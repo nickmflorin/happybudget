@@ -5,11 +5,10 @@ import { isNil } from "lodash";
 /* eslint-disable indent */
 const useFormattedValue = <
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 >(
-  props: Table.ValueCellProps<R, M, G, S>
+  props: Table.ValueCellProps<R, M, S>
 ) => {
   const formatterParams = useMemo<ValueFormatterParams | null>(
     () =>

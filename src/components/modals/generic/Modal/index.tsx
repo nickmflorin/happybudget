@@ -3,11 +3,11 @@ import { Modal as RootModal } from "antd";
 import { ModalProps as RootModalProps } from "antd/lib/modal";
 import { RenderWithSpinner } from "components";
 
-import ModalTitle from "./ModalTitle";
+export { default as ModalTitle } from "./ModalTitle";
 
 export interface ModalProps extends RootModalProps {
-  loading?: boolean;
-  children: ReactNode;
+  readonly loading?: boolean;
+  readonly children: ReactNode;
 }
 
 const Modal = ({
@@ -29,9 +29,4 @@ const Modal = ({
   );
 };
 
-const exportable = {
-  Modal: Modal,
-  Title: ModalTitle
-};
-
-export default exportable;
+export default Modal;

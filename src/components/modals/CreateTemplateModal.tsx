@@ -6,7 +6,7 @@ import { Form } from "components";
 import { TemplateForm } from "components/forms";
 import { useLoggedInUser } from "store/hooks";
 
-import Modal from "./Modal";
+import { Modal } from "./generic";
 
 interface CreateTemplateModalProps {
   onSuccess: (template: Model.Template) => void;
@@ -24,9 +24,10 @@ const CreateTemplateModal = ({
   const user = useLoggedInUser();
   const [file, setFile] = useState<UploadedImage | null>(null);
   const [form] = Form.useForm<Http.TemplatePayload>({ isInModal: true });
+  const cancelToken = api.useCancelToken();
 
   return (
-    <Modal.Modal
+    <Modal
       title={"Create Template"}
       visible={open}
       onCancel={() => onCancel()}
@@ -43,7 +44,7 @@ const CreateTemplateModal = ({
               service = api.createCommunityTemplate;
             }
             form.setLoading(true);
-            service({ ...values, image: !isNil(file) ? file.data : null })
+            service({ ...values, image: !isNil(file) ? file.data : null }, { cancelToken: cancelToken() })
               .then((template: Model.Template) => {
                 form.resetFields();
                 onSuccess(template);
@@ -61,7 +62,7 @@ const CreateTemplateModal = ({
       }}
     >
       <TemplateForm form={form} onImageChange={(f: UploadedImage | null) => setFile(f)} initialValues={{}} />
-    </Modal.Modal>
+    </Modal>
   );
 };
 

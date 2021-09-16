@@ -7,12 +7,7 @@ import { ModelTagsMenu } from "components/menus";
 import { framework } from "components/tabling/generic";
 
 export interface FringesEditorProps
-  extends Table.EditorParams<
-    Tables.SubAccountRowData,
-    Model.SubAccount,
-    Model.BudgetGroup,
-    Tables.SubAccountTableStore
-  > {
+  extends Table.EditorParams<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore> {
   readonly onAddFringes: () => void;
   readonly colId: keyof Tables.SubAccountRowData;
 }
@@ -24,7 +19,6 @@ const FringesEditor = (props: FringesEditorProps, ref: ForwardedRef<any>) => {
     ID[],
     Tables.SubAccountRowData,
     Model.SubAccount,
-    Model.BudgetGroup,
     Tables.SubAccountTableStore
   >({
     ...props,

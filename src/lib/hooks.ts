@@ -28,7 +28,7 @@ export const useDynamicCallback = <T = any>(callback: (...args: any[]) => T) => 
 export type DeepEqualCheck = "lodash" | "dequal" | "fast";
 
 export const deepCompareFn = (method?: DeepEqualCheck) => {
-  method = method || "dequal";
+  method = method || "lodash";
   return {
     lodash: isEqual,
     dequal: deepEqual,
@@ -45,7 +45,7 @@ export const deepMemo = (c: React.ComponentType<any>, method?: DeepEqualCheck) =
 export const useDeepEqualMemoDeps = (value: DependencyList, method?: DeepEqualCheck) => {
   const ref = useRef<DependencyList>();
   const signalRef = useRef<number>(0);
-  if (!deepCompare(value, ref.current, method || "dequal")) {
+  if (!deepCompare(value, ref.current, method || "lodash")) {
     ref.current = value;
     signalRef.current += 1;
   }

@@ -8,7 +8,7 @@ const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
 interface FringesColorEditorProps
-  extends Table.EditorParams<Tables.FringeRowData, Model.Fringe, Model.Group, Tables.FringeTableStore> {
+  extends Table.EditorParams<Tables.FringeRowData, Model.Fringe, Tables.FringeTableStore> {
   value: string | null;
 }
 

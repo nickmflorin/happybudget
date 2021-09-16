@@ -17,7 +17,7 @@ export const listResponseReducerTransformers = <M, S extends Redux.ListResponseS
 
 /* eslint-disable indent */
 export const modelListResponseReducerTransformers = <
-  M extends Model.Model,
+  M extends Model.HttpModel,
   S extends Redux.ModelListResponseStore<M> | Redux.ModelListResponseStore<M>
 >(
   initialState: S

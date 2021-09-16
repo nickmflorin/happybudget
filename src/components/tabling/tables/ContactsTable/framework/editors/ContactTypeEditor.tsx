@@ -9,7 +9,6 @@ const ContactTypeEditor = (
       Model.ContactType,
       Tables.ContactRowData,
       Model.Contact,
-      Model.Group,
       Tables.ContactTableStore
     >,
     "models" | "searchIndices"
@@ -17,7 +16,7 @@ const ContactTypeEditor = (
   ref: ForwardedRef<any>
 ) => {
   return (
-    <ChoiceSelectEditor<Model.ContactType, Tables.ContactRowData, Model.Contact, Model.Group, Tables.ContactTableStore>
+    <ChoiceSelectEditor<Model.ContactType, Tables.ContactRowData, Model.Contact, Tables.ContactTableStore>
       searchIndices={["name"]}
       models={model.models.ContactTypes}
       ref={ref}

@@ -7,28 +7,21 @@ import { tabling, hooks } from "lib";
 import { framework as generic } from "components/tabling/generic";
 import Grid, { GridProps } from "./Grid";
 
-export interface AuthenticatedGridProps<
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
-> extends GridProps<R, M, G> {
+export interface AuthenticatedGridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
+  extends GridProps<R, M> {
   readonly apis: Table.GridApis | null;
   readonly framework?: Table.Framework;
   readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
-  readonly onChangeEvent: (event: Table.ChangeEvent<R, M, G>) => void;
+  readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
   readonly onRowSelectionChanged?: (rows: Table.DataRow<R, M>[]) => void;
 }
 
 /* eslint-disable indent */
-const AuthenticatedGrid = <
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
->({
+const AuthenticatedGrid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>({
   framework,
   footerRowSelectors,
   ...props
-}: AuthenticatedGridProps<R, M, G>): JSX.Element => {
+}: AuthenticatedGridProps<R, M>): JSX.Element => {
   const frameworkComponents = useMemo<Table.FrameworkGroup>((): Table.FrameworkGroup => {
     const combinedFramework = tabling.aggrid.combineFrameworks(generic.Framework, framework);
     return {
@@ -51,14 +44,14 @@ const AuthenticatedGrid = <
     };
   }, [framework, props.id]);
 
-  const columns = useMemo<Table.Column<R, M, G>[]>((): Table.Column<R, M, G>[] => {
+  const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
     return map(
       props.columns,
-      (col: Table.Column<R, M, G>): Table.Column<R, M, G> =>
+      (col: Table.Column<R, M>): Table.Column<R, M> =>
         ({
           ...col,
           cellRendererParams: { ...col.cellRendererParams, onChangeEvent: props.onChangeEvent, readOnly: false }
-        } as Table.Column<R, M, G>)
+        } as Table.Column<R, M>)
     );
   }, [hooks.useDeepEqualMemo(props.columns)]);
 

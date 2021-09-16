@@ -9,7 +9,7 @@ namespace Table {
 
   type AgGridProps = import("@ag-grid-community/react/lib/interfaces").AgGridReactProps;
 
-  type NullValue = null | "" | 0 | [];
+  type NullValue<R extends Table.RowData> = R[keyof R];
   type ValueFormatter = (params: import("@ag-grid-community/core").ValueFormatterParams) => string | number | null;
 
   type GridApi = import("@ag-grid-community/core").GridApi;
@@ -65,109 +65,110 @@ namespace Table {
     readonly color?: string;
   }
 
-  type RowType = "placeholder" | "model" | "group";
+  type RowType = "placeholder" | "model" | "group" | "markup";
 
-  type PlaceholderRowId = `placeholder-${ID}`;
-  type GroupRowId = `group-${ID}`;
-  type RowID = ID | PlaceholderRowId | GroupRowId;
-  type DataRowID = ID | PlaceholderRowId;
+  type ModelRowId = number;
+  type PlaceholderRowId = `placeholder-${number}`;
+  type GroupRowId = `group-${number}`;
+  type MarkupRowId = `markup-${number}`;
+  type RowId = ModelRowId | PlaceholderRowId | GroupRowId | MarkupRowId;
+  type DataRowId = ModelRowId | PlaceholderRowId;
+  type EditableRowId = DataRowId | MarkupRowId;
+  type HttpEditableRowId = ModelRowId | MarkupRowId;
+
+  type RowNameLabelType = number | string | null;
+  type RowStringGetter<R extends Table.Row> = RowNameLabelType | FnWithTypedArgs<RowNameLabelType, [R]>;
 
   type RowData = object;
   type RowValue<R extends RowData> = Exclude<R[keyof R], undefined>;
 
-  type IRow<RowId extends RowID, TP extends RowType, D extends RowData, Grid extends GridId = GridId> = {
-    readonly id: RowId;
+  type IRow<RId extends RowId, TP extends RowType, D extends RowData, Grid extends GridId = GridId> = {
+    readonly id: RId;
     readonly rowType: TP;
     readonly gridId: Grid;
     readonly data: D;
-    readonly name?: string | number | null;
-    readonly label?: string | number | null;
   };
 
-  type ModelRow<D extends RowData, M extends Model.Model = Model.Model> = IRow<ID, "model", D> & {
-    readonly children: ID[] | null;
-    readonly model: M;
+  type ModelRow<R extends RowData, M extends Model.HttpModel = Model.HttpModel, Grid extends GridId = GridId> = IRow<
+    ModelRowId,
+    "model",
+    R,
+    Grid
+  > & {
+    readonly children: number[];
+    readonly modelData: Omit<M, "id" | "children">;
   };
   type PlaceholderRow<R extends RowData> = IRow<PlaceholderRowId, "placeholder", R, "data">;
-  type GroupRow<R extends RowData> = Omit<IRow<GroupRowId, "group", R, "data">, "group"> & {
-    readonly group: ID;
-    readonly children: ID[];
-    readonly color: string | null;
-    readonly name: string | null;
+  type GroupRow<R extends RowData> = IRow<GroupRowId, "group", R, "data"> & {
+    readonly group: number;
+    readonly children: number[];
+    readonly children_markups: number[];
+    readonly groupData: Pick<Model.Group, "name" | "color">;
+  };
+  type MarkupRow<R extends RowData> = IRow<MarkupRowId, "markup", R, "data"> & {
+    readonly markup: number;
+    readonly children: number[];
+    readonly markupData: Pick<Model.Markup, "unit" | "rate">;
   };
 
-  type Row<D extends RowData, M extends Model.Model = Model.Model> = ModelRow<D, M> | PlaceholderRow<D> | GroupRow<D>;
-  type DataRow<D extends RowData, M extends Model.Model = Model.Model> = ModelRow<D, M> | PlaceholderRow<D>;
+  type Row<D extends RowData = object, M extends Model.HttpModel = Model.HttpModel> =
+    | ModelRow<D, M>
+    | PlaceholderRow<D>
+    | GroupRow<D>
+    | MarkupRow<D>;
 
-  type RowNameLabelType = number | string | null;
-  type RowStringGetter<ARGS extends any[]> = RowNameLabelType | FnWithTypedArgs<RowNameLabelType, ARGS>;
+  type DataRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> = ModelRow<D, M> | PlaceholderRow<D>;
+  type NonGroupRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> = DataRow<D, M> | MarkupRow<D>;
+  type NonMarkupRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> = DataRow<D, M> | GroupRow<D>;
+
+  type EditableRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> =
+    | ModelRow<D, M>
+    | PlaceholderRow<D>
+    | MarkupRow<D>;
+  type HttpEditableRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> =
+    | ModelRow<D, M>
+    | MarkupRow<D>;
+  type EditableNonDataRow<D extends RowData> = MarkupRow<D>;
+  type EditableRowType = "model" | "placeholder" | "markup";
+
+  type CreateRowDataConfig<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {
+    readonly columns: Table.AnyColumn<R, M>[];
+    readonly defaultNullValue?: NullValue<R>;
+    readonly getValue: (field: keyof R, col: Table.AnyColumn<R, M>) => R[keyof R] | undefined;
+  };
+
+  type UpdateRowDataConfig<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = Omit<
+    CreateRowDataConfig<R, M>,
+    "getValue"
+  > & {
+    readonly data: R;
+    readonly update?: Partial<R>;
+    readonly getValue: (field: keyof R, curr: R[keyof R], col: Table.AnyColumn<R, M>) => R[keyof R] | undefined;
+  };
 
   type CreateRowConfig<
-    ARGS extends any[],
+    RId extends Table.RowId,
+    TP extends Table.RowType,
     R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > = {
-    readonly columns: Table.AnyColumn<R, M, G>[];
-    readonly defaultNullValue?: Table.NullValue;
-    // Because these will not necessarily update when the underlying row changes,
-    // we should probably remove these from the row meta.
-    readonly getRowName?: RowStringGetter<ARGS>;
-    readonly getRowLabel?: RowStringGetter<ARGS>;
-    readonly gridId: Table.GridId;
-  };
-
-  type CreateModelRowConfig<R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = CreateRowConfig<
-    [R, M],
-    R,
-    M,
-    G
-  > & {
+    M extends Model.HttpModel = Model.HttpModel,
+    Grid extends GridId = GridId
+  > = Omit<CreateRowDataConfig<R, M>, "getValue"> & {
+    readonly id: RId;
+    readonly rowType: TP;
     readonly data: R;
-    readonly model: M;
-    readonly getRowChildren?: (m: M) => ID[];
-  };
-
-  type CreatePlaceholderRowConfig<R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = Omit<
-    CreateRowConfig<[R], R, M, G>,
-    "gridId"
-  > & {
-    readonly id: Table.PlaceholderRowId;
-    readonly data: R;
-  };
-
-  type CreateGroupRowConfig<
-    R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > = Omit<CreateRowConfig<[G], R, M, G>, "group" | "gridId"> & {
-    readonly group: G;
+    readonly gridId: Grid;
   };
 
   type CreateTableDataConfig<
     R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
+    M extends Model.TypedHttpModel = Model.TypedHttpModel,
+    C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
   > = {
-    readonly ordering?: FieldOrder<keyof R>[];
-    readonly groups?: G[];
-    readonly models: M[];
-
-    readonly columns: Table.AnyColumn<R, M, G>[];
-    readonly defaultNullValue?: Table.NullValue;
-    readonly getModelRowChildren?: (m: M) => ID[];
-
-    // Because these will not necessarily update when the underlying row changes,
-    // we should probably remove these from the row meta.
-    readonly getModelRowLabel?: RowStringGetter<[R, M]>;
-    readonly getGroupRowLabel?: RowStringGetter<[G | null]>;
-    readonly getPlaceholderRowLabel?: RowStringGetter<[R]>;
-
-    // Because these will not necessarily update when the underlying row changes,
-    // we should probably remove these from the row meta.
-    readonly getModelRowName?: RowStringGetter<[R, M]>;
-    readonly getGroupRowName?: RowStringGetter<[G | null]>;
-    readonly getPlaceholderRowName?: RowStringGetter<[R]>;
+    readonly response: Http.TableResponse<M>;
+    readonly gridId: Table.GridId;
+    readonly columns: C[];
+    readonly defaultNullValue?: NullValue<R>;
+    readonly getModelRowChildren?: (m: M) => number[];
   };
 
   type ColumnTypeId =
@@ -182,10 +183,11 @@ namespace Table {
     | "sum"
     | "percentage"
     | "date"
+    | "fake"
     | "action";
 
   type ColumnAlignment = "right" | "left" | null;
-  type TableColumnTypeId = "action" | "body" | "calculated";
+  type TableColumnTypeId = "action" | "body" | "calculated" | "fake";
 
   interface ColumnType {
     readonly id: ColumnTypeId;
@@ -196,13 +198,9 @@ namespace Table {
     readonly headerOverrides?: Omit<Partial<ColumnType>, "id" | "editorIsPopup" | "icon" | "pdfOverrides">;
   }
 
-  type CellCallbackParams<
-    R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > = {
-    readonly column: Column<R, M, G>;
-    readonly row: Table.DataRow<R, M>;
+  type CellCallbackParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
+    readonly column: Column<R, M>;
+    readonly row: Table.Row<R, M>;
   };
 
   type RawClassName = string | string[] | undefined | { [key: string]: boolean };
@@ -217,29 +215,25 @@ namespace Table {
 
   type ColSpanParams<
     R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
+    M extends Model.HttpModel = Model.HttpModel
   > = import("@ag-grid-community/core").ColSpanParams & {
-    readonly columns: Column<R, M, G>[];
+    readonly columns: Column<R, M>[];
   };
 
   type ColumnDomain = "pdf" | "aggrid";
 
   // Column Type for Both PDF and AG Grid Tables
-  interface BaseColumn<R extends RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> {
-    readonly field: keyof R;
+  interface BaseColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel> {
+    readonly field?: keyof R;
     readonly headerName: string;
     readonly columnType: ColumnTypeId;
     readonly tableColumnType: TableColumnTypeId;
-    readonly nullValue?: NullValue;
+    readonly nullValue?: NullValue<R>;
     readonly index?: number;
     readonly domain: ColumnDomain;
-    // If provided, this column will populate the values for Group Rows based on this field on the Group.
-    readonly groupField?: keyof G;
-    // If provided, this column will populate the values for teh Group Rows based on the same field
-    // as this column, so as long as groupField is not provided.
-    readonly applicableForGroup?: boolean;
     readonly getRowValue?: (m: M) => R[keyof R];
+    readonly getMarkupValue?: keyof Model.Markup | ((rows: Table.NonGroupRow<R, M>[]) => R[keyof R]);
+    readonly getGroupValue?: keyof Model.Group | ((rows: Table.NonGroupRow<R, M>[]) => R[keyof R]);
   }
 
   type OmitColDefParams =
@@ -253,20 +247,17 @@ namespace Table {
     | "editable"
     | "onCellDoubleClicked";
 
-  interface Column<
-    R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    V extends RowValue<R> = any
-  > extends Omit<ColDef, OmitColDefParams>,
-      Omit<BaseColumn<R, M, G>, "domain"> {
+  interface Column<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V extends RowValue<R> = any>
+    extends Omit<ColDef, OmitColDefParams>,
+      Omit<BaseColumn<R, M>, "domain"> {
     readonly domain: "aggrid";
-    readonly selectable?: boolean | ((params: CellCallbackParams<R, M, G>) => boolean) | undefined;
-    readonly editable?: boolean | ((params: CellCallbackParams<R, M, G>) => boolean) | undefined;
-    readonly footer?: FooterColumn<R, M, G>;
-    readonly page?: FooterColumn<R, M, G>;
+    readonly selectable?: boolean | ((params: CellCallbackParams<R, M>) => boolean) | undefined;
+    readonly editable?: boolean | ((params: CellCallbackParams<R, M>) => boolean);
+    readonly footer?: FooterColumn<R, M>;
+    readonly page?: FooterColumn<R, M>;
     readonly isRead?: boolean;
     readonly isWrite?: boolean;
+    readonly isFake?: boolean;
     readonly cellRenderer?: string | Partial<GridSet<string>>;
     readonly cellClass?: CellClassName;
     readonly cellStyle?: React.CSSProperties;
@@ -274,33 +265,30 @@ namespace Table {
     readonly canBeHidden?: boolean;
     readonly canBeExported?: boolean;
     readonly requiresAuthentication?: boolean;
-    readonly colSpan?: (params: ColSpanParams<R, M, G>) => number;
-    readonly onCellFocus?: (params: CellFocusedParams<R, M, G>) => void;
-    readonly onCellUnfocus?: (params: CellFocusedParams<R, M, G>) => void;
-    readonly refreshColumns?: (change: SoloCellChange<R, V>) => keyof R | (keyof R)[] | null;
+    readonly colSpan?: (params: ColSpanParams<R, M>) => number;
+    readonly onCellFocus?: (params: CellFocusedParams<R, M>) => void;
+    readonly onCellUnfocus?: (params: CellFocusedParams<R, M>) => void;
+    readonly refreshColumns?: (change: CellChange<R, V>) => keyof R | (keyof R)[] | null;
     readonly getHttpValue?: (value: any) => any;
     readonly processCellForClipboard?: (row: R) => string;
     readonly processCellFromClipboard?: (value: string) => any;
     readonly onCellDoubleClicked?: (row: Table.DataRow<R, M>) => void;
   }
 
-  type AnyColumn<R extends RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> =
-    | Column<R, M, G>
-    | PdfTable.Column<R, M, G>;
+  type AnyColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = Column<R, M> | PdfTable.Column<R, M>;
 
-  interface FooterColumn<R extends RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group>
-    extends Pick<Column<R, M, G>, "colSpan"> {
+  interface FooterColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel>
+    extends Pick<Column<R, M>, "colSpan"> {
     readonly cellStyle?: React.CSSProperties;
   }
 
   interface CookieNames {
-    readonly ordering?: string;
     readonly hiddenColumns?: string;
   }
 
-  type TableInstance<R extends RowData = any, M extends Model.Model = any, G extends Model.Group = Model.Group> = {
-    readonly applyTableChange: (event: ChangeEvent<R, M, G>) => void;
-    readonly applyGroupColorChange: (group: G) => void;
+  type TableInstance<R extends RowData = object, M extends Model.HttpModel = any> = {
+    readonly applyTableChange: (event: ChangeEvent<R, M>) => void;
+    readonly applyGroupColorChange: (group: Model.Group) => void;
     readonly getCSVData: (fields?: string[]) => CSVData;
     readonly changeColumnVisibility: (changes: SingleOrArray<ColumnVisibilityChange<R>>, sizeToFit?: boolean) => void;
   };
@@ -318,92 +306,79 @@ namespace Table {
     readonly render?: RenderFunc;
   };
 
-  type MenuActionParams<R extends RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = {
+  type MenuActionParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
     readonly apis: GridApis;
-    readonly columns: Column<R, M, G>[];
-    readonly hiddenColumns: (keyof R)[];
+    readonly columns: Column<R, M>[];
+    readonly hiddenColumns: (keyof R | string)[];
   };
   type UnauthenticatedMenuActionParams<
     R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > = MenuActionParams<R, M, G>;
-  type AuthenticatedMenuActionParams<
-    R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > = MenuActionParams<R, M, G> & {
+    M extends Model.HttpModel = Model.HttpModel
+  > = MenuActionParams<R, M>;
+  type AuthenticatedMenuActionParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = MenuActionParams<
+    R,
+    M
+  > & {
     readonly selectedRows: Table.DataRow<R, M>[];
   };
 
   type MenuActionCallback<
     V,
     R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    T extends MenuActionParams<R, M, G> = MenuActionParams<R, M, G>
+    M extends Model.HttpModel = Model.HttpModel,
+    T extends MenuActionParams<R, M> = MenuActionParams<R, M>
   > = (params: T) => V;
   type MenuAction<
     R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    T extends MenuActionParams<R, M, G> = MenuActionParams<R, M, G>
-  > = MenuActionObj | MenuActionCallback<MenuActionObj, R, M, G, T>;
+    M extends Model.HttpModel = Model.HttpModel,
+    T extends MenuActionParams<R, M> = MenuActionParams<R, M>
+  > = MenuActionObj | MenuActionCallback<MenuActionObj, R, M, T>;
   type MenuActions<
     R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    T extends MenuActionParams<R, M, G> = MenuActionParams<R, M, G>
-  > = Array<MenuAction<R, M, G, T>> | MenuActionCallback<MenuAction<R, M, G, T>[], R, M, G, T>;
+    M extends Model.HttpModel = Model.HttpModel,
+    T extends MenuActionParams<R, M> = MenuActionParams<R, M>
+  > = Array<MenuAction<R, M, T>> | MenuActionCallback<MenuAction<R, M, T>[], R, M, T>;
 
-  type UnauthenticatedMenuAction<
-    R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > = MenuAction<R, M, G, UnauthenticatedMenuActionParams<R, M, G>>;
-  type AuthenticatedMenuAction<
-    R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > = MenuAction<R, M, G, AuthenticatedMenuActionParams<R, M, G>>;
-  type UnauthenticatedMenuActions<
-    R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > = MenuActions<R, M, G, UnauthenticatedMenuActionParams<R, M, G>>;
-  type AuthenticatedMenuActions<
-    R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > = MenuActions<R, M, G, AuthenticatedMenuActionParams<R, M, G>>;
+  type UnauthenticatedMenuAction<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = MenuAction<
+    R,
+    M,
+    UnauthenticatedMenuActionParams<R, M>
+  >;
+  type AuthenticatedMenuAction<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = MenuAction<
+    R,
+    M,
+    AuthenticatedMenuActionParams<R, M>
+  >;
+  type UnauthenticatedMenuActions<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = MenuActions<
+    R,
+    M,
+    UnauthenticatedMenuActionParams<R, M>
+  >;
+  type AuthenticatedMenuActions<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = MenuActions<
+    R,
+    M,
+    AuthenticatedMenuActionParams<R, M>
+  >;
 
   interface ColumnVisibilityChange<R extends RowData> {
-    readonly field: keyof R;
+    readonly field: keyof R | string;
     readonly visible: boolean;
   }
 
-  type Cell<R extends RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = {
+  type Cell<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
     readonly row: Table.Row<R, M>;
-    readonly column: Column<R, M, G>;
+    readonly column: Column<R, M>;
     readonly rowNode: import("@ag-grid-community/core").RowNode;
   };
 
-  type CellFocusedParams<
-    R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > = {
-    readonly cell: Cell<R, M, G>;
+  type CellFocusedParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
+    readonly cell: Cell<R, M>;
     readonly apis: GridApis;
   };
 
-  type CellFocusChangedParams<
-    R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > = {
-    readonly cell: Cell<R, M, G>;
-    readonly previousCell: Cell<R, M, G> | null;
+  type CellFocusChangedParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
+    readonly cell: Cell<R, M>;
+    readonly previousCell: Cell<R, M> | null;
     readonly apis: GridApis;
   };
 
@@ -414,7 +389,11 @@ namespace Table {
     | "rowRemoveFromGroup"
     | "rowAddToGroup"
     | "groupUpdate"
-    | "groupAdd";
+    | "groupAdd"
+    | "rowRemoveFromMarkup"
+    | "rowAddToMarkup"
+    | "markupAdd"
+    | "markupUpdate";
 
   type BaseChangeEvent = {
     readonly type: ChangeEventId;
@@ -432,19 +411,25 @@ namespace Table {
 
   type SoloCellChange<
     R extends RowData,
+    M extends Model.HttpModel,
+    RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>,
     V extends RowValue<R> = RowValue<R>
   > = CellChange<R, V> & {
     readonly field: keyof R;
-    readonly id: Table.DataRowID;
+    readonly id: RW["id"];
+    readonly row: RW;
   };
 
-  type RowChangeData<R extends RowData, M extends Model.Model = Model.Model> = Partial<
-    { [Property in keyof R]-?: CellChange<R, RowValue<R>> }
-  >;
+  type RowChangeData<R extends RowData> = Partial<{ [Property in keyof R]-?: CellChange<R, RowValue<R>> }>;
 
-  type RowChange<R extends RowData, M extends Model.Model = Model.Model> = {
-    readonly id: Table.RowID;
-    readonly data: RowChangeData<R, M>;
+  type RowChange<
+    R extends RowData,
+    M extends Model.HttpModel,
+    RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
+  > = {
+    readonly id: RW["id"];
+    readonly row: RW;
+    readonly data: RowChangeData<R>;
   };
 
   type RowAddData<R extends RowData> = Partial<{ [Property in keyof R]-?: CellAdd<R, RowValue<R>> }>;
@@ -456,13 +441,25 @@ namespace Table {
 
   type Add<R extends RowData> = RowAdd<R> | RowAdd<R>[];
 
-  type DataChangePayload<R extends RowData, M extends Model.Model = Model.Model> = RowChange<R, M> | RowChange<R, M>[];
+  type DataChangePayload<
+    R extends RowData,
+    M extends Model.HttpModel,
+    RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
+  > = RowChange<R, M, RW> | RowChange<R, M, RW>[];
 
-  type ConsolidatedChange<R extends RowData, M extends Model.Model = Model.Model> = RowChange<R, M>[];
+  type ConsolidatedChange<
+    R extends RowData,
+    M extends Model.HttpModel,
+    RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
+  > = RowChange<R, M, RW>[];
 
-  type DataChangeEvent<R extends RowData, M extends Model.Model = Model.Model> = {
+  type DataChangeEvent<
+    R extends RowData,
+    M extends Model.HttpModel,
+    RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
+  > = {
     readonly type: "dataChange";
-    readonly payload: DataChangePayload<R, M>;
+    readonly payload: DataChangePayload<R, M, RW>;
   };
 
   type RowAddPayload<R extends RowData> = RowAdd<R> | RowAdd<R>[];
@@ -471,75 +468,116 @@ namespace Table {
     readonly payload: RowAddPayload<R>;
   };
 
-  type RowDeletePayload<R extends RowData, M extends Model.Model = Model.Model> = {
-    readonly rows: SingleOrArray<Table.Row<R, M>>;
+  type RowDeletePayload = {
+    readonly rows: SingleOrArray<ModelRowId | MarkupRowId | GroupRowId | PlaceholderRowId>;
   };
-  type RowDeleteEvent<R extends RowData, M extends Model.Model = Model.Model> = {
+  type RowDeleteEvent = {
     readonly type: "rowDelete";
-    readonly payload: RowDeletePayload<R, M>;
+    readonly payload: RowDeletePayload;
   };
 
-  type RowRemoveFromGroupPayload<R extends RowData, M extends Model.Model = Model.Model> = {
-    readonly rows: DataRowID[] | DataRowID;
+  type RowRemoveFromGroupPayload = {
+    readonly rows: SingleOrArray<ModelRowId | MarkupRowId>;
     readonly group: GroupRowId;
   };
-  type RowRemoveFromGroupEvent<R extends RowData, M extends Model.Model = Model.Model> = {
+  type RowRemoveFromGroupEvent = {
     readonly type: "rowRemoveFromGroup";
-    readonly payload: RowRemoveFromGroupPayload<R, M>;
+    readonly payload: RowRemoveFromGroupPayload;
   };
 
-  type RowAddToGroupPayload<R extends RowData, M extends Model.Model = Model.Model> = {
+  type RowRemoveFromMarkupPayload = {
+    readonly rows: SingleOrArray<ModelRowId | GroupRowId>;
+    readonly markup: MarkupRowId;
+  };
+  type RowRemoveFromMarkupEvent = {
+    readonly type: "rowRemoveFromMarkup";
+    readonly payload: RowRemoveFromMarkupPayload;
+  };
+
+  type RowAddToGroupPayload = {
     readonly group: GroupRowId;
-    readonly rows: DataRowID[] | DataRowID;
+    readonly rows: SingleOrArray<ModelRowId | MarkupRowId>;
   };
-  type RowAddToGroupEvent<R extends RowData, M extends Model.Model = Model.Model> = {
+  type RowAddToGroupEvent = {
     readonly type: "rowAddToGroup";
-    readonly payload: RowAddToGroupPayload<R, M>;
+    readonly payload: RowAddToGroupPayload;
   };
 
-  type GroupAddPayload<G extends Model.Group = Model.Group> = G;
-  type GroupAddEvent<G extends Model.Group = Model.Group> = BaseChangeEvent & {
+  type RowAddToMarkupPayload = {
+    readonly markup: MarkupRowId;
+    readonly rows: SingleOrArray<ModelRowId | GroupRowId>;
+  };
+  type RowAddToMarkupEvent = {
+    readonly type: "rowAddToMarkup";
+    readonly payload: RowAddToMarkupPayload;
+  };
+
+  type GroupAddPayload = Model.Group;
+  type GroupAddEvent = {
     readonly type: "groupAdd";
-    readonly payload: GroupAddPayload<G>;
+    readonly payload: GroupAddPayload;
   };
 
-  type GroupUpdatePayload<G extends Model.Group = Model.Group> = Redux.UpdateActionPayload<G>;
-  type GroupUpdateEvent<G extends Model.Group = Model.Group> = BaseChangeEvent & {
+  type MarkupAddPayload = Model.Markup;
+  type MarkupAddEvent = {
+    readonly type: "markupAdd";
+    readonly payload: MarkupAddPayload;
+  };
+
+  type GroupUpdatePayload = Redux.UpdateActionPayload<Model.Group, number>;
+  type GroupUpdateEvent = {
     readonly type: "groupUpdate";
-    readonly payload: GroupUpdatePayload<G>;
+    readonly payload: GroupUpdatePayload;
   };
 
-  type ChangeEventTypeMap<R extends RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = {
-    dataChange: DataChangeEvent<R, M>;
+  type MarkupUpdatePayload = Redux.UpdateActionPayload<Model.Markup>;
+  type MarkupUpdateEvent = {
+    readonly type: "markupUpdate";
+    readonly payload: MarkupUpdatePayload;
+  };
+
+  type ChangeEventTypeMap<
+    R extends RowData,
+    M extends Model.HttpModel = Model.HttpModel,
+    RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
+  > = {
+    dataChange: DataChangeEvent<R, M, RW>;
     rowAdd: RowAddEvent<R>;
-    rowDelete: RowDeleteEvent<R, M>;
-    rowRemoveFromGroup: RowRemoveFromGroupEvent<R, M>;
-    rowAddToGroup: RowAddToGroupEvent<R, M>;
-    groupAdd: GroupAddEvent<G>;
-    groupUpdate: GroupUpdateEvent<G>;
-  }
+    rowDelete: RowDeleteEvent;
+    rowRemoveFromGroup: RowRemoveFromGroupEvent;
+    rowAddToGroup: RowAddToGroupEvent;
+    groupAdd: GroupAddEvent;
+    groupUpdate: GroupUpdateEvent;
+    markupAdd: MarkupAddEvent;
+    markupUpdate: MarkupUpdateEvent;
+    rowAddToMarkup: RowAddToMarkupEvent;
+    rowRemoveFromMarkup: RowRemoveFromMarkupEvent;
+  };
 
-  type ChangeEventTaskMap<R extends RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = Redux.TaskMapObject<ChangeEventTypeMap<R, M, G>>
+  type ChangeEventTaskMap<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = Redux.TaskMapObject<
+    ChangeEventTypeMap<R, M>
+  >;
 
-  type FullRowEvent<R extends RowData, M extends Model.Model = Model.Model> =
-    | RowDeleteEvent<R, M>
-    | RowRemoveFromGroupEvent<R, M>
-    | RowAddToGroupEvent<R, M>;
+  type FullRowEvent = RowDeleteEvent | RowRemoveFromGroupEvent | RowAddToGroupEvent;
 
-  type GroupEvent<R extends RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> =
-    | RowRemoveFromGroupEvent<R, M>
-    | RowAddToGroupEvent<R, M>
-    | GroupUpdateEvent<G>
-    | GroupAddEvent<G>;
+  type GroupEvent = RowRemoveFromGroupEvent | RowAddToGroupEvent | GroupUpdateEvent | GroupAddEvent;
 
-  type ChangeEvent<R extends RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> =
-    | DataChangeEvent<R, M>
+  type ChangeEvent<
+    R extends RowData,
+    M extends Model.HttpModel,
+    RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
+  > =
+    | DataChangeEvent<R, M, RW>
     | RowAddEvent<R>
-    | RowDeleteEvent<R, M>
-    | RowRemoveFromGroupEvent<R, M>
-    | RowAddToGroupEvent<R, M>
-    | GroupAddEvent<G>
-    | GroupUpdateEvent<G>;
+    | RowDeleteEvent
+    | RowRemoveFromGroupEvent
+    | RowAddToGroupEvent
+    | GroupAddEvent
+    | GroupUpdateEvent
+    | RowRemoveFromMarkupEvent
+    | RowAddToMarkupEvent
+    | MarkupAddEvent
+    | MarkupUpdateEvent;
 
   type CellDoneEditingEvent = import("react").SyntheticEvent | KeyboardEvent;
 
@@ -547,16 +585,15 @@ namespace Table {
   // does not work here.
   interface EditorParams<
     R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>,
+    M extends Model.HttpModel = Model.HttpModel,
+    S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
     V = any
   > {
     readonly value: V | null;
     readonly keyPress: number | null;
     readonly charPress: string | null;
-    readonly column: Column<R, M, G>;
-    readonly columns: Column<R, M, G>[];
+    readonly column: Column<R, M>;
+    readonly columns: Column<R, M>[];
     readonly colDef: import("@ag-grid-community/core").ColDef;
     readonly node: import("@ag-grid-community/core").RowNode;
     readonly data: any;
@@ -580,43 +617,41 @@ namespace Table {
 
   interface CellProps<
     R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>,
+    M extends Model.HttpModel = Model.HttpModel,
+    S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
     V = any
   > extends Omit<import("@ag-grid-community/core").ICellRendererParams, "value">,
       StandardComponentProps {
     readonly loading?: boolean;
     readonly hideClear?: boolean;
-    readonly customCol: Column<R, M, G>;
+    readonly customCol: Column<R, M>;
     readonly value: V;
     readonly gridId: Table.GridId;
+    readonly icon?: IconOrElement | ((row: Table.Row<R, M>) => IconOrElement | undefined | null);
     // Note: This is only applied for the data grid rows/cells - so we have to be careful.  We need
     // a better way of establishing which props are available to cells based on which grid they lie
     // in,
     readonly getRowColorDef: (row: Table.Row<R, M>) => Table.RowColorDef;
     readonly selector: (state: Application.Store) => S;
-    readonly onClear?: (row: Table.Row<R, M>, column: Column<R, M, G>) => void;
-    readonly showClear?: (row: Table.Row<R, M>, column: Column<R, M, G>) => boolean;
+    readonly onClear?: (row: Table.Row<R, M>, column: Column<R, M>) => void;
+    readonly showClear?: (row: Table.Row<R, M>, column: Column<R, M>) => boolean;
     readonly onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
-    readonly onChangeEvent?: (event: ChangeEvent<R, M, G>) => void;
+    readonly onChangeEvent?: (event: ChangeEvent<R, M>) => void;
   }
 
   type CellWithChildrenProps<
     R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
-  > = Omit<CellProps<R, M, G, S>, "value"> & {
+    M extends Model.HttpModel = Model.HttpModel,
+    S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  > = Omit<CellProps<R, M, S>, "value"> & {
     readonly children: import("react").ReactNode;
   };
 
   type ValueCellProps<
     R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
-  > = CellProps<R, M, G, S, string | number | null> & {
+    M extends Model.HttpModel = Model.HttpModel,
+    S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  > = CellProps<R, M, S, string | number | null> & {
     // This is used for extending cells.  Normally, the value formatter will be included on the ColDef
     // of the associated column.  But when extending a Cell, we sometimes want to provide a formatter
     // for that specific cell.
@@ -627,38 +662,36 @@ namespace Table {
 
   type TaskConfig<
     R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    A extends Redux.TableActionMap<M, G> = Redux.TableActionMap<M, G>
+    M extends Model.HttpModel = Model.HttpModel,
+    A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
   > = Redux.TaskConfig<A> & {
-    readonly columns: Table.Column<R, M, G>[];
+    readonly columns: Table.Column<R, M>[];
   };
 
   type ReducerConfig<
     R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>,
-    A extends Redux.TableActionMap<M, G> = Redux.TableActionMap<M, G>
-  > = TaskConfig<R, M, G, A> &
-    Omit<CreateTableDataConfig<R, M, G>, "models" | "groups" | "columns"> & {
+    M extends Model.TypedHttpModel = Model.TypedHttpModel,
+    S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+    A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>,
+    CFG extends CreateTableDataConfig<R, M, Table.Column<R, M>> = CreateTableDataConfig<R, M, Table.Column<R, M>>
+  > = TaskConfig<R, M, A> &
+    Omit<CFG, "gridId" | "response"> & {
       readonly initialState: S;
       readonly tableId: Table.Id;
+      readonly createTableRows?: (config: CFG) => Table.Row<R, M>[];
     };
 
   type SagaConfig<
     R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    A extends Redux.TableActionMap<M, G> = Redux.TableActionMap<M, G>
-  > = Redux.SagaConfig<Redux.TableTaskMap<R, M, G>, A>;
+    M extends Model.HttpModel = Model.HttpModel,
+    A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
+  > = Redux.SagaConfig<Redux.TableTaskMap<R, M>, A>;
 
   type StoreConfig<
     R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>,
-    A extends Redux.TableActionMap<M, G> = Redux.TableActionMap<M, G>
+    M extends Model.HttpModel = Model.HttpModel,
+    S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+    A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
   > = {
     readonly autoRequest?: boolean;
     readonly asyncId?: Table.AsyncId;
@@ -672,13 +705,9 @@ namespace Table {
 namespace PdfTable {
   type CellLocation = { index: number; colIndex: number };
 
-  type CellCallbackParams<
-    R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > = {
+  type CellCallbackParams<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {
     readonly location: PdfTable.CellLocation;
-    readonly column: PdfTable.Column<R, M, G>;
+    readonly column: PdfTable.Column<R, M>;
     readonly row: Table.Row<R, M>;
     readonly isHeader: boolean;
     readonly rawValue: any;
@@ -686,53 +715,34 @@ namespace PdfTable {
     readonly indented: boolean;
   };
 
-  type CellCallback<
-    R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    V = any
-  > = (params: PdfTable.CellCallbackParams<R, M, G>) => V;
+  type CellCallback<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = any> = (
+    params: PdfTable.CellCallbackParams<R, M>
+  ) => V;
 
-  type OptionalCellCallback<
-    R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    V = any
-  > = V | CellCallback<R, M, G, V> | undefined;
+  type OptionalCellCallback<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = any> =
+    | V
+    | CellCallback<R, M, V>
+    | undefined;
 
-  interface _CellClassName<
-    R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > {
-    [n: number]: OptionalCellCallback<R, M, G, string> | _CellClassName<R, M, G>;
+  interface _CellClassName<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
+    [n: number]: OptionalCellCallback<R, M, string> | _CellClassName<R, M>;
   }
-  type CellClassName<
-    R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > = OptionalCellCallback<R, M, G, string> | _CellClassName<R, M, G>;
+  type CellClassName<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> =
+    | OptionalCellCallback<R, M, string>
+    | _CellClassName<R, M>;
 
-  interface _CellStyle<
-    R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > {
-    [n: number]: OptionalCellCallback<R, M, G, import("@react-pdf/types").Style> | _CellStyle<R, M, G>;
+  interface _CellStyle<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
+    [n: number]: OptionalCellCallback<R, M, import("@react-pdf/types").Style> | _CellStyle<R, M>;
   }
-  type CellStyle<R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> =
-    | OptionalCellCallback<R, M, G, import("@react-pdf/types").Style>
-    | _CellStyle<R, M, G>;
+  type CellStyle<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> =
+    | OptionalCellCallback<R, M, import("@react-pdf/types").Style>
+    | _CellStyle<R, M>;
 
-  type CellStandardProps<
-    R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > = {
-    readonly style?: CellStyle<R, M, G>;
-    readonly className?: CellClassName<R, M, G>;
-    readonly textStyle?: CellStyle<R, M, G>;
-    readonly textClassName?: CellClassName<R, M, G>;
+  type CellStandardProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {
+    readonly style?: CellStyle<R, M>;
+    readonly className?: CellClassName<R, M>;
+    readonly textStyle?: CellStyle<R, M>;
+    readonly textClassName?: CellClassName<R, M>;
   };
 
   interface FooterColumn {
@@ -742,19 +752,19 @@ namespace PdfTable {
 
   type Formatter = (value: string | number) => string;
 
-  interface Column<R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group>
-    extends Omit<Table.BaseColumn<R, M, G>, "domain"> {
+  interface Column<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
+    extends Omit<Table.BaseColumn<R, M>, "domain"> {
     readonly domain: "pdf";
     // In the PDF case, since we cannot dynamically resize columns, the width refers to a ratio
     // of the column width to the overall table width assuming that all columns are present.  When
     // columns are hidden/shown, this ratio is adjusted.
     readonly width: number;
-    readonly cellProps?: CellStandardProps<R, M, G>;
-    readonly headerCellProps?: CellStandardProps<R, M, G>;
+    readonly cellProps?: CellStandardProps<R, M>;
+    readonly headerCellProps?: CellStandardProps<R, M>;
     readonly footer?: FooterColumn;
-    readonly cellContentsVisible?: OptionalCellCallback<R, M, G, boolean>;
+    readonly cellContentsVisible?: OptionalCellCallback<R, M, boolean>;
     readonly formatter?: PdfTable.Formatter;
-    readonly cellRenderer?: (params: PdfTable.CellCallbackParams<R, M, G>) => JSX.Element;
+    readonly cellRenderer?: (params: PdfTable.CellCallbackParams<R, M>) => JSX.Element;
     // NOTE: This only applies for the individual Account tables, not gf the overall
     // Accounts table.
     readonly childFooter?: (s: M) => FooterColumn;

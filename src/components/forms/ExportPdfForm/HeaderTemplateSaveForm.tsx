@@ -22,11 +22,11 @@ interface HeaderTemplateSaveFormProps extends StandardComponentProps {
   readonly saving: boolean;
   readonly onSave: (name?: string) => void;
   readonly loading: boolean;
-  readonly onLoad: (id: ID) => void;
+  readonly onLoad: (id: number) => void;
   readonly onClear: () => void;
   readonly value: Model.HeaderTemplate | null;
   readonly templates: Model.HeaderTemplate[];
-  readonly onHeaderTemplateDeleted: (id: ID) => void;
+  readonly onHeaderTemplateDeleted: (id: number) => void;
 }
 
 const HeaderTemplateSaveForm = (
@@ -49,7 +49,7 @@ const HeaderTemplateSaveForm = (
   const [saveAsMode, setSaveAsMode] = useState(false);
   const [requestNameInput, setRequestNameInput] = useState(false);
   const [name, setName] = useState<string>("");
-  const [deleting, setDeleting] = useState<ID | null>(null);
+  const [deleting, setDeleting] = useState<number | null>(null);
 
   useImperativeHandle(ref, () => ({
     setRequestNameInput,
@@ -73,7 +73,7 @@ const HeaderTemplateSaveForm = (
             value={value}
             templates={templates}
             deleting={deleting}
-            onDelete={(id: ID) => {
+            onDelete={(id: number) => {
               setDeleting(id);
               api
                 .deleteHeaderTemplate(id)

@@ -50,7 +50,7 @@ export const updateBudgetInStateAction = createAction<Redux.UpdateActionPayload<
   ActionType.Budgets.UpdateInState
 );
 export const addBudgetToStateAction = createAction<Model.SimpleBudget>(ActionType.Budgets.AddToState);
-export const removeBudgetFromStateAction = createAction<ID>(ActionType.Budgets.RemoveFromState);
+export const removeBudgetFromStateAction = createAction<number>(ActionType.Budgets.RemoveFromState);
 
 export const requestTemplatesAction = createAction<null>(ActionType.Templates.Request);
 export const loadingTemplatesAction = createAction<boolean>(ActionType.Templates.Loading);
@@ -62,7 +62,7 @@ export const updateTemplateInStateAction = createAction<Redux.UpdateActionPayloa
   ActionType.Templates.UpdateInState
 );
 export const addTemplateToStateAction = createAction<Model.SimpleTemplate>(ActionType.Templates.AddToState);
-export const removeTemplateFromStateAction = createAction<ID>(ActionType.Templates.RemoveFromState);
+export const removeTemplateFromStateAction = createAction<number>(ActionType.Templates.RemoveFromState);
 
 export const requestCommunityTemplatesAction = createAction<null>(ActionType.Community.Request);
 export const loadingCommunityTemplatesAction = createAction<boolean>(ActionType.Community.Loading);
@@ -74,7 +74,7 @@ export const updateCommunityTemplateInStateAction = createAction<Redux.UpdateAct
   ActionType.Community.UpdateInState
 );
 export const addCommunityTemplateToStateAction = createAction<Model.SimpleTemplate>(ActionType.Community.AddToState);
-export const removeCommunityTemplateFromStateAction = createAction<ID>(ActionType.Community.RemoveFromState);
+export const removeCommunityTemplateFromStateAction = createAction<number>(ActionType.Community.RemoveFromState);
 
 export const handleContactsTableChangeEventAction = createAction<
   Table.ChangeEvent<Tables.ContactRowData, Model.Contact>
@@ -88,7 +88,7 @@ export const addContactModelsToStateAction = createAction<Redux.AddModelsToTable
 );
 export const loadingContactsAction = createAction<boolean>(ActionType.Contacts.Loading);
 export const responseContactsAction = createAction<Http.TableResponse<Model.Contact>>(ActionType.Contacts.Response);
-export const removeContactFromStateAction = createAction<ID>(ActionType.Contacts.RemoveFromState);
+export const removeContactFromStateAction = createAction<number>(ActionType.Contacts.RemoveFromState);
 export const updateContactInStateAction = createAction<Redux.UpdateActionPayload<Model.Contact>>(
   ActionType.Contacts.UpdateInState
 );

@@ -7,7 +7,7 @@ import * as api from "api";
 import { ActionType } from "../actions";
 import * as actions from "../actions/pdf";
 
-function* loadHeaderTemplateTask(id: ID): SagaIterator {
+function* loadHeaderTemplateTask(id: number): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
   yield put(actions.setLoadingHeaderTemplateDetailAction(true));
@@ -29,7 +29,7 @@ function* loadHeaderTemplateTask(id: ID): SagaIterator {
 function* watchForLoadHeaderTemplateTask(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action: Redux.Action<ID> = yield take(ActionType.HeaderTemplates.Load);
+    const action: Redux.Action<number> = yield take(ActionType.HeaderTemplates.Load);
     if (lastTasks) {
       yield cancel(lastTasks);
     }

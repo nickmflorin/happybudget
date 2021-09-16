@@ -1,7 +1,7 @@
 import { tabling } from "lib";
 
-export const AccountColumns: { [key: string]: PdfTable.Column<Tables.PdfAccountRowData, Model.PdfAccount> } = {
-  identifier: {
+export const AccountColumns: PdfTable.Column<Tables.PdfAccountRowData, Model.PdfAccount>[] = [
+  {
     domain: "pdf",
     field: "identifier",
     headerName: "Acct #",
@@ -10,7 +10,7 @@ export const AccountColumns: { [key: string]: PdfTable.Column<Tables.PdfAccountR
     tableColumnType: "body",
     cellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
   },
-  description: {
+  {
     domain: "pdf",
     field: "description",
     headerName: "Category Description",
@@ -21,7 +21,7 @@ export const AccountColumns: { [key: string]: PdfTable.Column<Tables.PdfAccountR
       value: "Grand Total"
     }
   },
-  estimated: {
+  {
     domain: "pdf",
     field: "estimated",
     headerName: "Estimated",
@@ -30,10 +30,10 @@ export const AccountColumns: { [key: string]: PdfTable.Column<Tables.PdfAccountR
     formatter: tabling.formatters.currencyValueFormatter,
     width: 0.15
   }
-};
+];
 
-export const SubAccountColumns: { [key: string]: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount> } = {
-  identifier: {
+export const SubAccountColumns: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>[] = [
+  {
     domain: "pdf",
     field: "identifier",
     columnType: "number",
@@ -42,7 +42,7 @@ export const SubAccountColumns: { [key: string]: PdfTable.Column<Tables.PdfSubAc
     tableColumnType: "body",
     cellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
   },
-  description: {
+  {
     domain: "pdf",
     field: "description",
     headerName: "Description",
@@ -50,7 +50,7 @@ export const SubAccountColumns: { [key: string]: PdfTable.Column<Tables.PdfSubAc
     width: 0.3,
     tableColumnType: "body"
   },
-  contact: {
+  {
     domain: "pdf",
     field: "contact",
     headerName: "Contact",
@@ -58,7 +58,7 @@ export const SubAccountColumns: { [key: string]: PdfTable.Column<Tables.PdfSubAc
     width: 0.1,
     tableColumnType: "body"
   },
-  quantity: {
+  {
     domain: "pdf",
     field: "quantity",
     headerName: "Qty",
@@ -66,7 +66,7 @@ export const SubAccountColumns: { [key: string]: PdfTable.Column<Tables.PdfSubAc
     width: 0.1,
     tableColumnType: "body"
   },
-  unit: {
+  {
     domain: "pdf",
     field: "unit",
     headerName: "Unit",
@@ -74,7 +74,7 @@ export const SubAccountColumns: { [key: string]: PdfTable.Column<Tables.PdfSubAc
     width: 0.1,
     tableColumnType: "body"
   },
-  multiplier: {
+  {
     domain: "pdf",
     field: "multiplier",
     headerName: "X",
@@ -82,7 +82,7 @@ export const SubAccountColumns: { [key: string]: PdfTable.Column<Tables.PdfSubAc
     width: 0.1,
     tableColumnType: "body"
   },
-  rate: {
+  {
     domain: "pdf",
     field: "rate",
     headerName: "Rate",
@@ -91,7 +91,7 @@ export const SubAccountColumns: { [key: string]: PdfTable.Column<Tables.PdfSubAc
     width: 0.1,
     tableColumnType: "body"
   },
-  estimated: {
+  {
     domain: "pdf",
     field: "estimated",
     headerName: "Total",
@@ -100,4 +100,4 @@ export const SubAccountColumns: { [key: string]: PdfTable.Column<Tables.PdfSubAc
     width: 0.1,
     formatter: tabling.formatters.currencyValueFormatter
   }
-};
+];

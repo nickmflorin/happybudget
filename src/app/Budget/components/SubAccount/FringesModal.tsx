@@ -22,7 +22,6 @@ const ConnectedFringesTable = connectTableToStore<
   FringesTable.Props,
   Tables.FringeRowData,
   Model.Fringe,
-  Model.Group,
   Tables.FringeTableStore
 >({
   actions: ActionMap,

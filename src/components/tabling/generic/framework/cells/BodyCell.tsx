@@ -5,15 +5,14 @@ import connectCellToStore from "./connectCellToStore";
 /* eslint-disable indent */
 const BodyCell = <
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 >({
   value,
   ...props
-}: Table.ValueCellProps<R, M, G, S>): JSX.Element => {
+}: Table.ValueCellProps<R, M, S>): JSX.Element => {
   const formattedValue = useFormattedValue({ value, ...props });
-  return <ValueCell<R, M, G, S> {...props} value={formattedValue} />;
+  return <ValueCell<R, M, S> {...props} value={formattedValue} />;
 };
 
 export default connectCellToStore(BodyCell) as typeof BodyCell;

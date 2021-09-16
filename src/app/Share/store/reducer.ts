@@ -8,7 +8,7 @@ import * as actions from "./actions";
 import initialState from "./initialState";
 
 const genericReducer = combineReducers({
-  id: redux.reducers.createSimplePayloadReducer<ID | null>({
+  id: redux.reducers.createSimplePayloadReducer<number | null>({
     initialState: null,
     actions: { set: actions.setBudgetIdAction }
   }),
@@ -41,15 +41,10 @@ const genericReducer = combineReducers({
           responseSubAccountUnits: actions.responseSubAccountUnitsAction,
           setSearch: actions.account.setSearchAction
         },
-        getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
-        getPlaceholderRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
-        getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,
-        getModelRowName: "Sub Account",
-        getPlaceholderRowName: "Sub Account",
+        getModelRowChildren: (m: Model.SubAccount) => m.children,
         columns: filter(
           SubAccountsTable.Columns,
-          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup>) =>
-            c.requiresAuthentication !== true
+          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) => c.requiresAuthentication !== true
         ),
         fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
           tableId: "fringes-table",
@@ -86,15 +81,10 @@ const genericReducer = combineReducers({
           clear: actions.subAccount.clearAction,
           setSearch: actions.subAccount.setSearchAction
         },
-        getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
-        getPlaceholderRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
-        getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,
-        getModelRowName: "Sub Account",
-        getPlaceholderRowName: "Sub Account",
+        getModelRowChildren: (m: Model.SubAccount) => m.children,
         columns: filter(
           SubAccountsTable.Columns,
-          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup>) =>
-            c.requiresAuthentication !== true
+          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) => c.requiresAuthentication !== true
         ),
         fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
           tableId: "fringes-table",

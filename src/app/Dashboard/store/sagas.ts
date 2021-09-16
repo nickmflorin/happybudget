@@ -46,8 +46,7 @@ const ActionMap = {
 const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   Tables.ContactRowData,
   Model.Contact,
-  Model.Group,
-  Redux.AuthenticatedTableActionMap<Tables.ContactRowData, Model.Contact, Model.Group>
+  Redux.AuthenticatedTableActionMap<Tables.ContactRowData, Model.Contact>
 >({
   actions: ActionMap,
   tasks: contacts.createTableTaskSet({

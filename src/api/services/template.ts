@@ -17,13 +17,13 @@ export const getCommunityTemplates = async (
   return client.list<Model.Template>(url, query, options);
 };
 
-export const getTemplate = async (id: ID, options: Http.RequestOptions = {}): Promise<Model.Template> => {
+export const getTemplate = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Template> => {
   const url = URL.v1("templates", id);
   return client.retrieve<Model.Template>(url, options);
 };
 
 export const updateTemplate = async (
-  id: ID,
+  id: number,
   payload: Partial<Http.TemplatePayload> | FormData,
   options: Http.RequestOptions = {}
 ): Promise<Model.Template> => {
@@ -31,7 +31,7 @@ export const updateTemplate = async (
   return client.patch<Model.Template>(url, payload, options);
 };
 
-export const duplicateTemplate = async (id: ID, options: Http.RequestOptions = {}): Promise<Model.Template> => {
+export const duplicateTemplate = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Template> => {
   const url = URL.v1("templates", id, "duplicate");
   return client.post<Model.Template>(url, {}, options);
 };
@@ -52,13 +52,13 @@ export const createCommunityTemplate = async (
   return client.post<Model.Template>(url, payload, options);
 };
 
-export const deleteTemplate = async (id: ID, options: Http.RequestOptions = {}): Promise<null> => {
+export const deleteTemplate = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
   const url = URL.v1("templates", id);
   return client.delete<null>(url, options);
 };
 
 export const getTemplateAccounts = async (
-  id: ID,
+  id: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.Account>> => {
@@ -67,7 +67,7 @@ export const getTemplateAccounts = async (
 };
 
 export const createTemplateAccount = async (
-  id: ID,
+  id: number,
   payload: Http.AccountPayload,
   options: Http.RequestOptions = {}
 ): Promise<Model.Account> => {
@@ -76,25 +76,25 @@ export const createTemplateAccount = async (
 };
 
 export const getTemplateAccountGroups = async (
-  id: ID,
+  id: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.BudgetGroup>> => {
+): Promise<Http.ListResponse<Model.Group>> => {
   const url = URL.v1("templates", id, "groups");
-  return client.list<Model.BudgetGroup>(url, query, options);
+  return client.list<Model.Group>(url, query, options);
 };
 
 export const createTemplateAccountGroup = async (
-  id: ID,
+  id: number,
   payload: Http.GroupPayload,
   options: Http.RequestOptions = {}
-): Promise<Model.BudgetGroup> => {
+): Promise<Model.Group> => {
   const url = URL.v1("templates", id, "groups");
-  return client.post<Model.BudgetGroup>(url, payload, options);
+  return client.post<Model.Group>(url, payload, options);
 };
 
 export const getTemplateFringes = async (
-  id: ID,
+  id: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.Fringe>> => {
@@ -103,8 +103,8 @@ export const getTemplateFringes = async (
 };
 
 export const bulkDeleteTemplateFringes = async (
-  id: ID,
-  ids: ID[],
+  id: number,
+  ids: number[],
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkModelResponse<Model.Template>> => {
   const url = URL.v1("templates", id, "bulk-delete-fringes");
@@ -112,7 +112,7 @@ export const bulkDeleteTemplateFringes = async (
 };
 
 export const createTemplateFringe = async (
-  id: ID,
+  id: number,
   payload: Http.FringePayload,
   options: Http.RequestOptions = {}
 ): Promise<Model.Fringe> => {
@@ -121,7 +121,7 @@ export const createTemplateFringe = async (
 };
 
 export const bulkUpdateTemplateAccounts = async (
-  id: ID,
+  id: number,
   data: Http.BulkUpdatePayload<Http.AccountPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkModelResponse<Model.Template>> => {
@@ -130,8 +130,8 @@ export const bulkUpdateTemplateAccounts = async (
 };
 
 export const bulkDeleteTemplateAccounts = async (
-  id: ID,
-  ids: ID[],
+  id: number,
+  ids: number[],
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkModelResponse<Model.Template>> => {
   const url = URL.v1("templates", id, "bulk-delete-accounts");
@@ -139,7 +139,7 @@ export const bulkDeleteTemplateAccounts = async (
 };
 
 export const bulkCreateTemplateAccounts = async (
-  id: ID,
+  id: number,
   payload: Http.BulkCreatePayload<Http.AccountPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkCreateChildrenResponse<Model.Template, Model.Account>> => {
@@ -148,7 +148,7 @@ export const bulkCreateTemplateAccounts = async (
 };
 
 export const bulkUpdateTemplateFringes = async (
-  id: ID,
+  id: number,
   data: Http.BulkUpdatePayload<Http.FringePayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkModelResponse<Model.Template>> => {
@@ -157,7 +157,7 @@ export const bulkUpdateTemplateFringes = async (
 };
 
 export const bulkCreateTemplateFringes = async (
-  id: ID,
+  id: number,
   payload: Http.BulkCreatePayload<Http.FringePayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkCreateChildrenResponse<Model.Template, Model.Fringe>> => {

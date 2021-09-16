@@ -1,15 +1,14 @@
 import { combineReducers } from "redux";
-import { filter } from "lodash";
+import { filter, intersection } from "lodash";
 
 import { redux, budgeting } from "lib";
 import { SubAccountsTable, FringesTable } from "components/tabling";
 
 import * as actions from "./actions";
 import initialState from "./initialState";
-import { includes } from "lodash";
 
 const genericReducer = combineReducers({
-  id: redux.reducers.createSimplePayloadReducer<ID | null>({
+  id: redux.reducers.createSimplePayloadReducer<number | null>({
     initialState: null,
     actions: { set: actions.setTemplateIdAction }
   }),
@@ -47,15 +46,11 @@ const genericReducer = combineReducers({
           setSearch: actions.account.setSearchAction,
           clear: actions.account.clearAction
         },
-        getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
-        getPlaceholderRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
-        getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,
-        getModelRowName: "Sub Account",
-        getPlaceholderRowName: "Sub Account",
+        getModelRowChildren: (m: Model.SubAccount) => m.children,
         columns: filter(
           SubAccountsTable.Columns,
-          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup>) =>
-            !includes(["contact", "actual", "variance"], c.field)
+          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
+            intersection([c.field, c.colId], ["variance", "contact", "actual"]).length === 0
         ),
         fringesTableChangedAction: actions.handleFringesTableChangeEventAction,
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
@@ -102,14 +97,10 @@ const genericReducer = combineReducers({
         },
         columns: filter(
           SubAccountsTable.Columns,
-          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup>) =>
-            !includes(["contact", "actual", "variance"], c.field)
+          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
+            intersection([c.field, c.colId], ["variance", "contact", "actual"]).length === 0
         ),
-        getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
-        getPlaceholderRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
-        getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,
-        getModelRowName: "Sub Account",
-        getPlaceholderRowName: "Sub Account",
+        getModelRowChildren: (m: Model.SubAccount) => m.children,
         fringesTableChangedAction: actions.handleFringesTableChangeEventAction,
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
           tableId: "fringes-table",

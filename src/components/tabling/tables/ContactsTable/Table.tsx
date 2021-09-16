@@ -19,13 +19,20 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
       {...props}
       table={table}
       showPageFooter={false}
-      defaultRowLabel={"Contact"}
       minimal={true}
       cookieNames={{ hiddenColumns: "contacts-table-hidden-columns" }}
       leftAlignNewRowButton={true}
       indexColumnWidth={40}
       rowHeight={40}
       expandCellTooltip={"Edit"}
+      getModelRowName={(r: Table.ModelRow<R, M>) =>
+        util.conditionalJoinString(r.data.names_and_image.first_name, r.data.names_and_image.last_name)
+      }
+      getPlaceholderRowName={(r: Table.PlaceholderRow<R>) =>
+        util.conditionalJoinString(r.data.names_and_image.first_name, r.data.names_and_image.last_name)
+      }
+      getModelRowLabel={"Contact"}
+      getPlaceholderRowLabel={"Contact"}
       framework={Framework}
       actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
         framework.actions.ToggleColumnAction<R, M>(table.current, params),

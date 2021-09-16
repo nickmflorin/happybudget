@@ -6,7 +6,7 @@ import { model } from "lib";
 
 import { Form } from "components";
 import { TemplateForm } from "components/forms";
-import Modal from "./Modal";
+import { Modal } from "./generic";
 
 interface EditTemplateModalProps {
   template: Model.Template;
@@ -18,9 +18,10 @@ interface EditTemplateModalProps {
 const EditTemplateModal = ({ open, template, onSuccess, onCancel }: EditTemplateModalProps): JSX.Element => {
   const [file, setFile] = useState<UploadedImage | SavedImage | null>(template.image);
   const [form] = Form.useForm<Http.TemplatePayload>({ isInModal: true });
+  const cancelToken = api.useCancelToken();
 
   return (
-    <Modal.Modal
+    <Modal
       title={`Edit ${template.name}`}
       visible={open}
       onCancel={() => onCancel()}
@@ -38,7 +39,7 @@ const EditTemplateModal = ({ open, template, onSuccess, onCancel }: EditTemplate
               payload = { ...payload, image: !isNil(file) ? file.data : null };
             }
             api
-              .updateTemplate(template.id, payload)
+              .updateTemplate(template.id, payload, { cancelToken: cancelToken() })
               .then((newTemplate: Model.Template) => {
                 form.resetFields();
                 onSuccess(newTemplate);
@@ -61,7 +62,7 @@ const EditTemplateModal = ({ open, template, onSuccess, onCancel }: EditTemplate
         originalImage={template.image}
         initialValues={{ name: template.name }}
       />
-    </Modal.Modal>
+    </Modal>
   );
 };
 

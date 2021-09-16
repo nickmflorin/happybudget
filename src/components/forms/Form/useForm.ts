@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import axios from "axios";
 import { isNil, forEach, find } from "lodash";
 import { Form as RootForm } from "antd";
 import * as api from "api";
@@ -41,32 +42,38 @@ const useForm = <T>(form?: Partial<FormInstance<T>> | undefined) => {
         antdForm.resetFields();
       },
       setLoading,
-      setGlobalError: (e: Error | string) => {
-        if (typeof e === "string") {
-          setGlobalError(e);
+      setGlobalError: (e: Error | string | undefined) => {
+        if (!isNil(e)) {
+          if (typeof e === "string") {
+            setGlobalError(e);
+          } else {
+            setGlobalError(!isNil(e.message) ? e.message : `${e}`);
+          }
         } else {
-          setGlobalError(!isNil(e.message) ? e.message : `${e}`);
+          setGlobalError(undefined);
         }
       },
       renderFieldErrors: renderFieldErrors,
       handleRequestError: (e: Error) => {
-        if (e instanceof api.ClientError) {
-          const global = api.parseGlobalError(e);
-          if (!isNil(global)) {
+        if (!axios.isCancel(e)) {
+          if (e instanceof api.ClientError) {
+            const global = api.parseGlobalError(e);
+            if (!isNil(global)) {
+              /* eslint-disable no-console */
+              console.error(e.errors);
+              setGlobalError(global.message);
+            }
+            // Render the errors for each field next to the form field.
+            renderFieldErrors(e);
+          } else if (e instanceof api.NetworkError) {
+            setGlobalError("There was a problem communicating with the server.");
+          } else if (e instanceof api.ServerError) {
             /* eslint-disable no-console */
-            console.error(e.errors);
-            setGlobalError(global.message);
+            console.error(e);
+            setGlobalError("There was a problem communicating with the server.");
+          } else {
+            throw e;
           }
-          // Render the errors for each field next to the form field.
-          renderFieldErrors(e);
-        } else if (e instanceof api.NetworkError) {
-          setGlobalError("There was a problem communicating with the server.");
-        } else if (e instanceof api.ServerError) {
-          /* eslint-disable no-console */
-          console.error(e);
-          setGlobalError("There was a problem communicating with the server.");
-        } else {
-          throw e;
         }
       },
       globalError,

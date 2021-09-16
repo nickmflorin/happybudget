@@ -3,13 +3,13 @@ import * as api from "api";
 import { Form } from "components";
 import { GroupForm } from "components/forms";
 
-import Modal from "./Modal";
+import { Modal } from "./generic";
 
 interface CreateTemplateAccountGroupModalProps {
-  onSuccess: (group: Model.BudgetGroup) => void;
+  onSuccess: (group: Model.Group) => void;
   onCancel: () => void;
   templateId: number;
-  accounts: ID[];
+  accounts: number[];
   open: boolean;
 }
 
@@ -21,9 +21,10 @@ const CreateTemplateAccountGroupModal = ({
   onCancel
 }: CreateTemplateAccountGroupModalProps): JSX.Element => {
   const [form] = Form.useForm<Http.GroupPayload>({ isInModal: true });
+  const cancelToken = api.useCancelToken();
 
   return (
-    <Modal.Modal
+    <Modal
       title={"Create Sub-Total"}
       visible={open}
       onCancel={() => onCancel()}
@@ -36,14 +37,17 @@ const CreateTemplateAccountGroupModal = ({
           .validateFields()
           .then((values: Http.GroupPayload) => {
             form.setLoading(true);
-
             api
-              .createTemplateAccountGroup(templateId, {
-                name: values.name,
-                children: accounts,
-                color: values.color
-              })
-              .then((group: Model.BudgetGroup) => {
+              .createTemplateAccountGroup(
+                templateId,
+                {
+                  name: values.name,
+                  children: accounts,
+                  color: values.color
+                },
+                { cancelToken: cancelToken() }
+              )
+              .then((group: Model.Group) => {
                 form.resetFields();
                 onSuccess(group);
               })
@@ -60,7 +64,7 @@ const CreateTemplateAccountGroupModal = ({
       }}
     >
       <GroupForm form={form} initialValues={{}} />
-    </Modal.Modal>
+    </Modal>
   );
 };
 

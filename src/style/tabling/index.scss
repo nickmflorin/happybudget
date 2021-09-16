@@ -203,6 +203,16 @@
           // cell of the page and table footers.
           // white-space: break-spaces;
 
+          .icon-wrapper {
+            width: 16px;
+            margin-right: 6px;
+
+            .icon {
+              height: 16px;
+              width: 16px;
+            }
+          }
+
           .loadable-cell-wrapper {
             height: 100%;
             display: flex;

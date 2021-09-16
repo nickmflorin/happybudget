@@ -10,14 +10,14 @@ import Columns from "./Columns";
 type R = Tables.ActualRowData;
 type M = Model.Actual;
 
-type PreContactCreate = Omit<Table.SoloCellChange<R>, "newValue">;
+type PreContactCreate = Omit<Table.SoloCellChange<R, M>, "newValue">;
 
 export type Props = Omit<AuthenticatedModelTableProps<R, M>, "columns"> & {
   readonly exportFileName: string;
   readonly contacts: Model.Contact[];
   readonly onSubAccountsTreeSearch: (value: string) => void;
   readonly onNewContact: (params: { name?: string; change: PreContactCreate }) => void;
-  readonly onEditContact: (id: ID) => void;
+  readonly onEditContact: (id: number) => void;
 };
 
 const ActualsTable = ({
@@ -34,10 +34,13 @@ const ActualsTable = ({
     <AuthenticatedModelTable<R, M>
       {...props}
       table={table}
-      defaultRowLabel={"Actual"}
       showPageFooter={false}
       menuPortalId={"supplementary-header"}
       cookieNames={{ hiddenColumns: "actuals-table-hidden-columns" }}
+      getModelRowName={(r: Table.ModelRow<R, M>) => r.data.description}
+      getPlaceholderRowName={(r: Table.PlaceholderRow<R>) => r.data.description}
+      getModelRowLabel={"Sub Account"}
+      getPlaceholderRowLabel={"Sub Account"}
       framework={Framework}
       actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
         framework.actions.ToggleColumnAction(table.current, params),

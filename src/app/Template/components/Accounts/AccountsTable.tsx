@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
-import { isNil, map } from "lodash";
+import { isNil, map, filter, intersection } from "lodash";
 
 import { tabling, budgeting, redux } from "lib";
 import { CreateTemplateAccountGroupModal, EditGroupModal } from "components/modals";
@@ -28,7 +28,6 @@ const ConnectedTable = connectTableToStore<
   GenericAccountsTable.AuthenticatedTemplateProps,
   R,
   M,
-  Model.BudgetGroup,
   Tables.AccountTableStore
 >({
   asyncId: "async-accounts-table",
@@ -36,21 +35,24 @@ const ConnectedTable = connectTableToStore<
   footerRowSelectors: {
     footer: createSelector(
       [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.template.detail.data)],
-      (template: Model.Template | null) => ({
-        identifier: !isNil(template) && !isNil(template.name) ? `${template.name} Total` : "Template Total",
-        estimated: template?.estimated || 0.0
+      (budget: Model.Template | null) => ({
+        identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
+        estimated: !isNil(budget) ? budget.estimated + budget.markup_contribution + budget.fringe_contribution : 0.0,
+        variance: !isNil(budget)
+          ? budget.estimated + budget.markup_contribution + budget.fringe_contribution - budget.actual
+          : 0.0,
+        actual: budget?.actual || 0.0
       })
     )
   },
   reducer: budgeting.reducers.createAuthenticatedAccountsTableReducer({
     tableId: "accounts-table",
-    columns: GenericAccountsTable.TemplateColumns,
+    columns: filter(
+      GenericAccountsTable.Columns,
+      (c: Table.Column<R, M>) => intersection([c.field, c.colId], ["variance", "actual"]).length === 0
+    ),
     actions: ActionMap,
-    getModelRowLabel: (r: R) => r.identifier,
-    getModelRowName: "Account",
-    getPlaceholderRowLabel: (r: R) => r.identifier,
-    getModelRowChildren: (m: Model.Account) => m.subaccounts,
-    getPlaceholderRowName: "Account",
+    getModelRowChildren: (m: Model.Account) => m.children,
     initialState: redux.initialState.initialTableState
   })
 })(GenericAccountsTable.AuthenticatedTemplate);
@@ -61,13 +63,13 @@ interface AccountsTableProps {
 }
 
 const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Element => {
-  const [groupAccounts, setGroupAccounts] = useState<ID[] | undefined>(undefined);
+  const [groupAccounts, setGroupAccounts] = useState<number[] | undefined>(undefined);
   const [groupToEdit, setGroupToEdit] = useState<Table.GroupRow<R> | undefined>(undefined);
 
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const table = tabling.hooks.useTable<R, M, Model.BudgetGroup>();
+  const table = tabling.hooks.useTable<R, M>();
 
   return (
     <React.Fragment>
@@ -78,7 +80,16 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
         onRowExpand={(row: Table.ModelRow<R>) => history.push(`/templates/${templateId}/accounts/${row.id}`)}
-        onGroupRows={(rows: Table.DataRow<R>[]) => setGroupAccounts(map(rows, (row: Table.DataRow<R>) => row.id))}
+        onGroupRows={(rows: (Table.ModelRow<R, M> | Table.MarkupRow<R>)[]) =>
+          setGroupAccounts(
+            map(
+              filter(rows, (row: Table.ModelRow<R, M> | Table.MarkupRow<R>) =>
+                tabling.typeguards.isModelRow(row)
+              ) as Table.ModelRow<R, M>[],
+              (row: Table.ModelRow<R, M>) => row.id
+            )
+          )
+        }
         onEditGroup={(group: Table.GroupRow<R>) => setGroupToEdit(group)}
       />
       {!isNil(groupAccounts) && !isNil(templateId) && (
@@ -86,7 +97,7 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
           templateId={templateId}
           accounts={groupAccounts}
           open={true}
-          onSuccess={(group: Model.BudgetGroup) => {
+          onSuccess={(group: Model.Group) => {
             setGroupAccounts(undefined);
             dispatch(
               actions.accounts.handleTableChangeEventAction({
@@ -100,10 +111,10 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
       )}
       {!isNil(groupToEdit) && (
         <EditGroupModal
-          groupId={groupToEdit.group}
+          id={groupToEdit.group}
           open={true}
           onCancel={() => setGroupToEdit(undefined)}
-          onSuccess={(group: Model.BudgetGroup) => {
+          onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
             dispatch(
               actions.accounts.handleTableChangeEventAction({
@@ -111,7 +122,7 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
                 payload: { id: group.id, data: group }
               })
             );
-            if (group.color !== groupToEdit.color) {
+            if (group.color !== groupToEdit.groupData.color) {
               table.current.applyGroupColorChange(group);
             }
           }}

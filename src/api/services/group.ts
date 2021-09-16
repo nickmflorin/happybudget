@@ -1,26 +1,23 @@
 import { client } from "api";
 import { URL } from "./util";
 
-export const updateGroup = async <G extends Model.BudgetGroup = Model.BudgetGroup | Model.BudgetGroup>(
-  id: ID,
+export const updateGroup = async (
+  id: number,
   payload: Partial<Http.GroupPayload>,
   options: Http.RequestOptions = {}
-): Promise<G> => {
+): Promise<Model.Group> => {
   const url = URL.v1("groups", id);
-  return client.patch<G>(url, payload, options);
+  return client.patch<Model.Group>(url, payload, options);
 };
 
-export const deleteGroup = async (id: ID, options: Http.RequestOptions = {}): Promise<null> => {
+export const deleteGroup = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
   const url = URL.v1("groups", id);
   return client.delete<null>(url, options);
 };
 
-export const getGroup = async <G extends Model.BudgetGroup = Model.BudgetGroup | Model.BudgetGroup>(
-  id: ID,
-  options: Http.RequestOptions = {}
-): Promise<G> => {
+export const getGroup = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Group> => {
   const url = URL.v1("groups", id);
-  return client.retrieve<G>(url, options);
+  return client.retrieve<Model.Group>(url, options);
 };
 
 export const getGroupColors = async (options: Http.RequestOptions = {}): Promise<Http.ListResponse<string>> => {

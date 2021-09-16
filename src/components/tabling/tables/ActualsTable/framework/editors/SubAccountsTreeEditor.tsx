@@ -6,13 +6,7 @@ import { SubAccountTreeMenu } from "components/menus";
 import { framework } from "components/tabling/generic";
 
 interface SubAccountsTreeEditorProps
-  extends Table.EditorParams<
-    Tables.ActualRowData,
-    Model.Actual,
-    Model.Group,
-    Tables.ActualTableStore,
-    Model.SimpleSubAccount
-  > {
+  extends Table.EditorParams<Tables.ActualRowData, Model.Actual, Tables.ActualTableStore, Model.SimpleSubAccount> {
   readonly setSearch: (value: string) => void;
 }
 
@@ -28,7 +22,6 @@ const SubAccountsTreeEditor = ({ setSearch, ...props }: SubAccountsTreeEditorPro
     Model.SimpleSubAccount,
     Tables.ActualRowData,
     Model.Actual,
-    Model.Group,
     Tables.ActualTableStore
   >({
     ...props,

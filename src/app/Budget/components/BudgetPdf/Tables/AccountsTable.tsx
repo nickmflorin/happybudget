@@ -7,12 +7,11 @@ import { BodyRow, GroupRow, HeaderRow, FooterRow } from "../Rows";
 
 type M = Model.PdfAccount;
 type R = Tables.PdfAccountRowData;
-type G = Model.BudgetGroup;
 
 type AccountsTableProps = {
   readonly data: Model.PdfAccount[];
-  readonly groups: Model.BudgetGroup[];
-  readonly columns: PdfTable.Column<R, M, G>[];
+  readonly groups: Model.Group[];
+  readonly columns: PdfTable.Column<R, M>[];
 };
 
 const AccountsTable = ({
@@ -22,17 +21,12 @@ const AccountsTable = ({
   groups
 }: AccountsTableProps): JSX.Element => {
   const showFooterRow = useMemo(() => {
-    return filter(columns, (column: PdfTable.Column<R, M, G>) => !isNil(column.footer)).length !== 0;
+    return filter(columns, (column: PdfTable.Column<R, M>) => !isNil(column.footer)).length !== 0;
   }, [columns]);
 
-  const table: Table.Row<R, M>[] = tabling.data.createTableRows<
-    Tables.PdfAccountRowData,
-    Model.PdfAccount,
-    Model.BudgetGroup
-  >({
-    models: data,
+  const table: Table.Row<R, M>[] = tabling.data.createTableRows<Tables.PdfAccountRowData, Model.PdfAccount>({
+    response: { models: data, groups },
     columns,
-    groups,
     defaultNullValue: "",
     gridId: "data"
   });
@@ -45,8 +39,10 @@ const AccountsTable = ({
         runningIndex = runningIndex + 1;
         if (tabling.typeguards.isDataRow(row)) {
           return [...rws, <BodyRow key={runningIndex} index={runningIndex} columns={columns} row={row} />];
+        } else if (tabling.typeguards.isGroupRow(row)) {
+          return [...rws, <GroupRow row={row} index={runningIndex} key={runningIndex} columns={columns} />];
         }
-        return [...rws, <GroupRow row={row} index={runningIndex} key={runningIndex} columns={columns} />];
+        return rws;
       },
       [<HeaderRow columns={columns} index={0} key={0} />]
     );

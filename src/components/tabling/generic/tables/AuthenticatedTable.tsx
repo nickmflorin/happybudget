@@ -1,5 +1,5 @@
 import React, { useImperativeHandle, useState, useMemo } from "react";
-import { forEach, isNil, find, uniq, map, filter, includes } from "lodash";
+import { forEach, isNil, find, uniq, map, filter, intersection } from "lodash";
 
 import { tabling, util, hooks } from "lib";
 import { AuthenticatedGrid } from "components/tabling/generic";
@@ -19,38 +19,39 @@ import TableWrapper from "./TableWrapper";
 
 export type AuthenticatedTableDataGridProps<
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
-> = AuthenticateDataGridProps<R, M, G> & DataGridProps<R, M, G> & Omit<AuthenticatedGridProps<R, M, G>, "id">;
+  M extends Model.HttpModel = Model.HttpModel
+> = AuthenticateDataGridProps<R, M> & DataGridProps<R, M> & Omit<AuthenticatedGridProps<R, M>, "id">;
 
 export type AuthenticatedTableProps<
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
-> = TableConfigurationProps<R, M, G> & {
-  readonly tableId: Table.Id;
-  readonly table?: NonNullRef<Table.TableInstance<R, M, G>>;
-  readonly actions?: Table.AuthenticatedMenuActions<R, M, G>;
-  readonly excludeColumns?: SingleOrArray<keyof R> | ((col: Table.Column<R, M, G>) => boolean);
-  readonly onEditGroup?: (g: Table.GroupRow<R>) => void;
-  readonly onGroupRows?: (rows: Table.DataRow<R, M>[]) => void;
-  readonly children: RenderPropChild<AuthenticatedTableDataGridProps<R, M, G>>;
-  readonly rowHasCheckboxSelection?: (row: Table.DataRow<R, M>) => boolean;
-};
+  M extends Model.HttpModel = Model.HttpModel
+> = TableConfigurationProps<R, M> &
+  Omit<
+    AuthenticateDataGridProps<R, M>,
+    "onChangeEvent" | "columns" | "data" | "apis" | "onRowSelectionChanged" | "rowHasCheckboxSelection"
+  > & {
+    readonly table?: NonNullRef<Table.TableInstance<R, M>>;
+    readonly actions?: Table.AuthenticatedMenuActions<R, M>;
+    readonly excludeColumns?:
+      | SingleOrArray<keyof R | string | ((col: Table.Column<R, M>) => boolean)>
+      | ((col: Table.Column<R, M>) => boolean);
+    readonly children: RenderPropChild<AuthenticatedTableDataGridProps<R, M>>;
+    readonly rowHasCheckboxSelection?: (row: Table.NonGroupRow<R, M>) => boolean;
+  };
 
-const TableFooterGrid = FooterGrid<any, any, any, AuthenticatedGridProps<any, any, any>>({
+const TableFooterGrid = FooterGrid<any, any, AuthenticatedGridProps<any, any>>({
   rowId: "footer-row",
   id: "footer",
   className: "grid--table-footer",
   rowClass: "row--table-footer",
   getFooterColumn: (col: Table.Column<any>) => col.footer || null
 })(AuthenticatedGrid) as {
-  <R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group>(
-    props: Omit<AuthenticatedGridProps<R, M, G>, "id">
+  <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+    props: Omit<AuthenticatedGridProps<R, M>, "id">
   ): JSX.Element;
 };
 
-const PageFooterGrid = FooterGrid<any, any, any, AuthenticatedGridProps<any, any, any>>({
+const PageFooterGrid = FooterGrid<any, any, AuthenticatedGridProps<any, any>>({
   rowId: "page-row",
   id: "page",
   className: "grid--page-footer",
@@ -58,19 +59,18 @@ const PageFooterGrid = FooterGrid<any, any, any, AuthenticatedGridProps<any, any
   rowHeight: 28,
   getFooterColumn: (col: Table.Column<any>) => col.page || null
 })(AuthenticatedGrid) as {
-  <R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group>(
-    props: Omit<AuthenticatedGridProps<R, M, G>, "id">
+  <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+    props: Omit<AuthenticatedGridProps<R, M>, "id">
   ): JSX.Element;
 };
 
 /* eslint-disable indent */
 const AuthenticatedTable = <
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 >(
-  props: WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<R, M, G>, R>, R, M, G, S>
+  props: WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<R, M>, R>, R, M, S>
 ): JSX.Element => {
   const [selectedRows, setSelectedRows] = useState<Table.DataRow<R, M>[]>([]);
 
@@ -84,20 +84,25 @@ const AuthenticatedTable = <
    * configureTable in any order, and the selector will still be included in the editor
    * and renderer params for each column.
    */
-  const columns = useMemo<Table.Column<R, M, G>[]>((): Table.Column<R, M, G>[] => {
-    const evaluateColumnExclusionProp = (c: Table.Column<R, M, G>): boolean => {
+  const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
+    const evaluateColumnExclusionProp = (c: Table.Column<R, M>): boolean => {
       if (!isNil(props.excludeColumns)) {
         if (typeof props.excludeColumns === "function") {
           return props.excludeColumns(c);
         }
-        return includes(Array.isArray(props.excludeColumns) ? props.excludeColumns : [props.excludeColumns], c.field);
+        return (
+          intersection(Array.isArray(props.excludeColumns) ? props.excludeColumns : [props.excludeColumns], [
+            c.field,
+            c.colId
+          ]).length === 0
+        );
       }
       return false;
     };
 
     return map(
-      filter(props.columns, (c: Table.Column<R, M, G>) => !evaluateColumnExclusionProp(c)),
-      (c: Table.Column<R, M, G>) => ({
+      filter(props.columns, (c: Table.Column<R, M>) => !evaluateColumnExclusionProp(c)),
+      (c: Table.Column<R, M>) => ({
         ...c,
         cellRendererParams: {
           ...c.cellRendererParams,
@@ -115,7 +120,7 @@ const AuthenticatedTable = <
    * but then inspect whether or not the column associated with any of the fields
    * that were changed warrant refreshing another column.
    */
-  const _onChangeEvent = (event: Table.ChangeEvent<R, M, G>) => {
+  const _onChangeEvent = (event: Table.ChangeEvent<R, M>) => {
     props.onChangeEvent(event);
 
     const apis: Table.GridApis | null = props.tableApis.get("data");
@@ -136,18 +141,14 @@ const AuthenticatedTable = <
 
           let field: keyof R;
           for (field in rowChange.data) {
-            const change = util.getKeyValue<Table.RowChangeData<R, M>, keyof R>(field)(
+            const change = util.getKeyValue<Table.RowChangeData<R>, keyof R>(field)(
               rowChange.data
             ) as Table.CellChange<R>;
             // Check if the cellChange is associated with a Column that when changed,
             // should refresh other columns.
-            const col: Table.Column<R, M, G> | undefined = find(columns, { field } as any);
+            const col: Table.Column<R, M> | undefined = find(columns, { field } as any);
             if (!isNil(col) && !isNil(col.refreshColumns)) {
-              const fieldsToRefresh = col.refreshColumns({
-                ...change,
-                id: rowChange.id,
-                field
-              });
+              const fieldsToRefresh = col.refreshColumns(change);
               if (!isNil(fieldsToRefresh) && (!Array.isArray(fieldsToRefresh) || fieldsToRefresh.length !== 0)) {
                 hasColumnsToRefresh = true;
                 columnsToRefresh = uniq([
@@ -172,10 +173,10 @@ const AuthenticatedTable = <
     }
   };
 
-  const actions = useMemo<Table.AuthenticatedMenuActions<R, M, G>>(
-    (): Table.AuthenticatedMenuActions<R, M, G> =>
-      tabling.menu.combineMenuActions<Table.AuthenticatedMenuActionParams<R, M, G>, R, M, G>(
-        (params: Table.AuthenticatedMenuActionParams<R, M, G>) => {
+  const actions = useMemo<Table.AuthenticatedMenuActions<R, M>>(
+    (): Table.AuthenticatedMenuActions<R, M> =>
+      tabling.menu.combineMenuActions<Table.AuthenticatedMenuActionParams<R, M>, R, M>(
+        (params: Table.AuthenticatedMenuActionParams<R, M>) => {
           return [
             {
               index: 0,
@@ -185,11 +186,11 @@ const AuthenticatedTable = <
               onClick: () => {
                 const apis: Table.GridApis | null = props.tableApis.get("data");
                 const rows = filter((apis?.grid.getSelectedRows() || []) as Table.Row<R, M>[], (r: Table.Row<R, M>) =>
-                  tabling.typeguards.isDataRow(r)
-                ) as Table.DataRow<R, M>[];
+                  tabling.typeguards.isEditableRow(r)
+                ) as Table.EditableRow<R, M>[];
                 if (rows.length !== 0) {
                   props.onChangeEvent({
-                    payload: { rows: rows },
+                    payload: { rows: map(rows, (r: Table.EditableRow<R, M>) => r.id) },
                     type: "rowDelete"
                   });
                 }
@@ -239,37 +240,28 @@ const AuthenticatedTable = <
             // If we want to leftAlign the New Row Button, we do not want to have the cell span 2 columns
             // because then the New Row Button will be centered horizontally between two cells and not
             // aligned with the Index cells in the grid--data.
-            colSpan: (params: Table.ColSpanParams<R, M, G>) =>
+            colSpan: (params: Table.ColSpanParams<R, M>) =>
               props.hasExpandColumn && !(props.leftAlignNewRowButton === true) ? 2 : 1
           }}
         />
       }
     >
       <React.Fragment>
-        <AuthenticatedMenu<R, M, G>
+        <AuthenticatedMenu<R, M>
           {...props}
           apis={props.tableApis.get("data")}
           actions={actions}
           selectedRows={selectedRows}
         />
         {props.children({
+          ...props,
           apis: props.tableApis.get("data"),
-          hiddenColumns: props.hiddenColumns,
           columns: columns,
           gridOptions: props.tableGridOptions.data,
-          data: props.data,
-          hasExpandColumn: props.hasExpandColumn,
-          framework: props.framework,
-          footerRowSelectors: props.footerRowSelectors,
-          tableId: props.tableId,
-          onCellFocusChanged: props.onCellFocusChanged,
           onGridReady: props.onDataGridReady,
-          onFirstDataRendered: props.onFirstDataRendered,
           onRowSelectionChanged: (rows: Table.DataRow<R, M>[]) => setSelectedRows(rows),
           onChangeEvent: _onChangeEvent,
-          rowHasCheckboxSelection: props.rowHasCheckboxSelection,
-          onEditGroup: props.onEditGroup,
-          onGroupRows: props.onGroupRows
+          rowHasCheckboxSelection: props.rowHasCheckboxSelection
         })}
         <TableFooterGrid
           apis={props.tableApis.get("footer")}
@@ -286,7 +278,7 @@ const AuthenticatedTable = <
             // If we want to leftAlign the New Row Button, we do not want to have the cell span 2 columns
             // because then the New Row Button will be centered horizontally between two cells and not
             // aligned with the Index cells in the grid--data.
-            colSpan: (params: Table.ColSpanParams<R, M, G>) =>
+            colSpan: (params: Table.ColSpanParams<R, M>) =>
               props.hasExpandColumn && !(props.leftAlignNewRowButton === true) ? 2 : 1,
             // The onChangeEvent callback is needed to dispatch the action to create a new row.
             cellRendererParams: {
@@ -301,8 +293,8 @@ const AuthenticatedTable = <
 
 type Props = WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<any>, any>, any>;
 
-export default configureTable<any, any, any, Props>(AuthenticatedTable) as {
-  <R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group>(
-    props: AuthenticatedTableProps<R, M, G>
+export default configureTable<any, any, Props>(AuthenticatedTable) as {
+  <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+    props: AuthenticatedTableProps<R, M>
   ): JSX.Element;
 };

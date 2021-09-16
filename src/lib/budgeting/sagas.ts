@@ -20,7 +20,11 @@ export const createCommentsListResponseSaga = (
   }
 
   function* deleteSaga(): SagaIterator {
-    yield redux.sagas.takeWithCancellableById<ID>(config.actions.delete.toString(), config.tasks.delete, (p: ID) => p);
+    yield redux.sagas.takeWithCancellableById<number>(
+      config.actions.delete.toString(),
+      config.tasks.delete,
+      (p: number) => p
+    );
   }
 
   function* editSaga(): SagaIterator {

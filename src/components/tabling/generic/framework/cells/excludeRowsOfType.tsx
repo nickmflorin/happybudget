@@ -4,7 +4,7 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 
 /* eslint-disable indent */
 const excludeRowsOfType =
-  <T extends { node: Table.RowNode } = any, R extends Table.RowData = any>(types: Table.RowID[] | Table.RowID) =>
+  <T extends { node: Table.RowNode } = any, R extends Table.RowData = object>(types: Table.RowType[] | Table.RowType) =>
   (Component: React.ComponentClass<T, {}> | React.FunctionComponent<T>): React.FunctionComponent<T> => {
     const typesToExclude = Array.isArray(types) ? types : [types];
     const WithExcludeRowsOfType = (props: T) => {

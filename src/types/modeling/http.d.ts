@@ -41,9 +41,10 @@ namespace Http {
     readonly previous?: string | null;
   }
 
-  type TableResponse<M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = {
+  type TableResponse<M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
     readonly models: M[];
-    readonly groups?: G[];
+    readonly groups?: Model.Group[];
+    readonly markups?: Model.Markup[];
   }
 
   type ErrorType = "unknown" | "http" | "field" | "global" | "auth";
@@ -148,10 +149,24 @@ namespace Http {
     readonly color?: string | null;
   }
 
+  interface MarkupPayload {
+    readonly identifier?: string | null;
+    readonly description?: string | null;
+    readonly unit?: Model.MarkupUnitId | null;
+    readonly rate?: number | null;
+    readonly children?: number[];
+    readonly groups?: number[];
+  }
+
+  interface ModifyMarkupPayload {
+    readonly children?: number[];
+    readonly groups?: number[];
+  }
+
   interface BudgetPayload {
     readonly production_type?: Model.ProductionTypeId;
     readonly name: string;
-    readonly template?: ID;
+    readonly template?: number;
     readonly image?: string | ArrayBuffer | null;
   }
 
@@ -163,27 +178,27 @@ namespace Http {
   }
 
   interface GroupPayload {
-    readonly name: string;
-    readonly children?: ID[];
-    readonly color: string;
+    readonly name?: string;
+    readonly color?: string;
+    readonly children?: number[];
   }
 
   interface AccountPayload extends Http.ModelPayload<Model.Account> {
     // This is a write-only field in the backend, so we have to explicitly include
     // in the payload.
-    readonly group?: ID | null;
+    readonly group?: number | null;
   }
 
   interface SubAccountPayload extends Omit<Http.ModelPayload<Model.SubAccount>, "unit"> {
     readonly unit?: Model.SubAccountUnitId | null;
     // This is a write-only field in the backend, so we have to explicitly include
     // in the payload.
-    readonly group?: ID | null;
+    readonly group?: number | null;
   }
 
   interface ActualPayload extends Omit<Http.ModelPayload<Model.Actual>, "subaccount" | "payment_method"> {
     readonly payment_method?: Model.PaymentMethodId | null;
-    readonly subaccount?: ID | null;
+    readonly subaccount?: number | null;
   }
 
   interface CommentPayload {
@@ -211,7 +226,7 @@ namespace Http {
 
   type BulkCreatePayload<T extends Http.ModelPayload> = { data: Partial<T>[] };
 
-  type ModelBulkUpdatePayload<T extends Http.ModelPayload> = (Partial<T> | {}) & { readonly id: ID };
+  type ModelBulkUpdatePayload<T extends Http.ModelPayload> = (Partial<T> | {}) & { readonly id: number };
   type BulkUpdatePayload<T extends Http.ModelPayload> = { data: ModelBulkUpatePayload<T>[] };
 
   type BulkModelResponse<M extends Model.Model> = {

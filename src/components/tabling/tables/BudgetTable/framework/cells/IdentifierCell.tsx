@@ -4,16 +4,16 @@ import { ValueCell, GroupCell } from "components/tabling/generic/framework/cells
 
 interface IdentifierCellProps<
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
+  M extends Model.HttpModel = Model.HttpModel,
   S extends Redux.BudgetTableStore<R, M> = Redux.BudgetTableStore<R, M>
-> extends Table.ValueCellProps<R, M, Model.BudgetGroup, S> {
+> extends Table.ValueCellProps<R, M, S> {
   readonly onGroupEdit?: (group: Table.GroupRow<R>) => void;
 }
 
 /* eslint-disable indent */
 const IdentifierCell = <
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
+  M extends Model.HttpModel = Model.HttpModel,
   S extends Redux.BudgetTableStore<R, M> = Redux.BudgetTableStore<R, M>
 >({
   onGroupEdit,
@@ -21,10 +21,10 @@ const IdentifierCell = <
 }: IdentifierCellProps<R, M, S>): JSX.Element => {
   const row: Table.Row<R, M> = props.node.data;
   return tabling.typeguards.isGroupRow(row) ? (
-    <GroupCell<R, M, Model.BudgetGroup> onEdit={onGroupEdit} {...props} />
+    <GroupCell<R, M> onEdit={onGroupEdit} {...props} />
   ) : (
-    <ValueCell<R, M, Model.BudgetGroup> {...props} />
+    <ValueCell<R, M> {...props} />
   );
 };
 
-export default framework.connectCellToStore<any, any, Model.BudgetGroup>(IdentifierCell) as typeof IdentifierCell;
+export default framework.connectCellToStore<any, any>(IdentifierCell) as typeof IdentifierCell;

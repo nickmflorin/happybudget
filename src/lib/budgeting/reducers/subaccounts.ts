@@ -1,19 +1,19 @@
 import { PayloadActionCreator } from "@reduxjs/toolkit";
 import { isNil, reduce, map, includes, filter, flatten, uniqBy } from "lodash";
 
-import * as tabling from "../../tabling";
-import * as util from "../../util";
-import * as model from "../../model";
-import * as redux from "../../redux";
-
-import { createBudgetTableReducer } from "./base";
+import { tabling, util, redux } from "lib";
+import { createBudgetTableReducer, createAuthenticatedBudgetTableReducer, BudgetTableReducerConfig } from "./base";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
 type S = Tables.SubAccountTableStore;
 
 /* eslint-disable indent */
-const recalculateSubAccountRow = (st: S, action: Redux.Action, row: Table.DataRow<R, M>): Partial<R> => {
+const recalculateSubAccountRow = (
+  st: S,
+  action: Redux.Action,
+  row: Table.DataRow<R, M>
+): Pick<R, "estimated" | "fringe_contribution"> => {
   /*
   In the case that the SubAccount has SubAccount(s) itself, the estimated value is determined
   from the accumulation of the estimated values for those children SubAccount(s).  In this
@@ -23,41 +23,39 @@ const recalculateSubAccountRow = (st: S, action: Redux.Action, row: Table.DataRo
   const isValidToRecalculate =
     tabling.typeguards.isPlaceholderRow<R>(row) || (!isNil(row.children) && row.children.length === 0);
 
-  let payload: Partial<R> = {};
-
   if (isValidToRecalculate && !isNil(row.data.quantity) && !isNil(row.data.rate)) {
     const multiplier = row.data.multiplier || 1.0;
-    payload = { estimated: multiplier * row.data.quantity * row.data.rate };
-    if (!isNil(row.data.actual) && !isNil(payload.estimated)) {
-      payload = { ...payload, variance: payload.estimated - row.data.actual };
-    }
-    if (!isNil(st.fringes)) {
-      // Reapply the fringes to the SubAccount's estimated value.
-      payload = {
-        ...payload,
-        estimated: !isNil(payload.estimated)
-          ? model.util.fringeValue(
-              payload.estimated,
-              redux.reducers.findModelsInData(action, st.fringes.data, row.data.fringes, { name: "Fringe" })
-            )
-          : 0.0
-      };
-    }
+    const fringes: Table.Row<Tables.FringeRowData, Model.Fringe>[] = redux.reducers.findModelsInData(
+      action,
+      st.fringes.data,
+      row.data.fringes,
+      { name: "Fringe" }
+    );
+    return {
+      estimated: row.data.quantity * row.data.rate * multiplier,
+      fringe_contribution: tabling.businessLogic.contributionFromFringes(
+        row.data.quantity * row.data.rate * multiplier,
+        fringes
+      )
+    };
   }
-  return payload;
+  return {
+    estimated: row.data.estimated,
+    fringe_contribution: row.data.fringe_contribution
+  };
 };
 
-export type SubAccountTableActionMap = Redux.TableActionMap<M, Model.BudgetGroup> & {
+export type SubAccountTableActionMap = Redux.TableActionMap<M> & {
   readonly responseSubAccountUnits: Http.ListResponse<Model.Tag>;
 };
 
 /* eslint-disable indent */
 export const createUnauthenticatedSubAccountsTableReducer = (
-  config: Table.ReducerConfig<R, M, Model.BudgetGroup, S, SubAccountTableActionMap> & {
+  config: BudgetTableReducerConfig<R, M, S, SubAccountTableActionMap> & {
     readonly fringes: Redux.Reducer<Tables.FringeTableStore>;
   }
 ): Redux.Reducer<S> => {
-  const generic = createBudgetTableReducer<R, M, S>(config);
+  const generic = createBudgetTableReducer<R, M, S, SubAccountTableActionMap>(config);
 
   return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
     let newState = generic(state, action);
@@ -72,25 +70,18 @@ export const createUnauthenticatedSubAccountsTableReducer = (
   };
 };
 
-export type AuthenticatedSubAccountTableActionMap = Redux.AuthenticatedTableActionMap<R, M, Model.BudgetGroup> & {
+export type AuthenticatedSubAccountTableActionMap = Redux.AuthenticatedTableActionMap<R, M> & {
   readonly responseSubAccountUnits: Http.ListResponse<Model.Tag>;
 };
 
 export const createAuthenticatedSubAccountsTableReducer = (
-  config: Table.ReducerConfig<R, M, Model.BudgetGroup, S, AuthenticatedSubAccountTableActionMap> & {
+  config: BudgetTableReducerConfig<R, M, S, AuthenticatedSubAccountTableActionMap> & {
     readonly fringes: Redux.Reducer<Tables.FringeTableStore>;
     readonly fringesTableChangedAction: PayloadActionCreator<Table.ChangeEvent<Tables.FringeRowData, Model.Fringe>>;
   }
 ): Redux.Reducer<S> => {
-  const generic = tabling.reducers.createAuthenticatedTableReducer<R, M, Model.BudgetGroup, S>({
+  const generic = createAuthenticatedBudgetTableReducer<R, M, S>({
     ...config,
-    calculateGroup: (rws: Table.DataRow<R, M>[]) => {
-      let payload: any = {
-        estimated: reduce(rws, (sum: number, s: Table.DataRow<R, M>) => sum + (s.data.estimated || 0), 0),
-        actual: reduce(rws, (sum: number, s: Table.DataRow<R, M>) => sum + (s.data.actual || 0), 0)
-      };
-      return { ...payload, variance: payload.estimated - payload.actual };
-    },
     recalculateRow: recalculateSubAccountRow
   });
 
@@ -112,7 +103,7 @@ export const createAuthenticatedSubAccountsTableReducer = (
       // There are no group related events for the Fringe Table, but we have to assert this with
       // a typeguard to make TS happy.
       if (!tabling.typeguards.isGroupEvent(e)) {
-        const recalculateSubAccountsWithFringes = (fringeIds: ID[], removeFringes?: boolean): S => {
+        const recalculateSubAccountsWithFringes = (fringeIds: number[], removeFringes?: boolean): S => {
           /*
           For each Fringe that changed, we have to look at the SubAccount(s) that have that Fringe
           applied and recalculate the metrics for that SubAccount.
@@ -125,7 +116,7 @@ export const createAuthenticatedSubAccountsTableReducer = (
           const rowsWithFringes: Table.DataRow<R, M>[] = flatten(
             map(
               fringeIds,
-              (id: ID) =>
+              (id: number) =>
                 filter(
                   newState.data,
                   (row: Table.Row<R, M>) => tabling.typeguards.isDataRow(row) && includes(row.data.fringes, id)
@@ -169,11 +160,15 @@ export const createAuthenticatedSubAccountsTableReducer = (
           Fringe).
           */
           const consolidated = tabling.events.consolidateTableChange<Tables.FringeRowData, Model.Fringe>(e.payload);
-          const ids: Table.DataRowID[] = map(
-            consolidated,
+          const ids: Table.DataRowId[] = map(
+            filter(consolidated, (ch: Table.RowChange<Tables.FringeRowData, Model.Fringe>) =>
+              tabling.typeguards.isDataRow(ch.row)
+            ),
             (ch: Table.RowChange<Tables.FringeRowData, Model.Fringe>) => ch.id
+          ) as Table.DataRowId[];
+          newState = recalculateSubAccountsWithFringes(
+            filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[]
           );
-          newState = recalculateSubAccountsWithFringes(ids);
         } else if (tabling.typeguards.isRowAddEvent(e)) {
           // We do not need to worry about this right now, because when a Fringe is just added it
           // is not yet associated with a SubAccount.
@@ -183,11 +178,9 @@ export const createAuthenticatedSubAccountsTableReducer = (
           metrics for each SubAccount(s) that previously had that Fringe applied, while simultaneously
           removing that Fringe from the SubAccount.
           */
-          const rws: Table.Row<Tables.FringeRowData, Model.Fringe>[] = Array.isArray(e.payload.rows)
-            ? e.payload.rows
-            : [e.payload.rows];
+          const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
           newState = recalculateSubAccountsWithFringes(
-            map(rws, (r: Table.Row<Tables.FringeRowData, Model.Fringe>) => r.id),
+            filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[],
             true
           );
         }

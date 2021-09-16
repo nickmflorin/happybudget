@@ -35,39 +35,36 @@ export const getColumnTypeCSSStyle = (
 /* eslint-disable no-unused-vars */
 /* eslint-disable indent */
 type ColumnUpdates<
-  C extends Table.AnyColumn<R, M, G>,
+  C extends Table.AnyColumn<R, M>,
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
+  M extends Model.HttpModel = Model.HttpModel
 > = {
   [key in keyof R]: Partial<C> | ((c: C) => Partial<C>);
 };
 
 export const mergeColumns = <
-  C extends Table.AnyColumn<R, M, G>,
+  C extends Table.AnyColumn<R, M>,
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
+  M extends Model.HttpModel = Model.HttpModel
 >(
   columns: C[],
-  updates: Partial<ColumnUpdates<C, R, M, G>>
+  updates: Partial<ColumnUpdates<C, R, M>>
 ): C[] => {
   let key: keyof R;
   let merged: C[] = [...columns];
   for (key in updates) {
     const fieldUpdates: Partial<C> | ((c: C) => Partial<C>) | undefined = updates[key];
     if (!isNil(fieldUpdates)) {
-      merged = updateColumnsOfField<C, R, M, G>(merged, key, fieldUpdates);
+      merged = updateColumnsOfField<C, R, M>(merged, key, fieldUpdates);
     }
   }
   return merged;
 };
 
 export const updateColumnsOfTableType = <
-  C extends Table.AnyColumn<R, M, G>,
+  C extends Table.AnyColumn<R, M>,
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
+  M extends Model.HttpModel = Model.HttpModel
 >(
   columns: C[],
   type: Table.TableColumnTypeId,
@@ -86,10 +83,9 @@ export const updateColumnsOfTableType = <
 };
 
 export const updateColumnsOfField = <
-  C extends Table.AnyColumn<R, M, G>,
+  C extends Table.AnyColumn<R, M>,
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
+  M extends Model.HttpModel = Model.HttpModel
 >(
   columns: C[],
   field: keyof R,
@@ -108,10 +104,9 @@ export const updateColumnsOfField = <
 };
 
 export const orderColumns = <
-  C extends Table.AnyColumn<R, M, G>,
+  C extends Table.AnyColumn<R, M>,
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
+  M extends Model.HttpModel = Model.HttpModel
 >(
   columns: C[]
 ): C[] => {

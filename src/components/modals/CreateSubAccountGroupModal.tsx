@@ -5,14 +5,14 @@ import * as api from "api";
 import { Form } from "components";
 import { GroupForm } from "components/forms";
 
-import Modal from "./Modal";
+import { Modal } from "./generic";
 
 interface CreateSubAccountGroupModalProps {
-  onSuccess: (group: Model.BudgetGroup) => void;
+  onSuccess: (group: Model.Group) => void;
   onCancel: () => void;
   accountId?: number;
   subaccountId?: number;
-  subaccounts: ID[];
+  subaccounts: number[];
   open: boolean;
 }
 
@@ -25,9 +25,10 @@ const CreateSubAccountGroupModal = ({
   onCancel
 }: CreateSubAccountGroupModalProps): JSX.Element => {
   const [form] = Form.useForm<Http.GroupPayload>({ isInModal: true });
+  const cancelToken = api.useCancelToken();
 
   return (
-    <Modal.Modal
+    <Modal
       title={"Create Sub-Total"}
       visible={open}
       onCancel={() => onCancel()}
@@ -42,12 +43,16 @@ const CreateSubAccountGroupModal = ({
             form.setLoading(true);
             if (!isNil(accountId)) {
               api
-                .createAccountSubAccountGroup(accountId, {
-                  name: values.name,
-                  children: subaccounts,
-                  color: values.color
-                })
-                .then((group: Model.BudgetGroup) => {
+                .createAccountSubAccountGroup(
+                  accountId,
+                  {
+                    name: values.name,
+                    children: subaccounts,
+                    color: values.color
+                  },
+                  { cancelToken: cancelToken() }
+                )
+                .then((group: Model.Group) => {
                   form.resetFields();
                   onSuccess(group);
                 })
@@ -60,7 +65,7 @@ const CreateSubAccountGroupModal = ({
                   children: subaccounts,
                   color: values.color
                 })
-                .then((group: Model.BudgetGroup) => {
+                .then((group: Model.Group) => {
                   form.resetFields();
                   onSuccess(group);
                 })
@@ -74,7 +79,7 @@ const CreateSubAccountGroupModal = ({
       }}
     >
       <GroupForm form={form} initialValues={{}} />
-    </Modal.Modal>
+    </Modal>
   );
 };
 

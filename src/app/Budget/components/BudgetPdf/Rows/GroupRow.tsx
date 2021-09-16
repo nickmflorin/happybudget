@@ -8,9 +8,7 @@ import { CellProps } from "../Cells/Cell";
 import { RowProps } from "./Row";
 import BodyRow from "./BodyRow";
 
-type G = Model.BudgetGroup;
-
-const GroupRow = <R extends Table.RowData, M extends Model.Model = Model.Model>(
+const GroupRow = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   props: Omit<RowProps<R, M>, "row"> & {
     readonly row: Table.GroupRow<R>;
     readonly cellProps?: Omit<CellProps<R, M>, "column" | "location" | "row" | "debug" | "isHeader">;
@@ -40,7 +38,7 @@ const GroupRow = <R extends Table.RowData, M extends Model.Model = Model.Model>(
         ...props.cellProps,
         className: [
           props.cellProps?.className,
-          (params: PdfTable.CellCallbackParams<R, M, G>) => {
+          (params: PdfTable.CellCallbackParams<R, M>) => {
             // We have to add a borderLeft to the first indented column for the Group Row
             // because the Row itself will not have a borderLeft attribute on it and the
             // Row starts one column to the right.

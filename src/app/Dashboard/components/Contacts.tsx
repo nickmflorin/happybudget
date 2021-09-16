@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { isNil } from "lodash";
 
-import { tabling, redux, model } from "lib";
+import { tabling, redux } from "lib";
 
 import { Page } from "components/layout";
 import { CreateContactModal, EditContactModal } from "components/modals";
@@ -23,43 +23,26 @@ const ActionMap = {
   clear: actions.clearContactsAction
 };
 
-const ConnectedContactsTable = connectTableToStore<ContactsTable.Props, R, M, Model.Group, Tables.ContactTableStore>({
+const ConnectedContactsTable = connectTableToStore<ContactsTable.Props, R, M, Tables.ContactTableStore>({
   asyncId: "async-contacts-table",
   actions: ActionMap,
-  reducer: tabling.reducers.createAuthenticatedTableReducer<R, M, Model.Group, Tables.ContactTableStore>({
+  reducer: tabling.reducers.createAuthenticatedTableReducer<R, M, Tables.ContactTableStore>({
     tableId: "contacts-table",
     columns: ContactsTable.Columns,
     actions: ActionMap,
-    getModelRowLabel: (r: R) =>
-      model.util.displayFirstAndLastName(r.names_and_image.first_name, r.names_and_image.last_name),
-    getModelRowName: "Account",
-    getPlaceholderRowLabel: (r: R) =>
-      model.util.displayFirstAndLastName(r.names_and_image.first_name, r.names_and_image.last_name),
-    getPlaceholderRowName: "Account",
     initialState: redux.initialState.initialTableState
   })
 })(ContactsTable.Table);
 
 const Contacts = (): JSX.Element => {
-  const [contactToEdit, setContactToEdit] = useState<M | undefined>(undefined);
+  const [contactToEdit, setContactToEdit] = useState<number | undefined>(undefined);
   const [newContactModalOpen, setNewContactModalOpen] = useState(false);
 
   return (
     <Page className={"contacts"} title={"My Contacts"}>
       <ConnectedContactsTable
         tableId={"contacts-table"}
-        onRowExpand={(row: Table.ModelRow<R, M>) => {
-          /*
-          Important!:  At least right now, whenever a row is updated or changed, the
-          associated model stored on it's meta property is not updated.  The `meta.model`
-          property is the original model that was used to create the row.  Eventually, this
-          will be improved - but it should be noted right now that the modal will not show the
-          updated <Contact> if the table was edited.
-
-          The relationship between rows and models needs to be improved going forward.
-          */
-          setContactToEdit(row.model);
-        }}
+        onRowExpand={(row: Table.ModelRow<R, M>) => setContactToEdit(row.id)}
         exportFileName={"contacts"}
       />
       <CreateContactModal
@@ -69,10 +52,10 @@ const Contacts = (): JSX.Element => {
       />
       {!isNil(contactToEdit) && (
         <EditContactModal
-          contact={contactToEdit}
+          id={contactToEdit}
           onCancel={() => setContactToEdit(undefined)}
           onSuccess={() => setContactToEdit(undefined)}
-          visible={true}
+          open={true}
         />
       )}
     </Page>

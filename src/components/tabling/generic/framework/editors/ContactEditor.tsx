@@ -1,5 +1,5 @@
 import { forwardRef, ForwardedRef } from "react";
-import { filter } from "lodash";
+import { filter, isNil } from "lodash";
 
 import { tabling } from "lib";
 import { useContacts } from "store/hooks";
@@ -10,31 +10,29 @@ import { GenericModelMenuEditor } from "./generic";
 
 interface ContactEditorProps<
   R extends Table.RowData & { readonly contact: number | null },
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
-> extends Table.EditorParams<R, M, G, S> {
-  readonly onNewContact: (params: { name?: string; change: Omit<Table.SoloCellChange<R>, "newValue"> }) => void;
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+> extends Table.EditorParams<R, M, S> {
+  readonly onNewContact: (params: { name?: string; change: Omit<Table.SoloCellChange<R, M>, "newValue"> }) => void;
 }
 
 /* eslint-disable indent */
 const ContactEditor = <
   R extends Table.RowData & { readonly contact: number | null },
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 >(
-  props: ContactEditorProps<R, M, G, S>,
+  props: ContactEditorProps<R, M, S>,
   ref: ForwardedRef<any>
 ) => {
   const contacts = useContacts();
 
-  const [editor] = framework.editors.useModelMenuEditor<Model.Contact, ID, R, M, G, S>({
+  const [editor] = framework.editors.useModelMenuEditor<Model.Contact, ID, R, M, S>({
     ...props,
     forwardedRef: ref
   });
   return (
-    <GenericModelMenuEditor<Model.Contact, ID, R, M, G, S>
+    <GenericModelMenuEditor<Model.Contact, ID, R, M, S>
       {...props}
       editor={editor}
       style={{ width: 160 }}
@@ -48,7 +46,7 @@ const ContactEditor = <
           id: "add-contact",
           onClick: () => {
             const row: Table.DataRow<R, M> = props.node.data;
-            if (tabling.typeguards.isModelRow(row)) {
+            if (tabling.typeguards.isModelRow(row) && !isNil(props.column.field)) {
               const searchValue = editor.menu.current.getSearchValue();
               editor.stopEditing(false);
               if (searchValue !== "") {
@@ -57,7 +55,8 @@ const ContactEditor = <
                   change: {
                     oldValue: (row.data.contact || null) as unknown as Table.RowValue<R>,
                     field: props.column.field,
-                    id: row.id
+                    id: row.id,
+                    row
                   }
                 });
               } else {
@@ -65,7 +64,8 @@ const ContactEditor = <
                   change: {
                     oldValue: (row.data.contact || null) as unknown as Table.RowValue<R>,
                     field: props.column.field,
-                    id: row.id
+                    id: row.id,
+                    row
                   }
                 });
               }

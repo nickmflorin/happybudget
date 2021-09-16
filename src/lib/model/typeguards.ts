@@ -1,3 +1,14 @@
+export const isMarkup = (m: Model.HttpModel): m is Model.Markup => (m as Model.Markup).type === "markup";
+export const isFringe = (m: Model.HttpModel): m is Model.Fringe => (m as Model.Fringe).type === "fringe";
+export const isGroup = (m: Model.HttpModel): m is Model.Group => (m as Model.Group).type === "group";
+export const isAccount = (m: Model.HttpModel): m is Model.Account => (m as Model.Account).type === "account";
+export const isSubAccount = (m: Model.HttpModel): m is Model.SubAccount =>
+  (m as Model.SubAccount).type === "subaccount";
+export const isBudget = (m: Model.HttpModel): m is Model.Budget | Model.SimpleBudget =>
+  (m as Model.Budget | Model.SimpleBudget).type === "budget";
+export const isTemplate = (m: Model.HttpModel): m is Model.Template | Model.SimpleTemplate =>
+  (m as Model.Template | Model.SimpleTemplate).type === "template";
+
 export const isFieldAlterationEvent = (
   event: Model.FieldAlterationEvent | Model.CreateEvent
 ): event is Model.FieldAlterationEvent => {
@@ -10,9 +21,11 @@ export const isModelWithChildren = <M extends Model.Model>(model: M): model is M
   );
 };
 
-export const isModelWithGroup = <M extends Model.Model, G extends Model.Group = Model.Group>(
-  m: M | (M & { readonly group: G | null })
-): m is M & { readonly group: G | null } => (m as M & { readonly group: G | null }).group !== undefined;
+/* eslint-disable indent */
+export const isModelWithGroup = <M extends Model.Model>(
+  m: M | (M & { readonly group: Model.Group | null })
+): m is M & { readonly group: Model.Group | null } =>
+  (m as M & { readonly group: Model.Group | null }).group !== undefined;
 
 export const isBudgetForm = (obj: Model.Entity | Model.SimpleEntity): obj is Model.BudgetForm => {
   return (obj as Model.BudgetForm).type === "budget";
@@ -42,10 +55,6 @@ export const isBudgetOrTemplateForm = (
   obj: Model.Entity | Model.SimpleEntity
 ): obj is Model.BudgetForm | Model.TemplateForm => {
   return isBudgetForm(obj) || isTemplateForm(obj);
-};
-
-export const isSubAccount = (obj: Model.Account | Model.SubAccount): obj is Model.SubAccount => {
-  return (obj as Model.SubAccount).type === "subaccount";
 };
 
 export const isModelWithColor = (model: Model.Model | Model.ModelWithColor): model is Model.ModelWithColor => {

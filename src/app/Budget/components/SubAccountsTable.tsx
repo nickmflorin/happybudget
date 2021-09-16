@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { isNil, find } from "lodash";
+import { isNil } from "lodash";
 
 import { model, tabling } from "lib";
 import { selectors } from "store";
@@ -9,13 +9,13 @@ import { SubAccountsTable as GenericSubAccountsTable } from "components/tabling"
 
 import PreviewModal from "./PreviewModal";
 
-type PreContactCreate = Omit<Table.SoloCellChange<Tables.SubAccountRowData>, "newValue">;
+type PreContactCreate = Omit<Table.SoloCellChange<Tables.SubAccountRowData, Model.SubAccount>, "newValue">;
 
 type OmitTableProps = "contacts" | "onEditContact" | "onNewContact" | "menuPortalId" | "columns" | "onExportPdf";
 
 export interface BudgetSubAccountsTableProps
   extends Omit<GenericSubAccountsTable.AuthenticatedBudgetProps, OmitTableProps> {
-  readonly budgetId: ID;
+  readonly budgetId: number;
   readonly budget: Model.Budget | null;
 }
 
@@ -23,27 +23,11 @@ const SubAccountsTable = ({ budget, budgetId, ...props }: BudgetSubAccountsTable
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
   const [preContactCreate, setPreContactCreate] = useState<PreContactCreate | null>(null);
   const [initialContactFormValues, setInitialContactFormValues] = useState<any>(null);
-  const [contactToEdit, setContactToEdit] = useState<ID | null>(null);
+  const [contactToEdit, setContactToEdit] = useState<number | null>(null);
   const [createContactModalVisible, setCreateContactModalVisible] = useState(false);
 
   const contacts = useSelector(selectors.selectContacts);
-  const table = tabling.hooks.useTableIfNotDefined<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup>(
-    props.table
-  );
-
-  const editingContact = useMemo(() => {
-    if (!isNil(contactToEdit)) {
-      const contact: Model.Contact | undefined = find(contacts, { id: contactToEdit } as any);
-      if (!isNil(contact)) {
-        return contact;
-      } else {
-        /* eslint-disable no-console */
-        console.error(`Could not find contact with ID ${contactToEdit} in state.`);
-        return null;
-      }
-    }
-    return null;
-  }, [contactToEdit]);
+  const table = tabling.hooks.useTableIfNotDefined<Tables.SubAccountRowData, Model.SubAccount>(props.table);
 
   return (
     <React.Fragment>
@@ -53,7 +37,7 @@ const SubAccountsTable = ({ budget, budgetId, ...props }: BudgetSubAccountsTable
         contacts={contacts}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
-        onEditContact={(contact: ID) => setContactToEdit(contact)}
+        onEditContact={(contact: number) => setContactToEdit(contact)}
         onExportPdf={() => setPreviewModalVisible(true)}
         onNewContact={(params: { name?: string; change: PreContactCreate }) => {
           setPreContactCreate(params.change);
@@ -68,10 +52,10 @@ const SubAccountsTable = ({ budget, budgetId, ...props }: BudgetSubAccountsTable
           setCreateContactModalVisible(true);
         }}
       />
-      {!isNil(editingContact) && (
+      {!isNil(contactToEdit) && (
         <EditContactModal
-          visible={true}
-          contact={editingContact}
+          open={true}
+          id={contactToEdit}
           onSuccess={() => setContactToEdit(null)}
           onCancel={() => setContactToEdit(null)}
         />
@@ -88,7 +72,7 @@ const SubAccountsTable = ({ budget, budgetId, ...props }: BudgetSubAccountsTable
             // cell, combine that information with the new value to perform a table update, showing
             // the created contact in the new cell.
             if (!isNil(preContactCreate)) {
-              const cellChange: Table.SoloCellChange<Tables.SubAccountRowData> = {
+              const cellChange: Table.SoloCellChange<Tables.SubAccountRowData, Model.SubAccount> = {
                 ...preContactCreate,
                 newValue: contact.id
               };

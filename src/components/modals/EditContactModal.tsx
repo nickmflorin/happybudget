@@ -5,27 +5,18 @@ import { isNil } from "lodash";
 import * as api from "api";
 import { actions } from "store";
 
-import { Form } from "components";
 import { ContactForm } from "components/forms";
-import { Modal } from "components";
 
+import { EditModelModal, EditModelModalProps } from "./generic";
 import ContactModalHeader, { IContactModalHeaderRef } from "./ContactModalHeader";
 import "./ContactModal.scss";
 
-interface EditContactModalProps {
-  contact: Model.Contact;
-  visible: boolean;
-  onCancel: () => void;
-  onSuccess: () => void;
-}
+interface EditContactModalProps extends EditModelModalProps<Model.Contact> {}
 
 const MemoizedContactForm = React.memo(ContactForm);
 
-const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContactModalProps): JSX.Element => {
+const EditContactModal = (props: EditContactModalProps): JSX.Element => {
   const [image, setImage] = useState<UploadedImage | null | undefined>(undefined);
-  const [loading, setLoading] = useState(false);
-  const [globalError, setGlobalError] = useState<string | undefined>(undefined);
-  const [form] = Form.useForm<Http.ContactPayload>({ isInModal: true, autoFocusField: 1 });
   const dispatch: Redux.Dispatch = useDispatch();
   /*
   Note: We have to use a ref here, instead of storing firstName and lastName in the state
@@ -40,7 +31,6 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
       headerRef.current?.setFirstName(null);
       headerRef.current?.setLastName(null);
       setImage(null);
-      form.resetFields();
     };
   }, []);
 
@@ -57,9 +47,13 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
   );
 
   return (
-    <Modal.Modal
+    <EditModelModal
+      {...props}
       className={"contact-modal"}
-      title={
+      update={api.updateContact}
+      request={api.getContact}
+      autoFocusField={1}
+      title={(contact: Model.Contact, form: FormInstance<Http.ContactPayload>) => (
         <ContactModalHeader
           value={contact.image}
           onChange={(f: UploadedImage | null) => setImage(f)}
@@ -67,61 +61,35 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
           ref={headerRef}
           initialValues={{ first_name: contact.first_name, last_name: contact.last_name }}
         />
-      }
-      visible={visible}
-      onCancel={() => onCancel()}
-      okText={"Save"}
-      cancelText={"Cancel"}
-      loading={loading}
-      getContainer={false}
-      onOk={() => {
-        form
-          .validateFields()
-          .then((values: Http.ContactPayload) => {
-            setLoading(true);
-            let payload = { ...values };
-            // We have to account for allowing the image to be null, which is the case
-            // when we are deleting the image for the contact.
-            if (image !== undefined) {
-              payload = { ...payload, image: !isNil(image) ? image.data : null };
-            }
-            api
-              .updateContact(contact.id, payload)
-              .then((newContact: Model.Contact) => {
-                setGlobalError(undefined);
-                form.resetFields();
-                dispatch(actions.authenticated.updateContactInStateAction({ id: contact.id, data: newContact }));
-                onSuccess();
-              })
-              .catch((e: Error) => {
-                form.handleRequestError(e);
-              })
-              .finally(() => {
-                setLoading(false);
-              });
-          })
-          .catch(() => {
-            return;
-          });
+      )}
+      interceptPayload={(p: Http.ContactPayload) => {
+        // We have to account for allowing the image to be null, which is the case
+        // when we are deleting the image for the contact.
+        if (image !== undefined) {
+          return { ...p, image: !isNil(image) ? image.data : null };
+        }
+        return p;
       }}
+      onSuccess={(m: Model.Contact) => {
+        dispatch(actions.authenticated.updateContactInStateAction({ id: m.id, data: m }));
+        props.onSuccess?.(m);
+      }}
+      setFormData={(contact: Model.Contact, form: FormInstance<Http.ContactPayload>) =>
+        form.setFields([
+          { name: "type", value: contact.type },
+          { name: "first_name", value: contact.first_name },
+          { name: "last_name", value: contact.last_name },
+          { name: "company", value: contact.company },
+          { name: "email", value: contact.email },
+          { name: "position", value: contact.position },
+          { name: "rate", value: contact.rate },
+          { name: "city", value: contact.city },
+          { name: "phone_number", value: contact.phone_number }
+        ])
+      }
     >
-      <MemoizedContactForm
-        form={form}
-        globalError={globalError}
-        onValuesChange={onValuesChange}
-        initialValues={{
-          type: !isNil(contact.type) ? contact.type.id : null,
-          first_name: contact.first_name,
-          last_name: contact.last_name,
-          company: contact.company,
-          email: contact.email,
-          position: contact.position,
-          rate: contact.rate,
-          city: contact.city,
-          phone_number: contact.phone_number
-        }}
-      />
-    </Modal.Modal>
+      {(form: FormInstance<Http.ContactPayload>) => <MemoizedContactForm form={form} onValuesChange={onValuesChange} />}
+    </EditModelModal>
   );
 };
 

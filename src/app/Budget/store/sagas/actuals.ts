@@ -35,8 +35,7 @@ function* searchTreeSaga(): SagaIterator {
 const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   Tables.ActualRowData,
   Model.Actual,
-  Model.Group,
-  Redux.AuthenticatedTableActionMap<Tables.ActualRowData, Model.Actual, Model.Group>
+  Redux.AuthenticatedTableActionMap<Tables.ActualRowData, Model.Actual>
 >({
   actions: ActionMap,
   tasks: tasks

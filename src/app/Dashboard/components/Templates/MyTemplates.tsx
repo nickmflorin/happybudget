@@ -16,7 +16,7 @@ const selectTemplates = (state: Application.Authenticated.Store) => state.dashbo
 const selectLoadingTemplates = (state: Application.Authenticated.Store) => state.dashboard.templates.loading;
 
 interface MyTemplatesProps {
-  setTemplateToDerive: (template: ID) => void;
+  setTemplateToDerive: (template: number) => void;
 }
 
 const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.Element => {

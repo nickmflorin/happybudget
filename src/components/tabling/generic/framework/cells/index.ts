@@ -1,4 +1,7 @@
 export { default as ExpandCell } from "./ExpandCell";
+export * from "./ExpandCell";
+export { default as EditCell } from "./EditCell";
+export * from "./EditCell";
 export { default as CalculatedCell } from "./CalculatedCell";
 export * from "./CalculatedCell";
 export { default as ColorCell } from "./ColorCell";
@@ -20,3 +23,4 @@ export { default as PhoneNumberCell } from "./PhoneNumberCell";
 export * from "./PhoneNumberCell";
 export { default as excludeRowsOfType } from "./excludeRowsOfType";
 export { default as connectCellToStore } from "./connectCellToStore";
+export { default as renderOnRowType } from "./renderOnRowType";

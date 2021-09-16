@@ -23,6 +23,7 @@ const MemoizedContactForm = React.memo(ContactForm);
 
 const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: CreateContactModalProps): JSX.Element => {
   const [image, setImage] = useState<UploadedImage | null>(null);
+  const cancelToken = api.useCancelToken();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<Http.ContactPayload>({ isInModal: true, autoFocusField: 1 });
   const dispatch: Redux.Dispatch = useDispatch();
@@ -56,7 +57,7 @@ const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: Cre
   );
 
   return (
-    <Modal.Modal
+    <Modal
       className={"contact-modal"}
       title={
         <ContactModalHeader
@@ -84,7 +85,7 @@ const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: Cre
             }
             setLoading(true);
             api
-              .createContact(payload)
+              .createContact(payload, { cancelToken: cancelToken() })
               .then((contact: Model.Contact) => {
                 form.resetFields();
                 dispatch(actions.authenticated.addContactToStateAction(contact));
@@ -103,7 +104,7 @@ const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: Cre
       }}
     >
       <MemoizedContactForm form={form} initialValues={initialValues} onValuesChange={onValuesChange} />
-    </Modal.Modal>
+    </Modal>
   );
 };
 

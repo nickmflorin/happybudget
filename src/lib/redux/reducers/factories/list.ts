@@ -32,7 +32,7 @@ export const createListResponseReducer = <
 };
 
 export const createModelListResponseReducer = <
-  M extends Model.Model,
+  M extends Model.HttpModel,
   A extends Partial<Redux.ModelListResponseActionMap<M>> = Redux.ModelListResponseActionMap<M>,
   S extends Redux.ModelListResponseStore<M> = Redux.ModelListResponseStore<M>
 >(

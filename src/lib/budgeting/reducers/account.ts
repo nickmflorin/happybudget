@@ -7,13 +7,13 @@ type R = Tables.SubAccountRowData;
 type M = Model.Account;
 
 export type AccountDetailActionMap = Omit<Redux.ModelDetailResponseActionMap<M>, "updateInState"> & {
-  readonly setId: ID | null;
-  readonly tableChanged?: Table.ChangeEvent<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup>;
+  readonly setId: number | null;
+  readonly tableChanged?: Table.ChangeEvent<Tables.SubAccountRowData, Model.SubAccount>;
   readonly fringesTableChanged?: Table.ChangeEvent<Tables.FringeRowData, Model.Fringe>;
 };
 
 type MinimalAccountStore = {
-  readonly id: ID | null;
+  readonly id: number | null;
   readonly detail: Redux.ModelDetailResponseStore<Model.Account>;
   readonly table: Tables.SubAccountTableStore;
 };
@@ -34,7 +34,7 @@ export const createAccountDetailReducer = <S extends MinimalAccountStore>(
       initialState: redux.initialState.initialDetailResponseState,
       actions: config.actions
     }),
-    id: redux.reducers.createSimplePayloadReducer<ID | null>({
+    id: redux.reducers.createSimplePayloadReducer<number | null>({
       initialState: null,
       actions: { set: config.actions.setId }
     })

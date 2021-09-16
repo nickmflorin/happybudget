@@ -6,9 +6,10 @@ namespace Tables {
   interface AccountRowData {
     readonly identifier: string | null;
     readonly description: string | null;
-    readonly estimated: number | null;
-    readonly variance?: number | null;
-    readonly actual?: number | null;
+    readonly estimated: number;
+    readonly fringe_contribution: number;
+    readonly markup_contribution: number;
+    readonly actual: number;
   }
   type AccountRow = Table.Row<AccountRowData, Model.Account>;
   type AccountTableStore = Redux.BudgetTableStore<AccountRowData, Model.Account>;
@@ -20,11 +21,12 @@ namespace Tables {
     readonly unit: Model.Tag | null;
     readonly multiplier: number | null;
     readonly rate: number | null;
-    readonly estimated: number | null;
     readonly fringes: number[];
     readonly contact?: number | null;
-    readonly variance?: number | null;
-    readonly actual?: number | null;
+    readonly estimated: number;
+    readonly fringe_contribution: number;
+    readonly markup_contribution: number;
+    readonly actual: number;
   }
   type SubAccountRow = Table.Row<SubAccountRowData, Model.SubAccount>;
   type SubAccountTableStore = Redux.BudgetTableStore<SubAccountRowData, Model.SubAccount> & {
@@ -92,5 +94,5 @@ namespace Tables {
   };
 
   type ContactRow = Table.Row<ContactRowData, Model.Contact>;
-  type ContactTableStore = Redux.TableStore<ContactRowData, Model.Contact, Model.Group>;
+  type ContactTableStore = Redux.TableStore<ContactRowData, Model.Contact>;
 }

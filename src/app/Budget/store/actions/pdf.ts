@@ -9,9 +9,9 @@ export const responseHeaderTemplatesAction = createAction<Http.ListResponse<Mode
 export const addHeaderTemplateToStateAction = createAction<Model.SimpleHeaderTemplate>(
   ActionType.HeaderTemplates.AddToState
 );
-export const removeHeaderTemplateFromStateAction = createAction<ID>(ActionType.HeaderTemplates.RemoveFromState);
+export const removeHeaderTemplateFromStateAction = createAction<number>(ActionType.HeaderTemplates.RemoveFromState);
 
 export const setLoadingHeaderTemplateDetailAction = createAction<boolean>(ActionType.HeaderTemplates.LoadingDetail);
-export const loadHeaderTemplateAction = createAction<ID>(ActionType.HeaderTemplates.Load);
+export const loadHeaderTemplateAction = createAction<number>(ActionType.HeaderTemplates.Load);
 export const clearHeaderTemplateAction = createAction<null>(ActionType.HeaderTemplates.Clear);
 export const displayHeaderTemplateAction = createAction<Model.HeaderTemplate>(ActionType.HeaderTemplates.Display);

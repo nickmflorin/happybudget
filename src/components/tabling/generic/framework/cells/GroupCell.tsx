@@ -10,23 +10,21 @@ import { Cell, ValueCell } from "components/tabling/generic/framework/cells";
 
 interface GroupCellProps<
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
-> extends Table.ValueCellProps<R, M, G, S> {
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+> extends Table.ValueCellProps<R, M, S> {
   readonly onEdit?: (group: Table.GroupRow<R>) => void;
 }
 
 /* eslint-disable indent */
 const GroupCell = <
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 >({
   onEdit,
   ...props
-}: GroupCellProps<R, M, G, S>): JSX.Element => {
+}: GroupCellProps<R, M, S>): JSX.Element => {
   const row: Table.Row<R, M> = props.node.data;
   const groupRowSelector = createSelector(
     [(state: Application.Store) => props.selector(state).data],
@@ -49,7 +47,7 @@ const GroupCell = <
   return !isNil(groupRow) ? (
     <Cell {...props}>
       <div style={{ display: "flex" }}>
-        <span>{`${groupRow.name} (${groupRow.children.length} Line Items)`}</span>
+        <span>{`${groupRow.groupData.name} (${groupRow.children.length} Line Items)`}</span>
         <IconButton
           className={"btn--edit-group"}
           size={"xxsmall"}

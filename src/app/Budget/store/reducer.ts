@@ -40,7 +40,7 @@ const headerTemplatesRootReducer: Redux.Reducer<Modules.Budget.HeaderTemplatesSt
 };
 
 const genericReducer = combineReducers({
-  id: redux.reducers.createSimplePayloadReducer<ID | null>({
+  id: redux.reducers.createSimplePayloadReducer<number | null>({
     initialState: null,
     actions: { set: actions.setBudgetIdAction }
   }),
@@ -105,13 +105,9 @@ const genericReducer = combineReducers({
           setSearch: actions.account.setSearchAction
         },
         tableId: "account-subaccounts-table",
-        getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
-        getPlaceholderRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
-        getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,
-        getModelRowName: "Sub Account",
-        getPlaceholderRowName: "Sub Account",
         columns: SubAccountsTable.Columns,
         fringesTableChangedAction: actions.handleFringesTableChangeEventAction,
+        getModelRowChildren: (m: Model.SubAccount) => m.children,
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
           tableId: "fringes-table",
           initialState: initialState.account.table.fringes,
@@ -179,11 +175,7 @@ const genericReducer = combineReducers({
           setSearch: actions.subAccount.setSearchAction
         },
         columns: SubAccountsTable.Columns,
-        getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
-        getPlaceholderRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
-        getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,
-        getModelRowName: "Sub Account",
-        getPlaceholderRowName: "Sub Account",
+        getModelRowChildren: (m: Model.SubAccount) => m.children,
         fringesTableChangedAction: actions.handleFringesTableChangeEventAction,
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
           tableId: "fringes-table",
@@ -242,10 +234,6 @@ const genericReducer = combineReducers({
       setSearch: actions.actuals.setSearchAction
     },
     columns: ActualsTable.Columns,
-    getModelRowLabel: (r: Tables.ActualRowData) => r.description,
-    getModelRowName: "Actual",
-    getPlaceholderRowLabel: (r: Tables.ActualRowData) => r.description,
-    getPlaceholderRowName: "Actual",
     subAccountsTree: redux.reducers.createModelListResponseReducer<
       Model.SubAccountTreeNode,
       Pick<

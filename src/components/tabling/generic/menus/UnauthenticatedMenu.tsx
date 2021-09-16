@@ -10,40 +10,31 @@ import UnauthenticatedToolbar from "./UnauthenticatedToolbar";
 
 import "./index.scss";
 
-export interface UnauthenticatedMenuProps<
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
-> {
-  readonly columns: Table.Column<R, M, G>[];
+export interface UnauthenticatedMenuProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
+  readonly columns: Table.Column<R, M>[];
   readonly search?: string;
   readonly menuPortalId?: string;
-  readonly actions?: Table.UnauthenticatedMenuActions<R, M, G>;
+  readonly actions?: Table.UnauthenticatedMenuActions<R, M>;
   readonly onSearch: (v: string) => void;
 }
 
 type InternalUnauthenticatedMenuProps<
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
-> = UnauthenticatedMenuProps<R, M, G> & {
+  M extends Model.HttpModel = Model.HttpModel
+> = UnauthenticatedMenuProps<R, M> & {
   readonly apis: Table.GridApis | null;
-  readonly hiddenColumns: (keyof R)[];
+  readonly hiddenColumns: (keyof R | string)[];
 };
 
 /* eslint-disable indent */
-const UnauthenticatedMenu = <
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
->(
-  props: Omit<InternalUnauthenticatedMenuProps<R, M, G>, "menuPortalId"> & { readonly detached: boolean }
+const UnauthenticatedMenu = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  props: Omit<InternalUnauthenticatedMenuProps<R, M>, "menuPortalId"> & { readonly detached: boolean }
 ) => (
   /* eslint-disable indent */
   <div className={classNames("table-action-menu", { detached: props.detached })}>
     <div className={"table-menu-left"}>
       {!isNil(props.actions) && (
-        <UnauthenticatedToolbar<R, M, G>
+        <UnauthenticatedToolbar<R, M>
           actions={props.actions}
           columns={props.columns}
           apis={props.apis}
@@ -65,16 +56,16 @@ const UnauthenticatedMenu = <
   </div>
 );
 
-const Menu = <R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group>({
+const Menu = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>({
   menuPortalId,
   ...props
-}: InternalUnauthenticatedMenuProps<R, M, G>) =>
+}: InternalUnauthenticatedMenuProps<R, M>) =>
   !isNil(menuPortalId) ? (
     <Portal id={menuPortalId}>
-      <UnauthenticatedMenu<R, M, G> {...props} detached={false} />
+      <UnauthenticatedMenu<R, M> {...props} detached={false} />
     </Portal>
   ) : (
-    <UnauthenticatedMenu<R, M, G> {...props} detached={true} />
+    <UnauthenticatedMenu<R, M> {...props} detached={true} />
   );
 
 export default Menu;

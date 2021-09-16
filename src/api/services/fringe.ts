@@ -1,18 +1,18 @@
 import { client } from "api";
 import { URL } from "./util";
 
-export const getFringe = async (id: ID, options: Http.RequestOptions = {}): Promise<Model.Fringe> => {
+export const getFringe = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Fringe> => {
   const url = URL.v1("fringes", id);
   return client.retrieve<Model.Fringe>(url, options);
 };
 
-export const deleteFringe = async (id: ID, options: Http.RequestOptions = {}): Promise<null> => {
+export const deleteFringe = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
   const url = URL.v1("fringes", id);
   return client.delete<null>(url, options);
 };
 
 export const updateFringe = async (
-  id: ID,
+  id: number,
   payload: Partial<Http.FringePayload>,
   options: Http.RequestOptions = {}
 ): Promise<Model.Fringe> => {

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { call, put, select, cancelled, spawn, takeLatest, all } from "redux-saga/effects";
-import { isNil, filter, includes } from "lodash";
+import { isNil, filter, intersection } from "lodash";
 
 import * as api from "api";
 import { budgeting, tabling } from "lib";
@@ -62,8 +62,8 @@ const Tasks = budgeting.tasks.subaccounts.createTableTaskSet<Model.Account, Mode
   actions: ActionMap,
   columns: filter(
     SubAccountsTable.Columns,
-    (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup>) =>
-      !includes(["contact", "actual", "variance"], c.field)
+    (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
+      intersection([c.field, c.colId], ["variance", "contact", "actual"]).length === 0
   ),
   services: {
     request: api.getAccountSubAccounts,
@@ -78,8 +78,7 @@ const Tasks = budgeting.tasks.subaccounts.createTableTaskSet<Model.Account, Mode
 const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   Tables.SubAccountRowData,
   Model.SubAccount,
-  Model.BudgetGroup,
-  Redux.AuthenticatedTableActionMap<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup>
+  Redux.AuthenticatedTableActionMap<Tables.SubAccountRowData, Model.SubAccount>
 >({
   actions: ActionMap,
   tasks: Tasks

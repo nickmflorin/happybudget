@@ -4,7 +4,7 @@ type RootFormProps = import("antd/lib/form").FormProps;
 interface FormInstance<T> extends RootFormInstance<T> {
   readonly handleRequestError: (e: Error) => void;
   readonly renderFieldErrors: (e: Http.IHttpClientError) => void;
-  readonly setGlobalError: (e: Error | string) => void;
+  readonly setGlobalError: (e: Error | string | undefined) => void;
   readonly setLoading: (value: boolean) => void;
   readonly globalError: string | undefined;
   readonly loading: boolean | undefined;

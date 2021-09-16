@@ -19,7 +19,7 @@ const selectTemplates = (state: Application.Authenticated.Store) => state.dashbo
 const selectLoadingTemplates = (state: Application.Authenticated.Store) => state.dashboard.community.loading;
 
 interface DiscoverProps {
-  setTemplateToDerive: (template: ID) => void;
+  setTemplateToDerive: (template: number) => void;
 }
 
 const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element => {
@@ -44,7 +44,7 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
     <div className={"my-templates"}>
       <WrapInApplicationSpinner loading={loading}>
         <div className={"dashboard-card-grid"}>
-          {map(templates, (template: Model.Template, index: ID) => {
+          {map(templates, (template: Model.Template, index: number) => {
             // The API will exclude hidden community templates for non-staff users
             // by design.  However, just in case we will also make sure that we are
             // not showing those templates to the user in the frontend.

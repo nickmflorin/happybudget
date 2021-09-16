@@ -1,38 +1,45 @@
-import { findIndex, isNil, map, filter, includes } from "lodash";
-import { Column } from "@ag-grid-community/core";
+import { findIndex, isNil, map, filter, includes, reduce } from "lodash";
+import { ValueGetterParams, Column } from "@ag-grid-community/core";
 
 import { tabling } from "lib";
+import { Icon } from "components";
 import { framework } from "components/tabling/generic";
 import { framework as budgetFramework } from "../BudgetTable";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
 
-const Columns: Table.Column<R, M, Model.BudgetGroup>[] = [
+const Columns: Table.Column<R, M>[] = [
   budgetFramework.columnObjs.IdentifierColumn<R, M>({
     field: "identifier",
     headerName: "" // Will be populated by Table.
   }),
-  framework.columnObjs.BodyColumn<R, M, Model.BudgetGroup>({
+  framework.columnObjs.BodyColumn<R, M>({
     field: "description",
     minWidth: 200,
     flex: 100,
     columnType: "longText",
     index: 1,
+    getMarkupValue: "description",
     suppressSizeToFit: false,
-    colSpan: (params: Table.ColSpanParams<R, M, Model.BudgetGroup>) => {
+    cellRenderer: "BodyCell",
+    cellRendererParams: {
+      icon: (row: Table.Row<R, M>) =>
+        tabling.typeguards.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined
+    },
+    colSpan: (params: Table.ColSpanParams<R, M>) => {
       const row: Table.Row<R, M> = params.data;
       if (tabling.typeguards.isModelRow(row)) {
         if (!isNil(row.children) && row.children.length !== 0) {
           const agColumns: Column[] | undefined = params.columnApi?.getAllDisplayedColumns();
           if (!isNil(agColumns)) {
-            const originalCalculatedColumns = map(
-              filter(
-                params.columns,
-                (col: Table.Column<R, M, Model.BudgetGroup>) => col.tableColumnType === "calculated"
+            const originalCalculatedColumns = filter(
+              map(
+                filter(params.columns, (col: Table.Column<R, M>) => col.tableColumnType === "calculated"),
+                (col: Table.Column<R, M>) => col.field || col.colId
               ),
-              (col: Table.Column<R, M, Model.BudgetGroup>) => col.field
-            );
+              (f: keyof R | string | undefined) => !isNil(f)
+            ) as string[];
             const indexOfDescriptionColumn = findIndex(agColumns, (col: Column) => col.getColId() === "description");
             const indexOfFirstCalculatedColumn = findIndex(agColumns, (col: Column) =>
               includes(originalCalculatedColumns, col.getColId())
@@ -44,7 +51,7 @@ const Columns: Table.Column<R, M, Model.BudgetGroup>[] = [
       return 1;
     }
   }),
-  framework.columnObjs.ModelSelectColumn<R, M, Model.Contact, Model.BudgetGroup>({
+  framework.columnObjs.ModelSelectColumn<R, M, Model.Contact>({
     field: "contact",
     headerName: "Contact",
     cellRenderer: { data: "ContactCell" },
@@ -57,7 +64,7 @@ const Columns: Table.Column<R, M, Model.BudgetGroup>[] = [
     modelClipboardValue: (m: Model.Contact) => m.full_name,
     processCellFromClipboard: (name: string): Model.Contact | null => null // Will be populated by Table.
   }),
-  framework.columnObjs.BodyColumn<R, M, Model.BudgetGroup, number>({
+  framework.columnObjs.BodyColumn<R, M, number>({
     field: "quantity",
     headerName: "Qty",
     width: 60,
@@ -80,7 +87,7 @@ const Columns: Table.Column<R, M, Model.BudgetGroup>[] = [
       }
     }
   }),
-  framework.columnObjs.TagSelectColumn<R, M, Model.BudgetGroup>({
+  framework.columnObjs.TagSelectColumn<R, M>({
     field: "unit",
     headerName: "Unit",
     cellRenderer: { data: "SubAccountUnitCell" },
@@ -88,14 +95,14 @@ const Columns: Table.Column<R, M, Model.BudgetGroup>[] = [
     models: [], // Will be populated by Table.
     width: 100
   }),
-  framework.columnObjs.BodyColumn<R, M, Model.BudgetGroup>({
+  framework.columnObjs.BodyColumn<R, M>({
     field: "multiplier",
     headerName: "X",
     width: 60,
     valueSetter: tabling.valueSetters.floatValueSetter<R>("multiplier"),
     columnType: "number"
   }),
-  framework.columnObjs.BodyColumn<R, M, Model.BudgetGroup>({
+  framework.columnObjs.BodyColumn<R, M>({
     field: "rate",
     headerName: "Rate",
     tableColumnType: "body",
@@ -104,7 +111,7 @@ const Columns: Table.Column<R, M, Model.BudgetGroup>[] = [
     valueSetter: tabling.valueSetters.floatValueSetter<R>("rate"),
     columnType: "currency"
   }),
-  framework.columnObjs.SelectColumn<R, M, Model.BudgetGroup>({
+  framework.columnObjs.SelectColumn<R, M>({
     field: "fringes",
     headerName: "Fringes",
     cellRenderer: { data: "FringesCell" },
@@ -112,20 +119,34 @@ const Columns: Table.Column<R, M, Model.BudgetGroup>[] = [
     nullValue: [],
     processCellForClipboard: (row: R) => "" // Will be populated by Table.
   }),
-  framework.columnObjs.CalculatedColumn<R, M, Model.BudgetGroup>({
+  framework.columnObjs.CalculatedColumn<R, M>({
     field: "estimated",
     headerName: "Estimated",
-    groupField: "estimated"
+    getGroupValue: (rows: Table.EditableRow<R, M>[]) => {
+      return reduce(
+        rows,
+        (curr: number, r: Table.EditableRow<R, M>) => curr + r.data.estimated + r.data.fringe_contribution,
+        0.0
+      );
+    }
   }),
-  framework.columnObjs.CalculatedColumn<R, M, Model.BudgetGroup>({
+  framework.columnObjs.CalculatedColumn<R, M>({
     field: "actual",
     headerName: "Actual",
-    groupField: "actual"
+    getGroupValue: (rows: Table.EditableRow<R, M>[]) => {
+      return reduce(rows, (curr: number, r: Table.EditableRow<R, M>) => curr + r.data.actual, 0.0);
+    }
   }),
-  framework.columnObjs.CalculatedColumn<R, M, Model.BudgetGroup>({
-    field: "variance",
+  framework.columnObjs.CalculatedColumn<R, M>({
+    colId: "variance",
     headerName: "Variance",
-    groupField: "variance"
+    valueGetter: (params: ValueGetterParams) => {
+      if (!isNil(params.node)) {
+        const row: Table.Row<R, M> = params.node.data;
+        return row.data.estimated + row.data.fringe_contribution - row.data.actual;
+      }
+      return 0.0;
+    }
   })
 ];
 

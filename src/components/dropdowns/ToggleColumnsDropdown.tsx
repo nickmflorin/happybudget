@@ -1,37 +1,36 @@
 import { useMemo } from "react";
-import { filter, map, includes } from "lodash";
+import { filter, map, includes, isNil } from "lodash";
 
 import Dropdown, { DropdownMenuItemsProps } from "./Dropdown";
 
 type OmitDropdownProps = "menuMode" | "menuCheckbox" | "menuSelected" | "menuItems";
-export interface ToggleColumnsDropdownProps<
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
-> extends Omit<DropdownMenuItemsProps, OmitDropdownProps> {
-  readonly columns: Table.Column<R, M, G>[];
-  readonly hiddenColumns?: (keyof R)[];
+export interface ToggleColumnsDropdownProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
+  extends Omit<DropdownMenuItemsProps, OmitDropdownProps> {
+  readonly columns: Table.Column<R, M>[];
+  readonly hiddenColumns?: (keyof R | string)[];
 }
 
 /* eslint-disable indent */
-const ToggleColumnsDropdown = <
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
->(
-  props: ToggleColumnsDropdownProps<R, M, G>
+const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  props: ToggleColumnsDropdownProps<R, M>
 ): JSX.Element => {
-  const hideableColumns = useMemo<Table.Column<R, M, G>[]>(
-    () => filter(props.columns, (col: Table.Column<R, M, G>) => col.canBeHidden !== false),
+  const hideableColumns = useMemo<Table.Column<R, M>[]>(
+    () => filter(props.columns, (col: Table.Column<R, M>) => col.canBeHidden !== false),
     [props.columns]
   );
 
   const selected = useMemo<(keyof R)[]>(
     () =>
-      map(
-        filter(hideableColumns, (col: Table.Column<R, M, G>) => !includes(props.hiddenColumns, col.field)),
-        (col: Table.Column<R, M, G>) => col.field
-      ),
+      filter(
+        map(
+          filter(
+            hideableColumns,
+            (col: Table.Column<R, M>) => !isNil(col.field) && !includes(props.hiddenColumns, col.field)
+          ),
+          (col: Table.Column<R, M>) => col.field
+        ),
+        (field: keyof R | undefined) => !isNil(field)
+      ) as (keyof R)[],
     [hideableColumns, props.hiddenColumns]
   );
 
@@ -44,7 +43,7 @@ const ToggleColumnsDropdown = <
       menuCheckbox={true}
       menuSelected={selected as string[]}
       keepDropdownOpenOnClick={true}
-      menuItems={map(hideableColumns, (col: Table.Column<R, M, G>) => ({
+      menuItems={map(hideableColumns, (col: Table.Column<R, M>) => ({
         id: col.field as string,
         label: col.headerName || ""
       }))}

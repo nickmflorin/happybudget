@@ -9,9 +9,9 @@ export interface GenericFringesModalProps {
 
 const GenericFringesModal = ({ open, onCancel, ...props }: GenericFringesModalProps): JSX.Element => {
   return (
-    <Modal.Modal className={"fringes-modal"} title={"Fringes"} visible={open} onCancel={() => onCancel()} footer={null}>
+    <Modal className={"fringes-modal"} title={"Fringes"} visible={open} onCancel={() => onCancel()} footer={null}>
       {props.children}
-    </Modal.Modal>
+    </Modal>
   );
 };
 

@@ -2,7 +2,7 @@ import { client } from "api";
 import { URL } from "./util";
 
 export const getBudgetComments = async (
-  id: ID,
+  id: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.Comment>> => {
@@ -11,7 +11,7 @@ export const getBudgetComments = async (
 };
 
 export const getAccountComments = async (
-  id: ID,
+  id: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.Comment>> => {
@@ -20,7 +20,7 @@ export const getAccountComments = async (
 };
 
 export const getSubAccountComments = async (
-  id: ID,
+  id: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.Comment>> => {
@@ -28,18 +28,18 @@ export const getSubAccountComments = async (
   return client.list<Model.Comment>(url, query, options);
 };
 
-export const getComment = async (id: ID, options: Http.RequestOptions = {}): Promise<Model.Comment> => {
+export const getComment = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Comment> => {
   const url = URL.v1("comments", id);
   return client.retrieve<Model.Comment>(url, options);
 };
 
-export const deleteComment = async (id: ID, options: Http.RequestOptions = {}): Promise<null> => {
+export const deleteComment = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
   const url = URL.v1("comments", id);
   return client.delete<null>(url, options);
 };
 
 export const updateComment = async (
-  id: ID,
+  id: number,
   payload: Partial<Http.CommentPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Model.Comment> => {
@@ -48,7 +48,7 @@ export const updateComment = async (
 };
 
 export const replyToComment = async (
-  id: ID,
+  id: number,
   text: string,
   options: Http.RequestOptions = {}
 ): Promise<Model.Comment> => {
@@ -57,7 +57,7 @@ export const replyToComment = async (
 };
 
 export const createBudgetComment = async (
-  id: ID,
+  id: number,
   payload: Http.CommentPayload,
   options: Http.RequestOptions = {}
 ): Promise<Model.Comment> => {
@@ -66,7 +66,7 @@ export const createBudgetComment = async (
 };
 
 export const createAccountComment = async (
-  id: ID,
+  id: number,
   payload: Http.CommentPayload,
   options: Http.RequestOptions = {}
 ): Promise<Model.Comment> => {
@@ -75,7 +75,7 @@ export const createAccountComment = async (
 };
 
 export const createSubAccountComment = async (
-  id: ID,
+  id: number,
   payload: Http.CommentPayload,
   options: Http.RequestOptions = {}
 ): Promise<Model.Comment> => {

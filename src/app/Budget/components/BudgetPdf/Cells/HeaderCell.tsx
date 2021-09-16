@@ -2,7 +2,7 @@ import classNames from "classnames";
 
 import Cell, { CellProps } from "./Cell";
 
-const HeaderCell = <R extends Table.RowData, M extends Model.Model = Model.Model>(
+const HeaderCell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   props: CellProps<R, M>
 ): JSX.Element => {
   return (

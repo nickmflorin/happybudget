@@ -38,9 +38,9 @@ export const DefaultFooterGridOptions: GridOptions = {
   suppressHorizontalScroll: true
 };
 
-type TableConfigurationProvidedProps<R extends Table.RowData, M extends Model.Model = Model.Model> = {
+type TableConfigurationProvidedProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {
   readonly tableApis: Table.ITableApis;
-  readonly hiddenColumns: (keyof R)[];
+  readonly hiddenColumns: (keyof R | string)[];
   readonly tableGridOptions: Table.TableOptionsSet;
   readonly hasExpandColumn: boolean;
   readonly minimal?: boolean;
@@ -60,38 +60,32 @@ type TableConfigurationProvidedProps<R extends Table.RowData, M extends Model.Mo
   ) => void;
 };
 
-export type TableConfigurationProps<
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
-> = {
+export type TableConfigurationProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {
   readonly cookieNames?: Table.CookieNames;
   readonly calculatedColumnWidth?: number;
-  readonly indexColumn?: Partial<Table.Column<R, M, G>>;
+  readonly indexColumn?: Partial<Table.Column<R, M>>;
   readonly indexColumnWidth?: number;
-  readonly expandColumn?: Partial<Table.Column<R, M, G>>;
+  readonly expandColumn?: Partial<Table.Column<R, M>>;
   readonly expandColumnWidth?: number;
   readonly expandCellTooltip?: string;
   readonly showPageFooter?: boolean;
   readonly minimal?: boolean;
   readonly leftAlignNewRowButton?: boolean;
   readonly rowHeight?: number;
-  readonly defaultRowLabel?: string;
-  readonly defaultRowName?: string;
   readonly menuPortalId?: string;
   // TODO: We should restrict this to authenticated cases only.
   readonly savingChangesPortalId?: string;
   readonly framework?: Table.Framework;
   readonly className?: Table.GeneralClassName;
-  readonly columns: Table.Column<R, M, G>[];
+  readonly columns: Table.Column<R, M>[];
   readonly rowCanExpand?: (row: Table.ModelRow<R, M>) => boolean;
   readonly onRowExpand?: null | ((row: Table.ModelRow<R, M>) => void);
-  readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M, G>) => void;
-  readonly isCellSelectable?: (params: Table.CellCallbackParams<R, M, G>) => boolean;
+  readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
+  readonly isCellSelectable?: (params: Table.CellCallbackParams<R, M>) => boolean;
   readonly pinFirstColumn?: boolean;
 };
 
-export type WithConfiguredTableProps<T, R extends Table.RowData, M extends Model.Model = Model.Model> = T &
+export type WithConfiguredTableProps<T, R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = T &
   TableConfigurationProvidedProps<R, M>;
 
 const InitialAPIs = new tabling.TableApis({});
@@ -99,9 +93,8 @@ const InitialAPIs = new tabling.TableApis({});
 /* eslint-disable indent */
 const configureTable = <
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  T extends TableConfigurationProps<R, M, G> = TableConfigurationProps<R, M, G>
+  M extends Model.HttpModel = Model.HttpModel,
+  T extends TableConfigurationProps<R, M> = TableConfigurationProps<R, M>
 >(
   Component:
     | React.ComponentClass<WithConfiguredTableProps<T, R, M>, {}>
@@ -110,9 +103,9 @@ const configureTable = <
   function WithConfigureTable(props: T) {
     const [_apis, _setApis] = useState<tabling.TableApis>(InitialAPIs);
 
-    const [hiddenColumns, changeColumnVisibility] = tabling.hooks.useHiddenColumns<R, M, G>({
+    const [hiddenColumns, changeColumnVisibility] = tabling.hooks.useHiddenColumns<R, M>({
       cookie: props.cookieNames?.hiddenColumns,
-      columns: map(filter(props.columns, (col: Table.Column<R, M, G>) => col.canBeHidden !== false)),
+      columns: map(filter(props.columns, (col: Table.Column<R, M>) => col.canBeHidden !== false)),
       apis: _apis
     });
 
@@ -145,24 +138,24 @@ const configureTable = <
 
     const hasExpandColumn = useMemo(() => !isNil(props.onRowExpand), [props.onRowExpand]);
 
-    const columns = useMemo<Table.Column<R, M, G>[]>((): Table.Column<R, M, G>[] => {
-      let orderedColumns = tabling.columns.orderColumns<Table.Column<R, M, G>, R, M, G>(props.columns);
+    const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
+      let orderedColumns = tabling.columns.orderColumns<Table.Column<R, M>, R, M>(props.columns);
 
       if (hasExpandColumn === true) {
         return [
-          framework.columnObjs.IndexColumn<R, M, G>(
+          framework.columnObjs.IndexColumn<R, M>(
             { ...props.indexColumn, pinned: props.pinFirstColumn ? "left" : undefined },
             hasExpandColumn,
             props.indexColumnWidth
           ),
-          framework.columnObjs.ExpandColumn<R, M, G>(
+          framework.columnObjs.ExpandColumn<R, M>(
             {
               pinned: props.pinFirstColumn ? "left" : undefined,
               // These are only applicable for the non-footer grids, but it is easier to define them
               // at the top Table level than at the Grid level.
               cellRendererParams: {
                 ...props.expandColumn?.cellRendererParams,
-                onClick: (row: Table.ModelRow<R, M>) => tabling.typeguards.isDataRow(row) && props.onRowExpand?.(row),
+                onExpand: (row: Table.ModelRow<R, M>) => tabling.typeguards.isDataRow(row) && props.onRowExpand?.(row),
                 rowCanExpand: props.rowCanExpand,
                 tooltip: props.expandCellTooltip
               }
@@ -175,7 +168,7 @@ const configureTable = <
         ];
       }
       return [
-        framework.columnObjs.IndexColumn<R, M, G>(
+        framework.columnObjs.IndexColumn<R, M>(
           { ...props.indexColumn, pinned: props.pinFirstColumn ? "left" : undefined },
           hasExpandColumn || false,
           props.indexColumnWidth
@@ -187,7 +180,7 @@ const configureTable = <
     }, [hooks.useDeepEqualMemo(props.columns), props.pinFirstColumn, hasExpandColumn, props.onRowExpand]);
 
     const processCellForClipboard = hooks.useDynamicCallback(
-      (column: Table.Column<R, M, G>, row: Table.DataRow<R, M>, value?: any) => {
+      (column: Table.Column<R, M>, row: Table.DataRow<R, M>, value?: any) => {
         const processor = column.processCellForClipboard;
         if (!isNil(processor)) {
           return processor(row.data);
@@ -205,19 +198,19 @@ const configureTable = <
     const getCSVData = hooks.useDynamicCallback((fields?: (keyof R)[]) => {
       const apis: Table.GridApis | null = _apis.get("data");
       if (!isNil(apis)) {
-        const cs: Table.Column<R, M, G>[] = filter(
+        const cs: Table.Column<R, M>[] = filter(
           columns,
-          (column: Table.Column<R, M, G>) =>
+          (column: Table.Column<R, M>) =>
             column.canBeExported !== false && (isNil(fields) || includes(fields, column.field))
         );
-        const csvData: CSVData = [map(cs, (col: Table.Column<R, M, G>) => col.headerName || "")];
+        const csvData: CSVData = [map(cs, (col: Table.Column<R, M>) => col.headerName || "")];
         apis.grid.forEachNode((node: RowNode, index: number) => {
           const row: Table.Row<R, M> = node.data;
           if (typeguards.isDataRow(row)) {
             csvData.push(
               reduce(
                 cs,
-                (current: CSVRow, column: Table.Column<R, M, G>) => [...current, processCellForClipboard(column, row)],
+                (current: CSVRow, column: Table.Column<R, M>) => [...current, processCellForClipboard(column, row)],
                 []
               )
             );

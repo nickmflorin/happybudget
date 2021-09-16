@@ -13,7 +13,7 @@ import MyTemplates from "./MyTemplates";
 import TemplatesMenu from "./TemplatesMenu";
 
 const Templates = (): JSX.Element => {
-  const [templateToDerive, setTemplateToDerive] = useState<ID | undefined>(undefined);
+  const [templateToDerive, setTemplateToDerive] = useState<number | undefined>(undefined);
   const dispatch = useDispatch();
   const history = useHistory();
 

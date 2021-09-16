@@ -9,23 +9,27 @@ import { tabling } from "lib";
 import { AuthenticatedBudgetDataGrid } from "../grids";
 import { Framework } from "../framework";
 
-export type AuthenticatedBudgetTableProps<R extends Table.RowData, M extends Model.Model = Model.Model> = Omit<
-  AuthenticatedTableProps<R, M, Model.BudgetGroup>,
+export type AuthenticatedBudgetTableProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = Omit<
+  AuthenticatedTableProps<R, M>,
   "children"
 > & {
   readonly onBack?: () => void;
+  // Markup is currently not applicable for Templates.
+  readonly onEditMarkup?: (row: Table.MarkupRow<R>) => void;
 };
 
 /* eslint-disable indent */
-const AuthenticatedBudgetTable = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  props: AuthenticatedBudgetTableProps<R, M>
-): JSX.Element => {
+const AuthenticatedBudgetTable = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>({
+  onEditMarkup,
+  ...props
+}: AuthenticatedBudgetTableProps<R, M>): JSX.Element => {
   return (
-    <AuthenticatedTable<R, M, Model.BudgetGroup>
+    <AuthenticatedTable<R, M>
       {...props}
+      expandColumn={{ cellRendererParams: { onEdit: (row: Table.MarkupRow<R>) => onEditMarkup?.(row) } }}
       framework={tabling.aggrid.combineFrameworks(Framework, props.framework)}
     >
-      {(params: AuthenticatedTableDataGridProps<R, M, Model.BudgetGroup>) => (
+      {(params: AuthenticatedTableDataGridProps<R, M>) => (
         <AuthenticatedBudgetDataGrid<R, M>
           {...params}
           onBack={props.onBack}

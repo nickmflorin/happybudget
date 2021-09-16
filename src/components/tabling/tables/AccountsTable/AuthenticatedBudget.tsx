@@ -5,7 +5,7 @@ import { framework } from "components/tabling/generic";
 
 import { AuthenticatedBudgetTable, AuthenticatedBudgetTableProps } from "../BudgetTable";
 import AccountsTable, { AccountsTableProps } from "./AccountsTable";
-import { BudgetColumns } from "./Columns";
+import Columns from "./Columns";
 
 type R = Tables.AccountRowData;
 type M = Model.Account;
@@ -15,18 +15,16 @@ export type AuthenticatedBudgetProps = AccountsTableProps &
     readonly budget: Model.Budget | null;
     readonly cookieNames?: Table.CookieNames;
     readonly onExportPdf: () => void;
-    readonly onEditGroup: (group: Table.GroupRow<R>) => void;
   };
 
 const AuthenticatedBudgetAccountsTable = (props: AuthenticatedBudgetProps): JSX.Element => {
-  const table = tabling.hooks.useTableIfNotDefined<R, M, Model.BudgetGroup>(props.table);
+  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
 
   return (
     <AuthenticatedBudgetTable<R, M>
       {...props}
       table={table}
-      pinFirstColumn={true}
-      actions={(params: Table.AuthenticatedMenuActionParams<R, M, Model.BudgetGroup>) => [
+      actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
         {
           icon: "folder",
           disabled: true,
@@ -40,26 +38,23 @@ const AuthenticatedBudgetAccountsTable = (props: AuthenticatedBudgetProps): JSX.
           isWriteOnly: true
         },
         ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
-        framework.actions.ToggleColumnAction<R, M, Model.BudgetGroup>(table.current, params),
+        framework.actions.ToggleColumnAction<R, M>(table.current, params),
         framework.actions.ExportPdfAction(props.onExportPdf),
-        framework.actions.ExportCSVAction<R, M, Model.BudgetGroup>(
+        framework.actions.ExportCSVAction<R, M>(
           table.current,
           params,
           !isNil(props.budget) ? `${props.budget.type}_${props.budget.name}_accounts` : ""
         )
       ]}
-      columns={tabling.columns.mergeColumns<Table.Column<R, M, Model.BudgetGroup>, R, M, Model.BudgetGroup>(
-        BudgetColumns,
-        {
-          identifier: (col: Table.Column<R, M, Model.BudgetGroup>) => ({
-            ...col,
-            cellRendererParams: {
-              ...col.cellRendererParams,
-              onGroupEdit: props.onEditGroup
-            }
-          })
-        }
-      )}
+      columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(Columns, {
+        identifier: (col: Table.Column<R, M>) => ({
+          ...col,
+          cellRendererParams: {
+            ...col.cellRendererParams,
+            onGroupEdit: props.onEditGroup
+          }
+        })
+      })}
     />
   );
 };

@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { map, isNil, includes, cloneDeep } from "lodash";
+import { map, isNil, includes, cloneDeep, filter } from "lodash";
 import classNames from "classnames";
 
 import { AgGridReact } from "@ag-grid-community/react";
@@ -65,7 +65,7 @@ Note: Right now, we are restricting the use of AG Grid props to those that are
       Grid prop anywhere when they are created, we can simply set
       ExtendAgGridProps to true above.
 */
-type UseAgProps<R extends Table.RowData, M extends Model.Model = Model.Model> = ExtensionProps & {
+type UseAgProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = ExtensionProps & {
   readonly allowContextMenuWithControlKey?: boolean;
   readonly frameworkComponents?: Table.FrameworkGroup;
   readonly suppressCopyRowsToClipboard?: boolean;
@@ -92,17 +92,14 @@ type UseAgProps<R extends Table.RowData, M extends Model.Model = Model.Model> = 
   readonly getContextMenuItems?: (row: Table.Row<R, M>, node: Table.RowNode) => Table.MenuItemDef[];
 };
 
-export interface GridProps<
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
-> extends UseAgProps<R, M> {
+export interface GridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
+  extends UseAgProps<R, M> {
   readonly id: Table.GridId;
   readonly data?: Table.Row<R, M>[];
-  readonly hiddenColumns: (keyof R)[];
+  readonly hiddenColumns: (keyof R | string)[];
   readonly gridOptions: Table.GridOptions;
-  readonly indexColumn?: Partial<Table.Column<R, M, G>>;
-  readonly columns: Table.Column<R, M, G>[];
+  readonly indexColumn?: Partial<Table.Column<R, M>>;
+  readonly columns: Table.Column<R, M>[];
   readonly className?: Table.GeneralClassName;
   readonly style?: React.CSSProperties;
   readonly rowClass?: Table.RowClassName;
@@ -119,7 +116,8 @@ export interface GridProps<
   readonly onFirstDataRendered: (e: Table.FirstDataRenderedEvent) => void;
 }
 
-const Grid = <R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group>({
+/* eslint-disable indent */
+const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>({
   id,
   columns,
   data,
@@ -129,16 +127,11 @@ const Grid = <R extends Table.RowData, M extends Model.Model = Model.Model, G ex
   indexColumn,
   style,
   ...props
-}: GridProps<R, M, G>): JSX.Element => {
-  const rowData = useMemo<R[]>(
-    () => (isNil(data) ? [] : map(data, (row: Table.Row<R, M>) => row.data)),
-    [id, hooks.useDeepEqualMemo(data)]
-  );
-
-  const localColumns = useMemo<Table.Column<R, M, G>[]>((): Table.Column<R, M, G>[] => {
-    let cs: Table.Column<R, M, G>[] = map(
+}: GridProps<R, M>): JSX.Element => {
+  const localColumns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
+    let cs: Table.Column<R, M>[] = map(
       columns,
-      (col: Table.Column<R, M, G>, index: number): Table.Column<R, M, G> =>
+      (col: Table.Column<R, M>, index: number): Table.Column<R, M> =>
         ({
           ...col,
           headerComponentParams: { ...col.headerComponentParams, column: col },
@@ -146,99 +139,101 @@ const Grid = <R extends Table.RowData, M extends Model.Model = Model.Model, G ex
           hide: includes(hiddenColumns, col.field),
           resizable: index === columns.length - 1 ? false : !isNil(col.resizable) ? col.resizable : true,
           cellStyle: { ...tabling.columns.getColumnTypeCSSStyle(col.columnType), ...col.cellStyle }
-        } as Table.Column<R, M, G>)
+        } as Table.Column<R, M>)
     );
-    cs = !isNil(indexColumn) ? util.updateInArray<Table.Column<R, M, G>>(cs, { field: "index" }, indexColumn) : cs;
+    cs = !isNil(indexColumn) ? util.updateInArray<Table.Column<R, M>>(cs, { field: "index" }, indexColumn) : cs;
     return cs;
   }, [hooks.useDeepEqualMemo(columns)]);
 
   const colDefs = useMemo(
     () =>
-      map(localColumns, (col: Table.Column<R, M, G>): ColDef => {
-        /*
+      map(
+        filter(localColumns, (c: Table.Column<R, M>) => c.isFake !== true),
+        (col: Table.Column<R, M>): ColDef => {
+          /*
         While AG Grid will not break if we include extra properties on the ColDef(s)
         (properties from our own custom Table.Column model) - they will complain a lot.
         So we need to try to remove them.
         */
-        const {
-          groupField,
-          footer,
-          page,
-          selectable,
-          requiresAuthentication,
-          index,
-          canBeExported,
-          canBeHidden,
-          isRead,
-          isWrite,
-          columnType,
-          tableColumnType,
-          nullValue,
-          domain,
-          refreshColumns,
-          onCellDoubleClicked,
-          processCellForClipboard,
-          processCellFromClipboard,
-          getHttpValue,
-          getRowValue,
-          applicableForGroup,
-          ...agColumn
-        } = col;
-        return {
-          ...agColumn,
-          field: col.field as string,
-          cellStyle: !isNil(col.cellStyle) ? (col.cellStyle as { [key: string]: any }) : undefined,
-          suppressMenu: true,
-          valueGetter: (params: ValueGetterParams) => {
-            if (!isNil(params.node)) {
-              const row: Table.Row<R> | undefined = params.node.data;
-              if (!isNil(row) && !isNil(row.data)) {
-                return row.data[params.column.getColId() as keyof R];
-              }
-            }
-            return col.nullValue !== undefined ? col.nullValue : null;
-          },
-          cellRenderer:
-            /* eslint-disable indent */
-            typeof col.cellRenderer === "string"
-              ? col.cellRenderer
-              : !isNil(col.cellRenderer)
-              ? col.cellRenderer[id]
-              : undefined,
-          colSpan: (params: ColSpanParams) => (!isNil(col.colSpan) ? col.colSpan({ ...params, columns }) : 1),
-          editable: (params: EditableCallbackParams) => {
-            const row: Table.Row<R, M> = params.node.data;
-            if (tabling.typeguards.isDataRow(row)) {
+          const {
+            footer,
+            page,
+            selectable,
+            requiresAuthentication,
+            index,
+            canBeExported,
+            canBeHidden,
+            isRead,
+            isWrite,
+            isFake,
+            columnType,
+            tableColumnType,
+            nullValue,
+            domain,
+            refreshColumns,
+            onCellDoubleClicked,
+            processCellForClipboard,
+            processCellFromClipboard,
+            getHttpValue,
+            getRowValue,
+            getGroupValue,
+            getMarkupValue,
+            ...agColumn
+          } = col;
+          return {
+            ...agColumn,
+            field: col.field as string,
+            cellStyle: !isNil(col.cellStyle) ? (col.cellStyle as { [key: string]: any }) : undefined,
+            suppressMenu: true,
+            valueGetter: isNil(agColumn.valueGetter)
+              ? (params: ValueGetterParams) => {
+                  if (!isNil(params.node)) {
+                    const row: Table.Row<R> | undefined = params.node.data;
+                    if (!isNil(row) && !isNil(row.data)) {
+                      return row.data[params.column.getColId() as keyof R];
+                    }
+                  }
+                  return col.nullValue !== undefined ? col.nullValue : null;
+                }
+              : agColumn.valueGetter,
+            cellRenderer:
               /* eslint-disable indent */
-              return isNil(col.editable)
-                ? false
-                : typeof col.editable === "function"
+              typeof col.cellRenderer === "string"
+                ? col.cellRenderer
+                : !isNil(col.cellRenderer)
+                ? col.cellRenderer[id]
+                : undefined,
+            colSpan: (params: ColSpanParams) => (!isNil(col.colSpan) ? col.colSpan({ ...params, columns }) : 1),
+            editable: (params: EditableCallbackParams) => {
+              const row: Table.Row<R, M> = params.node.data;
+              return typeof col.editable === "function"
                 ? col.editable({ row, column: col })
+                : isNil(col.editable)
+                ? false
                 : col.editable;
-            }
-            return false;
-          },
-          cellClass: (params: CellClassParams) => {
-            const row: Table.Row<R, M> = params.node.data;
-            if (tabling.typeguards.isDataRow(row)) {
-              /* eslint-disable indent */
-              const isSelectable = isNil(col.selectable)
-                ? true
-                : typeof col.selectable === "function"
-                ? col.selectable({ row, column: col })
-                : col.selectable;
+            },
+            cellClass: (params: CellClassParams) => {
+              const row: Table.Row<R, M> = params.node.data;
+              if (tabling.typeguards.isEditableRow(row)) {
+                /* eslint-disable indent */
+                const isSelectable = isNil(col.selectable)
+                  ? true
+                  : typeof col.selectable === "function"
+                  ? col.selectable({ row, column: col })
+                  : col.selectable;
+                return tabling.aggrid.mergeClassNames<CellClassParams>(params, "cell", col.cellClass, {
+                  "cell--not-selectable": isSelectable === false,
+                  "cell--not-editable": !(col.editable === true)
+                });
+              }
               return tabling.aggrid.mergeClassNames<CellClassParams>(params, "cell", col.cellClass, {
-                "cell--not-selectable": isSelectable === false,
-                "cell--not-editable": !(col.editable === true)
+                "cell--not-selectable": true,
+                "cell--not-editable": true
               });
             }
-            return tabling.aggrid.mergeClassNames<CellClassParams>(params, "cell", col.cellClass, {
-              "cell--not-selectable": true,
-              "cell--not-editable": true
-            });
-          }
-        };
-      }),
+          };
+        }
+      ),
     [hooks.useDeepEqualMemo(localColumns)]
   );
 

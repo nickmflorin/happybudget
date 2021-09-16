@@ -14,7 +14,7 @@ export const initialModelListResponseState: Redux.ModelListResponseStore<any> = 
   updating: []
 };
 
-export const initialTableState: Redux.TableStore<any, any, any> = {
+export const initialTableState: Redux.TableStore<any, any> = {
   data: [],
   loading: false,
   groups: [],

@@ -16,8 +16,8 @@ export type ActualsTableActionMap = Redux.AuthenticatedTableActionMap<R, M> & {
   readonly responseSubAccountsTree: Http.ListResponse<Model.SubAccountTreeNode>;
 };
 
-export type ActualsTableTaskConfig = Table.TaskConfig<R, M, Model.Group, ActualsTableActionMap> & {
-  readonly selectObjId: (state: Application.Authenticated.Store) => ID | null;
+export type ActualsTableTaskConfig = Table.TaskConfig<R, M, ActualsTableActionMap> & {
+  readonly selectObjId: (state: Application.Authenticated.Store) => number | null;
   readonly selectTreeSearch: (state: Application.Authenticated.Store) => string;
   readonly selectTreeCache: (state: Application.Authenticated.Store) => Redux.SearchCache<Model.SubAccountTreeNode>;
 };
@@ -51,7 +51,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
     }
   }
 
-  function* requestActuals(budgetId: ID): SagaIterator {
+  function* requestActuals(budgetId: number): SagaIterator {
     const response: Http.ListResponse<M> = yield call(
       api.getBudgetActuals,
       budgetId,
@@ -108,7 +108,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
     }
   }
 
-  function* bulkCreateTask(budgetId: ID, e: Table.RowAddEvent<R>, errorMessage: string): SagaIterator {
+  function* bulkCreateTask(budgetId: number, e: Table.RowAddEvent<R>, errorMessage: string): SagaIterator {
     const requestPayload: Http.BulkCreatePayload<P> = tabling.http.createBulkCreatePayload<R, P, M>(
       e.payload,
       config.columns
@@ -123,7 +123,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
       );
       // Note: We also have access to the updated budget here, we should use that.
       // Note: The logic in the reducer for activating the placeholder rows with real data relies on the
-      // assumption that the models in the response are in the same order as the placeholder IDs.
+      // assumption that the models in the response are in the same order as the placeholder numbers.
       const placeholderIds: Table.PlaceholderRowId[] = map(
         Array.isArray(e.payload) ? e.payload : [e.payload],
         (rowAdd: Table.RowAdd<R>) => rowAdd.id
@@ -142,7 +142,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
   }
 
   function* bulkUpdateTask(
-    budgetId: ID,
+    budgetId: number,
     e: Table.ChangeEvent<R, M>,
     requestPayload: Http.BulkUpdatePayload<P>,
     errorMessage: string
@@ -163,30 +163,19 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
     }
   }
 
-  function* bulkDeleteTask(budgetId: ID, e: Table.RowDeleteEvent<R, M>, errorMessage: string): SagaIterator {
-    const rws: Table.ModelRow<R, M>[] = filter(
-      Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows],
-      (r: Table.Row<R, M>) => tabling.typeguards.isModelRow(r)
-    ) as Table.ModelRow<R, M>[];
-    if (rws.length !== 0) {
-      yield put(config.actions.saving(true));
-      try {
-        // Note: We also have access to the updated budget here, we should use that.
-        yield call(
-          api.bulkDeleteBudgetActuals,
-          budgetId,
-          map(rws, (r: Table.ModelRow<R, M>) => r.id),
-          { cancelToken: source.token }
-        );
-      } catch (err: unknown) {
-        if (!(yield cancelled())) {
-          api.handleRequestError(err as Error, errorMessage);
-        }
-      } finally {
-        yield put(config.actions.saving(false));
-        if (yield cancelled()) {
-          source.cancel();
-        }
+  function* bulkDeleteTask(budgetId: number, ids: number[], errorMessage: string): SagaIterator {
+    yield put(config.actions.saving(true));
+    try {
+      // Note: We also have access to the updated budget here, we should use that.
+      yield call(api.bulkDeleteBudgetActuals, budgetId, ids, { cancelToken: source.token });
+    } catch (err: unknown) {
+      if (!(yield cancelled())) {
+        api.handleRequestError(err as Error, errorMessage);
+      }
+    } finally {
+      yield put(config.actions.saving(false));
+      if (yield cancelled()) {
+        source.cancel();
       }
     }
   }
@@ -199,23 +188,31 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
     }
   }
 
-  function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent<R, M>>): SagaIterator {
+  function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent>): SagaIterator {
     const budgetId = yield select(config.selectObjId);
     if (!isNil(action.payload) && !isNil(budgetId)) {
-      const e: Table.RowDeleteEvent<R, M> = action.payload;
-      yield fork(bulkDeleteTask, budgetId, e, "There was an error deleting the rows.");
+      const e: Table.RowDeleteEvent = action.payload;
+      const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
+      const modelRowIds = filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[];
+      if (modelRowIds.length !== 0) {
+        yield fork(bulkDeleteTask, budgetId, modelRowIds, "There was an error deleting the rows.");
+      }
     }
   }
 
-  // ToDo: This is an EDGE case, but we need to do it for smooth operation - we need to filter out the
-  // changes that correspond to placeholder rows.
   function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, M>>): SagaIterator {
     const budgetId = yield select(config.selectObjId);
     if (!isNil(action.payload) && !isNil(budgetId)) {
       const e: Table.DataChangeEvent<R, M> = action.payload;
       const merged = tabling.events.consolidateTableChange(e.payload);
-      if (merged.length !== 0) {
-        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns);
+
+      const dataChanges: Table.RowChange<R, M, Table.ModelRow<R, M>>[] = filter(
+        merged,
+        (value: Table.RowChange<R, M>) => tabling.typeguards.isModelRow(value.row)
+      ) as Table.RowChange<R, M, Table.ModelRow<R, M>>[];
+
+      if (dataChanges.length !== 0) {
+        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(dataChanges, config.columns);
         yield fork(bulkUpdateTask, budgetId, e, requestPayload, "There was an error updating the rows.");
       }
     }

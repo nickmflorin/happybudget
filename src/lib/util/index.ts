@@ -1,4 +1,5 @@
-import { forEach, findIndex, find, isNil, map, filter, reduce, orderBy } from "lodash";
+import { forEach, findIndex, find, isNil, map, filter, reduce } from "lodash";
+import { sumChars } from "./string";
 
 export * as colors from "./colors";
 export * as dates from "./dates";
@@ -10,22 +11,35 @@ export * as html from "./html";
 export * as urls from "./urls";
 export * as validate from "./validate";
 
-export const sumChars = (val: string): number => {
-  let sum = 0;
-  for (let i = 0; i < val.length; i++) {
-    sum += val.charCodeAt(i);
-  }
-  return sum;
+export * from "./string";
+
+export const setToArray = <T>(a: Set<T>): T[] => {
+  const arr: T[] = [];
+  a.forEach((v: T) => arr.push(v));
+  return arr;
+};
+
+export const setsEqual = <T>(a: Set<T>, b: Set<T>): boolean => {
+  return a.size === b.size && setToArray(a).every(value => b.has(value));
+};
+
+export const differenceBetweenTwoSets = <T>(a: Set<T>, b: Set<T>): Set<T> => {
+  const difference: T[] = [];
+  a.forEach((v: T) => {
+    if (!b.has(v)) {
+      difference.push(v);
+    }
+  });
+  b.forEach((v: T) => {
+    if (!a.has(v)) {
+      difference.push(v);
+    }
+  });
+  return new Set(difference);
 };
 
 export const destruct = (obj: { [key: string]: any }, ...keys: string[]) =>
   keys.reduce((a, c) => ({ ...a, [c]: obj[c] }), {});
-
-export const hashString = (s: string): number =>
-  s.split("").reduce((a, b) => {
-    a = (a << 5) - a + b.charCodeAt(0);
-    return a & a;
-  }, 0);
 
 export const removeFromArray = (items: any[], key: any, value: any) => {
   const newItems = [...items];
@@ -111,30 +125,6 @@ export const updateInArray = <T extends object>(
     return replaceInArray<T>(array, predicate, { ...currentValue, ...updateValue });
   }
   return array;
-};
-
-export const updateFieldOrdering = <T = string>(
-  fieldOrdering: FieldOrdering<T>,
-  field: T,
-  order: Order
-): FieldOrdering<T> => {
-  if (order === 0) {
-    return filter(fieldOrdering, (fieldO: FieldOrder<T>) => fieldO.field !== field);
-  }
-  const fieldOrder = find(fieldOrdering, (fieldO: FieldOrder<T>) => fieldO.field === field);
-  if (!isNil(fieldOrder)) {
-    return replaceInArray<FieldOrder<T>>(fieldOrdering, { field }, { ...fieldOrder, order });
-  } else {
-    return [...fieldOrdering, { field: field, order }];
-  }
-};
-
-export const orderByFieldOrdering = <M = any>(array: M[], fieldOrdering: FieldOrdering<keyof M>): M[] => {
-  return orderBy(
-    array,
-    map(fieldOrdering, (fieldOrder: FieldOrder<keyof M>) => fieldOrder.field),
-    map(fieldOrdering, (fieldOrder: FieldOrder<keyof M>) => (fieldOrder.order === 1 ? "asc" : "desc"))
-  );
 };
 
 export const selectRandom = <T = any>(array: T[]): T => {

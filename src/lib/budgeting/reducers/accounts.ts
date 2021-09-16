@@ -1,18 +1,19 @@
-import { tabling } from "lib";
-
-import { createBudgetTableReducer } from "./base";
+import { createBudgetTableReducer, createAuthenticatedBudgetTableReducer } from "./base";
 
 type R = Tables.AccountRowData;
 type M = Model.Account;
 type S = Tables.AccountTableStore;
 
+type ReducerConfig<A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>> = Table.ReducerConfig<R, M, S, A>;
+
 /* eslint-disable indent */
-export const createUnauthenticatedAccountsTableReducer = (
-  config: Table.ReducerConfig<R, M, Model.BudgetGroup, S>
-): Redux.Reducer<S> => {
+export const createUnauthenticatedAccountsTableReducer = (config: ReducerConfig): Redux.Reducer<S> => {
   return createBudgetTableReducer<R, M, S>(config);
 };
 
 export const createAuthenticatedAccountsTableReducer = (
-  config: Table.ReducerConfig<R, M, Model.BudgetGroup, S, Redux.AuthenticatedTableActionMap<R, M, Model.BudgetGroup>>
-): Redux.Reducer<S> => tabling.reducers.createAuthenticatedTableReducer<R, M, Model.BudgetGroup, S>(config);
+  config: ReducerConfig<Redux.AuthenticatedTableActionMap<R, M>>
+): Redux.Reducer<S> =>
+  createAuthenticatedBudgetTableReducer<R, M, S>({
+    ...config
+  });

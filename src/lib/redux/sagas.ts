@@ -45,7 +45,7 @@ export const createListResponseSaga = (config: Redux.SagaConfig<Redux.ListRespon
   return rootSaga;
 };
 
-export const createModelListResponseSaga = <M extends Model.Model>(
+export const createModelListResponseSaga = <M extends Model.HttpModel>(
   config: Redux.SagaConfig<Redux.ModelListResponseTaskMap, Pick<Redux.ModelListResponseActionMap<M>, "request">>
 ) => {
   function* requestSaga(): SagaIterator {

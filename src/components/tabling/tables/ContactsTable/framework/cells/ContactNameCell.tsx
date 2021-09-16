@@ -1,18 +1,12 @@
 import { isNil } from "lodash";
 
-import { model } from "lib";
+import { util } from "lib";
 import { UserImageOrInitials } from "components/images";
 import { Cell } from "components/tabling/generic/framework/cells";
 
 interface ContactNameCellProps
-  extends Table.CellProps<
-    Tables.ContactRowData,
-    Model.Contact,
-    Model.Group,
-    Tables.ContactTableStore,
-    Model.ContactNamesAndImage
-  > {
-  readonly onEditContact: (id: ID) => void;
+  extends Table.CellProps<Tables.ContactRowData, Model.Contact, Tables.ContactTableStore, Model.ContactNamesAndImage> {
+  readonly onEditContact: (id: number) => void;
 }
 
 const ContactNameCell = ({ value, ...props }: ContactNameCellProps): JSX.Element => {
@@ -28,7 +22,7 @@ const ContactNameCell = ({ value, ...props }: ContactNameCellProps): JSX.Element
           imageProps={{ wrapperStyle: { width: 28, height: 28, marginRight: 8 } }}
           hideOnNoInitials={true}
         />
-        {model.util.displayFirstAndLastName(value.first_name, value.last_name)}
+        {util.conditionalJoinString(value.first_name, value.last_name)}
       </div>
     </Cell>
   );

@@ -33,7 +33,7 @@ export function* request(action: Redux.Action): SagaIterator {
 }
 
 export const createTableTaskSet = (
-  config: Table.TaskConfig<R, M, Model.Group, Redux.AuthenticatedTableActionMap<R, M, Model.Group>>
+  config: Table.TaskConfig<R, M, Redux.AuthenticatedTableActionMap<R, M>>
 ): Redux.TaskMapObject<Redux.TableTaskMap<R, M>> => {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
@@ -105,28 +105,18 @@ export const createTableTaskSet = (
     }
   }
 
-  function* bulkDeleteTask(e: Table.RowDeleteEvent<R, M>, errorMessage: string): SagaIterator {
-    const rws: Table.ModelRow<R, M>[] = filter(
-      Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows],
-      (r: Table.Row<R, M>) => tabling.typeguards.isModelRow(r)
-    ) as Table.ModelRow<R, M>[];
-    if (rws.length !== 0) {
-      yield put(config.actions.saving(true));
-      try {
-        yield call(
-          api.bulkDeleteContacts,
-          map(rws, (r: Table.ModelRow<R, M>) => r.id),
-          { cancelToken: source.token }
-        );
-      } catch (err: unknown) {
-        if (!(yield cancelled())) {
-          api.handleRequestError(err as Error, errorMessage);
-        }
-      } finally {
-        yield put(config.actions.saving(false));
-        if (yield cancelled()) {
-          source.cancel();
-        }
+  function* bulkDeleteTask(ids: number[], errorMessage: string): SagaIterator {
+    yield put(config.actions.saving(true));
+    try {
+      yield call(api.bulkDeleteContacts, ids, { cancelToken: source.token });
+    } catch (err: unknown) {
+      if (!(yield cancelled())) {
+        api.handleRequestError(err as Error, errorMessage);
+      }
+    } finally {
+      yield put(config.actions.saving(false));
+      if (yield cancelled()) {
+        source.cancel();
       }
     }
   }
@@ -138,21 +128,29 @@ export const createTableTaskSet = (
     }
   }
 
-  function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent<R, M>>): SagaIterator {
+  function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent>): SagaIterator {
     if (!isNil(action.payload)) {
-      const e: Table.RowDeleteEvent<R, M> = action.payload;
-      yield fork(bulkDeleteTask, e, "There was an error deleting the rows.");
+      const e: Table.RowDeleteEvent = action.payload;
+      const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
+      const modelRowIds = filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[];
+      if (modelRowIds.length !== 0) {
+        yield fork(bulkDeleteTask, modelRowIds, "There was an error deleting the rows.");
+      }
     }
   }
 
-  // ToDo: This is an EDGE case, but we need to do it for smooth operation - we need to filter out the
-  // changes that correspond to placeholder rows.
   function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, M>>): SagaIterator {
     if (!isNil(action.payload)) {
       const e: Table.DataChangeEvent<R, M> = action.payload;
       const merged = tabling.events.consolidateTableChange(e.payload);
-      if (merged.length !== 0) {
-        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns);
+
+      const dataChanges: Table.RowChange<R, M, Table.ModelRow<R, M>>[] = filter(
+        merged,
+        (value: Table.RowChange<R, M>) => tabling.typeguards.isModelRow(value.row)
+      ) as Table.RowChange<R, M, Table.ModelRow<R, M>>[];
+
+      if (dataChanges.length !== 0) {
+        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(dataChanges, config.columns);
         yield fork(bulkUpdateTask, e, requestPayload, "There was an error updating the rows.");
       }
     }

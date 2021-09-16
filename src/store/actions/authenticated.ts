@@ -16,7 +16,7 @@ const ActionTypes = {
 
 export const updateLoggedInUserAction = createAction<Model.User>(ActionTypes.User.UpdateInState);
 export const deletingContactAction = createAction<Redux.ModelListActionPayload>(ActionTypes.Contacts.Deleting);
-export const removeContactFromStateAction = createAction<ID>(ActionTypes.Contacts.RemoveFromState);
+export const removeContactFromStateAction = createAction<number>(ActionTypes.Contacts.RemoveFromState);
 export const updateContactInStateAction = createAction<Redux.UpdateActionPayload<Model.Contact>>(
   ActionTypes.Contacts.UpdateInState
 );

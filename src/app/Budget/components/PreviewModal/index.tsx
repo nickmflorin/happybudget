@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { pdf } from "@react-pdf/renderer";
-import { isNil, map, debounce } from "lodash";
+import { isNil, map, debounce, filter } from "lodash";
 
 import * as api from "api";
 import { registerFonts } from "style/pdf";
@@ -69,10 +69,10 @@ const DEFAULT_OPTIONS: PdfBudgetTable.Options = {
     ]
   },
   includeNotes: false,
-  columns: map(
-    SubAccountColumns,
-    (column: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount, Model.BudgetGroup>) => column.field
-  )
+  columns: filter(
+    map(SubAccountColumns, (column: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => column.field),
+    (field: keyof Table.Row<Tables.PdfSubAccountRowData, Model.PdfSubAccount> | undefined) => !isNil(field)
+  ) as (keyof Tables.PdfSubAccountRowData)[]
 };
 
 interface PreviewModalProps {
@@ -80,7 +80,7 @@ interface PreviewModalProps {
   readonly onCancel: () => void;
   readonly autoRenderPdf?: boolean;
   readonly visible: boolean;
-  readonly budgetId: ID;
+  readonly budgetId: number;
   readonly budgetName: string;
   readonly filename: string;
 }
@@ -193,7 +193,7 @@ const PreviewModal = ({
   }, [contactsResponse, budgetResponse, options, autoRenderPdf]);
 
   return (
-    <Modal.Modal
+    <Modal
       className={"export-preview-modal"}
       title={"Export"}
       visible={visible}
@@ -222,7 +222,7 @@ const PreviewModal = ({
           headerTemplates={headerTemplates}
           headerTemplatesLoading={headerTemplatesLoading}
           accountsLoading={loadingData}
-          accounts={!isNil(budgetResponse) ? budgetResponse.accounts : []}
+          accounts={!isNil(budgetResponse) ? budgetResponse.children : []}
           disabled={isNil(budgetResponse) || isNil(contactsResponse)}
           columns={Object.values(SubAccountColumns)}
           onValuesChange={(changedValues: Partial<PdfBudgetTable.Options>, values: PdfBudgetTable.Options) => {
@@ -237,8 +237,8 @@ const PreviewModal = ({
           }}
           displayedHeaderTemplate={displayedHeaderTemplate}
           onClearHeaderTemplate={() => dispatch(actions.pdf.clearHeaderTemplateAction(null))}
-          onLoadHeaderTemplate={(id: ID) => dispatch(actions.pdf.loadHeaderTemplateAction(id))}
-          onHeaderTemplateDeleted={(id: ID) => {
+          onLoadHeaderTemplate={(id: number) => dispatch(actions.pdf.loadHeaderTemplateAction(id))}
+          onHeaderTemplateDeleted={(id: number) => {
             if (!isNil(displayedHeaderTemplate) && displayedHeaderTemplate.id === id) {
               dispatch(actions.pdf.clearHeaderTemplateAction(null));
             }
@@ -266,7 +266,7 @@ const PreviewModal = ({
           }
         }}
       />
-    </Modal.Modal>
+    </Modal>
   );
 };
 

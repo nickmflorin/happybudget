@@ -35,7 +35,6 @@ const ConnectedTable = connectTableToStore<
   GenericSubAccountsTable.UnauthenticatedBudgetProps,
   R,
   M,
-  Model.BudgetGroup,
   Tables.SubAccountTableStore
 >({
   // We cannot autoRequest because we have to also request the new data when the dropdown breadcrumbs change.
@@ -49,8 +48,10 @@ const ConnectedTable = connectTableToStore<
       [redux.selectors.simpleDeepEqualSelector((state: Application.Unauthenticated.Store) => state.share.detail.data)],
       (budget: Model.Budget | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
-        estimated: budget?.estimated || 0.0,
-        variance: budget?.variance || 0.0,
+        estimated: !isNil(budget) ? budget.estimated + budget.markup_contribution + budget.fringe_contribution : 0.0,
+        variance: !isNil(budget)
+          ? budget.estimated + budget.markup_contribution + budget.fringe_contribution - budget.actual
+          : 0.0,
         actual: budget?.actual || 0.0
       })
     ),
@@ -62,8 +63,10 @@ const ConnectedTable = connectTableToStore<
       ],
       (detail: Model.SubAccount | null) => ({
         identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Sub Account Total",
-        estimated: detail?.estimated || 0.0,
-        variance: detail?.variance || 0.0,
+        estimated: !isNil(detail) ? detail.estimated + detail.markup_contribution + detail.fringe_contribution : 0.0,
+        variance: !isNil(detail)
+          ? detail.estimated + detail.markup_contribution + detail.fringe_contribution - detail.actual
+          : 0.0,
         actual: detail?.actual || 0.0
       })
     )
@@ -103,7 +106,6 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
           }
         }
       }}
-      cookieNames={!isNil(subaccountDetail) ? { ordering: `subaccount-${subaccountDetail.id}-table-ordering` } : {}}
     />
   );
 };

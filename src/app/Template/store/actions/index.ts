@@ -8,7 +8,7 @@ export * as subAccount from "./subAccount";
 export { default as ActionType } from "./ActionType";
 
 export const wipeStateAction = createAction<null>(ActionType.WipeState);
-export const setTemplateIdAction = createAction<ID | null>(ActionType.SetId);
+export const setTemplateIdAction = createAction<number | null>(ActionType.SetId);
 export const setTemplateAutoIndex = createAction<boolean>(ActionType.SetAutoIndex);
 export const loadingTemplateAction = createAction<boolean>(ActionType.Loading);
 export const responseTemplateAction = createAction<Model.Template | null>(ActionType.Response);

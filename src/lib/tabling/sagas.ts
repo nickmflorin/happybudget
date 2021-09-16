@@ -5,11 +5,10 @@ import { isNil } from "lodash";
 /* eslint-disable indent */
 export const createTableSaga = <
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  A extends Redux.AuthenticatedTableActionMap<R, M, G> = Redux.AuthenticatedTableActionMap<R, M, G>
+  M extends Model.HttpModel = Model.HttpModel,
+  A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
-  config: Table.SagaConfig<R, M, G, A>
+  config: Table.SagaConfig<R, M, A>
 ): Saga => {
   function* requestSaga(): SagaIterator {
     let lastTasks;
@@ -32,23 +31,21 @@ export const createTableSaga = <
 
 export const createUnauthenticatedTableSaga = <
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  A extends Redux.AuthenticatedTableActionMap<R, M, G> = Redux.AuthenticatedTableActionMap<R, M, G>
+  M extends Model.HttpModel = Model.HttpModel,
+  A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
-  config: Table.SagaConfig<R, M, G, A>
+  config: Table.SagaConfig<R, M, A>
 ): Saga => {
-  return createTableSaga<R, M, G, A>(config);
+  return createTableSaga<R, M, A>(config);
 };
 
 /* eslint-disable indent */
 export const createAuthenticatedTableSaga = <
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  A extends Redux.AuthenticatedTableActionMap<R, M, G> = Redux.AuthenticatedTableActionMap<R, M, G>
+  M extends Model.HttpModel = Model.HttpModel,
+  A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
-  config: Table.SagaConfig<R, M, G, A>
+  config: Table.SagaConfig<R, M, A>
 ): Saga => {
   function* tableChangeEventSaga(): SagaIterator {
     // TODO: We probably want a way to prevent duplicate events that can cause
@@ -56,13 +53,13 @@ export const createAuthenticatedTableSaga = <
     // delete the same row twice.
     const changeChannel = yield actionChannel(config.actions.tableChanged.toString());
     while (true) {
-      const action: Redux.Action<Table.ChangeEvent<R, M, G>> = yield take(changeChannel);
+      const action: Redux.Action<Table.ChangeEvent<R, M>> = yield take(changeChannel);
       // Blocking call so that table changes happen sequentially.
       yield call(config.tasks.handleChangeEvent, action);
     }
   }
 
-  const baseTableSaga = createTableSaga<R, M, G, A>(config);
+  const baseTableSaga = createTableSaga<R, M, A>(config);
 
   function* rootSaga(): SagaIterator {
     yield spawn(baseTableSaga);

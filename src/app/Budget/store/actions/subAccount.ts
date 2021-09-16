@@ -1,17 +1,17 @@
 import { createAction } from "@reduxjs/toolkit";
 import ActionType from "./ActionType";
 
-export const setSubAccountIdAction = createAction<ID | null>(ActionType.SubAccount.SetId);
+export const setSubAccountIdAction = createAction<number | null>(ActionType.SubAccount.SetId);
 export const loadingSubAccountAction = createAction<boolean>(ActionType.SubAccount.Loading);
 export const responseSubAccountAction = createAction<Model.SubAccount | null>(ActionType.SubAccount.Response);
 
-export const handleTableChangeEventAction = createAction<
-  Table.ChangeEvent<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup>
->(ActionType.SubAccount.SubAccounts.TableChanged);
+export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.SubAccountRowData, Model.SubAccount>>(
+  ActionType.SubAccount.SubAccounts.TableChanged
+);
 export const savingTableAction = createAction<boolean>(ActionType.SubAccount.SubAccounts.Saving);
 export const clearAction = createAction<null>(ActionType.SubAccount.SubAccounts.Clear);
 export const loadingAction = createAction<boolean>(ActionType.SubAccount.SubAccounts.Loading);
-export const responseAction = createAction<Http.TableResponse<Model.SubAccount, Model.BudgetGroup>>(
+export const responseAction = createAction<Http.TableResponse<Model.SubAccount>>(
   ActionType.SubAccount.SubAccounts.Response
 );
 export const addModelsToStateAction = createAction<Redux.AddModelsToTablePayload<Model.SubAccount>>(
@@ -25,11 +25,11 @@ export const responseCommentsAction = createAction<Http.ListResponse<Model.Comme
 );
 export const loadingCommentsAction = createAction<boolean>(ActionType.SubAccount.Comments.Loading);
 export const createCommentAction = createAction<{
-  parent?: ID;
+  parent?: number;
   data: Http.CommentPayload;
 }>(ActionType.SubAccount.Comments.Create);
 export const creatingCommentAction = createAction<boolean>(ActionType.SubAccount.Comments.Creating);
-export const deleteCommentAction = createAction<ID>(ActionType.SubAccount.Comments.Delete);
+export const deleteCommentAction = createAction<number>(ActionType.SubAccount.Comments.Delete);
 export const updateCommentAction = createAction<Redux.UpdateActionPayload<Model.Comment>>(
   ActionType.SubAccount.Comments.Update
 );
@@ -44,9 +44,9 @@ export const updatingCommentAction = createAction<Redux.ModelListActionPayload>(
 );
 export const addCommentToStateAction = createAction<{
   data: Model.Comment;
-  parent?: ID;
+  parent?: number;
 }>(ActionType.SubAccount.Comments.AddToState);
-export const removeCommentFromStateAction = createAction<ID>(ActionType.SubAccount.Comments.RemoveFromState);
+export const removeCommentFromStateAction = createAction<number>(ActionType.SubAccount.Comments.RemoveFromState);
 export const updateCommentInStateAction = createAction<
   Redux.UpdateActionPayload<Redux.UpdateActionPayload<Model.Comment>>
 >(ActionType.SubAccount.Comments.UpdateInState);

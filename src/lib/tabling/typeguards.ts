@@ -1,34 +1,53 @@
 import { SyntheticEvent } from "react";
 
-export const isPlaceholderRow = <R extends Table.RowData = any>(row: Table.Row<R>): row is Table.PlaceholderRow<R> =>
+export const isPlaceholderRow = <R extends Table.RowData = object>(row: Table.Row<R>): row is Table.PlaceholderRow<R> =>
   (row as Table.PlaceholderRow<R>).rowType === "placeholder";
 
-export const isGroupRow = <R extends Table.RowData = any>(row: Table.Row<R>): row is Table.GroupRow<R> =>
+export const isPlaceholderRowId = (id: Table.RowId): id is Table.PlaceholderRowId =>
+  typeof id === "string" && id.startsWith("placeholder-");
+
+export const isGroupRow = <R extends Table.RowData = object>(row: Table.Row<R>): row is Table.GroupRow<R> =>
   (row as Table.GroupRow<R>).rowType === "group";
 
-export const isModelRow = <R extends Table.RowData = any>(row: Table.Row<R>): row is Table.ModelRow<R> =>
+export const isGroupRowId = (id: Table.RowId): id is Table.GroupRowId =>
+  typeof id === "string" && id.startsWith("group-");
+
+export const isMarkupRow = <R extends Table.RowData = object>(row: Table.Row<R>): row is Table.MarkupRow<R> =>
+  (row as Table.MarkupRow<R>).rowType === "markup";
+
+export const isMarkupRowId = (id: Table.RowId): id is Table.MarkupRowId =>
+  typeof id === "string" && id.startsWith("markup-");
+
+export const isModelRow = <R extends Table.RowData = object>(row: Table.Row<R>): row is Table.ModelRow<R> =>
   (row as Table.ModelRow<R>).rowType === "model";
 
-export const isDataRow = <R extends Table.RowData = any>(row: Table.Row<R>): row is Table.DataRow<R> =>
-  isPlaceholderRow(row) || isModelRow(row);
+export const isModelRowId = (id: Table.RowId): id is Table.ModelRowId => typeof id === "number";
+
+export const isDataRow = <R extends Table.RowData = object, M extends Model.HttpModel = any>(
+  row: Table.Row<R, M>
+): row is Table.DataRow<R, M> => isPlaceholderRow(row) || isModelRow(row);
+
+export const isDataRowId = (id: Table.RowId): id is Table.DataRowId => isModelRowId(id) || isPlaceholderRowId(id);
+
+export const isEditableRow = <R extends Table.RowData = object>(row: Table.Row<R>): row is Table.DataRow<R> =>
+  isPlaceholderRow(row) || isModelRow(row) || isMarkupRow(row);
+
+export const isEditableNonDataRow = <R extends Table.RowData = object>(
+  row: Table.Row<R>
+): row is Table.EditableNonDataRow<R> => isEditableRow(row) && !isDataRow(row);
 
 /* eslint-disable indent */
-export const isAuthenticatedActionMap = <
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
->(
-  a:
-    | Redux.ActionMapObject<Redux.TableActionMap<M, G>>
-    | Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<R, M, G>>
-): a is Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<R, M, G>> =>
-  (a as Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<R, M, G>>).tableChanged !== undefined;
+export const isAuthenticatedActionMap = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  a: Redux.ActionMapObject<Redux.TableActionMap<M>> | Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<R, M>>
+): a is Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<R, M>> =>
+  (a as Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<R, M>>).tableChanged !== undefined;
 
-export const isRow = <M extends Model.Model>(obj: Table.Row<M> | M): obj is Table.Row<M> =>
-  (obj as Table.Row<M>).data !== undefined;
+export const isRow = <R extends Table.RowData, M extends Model.HttpModel>(
+  obj: Table.Row<R, M> | M
+): obj is Table.Row<R, M> => (obj as Table.Row<R, M>).data !== undefined;
 
 export const isAgColumn = <R extends Table.RowData>(
-  col: Table.Column<R, any, any> | PdfTable.Column<R, any, any>
+  col: Table.Column<R, any, any> | PdfTable.Column<R, any>
 ): col is Table.Column<R, any, any> => (col as Table.Column<R, any, any>).domain === "aggrid";
 
 export const isKeyboardEvent = (e: Table.CellDoneEditingEvent): e is KeyboardEvent => {
@@ -39,68 +58,84 @@ export const isSyntheticClickEvent = (e: Table.CellDoneEditingEvent): e is Synth
   return (e as SyntheticEvent).type === "click";
 };
 
-export const isDataChangeEvent = <R extends Table.RowData, M extends Model.Model = Model.Model>(
+export const isDataChangeEvent = <
+  R extends Table.RowData,
+  M extends Model.HttpModel = Model.HttpModel,
+  RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
+>(
   e: Table.ChangeEvent<R, M>
-): e is Table.DataChangeEvent<R, M> => {
-  return (e as Table.DataChangeEvent<R, M>).type === "dataChange";
+): e is Table.DataChangeEvent<R, M, RW> => {
+  return (e as Table.DataChangeEvent<R, M, RW>).type === "dataChange";
 };
 
-export const isRowAddEvent = <R extends Table.RowData, M extends Model.Model = Model.Model>(
+export const isRowAddEvent = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   e: Table.ChangeEvent<R, M>
 ): e is Table.RowAddEvent<R> => {
   return (e as Table.RowAddEvent<R>).type === "rowAdd";
 };
 
-export const isRowDeleteEvent = <R extends Table.RowData, M extends Model.Model = Model.Model>(
+export const isRowDeleteEvent = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   e: Table.ChangeEvent<R, M>
-): e is Table.RowDeleteEvent<R, M> => {
-  return (e as Table.RowDeleteEvent<R, M>).type === "rowDelete";
+): e is Table.RowDeleteEvent => {
+  return (e as Table.RowDeleteEvent).type === "rowDelete";
 };
 
-export const isRowRemoveFromGroupEvent = <R extends Table.RowData, M extends Model.Model = Model.Model>(
+export const isRowRemoveFromGroupEvent = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   e: Table.ChangeEvent<R, M>
-): e is Table.RowRemoveFromGroupEvent<R, M> => {
-  return (e as Table.RowRemoveFromGroupEvent<R, M>).type === "rowRemoveFromGroup";
+): e is Table.RowRemoveFromGroupEvent => {
+  return (e as Table.RowRemoveFromGroupEvent).type === "rowRemoveFromGroup";
 };
 
-export const isRowAddToGroupEvent = <R extends Table.RowData, M extends Model.Model = Model.Model>(
+export const isRowAddToGroupEvent = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   e: Table.ChangeEvent<R, M>
-): e is Table.RowAddToGroupEvent<R, M> => {
-  return (e as Table.RowAddToGroupEvent<R, M>).type === "rowAddToGroup";
+): e is Table.RowAddToGroupEvent => {
+  return (e as Table.RowAddToGroupEvent).type === "rowAddToGroup";
 };
 
-export const isGroupAddEvent = <
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
->(
-  e: Table.ChangeEvent<R, M, G>
-): e is Table.GroupAddEvent<G> => {
-  return (e as Table.GroupAddEvent<G>).type === "groupAdd";
-};
-
-export const isFullRowEvent = <R extends Table.RowData, M extends Model.Model = Model.Model>(
+export const isGroupAddEvent = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   e: Table.ChangeEvent<R, M>
-): e is Table.FullRowEvent<R, M> => {
-  return (e as Table.FullRowEvent<R, M>).payload.rows !== undefined;
+): e is Table.GroupAddEvent => {
+  return (e as Table.GroupAddEvent).type === "groupAdd";
 };
 
-export const isGroupEvent = <
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
->(
-  e: Table.ChangeEvent<R, M, G>
-): e is Table.GroupEvent<R, M, G> => {
+export const isFullRowEvent = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.FullRowEvent => {
+  return (e as Table.FullRowEvent).payload.rows !== undefined;
+};
+
+export const isGroupEvent = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.GroupEvent => {
   return isRowAddToGroupEvent(e) || isRowRemoveFromGroupEvent(e) || isGroupUpdateEvent(e) || isGroupAddEvent(e);
 };
 
-export const isGroupUpdateEvent = <
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
->(
-  e: Table.ChangeEvent<R, M, G>
-): e is Table.GroupUpdateEvent<G> => {
-  return (e as Table.GroupUpdateEvent<G>).type === "groupUpdate";
+export const isGroupUpdateEvent = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.GroupUpdateEvent => {
+  return (e as Table.GroupUpdateEvent).type === "groupUpdate";
+};
+
+export const isMarkupAddEvent = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.MarkupAddEvent => {
+  return (e as Table.MarkupAddEvent).type === "markupAdd";
+};
+
+export const isMarkupUpdateEvent = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.MarkupUpdateEvent => {
+  return (e as Table.MarkupUpdateEvent).type === "markupUpdate";
+};
+
+export const isRowRemoveFromMarkupEvent = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.RowRemoveFromMarkupEvent => {
+  return (e as Table.RowRemoveFromMarkupEvent).type === "rowRemoveFromMarkup";
+};
+
+export const isRowAddToMarkupEvent = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.RowAddToMarkupEvent => {
+  return (e as Table.RowAddToMarkupEvent).type === "rowAddToMarkup";
 };

@@ -26,6 +26,10 @@
     border: none;
   }
 
+  .ag-root .ag-body-viewport:not(.ag-has-focus) .ag-cell-range-selected-1:not(.ag-cell-inline-editing) {
+    background-color: unset !important;
+  }
+
   .ag-menu {
     border: $menu-border;
     border-radius: 0px;

@@ -14,13 +14,9 @@ type InjectedUnauthenticatedDataGridProps = {
   readonly tabToNextCell?: (params: TabToNextCellParams) => Table.CellPosition;
 };
 
-export interface UnauthenticateDataGridProps<
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
-> {
+export interface UnauthenticateDataGridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
   readonly apis: Table.GridApis | null;
-  readonly columns: Table.Column<R, M, G>[];
+  readonly columns: Table.Column<R, M>[];
 }
 
 export type WithUnauthenticatedDataGridProps<T> = T & InjectedUnauthenticatedDataGridProps;
@@ -29,9 +25,8 @@ export type WithUnauthenticatedDataGridProps<T> = T & InjectedUnauthenticatedDat
 const unauthenticatedDataGrid =
   <
     R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    T extends UnauthenticateDataGridProps<R, M, G> = UnauthenticateDataGridProps<R, M, G>
+    M extends Model.HttpModel = Model.HttpModel,
+    T extends UnauthenticateDataGridProps<R, M> = UnauthenticateDataGridProps<R, M>
   >(
     config?: TableUi.UnauthenticatedDataGridConfig<R, M>
   ) =>
@@ -43,14 +38,14 @@ const unauthenticatedDataGrid =
     function WithUnauthenticatedDataGrid(props: T) {
       /* eslint-disable no-unused-vars */
       /* eslint-disable @typescript-eslint/no-unused-vars */
-      const [navigateToNextCell, tabToNextCell, _, moveToNextRow] = useCellNavigation<R, M, G>({
+      const [navigateToNextCell, tabToNextCell, _, moveToNextRow] = useCellNavigation<R, M>({
         apis: props.apis,
         columns: props.columns,
         includeRowInNavigation: config?.includeRowInNavigation
       });
 
-      const columns = useMemo<Table.Column<R, M, G>[]>((): Table.Column<R, M, G>[] => {
-        return map(props.columns, (col: Table.Column<R, M, G>) => ({
+      const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
+        return map(props.columns, (col: Table.Column<R, M>) => ({
           ...col,
           editable: false
         }));

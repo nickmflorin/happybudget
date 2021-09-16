@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
-import { isNil, find, reduce } from "lodash";
+import { isNil, reduce } from "lodash";
 
 import { redux } from "lib";
 import { selectors } from "store";
@@ -25,7 +25,7 @@ const ActionMap = {
   clear: actions.actuals.clearAction
 };
 
-const ConnectedActualsTable = connectTableToStore<ActualsTable.Props, R, M, Model.Group, Tables.ActualTableStore>({
+const ConnectedActualsTable = connectTableToStore<ActualsTable.Props, R, M, Tables.ActualTableStore>({
   actions: ActionMap,
   selector: redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.actuals),
   footerRowSelectors: {
@@ -48,25 +48,11 @@ interface ActualsProps {
 }
 
 const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
-  const [contactToEdit, setContactToEdit] = useState<ID | null>(null);
+  const [contactToEdit, setContactToEdit] = useState<number | null>(null);
   const [createContactModalVisible, setCreateContactModalVisible] = useState(false);
 
   const dispatch = useDispatch();
   const contacts = useSelector(selectors.selectContacts);
-
-  const editingContact = useMemo(() => {
-    if (!isNil(contactToEdit)) {
-      const contact: Model.Contact | undefined = find(contacts, { id: contactToEdit } as any);
-      if (!isNil(contact)) {
-        return contact;
-      } else {
-        /* eslint-disable no-console */
-        console.error(`Could not find contact with ID ${contactToEdit} in state.`);
-        return null;
-      }
-    }
-    return null;
-  }, [contactToEdit]);
 
   return (
     <React.Fragment>
@@ -88,12 +74,12 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
         onSubAccountsTreeSearch={(value: string) => dispatch(actions.actuals.setSubAccountsTreeSearchAction(value))}
         exportFileName={!isNil(budget) ? `${budget.name}_actuals` : "actuals"}
         onNewContact={() => setCreateContactModalVisible(true)}
-        onEditContact={(id: ID) => setContactToEdit(id)}
+        onEditContact={(id: number) => setContactToEdit(id)}
       />
-      {!isNil(editingContact) && (
+      {!isNil(contactToEdit) && (
         <EditContactModal
-          visible={true}
-          contact={editingContact}
+          open={true}
+          id={contactToEdit}
           onSuccess={() => setContactToEdit(null)}
           onCancel={() => setContactToEdit(null)}
         />

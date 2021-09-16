@@ -2,18 +2,19 @@ import React, { useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { VerticalFlexCenter } from "components";
+import { ui } from "lib";
+
+import { VerticalFlexCenter, Icon } from "components";
 import { ClearButton } from "components/buttons";
 import LoadableCellWrapper from "./LoadableCellWrapper";
 
 /* eslint-disable indent */
 const Cell = <
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 >(
-  props: Table.CellWithChildrenProps<R, M, G, S>
+  props: Table.CellWithChildrenProps<R, M, S>
 ): JSX.Element => {
   const row: Table.Row<R, M> = props.node.data;
 
@@ -31,6 +32,16 @@ const Cell = <
     }
   }, [props.onClear, props.showClear, props.hideClear, row, props.colDef]);
 
+  const icon = useMemo<IconOrElement | null | undefined>(() => {
+    if (!isNil(props.icon)) {
+      if (typeof props.icon === "function") {
+        return props.icon(row);
+      }
+      return props.icon;
+    }
+    return null;
+  }, [props.icon]);
+
   return (
     <div
       id={props.id}
@@ -39,6 +50,14 @@ const Cell = <
       onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => !isNil(props.onKeyDown) && props.onKeyDown(event)}
     >
       <LoadableCellWrapper loading={props.loading}>{props.children}</LoadableCellWrapper>
+
+      {!isNil(icon) ? (
+        <div className={"icon-wrapper"}>
+          {ui.typeguards.iconIsJSX(icon) ? icon : <Icon icon={icon} weight={"light"} />}
+        </div>
+      ) : (
+        <></>
+      )}
 
       {showClearButton && (
         <VerticalFlexCenter>

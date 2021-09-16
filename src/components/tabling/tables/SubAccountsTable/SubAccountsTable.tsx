@@ -6,14 +6,13 @@ import Columns from "./Columns";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
-type G = Model.BudgetGroup;
 
 type SubAccountsTableProps = {
   readonly cookieNames?: Omit<Table.CookieNames, "hiddenColumns">;
 };
 
 export type WithSubAccountsTableProps<T> = T & {
-  readonly columns: Table.Column<R, M, G>[];
+  readonly columns: Table.Column<R, M>[];
 };
 
 function SubAccountsTable<T extends SubAccountsTableProps>(
@@ -29,6 +28,12 @@ function SubAccountsTable<T extends SubAccountsTableProps>(
         showPageFooter={true}
         cookieNames={{ ...props.cookieNames, hiddenColumns: "subaccount-table-hidden-columns" }}
         framework={Framework}
+        getModelRowName={(r: Table.ModelRow<R, M>) => r.data.identifier || r.data.description}
+        getPlaceholderRowName={(r: Table.PlaceholderRow<R>) => r.data.identifier || r.data.description}
+        getMarkupRowName={(r: Table.MarkupRow<R>) => r.data.identifier}
+        getMarkupRowLabel={"Markup"}
+        getModelRowLabel={"Sub Account"}
+        getPlaceholderRowLabel={"Sub Account"}
       />
     );
   };

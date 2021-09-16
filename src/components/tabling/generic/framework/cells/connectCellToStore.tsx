@@ -6,11 +6,10 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 
 /* eslint-disable indent */
 const connectCellToStore = <
-  R extends Table.RowData = any,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>,
-  T extends Table.CellProps<R, M, G, S> = Table.CellProps<R, M, G, S>
+  R extends Table.RowData = object,
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+  T extends Table.CellProps<R, M, S> = Table.CellProps<R, M, S>
 >(
   Component: React.ComponentClass<T, {}> | React.FunctionComponent<T>
 ): React.FunctionComponent<T> => {
@@ -26,7 +25,7 @@ const connectCellToStore = <
       }
     }
     const valueSelector = createSelector([selectorFn], (v: Partial<R> | null) =>
-      !isNil(v) && !isNil(props.customCol) ? v[props.customCol.field] : null
+      !isNil(v) && !isNil(props.customCol) && !isNil(props.customCol.field) ? v[props.customCol.field] : null
     );
     const value = useSelector(valueSelector);
     if (props.gridId === "data" || isNil(props.footerRowSelectors)) {

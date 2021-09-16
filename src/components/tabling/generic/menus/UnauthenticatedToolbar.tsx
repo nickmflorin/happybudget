@@ -4,30 +4,22 @@ import { map, isNil } from "lodash";
 import { tabling } from "lib";
 import TableMenuAction from "./MenuAction";
 
-interface UnauthenticatedToolbarProps<
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
-> {
+interface UnauthenticatedToolbarProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
   readonly apis: Table.GridApis | null;
-  readonly columns: Table.Column<R, M, G>[];
-  readonly actions: Table.UnauthenticatedMenuActions<R, M, G>;
-  readonly hiddenColumns: (keyof R)[];
+  readonly columns: Table.Column<R, M>[];
+  readonly actions: Table.UnauthenticatedMenuActions<R, M>;
+  readonly hiddenColumns: (keyof R | string)[];
 }
 
 /* eslint-disable indent */
-const UnauthenticatedToolbar = <
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
->(
-  props: UnauthenticatedToolbarProps<R, M, G>
+const UnauthenticatedToolbar = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  props: UnauthenticatedToolbarProps<R, M>
 ): JSX.Element => {
   return (
     <div className={"toolbar-buttons"}>
       {!isNil(props.apis) &&
         map(
-          tabling.menu.evaluateActions<R, M, G, Table.UnauthenticatedMenuActionParams<R, M, G>>(props.actions, {
+          tabling.menu.evaluateActions<R, M, Table.UnauthenticatedMenuActionParams<R, M>>(props.actions, {
             apis: props.apis,
             columns: props.columns,
             hiddenColumns: props.hiddenColumns

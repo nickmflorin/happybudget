@@ -6,20 +6,20 @@ import {
 
 import { UnauthenticatedBudgetDataGrid } from "../grids";
 
-export type UnauthenticatedBudgetTableProps<R extends Table.RowData, M extends Model.Model = Model.Model> = Omit<
-  UnauthenticatedTableProps<R, M, Model.BudgetGroup>,
-  "children"
-> & {
+export type UnauthenticatedBudgetTableProps<
+  R extends Table.RowData,
+  M extends Model.HttpModel = Model.HttpModel
+> = Omit<UnauthenticatedTableProps<R, M>, "children"> & {
   readonly onBack?: () => void;
 };
 
 /* eslint-disable indent */
-const UnauthenticatedBudgetTable = <R extends Table.RowData, M extends Model.Model = Model.Model>(
+const UnauthenticatedBudgetTable = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   props: UnauthenticatedBudgetTableProps<R, M>
 ): JSX.Element => {
   return (
-    <UnauthenticatedTable<R, M, Model.BudgetGroup> {...props}>
-      {(params: UnauthenticatedTableDataGridProps<R, M, Model.BudgetGroup>) => (
+    <UnauthenticatedTable<R, M> {...props}>
+      {(params: UnauthenticatedTableDataGridProps<R, M>) => (
         <UnauthenticatedBudgetDataGrid<R, M>
           {...params}
           onBack={props.onBack}

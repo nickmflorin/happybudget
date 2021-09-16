@@ -33,7 +33,7 @@ export const createListResponseTaskSet = (
     }
   }
 
-  function* submit(action: Redux.Action<{ parent?: ID; data: Http.CommentPayload }>): SagaIterator {
+  function* submit(action: Redux.Action<{ parent?: number; data: Http.CommentPayload }>): SagaIterator {
     const budgetId = yield select((state: Application.Authenticated.Store) => state.budget.id);
     if (!isNil(budgetId) && !isNil(action.payload)) {
       const { parent, data } = action.payload;
@@ -67,7 +67,7 @@ export const createListResponseTaskSet = (
     }
   }
 
-  function* deleteTask(action: Redux.Action<ID>): SagaIterator {
+  function* deleteTask(action: Redux.Action<number>): SagaIterator {
     if (!isNil(action.payload)) {
       yield put(config.actions.deleting({ id: action.payload, value: true }));
       try {

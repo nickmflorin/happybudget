@@ -7,13 +7,6 @@ import { redux } from "lib";
 import * as actions from "./actions";
 import { createInitialUserState } from "./initialState";
 
-/**
- * Creates the reducer to handle state changes to the User in the Redux store.
- * The initial state for the reducer is constructed with the provided Organization
- * ID and User Role.
- *
- * @param user   The User object returned from the JWT token validation.
- */
 const createUserReducer = (user: Model.User): Redux.Reducer<Model.User> => {
   const initialUserState = createInitialUserState(user);
 

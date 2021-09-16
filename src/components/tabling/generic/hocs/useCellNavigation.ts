@@ -4,14 +4,10 @@ import { NavigateToNextCellParams, TabToNextCellParams } from "@ag-grid-communit
 
 import { hooks, tabling, events } from "lib";
 
-export interface UseCellNavigationParams<
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
-> {
+export interface UseCellNavigationParams<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
   readonly tableId?: Table.Id;
   readonly apis: Table.GridApis | null;
-  readonly columns: Table.Column<R, M, G>[];
+  readonly columns: Table.Column<R, M>[];
   readonly includeRowInNavigation?: (row: Table.DataRow<R, M>) => boolean;
   readonly onNewRowRequired?: () => void;
 }
@@ -24,12 +20,8 @@ type UseCellNavigationReturnType = [
 ];
 
 /* eslint-disable indent */
-const useCellNavigation = <
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
->(
-  params: UseCellNavigationParams<R, M, G>
+const useCellNavigation = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  params: UseCellNavigationParams<R, M>
 ): UseCellNavigationReturnType => {
   const scrollToBottom = hooks.useDynamicCallback((numRows: number) => {
     params.apis?.grid.ensureIndexVisible(numRows - 1, "bottom");
@@ -70,7 +62,7 @@ const useCellNavigation = <
           } else {
             const row: Table.Row<R, M> = nextRowNode.data;
             if (
-              tabling.typeguards.isDataRow(row) &&
+              tabling.typeguards.isEditableRow(row) &&
               (isNil(params.includeRowInNavigation) || params.includeRowInNavigation(row) !== false)
             ) {
               return [nextRowNode, startingIndex + runningIndex, runningIndex];

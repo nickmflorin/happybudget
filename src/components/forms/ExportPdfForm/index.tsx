@@ -46,8 +46,8 @@ interface ExportFormProps extends FormProps<PdfBudgetTable.Options> {
   readonly headerTemplates: Model.HeaderTemplate[];
   readonly headerTemplatesLoading: boolean;
   readonly onClearHeaderTemplate: () => void;
-  readonly onLoadHeaderTemplate: (id: ID) => void;
-  readonly onHeaderTemplateDeleted: (id: ID) => void;
+  readonly onLoadHeaderTemplate: (id: number) => void;
+  readonly onHeaderTemplateDeleted: (id: number) => void;
   readonly onHeaderTemplateCreated: (template: Model.HeaderTemplate) => void;
   readonly onHeaderTemplateUpdated?: (template: Model.HeaderTemplate) => void;
 }

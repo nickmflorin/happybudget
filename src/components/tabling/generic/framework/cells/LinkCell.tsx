@@ -7,10 +7,9 @@ import useFormattedValue from "./useFormattedValue";
 
 export type LinkCellProps<
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
-> = Table.ValueCellProps<R, M, G, S> & {
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+> = Table.ValueCellProps<R, M, S> & {
   readonly href?: string | ((value: string | number | null) => string | undefined) | undefined;
   readonly rel?: string | undefined;
 };
@@ -18,18 +17,17 @@ export type LinkCellProps<
 /* eslint-disable indent */
 const LinkCell = <
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 >({
   value,
   href,
   rel,
   ...props
-}: LinkCellProps<R, M, G, S>): JSX.Element => {
+}: LinkCellProps<R, M, S>): JSX.Element => {
   const formattedValue = useFormattedValue({ value, ...props });
   return (
-    <Cell<R, M, G, S> {...props}>
+    <Cell<R, M, S> {...props}>
       <Link
         className={"link--table"}
         href={!isNil(href) ? (typeof href === "string" ? href : href(formattedValue)) : undefined}

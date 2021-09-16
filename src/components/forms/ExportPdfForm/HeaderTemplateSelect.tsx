@@ -11,10 +11,10 @@ interface HeaderTemplateSelectProps {
   readonly value: Model.HeaderTemplate | null;
   readonly templates: Model.HeaderTemplate[];
   readonly loading: boolean;
-  readonly deleting: ID | null;
+  readonly deleting: number | null;
   readonly onClear: () => void;
-  readonly onLoad: (id: ID) => void;
-  readonly onDelete: (id: ID) => void;
+  readonly onLoad: (id: number) => void;
+  readonly onDelete: (id: number) => void;
 }
 
 const HeaderTemplateSelect = (props: HeaderTemplateSelectProps): JSX.Element => {

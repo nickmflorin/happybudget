@@ -5,20 +5,18 @@ import {
   AuthenticatedTableDataGridProps
 } from "components/tabling/generic";
 
-export type AuthenticatedModelTableProps<R extends Table.RowData, M extends Model.Model = Model.Model> = Omit<
-  AuthenticatedTableProps<R, M, Model.Group>,
+export type AuthenticatedModelTableProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = Omit<
+  AuthenticatedTableProps<R, M>,
   "children"
 >;
 
 /* eslint-disable indent */
-const AuthenticatedModelTable = <R extends Table.RowData, M extends Model.Model = Model.Model>(
+const AuthenticatedModelTable = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   props: AuthenticatedModelTableProps<R, M>
 ): JSX.Element => {
   return (
-    <AuthenticatedTable<R, M, Model.Group> {...props}>
-      {(params: AuthenticatedTableDataGridProps<R, M, Model.Group>) => (
-        <AuthenticatedDataGrid<R, M, Model.Group> {...params} />
-      )}
+    <AuthenticatedTable<R, M> {...props}>
+      {(params: AuthenticatedTableDataGridProps<R, M>) => <AuthenticatedDataGrid<R, M> {...params} />}
     </AuthenticatedTable>
   );
 };

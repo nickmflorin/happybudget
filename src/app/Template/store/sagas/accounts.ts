@@ -1,7 +1,7 @@
 import { SagaIterator } from "redux-saga";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import { spawn } from "redux-saga/effects";
-import { isNil } from "lodash";
+import { isNil, filter, intersection } from "lodash";
 
 import * as api from "api";
 import { budgeting, tabling } from "lib";
@@ -10,9 +10,7 @@ import { AccountsTable } from "components/tabling";
 
 import { accounts as actions, loadingTemplateAction, updateTemplateInStateAction } from "../actions";
 
-const ActionMap: Redux.ActionMapObject<
-  Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account, Model.BudgetGroup>
-> & {
+const ActionMap: Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account>> & {
   readonly loadingBudget: ActionCreatorWithPayload<boolean>;
   readonly updateBudgetInState: ActionCreatorWithPayload<Redux.UpdateActionPayload<Model.Template>>;
 } = {
@@ -31,12 +29,15 @@ const ActionMap: Redux.ActionMapObject<
 const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   Tables.AccountRowData,
   Model.Account,
-  Model.BudgetGroup,
-  Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account, Model.BudgetGroup>
+  Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account>
 >({
   actions: ActionMap,
   tasks: budgeting.tasks.accounts.createTableTaskSet<Model.Template>({
-    columns: AccountsTable.TemplateColumns,
+    columns: filter(
+      AccountsTable.Columns,
+      (c: Table.Column<Tables.AccountRowData, Model.Account>) =>
+        intersection([c.field, c.colId], ["variance", "actual"]).length === 0
+    ),
     selectObjId: (state: Application.Authenticated.Store) => state.template.id,
     selectAutoIndex: (state: Application.Authenticated.Store) => state.template.autoIndex,
     selectData: (state: Application.Authenticated.Store) =>

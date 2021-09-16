@@ -12,14 +12,12 @@ import SubAccountsTable, { WithSubAccountsTableProps } from "./SubAccountsTable"
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
-type G = Model.BudgetGroup;
 
 export type UnauthenticatedBudgetProps = Omit<UnauthenticatedBudgetTableProps<R, M>, "columns"> & {
   readonly subAccountUnits: Model.Tag[];
   readonly fringes: Tables.FringeRow[];
   readonly categoryName: "Sub Account" | "Detail";
   readonly identifierFieldHeader: "Account" | "Line";
-  readonly cookieNames: Table.CookieNames;
   readonly exportFileName: string;
 };
 
@@ -33,23 +31,23 @@ const UnauthenticatedBudgetSubAccountsTable = (
       {...props}
       table={table}
       pinFirstColumn={true}
-      columns={tabling.columns.mergeColumns<Table.Column<R, M, G>, R, M, G>(props.columns, {
-        identifier: (col: Table.Column<R, M, G>) =>
+      columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(props.columns, {
+        identifier: (col: Table.Column<R, M>) =>
           budgetTableFramework.columnObjs.IdentifierColumn<R, M>({
             ...col,
             headerName: props.identifierFieldHeader
           }),
         description: { headerName: `${props.categoryName} Description` },
-        unit: (col: Table.Column<R, M, G>) =>
-          framework.columnObjs.TagSelectColumn<R, M, G>({ ...col, models: props.subAccountUnits }),
+        unit: (col: Table.Column<R, M>) =>
+          framework.columnObjs.TagSelectColumn<R, M>({ ...col, models: props.subAccountUnits }),
         fringes: {
           processCellForClipboard: (row: R) => {
             const fringes = model.util.getModelsByIds<Tables.FringeRow>(props.fringes, row.fringes);
-            return map(fringes, (fringe: Tables.FringeRow) => fringe.name).join(", ");
+            return map(fringes, (fringe: Tables.FringeRow) => fringe.data.name).join(", ");
           }
         }
       })}
-      actions={(params: Table.UnauthenticatedMenuActionParams<R, M, G>) => [
+      actions={(params: Table.UnauthenticatedMenuActionParams<R, M>) => [
         {
           icon: "folder",
           disabled: true,
@@ -63,8 +61,8 @@ const UnauthenticatedBudgetSubAccountsTable = (
           isWriteOnly: true
         },
         ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
-        framework.actions.ToggleColumnAction<R, M, G>(table.current, params),
-        framework.actions.ExportCSVAction<R, M, G>(table.current, params, props.exportFileName)
+        framework.actions.ToggleColumnAction<R, M>(table.current, params),
+        framework.actions.ExportCSVAction<R, M>(table.current, params, props.exportFileName)
       ]}
     />
   );

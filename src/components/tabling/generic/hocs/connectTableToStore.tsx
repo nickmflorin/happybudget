@@ -7,9 +7,8 @@ import { redux, tabling } from "lib";
 
 type ProvidedProps<
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 > = {
   readonly search: string;
   readonly data: Table.Row<R, M>[];
@@ -18,32 +17,30 @@ type ProvidedProps<
   readonly selector: (state: Application.Store) => S;
   readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
   readonly onSearch: (v: string) => void;
-  readonly onChangeEvent: (e: Table.ChangeEvent<R, M, G>) => void;
+  readonly onChangeEvent: (e: Table.ChangeEvent<R, M>) => void;
 };
 
 export type WithConnectedTableProps<
   T,
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
-> = T & ProvidedProps<R, M, G, S>;
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+> = T & ProvidedProps<R, M, S>;
 
 /* eslint-disable indent */
 const connectTableToStore =
   <
     T,
     R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+    M extends Model.HttpModel = Model.HttpModel,
+    S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
   >(
-    config: Table.StoreConfig<R, M, G, S>
+    config: Table.StoreConfig<R, M, S>
   ) =>
   (
     Component:
-      | React.ComponentClass<WithConnectedTableProps<T, R, M, G, S>, {}>
-      | React.FunctionComponent<WithConnectedTableProps<T, R, M, G, S>>
+      | React.ComponentClass<WithConnectedTableProps<T, R, M, S>, {}>
+      | React.FunctionComponent<WithConnectedTableProps<T, R, M, S>>
   ): React.FunctionComponent<T> => {
     let selector: (state: Application.Store) => S = (state: Application.Store) =>
       redux.initialState.initialTableState as S;
@@ -91,8 +88,8 @@ const connectTableToStore =
           selector={selector}
           footerRowSelectors={config.footerRowSelectors}
           saving={saving}
-          onChangeEvent={(e: Table.ChangeEvent<R, M, G>) => {
-            if (tabling.typeguards.isAuthenticatedActionMap<R, M, G>(config.actions)) {
+          onChangeEvent={(e: Table.ChangeEvent<R, M>) => {
+            if (tabling.typeguards.isAuthenticatedActionMap<R, M>(config.actions)) {
               dispatch(config.actions.tableChanged(e));
             }
           }}

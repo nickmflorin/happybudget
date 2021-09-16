@@ -6,7 +6,7 @@ import { model } from "lib";
 
 import { Form } from "components";
 import { BudgetForm } from "components/forms";
-import Modal from "./Modal";
+import { Modal } from "./generic";
 
 interface EditBudgetModalProps {
   budget: Model.Budget;
@@ -18,9 +18,10 @@ interface EditBudgetModalProps {
 const EditBudgetModal = ({ open, budget, onSuccess, onCancel }: EditBudgetModalProps): JSX.Element => {
   const [file, setFile] = useState<UploadedImage | SavedImage | null>(budget.image);
   const [form] = Form.useForm<Http.BudgetPayload>({ isInModal: true });
+  const cancelToken = api.useCancelToken();
 
   return (
-    <Modal.Modal
+    <Modal
       title={`Edit ${budget.name}`}
       visible={open}
       onCancel={() => onCancel()}
@@ -64,7 +65,7 @@ const EditBudgetModal = ({ open, budget, onSuccess, onCancel }: EditBudgetModalP
               payload = { ...payload, image: !isNil(file) ? file.data : null };
             }
             api
-              .updateBudget(budget.id, payload)
+              .updateBudget(budget.id, payload, { cancelToken: cancelToken() })
               .then((newBudget: Model.Budget) => {
                 form.resetFields();
                 onSuccess(newBudget);
@@ -87,7 +88,7 @@ const EditBudgetModal = ({ open, budget, onSuccess, onCancel }: EditBudgetModalP
         originalImage={budget.image}
         initialValues={{ name: budget.name }}
       />
-    </Modal.Modal>
+    </Modal>
   );
 };
 

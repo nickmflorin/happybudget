@@ -11,20 +11,15 @@ type WithFooterGridProps<T> = T & { readonly id: "page" | "footer" };
 
 /* eslint-disable indent */
 const FooterGrid =
-  <
-    R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    T extends GridProps<R, M, G> = GridProps<R, M, G>
-  >(
-    config: TableUi.FooterGridConfig<R, M, G>
+  <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, T extends GridProps<R, M> = GridProps<R, M>>(
+    config: TableUi.FooterGridConfig<R, M>
   ) =>
   (
     Component: React.ComponentClass<WithFooterGridProps<T>, {}> | React.FunctionComponent<WithFooterGridProps<T>>
   ): React.FunctionComponent<Omit<T, "id">> => {
     function WithFooterGrid(props: T) {
-      const columns = useMemo<Table.Column<R, M, G>[]>((): Table.Column<R, M, G>[] => {
-        const UniversalFooterColumn = (col: Table.Column<R, M, G>): Table.Column<R, M, G> => {
+      const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
+        const UniversalFooterColumn = (col: Table.Column<R, M>): Table.Column<R, M> => {
           const footerColumn = config.getFooterColumn(col);
           if (!isNil(footerColumn)) {
             return {
@@ -35,7 +30,7 @@ const FooterGrid =
           }
           return { ...col, editable: false };
         };
-        return map(props.columns, (col: Table.Column<R, M, G>) => UniversalFooterColumn(col));
+        return map(props.columns, (col: Table.Column<R, M>) => UniversalFooterColumn(col));
       }, [hooks.useDeepEqualMemo(props.columns)]);
 
       return (

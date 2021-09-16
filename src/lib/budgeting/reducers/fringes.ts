@@ -6,20 +6,13 @@ export type FringeTableActionMap = Redux.TableActionMap<Model.Fringe> & {
 
 /* eslint-disable indent */
 export const createUnauthenticatedFringesTableReducer = (
-  config: Table.ReducerConfig<
-    Tables.FringeRowData,
-    Model.Fringe,
-    Model.Group,
-    Tables.FringeTableStore,
-    FringeTableActionMap
-  >
+  config: Table.ReducerConfig<Tables.FringeRowData, Model.Fringe, Tables.FringeTableStore, FringeTableActionMap>
 ): Redux.Reducer<Tables.FringeTableStore> => {
   type S = Tables.FringeTableStore;
 
   const generic = tabling.reducers.createUnauthenticatedTableReducer<
     Tables.FringeRowData,
     Model.Fringe,
-    Model.Group,
     Tables.FringeTableStore
   >(config);
 
@@ -45,7 +38,6 @@ export const createAuthenticatedFringesTableReducer = (
   config: Table.ReducerConfig<
     Tables.FringeRowData,
     Model.Fringe,
-    Model.Group,
     Tables.FringeTableStore,
     AuthenticatedFringeTableActionMap
   >
@@ -55,7 +47,6 @@ export const createAuthenticatedFringesTableReducer = (
   const generic = tabling.reducers.createAuthenticatedTableReducer<
     Tables.FringeRowData,
     Model.Fringe,
-    Model.Group,
     Tables.FringeTableStore
   >(config);
 

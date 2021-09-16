@@ -7,7 +7,7 @@ import { Tag } from "components/tagging";
 import { Cell } from "components/tabling/generic/framework/cells";
 
 export interface FringesCellProps
-  extends Table.CellProps<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup, Tables.SubAccountTableStore> {
+  extends Table.CellProps<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore> {
   readonly onAddFringes: () => void;
 }
 
@@ -20,7 +20,7 @@ const FringesCell = ({ value, onAddFringes, ...props }: FringesCellProps): JSX.E
   }, [hooks.useDeepEqualMemo(fringes), row.data.fringes]);
 
   return (
-    <Cell<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup, Tables.SubAccountTableStore> {...props}>
+    <Cell<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore> {...props}>
       <div style={{ display: "flex", justifyContent: "left" }}>
         <Tag.Multiple<Tables.FringeRow> models={models} />
       </div>

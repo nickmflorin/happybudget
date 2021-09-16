@@ -123,18 +123,19 @@ const Tasks = budgeting.tasks.subaccounts.createTableTaskSet<Model.Account, Mode
   services: {
     request: api.getAccountSubAccounts,
     requestGroups: api.getAccountSubAccountGroups,
+    requestMarkups: api.getAccountSubAccountMarkups,
     requestFringes: api.getBudgetFringes,
     bulkCreate: api.bulkCreateAccountSubAccounts,
     bulkDelete: api.bulkDeleteAccountSubAccounts,
-    bulkUpdate: api.bulkUpdateAccountSubAccounts
+    bulkUpdate: api.bulkUpdateAccountSubAccounts,
+    bulkDeleteMarkups: api.bulkDeleteAccountMarkups
   }
 });
 
 const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   Tables.SubAccountRowData,
   Model.SubAccount,
-  Model.BudgetGroup,
-  Redux.AuthenticatedTableActionMap<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup>
+  Redux.AuthenticatedTableActionMap<Tables.SubAccountRowData, Model.SubAccount>
 >({
   actions: ActionMap,
   tasks: Tasks

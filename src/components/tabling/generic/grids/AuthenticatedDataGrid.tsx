@@ -3,18 +3,15 @@ import AuthenticatedGrid, { AuthenticatedGridProps } from "./AuthenticatedGrid";
 
 export type AuthenticatedDataGridProps<
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
-> = DataGridProps<R, M, G> & AuthenticateDataGridProps<R, M, G> & Omit<AuthenticatedGridProps<R, M, G>, "id">;
+  M extends Model.HttpModel = Model.HttpModel
+> = DataGridProps<R, M> & AuthenticateDataGridProps<R, M> & Omit<AuthenticatedGridProps<R, M>, "id">;
 
-const DG = DataGrid<any, any, any, AuthenticatedDataGridProps<any>>()(AuthenticatedGrid) as {
-  <R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group>(
-    props: DataGridProps<R, M, G>
-  ): JSX.Element;
+const DG = DataGrid<any, any, AuthenticatedDataGridProps<any>>()(AuthenticatedGrid) as {
+  <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(props: DataGridProps<R, M>): JSX.Element;
 };
 
-export default authenticateDataGrid<any, any, any, AuthenticatedDataGridProps<any>>()(DG) as {
-  <R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group>(
-    props: AuthenticatedDataGridProps<R, M, G>
+export default authenticateDataGrid<any, any, AuthenticatedDataGridProps<any>>()(DG) as {
+  <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+    props: AuthenticatedDataGridProps<R, M>
   ): JSX.Element;
 };

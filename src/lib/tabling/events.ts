@@ -2,26 +2,26 @@ import { groupBy, isNil, reduce } from "lodash";
 
 import * as util from "../util";
 
-export const collapseSoloCellChange = <R extends Table.RowData>(
-  cellChange: Table.SoloCellChange<R>
-): Table.CellChange<R> => {
-  return {
-    oldValue: cellChange.oldValue,
-    newValue: cellChange.newValue
-  };
-};
-
-export const cellChangeToRowChange = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  cellChange: Table.SoloCellChange<R>
-): Table.RowChange<R, M> => {
-  let rowChange: Table.RowChange<R, M> = {
+/* eslint-disable indent */
+export const cellChangeToRowChange = <
+  R extends Table.RowData,
+  M extends Model.HttpModel,
+  RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
+>(
+  cellChange: Table.SoloCellChange<R, M, RW>
+): Table.RowChange<R, M, RW> => {
+  let rowChange: Table.RowChange<R, M, RW> = {
     id: cellChange.id,
-    data: {}
+    data: {},
+    row: cellChange.row
   };
-  let rowChangeData: Table.RowChangeData<R, M> = {};
+  let rowChangeData: Table.RowChangeData<R> = {};
   rowChangeData = {
     ...rowChangeData,
-    [cellChange.field as string]: collapseSoloCellChange(cellChange)
+    [cellChange.field as string]: {
+      oldValue: cellChange.oldValue,
+      newValue: cellChange.newValue
+    }
   };
   rowChange = {
     ...rowChange,
@@ -30,19 +30,26 @@ export const cellChangeToRowChange = <R extends Table.RowData, M extends Model.M
   return rowChange;
 };
 
-export const addCellChangeToRowChange = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  rowChange: Table.RowChange<R, M>,
-  cellChange: Table.SoloCellChange<R>
-): Table.RowChange<R, M> => {
-  const fieldChange = util.getKeyValue<Table.RowChangeData<R, M>, keyof R>(cellChange.field)(rowChange.data) as
-    | Omit<Table.SoloCellChange<R>, "field" | "id">
+export const addCellChangeToRowChange = <
+  R extends Table.RowData,
+  M extends Model.HttpModel,
+  RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
+>(
+  rowChange: Table.RowChange<R, M, RW>,
+  cellChange: Table.SoloCellChange<R, M, RW>
+): Table.RowChange<R, M, RW> => {
+  const fieldChange = util.getKeyValue<Table.RowChangeData<R>, keyof R>(cellChange.field)(rowChange.data) as
+    | Omit<Table.SoloCellChange<R, M, RW>, "field" | "id">
     | undefined;
   if (isNil(fieldChange)) {
     return {
       ...rowChange,
       data: {
         ...rowChange.data,
-        [cellChange.field as string]: collapseSoloCellChange(cellChange)
+        [cellChange.field as string]: {
+          oldValue: cellChange.oldValue,
+          newValue: cellChange.newValue
+        }
       }
     };
   } else {
@@ -59,59 +66,94 @@ export const addCellChangeToRowChange = <R extends Table.RowData, M extends Mode
   }
 };
 
-export const cellChangesToRowChanges = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  cellChanges: Table.SoloCellChange<R>[]
-): Table.RowChange<R, M>[] => {
+export const cellChangesToRowChanges = <
+  R extends Table.RowData,
+  M extends Model.HttpModel,
+  RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
+>(
+  cellChanges: Table.SoloCellChange<R, M, RW>[]
+): Table.RowChange<R, M, RW>[] => {
   /* eslint-disable no-unused-vars */
-  const grouped: { [key in Table.RowID]: Table.SoloCellChange<R>[] } = groupBy(
+  const grouped: { [key in Table.EditableRowId]: Table.SoloCellChange<R, M, RW>[] } = groupBy(
     cellChanges,
-    (ch: Table.SoloCellChange<R>) => ch.id
+    (ch: Table.SoloCellChange<R, M, RW>) => ch.id
   );
   return reduce(
     grouped,
-    (curr: Table.RowChange<R, M>[], group: Table.SoloCellChange<R>[], id: ID) => {
-      return [
-        ...curr,
-        reduce(
-          group,
-          (cr: Table.RowChange<R, M>, ch: Table.SoloCellChange<R>) => {
-            return addCellChangeToRowChange(cr, ch);
-          },
-          { id, data: {} }
-        )
-      ];
+    (curr: Table.RowChange<R, M, RW>[], group: Table.SoloCellChange<R, M, RW>[], id: string) => {
+      if (group.length !== 0) {
+        return [
+          ...curr,
+          reduce(
+            group,
+            (cr: Table.RowChange<R, M, RW>, ch: Table.SoloCellChange<R, M, RW>) => {
+              return addCellChangeToRowChange(cr, ch);
+            },
+            // Note: Since the changes are grouped by Row ID, the row will be
+            // close to the same for each <SoloCellChange> in the group.  All
+            // of the properties that we care about will be the same, but the
+            // data might differ... we should improve this API.
+            { id: id as Table.EditableRowId, data: {}, row: group[0].row }
+          )
+        ];
+      }
+      return curr;
     },
     []
   );
 };
 
-export const consolidateTableChange = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  change: Table.DataChangePayload<R, M>
-): Table.ConsolidatedChange<R, M> => {
-  const reduceChangesForRow = (initial: Table.RowChange<R, M>, ch: Table.RowChange<R, M>): Table.RowChange<R, M> => {
+export const consolidateTableChange = <
+  R extends Table.RowData,
+  M extends Model.HttpModel,
+  RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
+>(
+  change: Table.DataChangePayload<R, M, RW>
+): Table.ConsolidatedChange<R, M, RW> => {
+  const reduceChangesForRow = (
+    initial: Table.RowChange<R, M, RW>,
+    ch: Table.RowChange<R, M, RW>
+  ): Table.RowChange<R, M, RW> => {
     if (initial.id !== ch.id) {
       throw new Error("Cannot reduce table changes for different rows.");
     }
     let rowChange = { ...initial };
     let key: keyof R;
     for (key in ch.data) {
-      const cellChange: Table.CellChange<R> | undefined = util.getKeyValue<Table.RowChangeData<R, M>, keyof R>(key)(
+      const cellChange: Table.CellChange<R> | undefined = util.getKeyValue<Table.RowChangeData<R>, keyof R>(key)(
         ch.data
       );
       if (!isNil(cellChange)) {
-        rowChange = addCellChangeToRowChange(rowChange, { ...cellChange, field: key, id: rowChange.id });
+        rowChange = addCellChangeToRowChange(rowChange, {
+          ...cellChange,
+          field: key,
+          id: rowChange.id,
+          row: initial.row
+        });
       }
     }
     return rowChange;
   };
   if (Array.isArray(change)) {
     const grouped = groupBy(change, "id") as {
-      [key in Table.DataRowID]: Table.RowChange<R, M>[];
+      [key in Table.DataRowId]: Table.RowChange<R, M, RW>[];
     };
-    let id: Table.DataRowID;
-    const merged: Table.RowChange<R, M>[] = [];
+    let id: Table.DataRowId;
+    const merged: Table.RowChange<R, M, RW>[] = [];
     for (id in grouped) {
-      merged.push(reduce(grouped[parseInt(id)], reduceChangesForRow, { id: id, data: {} }));
+      if (grouped[id].length !== 0) {
+        merged.push(
+          reduce(grouped[id], reduceChangesForRow, {
+            id: id,
+            data: {},
+            // Note: Since the changes are grouped by Row ID, the row will be
+            // close to the same for each <SoloCellChange> in the group.  All
+            // of the properties that we care about will be the same, but the
+            // data might differ... we should improve this API.
+            row: grouped[id][0].row
+          })
+        );
+      }
     }
     return merged;
   } else {

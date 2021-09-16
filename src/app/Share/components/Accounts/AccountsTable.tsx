@@ -22,7 +22,6 @@ const ConnectedTable = connectTableToStore<
   GenericAccountsTable.UnauthenticatedBudgetProps,
   R,
   M,
-  Model.BudgetGroup,
   Tables.AccountTableStore
 >({
   asyncId: "async-accounts-table",
@@ -32,21 +31,19 @@ const ConnectedTable = connectTableToStore<
       [redux.selectors.simpleDeepEqualSelector((state: Application.Unauthenticated.Store) => state.share.detail.data)],
       (budget: Model.Budget | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
-        estimated: budget?.estimated || 0.0,
-        variance: budget?.variance || 0.0,
+        estimated: !isNil(budget) ? budget.estimated + budget.markup_contribution + budget.fringe_contribution : 0.0,
+        variance: !isNil(budget)
+          ? budget.estimated + budget.markup_contribution + budget.fringe_contribution - budget.actual
+          : 0.0,
         actual: budget?.actual || 0.0
       })
     )
   },
   reducer: budgeting.reducers.createUnauthenticatedAccountsTableReducer({
     tableId: "accounts-table",
-    columns: GenericAccountsTable.BudgetColumns,
+    columns: GenericAccountsTable.Columns,
     actions: ActionMap,
-    getModelRowLabel: (r: R) => r.identifier,
-    getModelRowName: "Account",
-    getPlaceholderRowLabel: (r: R) => r.identifier,
-    getModelRowChildren: (m: Model.Account) => m.subaccounts,
-    getPlaceholderRowName: "Account",
+    getModelRowChildren: (m: Model.Account) => m.children,
     initialState: redux.initialState.initialTableState
   })
 })(GenericAccountsTable.UnauthenticatedBudget);

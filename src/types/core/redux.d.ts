@@ -95,12 +95,12 @@ namespace Redux {
     data: Partial<T>;
   }
 
-  interface ModelDetailResponseStore<T extends Model.Model> {
+  interface ModelDetailResponseStore<T extends Model.HttpModel> {
     readonly data: T | null;
     readonly loading: boolean;
   }
 
-  interface ModelDetailResponseActionMap<M extends Model.Model> {
+  interface ModelDetailResponseActionMap<M extends Model.HttpModel> {
     readonly loading: boolean;
     readonly response: M | null;
     readonly updateInState: Redux.UpdateActionPayload<M>;
@@ -121,21 +121,21 @@ namespace Redux {
     readonly request: null;
   }
 
-  interface ModelListResponseStore<T extends Model.Model> extends Redux.ListResponseStore<T> {
+  interface ModelListResponseStore<T extends Model.HttpModel> extends Redux.ListResponseStore<T> {
     readonly cache: SearchCache;
     readonly search: string;
     readonly deleting: Redux.ModelListActionStore;
     readonly updating: Redux.ModelListActionStore;
     readonly creating: boolean;
-    readonly selected: ID[];
+    readonly selected: number[];
   }
 
-  type ModelListResponseActionMap<M extends Model.Model> = {
+  type ModelListResponseActionMap<M extends Model.HttpModel> = {
     readonly loading: boolean;
     readonly request: null;
     readonly updating: Redux.ModelListActionPayload;
     readonly creating: boolean;
-    readonly removeFromState: ID;
+    readonly removeFromState: number;
     readonly deleting: Redux.ModelListActionPayload;
     readonly response: Http.ListResponse<M>;
     readonly addToState: M;
@@ -149,61 +149,60 @@ namespace Redux {
   }
 
   type CommentsListResponseActionMap = Omit<Redux.ModelListResponseActionMap<Model.Comment>, "addToState" | "setSearch" | "restoreSearchCache"> & {
-    readonly submit: { parent?: ID; data: Http.CommentPayload };
-    readonly delete: ID;
+    readonly submit: { parent?: number; data: Http.CommentPayload };
+    readonly delete: number;
     readonly edit: Redux.UpdateActionPayload<Model.Comment>;
-    readonly addToState: { data: Model.Comment; parent?: ID };
+    readonly addToState: { data: Model.Comment; parent?: number };
     readonly replying: Redux.ModelListActionPayload;
   };
 
   type CommentsListResponseTaskMap = Redux.ModelListResponseTaskMap & {
-    readonly submit: { parent?: ID; data: Http.CommentPayload };
-    readonly delete: ID;
+    readonly submit: { parent?: number; data: Http.CommentPayload };
+    readonly delete: number;
     readonly edit: Redux.UpdateActionPayload<Model.Comment>;
   };
 
   // Holds previously searched for results.  Note that this may not play well
   // with pagination, in which case we will have to adjust (but we are currently
   // not using pagination anywhere that we are using this cache).
-  type SearchCache<T extends Model.Model> = { [key: string]: Http.ListResponse<T> };
+  type SearchCache<T extends Model.HttpModel> = { [key: string]: Http.ListResponse<T> };
 
-  type TableTaskMap<R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = {
+  type TableTaskMap<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {
     readonly request: null;
-    readonly handleChangeEvent: Table.ChangeEvent<R, M, G>;
+    readonly handleChangeEvent: Table.ChangeEvent<R, M>;
   }
 
-  type TableActionMap<M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = {
+  type TableActionMap<M extends Model.HttpModel = Model.HttpModel> = {
     readonly loading: boolean;
-    readonly response: Http.TableResponse<M, G>;
+    readonly response: Http.TableResponse<M>;
     readonly request?: null;
     readonly setSearch: string;
     readonly clear: null;
   }
 
-  type AuthenticatedTableActionMap<R extends Table.RowData = any, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = TableActionMap<M, G> & {
-    readonly tableChanged: Table.ChangeEvent<R, M, G>;
+  type AuthenticatedTableActionMap<R extends Table.RowData = object, M extends Model.HttpModel = Model.HttpModel> = TableActionMap<M> & {
+    readonly tableChanged: Table.ChangeEvent<R, M>;
     readonly saving: boolean;
     readonly addModelsToState: Redux.AddModelsToTablePayload<M>;
   }
 
-  type TableStore<D extends Table.RowData = any, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = {
+  type TableStore<D extends Table.RowData = object, M extends Model.HttpModel = Model.HttpModel> = {
     readonly data: Table.Row<D, M>[];
     readonly models: M[];
-    readonly groups: G[];
+    readonly groups: Model.Group[];
     readonly search: string;
     readonly loading: boolean;
     readonly saving: boolean;
   }
 
-  type AddModelsToTablePayload<M extends Model.Model> = { readonly placeholderIds: Table.PlaceholderRowId[]; readonly models: M[] };
+  type AddModelsToTablePayload<M extends Model.HttpModel> = { readonly placeholderIds: Table.PlaceholderRowId[]; readonly models: M[] };
 
   type InferTableRow<S> = S extends Redux.TableStore<infer R> ? R : unknown;
   type InferTableModel<S> = S extends TableStore<any, infer M> ? M : unknown;
-  type InferTableGroup<S> = S extends TableStore<any, any, infer G> ? G : unknown;
 
-  type BudgetTableStore<R extends Table.Row = Table.Row, M extends Model.Model = Model.Model> = Redux.TableStore<R, M, Model.BudgetGroup>;
+  type BudgetTableStore<R extends Table.RowData = object, M extends Model.HttpModel = Model.HttpModel> = Redux.TableStore<R, M>;
 
   interface CommentsListResponseStore extends Redux.ModelListResponseStore<Model.Comment> {
-    readonly replying: ID[];
+    readonly replying: number[];
   }
 }

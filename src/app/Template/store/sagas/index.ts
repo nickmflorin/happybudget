@@ -41,7 +41,7 @@ const FringesTasks = budgeting.tasks.fringes.createTableTaskSet<Model.Template>(
   }
 });
 
-const fringesTableSaga = tabling.sagas.createAuthenticatedTableSaga<Tables.FringeRowData, Model.Fringe, Model.Group>({
+const fringesTableSaga = tabling.sagas.createAuthenticatedTableSaga<Tables.FringeRowData, Model.Fringe>({
   actions: FringesActionMap,
   tasks: FringesTasks
 });

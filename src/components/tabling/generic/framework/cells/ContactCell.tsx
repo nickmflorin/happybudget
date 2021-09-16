@@ -9,23 +9,21 @@ import { Cell } from "./generic";
 
 interface ContactCellProps<
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
-> extends Table.CellProps<R, M, G, S, number | null> {
-  readonly onEditContact: (id: ID) => void;
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+> extends Table.CellProps<R, M, S, number | null> {
+  readonly onEditContact: (id: number) => void;
 }
 
 /* eslint-disable indent */
 const ContactCell = <
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 >({
   value,
   ...props
-}: ContactCellProps<R, M, G, S>): JSX.Element => {
+}: ContactCellProps<R, M, S>): JSX.Element => {
   const contacts = useContacts();
   const model = useMemo(() => (!isNil(value) ? find(contacts, { id: value } as any) || null : null), [value, contacts]);
 

@@ -3,14 +3,14 @@ import { isNil } from "lodash";
 import { Icon, ShowHide } from "components";
 import { IconButton } from "components/buttons";
 
-interface ExpandCellProps<
+export interface ExpandCellProps<
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
-> extends Table.CellProps<R, M, G, S, null> {
-  readonly onClick: (row: Table.ModelRow<R>) => void;
-  readonly rowCanExpand?: (row: Table.ModelRow<R>) => boolean;
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+> extends Table.CellProps<R, M, S, null> {
+  readonly onExpand: (row: Table.ModelRow<R, M>) => void;
+  readonly rowCanExpand?: (row: Table.ModelRow<R, M>) => boolean;
+  readonly alwaysShow?: (row: Table.ModelRow<R, M>) => boolean;
   readonly tooltip?: string;
   readonly cannotExpandTooltip?: string;
 }
@@ -18,17 +18,17 @@ interface ExpandCellProps<
 /* eslint-disable indent */
 const ExpandCell = <
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group,
-  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 >({
   rowCanExpand,
-  onClick,
+  onExpand,
+  alwaysShow,
   tooltip,
   cannotExpandTooltip,
   node,
   ...props
-}: ExpandCellProps<R, M, G, S>): JSX.Element => {
+}: ExpandCellProps<R, M, S>): JSX.Element => {
   // This cell renderer will only be allowed if the row is of type model.
   const row: Table.ModelRow<R, M> = node.data;
 
@@ -43,25 +43,37 @@ const ExpandCell = <
 
   // Note: Wrapping the cell in a <div> helps alleviate some issues with AG Grid.
   if (isNil(rowCanExpand) || rowCanExpand(row) === true) {
-    return (
-      <div>
-        <ShowHide show={rowIsHovered()}>
-          <IconButton
-            className={"ag-grid-expand-button"}
-            size={"small"}
-            icon={<Icon icon={"expand-alt"} weight={"solid"} />}
-            onClick={() => onClick(row)}
-            tooltip={{ placement: "bottom", overlayClassName: "tooltip-lower", title: tooltip || "Expand" }}
-          />
-        </ShowHide>
-      </div>
-    );
+    if (!isNil(alwaysShow) && alwaysShow(row)) {
+      return (
+        <IconButton
+          className={"ag-grid-action-button"}
+          size={"small"}
+          icon={<Icon icon={"expand-alt"} weight={"solid"} />}
+          onClick={() => onExpand(row)}
+          tooltip={{ title: "Expand", placement: "bottom", overlayClassName: "tooltip-lower" }}
+        />
+      );
+    } else {
+      return (
+        <div>
+          <ShowHide show={rowIsHovered()}>
+            <IconButton
+              className={"ag-grid-action-button"}
+              size={"small"}
+              icon={<Icon icon={"expand-alt"} weight={"solid"} />}
+              onClick={() => onExpand(row)}
+              tooltip={{ title: "Expand", placement: "bottom", overlayClassName: "tooltip-lower" }}
+            />
+          </ShowHide>
+        </div>
+      );
+    }
   } else {
     return (
       <div>
         <ShowHide show={rowIsHovered()}>
           <IconButton
-            className={"ag-grid-expand-button fake-disabled"}
+            className={"ag-grid-action-button fake-disabled"}
             size={"small"}
             disabled={false}
             tooltip={

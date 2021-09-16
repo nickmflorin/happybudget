@@ -4,8 +4,8 @@ import classNames from "classnames";
 import { model } from "lib";
 
 import { Form, Icon } from "components";
-import { Input, Select } from "components/fields";
-import { PhoneNumberInput } from "../fields";
+import { Input, Select, PhoneNumberInput } from "components/fields";
+
 import "./ContactForm.scss";
 
 const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialValues, globalError, ...props }) => {

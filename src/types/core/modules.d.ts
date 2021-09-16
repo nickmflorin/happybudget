@@ -8,8 +8,8 @@
 namespace Modules {
 
   namespace Template {
-    type AccountOrSubAccountStore<D extends Model.Model> = {
-      readonly id: ID | null;
+    type AccountOrSubAccountStore<D extends Model.HttpModel> = {
+      readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<D>;
     }
 
@@ -23,7 +23,7 @@ namespace Modules {
 
     /* eslint-disable no-shadow */
     interface Store {
-      readonly id: ID | null;
+      readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<Model.Template>;
       readonly autoIndex: boolean;
       readonly subaccount: SubAccountStore;
@@ -38,11 +38,11 @@ namespace Modules {
     }
 
     interface CommentsStore extends Redux.ModelListResponseStore<Model.Comment> {
-      readonly replying: ID[];
+      readonly replying: number[];
     }
 
-    type AccountOrSubAccountStore<D extends Model.Model> = {
-      readonly id: ID | null;
+    type AccountOrSubAccountStore<D extends Model.HttpModel> = {
+      readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<D>;
       readonly comments: CommentsStore;
       readonly history: Redux.ListResponseStore<Model.IFieldAlterationEvent>;
@@ -58,7 +58,7 @@ namespace Modules {
 
     /* eslint-disable no-shadow */
     interface Store {
-      readonly id: ID | null;
+      readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<Model.Budget>;
       readonly comments: CommentsStore;
       readonly history: Redux.ListResponseStore<Model.IFieldAlterationEvent>;
@@ -81,8 +81,8 @@ namespace Modules {
   }
 
   namespace Share {
-    type AccountOrSubAccountStore<D extends Model.Model> = {
-      readonly id: ID | null;
+    type AccountOrSubAccountStore<D extends Model.HttpModel> = {
+      readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<D>;
     }
 
@@ -96,7 +96,7 @@ namespace Modules {
 
     /* eslint-disable no-shadow */
     interface Store {
-      readonly id: ID | null;
+      readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<Model.Budget>;
       readonly subaccount: SubAccountStore;
       readonly account: AccountStore;

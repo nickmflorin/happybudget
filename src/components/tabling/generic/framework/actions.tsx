@@ -9,13 +9,9 @@ export const ExportPdfAction = (onExport: () => void): Table.MenuActionObj => ({
 });
 
 /* eslint-disable indent */
-export const ExportCSVAction = <
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
->(
-  table: Table.TableInstance<R, M, G>,
-  params: Table.MenuActionParams<R, M, G>,
+export const ExportCSVAction = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  table: Table.TableInstance<R, M>,
+  params: Table.MenuActionParams<R, M>,
   exportFileName: string
 ): Table.MenuActionObj => ({
   /* eslint-disable indent */
@@ -23,7 +19,7 @@ export const ExportCSVAction = <
   icon: "file-csv",
   wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => {
     return (
-      <ExportCSVDropdown<R, M, G>
+      <ExportCSVDropdown<R, M>
         columns={params.columns}
         hiddenColumns={params.hiddenColumns}
         onDownload={(state: IMenuItemState<MenuItemModel>[]) => {
@@ -44,13 +40,9 @@ export const ExportCSVAction = <
   }
 });
 
-export const ToggleColumnAction = <
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
->(
-  table: Table.TableInstance<R, M, G>,
-  params: Table.MenuActionParams<R, M, G>
+export const ToggleColumnAction = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  table: Table.TableInstance<R, M>,
+  params: Table.MenuActionParams<R, M>
 ): Table.MenuActionObj => ({
   /* eslint-disable indent */
   label: "Columns",

@@ -5,7 +5,6 @@ export const createAuthenticatedActualsTableReducer = (
   config: Table.ReducerConfig<
     Tables.ActualRowData,
     Model.Actual,
-    Model.Group,
     Tables.ActualTableStore,
     Redux.AuthenticatedTableActionMap<Tables.ActualRowData, Model.Actual>
   > & {
@@ -17,7 +16,6 @@ export const createAuthenticatedActualsTableReducer = (
   const generic = tabling.reducers.createAuthenticatedTableReducer<
     Tables.ActualRowData,
     Model.Actual,
-    Model.Group,
     Tables.ActualTableStore
   >(config);
 

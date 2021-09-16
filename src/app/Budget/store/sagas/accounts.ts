@@ -70,9 +70,7 @@ const commentsSaga = budgeting.sagas.createCommentsListResponseSaga({
   actions: CommentsActionMap
 });
 
-const ActionMap: Redux.ActionMapObject<
-  Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account, Model.BudgetGroup>
-> & {
+const ActionMap: Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account>> & {
   readonly loadingBudget: ActionCreatorWithPayload<boolean>;
   readonly updateBudgetInState: ActionCreatorWithPayload<Redux.UpdateActionPayload<Model.Budget>>;
 } = {
@@ -91,12 +89,11 @@ const ActionMap: Redux.ActionMapObject<
 const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   Tables.AccountRowData,
   Model.Account,
-  Model.BudgetGroup,
-  Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account, Model.BudgetGroup>
+  Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account>
 >({
   actions: ActionMap,
   tasks: budgeting.tasks.accounts.createTableTaskSet<Model.Budget>({
-    columns: AccountsTable.BudgetColumns,
+    columns: AccountsTable.Columns,
     selectObjId: (state: Application.Authenticated.Store) => state.budget.id,
     selectAutoIndex: (state: Application.Authenticated.Store) => state.budget.autoIndex,
     selectData: (state: Application.Authenticated.Store) =>
@@ -107,9 +104,11 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
     services: {
       request: api.getBudgetAccounts,
       requestGroups: api.getBudgetAccountGroups,
+      requestMarkups: api.getBudgetAccountMarkups,
       bulkCreate: api.bulkCreateBudgetAccounts,
       bulkDelete: api.bulkDeleteBudgetAccounts,
-      bulkUpdate: api.bulkUpdateBudgetAccounts
+      bulkUpdate: api.bulkUpdateBudgetAccounts,
+      bulkDeleteMarkups: api.bulkDeleteBudgetMarkups
     }
   })
 });

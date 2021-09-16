@@ -1,95 +1,40 @@
 import { useEffect, useState, useRef } from "react";
-import Cookies from "universal-cookie";
 import { isNil, filter, map } from "lodash";
 
 import { ColumnApi, GridApi } from "@ag-grid-community/core";
 
 import * as hooks from "../hooks";
-import * as util from "../util";
 import TableApis from "./apis";
 import * as cookies from "./cookies";
 
-type UseOrderingParams<
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
-> = {
+type UseHiddenColumnsParams<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {
   readonly cookie?: string;
-  readonly columns: Table.Column<R, M, G>[];
-};
-
-type UseOrderingReturnType<R extends Table.RowData> = [FieldOrder<keyof R>[], (order: Order, field: keyof R) => void];
-
-/* eslint-disable indent */
-export const useOrdering = <
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
->(
-  params: UseOrderingParams<R, M, G>
-): UseOrderingReturnType<R> => {
-  const cookiesObj = new Cookies();
-  // TODO: When the columns change, we also need to update the ordering
-  // to account for columns that are no longer there.
-  const [ordering, setOrdering] = useState<FieldOrder<keyof R>[]>([]);
-
-  const updateOrdering = (order: Order, field: keyof R) => {
-    const newOrdering = util.updateFieldOrdering(ordering, field, order);
-    setOrdering(newOrdering);
-    if (!isNil(params.cookie)) {
-      cookiesObj.set(params.cookie, newOrdering);
-    }
-  };
-
-  useEffect(() => {
-    if (!isNil(params.cookie)) {
-      const cookiesOrdering = cookiesObj.get(params.cookie);
-      const validatedOrdering = cookies.validateOrdering(
-        cookiesOrdering,
-        filter(params.columns, (col: Table.Column<R, M, G>) => col.tableColumnType !== "calculated")
-      );
-      if (!isNil(validatedOrdering)) {
-        setOrdering(validatedOrdering);
-      }
-    }
-  }, [params.cookie]);
-
-  return [ordering, updateOrdering];
-};
-
-type UseHiddenColumnsParams<
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
-> = {
-  readonly cookie?: string;
-  readonly columns: Table.Column<R, M, G>[];
+  readonly columns: Table.Column<R, M>[];
   readonly apis: TableApis;
 };
 
 type UseHiddenColumnsReturnType<R extends Table.RowData> = [
-  (keyof R)[],
+  (keyof R | string)[],
   (changes: SingleOrArray<Table.ColumnVisibilityChange<R>>, sizeToFit?: boolean) => void
 ];
 
-export const useHiddenColumns = <
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
->(
-  params: UseHiddenColumnsParams<R, M, G>
+export const useHiddenColumns = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  params: UseHiddenColumnsParams<R, M>
 ): UseHiddenColumnsReturnType<R> => {
-  const [hiddenColumns, _setHiddenColumns] = useState<(keyof R)[]>([]);
+  const [hiddenColumns, _setHiddenColumns] = useState<(keyof R | string)[]>([]);
 
   useEffect(() => {
     let setColumnsFromCookies = false;
     if (!isNil(params.cookie)) {
-      const hiddenColumnsInCookies: (keyof R)[] | null = cookies.getHiddenColumns(
+      const hiddenColumnsInCookies: (keyof R | string)[] | null = cookies.getHiddenColumns(
         params.cookie,
-        map(
-          filter(params.columns, (c: Table.Column<R, M, G>) => c.canBeHidden !== false),
-          (c: Table.Column<R, M, G>) => c.field
-        )
+        filter(
+          map(
+            filter(params.columns, (c: Table.Column<R, M>) => c.canBeHidden !== false),
+            (c: Table.Column<R, M>) => c.field || c.colId
+          ),
+          (f: keyof R | string | undefined) => !isNil(f)
+        ) as (keyof R | string)[]
       );
       if (!isNil(hiddenColumnsInCookies)) {
         _setHiddenColumns(hiddenColumnsInCookies);
@@ -100,10 +45,13 @@ export const useHiddenColumns = <
       // If there the hidden columns are not stored in cookies or the hidden columns stored in
       // cookies are corrupted, we want to set the hidden columns based on the defaultHidden property.
       _setHiddenColumns(
-        map(
-          filter(params.columns, (c: Table.Column<R, M, G>) => c.canBeHidden !== false && c.defaultHidden === true),
-          (c: Table.Column<R, M, G>) => c.field
-        )
+        filter(
+          map(
+            filter(params.columns, (c: Table.Column<R, M>) => c.canBeHidden !== false && c.defaultHidden === true),
+            (c: Table.Column<R, M>) => c.field
+          ),
+          (f: keyof R | string | undefined) => !isNil(f)
+        ) as (keyof R | string)[]
       );
     }
   }, [params.cookie]);
@@ -128,26 +76,20 @@ export const useHiddenColumns = <
   return [hiddenColumns, changeColumnVisibility];
 };
 
-export const InitialTableRef: Table.TableInstance = {
+export const InitialTableRef: Table.TableInstance<any, any> = {
   getCSVData: (fields?: string[]) => [],
   changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange<any>>, sizeToFit?: boolean) => {},
-  applyTableChange: (event: Table.ChangeEvent<any>) => {},
+  applyTableChange: (event: Table.ChangeEvent<any, any>) => {},
   applyGroupColorChange: (group: Model.Group) => {}
 };
 
-export const useTable = <
-  R extends Table.RowData = any,
-  M extends Model.Model = any,
-  G extends Model.Group = Model.Group
->(): NonNullRef<Table.TableInstance<R, M, G>> => {
-  return useRef<Table.TableInstance<R, M, G>>(InitialTableRef);
+export const useTable = <R extends Table.RowData = object, M extends Model.HttpModel = any>(): NonNullRef<
+  Table.TableInstance<R, M>
+> => {
+  return useRef<Table.TableInstance<R, M>>(InitialTableRef);
 };
 
 /* eslint-disable indent */
-export const useTableIfNotDefined = <
-  R extends Table.RowData = any,
-  M extends Model.Model = any,
-  G extends Model.Group = Model.Group
->(
-  table?: NonNullRef<Table.TableInstance<R, M, G>>
-): NonNullRef<Table.TableInstance<R, M, G>> => hooks.useRefIfNotDefined<Table.TableInstance<R, M, G>>(useTable, table);
+export const useTableIfNotDefined = <R extends Table.RowData = object, M extends Model.HttpModel = any>(
+  table?: NonNullRef<Table.TableInstance<R, M>>
+): NonNullRef<Table.TableInstance<R, M>> => hooks.useRefIfNotDefined<Table.TableInstance<R, M>>(useTable, table);

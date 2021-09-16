@@ -13,7 +13,7 @@ import { createObjectReducerFromTransformers } from "./util";
  * @param options   Additional options supplied to the reducer factory.
  */
 export const createDetailResponseReducer = <
-  M extends Model.Model,
+  M extends Model.HttpModel,
   A extends Partial<Redux.ModelDetailResponseActionMap<M>> = Redux.ModelDetailResponseActionMap<M>,
   S extends Redux.ModelDetailResponseStore<M> = Redux.ModelDetailResponseStore<M>
 >(

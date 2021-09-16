@@ -5,13 +5,13 @@ import * as api from "api";
 import { Form } from "components";
 import { BudgetForm } from "components/forms";
 
-import Modal from "./Modal";
+import { Modal } from "./generic";
 
 interface CreateBudgetModalProps {
   onSuccess: (budget: Model.Budget) => void;
   onCancel: () => void;
   open: boolean;
-  templateId?: ID;
+  templateId?: number;
   title?: string;
 }
 
@@ -24,9 +24,10 @@ const CreateBudgetModal = ({
 }: CreateBudgetModalProps): JSX.Element => {
   const [file, setFile] = useState<UploadedImage | null>(null);
   const [form] = Form.useForm<Http.BudgetPayload>({ isInModal: true });
+  const cancelToken = api.useCancelToken();
 
   return (
-    <Modal.Modal
+    <Modal
       title={title}
       visible={open}
       onCancel={() => onCancel()}
@@ -43,7 +44,7 @@ const CreateBudgetModal = ({
             }
             form.setLoading(true);
             api
-              .createBudget({ ...values, image: !isNil(file) ? file.data : null })
+              .createBudget({ ...values, image: !isNil(file) ? file.data : null }, { cancelToken: cancelToken() })
               .then((budget: Model.Budget) => {
                 form.resetFields();
                 onSuccess(budget);
@@ -61,7 +62,7 @@ const CreateBudgetModal = ({
       }}
     >
       <BudgetForm form={form} onImageChange={(f: UploadedImage | null) => setFile(f)} initialValues={{}} />
-    </Modal.Modal>
+    </Modal>
   );
 };
 

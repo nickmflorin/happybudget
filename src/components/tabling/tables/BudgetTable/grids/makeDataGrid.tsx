@@ -11,7 +11,7 @@ interface InjectedBudgetDataGridProps {
   readonly framework?: Table.Framework;
 }
 
-export interface BudgetDataGridProps<R extends Table.RowData, M extends Model.Model = Model.Model> {
+export interface BudgetDataGridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
   readonly apis: Table.GridApis | null;
   readonly framework?: Table.Framework;
   readonly onBack?: () => void;
@@ -24,7 +24,7 @@ export type WithBudgetDataGridProps<T> = T & InjectedBudgetDataGridProps;
 /* eslint-disable indent */
 const BudgetDataGrid = <
   R extends Table.RowData,
-  M extends Model.Model = Model.Model,
+  M extends Model.HttpModel = Model.HttpModel,
   T extends BudgetDataGridProps<R, M> = BudgetDataGridProps<R, M>
 >(
   Component: React.ComponentClass<WithBudgetDataGridProps<T>, {}> | React.FunctionComponent<WithBudgetDataGridProps<T>>

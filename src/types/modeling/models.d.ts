@@ -10,12 +10,22 @@ namespace Model {
     readonly id: ID;
   }
 
-  interface TimestampTrackedModel extends Model.Model {
+  type HttpModelType = "markup" | "subaccount" | "account" | "group" | "fringe" | "budget" | "template" | "actual" | "contact";
+
+  interface HttpModel {
+    readonly id: number;
+  }
+
+  interface TypedHttpModel extends HttpModel {
+    readonly type: HttpModelType;
+  }
+
+  interface TimestampTrackedModel extends Model.HttpModel {
     readonly created_at: string;
     readonly updated_at: string;
   }
 
-  interface UserTrackedModel extends Model.Model {
+  interface UserTrackedModel extends Model.HttpModel {
     readonly created_by: number;
     readonly updated_by: number;
   }
@@ -34,6 +44,10 @@ namespace Model {
   type PaymentMethodName = "Check" | "Card" | "Wire";
   type PaymentMethodId = 0 | 1 | 2;
   type PaymentMethod = Model.Choice<PaymentMethodId, PaymentMethodName>;
+
+  type MarkupUnitId = 0 | 1;
+  type MarkupUnitName = "Percent" | "Flat";
+  type MarkupUnit = Model.Choice<MarkupUnitId, MarkupUnitName>;
 
   type FringeUnitId = 0 | 1;
   type FringeUnitName = "Percent" | "Flat";
@@ -59,8 +73,8 @@ namespace Model {
   type AccountForm = Model.Account | Model.SimpleAccount | Model.PdfAccount;
   type SubAccountForm = Model.SubAccount | Model.SimpleSubAccount | Model.PdfSubAccount;
 
-  type ModelWithColor = Model.Model & { color: string | null };
-  type ModelWithName = Model.Model & { name: string | null };
+  type ModelWithColor = Model.HttpModel & { color: string | null };
+  type ModelWithName = Model.HttpModel & { name: string | null };
 
   interface Tag extends Model.TimestampTrackedModel {
     readonly title: string;
@@ -69,7 +83,7 @@ namespace Model {
     readonly color: string | null;
   }
 
-  interface SimpleUser extends Model.Model {
+  interface SimpleUser extends Model.HttpModel {
     readonly first_name: string;
     readonly last_name: string;
     readonly full_name: string;
@@ -77,28 +91,36 @@ namespace Model {
     readonly profile_image: SavedImage | null;
   }
 
-  interface NestedUser extends Model.SimpleUser {
-    readonly username: string;
+  interface User extends Model.SimpleUser, Model.TimestampTrackedModel {
+    readonly last_login: null | string;
+    readonly date_joined: string;
+    readonly timezone: string;
+    readonly is_first_time: boolean;
     readonly is_active: boolean;
     readonly is_staff: boolean;
     readonly is_admin: boolean;
     readonly is_superuser: boolean;
   }
 
-  interface User extends Model.NestedUser, Model.TimestampTrackedModel {
-    readonly last_login: null | string;
-    readonly date_joined: string;
-    readonly timezone: string;
-    readonly is_first_time: boolean;
-  }
-
   interface Fringe extends Model.TrackedModel {
+    readonly type: "fringe";
     readonly color: string | null;
     readonly name: string | null;
     readonly description: string | null;
     readonly cutoff: number | null;
     readonly rate: number | null;
     readonly unit: Model.FringeUnit | null;
+  }
+
+  interface Markup extends Model.TrackedModel {
+    readonly type: "markup";
+    readonly identifier: string | null;
+    readonly description: string | null;
+    readonly unit: MarkupUnit | null;
+    readonly rate: number | null;
+    readonly children: number[];
+    readonly groups: number[];
+    readonly group: number | null;
   }
 
   interface BaseBudget extends Model.TrackedModel {
@@ -115,6 +137,9 @@ namespace Model {
 
   interface Template extends Model.SimpleTemplate {
     readonly estimated: number;
+    readonly actual: number;
+    readonly fringe_contribution: number;
+    readonly markup_contribution: number;
   }
 
   interface SimpleBudget extends Model.BaseBudget {
@@ -131,34 +156,32 @@ namespace Model {
     readonly prelight_days: number;
     readonly studio_shoot_days: number;
     readonly location_days: number;
-    readonly actual: number;
-    readonly variance: number;
     readonly estimated: number;
+    readonly actual: number;
+    readonly fringe_contribution: number;
+    readonly markup_contribution: number;
   }
 
   interface PdfBudget {
     readonly name: string;
-    readonly estimated: number | null;
-    readonly actual: number | null;
-    readonly variance: number | null;
-    readonly accounts: Model.PdfAccount[];
-    readonly groups: Model.BudgetGroup[];
+    readonly estimated: number;
+    readonly actual: number;
+    readonly fringe_contribution: number;
+    readonly markup_contribution: number;
+    readonly children: Model.PdfAccount[];
+    readonly groups: Model.Group[];
   }
 
   interface Group extends Model.TrackedModel {
+    readonly type: "group";
     readonly name: string;
     readonly color: string | null;
-    readonly children: ID[];
-  }
-
-  interface BudgetGroup extends Model.Group {
-    readonly estimated: number;
-    readonly variance?: number; // Will be undefined for Template Group(s).
-    readonly actual?: number; // Will be undefined for Template Group(s).
+    readonly children: number[];
+    readonly children_markups: number[];
   }
 
   // Represents a simple form of an Account, SubAccount or Detail (Nested SubAccount).
-  interface Line extends Model.Model {
+  interface Line extends Model.HttpModel {
     readonly identifier: string | null;
     readonly type: LineType;
     readonly description: string | null;
@@ -182,22 +205,21 @@ namespace Model {
   // Abstract -- not meant for external reference.
   interface AbstractAccount extends Model.SimpleAccount {
     readonly estimated: number;
+    readonly actual: number;
+    readonly fringe_contribution: number;
+    readonly markup_contribution: number;
   }
 
   interface Account extends Model.AbstractAccount, Model.TrackedModel {
     readonly access: number[];
-    readonly subaccounts: number[];
+    readonly children: number[];
     readonly siblings?: Model.SimpleAccount[]; // Only included for detail endpoints.
     readonly ancestors?: Model.Entity[]; // Only included for detail endpoints.
-    readonly variance?: number; // Will be undefined for Template Account(s).
-    readonly actual?: number; // Will be undefined for Template Account(s).
   }
 
   interface PdfAccount extends Model.AbstractAccount {
-    readonly variance: number; // Always Defined
-    readonly actual: number; // Always Defined
-    readonly subaccounts: Model.PdfSubAccount[];
-    readonly groups: Model.BudgetGroup[];
+    readonly children: Model.PdfSubAccount[];
+    readonly groups: Model.Group[];
   }
 
   // Abstract -- not meant for external reference.
@@ -207,28 +229,28 @@ namespace Model {
     readonly multiplier: number | null;
     readonly unit: Model.Tag | null;
     readonly estimated: number;
+    readonly fringe_contribution: number;
+    readonly markup_contribution: number;
+    readonly actual: number;
     readonly contact?: number | null; // Will be undefined for Template SubAccount(s).
   }
 
   interface SubAccount extends Model.AbstractSubAccount, Model.TrackedModel {
-    readonly subaccounts: number[];
-    readonly object_id: number; // Not applicable for PDF case.
-    readonly parent_type: "account" | "subaccount"; // Not applicable for PDF case.
-    readonly fringes: number[]; // Not applicable for PDF case.
+    readonly children: number[];
+    readonly object_id: number;
+    readonly parent_type: "account" | "subaccount";
+    readonly fringes: number[];
     readonly siblings?: Model.SimpleSubAccount[]; // Only included for detail endpoints.
     readonly ancestors?: Model.Entity[]; // Only included for detail endpoints.
-    readonly variance?: number; // Will be undefined for Template SubAccount(s).
-    readonly actual?: number; // Will be undefined for Template SubAccount(s).
   }
 
   interface PdfSubAccount extends Model.AbstractSubAccount {
-    readonly variance: number; // Always Defined
-    readonly actual: number; // Always Defined
-    readonly subaccounts: PdfSubAccount[];
-    readonly groups: Model.BudgetGroup[];
+    readonly children: PdfSubAccount[];
+    readonly groups: Model.Group[];
   }
 
   interface Actual extends Model.TrackedModel {
+    readonly type: "actual";
     readonly contact: number | null;
     readonly description: string | null;
     readonly purchase_order: string | null;
@@ -255,7 +277,8 @@ namespace Model {
   }
 
   interface Contact extends Model.TimestampTrackedModel, ContactNamesAndImage {
-    readonly type: Model.ContactType | null;
+    readonly type: "contact";
+    readonly contact_type: Model.ContactType | null;
     readonly full_name: string;
     readonly company: string | null;
     readonly position: string | null;
@@ -274,7 +297,7 @@ namespace Model {
 
   type HistoryEventType = "field_alteration" | "create";
 
-  interface PolymorphicEvent extends Model.Model {
+  interface PolymorphicEvent extends Model.HttpModel {
     readonly created_at: string;
     readonly user: Model.SimpleUser;
     readonly type: Model.HistoryEventType;
@@ -292,7 +315,6 @@ namespace Model {
   type HistoryEvent = Model.FieldAlterationEvent | Model.CreateEvent;
 
   interface SimpleHeaderTemplate extends Model.TimestampTrackedModel {
-    readonly id: ID;
     readonly name: string;
   }
 

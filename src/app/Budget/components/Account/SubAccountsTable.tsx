@@ -1,11 +1,16 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { isNil, map } from "lodash";
+import { isNil, map, filter } from "lodash";
 import { createSelector } from "reselect";
 
 import { redux, tabling } from "lib";
-import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
+import {
+  CreateSubAccountGroupModal,
+  EditGroupModal,
+  EditMarkupModal,
+  CreateBudgetSubAccountMarkupModal
+} from "components/modals";
 import { connectTableToStore } from "components/tabling";
 
 import { actions } from "../../store";
@@ -37,13 +42,7 @@ const ActionMap = {
   clear: actions.account.clearAction
 };
 
-const ConnectedTable = connectTableToStore<
-  BudgetSubAccountsTableProps,
-  R,
-  M,
-  Model.BudgetGroup,
-  Tables.SubAccountTableStore
->({
+const ConnectedTable = connectTableToStore<BudgetSubAccountsTableProps, R, M, Tables.SubAccountTableStore>({
   actions: ActionMap,
   // We cannot autoRequest because we have to also request the new data when the dropdown breadcrumbs change.
   autoRequest: false,
@@ -55,8 +54,10 @@ const ConnectedTable = connectTableToStore<
       [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.detail.data)],
       (budget: Model.Budget | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
-        estimated: budget?.estimated || 0.0,
-        variance: budget?.variance || 0.0,
+        estimated: !isNil(budget) ? budget.estimated + budget.markup_contribution + budget.fringe_contribution : 0.0,
+        variance: !isNil(budget)
+          ? budget.estimated + budget.markup_contribution + budget.fringe_contribution - budget.actual
+          : 0.0,
         actual: budget?.actual || 0.0
       })
     ),
@@ -68,8 +69,10 @@ const ConnectedTable = connectTableToStore<
       ],
       (detail: Model.Account | null) => ({
         identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
-        estimated: detail?.estimated || 0.0,
-        variance: detail?.variance || 0.0,
+        estimated: !isNil(detail) ? detail.estimated + detail.markup_contribution + detail.fringe_contribution : 0.0,
+        variance: !isNil(detail)
+          ? detail.estimated + detail.markup_contribution + detail.fringe_contribution - detail.actual
+          : 0.0,
         actual: detail?.actual || 0.0
       })
     )
@@ -83,7 +86,9 @@ interface SubAccountsTableProps {
 }
 
 const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps): JSX.Element => {
-  const [groupSubAccounts, setGroupSubAccounts] = useState<ID[] | undefined>(undefined);
+  const [groupSubAccounts, setGroupSubAccounts] = useState<number[] | undefined>(undefined);
+  const [markupSubAccounts, setMarkupSubAccounts] = useState<number[] | undefined>(undefined);
+  const [markupToEdit, setMarkupToEdit] = useState<number | null>(null);
   const [groupToEdit, setGroupToEdit] = useState<Table.GroupRow<R> | undefined>(undefined);
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
 
@@ -93,7 +98,7 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
   const fringes = useSelector(selectFringes);
   const accountDetail = useSelector(selectAccountDetail);
   const subAccountUnits = useSelector(selectSubAccountUnits);
-  const table = tabling.hooks.useTable<R, M, Model.BudgetGroup>();
+  const table = tabling.hooks.useTable<R, M>();
 
   return (
     <React.Fragment>
@@ -109,20 +114,54 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
         exportFileName={!isNil(accountDetail) ? `account_${accountDetail.identifier}` : ""}
         categoryName={"Sub Account"}
         identifierFieldHeader={"Account"}
-        cookieNames={!isNil(accountDetail) ? { ordering: `account-${accountDetail.id}-table-ordering` } : {}}
         onRowExpand={(row: Table.ModelRow<R, M>) => history.push(`/budgets/${budgetId}/subaccounts/${row.id}`)}
         onBack={() => history.push(`/budgets/${budgetId}/accounts?row=${accountId}`)}
-        onGroupRows={(rows: Table.DataRow<R, M>[]) =>
-          setGroupSubAccounts(map(rows, (row: Table.DataRow<R, M>) => row.id))
+        onGroupRows={(rows: (Table.ModelRow<R, M> | Table.MarkupRow<R>)[]) =>
+          setGroupSubAccounts(
+            map(
+              filter(rows, (row: Table.ModelRow<R, M> | Table.MarkupRow<R>) =>
+                tabling.typeguards.isModelRow(row)
+              ) as Table.ModelRow<R, M>[],
+              (row: Table.ModelRow<R, M>) => row.id
+            )
+          )
+        }
+        onMarkupRows={(rows: (Table.ModelRow<R, M> | Table.GroupRow<R>)[]) =>
+          setMarkupSubAccounts(
+            map(
+              filter(rows, (row: Table.ModelRow<R, M> | Table.GroupRow<R>) =>
+                tabling.typeguards.isModelRow(row)
+              ) as Table.ModelRow<R, M>[],
+              (row: Table.ModelRow<R, M>) => row.id
+            )
+          )
         }
         onEditGroup={(group: Table.GroupRow<R>) => setGroupToEdit(group)}
+        onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(row.markup)}
       />
+      {!isNil(markupSubAccounts) && !isNil(accountId) && (
+        <CreateBudgetSubAccountMarkupModal
+          accountId={accountId}
+          subaccounts={markupSubAccounts}
+          open={true}
+          onSuccess={(markup: Model.Markup) => {
+            setMarkupSubAccounts(undefined);
+            dispatch(
+              actions.accounts.handleTableChangeEventAction({
+                type: "markupAdd",
+                payload: markup
+              })
+            );
+          }}
+          onCancel={() => setMarkupSubAccounts(undefined)}
+        />
+      )}
       {!isNil(groupSubAccounts) && (
         <CreateSubAccountGroupModal
           accountId={accountId}
           subaccounts={groupSubAccounts}
           open={true}
-          onSuccess={(group: Model.BudgetGroup) => {
+          onSuccess={(group: Model.Group) => {
             setGroupSubAccounts(undefined);
             dispatch(
               actions.account.handleTableChangeEventAction({
@@ -134,12 +173,28 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
           onCancel={() => setGroupSubAccounts(undefined)}
         />
       )}
+      {!isNil(markupToEdit) && (
+        <EditMarkupModal
+          id={markupToEdit}
+          open={true}
+          onCancel={() => setMarkupToEdit(null)}
+          onSuccess={(markup: Model.Markup) => {
+            setMarkupToEdit(null);
+            dispatch(
+              actions.account.handleTableChangeEventAction({
+                type: "markupUpdate",
+                payload: { id: markup.id, data: markup }
+              })
+            );
+          }}
+        />
+      )}
       {!isNil(groupToEdit) && (
         <EditGroupModal
-          groupId={groupToEdit.group}
+          id={groupToEdit.group}
           open={true}
           onCancel={() => setGroupToEdit(undefined)}
-          onSuccess={(group: Model.BudgetGroup) => {
+          onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
             dispatch(
               actions.account.handleTableChangeEventAction({
@@ -147,7 +202,7 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
                 payload: { id: group.id, data: group }
               })
             );
-            if (group.color !== groupToEdit.color) {
+            if (group.color !== groupToEdit.groupData.color) {
               table.current.applyGroupColorChange(group);
             }
           }}

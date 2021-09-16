@@ -1,19 +1,17 @@
-import { forEach, isNil, filter, reduce, find, map } from "lodash";
-import { util } from "lib";
+import { isNil, filter, find, map } from "lodash";
+import { util, tabling } from "lib";
 import { Colors } from "style/constants";
 
-import { FringeUnitModels } from "./models";
-
 export const getGroupColorDefinition = (group: Model.Group | Table.GroupRow<any>): Table.RowColorDef => {
-  if (!isNil(group) && !isNil(group.color)) {
-    let backgroundColor = group.color;
-    if (!isNil(backgroundColor)) {
-      if (!backgroundColor.startsWith("#")) {
-        backgroundColor = `#${group.color}`;
+  if (!isNil(group)) {
+    let color = tabling.typeguards.isRow(group) ? group.groupData.color : group.color;
+    if (!isNil(color)) {
+      if (!color.startsWith("#")) {
+        color = `#${color}`;
       }
       return {
-        backgroundColor,
-        color: util.colors.contrastedForegroundColor(backgroundColor)
+        backgroundColor: color,
+        color: util.colors.contrastedForegroundColor(color)
       };
     }
   }
@@ -21,47 +19,6 @@ export const getGroupColorDefinition = (group: Model.Group | Table.GroupRow<any>
     backgroundColor: Colors.DEFAULT_GROUP_ROW_BACKGROUND,
     color: util.colors.contrastedForegroundColor(Colors.DEFAULT_GROUP_ROW_BACKGROUND)
   };
-};
-
-export const getFringesNominalAdditions = (value: number, fringes: Model.Fringe[]): number[] => {
-  const additionalValues: number[] = [];
-  forEach(fringes, (fringe: Model.Fringe) => {
-    if (!isNil(fringe.unit) && !isNil(fringe.rate)) {
-      if (fringe.unit.id === FringeUnitModels.FLAT.id) {
-        additionalValues.push(fringe.rate);
-      } else {
-        if (fringe.cutoff === null || fringe.cutoff >= value) {
-          additionalValues.push(fringe.rate * value);
-        } else {
-          additionalValues.push(fringe.rate * fringe.cutoff);
-        }
-      }
-    }
-  });
-  return additionalValues;
-};
-
-export const fringeValue = (value: number, fringes: Model.Fringe[]): number => {
-  const additionalValues: number[] = getFringesNominalAdditions(value, fringes);
-  return value + reduce(additionalValues, (sum: number, val: number) => sum + val, 0);
-};
-
-export const unfringeValue = (value: number, fringes: Model.Fringe[]): number => {
-  const additionalValues: number[] = [];
-  forEach(fringes, (fringe: Model.Fringe) => {
-    if (!isNil(fringe.unit) && !isNil(fringe.rate)) {
-      if (fringe.unit.id === FringeUnitModels.FLAT.id) {
-        additionalValues.push(fringe.rate);
-      } else {
-        if (fringe.cutoff === null || fringe.cutoff >= value) {
-          additionalValues.push(fringe.rate * value);
-        } else {
-          additionalValues.push(fringe.rate * fringe.cutoff);
-        }
-      }
-    }
-  });
-  return value - reduce(additionalValues, (sum: number, val: number) => sum + val, 0);
 };
 
 export const findChoiceForName = <M extends Model.Choice<number, string>>(
@@ -150,20 +107,6 @@ export const inferModelFromName = <M extends Model.Model>(
       }
     }
   }
-};
-
-export const displayFirstAndLastName = (
-  firstName: string | null | undefined,
-  lastName: string | null | undefined
-): string => {
-  if (!isNil(firstName) && !isNil(lastName)) {
-    return `${firstName} ${lastName}`;
-  } else if (!isNil(firstName)) {
-    return firstName;
-  } else if (!isNil(lastName)) {
-    return lastName;
-  }
-  return "";
 };
 
 export const parseFirstAndLastName = (name: string): [string | null, string | null] => {
