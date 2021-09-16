@@ -28,17 +28,18 @@ form {
     }
   }
   .form-error {
-    padding: 8px 20px 8px 50px !important;
+    padding: 8px 20px 8px 40px !important;
     border-radius: 6px;
 
     .ant-alert-icon {
       position: absolute;
-      top: 10px !important;
-      left: 20px !important;
+      top: 8px !important;
+      left: 10px !important;
       font-size: 16px !important;
     }
 
     .ant-alert-message {
+      font-weight: 500;
       font-size: 14px !important;
       line-height: 16px !important;
       margin-bottom: 6px !important;
