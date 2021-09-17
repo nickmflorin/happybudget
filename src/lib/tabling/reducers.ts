@@ -407,13 +407,13 @@ export const createTableReducer = <
       const payload: Http.TableResponse<M, G> = action.payload;
       newState = {
         ...newState,
-        models: !isNil(payload.models) ? payload.models.data : newState.models,
-        groups: !isNil(payload.groups) ? payload.groups.data : newState.groups,
+        models: payload.models,
+        groups: payload.groups || [],
         data: data.createTableRows<R, M, G>({
           ...config,
           gridId: "data",
-          models: !isNil(payload.models) ? payload.models.data : newState.models,
-          groups: !isNil(payload.groups) ? payload.groups.data : newState.groups
+          models: payload.models,
+          groups: payload.groups || []
         })
       };
     } else if (action.type === config.actions.loading.toString()) {

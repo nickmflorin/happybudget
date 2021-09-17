@@ -469,7 +469,6 @@ namespace Table {
   type RowAddEvent<R extends RowData> = {
     readonly type: "rowAdd";
     readonly payload: RowAddPayload<R>;
-    readonly artificial?: boolean;
   };
 
   type RowDeletePayload<R extends RowData, M extends Model.Model = Model.Model> = {

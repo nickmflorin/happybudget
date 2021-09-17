@@ -42,14 +42,8 @@ namespace Http {
   }
 
   type TableResponse<M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = {
-    readonly models: Http.ListResponse<M>;
-    readonly groups: Http.ListResponse<G>;
-  } | {
-    readonly models: Http.ListResponse<M>;
-    readonly groups?: Http.ListResponse<G>;
-  } | {
-    readonly models?: Http.ListResponse<M>;
-    readonly groups: Http.ListResponse<G>;
+    readonly models: M[];
+    readonly groups?: G[];
   }
 
   type ErrorType = "unknown" | "http" | "field" | "global" | "auth";

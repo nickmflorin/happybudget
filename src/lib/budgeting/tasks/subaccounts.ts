@@ -6,7 +6,6 @@ import { isNil, map, filter } from "lodash";
 import * as api from "api";
 import * as contactsTasks from "store/tasks/contacts";
 import * as tabling from "../../tabling";
-import * as util from "../../util";
 
 type R = Tables.SubAccountRowData;
 type C = Model.SubAccount;
@@ -103,25 +102,22 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
           call(requestSubAccounts, objId),
           call(requestGroups, objId)
         ]);
-        yield put(config.actions.response({ models, groups }));
-        if (models.data.length === 0) {
-          const event: Table.RowAddEvent<R> = {
-            type: "rowAdd",
-            payload: [
-              { id: `placeholder-${util.generateRandomNumericId()}`, data: {} },
-              { id: `placeholder-${util.generateRandomNumericId()}`, data: {} }
-            ]
-          };
-          // Tag the event as artificial so it does not re-trigger this same task.
-          if (isAuthenticatedConfig(config)) {
-            yield put({ type: config.actions.tableChanged.toString(), payload: { ...event, artificial: true } });
-            yield fork(bulkCreateTask, objId, event, "There was an error creating the rows.");
-          }
+        if (models.data.length === 0 && isAuthenticatedConfig(config)) {
+          // If there is no table data, we want to default create two rows.
+          const response: Http.BudgetBulkCreateResponse<B, M, C> = yield call(
+            config.services.bulkCreate,
+            objId,
+            { data: [{}, {}] },
+            { cancelToken: source.token }
+          );
+          yield put(config.actions.response({ models: response.children, groups: groups.data }));
+        } else {
+          yield put(config.actions.response({ models: models.data, groups: groups.data }));
         }
       } catch (e: unknown) {
         if (!(yield cancelled())) {
           api.handleRequestError(e as Error, "There was an error retrieving the table data.");
-          yield put(config.actions.response({ models: { count: 0, data: [] }, groups: { count: 0, data: [] } }));
+          yield put(config.actions.response({ models: [] }));
         }
       } finally {
         yield put(config.actions.loading(false));
@@ -145,7 +141,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       { no_pagination: true },
       { cancelToken: source.token }
     );
-    yield put(config.actions.responseFringes({ models: response, groups: { count: 0, data: [] } }));
+    yield put(config.actions.responseFringes({ models: response.data }));
   }
 
   function* requestSubAccountUnits(): SagaIterator {

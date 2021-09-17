@@ -42,11 +42,11 @@ export const createTableTaskSet = (
     yield put(config.actions.loading(true));
     try {
       const response: Http.ListResponse<M> = yield call(api.getContacts, {}, { cancelToken: source.token });
-      yield put(config.actions.response({ models: response, groups: { count: 0, data: [] } }));
+      yield put(config.actions.response({ models: response.data }));
     } catch (e: unknown) {
       if (!(yield cancelled())) {
         api.handleRequestError(e as Error, "There was an error retrieving the contacts.");
-        yield put(config.actions.response({ models: { count: 0, data: [] }, groups: { count: 0, data: [] } }));
+        yield put(config.actions.response({ models: [] }));
       }
     } finally {
       yield put(config.actions.loading(false));

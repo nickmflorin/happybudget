@@ -5,7 +5,6 @@ import { map, isNil, filter } from "lodash";
 
 import * as api from "api";
 import * as tabling from "../../tabling";
-import * as util from "../../util";
 
 type R = Tables.FringeRowData;
 type M = Model.Fringe;
@@ -66,7 +65,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       } catch (e: unknown) {
         if (!(yield cancelled())) {
           api.handleRequestError(e as Error, "There was an error retrieving the table data.");
-          yield put(config.actions.response({ models: { count: 0, data: [] }, groups: { count: 0, data: [] } }));
+          yield put(config.actions.response({ models: [] }));
         }
       } finally {
         yield put(config.actions.loading(false));
@@ -77,25 +76,24 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     }
   }
 
-  function* requestFringes(objId: number): SagaIterator {
+  function* requestFringes(objId: ID): SagaIterator {
     const response: Http.ListResponse<M> = yield call(
       config.services.request,
       objId,
       { no_pagination: true },
       { cancelToken: source.token }
     );
-    yield put(config.actions.response({ models: response, groups: { count: 0, data: [] } }));
     if (response.data.length === 0) {
-      const event: Table.RowAddEvent<R> = {
-        type: "rowAdd",
-        payload: [
-          { id: `placeholder-${util.generateRandomNumericId()}`, data: {} },
-          { id: `placeholder-${util.generateRandomNumericId()}`, data: {} }
-        ]
-      };
-      // Tag the event as artificial so it does not re-trigger this same task.
-      yield put({ type: config.actions.tableChanged.toString(), payload: { ...event, artificial: true } });
-      yield fork(bulkCreateTask, objId, event, "There was an error creating the rows.");
+      // If there is no table data, we want to default create two rows.
+      const createResponse: Http.BulkCreateChildrenResponse<B, M> = yield call(
+        config.services.bulkCreate,
+        objId,
+        { data: [{}, {}] },
+        { cancelToken: source.token }
+      );
+      yield put(config.actions.response({ models: createResponse.children }));
+    } else {
+      yield put(config.actions.response({ models: response.data }));
     }
   }
 
