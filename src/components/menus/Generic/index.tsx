@@ -505,6 +505,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
                 checkbox={props.checkbox}
                 level={0}
                 selected={selected}
+                keepDropdownOpenOnClick={props.keepDropdownOpenOnClick}
                 levelIndent={props.levelIndent}
                 itemProps={props.itemProps}
                 bordersForLevels={props.bordersForLevels}

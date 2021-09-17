@@ -43,6 +43,7 @@ const ToggleColumnsDropdown = <
       searchIndices={["label"]}
       menuCheckbox={true}
       menuSelected={selected as string[]}
+      keepDropdownOpenOnClick={true}
       menuItems={map(hideableColumns, (col: Table.Column<R, M, G>) => ({
         id: col.field as string,
         label: col.headerName || ""

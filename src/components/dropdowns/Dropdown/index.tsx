@@ -28,6 +28,7 @@ export interface DropdownMenuItemsProps extends BaseDropdownProps {
   readonly menuSelected?: MenuItemId[];
   readonly includeSearch?: boolean;
   readonly searchIndices?: SearchIndicies;
+  readonly keepDropdownOpenOnClick?: boolean;
   readonly onChange?: (params: MenuChangeEvent<MenuItemModel>) => void;
 }
 
@@ -80,6 +81,7 @@ const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
               <Menu
                 {...props.menuProps}
                 id={menuId}
+                keepDropdownOpenOnClick={props.keepDropdownOpenOnClick}
                 models={props.menuItems}
                 onChange={props.onChange}
                 closeParentDropdown={() => setVisible(false)}

@@ -45,6 +45,7 @@ interface ICommonMenuItem<M extends MenuItemModel> extends Omit<StandardComponen
   readonly model: M;
   readonly menuId: string;
   readonly focused: boolean;
+  readonly keepDropdownOpenOnClick?: boolean;
   readonly onClick?: (params: MenuItemClickEvent<M>) => void;
   readonly closeParentDropdown?: () => void;
 }
@@ -84,6 +85,7 @@ type IMenu<M extends MenuItemModel> = StandardComponentProps & {
   readonly extra?: ExtraMenuItemModel[];
   readonly unfocusMenuOnSearchFocus?: boolean;
   readonly bordersForLevels?: boolean;
+  readonly keepDropdownOpenOnClick?: boolean;
   readonly getLabel?: (m: M) => string;
   readonly onChange?: (params: MenuChangeEvent<M>) => void;
   readonly onSearch?: (value: string) => void;

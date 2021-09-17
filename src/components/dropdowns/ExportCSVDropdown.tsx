@@ -43,6 +43,7 @@ const ExportCSVDropdown = <
       menuMode={"multiple"}
       menuCheckbox={true}
       includeSearch={true}
+      keepDropdownOpenOnClick={true}
       searchIndices={["label"]}
       onChange={(e: MenuChangeEvent<MenuItemModel>) => {
         const selectedStates = filter(
