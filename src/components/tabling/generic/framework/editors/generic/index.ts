@@ -6,4 +6,3 @@ export { default as useModelMenuEditor } from "./useModelMenuEditor";
 export * from "./useModelMenuEditor";
 export { default as GenericModelMenuEditor } from "./GenericModelMenuEditor";
 export * from "./GenericModelMenuEditor";
-export { default as DateEditor } from "./DateEditor";
