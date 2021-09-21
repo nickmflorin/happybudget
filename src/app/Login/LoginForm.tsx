@@ -58,7 +58,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
       <Form.Item
         className={"mb--0"}
         name={"password"}
-        rules={[{ required: true, message: "Please enter a valid password.", min: 8 }]}
+        rules={[{ required: true, message: "Please enter a valid password." }]}
       >
         <PasswordInput size={"large"} />
       </Form.Item>

@@ -65,7 +65,7 @@ const SignupForm = ({
       <Form.Item
         name={"password"}
         rules={[
-          { required: true, message: "Please enter a valid password.", min: 8 },
+          { required: true, message: "Please enter a valid password." },
           ({ getFieldValue }: { getFieldValue: any }) => ({
             validator(rule: any, value: string) {
               if (value !== "" && !util.validate.validatePassword(value)) {

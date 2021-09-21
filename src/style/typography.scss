@@ -49,3 +49,8 @@ h6 {
     text-align: left;
   }
 }
+
+.strikethrough {
+  text-decoration: line-through;
+  color: $gray;
+}

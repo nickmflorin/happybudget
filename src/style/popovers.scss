@@ -1,0 +1,22 @@
+.ant-popover {
+  .ant-popover-inner {
+    padding: 0 10px;
+    border-radius: $input-border-radius;
+    box-shadow: 0px 2px 10px #b3b3b3;
+  }
+
+  .validation-items {
+    color: $text-tertiary;
+    padding-left: 0;
+    margin-bottom: 0;
+
+    li {
+      list-style: none;
+      padding-bottom: 10px;
+
+      &:last-child {
+        padding-bottom: 0;
+      }
+    }
+  }
+}

@@ -80,3 +80,9 @@ type HeaderTemplateFormData = {
   readonly right_image: UploadedImage | SavedImage | null;
   readonly right_info: RichText.Block[] | null;
 };
+
+
+type PasswordValidationID = "lowercase" | "uppercase" | "number" | "character" | "minChar";
+type PasswordValidationName = { id: ValidationId; name: string };
+// eslint-disable-next-line no-unused-vars
+type PasswordValidationState = { [key in ValidationId]: boolean };

@@ -1,12 +1,20 @@
-import { isNil } from "lodash";
+import { isNil, uniq } from "lodash";
 
-export const validatePassword = (password?: string): boolean => {
-  if (isNil(password) || password === "") {
+const getPasswordValidationState = (value: string): PasswordValidationState => {
+  const lowercase = /[a-z|ç|ş|ö|ü|ı|ğ]/.test(value);
+  const uppercase = /[A-Z|Ç|Ş|Ö|Ü|İ|Ğ]/.test(value);
+  const number = /[0-9]/.test(value);
+  const character = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(value);
+  const minChar = value.length >= 8;
+  return { lowercase, uppercase, number, character, minChar };
+};
+
+export const validatePassword = (value: string): boolean => {
+  if (isNil(value) || value === "") {
     return false;
   }
-  const re = /(?=.*\d)(?=.*[a-z])(?=.*[!@#$%^&*])(?=.*[A-Z]).{8,}/;
-  // TODO: Add a constants/configuration file with the minimum password length.
-  return re.test(password) && password.length >= 8;
+  const state = getPasswordValidationState(value);
+  return uniq(Object.values(state)).length === 1 && Object.values(state)[0] === true;
 };
 
 export const validateEmail = (email?: string): boolean => {
