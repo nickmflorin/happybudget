@@ -69,6 +69,7 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
   const [markupAccounts, setMarkupAccounts] = useState<number[] | undefined>(undefined);
   const [groupAccounts, setGroupAccounts] = useState<number[] | undefined>(undefined);
+  const [groupMarkups, setGroupMarkups] = useState<number[] | undefined>(undefined);
   const [groupToEdit, setGroupToEdit] = useState<Table.GroupRow<R> | undefined>(undefined);
   const [markupToEdit, setMarkupToEdit] = useState<number | null>(null);
 
@@ -87,7 +88,7 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
         savingChangesPortalId={"saving-changes"}
         onExportPdf={() => setPreviewModalVisible(true)}
         onRowExpand={(row: Table.DataRow<R, M>) => history.push(`/budgets/${budgetId}/accounts/${row.id}`)}
-        onGroupRows={(rows: (Table.ModelRow<R, M> | Table.MarkupRow<R>)[]) =>
+        onGroupRows={(rows: (Table.ModelRow<R, M> | Table.MarkupRow<R>)[]) => {
           setGroupAccounts(
             map(
               filter(rows, (row: Table.ModelRow<R, M> | Table.MarkupRow<R>) =>
@@ -95,8 +96,16 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
               ) as Table.ModelRow<R, M>[],
               (row: Table.ModelRow<R, M>) => row.id
             )
-          )
-        }
+          );
+          setGroupMarkups(
+            map(
+              filter(rows, (row: Table.ModelRow<R, M> | Table.MarkupRow<R>) =>
+                tabling.typeguards.isMarkupRow(row)
+              ) as Table.MarkupRow<R>[],
+              (row: Table.MarkupRow<R>) => row.markup
+            )
+          );
+        }}
         onMarkupRows={(rows: (Table.ModelRow<R, M> | Table.GroupRow<R>)[]) =>
           setMarkupAccounts(
             map(
@@ -117,6 +126,7 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
           open={true}
           onSuccess={(markup: Model.Markup) => {
             setMarkupAccounts(undefined);
+            setGroupMarkups(undefined);
             dispatch(
               actions.accounts.handleTableChangeEventAction({
                 type: "markupAdd",
@@ -131,6 +141,7 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
         <CreateBudgetAccountGroupModal
           budgetId={budgetId}
           accounts={groupAccounts}
+          markups={groupMarkups}
           open={true}
           onSuccess={(group: Model.Group) => {
             setGroupAccounts(undefined);

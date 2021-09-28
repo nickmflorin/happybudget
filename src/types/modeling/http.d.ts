@@ -181,6 +181,7 @@ namespace Http {
     readonly name?: string;
     readonly color?: string;
     readonly children?: number[];
+    readonly children_markups?: number[];
   }
 
   interface AccountPayload extends Http.ModelPayload<Model.Account> {

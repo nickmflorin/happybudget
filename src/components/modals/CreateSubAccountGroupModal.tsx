@@ -8,12 +8,13 @@ import { GroupForm } from "components/forms";
 import { Modal } from "./generic";
 
 interface CreateSubAccountGroupModalProps {
-  onSuccess: (group: Model.Group) => void;
-  onCancel: () => void;
-  accountId?: number;
-  subaccountId?: number;
-  subaccounts: number[];
-  open: boolean;
+  readonly onSuccess: (group: Model.Group) => void;
+  readonly onCancel: () => void;
+  readonly accountId?: number;
+  readonly subaccountId?: number;
+  readonly subaccounts: number[];
+  readonly markups?: number[];
+  readonly open: boolean;
 }
 
 const CreateSubAccountGroupModal = ({
@@ -21,6 +22,7 @@ const CreateSubAccountGroupModal = ({
   subaccountId,
   open,
   subaccounts,
+  markups,
   onSuccess,
   onCancel
 }: CreateSubAccountGroupModalProps): JSX.Element => {
@@ -40,18 +42,14 @@ const CreateSubAccountGroupModal = ({
         form
           .validateFields()
           .then((values: Http.GroupPayload) => {
+            let payload = { ...values, children: subaccounts };
+            if (!isNil(markups)) {
+              payload = { ...payload, children_markups: markups };
+            }
             form.setLoading(true);
             if (!isNil(accountId)) {
               api
-                .createAccountSubAccountGroup(
-                  accountId,
-                  {
-                    name: values.name,
-                    children: subaccounts,
-                    color: values.color
-                  },
-                  { cancelToken: cancelToken() }
-                )
+                .createAccountSubAccountGroup(accountId, payload, { cancelToken: cancelToken() })
                 .then((group: Model.Group) => {
                   form.resetFields();
                   onSuccess(group);
@@ -60,11 +58,7 @@ const CreateSubAccountGroupModal = ({
                 .finally(() => form.setLoading(false));
             } else if (!isNil(subaccountId)) {
               api
-                .createSubAccountSubAccountGroup(subaccountId, {
-                  name: values.name,
-                  children: subaccounts,
-                  color: values.color
-                })
+                .createSubAccountSubAccountGroup(subaccountId, payload)
                 .then((group: Model.Group) => {
                   form.resetFields();
                   onSuccess(group);

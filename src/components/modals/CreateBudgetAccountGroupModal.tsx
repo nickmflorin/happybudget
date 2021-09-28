@@ -1,3 +1,5 @@
+import { isNil } from "lodash";
+
 import * as api from "api";
 
 import { Form } from "components";
@@ -6,16 +8,18 @@ import { GroupForm } from "components/forms";
 import { Modal } from "./generic";
 
 interface CreateBudgetAccountGroupModalProps {
-  onSuccess: (group: Model.Group) => void;
-  onCancel: () => void;
-  budgetId: number;
-  accounts: number[];
-  open: boolean;
+  readonly onSuccess: (group: Model.Group) => void;
+  readonly onCancel: () => void;
+  readonly budgetId: number;
+  readonly accounts: number[];
+  readonly markups?: number[];
+  readonly open: boolean;
 }
 
 const CreateBudgetAccountGroupModal = ({
   budgetId,
   accounts,
+  markups,
   open,
   onSuccess,
   onCancel
@@ -36,17 +40,13 @@ const CreateBudgetAccountGroupModal = ({
         form
           .validateFields()
           .then((values: Http.GroupPayload) => {
+            let payload = { ...values, children: accounts };
+            if (!isNil(markups)) {
+              payload = { ...payload, children_markups: markups };
+            }
             form.setLoading(true);
             api
-              .createBudgetAccountGroup(
-                budgetId,
-                {
-                  name: values.name,
-                  children: accounts,
-                  color: values.color
-                },
-                { cancelToken: cancelToken() }
-              )
+              .createBudgetAccountGroup(budgetId, payload, { cancelToken: cancelToken() })
               .then((group: Model.Group) => {
                 form.resetFields();
                 onSuccess(group);
