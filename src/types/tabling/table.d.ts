@@ -118,6 +118,8 @@ namespace Table {
     | MarkupRow<D>;
 
   type DataRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> = ModelRow<D, M> | PlaceholderRow<D>;
+  type MarkupableRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> = ModelRow<D, M> | GroupRow<D>;
+  type GroupableRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> = ModelRow<D, M> | MarkupRow<D>;
   type NonGroupRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> = DataRow<D, M> | MarkupRow<D>;
   type NonMarkupRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> = DataRow<D, M> | GroupRow<D>;
 
