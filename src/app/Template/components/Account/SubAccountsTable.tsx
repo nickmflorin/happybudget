@@ -137,7 +137,7 @@ const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableP
       )}
       {!isNil(groupToEdit) && (
         <EditGroupModal
-          id={groupToEdit.group}
+          id={tabling.rows.groupId(groupToEdit.id)}
           open={true}
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.Group) => {

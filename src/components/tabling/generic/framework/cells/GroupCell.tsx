@@ -34,7 +34,7 @@ const GroupCell = <
   const groupRows = useSelector(groupRowSelector);
 
   const groupRow = useMemo<Table.GroupRow<R> | null>((): Table.GroupRow<R> | null => {
-    const groupId = tabling.typeguards.isGroupRow(row) ? row.group : null;
+    const groupId = tabling.typeguards.isGroupRow(row) ? tabling.rows.groupId(row.id) : null;
     return isNil(groupId)
       ? null
       : (find(groupRows, { group: groupId } as any) as Table.GroupRow<R> | undefined) || null;

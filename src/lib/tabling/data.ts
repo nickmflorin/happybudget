@@ -54,8 +54,9 @@ export const injectGroups = <
       (!tabling.typeguards.isRow(obj) && model.typeguards.isGroup(obj))
     );
   };
-  const markupId = (obj: B) => (tabling.typeguards.isRow(obj) ? obj.markup : obj.id);
-  const groupId = (obj: C) => (tabling.typeguards.isRow(obj) ? obj.group : obj.id);
+  const markupId = (obj: B) => (tabling.typeguards.isRow(obj) ? tabling.rows.markupId(obj.id) : obj.id);
+  const groupId = (obj: C) => (tabling.typeguards.isRow(obj) ? tabling.rows.groupId(obj.id) : obj.id);
+
   const modelGroup = (obj: A | B): C | null => {
     const groupsForModel = filter(config.groups, (g: C) =>
       isB(obj) ? includes(g.children_markups, markupId(obj)) : includes(g.children, (obj as A).id)
@@ -148,7 +149,7 @@ export const injectMarkups = <
       (!tabling.typeguards.isRow(obj) && model.typeguards.isMarkup(obj))
     );
   };
-  const markupId = (obj: B) => (tabling.typeguards.isRow(obj) ? obj.markup : obj.id);
+  const markupId = (obj: B) => (tabling.typeguards.isRow(obj) ? tabling.rows.markupId(obj.id) : obj.id);
 
   for (let i = 0; i < config.current.length; i++) {
     const mdl: A = config.current[i];
@@ -239,19 +240,6 @@ export const createTableRows = <R extends Table.RowData, M extends Model.TypedHt
     []
   );
 
-  let groupRows: Table.GroupRow<R>[] = reduce(
-    groups,
-    (curr: Table.GroupRow<R>[], g: Model.Group) => [
-      ...curr,
-      tabling.rows.createGroupRow<R, M>({
-        columns: config.columns,
-        group: g,
-        childrenRows: filter(modelRows, (r: Table.ModelRow<R, M>) => includes(g.children, r.id))
-      })
-    ],
-    []
-  );
-
   let markupRows: Table.MarkupRow<R>[] = reduce(
     markups,
     (curr: Table.MarkupRow<R>[], mk: Model.Markup) => [
@@ -260,6 +248,23 @@ export const createTableRows = <R extends Table.RowData, M extends Model.TypedHt
         markup: mk,
         columns: config.columns,
         childrenRows: filter(modelRows, (r: Table.ModelRow<R, M>) => includes(mk.children, r.id))
+      })
+    ],
+    []
+  );
+
+  let groupRows: Table.GroupRow<R>[] = reduce(
+    groups,
+    (curr: Table.GroupRow<R>[], g: Model.Group) => [
+      ...curr,
+      tabling.rows.createGroupRow<R, M>({
+        columns: config.columns,
+        group: g,
+        childrenRows: filter([...modelRows, ...markupRows], (r: Table.ModelRow<R, M> | Table.MarkupRow<R>) =>
+          tabling.typeguards.isModelRow(r)
+            ? includes(g.children, r.id)
+            : includes(g.children_markups, tabling.rows.markupId(r.id))
+        )
       })
     ],
     []

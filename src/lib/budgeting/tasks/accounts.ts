@@ -214,7 +214,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       const effects: (StrictEffect | null)[] = map(changes, (ch: Table.RowChange<R, C, Table.MarkupRow<R>>) => {
         const payload = tabling.http.patchPayloadForChange<R, Http.MarkupPayload, C>(ch, config.columns);
         if (!isNil(payload)) {
-          return call(api.updateMarkup, ch.row.markup, payload, {
+          return call(api.updateMarkup, tabling.rows.markupId(ch.row.id), payload, {
             cancelToken: source.token
           });
         }

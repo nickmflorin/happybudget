@@ -131,7 +131,7 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
               filter(rows, (row: Table.ModelRow<R, M> | Table.MarkupRow<R>) =>
                 tabling.typeguards.isMarkupRow(row)
               ) as Table.MarkupRow<R>[],
-              (row: Table.MarkupRow<R>) => row.markup
+              (row: Table.MarkupRow<R>) => tabling.rows.markupId(row.id)
             )
           );
         }}
@@ -146,7 +146,7 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
           )
         }
         onEditGroup={(group: Table.GroupRow<R>) => setGroupToEdit(group)}
-        onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(row.markup)}
+        onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(tabling.rows.markupId(row.id))}
       />
       {!isNil(markupSubAccounts) && !isNil(accountId) && (
         <CreateBudgetSubAccountMarkupModal
@@ -202,7 +202,7 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
       )}
       {!isNil(groupToEdit) && (
         <EditGroupModal
-          id={groupToEdit.group}
+          id={tabling.rows.groupId(groupToEdit.id)}
           open={true}
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.Group) => {

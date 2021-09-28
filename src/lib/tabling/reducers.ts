@@ -102,7 +102,7 @@ const rowRemoveFromGroupReducer = <
     ) as Table.MarkupRowId[]
   );
   // IDs of the Markup Rows that are actually in the current state.
-  const markupRowIds = map(markupRows, (r: Table.MarkupRow<R>) => r.markup);
+  const markupRowIds = map(markupRows, (r: Table.MarkupRow<R>) => tabling.rows.markupId(r.id));
 
   const g: Table.GroupRow<R> | null = groupRowFromState<R, M, S>(action, st, e.payload.group);
   if (!isNil(g)) {
@@ -172,7 +172,7 @@ const rowAddToGroupReducer = <
     ) as Table.MarkupRowId[]
   );
   // IDs of the Markup Rows that are actually in the current state.
-  const markupRowIds = map(markupRows, (r: Table.MarkupRow<R>) => r.markup);
+  const markupRowIds = map(markupRows, (r: Table.MarkupRow<R>) => tabling.rows.markupId(r.id));
 
   const g: Table.GroupRow<R> | null = groupRowFromState<R, M, S>(action, st, e.payload.group);
   if (!isNil(g)) {
@@ -256,7 +256,7 @@ const removeRowsFromTheirGroupsIfTheyExist = <
           // IDS - but that is what we want, because we want the final values to have the most up to
           // date children for each group after all alterations.
           if (tabling.typeguards.isMarkupRow(r)) {
-            const markupId = r.markup;
+            const markupId = tabling.rows.markupId(r.id);
             return {
               ...alterations,
               [groupRow.id]: {
@@ -507,8 +507,8 @@ export const createTableChangeEventReducer = <
         group: e.payload,
         childrenRows: filter(
           newState.data,
-          (r: Table.Row<R, M>) => !tabling.typeguards.isGroupRow(r) && includes(e.payload.children, r.id)
-        ) as Table.NonGroupRow<R, M>[]
+          (r: Table.Row<R, M>) => tabling.typeguards.isGroupableRow(r) && includes(e.payload.children, r.id)
+        ) as Table.GroupableRow<R, M>[]
       });
       // Insert the new GroupRow(s) into the table and reorder the rows of the table so that the
       // GroupRow(s) are in the appropriate location.

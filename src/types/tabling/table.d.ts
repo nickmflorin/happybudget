@@ -100,13 +100,11 @@ namespace Table {
   };
   type PlaceholderRow<R extends RowData> = IRow<PlaceholderRowId, "placeholder", R, "data">;
   type GroupRow<R extends RowData> = IRow<GroupRowId, "group", R, "data"> & {
-    readonly group: number;
     readonly children: number[];
     readonly children_markups: number[];
     readonly groupData: Pick<Model.Group, "name" | "color">;
   };
   type MarkupRow<R extends RowData> = IRow<MarkupRowId, "markup", R, "data"> & {
-    readonly markup: number;
     readonly children: number[];
     readonly markupData: Pick<Model.Markup, "unit" | "rate">;
   };

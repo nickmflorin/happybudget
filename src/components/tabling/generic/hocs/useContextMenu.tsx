@@ -142,7 +142,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.HttpModel = Mod
           contextMenuItems = [
             ...contextMenuItems,
             {
-              name: `Remove ${getRowLabel(row) || "Row"} from Group ${getRowName(groupRow) || groupRow.group}`,
+              name: `Remove ${getRowLabel(row) || "Row"} from Group ${getRowName(groupRow) || groupRow.groupData.name}`,
               action: () =>
                 params.onChangeEvent({
                   type: "rowRemoveFromGroup",
@@ -188,7 +188,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.HttpModel = Mod
               {
                 name: "Add to Group",
                 subMenu: map(groupRows, (gr: Table.GroupRow<R>) => ({
-                  name: `${getRowName(gr) || gr.group}`,
+                  name: `${getRowName(gr) || gr.groupData.name}`,
                   action: () =>
                     params.onChangeEvent({
                       type: "rowRemoveFromGroup",
@@ -217,7 +217,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.HttpModel = Mod
           {
             name: `Remove ${getRowLabel(row) || "Row"} from Markup`,
             subMenu: map(markupRowsToRemove, (mr: Table.MarkupRow<R>) => ({
-              name: `${getRowName(mr) || mr.markup}`,
+              name: `${getRowName(mr) || tabling.rows.markupId(mr.id)}`,
               action: () =>
                 params.onChangeEvent({
                   type: "rowRemoveFromMarkup",
@@ -237,7 +237,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.HttpModel = Mod
           {
             name: "Add to Markup",
             subMenu: map(markupRowsToAdd, (mr: Table.MarkupRow<R>) => ({
-              name: `${getRowName(mr) || mr.markup}`,
+              name: `${getRowName(mr) || tabling.rows.markupId(mr.id)}`,
               action: () =>
                 params.onChangeEvent({
                   type: "rowAddToMarkup",
@@ -323,7 +323,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.HttpModel = Mod
       return [
         ...(!isNil(params.getGroupRowContextMenuItems) ? params.getGroupRowContextMenuItems(row, node) : []),
         {
-          name: `Ungroup ${getRowName(row) || row.group}`,
+          name: `Ungroup ${getRowName(row) || row.groupData.name}`,
           action: () =>
             params.onChangeEvent({
               type: "rowDelete",
