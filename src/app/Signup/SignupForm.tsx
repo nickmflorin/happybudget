@@ -76,7 +76,7 @@ const SignupForm = ({
           })
         ]}
       >
-        <PasswordInput size={"large"} />
+        <PasswordInput size={"large"} hasValidator={true} />
       </Form.Item>
       <Form.Item
         name={"confirm"}
@@ -92,7 +92,7 @@ const SignupForm = ({
           })
         ]}
       >
-        <PasswordInput size={"large"} placeholder={"Confirm"} />
+        <PasswordInput size={"large"} placeholder={"Confirm"} hasValidator={true} />
       </Form.Item>
       <Form.Footer style={{ marginTop: 20 }}>
         <Button loading={loading} className={"btn btn--login"} htmlType={"submit"}>
