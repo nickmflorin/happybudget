@@ -46,22 +46,7 @@ export const injectMarkupsAndGroups = <
     );
   };
   const markupId = (obj: B) => (tabling.typeguards.isRow(obj) ? tabling.rows.markupId(obj.id) : obj.id);
-  // Note: This only works right now because we are not using markups outside of the budget table context.
-  // It should be removed when things become more stable as it is mostly a debugging help and it introduces
-  // a type inconsistency around the markup row.
-  const markupName = (obj: B): string | null =>
-    tabling.typeguards.isRow(obj)
-      ? (obj as Table.MarkupRow<{ identifier: string | null; description: string | null }>).data.identifier ||
-        (obj as Table.MarkupRow<{ identifier: string | null; description: string | null }>).data.description
-      : obj.identifier || obj.description;
-  const markupRef = (obj: B): string => {
-    const id = markupId(obj);
-    const name = markupName(obj);
-    if (!isNil(name)) {
-      return `Markup ${name} (id = ${id})`;
-    }
-    return `Markup (id = ${id})`;
-  };
+
   const groupId = (obj: C) => (tabling.typeguards.isRow(obj) ? tabling.rows.groupId(obj.id) : obj.id);
   const groupName = (obj: C) => (tabling.typeguards.isRow(obj) ? obj.groupData.name : obj.name);
   const groupRef = (obj: C) => `Group ${groupName(obj)} (id = ${groupId(obj)})`;
@@ -78,41 +63,41 @@ export const injectMarkupsAndGroups = <
 
   const modelMarkups = (obj: A): B[] => filter(config.markups, (m: B) => includes(m.children, obj.id)) as B[];
 
+  const isAllocated = (mdli: A | B | C) =>
+    isA(mdli)
+      ? includes(
+          map(filter(data, (obj: A | B | C) => isA(obj)) as A[], (obj: A) => obj.id),
+          mdli.id
+        )
+      : isB(mdli)
+      ? includes(
+          map(filter(data, (obj: A | B | C) => isB(obj)) as B[], (obj: B) => markupId(obj)),
+          markupId(mdli as B)
+        )
+      : includes(
+          map(filter(data, (obj: A | B | C) => isC(obj)) as C[], (obj: C) => groupId(obj)),
+          groupId(mdli as C)
+        );
+
+  const allocateMarkup = (mk: B) => {
+    // If the Markup was previously added, we have to remove it at it's first location
+    // and move it down the array towards the bottom of the table - since it is now used
+    // in more than 1 location.
+    if (isAllocated(mk)) {
+      data = filter(data, (obj: A | B | C) => !(isB(obj) && markupId(obj) === markupId(mk)));
+    }
+    data = [...data, mk];
+  };
+
+  const allocateGroup = (g: C) => {
+    if (isAllocated(g)) {
+      data = filter(data, (m: A | B | C) => !(isC(m) && groupId(m) === groupId(g)));
+    }
+    data = [...data, g];
+  };
+
   for (let i = 0; i < config.current.length; i++) {
     let mdl: A = config.current[i];
-
-    const allocatedModels: Table.DataRowId[] = map(
-      filter(data, (obj: A | B | C) => isA(obj)) as A[],
-      (obj: A) => obj.id
-    );
-    const allocatedMarkups: number[] = map(filter(data, (obj: A | B | C) => isB(obj)) as B[], (obj: B) =>
-      markupId(obj)
-    );
-    const allocatedGroups: number[] = map(filter(data, (obj: A | B | C) => isC(obj)) as C[], (obj: C) => groupId(obj));
-
-    const isAllocated = (mdli: A | B | C) =>
-      isA(mdli)
-        ? includes(allocatedModels, mdl.id)
-        : isB(mdli)
-        ? includes(allocatedMarkups, markupId(mdli as B))
-        : includes(allocatedGroups, groupId(mdli as C));
-
-    const allocateMarkup = (mk: B, dat: (A | B | C)[]) => {
-      // If the Markup was previously added, we have to remove it at it's first location
-      // and move it down the array towards the bottom of the table - since it is now used
-      // in more than 1 location.
-      if (isAllocated(mk)) {
-        dat = filter(dat, (obj: A | B | C) => !(isB(obj) && markupId(obj) === markupId(mk)));
-      }
-      return [...dat, mk];
-    };
-
-    const allocateGroup = (g: C, dat: (A | B | C)[]) => {
-      if (isAllocated(g)) {
-        dat = filter(dat, (m: A | B | C) => !(isC(m) && groupId(m) === groupId(g)));
-      }
-      return [...dat, g];
-    };
 
     if (!isAllocated(mdl)) {
       const g = modelGroup(mdl);
@@ -123,11 +108,11 @@ export const injectMarkupsAndGroups = <
       } else {
         data = [...data, mdl];
         if (!isNil(g) && markups.length === 0) {
-          data = allocateGroup(g, data);
+          allocateGroup(g);
         } else if (isNil(g) && markups.length !== 0) {
           for (let j = 0; j < markups.length; j++) {
             const mk = markups[j];
-            data = allocateMarkup(mk, data);
+            allocateMarkup(mk);
           }
         } else if (!isNil(g) && markups.length !== 0) {
           if (g.children_markups.length !== 0) {
@@ -140,15 +125,15 @@ export const injectMarkupsAndGroups = <
                   `${groupRef(g)} references markup ${id} as a child but it could not be found in the data.`
                 );
               } else {
-                data = allocateMarkup(mk, data);
+                allocateMarkup(mk);
               }
             }
           }
-          data = allocateGroup(g, data);
+          allocateGroup(g);
           const leftoverMarkups = filter(markups, (mk: B) => !includes(g.children_markups, markupId(mk)));
           for (let j = 0; j < leftoverMarkups.length; j++) {
             const mk = markups[j];
-            data = allocateMarkup(mk, data);
+            allocateMarkup(mk);
           }
         }
       }
