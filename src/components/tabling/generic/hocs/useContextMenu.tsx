@@ -125,11 +125,13 @@ const useContextMenu = <R extends Table.RowData, M extends Model.HttpModel = Mod
   ) => Table.MenuItemDef[] = hooks.useDynamicCallback(
     (row: Table.ModelRow<R, M> | Table.MarkupRow<R>, node: Table.RowNode): Table.MenuItemDef[] => {
       let contextMenuItems: Table.MenuItemDef[] = [];
-      const groupRows: Table.GroupRow<R>[] = filter(params.data, (r: Table.Row<R, M>) =>
-        tabling.typeguards.isGroupRow(r)
-      ) as Table.GroupRow<R>[];
+
       const onGroupRows = params.onGroupRows;
       if (!isNil(onGroupRows)) {
+        const groupRows: Table.GroupRow<R>[] = filter(params.data, (r: Table.Row<R, M>) =>
+          tabling.typeguards.isGroupRow(r)
+        ) as Table.GroupRow<R>[];
+
         const groupRow: Table.GroupRow<R> | undefined = find(groupRows, (r: Table.GroupRow<R>) =>
           includes(r.children, row.id)
         ) as Table.GroupRow<R> | undefined;
@@ -202,39 +204,48 @@ const useContextMenu = <R extends Table.RowData, M extends Model.HttpModel = Mod
   const getModelRowMarkupContextMenuItems: (row: Table.ModelRow<R, M>, node: Table.RowNode) => Table.MenuItemDef[] =
     hooks.useDynamicCallback((row: Table.ModelRow<R, M>, node: Table.RowNode): Table.MenuItemDef[] => {
       let contextMenuItems: Table.MenuItemDef[] = [];
+      const markupRowsToRemove: Table.MarkupRow<R>[] = filter(
+        params.data,
+        (r: Table.Row<R, M>) => tabling.typeguards.isMarkupRow(r) && includes(r.children, row.id)
+      ) as Table.MarkupRow<R>[];
+      if (markupRowsToRemove.length !== 0) {
+        contextMenuItems = [
+          ...contextMenuItems,
+          {
+            name: `Remove ${getRowLabel(row) || "Row"} from Markup`,
+            subMenu: map(markupRowsToRemove, (mr: Table.MarkupRow<R>) => ({
+              name: `${getRowName(mr) || mr.markup}`,
+              action: () =>
+                params.onChangeEvent({
+                  type: "rowRemoveFromMarkup",
+                  payload: { rows: [row.id], markup: mr.id }
+                })
+            }))
+          }
+        ];
+      }
+      const markupRowsToAdd: Table.MarkupRow<R>[] = filter(
+        params.data,
+        (r: Table.Row<R, M>) => tabling.typeguards.isMarkupRow(r) && !includes(r.children, row.id)
+      ) as Table.MarkupRow<R>[];
+      if (markupRowsToAdd.length !== 0) {
+        contextMenuItems = [
+          ...contextMenuItems,
+          {
+            name: "Add to Markup",
+            subMenu: map(markupRowsToAdd, (mr: Table.MarkupRow<R>) => ({
+              name: `${getRowName(mr) || mr.markup}`,
+              action: () =>
+                params.onChangeEvent({
+                  type: "rowAddToMarkup",
+                  payload: { rows: [row.id], markup: mr.id }
+                })
+            }))
+          }
+        ];
+      }
       const onMarkupRows = params.onMarkupRows;
       if (!isNil(onMarkupRows)) {
-        const markupRows: Table.MarkupRow<R>[] = filter(
-          params.data,
-          (r: Table.Row<R, M>) => tabling.typeguards.isMarkupRow(r) && includes(r.children, row.id)
-        ) as Table.MarkupRow<R>[];
-        if (markupRows.length !== 0) {
-          contextMenuItems = [
-            ...contextMenuItems,
-            {
-              name: `Remove ${getRowLabel(row) || "Row"} from Markup`,
-              subMenu: map(markupRows, (mr: Table.MarkupRow<R>) => ({
-                name: `${getRowName(mr) || mr.markup}`,
-                action: () =>
-                  params.onChangeEvent({
-                    type: "rowRemoveFromMarkup",
-                    payload: { rows: [row.id], markup: mr.id }
-                  })
-              }))
-            },
-            {
-              name: "Add to Markup",
-              subMenu: map(markupRows, (mr: Table.MarkupRow<R>) => ({
-                name: `${getRowName(mr) || mr.markup}`,
-                action: () =>
-                  params.onChangeEvent({
-                    type: "rowAddToMarkup",
-                    payload: { rows: [row.id], markup: mr.id }
-                  })
-              }))
-            }
-          ];
-        }
         const markupableRowsAbove: (Table.ModelRow<R, M> | Table.GroupRow<R>)[] = findMarkupableRowsAbove(node);
         if (markupableRowsAbove.length !== 0) {
           let label: string;
@@ -289,7 +300,6 @@ const useContextMenu = <R extends Table.RowData, M extends Model.HttpModel = Mod
       if (isNil(params.rowCanDelete) || params.rowCanDelete(row) === true) {
         contextMenuItems = [
           ...contextMenuItems,
-          ...getRowGroupContextMenuItems(row, node),
           {
             name: `Delete ${getRowLabel(row)}`,
             action: () => params.onChangeEvent({ payload: { rows: row.id }, type: "rowDelete" })
