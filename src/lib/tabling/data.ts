@@ -2,6 +2,18 @@ import { includes, reduce, filter, map, isNil } from "lodash";
 
 import { tabling, util, model } from "lib";
 
+type InjectMarkupsAndGroupsConfig<
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel,
+  A extends Table.DataRow<R, M> | M = M,
+  B extends Model.Markup | Table.MarkupRow<R> = Model.Markup,
+  C extends Model.Group | Table.GroupRow<R> = Model.Group
+> = {
+  readonly current: A[];
+  readonly markups?: B[];
+  readonly groups?: C[];
+};
+
 type InjectMarkupsConfig<
   R extends Table.RowData,
   M extends Model.TypedHttpModel,
@@ -21,6 +33,142 @@ type InjectGroupsConfig<
 > = {
   readonly current: (A | B)[];
   readonly groups: C[];
+};
+
+/* eslint-disable indent */
+export const injectMarkupsAndGroups = <
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel,
+  A extends Table.DataRow<R, M> | M = M,
+  B extends Model.Markup | Table.MarkupRow<R> = Model.Markup,
+  C extends Model.Group | Table.GroupRow<R> = Model.Group
+>(
+  config: InjectMarkupsAndGroupsConfig<R, M, A, B, C>
+): (A | B | C)[] => {
+  let modelsAndMarkupsAndGroups: (A | B | C)[] = [];
+  let modelsWithoutGroups: (A | B)[] = [];
+
+  const isA = (obj: A | B | C): obj is A => {
+    return (
+      (tabling.typeguards.isRow(obj) && tabling.typeguards.isDataRow(obj)) ||
+      (!tabling.typeguards.isRow(obj) && !model.typeguards.isMarkup(obj))
+    );
+  };
+  const isB = (obj: A | B | C): obj is B => {
+    return (
+      (tabling.typeguards.isRow(obj) && tabling.typeguards.isMarkupRow(obj)) ||
+      (!tabling.typeguards.isRow(obj) && model.typeguards.isMarkup(obj))
+    );
+  };
+  const isC = (obj: A | B | C): obj is C => {
+    return (
+      (tabling.typeguards.isRow(obj) && tabling.typeguards.isGroupRow(obj)) ||
+      (!tabling.typeguards.isRow(obj) && model.typeguards.isGroup(obj))
+    );
+  };
+  const markupId = (obj: B) => (tabling.typeguards.isRow(obj) ? tabling.rows.markupId(obj.id) : obj.id);
+  const groupId = (obj: C) => (tabling.typeguards.isRow(obj) ? tabling.rows.groupId(obj.id) : obj.id);
+
+  const modelGroup = (obj: A | B): C | null => {
+    const groupsForModel = filter(config.groups, (g: C) =>
+      isB(obj) ? includes(g.children_markups, markupId(obj)) : includes(g.children, (obj as A).id)
+    );
+    if (groupsForModel.length > 1) {
+      throw new Error("Corrupted table data!");
+    }
+    return groupsForModel.length === 0 ? null : groupsForModel[0];
+  };
+
+  const modelMarkups = (obj: A): B[] => filter(config.markups, (m: B) => includes(m.children, obj.id)) as B[];
+
+  const equalById = (obj1: A | B, obj2: A | B) => {
+    if (isA(obj1) && isA(obj2)) {
+      return obj1.id === obj2.id;
+    } else if (isB(obj1) && isB(obj2)) {
+      return markupId(obj1) === markupId(obj2);
+    }
+    return false;
+  };
+
+  for (let i = 0; i < config.current.length; i++) {
+    let mdl: A = config.current[i];
+
+    const allocatedModels: Table.DataRowId[] = map(
+      filter(modelsAndMarkupsAndGroups, (obj: A | B | C) => isA(obj)) as A[],
+      (obj: A) => obj.id
+    );
+    const allocatedMarkups: number[] = map(
+      filter(modelsAndMarkupsAndGroups, (obj: A | B | C) => isB(obj)) as B[],
+      (obj: B) => markupId(obj)
+    );
+    const allocatedGroups: number[] = map(
+      filter(modelsAndMarkupsAndGroups, (obj: A | B | C) => isC(obj)) as C[],
+      (obj: C) => groupId(obj)
+    );
+
+    const isAllocated = (mdli: A | B | C) =>
+      isA(mdli)
+        ? includes(allocatedModels, mdl.id)
+        : isB(mdli)
+        ? includes(allocatedMarkups, markupId(mdli as B))
+        : includes(allocatedGroups, groupId(mdli as C));
+
+    if (!isAllocated(mdl)) {
+      const groupForModel = modelGroup(mdl);
+      const markupsForModel = modelMarkups(mdl);
+
+      if (isNil(groupForModel) && markupsForModel.length === 0) {
+        modelsWithoutGroups = [...modelsWithoutGroups, mdl];
+      } else if (!isNil(groupForModel) && markupsForModel.length === 0) {
+        modelsAndMarkupsAndGroups = [...modelsAndMarkupsAndGroups, mdl];
+        if (isAllocated(groupForModel)) {
+          modelsAndMarkupsAndGroups = filter(
+            modelsAndMarkupsAndGroups,
+            (m: A | B | C) => !(isC(m) && groupId(m) === groupId(groupForModel))
+          );
+        }
+        modelsAndMarkupsAndGroups = [...modelsAndMarkupsAndGroups, groupForModel];
+      } else if (isNil(groupForModel) && markupsForModel.length !== 0) {
+        modelsAndMarkupsAndGroups = [...modelsAndMarkupsAndGroups, mdl];
+        for (let j = 0; j < markupsForModel.length; j++) {
+          const mk = markupsForModel[j];
+          // If the Markup was previously added, we have to remove it at it's first location
+          // and move it down the array towards the bottom of the table - since it is now used
+          // in more than 1 location.
+          if (isAllocated(mk)) {
+            modelsAndMarkupsAndGroups = filter(
+              modelsAndMarkupsAndGroups,
+              (obj: A | B | C) => !(isB(obj) && markupId(obj) === markupId(mk))
+            );
+          }
+          modelsAndMarkupsAndGroups = [...modelsAndMarkupsAndGroups, mk];
+        }
+      } else if (!isNil(groupForModel) && markupsForModel.length !== 0) {
+        modelsAndMarkupsAndGroups = [...modelsAndMarkupsAndGroups, mdl];
+        if (isAllocated(groupForModel)) {
+          modelsAndMarkupsAndGroups = filter(
+            modelsAndMarkupsAndGroups,
+            (m: A | B | C) => !(isC(m) && groupId(m) === groupId(groupForModel))
+          );
+        }
+        modelsAndMarkupsAndGroups = [...modelsAndMarkupsAndGroups, groupForModel];
+        for (let j = 0; j < markupsForModel.length; j++) {
+          const mk = markupsForModel[j];
+          // If the Markup was previously added, we have to remove it at it's first location
+          // and move it down the array towards the bottom of the table - since it is now used
+          // in more than 1 location.
+          if (isAllocated(mk)) {
+            modelsAndMarkupsAndGroups = filter(
+              modelsAndMarkupsAndGroups,
+              (obj: A | B | C) => !(isB(obj) && markupId(obj) === markupId(mk))
+            );
+          }
+          modelsAndMarkupsAndGroups = [...modelsAndMarkupsAndGroups, mk];
+        }
+      }
+    }
+  }
+  return [...modelsAndMarkupsAndGroups, ...modelsWithoutGroups];
 };
 
 /* eslint-disable indent */
@@ -207,6 +355,20 @@ export const injectMarkups = <
 };
 
 export const orderTableRows = <R extends Table.RowData, M extends Model.TypedHttpModel>(
+  data: Table.Row<R, M>[]
+): Table.Row<R, M>[] => {
+  // The order of the actual data rows of the table dictate the order of everything else.
+  const dataRows = filter(data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R, M>[];
+  const markupRows = filter(data, (r: Table.Row<R, M>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[];
+  const groupRows = filter(data, (r: Table.Row<R, M>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[];
+  return injectMarkupsAndGroups<R, M, Table.DataRow<R, M>, Table.MarkupRow<R>, Table.GroupRow<R>>({
+    groups: groupRows,
+    current: dataRows,
+    markups: markupRows
+  });
+};
+
+export const orderTableRowsOld = <R extends Table.RowData, M extends Model.TypedHttpModel>(
   data: Table.Row<R, M>[]
 ): Table.Row<R, M>[] => {
   // The order of the actual data rows of the table dictate the order of everything else.
