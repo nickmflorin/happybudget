@@ -161,8 +161,8 @@ const useContextMenu = <R extends Table.RowData, M extends Model.HttpModel = Mod
                 const endpoints = [getRowName(row), getRowName(lastRow)];
                 if (!(endpoints[0] === undefined && endpoints[1] === undefined)) {
                   label = `Group ${getRowLabel(row) || "Row"}s ${util.conditionalJoinString(
-                    endpoints[0],
                     endpoints[1],
+                    endpoints[0],
                     {
                       delimeter: " - ",
                       replaceMissing: ""
@@ -258,7 +258,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.HttpModel = Mod
             if (!isNil(lastRow)) {
               const endpoints = [getRowName(row), getRowName(lastRow)];
               if (!(endpoints[0] === undefined && endpoints[1] === undefined)) {
-                label = `Markup ${getRowLabel(row) || "Row"}s ${util.conditionalJoinString(endpoints[0], endpoints[1], {
+                label = `Markup ${getRowLabel(row) || "Row"}s ${util.conditionalJoinString(endpoints[1], endpoints[0], {
                   delimeter: " - ",
                   replaceMissing: ""
                 })}`;
