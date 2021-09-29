@@ -20,7 +20,9 @@ const EditMarkupModal = (props: EditModelModalProps<Model.Markup>): JSX.Element 
         ])
       }
     >
-      {(form: FormInstance<Http.MarkupPayload>) => <MarkupForm form={form} />}
+      {(m: Model.Markup | null, form: FormInstance<Http.MarkupPayload>) => (
+        <MarkupForm form={form} availableChildren={[]} availableChildrenLoading={false} />
+      )}
     </EditModelModal>
   );
 };

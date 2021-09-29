@@ -56,13 +56,13 @@ export const bulkDeleteAccountMarkups = async (
   return client.patch<Http.BudgetBulkResponse<Model.Budget, Model.Account>>(url, { ids }, options);
 };
 
-export const getAccountSubAccounts = async (
+export const getAccountSubAccounts = async <M extends Model.SubAccount | Model.SimpleSubAccount = Model.SubAccount>(
   accountId: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.SubAccount>> => {
+): Promise<Http.ListResponse<M>> => {
   const url = URL.v1("accounts", accountId, "subaccounts");
-  return client.list<Model.SubAccount>(url, query, options);
+  return client.list<M>(url, query, options);
 };
 
 export const createAccountSubAccount = async (

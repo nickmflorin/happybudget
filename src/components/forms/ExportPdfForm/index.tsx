@@ -4,8 +4,6 @@ import { map, isNil, find } from "lodash";
 
 import { Select, Switch, Tag, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown } from "@fortawesome/pro-solid-svg-icons";
 
 import * as api from "api";
 import { hooks, model, util, tabling, ui } from "lib";
@@ -384,7 +382,7 @@ const ExportForm = (
       >
         <Form.Item label={"Columns"} name={"columns"}>
           <Select
-            suffixIcon={<FontAwesomeIcon icon={faCaretDown} />}
+            suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
             mode={"multiple"}
             showArrow
             tagRender={(params: CustomTagProps) => {
@@ -443,7 +441,7 @@ const ExportForm = (
         </Form.ItemStyle>
         <Form.Item label={"Tables"} name={"tables"} style={{ marginBottom: 5 }}>
           <Select
-            suffixIcon={<FontAwesomeIcon icon={faCaretDown} />}
+            suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
             showArrow
             disabled={accountsLoading}
             loading={accountsLoading}

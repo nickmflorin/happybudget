@@ -88,7 +88,9 @@ const EditContactModal = (props: EditContactModalProps): JSX.Element => {
         ])
       }
     >
-      {(form: FormInstance<Http.ContactPayload>) => <MemoizedContactForm form={form} onValuesChange={onValuesChange} />}
+      {(m: Model.Contact | null, form: FormInstance<Http.ContactPayload>) => (
+        <MemoizedContactForm form={form} onValuesChange={onValuesChange} />
+      )}
     </EditModelModal>
   );
 };

@@ -58,6 +58,8 @@ namespace Model {
   type ContactType = Model.Choice<ContactTypeId, ContactTypeName>;
 
   type LineType = "account" | "subaccount";
+  type ParentType = LineType | "budget";
+
   type SimpleLineItem = Model.SimpleAccount | Model.SimpleSubAccount;
   type LineItem = Model.Account | Model.SubAccount;
   type PdfLineItem = Model.PdfAccount | Model.PdfSubAccount;
@@ -119,8 +121,6 @@ namespace Model {
     readonly unit: MarkupUnit | null;
     readonly rate: number | null;
     readonly children: number[];
-    readonly groups: number[];
-    readonly group: number | null;
   }
 
   interface BaseBudget extends Model.TrackedModel {
@@ -177,7 +177,6 @@ namespace Model {
     readonly name: string;
     readonly color: string | null;
     readonly children: number[];
-    readonly children_markups: number[];
   }
 
   // Represents a simple form of an Account, SubAccount or Detail (Nested SubAccount).

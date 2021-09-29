@@ -101,7 +101,6 @@ namespace Table {
   type PlaceholderRow<R extends RowData> = IRow<PlaceholderRowId, "placeholder", R, "data">;
   type GroupRow<R extends RowData> = IRow<GroupRowId, "group", R, "data"> & {
     readonly children: number[];
-    readonly children_markups: number[];
     readonly groupData: Pick<Model.Group, "name" | "color">;
   };
   type MarkupRow<R extends RowData> = IRow<MarkupRowId, "markup", R, "data"> & {
@@ -116,8 +115,6 @@ namespace Table {
     | MarkupRow<D>;
 
   type DataRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> = ModelRow<D, M> | PlaceholderRow<D>;
-  type MarkupableRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> = ModelRow<D, M> | GroupRow<D>;
-  type GroupableRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> = ModelRow<D, M> | MarkupRow<D>;
   type NonGroupRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> = DataRow<D, M> | MarkupRow<D>;
   type NonMarkupRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> = DataRow<D, M> | GroupRow<D>;
 
@@ -477,7 +474,7 @@ namespace Table {
   };
 
   type RowRemoveFromGroupPayload = {
-    readonly rows: SingleOrArray<ModelRowId | MarkupRowId>;
+    readonly rows: SingleOrArray<ModelRowId>;
     readonly group: GroupRowId;
   };
   type RowRemoveFromGroupEvent = {
@@ -486,7 +483,7 @@ namespace Table {
   };
 
   type RowRemoveFromMarkupPayload = {
-    readonly rows: SingleOrArray<ModelRowId | GroupRowId>;
+    readonly rows: SingleOrArray<ModelRowId>;
     readonly markup: MarkupRowId;
   };
   type RowRemoveFromMarkupEvent = {
@@ -496,7 +493,7 @@ namespace Table {
 
   type RowAddToGroupPayload = {
     readonly group: GroupRowId;
-    readonly rows: SingleOrArray<ModelRowId | MarkupRowId>;
+    readonly rows: SingleOrArray<ModelRowId>;
   };
   type RowAddToGroupEvent = {
     readonly type: "rowAddToGroup";
@@ -505,7 +502,7 @@ namespace Table {
 
   type RowAddToMarkupPayload = {
     readonly markup: MarkupRowId;
-    readonly rows: SingleOrArray<ModelRowId | GroupRowId>;
+    readonly rows: SingleOrArray<ModelRowId>;
   };
   type RowAddToMarkupEvent = {
     readonly type: "rowAddToMarkup";

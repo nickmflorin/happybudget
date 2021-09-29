@@ -115,22 +115,11 @@ export const createBudgetTableChangeEventReducer = <
       row.  Then, we must recalculate the Group metrics (if applicable) to reflect the new Row(s) it
       contains.
       */
-      const ids: (Table.ModelRowId | Table.GroupRowId)[] = Array.isArray(e.payload.rows)
-        ? e.payload.rows
-        : [e.payload.rows];
-
-      const modelRowIds = filter(ids, (id: Table.ModelRowId | Table.GroupRowId) =>
-        tabling.typeguards.isModelRowId(id)
-      ) as Table.ModelRowId[];
-
-      console.log("NEED TO FIGURE THIS OUT!");
-      const groupRowIds = filter(ids, (id: Table.ModelRowId | Table.GroupRowId) =>
-        tabling.typeguards.isGroupRowId(id)
-      ) as Table.GroupRowId[];
+      const ids: Table.ModelRowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
 
       const mk = markupRowFromState<R, M, S>(action, newState, e.payload.markup);
       if (!isNil(mk)) {
-        const newChildren: Table.ModelRowId[] = filter(mk.children, (child: number) => !includes(modelRowIds, child));
+        const newChildren: Table.ModelRowId[] = filter(mk.children, (child: number) => !includes(ids, child));
         // TODO: We will need to recalculate the children rows.
         const childrenRows: Table.ModelRow<R, M>[] = redux.reducers.findModelsInData(
           action,
@@ -145,7 +134,7 @@ export const createBudgetTableChangeEventReducer = <
               { id: mk.id },
               {
                 ...mk,
-                children: filter(mk.children, (child: number) => !includes(modelRowIds, child)),
+                children: filter(mk.children, (child: number) => !includes(ids, child)),
                 data: tabling.rows.updateMarkupRowData({
                   columns: config.columns,
                   data: mk.data,

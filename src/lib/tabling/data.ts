@@ -25,7 +25,7 @@ export const injectMarkupsAndGroups = <
   config: InjectMarkupsAndGroupsConfig<R, M, A, B, C>
 ): (A | B | C)[] => {
   let data: (A | B | C)[] = [];
-  let modelsWithoutGroupsOrMarkups: A[] = [];
+  let modelsWithoutGroups: A[] = [];
 
   const isA = (obj: A | B | C): obj is A => {
     return (
@@ -45,23 +45,14 @@ export const injectMarkupsAndGroups = <
       (!tabling.typeguards.isRow(obj) && model.typeguards.isGroup(obj))
     );
   };
+
   const markupId = (obj: B) => (tabling.typeguards.isRow(obj) ? tabling.rows.markupId(obj.id) : obj.id);
-
   const groupId = (obj: C) => (tabling.typeguards.isRow(obj) ? tabling.rows.groupId(obj.id) : obj.id);
-  const groupName = (obj: C) => (tabling.typeguards.isRow(obj) ? obj.groupData.name : obj.name);
-  const groupRef = (obj: C) => `Group ${groupName(obj)} (id = ${groupId(obj)})`;
 
-  const modelGroup = (obj: A | B): C | null => {
-    const groupsForModel = filter(config.groups, (g: C) =>
-      isB(obj) ? includes(g.children_markups, markupId(obj)) : includes(g.children, (obj as A).id)
-    );
-    if (groupsForModel.length > 1) {
-      throw new Error("Corrupted table data!");
-    }
-    return groupsForModel.length === 0 ? null : groupsForModel[0];
+  const modelGroup = (obj: A): C | null => {
+    const groupsForModel: C | undefined = find(config.groups, (g: C) => includes(g.children, obj.id));
+    return groupsForModel === undefined ? null : groupsForModel;
   };
-
-  const modelMarkups = (obj: A): B[] => filter(config.markups, (m: B) => includes(m.children, obj.id)) as B[];
 
   const isAllocated = (mdli: A | B | C) =>
     isA(mdli)
@@ -79,16 +70,6 @@ export const injectMarkupsAndGroups = <
           groupId(mdli as C)
         );
 
-  const allocateMarkup = (mk: B) => {
-    // If the Markup was previously added, we have to remove it at it's first location
-    // and move it down the array towards the bottom of the table - since it is now used
-    // in more than 1 location.
-    if (isAllocated(mk)) {
-      data = filter(data, (obj: A | B | C) => !(isB(obj) && markupId(obj) === markupId(mk)));
-    }
-    data = [...data, mk];
-  };
-
   const allocateGroup = (g: C) => {
     if (isAllocated(g)) {
       data = filter(data, (m: A | B | C) => !(isC(m) && groupId(m) === groupId(g)));
@@ -101,45 +82,15 @@ export const injectMarkupsAndGroups = <
 
     if (!isAllocated(mdl)) {
       const g = modelGroup(mdl);
-      const markups = modelMarkups(mdl);
-
-      if (isNil(g) && markups.length === 0) {
-        modelsWithoutGroupsOrMarkups = [...modelsWithoutGroupsOrMarkups, mdl];
+      if (isNil(g)) {
+        modelsWithoutGroups = [...modelsWithoutGroups, mdl];
       } else {
         data = [...data, mdl];
-        if (!isNil(g) && markups.length === 0) {
-          allocateGroup(g);
-        } else if (isNil(g) && markups.length !== 0) {
-          for (let j = 0; j < markups.length; j++) {
-            const mk = markups[j];
-            allocateMarkup(mk);
-          }
-        } else if (!isNil(g) && markups.length !== 0) {
-          if (g.children_markups.length !== 0) {
-            for (let j = 0; j < g.children_markups.length; j++) {
-              const id = g.children_markups[j];
-              const mk = find(config.markups, (mki: B) => markupId(mki) === id);
-              if (isNil(mk)) {
-                /* eslint-disable no-console */
-                console.error(
-                  `${groupRef(g)} references markup ${id} as a child but it could not be found in the data.`
-                );
-              } else {
-                allocateMarkup(mk);
-              }
-            }
-          }
-          allocateGroup(g);
-          const leftoverMarkups = filter(markups, (mk: B) => !includes(g.children_markups, markupId(mk)));
-          for (let j = 0; j < leftoverMarkups.length; j++) {
-            const mk = markups[j];
-            allocateMarkup(mk);
-          }
-        }
+        allocateGroup(g);
       }
     }
   }
-  return [...data, ...modelsWithoutGroupsOrMarkups];
+  return [...data, ...modelsWithoutGroups, ...(config.markups || [])];
 };
 
 export const orderTableRows = <R extends Table.RowData, M extends Model.TypedHttpModel>(
@@ -162,7 +113,6 @@ export const createTableRows = <R extends Table.RowData, M extends Model.TypedHt
   const models = config.response.models;
   const groups = config.response.groups === undefined ? [] : config.response.groups;
   const markups = config.response.markups === undefined ? [] : config.response.markups;
-  console.log({ models, groups, markups });
   const modelRows: Table.ModelRow<R, M>[] = reduce(
     models,
     (curr: Table.ModelRow<R, M>[], m: M) => [
@@ -177,7 +127,7 @@ export const createTableRows = <R extends Table.RowData, M extends Model.TypedHt
     []
   );
 
-  let markupRows: Table.MarkupRow<R>[] = reduce(
+  const markupRows: Table.MarkupRow<R>[] = reduce(
     markups,
     (curr: Table.MarkupRow<R>[], mk: Model.Markup) => [
       ...curr,
@@ -190,18 +140,14 @@ export const createTableRows = <R extends Table.RowData, M extends Model.TypedHt
     []
   );
 
-  let groupRows: Table.GroupRow<R>[] = reduce(
+  const groupRows: Table.GroupRow<R>[] = reduce(
     groups,
     (curr: Table.GroupRow<R>[], g: Model.Group) => [
       ...curr,
       tabling.rows.createGroupRow<R, M>({
         columns: config.columns,
         group: g,
-        childrenRows: filter([...modelRows, ...markupRows], (r: Table.ModelRow<R, M> | Table.MarkupRow<R>) =>
-          tabling.typeguards.isModelRow(r)
-            ? includes(g.children, r.id)
-            : includes(g.children_markups, tabling.rows.markupId(r.id))
-        )
+        childrenRows: filter(modelRows, (r: Table.ModelRow<R, M>) => includes(g.children, r.id))
       })
     ],
     []

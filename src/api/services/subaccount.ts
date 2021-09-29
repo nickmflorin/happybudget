@@ -1,13 +1,13 @@
 import { client } from "api";
 import { URL } from "./util";
 
-export const getSubAccountSubAccounts = async (
+export const getSubAccountSubAccounts = async <M extends Model.SubAccount | Model.SimpleSubAccount = Model.SubAccount>(
   subaccountId: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.SubAccount>> => {
+): Promise<Http.ListResponse<M>> => {
   const url = URL.v1("subaccounts", subaccountId, "subaccounts");
-  return client.list<Model.SubAccount>(url, query, options);
+  return client.list<M>(url, query, options);
 };
 
 export const createSubAccountSubAccount = async (

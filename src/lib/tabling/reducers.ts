@@ -1,5 +1,5 @@
 import { tabling } from "lib";
-import { isNil, reduce, map, filter, includes, intersection } from "lodash";
+import { isNil, reduce, map, filter, includes, intersection, uniq } from "lodash";
 
 import * as applicationEvents from "../events";
 import * as redux from "../redux";
@@ -28,12 +28,7 @@ export const groupRowFromState = <
 ): Table.GroupRow<R> | null => {
   let predicate = (g: Table.GroupRow<R>) => g.id === id;
   if (!isNil(rowId)) {
-    if (tabling.typeguards.isMarkupRowId(rowId)) {
-      predicate = (g: Table.GroupRow<R>) =>
-        g.id === id && includes(g.children_markups, parseInt(rowId.split("markup-")[1]));
-    } else {
-      predicate = (g: Table.GroupRow<R>) => g.id === id && includes(g.children, rowId);
-    }
+    predicate = (g: Table.GroupRow<R>) => g.id === id && includes(g.children, rowId);
   }
   return redux.reducers.modelFromState<Table.GroupRow<R>>(
     action,
@@ -82,34 +77,14 @@ const rowRemoveFromGroupReducer = <
   */
   const e: Table.RowRemoveFromGroupEvent = action.payload;
 
-  const ids: (Table.ModelRowId | Table.MarkupRowId)[] = Array.isArray(e.payload.rows)
-    ? e.payload.rows
-    : [e.payload.rows];
-
-  const modelRows: Table.ModelRow<R, M>[] = redux.reducers.findModelsInData<Table.ModelRow<R, M>>(
-    action,
-    filter(st.data, (r: Table.Row<R, M>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R, M>[],
-    filter(ids, (id: Table.ModelRowId | Table.MarkupRowId) => tabling.typeguards.isModelRowId(id)) as Table.ModelRowId[]
-  );
-  // IDs of the Model Rows that are actually in the current state.
-  const modelRowIds = map(modelRows, (r: Table.ModelRow<R, M>) => r.id);
-
-  const markupRows: Table.MarkupRow<R>[] = redux.reducers.findModelsInData<Table.MarkupRow<R>>(
-    action,
-    filter(st.data, (r: Table.Row<R, M>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[],
-    filter(ids, (id: Table.ModelRowId | Table.MarkupRowId) =>
-      tabling.typeguards.isMarkupRowId(id)
-    ) as Table.MarkupRowId[]
-  );
-  // IDs of the Markup Rows that are actually in the current state.
-  const markupRowIds = map(markupRows, (r: Table.MarkupRow<R>) => tabling.rows.markupId(r.id));
+  const ids: Table.ModelRowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
 
   const g: Table.GroupRow<R> | null = groupRowFromState<R, M, S>(action, st, e.payload.group);
   if (!isNil(g)) {
-    const newModelRows = redux.reducers.findModelsInData<Table.ModelRow<R, M>>(
+    const rws = redux.reducers.findModelsInData<Table.ModelRow<R, M>>(
       action,
       filter(st.data, (r: Table.Row<R, M>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R, M>[],
-      filter(g.children, (child: number) => !includes(modelRowIds, child))
+      filter(g.children, (child: number) => !includes(ids, child))
     );
     return {
       ...st,
@@ -119,14 +94,11 @@ const rowRemoveFromGroupReducer = <
           { id: g.id },
           {
             ...g,
-            children: filter(g.children, (child: number) => !includes(modelRowIds, child)),
-            children_markups: filter(g.children_markups, (child: number) => !includes(markupRowIds, child)),
+            children: filter(g.children, (child: number) => !includes(ids, child)),
             data: tabling.rows.updateGroupRowData({
               columns,
               data: g.data,
-              // At least right now, the children rows used to determine the properties of
-              // a GroupRow do not include the MarkupRow(s).
-              childrenRows: newModelRows
+              childrenRows: rws
             })
           }
         )
@@ -152,34 +124,14 @@ const rowAddToGroupReducer = <
   */
   const e: Table.RowAddToGroupEvent = action.payload;
 
-  const ids: (Table.ModelRowId | Table.MarkupRowId)[] = Array.isArray(e.payload.rows)
-    ? e.payload.rows
-    : [e.payload.rows];
-
-  const modelRows: Table.ModelRow<R, M>[] = redux.reducers.findModelsInData<Table.ModelRow<R, M>>(
-    action,
-    filter(st.data, (r: Table.Row<R, M>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R, M>[],
-    filter(ids, (id: Table.ModelRowId | Table.MarkupRowId) => tabling.typeguards.isModelRowId(id)) as Table.ModelRowId[]
-  );
-  // IDs of the Model Rows that are actually in the current state.
-  const modelRowIds = map(modelRows, (r: Table.ModelRow<R, M>) => r.id);
-
-  const markupRows: Table.MarkupRow<R>[] = redux.reducers.findModelsInData<Table.MarkupRow<R>>(
-    action,
-    filter(st.data, (r: Table.Row<R, M>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[],
-    filter(ids, (id: Table.ModelRowId | Table.MarkupRowId) =>
-      tabling.typeguards.isMarkupRowId(id)
-    ) as Table.MarkupRowId[]
-  );
-  // IDs of the Markup Rows that are actually in the current state.
-  const markupRowIds = map(markupRows, (r: Table.MarkupRow<R>) => tabling.rows.markupId(r.id));
+  const ids: Table.ModelRowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
 
   const g: Table.GroupRow<R> | null = groupRowFromState<R, M, S>(action, st, e.payload.group);
   if (!isNil(g)) {
-    const newModelRows = redux.reducers.findModelsInData<Table.ModelRow<R, M>>(
+    const rws = redux.reducers.findModelsInData<Table.ModelRow<R, M>>(
       action,
       filter(st.data, (r: Table.Row<R, M>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R, M>[],
-      [...modelRowIds, ...g.children]
+      uniq([...ids, ...g.children])
     );
     return {
       ...st,
@@ -189,14 +141,11 @@ const rowAddToGroupReducer = <
           { id: g.id },
           {
             ...g,
-            children: [...g.children, ...modelRowIds],
-            children_markups: [...g.children_markups, ...markupRowIds],
+            children: map(rws, (r: Table.ModelRow<R, M>) => r.id),
             data: tabling.rows.updateGroupRowData({
               columns,
               data: g.data,
-              // At least right now, the children rows used to determine the properties of
-              // a GroupRow do not include the MarkupRow(s).
-              childrenRows: newModelRows
+              childrenRows: rws
             })
           }
         )
@@ -213,7 +162,7 @@ const removeRowsFromTheirGroupsIfTheyExist = <
 >(
   st: S,
   action: Redux.Action,
-  rowIds: (Table.ModelRowId | Table.ModelRow<R, M> | Table.MarkupRowId | Table.MarkupRow<R>)[],
+  rowIds: (Table.ModelRowId | Table.ModelRow<R, M>)[],
   columns: Table.Column<R, M>[]
 ): S => {
   // Keep track of which groups were altered and what their most recent children were after all
@@ -222,30 +171,18 @@ const removeRowsFromTheirGroupsIfTheyExist = <
   type Alteration = {
     groupRow: Table.GroupRow<R>;
     children: number[];
-    children_markups: number[];
   };
   type AlteredGroups = { [key: Table.GroupRowId]: Alteration };
   let alteredGroupsWithChildren: AlteredGroups = reduce(
     rowIds,
-    (
-      alterations: AlteredGroups,
-      rowId: Table.ModelRowId | Table.ModelRow<R, M> | Table.MarkupRowId | Table.MarkupRow<R>
-    ) => {
-      let r: Table.ModelRow<R, M> | Table.MarkupRow<R> | null = null;
+    (alterations: AlteredGroups, rowId: Table.ModelRowId | Table.ModelRow<R, M>) => {
+      let r: Table.ModelRow<R, M> | null = null;
       if (typeof rowId === "number" || typeof rowId === "string") {
-        if (tabling.typeguards.isMarkupRowId(rowId)) {
-          r = redux.reducers.modelFromState<Table.MarkupRow<R>>(
-            action,
-            filter(st.data, (ri: Table.Row<R, M>) => typeguards.isMarkupRow(ri)) as Table.MarkupRow<R>[],
-            rowId
-          );
-        } else {
-          r = redux.reducers.modelFromState<Table.ModelRow<R, M>>(
-            action,
-            filter(st.data, (ri: Table.Row<R, M>) => typeguards.isDataRow(ri)) as Table.ModelRow<R, M>[],
-            rowId
-          );
-        }
+        r = redux.reducers.modelFromState<Table.ModelRow<R, M>>(
+          action,
+          filter(st.data, (ri: Table.Row<R, M>) => typeguards.isDataRow(ri)) as Table.ModelRow<R, M>[],
+          rowId
+        );
       } else {
         r = rowId;
       }
@@ -255,16 +192,6 @@ const removeRowsFromTheirGroupsIfTheyExist = <
           // This will be overwrittten if a group belongs to multiple rows associated with the provided
           // IDS - but that is what we want, because we want the final values to have the most up to
           // date children for each group after all alterations.
-          if (tabling.typeguards.isMarkupRow(r)) {
-            const markupId = tabling.rows.markupId(r.id);
-            return {
-              ...alterations,
-              [groupRow.id]: {
-                groupRow,
-                children_markups: filter(groupRow.children_markups, (id: number) => id !== markupId)
-              }
-            };
-          }
           const modelId = r.id;
           return {
             ...alterations,
@@ -281,10 +208,8 @@ const removeRowsFromTheirGroupsIfTheyExist = <
     (s: S, alteration: Alteration) => {
       const childrenRows: Table.ModelRow<R, M>[] = redux.reducers.findModelsInData(
         action,
-        filter(s.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)) as Table.ModelRow<R, M>[],
-        filter(alteration.children, (id: Table.ModelRowId | Table.MarkupRowId) =>
-          tabling.typeguards.isModelRowId(id)
-        ) as Table.ModelRowId[]
+        filter(s.data, (r: Table.Row<R, M>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R, M>[],
+        alteration.children
       );
       return {
         ...s,
@@ -294,12 +219,9 @@ const removeRowsFromTheirGroupsIfTheyExist = <
           {
             ...alteration.groupRow,
             children: alteration.children,
-            children_markups: alteration.children_markups,
             data: tabling.rows.updateGroupRowData({
               columns,
               data: alteration.groupRow.data,
-              // At least right now, the children rows used to determine the properties of
-              // a GroupRow do not include the MarkupRow(s).
               childrenRows
             })
           }
@@ -344,15 +266,7 @@ const rowDeleteReducer = <
     filter(ids, (id: Table.ModelRowId | Table.MarkupRowId) => tabling.typeguards.isModelRowId(id)) as Table.ModelRowId[]
   );
 
-  const markupRows: Table.MarkupRow<R>[] = redux.reducers.findModelsInData<Table.MarkupRow<R>>(
-    action,
-    filter(st.data, (r: Table.Row<R, M>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[],
-    filter(ids, (id: Table.ModelRowId | Table.MarkupRowId) =>
-      tabling.typeguards.isMarkupRowId(id)
-    ) as Table.MarkupRowId[]
-  );
-
-  st = removeRowsFromTheirGroupsIfTheyExist(st, action, [...markupRows, ...modelRows], columns);
+  st = removeRowsFromTheirGroupsIfTheyExist(st, action, modelRows, columns);
   return {
     ...st,
     data: filter(st.data, (ri: Table.Row<R, M>) => !includes(ids, ri.id))
@@ -507,8 +421,8 @@ export const createTableChangeEventReducer = <
         group: e.payload,
         childrenRows: filter(
           newState.data,
-          (r: Table.Row<R, M>) => tabling.typeguards.isGroupableRow(r) && includes(e.payload.children, r.id)
-        ) as Table.GroupableRow<R, M>[]
+          (r: Table.Row<R, M>) => tabling.typeguards.isModelRow(r) && includes(e.payload.children, r.id)
+        ) as Table.ModelRow<R, M>[]
       });
       // Insert the new GroupRow(s) into the table and reorder the rows of the table so that the
       // GroupRow(s) are in the appropriate location.

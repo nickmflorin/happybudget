@@ -23,7 +23,7 @@ interface DiscoverProps {
 }
 
 const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element => {
-  const [templateToEdit, setTemplateToEdit] = useState<Model.Template | undefined>(undefined);
+  const [templateToEdit, setTemplateToEdit] = useState<number | undefined>(undefined);
   const [createTemplateModalOpen, setCreateTempateModalOpen] = useState(false);
   const user = useLoggedInUser();
   const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
@@ -87,7 +87,7 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
                   }
                 }}
                 onEdit={() => history.push(`/templates/${template.id}/accounts`)}
-                onEditNameImage={() => setTemplateToEdit(template)}
+                onEditNameImage={() => setTemplateToEdit(template.id)}
                 onDelete={(e: MenuItemClickEvent<MenuItemModel>) => {
                   setDeleting(template.id);
                   api
@@ -127,7 +127,7 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
         <IsStaff>
           <EditTemplateModal
             open={true}
-            template={templateToEdit}
+            id={templateToEdit}
             onCancel={() => setTemplateToEdit(undefined)}
             onSuccess={(template: Model.Template) => {
               setTemplateToEdit(undefined);

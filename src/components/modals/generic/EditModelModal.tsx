@@ -17,10 +17,11 @@ export interface EditModelModalProps<M extends Model.Model> extends Omit<ModalPr
 interface PrivateEditModelModalProps<M extends Model.Model, P> extends EditModelModalProps<M> {
   readonly title?: string | JSX.Element | ((m: M, form: FormInstance<P>) => JSX.Element | string);
   readonly autoFocusField?: number;
+  readonly onModelLoaded?: (m: M) => void;
   readonly setFormData: (m: M, form: FormInstance<P>) => void;
   readonly request: (id: number) => Promise<M>;
   readonly update: (id: number, payload: P, options: Http.RequestOptions) => Promise<M>;
-  readonly children: (form: FormInstance<P>) => JSX.Element;
+  readonly children: (m: M | null, form: FormInstance<P>) => JSX.Element;
   readonly interceptPayload?: (p: P) => P;
 }
 
@@ -28,6 +29,7 @@ const EditModelModal = <M extends Model.Model, P>({
   id,
   open,
   autoFocusField,
+  onModelLoaded,
   onSuccess,
   onCancel,
   request,
@@ -41,6 +43,7 @@ const EditModelModal = <M extends Model.Model, P>({
   const cancelToken = api.useCancelToken();
   const [instance, loading, error] = model.hooks.useModel(id, {
     request,
+    onModelLoaded,
     conditional: () => open === true,
     deps: [open]
   });
@@ -105,7 +108,7 @@ const EditModelModal = <M extends Model.Model, P>({
           });
       }}
     >
-      {children(form)}
+      {children(instance, form)}
     </Modal>
   );
 };

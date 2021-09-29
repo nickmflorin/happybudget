@@ -3,14 +3,15 @@ import { isNil } from "lodash";
 
 import * as api from "api";
 
-type ModelHookOptions = {
+type ModelHookOptions<M extends Model.Model> = {
+  readonly onModelLoaded?: (m: M) => void;
   readonly conditional?: () => boolean;
   readonly deps?: any[];
 };
 
 export const useModel = <M extends Model.Model>(
   id: number,
-  options: ModelHookOptions & {
+  options: ModelHookOptions<M> & {
     readonly request: (i: number) => Promise<M>;
   }
 ): [M | null, boolean, Error | null] => {
@@ -25,6 +26,7 @@ export const useModel = <M extends Model.Model>(
         .request(id)
         .then((response: M) => {
           setModel(response);
+          options?.onModelLoaded?.(response);
         })
         .catch((e: Error) => {
           setError(e);
@@ -38,15 +40,24 @@ export const useModel = <M extends Model.Model>(
   return [model, loading, error];
 };
 
-export const useMarkup = (id: number, options?: ModelHookOptions): [Model.Markup | null, boolean, Error | null] => {
+export const useMarkup = (
+  id: number,
+  options?: ModelHookOptions<Model.Markup>
+): [Model.Markup | null, boolean, Error | null] => {
   return useModel(id, { ...options, request: api.getMarkup });
 };
 
-export const useContact = (id: number, options?: ModelHookOptions): [Model.Contact | null, boolean, Error | null] => {
+export const useContact = (
+  id: number,
+  options?: ModelHookOptions<Model.Contact>
+): [Model.Contact | null, boolean, Error | null] => {
   return useModel(id, { ...options, request: api.getContact });
 };
 
-export const useGroup = (id: number, options?: ModelHookOptions): [Model.Group | null, boolean, Error | null] => {
+export const useGroup = (
+  id: number,
+  options?: ModelHookOptions<Model.Group>
+): [Model.Group | null, boolean, Error | null] => {
   return useModel(id, { ...options, request: api.getGroup });
 };
 

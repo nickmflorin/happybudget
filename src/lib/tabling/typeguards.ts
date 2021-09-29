@@ -36,12 +36,6 @@ export const isEditableNonDataRow = <R extends Table.RowData = object>(
   row: Table.Row<R>
 ): row is Table.EditableNonDataRow<R> => isEditableRow(row) && !isDataRow(row);
 
-export const isGroupableRow = <R extends Table.RowData = object>(row: Table.Row<R>): row is Table.GroupableRow<R> =>
-  isModelRow(row) || isMarkupRow(row);
-
-export const isMarkupableRow = <R extends Table.RowData = object>(row: Table.Row<R>): row is Table.MarkupableRow<R> =>
-  isModelRow(row) || isGroupRow(row);
-
 /* eslint-disable indent */
 export const isAuthenticatedActionMap = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   a: Redux.ActionMapObject<Redux.TableActionMap<M>> | Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<R, M>>

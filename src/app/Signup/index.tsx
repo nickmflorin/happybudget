@@ -3,7 +3,8 @@ import { useHistory } from "react-router-dom";
 
 import { Typography } from "antd";
 
-import { register, socialLogin } from "api/services";
+import * as api from "api";
+
 import { Form } from "components";
 import { Logo } from "components/svgs";
 
@@ -27,7 +28,8 @@ const Signup = (): JSX.Element => {
           loading={loading}
           onGoogleSuccess={(token: string) => {
             setLoading(true);
-            socialLogin({ token_id: token, provider: "google" })
+            api
+              .socialLogin({ token_id: token, provider: "google" })
               .then((user: Model.User) => {
                 // It might not be the the case that the User has not already logged in
                 // if doing Social Registration, because the User might already exist
@@ -52,7 +54,8 @@ const Signup = (): JSX.Element => {
             form.setGlobalError("There was an error authenticating with Google.");
           }}
           onSubmit={(values: ISignupFormValues) => {
-            register(values)
+            api
+              .register(values)
               .then((user: Model.User) => {
                 if (user.is_first_time === true) {
                   history.push("/discover");

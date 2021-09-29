@@ -5,7 +5,7 @@ import { createSelector } from "reselect";
 import { isNil, map, filter, intersection } from "lodash";
 
 import { tabling, budgeting, redux } from "lib";
-import { CreateTemplateAccountGroupModal, EditGroupModal } from "components/modals";
+import { CreateGroupModal, EditGroupModal } from "components/modals";
 import { AccountsTable as GenericAccountsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../../store";
@@ -93,9 +93,10 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
         onEditGroup={(group: Table.GroupRow<R>) => setGroupToEdit(group)}
       />
       {!isNil(groupAccounts) && !isNil(templateId) && (
-        <CreateTemplateAccountGroupModal
-          templateId={templateId}
-          accounts={groupAccounts}
+        <CreateGroupModal
+          id={templateId}
+          parentType={"template"}
+          children={groupAccounts}
           open={true}
           onSuccess={(group: Model.Group) => {
             setGroupAccounts(undefined);

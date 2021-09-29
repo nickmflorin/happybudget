@@ -5,12 +5,7 @@ import { isNil, map, filter } from "lodash";
 import { createSelector } from "reselect";
 
 import { redux, tabling } from "lib";
-import {
-  CreateSubAccountGroupModal,
-  EditGroupModal,
-  EditMarkupModal,
-  CreateBudgetSubAccountMarkupModal
-} from "components/modals";
+import { CreateGroupModal, EditGroupModal, EditMarkupModal, CreateMarkupModal } from "components/modals";
 import { connectTableToStore } from "components/tabling";
 
 import { actions } from "../../store";
@@ -87,7 +82,6 @@ interface SubAccountsTableProps {
 
 const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps): JSX.Element => {
   const [groupSubAccounts, setGroupSubAccounts] = useState<number[] | undefined>(undefined);
-  const [groupMarkups, setGroupMarkups] = useState<number[] | undefined>(undefined);
   const [markupSubAccounts, setMarkupSubAccounts] = useState<number[] | undefined>(undefined);
   const [markupToEdit, setMarkupToEdit] = useState<number | null>(null);
   const [groupToEdit, setGroupToEdit] = useState<Table.GroupRow<R> | undefined>(undefined);
@@ -117,7 +111,7 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
         identifierFieldHeader={"Account"}
         onRowExpand={(row: Table.ModelRow<R, M>) => history.push(`/budgets/${budgetId}/subaccounts/${row.id}`)}
         onBack={() => history.push(`/budgets/${budgetId}/accounts?row=${accountId}`)}
-        onGroupRows={(rows: (Table.ModelRow<R, M> | Table.MarkupRow<R>)[]) => {
+        onGroupRows={(rows: (Table.ModelRow<R, M> | Table.MarkupRow<R>)[]) =>
           setGroupSubAccounts(
             map(
               filter(rows, (row: Table.ModelRow<R, M> | Table.MarkupRow<R>) =>
@@ -125,16 +119,8 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
               ) as Table.ModelRow<R, M>[],
               (row: Table.ModelRow<R, M>) => row.id
             )
-          );
-          setGroupMarkups(
-            map(
-              filter(rows, (row: Table.ModelRow<R, M> | Table.MarkupRow<R>) =>
-                tabling.typeguards.isMarkupRow(row)
-              ) as Table.MarkupRow<R>[],
-              (row: Table.MarkupRow<R>) => tabling.rows.markupId(row.id)
-            )
-          );
-        }}
+          )
+        }
         onMarkupRows={(rows: (Table.ModelRow<R, M> | Table.GroupRow<R>)[]) =>
           setMarkupSubAccounts(
             map(
@@ -149,9 +135,10 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
         onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(tabling.rows.markupId(row.id))}
       />
       {!isNil(markupSubAccounts) && !isNil(accountId) && (
-        <CreateBudgetSubAccountMarkupModal
-          accountId={accountId}
-          subaccounts={markupSubAccounts}
+        <CreateMarkupModal
+          id={accountId}
+          parentType={"account"}
+          children={markupSubAccounts}
           open={true}
           onSuccess={(markup: Model.Markup) => {
             setMarkupSubAccounts(undefined);
@@ -166,14 +153,13 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
         />
       )}
       {!isNil(groupSubAccounts) && (
-        <CreateSubAccountGroupModal
-          accountId={accountId}
-          subaccounts={groupSubAccounts}
-          markups={groupMarkups}
+        <CreateGroupModal
+          id={accountId}
+          parentType={"account"}
+          children={groupSubAccounts}
           open={true}
           onSuccess={(group: Model.Group) => {
             setGroupSubAccounts(undefined);
-            setGroupMarkups(undefined);
             dispatch(
               actions.account.handleTableChangeEventAction({
                 type: "groupAdd",

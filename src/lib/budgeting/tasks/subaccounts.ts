@@ -330,7 +330,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       const e: Table.RowRemoveFromGroupEvent = action.payload;
       const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
       const requestPayload: Http.BulkUpdatePayload<P> = {
-        data: map(ids, (id: Table.RowId) => ({
+        data: map(ids, (id: Table.ModelRowId) => ({
           id,
           group: null
         }))
@@ -345,9 +345,9 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       const e: Table.RowAddToGroupEvent = action.payload;
       const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
       const requestPayload: Http.BulkUpdatePayload<P> = {
-        data: map(ids, (id: Table.RowId) => ({
+        data: map(ids, (id: Table.ModelRowId) => ({
           id,
-          group: e.payload.group
+          group: tabling.rows.groupId(e.payload.group)
         }))
       };
       yield fork(bulkUpdateTask, objId, requestPayload, "There was an error adding the row to the group.", true);

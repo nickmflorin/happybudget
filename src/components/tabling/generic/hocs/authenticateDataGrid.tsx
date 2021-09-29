@@ -602,15 +602,12 @@ const authenticateDataGrid =
           // is not yet persisted in the backend database.  While this is an EDGE case, because the
           // placeholder rows only exist for a very short period of time, these scenarios need to be
           // more concretely established.
-          console.log(row);
           if (tabling.typeguards.isEditableRow(row)) {
             if (e.source === "paste") {
               setCellChangeEvents([...cellChangeEvents, e]);
             } else {
               const change = getCellChangeFromEvent(e);
-              console.log({ change });
               if (!isNil(change)) {
-                console.log(tabling.events.cellChangeToRowChange(change));
                 props.onChangeEvent({ type: "dataChange", payload: tabling.events.cellChangeToRowChange(change) });
                 if (tabling.typeguards.isModelRow(row) && !isNil(props.onRowExpand) && !isNil(props.rowCanExpand)) {
                   const col = props.apis?.column.getColumn("expand");

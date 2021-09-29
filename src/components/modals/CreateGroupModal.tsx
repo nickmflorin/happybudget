@@ -1,5 +1,3 @@
-import { isNil } from "lodash";
-
 import * as api from "api";
 
 import { Form } from "components";
@@ -7,23 +5,23 @@ import { GroupForm } from "components/forms";
 
 import { Modal } from "./generic";
 
-interface CreateBudgetAccountGroupModalProps {
+interface CreateGroupModalProps {
   readonly onSuccess: (group: Model.Group) => void;
   readonly onCancel: () => void;
-  readonly budgetId: number;
-  readonly accounts: number[];
-  readonly markups?: number[];
+  readonly id: number;
+  readonly children: number[];
+  readonly parentType: Model.ParentType | "template";
   readonly open: boolean;
 }
 
-const CreateBudgetAccountGroupModal = ({
-  budgetId,
-  accounts,
-  markups,
+const CreateGroupModal = ({
+  id,
+  children,
+  parentType,
   open,
   onSuccess,
   onCancel
-}: CreateBudgetAccountGroupModalProps): JSX.Element => {
+}: CreateGroupModalProps): JSX.Element => {
   const [form] = Form.useForm<Http.GroupPayload>({ isInModal: true });
   const cancelToken = api.useCancelToken();
 
@@ -40,13 +38,9 @@ const CreateBudgetAccountGroupModal = ({
         form
           .validateFields()
           .then((values: Http.GroupPayload) => {
-            let payload = { ...values, children: accounts };
-            if (!isNil(markups)) {
-              payload = { ...payload, children_markups: markups };
-            }
             form.setLoading(true);
             api
-              .createBudgetAccountGroup(budgetId, payload, { cancelToken: cancelToken() })
+              .createTableGroup(id, parentType, { ...values, children }, { cancelToken: cancelToken() })
               .then((group: Model.Group) => {
                 form.resetFields();
                 onSuccess(group);
@@ -68,4 +62,4 @@ const CreateBudgetAccountGroupModal = ({
   );
 };
 
-export default CreateBudgetAccountGroupModal;
+export default CreateGroupModal;

@@ -17,6 +17,8 @@ export const validatePassword = (value: string): boolean => {
   return uniq(Object.values(state)).length === 1 && Object.values(state)[0] === true;
 };
 
+export const validateNumeric = (value: string | number): boolean => !isNaN(parseFloat(String(value)));
+
 export const validateEmail = (email?: string): boolean => {
   if (isNil(email) || email === "") {
     return false;

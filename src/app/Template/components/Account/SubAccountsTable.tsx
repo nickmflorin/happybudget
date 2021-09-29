@@ -5,7 +5,7 @@ import { createSelector } from "reselect";
 import { isNil, map, filter } from "lodash";
 
 import { redux, tabling } from "lib";
-import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
+import { CreateGroupModal, EditGroupModal } from "components/modals";
 import { SubAccountsTable as GenericSubAccountsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../../store";
@@ -119,9 +119,10 @@ const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableP
         onEditGroup={(group: Table.GroupRow<R>) => setGroupToEdit(group)}
       />
       {!isNil(groupSubAccounts) && (
-        <CreateSubAccountGroupModal
-          accountId={accountId}
-          subaccounts={groupSubAccounts}
+        <CreateGroupModal
+          id={accountId}
+          parentType={"account"}
+          children={groupSubAccounts}
           open={true}
           onSuccess={(group: Model.Group) => {
             setGroupSubAccounts(undefined);

@@ -228,7 +228,7 @@ namespace Http {
   type BulkCreatePayload<T extends Http.ModelPayload> = { data: Partial<T>[] };
 
   type ModelBulkUpdatePayload<T extends Http.ModelPayload> = (Partial<T> | {}) & { readonly id: number };
-  type BulkUpdatePayload<T extends Http.ModelPayload> = { data: ModelBulkUpatePayload<T>[] };
+  type BulkUpdatePayload<T extends Http.ModelPayload> = { data: ModelBulkUpdatePayload<T>[] };
 
   type BulkModelResponse<M extends Model.Model> = {
     readonly data: M;

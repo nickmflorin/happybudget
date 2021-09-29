@@ -41,13 +41,13 @@ export const deleteBudget = async (id: number, options: Http.RequestOptions = {}
   return client.delete<null>(url, options);
 };
 
-export const getBudgetAccounts = async (
+export const getBudgetAccounts = async <M extends Model.Account | Model.SimpleAccount = Model.Account>(
   budgetId: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.Account>> => {
+): Promise<Http.ListResponse<M>> => {
   const url = URL.v1("budgets", budgetId, "accounts");
-  return client.list<Model.Account>(url, query, options);
+  return client.list<M>(url, query, options);
 };
 
 export const createBudgetAccount = async (

@@ -274,24 +274,14 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
 
   function* handleRowRemoveFromMarkup(action: Redux.Action<Table.RowRemoveFromMarkupEvent>): SagaIterator {
     const e: Table.RowRemoveFromMarkupEvent = action.payload;
-    const ids: (Table.GroupRowId | Table.ModelRowId)[] = Array.isArray(e.payload.rows)
-      ? e.payload.rows
-      : [e.payload.rows];
+    const ids: Table.ModelRowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
     if (isAuthenticatedConfig(config) && ids.length !== 0) {
       yield put(config.actions.saving(true));
-
-      const modelRowIds = filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[];
-
-      const groupRowIds = map(
-        filter(ids, (id: Table.RowId) => tabling.typeguards.isGroupRowId(id)) as Table.GroupRowId[],
-        (id: Table.GroupRowId) => tabling.rows.groupId(id)
-      );
-
       try {
         yield call(
           api.removeMarkupChildren,
           tabling.rows.markupId(e.payload.markup),
-          { children: modelRowIds, groups: groupRowIds },
+          { children: ids },
           { cancelToken: source.token }
         );
       } catch (err: unknown) {
@@ -313,7 +303,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       const e: Table.RowRemoveFromGroupEvent = action.payload;
       const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
       const requestPayload: Http.BulkUpdatePayload<P> = {
-        data: map(ids, (id: Table.RowId) => ({
+        data: map(ids, (id: Table.ModelRowId) => ({
           id,
           group: null
         }))
@@ -328,9 +318,9 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       const e: Table.RowAddToGroupEvent = action.payload;
       const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
       const requestPayload: Http.BulkUpdatePayload<P> = {
-        data: map(ids, (id: Table.RowId) => ({
+        data: map(ids, (id: Table.ModelRowId) => ({
           id,
-          group: e.payload.group
+          group: tabling.rows.groupId(e.payload.group)
         }))
       };
       yield fork(bulkUpdateTask, objId, requestPayload, "There was an error adding the row to the group.", true);

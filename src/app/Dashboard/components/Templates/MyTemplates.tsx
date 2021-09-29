@@ -20,7 +20,7 @@ interface MyTemplatesProps {
 }
 
 const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.Element => {
-  const [templateToEdit, setTemplateToEdit] = useState<Model.Template | undefined>(undefined);
+  const [templateToEdit, setTemplateToEdit] = useState<number | undefined>(undefined);
   const [createTemplateModalOpen, setCreateTempateModalOpen] = useState(false);
   const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
   const [isMoving, setMoving, setMoved] = redux.hooks.useTrackModelActions([]);
@@ -49,7 +49,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
                 moving={isMoving(template.id)}
                 deleting={isDeleting(template.id)}
                 onEdit={() => history.push(`/templates/${template.id}/accounts`)}
-                onEditNameImage={() => setTemplateToEdit(template)}
+                onEditNameImage={() => setTemplateToEdit(template.id)}
                 onDelete={(e: MenuItemClickEvent<MenuItemModel>) => {
                   setDeleting(template.id);
                   api
@@ -94,7 +94,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
       {!isNil(templateToEdit) && (
         <EditTemplateModal
           open={true}
-          template={templateToEdit}
+          id={templateToEdit}
           onCancel={() => setTemplateToEdit(undefined)}
           onSuccess={(template: Model.Template) => {
             setTemplateToEdit(undefined);

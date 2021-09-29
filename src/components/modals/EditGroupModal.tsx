@@ -18,7 +18,7 @@ const EditGroupModal = (props: EditModelModalProps<Model.Group>): JSX.Element =>
         ])
       }
     >
-      {(form: FormInstance<Http.GroupPayload>) => <GroupForm form={form} />}
+      {(m: Model.Group | null, form: FormInstance<Http.GroupPayload>) => <GroupForm form={form} />}
     </EditModelModal>
   );
 };

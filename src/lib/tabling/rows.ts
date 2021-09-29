@@ -151,7 +151,7 @@ export const createGroupRow = <R extends Table.RowData, M extends Model.HttpMode
     "gridId" | "rowType" | "id" | "callbackArgs" | "data"
   > & {
     readonly group: Model.Group;
-    readonly childrenRows: Table.GroupableRow<R, M>[];
+    readonly childrenRows: Table.ModelRow<R, M>[];
   }
 ): Table.GroupRow<R> => {
   return {
@@ -163,7 +163,6 @@ export const createGroupRow = <R extends Table.RowData, M extends Model.HttpMode
       data: createGroupRowData(config)
     }),
     children: config.group.children,
-    children_markups: config.group.children_markups,
     groupData: {
       color: config.group.color,
       name: config.group.name

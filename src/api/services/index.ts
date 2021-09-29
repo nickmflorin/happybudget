@@ -12,3 +12,4 @@ export * from "./template";
 export * from "./user";
 export * from "./pdf";
 export * from "./markup";
+export * from "./table";
