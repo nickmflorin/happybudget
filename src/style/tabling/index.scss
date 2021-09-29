@@ -82,7 +82,7 @@
     }
 
     .ag-pinned-left-header {
-      border-right: 1px solid #cdcdcd;
+      border-right: none !important;
     }
   }
 
@@ -289,6 +289,7 @@
     .grid--data {
       max-height: calc(100% - 40px);
 
+      // Fixes problem with range selection and hover causing white "blocks" in table.
       .ag-root .ag-body-viewport:not(.ag-has-focus) .ag-cell-range-selected-1:not(.ag-cell-inline-editing) {
         background-color: $white !important;
       }
@@ -400,6 +401,7 @@
         border-bottom-right-radius: 8px;
       }
 
+      // Fixes problem with range selection and hover causing white "blocks" in table.
       .ag-root .ag-body-viewport:not(.ag-has-focus) .ag-cell-range-selected-1:not(.ag-cell-inline-editing) {
         background-color: $table-border-color !important;
       }
@@ -440,6 +442,7 @@
         border-radius: 8px;
       }
 
+      // Fixes problem with range selection and hover causing white "blocks" in table.
       .ag-root .ag-body-viewport:not(.ag-has-focus) .ag-cell-range-selected-1:not(.ag-cell-inline-editing) {
         background-color: #d3d3d3 !important;
       }

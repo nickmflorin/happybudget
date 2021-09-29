@@ -26,6 +26,11 @@
     border: none;
   }
 
+  .ag-cell.ag-cell-last-left-pinned:not(.ag-cell-range-right):not(.ag-cell-range-single-cell) {
+    border-right: solid 2px;
+    border-right-color: $table-border-color;
+  }
+
   .ag-menu {
     border: $menu-border;
     border-radius: 0px;
