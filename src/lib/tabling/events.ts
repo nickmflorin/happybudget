@@ -80,14 +80,19 @@ export const cellChangesToRowChanges = <
   );
   return reduce(
     grouped,
-    (curr: Table.RowChange<R, M, RW>[], group: Table.SoloCellChange<R, M, RW>[], id: string) => {
+    (
+      curr: Table.RowChange<R, M, RW>[],
+      group: Table.SoloCellChange<R, M, RW>[],
+      id: string | number
+    ): Table.RowChange<R, M, RW>[] => {
       if (group.length !== 0) {
         return [
           ...curr,
           reduce(
             group,
             (cr: Table.RowChange<R, M, RW>, ch: Table.SoloCellChange<R, M, RW>) => {
-              return addCellChangeToRowChange(cr, ch);
+              // return addCellChangeToRowChange(cr, ch);
+              return cr;
             },
             // Note: Since the changes are grouped by Row ID, the row will be
             // close to the same for each <SoloCellChange> in the group.  All
@@ -136,9 +141,9 @@ export const consolidateTableChange = <
   };
   if (Array.isArray(change)) {
     const grouped = groupBy(change, "id") as {
-      [key in Table.DataRowId]: Table.RowChange<R, M, RW>[];
+      [key in Table.EditableRowId]: Table.RowChange<R, M, RW>[];
     };
-    let id: Table.DataRowId;
+    let id: Table.EditableRowId;
     const merged: Table.RowChange<R, M, RW>[] = [];
     for (id in grouped) {
       if (grouped[id].length !== 0) {

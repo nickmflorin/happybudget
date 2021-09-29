@@ -10,11 +10,6 @@ import * as rows from "./rows";
 import * as typeguards from "./typeguards";
 
 /* eslint-disable indent */
-/**
- * Returns (if present) the GroupRow in state with a provided ID.  If the rowId is also
- * provided, it will only return the GroupRow if that GroupRow also pertains to the
- * specific rowId.
- */
 export const groupRowFromState = <
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
@@ -38,9 +33,6 @@ export const groupRowFromState = <
   );
 };
 
-/**
- * Returns (if present) the Group in state that a specific row belongs to.
- */
 export const rowGroupRowFromState = <
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
@@ -298,17 +290,14 @@ export const createTableChangeEventReducer = <
 
       // Note: This grouping may be redundant - we should investigate.
       let changesPerRow: {
-        [key: ID]: { changes: Table.RowChange<R, M>[]; row: Table.EditableRow<R, M> };
+        [key: ID]: { changes: Table.RowChange<R, M>[]; row: Table.ModelRow<R, M> };
       } = {};
       for (let i = 0; i < consolidated.length; i++) {
         if (isNil(changesPerRow[consolidated[i].id])) {
           /* eslint-disable no-loop-func */
-          const r: Table.EditableRow<R, M> | null = redux.reducers.findModelInData<Table.EditableRow<R, M>>(
+          const r: Table.ModelRow<R, M> | null = redux.reducers.findModelInData<Table.ModelRow<R, M>>(
             action,
-            filter(newState.data, (ri: Table.Row<R, M>) => tabling.typeguards.isEditableRow(ri)) as Table.EditableRow<
-              R,
-              M
-            >[],
+            filter(newState.data, (ri: Table.Row<R, M>) => tabling.typeguards.isModelRow(ri)) as Table.ModelRow<R, M>[],
             consolidated[i].id,
             options
           );
@@ -352,7 +341,12 @@ export const createTableChangeEventReducer = <
           return (
             intersection(
               row.children,
-              map(modifiedRows, (r: Table.EditableRow<R, M>) => r.id)
+              map(
+                filter(modifiedRows, (r: Table.EditableRow<R, M>) =>
+                  tabling.typeguards.isModelRow(r)
+                ) as Table.ModelRow<R, M>[],
+                (r: Table.ModelRow<R, M>) => r.id
+              )
             ).length !== 0
           );
         }
@@ -360,9 +354,9 @@ export const createTableChangeEventReducer = <
       newState = reduce(
         groupsWithRowsThatChanged,
         (s: S, groupRow: Table.GroupRow<R>) => {
-          const childrenRows: Table.DataRow<R, M>[] = redux.reducers.findModelsInData(
+          const childrenRows: Table.ModelRow<R, M>[] = redux.reducers.findModelsInData(
             action,
-            filter(s.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R, M>[],
+            filter(s.data, (r: Table.ModelRow<R, M>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R, M>[],
             groupRow.children
           );
           return {
@@ -370,14 +364,11 @@ export const createTableChangeEventReducer = <
             data: util.replaceInArray<Table.Row<R, M>>(
               s.data,
               { id: groupRow.id },
-              {
-                ...groupRow,
-                data: tabling.rows.updateGroupRowData({
-                  columns: config.columns,
-                  data: groupRow.data,
-                  childrenRows
-                })
-              }
+              tabling.rows.updateGroupRow({
+                childrenRows,
+                columns: config.columns,
+                row: groupRow
+              })
             )
           };
         },
@@ -411,48 +402,42 @@ export const createTableChangeEventReducer = <
       newState = rowAddToGroupReducer(newState, action as Redux.Action<Table.RowAddToGroupEvent>, config.columns);
     } else if (typeguards.isGroupAddEvent(e)) {
       /*
-      When a Group is added to the table, we must first convert that Group model to a GroupRow.  Then,
-      before we insert that row into the table, we must update the rows that are children of that Group
-      such that they reference that Group.  Then, we insert the GroupRow into the table and reorder
-      the table so that the GroupRow is in the appropriate location.
+      When a Group is added to the table, we must first convert that Group model to a
+      GroupRow - then, we need to insert the GroupRow into the set of table data and reapply
+      the ordering scheme on the overall set of table data so the GroupRow aappears in the
+      correct location.
       */
-      const groupRow = rows.createGroupRow<R, M>({
-        columns: config.columns,
-        group: e.payload,
-        childrenRows: filter(
-          newState.data,
-          (r: Table.Row<R, M>) => tabling.typeguards.isModelRow(r) && includes(e.payload.children, r.id)
-        ) as Table.ModelRow<R, M>[]
-      });
-      // Insert the new GroupRow(s) into the table and reorder the rows of the table so that the
-      // GroupRow(s) are in the appropriate location.
       newState = {
         ...newState,
-        data: data.orderTableRows<R, M>([...newState.data, groupRow])
+        data: data.orderTableRows<R, M>([
+          ...newState.data,
+          rows.createGroupRow<R, M>({
+            columns: config.columns,
+            model: e.payload,
+            childrenRows: filter(
+              newState.data,
+              (r: Table.Row<R, M>) => tabling.typeguards.isModelRow(r) && includes(e.payload.children, r.id)
+            ) as Table.ModelRow<R, M>[]
+          })
+        ])
       };
     } else if (typeguards.isGroupUpdateEvent(e)) {
-      /*
-      Note: Eventually we are going to want to try to treat this the same as an update to a regular row.
-
-      Right now, we are only really concerned with changes to the color or names field of the
-      group, as everything else that would trigger mechanical recalculations is handled by separate
-      events.
-      */
-      const groupRow: Table.GroupRow<R> | null = groupRowFromState<R, M, S>(action, newState, `group-${e.payload.id}`);
+      const groupRow: Table.GroupRow<R> | null = groupRowFromState<R, M, S>(
+        action,
+        newState,
+        tabling.rows.groupRowId(e.payload.id)
+      );
       if (!isNil(groupRow)) {
         newState = {
           ...newState,
           data: util.replaceInArray<Table.Row<R>>(
             newState.data,
             { id: groupRow.id },
-            {
-              ...groupRow,
-              groupData: {
-                ...groupRow.groupData,
-                name: e.payload.data.name || groupRow.groupData.name,
-                color: e.payload.data.color || groupRow.groupData.color
-              }
-            }
+            tabling.rows.updateGroupRow({
+              model: e.payload.data,
+              columns: config.columns,
+              row: groupRow
+            })
           )
         };
       }
@@ -486,7 +471,6 @@ export const createTableReducer = <
           groups: response.groups || [],
           data: config.createTableRows({
             ...config,
-            gridId: "data",
             response
           })
         };
@@ -497,7 +481,6 @@ export const createTableReducer = <
           groups: response.groups || [],
           data: data.createTableRows<R, M>({
             ...config,
-            gridId: "data",
             response
           })
         };
@@ -561,7 +544,6 @@ export const createAuthenticatedTableReducer = <
                 s.data,
                 { id: r.id },
                 rows.createModelRow({
-                  gridId: "data",
                   model: payload.models[index],
                   columns: config.columns
                 })

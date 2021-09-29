@@ -32,7 +32,7 @@ export const addCommentToStateAction = createAction<{ data: Model.Comment; paren
 );
 export const removeCommentFromStateAction = createAction<number>(ActionType.Comments.RemoveFromState);
 export const updateCommentInStateAction = createAction<
-  Redux.UpdateActionPayload<Redux.UpdateActionPayload<Model.Comment>>
+  Redux.UpdateActionPayload<Redux.UpdateActionPayload<Model.Comment, number>>
 >(ActionType.Comments.UpdateInState);
 
 export const requestHistoryAction = createAction<null>(ActionType.History.Request);

@@ -48,8 +48,8 @@ export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Mo
   readonly tableId: Table.Id;
   readonly columns: Table.Column<R, M>[];
   readonly data: Table.Row<R, M>[];
-  readonly rowHasCheckboxSelection: ((row: Table.NonGroupRow<R, M>) => boolean) | undefined;
-  readonly onRowSelectionChanged: (rows: Table.DataRow<R, M>[]) => void;
+  readonly rowHasCheckboxSelection: ((row: Table.EditableRow<R, M>) => boolean) | undefined;
+  readonly onRowSelectionChanged: (rows: Table.EditableRow<R, M>[]) => void;
   readonly rowCanExpand?: (row: Table.ModelRow<R, M>) => boolean;
   readonly onRowExpand?: null | ((row: Table.ModelRow<R, M>) => void);
   readonly isCellEditable?: (params: Table.CellCallbackParams<R, M>) => boolean;
@@ -204,10 +204,10 @@ const authenticateDataGrid =
           {
             checkboxSelection: (params: CheckboxSelectionCallbackParams) => {
               const row: Table.Row<R, M> = params.data;
-              return (
-                !tabling.typeguards.isGroupRow(row) &&
-                (isNil(props.rowHasCheckboxSelection) || props.rowHasCheckboxSelection(row))
-              );
+              if (tabling.typeguards.isEditableRow(row)) {
+                return isNil(props.rowHasCheckboxSelection) || props.rowHasCheckboxSelection(row);
+              }
+              return false;
             }
           }
         );
@@ -270,10 +270,12 @@ const authenticateDataGrid =
               const row: Table.Row<R, M> = node.data;
               if (tabling.typeguards.isEditableRow(row)) {
                 callWithColumn(focusedCell.column.getColId(), (c: Table.Column<R, M>) => {
-                  const change = getCellChangeForClear(row, c);
-                  local.flashCells({ columns: [focusedCell.column], rowNodes: [node] });
-                  if (!isNil(change)) {
-                    setCellCutChange(change);
+                  if (tabling.typeguards.isEditableRow(row)) {
+                    const change = getCellChangeForClear(row, c);
+                    local.flashCells({ columns: [focusedCell.column], rowNodes: [node] });
+                    if (!isNil(change)) {
+                      setCellCutChange(change);
+                    }
                   }
                 });
               }
@@ -412,8 +414,8 @@ const authenticateDataGrid =
         return null;
       };
 
-      const clearCell: (row: Table.DataRow<R, M>, def: Table.Column<R, M>) => void = hooks.useDynamicCallback(
-        (row: Table.DataRow<R, M>, def: Table.Column<R, M>) => {
+      const clearCell: (row: Table.EditableRow<R, M>, def: Table.Column<R, M>) => void = hooks.useDynamicCallback(
+        (row: Table.EditableRow<R, M>, def: Table.Column<R, M>) => {
           const change = getCellChangeForClear(row, def);
           if (!isNil(change)) {
             props.onChangeEvent({
@@ -633,7 +635,7 @@ const authenticateDataGrid =
 
       const onCellDoubleClicked = hooks.useDynamicCallback((e: CellDoubleClickedEvent) => {
         const row: Table.Row<R, M> = e.data;
-        if (tabling.typeguards.isEditableRow(row)) {
+        if (tabling.typeguards.isModelRow(row)) {
           callWithColumn(e.column.getColId(), (c: Table.Column<R, M>) => {
             c.onCellDoubleClicked?.(row);
           });

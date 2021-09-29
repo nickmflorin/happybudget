@@ -78,9 +78,7 @@ const AccountTable = ({
     );
     const table: Table.Row<R, M>[] = tabling.data.createTableRows<R, M>({
       response: { models: subaccounts, groups: account.groups },
-      columns,
-      gridId: "data",
-      defaultNullValue: ""
+      columns
     });
 
     let runningIndex = 2;
@@ -101,9 +99,7 @@ const AccountTable = ({
 
             const subTable: Table.Row<R, M>[] = tabling.data.createTableRows<R, M>({
               response: { models: details, groups: subAccount.groups },
-              columns,
-              gridId: "data",
-              defaultNullValue: ""
+              columns
             });
 
             let subRows: JSX.Element[] = reduce(

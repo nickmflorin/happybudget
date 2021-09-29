@@ -120,7 +120,6 @@ export const createTableRows = <R extends Table.RowData, M extends Model.TypedHt
       tabling.rows.createModelRow<R, M>({
         model: m,
         columns: config.columns,
-        gridId: config.gridId,
         getRowChildren: config.getModelRowChildren
       })
     ],
@@ -132,7 +131,7 @@ export const createTableRows = <R extends Table.RowData, M extends Model.TypedHt
     (curr: Table.MarkupRow<R>[], mk: Model.Markup) => [
       ...curr,
       tabling.rows.createMarkupRow<R, M>({
-        markup: mk,
+        model: mk,
         columns: config.columns,
         childrenRows: filter(modelRows, (r: Table.ModelRow<R, M>) => includes(mk.children, r.id))
       })
@@ -146,7 +145,7 @@ export const createTableRows = <R extends Table.RowData, M extends Model.TypedHt
       ...curr,
       tabling.rows.createGroupRow<R, M>({
         columns: config.columns,
-        group: g,
+        model: g,
         childrenRows: filter(modelRows, (r: Table.ModelRow<R, M>) => includes(g.children, r.id))
       })
     ],

@@ -81,7 +81,7 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
         onExportPdf={() => setPreviewModalVisible(true)}
-        onRowExpand={(row: Table.DataRow<R, M>) => history.push(`/budgets/${budgetId}/accounts/${row.id}`)}
+        onRowExpand={(row: Table.ModelRow<R, M>) => history.push(`/budgets/${budgetId}/accounts/${row.id}`)}
         onGroupRows={(rows: (Table.ModelRow<R, M> | Table.MarkupRow<R>)[]) =>
           setGroupAccounts(
             map(

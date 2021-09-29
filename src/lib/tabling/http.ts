@@ -35,7 +35,7 @@ export const bulkPatchPayloadForChange = <
   R extends Table.RowData,
   P,
   M extends Model.HttpModel = Model.HttpModel,
-  RW extends Table.HttpEditableRow<R, M> = Table.HttpEditableRow<R, M>
+  RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
 >(
   change: Table.RowChange<R, M, RW>,
   columns: Table.Column<R, M>[]
@@ -47,7 +47,7 @@ export const bulkPatchPayloads = <
   R extends Table.RowData,
   P,
   M extends Model.HttpModel = Model.HttpModel,
-  RW extends Table.HttpEditableRow<R, M> = Table.HttpEditableRow<R, M>
+  RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
 >(
   p: Table.DataChangePayload<R, M, RW> | Table.DataChangeEvent<R, M, RW>,
   columns: Table.Column<R, M>[]
@@ -152,7 +152,7 @@ export const createBulkUpdatePayload = <
   R extends Table.RowData,
   P,
   M extends Model.HttpModel = Model.HttpModel,
-  RW extends Table.HttpEditableRow<R, M> = Table.HttpEditableRow<R, M>
+  RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
 >(
   /* eslint-disable indent */
   p: Table.DataChangePayload<R, M, RW>,

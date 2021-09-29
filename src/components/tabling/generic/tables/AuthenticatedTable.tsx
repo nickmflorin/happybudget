@@ -72,7 +72,7 @@ const AuthenticatedTable = <
 >(
   props: WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<R, M>, R>, R, M, S>
 ): JSX.Element => {
-  const [selectedRows, setSelectedRows] = useState<Table.DataRow<R, M>[]>([]);
+  const [selectedRows, setSelectedRows] = useState<Table.EditableRow<R, M>[]>([]);
 
   /**
    * Note: Ideally, we would be including the selector in the mechanics of the
@@ -296,7 +296,7 @@ const AuthenticatedTable = <
           columns: columns,
           gridOptions: props.tableGridOptions.data,
           onGridReady: props.onDataGridReady,
-          onRowSelectionChanged: (rows: Table.DataRow<R, M>[]) => setSelectedRows(rows),
+          onRowSelectionChanged: (rows: Table.EditableRow<R, M>[]) => setSelectedRows(rows),
           onChangeEvent: _onChangeEvent,
           rowHasCheckboxSelection: props.rowHasCheckboxSelection
         })}

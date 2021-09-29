@@ -122,10 +122,10 @@ const Columns: Table.Column<R, M>[] = [
   framework.columnObjs.CalculatedColumn<R, M>({
     field: "estimated",
     headerName: "Estimated",
-    getGroupValue: (rows: Table.EditableRow<R, M>[]) => {
+    getGroupValue: (rows: Table.ModelRow<R, M>[]) => {
       return reduce(
         rows,
-        (curr: number, r: Table.EditableRow<R, M>) => curr + r.data.estimated + r.data.fringe_contribution,
+        (curr: number, r: Table.ModelRow<R, M>) => curr + r.data.estimated + r.data.fringe_contribution,
         0.0
       );
     }
@@ -133,8 +133,8 @@ const Columns: Table.Column<R, M>[] = [
   framework.columnObjs.CalculatedColumn<R, M>({
     field: "actual",
     headerName: "Actual",
-    getGroupValue: (rows: Table.EditableRow<R, M>[]) => {
-      return reduce(rows, (curr: number, r: Table.EditableRow<R, M>) => curr + r.data.actual, 0.0);
+    getGroupValue: (rows: Table.ModelRow<R, M>[]) => {
+      return reduce(rows, (curr: number, r: Table.ModelRow<R, M>) => curr + r.data.actual, 0.0);
     }
   }),
   framework.columnObjs.CalculatedColumn<R, M>({

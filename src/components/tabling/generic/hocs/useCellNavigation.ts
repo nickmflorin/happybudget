@@ -8,7 +8,7 @@ export interface UseCellNavigationParams<R extends Table.RowData, M extends Mode
   readonly tableId?: Table.Id;
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
-  readonly includeRowInNavigation?: (row: Table.DataRow<R, M>) => boolean;
+  readonly includeRowInNavigation?: (row: Table.EditableRow<R, M>) => boolean;
   readonly onNewRowRequired?: () => void;
 }
 

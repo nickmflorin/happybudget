@@ -26,9 +26,7 @@ const AccountsTable = ({
 
   const table: Table.Row<R, M>[] = tabling.data.createTableRows<Tables.PdfAccountRowData, Model.PdfAccount>({
     response: { models: data, groups },
-    columns,
-    defaultNullValue: "",
-    gridId: "data"
+    columns
   });
 
   const generateRows = hooks.useDynamicCallback((): JSX.Element[] => {

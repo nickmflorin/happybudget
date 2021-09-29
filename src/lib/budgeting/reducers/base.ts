@@ -68,7 +68,7 @@ export const createBudgetTableChangeEventReducer = <
 
       const markupRow = tabling.rows.createMarkupRow<R, M>({
         columns: config.columns,
-        markup,
+        model: markup,
         childrenRows: redux.reducers.findModelsInData(
           action,
           filter(newState.data, (r: Table.Row<R, M>) => tabling.typeguards.isModelRow(r)),
@@ -89,7 +89,7 @@ export const createBudgetTableChangeEventReducer = <
       const markupRow: Table.MarkupRow<R> | null = markupRowFromState<R, M, S>(
         action,
         newState,
-        `markup-${e.payload.id}`
+        tabling.rows.markupRowId(e.payload.id)
       );
       if (!isNil(markupRow)) {
         newState = {
@@ -97,14 +97,11 @@ export const createBudgetTableChangeEventReducer = <
           data: util.replaceInArray<Table.Row<R>>(
             newState.data,
             { id: markupRow.id },
-            {
-              ...markupRow,
-              data: {
-                ...markupRow.data,
-                identifier: e.payload.data.identifier || markupRow.data.identifier,
-                description: e.payload.data.description || markupRow.data.description
-              }
-            }
+            tabling.rows.updateMarkupRow({
+              row: markupRow,
+              columns: config.columns,
+              model: e.payload.data
+            })
           )
         };
       }

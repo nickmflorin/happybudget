@@ -13,7 +13,7 @@ export interface AuthenticatedGridProps<R extends Table.RowData, M extends Model
   readonly framework?: Table.Framework;
   readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
   readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
-  readonly onRowSelectionChanged?: (rows: Table.DataRow<R, M>[]) => void;
+  readonly onRowSelectionChanged?: (rows: Table.EditableRow<R, M>[]) => void;
 }
 
 /* eslint-disable indent */
@@ -58,7 +58,7 @@ const AuthenticatedGrid = <R extends Table.RowData, M extends Model.HttpModel = 
   const onSelectionChanged: (e: SelectionChangedEvent) => void = hooks.useDynamicCallback(
     (e: SelectionChangedEvent) => {
       if (!isNil(props.apis)) {
-        const selected: Table.DataRow<R, M>[] = props.apis.grid.getSelectedRows();
+        const selected: Table.EditableRow<R, M>[] = props.apis.grid.getSelectedRows();
         props.onRowSelectionChanged?.(selected);
       }
     }

@@ -18,24 +18,21 @@ export const isMarkupRow = <R extends Table.RowData = object>(row: Table.Row<R>)
 export const isMarkupRowId = (id: Table.RowId): id is Table.MarkupRowId =>
   typeof id === "string" && id.startsWith("markup-");
 
-export const isModelRow = <R extends Table.RowData = object, M extends Model.HttpModel = any>(
+export const isModelRow = <R extends Table.RowData = object, M extends Model.HttpModel = Model.HttpModel>(
   row: Table.Row<R, M>
 ): row is Table.ModelRow<R, M> => (row as Table.ModelRow<R, M>).rowType === "model";
 
 export const isModelRowId = (id: Table.RowId): id is Table.ModelRowId => typeof id === "number";
 
-export const isDataRow = <R extends Table.RowData = object, M extends Model.HttpModel = any>(
+export const isDataRow = <R extends Table.RowData = object, M extends Model.HttpModel = Model.HttpModel>(
   row: Table.Row<R, M>
 ): row is Table.DataRow<R, M> => isPlaceholderRow(row) || isModelRow(row);
 
 export const isDataRowId = (id: Table.RowId): id is Table.DataRowId => isModelRowId(id) || isPlaceholderRowId(id);
 
-export const isEditableRow = <R extends Table.RowData = object>(row: Table.Row<R>): row is Table.DataRow<R> =>
-  isPlaceholderRow(row) || isModelRow(row) || isMarkupRow(row);
-
-export const isEditableNonDataRow = <R extends Table.RowData = object>(
-  row: Table.Row<R>
-): row is Table.EditableNonDataRow<R> => isEditableRow(row) && !isDataRow(row);
+export const isEditableRow = <R extends Table.RowData = object, M extends Model.HttpModel = Model.HttpModel>(
+  row: Table.Row<R, M>
+): row is Table.EditableRow<R, M> => (isModelRow(row) && row.gridId === "data") || isMarkupRow(row);
 
 /* eslint-disable indent */
 export const isAuthenticatedActionMap = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(

@@ -48,7 +48,7 @@ export const addCommentToStateAction = createAction<{
 }>(ActionType.SubAccount.Comments.AddToState);
 export const removeCommentFromStateAction = createAction<number>(ActionType.SubAccount.Comments.RemoveFromState);
 export const updateCommentInStateAction = createAction<
-  Redux.UpdateActionPayload<Redux.UpdateActionPayload<Model.Comment>>
+  Redux.UpdateActionPayload<Redux.UpdateActionPayload<Model.Comment, number>>
 >(ActionType.SubAccount.Comments.UpdateInState);
 
 export const requestHistoryAction = createAction<null>(ActionType.SubAccount.History.Request);

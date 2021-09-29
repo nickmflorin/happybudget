@@ -6,12 +6,12 @@ namespace TableUi {
   }
 
   type AuthenticatedDataGridConfig<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = DataGridConfig<R, M> & {
-    readonly rowCanDelete?: (row: Table.DataRow<R, M>) => boolean;
-    readonly includeRowInNavigation?: (row: Table.DataRow<R, M>) => boolean;
+    readonly rowCanDelete?: (row: Table.EditableRow<R, M>) => boolean;
+    readonly includeRowInNavigation?: (row: Table.EditableRow<R, M>) => boolean;
   };
 
   type UnauthenticatedDataGridConfig<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {
-    readonly includeRowInNavigation?: (row: Table.DataRow<R, M>) => boolean;
+    readonly includeRowInNavigation?: (row: Table.EditableRow<R, M>) => boolean;
   };
 
   type FooterGridConfig<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {

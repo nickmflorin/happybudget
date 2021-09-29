@@ -90,8 +90,8 @@ namespace Redux {
   type ModelListActionInstance = { id: ID; count: number };
   type ModelListActionStore = ModelListActionInstance[];
 
-  interface UpdateActionPayload<T extends object, ID extends ID = ID> {
-    id: ID;
+  interface UpdateActionPayload<T extends object, Id extends ID = number> {
+    id: Id;
     data: Partial<T>;
   }
 

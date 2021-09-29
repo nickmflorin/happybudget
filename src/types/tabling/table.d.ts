@@ -73,7 +73,7 @@ namespace Table {
   type MarkupRowId = `markup-${number}`;
   type RowId = ModelRowId | PlaceholderRowId | GroupRowId | MarkupRowId;
   type DataRowId = ModelRowId | PlaceholderRowId;
-  type EditableRowId = DataRowId | MarkupRowId;
+  type EditableRowId = ModelRowId | MarkupRowId;
   type HttpEditableRowId = ModelRowId | MarkupRowId;
 
   type RowNameLabelType = number | string | null;
@@ -89,14 +89,13 @@ namespace Table {
     readonly data: D;
   };
 
-  type ModelRow<R extends RowData, M extends Model.HttpModel = Model.HttpModel, Grid extends GridId = GridId> = IRow<
+  type ModelRow<R extends RowData, M extends Model.HttpModel = Model.HttpModel, Grid extends GridId = "data"> = IRow<
     ModelRowId,
     "model",
     R,
     Grid
   > & {
     readonly children: number[];
-    readonly modelData: Omit<M, "id" | "children">;
   };
   type PlaceholderRow<R extends RowData> = IRow<PlaceholderRowId, "placeholder", R, "data">;
   type GroupRow<R extends RowData> = IRow<GroupRowId, "group", R, "data"> & {
@@ -114,47 +113,13 @@ namespace Table {
     | GroupRow<D>
     | MarkupRow<D>;
 
-  type DataRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> = ModelRow<D, M> | PlaceholderRow<D>;
+  type DataRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> = ModelRow<D, M, "data"> | PlaceholderRow<D>;
   type NonGroupRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> = DataRow<D, M> | MarkupRow<D>;
   type NonMarkupRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> = DataRow<D, M> | GroupRow<D>;
 
   type EditableRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> =
-    | ModelRow<D, M>
-    | PlaceholderRow<D>
+    | ModelRow<D, M, "data">
     | MarkupRow<D>;
-  type HttpEditableRow<D extends RowData, M extends Model.HttpModel = Model.HttpModel> =
-    | ModelRow<D, M>
-    | MarkupRow<D>;
-  type EditableNonDataRow<D extends RowData> = MarkupRow<D>;
-  type EditableRowType = "model" | "placeholder" | "markup";
-
-  type CreateRowDataConfig<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {
-    readonly columns: Table.AnyColumn<R, M>[];
-    readonly defaultNullValue?: NullValue<R>;
-    readonly getValue: (field: keyof R, col: Table.AnyColumn<R, M>) => R[keyof R] | undefined;
-  };
-
-  type UpdateRowDataConfig<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = Omit<
-    CreateRowDataConfig<R, M>,
-    "getValue"
-  > & {
-    readonly data: R;
-    readonly update?: Partial<R>;
-    readonly getValue: (field: keyof R, curr: R[keyof R], col: Table.AnyColumn<R, M>) => R[keyof R] | undefined;
-  };
-
-  type CreateRowConfig<
-    RId extends Table.RowId,
-    TP extends Table.RowType,
-    R extends Table.RowData,
-    M extends Model.HttpModel = Model.HttpModel,
-    Grid extends GridId = GridId
-  > = Omit<CreateRowDataConfig<R, M>, "getValue"> & {
-    readonly id: RId;
-    readonly rowType: TP;
-    readonly data: R;
-    readonly gridId: Grid;
-  };
 
   type CreateTableDataConfig<
     R extends Table.RowData,
@@ -162,9 +127,7 @@ namespace Table {
     C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
   > = {
     readonly response: Http.TableResponse<M>;
-    readonly gridId: Table.GridId;
     readonly columns: C[];
-    readonly defaultNullValue?: NullValue<R>;
     readonly getModelRowChildren?: (m: M) => number[];
   };
 
@@ -229,8 +192,8 @@ namespace Table {
     readonly index?: number;
     readonly domain: ColumnDomain;
     readonly getRowValue?: (m: M) => R[keyof R];
-    readonly getMarkupValue?: keyof Model.Markup | ((rows: Table.NonGroupRow<R, M>[]) => R[keyof R]);
-    readonly getGroupValue?: keyof Model.Group | ((rows: Table.NonGroupRow<R, M>[]) => R[keyof R]);
+    readonly getMarkupValue?: keyof Model.Markup | ((rows: Table.ModelRow<R, M>[]) => R[keyof R]);
+    readonly getGroupValue?: keyof Model.Group | ((rows: Table.ModelRow<R, M>[]) => R[keyof R]);
   }
 
   type OmitColDefParams =
@@ -269,7 +232,7 @@ namespace Table {
     readonly getHttpValue?: (value: any) => any;
     readonly processCellForClipboard?: (row: R) => string;
     readonly processCellFromClipboard?: (value: string) => any;
-    readonly onCellDoubleClicked?: (row: Table.DataRow<R, M>) => void;
+    readonly onCellDoubleClicked?: (row: Table.ModelRow<R, M>) => void;
   }
 
   type AnyColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = Column<R, M> | PdfTable.Column<R, M>;
@@ -318,7 +281,7 @@ namespace Table {
     R,
     M
   > & {
-    readonly selectedRows: Table.DataRow<R, M>[];
+    readonly selectedRows: Table.EditableRow<R, M>[];
   };
 
   type MenuActionCallback<
@@ -529,7 +492,7 @@ namespace Table {
     readonly payload: GroupUpdatePayload;
   };
 
-  type MarkupUpdatePayload = Redux.UpdateActionPayload<Model.Markup>;
+  type MarkupUpdatePayload = Redux.UpdateActionPayload<Model.Markup, number>;
   type MarkupUpdateEvent = {
     readonly type: "markupUpdate";
     readonly payload: MarkupUpdatePayload;
