@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import { useMemo } from "react";
 import { map, isNil, includes, find, filter } from "lodash";
 
@@ -134,6 +135,7 @@ const useContextMenu = <R extends Table.RowData>(
             ...contextMenuItems,
             {
               name: `Remove ${getRowLabel(row) || "Row"} from Group ${getRowName(groupRow) || groupRow.groupData.name}`,
+              icon: '<i class="far fa-folder-minus context-icon"></i>',
               action: () =>
                 params.onChangeEvent({
                   type: "rowRemoveFromGroup",
@@ -169,6 +171,7 @@ const useContextMenu = <R extends Table.RowData>(
               ...contextMenuItems,
               {
                 name: label,
+                icon: '<i class="far fa-folder context-icon"></i>',
                 action: () => onGroupRows(groupableRowsAbove)
               }
             ];
@@ -178,8 +181,10 @@ const useContextMenu = <R extends Table.RowData>(
               ...contextMenuItems,
               {
                 name: "Add to Group",
+                icon: '<i class="far fa-folder-plus context-icon"></i>',
                 subMenu: map(groupRows, (gr: Table.GroupRow<R>) => ({
                   name: `${getRowName(gr) || gr.groupData.name}`,
+                  icon: '<i class="far fa-folders context-icon"></i>',
                   action: () =>
                     params.onChangeEvent({
                       type: "rowAddToGroup",
@@ -205,6 +210,7 @@ const useContextMenu = <R extends Table.RowData>(
             ...contextMenuItems,
             {
               name: "Insert Markup",
+              icon: '<i class="far fa-badge-percent context-icon"></i>',
               action: () => onMarkupRows(markupableRowsAbove)
             }
           ];
@@ -223,6 +229,7 @@ const useContextMenu = <R extends Table.RowData>(
           ...contextMenuItems,
           {
             name: `Delete ${getRowLabel(row)}`,
+            icon: '<i class="far fa-trash-alt context-icon"></i>',
             action: () => params.onChangeEvent({ payload: { rows: row.id }, type: "rowDelete" })
           }
         ];
@@ -240,6 +247,7 @@ const useContextMenu = <R extends Table.RowData>(
           ...contextMenuItems,
           {
             name: `Delete ${getRowLabel(row)}`,
+            icon: '<i class="far fa-trash-alt context-icon"></i>',
             action: () => params.onChangeEvent({ payload: { rows: row.id }, type: "rowDelete" })
           }
         ];
@@ -257,6 +265,7 @@ const useContextMenu = <R extends Table.RowData>(
         ...(!isNil(params.getGroupRowContextMenuItems) ? params.getGroupRowContextMenuItems(row, node) : []),
         {
           name: `Ungroup ${getRowName(row) || row.groupData.name}`,
+          icon: '<i class="far fa-folder-minus context-icon"></i>',
           action: () =>
             params.onChangeEvent({
               type: "rowDelete",
