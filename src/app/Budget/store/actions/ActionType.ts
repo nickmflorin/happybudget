@@ -2,7 +2,6 @@ const ActionType = {
   WipeState: "budget.WipeState",
   SetCommentsHistoryDrawerVisibility: "budget.SetCommentsHistoryDrawerVisibility",
   SetId: "budget.SetId",
-  SetAutoIndex: "budget.SetAutoIndex",
   Loading: "budget.Loading",
   Response: "budget.Response",
   UpdateInState: "budget.UpdateInState",

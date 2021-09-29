@@ -1,7 +1,7 @@
 import { SagaIterator } from "redux-saga";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import { spawn } from "redux-saga/effects";
-import { isNil, filter, intersection } from "lodash";
+import { filter, intersection } from "lodash";
 
 import * as api from "api";
 import { budgeting, tabling } from "lib";
@@ -39,11 +39,6 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
         intersection([c.field, c.colId], ["variance", "actual"]).length === 0
     ),
     selectObjId: (state: Application.Authenticated.Store) => state.template.id,
-    selectAutoIndex: (state: Application.Authenticated.Store) => state.template.autoIndex,
-    selectData: (state: Application.Authenticated.Store) =>
-      !isNil(state["async-TemplateAccountsTable"])
-        ? (state["async-TemplateAccountsTable"].data as Tables.AccountRow[])
-        : ([] as Tables.AccountRow[]),
     actions: ActionMap,
     services: {
       request: api.getTemplateAccounts,

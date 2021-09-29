@@ -29,10 +29,6 @@ const SubAccount = ({ budgetId, budget }: SubAccountProps): JSX.Element => {
   const detail = useSelector(selectDetail);
 
   useEffect(() => {
-    dispatch(actions.setBudgetAutoIndex(true));
-  }, []);
-
-  useEffect(() => {
     if (!isNaN(parseInt(subaccountId))) {
       dispatch(actions.subAccount.setSubAccountIdAction(parseInt(subaccountId)));
     }

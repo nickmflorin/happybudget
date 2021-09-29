@@ -80,8 +80,6 @@ export type AuthenticatedSubAccountsTableTaskConfig<
   readonly services: AuthenticatedSubAccountsTableServiceSet<M, B>;
   readonly selectBudgetId: (state: Application.Authenticated.Store) => number | null;
   readonly selectObjId: (state: Application.Authenticated.Store) => number | null;
-  readonly selectAutoIndex: (state: Application.Authenticated.Store) => boolean;
-  readonly selectData: (state: Application.Authenticated.Store) => Table.Row<R>[];
 };
 
 const isAuthenticatedConfig = <M extends Model.Account | Model.SubAccount, B extends Model.Template | Model.Budget>(
@@ -168,17 +166,9 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
 
   function* bulkCreateTask(objId: number, e: Table.RowAddEvent<R>, errorMessage: string): SagaIterator {
     if (isAuthenticatedConfig(config)) {
-      const data = yield select(config.selectData);
-      const autoIndex = yield select(config.selectAutoIndex);
-
       const requestPayload: Http.BulkCreatePayload<P> = tabling.http.createBulkCreatePayload<R, P, C>(
         e.payload,
-        config.columns,
-        {
-          autoIndex,
-          rows: data,
-          field: "identifier"
-        }
+        config.columns
       );
       yield put(config.actions.saving(true));
       yield put(config.actions.loadingBudget(true));

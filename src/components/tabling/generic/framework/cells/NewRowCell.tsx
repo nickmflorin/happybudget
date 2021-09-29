@@ -1,13 +1,9 @@
-import { util } from "lib";
+import { tabling } from "lib";
 
 import { Icon } from "components";
 import { IconButton } from "components/buttons";
 
-interface NewRowCellProps extends Table.CellProps<any, any, any, null> {
-  onChangeEvent: (e: Table.ChangeEvent<any>) => void;
-}
-
-const NewRowCell = ({ onChangeEvent }: NewRowCellProps): JSX.Element => {
+const NewRowCell = (props: Table.CellProps<any, any, any, null>): JSX.Element => {
   return (
     <IconButton
       className={"green"}
@@ -15,9 +11,9 @@ const NewRowCell = ({ onChangeEvent }: NewRowCellProps): JSX.Element => {
       icon={<Icon icon={"plus-circle"} weight={"solid"} />}
       style={{ margin: "0 auto" }}
       onClick={() =>
-        onChangeEvent({
+        props.onChangeEvent?.({
           type: "rowAdd",
-          payload: [{ id: `placeholder-${util.generateRandomNumericId()}`, data: {} }]
+          payload: { id: tabling.rows.placeholderRowId(), data: props.generateNewRowData?.(props.data) }
         })
       }
     />

@@ -48,6 +48,7 @@ export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Mo
   readonly tableId: Table.Id;
   readonly columns: Table.Column<R, M>[];
   readonly data: Table.Row<R>[];
+  readonly generateNewRowData?: (rows: Table.Row<R>[]) => Partial<R>;
   readonly rowHasCheckboxSelection: ((row: Table.EditableRow<R>) => boolean) | undefined;
   readonly onRowSelectionChanged: (rows: Table.EditableRow<R>[]) => void;
   readonly rowCanExpand?: (row: Table.ModelRow<R>) => boolean;
@@ -104,7 +105,7 @@ const authenticateDataGrid =
             props.columns,
             "body",
             (col: Table.Column<R, M>) => ({
-              cellRendererParams: { ...col.cellRendererParams },
+              cellRendererParams: { ...col.cellRendererParams, generateNewRowData: props.generateNewRowData },
               cellEditorParams: { ...col.cellEditorParams, onDoneEditing },
               editable: (params: Table.CellCallbackParams<R, M>) => {
                 if (!tabling.typeguards.isEditableRow(params.row)) {
@@ -222,7 +223,7 @@ const authenticateDataGrid =
         onNewRowRequired: () =>
           props.onChangeEvent({
             type: "rowAdd",
-            payload: { id: `placeholder-${util.generateRandomNumericId()}`, data: {} }
+            payload: { id: tabling.rows.placeholderRowId(), data: props.generateNewRowData?.(props.data) }
           })
       });
 
@@ -469,10 +470,10 @@ const authenticateDataGrid =
               return null;
             } else {
               return {
-                id: `placeholder-${util.generateRandomNumericId()}`,
+                id: tabling.rows.placeholderRowId(),
                 data: reduce(
                   cols,
-                  (curr: Table.RowAddData<R>, c: Table.Column<R, M>, index: number) =>
+                  (curr: Partial<R>, c: Table.Column<R, M>, index: number) =>
                     !isNil(c.field)
                       ? {
                           ...curr,

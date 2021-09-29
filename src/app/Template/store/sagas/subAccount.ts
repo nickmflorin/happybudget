@@ -62,8 +62,6 @@ const Tasks = budgeting.tasks.subaccounts.createTableTaskSet<Model.SubAccount, M
   ),
   selectBudgetId: (state: Application.Authenticated.Store) => state.template.id,
   selectObjId: (state: Application.Authenticated.Store) => state.template.subaccount.id,
-  selectAutoIndex: (state: Application.Authenticated.Store) => state.template.autoIndex,
-  selectData: (state: Application.Authenticated.Store) => state.template.subaccount.table.data,
   actions: ActionMap,
   services: {
     request: api.getSubAccountSubAccounts,

@@ -25,7 +25,6 @@ namespace Modules {
     interface Store {
       readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<Model.Template>;
-      readonly autoIndex: boolean;
       readonly subaccount: SubAccountStore;
       readonly account: AccountStore;
     }
@@ -62,7 +61,6 @@ namespace Modules {
       readonly detail: Redux.ModelDetailResponseStore<Model.Budget>;
       readonly comments: CommentsStore;
       readonly history: Redux.ListResponseStore<Model.IFieldAlterationEvent>;
-      readonly autoIndex: boolean;
       readonly subaccount: SubAccountStore;
       readonly account: AccountStore;
       readonly actuals: Tables.ActualTableStore;

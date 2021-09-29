@@ -382,7 +382,7 @@ export const createTableChangeEventReducer = <
           ...map(payload, (addition: Table.RowAdd<R>) =>
             rows.createPlaceholderRow<R, M>({
               id: addition.id,
-              data: events.rowAddToRowData<R>(addition),
+              data: addition.data,
               columns: config.columns
             })
           )

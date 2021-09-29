@@ -1,11 +1,9 @@
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { isNil } from "lodash";
 
 import { budgeting } from "lib";
 import { Portal, BreadCrumbs } from "components/layout";
 
-import { actions } from "../../store";
 import AccountsTable from "./AccountsTable";
 
 interface AccountsProps {
@@ -14,12 +12,6 @@ interface AccountsProps {
 }
 
 const Accounts = ({ templateId, template }: AccountsProps): JSX.Element => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(actions.setTemplateAutoIndex(false));
-  }, []);
-
   useEffect(() => {
     if (!isNil(templateId)) {
       budgeting.urls.setTemplateLastVisited(templateId, `/templates/${templateId}/accounts`);

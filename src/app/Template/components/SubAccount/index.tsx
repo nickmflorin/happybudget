@@ -28,10 +28,6 @@ const SubAccount = ({ template, templateId }: SubAccountProps): JSX.Element => {
   const detail = useSelector(selectDetail);
 
   useEffect(() => {
-    dispatch(actions.setTemplateAutoIndex(true));
-  }, []);
-
-  useEffect(() => {
     if (!isNaN(parseInt(subaccountId))) {
       dispatch(actions.subAccount.setSubAccountIdAction(parseInt(subaccountId)));
     }

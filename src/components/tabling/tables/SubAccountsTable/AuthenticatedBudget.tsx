@@ -94,6 +94,14 @@ const AuthenticatedBudgetSubAccountsTable = (
             }
           })
       })}
+      generateNewRowData={(rows: Table.Row<R>[]) => {
+        const dataRows = filter(rows, (r: Table.Row<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[];
+        const numericIdentifiers: number[] = map(
+          filter(dataRows, (r: Table.DataRow<R>) => !isNil(r.data.identifier) && !isNaN(parseInt(r.data.identifier))),
+          (r: Table.DataRow<R>) => parseInt(r.data.identifier as string)
+        );
+        return { identifier: String(Math.max(...numericIdentifiers) + 1) };
+      }}
       onCellFocusChanged={(params: Table.CellFocusChangedParams<R, M>) => {
         /*
         For the ContactCell, we want the contact tag in the cell to be clickable

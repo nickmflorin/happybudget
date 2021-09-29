@@ -417,11 +417,6 @@ namespace Table {
     readonly newValue: V | null;
   };
 
-  type CellAdd<R extends RowData, V extends RowValue<R> = RowValue<R>> = {
-    readonly value: V | null;
-    readonly row: PlaceholderRow<R>;
-  };
-
   type SoloCellChange<
     R extends RowData,
     I extends EditableRowId = EditableRowId,
@@ -438,14 +433,10 @@ namespace Table {
     readonly data: RowChangeData<R>;
   };
 
-  type RowAddData<R extends RowData> = Partial<{ [Property in keyof R]-?: CellAdd<R, RowValue<R>> }>;
-
   type RowAdd<R extends RowData> = {
     readonly id: PlaceholderRowId;
-    readonly data: RowAddData<R>;
+    readonly data?: Partial<R>;
   };
-
-  type Add<R extends RowData> = RowAdd<R> | RowAdd<R>[];
 
   type DataChangePayload<R extends RowData, I extends EditableRowId = EditableRowId> = SingleOrArray<RowChange<R, I>>;
 
@@ -612,6 +603,7 @@ namespace Table {
     readonly value: V;
     readonly gridId: GridId;
     readonly icon?: IconOrElement | ((row: Row<R>) => IconOrElement | undefined | null);
+    readonly generateNewRowData?: (rows: Table.Row<R>[]) => Partial<R>;
     // Note: This is only applied for the data grid rows/cells - so we have to be careful.  We need
     // a better way of establishing which props are available to cells based on which grid they lie
     // in,

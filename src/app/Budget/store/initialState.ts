@@ -43,7 +43,6 @@ export const initialHeaderTemplatesState: Modules.Budget.HeaderTemplatesStore = 
 };
 
 const initialState: Modules.Budget.Store = {
-  autoIndex: false,
   id: null,
   detail: redux.initialState.initialDetailResponseState,
   comments: {

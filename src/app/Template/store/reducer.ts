@@ -20,9 +20,6 @@ const genericReducer = combineReducers({
       updateInState: actions.updateTemplateInStateAction
     }
   }),
-  autoIndex: redux.reducers.createSimpleBooleanReducer({
-    actions: { set: actions.setTemplateAutoIndex }
-  }),
   account: budgeting.reducers.createAccountDetailReducer({
     initialState: initialState.account,
     actions: {

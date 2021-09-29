@@ -1,7 +1,6 @@
 const ActionType = {
   WipeState: "template.WipeState",
   SetId: "template.SetId",
-  SetAutoIndex: "template.SetAutoIndex",
   Loading: "template.Loading",
   Response: "template.Response",
   UpdateInState: "template.UpdateInState",

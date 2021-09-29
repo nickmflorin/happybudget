@@ -1,4 +1,4 @@
-import { isNil, filter } from "lodash";
+import { isNil, filter, map } from "lodash";
 
 import { tabling } from "lib";
 import { framework } from "components/tabling/generic";
@@ -47,6 +47,14 @@ const AuthenticatedTemplateSubAccountsTable = (
         unit: (col: Table.Column<R, M>) =>
           framework.columnObjs.TagSelectColumn<R, M>({ ...col, models: props.subAccountUnits })
       })}
+      generateNewRowData={(rows: Table.Row<R>[]) => {
+        const dataRows = filter(rows, (r: Table.Row<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[];
+        const numericIdentifiers: number[] = map(
+          filter(dataRows, (r: Table.DataRow<R>) => !isNil(r.data.identifier) && !isNaN(parseInt(r.data.identifier))),
+          (r: Table.DataRow<R>) => parseInt(r.data.identifier as string)
+        );
+        return { identifier: String(Math.max(...numericIdentifiers) + 1) };
+      }}
       actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
         {
           icon: "folder",

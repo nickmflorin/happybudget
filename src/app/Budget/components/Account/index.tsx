@@ -29,10 +29,6 @@ const Account = ({ budgetId, budget }: AccountProps): JSX.Element => {
   const detail = useSelector(selectDetail);
 
   useEffect(() => {
-    dispatch(actions.setBudgetAutoIndex(false));
-  }, []);
-
-  useEffect(() => {
     if (!isNaN(parseInt(accountId))) {
       dispatch(actions.account.setAccountIdAction(parseInt(accountId)));
     }

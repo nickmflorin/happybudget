@@ -146,13 +146,3 @@ export const consolidateRowChanges = <R extends Table.RowData, I extends Table.E
     []
   );
 };
-
-/* eslint-disable indent */
-export const rowAddToRowData = <R extends Table.RowData>(add: Table.RowAdd<R>): R =>
-  reduce(
-    add.data,
-    (curr: R, cellAdd: Table.CellAdd<R> | undefined, field: string) => {
-      return !isNil(cellAdd) ? { ...curr, [field as keyof R]: cellAdd.value } : curr;
-    },
-    {} as R
-  );

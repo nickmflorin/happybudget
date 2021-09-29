@@ -1,4 +1,4 @@
-import { isNil, filter, map, reduce } from "lodash";
+import { isNil, filter, reduce } from "lodash";
 
 import * as rows from "./rows";
 
@@ -80,14 +80,14 @@ export const postPayloadForAddition = <R extends Table.RowData, P, M extends Mod
   return reduce(
     cols,
     (p: P, col: Table.Column<R, M>) => {
-      const cellAdd: Table.CellAdd<R> | undefined = addition.data[col.field];
-      // We might not be including data for all of the cells in the row.
-      if (cellAdd !== undefined) {
-        let httpValue = cellAdd.value;
-        if (!isNil(col.getHttpValue)) {
-          httpValue = col.getHttpValue(httpValue);
+      if (!isNil(col.field) && !isNil(addition.data)) {
+        let value: R[keyof R] | undefined = addition.data[col.field];
+        if (!isNil(value)) {
+          if (!isNil(col.getHttpValue)) {
+            value = col.getHttpValue(value);
+          }
+          return { ...p, [col.field as unknown as keyof P]: value as unknown as P[keyof P] };
         }
-        return { ...p, [col.field as unknown as keyof P]: httpValue as unknown as P[keyof P] };
       }
       return p;
     },
@@ -114,37 +114,6 @@ export const postPayloads = <R extends Table.RowData, P, M extends Model.HttpMod
   );
 };
 
-export const createAutoIndexedBulkCreatePayload = <R extends Table.RowData>(
-  /* eslint-disable indent */
-  count: number,
-  rws: Table.Row<R>[],
-  autoIndexField: keyof R
-): Http.BulkCreatePayload<any> => {
-  const converter = (r: R): number | null => {
-    if (!isNil(r[autoIndexField]) && !isNaN(parseInt(String(r[autoIndexField])))) {
-      return parseInt(String(r[autoIndexField]));
-    }
-    return null;
-  };
-  const numericIndices: number[] = filter(
-    map(rws, converter),
-    (identifier: number | null) => identifier !== null
-  ) as number[];
-  // Apparently, Math.max() (no arguments) is not 0, it is -Infinity.  Dumb
-  const baseIndex = numericIndices.length === 0 ? 0 : Math.max(...numericIndices);
-  return {
-    data: Array(count)
-      .fill(0)
-      .map((_, i: number) => ({ identifier: String(baseIndex + i + 1) }))
-  };
-};
-
-type AutoIndexParams<R extends Table.RowData> = {
-  rows: Table.Row<R>[];
-  autoIndex: boolean;
-  field: keyof R;
-};
-
 export const createBulkUpdatePayload = <
   R extends Table.RowData,
   P,
@@ -159,19 +128,7 @@ export const createBulkUpdatePayload = <
 export const createBulkCreatePayload = <R extends Table.RowData, P, M extends Model.HttpModel = Model.HttpModel>(
   /* eslint-disable indent */
   p: Table.RowAddPayload<R>,
-  columns: Table.Column<R, M>[],
-  autoIndexParams?: AutoIndexParams<R>
+  columns: Table.Column<R, M>[]
 ): Http.BulkCreatePayload<P> => {
-  let bulkPayload: Http.BulkCreatePayload<P>;
-
-  if (!isNil(autoIndexParams) && autoIndexParams.autoIndex === true && typeof p === "number") {
-    bulkPayload = createAutoIndexedBulkCreatePayload(
-      p,
-      autoIndexParams.rows,
-      autoIndexParams.field
-    ) as Http.BulkCreatePayload<P>;
-  } else {
-    bulkPayload = { data: postPayloads(p, columns) };
-  }
-  return bulkPayload;
+  return { data: postPayloads(p, columns) };
 };

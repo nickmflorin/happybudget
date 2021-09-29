@@ -27,7 +27,6 @@ export const initialAccountState: Modules.Template.AccountStore = {
 };
 
 const initialState: Modules.Template.Store = {
-  autoIndex: false,
   id: null,
   detail: redux.initialState.initialDetailResponseState,
   account: initialAccountState,

@@ -76,9 +76,6 @@ const genericReducer = combineReducers({
       loading: actions.accounts.loadingHistoryAction
     }
   }),
-  autoIndex: redux.reducers.createSimpleBooleanReducer({
-    actions: { set: actions.setBudgetAutoIndex }
-  }),
   commentsHistoryDrawerOpen: redux.reducers.createSimpleBooleanReducer({
     actions: { set: actions.setCommentsHistoryDrawerVisibilityAction }
   }),

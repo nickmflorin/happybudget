@@ -28,10 +28,6 @@ const Account = ({ templateId, template }: AccountProps): JSX.Element => {
   const detail = useSelector(selectDetail);
 
   useEffect(() => {
-    dispatch(actions.setTemplateAutoIndex(false));
-  }, []);
-
-  useEffect(() => {
     if (!isNaN(parseInt(accountId))) {
       dispatch(actions.account.setAccountIdAction(parseInt(accountId)));
     }
