@@ -254,7 +254,7 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
   return (
     <div className={classNames("ag-theme-alpine", "grid", className)} style={style}>
       <AgGridReact
-        rowHeight={36}
+        // rowHeight={36}
         headerHeight={38}
         cellFlashDelay={100}
         cellFadeDelay={500}
@@ -266,6 +266,7 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
         immutableData={true}
         getRowNodeId={(r: any) => r.id}
         {...props}
+        rowHeight={36}
         navigateToNextCell={navigateToNextCell}
         tabToNextCell={tabToNextCell}
         getRowStyle={
