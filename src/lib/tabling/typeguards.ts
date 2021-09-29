@@ -18,8 +18,9 @@ export const isMarkupRow = <R extends Table.RowData = object>(row: Table.Row<R>)
 export const isMarkupRowId = (id: Table.RowId): id is Table.MarkupRowId =>
   typeof id === "string" && id.startsWith("markup-");
 
-export const isModelRow = <R extends Table.RowData = object>(row: Table.Row<R>): row is Table.ModelRow<R> =>
-  (row as Table.ModelRow<R>).rowType === "model";
+export const isModelRow = <R extends Table.RowData = object, M extends Model.HttpModel = any>(
+  row: Table.Row<R, M>
+): row is Table.ModelRow<R, M> => (row as Table.ModelRow<R, M>).rowType === "model";
 
 export const isModelRowId = (id: Table.RowId): id is Table.ModelRowId => typeof id === "number";
 

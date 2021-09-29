@@ -78,6 +78,8 @@ export const useHiddenColumns = <R extends Table.RowData, M extends Model.HttpMo
 
 export const InitialTableRef: Table.TableInstance<any, any> = {
   getCSVData: (fields?: string[]) => [],
+  getFocusedRow: () => null,
+  getRowsAboveAndIncludingFocusedRow: () => [],
   changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange<any>>, sizeToFit?: boolean) => {},
   applyTableChange: (event: Table.ChangeEvent<any, any>) => {},
   applyGroupColorChange: (group: Model.Group) => {}

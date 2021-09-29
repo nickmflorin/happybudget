@@ -284,6 +284,8 @@ namespace Table {
   }
 
   type TableInstance<R extends RowData = object, M extends Model.HttpModel = any> = {
+    readonly getFocusedRow: () => Table.Row<R, M> | null;
+    readonly getRowsAboveAndIncludingFocusedRow: () => Table.Row<R, M>[];
     readonly applyTableChange: (event: ChangeEvent<R, M>) => void;
     readonly applyGroupColorChange: (group: Model.Group) => void;
     readonly getCSVData: (fields?: string[]) => CSVData;

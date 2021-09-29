@@ -207,6 +207,43 @@ const AuthenticatedTable = <
     getCSVData: props.getCSVData,
     changeColumnVisibility: props.changeColumnVisibility,
     applyTableChange: _onChangeEvent,
+    getRowsAboveAndIncludingFocusedRow: () => {
+      const apis = props.tableApis.get("data");
+      if (!isNil(apis)) {
+        const position: Table.CellPosition | null = apis.grid.getFocusedCell();
+        if (!isNil(position)) {
+          const nodes: Table.RowNode[] = [];
+          let rowIndex = position.rowIndex;
+          let node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(rowIndex);
+          while (rowIndex >= 0 && node !== undefined) {
+            nodes.push(node);
+            rowIndex = rowIndex - 1;
+            if (rowIndex >= 0) {
+              node = apis.grid.getDisplayedRowAtIndex(rowIndex);
+            }
+          }
+          return map(nodes, (nd: Table.RowNode) => {
+            const row: Table.Row<R, M> = nd.data;
+            return row;
+          });
+        }
+      }
+      return [];
+    },
+    getFocusedRow: () => {
+      const apis = props.tableApis.get("data");
+      if (!isNil(apis)) {
+        const position: Table.CellPosition | null = apis.grid.getFocusedCell();
+        if (!isNil(position)) {
+          const node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(position.rowIndex);
+          if (!isNil(node)) {
+            const row: Table.Row<R, M> = node.data;
+            return row;
+          }
+        }
+      }
+      return null;
+    },
     applyGroupColorChange: (group: Model.Group) => {
       const apis = props.tableApis.get("data");
       if (!isNil(apis)) {

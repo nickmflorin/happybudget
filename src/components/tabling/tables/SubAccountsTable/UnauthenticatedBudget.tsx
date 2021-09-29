@@ -48,18 +48,6 @@ const UnauthenticatedBudgetSubAccountsTable = (
         }
       })}
       actions={(params: Table.UnauthenticatedMenuActionParams<R, M>) => [
-        {
-          icon: "folder",
-          disabled: true,
-          label: "Group",
-          isWriteOnly: true
-        },
-        {
-          icon: "badge-percent",
-          disabled: true,
-          label: "Mark Up",
-          isWriteOnly: true
-        },
         ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
         framework.actions.ToggleColumnAction<R, M>(table.current, params),
         framework.actions.ExportCSVAction<R, M>(table.current, params, props.exportFileName)
