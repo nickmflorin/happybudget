@@ -1,13 +1,44 @@
+import { useState, useEffect, useRef } from "react";
 import * as api from "api";
 
 import { MarkupForm } from "components/forms";
 
 import { EditModelModal, EditModelModalProps } from "./generic";
 
-const EditMarkupModal = (props: EditModelModalProps<Model.Markup>): JSX.Element => {
+interface EditMarkupModalProps extends EditModelModalProps<Model.Markup> {
+  readonly id: number;
+  readonly parentId: number;
+  readonly parentType: Model.ParentType;
+}
+
+const EditMarkupModal = <M extends Model.SimpleAccount | Model.SimpleAccount>({
+  id,
+  parentId,
+  parentType,
+  ...props
+}: EditMarkupModalProps): JSX.Element => {
+  const cancelToken = api.useCancelToken();
+  const formRef = useRef<FormInstance<Http.MarkupPayload>>(null);
+  const [availableChildren, setAvailableChildren] = useState<M[]>([]);
+  const [availableChildrenLoading, setAvailableChildrenLoading] = useState(false);
+
+  useEffect(() => {
+    setAvailableChildrenLoading(true);
+    api
+      .getTableChildren<M>(parentId, parentType, { simple: true }, { cancelToken: cancelToken() })
+      .then((response: Http.ListResponse<M>) => {
+        setAvailableChildren(response.data);
+      })
+      .catch((e: Error) => {
+        formRef.current?.handleRequestError(e);
+      })
+      .finally(() => setAvailableChildrenLoading(false));
+  }, [parentId]);
+
   return (
     <EditModelModal<Model.Markup, Http.MarkupPayload>
       {...props}
+      id={id}
       title={"Markup"}
       request={api.getMarkup}
       update={api.updateMarkup}
@@ -16,12 +47,17 @@ const EditMarkupModal = (props: EditModelModalProps<Model.Markup>): JSX.Element 
           { name: "identifier", value: markup.identifier },
           { name: "description", value: markup.description },
           { name: "unit", value: markup.unit?.id || null },
-          { name: "rate", value: markup.rate }
+          { name: "rate", value: markup.rate },
+          { name: "children", value: markup.children }
         ])
       }
     >
       {(m: Model.Markup | null, form: FormInstance<Http.MarkupPayload>) => (
-        <MarkupForm form={form} availableChildren={[]} availableChildrenLoading={false} />
+        <MarkupForm
+          form={form}
+          availableChildren={availableChildren}
+          availableChildrenLoading={availableChildrenLoading}
+        />
       )}
     </EditModelModal>
   );

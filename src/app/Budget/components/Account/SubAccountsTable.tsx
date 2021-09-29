@@ -173,6 +173,8 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
       {!isNil(markupToEdit) && (
         <EditMarkupModal
           id={markupToEdit}
+          parentId={accountId}
+          parentType={"account"}
           open={true}
           onCancel={() => setMarkupToEdit(null)}
           onSuccess={(markup: Model.Markup) => {

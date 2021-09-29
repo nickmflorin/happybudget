@@ -144,6 +144,8 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
       {!isNil(markupToEdit) && (
         <EditMarkupModal
           id={markupToEdit}
+          parentId={budgetId}
+          parentType={"budget"}
           open={true}
           onCancel={() => setMarkupToEdit(null)}
           onSuccess={(markup: Model.Markup) => {

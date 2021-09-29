@@ -7,7 +7,7 @@ namespace Http {
 
   type PayloadFilterSetting = boolean | string | string[];
 
-  interface RequestOptions extends AxiosRequestConfig {
+  interface RequestOptions {
     readonly retries?: number;
     readonly headers?: { [key: string]: string };
     readonly cancelToken?: any;
@@ -25,13 +25,16 @@ namespace Http {
     readonly page?: number;
     readonly page_size?: number;
     readonly no_pagination?: string | number | boolean;
+    readonly simple?: boolean;
     readonly search?: string;
   }
 
-  type NonModelPayloadFields = "created_at" | "updated_at" | "created_by" | "updated_by" | "id";
+  type NonModelPayloadFields = "created_at" | "updated_at" | "created_by" | "updated_by" | "id" | "type";
+
+  type Payload = { [key: string]: any };
 
   type ModelPayload<M extends Model.Model> = {
-    [key in keyof Omit<M, NonModelPayloadFields>]: M[key];
+    [key in keyof Omit<M, NonModelPayloadFields>]?: any;
   };
 
   interface ListResponse<T> {
@@ -45,7 +48,7 @@ namespace Http {
     readonly models: M[];
     readonly groups?: Model.Group[];
     readonly markups?: Model.Markup[];
-  }
+  };
 
   type ErrorType = "unknown" | "http" | "field" | "global" | "auth";
 
@@ -185,15 +188,11 @@ namespace Http {
   }
 
   interface AccountPayload extends Http.ModelPayload<Model.Account> {
-    // This is a write-only field in the backend, so we have to explicitly include
-    // in the payload.
     readonly group?: number | null;
   }
 
-  interface SubAccountPayload extends Omit<Http.ModelPayload<Model.SubAccount>, "unit"> {
-    readonly unit?: Model.SubAccountUnitId | null;
-    // This is a write-only field in the backend, so we have to explicitly include
-    // in the payload.
+  type SubAccountPayload = Omit<Http.ModelPayload<Model.SubAccount>, "unit"> & {
+    readonly unit?: number | null;
     readonly group?: number | null;
   }
 
@@ -225,28 +224,35 @@ namespace Http {
     readonly image?: ArrayBuffer | string | null;
   }
 
-  type BulkCreatePayload<T extends Http.ModelPayload> = { data: Partial<T>[] };
+  type BulkCreatePayload<T extends Http.PayloadObj> = { data: Partial<T>[] };
 
-  type ModelBulkUpdatePayload<T extends Http.ModelPayload> = (Partial<T> | {}) & { readonly id: number };
-  type BulkUpdatePayload<T extends Http.ModelPayload> = { data: ModelBulkUpdatePayload<T>[] };
+  type ModelBulkUpdatePayload<T extends Http.PayloadObj> = (Partial<T> | {}) & { readonly id: number };
+  type BulkUpdatePayload<T extends Http.PayloadObj> = { data: ModelBulkUpdatePayload<T>[] };
 
   type BulkModelResponse<M extends Model.Model> = {
     readonly data: M;
-  }
+  };
 
   type BulkCreateResponse<M extends Model.Model> = {
     readonly data: M[];
-  }
+  };
 
-  type BudgetBulkResponse<B extends Model.Budget | Model.Template, M extends Model.Model> = Http.BulkModelResponse<M> & {
+  type BudgetBulkResponse<
+    B extends Model.Budget | Model.Template,
+    M extends Model.Model
+  > = Http.BulkModelResponse<M> & {
     readonly budget: B;
-  }
+  };
 
   type BulkCreateChildrenResponse<M extends Model.Model, C extends Model.Model> = Http.BulkModelResponse<M> & {
     readonly children: C[];
-  }
+  };
 
-  type BudgetBulkCreateResponse<B extends Model.Budget | Model.Template, M extends Model.Model, C extends Model.Model> = Http.BulkCreateChildrenResponse<M, C> & {
+  type BudgetBulkCreateResponse<
+    B extends Model.Budget | Model.Template,
+    M extends Model.Model,
+    C extends Model.Model
+  > = Http.BulkCreateChildrenResponse<M, C> & {
     readonly budget: B;
-  }
+  };
 }

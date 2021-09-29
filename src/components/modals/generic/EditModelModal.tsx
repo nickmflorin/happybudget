@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useImperativeHandle, forwardRef, ForwardedRef } from "react";
 import { isNil } from "lodash";
 
 import { model } from "lib";
@@ -14,7 +14,8 @@ export interface EditModelModalProps<M extends Model.Model> extends Omit<ModalPr
   readonly onCancel: () => void;
 }
 
-interface PrivateEditModelModalProps<M extends Model.Model, P> extends EditModelModalProps<M> {
+interface PrivateEditModelModalProps<M extends Model.Model, P extends Http.ModelPayload<M>>
+  extends EditModelModalProps<M> {
   readonly title?: string | JSX.Element | ((m: M, form: FormInstance<P>) => JSX.Element | string);
   readonly autoFocusField?: number;
   readonly onModelLoaded?: (m: M) => void;
@@ -25,20 +26,23 @@ interface PrivateEditModelModalProps<M extends Model.Model, P> extends EditModel
   readonly interceptPayload?: (p: P) => P;
 }
 
-const EditModelModal = <M extends Model.Model, P>({
-  id,
-  open,
-  autoFocusField,
-  onModelLoaded,
-  onSuccess,
-  onCancel,
-  request,
-  update,
-  children,
-  interceptPayload,
-  setFormData,
-  ...props
-}: PrivateEditModelModalProps<M, P>): JSX.Element => {
+const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>>(
+  {
+    id,
+    open,
+    autoFocusField,
+    onModelLoaded,
+    onSuccess,
+    onCancel,
+    request,
+    update,
+    children,
+    interceptPayload,
+    setFormData,
+    ...props
+  }: PrivateEditModelModalProps<M, P>,
+  ref: ForwardedRef<FormInstance<P>>
+): JSX.Element => {
   const [form] = Form.useForm<P>({ isInModal: true, autoFocusField });
   const cancelToken = api.useCancelToken();
   const [instance, loading, error] = model.hooks.useModel(id, {
@@ -74,6 +78,10 @@ const EditModelModal = <M extends Model.Model, P>({
       return props.title;
     }
   }, [instance]);
+
+  useImperativeHandle(ref, () => ({
+    ...form
+  }));
 
   return (
     <Modal
@@ -113,4 +121,4 @@ const EditModelModal = <M extends Model.Model, P>({
   );
 };
 
-export default EditModelModal;
+export default forwardRef(EditModelModal) as typeof EditModelModal;
