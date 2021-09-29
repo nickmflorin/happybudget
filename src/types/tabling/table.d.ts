@@ -38,7 +38,7 @@ namespace Table {
   type ColDef = import("@ag-grid-community/core").ColDef;
   type AgColumn = import("@ag-grid-community/core").Column;
   type RowNode = import("@ag-grid-community/core").RowNode;
-  type MenuItemDef = import("@ag-grid-community/core").MenuItemDef;
+  type MenuItemDef = import("@ag-grid-community/core").MenuItemDef | string;
   type GridReadyEvent = import("@ag-grid-community/core").GridReadyEvent;
   type FirstDataRenderedEvent = import("@ag-grid-community/core").FirstDataRenderedEvent;
 

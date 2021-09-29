@@ -234,7 +234,7 @@ const useContextMenu = <R extends Table.RowData>(
           }
         ];
       }
-      return contextMenuItems;
+      return ["copy", ...contextMenuItems];
     });
 
   const getModelRowContextMenuItems: (row: Table.ModelRow<R>, node: Table.RowNode) => Table.MenuItemDef[] =
@@ -253,6 +253,7 @@ const useContextMenu = <R extends Table.RowData>(
         ];
       }
       return [
+        "copy",
         ...contextMenuItems,
         ...getModelRowGroupContextMenuItems(row, node),
         ...getModelRowMarkupContextMenuItems(row, node)
