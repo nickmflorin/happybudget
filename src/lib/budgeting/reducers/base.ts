@@ -1,4 +1,4 @@
-import { isNil, includes, filter } from "lodash";
+import { isNil, includes, filter, reduce } from "lodash";
 
 import { redux, tabling, util } from "lib";
 
@@ -92,15 +92,64 @@ export const createBudgetTableChangeEventReducer = <
         tabling.rows.markupRowId(e.payload.id)
       );
       if (!isNil(markupRow)) {
+        /*
+        We first have to update the MarkupRow with the new Markup model - which
+        will cause the MarkupRow to include updated values for the unit and rate
+        properties.  Once that is done, we need to update the children rows of
+        the MarkupRow to reflect these new values, and then finally update the
+        MarkupRow again to reflect the new children.
+        */
+        let updatedMarkupRow = tabling.rows.updateMarkupRow({
+          row: markupRow,
+          columns: config.columns,
+          model: e.payload.data
+        });
+
+        const childrenRows = filter(newState.data, (r: Table.Row<R, M>) =>
+          tabling.typeguards.isModelRow(r)
+        ) as Table.ModelRow<R, M>[];
+
+        // Update the children rows of the MarkupRow to reflect the new MarkupRow data.
+        newState = reduce(
+          childrenRows,
+          (st: S, r: Table.ModelRow<R, M>) => {
+            const otherMarkupRows = filter(
+              newState.data,
+              (ri: Table.Row<R, M>) =>
+                tabling.typeguards.isMarkupRow(ri) && includes(ri.children, r.id) && ri.id !== updatedMarkupRow.id
+            ) as Table.MarkupRow<R>[];
+            return {
+              ...st,
+              data: util.replaceInArray<Table.Row<R, M>>(
+                st.data,
+                { id: r.id },
+                {
+                  ...r,
+                  data: {
+                    ...r.data,
+                    // Markup contributions get applied to the value after fringes are applied.
+                    markup_contribution: tabling.businessLogic.contributionFromMarkups(
+                      r.data.estimated + r.data.fringe_contribution,
+                      [...otherMarkupRows, updatedMarkupRow]
+                    )
+                  }
+                }
+              )
+            };
+          },
+          newState
+        );
         newState = {
           ...newState,
           data: util.replaceInArray<Table.Row<R>>(
             newState.data,
-            { id: markupRow.id },
+            { id: updatedMarkupRow.id },
             tabling.rows.updateMarkupRow({
-              row: markupRow,
+              row: updatedMarkupRow,
               columns: config.columns,
-              model: e.payload.data
+              childrenRows: filter(newState.data, (r: Table.Row<R, M>) =>
+                tabling.typeguards.isModelRow(r)
+              ) as Table.ModelRow<R, M>[]
             })
           )
         };
