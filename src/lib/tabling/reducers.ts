@@ -290,14 +290,17 @@ export const createTableChangeEventReducer = <
 
       // Note: This grouping may be redundant - we should investigate.
       let changesPerRow: {
-        [key: ID]: { changes: Table.RowChange<R, M>[]; row: Table.ModelRow<R, M> };
+        [key: ID]: { changes: Table.RowChange<R, M>[]; row: Table.EditableRow<R, M> };
       } = {};
       for (let i = 0; i < consolidated.length; i++) {
         if (isNil(changesPerRow[consolidated[i].id])) {
           /* eslint-disable no-loop-func */
-          const r: Table.ModelRow<R, M> | null = redux.reducers.findModelInData<Table.ModelRow<R, M>>(
+          const r: Table.EditableRow<R, M> | null = redux.reducers.findModelInData<Table.EditableRow<R, M>>(
             action,
-            filter(newState.data, (ri: Table.Row<R, M>) => tabling.typeguards.isModelRow(ri)) as Table.ModelRow<R, M>[],
+            filter(newState.data, (ri: Table.Row<R, M>) => tabling.typeguards.isEditableRow(ri)) as Table.EditableRow<
+              R,
+              M
+            >[],
             consolidated[i].id,
             options
           );
