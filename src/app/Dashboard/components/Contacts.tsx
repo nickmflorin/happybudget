@@ -42,7 +42,7 @@ const Contacts = (): JSX.Element => {
     <Page className={"contacts"} title={"My Contacts"}>
       <ConnectedContactsTable
         tableId={"contacts-table"}
-        onRowExpand={(row: Table.ModelRow<R, M>) => setContactToEdit(row.id)}
+        onRowExpand={(row: Table.ModelRow<R>) => setContactToEdit(row.id)}
         exportFileName={"contacts"}
       />
       <CreateContactModal

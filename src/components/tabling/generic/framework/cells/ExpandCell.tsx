@@ -8,9 +8,9 @@ export interface ExpandCellProps<
   M extends Model.HttpModel = Model.HttpModel,
   S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 > extends Table.CellProps<R, M, S, null> {
-  readonly onExpand: (row: Table.ModelRow<R, M>) => void;
-  readonly rowCanExpand?: (row: Table.ModelRow<R, M>) => boolean;
-  readonly alwaysShow?: (row: Table.ModelRow<R, M>) => boolean;
+  readonly onExpand: (row: Table.ModelRow<R>) => void;
+  readonly rowCanExpand?: (row: Table.ModelRow<R>) => boolean;
+  readonly alwaysShow?: (row: Table.ModelRow<R>) => boolean;
   readonly tooltip?: string;
   readonly cannotExpandTooltip?: string;
 }
@@ -30,7 +30,7 @@ const ExpandCell = <
   ...props
 }: ExpandCellProps<R, M, S>): JSX.Element => {
   // This cell renderer will only be allowed if the row is of type model.
-  const row: Table.ModelRow<R, M> = node.data;
+  const row: Table.ModelRow<R> = node.data;
 
   const rowIsHovered = () => {
     const parent = props.eGridCell.parentElement;

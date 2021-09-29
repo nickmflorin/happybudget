@@ -23,7 +23,7 @@ const GroupCell = <
   onEdit,
   ...props
 }: GroupCellProps<R, M, S>): JSX.Element => {
-  const row: Table.Row<R, M> = props.node.data;
+  const row: Table.Row<R> = props.node.data;
 
   const colorDef = useMemo<Table.RowColorDef>(() => {
     return props.getRowColorDef(row);

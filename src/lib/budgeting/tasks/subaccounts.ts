@@ -61,7 +61,7 @@ export type SubAccountsTableActionMap = Redux.TableActionMap<C> & {
 export type AuthenticatedSubAccountsTableActionMap<B extends Model.Template | Model.Budget> =
   Redux.AuthenticatedTableActionMap<R, C> & {
     readonly loadingBudget: boolean;
-    readonly tableChanged: Table.ChangeEvent<R, C>;
+    readonly tableChanged: Table.ChangeEvent<R>;
     readonly updateBudgetInState: Redux.UpdateActionPayload<B>;
     readonly responseSubAccountUnits: Http.ListResponse<Model.Tag>;
     readonly responseFringes: Http.TableResponse<Model.Fringe>;
@@ -81,7 +81,7 @@ export type AuthenticatedSubAccountsTableTaskConfig<
   readonly selectBudgetId: (state: Application.Authenticated.Store) => number | null;
   readonly selectObjId: (state: Application.Authenticated.Store) => number | null;
   readonly selectAutoIndex: (state: Application.Authenticated.Store) => boolean;
-  readonly selectData: (state: Application.Authenticated.Store) => Table.Row<R, C>[];
+  readonly selectData: (state: Application.Authenticated.Store) => Table.Row<R>[];
 };
 
 const isAuthenticatedConfig = <M extends Model.Account | Model.SubAccount, B extends Model.Template | Model.Budget>(
@@ -93,7 +93,7 @@ const isAuthenticatedConfig = <M extends Model.Account | Model.SubAccount, B ext
 /* eslint-disable indent */
 export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B extends Model.Budget | Model.Template>(
   config: SubAccountsTableTaskConfig | AuthenticatedSubAccountsTableTaskConfig<M, B>
-): Redux.TaskMapObject<Redux.TableTaskMap<R, C>> => {
+): Redux.TaskMapObject<Redux.TableTaskMap<R>> => {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
 
@@ -255,12 +255,12 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     }
   }
 
-  function* updateMarkupTask(changes: Table.RowChange<R, C, Table.MarkupRow<R>>[]): SagaIterator {
+  function* updateMarkupTask(changes: Table.RowChange<R, Table.MarkupRowId>[]): SagaIterator {
     if (isAuthenticatedConfig(config) && changes.length !== 0) {
-      const effects: (StrictEffect | null)[] = map(changes, (ch: Table.RowChange<R, C, Table.MarkupRow<R>>) => {
+      const effects: (StrictEffect | null)[] = map(changes, (ch: Table.RowChange<R, Table.MarkupRowId>) => {
         const payload = tabling.http.patchPayloadForChange<R, Http.MarkupPayload, C>(ch, config.columns);
         if (!isNil(payload)) {
-          return call(api.updateMarkup, tabling.rows.markupId(ch.row.id), payload, {
+          return call(api.updateMarkup, tabling.rows.markupId(ch.id), payload, {
             cancelToken: source.token
           });
         }
@@ -402,22 +402,20 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     }
   }
 
-  function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, C>>): SagaIterator {
+  function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R>>): SagaIterator {
     if (isAuthenticatedConfig(config)) {
       const objId = yield select(config.selectObjId);
       if (!isNil(action.payload) && !isNil(objId)) {
-        const e: Table.DataChangeEvent<R, C> = action.payload;
-        const merged = tabling.events.consolidateTableChange<R, C>(e.payload);
+        const e: Table.DataChangeEvent<R> = action.payload;
+        const merged = tabling.events.consolidateRowChanges<R>(e.payload);
 
-        const markupChanges: Table.RowChange<R, C, Table.MarkupRow<R>>[] = filter(
-          merged,
-          (value: Table.RowChange<R, C>) => tabling.typeguards.isMarkupRow(value.row)
-        ) as Table.RowChange<R, C, Table.MarkupRow<R>>[];
+        const markupChanges: Table.RowChange<R, Table.MarkupRowId>[] = filter(merged, (value: Table.RowChange<R>) =>
+          tabling.typeguards.isMarkupRowId(value.id)
+        ) as Table.RowChange<R, Table.MarkupRowId>[];
 
-        const dataChanges: Table.RowChange<R, C, Table.ModelRow<R, C>>[] = filter(
-          merged,
-          (value: Table.RowChange<R, C>) => tabling.typeguards.isModelRow(value.row)
-        ) as Table.RowChange<R, C, Table.ModelRow<R, C>>[];
+        const dataChanges: Table.RowChange<R, Table.ModelRowId>[] = filter(merged, (value: Table.RowChange<R>) =>
+          tabling.typeguards.isModelRowId(value.id)
+        ) as Table.RowChange<R, Table.ModelRowId>[];
 
         yield fork(updateMarkupTask, markupChanges);
         if (dataChanges.length !== 0) {

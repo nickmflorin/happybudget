@@ -48,7 +48,7 @@ type TableConfigurationProvidedProps<R extends Table.RowData, M extends Model.Ht
   readonly rowHeight?: number;
   readonly menuPortalId?: string;
   readonly showPageFooter?: boolean;
-  readonly rowCanExpand?: (row: Table.ModelRow<R, M>) => boolean;
+  readonly rowCanExpand?: (row: Table.ModelRow<R>) => boolean;
   readonly getCSVData: () => CSVData;
   readonly onDataGridReady: (event: GridReadyEvent) => void;
   readonly onFooterGridReady: (event: GridReadyEvent) => void;
@@ -78,8 +78,8 @@ export type TableConfigurationProps<R extends Table.RowData, M extends Model.Htt
   readonly framework?: Table.Framework;
   readonly className?: Table.GeneralClassName;
   readonly columns: Table.Column<R, M>[];
-  readonly rowCanExpand?: (row: Table.ModelRow<R, M>) => boolean;
-  readonly onRowExpand?: null | ((row: Table.ModelRow<R, M>) => void);
+  readonly rowCanExpand?: (row: Table.ModelRow<R>) => boolean;
+  readonly onRowExpand?: null | ((row: Table.ModelRow<R>) => void);
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
   readonly isCellSelectable?: (params: Table.CellCallbackParams<R, M>) => boolean;
   readonly pinFirstColumn?: boolean;
@@ -155,7 +155,7 @@ const configureTable = <
               // at the top Table level than at the Grid level.
               cellRendererParams: {
                 ...props.expandColumn?.cellRendererParams,
-                onExpand: (row: Table.ModelRow<R, M>) => tabling.typeguards.isDataRow(row) && props.onRowExpand?.(row),
+                onExpand: (row: Table.ModelRow<R>) => tabling.typeguards.isDataRow(row) && props.onRowExpand?.(row),
                 rowCanExpand: props.rowCanExpand,
                 tooltip: props.expandCellTooltip
               }
@@ -180,7 +180,7 @@ const configureTable = <
     }, [hooks.useDeepEqualMemo(props.columns), props.pinFirstColumn, hasExpandColumn, props.onRowExpand]);
 
     const processCellForClipboard = hooks.useDynamicCallback(
-      (column: Table.Column<R, M>, row: Table.DataRow<R, M>, value?: any) => {
+      (column: Table.Column<R, M>, row: Table.DataRow<R>, value?: any) => {
         const processor = column.processCellForClipboard;
         if (!isNil(processor)) {
           return processor(row.data);
@@ -205,7 +205,7 @@ const configureTable = <
         );
         const csvData: CSVData = [map(cs, (col: Table.Column<R, M>) => col.headerName || "")];
         apis.grid.forEachNode((node: RowNode, index: number) => {
-          const row: Table.Row<R, M> = node.data;
+          const row: Table.Row<R> = node.data;
           if (typeguards.isDataRow(row)) {
             csvData.push(
               reduce(

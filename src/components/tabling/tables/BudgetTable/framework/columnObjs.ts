@@ -28,7 +28,7 @@ export const IdentifierColumn = <R extends Table.RowData, M extends Model.HttpMo
     suppressSizeToFit: true,
     cellStyle: { textAlign: "left" },
     colSpan: (params: Table.ColSpanParams<R, M>) => {
-      const row: Table.Row<R, M> = params.data;
+      const row: Table.Row<R> = params.data;
       if (tabling.typeguards.isGroupRow(row)) {
         /*
         Note: We have to look at all of the visible columns that are present up until

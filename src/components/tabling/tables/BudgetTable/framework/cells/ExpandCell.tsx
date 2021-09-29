@@ -13,7 +13,7 @@ const ExpandCell = <
   return (
     <GenericExpandCell
       {...props}
-      alwaysShow={(row: Table.ModelRow<R, M>) => !isNil(row.children) && row.children.length !== 0}
+      alwaysShow={(row: Table.ModelRow<R>) => !isNil(row.children) && row.children.length !== 0}
     />
   );
 };

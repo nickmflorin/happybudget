@@ -9,17 +9,17 @@ import { tabling } from "lib";
 import { AuthenticatedBudgetDataGrid } from "../grids";
 import { Framework } from "../framework";
 
-export type AuthenticatedBudgetTableProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = Omit<
-  AuthenticatedTableProps<R, M>,
-  "children"
-> & {
+export type AuthenticatedBudgetTableProps<
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel = Model.TypedHttpModel
+> = Omit<AuthenticatedTableProps<R, M>, "children"> & {
   readonly onBack?: () => void;
   // Markup is currently not applicable for Templates.
   readonly onEditMarkup?: (row: Table.MarkupRow<R>) => void;
 };
 
 /* eslint-disable indent */
-const AuthenticatedBudgetTable = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>({
+const AuthenticatedBudgetTable = <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>({
   onEditMarkup,
   ...props
 }: AuthenticatedBudgetTableProps<R, M>): JSX.Element => {

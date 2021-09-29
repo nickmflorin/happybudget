@@ -22,7 +22,7 @@ export type ActualsTableTaskConfig = Table.TaskConfig<R, M, ActualsTableActionMa
   readonly selectTreeCache: (state: Application.Authenticated.Store) => Redux.SearchCache<Model.SubAccountTreeNode>;
 };
 
-export type ActualsTableTaskMap = Redux.TableTaskMap<R, M> & {
+export type ActualsTableTaskMap = Redux.TableTaskMap<R> & {
   readonly requestSubAccountsTree: null;
 };
 
@@ -143,7 +143,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
 
   function* bulkUpdateTask(
     budgetId: number,
-    e: Table.ChangeEvent<R, M>,
+    e: Table.ChangeEvent<R>,
     requestPayload: Http.BulkUpdatePayload<P>,
     errorMessage: string
   ): SagaIterator {
@@ -200,19 +200,13 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
     }
   }
 
-  function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, M>>): SagaIterator {
+  function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R>>): SagaIterator {
     const budgetId = yield select(config.selectObjId);
     if (!isNil(action.payload) && !isNil(budgetId)) {
-      const e: Table.DataChangeEvent<R, M> = action.payload;
-      const merged = tabling.events.consolidateTableChange(e.payload);
-
-      const dataChanges: Table.RowChange<R, M, Table.ModelRow<R, M>>[] = filter(
-        merged,
-        (value: Table.RowChange<R, M>) => tabling.typeguards.isModelRow(value.row)
-      ) as Table.RowChange<R, M, Table.ModelRow<R, M>>[];
-
-      if (dataChanges.length !== 0) {
-        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(dataChanges, config.columns);
+      const e = action.payload as Table.DataChangeEvent<R, Table.ModelRowId>;
+      const merged = tabling.events.consolidateRowChanges(e.payload);
+      if (merged.length !== 0) {
+        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns);
         yield fork(bulkUpdateTask, budgetId, e, requestPayload, "There was an error updating the rows.");
       }
     }

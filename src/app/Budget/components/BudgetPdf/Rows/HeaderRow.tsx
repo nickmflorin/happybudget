@@ -13,19 +13,19 @@ const HeaderRow = <R extends Table.RowData, M extends Model.HttpModel = Model.Ht
   const headerRow = useMemo(() => {
     return reduce(
       props.columns,
-      (obj: { [key: string]: any }, col: PdfTable.Column<R, M>) => {
+      (obj: { [key: string]: any }, col: Table.PdfColumn<R, M>) => {
         obj[col.field as string] = col.headerName;
         return obj;
       },
       {}
-    ) as Table.Row<R, M>;
+    ) as Table.Row<R>;
   }, [props.columns]);
   return (
     <Row<R, M>
       {...props}
       className={classNames("header-tr", props.className)}
       row={headerRow}
-      renderCell={(params: { column: PdfTable.Column<R, M>; location: PdfTable.CellLocation }) => {
+      renderCell={(params: { column: Table.PdfColumn<R, M>; location: Table.PdfCellLocation }) => {
         return (
           <HeaderCell<R, M>
             key={`header-${params.location.index}-${params.location.colIndex}`}

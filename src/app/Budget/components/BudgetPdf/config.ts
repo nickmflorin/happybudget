@@ -1,6 +1,6 @@
 import { tabling } from "lib";
 
-export const AccountColumns: PdfTable.Column<Tables.PdfAccountRowData, Model.PdfAccount>[] = [
+export const AccountColumns: Table.PdfColumn<Tables.PdfAccountRowData, Model.PdfAccount>[] = [
   {
     domain: "pdf",
     field: "identifier",
@@ -32,7 +32,7 @@ export const AccountColumns: PdfTable.Column<Tables.PdfAccountRowData, Model.Pdf
   }
 ];
 
-export const SubAccountColumns: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>[] = [
+export const SubAccountColumns: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>[] = [
   {
     domain: "pdf",
     field: "identifier",

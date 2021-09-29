@@ -6,8 +6,8 @@ export type RowProps<
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel
 > = StandardPdfComponentProps & {
-  readonly columns: PdfTable.Column<R, M>[];
-  readonly row: Table.Row<R, M>;
+  readonly columns: Table.PdfColumn<R, M>[];
+  readonly row: Table.Row<R>;
   readonly index: number;
   readonly columnIndent?: number;
 };
@@ -15,15 +15,15 @@ export type RowProps<
 const Row = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   props: RowProps<R, M> & {
     readonly renderCell: (params: {
-      column: PdfTable.Column<R, M>;
+      column: Table.PdfColumn<R, M>;
       indented: boolean;
-      location: PdfTable.CellLocation;
+      location: Table.PdfCellLocation;
     }) => JSX.Element;
   }
 ): JSX.Element => {
   return (
     <View style={props.style} className={classNames("tr", props.className)} wrap={false}>
-      {map(props.columns, (column: PdfTable.Column<R, M>, colIndex: number) => {
+      {map(props.columns, (column: Table.PdfColumn<R, M>, colIndex: number) => {
         return props.renderCell({
           column,
           indented: !isNil(props.columnIndent) ? colIndex < props.columnIndent : false,

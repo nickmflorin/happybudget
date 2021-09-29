@@ -8,10 +8,10 @@ import BodyRow from "./BodyRow";
 const FooterRow = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   props: Omit<RowProps<R, M>, "row">
 ): JSX.Element => {
-  const footerRow = useMemo((): Table.Row<R, M> => {
+  const footerRow = useMemo((): Table.Row<R> => {
     return reduce(
       props.columns,
-      (obj: { [key: string]: any }, col: PdfTable.Column<R, M>) => {
+      (obj: { [key: string]: any }, col: Table.PdfColumn<R, M>) => {
         if (!isNil(col.footer) && !isNil(col.footer.value)) {
           obj[col.field as string] = col.footer.value;
         } else {
@@ -20,7 +20,7 @@ const FooterRow = <R extends Table.RowData, M extends Model.HttpModel = Model.Ht
         return obj;
       },
       {}
-    ) as Table.Row<R, M>;
+    ) as Table.Row<R>;
   }, [props.columns]);
   return (
     <BodyRow<R, M>

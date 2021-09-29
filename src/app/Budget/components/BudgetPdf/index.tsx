@@ -17,13 +17,13 @@ interface BudgetPdfProps {
 }
 
 const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element => {
-  const accountColumns = useMemo<PdfTable.Column<Tables.PdfAccountRowData, Model.PdfAccount>[]>(() => {
+  const accountColumns = useMemo<Table.PdfColumn<Tables.PdfAccountRowData, Model.PdfAccount>[]>(() => {
     const columns = tabling.columns.mergeColumns<
-      PdfTable.Column<Tables.PdfAccountRowData, Model.PdfAccount>,
+      Table.PdfColumn<Tables.PdfAccountRowData, Model.PdfAccount>,
       Tables.PdfAccountRowData,
       Model.PdfAccount
     >(AccountColumns, {
-      estimated: (col: PdfTable.Column<Tables.PdfAccountRowData, Model.PdfAccount>) => ({
+      estimated: (col: Table.PdfColumn<Tables.PdfAccountRowData, Model.PdfAccount>) => ({
         ...col,
         footer: {
           value: !isNil(budget.estimated) ? budget.estimated : 0.0
@@ -31,20 +31,20 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
       })
     });
     return tabling.columns.orderColumns<
-      PdfTable.Column<Tables.PdfAccountRowData, Model.PdfAccount>,
+      Table.PdfColumn<Tables.PdfAccountRowData, Model.PdfAccount>,
       Tables.PdfAccountRowData,
       Model.PdfAccount
     >(columns);
   }, []);
 
   const subaccountColumns = useMemo(() => {
-    return (account: Model.PdfAccount): PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>[] => {
+    return (account: Model.PdfAccount): Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>[] => {
       let columns = tabling.columns.mergeColumns<
-        PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>,
+        Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>,
         Tables.PdfSubAccountRowData,
         Model.PdfSubAccount
       >(SubAccountColumns, {
-        description: (col: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
+        description: (col: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
           ...col,
           footer: {
             /* eslint-disable indent */
@@ -63,9 +63,9 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
             return { value: "Total" };
           }
         }),
-        contact: (col: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
+        contact: (col: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
           ...col,
-          cellRenderer: (params: PdfTable.CellCallbackParams<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => {
+          cellRenderer: (params: Table.PdfCellCallbackParams<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => {
             if (params.rawValue !== null) {
               const contact: Model.Contact | undefined = find(contacts, { id: params.rawValue });
               if (!isNil(contact)) {
@@ -82,12 +82,12 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
             return <span></span>;
           }
         }),
-        unit: (col: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
+        unit: (col: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
           ...col,
-          cellRenderer: (params: PdfTable.CellCallbackParams<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) =>
+          cellRenderer: (params: Table.PdfCellCallbackParams<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) =>
             params.rawValue !== null ? <Tag model={params.rawValue} /> : <span></span>
         }),
-        estimated: (col: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
+        estimated: (col: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
           ...col,
           footer: {
             value: !isNil(account.estimated) ? account.estimated : 0.0
@@ -101,30 +101,30 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
       // Calculate Total Column Width Before Filtering Out Unused Columns
       const totalWidth = reduce(
         columns,
-        (prev: number, column: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) =>
+        (prev: number, column: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) =>
           prev + column.width,
         0.0
       );
       if (totalWidth !== 0.0) {
         // Normalize Column Widths Before Filtering Out Unused Columns
-        columns = map(columns, (column: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
+        columns = map(columns, (column: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
           ...column,
           width: column.width / totalWidth
         }));
         // Filter Out Unused Columns
-        columns = filter(columns, (column: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) =>
+        columns = filter(columns, (column: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) =>
           includes(options.columns, column.field as string)
         );
         // Calculate Total Column Width After Filtering Out Unused Columns
         const totalWidthWithFilter = reduce(
           columns,
-          (prev: number, column: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) =>
+          (prev: number, column: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) =>
             prev + column.width,
           0.0
         );
         if (totalWidthWithFilter !== 0.0) {
           // Normalize Column Widths After Filtering Out Unused Columns
-          columns = map(columns, (column: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
+          columns = map(columns, (column: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
             ...column,
             width: column.width / totalWidthWithFilter
           }));
@@ -132,7 +132,7 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
       }
       // Order the Columns
       return tabling.columns.orderColumns<
-        PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>,
+        Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>,
         Tables.PdfSubAccountRowData,
         Model.PdfSubAccount
       >(columns);

@@ -8,8 +8,8 @@ type M = Model.Account;
 
 export type AccountDetailActionMap = Omit<Redux.ModelDetailResponseActionMap<M>, "updateInState"> & {
   readonly setId: number | null;
-  readonly tableChanged?: Table.ChangeEvent<Tables.SubAccountRowData, Model.SubAccount>;
-  readonly fringesTableChanged?: Table.ChangeEvent<Tables.FringeRowData, Model.Fringe>;
+  readonly tableChanged?: Table.ChangeEvent<Tables.SubAccountRowData>;
+  readonly fringesTableChanged?: Table.ChangeEvent<Tables.FringeRowData>;
 };
 
 type MinimalAccountStore = {
@@ -55,19 +55,13 @@ export const createAccountDetailReducer = <S extends MinimalAccountStore>(
             data: {
               ...newState.detail.data,
               estimated: reduce(
-                filter(newState.table.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<
-                  R,
-                  M
-                >[],
-                (curr: number, row: Table.DataRow<R, M>) => curr + (row.data.estimated || 0),
+                filter(newState.table.data, (r: Table.Row<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[],
+                (curr: number, row: Table.DataRow<R>) => curr + (row.data.estimated || 0),
                 0
               ),
               actual: reduce(
-                filter(newState.table.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<
-                  R,
-                  M
-                >[],
-                (curr: number, row: Table.DataRow<R, M>) => curr + (row.data.actual || 0),
+                filter(newState.table.data, (r: Table.Row<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[],
+                (curr: number, row: Table.DataRow<R>) => curr + (row.data.actual || 0),
                 0
               )
             }

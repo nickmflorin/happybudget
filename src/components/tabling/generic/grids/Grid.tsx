@@ -89,13 +89,13 @@ type UseAgProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpM
   readonly onPasteEnd?: (event: PasteEndEvent) => void;
   readonly onCellValueChanged?: (e: CellValueChangedEvent) => void;
   readonly fillOperation?: (params: FillOperationParams) => boolean;
-  readonly getContextMenuItems?: (row: Table.Row<R, M>, node: Table.RowNode) => Table.MenuItemDef[];
+  readonly getContextMenuItems?: (row: Table.Row<R>, node: Table.RowNode) => Table.MenuItemDef[];
 };
 
 export interface GridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
   extends UseAgProps<R, M> {
   readonly id: Table.GridId;
-  readonly data?: Table.Row<R, M>[];
+  readonly data?: Table.Row<R>[];
   readonly hiddenColumns: (keyof R | string)[];
   readonly gridOptions: Table.GridOptions;
   readonly indexColumn?: Partial<Table.Column<R, M>>;
@@ -105,7 +105,7 @@ export interface GridProps<R extends Table.RowData, M extends Model.HttpModel = 
   readonly rowClass?: Table.RowClassName;
   readonly rowHeight?: number;
   readonly onCellDoubleClicked?: (e: CellDoubleClickedEvent) => void;
-  readonly getContextMenuItems?: (row: Table.Row<R, M>, node: Table.RowNode) => Table.MenuItemDef[];
+  readonly getContextMenuItems?: (row: Table.Row<R>, node: Table.RowNode) => Table.MenuItemDef[];
   readonly navigateToNextCell?: (params: NavigateToNextCellParams) => Table.CellPosition;
   readonly processCellForClipboard?: (params: ProcessCellForExportParams) => string;
   readonly tabToNextCell?: (params: TabToNextCellParams) => Table.CellPosition;
@@ -205,7 +205,7 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
                 : undefined,
             colSpan: (params: ColSpanParams) => (!isNil(col.colSpan) ? col.colSpan({ ...params, columns }) : 1),
             editable: (params: EditableCallbackParams) => {
-              const row: Table.Row<R, M> = params.node.data;
+              const row: Table.Row<R> = params.node.data;
               return typeof col.editable === "function"
                 ? col.editable({ row, column: col })
                 : isNil(col.editable)
@@ -213,7 +213,7 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
                 : col.editable;
             },
             cellClass: (params: CellClassParams) => {
-              const row: Table.Row<R, M> = params.node.data;
+              const row: Table.Row<R> = params.node.data;
               if (tabling.typeguards.isEditableRow(row)) {
                 /* eslint-disable indent */
                 const isSelectable = isNil(col.selectable)
@@ -277,7 +277,7 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
         }
         getContextMenuItems={(params: GetContextMenuItemsParams) => {
           if (!isNil(props.getContextMenuItems) && !isNil(params.node)) {
-            const row: Table.Row<R, M> = params.node.data;
+            const row: Table.Row<R> = params.node.data;
             return props.getContextMenuItems(row, params.node);
           }
           return [];
@@ -285,7 +285,7 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
         getRowClass={(params: RowClassParams) =>
           tabling.aggrid.mergeClassNames<RowClassParams>(params, "row", rowClass)
         }
-        rowData={map(data, (r: Table.Row<R, M>) => {
+        rowData={map(data, (r: Table.Row<R>) => {
           /*
           We have to deep clone the row data because it is being pulled directly from the store
           and as such, is immutable.  If we did not do this, than AG Grid would be applying the

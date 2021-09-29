@@ -10,7 +10,7 @@ export const ExportPdfAction = (onExport: () => void): Table.MenuActionObj => ({
 
 /* eslint-disable indent */
 export const ExportCSVAction = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
-  table: Table.TableInstance<R, M>,
+  table: Table.TableInstance<R>,
   params: Table.MenuActionParams<R, M>,
   exportFileName: string
 ): Table.MenuActionObj => ({
@@ -41,7 +41,7 @@ export const ExportCSVAction = <R extends Table.RowData, M extends Model.HttpMod
 });
 
 export const ToggleColumnAction = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
-  table: Table.TableInstance<R, M>,
+  table: Table.TableInstance<R>,
   params: Table.MenuActionParams<R, M>
 ): Table.MenuActionObj => ({
   /* eslint-disable indent */

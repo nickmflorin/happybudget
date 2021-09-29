@@ -13,7 +13,7 @@ interface ContactEditorProps<
   M extends Model.HttpModel = Model.HttpModel,
   S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 > extends Table.EditorParams<R, M, S> {
-  readonly onNewContact: (params: { name?: string; change: Omit<Table.SoloCellChange<R, M>, "newValue"> }) => void;
+  readonly onNewContact: (params: { name?: string; change: Omit<Table.SoloCellChange<R>, "newValue"> }) => void;
 }
 
 /* eslint-disable indent */
@@ -45,7 +45,7 @@ const ContactEditor = <
         {
           id: "add-contact",
           onClick: () => {
-            const row: Table.DataRow<R, M> = props.node.data;
+            const row: Table.DataRow<R> = props.node.data;
             if (tabling.typeguards.isModelRow(row) && !isNil(props.column.field)) {
               const searchValue = editor.menu.current.getSearchValue();
               editor.stopEditing(false);
@@ -55,8 +55,7 @@ const ContactEditor = <
                   change: {
                     oldValue: (row.data.contact || null) as unknown as Table.RowValue<R>,
                     field: props.column.field,
-                    id: row.id,
-                    row
+                    id: row.id
                   }
                 });
               } else {
@@ -64,8 +63,7 @@ const ContactEditor = <
                   change: {
                     oldValue: (row.data.contact || null) as unknown as Table.RowValue<R>,
                     field: props.column.field,
-                    id: row.id,
-                    row
+                    id: row.id
                   }
                 });
               }

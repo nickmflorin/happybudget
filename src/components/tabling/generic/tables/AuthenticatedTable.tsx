@@ -19,24 +19,24 @@ import TableWrapper from "./TableWrapper";
 
 export type AuthenticatedTableDataGridProps<
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel
+  M extends Model.TypedHttpModel = Model.TypedHttpModel
 > = AuthenticateDataGridProps<R, M> & DataGridProps<R, M> & Omit<AuthenticatedGridProps<R, M>, "id">;
 
 export type AuthenticatedTableProps<
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel
+  M extends Model.TypedHttpModel = Model.TypedHttpModel
 > = TableConfigurationProps<R, M> &
   Omit<
     AuthenticateDataGridProps<R, M>,
     "onChangeEvent" | "columns" | "data" | "apis" | "onRowSelectionChanged" | "rowHasCheckboxSelection"
   > & {
-    readonly table?: NonNullRef<Table.TableInstance<R, M>>;
+    readonly table?: NonNullRef<Table.TableInstance<R>>;
     readonly actions?: Table.AuthenticatedMenuActions<R, M>;
     readonly excludeColumns?:
       | SingleOrArray<keyof R | string | ((col: Table.Column<R, M>) => boolean)>
       | ((col: Table.Column<R, M>) => boolean);
     readonly children: RenderPropChild<AuthenticatedTableDataGridProps<R, M>>;
-    readonly rowHasCheckboxSelection?: (row: Table.NonGroupRow<R, M>) => boolean;
+    readonly rowHasCheckboxSelection?: (row: Table.EditableRow<R>) => boolean;
   };
 
 const TableFooterGrid = FooterGrid<any, any, AuthenticatedGridProps<any, any>>({
@@ -46,7 +46,7 @@ const TableFooterGrid = FooterGrid<any, any, AuthenticatedGridProps<any, any>>({
   rowClass: "row--table-footer",
   getFooterColumn: (col: Table.Column<any>) => col.footer || null
 })(AuthenticatedGrid) as {
-  <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
     props: Omit<AuthenticatedGridProps<R, M>, "id">
   ): JSX.Element;
 };
@@ -59,7 +59,7 @@ const PageFooterGrid = FooterGrid<any, any, AuthenticatedGridProps<any, any>>({
   rowHeight: 28,
   getFooterColumn: (col: Table.Column<any>) => col.page || null
 })(AuthenticatedGrid) as {
-  <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
     props: Omit<AuthenticatedGridProps<R, M>, "id">
   ): JSX.Element;
 };
@@ -67,12 +67,12 @@ const PageFooterGrid = FooterGrid<any, any, AuthenticatedGridProps<any, any>>({
 /* eslint-disable indent */
 const AuthenticatedTable = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.TypedHttpModel = Model.TypedHttpModel,
   S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 >(
   props: WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<R, M>, R>, R, M, S>
 ): JSX.Element => {
-  const [selectedRows, setSelectedRows] = useState<Table.EditableRow<R, M>[]>([]);
+  const [selectedRows, setSelectedRows] = useState<Table.EditableRow<R>[]>([]);
 
   /**
    * Note: Ideally, we would be including the selector in the mechanics of the
@@ -120,7 +120,7 @@ const AuthenticatedTable = <
    * but then inspect whether or not the column associated with any of the fields
    * that were changed warrant refreshing another column.
    */
-  const _onChangeEvent = (event: Table.ChangeEvent<R, M>) => {
+  const _onChangeEvent = (event: Table.ChangeEvent<R>) => {
     props.onChangeEvent(event);
 
     const apis: Table.GridApis | null = props.tableApis.get("data");
@@ -130,11 +130,11 @@ const AuthenticatedTable = <
       let nodesToRefresh: Table.RowNode[] = [];
       let columnsToRefresh: (keyof R)[] = [];
 
-      const changes: Table.RowChange<R, M>[] = tabling.events.consolidateTableChange(event.payload);
+      const changes: Table.RowChange<R>[] = tabling.events.consolidateRowChanges(event.payload);
 
       // Look at the changes for each row and determine if the field changed is
       // associated with a column that refreshes other columns.
-      forEach(changes, (rowChange: Table.RowChange<R, M>) => {
+      forEach(changes, (rowChange: Table.RowChange<R>) => {
         const node = apis?.grid.getRowNode(String(rowChange.id));
         if (!isNil(node)) {
           let hasColumnsToRefresh = false;
@@ -185,12 +185,12 @@ const AuthenticatedTable = <
               isWriteOnly: true,
               onClick: () => {
                 const apis: Table.GridApis | null = props.tableApis.get("data");
-                const rows = filter((apis?.grid.getSelectedRows() || []) as Table.Row<R, M>[], (r: Table.Row<R, M>) =>
+                const rows = filter((apis?.grid.getSelectedRows() || []) as Table.Row<R>[], (r: Table.Row<R>) =>
                   tabling.typeguards.isEditableRow(r)
-                ) as Table.EditableRow<R, M>[];
+                ) as Table.EditableRow<R>[];
                 if (rows.length !== 0) {
                   props.onChangeEvent({
-                    payload: { rows: map(rows, (r: Table.EditableRow<R, M>) => r.id) },
+                    payload: { rows: map(rows, (r: Table.EditableRow<R>) => r.id) },
                     type: "rowDelete"
                   });
                 }
@@ -223,7 +223,7 @@ const AuthenticatedTable = <
             }
           }
           return map(nodes, (nd: Table.RowNode) => {
-            const row: Table.Row<R, M> = nd.data;
+            const row: Table.Row<R> = nd.data;
             return row;
           });
         }
@@ -237,7 +237,7 @@ const AuthenticatedTable = <
         if (!isNil(position)) {
           const node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(position.rowIndex);
           if (!isNil(node)) {
-            const row: Table.Row<R, M> = node.data;
+            const row: Table.Row<R> = node.data;
             return row;
           }
         }
@@ -296,7 +296,7 @@ const AuthenticatedTable = <
           columns: columns,
           gridOptions: props.tableGridOptions.data,
           onGridReady: props.onDataGridReady,
-          onRowSelectionChanged: (rows: Table.EditableRow<R, M>[]) => setSelectedRows(rows),
+          onRowSelectionChanged: (rows: Table.EditableRow<R>[]) => setSelectedRows(rows),
           onChangeEvent: _onChangeEvent,
           rowHasCheckboxSelection: props.rowHasCheckboxSelection
         })}
@@ -331,7 +331,7 @@ const AuthenticatedTable = <
 type Props = WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<any>, any>, any>;
 
 export default configureTable<any, any, Props>(AuthenticatedTable) as {
-  <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
     props: AuthenticatedTableProps<R, M>
   ): JSX.Element;
 };

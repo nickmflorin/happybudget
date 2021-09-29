@@ -7,23 +7,23 @@ import { redux, tabling } from "lib";
 
 type ProvidedProps<
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.TypedHttpModel = Model.TypedHttpModel,
   S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 > = {
   readonly search: string;
-  readonly data: Table.Row<R, M>[];
+  readonly data: Table.Row<R>[];
   readonly loading: boolean;
   readonly saving: boolean;
   readonly selector: (state: Application.Store) => S;
   readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
   readonly onSearch: (v: string) => void;
-  readonly onChangeEvent: (e: Table.ChangeEvent<R, M>) => void;
+  readonly onChangeEvent: (e: Table.ChangeEvent<R>) => void;
 };
 
 export type WithConnectedTableProps<
   T,
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.TypedHttpModel = Model.TypedHttpModel,
   S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 > = T & ProvidedProps<R, M, S>;
 
@@ -32,7 +32,7 @@ const connectTableToStore =
   <
     T,
     R extends Table.RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.TypedHttpModel = Model.TypedHttpModel,
     S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
   >(
     config: Table.StoreConfig<R, M, S>
@@ -88,7 +88,7 @@ const connectTableToStore =
           selector={selector}
           footerRowSelectors={config.footerRowSelectors}
           saving={saving}
-          onChangeEvent={(e: Table.ChangeEvent<R, M>) => {
+          onChangeEvent={(e: Table.ChangeEvent<R>) => {
             if (tabling.typeguards.isAuthenticatedActionMap<R, M>(config.actions)) {
               dispatch(config.actions.tableChanged(e));
             }

@@ -88,7 +88,7 @@ const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableP
   const subAccountUnits = useSelector(selectSubAccountUnits);
   const fringes = useSelector(selectFringes);
 
-  const table = tabling.hooks.useTable<R, M>();
+  const table = tabling.hooks.useTable<R>();
 
   return (
     <React.Fragment>
@@ -106,13 +106,13 @@ const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableP
         identifierFieldHeader={"Account"}
         onRowExpand={(row: Table.ModelRow<R>) => history.push(`/templates/${templateId}/subaccounts/${row.id}`)}
         onBack={() => history.push(`/templates/${templateId}/accounts?row=${accountId}`)}
-        onGroupRows={(rows: (Table.ModelRow<R, M> | Table.MarkupRow<R>)[]) =>
+        onGroupRows={(rows: (Table.ModelRow<R> | Table.MarkupRow<R>)[]) =>
           setGroupSubAccounts(
             map(
-              filter(rows, (row: Table.ModelRow<R, M> | Table.MarkupRow<R>) =>
+              filter(rows, (row: Table.ModelRow<R> | Table.MarkupRow<R>) =>
                 tabling.typeguards.isModelRow(row)
-              ) as Table.ModelRow<R, M>[],
-              (row: Table.ModelRow<R, M>) => row.id
+              ) as Table.ModelRow<R>[],
+              (row: Table.ModelRow<R>) => row.id
             )
           )
         }

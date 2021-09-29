@@ -70,7 +70,7 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const table = tabling.hooks.useTable<R, M>();
+  const table = tabling.hooks.useTable<R>();
 
   return (
     <React.Fragment>
@@ -81,24 +81,24 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
         onExportPdf={() => setPreviewModalVisible(true)}
-        onRowExpand={(row: Table.ModelRow<R, M>) => history.push(`/budgets/${budgetId}/accounts/${row.id}`)}
-        onGroupRows={(rows: (Table.ModelRow<R, M> | Table.MarkupRow<R>)[]) =>
+        onRowExpand={(row: Table.ModelRow<R>) => history.push(`/budgets/${budgetId}/accounts/${row.id}`)}
+        onGroupRows={(rows: (Table.ModelRow<R> | Table.MarkupRow<R>)[]) =>
           setGroupAccounts(
             map(
-              filter(rows, (row: Table.ModelRow<R, M> | Table.MarkupRow<R>) =>
+              filter(rows, (row: Table.ModelRow<R> | Table.MarkupRow<R>) =>
                 tabling.typeguards.isModelRow(row)
-              ) as Table.ModelRow<R, M>[],
-              (row: Table.ModelRow<R, M>) => row.id
+              ) as Table.ModelRow<R>[],
+              (row: Table.ModelRow<R>) => row.id
             )
           )
         }
-        onMarkupRows={(rows: (Table.ModelRow<R, M> | Table.GroupRow<R>)[]) =>
+        onMarkupRows={(rows: (Table.ModelRow<R> | Table.GroupRow<R>)[]) =>
           setMarkupAccounts(
             map(
-              filter(rows, (row: Table.ModelRow<R, M> | Table.GroupRow<R>) =>
+              filter(rows, (row: Table.ModelRow<R> | Table.GroupRow<R>) =>
                 tabling.typeguards.isModelRow(row)
-              ) as Table.ModelRow<R, M>[],
-              (row: Table.ModelRow<R, M>) => row.id
+              ) as Table.ModelRow<R>[],
+              (row: Table.ModelRow<R>) => row.id
             )
           )
         }

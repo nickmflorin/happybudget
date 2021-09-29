@@ -18,14 +18,14 @@ import TableWrapper from "./TableWrapper";
 
 export type UnauthenticatedTableDataGridProps<
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel
+  M extends Model.TypedHttpModel = Model.TypedHttpModel
 > = UnauthenticateDataGridProps<R, M> & DataGridProps<R, M> & Omit<UnauthenticatedGridProps<R, M>, "id">;
 
 export type UnauthenticatedTableProps<
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel
+  M extends Model.TypedHttpModel = Model.TypedHttpModel
 > = TableConfigurationProps<R, M> & {
-  readonly table?: NonNullRef<Table.TableInstance<R, M>>;
+  readonly table?: NonNullRef<Table.TableInstance<R>>;
   readonly actions?: Table.UnauthenticatedMenuActions<R, M>;
   readonly excludeColumns?:
     | SingleOrArray<keyof R | string | ((col: Table.Column<R, M>) => boolean)>
@@ -40,7 +40,7 @@ const TableFooterGrid = FooterGrid<any, any, UnauthenticatedGridProps<any>>({
   rowClass: "row--table-footer",
   getFooterColumn: (col: Table.Column<any, any, any>) => col.footer || null
 })(UnauthenticatedGrid) as {
-  <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
     props: Omit<UnauthenticatedGridProps<R, M>, "id">
   ): JSX.Element;
 };
@@ -53,13 +53,13 @@ const PageFooterGrid = FooterGrid<any, any, UnauthenticatedGridProps<any>>({
   rowHeight: 28,
   getFooterColumn: (col: Table.Column<any, any, any>) => col.page || null
 })(UnauthenticatedGrid) as {
-  <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
     props: Omit<UnauthenticatedGridProps<R, M>, "id">
   ): JSX.Element;
 };
 
 /* eslint-disable indent */
-const UnauthenticatedTable = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+const UnauthenticatedTable = <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
   props: WithConnectedTableProps<WithConfiguredTableProps<UnauthenticatedTableProps<R, M>, R, M>, R, M>
 ): JSX.Element => {
   /**
@@ -104,7 +104,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.HttpModel
   useImperativeHandle(props.table, () => ({
     getCSVData: props.getCSVData,
     changeColumnVisibility: props.changeColumnVisibility,
-    applyTableChange: (event: Table.ChangeEvent<R, M>) => {},
+    applyTableChange: (event: Table.ChangeEvent<R>) => {},
     getRowsAboveAndIncludingFocusedRow: () => {
       const apis = props.tableApis.get("data");
       if (!isNil(apis)) {
@@ -121,7 +121,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.HttpModel
             }
           }
           return map(nodes, (nd: Table.RowNode) => {
-            const row: Table.Row<R, M> = nd.data;
+            const row: Table.Row<R> = nd.data;
             return row;
           });
         }
@@ -135,7 +135,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.HttpModel
         if (!isNil(position)) {
           const node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(position.rowIndex);
           if (!isNil(node)) {
-            const row: Table.Row<R, M> = node.data;
+            const row: Table.Row<R> = node.data;
             return row;
           }
         }
@@ -203,7 +203,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.HttpModel
 type Props = WithConnectedTableProps<WithConfiguredTableProps<UnauthenticatedTableProps<any>, any>, any>;
 
 export default configureTable<any, any, Props>(UnauthenticatedTable) as {
-  <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
     props: UnauthenticatedTableProps<R, M>
   ): JSX.Element;
 };

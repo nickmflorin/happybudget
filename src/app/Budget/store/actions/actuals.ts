@@ -10,7 +10,7 @@ export const restoreSubAccountsTreeSearchCacheAction = createAction<null>(
 export const setSubAccountsTreeSearchAction = createAction<string>(ActionType.SubAccountsTree.SetSearch);
 export const loadingSubAccountsTreeAction = createAction<boolean>(ActionType.SubAccountsTree.Loading);
 
-export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.ActualRowData, Model.Actual>>(
+export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.ActualRowData>>(
   ActionType.Actuals.TableChanged
 );
 export const savingTableAction = createAction<boolean>(ActionType.Actuals.Saving);

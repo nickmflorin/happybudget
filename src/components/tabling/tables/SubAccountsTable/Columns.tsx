@@ -24,11 +24,11 @@ const Columns: Table.Column<R, M>[] = [
     suppressSizeToFit: false,
     cellRenderer: "BodyCell",
     cellRendererParams: {
-      icon: (row: Table.Row<R, M>) =>
+      icon: (row: Table.Row<R>) =>
         tabling.typeguards.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined
     },
     colSpan: (params: Table.ColSpanParams<R, M>) => {
-      const row: Table.Row<R, M> = params.data;
+      const row: Table.Row<R> = params.data;
       if (tabling.typeguards.isModelRow(row)) {
         if (!isNil(row.children) && row.children.length !== 0) {
           const agColumns: Column[] | undefined = params.columnApi?.getAllDisplayedColumns();
@@ -122,10 +122,10 @@ const Columns: Table.Column<R, M>[] = [
   framework.columnObjs.CalculatedColumn<R, M>({
     field: "estimated",
     headerName: "Estimated",
-    getGroupValue: (rows: Table.ModelRow<R, M>[]) => {
+    getGroupValue: (rows: Table.ModelRow<R>[]) => {
       return reduce(
         rows,
-        (curr: number, r: Table.ModelRow<R, M>) => curr + r.data.estimated + r.data.fringe_contribution,
+        (curr: number, r: Table.ModelRow<R>) => curr + r.data.estimated + r.data.fringe_contribution,
         0.0
       );
     }
@@ -133,8 +133,8 @@ const Columns: Table.Column<R, M>[] = [
   framework.columnObjs.CalculatedColumn<R, M>({
     field: "actual",
     headerName: "Actual",
-    getGroupValue: (rows: Table.ModelRow<R, M>[]) => {
-      return reduce(rows, (curr: number, r: Table.ModelRow<R, M>) => curr + r.data.actual, 0.0);
+    getGroupValue: (rows: Table.ModelRow<R>[]) => {
+      return reduce(rows, (curr: number, r: Table.ModelRow<R>) => curr + r.data.actual, 0.0);
     }
   }),
   framework.columnObjs.CalculatedColumn<R, M>({
@@ -142,7 +142,7 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "Variance",
     valueGetter: (params: ValueGetterParams) => {
       if (!isNil(params.node)) {
-        const row: Table.Row<R, M> = params.node.data;
+        const row: Table.Row<R> = params.node.data;
         return row.data.estimated + row.data.fringe_contribution - row.data.actual;
       }
       return 0.0;

@@ -11,7 +11,7 @@ type R = Tables.PdfAccountRowData;
 type AccountsTableProps = {
   readonly data: Model.PdfAccount[];
   readonly groups: Model.Group[];
-  readonly columns: PdfTable.Column<R, M>[];
+  readonly columns: Table.PdfColumn<R, M>[];
 };
 
 const AccountsTable = ({
@@ -21,10 +21,10 @@ const AccountsTable = ({
   groups
 }: AccountsTableProps): JSX.Element => {
   const showFooterRow = useMemo(() => {
-    return filter(columns, (column: PdfTable.Column<R, M>) => !isNil(column.footer)).length !== 0;
+    return filter(columns, (column: Table.PdfColumn<R, M>) => !isNil(column.footer)).length !== 0;
   }, [columns]);
 
-  const table: Table.Row<R, M>[] = tabling.data.createTableRows<Tables.PdfAccountRowData, Model.PdfAccount>({
+  const table: Table.Row<R>[] = tabling.data.createTableRows<Tables.PdfAccountRowData, Model.PdfAccount>({
     response: { models: data, groups },
     columns
   });
@@ -33,7 +33,7 @@ const AccountsTable = ({
     let runningIndex = 1;
     const rows = reduce(
       table,
-      (rws: JSX.Element[], row: Table.Row<R, M>) => {
+      (rws: JSX.Element[], row: Table.Row<R>) => {
         runningIndex = runningIndex + 1;
         if (tabling.typeguards.isDataRow(row)) {
           return [...rws, <BodyRow key={runningIndex} index={runningIndex} columns={columns} row={row} />];

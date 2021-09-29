@@ -1,35 +1,40 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Redux {
-  type GenericSelectorFunc<S extends Modules.StoreObj, T = any> = (state: S) => T;
+  type GenericSelectorFunc<S, T = any> = (state: S) => T;
   type AuthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Application.Authenticated.Store, T>;
-  type UnauthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Modules.Unauthenticated.Store, T>;
-  type SwitchSelectorFunc<AUTH extends boolean = true, T = any> = AUTH extends true ? AuthenticatedSelectorFunc<T> : UnauthenticatedSelectorFunc<T>;
+  type UnauthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Application.Unauthenticated.Store, T>;
+  type SwitchSelectorFunc<AUTH extends boolean = true, T = any> = AUTH extends true
+    ? AuthenticatedSelectorFunc<T>
+    : UnauthenticatedSelectorFunc<T>;
   type SelectorFunc<T = any> = AuthenticatedSelectorFunc<T> | UnauthenticatedSelectorFunc<T>;
 
-  type AsyncId = `async-${string}`
+  type AsyncId = `async-${string}`;
   type AsyncStores<S = any> = { [key in AsyncId]: S };
 
   type Transformers<S = any, A = any> = {
-    [K in keyof A]: Redux.Reducer<S>
-  }
+    [K in keyof A]: Redux.Reducer<S>;
+  };
 
   type Task<P = any> = (action: Redux.Action<P>) => import("@redux-saga/types").SagaIterator;
   type TaskMapObject<M = any> = {
-    [K in keyof M]-?: Redux.Task<M[K]>
-  }
+    [K in keyof M]-?: Redux.Task<M[K]>;
+  };
 
   type ActionMapObject<M = any> = {
-    [K in keyof M]: undefined extends M[K] ? import("@reduxjs/toolkit").PayloadActionCreator<Exclude<M[K], undefined>> : import("@reduxjs/toolkit").PayloadActionCreator<M[K]>
-  }
+    [K in keyof M]: undefined extends M[K]
+      ? import("@reduxjs/toolkit").PayloadActionCreator<Exclude<M[K], undefined>>
+      : import("@reduxjs/toolkit").PayloadActionCreator<M[K]>;
+  };
 
   type Reducer<S, A = Redux.Action> = import("redux").Reducer<S, A>;
   type ReducersMapObject<S = any> = {
-    [K in keyof S]-?: Redux.Reducer<S[K]>
-  }
-  type ReducersWithAsyncMapObject<S = any> = ReducersMapObject<S> & {
-    [K in AsyncId]: Redux.Reducer<any>
-  }
+    [K in keyof S]-?: Redux.Reducer<S[K]>;
+  };
+  type ReducersWithAsyncMapObject<S = any> = ReducersMapObject<S> &
+    {
+      [K in AsyncId]: Redux.Reducer<any>;
+    };
 
   type SagaManager = {
     readonly injectSaga: (id: Table.AsyncId, saga: import("redux-saga").Saga) => void;
@@ -44,13 +49,12 @@ namespace Redux {
   };
 
   type StoreObj = Record<string, any> | boolean | number;
-  type Store<S> = import("redux").Store<S, Redux.Action> & {
+  type Store<S extends Application.Store> = import("redux").Store<S, Redux.Action> & {
     readonly reducerManager: ReducerManager<S>;
     readonly sagaManager: SagaManager;
-  }
+  };
 
   type Dispatch = import("redux").Dispatch<Redux.Action>;
-  type DispatchWithoutActionOptions<T extends keyof ActionOptions> = Redux.Dispatch<Omit<Redux.Action, T>>;
 
   type ActionOptions = {
     readonly type: string;
@@ -82,7 +86,7 @@ namespace Redux {
 
   type SagaConfig<T, A> = TaskConfig<A> & {
     readonly tasks: TaskMapObject<T>;
-  }
+  };
 
   type ListStore<T> = T[];
 
@@ -114,15 +118,15 @@ namespace Redux {
 
   type ListResponseActionMap<T> = {
     readonly loading: boolean;
-    readonly response: Http.ListResponse<M>;
-  }
+    readonly response: Http.ListResponse<T>;
+  };
 
   interface ListResponseTaskMap {
     readonly request: null;
   }
 
   interface ModelListResponseStore<T extends Model.HttpModel> extends Redux.ListResponseStore<T> {
-    readonly cache: SearchCache;
+    readonly cache: SearchCache<T>;
     readonly search: string;
     readonly deleting: Redux.ModelListActionStore;
     readonly updating: Redux.ModelListActionStore;
@@ -142,13 +146,16 @@ namespace Redux {
     readonly updateInState: Redux.UpdateActionPayload<M>;
     readonly setSearch: string;
     readonly restoreSearchCache: null;
-  }
+  };
 
   interface ModelListResponseTaskMap {
     readonly request: null;
   }
 
-  type CommentsListResponseActionMap = Omit<Redux.ModelListResponseActionMap<Model.Comment>, "addToState" | "setSearch" | "restoreSearchCache"> & {
+  type CommentsListResponseActionMap = Omit<
+    Redux.ModelListResponseActionMap<Model.Comment>,
+    "addToState" | "setSearch" | "restoreSearchCache"
+  > & {
     readonly submit: { parent?: number; data: Http.CommentPayload };
     readonly delete: number;
     readonly edit: Redux.UpdateActionPayload<Model.Comment>;
@@ -167,40 +174,46 @@ namespace Redux {
   // not using pagination anywhere that we are using this cache).
   type SearchCache<T extends Model.HttpModel> = { [key: string]: Http.ListResponse<T> };
 
-  type TableTaskMap<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {
+  type TableTaskMap<R extends Table.RowData> = {
     readonly request: null;
-    readonly handleChangeEvent: Table.ChangeEvent<R, M>;
-  }
+    readonly handleChangeEvent: Table.ChangeEvent<R>;
+  };
 
-  type TableActionMap<M extends Model.HttpModel = Model.HttpModel> = {
+  type TableActionMap<M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
     readonly loading: boolean;
     readonly response: Http.TableResponse<M>;
     readonly request?: null;
     readonly setSearch: string;
     readonly clear: null;
-  }
+  };
 
-  type AuthenticatedTableActionMap<R extends Table.RowData = object, M extends Model.HttpModel = Model.HttpModel> = TableActionMap<M> & {
-    readonly tableChanged: Table.ChangeEvent<R, M>;
+  type AuthenticatedTableActionMap<
+    R extends Table.RowData = object,
+    M extends Model.TypedHttpModel = Model.TypedHttpModel
+  > = TableActionMap<M> & {
+    readonly tableChanged: Table.ChangeEvent<R>;
     readonly saving: boolean;
     readonly addModelsToState: Redux.AddModelsToTablePayload<M>;
-  }
+  };
 
   type TableStore<D extends Table.RowData = object, M extends Model.HttpModel = Model.HttpModel> = {
-    readonly data: Table.Row<D, M>[];
+    readonly data: Table.Row<D>[];
     readonly models: M[];
     readonly groups: Model.Group[];
     readonly search: string;
     readonly loading: boolean;
     readonly saving: boolean;
-  }
+  };
 
-  type AddModelsToTablePayload<M extends Model.HttpModel> = { readonly placeholderIds: Table.PlaceholderRowId[]; readonly models: M[] };
+  type AddModelsToTablePayload<M extends Model.HttpModel> = {
+    readonly placeholderIds: Table.PlaceholderRowId[];
+    readonly models: M[];
+  };
 
-  type InferTableRow<S> = S extends Redux.TableStore<infer R> ? R : unknown;
-  type InferTableModel<S> = S extends TableStore<any, infer M> ? M : unknown;
-
-  type BudgetTableStore<R extends Table.RowData = object, M extends Model.HttpModel = Model.HttpModel> = Redux.TableStore<R, M>;
+  type BudgetTableStore<
+    R extends Table.RowData = object,
+    M extends Model.HttpModel = Model.HttpModel
+  > = Redux.TableStore<R, M>;
 
   interface CommentsListResponseStore extends Redux.ModelListResponseStore<Model.Comment> {
     readonly replying: number[];

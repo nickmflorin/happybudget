@@ -15,8 +15,8 @@ export interface BudgetDataGridProps<R extends Table.RowData, M extends Model.Ht
   readonly apis: Table.GridApis | null;
   readonly framework?: Table.Framework;
   readonly onBack?: () => void;
-  readonly rowCanExpand?: (row: Table.ModelRow<R, M>) => boolean;
-  readonly onRowExpand?: null | ((row: Table.ModelRow<R, M>) => void);
+  readonly rowCanExpand?: (row: Table.ModelRow<R>) => boolean;
+  readonly onRowExpand?: null | ((row: Table.ModelRow<R>) => void);
 }
 
 export type WithBudgetDataGridProps<T> = T & InjectedBudgetDataGridProps;
@@ -37,7 +37,7 @@ const BudgetDataGrid = <
         if (!isNil(focusedCell)) {
           const node = localApi.getDisplayedRowAtIndex(focusedCell.rowIndex);
           if (!isNil(node)) {
-            const row: Table.Row<R, M> = node.data;
+            const row: Table.Row<R> = node.data;
             if (
               tabling.typeguards.isModelRow(row) &&
               !isNil(props.onRowExpand) &&

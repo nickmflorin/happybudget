@@ -5,7 +5,7 @@ export const setSubAccountIdAction = createAction<number | null>(ActionType.SubA
 export const loadingSubAccountAction = createAction<boolean>(ActionType.SubAccount.Loading);
 export const responseSubAccountAction = createAction<Model.SubAccount | null>(ActionType.SubAccount.Response);
 
-export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.SubAccountRowData, Model.SubAccount>>(
+export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.SubAccountRowData>>(
   ActionType.SubAccount.SubAccounts.TableChanged
 );
 export const savingTableAction = createAction<boolean>(ActionType.SubAccount.SubAccounts.Saving);

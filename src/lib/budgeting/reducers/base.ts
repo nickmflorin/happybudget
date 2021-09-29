@@ -10,7 +10,7 @@ import { redux, tabling, util } from "lib";
 /* eslint-disable indent */
 export const markupRowFromState = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.TypedHttpModel = Model.TypedHttpModel,
   S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 >(
   action: Redux.Action,
@@ -25,7 +25,7 @@ export const markupRowFromState = <
   }
   return redux.reducers.modelFromState<Table.MarkupRow<R>>(
     action,
-    filter(st.data, (r: Table.Row<R, M>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[],
+    filter(st.data, (r: Table.Row<R>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[],
     predicate,
     options
   );
@@ -56,13 +56,13 @@ export const createBudgetTableChangeEventReducer = <
   A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
   config: BudgetTableReducerConfig<R, M, S, A>
-): Redux.Reducer<S, Redux.Action<Table.ChangeEvent<R, M>>> => {
+): Redux.Reducer<S, Redux.Action<Table.ChangeEvent<R>>> => {
   const generic = tabling.reducers.createTableChangeEventReducer<R, M, S, A>(config);
 
-  return (state: S = config.initialState, action: Redux.Action<Table.ChangeEvent<R, M>>): S => {
+  return (state: S = config.initialState, action: Redux.Action<Table.ChangeEvent<R>>): S => {
     let newState: S = generic(state, action);
 
-    const e: Table.ChangeEvent<R, M> = action.payload;
+    const e: Table.ChangeEvent<R> = action.payload;
     if (tabling.typeguards.isMarkupAddEvent(e)) {
       const markup: Model.Markup = e.payload;
 
@@ -71,7 +71,7 @@ export const createBudgetTableChangeEventReducer = <
         model: markup,
         childrenRows: redux.reducers.findModelsInData(
           action,
-          filter(newState.data, (r: Table.Row<R, M>) => tabling.typeguards.isModelRow(r)),
+          filter(newState.data, (r: Table.Row<R>) => tabling.typeguards.isModelRow(r)),
           markup.children
         )
       });
@@ -105,22 +105,22 @@ export const createBudgetTableChangeEventReducer = <
           model: e.payload.data
         });
 
-        const childrenRows = filter(newState.data, (r: Table.Row<R, M>) =>
+        const childrenRows = filter(newState.data, (r: Table.Row<R>) =>
           tabling.typeguards.isModelRow(r)
-        ) as Table.ModelRow<R, M>[];
+        ) as Table.ModelRow<R>[];
 
         // Update the children rows of the MarkupRow to reflect the new MarkupRow data.
         newState = reduce(
           childrenRows,
-          (st: S, r: Table.ModelRow<R, M>) => {
+          (st: S, r: Table.ModelRow<R>) => {
             const otherMarkupRows = filter(
               newState.data,
-              (ri: Table.Row<R, M>) =>
+              (ri: Table.Row<R>) =>
                 tabling.typeguards.isMarkupRow(ri) && includes(ri.children, r.id) && ri.id !== updatedMarkupRow.id
             ) as Table.MarkupRow<R>[];
             return {
               ...st,
-              data: util.replaceInArray<Table.Row<R, M>>(
+              data: util.replaceInArray<Table.Row<R>>(
                 st.data,
                 { id: r.id },
                 {
@@ -147,9 +147,9 @@ export const createBudgetTableChangeEventReducer = <
             tabling.rows.updateMarkupRow({
               row: updatedMarkupRow,
               columns: config.columns,
-              childrenRows: filter(newState.data, (r: Table.Row<R, M>) =>
+              childrenRows: filter(newState.data, (r: Table.Row<R>) =>
                 tabling.typeguards.isModelRow(r)
-              ) as Table.ModelRow<R, M>[]
+              ) as Table.ModelRow<R>[]
             })
           )
         };
@@ -167,15 +167,15 @@ export const createBudgetTableChangeEventReducer = <
       if (!isNil(mk)) {
         const newChildren: Table.ModelRowId[] = filter(mk.children, (child: number) => !includes(ids, child));
         // TODO: We will need to recalculate the children rows.
-        const childrenRows: Table.ModelRow<R, M>[] = redux.reducers.findModelsInData(
+        const childrenRows: Table.ModelRow<R>[] = redux.reducers.findModelsInData(
           action,
-          filter(newState.data, (r: Table.Row<R, M>) => tabling.typeguards.isModelRow(r)),
+          filter(newState.data, (r: Table.Row<R>) => tabling.typeguards.isModelRow(r)),
           newChildren
         );
         newState = {
           ...newState,
           data: tabling.data.orderTableRows<R, M>(
-            util.replaceInArray<Table.Row<R, M>>(
+            util.replaceInArray<Table.Row<R>>(
               newState.data,
               { id: mk.id },
               {
@@ -203,7 +203,7 @@ export const createAuthenticatedBudgetTableReducer = <
   A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
   config: BudgetTableReducerConfig<R, M, S, A> & {
-    readonly recalculateRow?: (state: S, action: Redux.Action, row: Table.DataRow<R, M>) => Partial<R>;
+    readonly recalculateRow?: (state: S, action: Redux.Action, row: Table.DataRow<R>) => Partial<R>;
   }
 ): Redux.Reducer<S> => {
   const eventReducer = createBudgetTableChangeEventReducer(config);

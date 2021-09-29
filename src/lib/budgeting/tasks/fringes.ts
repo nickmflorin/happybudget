@@ -50,7 +50,7 @@ export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Ta
 
 export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   config: FringesTableTaskConfig<B>
-): Redux.TaskMapObject<Redux.TableTaskMap<R, M>> => {
+): Redux.TaskMapObject<Redux.TableTaskMap<R>> => {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
 
@@ -140,7 +140,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
 
   function* bulkUpdateTask(
     objId: number,
-    e: Table.ChangeEvent<R, M>,
+    e: Table.ChangeEvent<R>,
     requestPayload: Http.BulkUpdatePayload<P>,
     errorMessage: string
   ): SagaIterator {
@@ -209,19 +209,13 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     }
   }
 
-  function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, M>>): SagaIterator {
+  function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R>>): SagaIterator {
     const objId = yield select(config.selectObjId);
     if (!isNil(objId) && !isNil(action.payload)) {
-      const e: Table.DataChangeEvent<R, M> = action.payload;
-      const merged = tabling.events.consolidateTableChange<R, M>(e.payload);
-
-      const dataChanges: Table.RowChange<R, M, Table.ModelRow<R, M>>[] = filter(
-        merged,
-        (value: Table.RowChange<R, M>) => tabling.typeguards.isModelRow(value.row)
-      ) as Table.RowChange<R, M, Table.ModelRow<R, M>>[];
-
-      if (dataChanges.length !== 0) {
-        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(dataChanges, config.columns);
+      const e = action.payload as Table.DataChangeEvent<R, Table.ModelRowId>;
+      const merged = tabling.events.consolidateRowChanges<R, Table.ModelRowId>(e.payload);
+      if (merged.length !== 0) {
+        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns);
         yield fork(bulkUpdateTask, objId, e, requestPayload, "There was an error updating the rows.");
       }
     }

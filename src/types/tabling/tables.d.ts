@@ -11,7 +11,7 @@ namespace Tables {
     readonly markup_contribution: number;
     readonly actual: number;
   }
-  type AccountRow = Table.Row<AccountRowData, Model.Account>;
+  type AccountRow = Table.Row<AccountRowData>;
   type AccountTableStore = Redux.BudgetTableStore<AccountRowData, Model.Account>;
 
   interface SubAccountRowData {
@@ -28,7 +28,7 @@ namespace Tables {
     readonly markup_contribution: number;
     readonly actual: number;
   }
-  type SubAccountRow = Table.Row<SubAccountRowData, Model.SubAccount>;
+  type SubAccountRow = Table.Row<SubAccountRowData>;
   type SubAccountTableStore = Redux.BudgetTableStore<SubAccountRowData, Model.SubAccount> & {
     readonly fringes: FringeTableStore;
     readonly subaccountUnits: Model.Tag[];
@@ -42,10 +42,10 @@ namespace Tables {
     readonly rate: number | null;
     readonly unit: Model.FringeUnit;
   }
-  type FringeRow = Table.Row<FringeRowData, Model.Fringe>;
+  type FringeRow = Table.Row<FringeRowData>;
   type FringeTableStore = Redux.TableStore<FringeRowData, Model.Fringe> & {
     readonly fringeColors: string[];
-  }
+  };
 
   interface ActualRowData {
     readonly description: string | null;
@@ -58,10 +58,10 @@ namespace Tables {
     readonly value: number | null;
     readonly contact: number | null;
   }
-  type ActualRow = Table.Row<ActualRowData, Model.Actual>;
+  type ActualRow = Table.Row<ActualRowData>;
   type ActualTableStore = Redux.TableStore<ActualRowData, Model.Actual> & {
     readonly subAccountsTree: Redux.ModelListResponseStore<Model.SubAccountTreeNode>;
-  }
+  };
 
   type PdfSubAccountRowData = {
     readonly identifier: string | null;
@@ -72,8 +72,8 @@ namespace Tables {
     readonly rate: number | null;
     readonly estimated: number | null;
     readonly contact: number | null;
-  }
-  type PdfSubAccountRow = Table.Row<PdfSubAccountRowData, Model.PdfSubAccount>;
+  };
+  type PdfSubAccountRow = Table.Row<PdfSubAccountRowData>;
 
   type PdfAccountRowData = {
     readonly identifier: string | null;
@@ -81,8 +81,8 @@ namespace Tables {
     readonly estimated: number | null;
     readonly variance: number | null;
     readonly actual: number | null;
-  }
-  type PdfAccountRow = Table.Row<PdfAccountRowData, Model.PdfAccount>;
+  };
+  type PdfAccountRow = Table.Row<PdfAccountRowData>;
 
   type ContactRowData = {
     readonly type: Model.ContactTypeName | null;
@@ -93,6 +93,6 @@ namespace Tables {
     readonly email: string | null;
   };
 
-  type ContactRow = Table.Row<ContactRowData, Model.Contact>;
+  type ContactRow = Table.Row<ContactRowData>;
   type ContactTableStore = Redux.TableStore<ContactRowData, Model.Contact>;
 }

@@ -1,7 +1,7 @@
 import { createAction } from "@reduxjs/toolkit";
 import ActionType from "./ActionType";
 
-export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.AccountRowData, Model.Account>>(
+export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.AccountRowData>>(
   ActionType.Accounts.TableChanged
 );
 export const savingTableAction = createAction<boolean>(ActionType.Accounts.Saving);

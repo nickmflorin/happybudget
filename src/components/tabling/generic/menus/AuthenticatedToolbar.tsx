@@ -9,7 +9,7 @@ interface AuthenticatedToolbarProps<R extends Table.RowData, M extends Model.Htt
   readonly columns: Table.Column<R, M>[];
   readonly actions: Table.AuthenticatedMenuActions<R, M>;
   readonly hiddenColumns: (keyof R | string)[];
-  readonly selectedRows: Table.EditableRow<R, M>[];
+  readonly selectedRows: Table.EditableRow<R>[];
 }
 
 /* eslint-disable indent */

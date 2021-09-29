@@ -14,7 +14,7 @@ const BodyRow = <R extends Table.RowData, M extends Model.HttpModel = Model.Http
   <Row
     {...props}
     className={classNames("body-tr", props.className)}
-    renderCell={(params: { column: PdfTable.Column<R, M>; indented: boolean; location: PdfTable.CellLocation }) => {
+    renderCell={(params: { column: Table.PdfColumn<R, M>; indented: boolean; location: Table.PdfCellLocation }) => {
       return (
         <BodyCell<R, M>
           key={`${params.location.index}-${params.location.colIndex}`}

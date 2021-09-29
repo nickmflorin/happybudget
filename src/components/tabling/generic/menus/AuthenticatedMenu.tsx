@@ -33,8 +33,8 @@ type InternalAuthenticatedMenuProps<
 > = AuthenticatedMenuProps<R, M> & {
   readonly apis: Table.GridApis | null;
   readonly hiddenColumns: (keyof R | string)[];
-  readonly selectedRows: Table.EditableRow<R, M>[];
-  readonly rowHasCheckboxSelection?: (row: Table.EditableRow<R, M>) => boolean;
+  readonly selectedRows: Table.EditableRow<R>[];
+  readonly rowHasCheckboxSelection?: (row: Table.EditableRow<R>) => boolean;
 };
 
 /* eslint-disable indent */
@@ -51,7 +51,7 @@ const AuthenticatedMenu = <R extends Table.RowData, M extends Model.HttpModel = 
         <Checkbox
           onChange={(e: CheckboxChangeEvent) => {
             props.apis?.grid.forEachNode((node: RowNode) => {
-              const row: Table.Row<R, M> = node.data;
+              const row: Table.Row<R> = node.data;
               if (
                 tabling.typeguards.isEditableRow(row) &&
                 (isNil(props.rowHasCheckboxSelection) || props.rowHasCheckboxSelection(row))

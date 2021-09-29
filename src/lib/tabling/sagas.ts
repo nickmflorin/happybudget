@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 /* eslint-disable indent */
 export const createTableSaga = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.TypedHttpModel = Model.TypedHttpModel,
   A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
   config: Table.SagaConfig<R, M, A>
@@ -31,7 +31,7 @@ export const createTableSaga = <
 
 export const createUnauthenticatedTableSaga = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.TypedHttpModel = Model.TypedHttpModel,
   A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
   config: Table.SagaConfig<R, M, A>
@@ -42,7 +42,7 @@ export const createUnauthenticatedTableSaga = <
 /* eslint-disable indent */
 export const createAuthenticatedTableSaga = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.TypedHttpModel = Model.TypedHttpModel,
   A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
   config: Table.SagaConfig<R, M, A>
@@ -53,7 +53,7 @@ export const createAuthenticatedTableSaga = <
     // delete the same row twice.
     const changeChannel = yield actionChannel(config.actions.tableChanged.toString());
     while (true) {
-      const action: Redux.Action<Table.ChangeEvent<R, M>> = yield take(changeChannel);
+      const action: Redux.Action<Table.ChangeEvent<R>> = yield take(changeChannel);
       // Blocking call so that table changes happen sequentially.
       yield call(config.tasks.handleChangeEvent, action);
     }

@@ -24,8 +24,8 @@ export interface DataGridProps<R extends Table.RowData, M extends Model.HttpMode
   readonly cookieNames?: Table.CookieNames;
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
   readonly isCellSelectable?: (params: Table.CellCallbackParams<R, M>) => boolean;
-  readonly rowCanExpand?: (row: Table.ModelRow<R, M>) => boolean;
-  readonly onRowExpand?: null | ((row: Table.ModelRow<R, M>) => void);
+  readonly rowCanExpand?: (row: Table.ModelRow<R>) => boolean;
+  readonly onRowExpand?: null | ((row: Table.ModelRow<R>) => void);
   readonly onFirstDataRendered: (e: FirstDataRenderedEvent) => void;
 }
 
@@ -48,7 +48,7 @@ const DataGrid =
       const oldFocusedEvent = useRef<CellFocusedEvent | null>(null);
       const location = useLocation();
 
-      const getRowColorDef = hooks.useDynamicCallback((row: Table.Row<R, M>): Table.RowColorDef => {
+      const getRowColorDef = hooks.useDynamicCallback((row: Table.Row<R>): Table.RowColorDef => {
         if (tabling.typeguards.isGroupRow(row)) {
           const colorDef = model.util.getGroupColorDefinition(row);
           if (!isNil(colorDef?.color) && !isNil(colorDef?.backgroundColor)) {
@@ -104,7 +104,7 @@ const DataGrid =
       );
 
       const getRowClass: Table.GetRowClassName = hooks.useDynamicCallback((params: Table.RowClassParams) => {
-        const row: Table.Row<R, M> = params.node.data;
+        const row: Table.Row<R> = params.node.data;
         if (tabling.typeguards.isGroupRow(row)) {
           return classNames("row--data", "row--group", props.rowClass);
         }
@@ -113,7 +113,7 @@ const DataGrid =
 
       const getRowStyle: Table.GetRowStyle = hooks.useDynamicCallback(
         (params: Table.RowClassParams): { [key: string]: any } => {
-          const row: Table.Row<R, M> = params.node.data;
+          const row: Table.Row<R> = params.node.data;
           return getRowColorDef(row);
         }
       );
@@ -129,7 +129,7 @@ const DataGrid =
               ? col
               : find(columns, { field: event.column.getColId() } as any);
             if (!isNil(rowNode) && !isNil(column)) {
-              const row: Table.Row<R, M> = rowNode.data;
+              const row: Table.Row<R> = rowNode.data;
               return { rowNode, column, row };
             }
           }
@@ -185,7 +185,7 @@ const DataGrid =
               const lastRow = e.api.getLastDisplayedRow();
               e.api.forEachNodeAfterFilter((node: Table.RowNode, index: number) => {
                 if (index >= firstRow && index <= lastRow) {
-                  const row: Table.Row<R, M> = node.data;
+                  const row: Table.Row<R> = node.data;
                   if (
                     isNil(config?.refreshRowExpandColumnOnCellHover) ||
                     config?.refreshRowExpandColumnOnCellHover(row) === true

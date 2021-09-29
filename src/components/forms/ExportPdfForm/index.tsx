@@ -37,7 +37,7 @@ export type IExportFormRef = {
 
 interface ExportFormProps extends FormProps<PdfBudgetTable.Options> {
   readonly disabled?: boolean;
-  readonly columns: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>[];
+  readonly columns: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>[];
   readonly accounts: Model.PdfAccount[];
   readonly accountsLoading?: boolean;
   readonly displayedHeaderTemplate: Model.HeaderTemplate | null;
@@ -405,7 +405,7 @@ const ExportForm = (
           >
             {map(
               columns,
-              (column: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>, index: number) => {
+              (column: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>, index: number) => {
                 const colType = find(tabling.models.ColumnTypes, { id: column.columnType });
                 return (
                   <Select.Option className={"column-select-option"} key={index + 1} value={column.field as string}>

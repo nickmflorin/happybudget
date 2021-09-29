@@ -76,22 +76,20 @@ export const useHiddenColumns = <R extends Table.RowData, M extends Model.HttpMo
   return [hiddenColumns, changeColumnVisibility];
 };
 
-export const InitialTableRef: Table.TableInstance<any, any> = {
+export const InitialTableRef: Table.TableInstance<any> = {
   getCSVData: (fields?: string[]) => [],
   getFocusedRow: () => null,
   getRowsAboveAndIncludingFocusedRow: () => [],
   changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange<any>>, sizeToFit?: boolean) => {},
-  applyTableChange: (event: Table.ChangeEvent<any, any>) => {},
+  applyTableChange: (event: Table.ChangeEvent<any>) => {},
   applyGroupColorChange: (group: Model.Group) => {}
 };
 
-export const useTable = <R extends Table.RowData = object, M extends Model.HttpModel = any>(): NonNullRef<
-  Table.TableInstance<R, M>
-> => {
-  return useRef<Table.TableInstance<R, M>>(InitialTableRef);
+export const useTable = <R extends Table.RowData = object>(): NonNullRef<Table.TableInstance<R>> => {
+  return useRef<Table.TableInstance<R>>(InitialTableRef);
 };
 
 /* eslint-disable indent */
-export const useTableIfNotDefined = <R extends Table.RowData = object, M extends Model.HttpModel = any>(
-  table?: NonNullRef<Table.TableInstance<R, M>>
-): NonNullRef<Table.TableInstance<R, M>> => hooks.useRefIfNotDefined<Table.TableInstance<R, M>>(useTable, table);
+export const useTableIfNotDefined = <R extends Table.RowData = object>(
+  table?: NonNullRef<Table.TableInstance<R>>
+): NonNullRef<Table.TableInstance<R>> => hooks.useRefIfNotDefined<Table.TableInstance<R>>(useTable, table);

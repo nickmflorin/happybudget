@@ -69,7 +69,7 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const table = tabling.hooks.useTable<R, M>();
+  const table = tabling.hooks.useTable<R>();
 
   return (
     <React.Fragment>
@@ -80,13 +80,13 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
         onRowExpand={(row: Table.ModelRow<R>) => history.push(`/templates/${templateId}/accounts/${row.id}`)}
-        onGroupRows={(rows: (Table.ModelRow<R, M> | Table.MarkupRow<R>)[]) =>
+        onGroupRows={(rows: (Table.ModelRow<R> | Table.MarkupRow<R>)[]) =>
           setGroupAccounts(
             map(
-              filter(rows, (row: Table.ModelRow<R, M> | Table.MarkupRow<R>) =>
+              filter(rows, (row: Table.ModelRow<R> | Table.MarkupRow<R>) =>
                 tabling.typeguards.isModelRow(row)
-              ) as Table.ModelRow<R, M>[],
-              (row: Table.ModelRow<R, M>) => row.id
+              ) as Table.ModelRow<R>[],
+              (row: Table.ModelRow<R>) => row.id
             )
           )
         }

@@ -7,9 +7,9 @@ export const patchPayloadForChange = <
   R extends Table.RowData,
   P,
   M extends Model.HttpModel = Model.HttpModel,
-  RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
+  I extends Table.EditableRowId = Table.EditableRowId
 >(
-  change: Table.RowChange<R, M, RW>,
+  change: Table.RowChange<R, I>,
   columns: Table.Column<R, M>[]
 ): P | null => {
   const cols = filter(columns, (c: Table.Column<R, M>) => c.isWrite !== false);
@@ -35,33 +35,33 @@ export const bulkPatchPayloadForChange = <
   R extends Table.RowData,
   P,
   M extends Model.HttpModel = Model.HttpModel,
-  RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
+  I extends Table.EditableRowId = Table.EditableRowId
 >(
-  change: Table.RowChange<R, M, RW>,
+  change: Table.RowChange<R, I>,
   columns: Table.Column<R, M>[]
 ): Http.ModelBulkUpdatePayload<P> | null => {
-  return { id: rows.httpId(change.id), ...patchPayloadForChange(change, columns) };
+  return { id: rows.editableId(change.id), ...patchPayloadForChange(change, columns) };
 };
 
 export const bulkPatchPayloads = <
   R extends Table.RowData,
   P,
   M extends Model.HttpModel = Model.HttpModel,
-  RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
+  I extends Table.EditableRowId = Table.EditableRowId
 >(
-  p: Table.DataChangePayload<R, M, RW> | Table.DataChangeEvent<R, M, RW>,
+  p: Table.DataChangePayload<R, I> | Table.DataChangeEvent<R, I>,
   columns: Table.Column<R, M>[]
 ): Http.ModelBulkUpdatePayload<P>[] => {
   const isEvent = (
-    obj: Table.DataChangePayload<R, M, RW> | Table.DataChangeEvent<R, M, RW>
-  ): obj is Table.DataChangeEvent<R, M, RW> => (obj as Table.DataChangeEvent<R, M, RW>).type === "dataChange";
+    obj: Table.DataChangePayload<R, I> | Table.DataChangeEvent<R, I>
+  ): obj is Table.DataChangeEvent<R, I> => (obj as Table.DataChangeEvent<R, I>).type === "dataChange";
 
-  const payload: Table.DataChangePayload<R, M, RW> = isEvent(p) ? p.payload : p;
-  const changes: Table.RowChange<R, M, RW>[] = Array.isArray(payload) ? payload : [payload];
+  const payload: Table.DataChangePayload<R, I> = isEvent(p) ? p.payload : p;
+  const changes: Table.RowChange<R, I>[] = Array.isArray(payload) ? payload : [payload];
 
   return reduce(
     changes,
-    (prev: Http.ModelBulkUpdatePayload<P>[], change: Table.RowChange<R, M, RW>) => {
+    (prev: Http.ModelBulkUpdatePayload<P>[], change: Table.RowChange<R, I>) => {
       const patchPayload = bulkPatchPayloadForChange<R, P, M>(change, columns);
       if (!isNil(patchPayload)) {
         return [...prev, patchPayload];
@@ -114,13 +114,10 @@ export const postPayloads = <R extends Table.RowData, P, M extends Model.HttpMod
   );
 };
 
-export const createAutoIndexedBulkCreatePayload = <
-  R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel
->(
+export const createAutoIndexedBulkCreatePayload = <R extends Table.RowData>(
   /* eslint-disable indent */
   count: number,
-  rws: Table.Row<R, M>[],
+  rws: Table.Row<R>[],
   autoIndexField: keyof R
 ): Http.BulkCreatePayload<any> => {
   const converter = (r: R): number | null => {
@@ -142,8 +139,8 @@ export const createAutoIndexedBulkCreatePayload = <
   };
 };
 
-type AutoIndexParams<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {
-  rows: Table.Row<R, M>[];
+type AutoIndexParams<R extends Table.RowData> = {
+  rows: Table.Row<R>[];
   autoIndex: boolean;
   field: keyof R;
 };
@@ -152,10 +149,10 @@ export const createBulkUpdatePayload = <
   R extends Table.RowData,
   P,
   M extends Model.HttpModel = Model.HttpModel,
-  RW extends Table.EditableRow<R, M> = Table.EditableRow<R, M>
+  I extends Table.EditableRowId = Table.EditableRowId
 >(
   /* eslint-disable indent */
-  p: Table.DataChangePayload<R, M, RW>,
+  p: Table.DataChangePayload<R, I>,
   columns: Table.Column<R, M>[]
 ): Http.BulkUpdatePayload<P> => ({ data: bulkPatchPayloads(p, columns) });
 
@@ -163,7 +160,7 @@ export const createBulkCreatePayload = <R extends Table.RowData, P, M extends Mo
   /* eslint-disable indent */
   p: Table.RowAddPayload<R>,
   columns: Table.Column<R, M>[],
-  autoIndexParams?: AutoIndexParams<R, M>
+  autoIndexParams?: AutoIndexParams<R>
 ): Http.BulkCreatePayload<P> => {
   let bulkPayload: Http.BulkCreatePayload<P>;
 

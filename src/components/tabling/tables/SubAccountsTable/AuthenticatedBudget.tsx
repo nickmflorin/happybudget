@@ -13,7 +13,7 @@ import SubAccountsTable, { WithSubAccountsTableProps } from "./SubAccountsTable"
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
 
-type PreContactCreate = Omit<Table.SoloCellChange<R, M>, "newValue">;
+type PreContactCreate = Omit<Table.SoloCellChange<R>, "newValue">;
 
 export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>, "columns"> & {
   readonly subAccountUnits: Model.Tag[];
@@ -122,10 +122,10 @@ const AuthenticatedBudgetSubAccountsTable = (
           label: "Group",
           isWriteOnly: true,
           onClick: () => {
-            const rows: Table.Row<R, M>[] = table.current.getRowsAboveAndIncludingFocusedRow();
-            const modelRows: Table.ModelRow<R, M>[] = filter(rows, (r: Table.Row<R, M>) =>
+            const rows: Table.Row<R>[] = table.current.getRowsAboveAndIncludingFocusedRow();
+            const modelRows: Table.ModelRow<R>[] = filter(rows, (r: Table.Row<R>) =>
               tabling.typeguards.isModelRow(r)
-            ) as Table.ModelRow<R, M>[];
+            ) as Table.ModelRow<R>[];
             if (modelRows.length !== 0) {
               props.onGroupRows?.(modelRows);
             }
@@ -136,10 +136,10 @@ const AuthenticatedBudgetSubAccountsTable = (
           label: "Mark Up",
           isWriteOnly: true,
           onClick: () => {
-            const rows: Table.Row<R, M>[] = table.current.getRowsAboveAndIncludingFocusedRow();
-            const modelRows: Table.ModelRow<R, M>[] = filter(rows, (r: Table.Row<R, M>) =>
+            const rows: Table.Row<R>[] = table.current.getRowsAboveAndIncludingFocusedRow();
+            const modelRows: Table.ModelRow<R>[] = filter(rows, (r: Table.Row<R>) =>
               tabling.typeguards.isModelRow(r)
-            ) as Table.ModelRow<R, M>[];
+            ) as Table.ModelRow<R>[];
             if (modelRows.length !== 0) {
               props.onMarkupRows?.(modelRows);
             }

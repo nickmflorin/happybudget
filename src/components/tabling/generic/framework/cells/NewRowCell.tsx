@@ -4,7 +4,7 @@ import { Icon } from "components";
 import { IconButton } from "components/buttons";
 
 interface NewRowCellProps extends Table.CellProps<any, any, any, null> {
-  onChangeEvent: (e: Table.ChangeEvent<any, any>) => void;
+  onChangeEvent: (e: Table.ChangeEvent<any>) => void;
 }
 
 const NewRowCell = ({ onChangeEvent }: NewRowCellProps): JSX.Element => {

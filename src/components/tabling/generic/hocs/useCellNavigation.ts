@@ -8,7 +8,7 @@ export interface UseCellNavigationParams<R extends Table.RowData, M extends Mode
   readonly tableId?: Table.Id;
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
-  readonly includeRowInNavigation?: (row: Table.EditableRow<R, M>) => boolean;
+  readonly includeRowInNavigation?: (row: Table.EditableRow<R>) => boolean;
   readonly onNewRowRequired?: () => void;
 }
 
@@ -60,7 +60,7 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.HttpModel = 
           if (isNil(nextRowNode)) {
             noMoreRows = true;
           } else {
-            const row: Table.Row<R, M> = nextRowNode.data;
+            const row: Table.Row<R> = nextRowNode.data;
             if (
               tabling.typeguards.isEditableRow(row) &&
               (isNil(params.includeRowInNavigation) || params.includeRowInNavigation(row) !== false)

@@ -5,7 +5,7 @@ import { tabling, model } from "lib";
 type InjectMarkupsAndGroupsConfig<
   R extends Table.RowData,
   M extends Model.TypedHttpModel,
-  A extends Table.DataRow<R, M> | M = M,
+  A extends Table.DataRow<R> | M = M,
   B extends Model.Markup | Table.MarkupRow<R> = Model.Markup,
   C extends Model.Group | Table.GroupRow<R> = Model.Group
 > = {
@@ -18,7 +18,7 @@ type InjectMarkupsAndGroupsConfig<
 export const injectMarkupsAndGroups = <
   R extends Table.RowData,
   M extends Model.TypedHttpModel,
-  A extends Table.DataRow<R, M> | M = M,
+  A extends Table.DataRow<R> | M = M,
   B extends Model.Markup | Table.MarkupRow<R> = Model.Markup,
   C extends Model.Group | Table.GroupRow<R> = Model.Group
 >(
@@ -94,13 +94,13 @@ export const injectMarkupsAndGroups = <
 };
 
 export const orderTableRows = <R extends Table.RowData, M extends Model.TypedHttpModel>(
-  data: Table.Row<R, M>[]
-): Table.Row<R, M>[] => {
+  data: Table.Row<R>[]
+): Table.Row<R>[] => {
   // The order of the actual data rows of the table dictate the order of everything else.
-  const dataRows = filter(data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R, M>[];
-  const markupRows = filter(data, (r: Table.Row<R, M>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[];
-  const groupRows = filter(data, (r: Table.Row<R, M>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[];
-  return injectMarkupsAndGroups<R, M, Table.DataRow<R, M>, Table.MarkupRow<R>, Table.GroupRow<R>>({
+  const dataRows = filter(data, (r: Table.Row<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[];
+  const markupRows = filter(data, (r: Table.Row<R>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[];
+  const groupRows = filter(data, (r: Table.Row<R>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[];
+  return injectMarkupsAndGroups<R, M, Table.DataRow<R>, Table.MarkupRow<R>, Table.GroupRow<R>>({
     groups: groupRows,
     current: dataRows,
     markups: markupRows
@@ -109,13 +109,13 @@ export const orderTableRows = <R extends Table.RowData, M extends Model.TypedHtt
 
 export const createTableRows = <R extends Table.RowData, M extends Model.TypedHttpModel>(
   config: Table.CreateTableDataConfig<R, M>
-): Table.Row<R, M>[] => {
+): Table.Row<R>[] => {
   const models = config.response.models;
   const groups = config.response.groups === undefined ? [] : config.response.groups;
   const markups = config.response.markups === undefined ? [] : config.response.markups;
-  const modelRows: Table.ModelRow<R, M>[] = reduce(
+  const modelRows: Table.ModelRow<R>[] = reduce(
     models,
-    (curr: Table.ModelRow<R, M>[], m: M) => [
+    (curr: Table.ModelRow<R>[], m: M) => [
       ...curr,
       tabling.rows.createModelRow<R, M>({
         model: m,
@@ -133,7 +133,7 @@ export const createTableRows = <R extends Table.RowData, M extends Model.TypedHt
       tabling.rows.createMarkupRow<R, M>({
         model: mk,
         columns: config.columns,
-        childrenRows: filter(modelRows, (r: Table.ModelRow<R, M>) => includes(mk.children, r.id))
+        childrenRows: filter(modelRows, (r: Table.ModelRow<R>) => includes(mk.children, r.id))
       })
     ],
     []
@@ -146,7 +146,7 @@ export const createTableRows = <R extends Table.RowData, M extends Model.TypedHt
       tabling.rows.createGroupRow<R, M>({
         columns: config.columns,
         model: g,
-        childrenRows: filter(modelRows, (r: Table.ModelRow<R, M>) => includes(g.children, r.id))
+        childrenRows: filter(modelRows, (r: Table.ModelRow<R>) => includes(g.children, r.id))
       })
     ],
     []

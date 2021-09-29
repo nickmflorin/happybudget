@@ -26,7 +26,7 @@ type UpdateRowDataConfig<
 };
 
 type UpdateRowConfig<
-  RW extends Table.Row<R, M>,
+  RW extends Table.Row<R>,
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
   MM extends Model.HttpModel = M
@@ -63,19 +63,22 @@ export const markupRowId = (r: number): Table.MarkupRowId => `markup-${r}`;
 export const markupId = (r: Table.MarkupRowId): number => parseInt(r.split("markup-")[1]);
 export const groupRowId = (r: number): Table.GroupRowId => `group-${r}`;
 export const groupId = (r: Table.GroupRowId): number => parseInt(r.split("group-")[1]);
-export const httpId = (r: Table.HttpEditableRowId): number => (typeguards.isMarkupRowId(r) ? markupId(r) : r);
+export const safeEditableRowId = (r: Table.EditableRowId): Table.EditableRowId =>
+  typeguards.isMarkupRowId(r) ? r : parseInt(String(r));
+export const editableId = (r: Table.EditableRowId): number =>
+  typeguards.isMarkupRowId(r) ? markupId(r) : parseInt(String(r));
 
-export const mergeChangesWithRow = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+export const mergeChangesWithRow = <R extends Table.RowData>(
   id: Table.RowId,
-  row: Table.EditableRow<R, M>,
-  changes: Table.DataChangePayload<R, M>
-): Table.EditableRow<R, M> => {
-  const consolidated: Table.ConsolidatedChange<R, M> = events.consolidateTableChange<R, M>(changes);
+  row: Table.EditableRow<R>,
+  changes: Table.DataChangePayload<R>
+): Table.EditableRow<R> => {
+  const consolidated: Table.ConsolidatedChange<R> = events.consolidateRowChanges<R>(changes);
   return {
     ...row,
     data: reduce(
       consolidated,
-      (curr: R, change: Table.RowChange<R, M>) => {
+      (curr: R, change: Table.RowChange<R>) => {
         if (change.id !== id) {
           /* eslint-disable no-console */
           console.error("Cannot apply table changes from one row to another row!");
@@ -160,7 +163,7 @@ export const createRow = <
 
 export const updateGroupRowData = <R extends Table.RowData, M extends Model.HttpModel>(
   config: Omit<UpdateRowDataConfig<R, M, Model.Group>, "getValue"> & {
-    readonly childrenRows?: Table.ModelRow<R, M>[];
+    readonly childrenRows?: Table.ModelRow<R>[];
   }
 ): R =>
   updateRowData({
@@ -182,7 +185,7 @@ export const updateGroupRowData = <R extends Table.RowData, M extends Model.Http
 
 export const createGroupRowData = <R extends Table.RowData, M extends Model.HttpModel>(
   config: Omit<CreateRowDataConfig<R, M, Model.Group>, "getValue"> & {
-    readonly childrenRows: Table.ModelRow<R, M>[];
+    readonly childrenRows: Table.ModelRow<R>[];
   }
 ): R =>
   createRowData<R, M, Model.Group>({
@@ -201,7 +204,7 @@ export const createGroupRowData = <R extends Table.RowData, M extends Model.Http
 
 export const updateGroupRow = <R extends Table.RowData, M extends Model.HttpModel>(
   config: UpdateRowConfig<Table.GroupRow<R>, R, M, Model.Group> & {
-    readonly childrenRows?: Table.ModelRow<R, M>[];
+    readonly childrenRows?: Table.ModelRow<R>[];
   }
 ): Table.GroupRow<R> => {
   return {
@@ -217,7 +220,7 @@ export const updateGroupRow = <R extends Table.RowData, M extends Model.HttpMode
 
 export const createGroupRow = <R extends Table.RowData, M extends Model.HttpModel>(
   config: Omit<CreateRowFromModelConfig<Table.GroupRowId, "group", R, M, Model.Group>, "gridId" | "rowType" | "id"> & {
-    readonly childrenRows: Table.ModelRow<R, M>[];
+    readonly childrenRows: Table.ModelRow<R>[];
   }
 ): Table.GroupRow<R> => {
   return {
@@ -238,7 +241,7 @@ export const createGroupRow = <R extends Table.RowData, M extends Model.HttpMode
 
 export const updateMarkupRowData = <R extends Table.RowData, M extends Model.HttpModel>(
   config: Omit<UpdateRowDataConfig<R, M, Model.Markup>, "getValue"> & {
-    readonly childrenRows?: Table.ModelRow<R, M>[];
+    readonly childrenRows?: Table.ModelRow<R>[];
   }
 ): R =>
   updateRowData({
@@ -260,7 +263,7 @@ export const updateMarkupRowData = <R extends Table.RowData, M extends Model.Htt
 
 export const createMarkupRowData = <R extends Table.RowData, M extends Model.HttpModel>(
   config: Omit<CreateRowDataConfig<R, M, Model.Markup>, "getValue"> & {
-    readonly childrenRows: Table.ModelRow<R, M>[];
+    readonly childrenRows: Table.ModelRow<R>[];
   }
 ): R =>
   createRowData({
@@ -279,7 +282,7 @@ export const createMarkupRowData = <R extends Table.RowData, M extends Model.Htt
 
 export const updateMarkupRow = <R extends Table.RowData, M extends Model.HttpModel>(
   config: UpdateRowConfig<Table.MarkupRow<R>, R, M, Model.Markup> & {
-    readonly childrenRows?: Table.ModelRow<R, M>[];
+    readonly childrenRows?: Table.ModelRow<R>[];
   }
 ): Table.MarkupRow<R> => {
   return {
@@ -298,7 +301,7 @@ export const createMarkupRow = <R extends Table.RowData, M extends Model.HttpMod
     CreateRowFromModelConfig<Table.MarkupRowId, "markup", R, M, Model.Markup>,
     "gridId" | "rowType" | "id"
   > & {
-    readonly childrenRows: Table.ModelRow<R, M>[];
+    readonly childrenRows: Table.ModelRow<R>[];
   }
 ): Table.MarkupRow<R> => {
   return {
@@ -361,7 +364,7 @@ export const createModelRow = <R extends Table.RowData, M extends Model.HttpMode
   config: Omit<CreateRowFromModelConfig<Table.ModelRowId, "model", R, M>, "gridId" | "rowType" | "id"> & {
     readonly getRowChildren?: (m: M) => number[];
   }
-): Table.ModelRow<R, M> => {
+): Table.ModelRow<R> => {
   return {
     children: !isNil(config.getRowChildren) ? config.getRowChildren(config.model) : [],
     ...createRow<Table.ModelRowId, "model", R, M, "data">({

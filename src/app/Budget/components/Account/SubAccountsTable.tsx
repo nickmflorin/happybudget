@@ -93,7 +93,7 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
   const fringes = useSelector(selectFringes);
   const accountDetail = useSelector(selectAccountDetail);
   const subAccountUnits = useSelector(selectSubAccountUnits);
-  const table = tabling.hooks.useTable<R, M>();
+  const table = tabling.hooks.useTable<R>();
 
   return (
     <React.Fragment>
@@ -109,25 +109,25 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
         exportFileName={!isNil(accountDetail) ? `account_${accountDetail.identifier}` : ""}
         categoryName={"Sub Account"}
         identifierFieldHeader={"Account"}
-        onRowExpand={(row: Table.ModelRow<R, M>) => history.push(`/budgets/${budgetId}/subaccounts/${row.id}`)}
+        onRowExpand={(row: Table.ModelRow<R>) => history.push(`/budgets/${budgetId}/subaccounts/${row.id}`)}
         onBack={() => history.push(`/budgets/${budgetId}/accounts?row=${accountId}`)}
-        onGroupRows={(rows: (Table.ModelRow<R, M> | Table.MarkupRow<R>)[]) =>
+        onGroupRows={(rows: (Table.ModelRow<R> | Table.MarkupRow<R>)[]) =>
           setGroupSubAccounts(
             map(
-              filter(rows, (row: Table.ModelRow<R, M> | Table.MarkupRow<R>) =>
+              filter(rows, (row: Table.ModelRow<R> | Table.MarkupRow<R>) =>
                 tabling.typeguards.isModelRow(row)
-              ) as Table.ModelRow<R, M>[],
-              (row: Table.ModelRow<R, M>) => row.id
+              ) as Table.ModelRow<R>[],
+              (row: Table.ModelRow<R>) => row.id
             )
           )
         }
-        onMarkupRows={(rows: (Table.ModelRow<R, M> | Table.GroupRow<R>)[]) =>
+        onMarkupRows={(rows: (Table.ModelRow<R> | Table.GroupRow<R>)[]) =>
           setMarkupSubAccounts(
             map(
-              filter(rows, (row: Table.ModelRow<R, M> | Table.GroupRow<R>) =>
+              filter(rows, (row: Table.ModelRow<R> | Table.GroupRow<R>) =>
                 tabling.typeguards.isModelRow(row)
-              ) as Table.ModelRow<R, M>[],
-              (row: Table.ModelRow<R, M>) => row.id
+              ) as Table.ModelRow<R>[],
+              (row: Table.ModelRow<R>) => row.id
             )
           )
         }

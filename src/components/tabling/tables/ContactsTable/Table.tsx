@@ -13,7 +13,7 @@ export type Props = Omit<AuthenticatedModelTableProps<R, M>, "columns"> & {
 };
 
 const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Props, R, M>): JSX.Element => {
-  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
+  const table = tabling.hooks.useTableIfNotDefined<R>(props.table);
   return (
     <AuthenticatedModelTable<R, M>
       {...props}
@@ -25,7 +25,7 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
       indexColumnWidth={40}
       rowHeight={40}
       expandCellTooltip={"Edit"}
-      getModelRowName={(r: Table.ModelRow<R, M>) =>
+      getModelRowName={(r: Table.ModelRow<R>) =>
         util.conditionalJoinString(r.data.names_and_image.first_name, r.data.names_and_image.last_name)
       }
       getPlaceholderRowName={(r: Table.PlaceholderRow<R>) =>
@@ -42,7 +42,7 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
         Columns,
         { field: "names_and_image" },
         {
-          onCellDoubleClicked: (row: Table.Row<R, M>) => tabling.typeguards.isModelRow(row) && props.onRowExpand?.(row)
+          onCellDoubleClicked: (row: Table.Row<R>) => tabling.typeguards.isModelRow(row) && props.onRowExpand?.(row)
         }
       )}
     />

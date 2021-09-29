@@ -38,7 +38,7 @@ const GroupRow = <R extends Table.RowData, M extends Model.HttpModel = Model.Htt
         ...props.cellProps,
         className: [
           props.cellProps?.className,
-          (params: PdfTable.CellCallbackParams<R, M>) => {
+          (params: Table.PdfCellCallbackParams<R, M>) => {
             // We have to add a borderLeft to the first indented column for the Group Row
             // because the Row itself will not have a borderLeft attribute on it and the
             // Row starts one column to the right.

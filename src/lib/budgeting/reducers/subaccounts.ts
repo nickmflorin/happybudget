@@ -12,7 +12,7 @@ type S = Tables.SubAccountTableStore;
 const recalculateSubAccountRow = (
   st: S,
   action: Redux.Action,
-  row: Table.DataRow<R, M>
+  row: Table.DataRow<R>
 ): Pick<R, "estimated" | "fringe_contribution"> => {
   /*
   In the case that the SubAccount has SubAccount(s) itself, the estimated value is determined
@@ -25,7 +25,7 @@ const recalculateSubAccountRow = (
 
   if (isValidToRecalculate && !isNil(row.data.quantity) && !isNil(row.data.rate)) {
     const multiplier = row.data.multiplier || 1.0;
-    const fringes: Table.Row<Tables.FringeRowData, Model.Fringe>[] = redux.reducers.findModelsInData(
+    const fringes: Table.Row<Tables.FringeRowData>[] = redux.reducers.findModelsInData(
       action,
       st.fringes.data,
       row.data.fringes,
@@ -77,7 +77,7 @@ export type AuthenticatedSubAccountTableActionMap = Redux.AuthenticatedTableActi
 export const createAuthenticatedSubAccountsTableReducer = (
   config: BudgetTableReducerConfig<R, M, S, AuthenticatedSubAccountTableActionMap> & {
     readonly fringes: Redux.Reducer<Tables.FringeTableStore>;
-    readonly fringesTableChangedAction: PayloadActionCreator<Table.ChangeEvent<Tables.FringeRowData, Model.Fringe>>;
+    readonly fringesTableChangedAction: PayloadActionCreator<Table.ChangeEvent<Tables.FringeRowData>>;
   }
 ): Redux.Reducer<S> => {
   const generic = createAuthenticatedBudgetTableReducer<R, M, S>({
@@ -98,7 +98,7 @@ export const createAuthenticatedSubAccountsTableReducer = (
       changed we need to recalculate the SubAcccount(s) that have that Fringe so they display
       estimated values that are consistent with the change to the Fringe.
       */
-      const e: Table.ChangeEvent<Tables.FringeRowData, Model.Fringe> = action.payload;
+      const e: Table.ChangeEvent<Tables.FringeRowData> = action.payload;
 
       // There are no group related events for the Fringe Table, but we have to assert this with
       // a typeguard to make TS happy.
@@ -113,19 +113,19 @@ export const createAuthenticatedSubAccountsTableReducer = (
           on the SubAccount already has fringes applied, and we cannot refringe and already
           fringed value without knowing what the previous Fringe(s) were.
           */
-          const rowsWithFringes: Table.DataRow<R, M>[] = flatten(
+          const rowsWithFringes: Table.DataRow<R>[] = flatten(
             map(
               fringeIds,
               (id: number) =>
                 filter(
                   newState.data,
-                  (row: Table.Row<R, M>) => tabling.typeguards.isDataRow(row) && includes(row.data.fringes, id)
-                ) as Table.DataRow<R, M>[]
+                  (row: Table.Row<R>) => tabling.typeguards.isDataRow(row) && includes(row.data.fringes, id)
+                ) as Table.DataRow<R>[]
             )
           );
           return reduce(
-            uniqBy(rowsWithFringes, (r: Table.DataRow<R, M>) => r.id),
-            (s: S, r: Table.DataRow<R, M>): S => {
+            uniqBy(rowsWithFringes, (r: Table.DataRow<R>) => r.id),
+            (s: S, r: Table.DataRow<R>): S => {
               let payload: Partial<R> = recalculateSubAccountRow(s, action, r);
               if (removeFringes === true) {
                 payload = {
@@ -135,11 +135,7 @@ export const createAuthenticatedSubAccountsTableReducer = (
               }
               return {
                 ...s,
-                data: util.replaceInArray<Table.Row<R, M>>(
-                  s.data,
-                  { id: r.id },
-                  { ...r, data: { ...r.data, ...payload } }
-                )
+                data: util.replaceInArray<Table.Row<R>>(s.data, { id: r.id }, { ...r, data: { ...r.data, ...payload } })
               };
             },
             newState
@@ -159,15 +155,11 @@ export const createAuthenticatedSubAccountsTableReducer = (
           to determine what SubAccount(s) need to be updated (as a result of the change to the
           Fringe).
           */
-          const consolidated = tabling.events.consolidateTableChange<Tables.FringeRowData, Model.Fringe>(e.payload);
-          const ids: Table.DataRowId[] = map(
-            filter(consolidated, (ch: Table.RowChange<Tables.FringeRowData, Model.Fringe>) =>
-              tabling.typeguards.isDataRow(ch.row)
-            ),
-            (ch: Table.RowChange<Tables.FringeRowData, Model.Fringe>) => ch.id
-          ) as Table.DataRowId[];
+          const consolidated = tabling.events.consolidateRowChanges<Tables.FringeRowData, Table.ModelRowId>(
+            e.payload as Table.DataChangePayload<Tables.FringeRowData, Table.ModelRowId>
+          );
           newState = recalculateSubAccountsWithFringes(
-            filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[]
+            map(consolidated, (r: Table.RowChange<Tables.FringeRowData, Table.ModelRowId>) => r.id)
           );
         } else if (tabling.typeguards.isRowAddEvent(e)) {
           // We do not need to worry about this right now, because when a Fringe is just added it

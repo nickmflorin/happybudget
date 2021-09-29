@@ -16,7 +16,7 @@ export interface Props extends Omit<AuthenticatedModelTableProps<R, M>, "columns
 }
 
 const FringesTable: React.FC<WithConnectedTableProps<Props, R, M, S>> = ({ exportFileName, ...props }): JSX.Element => {
-  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
+  const table = tabling.hooks.useTableIfNotDefined<R>(props.table);
 
   return (
     <AuthenticatedModelTable<R, M>

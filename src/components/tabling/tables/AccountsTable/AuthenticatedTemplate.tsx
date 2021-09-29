@@ -17,7 +17,7 @@ export type AuthenticatedTemplateProps = AccountsTableProps &
   };
 
 const AuthenticatedTemplateAccountsTable = (props: AuthenticatedTemplateProps): JSX.Element => {
-  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
+  const table = tabling.hooks.useTableIfNotDefined<R>(props.table);
 
   return (
     <AuthenticatedBudgetTable<R, M>
@@ -29,10 +29,10 @@ const AuthenticatedTemplateAccountsTable = (props: AuthenticatedTemplateProps): 
           label: "Group",
           isWriteOnly: true,
           onClick: () => {
-            const rows: Table.Row<R, M>[] = table.current.getRowsAboveAndIncludingFocusedRow();
-            const modelRows: Table.ModelRow<R, M>[] = filter(rows, (r: Table.Row<R, M>) =>
+            const rows: Table.Row<R>[] = table.current.getRowsAboveAndIncludingFocusedRow();
+            const modelRows: Table.ModelRow<R>[] = filter(rows, (r: Table.Row<R>) =>
               tabling.typeguards.isModelRow(r)
-            ) as Table.ModelRow<R, M>[];
+            ) as Table.ModelRow<R>[];
             if (modelRows.length !== 0) {
               props.onGroupRows?.(modelRows);
             }
