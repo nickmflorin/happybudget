@@ -27,5 +27,5 @@ export const evaluateFlagFromEnvOrMemory = (option: Application.ConfigOption): b
   if (!isNil(valueFromMemory)) {
     return valueFromMemory;
   }
-  return option.default || false;
+  return option.default === undefined ? false : option.default;
 };
