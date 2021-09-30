@@ -128,12 +128,18 @@ const Columns: Table.Column<R, M>[] = [
         (curr: number, r: Table.ModelRow<R>) => curr + r.data.estimated + r.data.fringe_contribution,
         0.0
       );
+    },
+    getMarkupValue: (rows: Table.ModelRow<R>[]) => {
+      return reduce(rows, (curr: number, r: Table.ModelRow<R>) => curr + r.data.markup_contribution, 0.0);
     }
   }),
   framework.columnObjs.CalculatedColumn<R, M>({
     field: "actual",
     headerName: "Actual",
     getGroupValue: (rows: Table.ModelRow<R>[]) => {
+      return reduce(rows, (curr: number, r: Table.ModelRow<R>) => curr + r.data.actual, 0.0);
+    },
+    getMarkupValue: (rows: Table.ModelRow<R>[]) => {
       return reduce(rows, (curr: number, r: Table.ModelRow<R>) => curr + r.data.actual, 0.0);
     }
   }),

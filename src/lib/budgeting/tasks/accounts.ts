@@ -93,7 +93,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
             { data: [{}, {}] },
             { cancelToken: source.token }
           );
-          yield put(config.actions.response({ models: response.children, groups: groups.data }));
+          yield put(config.actions.response({ models: response.children, groups: groups.data, markups: markups.data }));
         } else {
           yield put(config.actions.response({ models: models.data, groups: groups.data, markups: markups.data }));
         }
