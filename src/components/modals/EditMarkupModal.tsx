@@ -46,11 +46,12 @@ const EditMarkupModal = <M extends Model.SimpleAccount | Model.SimpleAccount>({
       request={api.getMarkup}
       update={api.updateMarkup}
       setFormData={(markup: Model.Markup, form: FormInstance<Http.MarkupPayload>) => {
+        // Because AntD sucks and form.setFields does not trigger onValuesChanged.
         markupRef.current?.setUnitState(markup.unit?.id === undefined ? null : markup.unit?.id);
         form.setFields([
           { name: "identifier", value: markup.identifier },
           { name: "description", value: markup.description },
-          { name: "unit", value: markup.unit?.id || null },
+          { name: "unit", value: markup.unit?.id === undefined ? null : markup.unit?.id },
           { name: "rate", value: markup.rate },
           { name: "children", value: markup.children }
         ]);
