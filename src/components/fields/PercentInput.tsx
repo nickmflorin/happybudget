@@ -8,7 +8,6 @@ export type PercentInputProps = InputNumberProps;
 
 const PercentInput = (props: PercentInputProps, ref: React.ForwardedRef<typeof InputNumber>): JSX.Element => (
   <InputNumber
-    defaultValue={100}
     min={0}
     max={100}
     formatter={(value: string | number | undefined) => {
