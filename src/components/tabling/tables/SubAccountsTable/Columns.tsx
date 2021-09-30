@@ -137,6 +137,8 @@ const Columns: Table.Column<R, M>[] = [
       return reduce(rows, (curr: number, r: Table.ModelRow<R>) => curr + r.data.actual, 0.0);
     }
   }),
+  framework.columnObjs.FakeColumn<R, M>({ field: "fringe_contribution" }),
+  framework.columnObjs.FakeColumn<R, M>({ field: "markup_contribution" }),
   framework.columnObjs.CalculatedColumn<R, M>({
     colId: "variance",
     headerName: "Variance",
