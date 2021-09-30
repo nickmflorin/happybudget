@@ -40,7 +40,7 @@ const MarkupForm = (
       }}
     >
       <Form.Item name={"identifier"}>
-        <Input placeholder={"Name"} />
+        <Input placeholder={"Account"} />
       </Form.Item>
       <Form.Item name={"description"}>
         <Input placeholder={"Description"} />
