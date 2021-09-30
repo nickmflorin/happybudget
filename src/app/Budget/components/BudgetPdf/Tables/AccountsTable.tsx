@@ -24,7 +24,7 @@ const AccountsTable = ({
     return filter(columns, (column: Table.PdfColumn<R, M>) => !isNil(column.footer)).length !== 0;
   }, [columns]);
 
-  const table: Table.Row<R>[] = tabling.data.createTableRows<Tables.PdfAccountRowData, Model.PdfAccount>({
+  const table: Table.BodyRow<R>[] = tabling.data.createTableRows<Tables.PdfAccountRowData, Model.PdfAccount>({
     response: { models: data, groups },
     columns
   });
@@ -33,7 +33,7 @@ const AccountsTable = ({
     let runningIndex = 1;
     const rows = reduce(
       table,
-      (rws: JSX.Element[], row: Table.Row<R>) => {
+      (rws: JSX.Element[], row: Table.BodyRow<R>) => {
         runningIndex = runningIndex + 1;
         if (tabling.typeguards.isDataRow(row)) {
           return [...rws, <BodyRow key={runningIndex} index={runningIndex} columns={columns} row={row} />];

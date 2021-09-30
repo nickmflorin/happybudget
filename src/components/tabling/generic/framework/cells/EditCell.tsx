@@ -8,7 +8,7 @@ interface EditCellProps<
   M extends Model.HttpModel = Model.HttpModel,
   S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 > extends Table.CellProps<R, M, S, null> {
-  readonly onEdit: (row: Table.Row<R>) => void;
+  readonly onEdit: (row: Table.BodyRow<R>) => void;
 }
 
 /* eslint-disable indent */
@@ -21,7 +21,7 @@ const EditCell = <
   node,
   ...props
 }: EditCellProps<R, M, S>): JSX.Element => {
-  const row: Table.Row<R> = node.data;
+  const row: Table.BodyRow<R> = node.data;
 
   const rowIsHovered = () => {
     const parent = props.eGridCell.parentElement;

@@ -76,7 +76,7 @@ const AccountTable = ({
       account.children,
       (subaccount: M) => !(options.excludeZeroTotals === true) || subaccount.estimated !== 0
     );
-    const table: Table.Row<R>[] = tabling.data.createTableRows<R, M>({
+    const table: Table.BodyRow<R>[] = tabling.data.createTableRows<R, M>({
       response: { models: subaccounts, groups: account.groups },
       columns
     });
@@ -84,7 +84,7 @@ const AccountTable = ({
     let runningIndex = 2;
     let rows = reduce(
       table,
-      (rws: JSX.Element[], subAccountRow: Table.Row<R>) => {
+      (rws: JSX.Element[], subAccountRow: Table.BodyRow<R>) => {
         runningIndex = runningIndex + 1;
 
         if (tabling.typeguards.isModelRow(subAccountRow)) {
@@ -97,14 +97,14 @@ const AccountTable = ({
             // const isLastSubAccount = subaccountRowGroupIndex === subaccounts.length - 1;
             const isLastSubAccount = false;
 
-            const subTable: Table.Row<R>[] = tabling.data.createTableRows<R, M>({
+            const subTable: Table.BodyRow<R>[] = tabling.data.createTableRows<R, M>({
               response: { models: details, groups: subAccount.groups },
               columns
             });
 
             let subRows: JSX.Element[] = reduce(
               subTable,
-              (subRws: JSX.Element[], detailRow: Table.Row<R>) => {
+              (subRws: JSX.Element[], detailRow: Table.BodyRow<R>) => {
                 runningIndex = runningIndex + 1;
                 if (tabling.typeguards.isDataRow(detailRow)) {
                   return [

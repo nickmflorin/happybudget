@@ -12,6 +12,18 @@ export const isGroupRow = <R extends Table.RowData = object>(row: Table.Row<R>):
 export const isGroupRowId = (id: Table.RowId): id is Table.GroupRowId =>
   typeof id === "string" && id.startsWith("group-");
 
+export const isFooterRow = <R extends Table.RowData = object>(row: Table.Row<R>): row is Table.FooterRow =>
+  (row as Table.FooterRow).rowType === "footer";
+
+export const isFooterRowId = (id: Table.RowId): id is Table.FooterRowId =>
+  typeof id === "string" && id.startsWith("footer-");
+
+export const isBodyRow = <R extends Table.RowData = object>(row: Table.Row<R>): row is Table.BodyRow<R> =>
+  !isFooterRow(row);
+
+export const isBodyRowId = (id: Table.RowId): id is Table.FooterRowId =>
+  typeof id === "string" && !id.startsWith("footer-");
+
 export const isMarkupRow = <R extends Table.RowData = object>(row: Table.Row<R>): row is Table.MarkupRow<R> =>
   (row as Table.MarkupRow<R>).rowType === "markup";
 
@@ -41,7 +53,7 @@ export const isAuthenticatedActionMap = <
   (a as Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<R, M>>).tableChanged !== undefined;
 
 export const isRow = <R extends Table.RowData, M extends Model.HttpModel>(obj: Table.Row<R> | M): obj is Table.Row<R> =>
-  (obj as Table.Row<R>).data !== undefined;
+  (obj as Table.Row<R>).rowType !== undefined;
 
 export const isAgColumn = <R extends Table.RowData>(
   col: Table.Column<R, any, any> | Table.PdfColumn<R, any>

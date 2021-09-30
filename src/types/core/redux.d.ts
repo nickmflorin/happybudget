@@ -197,7 +197,7 @@ namespace Redux {
   };
 
   type TableStore<D extends Table.RowData = object, M extends Model.HttpModel = Model.HttpModel> = {
-    readonly data: Table.Row<D>[];
+    readonly data: Table.BodyRow<D>[];
     readonly models: M[];
     readonly groups: Model.Group[];
     readonly search: string;

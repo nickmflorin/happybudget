@@ -89,13 +89,13 @@ type UseAgProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpM
   readonly onPasteEnd?: (event: PasteEndEvent) => void;
   readonly onCellValueChanged?: (e: CellValueChangedEvent) => void;
   readonly fillOperation?: (params: FillOperationParams) => boolean;
-  readonly getContextMenuItems?: (row: Table.Row<R>, node: Table.RowNode) => Table.MenuItemDef[];
+  readonly getContextMenuItems?: (row: Table.BodyRow<R>, node: Table.RowNode) => Table.MenuItemDef[];
 };
 
 export interface GridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
   extends UseAgProps<R, M> {
   readonly id: Table.GridId;
-  readonly data?: Table.Row<R>[];
+  readonly data?: Table.BodyRow<R>[];
   readonly hiddenColumns: (keyof R | string)[];
   readonly gridOptions: Table.GridOptions;
   readonly indexColumn?: Partial<Table.Column<R, M>>;
@@ -105,7 +105,7 @@ export interface GridProps<R extends Table.RowData, M extends Model.HttpModel = 
   readonly rowClass?: Table.RowClassName;
   readonly rowHeight?: number;
   readonly onCellDoubleClicked?: (e: CellDoubleClickedEvent) => void;
-  readonly getContextMenuItems?: (row: Table.Row<R>, node: Table.RowNode) => Table.MenuItemDef[];
+  readonly getContextMenuItems?: (row: Table.BodyRow<R>, node: Table.RowNode) => Table.MenuItemDef[];
   readonly navigateToNextCell?: (params: NavigateToNextCellParams) => Table.CellPosition;
   readonly processCellForClipboard?: (params: ProcessCellForExportParams) => string;
   readonly tabToNextCell?: (params: TabToNextCellParams) => Table.CellPosition;
@@ -188,7 +188,7 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
             valueGetter: isNil(agColumn.valueGetter)
               ? (params: ValueGetterParams) => {
                   if (!isNil(params.node)) {
-                    const row: Table.Row<R> | undefined = params.node.data;
+                    const row: Table.BodyRow<R> | undefined = params.node.data;
                     if (!isNil(row) && !isNil(row.data)) {
                       return row.data[params.column.getColId() as keyof R];
                     }
@@ -206,11 +206,14 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
             colSpan: (params: ColSpanParams) => (!isNil(col.colSpan) ? col.colSpan({ ...params, columns }) : 1),
             editable: (params: EditableCallbackParams) => {
               const row: Table.Row<R> = params.node.data;
-              return typeof col.editable === "function"
-                ? col.editable({ row, column: col })
-                : isNil(col.editable)
-                ? false
-                : col.editable;
+              if (tabling.typeguards.isBodyRow(row)) {
+                return typeof col.editable === "function"
+                  ? col.editable({ row, column: col })
+                  : isNil(col.editable)
+                  ? false
+                  : col.editable;
+              }
+              return false;
             },
             cellClass: (params: CellClassParams) => {
               const row: Table.Row<R> = params.node.data;
@@ -278,14 +281,16 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
         getContextMenuItems={(params: GetContextMenuItemsParams) => {
           if (!isNil(props.getContextMenuItems) && !isNil(params.node)) {
             const row: Table.Row<R> = params.node.data;
-            return props.getContextMenuItems(row, params.node);
+            if (tabling.typeguards.isBodyRow(row)) {
+              return props.getContextMenuItems(row, params.node);
+            }
           }
           return [];
         }}
         getRowClass={(params: RowClassParams) =>
           tabling.aggrid.mergeClassNames<RowClassParams>(params, "row", rowClass)
         }
-        rowData={map(data, (r: Table.Row<R>) => {
+        rowData={map(data, (r: Table.BodyRow<R>) => {
           /*
           We have to deep clone the row data because it is being pulled directly from the store
           and as such, is immutable.  If we did not do this, than AG Grid would be applying the

@@ -94,12 +94,12 @@ export const injectMarkupsAndGroups = <
 };
 
 export const orderTableRows = <R extends Table.RowData, M extends Model.TypedHttpModel>(
-  data: Table.Row<R>[]
-): Table.Row<R>[] => {
+  data: Table.BodyRow<R>[]
+): Table.BodyRow<R>[] => {
   // The order of the actual data rows of the table dictate the order of everything else.
-  const dataRows = filter(data, (r: Table.Row<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[];
-  const markupRows = filter(data, (r: Table.Row<R>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[];
-  const groupRows = filter(data, (r: Table.Row<R>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[];
+  const dataRows = filter(data, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[];
+  const markupRows = filter(data, (r: Table.BodyRow<R>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[];
+  const groupRows = filter(data, (r: Table.BodyRow<R>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[];
   return injectMarkupsAndGroups<R, M, Table.DataRow<R>, Table.MarkupRow<R>, Table.GroupRow<R>>({
     groups: groupRows,
     current: dataRows,
@@ -109,7 +109,7 @@ export const orderTableRows = <R extends Table.RowData, M extends Model.TypedHtt
 
 export const createTableRows = <R extends Table.RowData, M extends Model.TypedHttpModel>(
   config: Table.CreateTableDataConfig<R, M>
-): Table.Row<R>[] => {
+): Table.BodyRow<R>[] => {
   const models = config.response.models;
   const groups = config.response.groups === undefined ? [] : config.response.groups;
   const markups = config.response.markups === undefined ? [] : config.response.markups;

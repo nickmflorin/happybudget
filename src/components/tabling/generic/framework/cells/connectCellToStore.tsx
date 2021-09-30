@@ -24,8 +24,9 @@ const connectCellToStore = <
         selectorFn = fn;
       }
     }
+    const field = props.customCol.field || props.customCol.colId;
     const valueSelector = createSelector([selectorFn], (v: Partial<R> | null) =>
-      !isNil(v) && !isNil(props.customCol) && !isNil(props.customCol.field) ? v[props.customCol.field] : null
+      !isNil(v) && !isNil(props.customCol) && !isNil(field) ? v[field as keyof R] : null
     );
     const value = useSelector(valueSelector);
     if (props.gridId === "data" || isNil(props.footerRowSelectors)) {

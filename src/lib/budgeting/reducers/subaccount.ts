@@ -56,12 +56,16 @@ export const createSubAccountDetailReducer = <S extends MinimalSubAccountStore>(
             data: {
               ...newState.detail.data,
               estimated: reduce(
-                filter(newState.table.data, (r: Table.Row<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[],
+                filter(newState.table.data, (r: Table.BodyRow<R>) =>
+                  tabling.typeguards.isDataRow(r)
+                ) as Table.DataRow<R>[],
                 (curr: number, row: Table.DataRow<R>) => curr + (row.data.estimated || 0),
                 0
               ),
               actual: reduce(
-                filter(newState.table.data, (r: Table.Row<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[],
+                filter(newState.table.data, (r: Table.BodyRow<R>) =>
+                  tabling.typeguards.isDataRow(r)
+                ) as Table.DataRow<R>[],
                 (curr: number, row: Table.DataRow<R>) => curr + (row.data.actual || 0),
                 0
               )

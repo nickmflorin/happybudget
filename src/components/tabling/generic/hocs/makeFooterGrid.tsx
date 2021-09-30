@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { isNil, map } from "lodash";
 import hoistNonReactStatics from "hoist-non-react-statics";
 
-import { hooks } from "lib";
+import { hooks, tabling } from "lib";
 
 import { GridProps } from "../grids";
 
@@ -24,11 +24,10 @@ const FooterGrid =
           if (!isNil(footerColumn)) {
             return {
               ...col,
-              ...footerColumn,
-              editable: false
+              ...footerColumn
             };
           }
-          return { ...col, editable: false };
+          return col;
         };
         return map(props.columns, (col: Table.Column<R, M>) => UniversalFooterColumn(col));
       }, [hooks.useDeepEqualMemo(props.columns)]);
@@ -38,7 +37,7 @@ const FooterGrid =
           {...props}
           id={config.id}
           columns={columns}
-          data={[{ id: config.rowId, data: {} }]}
+          data={[tabling.rows.createFooterRow({ gridId: config.id })]}
           headerHeight={0}
           rowHeight={config.rowHeight || 38}
           className={classNames("grid--footer", config.className)}

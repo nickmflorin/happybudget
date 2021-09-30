@@ -29,8 +29,8 @@ const AuthenticatedTemplateAccountsTable = (props: AuthenticatedTemplateProps): 
           label: "Group",
           isWriteOnly: true,
           onClick: () => {
-            const rows: Table.Row<R>[] = table.current.getRowsAboveAndIncludingFocusedRow();
-            const modelRows: Table.ModelRow<R>[] = filter(rows, (r: Table.Row<R>) =>
+            const rows: Table.BodyRow<R>[] = table.current.getRowsAboveAndIncludingFocusedRow();
+            const modelRows: Table.ModelRow<R>[] = filter(rows, (r: Table.BodyRow<R>) =>
               tabling.typeguards.isModelRow(r)
             ) as Table.ModelRow<R>[];
             if (modelRows.length !== 0) {

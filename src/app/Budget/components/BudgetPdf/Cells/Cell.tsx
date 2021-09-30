@@ -60,7 +60,7 @@ const evaluateCellStyle = <R extends Table.RowData, M extends Model.HttpModel = 
 
 export interface CellProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
   readonly column: Table.PdfColumn<R, M>;
-  readonly row: Table.Row<R>;
+  readonly row: Table.BodyRow<R>;
   readonly location: Table.PdfCellLocation;
   readonly style?: Table.PdfCellStyle<R, M>;
   readonly className?: Table.PdfCellClassName<R, M>;
@@ -91,7 +91,7 @@ const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
   const rawValue = useMemo(() => {
     return !isNil(props.valueCallback)
       ? props.valueCallback(callbackParams)
-      : props.row[props.column.field as keyof Table.Row<R>];
+      : props.row[props.column.field as keyof Table.BodyRow<R>];
   }, [callbackParams, props.row, props.column]);
 
   const value = useMemo(() => {

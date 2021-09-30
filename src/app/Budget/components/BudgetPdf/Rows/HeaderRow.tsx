@@ -18,7 +18,7 @@ const HeaderRow = <R extends Table.RowData, M extends Model.HttpModel = Model.Ht
         return obj;
       },
       {}
-    ) as Table.Row<R>;
+    ) as Table.BodyRow<R>;
   }, [props.columns]);
   return (
     <Row<R, M>

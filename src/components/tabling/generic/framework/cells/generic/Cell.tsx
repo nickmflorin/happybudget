@@ -16,7 +16,7 @@ const Cell = <
 >(
   props: Table.CellWithChildrenProps<R, M, S>
 ): JSX.Element => {
-  const row: Table.Row<R> = props.node.data;
+  const row: Table.BodyRow<R> = props.node.data;
 
   const showClearButton = useMemo(() => {
     if (!isNil(props.onClear)) {

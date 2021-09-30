@@ -8,7 +8,7 @@ import BodyRow from "./BodyRow";
 const FooterRow = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   props: Omit<RowProps<R, M>, "row">
 ): JSX.Element => {
-  const footerRow = useMemo((): Table.Row<R> => {
+  const footerRow = useMemo((): Table.BodyRow<R> => {
     return reduce(
       props.columns,
       (obj: { [key: string]: any }, col: Table.PdfColumn<R, M>) => {
@@ -20,7 +20,7 @@ const FooterRow = <R extends Table.RowData, M extends Model.HttpModel = Model.Ht
         return obj;
       },
       {}
-    ) as Table.Row<R>;
+    ) as Table.BodyRow<R>;
   }, [props.columns]);
   return (
     <BodyRow<R, M>

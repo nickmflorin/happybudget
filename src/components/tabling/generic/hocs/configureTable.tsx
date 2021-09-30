@@ -205,7 +205,7 @@ const configureTable = <
         );
         const csvData: CSVData = [map(cs, (col: Table.Column<R, M>) => col.headerName || "")];
         apis.grid.forEachNode((node: RowNode, index: number) => {
-          const row: Table.Row<R> = node.data;
+          const row: Table.BodyRow<R> = node.data;
           if (typeguards.isDataRow(row)) {
             csvData.push(
               reduce(

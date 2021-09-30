@@ -51,7 +51,7 @@ const AuthenticatedMenu = <R extends Table.RowData, M extends Model.HttpModel = 
         <Checkbox
           onChange={(e: CheckboxChangeEvent) => {
             props.apis?.grid.forEachNode((node: RowNode) => {
-              const row: Table.Row<R> = node.data;
+              const row: Table.BodyRow<R> = node.data;
               if (
                 tabling.typeguards.isEditableRow(row) &&
                 (isNil(props.rowHasCheckboxSelection) || props.rowHasCheckboxSelection(row))

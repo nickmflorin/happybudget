@@ -20,7 +20,7 @@ namespace Table {
   };
 
   type FooterGridId = "footer" | "page";
-  type GridId = "data" | "footer" | "page";
+  type GridId = "data" | FooterGridId;
   type GridSet<T> = { [key in GridId]: T };
   type FooterGridSet<T> = { [key in FooterGridId]: T };
 
@@ -65,15 +65,18 @@ namespace Table {
     readonly color?: string;
   }
 
-  type RowType = "placeholder" | "model" | "group" | "markup";
+  type RowType = "placeholder" | "model" | "group" | "markup" | "footer";
 
   type ModelRowId = number;
+  type FooterRowId = `footer-${FooterGridId}`;
   type PlaceholderRowId = `placeholder-${number}`;
   type GroupRowId = `group-${number}`;
   type MarkupRowId = `markup-${number}`;
-  type RowId = ModelRowId | PlaceholderRowId | GroupRowId | MarkupRowId;
   type DataRowId = ModelRowId | PlaceholderRowId;
   type EditableRowId = ModelRowId | MarkupRowId;
+  type BodyRowId = ModelRowId | PlaceholderRowId | GroupRowId | MarkupRowId;
+
+  type RowId = BodyRowId | FooterRowId;
 
   type RowNameLabelType = number | string | null;
   type RowStringGetter<R extends Row> = RowNameLabelType | FnWithTypedArgs<RowNameLabelType, [R]>;
@@ -81,29 +84,38 @@ namespace Table {
   type RowData = object;
   type RowValue<R extends RowData> = Exclude<R[keyof R], undefined>;
 
-  type IRow<RId extends RowId, TP extends RowType, D extends RowData, Grid extends GridId = GridId> = {
+  type IRow<RId extends RowId, TP extends RowType, Grid extends GridId = GridId> = {
     readonly id: RId;
     readonly rowType: TP;
     readonly gridId: Grid;
+  };
+
+  type IBodyRow<RId extends RowId, TP extends RowType, D extends RowData, Grid extends GridId = GridId> = IRow<
+    RId,
+    TP,
+    Grid
+  > & {
     readonly data: D;
   };
 
-  type ModelRow<R extends RowData, Grid extends GridId = "data"> = IRow<ModelRowId, "model", R, Grid> & {
+  type FooterRow<Grid extends FooterGridId = FooterGridId> = IRow<FooterRowId, "footer", Grid>;
+  type ModelRow<R extends RowData, Grid extends GridId = "data"> = IBodyRow<ModelRowId, "model", R, Grid> & {
     readonly children: number[];
   };
-  type PlaceholderRow<R extends RowData> = IRow<PlaceholderRowId, "placeholder", R, "data">;
-  type GroupRow<R extends RowData> = IRow<GroupRowId, "group", R, "data"> & {
+  type PlaceholderRow<R extends RowData> = IBodyRow<PlaceholderRowId, "placeholder", R, "data">;
+  type GroupRow<R extends RowData> = IBodyRow<GroupRowId, "group", R, "data"> & {
     readonly children: number[];
     readonly groupData: Pick<Model.Group, "name" | "color">;
   };
-  type MarkupRow<R extends RowData> = IRow<MarkupRowId, "markup", R, "data"> & {
+  type MarkupRow<R extends RowData> = IBodyRow<MarkupRowId, "markup", R, "data"> & {
     readonly children: number[];
     readonly markupData: Pick<Model.Markup, "unit" | "rate">;
   };
-
-  type Row<D extends RowData = RowData> = ModelRow<D> | PlaceholderRow<D> | GroupRow<D> | MarkupRow<D>;
   type DataRow<D extends RowData> = ModelRow<D, "data"> | PlaceholderRow<D>;
   type EditableRow<D extends RowData> = ModelRow<D, "data"> | MarkupRow<D>;
+
+  type BodyRow<D extends RowData = RowData> = ModelRow<D> | PlaceholderRow<D> | GroupRow<D> | MarkupRow<D>;
+  type Row<D extends RowData = RowData> = BodyRow<D> | FooterRow;
 
   type CreateTableDataConfig<
     R extends RowData,
@@ -144,7 +156,7 @@ namespace Table {
 
   type CellCallbackParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
     readonly column: Column<R, M>;
-    readonly row: Row<R>;
+    readonly row: BodyRow<R>;
   };
 
   type RawClassName = string | string[] | undefined | { [key: string]: boolean };
@@ -166,7 +178,11 @@ namespace Table {
 
   type ColumnDomain = "pdf" | "aggrid";
 
-  interface BaseColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel, D extends ColumnDomain = ColumnDomain> {
+  interface BaseColumn<
+    R extends RowData,
+    M extends Model.HttpModel = Model.HttpModel,
+    D extends ColumnDomain = ColumnDomain
+  > {
     readonly field?: keyof R;
     readonly domain: D;
     readonly headerName: string;
@@ -174,7 +190,6 @@ namespace Table {
     readonly tableColumnType: TableColumnTypeId;
     readonly nullValue?: NullValue<R>;
     readonly index?: number;
-    readonly domain: ColumnDomain;
     readonly getRowValue?: (m: M) => R[keyof R];
     readonly getMarkupValue?: keyof Model.Markup | ((rows: ModelRow<R>[]) => R[keyof R]);
     readonly getGroupValue?: keyof Model.Group | ((rows: ModelRow<R>[]) => R[keyof R]);
@@ -185,7 +200,7 @@ namespace Table {
   type PdfCellCallbackParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
     readonly location: PdfCellLocation;
     readonly column: PdfColumn<R, M>;
-    readonly row: Row<R>;
+    readonly row: BodyRow<R>;
     readonly isHeader: boolean;
     readonly rawValue: any;
     readonly value: any;
@@ -229,8 +244,7 @@ namespace Table {
 
   type PdfFormatter = (value: string | number) => string;
 
-  interface PdfColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel>
-    extends BaseColumn<R, M, "pdf"> {
+  interface PdfColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel> extends BaseColumn<R, M, "pdf"> {
     // In the PDF case, since we cannot dynamically resize columns, the width refers to a ratio
     // of the column width to the overall table width assuming that all columns are present.  When
     // columns are hidden/shown, this ratio is adjusted.
@@ -296,8 +310,8 @@ namespace Table {
   }
 
   type TableInstance<R extends RowData = RowData> = {
-    readonly getFocusedRow: () => Row<R> | null;
-    readonly getRowsAboveAndIncludingFocusedRow: () => Row<R>[];
+    readonly getFocusedRow: () => BodyRow<R> | null;
+    readonly getRowsAboveAndIncludingFocusedRow: () => BodyRow<R>[];
     readonly applyTableChange: (event: SingleOrArray<ChangeEvent<R>>) => void;
     readonly applyGroupColorChange: (group: Model.Group) => void;
     readonly getCSVData: (fields?: string[]) => CSVData;
@@ -379,7 +393,7 @@ namespace Table {
   }
 
   type Cell<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
-    readonly row: Row<R>;
+    readonly row: BodyRow<R>;
     readonly column: Column<R, M>;
     readonly rowNode: import("@ag-grid-community/core").RowNode;
   };
@@ -602,15 +616,15 @@ namespace Table {
     readonly customCol: Column<R, M>;
     readonly value: V;
     readonly gridId: GridId;
-    readonly icon?: IconOrElement | ((row: Row<R>) => IconOrElement | undefined | null);
-    readonly generateNewRowData?: (rows: Table.Row<R>[]) => Partial<R>;
+    readonly icon?: IconOrElement | ((row: BodyRow<R>) => IconOrElement | undefined | null);
+    readonly generateNewRowData?: (rows: BodyRow<R>[]) => Partial<R>;
     // Note: This is only applied for the data grid rows/cells - so we have to be careful.  We need
     // a better way of establishing which props are available to cells based on which grid they lie
     // in,
-    readonly getRowColorDef: (row: Row<R>) => RowColorDef;
+    readonly getRowColorDef: (row: BodyRow<R>) => RowColorDef;
     readonly selector: (state: Application.Store) => S;
-    readonly onClear?: (row: Row<R>, column: Column<R, M>) => void;
-    readonly showClear?: (row: Row<R>, column: Column<R, M>) => boolean;
+    readonly onClear?: (row: BodyRow<R>, column: Column<R, M>) => void;
+    readonly showClear?: (row: BodyRow<R>, column: Column<R, M>) => boolean;
     readonly onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
     readonly onChangeEvent?: (event: ChangeEvent<R>) => void;
   }
@@ -638,7 +652,7 @@ namespace Table {
 
   type TaskConfig<
     R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.TypedHttpModel = Model.TypedHttpModel,
     A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
   > = Redux.TaskConfig<A> & {
     readonly columns: Column<R, M>[];
@@ -654,18 +668,18 @@ namespace Table {
     Omit<CFG, "gridId" | "response"> & {
       readonly initialState: S;
       readonly tableId: Id;
-      readonly createTableRows?: (config: CFG) => Row<R>[];
+      readonly createTableRows?: (config: CFG) => BodyRow<R>[];
     };
 
   type SagaConfig<
     R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.TypedHttpModel = Model.TypedHttpModel,
     A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
   > = Redux.SagaConfig<Redux.TableTaskMap<R>, A>;
 
   type StoreConfig<
     R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.TypedHttpModel = Model.TypedHttpModel,
     S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
     A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
   > = {

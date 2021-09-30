@@ -56,8 +56,8 @@ const ActualsTable = ({
               }
               const availableSubAccounts: Model.SimpleSubAccount[] = filter(
                 map(
-                  filter(props.data, (r: Table.Row<R>) => tabling.typeguards.isDataRow(r)),
-                  (row: Table.Row<R>) => row.data.subaccount
+                  filter(props.data, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)),
+                  (row: Table.BodyRow<R>) => row.data.subaccount
                 ),
                 (sub: Model.SimpleSubAccount | null) => sub !== null && sub.identifier !== null
               ) as Model.SimpleSubAccount[];

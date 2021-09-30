@@ -40,7 +40,6 @@ export type AuthenticatedTableProps<
   };
 
 const TableFooterGrid = FooterGrid<any, any, AuthenticatedGridProps<any, any>>({
-  rowId: "footer-row",
   id: "footer",
   className: "grid--table-footer",
   rowClass: "row--table-footer",
@@ -52,7 +51,6 @@ const TableFooterGrid = FooterGrid<any, any, AuthenticatedGridProps<any, any>>({
 };
 
 const PageFooterGrid = FooterGrid<any, any, AuthenticatedGridProps<any, any>>({
-  rowId: "page-row",
   id: "page",
   className: "grid--page-footer",
   rowClass: "row--page-footer",
@@ -185,7 +183,7 @@ const AuthenticatedTable = <
               isWriteOnly: true,
               onClick: () => {
                 const apis: Table.GridApis | null = props.tableApis.get("data");
-                const rows = filter((apis?.grid.getSelectedRows() || []) as Table.Row<R>[], (r: Table.Row<R>) =>
+                const rows = filter((apis?.grid.getSelectedRows() || []) as Table.BodyRow<R>[], (r: Table.BodyRow<R>) =>
                   tabling.typeguards.isEditableRow(r)
                 ) as Table.EditableRow<R>[];
                 if (rows.length !== 0) {
@@ -224,7 +222,7 @@ const AuthenticatedTable = <
             }
           }
           return map(nodes, (nd: Table.RowNode) => {
-            const row: Table.Row<R> = nd.data;
+            const row: Table.BodyRow<R> = nd.data;
             return row;
           });
         }
@@ -238,7 +236,7 @@ const AuthenticatedTable = <
         if (!isNil(position)) {
           const node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(position.rowIndex);
           if (!isNil(node)) {
-            const row: Table.Row<R> = node.data;
+            const row: Table.BodyRow<R> = node.data;
             return row;
           }
         }

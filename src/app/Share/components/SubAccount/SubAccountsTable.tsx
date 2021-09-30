@@ -96,7 +96,7 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
       exportFileName={!isNil(subaccountDetail) ? `subaccount_${subaccountDetail.identifier}` : ""}
       categoryName={"Detail"}
       identifierFieldHeader={"Line"}
-      onBack={(row?: Table.Row<R>) => {
+      onBack={(row?: Table.BodyRow<R>) => {
         if (!isNil(subaccountDetail) && !isNil(subaccountDetail.ancestors) && subaccountDetail.ancestors.length !== 0) {
           const ancestor = subaccountDetail.ancestors[subaccountDetail.ancestors.length - 1];
           if (ancestor.type === "subaccount") {

@@ -25,7 +25,7 @@ export const markupRowFromState = <
   }
   return redux.reducers.modelFromState<Table.MarkupRow<R>>(
     action,
-    filter(st.data, (r: Table.Row<R>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[],
+    filter(st.data, (r: Table.BodyRow<R>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[],
     predicate,
     options
   );
@@ -71,7 +71,7 @@ export const createBudgetTableChangeEventReducer = <
         model: markup,
         childrenRows: redux.reducers.findModelsInData(
           action,
-          filter(newState.data, (r: Table.Row<R>) => tabling.typeguards.isModelRow(r)),
+          filter(newState.data, (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r)),
           markup.children
         )
       });
@@ -109,7 +109,7 @@ export const createBudgetTableChangeEventReducer = <
 
         const childrenRows = filter(
           newState.data,
-          (r: Table.Row<R>) => tabling.typeguards.isModelRow(r) && includes(updatedMarkupRow.children, r.id)
+          (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) && includes(updatedMarkupRow.children, r.id)
         ) as Table.ModelRow<R>[];
 
         // Update the children rows of the MarkupRow to reflect the new MarkupRow data.
@@ -118,12 +118,12 @@ export const createBudgetTableChangeEventReducer = <
           (st: S, r: Table.ModelRow<R>) => {
             const otherMarkupRows = filter(
               newState.data,
-              (ri: Table.Row<R>) =>
+              (ri: Table.BodyRow<R>) =>
                 tabling.typeguards.isMarkupRow(ri) && includes(ri.children, r.id) && ri.id !== updatedMarkupRow.id
             ) as Table.MarkupRow<R>[];
             return {
               ...st,
-              data: util.replaceInArray<Table.Row<R>>(
+              data: util.replaceInArray<Table.BodyRow<R>>(
                 st.data,
                 { id: r.id },
                 {
@@ -144,13 +144,13 @@ export const createBudgetTableChangeEventReducer = <
         );
         newState = {
           ...newState,
-          data: util.replaceInArray<Table.Row<R>>(
+          data: util.replaceInArray<Table.BodyRow<R>>(
             newState.data,
             { id: updatedMarkupRow.id },
             tabling.rows.updateMarkupRow({
               row: updatedMarkupRow,
               columns: config.columns,
-              childrenRows: filter(newState.data, (r: Table.Row<R>) =>
+              childrenRows: filter(newState.data, (r: Table.BodyRow<R>) =>
                 tabling.typeguards.isModelRow(r)
               ) as Table.ModelRow<R>[]
             })
@@ -172,13 +172,13 @@ export const createBudgetTableChangeEventReducer = <
         // TODO: We will need to recalculate the children rows.
         const childrenRows: Table.ModelRow<R>[] = redux.reducers.findModelsInData(
           action,
-          filter(newState.data, (r: Table.Row<R>) => tabling.typeguards.isModelRow(r)),
+          filter(newState.data, (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r)),
           newChildren
         );
         newState = {
           ...newState,
           data: tabling.data.orderTableRows<R, M>(
-            util.replaceInArray<Table.Row<R>>(
+            util.replaceInArray<Table.BodyRow<R>>(
               newState.data,
               { id: mk.id },
               {

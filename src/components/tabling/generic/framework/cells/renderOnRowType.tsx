@@ -13,7 +13,7 @@ const renderOnRowType = <T extends { node: Table.RowNode } = any, R extends Tabl
   lookup: RowTypeRender<T>
 ) => {
   const WithRowsOfType = (props: T) => {
-    const row: Table.Row<R> = props.node.data;
+    const row: Table.BodyRow<R> = props.node.data;
     let Component: React.ComponentClass<T, {}> | React.FunctionComponent<T> | undefined = lookup[row.rowType];
     if (isNil(Component)) {
       Component = lookup["default"];

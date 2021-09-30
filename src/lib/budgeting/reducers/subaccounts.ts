@@ -25,7 +25,7 @@ const recalculateSubAccountRow = (
 
   if (isValidToRecalculate && !isNil(row.data.quantity) && !isNil(row.data.rate)) {
     const multiplier = row.data.multiplier || 1.0;
-    const fringes: Table.Row<Tables.FringeRowData>[] = redux.reducers.findModelsInData(
+    const fringes: Table.BodyRow<Tables.FringeRowData>[] = redux.reducers.findModelsInData(
       action,
       st.fringes.data,
       row.data.fringes,
@@ -119,7 +119,7 @@ export const createAuthenticatedSubAccountsTableReducer = (
               (id: number) =>
                 filter(
                   newState.data,
-                  (row: Table.Row<R>) => tabling.typeguards.isDataRow(row) && includes(row.data.fringes, id)
+                  (row: Table.BodyRow<R>) => tabling.typeguards.isDataRow(row) && includes(row.data.fringes, id)
                 ) as Table.DataRow<R>[]
             )
           );
@@ -135,7 +135,11 @@ export const createAuthenticatedSubAccountsTableReducer = (
               }
               return {
                 ...s,
-                data: util.replaceInArray<Table.Row<R>>(s.data, { id: r.id }, { ...r, data: { ...r.data, ...payload } })
+                data: util.replaceInArray<Table.BodyRow<R>>(
+                  s.data,
+                  { id: r.id },
+                  { ...r, data: { ...r.data, ...payload } }
+                )
               };
             },
             newState

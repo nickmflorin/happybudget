@@ -48,7 +48,7 @@ const DataGrid =
       const oldFocusedEvent = useRef<CellFocusedEvent | null>(null);
       const location = useLocation();
 
-      const getRowColorDef = hooks.useDynamicCallback((row: Table.Row<R>): Table.RowColorDef => {
+      const getRowColorDef = hooks.useDynamicCallback((row: Table.BodyRow<R>): Table.RowColorDef => {
         if (tabling.typeguards.isGroupRow(row)) {
           const colorDef = model.util.getGroupColorDefinition(row);
           if (!isNil(colorDef?.color) && !isNil(colorDef?.backgroundColor)) {
@@ -104,7 +104,7 @@ const DataGrid =
       );
 
       const getRowClass: Table.GetRowClassName = hooks.useDynamicCallback((params: Table.RowClassParams) => {
-        const row: Table.Row<R> = params.node.data;
+        const row: Table.BodyRow<R> = params.node.data;
         if (tabling.typeguards.isGroupRow(row)) {
           return classNames("row--data", "row--group", props.rowClass);
         }
@@ -113,7 +113,7 @@ const DataGrid =
 
       const getRowStyle: Table.GetRowStyle = hooks.useDynamicCallback(
         (params: Table.RowClassParams): { [key: string]: any } => {
-          const row: Table.Row<R> = params.node.data;
+          const row: Table.BodyRow<R> = params.node.data;
           return getRowColorDef(row);
         }
       );
@@ -129,7 +129,7 @@ const DataGrid =
               ? col
               : find(columns, { field: event.column.getColId() } as any);
             if (!isNil(rowNode) && !isNil(column)) {
-              const row: Table.Row<R> = rowNode.data;
+              const row: Table.BodyRow<R> = rowNode.data;
               return { rowNode, column, row };
             }
           }
@@ -185,7 +185,7 @@ const DataGrid =
               const lastRow = e.api.getLastDisplayedRow();
               e.api.forEachNodeAfterFilter((node: Table.RowNode, index: number) => {
                 if (index >= firstRow && index <= lastRow) {
-                  const row: Table.Row<R> = node.data;
+                  const row: Table.BodyRow<R> = node.data;
                   if (
                     isNil(config?.refreshRowExpandColumnOnCellHover) ||
                     config?.refreshRowExpandColumnOnCellHover(row) === true

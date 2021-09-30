@@ -10,7 +10,7 @@ const SubAccountUnitCell = (
     Model.Tag
   >
 ): JSX.Element => {
-  const row: Table.Row<Tables.SubAccountRowData> = props.node.data;
+  const row: Table.BodyRow<Tables.SubAccountRowData> = props.node.data;
   return (
     <ModelTagCell
       {...props}

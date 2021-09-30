@@ -42,7 +42,7 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
         Columns,
         { field: "names_and_image" },
         {
-          onCellDoubleClicked: (row: Table.Row<R>) => tabling.typeguards.isModelRow(row) && props.onRowExpand?.(row)
+          onCellDoubleClicked: (row: Table.BodyRow<R>) => tabling.typeguards.isModelRow(row) && props.onRowExpand?.(row)
         }
       )}
     />

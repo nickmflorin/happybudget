@@ -11,7 +11,7 @@ namespace Tables {
     readonly markup_contribution: number;
     readonly actual: number;
   }
-  type AccountRow = Table.Row<AccountRowData>;
+  type AccountRow = Table.BodyRow<AccountRowData>;
   type AccountTableStore = Redux.BudgetTableStore<AccountRowData, Model.Account>;
 
   interface SubAccountRowData {
@@ -28,7 +28,7 @@ namespace Tables {
     readonly markup_contribution: number;
     readonly actual: number;
   }
-  type SubAccountRow = Table.Row<SubAccountRowData>;
+  type SubAccountRow = Table.BodyRow<SubAccountRowData>;
   type SubAccountTableStore = Redux.BudgetTableStore<SubAccountRowData, Model.SubAccount> & {
     readonly fringes: FringeTableStore;
     readonly subaccountUnits: Model.Tag[];
@@ -42,7 +42,7 @@ namespace Tables {
     readonly rate: number | null;
     readonly unit: Model.FringeUnit;
   }
-  type FringeRow = Table.Row<FringeRowData>;
+  type FringeRow = Table.BodyRow<FringeRowData>;
   type FringeTableStore = Redux.TableStore<FringeRowData, Model.Fringe> & {
     readonly fringeColors: string[];
   };
@@ -58,7 +58,7 @@ namespace Tables {
     readonly value: number | null;
     readonly contact: number | null;
   }
-  type ActualRow = Table.Row<ActualRowData>;
+  type ActualRow = Table.BodyRow<ActualRowData>;
   type ActualTableStore = Redux.TableStore<ActualRowData, Model.Actual> & {
     readonly subAccountsTree: Redux.ModelListResponseStore<Model.SubAccountTreeNode>;
   };
@@ -73,7 +73,7 @@ namespace Tables {
     readonly estimated: number | null;
     readonly contact: number | null;
   };
-  type PdfSubAccountRow = Table.Row<PdfSubAccountRowData>;
+  type PdfSubAccountRow = Table.BodyRow<PdfSubAccountRowData>;
 
   type PdfAccountRowData = {
     readonly identifier: string | null;
@@ -82,7 +82,7 @@ namespace Tables {
     readonly variance: number | null;
     readonly actual: number | null;
   };
-  type PdfAccountRow = Table.Row<PdfAccountRowData>;
+  type PdfAccountRow = Table.BodyRow<PdfAccountRowData>;
 
   type ContactRowData = {
     readonly type: Model.ContactTypeName | null;
@@ -93,6 +93,6 @@ namespace Tables {
     readonly email: string | null;
   };
 
-  type ContactRow = Table.Row<ContactRowData>;
+  type ContactRow = Table.BodyRow<ContactRowData>;
   type ContactTableStore = Redux.TableStore<ContactRowData, Model.Contact>;
 }

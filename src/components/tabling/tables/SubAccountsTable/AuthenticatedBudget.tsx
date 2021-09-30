@@ -94,8 +94,8 @@ const AuthenticatedBudgetSubAccountsTable = (
             }
           })
       })}
-      generateNewRowData={(rows: Table.Row<R>[]) => {
-        const dataRows = filter(rows, (r: Table.Row<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[];
+      generateNewRowData={(rows: Table.BodyRow<R>[]) => {
+        const dataRows = filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[];
         const numericIdentifiers: number[] = map(
           filter(dataRows, (r: Table.DataRow<R>) => !isNil(r.data.identifier) && !isNaN(parseInt(r.data.identifier))),
           (r: Table.DataRow<R>) => parseInt(r.data.identifier as string)
@@ -130,8 +130,8 @@ const AuthenticatedBudgetSubAccountsTable = (
           label: "Group",
           isWriteOnly: true,
           onClick: () => {
-            const rows: Table.Row<R>[] = table.current.getRowsAboveAndIncludingFocusedRow();
-            const modelRows: Table.ModelRow<R>[] = filter(rows, (r: Table.Row<R>) =>
+            const rows: Table.BodyRow<R>[] = table.current.getRowsAboveAndIncludingFocusedRow();
+            const modelRows: Table.ModelRow<R>[] = filter(rows, (r: Table.BodyRow<R>) =>
               tabling.typeguards.isModelRow(r)
             ) as Table.ModelRow<R>[];
             if (modelRows.length !== 0) {
@@ -144,8 +144,8 @@ const AuthenticatedBudgetSubAccountsTable = (
           label: "Mark Up",
           isWriteOnly: true,
           onClick: () => {
-            const rows: Table.Row<R>[] = table.current.getRowsAboveAndIncludingFocusedRow();
-            const modelRows: Table.ModelRow<R>[] = filter(rows, (r: Table.Row<R>) =>
+            const rows: Table.BodyRow<R>[] = table.current.getRowsAboveAndIncludingFocusedRow();
+            const modelRows: Table.ModelRow<R>[] = filter(rows, (r: Table.BodyRow<R>) =>
               tabling.typeguards.isModelRow(r)
             ) as Table.ModelRow<R>[];
             if (modelRows.length !== 0) {

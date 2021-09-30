@@ -24,11 +24,11 @@ const Columns: Table.Column<R, M>[] = [
     suppressSizeToFit: false,
     cellRenderer: "BodyCell",
     cellRendererParams: {
-      icon: (row: Table.Row<R>) =>
+      icon: (row: Table.BodyRow<R>) =>
         tabling.typeguards.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined
     },
     colSpan: (params: Table.ColSpanParams<R, M>) => {
-      const row: Table.Row<R> = params.data;
+      const row: Table.BodyRow<R> = params.data;
       if (tabling.typeguards.isModelRow(row)) {
         if (!isNil(row.children) && row.children.length !== 0) {
           const agColumns: Column[] | undefined = params.columnApi?.getAllDisplayedColumns();
@@ -141,9 +141,13 @@ const Columns: Table.Column<R, M>[] = [
     colId: "variance",
     headerName: "Variance",
     valueGetter: (params: ValueGetterParams) => {
+      // If we are dealing with a FooterRow, the value will be provided via the
+      // footerRowSelectors.
       if (!isNil(params.node)) {
         const row: Table.Row<R> = params.node.data;
-        return row.data.estimated + row.data.fringe_contribution - row.data.actual;
+        if (tabling.typeguards.isBodyRow(row)) {
+          return row.data.estimated + row.data.fringe_contribution - row.data.actual;
+        }
       }
       return 0.0;
     }

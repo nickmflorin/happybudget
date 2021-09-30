@@ -60,7 +60,7 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.HttpModel = 
           if (isNil(nextRowNode)) {
             noMoreRows = true;
           } else {
-            const row: Table.Row<R> = nextRowNode.data;
+            const row: Table.BodyRow<R> = nextRowNode.data;
             if (
               tabling.typeguards.isEditableRow(row) &&
               (isNil(params.includeRowInNavigation) || params.includeRowInNavigation(row) !== false)

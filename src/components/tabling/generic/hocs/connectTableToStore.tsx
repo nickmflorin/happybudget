@@ -11,7 +11,7 @@ type ProvidedProps<
   S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
 > = {
   readonly search: string;
-  readonly data: Table.Row<R>[];
+  readonly data: Table.BodyRow<R>[];
   readonly loading: boolean;
   readonly saving: boolean;
   readonly selector: (state: Application.Store) => S;

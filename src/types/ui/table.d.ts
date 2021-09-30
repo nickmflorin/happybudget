@@ -16,7 +16,6 @@ namespace TableUi {
 
   type FooterGridConfig<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {
     readonly id: "page" | "footer";
-    readonly rowId: string;
     readonly rowClass: Table.RowClassName;
     readonly className: Table.GeneralClassName;
     readonly rowHeight?: number;

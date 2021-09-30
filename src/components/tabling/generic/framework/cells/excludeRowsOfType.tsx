@@ -8,7 +8,7 @@ const excludeRowsOfType =
   (Component: React.ComponentClass<T, {}> | React.FunctionComponent<T>): React.FunctionComponent<T> => {
     const typesToExclude = Array.isArray(types) ? types : [types];
     const WithExcludeRowsOfType = (props: T) => {
-      const row: Table.Row<R> = props.node.data;
+      const row: Table.BodyRow<R> = props.node.data;
       if (includes(typesToExclude, row.rowType)) {
         return <span></span>;
       }

@@ -37,7 +37,7 @@ const BudgetDataGrid = <
         if (!isNil(focusedCell)) {
           const node = localApi.getDisplayedRowAtIndex(focusedCell.rowIndex);
           if (!isNil(node)) {
-            const row: Table.Row<R> = node.data;
+            const row: Table.BodyRow<R> = node.data;
             if (
               tabling.typeguards.isModelRow(row) &&
               !isNil(props.onRowExpand) &&

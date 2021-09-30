@@ -5,7 +5,7 @@ import { tabling, hooks, util } from "lib";
 
 export type UseContextMenuParams<R extends Table.RowData> = {
   readonly apis: Table.GridApis | null;
-  readonly data: Table.Row<R>[];
+  readonly data: Table.BodyRow<R>[];
   readonly getModelRowLabel?: Table.RowStringGetter<Table.ModelRow<R>>;
   readonly getModelRowName?: Table.RowStringGetter<Table.ModelRow<R>>;
   readonly getGroupRowLabel?: Table.RowStringGetter<Table.GroupRow<R>>;
@@ -23,7 +23,7 @@ export type UseContextMenuParams<R extends Table.RowData> = {
   readonly onMarkupRows?: (rows: Table.ModelRow<R>[]) => void;
 };
 
-const evaluateRowStringGetter = <R extends Table.Row>(
+const evaluateRowStringGetter = <R extends Table.BodyRow>(
   value: Table.RowStringGetter<R> | undefined,
   row: R
 ): Table.RowNameLabelType | undefined => (typeof value === "function" ? value(row) : value);
@@ -31,9 +31,9 @@ const evaluateRowStringGetter = <R extends Table.Row>(
 /* eslint-disable indent */
 const useContextMenu = <R extends Table.RowData>(
   params: UseContextMenuParams<R>
-): [(row: Table.Row<R>, node: Table.RowNode) => Table.MenuItemDef[]] => {
+): [(row: Table.BodyRow<R>, node: Table.RowNode) => Table.MenuItemDef[]] => {
   const getRowName = useMemo(
-    () => (row: Table.Row<R>) => {
+    () => (row: Table.BodyRow<R>) => {
       if (tabling.typeguards.isModelRow(row)) {
         return evaluateRowStringGetter(params.getModelRowName, row);
       } else if (tabling.typeguards.isMarkupRow(row)) {
@@ -49,7 +49,7 @@ const useContextMenu = <R extends Table.RowData>(
   );
 
   const getRowLabel = useMemo(
-    () => (row: Table.Row<R>) => {
+    () => (row: Table.BodyRow<R>) => {
       if (tabling.typeguards.isModelRow(row)) {
         return evaluateRowStringGetter(params.getModelRowLabel, row);
       } else if (tabling.typeguards.isMarkupRow(row)) {
@@ -65,14 +65,14 @@ const useContextMenu = <R extends Table.RowData>(
   );
 
   const getFullRowName = useMemo(
-    () => (row: Table.Row<R>) => {
+    () => (row: Table.BodyRow<R>) => {
       return util.conditionalJoinString(getRowLabel(row), getRowName(row), { replaceMissing: "Row" });
     },
     [getRowLabel, getRowName]
   );
 
   const findGroupableRowsAbove = hooks.useDynamicCallback((node: Table.RowNode): Table.ModelRow<R>[] => {
-    const firstRow: Table.Row<R> = node.data;
+    const firstRow: Table.BodyRow<R> = node.data;
     if (tabling.typeguards.isModelRow(firstRow)) {
       const rows: Table.ModelRow<R>[] = [firstRow];
       if (!isNil(params.apis)) {
@@ -80,7 +80,7 @@ const useContextMenu = <R extends Table.RowData>(
         while (!isNil(currentNode) && !isNil(currentNode.rowIndex) && currentNode.rowIndex >= 1) {
           currentNode = params.apis.grid.getDisplayedRowAtIndex(currentNode.rowIndex - 1);
           if (!isNil(currentNode)) {
-            const row: Table.Row<R> = currentNode.data;
+            const row: Table.BodyRow<R> = currentNode.data;
             if (tabling.typeguards.isGroupRow(row)) {
               break;
             } else if (tabling.typeguards.isModelRow(row)) {
@@ -95,7 +95,7 @@ const useContextMenu = <R extends Table.RowData>(
   });
 
   const findMarkupableRowsAbove = hooks.useDynamicCallback((node: Table.RowNode): Table.ModelRow<R>[] => {
-    const firstRow: Table.Row<R> = node.data;
+    const firstRow: Table.BodyRow<R> = node.data;
     if (tabling.typeguards.isModelRow(firstRow)) {
       const rows: Table.ModelRow<R>[] = [firstRow];
       if (!isNil(params.apis)) {
@@ -103,7 +103,7 @@ const useContextMenu = <R extends Table.RowData>(
         while (!isNil(currentNode) && !isNil(currentNode.rowIndex) && currentNode.rowIndex >= 1) {
           currentNode = params.apis.grid.getDisplayedRowAtIndex(currentNode.rowIndex - 1);
           if (!isNil(currentNode)) {
-            const row: Table.Row<R> = currentNode.data;
+            const row: Table.BodyRow<R> = currentNode.data;
             if (tabling.typeguards.isModelRow(row)) {
               rows.push(row);
             }
@@ -121,7 +121,7 @@ const useContextMenu = <R extends Table.RowData>(
 
       const onGroupRows = params.onGroupRows;
       if (!isNil(onGroupRows)) {
-        const groupRows: Table.GroupRow<R>[] = filter(params.data, (r: Table.Row<R>) =>
+        const groupRows: Table.GroupRow<R>[] = filter(params.data, (r: Table.BodyRow<R>) =>
           tabling.typeguards.isGroupRow(r)
         ) as Table.GroupRow<R>[];
 
@@ -266,8 +266,8 @@ const useContextMenu = <R extends Table.RowData>(
       ];
     });
 
-  const getContextMenuItems: (row: Table.Row<R>, node: Table.RowNode) => Table.MenuItemDef[] = hooks.useDynamicCallback(
-    (row: Table.Row<R>, node: Table.RowNode): Table.MenuItemDef[] => {
+  const getContextMenuItems: (row: Table.BodyRow<R>, node: Table.RowNode) => Table.MenuItemDef[] =
+    hooks.useDynamicCallback((row: Table.BodyRow<R>, node: Table.RowNode): Table.MenuItemDef[] => {
       if (tabling.typeguards.isModelRow(row)) {
         return getModelRowContextMenuItems(row, node);
       } else if (tabling.typeguards.isGroupRow(row)) {
@@ -276,8 +276,7 @@ const useContextMenu = <R extends Table.RowData>(
         return getMarkupRowContextMenuItems(row, node);
       }
       return [];
-    }
-  );
+    });
 
   return [getContextMenuItems];
 };

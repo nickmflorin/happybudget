@@ -71,7 +71,7 @@ const DEFAULT_OPTIONS: PdfBudgetTable.Options = {
   includeNotes: false,
   columns: filter(
     map(SubAccountColumns, (column: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => column.field),
-    (field: keyof Table.Row<Tables.PdfSubAccountRowData> | undefined) => !isNil(field)
+    (field: keyof Table.BodyRow<Tables.PdfSubAccountRowData> | undefined) => !isNil(field)
   ) as (keyof Tables.PdfSubAccountRowData)[]
 };
 

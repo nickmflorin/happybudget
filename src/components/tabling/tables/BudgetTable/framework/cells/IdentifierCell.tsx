@@ -19,7 +19,7 @@ const IdentifierCell = <
   onGroupEdit,
   ...props
 }: IdentifierCellProps<R, M, S>): JSX.Element => {
-  const row: Table.Row<R> = props.node.data;
+  const row: Table.BodyRow<R> = props.node.data;
   return tabling.typeguards.isGroupRow(row) ? (
     <GroupCell<R, M> onEdit={onGroupEdit} {...props} />
   ) : (
