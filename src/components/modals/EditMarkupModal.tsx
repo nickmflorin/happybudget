@@ -46,7 +46,7 @@ const EditMarkupModal = <M extends Model.SimpleAccount | Model.SimpleAccount>({
       request={api.getMarkup}
       update={api.updateMarkup}
       setFormData={(markup: Model.Markup, form: FormInstance<Http.MarkupPayload>) => {
-        markupRef.current?.setUnitState(markup.unit?.id || null);
+        markupRef.current?.setUnitState(markup.unit?.id === undefined ? null : markup.unit?.id);
         form.setFields([
           { name: "identifier", value: markup.identifier },
           { name: "description", value: markup.description },
