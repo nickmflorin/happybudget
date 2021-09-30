@@ -139,7 +139,7 @@ export class ApiClient {
   }
 
   _prepare_url = (
-    url: string,
+    url: Http.V1Url,
     query: Http.Query = {},
     method:
       | HttpRequestMethods.POST
@@ -147,7 +147,7 @@ export class ApiClient {
       | HttpRequestMethods.PUT
       | HttpRequestMethods.DELETE
       | HttpRequestMethods.PATCH
-  ): string => {
+  ): Http.V1Url => {
     if (method === HttpRequestMethods.GET) {
       const { ordering, ...rest } = query;
       // Convert Ordering to String if Present
@@ -158,12 +158,13 @@ export class ApiClient {
           rest.ordering = ordering;
         }
       }
-      url = util.urls.addQueryParamsToUrl(url, rest, { filter: [""] });
+      url = util.urls.addQueryParamsToUrl(url, rest, { filter: [""] }) as Http.V1Url;
     } else if (!url.endsWith("/")) {
-      url = url + "/";
+      url = (url + "/") as Http.V1Url;
     }
     return url;
   };
+
   /**
    * Submits a request to the provided URL and properly handles the response
    * and any potential error.  Should not be used alone, but should be the
@@ -182,7 +183,7 @@ export class ApiClient {
       | HttpRequestMethods.PUT
       | HttpRequestMethods.DELETE
       | HttpRequestMethods.PATCH,
-    url: string,
+    url: Http.V1Url,
     query: Http.Query = {},
     payload: Http.Payload = {},
     options: Http.RequestOptions
@@ -220,7 +221,7 @@ export class ApiClient {
    * @param query   The query parameters to embed in the URL.
    * @param options The options for the request (see IRequestOptions).
    */
-  get = async <T>(url: string, query: Http.Query = {}, options: Http.RequestOptions = {}): Promise<T> => {
+  get = async <T>(url: Http.V1Url, query: Http.Query = {}, options: Http.RequestOptions = {}): Promise<T> => {
     return this.request<T>(HttpRequestMethods.GET, url, query, {}, options);
   };
 
@@ -231,7 +232,7 @@ export class ApiClient {
    * @param url     The URL to send the POST request.
    * @param options The options for the request (see IRequestOptions).
    */
-  retrieve = async <T>(url: string, options: Http.RequestOptions = {}): Promise<T> => {
+  retrieve = async <T>(url: Http.V1Url, options: Http.RequestOptions = {}): Promise<T> => {
     return this.request<T>(HttpRequestMethods.GET, url, {}, {}, options);
   };
 
@@ -244,7 +245,7 @@ export class ApiClient {
    * @param options The options for the request (see IRequestOptions).
    */
   list = async <T>(
-    url: string,
+    url: Http.V1Url,
     query: Http.ListQuery,
     options: Http.RequestOptions = {}
   ): Promise<Http.ListResponse<T>> => {
@@ -258,12 +259,12 @@ export class ApiClient {
    * @param payload    The JSON body of the request.
    * @param options    The options for the request (see IRequestOptions).
    */
-  post = async <T>(url: string, payload: Http.Payload = {}, options: Http.RequestOptions = {}): Promise<T> => {
+  post = async <T>(url: Http.V1Url, payload: Http.Payload = {}, options: Http.RequestOptions = {}): Promise<T> => {
     return this.request<T>(HttpRequestMethods.POST, url, {}, payload, options);
   };
 
   upload = async <T>(
-    url: string,
+    url: Http.V1Url,
     payload: Http.Payload = {},
     options: Http.RequestOptions = {}
   ): Promise<AxiosResponse<T>> => {
@@ -281,7 +282,7 @@ export class ApiClient {
    * @param payload    The JSON body of the request.
    * @param options    The options for the request (see IRequestOptions).
    */
-  put = async <T>(url: string, payload: Http.Payload = {}, options: Http.RequestOptions = {}): Promise<T> => {
+  put = async <T>(url: Http.V1Url, payload: Http.Payload = {}, options: Http.RequestOptions = {}): Promise<T> => {
     return this.request<T>(HttpRequestMethods.PUT, url, {}, payload, options);
   };
 
@@ -292,7 +293,7 @@ export class ApiClient {
    * @param payload    The JSON body of the request.
    * @param options    The options for the request (see IRequestOptions).
    */
-  delete = async <T>(url: string, options: Http.RequestOptions = {}): Promise<T> => {
+  delete = async <T>(url: Http.V1Url, options: Http.RequestOptions = {}): Promise<T> => {
     return this.request<T>(HttpRequestMethods.DELETE, url, {}, {}, options);
   };
 
@@ -303,7 +304,7 @@ export class ApiClient {
    * @param payload    The JSON body of the request.
    * @param options    The options for the request (see IRequestOptions).
    */
-  patch = async <T>(url: string, payload: Http.Payload = {}, options: Http.RequestOptions = {}): Promise<T> => {
+  patch = async <T>(url: Http.V1Url, payload: Http.Payload = {}, options: Http.RequestOptions = {}): Promise<T> => {
     return this.request(HttpRequestMethods.PATCH, url, {}, payload, options);
   };
 }

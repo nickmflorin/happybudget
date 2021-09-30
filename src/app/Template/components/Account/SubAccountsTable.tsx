@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
 import { isNil, map, filter } from "lodash";
@@ -81,7 +81,6 @@ const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableP
   const [groupToEdit, setGroupToEdit] = useState<Table.GroupRow<R> | undefined>(undefined);
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
 
-  const dispatch = useDispatch();
   const history = useHistory();
 
   const accountDetail = useSelector(selectAccountDetail);
@@ -126,12 +125,10 @@ const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableP
           open={true}
           onSuccess={(group: Model.Group) => {
             setGroupSubAccounts(undefined);
-            dispatch(
-              actions.account.handleTableChangeEventAction({
-                type: "groupAdd",
-                payload: group
-              })
-            );
+            table.current.applyTableChange({
+              type: "groupAdded",
+              payload: group
+            });
           }}
           onCancel={() => setGroupSubAccounts(undefined)}
         />
@@ -143,12 +140,10 @@ const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableP
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
-            dispatch(
-              actions.account.handleTableChangeEventAction({
-                type: "groupUpdate",
-                payload: { id: group.id, data: group }
-              })
-            );
+            table.current.applyTableChange({
+              type: "groupUpdated",
+              payload: { id: group.id, data: group }
+            });
             if (group.color !== groupToEdit.groupData.color) {
               table.current.applyGroupColorChange(group);
             }

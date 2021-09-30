@@ -1,13 +1,10 @@
 import { client } from "api";
-import { URL } from "./util";
+import * as services from "./services";
 
-export const getFringe = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Fringe> => {
-  const url = URL.v1("fringes", id);
-  return client.retrieve<Model.Fringe>(url, options);
-};
+export const getFringe = services.retrieveService<Model.Fringe>((id: number) => ["fringes", id]);
 
 export const deleteFringe = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
-  const url = URL.v1("fringes", id);
+  const url = services.URL.v1("fringes", id);
   return client.delete<null>(url, options);
 };
 
@@ -16,11 +13,11 @@ export const updateFringe = async (
   payload: Partial<Http.FringePayload>,
   options: Http.RequestOptions = {}
 ): Promise<Model.Fringe> => {
-  const url = URL.v1("fringes", id);
+  const url = services.URL.v1("fringes", id);
   return client.patch<Model.Fringe>(url, payload, options);
 };
 
 export const getFringeColors = async (options: Http.RequestOptions = {}): Promise<Http.ListResponse<string>> => {
-  const url = URL.v1("fringes", "colors");
+  const url = services.URL.v1("fringes", "colors");
   return client.list<string>(url, { no_pagination: true, ...options });
 };

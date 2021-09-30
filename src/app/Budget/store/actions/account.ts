@@ -1,6 +1,11 @@
 import { createAction } from "@reduxjs/toolkit";
 import ActionType from "./ActionType";
 
+// Only used for post Markup create/update.
+export const updateInStateAction = createAction<Redux.UpdateActionPayload<Model.Account>>(
+  ActionType.Account.UpdateInState
+);
+
 export const setAccountIdAction = createAction<number | null>(ActionType.Account.SetId);
 export const loadingAccountAction = createAction<boolean>(ActionType.Account.Loading);
 export const responseAccountAction = createAction<Model.Account | null>(ActionType.Account.Response);

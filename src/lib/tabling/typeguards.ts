@@ -81,8 +81,8 @@ export const isRowAddToGroupEvent = <R extends Table.RowData>(
   return (e as Table.RowAddToGroupEvent).type === "rowAddToGroup";
 };
 
-export const isGroupAddEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.GroupAddEvent => {
-  return (e as Table.GroupAddEvent).type === "groupAdd";
+export const isGroupAddedEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.GroupAddedEvent => {
+  return (e as Table.GroupAddedEvent).type === "groupAdded";
 };
 
 export const isFullRowEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.FullRowEvent => {
@@ -90,19 +90,21 @@ export const isFullRowEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>)
 };
 
 export const isGroupEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.GroupEvent => {
-  return isRowAddToGroupEvent(e) || isRowRemoveFromGroupEvent(e) || isGroupUpdateEvent(e) || isGroupAddEvent(e);
+  return isRowAddToGroupEvent(e) || isRowRemoveFromGroupEvent(e) || isGroupUpdateEvent(e) || isGroupAddedEvent(e);
 };
 
-export const isGroupUpdateEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.GroupUpdateEvent => {
-  return (e as Table.GroupUpdateEvent).type === "groupUpdate";
+export const isGroupUpdateEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.GroupUpdatedEvent => {
+  return (e as Table.GroupUpdatedEvent).type === "groupUpdated";
 };
 
-export const isMarkupAddEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.MarkupAddEvent => {
-  return (e as Table.MarkupAddEvent).type === "markupAdd";
+export const isMarkupAddedEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.MarkupAddedEvent => {
+  return (e as Table.MarkupAddedEvent).type === "markupAdded";
 };
 
-export const isMarkupUpdateEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.MarkupUpdateEvent => {
-  return (e as Table.MarkupUpdateEvent).type === "markupUpdate";
+export const isMarkupUpdatedEvent = <R extends Table.RowData>(
+  e: Table.ChangeEvent<R>
+): e is Table.MarkupUpdatedEvent => {
+  return (e as Table.MarkupUpdatedEvent).type === "markupUpdated";
 };
 
 export const isRowRemoveFromMarkupEvent = <R extends Table.RowData>(

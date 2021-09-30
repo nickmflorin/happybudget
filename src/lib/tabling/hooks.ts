@@ -81,7 +81,7 @@ export const InitialTableRef: Table.TableInstance<any> = {
   getFocusedRow: () => null,
   getRowsAboveAndIncludingFocusedRow: () => [],
   changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange<any>>, sizeToFit?: boolean) => {},
-  applyTableChange: (event: Table.ChangeEvent<any>) => {},
+  applyTableChange: (event: SingleOrArray<Table.ChangeEvent<any>>) => {},
   applyGroupColorChange: (group: Model.Group) => {}
 };
 

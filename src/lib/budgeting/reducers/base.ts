@@ -63,7 +63,7 @@ export const createBudgetTableChangeEventReducer = <
     let newState: S = generic(state, action);
 
     const e: Table.ChangeEvent<R> = action.payload;
-    if (tabling.typeguards.isMarkupAddEvent(e)) {
+    if (tabling.typeguards.isMarkupAddedEvent(e)) {
       const markup: Model.Markup = e.payload;
 
       const markupRow = tabling.rows.createMarkupRow<R, M>({
@@ -81,10 +81,12 @@ export const createBudgetTableChangeEventReducer = <
         ...newState,
         data: tabling.data.orderTableRows<R, M>([...newState.data, markupRow])
       };
-    } else if (tabling.typeguards.isMarkupUpdateEvent(e)) {
+    } else if (tabling.typeguards.isMarkupUpdatedEvent(e)) {
       /*
-      Note: Eventually we are going to want to try to treat this the same as an
-      update to a regular row.
+      Note: This event occurs when Markup is updated via a Modal and the response
+      is received - so we have access to the complete updated Markup and do not
+      need to perform any recalculations or manipulations of the Markup itself,
+      just the children that belong to the Markup.
       */
       const markupRow: Table.MarkupRow<R> | null = markupRowFromState<R, M, S>(
         action,
@@ -105,8 +107,9 @@ export const createBudgetTableChangeEventReducer = <
           model: e.payload.data
         });
 
-        const childrenRows = filter(newState.data, (r: Table.Row<R>) =>
-          tabling.typeguards.isModelRow(r)
+        const childrenRows = filter(
+          newState.data,
+          (r: Table.Row<R>) => tabling.typeguards.isModelRow(r) && includes(updatedMarkupRow.children, r.id)
         ) as Table.ModelRow<R>[];
 
         // Update the children rows of the MarkupRow to reflect the new MarkupRow data.

@@ -399,7 +399,7 @@ export const createTableChangeEventReducer = <
       );
     } else if (typeguards.isRowAddToGroupEvent(e)) {
       newState = rowAddToGroupReducer(newState, action as Redux.Action<Table.RowAddToGroupEvent>, config.columns);
-    } else if (typeguards.isGroupAddEvent(e)) {
+    } else if (typeguards.isGroupAddedEvent(e)) {
       /*
       When a Group is added to the table, we must first convert that Group model to a
       GroupRow - then, we need to insert the GroupRow into the set of table data and reapply

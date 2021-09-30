@@ -24,21 +24,26 @@ export const getTableChildren = <
   return serviceMap[parentType](parentId, query, options);
 };
 
-export const createTableMarkup = (
+export const createTableMarkup = <R extends Http.MarkupResponseTypes = Http.MarkupResponseTypes>(
   parentId: number,
   parentType: Model.ParentType,
   payload: Http.MarkupPayload,
   options: Http.RequestOptions = {}
-): Promise<Model.Markup> => {
+): Promise<R> => {
+  type ResponseTypes =
+    | Http.BudgetContextDetailResponse<Model.Markup>
+    | Http.BudgetParentContextDetailResponse<Model.Markup, Model.Account>
+    | Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount>;
+
   const serviceMap: {
     /* eslint-disable-next-line no-unused-vars */
-    [key in Model.ParentType]: (id: number, p: Http.MarkupPayload, o?: Http.RequestOptions) => Promise<Model.Markup>;
+    [key in Model.ParentType]: (id: number, p: Http.MarkupPayload, o?: Http.RequestOptions) => Promise<ResponseTypes>;
   } = {
     budget: api.createBudgetAccountMarkup,
     account: api.createAccountSubAccountMarkup,
     subaccount: api.createSubAccountSubAccountMarkup
   };
-  return serviceMap[parentType](parentId, payload, options);
+  return serviceMap[parentType](parentId, payload, options) as Promise<R>;
 };
 
 export const createTableGroup = (

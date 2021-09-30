@@ -6,18 +6,25 @@ import { IMarkupForm } from "components/forms/MarkupForm";
 
 import { EditModelModal, EditModelModalProps } from "./generic";
 
-interface EditMarkupModalProps extends EditModelModalProps<Model.Markup> {
+interface EditMarkupModalProps<R extends Http.MarkupResponseTypes = Http.MarkupResponseTypes>
+  extends EditModelModalProps<Model.Markup, Http.MarkupPayload, R> {
   readonly id: number;
   readonly parentId: number;
   readonly parentType: Model.ParentType;
+  readonly performUpdate?: boolean;
 }
 
-const EditMarkupModal = <M extends Model.SimpleAccount | Model.SimpleAccount>({
+/* eslint-disable indent */
+const EditMarkupModal = <
+  M extends Model.SimpleAccount | Model.SimpleSubAccount,
+  R extends Http.MarkupResponseTypes = Http.MarkupResponseTypes
+>({
   id,
   parentId,
+  performUpdate,
   parentType,
   ...props
-}: EditMarkupModalProps): JSX.Element => {
+}: EditMarkupModalProps<R>): JSX.Element => {
   const cancelToken = api.useCancelToken();
   const formRef = useRef<FormInstance<Http.MarkupPayload>>(null);
   const markupRef = useRef<IMarkupForm>(null);
@@ -39,7 +46,7 @@ const EditMarkupModal = <M extends Model.SimpleAccount | Model.SimpleAccount>({
   }, [parentId]);
 
   return (
-    <EditModelModal<Model.Markup, Http.MarkupPayload>
+    <EditModelModal<Model.Markup, Http.MarkupPayload, R>
       {...props}
       id={id}
       title={"Markup"}

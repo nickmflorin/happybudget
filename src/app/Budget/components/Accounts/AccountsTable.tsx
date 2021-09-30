@@ -106,19 +106,18 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
         onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(tabling.rows.markupId(row.id))}
       />
       {!isNil(markupAccounts) && !isNil(budgetId) && (
-        <CreateMarkupModal
+        <CreateMarkupModal<Model.SimpleSubAccount, Http.BudgetContextDetailResponse<Model.Markup, Model.Budget>>
           id={budgetId}
           parentType={"budget"}
           children={markupAccounts}
           open={true}
-          onSuccess={(markup: Model.Markup) => {
+          onSuccess={(response: Http.BudgetContextDetailResponse<Model.Markup, Model.Budget>) => {
             setMarkupAccounts(undefined);
-            dispatch(
-              actions.accounts.handleTableChangeEventAction({
-                type: "markupAdd",
-                payload: markup
-              })
-            );
+            table.current.applyTableChange({
+              type: "markupAdded",
+              payload: response.data
+            });
+            dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
           }}
           onCancel={() => setMarkupAccounts(undefined)}
         />
@@ -131,31 +130,28 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
           open={true}
           onSuccess={(group: Model.Group) => {
             setGroupAccounts(undefined);
-            dispatch(
-              actions.accounts.handleTableChangeEventAction({
-                type: "groupAdd",
-                payload: group
-              })
-            );
+            table.current.applyTableChange({
+              type: "groupAdded",
+              payload: group
+            });
           }}
           onCancel={() => setGroupAccounts(undefined)}
         />
       )}
       {!isNil(markupToEdit) && (
-        <EditMarkupModal
+        <EditMarkupModal<Model.SimpleSubAccount, Http.BudgetContextDetailResponse<Model.Markup, Model.Budget>>
           id={markupToEdit}
           parentId={budgetId}
           parentType={"budget"}
           open={true}
           onCancel={() => setMarkupToEdit(null)}
-          onSuccess={(markup: Model.Markup) => {
+          onSuccess={(response: Http.BudgetContextDetailResponse<Model.Markup, Model.Budget>) => {
             setMarkupToEdit(null);
-            dispatch(
-              actions.accounts.handleTableChangeEventAction({
-                type: "markupUpdate",
-                payload: { id: markup.id, data: markup }
-              })
-            );
+            table.current.applyTableChange({
+              type: "markupUpdated",
+              payload: { id: response.data.id, data: response.data }
+            });
+            dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
           }}
         />
       )}
@@ -166,12 +162,10 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
-            dispatch(
-              actions.accounts.handleTableChangeEventAction({
-                type: "groupUpdate",
-                payload: { id: group.id, data: group }
-              })
-            );
+            table.current.applyTableChange({
+              type: "groupUpdated",
+              payload: { id: group.id, data: group }
+            });
             if (group.color !== groupToEdit.groupData.color) {
               table.current.applyGroupColorChange(group);
             }

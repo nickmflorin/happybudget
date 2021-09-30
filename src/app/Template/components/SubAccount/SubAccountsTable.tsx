@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
 import { isNil, map, filter } from "lodash";
@@ -82,7 +82,6 @@ const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTab
   const [groupSubAccounts, setGroupSubAccounts] = useState<number[] | undefined>(undefined);
   const [groupToEdit, setGroupToEdit] = useState<Table.GroupRow<R> | undefined>(undefined);
 
-  const dispatch = useDispatch();
   const history = useHistory();
   const subaccountDetail = useSelector(selectSubAccountDetail);
   const subAccountUnits = useSelector(selectSubAccountUnits);
@@ -141,12 +140,10 @@ const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTab
           open={true}
           onSuccess={(group: Model.Group) => {
             setGroupSubAccounts(undefined);
-            dispatch(
-              actions.subAccount.handleTableChangeEventAction({
-                type: "groupAdd",
-                payload: group
-              })
-            );
+            table.current.applyTableChange({
+              type: "groupAdded",
+              payload: group
+            });
           }}
           onCancel={() => setGroupSubAccounts(undefined)}
         />
@@ -158,12 +155,10 @@ const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTab
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
-            dispatch(
-              actions.subAccount.handleTableChangeEventAction({
-                type: "groupUpdate",
-                payload: { id: group.id, data: group }
-              })
-            );
+            table.current.applyTableChange({
+              type: "groupUpdated",
+              payload: { id: group.id, data: group }
+            });
             if (group.color !== groupToEdit.groupData.color) {
               table.current.applyGroupColorChange(group);
             }

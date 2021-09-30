@@ -217,6 +217,12 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
 
       yield put(config.actions.saving(true));
       try {
+        /*
+        Note: We will have access to the updated parent and budget for each request made to update
+        a specific markup - however, the budget or parent will only change when the unit/rate fields
+        are updated for the Markup via the Modal (not the table) - so we do not have to be concerned
+        with updating the budget or parent in state here.
+        */
         yield all(validEffects);
       } catch (err: unknown) {
         if (!(yield cancelled())) {

@@ -135,19 +135,22 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
         onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(tabling.rows.markupId(row.id))}
       />
       {!isNil(markupSubAccounts) && !isNil(accountId) && (
-        <CreateMarkupModal
+        <CreateMarkupModal<
+          Model.SimpleSubAccount,
+          Http.BudgetParentContextDetailResponse<Model.Markup, Model.Account, Model.Budget>
+        >
           id={accountId}
           parentType={"account"}
           children={markupSubAccounts}
           open={true}
-          onSuccess={(markup: Model.Markup) => {
+          onSuccess={(response: Http.BudgetParentContextDetailResponse<Model.Markup, Model.Account, Model.Budget>) => {
             setMarkupSubAccounts(undefined);
-            dispatch(
-              actions.accounts.handleTableChangeEventAction({
-                type: "markupAdd",
-                payload: markup
-              })
-            );
+            table.current.applyTableChange({
+              type: "markupAdded",
+              payload: response.data
+            });
+            dispatch(actions.account.updateInStateAction({ id: response.parent.id, data: response.parent }));
+            dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
           }}
           onCancel={() => setMarkupSubAccounts(undefined)}
         />
@@ -160,31 +163,32 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
           open={true}
           onSuccess={(group: Model.Group) => {
             setGroupSubAccounts(undefined);
-            dispatch(
-              actions.account.handleTableChangeEventAction({
-                type: "groupAdd",
-                payload: group
-              })
-            );
+            table.current.applyTableChange({
+              type: "groupAdded",
+              payload: group
+            });
           }}
           onCancel={() => setGroupSubAccounts(undefined)}
         />
       )}
       {!isNil(markupToEdit) && (
-        <EditMarkupModal
+        <EditMarkupModal<
+          Model.SimpleSubAccount,
+          Http.BudgetParentContextDetailResponse<Model.Markup, Model.Account, Model.Budget>
+        >
           id={markupToEdit}
           parentId={accountId}
           parentType={"account"}
           open={true}
           onCancel={() => setMarkupToEdit(null)}
-          onSuccess={(markup: Model.Markup) => {
+          onSuccess={(response: Http.BudgetParentContextDetailResponse<Model.Markup, Model.Account, Model.Budget>) => {
             setMarkupToEdit(null);
-            dispatch(
-              actions.account.handleTableChangeEventAction({
-                type: "markupUpdate",
-                payload: { id: markup.id, data: markup }
-              })
-            );
+            table.current.applyTableChange({
+              type: "markupUpdated",
+              payload: { id: response.data.id, data: response.data }
+            });
+            dispatch(actions.account.updateInStateAction({ id: response.parent.id, data: response.parent }));
+            dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
           }}
         />
       )}
@@ -197,7 +201,7 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
             setGroupToEdit(undefined);
             dispatch(
               actions.account.handleTableChangeEventAction({
-                type: "groupUpdate",
+                type: "groupUpdated",
                 payload: { id: group.id, data: group }
               })
             );

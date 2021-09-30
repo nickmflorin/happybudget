@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
 import { isNil, map, filter, intersection } from "lodash";
@@ -66,7 +65,6 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
   const [groupAccounts, setGroupAccounts] = useState<number[] | undefined>(undefined);
   const [groupToEdit, setGroupToEdit] = useState<Table.GroupRow<R> | undefined>(undefined);
 
-  const dispatch = useDispatch();
   const history = useHistory();
 
   const table = tabling.hooks.useTable<R>();
@@ -100,12 +98,10 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
           open={true}
           onSuccess={(group: Model.Group) => {
             setGroupAccounts(undefined);
-            dispatch(
-              actions.accounts.handleTableChangeEventAction({
-                type: "groupAdd",
-                payload: group
-              })
-            );
+            table.current.applyTableChange({
+              type: "groupAdded",
+              payload: group
+            });
           }}
           onCancel={() => setGroupAccounts(undefined)}
         />
@@ -117,12 +113,10 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
-            dispatch(
-              actions.accounts.handleTableChangeEventAction({
-                type: "groupUpdate",
-                payload: { id: group.id, data: group }
-              })
-            );
+            table.current.applyTableChange({
+              type: "groupUpdated",
+              payload: { id: group.id, data: group }
+            });
             if (group.color !== groupToEdit.groupData.color) {
               table.current.applyGroupColorChange(group);
             }

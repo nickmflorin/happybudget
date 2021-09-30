@@ -17,6 +17,11 @@ namespace Http {
     [key: string]: any;
   }
 
+  type PathParam = string | number;
+  type PathParams = Array<PathParam>;
+
+  type V1Url = `v1/${string}/`
+
   type Order = 1 | -1 | 0;
   type Ordering = { [key: string]: Http.Order };
 
@@ -152,6 +157,11 @@ namespace Http {
     readonly color?: string | null;
   }
 
+  type MarkupResponseTypes =
+  | BudgetContextDetailResponse<Model.Markup>
+  | BudgetParentContextDetailResponse<Model.Markup, Model.Account>
+  | BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount>;
+
   interface MarkupPayload {
     readonly identifier?: string | null;
     readonly description?: string | null;
@@ -222,6 +232,17 @@ namespace Http {
     readonly phone_number?: string | null;
     readonly rate?: number | null;
     readonly image?: ArrayBuffer | string | null;
+  }
+
+  type BudgetContextDetailResponse<M extends Model.HttpModel, B extends Model.Budget | Model.Template = Model.Budget> = {
+    readonly data: M;
+    readonly budget: B;
+  }
+
+  type BudgetParentContextDetailResponse<M extends Model.HttpModel, P extends Model.Account | Model.SubAccount, B extends Model.Budget | Model.Template = Model.Budget> = {
+    readonly data: M;
+    readonly budget: B;
+    readonly parent: P;
   }
 
   type BulkCreatePayload<T extends Http.PayloadObj> = { data: Partial<T>[] };

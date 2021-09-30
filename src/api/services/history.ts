@@ -1,12 +1,12 @@
 import { client } from "api";
-import { URL } from "./util";
+import * as services from "./services";
 
 export const getAccountsHistory = async (
   budgetId: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.HistoryEvent>> => {
-  const url = URL.v1("budgets", budgetId, "accounts", "history");
+  const url = services.URL.v1("budgets", budgetId, "accounts", "history");
   return client.list<Model.HistoryEvent>(url, query, options);
 };
 
@@ -15,7 +15,7 @@ export const getAccountHistory = async (
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.HistoryEvent>> => {
-  const url = URL.v1("accounts", accountId, "history");
+  const url = services.URL.v1("accounts", accountId, "history");
   return client.list<Model.HistoryEvent>(url, query, options);
 };
 
@@ -24,7 +24,7 @@ export const getAccountSubAccountsHistory = async (
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.HistoryEvent>> => {
-  const url = URL.v1("accounts", accountId, "subaccounts", "history");
+  const url = services.URL.v1("accounts", accountId, "subaccounts", "history");
   return client.list<Model.HistoryEvent>(url, query, options);
 };
 
@@ -33,7 +33,7 @@ export const getSubAccountSubAccountsHistory = async (
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.HistoryEvent>> => {
-  const url = URL.v1("subaccounts", subaccountId, "subaccounts", "history");
+  const url = services.URL.v1("subaccounts", subaccountId, "subaccounts", "history");
   return client.list<Model.HistoryEvent>(url, query, options);
 };
 
@@ -42,7 +42,7 @@ export const getSubAccountHistory = async (
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.HistoryEvent>> => {
-  const url = URL.v1("subaccounts", subaccountId, "history");
+  const url = services.URL.v1("subaccounts", subaccountId, "history");
   return client.list<Model.HistoryEvent>(url, query, options);
 };
 
@@ -51,7 +51,7 @@ export const getActualsHistory = async (
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.HistoryEvent>> => {
-  const url = URL.v1("budgets", budgetId, "actuals", "history");
+  const url = services.URL.v1("budgets", budgetId, "actuals", "history");
   return client.list<Model.HistoryEvent>(url, query, options);
 };
 
@@ -60,6 +60,6 @@ export const getActualHistory = async (
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.HistoryEvent>> => {
-  const url = URL.v1("actuals", actualId, "history");
+  const url = services.URL.v1("actuals", actualId, "history");
   return client.list<Model.HistoryEvent>(url, query, options);
 };

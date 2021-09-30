@@ -10,6 +10,7 @@ export type SubAccountAccountDetailActionMap = Omit<Redux.ModelDetailResponseAct
   readonly setId: number | null;
   readonly tableChanged?: Table.ChangeEvent<Tables.SubAccountRowData>;
   readonly fringesTableChanged?: Table.ChangeEvent<Tables.FringeRowData>;
+  readonly updateInState?: Redux.UpdateActionPayload<Model.SubAccount>;
 };
 
 type MinimalSubAccountStore = {

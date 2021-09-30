@@ -162,7 +162,7 @@ namespace Model {
     readonly markup_contribution: number;
   }
 
-  interface PdfBudget {
+  interface PdfBudget extends Model.HttpModel {
     readonly name: string;
     readonly estimated: number;
     readonly actual: number;

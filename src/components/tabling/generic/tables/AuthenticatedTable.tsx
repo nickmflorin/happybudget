@@ -206,7 +206,8 @@ const AuthenticatedTable = <
   useImperativeHandle(props.table, () => ({
     getCSVData: props.getCSVData,
     changeColumnVisibility: props.changeColumnVisibility,
-    applyTableChange: _onChangeEvent,
+    applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R>>) =>
+      Array.isArray(event) ? map(event, (e: Table.ChangeEvent<R>) => _onChangeEvent(e)) : _onChangeEvent(event),
     getRowsAboveAndIncludingFocusedRow: () => {
       const apis = props.tableApis.get("data");
       if (!isNil(apis)) {

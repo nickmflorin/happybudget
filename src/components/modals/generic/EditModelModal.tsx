@@ -7,26 +7,28 @@ import { Form } from "components";
 
 import Modal, { ModalProps } from "./Modal";
 
-export interface EditModelModalProps<M extends Model.Model> extends Omit<ModalProps, "children"> {
+export interface EditModelModalProps<M extends Model.Model, P extends Http.ModelPayload<M>, R = M>
+  extends Omit<ModalProps, "children"> {
   readonly id: number;
   readonly open: boolean;
-  readonly onSuccess: (m: M) => void;
+  readonly onUpdate?: (values: P) => void;
+  readonly onSuccess: (m: R) => void;
   readonly onCancel: () => void;
 }
 
-interface PrivateEditModelModalProps<M extends Model.Model, P extends Http.ModelPayload<M>>
-  extends EditModelModalProps<M> {
+interface PrivateEditModelModalProps<M extends Model.Model, P extends Http.ModelPayload<M>, R = M>
+  extends EditModelModalProps<M, P, R> {
   readonly title?: string | JSX.Element | ((m: M, form: FormInstance<P>) => JSX.Element | string);
   readonly autoFocusField?: number;
   readonly onModelLoaded?: (m: M) => void;
   readonly setFormData: (m: M, form: FormInstance<P>) => void;
   readonly request: (id: number) => Promise<M>;
-  readonly update: (id: number, payload: P, options: Http.RequestOptions) => Promise<M>;
+  readonly update?: (id: number, payload: P, options: Http.RequestOptions) => Promise<R>;
   readonly children: (m: M | null, form: FormInstance<P>) => JSX.Element;
   readonly interceptPayload?: (p: P) => P;
 }
 
-const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>>(
+const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, R = M>(
   {
     id,
     open,
@@ -36,11 +38,12 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>>(
     onCancel,
     request,
     update,
+    onUpdate,
     children,
     interceptPayload,
     setFormData,
     ...props
-  }: PrivateEditModelModalProps<M, P>,
+  }: PrivateEditModelModalProps<M, P, R>,
   ref: ForwardedRef<FormInstance<P>>
 ): JSX.Element => {
   const [form] = Form.useForm<P>({ isInModal: true, autoFocusField });
@@ -98,18 +101,21 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>>(
           .validateFields()
           .then((values: P) => {
             const payload = !isNil(interceptPayload) ? interceptPayload(values) : values;
-            form.setLoading(true);
-            update(id, payload, { cancelToken: cancelToken() })
-              .then((response: M) => {
-                form.resetFields();
-                onSuccess(response);
-              })
-              .catch((e: Error) => {
-                form.handleRequestError(e);
-              })
-              .finally(() => {
-                form.setLoading(false);
-              });
+            onUpdate?.(payload);
+            if (!isNil(update) && isNil(onUpdate)) {
+              form.setLoading(true);
+              update(id, payload, { cancelToken: cancelToken() })
+                .then((response: R) => {
+                  form.resetFields();
+                  onSuccess(response);
+                })
+                .catch((e: Error) => {
+                  form.handleRequestError(e);
+                })
+                .finally(() => {
+                  form.setLoading(false);
+                });
+            }
           })
           .catch(() => {
             return;

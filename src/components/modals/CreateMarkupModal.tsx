@@ -7,8 +7,8 @@ import { MarkupForm } from "components/forms";
 
 import { Modal } from "./generic";
 
-interface CreateMarkupModalProps {
-  readonly onSuccess: (markup: Model.Markup) => void;
+interface CreateMarkupModalProps<R extends Http.MarkupResponseTypes = Http.MarkupResponseTypes> {
+  readonly onSuccess: (response: R) => void;
   readonly onCancel: () => void;
   readonly id: number;
   readonly children: number[];
@@ -16,14 +16,18 @@ interface CreateMarkupModalProps {
   readonly parentType: Model.ParentType;
 }
 
-const CreateMarkupModal = <M extends Model.SimpleAccount | Model.SimpleAccount>({
+/* eslint-disable indent */
+const CreateMarkupModal = <
+  M extends Model.SimpleAccount | Model.SimpleSubAccount,
+  R extends Http.MarkupResponseTypes = Http.MarkupResponseTypes
+>({
   id,
   children,
   parentType,
   open,
   onSuccess,
   onCancel
-}: CreateMarkupModalProps): JSX.Element => {
+}: CreateMarkupModalProps<R>): JSX.Element => {
   const [form] = Form.useForm<Http.MarkupPayload>({ isInModal: true });
   const cancelToken = api.useCancelToken();
 
@@ -59,10 +63,10 @@ const CreateMarkupModal = <M extends Model.SimpleAccount | Model.SimpleAccount>(
           .then((values: Http.MarkupPayload) => {
             form.setLoading(true);
             api
-              .createTableMarkup(id, parentType, values, { cancelToken: cancelToken() })
-              .then((markup: Model.Markup) => {
+              .createTableMarkup<R>(id, parentType, values, { cancelToken: cancelToken() })
+              .then((response: R) => {
                 form.resetFields();
-                onSuccess(markup);
+                onSuccess(response);
               })
               .catch((e: Error) => {
                 form.handleRequestError(e);

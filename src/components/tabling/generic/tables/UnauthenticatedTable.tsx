@@ -104,7 +104,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.TypedHttp
   useImperativeHandle(props.table, () => ({
     getCSVData: props.getCSVData,
     changeColumnVisibility: props.changeColumnVisibility,
-    applyTableChange: (event: Table.ChangeEvent<R>) => {},
+    applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R>>) => {},
     getRowsAboveAndIncludingFocusedRow: () => {
       const apis = props.tableApis.get("data");
       if (!isNil(apis)) {

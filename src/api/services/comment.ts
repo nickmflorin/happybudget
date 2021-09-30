@@ -1,12 +1,12 @@
 import { client } from "api";
-import { URL } from "./util";
+import * as services from "./services";
 
 export const getBudgetComments = async (
   id: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.Comment>> => {
-  const url = URL.v1("budgets", id, "comments");
+  const url = services.URL.v1("budgets", id, "comments");
   return client.list<Model.Comment>(url, query, options);
 };
 
@@ -15,7 +15,7 @@ export const getAccountComments = async (
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.Comment>> => {
-  const url = URL.v1("accounts", id, "comments");
+  const url = services.URL.v1("accounts", id, "comments");
   return client.list<Model.Comment>(url, query, options);
 };
 
@@ -24,17 +24,17 @@ export const getSubAccountComments = async (
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.Comment>> => {
-  const url = URL.v1("subaccounts", id, "comments");
+  const url = services.URL.v1("subaccounts", id, "comments");
   return client.list<Model.Comment>(url, query, options);
 };
 
 export const getComment = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Comment> => {
-  const url = URL.v1("comments", id);
+  const url = services.URL.v1("comments", id);
   return client.retrieve<Model.Comment>(url, options);
 };
 
 export const deleteComment = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
-  const url = URL.v1("comments", id);
+  const url = services.URL.v1("comments", id);
   return client.delete<null>(url, options);
 };
 
@@ -43,7 +43,7 @@ export const updateComment = async (
   payload: Partial<Http.CommentPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Model.Comment> => {
-  const url = URL.v1("comments", id);
+  const url = services.URL.v1("comments", id);
   return client.patch<Model.Comment>(url, payload, options);
 };
 
@@ -52,7 +52,7 @@ export const replyToComment = async (
   text: string,
   options: Http.RequestOptions = {}
 ): Promise<Model.Comment> => {
-  const url = URL.v1("comments", id, "reply");
+  const url = services.URL.v1("comments", id, "reply");
   return client.post<Model.Comment>(url, { text }, options);
 };
 
@@ -61,7 +61,7 @@ export const createBudgetComment = async (
   payload: Http.CommentPayload,
   options: Http.RequestOptions = {}
 ): Promise<Model.Comment> => {
-  const url = URL.v1("budgets", id, "comments");
+  const url = services.URL.v1("budgets", id, "comments");
   return client.post<Model.Comment>(url, payload, options);
 };
 
@@ -70,7 +70,7 @@ export const createAccountComment = async (
   payload: Http.CommentPayload,
   options: Http.RequestOptions = {}
 ): Promise<Model.Comment> => {
-  const url = URL.v1("accounts", id, "comments");
+  const url = services.URL.v1("accounts", id, "comments");
   return client.post<Model.Comment>(url, payload, options);
 };
 
@@ -79,6 +79,6 @@ export const createSubAccountComment = async (
   payload: Http.CommentPayload,
   options: Http.RequestOptions = {}
 ): Promise<Model.Comment> => {
-  const url = URL.v1("subaccounts", id, "comments");
+  const url = services.URL.v1("subaccounts", id, "comments");
   return client.post<Model.Comment>(url, payload, options);
 };

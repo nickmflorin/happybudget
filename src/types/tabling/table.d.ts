@@ -298,7 +298,7 @@ namespace Table {
   type TableInstance<R extends RowData = RowData> = {
     readonly getFocusedRow: () => Row<R> | null;
     readonly getRowsAboveAndIncludingFocusedRow: () => Row<R>[];
-    readonly applyTableChange: (event: ChangeEvent<R>) => void;
+    readonly applyTableChange: (event: SingleOrArray<ChangeEvent<R>>) => void;
     readonly applyGroupColorChange: (group: Model.Group) => void;
     readonly getCSVData: (fields?: string[]) => CSVData;
     readonly changeColumnVisibility: (changes: SingleOrArray<ColumnVisibilityChange<R>>, sizeToFit?: boolean) => void;
@@ -401,12 +401,12 @@ namespace Table {
     | "rowDelete"
     | "rowRemoveFromGroup"
     | "rowAddToGroup"
-    | "groupUpdate"
-    | "groupAdd"
+    | "groupUpdated"
+    | "groupAdded"
     | "rowRemoveFromMarkup"
     | "rowAddToMarkup"
-    | "markupAdd"
-    | "markupUpdate";
+    | "markupAdded"
+    | "markupUpdated";
 
   type BaseChangeEvent = {
     readonly type: ChangeEventId;
@@ -497,28 +497,28 @@ namespace Table {
     readonly payload: RowAddToMarkupPayload;
   };
 
-  type GroupAddPayload = Model.Group;
-  type GroupAddEvent = {
-    readonly type: "groupAdd";
-    readonly payload: GroupAddPayload;
+  type GroupAddedPayload = Model.Group;
+  type GroupAddedEvent = {
+    readonly type: "groupAdded";
+    readonly payload: GroupAddedPayload;
   };
 
-  type MarkupAddPayload = Model.Markup;
-  type MarkupAddEvent = {
-    readonly type: "markupAdd";
-    readonly payload: MarkupAddPayload;
+  type MarkupAddedPayload = Model.Markup;
+  type MarkupAddedEvent = {
+    readonly type: "markupAdded";
+    readonly payload: MarkupAddedPayload;
   };
 
-  type GroupUpdatePayload = Redux.UpdateActionPayload<Model.Group, number>;
-  type GroupUpdateEvent = {
-    readonly type: "groupUpdate";
-    readonly payload: GroupUpdatePayload;
+  type GroupUpdatedPayload = Redux.UpdateActionPayload<Model.Group, number>;
+  type GroupUpdatedEvent = {
+    readonly type: "groupUpdated";
+    readonly payload: GroupUpdatedPayload;
   };
 
-  type MarkupUpdatePayload = Redux.UpdateActionPayload<Model.Markup, number>;
-  type MarkupUpdateEvent = {
-    readonly type: "markupUpdate";
-    readonly payload: MarkupUpdatePayload;
+  type MarkupUpdatedPayload = Redux.UpdateActionPayload<Model.Markup, number>;
+  type MarkupUpdatedEvent = {
+    readonly type: "markupUpdated";
+    readonly payload: MarkupUpdatedPayload;
   };
 
   type ChangeEventTypeMap<R extends RowData> = {
@@ -527,10 +527,10 @@ namespace Table {
     rowDelete: RowDeleteEvent;
     rowRemoveFromGroup: RowRemoveFromGroupEvent;
     rowAddToGroup: RowAddToGroupEvent;
-    groupAdd: GroupAddEvent;
-    groupUpdate: GroupUpdateEvent;
-    markupAdd: MarkupAddEvent;
-    markupUpdate: MarkupUpdateEvent;
+    groupAdded: GroupAddedEvent;
+    groupUpdated: GroupUpdatedEvent;
+    markupAdded: MarkupAddedEvent;
+    markupUpdated: MarkupUpdatedEvent;
     rowAddToMarkup: RowAddToMarkupEvent;
     rowRemoveFromMarkup: RowRemoveFromMarkupEvent;
   };
@@ -539,7 +539,7 @@ namespace Table {
 
   type FullRowEvent = RowDeleteEvent | RowRemoveFromGroupEvent | RowAddToGroupEvent;
 
-  type GroupEvent = RowRemoveFromGroupEvent | RowAddToGroupEvent | GroupUpdateEvent | GroupAddEvent;
+  type GroupEvent = RowRemoveFromGroupEvent | RowAddToGroupEvent | GroupUpdatedEvent | GroupAddedEvent;
 
   type ChangeEvent<R extends RowData> =
     | DataChangeEvent<R>
@@ -547,12 +547,12 @@ namespace Table {
     | RowDeleteEvent
     | RowRemoveFromGroupEvent
     | RowAddToGroupEvent
-    | GroupAddEvent
-    | GroupUpdateEvent
+    | GroupAddedEvent
+    | GroupUpdatedEvent
     | RowRemoveFromMarkupEvent
     | RowAddToMarkupEvent
-    | MarkupAddEvent
-    | MarkupUpdateEvent;
+    | MarkupAddedEvent
+    | MarkupUpdatedEvent;
 
   type CellDoneEditingEvent = import("react").SyntheticEvent | KeyboardEvent;
 

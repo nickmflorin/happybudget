@@ -10,7 +10,7 @@ import { EditModelModal, EditModelModalProps } from "./generic";
 
 const MemoizedTemplateForm = React.memo(TemplateForm);
 
-interface EditTemplateModalProps extends EditModelModalProps<Model.Template> {}
+interface EditTemplateModalProps extends EditModelModalProps<Model.Template, Http.TemplatePayload> {}
 
 const EditTemplateModal = (props: EditTemplateModalProps): JSX.Element => {
   const [file, setFile] = useState<UploadedImage | SavedImage | null>(null);

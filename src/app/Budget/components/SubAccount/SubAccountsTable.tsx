@@ -8,7 +8,7 @@ import { redux, tabling } from "lib";
 import { CreateGroupModal, EditGroupModal, CreateMarkupModal, EditMarkupModal } from "components/modals";
 import { connectTableToStore } from "components/tabling";
 
-import { actions, selectors } from "../../store";
+import { actions } from "../../store";
 import BudgetSubAccountsTable, { BudgetSubAccountsTableProps } from "../SubAccountsTable";
 import FringesModal from "./FringesModal";
 
@@ -93,7 +93,6 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
   const fringes = useSelector(selectFringes);
   const subaccountDetail = useSelector(selectSubAccountDetail);
   const subAccountUnits = useSelector(selectSubAccountUnits);
-  const commentsHistoryDrawerOpen = useSelector(selectors.selectCommentsHistoryDrawerOpen);
 
   const table = tabling.hooks.useTable<R>();
 
@@ -150,28 +149,26 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
         }
         onEditGroup={(group: Table.GroupRow<R>) => setGroupToEdit(group)}
         onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(tabling.rows.markupId(row.id))}
-        actions={[
-          {
-            label: "Comments",
-            icon: "comments-alt",
-            onClick: () => dispatch(actions.setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen))
-          }
-        ]}
       />
       {!isNil(markupSubAccounts) && !isNil(subaccountId) && (
-        <CreateMarkupModal
+        <CreateMarkupModal<
+          Model.SimpleSubAccount,
+          Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, Model.Budget>
+        >
           id={subaccountId}
           parentType={"subaccount"}
           children={markupSubAccounts}
           open={true}
-          onSuccess={(markup: Model.Markup) => {
+          onSuccess={(
+            response: Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, Model.Budget>
+          ) => {
             setMarkupSubAccounts(undefined);
-            dispatch(
-              actions.accounts.handleTableChangeEventAction({
-                type: "markupAdd",
-                payload: markup
-              })
-            );
+            table.current.applyTableChange({
+              type: "markupAdded",
+              payload: response.data
+            });
+            dispatch(actions.subAccount.updateInStateAction({ id: response.parent.id, data: response.parent }));
+            dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
           }}
           onCancel={() => setMarkupSubAccounts(undefined)}
         />
@@ -184,31 +181,34 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
           open={true}
           onSuccess={(group: Model.Group) => {
             setGroupSubAccounts(undefined);
-            dispatch(
-              actions.subAccount.handleTableChangeEventAction({
-                type: "groupAdd",
-                payload: group
-              })
-            );
+            table.current.applyTableChange({
+              type: "groupAdded",
+              payload: group
+            });
           }}
           onCancel={() => setGroupSubAccounts(undefined)}
         />
       )}
       {!isNil(markupToEdit) && (
-        <EditMarkupModal
+        <EditMarkupModal<
+          Model.SimpleSubAccount,
+          Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, Model.Budget>
+        >
           id={markupToEdit}
           parentId={subaccountId}
           parentType={"subaccount"}
           open={true}
           onCancel={() => setMarkupToEdit(null)}
-          onSuccess={(markup: Model.Markup) => {
+          onSuccess={(
+            response: Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, Model.Budget>
+          ) => {
             setMarkupToEdit(null);
-            dispatch(
-              actions.subAccount.handleTableChangeEventAction({
-                type: "markupUpdate",
-                payload: { id: markup.id, data: markup }
-              })
-            );
+            table.current.applyTableChange({
+              type: "markupUpdated",
+              payload: { id: response.data.id, data: response.data }
+            });
+            dispatch(actions.subAccount.updateInStateAction({ id: response.parent.id, data: response.parent }));
+            dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
           }}
         />
       )}
@@ -219,12 +219,10 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
-            dispatch(
-              actions.subAccount.handleTableChangeEventAction({
-                type: "groupUpdate",
-                payload: { id: group.id, data: group }
-              })
-            );
+            table.current.applyTableChange({
+              type: "groupUpdated",
+              payload: { id: group.id, data: group }
+            });
             if (group.color !== groupToEdit.groupData.color) {
               table.current.applyGroupColorChange(group);
             }
