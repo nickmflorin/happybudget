@@ -8,6 +8,16 @@ input:-webkit-autofill:focus,
 input.ant-input:-webkit-autofill,
 input.ant-input:-webkit-autofill:hover,
 input.ant-input:-webkit-autofill:focus,
+.ant-input-number-focused,
+.ant-input-number:-webkit-autofill,
+.ant-input-number:-webkit-autofill:hover,
+.ant-input-number:-webkit-autofill:focus,
+.ant-input-number .ant-input-number-input-wrap:-webkit-autofill,
+.ant-input-number .ant-input-number-input-wrap:-webkit-autofill:hover,
+.ant-input-number .ant-input-number-input-wrap:-webkit-autofill:focus,
+.ant-input-number .ant-input-number-input-wrap input:-webkit-autofill,
+.ant-input-number .ant-input-number-input-wrap input:-webkit-autofill:hover,
+.ant-input-number .ant-input-number-input-wrap input:-webkit-autofill:focus,
 textarea:-webkit-autofill,
 textarea:-webkit-autofill:hover,
 textarea:-webkit-autofill:focus,
@@ -23,7 +33,7 @@ select:-webkit-autofill:focus {
 }
 
 input:-webkit-autofill::first-line {
-  font-size: 14px;
+  font-size: 13px;
   color: $text-primary !important;
   font-family: $avenir;
   font-weight: 500;
@@ -67,7 +77,7 @@ input:focus-visible {
   font-weight: 500;
   width: 100%;
   line-height: 22px;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .input-small-base {
@@ -89,7 +99,7 @@ input:focus-visible {
 
   .ant-input-prefix {
     margin-right: 12px;
-    font-size: 14px;
+    font-size: 13px;
   }
 
   input {
@@ -107,6 +117,12 @@ input:focus-visible {
     input {
       @extend .input-small-base;
     }
+  }
+
+  &:hover,
+  &:focus {
+    border-color: transparent !important;
+    box-shadow: none !important;
   }
 }
 
@@ -143,6 +159,19 @@ textarea {
   font-size: 12px;
 }
 
+.ant-input-number {
+  .ant-input-number-handler-wrap {
+    display: none !important;
+  }
+  .ant-input-number-input-wrap {
+    height: 22px;
+    input {
+      height: 22px;
+      padding: 0 !important;
+    }
+  }
+}
+
 .ant-select-multiple {
   .ant-select-selection-item-remove > .anticon {
     vertical-align: -0.1em;
@@ -154,38 +183,41 @@ textarea {
   }
 }
 
-.select-base {
-  font-size: 12px;
-  width: 100%;
-  border-radius: $input-border-radius;
-}
-
-.select-disabled-base {
-  background-color: $gray-light;
-}
-
 .select {
+  @extend .input-base;
+  box-shadow: none !important;
   min-width: 200px;
-  @extend .select-base;
-  .ant-select-selector {
-    @extend .select-base;
+  background-color: $white !important;
+
+  &:not(.ant-select-disabled):hover .ant-select-selector {
+    border-color: #ebebeb !important;
+    border: 1px solid #ebebeb !important;
   }
+
+  .ant-select-selector {
+    @extend .input-base;
+    box-shadow: none !important;
+    background-color: $white !important;
+    border-color: #ebebeb !important;
+    border: 1px solid #ebebeb !important;
+  }
+
   &.ant-select-open .ant-select-arrow svg {
     color: $black;
   }
   &.disabled {
-    @extend .select-disabled-base;
+    background-color: $gray-light !important;
     .ant-select-selector {
-      @extend .select-disabled-base;
+      background-color: $gray-light !important;
     }
   }
 }
 
 .ant-select-item-option {
   color: $text-secondary;
-  font-size: 12px;
-  font-weight: 400;
-  font-family: $roboto;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: $avenir;
   min-height: 32px;
   height: 32px;
 
