@@ -10,27 +10,25 @@ export interface ToggleColumnsDropdownProps<R extends Table.RowData, M extends M
   readonly hiddenColumns?: (keyof R | string)[];
 }
 
+const colField = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  col: Table.Column<R, M>
+): keyof R | string | undefined => (col.field !== undefined ? col.field : col.colId);
+
 /* eslint-disable indent */
 const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   props: ToggleColumnsDropdownProps<R, M>
 ): JSX.Element => {
   const hideableColumns = useMemo<Table.Column<R, M>[]>(
-    () => filter(props.columns, (col: Table.Column<R, M>) => col.canBeHidden !== false),
+    () => filter(props.columns, (col: Table.Column<R, M>) => col.canBeHidden !== false && !isNil(colField(col))),
     [props.columns]
   );
 
-  const selected = useMemo<(keyof R)[]>(
+  const selected = useMemo<(keyof R | string)[]>(
     () =>
-      filter(
-        map(
-          filter(
-            hideableColumns,
-            (col: Table.Column<R, M>) => !isNil(col.field) && !includes(props.hiddenColumns, col.field)
-          ),
-          (col: Table.Column<R, M>) => col.field
-        ),
-        (field: keyof R | undefined) => !isNil(field)
-      ) as (keyof R)[],
+      map(
+        filter(hideableColumns, (col: Table.Column<R, M>) => !includes(props.hiddenColumns, colField(col))),
+        (col: Table.Column<R, M>) => colField(col)
+      ) as (keyof R | string)[],
     [hideableColumns, props.hiddenColumns]
   );
 
@@ -44,7 +42,7 @@ const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.HttpMode
       menuSelected={selected as string[]}
       keepDropdownOpenOnClick={true}
       menuItems={map(hideableColumns, (col: Table.Column<R, M>) => ({
-        id: col.field as string,
+        id: colField(col) as string,
         label: col.headerName || ""
       }))}
     />
