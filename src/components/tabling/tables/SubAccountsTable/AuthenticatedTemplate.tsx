@@ -19,6 +19,7 @@ export type AuthenticatedTemplateProps = Omit<AuthenticatedBudgetTableProps<R, M
   readonly categoryName: "Sub Account" | "Detail";
   readonly identifierFieldHeader: "Account" | "Line";
   readonly exportFileName: string;
+  readonly onGroupRows: (rows: Table.ModelRow<R>[]) => void;
   readonly onAddFringes: () => void;
   readonly onEditFringes: () => void;
 };

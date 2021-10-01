@@ -22,8 +22,11 @@ export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>,
   readonly identifierFieldHeader: "Account" | "Line";
   readonly contacts: Model.Contact[];
   readonly exportFileName: string;
+  readonly onGroupRows: (rows: Table.ModelRow<R>[]) => void;
   readonly onExportPdf: () => void;
   readonly onNewContact: (params: { name?: string; change: PreContactCreate }) => void;
+  readonly onEditMarkup: (row: Table.MarkupRow<R>) => void;
+  readonly onMarkupRows?: (rows: Table.ModelRow<R>[]) => void;
   readonly onEditContact: (id: number) => void;
   readonly onAddFringes: () => void;
   readonly onEditFringes: () => void;

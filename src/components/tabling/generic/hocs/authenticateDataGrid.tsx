@@ -51,8 +51,8 @@ export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Mo
   readonly generateNewRowData?: (rows: Table.BodyRow<R>[]) => Partial<R>;
   readonly rowHasCheckboxSelection: ((row: Table.EditableRow<R>) => boolean) | undefined;
   readonly onRowSelectionChanged: (rows: Table.EditableRow<R>[]) => void;
-  readonly rowCanExpand?: (row: Table.ModelRow<R>) => boolean;
-  readonly onRowExpand?: null | ((row: Table.ModelRow<R>) => void);
+  readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
+  readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
   readonly isCellEditable?: (params: Table.CellCallbackParams<R, M>) => boolean;
   readonly onChangeEvent: (event: Table.ChangeEvent<R>) => void;
   readonly onEditGroup?: (g: Table.GroupRow<R>) => void;
@@ -614,7 +614,9 @@ const authenticateDataGrid =
                   const col = props.apis?.column.getColumn("expand");
                   if (
                     !isNil(col) &&
-                    (isNil(oldRow.current) || props.rowCanExpand(oldRow.current) !== props.rowCanExpand(row))
+                    (isNil(oldRow.current) ||
+                      (typeof props.rowCanExpand === "function" &&
+                        props.rowCanExpand(oldRow.current) !== props.rowCanExpand(row)))
                   ) {
                     props.apis?.grid.refreshCells({ force: true, rowNodes: [e.node], columns: [col] });
                   }

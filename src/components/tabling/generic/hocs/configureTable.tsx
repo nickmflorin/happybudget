@@ -49,7 +49,7 @@ type TableConfigurationProvidedProps<R extends Table.RowData> = {
   readonly rowHeight?: number;
   readonly menuPortalId?: string;
   readonly showPageFooter?: boolean;
-  readonly rowCanExpand?: (row: Table.ModelRow<R>) => boolean;
+  readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
   readonly getCSVData: () => CSVData;
   readonly onDataGridReady: (event: GridReadyEvent) => void;
   readonly onFooterGridReady: (event: GridReadyEvent) => void;
@@ -74,16 +74,18 @@ export type TableConfigurationProps<R extends Table.RowData, M extends Model.Htt
   readonly leftAlignNewRowButton?: boolean;
   readonly rowHeight?: number;
   readonly menuPortalId?: string;
+  readonly pinFirstColumn?: boolean;
   // TODO: We should restrict this to authenticated cases only.
   readonly savingChangesPortalId?: string;
   readonly framework?: Table.Framework;
   readonly className?: Table.GeneralClassName;
   readonly columns: Table.Column<R, M>[];
-  readonly rowCanExpand?: (row: Table.ModelRow<R>) => boolean;
-  readonly onRowExpand?: null | ((row: Table.ModelRow<R>) => void);
+  readonly expandActionBehavior?: Table.ExpandActionBehavior | ((r: Table.BodyRow<R>) => Table.ExpandActionBehavior);
+  readonly onEditRow?: (g: Table.EditableRow<R>) => void;
+  readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
+  readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
   readonly isCellSelectable?: (params: Table.CellCallbackParams<R, M>) => boolean;
-  readonly pinFirstColumn?: boolean;
 };
 
 export type WithConfiguredTableProps<T, R extends Table.RowData> = T & TableConfigurationProvidedProps<R>;
@@ -163,8 +165,10 @@ const configureTable = <
       return { data, footer, page };
     }, []);
 
-    // const hasExpandColumn = useMemo(() => !isNil(props.onRowExpand), [props.onRowExpand]);
-    const hasExpandColumn = true;
+    const hasExpandColumn = useMemo(
+      () => !isNil(props.onRowExpand) || !isNil(props.onEditRow),
+      [props.onRowExpand, props.onEditRow]
+    );
 
     const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
       let orderedColumns = tabling.columns.orderColumns<Table.Column<R, M>, R, M>(props.columns);
@@ -183,6 +187,8 @@ const configureTable = <
               // at the top Table level than at the Grid level.
               cellRendererParams: {
                 ...props.expandColumn?.cellRendererParams,
+                expandActionBehavior: props.expandActionBehavior,
+                onEditRow: (row: Table.BodyRow<R>) => tabling.typeguards.isEditableRow(row) && props.onEditRow?.(row),
                 onExpand: (row: Table.ModelRow<R>) => tabling.typeguards.isDataRow(row) && props.onRowExpand?.(row),
                 rowCanExpand: props.rowCanExpand,
                 tooltip: props.expandCellTooltip
@@ -205,7 +211,14 @@ const configureTable = <
           ? [{ ...orderedColumns[0], pinned: props.pinFirstColumn ? "left" : undefined }, ...orderedColumns.slice(1)]
           : orderedColumns)
       ];
-    }, [hooks.useDeepEqualMemo(props.columns), props.pinFirstColumn, hasExpandColumn, props.onRowExpand]);
+    }, [
+      hooks.useDeepEqualMemo(props.columns),
+      props.pinFirstColumn,
+      hasExpandColumn,
+      props.expandActionBehavior,
+      props.onRowExpand,
+      props.onEditRow
+    ]);
 
     const processCellForClipboard = hooks.useDynamicCallback(
       (column: Table.Column<R, M>, row: Table.DataRow<R>, value?: any) => {

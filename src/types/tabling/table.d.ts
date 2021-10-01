@@ -303,6 +303,8 @@ namespace Table {
     readonly hiddenColumns?: string;
   }
 
+  type ExpandActionBehavior = "expand" | "edit";
+
   type TableInstance<R extends RowData = RowData> = {
     readonly getFocusedRow: () => BodyRow<R> | null;
     readonly getRowsAboveAndIncludingFocusedRow: () => BodyRow<R>[];

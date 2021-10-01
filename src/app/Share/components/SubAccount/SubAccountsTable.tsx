@@ -88,7 +88,7 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
       fringes={fringes}
       // Right now, the SubAccount recursion only goes 1 layer deep.
       // Account -> SubAccount -> Detail (Recrusive SubAccount).
-      onRowExpand={null}
+      rowCanExpand={false}
       exportFileName={!isNil(subaccountDetail) ? `subaccount_${subaccountDetail.identifier}` : ""}
       categoryName={"Detail"}
       identifierFieldHeader={"Line"}

@@ -11,22 +11,18 @@ interface InjectedBudgetDataGridProps {
   readonly framework?: Table.Framework;
 }
 
-export interface BudgetDataGridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
+export interface BudgetDataGridProps<R extends Table.RowData> {
   readonly apis: Table.GridApis | null;
   readonly framework?: Table.Framework;
   readonly onBack?: () => void;
-  readonly rowCanExpand?: (row: Table.ModelRow<R>) => boolean;
-  readonly onRowExpand?: null | ((row: Table.ModelRow<R>) => void);
+  readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
+  readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
 }
 
 export type WithBudgetDataGridProps<T> = T & InjectedBudgetDataGridProps;
 
 /* eslint-disable indent */
-const BudgetDataGrid = <
-  R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  T extends BudgetDataGridProps<R, M> = BudgetDataGridProps<R, M>
->(
+const BudgetDataGrid = <R extends Tables.BudgetRowData, T extends BudgetDataGridProps<R> = BudgetDataGridProps<R>>(
   Component: React.ComponentClass<WithBudgetDataGridProps<T>, {}> | React.FunctionComponent<WithBudgetDataGridProps<T>>
 ): React.FunctionComponent<T> => {
   function WithBudgetDataGrid(props: T) {
@@ -41,7 +37,9 @@ const BudgetDataGrid = <
             if (
               tabling.typeguards.isModelRow(row) &&
               !isNil(props.onRowExpand) &&
-              (isNil(props.rowCanExpand) || props.rowCanExpand(row))
+              (isNil(props.rowCanExpand) ||
+                (typeof props.rowCanExpand === "boolean" && props.rowCanExpand !== false) ||
+                (typeof props.rowCanExpand === "function" && props.rowCanExpand(row)))
             ) {
               props.onRowExpand(row);
             }

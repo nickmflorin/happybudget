@@ -1,5 +1,7 @@
 import { isNil } from "lodash";
 
+import { tabling } from "lib";
+
 import { ExpandCell as GenericExpandCell, ExpandCellProps } from "components/tabling/generic/framework/cells";
 
 /* eslint-disable indent */
@@ -13,7 +15,9 @@ const ExpandCell = <
   return (
     <GenericExpandCell
       {...props}
-      alwaysShow={(row: Table.ModelRow<R>) => !isNil(row.children) && row.children.length !== 0}
+      alwaysShow={(row: Table.BodyRow<R>) =>
+        tabling.typeguards.isModelRow(row) && !isNil(row.children) && row.children.length !== 0
+      }
     />
   );
 };

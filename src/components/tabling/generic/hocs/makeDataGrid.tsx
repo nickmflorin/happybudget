@@ -24,8 +24,8 @@ export interface DataGridProps<R extends Table.RowData, M extends Model.HttpMode
   readonly cookieNames?: Table.CookieNames;
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
   readonly isCellSelectable?: (params: Table.CellCallbackParams<R, M>) => boolean;
-  readonly rowCanExpand?: (row: Table.ModelRow<R>) => boolean;
-  readonly onRowExpand?: null | ((row: Table.ModelRow<R>) => void);
+  readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
+  readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
   readonly onFirstDataRendered: (e: FirstDataRenderedEvent) => void;
 }
 

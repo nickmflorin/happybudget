@@ -26,7 +26,8 @@ const AuthenticatedBudgetTable = <R extends Table.RowData, M extends Model.Typed
   return (
     <AuthenticatedTable<R, M>
       {...props}
-      expandColumn={{ cellRendererParams: { onEdit: (row: Table.MarkupRow<R>) => onEditMarkup?.(row) } }}
+      onEditRow={(r: Table.EditableRow<R>) => tabling.typeguards.isMarkupRow(r) && onEditMarkup?.(r)}
+      expandActionBehavior={(r: Table.BodyRow<R>) => (tabling.typeguards.isMarkupRow(r) ? "edit" : "expand")}
       framework={tabling.aggrid.combineFrameworks(Framework, props.framework)}
     >
       {(params: AuthenticatedTableDataGridProps<R, M>) => (
