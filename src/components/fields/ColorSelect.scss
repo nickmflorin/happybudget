@@ -4,9 +4,9 @@
   display: flex;
   flex-wrap: wrap;
   flex-grow: 100;
-  height: 36px;
   padding-top: 6px;
   padding-bottom: 6px;
+  margin-bottom: -12px !important;
 
   .color-select-color {
     flex: 1 1 24px;
