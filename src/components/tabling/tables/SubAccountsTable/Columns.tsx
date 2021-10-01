@@ -29,7 +29,7 @@ const Columns: Table.Column<R, M>[] = [
     },
     colSpan: (params: Table.ColSpanParams<R, M>) => {
       const row: Table.BodyRow<R> = params.data;
-      if ((tabling.typeguards.isModelRow(row) && row.children.length !== 0) || tabling.typeguards.isMarkupRow) {
+      if ((tabling.typeguards.isModelRow(row) && row.children.length !== 0) || tabling.typeguards.isMarkupRow(row)) {
         const agColumns: Column[] | undefined = params.columnApi?.getAllDisplayedColumns();
         if (!isNil(agColumns)) {
           const originalCalculatedColumns = filter(
