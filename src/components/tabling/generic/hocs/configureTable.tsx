@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo, useReducer } from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
-import { map, isNil, filter, includes, reduce } from "lodash";
+import { map, isNil, filter, includes, reduce, uniqueId } from "lodash";
 import { GridReadyEvent, GridOptions, FirstDataRenderedEvent, RowNode } from "@ag-grid-community/core";
 
 import { Config } from "config";
@@ -39,6 +39,7 @@ export const DefaultFooterGridOptions: GridOptions = {
 };
 
 type TableConfigurationProvidedProps<R extends Table.RowData> = {
+  readonly id: string;
   readonly tableApis: Table.ITableApis;
   readonly hiddenColumns: (keyof R | string)[];
   readonly tableGridOptions: Table.TableOptionsSet;
@@ -89,6 +90,20 @@ export type WithConfiguredTableProps<T, R extends Table.RowData> = T & TableConf
 
 const InitialAPIs = new tabling.TableApis({});
 
+type SetApiAction = {
+  readonly gridId: Table.GridId;
+  readonly payload: {
+    readonly api: Table.GridApi;
+    readonly columnApi: Table.ColumnApi;
+  };
+};
+
+const apisReducer = (state: tabling.TableApis = InitialAPIs, action: SetApiAction): tabling.TableApis => {
+  const newApis = state.clone();
+  newApis.set(action.gridId, { grid: action.payload.api, column: action.payload.columnApi });
+  return newApis;
+};
+
 /* eslint-disable indent */
 const configureTable = <
   R extends Table.RowData,
@@ -100,7 +115,8 @@ const configureTable = <
     | React.FunctionComponent<WithConfiguredTableProps<T, R>>
 ): React.FunctionComponent<T> => {
   function WithConfigureTable(props: T) {
-    const [_apis, _setApis] = useState<tabling.TableApis>(InitialAPIs);
+    const tableId = useMemo(() => uniqueId("table-"), []);
+    const [_apis, dispatchApis] = useReducer(apisReducer, InitialAPIs);
 
     const [hiddenColumns, changeColumnVisibility] = tabling.hooks.useHiddenColumns<R, M>({
       cookie: props.cookieNames?.hiddenColumns,
@@ -112,16 +128,28 @@ const configureTable = <
     const onFooterGridReady = useMemo(() => (e: GridReadyEvent) => onGridReady(e, "footer"), []);
     const onPageGridReady = useMemo(() => (e: GridReadyEvent) => onGridReady(e, "page"), []);
 
-    const onGridReady = hooks.useDynamicCallback((e: GridReadyEvent, id: Table.GridId) => {
-      const newApis = _apis.clone();
-      newApis.set(id, { grid: e.api, column: e.columnApi });
-      _setApis(newApis);
-    });
+    const onGridReady = useMemo(
+      () => (e: GridReadyEvent, gridId: Table.GridId) => {
+        dispatchApis({ gridId, payload: { api: e.api, columnApi: e.columnApi } });
+      },
+      []
+    );
 
     const onFirstDataRendered = useMemo(
       () =>
         (event: FirstDataRenderedEvent): void => {
-          event.api.sizeColumnsToFit();
+          const grid = document.querySelector(`#${tableId}`);
+          const cols = event.columnApi.getAllDisplayedColumns();
+          const width = reduce(
+            cols,
+            (curr: number, c: Table.AgColumn) => {
+              return curr + c.getActualWidth();
+            },
+            0.0
+          );
+          if (grid?.clientWidth && width < grid.clientWidth) {
+            event.api.sizeColumnsToFit();
+          }
         },
       []
     );
@@ -223,6 +251,7 @@ const configureTable = <
     return (
       <Component
         {...props}
+        id={tableId}
         minimal={props.minimal}
         leftAlignNewRowButton={props.leftAlignNewRowButton}
         rowHeight={props.rowHeight}

@@ -4,6 +4,7 @@ import { isNil } from "lodash";
 import { WrapInApplicationSpinner, ShowHide } from "components";
 
 export interface TableWrapperProps {
+  readonly id: string;
   readonly children: JSX.Element;
   readonly loading?: boolean | undefined;
   readonly menuPortalId?: string | undefined;
@@ -18,6 +19,7 @@ const TableWrapper = (props: TableWrapperProps) => {
     <WrapInApplicationSpinner hideWhileLoading={false} loading={props.loading}>
       <div className={classNames("table", "ag-theme-alpine", { "table--minimal": props.minimal }, props.className)}>
         <div
+          id={props.id}
           className={classNames("core-table", {
             "with-page-footer": !isNil(props.footer) && props.showPageFooter === true,
             "with-table-menu": isNil(props.menuPortalId)

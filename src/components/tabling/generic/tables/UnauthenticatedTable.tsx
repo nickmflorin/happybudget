@@ -153,6 +153,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.TypedHttp
 
   return (
     <TableWrapper
+      id={props.id}
       loading={props.loading}
       minimal={props.minimal}
       className={props.className}

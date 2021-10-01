@@ -256,6 +256,7 @@ const AuthenticatedTable = <
 
   return (
     <TableWrapper
+      id={props.id}
       loading={props.loading}
       minimal={props.minimal}
       className={props.className}
