@@ -1,4 +1,4 @@
-import { filter, find, isNil, reduce } from "lodash";
+import { isNil, reduce } from "lodash";
 
 export const sumChars = (val: string): number => {
   let sum = 0;
@@ -14,29 +14,35 @@ export const hashString = (s: string): number =>
     return a & a;
   }, 0);
 
-type JoinStringArg = number | string | null | undefined;
+type JoinStringArg = number | string | null;
 type JoinStringConfig = {
   readonly delimeter?: string;
   readonly replaceMissing?: string | boolean;
   readonly ifBlank?: string;
 };
 
-export function conditionalJoinString(arg0: JoinStringArg, config?: JoinStringConfig): string;
-export function conditionalJoinString(arg0: JoinStringArg, arg1: JoinStringArg, config?: JoinStringConfig): string;
+export function conditionalJoinString(arg0: JoinStringArg): string;
+export function conditionalJoinString(arg0: JoinStringArg, config: JoinStringConfig): string;
+export function conditionalJoinString(arg0: JoinStringArg, arg1: JoinStringArg): string;
+export function conditionalJoinString(arg0: JoinStringArg, arg1: JoinStringArg, config: JoinStringConfig): string;
+export function conditionalJoinString(arg0: JoinStringArg, arg1: JoinStringArg, arg2: JoinStringArg): string;
 export function conditionalJoinString(
   arg0: JoinStringArg,
   arg1: JoinStringArg,
   arg2: JoinStringArg,
-  config?: JoinStringConfig
+  config: JoinStringConfig
 ): string;
 
 export function conditionalJoinString(...args: (JoinStringArg | JoinStringConfig)[]): string {
-  const isArg = (a: JoinStringArg | JoinStringConfig): a is JoinStringArg => typeof a === "string";
-  const isConfig = (a: JoinStringArg | JoinStringConfig): a is JoinStringConfig => typeof a !== "string";
-  const parts: JoinStringArg[] = filter(args, (a: JoinStringArg | JoinStringConfig) => isArg(a)) as JoinStringArg[];
-  const config: JoinStringConfig | undefined = find(args, (a: JoinStringArg | JoinStringConfig) => isConfig(a)) as
-    | JoinStringConfig
-    | undefined;
+  const isConfig = (a: JoinStringArg | JoinStringConfig): a is JoinStringConfig => typeof a === "object";
+
+  let config: JoinStringConfig | null = null;
+  let reversedArgs = args.slice().reverse();
+  if (isConfig(reversedArgs[0])) {
+    config = reversedArgs[0];
+    reversedArgs = reversedArgs.slice(1);
+  }
+  const parts = reversedArgs.slice().reverse() as JoinStringArg[];
 
   const metabolizedParts: string[] = reduce(
     parts,

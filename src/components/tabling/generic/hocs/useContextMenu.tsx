@@ -67,7 +67,7 @@ const useContextMenu = <R extends Table.RowData>(
 
   const getFullRowName = useMemo(
     () => (row: Table.BodyRow<R>) => {
-      return util.conditionalJoinString(getRowLabel(row), getRowName(row), { replaceMissing: "Row" });
+      return util.conditionalJoinString(getRowLabel(row) || null, getRowName(row) || null, { replaceMissing: "Row" });
     },
     [getRowLabel, getRowName]
   );
@@ -157,11 +157,11 @@ const useContextMenu = <R extends Table.RowData>(
                 const endpoints = [getRowName(row), getRowName(lastRow)];
                 if (!(endpoints[0] === undefined && endpoints[1] === undefined)) {
                   label = `Group ${getRowLabel(row) || "Row"}s ${util.conditionalJoinString(
-                    endpoints[1],
-                    endpoints[0],
+                    endpoints[1] || null,
+                    endpoints[0] || null,
                     {
-                      delimeter: " - ",
-                      replaceMissing: ""
+                      delimeter: " to ",
+                      replaceMissing: "-"
                     }
                   )}`;
                 }

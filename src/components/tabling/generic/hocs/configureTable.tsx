@@ -38,7 +38,7 @@ export const DefaultFooterGridOptions: GridOptions = {
   suppressHorizontalScroll: true
 };
 
-type TableConfigurationProvidedProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {
+type TableConfigurationProvidedProps<R extends Table.RowData> = {
   readonly tableApis: Table.ITableApis;
   readonly hiddenColumns: (keyof R | string)[];
   readonly tableGridOptions: Table.TableOptionsSet;
@@ -85,8 +85,7 @@ export type TableConfigurationProps<R extends Table.RowData, M extends Model.Htt
   readonly pinFirstColumn?: boolean;
 };
 
-export type WithConfiguredTableProps<T, R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = T &
-  TableConfigurationProvidedProps<R, M>;
+export type WithConfiguredTableProps<T, R extends Table.RowData> = T & TableConfigurationProvidedProps<R>;
 
 const InitialAPIs = new tabling.TableApis({});
 
@@ -97,8 +96,8 @@ const configureTable = <
   T extends TableConfigurationProps<R, M> = TableConfigurationProps<R, M>
 >(
   Component:
-    | React.ComponentClass<WithConfiguredTableProps<T, R, M>, {}>
-    | React.FunctionComponent<WithConfiguredTableProps<T, R, M>>
+    | React.ComponentClass<WithConfiguredTableProps<T, R>, {}>
+    | React.FunctionComponent<WithConfiguredTableProps<T, R>>
 ): React.FunctionComponent<T> => {
   function WithConfigureTable(props: T) {
     const [_apis, _setApis] = useState<tabling.TableApis>(InitialAPIs);
