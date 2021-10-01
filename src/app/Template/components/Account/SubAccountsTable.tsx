@@ -64,7 +64,7 @@ const ConnectedTable = connectTableToStore<
       ],
       (detail: Model.Account | null) => ({
         identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
-        estimated: !isNil(detail) ? detail.estimated + detail.markup_contribution + detail.fringe_contribution : 0.0
+        estimated: !isNil(detail) ? detail.estimated : 0.0
       })
     )
   }

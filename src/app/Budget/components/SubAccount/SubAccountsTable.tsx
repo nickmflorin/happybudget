@@ -64,10 +64,8 @@ const ConnectedTable = connectTableToStore<BudgetSubAccountsTableProps, R, M, Ta
       ],
       (detail: Model.SubAccount | null) => ({
         identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Sub Account Total",
-        estimated: !isNil(detail) ? detail.estimated + detail.markup_contribution + detail.fringe_contribution : 0.0,
-        variance: !isNil(detail)
-          ? detail.estimated + detail.markup_contribution + detail.fringe_contribution - detail.actual
-          : 0.0,
+        estimated: !isNil(detail) ? detail.estimated : 0.0,
+        variance: !isNil(detail) ? detail.estimated - detail.actual : 0.0,
         actual: detail?.actual || 0.0
       })
     )
