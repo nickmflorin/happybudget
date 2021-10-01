@@ -5,7 +5,6 @@ import classNames from "classnames";
 
 import { Dropdown, TooltipWrapper } from "components";
 import { Button } from "components/buttons";
-import { hooks } from "lib";
 
 import "./BreadCrumbs.scss";
 
@@ -52,8 +51,6 @@ const BreadCrumbGenericItem = ({
   );
 };
 
-const MemoizedBreadCrumbGenericItem = React.memo(BreadCrumbGenericItem);
-
 interface BreadCrumbItemProps extends StandardComponentProps {
   readonly item: IBreadCrumbItem;
   readonly primary?: boolean;
@@ -79,7 +76,7 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
   };
 
   return (
-    <MemoizedBreadCrumbGenericItem
+    <BreadCrumbGenericItem
       {...props}
       tooltip={item.tooltip}
       url={item.url}
@@ -98,11 +95,9 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
       ) : (
         <div className={"text-wrapper"}>{renderItem(item)}</div>
       )}
-    </MemoizedBreadCrumbGenericItem>
+    </BreadCrumbGenericItem>
   );
 };
-
-const MemoizedBreadCrumbItem = hooks.deepMemo(BreadCrumbItem);
 
 interface BreadCrumbItemsProps {
   readonly children: JSX.Element[];
@@ -131,8 +126,6 @@ const BreadCrumbItems = ({ children }: BreadCrumbItemsProps): JSX.Element => {
   }
 };
 
-const MemoizedBreadCrumbItems = React.memo(BreadCrumbItems);
-
 interface BreadCrumbsProps extends StandardComponentProps {
   readonly items?: (IBreadCrumbItem | ILazyBreadCrumbItem)[];
   readonly itemProps?: StandardComponentProps;
@@ -141,22 +134,26 @@ interface BreadCrumbsProps extends StandardComponentProps {
 }
 
 const BreadCrumbs = ({ items, itemProps, params, children, ...props }: BreadCrumbsProps): JSX.Element => {
-  const parametersPresent = hooks.useDynamicCallback((item: ILazyBreadCrumbItem): [boolean, { [key: string]: any }] => {
-    if ((item.requiredParams.length !== 0 && !isNil(params) && Object.keys(params).length === 0) || isNil(params)) {
-      return [false, {}];
-    }
-    let allRequiredParamsPresent = true;
-    let presentParamsObj: { [key: string]: any } = {};
-    forEach(item.requiredParams, (param: string) => {
-      if (isNil(params[param])) {
-        allRequiredParamsPresent = false;
-        return false;
-      } else {
-        presentParamsObj[param] = params[param];
-      }
-    });
-    return [allRequiredParamsPresent, presentParamsObj];
-  });
+  const parametersPresent = useMemo(
+    () =>
+      (item: ILazyBreadCrumbItem): [boolean, { [key: string]: any }] => {
+        if ((item.requiredParams.length !== 0 && !isNil(params) && Object.keys(params).length === 0) || isNil(params)) {
+          return [false, {}];
+        }
+        let allRequiredParamsPresent = true;
+        let presentParamsObj: { [key: string]: any } = {};
+        forEach(item.requiredParams, (param: string) => {
+          if (isNil(params[param])) {
+            allRequiredParamsPresent = false;
+            return false;
+          } else {
+            presentParamsObj[param] = params[param];
+          }
+        });
+        return [allRequiredParamsPresent, presentParamsObj];
+      },
+    [params]
+  );
 
   const preparedItems = useMemo((): IBreadCrumbItem[] | null => {
     if (isNil(items)) {
@@ -182,22 +179,22 @@ const BreadCrumbs = ({ items, itemProps, params, children, ...props }: BreadCrum
       }
     }
     return transformed;
-  }, [items, params]);
+  }, [items, parametersPresent]);
 
   if (!isNil(children)) {
     return (
       <div {...props} className={classNames("bread-crumbs", props.className)}>
-        <MemoizedBreadCrumbItems>{children}</MemoizedBreadCrumbItems>
+        <BreadCrumbItems>{children}</BreadCrumbItems>
       </div>
     );
   } else if (!isNil(preparedItems)) {
     return (
       <div {...props} className={classNames("bread-crumbs", props.className)}>
-        <MemoizedBreadCrumbItems>
+        <BreadCrumbItems>
           {map(preparedItems, (item: IBreadCrumbItem, index: number) => (
-            <MemoizedBreadCrumbItem {...itemProps} key={index} item={item} />
+            <BreadCrumbItem {...itemProps} key={index} item={item} />
           ))}
-        </MemoizedBreadCrumbItems>
+        </BreadCrumbItems>
       </div>
     );
   } else {
@@ -205,4 +202,4 @@ const BreadCrumbs = ({ items, itemProps, params, children, ...props }: BreadCrum
   }
 };
 
-export default hooks.deepMemo(BreadCrumbs);
+export default BreadCrumbs;

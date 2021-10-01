@@ -57,6 +57,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
     () => (!isNil(props.selected) ? (Array.isArray(props.selected) ? props.selected : [props.selected]) : _selected),
     [props.selected, _selected]
   );
+
   const [_search, _setSearch] = useState("");
   const search = useMemo(() => (!isNil(props.search) ? props.search : _search), [props.search, _search]);
   const mode = useMemo(() => (!isNil(props.mode) ? props.mode : "single"), [props]);

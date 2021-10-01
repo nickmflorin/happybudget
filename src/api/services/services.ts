@@ -27,8 +27,8 @@ export const detailPostService = <P extends Http.Payload, R>(
   path: Http.PathParams | ((id: number) => Http.PathParams)
 ) => {
   return async (id: number, payload: P, options: Http.RequestOptions = {}): Promise<R> => {
-    path = typeof path === "function" ? path(id) : path;
-    const url = URL.v1(...path);
+    const pt = typeof path === "function" ? path(id) : path;
+    const url = URL.v1(...pt);
     return client.post<R>(url, payload, options);
   };
 };
@@ -37,8 +37,8 @@ export const detailPatchService = <P extends Http.Payload, R>(
   path: Http.PathParams | ((id: number) => Http.PathParams)
 ) => {
   return async (id: number, payload: Partial<P>, options: Http.RequestOptions = {}): Promise<R> => {
-    path = typeof path === "function" ? path(id) : path;
-    const url = URL.v1(...path);
+    const pt = typeof path === "function" ? path(id) : path;
+    const url = URL.v1(...pt);
     return client.patch<R>(url, payload, options);
   };
 };
@@ -47,8 +47,8 @@ export const retrieveService = <M extends Model.HttpModel>(
   path: Http.PathParams | ((id: number) => Http.PathParams)
 ) => {
   return async (id: number, options: Http.RequestOptions = {}): Promise<M> => {
-    path = typeof path === "function" ? path(id) : path;
-    const url = URL.v1(...path);
+    const pt = typeof path === "function" ? path(id) : path;
+    const url = URL.v1(...pt);
     return client.retrieve<M>(url, options);
   };
 };
@@ -59,8 +59,8 @@ export const listService = <M extends Model.HttpModel>(path: Http.PathParams | (
     query: Http.ListQuery = {},
     options: Http.RequestOptions = {}
   ): Promise<Http.ListResponse<M>> => {
-    path = typeof path === "function" ? path(id) : path;
-    const url = URL.v1(...path);
+    const pt = typeof path === "function" ? path(id) : path;
+    const url = URL.v1(...pt);
     return client.list<M>(url, query, options);
   };
 };

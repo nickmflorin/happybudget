@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { isNil, map } from "lodash";
 
-import { redux, budgeting } from "lib";
+import { budgeting } from "lib";
 
 import { RenderIfValidId } from "components";
 import { Portal, BreadCrumbs } from "components/layout";
@@ -13,9 +13,7 @@ import { EntityText } from "components/typography";
 import { actions } from "../../store";
 import SubAccountsTable from "./SubAccountsTable";
 
-const selectDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.budget.subaccount.detail.data
-);
+const selectDetail = (state: Application.Authenticated.Store) => state.budget.subaccount.detail.data;
 
 interface SubAccountProps {
   readonly budgetId: number;
