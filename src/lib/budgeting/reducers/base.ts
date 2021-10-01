@@ -1,6 +1,6 @@
 import { isNil, includes, filter, reduce } from "lodash";
 
-import { redux, tabling, util } from "lib";
+import { redux, tabling, util, model } from "lib";
 
 /**
  * Returns (if present) the MarkupRow in state with a provided ID.  If the rowId is also
@@ -57,6 +57,10 @@ export const createBudgetTableChangeEventReducer = <
 >(
   config: BudgetTableReducerConfig<R, M, S, A>
 ): Redux.Reducer<S, Redux.Action<Table.ChangeEvent<R>>> => {
+  const isSubAccountRowData = (
+    data: Tables.AccountRowData | Tables.SubAccountRowData
+  ): data is Tables.SubAccountRowData => (data as Tables.SubAccountRowData).fringe_contribution !== undefined;
+
   const generic = tabling.reducers.createTableChangeEventReducer<R, M, S, A>(config);
 
   return (state: S = config.initialState, action: Redux.Action<Table.ChangeEvent<R>>): S => {
@@ -68,12 +72,7 @@ export const createBudgetTableChangeEventReducer = <
 
       const markupRow = tabling.rows.createMarkupRow<R, M>({
         columns: config.columns,
-        model: markup,
-        childrenRows: redux.reducers.findModelsInData(
-          action,
-          filter(newState.data, (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r)),
-          markup.children
-        )
+        model: markup
       });
       // Insert the new MarkupRow(s) into the table and reorder the rows of the table so that the
       // MarkupRow(s) are in the appropriate location.
@@ -131,8 +130,15 @@ export const createBudgetTableChangeEventReducer = <
                   data: {
                     ...r.data,
                     // Markup contributions get applied to the value after fringes are applied.
-                    markup_contribution: tabling.businessLogic.contributionFromMarkups(
-                      r.data.estimated + r.data.fringe_contribution,
+                    markup_contribution: model.businessLogic.contributionFromMarkups(
+                      isSubAccountRowData(r.data)
+                        ? r.data.nominal_value +
+                            r.data.accumulated_fringe_contribution +
+                            r.data.accumulated_markup_contribution +
+                            r.data.fringe_contribution
+                        : r.data.nominal_value +
+                            r.data.accumulated_fringe_contribution +
+                            r.data.accumulated_markup_contribution,
                       [...otherMarkupRows, updatedMarkupRow]
                     )
                   }
@@ -149,10 +155,7 @@ export const createBudgetTableChangeEventReducer = <
             { id: updatedMarkupRow.id },
             tabling.rows.updateMarkupRow({
               row: updatedMarkupRow,
-              columns: config.columns,
-              childrenRows: filter(newState.data, (r: Table.BodyRow<R>) =>
-                tabling.typeguards.isModelRow(r)
-              ) as Table.ModelRow<R>[]
+              columns: config.columns
             })
           )
         };
@@ -168,13 +171,6 @@ export const createBudgetTableChangeEventReducer = <
 
       const mk = markupRowFromState<R, M, S>(action, newState, e.payload.markup);
       if (!isNil(mk)) {
-        const newChildren: Table.ModelRowId[] = filter(mk.children, (child: number) => !includes(ids, child));
-        // TODO: We will need to recalculate the children rows.
-        const childrenRows: Table.ModelRow<R>[] = redux.reducers.findModelsInData(
-          action,
-          filter(newState.data, (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r)),
-          newChildren
-        );
         newState = {
           ...newState,
           data: tabling.data.orderTableRows<R, M>(
@@ -186,8 +182,7 @@ export const createBudgetTableChangeEventReducer = <
                 children: filter(mk.children, (child: number) => !includes(ids, child)),
                 data: tabling.rows.updateMarkupRowData({
                   columns: config.columns,
-                  data: mk.data,
-                  childrenRows
+                  data: mk.data
                 })
               }
             )

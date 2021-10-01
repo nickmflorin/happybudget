@@ -1,5 +1,5 @@
-import { findIndex, isNil, map, filter, includes, reduce } from "lodash";
-import { ValueGetterParams, Column } from "@ag-grid-community/core";
+import { findIndex, isNil, map, filter, includes } from "lodash";
+import { Column } from "@ag-grid-community/core";
 
 import { tabling } from "lib";
 import { Icon } from "components";
@@ -11,7 +11,6 @@ type M = Model.SubAccount;
 
 const Columns: Table.Column<R, M>[] = [
   budgetFramework.columnObjs.IdentifierColumn<R, M>({
-    field: "identifier",
     headerName: "" // Will be populated by Table.
   }),
   framework.columnObjs.BodyColumn<R, M>({
@@ -20,7 +19,6 @@ const Columns: Table.Column<R, M>[] = [
     flex: 100,
     columnType: "longText",
     index: 1,
-    getMarkupValue: "description",
     suppressSizeToFit: false,
     cellRenderer: "BodyCell",
     cellRendererParams: {
@@ -117,47 +115,14 @@ const Columns: Table.Column<R, M>[] = [
     nullValue: [],
     processCellForClipboard: (row: R) => "" // Will be populated by Table.
   }),
-  framework.columnObjs.CalculatedColumn<R, M>({
-    field: "estimated",
-    headerName: "Estimated",
-    getGroupValue: (rows: Table.ModelRow<R>[]) => {
-      return reduce(
-        rows,
-        (curr: number, r: Table.ModelRow<R>) => curr + r.data.estimated + r.data.fringe_contribution,
-        0.0
-      );
-    },
-    getMarkupValue: (rows: Table.ModelRow<R>[]) => {
-      return reduce(rows, (curr: number, r: Table.ModelRow<R>) => curr + r.data.markup_contribution, 0.0);
-    }
-  }),
-  framework.columnObjs.CalculatedColumn<R, M>({
-    field: "actual",
-    headerName: "Actual",
-    getGroupValue: (rows: Table.ModelRow<R>[]) => {
-      return reduce(rows, (curr: number, r: Table.ModelRow<R>) => curr + r.data.actual, 0.0);
-    },
-    getMarkupValue: (rows: Table.ModelRow<R>[]) => {
-      return reduce(rows, (curr: number, r: Table.ModelRow<R>) => curr + r.data.actual, 0.0);
-    }
-  }),
-  framework.columnObjs.FakeColumn<R, M>({ field: "fringe_contribution" }),
+  budgetFramework.columnObjs.EstimatedColumn<R, M>({}),
+  budgetFramework.columnObjs.ActualColumn<R, M>({}),
+  budgetFramework.columnObjs.VarianceColumn<R, M>({}),
+  framework.columnObjs.FakeColumn<R, M>({ field: "nominal_value" }),
   framework.columnObjs.FakeColumn<R, M>({ field: "markup_contribution" }),
-  framework.columnObjs.CalculatedColumn<R, M>({
-    colId: "variance",
-    headerName: "Variance",
-    valueGetter: (params: ValueGetterParams) => {
-      // If we are dealing with a FooterRow, the value will be provided via the
-      // footerRowSelectors.
-      if (!isNil(params.node)) {
-        const row: Table.Row<R> = params.node.data;
-        if (tabling.typeguards.isBodyRow(row)) {
-          return row.data.estimated + row.data.fringe_contribution - row.data.actual;
-        }
-      }
-      return 0.0;
-    }
-  })
+  framework.columnObjs.FakeColumn<R, M>({ field: "fringe_contribution" }),
+  framework.columnObjs.FakeColumn<R, M>({ field: "accumulated_fringe_contribution" }),
+  framework.columnObjs.FakeColumn<R, M>({ field: "accumulated_markup_contribution" })
 ];
 
 export default Columns;

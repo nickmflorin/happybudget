@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
 import { isNil, map, filter, intersection } from "lodash";
 
-import { tabling, budgeting, redux } from "lib";
+import { tabling, budgeting, redux, model } from "lib";
 import { CreateGroupModal, EditGroupModal } from "components/modals";
 import { AccountsTable as GenericAccountsTable, connectTableToStore } from "components/tabling";
 
@@ -36,11 +36,7 @@ const ConnectedTable = connectTableToStore<
       [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.template.detail.data)],
       (budget: Model.Template | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
-        estimated: !isNil(budget) ? budget.estimated + budget.markup_contribution + budget.fringe_contribution : 0.0,
-        variance: !isNil(budget)
-          ? budget.estimated + budget.markup_contribution + budget.fringe_contribution - budget.actual
-          : 0.0,
-        actual: budget?.actual || 0.0
+        estimated: !isNil(budget) ? model.businessLogic.estimatedValue(budget) : 0.0
       })
     )
   },

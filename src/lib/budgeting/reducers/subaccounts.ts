@@ -1,7 +1,7 @@
 import { PayloadActionCreator } from "@reduxjs/toolkit";
 import { isNil, reduce, map, includes, filter, flatten, uniqBy } from "lodash";
 
-import { tabling, util, redux } from "lib";
+import { tabling, util, redux, model } from "lib";
 import { createBudgetTableReducer, createAuthenticatedBudgetTableReducer, BudgetTableReducerConfig } from "./base";
 
 type R = Tables.SubAccountRowData;
@@ -13,7 +13,7 @@ const recalculateSubAccountRow = (
   st: S,
   action: Redux.Action,
   row: Table.DataRow<R>
-): Pick<R, "estimated" | "fringe_contribution"> => {
+): Pick<R, "nominal_value" | "fringe_contribution"> => {
   /*
   In the case that the SubAccount has SubAccount(s) itself, the estimated value is determined
   from the accumulation of the estimated values for those children SubAccount(s).  In this
@@ -32,15 +32,15 @@ const recalculateSubAccountRow = (
       { name: "Fringe" }
     );
     return {
-      estimated: row.data.quantity * row.data.rate * multiplier,
-      fringe_contribution: tabling.businessLogic.contributionFromFringes(
+      nominal_value: row.data.quantity * row.data.rate * multiplier,
+      fringe_contribution: model.businessLogic.contributionFromFringes(
         row.data.quantity * row.data.rate * multiplier,
         fringes
       )
     };
   }
   return {
-    estimated: row.data.estimated,
+    nominal_value: row.data.nominal_value,
     fringe_contribution: row.data.fringe_contribution
   };
 };

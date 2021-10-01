@@ -109,48 +109,40 @@ export const orderTableRows = <R extends Table.RowData, M extends Model.TypedHtt
 
 export const createTableRows = <R extends Table.RowData, M extends Model.TypedHttpModel>(
   config: Table.CreateTableDataConfig<R, M>
-): Table.BodyRow<R>[] => {
-  const models = config.response.models;
-  const groups = config.response.groups === undefined ? [] : config.response.groups;
-  const markups = config.response.markups === undefined ? [] : config.response.markups;
-  const modelRows: Table.ModelRow<R>[] = reduce(
-    models,
-    (curr: Table.ModelRow<R>[], m: M) => [
-      ...curr,
-      tabling.rows.createModelRow<R, M>({
-        model: m,
-        columns: config.columns,
-        getRowChildren: config.getModelRowChildren
-      })
-    ],
-    []
-  );
-
-  const markupRows: Table.MarkupRow<R>[] = reduce(
-    markups,
-    (curr: Table.MarkupRow<R>[], mk: Model.Markup) => [
-      ...curr,
-      tabling.rows.createMarkupRow<R, M>({
-        model: mk,
-        columns: config.columns,
-        childrenRows: filter(modelRows, (r: Table.ModelRow<R>) => includes(mk.children, r.id))
-      })
-    ],
-    []
-  );
-
-  const groupRows: Table.GroupRow<R>[] = reduce(
-    groups,
-    (curr: Table.GroupRow<R>[], g: Model.Group) => [
-      ...curr,
-      tabling.rows.createGroupRow<R, M>({
-        columns: config.columns,
-        model: g,
-        childrenRows: filter(modelRows, (r: Table.ModelRow<R>) => includes(g.children, r.id))
-      })
-    ],
-    []
-  );
-
-  return orderTableRows([...modelRows, ...groupRows, ...markupRows]);
-};
+): Table.BodyRow<R>[] =>
+  orderTableRows([
+    ...reduce(
+      config.response.models,
+      (curr: Table.ModelRow<R>[], m: M) => [
+        ...curr,
+        tabling.rows.createModelRow<R, M>({
+          model: m,
+          columns: config.columns,
+          getRowChildren: config.getModelRowChildren
+        })
+      ],
+      []
+    ),
+    ...reduce(
+      config.response.groups === undefined ? [] : config.response.groups,
+      (curr: Table.GroupRow<R>[], g: Model.Group) => [
+        ...curr,
+        tabling.rows.createGroupRow<R, M>({
+          columns: config.columns,
+          model: g
+        })
+      ],
+      []
+    ),
+    ...reduce(
+      config.response.markups === undefined ? [] : config.response.markups,
+      (curr: Table.MarkupRow<R>[], mk: Model.Markup) => [
+        ...curr,
+        tabling.rows.createMarkupRow<R, M>({
+          model: mk,
+          columns: config.columns
+        })
+      ],
+      []
+    )
+  ]);

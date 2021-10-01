@@ -3,7 +3,7 @@ import { isNil, map, filter, find, includes, reduce } from "lodash";
 
 import { ShowHide } from "components";
 import { Document, View, Page, Tag, NoDataPage } from "components/pdf";
-import { tabling } from "lib";
+import { tabling, model } from "lib";
 
 import { AccountColumns, SubAccountColumns } from "./config";
 import PageHeader from "./PageHeader";
@@ -26,7 +26,7 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
       estimated: (col: Table.PdfColumn<Tables.PdfAccountRowData, Model.PdfAccount>) => ({
         ...col,
         footer: {
-          value: !isNil(budget.estimated) ? budget.estimated : 0.0
+          value: model.businessLogic.estimatedValue(budget)
         }
       })
     });
@@ -54,11 +54,11 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
               ? `${account.identifier} Total`
               : "Total"
           },
-          childFooter: (model: Model.PdfSubAccount) => {
-            if (!isNil(model.description)) {
-              return { value: `${model.description} Total` };
-            } else if (!isNil(model.identifier)) {
-              return { value: `${model.identifier} Total` };
+          childFooter: (m: Model.PdfSubAccount) => {
+            if (!isNil(m.description)) {
+              return { value: `${m.description} Total` };
+            } else if (!isNil(m.identifier)) {
+              return { value: `${m.identifier} Total` };
             }
             return { value: "Total" };
           }
@@ -90,10 +90,10 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
         estimated: (col: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
           ...col,
           footer: {
-            value: !isNil(account.estimated) ? account.estimated : 0.0
+            value: model.businessLogic.estimatedValue(account)
           },
-          childFooter: (model: Model.PdfSubAccount) => {
-            return { value: !isNil(model.estimated) ? model.estimated : 0.0 };
+          childFooter: (m: Model.PdfSubAccount) => {
+            return { value: model.businessLogic.estimatedValue(m) };
           }
         })
       });
@@ -145,11 +145,12 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
     return filter(
       budget.children,
       (account: Model.PdfAccount) =>
-        (!(options.excludeZeroTotals === true) || account.estimated !== 0) &&
+        (!(options.excludeZeroTotals === true) || model.businessLogic.estimatedValue(account) !== 0) &&
         (isNil(options.tables) || includes(options.tables, account.id)) &&
         filter(
           account.children,
-          (subaccount: Model.PdfSubAccount) => !(options.excludeZeroTotals === true) || subaccount.estimated !== 0
+          (subaccount: Model.PdfSubAccount) =>
+            !(options.excludeZeroTotals === true) || model.businessLogic.estimatedValue(subaccount) !== 0
         ).length !== 0
     );
   }, [budget, options]);
@@ -176,7 +177,8 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
           <AccountsTable
             data={filter(
               budget.children,
-              (account: Model.PdfAccount) => !(options.excludeZeroTotals === true) || account.estimated !== 0
+              (account: Model.PdfAccount) =>
+                !(options.excludeZeroTotals === true) || model.businessLogic.estimatedValue(account) !== 0
             )}
             groups={budget.groups}
             columns={accountColumns}

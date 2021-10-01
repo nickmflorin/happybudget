@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
 import { isNil, map, filter } from "lodash";
 
-import { redux, tabling } from "lib";
+import { redux, tabling, model } from "lib";
 import { CreateGroupModal, EditGroupModal, CreateMarkupModal, EditMarkupModal } from "components/modals";
 import { connectTableToStore } from "components/tabling";
 
@@ -49,10 +49,8 @@ const ConnectedTable = connectTableToStore<BudgetSubAccountsTableProps, R, M, Ta
       [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.detail.data)],
       (budget: Model.Budget | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
-        estimated: !isNil(budget) ? budget.estimated + budget.markup_contribution + budget.fringe_contribution : 0.0,
-        variance: !isNil(budget)
-          ? budget.estimated + budget.markup_contribution + budget.fringe_contribution - budget.actual
-          : 0.0,
+        estimated: !isNil(budget) ? model.businessLogic.estimatedValue(budget) : 0.0,
+        variance: !isNil(budget) ? model.businessLogic.varianceValue(budget) : 0.0,
         actual: budget?.actual || 0.0
       })
     ),
@@ -63,9 +61,9 @@ const ConnectedTable = connectTableToStore<BudgetSubAccountsTableProps, R, M, Ta
         )
       ],
       (detail: Model.SubAccount | null) => ({
-        identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Sub Account Total",
-        estimated: !isNil(detail) ? detail.estimated : 0.0,
-        variance: !isNil(detail) ? detail.estimated - detail.actual : 0.0,
+        identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
+        estimated: !isNil(detail) ? model.businessLogic.estimatedValue(detail) : 0.0,
+        variance: !isNil(detail) ? model.businessLogic.varianceValue(detail) : 0.0,
         actual: detail?.actual || 0.0
       })
     )

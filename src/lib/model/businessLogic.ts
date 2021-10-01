@@ -2,6 +2,33 @@ import { isNil, reduce } from "lodash";
 
 import { model, tabling } from "lib";
 
+export const estimatedValue = (
+  m:
+    | Model.Account
+    | Model.SubAccount
+    | Model.Budget
+    | Model.Template
+    | Model.PdfBudget
+    | Model.PdfAccount
+    | Model.PdfSubAccount
+): number => {
+  if (model.typeguards.isAccount(m) || model.typeguards.isPdfAccount(m)) {
+    return m.nominal_value + m.accumulated_fringe_contribution + m.accumulated_markup_contribution;
+  } else if (model.typeguards.isBudget(m) || model.typeguards.isPdfBudget(m)) {
+    return m.nominal_value + m.accumulated_fringe_contribution + m.accumulated_markup_contribution;
+  } else if (model.typeguards.isTemplate(m)) {
+    return m.nominal_value + m.accumulated_fringe_contribution;
+  } else {
+    return (
+      m.nominal_value + m.accumulated_fringe_contribution + m.accumulated_markup_contribution + m.fringe_contribution
+    );
+  }
+};
+
+export const varianceValue = (m: Model.Account | Model.SubAccount | Model.Budget): number => {
+  return estimatedValue(m) - m.actual;
+};
+
 export const contributionFromFringes = (value: number, fringes: (Model.Fringe | Tables.FringeRow)[]): number => {
   return reduce(
     fringes,

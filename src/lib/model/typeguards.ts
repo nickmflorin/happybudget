@@ -4,6 +4,11 @@ export const isGroup = (m: Model.HttpModel): m is Model.Group => (m as Model.Gro
 export const isAccount = (m: Model.HttpModel): m is Model.Account => (m as Model.Account).type === "account";
 export const isSubAccount = (m: Model.HttpModel): m is Model.SubAccount =>
   (m as Model.SubAccount).type === "subaccount";
+export const isPdfAccount = (m: Model.HttpModel): m is Model.PdfAccount =>
+  (m as Model.PdfAccount).type === "pdf-account";
+export const isPdfSubAccount = (m: Model.HttpModel): m is Model.PdfSubAccount =>
+  (m as Model.PdfSubAccount).type === "pdf-subaccount";
+export const isPdfBudget = (m: Model.HttpModel): m is Model.PdfBudget => (m as Model.PdfBudget).type === "pdf-budget";
 export const isBudget = (m: Model.HttpModel): m is Model.Budget | Model.SimpleBudget =>
   (m as Model.Budget | Model.SimpleBudget).type === "budget";
 export const isTemplate = (m: Model.HttpModel): m is Model.Template | Model.SimpleTemplate =>

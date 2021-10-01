@@ -176,8 +176,6 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
             processCellFromClipboard,
             getHttpValue,
             getRowValue,
-            getGroupValue,
-            getMarkupValue,
             ...agColumn
           } = col;
           return {

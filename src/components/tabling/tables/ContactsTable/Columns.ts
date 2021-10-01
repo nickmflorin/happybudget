@@ -16,7 +16,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     getRowValue: (m: M) => ({ image: m.image, first_name: m.first_name, last_name: m.last_name })
   }),
   framework.columnObjs.ChoiceSelectColumn<R, M, Model.ContactType>({
-    field: "type",
+    field: "contact_type",
     headerName: "Type",
     defaultHidden: true,
     cellRenderer: { data: "ContactTypeCell" },

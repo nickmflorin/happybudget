@@ -10,7 +10,7 @@ export type SubAccountTreeMenuProps = Omit<
   IMenu<Model.SubAccountTreeNode>,
   "renderItemContent" | "items" | "mode" | "onChange" | "models"
 > & { readonly menu?: NonNullRef<IMenuRef<Model.SubAccountTreeNode>> } & {
-  readonly nodes: Model.Tree;
+  readonly nodes: Model.SubAccountTreeNode[];
   readonly onChange: (m: Model.SimpleSubAccount, e: Table.CellDoneEditingEvent) => void;
   readonly onSearch: (value: string) => void;
   readonly search: string;

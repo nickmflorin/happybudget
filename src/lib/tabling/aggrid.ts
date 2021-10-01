@@ -2,6 +2,12 @@ import classNames from "classnames";
 import { reduce, map } from "lodash";
 import { CellRange } from "@ag-grid-community/core";
 
+export const getRows = <R extends Table.RowData, RW extends Table.Row<R> = Table.Row<R>>(api: Table.GridApi): RW[] => {
+  let rows: RW[] = [];
+  api.forEachNode((node: Table.RowNode) => rows.push(node.data));
+  return rows;
+};
+
 export const rangeSelectionIsSingleCell = (range: CellRange) => {
   if (range.startRow?.rowIndex === range.endRow?.rowIndex && range.columns.length === 1) {
     return true;

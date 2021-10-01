@@ -1,9 +1,9 @@
 import { combineReducers } from "redux";
-import { reduce, filter, isNil } from "lodash";
+import { isNil } from "lodash";
 
-import { redux, tabling } from "lib";
+import { redux } from "lib";
 
-type R = Tables.SubAccountRowData;
+// type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
 
 export type SubAccountAccountDetailActionMap = Omit<Redux.ModelDetailResponseActionMap<M>, "updateInState"> & {
@@ -54,33 +54,33 @@ export const createSubAccountDetailReducer = <S extends MinimalSubAccountStore>(
           detail: {
             ...newState.detail,
             data: {
-              ...newState.detail.data,
-              estimated: reduce(
-                filter(newState.table.data, (r: Table.BodyRow<R>) =>
-                  tabling.typeguards.isDataRow(r)
-                ) as Table.DataRow<R>[],
-                (curr: number, row: Table.DataRow<R>) => curr + (row.data.estimated || 0),
-                0
-              ),
-              actual: reduce(
-                filter(newState.table.data, (r: Table.BodyRow<R>) =>
-                  tabling.typeguards.isDataRow(r)
-                ) as Table.DataRow<R>[],
-                (curr: number, row: Table.DataRow<R>) => curr + (row.data.actual || 0),
-                0
-              )
+              ...newState.detail.data
+              // estimated: reduce(
+              //   filter(newState.table.data, (r: Table.BodyRow<R>) =>
+              //     tabling.typeguards.isDataRow(r)
+              //   ) as Table.DataRow<R>[],
+              //   (curr: number, row: Table.DataRow<R>) => curr + (row.data.estimated || 0),
+              //   0
+              // ),
+              // actual: reduce(
+              //   filter(newState.table.data, (r: Table.BodyRow<R>) =>
+              //     tabling.typeguards.isDataRow(r)
+              //   ) as Table.DataRow<R>[],
+              //   (curr: number, row: Table.DataRow<R>) => curr + (row.data.actual || 0),
+              //   0
+              // )
             }
           }
         };
         newState = {
-          ...newState,
-          detail: {
-            ...newState.detail,
-            data: {
-              ...newState.detail.data,
-              variance: (newState.detail.data?.estimated || 0) - (newState.detail.data?.actual || 0)
-            }
-          }
+          ...newState
+          // detail: {
+          //   ...newState.detail,
+          //   data: {
+          //     ...newState.detail.data,
+          //     variance: (newState.detail.data?.estimated || 0) - (newState.detail.data?.actual || 0)
+          //   }
+          // }
         };
       }
     }

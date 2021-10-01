@@ -163,7 +163,8 @@ const configureTable = <
       return { data, footer, page };
     }, []);
 
-    const hasExpandColumn = useMemo(() => !isNil(props.onRowExpand), [props.onRowExpand]);
+    // const hasExpandColumn = useMemo(() => !isNil(props.onRowExpand), [props.onRowExpand]);
+    const hasExpandColumn = true;
 
     const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
       let orderedColumns = tabling.columns.orderColumns<Table.Column<R, M>, R, M>(props.columns);

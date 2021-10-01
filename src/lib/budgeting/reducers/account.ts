@@ -59,7 +59,7 @@ export const createAccountDetailReducer = <S extends MinimalAccountStore>(
                 filter(newState.table.data, (r: Table.BodyRow<R>) =>
                   tabling.typeguards.isDataRow(r)
                 ) as Table.DataRow<R>[],
-                (curr: number, row: Table.DataRow<R>) => curr + (row.data.estimated || 0),
+                (curr: number, row: Table.DataRow<R>) => curr + (row.data.nominal_value || 0),
                 0
               ),
               actual: reduce(
@@ -78,7 +78,7 @@ export const createAccountDetailReducer = <S extends MinimalAccountStore>(
             ...newState.detail,
             data: {
               ...newState.detail.data,
-              variance: (newState.detail.data?.estimated || 0) - (newState.detail.data?.actual || 0)
+              variance: (newState.detail.data?.nominal_value || 0) - (newState.detail.data?.actual || 0)
             }
           }
         };

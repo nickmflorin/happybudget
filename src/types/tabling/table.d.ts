@@ -90,29 +90,25 @@ namespace Table {
     readonly gridId: Grid;
   };
 
-  type IBodyRow<RId extends RowId, TP extends RowType, D extends RowData, Grid extends GridId = GridId> = IRow<
-    RId,
-    TP,
-    Grid
-  > & {
+  type IBodyRow<RId extends RowId, TP extends RowType, D extends RowData> = IRow<RId, TP, "data"> & {
     readonly data: D;
   };
 
   type FooterRow<Grid extends FooterGridId = FooterGridId> = IRow<FooterRowId, "footer", Grid>;
-  type ModelRow<R extends RowData, Grid extends GridId = "data"> = IBodyRow<ModelRowId, "model", R, Grid> & {
+  type ModelRow<R extends RowData> = IBodyRow<ModelRowId, "model", R> & {
     readonly children: number[];
   };
-  type PlaceholderRow<R extends RowData> = IBodyRow<PlaceholderRowId, "placeholder", R, "data">;
-  type GroupRow<R extends RowData> = IBodyRow<GroupRowId, "group", R, "data"> & {
+  type PlaceholderRow<R extends RowData> = IBodyRow<PlaceholderRowId, "placeholder", R>;
+  type GroupRow<R extends RowData> = IBodyRow<GroupRowId, "group", R> & {
     readonly children: number[];
     readonly groupData: Pick<Model.Group, "name" | "color">;
   };
-  type MarkupRow<R extends RowData> = IBodyRow<MarkupRowId, "markup", R, "data"> & {
+  type MarkupRow<R extends RowData> = IBodyRow<MarkupRowId, "markup", R> & {
     readonly children: number[];
     readonly markupData: Pick<Model.Markup, "unit" | "rate">;
   };
-  type DataRow<D extends RowData> = ModelRow<D, "data"> | PlaceholderRow<D>;
-  type EditableRow<D extends RowData> = ModelRow<D, "data"> | MarkupRow<D>;
+  type DataRow<D extends RowData> = ModelRow<D> | PlaceholderRow<D>;
+  type EditableRow<D extends RowData> = ModelRow<D> | MarkupRow<D>;
 
   type BodyRow<D extends RowData = RowData> = ModelRow<D> | PlaceholderRow<D> | GroupRow<D> | MarkupRow<D>;
   type Row<D extends RowData = RowData> = BodyRow<D> | FooterRow;
@@ -191,8 +187,6 @@ namespace Table {
     readonly nullValue?: NullValue<R>;
     readonly index?: number;
     readonly getRowValue?: (m: M) => R[keyof R];
-    readonly getMarkupValue?: keyof Model.Markup | ((rows: ModelRow<R>[]) => R[keyof R]);
-    readonly getGroupValue?: keyof Model.Group | ((rows: ModelRow<R>[]) => R[keyof R]);
   }
 
   type PdfCellLocation = { index: number; colIndex: number };

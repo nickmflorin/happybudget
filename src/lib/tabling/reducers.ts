@@ -73,11 +73,6 @@ const rowRemoveFromGroupReducer = <
 
   const g: Table.GroupRow<R> | null = groupRowFromState<R, M, S>(action, st, e.payload.group);
   if (!isNil(g)) {
-    const rws = redux.reducers.findModelsInData<Table.ModelRow<R>>(
-      action,
-      filter(st.data, (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R>[],
-      filter(g.children, (child: number) => !includes(ids, child))
-    );
     return {
       ...st,
       data: data.orderTableRows<R, M>(
@@ -89,8 +84,7 @@ const rowRemoveFromGroupReducer = <
             children: filter(g.children, (child: number) => !includes(ids, child)),
             data: tabling.rows.updateGroupRowData({
               columns,
-              data: g.data,
-              childrenRows: rws
+              data: g.data
             })
           }
         )
@@ -136,8 +130,7 @@ const rowAddToGroupReducer = <
             children: map(rws, (r: Table.ModelRow<R>) => r.id),
             data: tabling.rows.updateGroupRowData({
               columns,
-              data: g.data,
-              childrenRows: rws
+              data: g.data
             })
           }
         )
@@ -198,11 +191,6 @@ const removeRowsFromTheirGroupsIfTheyExist = <
   st = reduce(
     alteredGroupsWithChildren,
     (s: S, alteration: Alteration) => {
-      const childrenRows: Table.ModelRow<R>[] = redux.reducers.findModelsInData(
-        action,
-        filter(s.data, (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R>[],
-        alteration.children
-      );
       return {
         ...s,
         data: util.replaceInArray<Table.BodyRow<R>>(
@@ -213,8 +201,7 @@ const removeRowsFromTheirGroupsIfTheyExist = <
             children: alteration.children,
             data: tabling.rows.updateGroupRowData({
               columns,
-              data: alteration.groupRow.data,
-              childrenRows
+              data: alteration.groupRow.data
             })
           }
         )
@@ -355,18 +342,12 @@ export const createTableChangeEventReducer = <
       newState = reduce(
         groupsWithRowsThatChanged,
         (s: S, groupRow: Table.GroupRow<R>) => {
-          const childrenRows: Table.ModelRow<R>[] = redux.reducers.findModelsInData(
-            action,
-            filter(s.data, (r: Table.ModelRow<R>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R>[],
-            groupRow.children
-          );
           return {
             ...s,
             data: util.replaceInArray<Table.BodyRow<R>>(
               s.data,
               { id: groupRow.id },
               tabling.rows.updateGroupRow({
-                childrenRows,
                 columns: config.columns,
                 row: groupRow
               })
@@ -414,11 +395,7 @@ export const createTableChangeEventReducer = <
           ...newState.data,
           rows.createGroupRow<R, M>({
             columns: config.columns,
-            model: e.payload,
-            childrenRows: filter(
-              newState.data,
-              (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) && includes(e.payload.children, r.id)
-            ) as Table.ModelRow<R>[]
+            model: e.payload
           })
         ])
       };
