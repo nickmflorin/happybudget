@@ -101,7 +101,7 @@ const ExpandCell = <
         return <ExpandAction onClick={onExpand} row={row} />;
       }
       return <span></span>;
-    } else if (rowIsHovered()) {
+    } else if (rowIsHovered() && rowCanExpand !== false) {
       return <ExpandAction onClick={onExpand} disabled={true} row={row} tooltip={cannotExpandTooltip} />;
     } else {
       return <span></span>;
