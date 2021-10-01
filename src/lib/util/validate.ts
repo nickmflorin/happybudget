@@ -1,10 +1,10 @@
 import { isNil, uniq } from "lodash";
 
 const getPasswordValidationState = (value: string): PasswordValidationState => {
-  const lowercase = /[a-z|ç|ş|ö|ü|ı|ğ]/.test(value);
-  const uppercase = /[A-Z|Ç|Ş|Ö|Ü|İ|Ğ]/.test(value);
+  const lowercase = /[a-z]/.test(value);
+  const uppercase = /[A-Z]/.test(value);
   const number = /[0-9]/.test(value);
-  const character = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(value);
+  const character = /[!@#$%&_=]/.test(value);
   const minChar = value.length >= 8;
   return { lowercase, uppercase, number, character, minChar };
 };
