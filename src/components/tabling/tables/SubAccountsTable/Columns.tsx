@@ -29,23 +29,24 @@ const Columns: Table.Column<R, M>[] = [
     },
     colSpan: (params: Table.ColSpanParams<R, M>) => {
       const row: Table.BodyRow<R> = params.data;
-      if (tabling.typeguards.isModelRow(row)) {
-        if (!isNil(row.children) && row.children.length !== 0) {
-          const agColumns: Column[] | undefined = params.columnApi?.getAllDisplayedColumns();
-          if (!isNil(agColumns)) {
-            const originalCalculatedColumns = filter(
-              map(
-                filter(params.columns, (col: Table.Column<R, M>) => col.tableColumnType === "calculated"),
-                (col: Table.Column<R, M>) => col.field || col.colId
-              ),
-              (f: keyof R | string | undefined) => !isNil(f)
-            ) as string[];
-            const indexOfDescriptionColumn = findIndex(agColumns, (col: Column) => col.getColId() === "description");
-            const indexOfFirstCalculatedColumn = findIndex(agColumns, (col: Column) =>
-              includes(originalCalculatedColumns, col.getColId())
-            );
-            return indexOfFirstCalculatedColumn - indexOfDescriptionColumn;
-          }
+      if (
+        (tabling.typeguards.isModelRow(row) && !isNil(row.children) && row.children.length !== 0) ||
+        tabling.typeguards.isMarkupRow
+      ) {
+        const agColumns: Column[] | undefined = params.columnApi?.getAllDisplayedColumns();
+        if (!isNil(agColumns)) {
+          const originalCalculatedColumns = filter(
+            map(
+              filter(params.columns, (col: Table.Column<R, M>) => col.tableColumnType === "calculated"),
+              (col: Table.Column<R, M>) => col.field || col.colId
+            ),
+            (f: keyof R | string | undefined) => !isNil(f)
+          ) as string[];
+          const indexOfDescriptionColumn = findIndex(agColumns, (col: Column) => col.getColId() === "description");
+          const indexOfFirstCalculatedColumn = findIndex(agColumns, (col: Column) =>
+            includes(originalCalculatedColumns, col.getColId())
+          );
+          return indexOfFirstCalculatedColumn - indexOfDescriptionColumn;
         }
       }
       return 1;
