@@ -177,6 +177,7 @@
           .page {
             display: flex;
             flex-direction: column;
+            overflow: visible;
 
             .page-content {
               width: 100%;
