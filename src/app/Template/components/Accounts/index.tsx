@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { isNil } from "lodash";
 
 import { budgeting } from "lib";
-import { Portal, BreadCrumbs } from "components/layout";
 
+import { AccountsPage } from "app/Pages";
 import AccountsTable from "./AccountsTable";
 
 interface AccountsProps {
@@ -19,26 +19,9 @@ const Accounts = ({ templateId, template }: AccountsProps): JSX.Element => {
   }, [template]);
 
   return (
-    <React.Fragment>
-      <Portal id={"breadcrumbs"}>
-        <BreadCrumbs
-          params={{ t: template }}
-          items={[
-            {
-              requiredParams: ["t"],
-              func: ({ t }: { t: Model.Template }) => ({
-                id: t.id,
-                primary: true,
-                label: t.name,
-                tooltip: { title: "Top Sheet", placement: "bottom" },
-                url: budgeting.urls.getUrl(t)
-              })
-            }
-          ]}
-        />
-      </Portal>
+    <AccountsPage budget={template}>
       <AccountsTable template={template} templateId={templateId} />
-    </React.Fragment>
+    </AccountsPage>
   );
 };
 

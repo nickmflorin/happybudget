@@ -1,9 +1,8 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { isNil } from "lodash";
 
 import { budgeting, hooks } from "lib";
-import { Portal, BreadCrumbs } from "components/layout";
-
+import { AccountsPage } from "app/Pages";
 import AccountsTable from "./AccountsTable";
 
 interface AccountsProps {
@@ -19,27 +18,10 @@ const Accounts = ({ budget, budgetId }: AccountsProps): JSX.Element => {
   }, [budget]);
 
   return (
-    <React.Fragment>
-      <Portal id={"breadcrumbs"}>
-        <BreadCrumbs
-          params={{ b: budget }}
-          items={[
-            {
-              requiredParams: ["b"],
-              func: ({ b }: { b: Model.Budget }) => ({
-                id: b.id,
-                primary: true,
-                label: b.name,
-                tooltip: { title: "Top Sheet", placement: "bottom" },
-                url: budgeting.urls.getUrl(b)
-              })
-            }
-          ]}
-        />
-      </Portal>
+    <AccountsPage budget={budget}>
       <AccountsTable budget={budget} budgetId={budgetId} />
       {/* <AccountsCommentsHistory /> */}
-    </React.Fragment>
+    </AccountsPage>
   );
 };
 

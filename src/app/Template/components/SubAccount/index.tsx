@@ -1,14 +1,11 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { isNil, map } from "lodash";
+import { isNil } from "lodash";
 
 import { redux, budgeting } from "lib";
 
-import { RenderIfValidId } from "components";
-import { Portal, BreadCrumbs } from "components/layout";
-import { EntityTextButton } from "components/buttons";
-import { EntityText } from "components/typography";
+import { SubAccountPage } from "app/Pages";
 
 import { actions } from "../../store";
 import SubAccountBudgetTable from "./SubAccountsTable";
@@ -40,60 +37,9 @@ const SubAccount = ({ template, templateId }: SubAccountProps): JSX.Element => {
   }, [template]);
 
   return (
-    <RenderIfValidId id={[subaccountId]}>
-      <Portal id={"breadcrumbs"}>
-        <BreadCrumbs
-          params={{ t: template, subaccount: detail }}
-          items={[
-            {
-              requiredParams: ["t"],
-              func: ({ t }: { t: Model.Template }) => ({
-                id: t.id,
-                primary: true,
-                label: t.name,
-                tooltip: { title: "Top Sheet", placement: "bottom" },
-                url: budgeting.urls.getUrl(t)
-              })
-            },
-            {
-              requiredParams: ["t", "subaccount"],
-              func: ({ t, subaccount }: { t: Model.Template; subaccount: Model.SubAccount }) => {
-                const siblings = subaccount.siblings || [];
-                const ancestors = (subaccount.ancestors || []).slice(1) as [
-                  Model.SimpleAccount,
-                  ...Array<Model.SimpleSubAccount>
-                ];
-                return [
-                  ...map(ancestors, (ancestor: Model.SimpleAccount | Model.SimpleSubAccount) => {
-                    return {
-                      id: ancestor.id,
-                      render: () => <EntityText fillEmpty={"---------"}>{ancestor}</EntityText>,
-                      url: budgeting.urls.getUrl(t, ancestor)
-                    };
-                  }),
-                  {
-                    id: subaccount.id,
-                    url: budgeting.urls.getUrl(t, subaccount),
-                    render: () => {
-                      if (siblings.length !== 0) {
-                        return <EntityTextButton fillEmpty={"---------"}>{subaccount}</EntityTextButton>;
-                      }
-                      return <EntityText fillEmpty={"---------"}>{subaccount}</EntityText>;
-                    },
-                    options: map(siblings, (option: Model.SimpleSubAccount) => ({
-                      id: option.id,
-                      url: budgeting.urls.getUrl(t, option),
-                      render: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
-                    }))
-                  }
-                ];
-              }
-            }
-          ]}
-        />
-      </Portal>
+    <SubAccountPage detail={detail} budget={template} subaccountId={subaccountId}>
       <SubAccountBudgetTable template={template} templateId={templateId} subaccountId={parseInt(subaccountId)} />
-    </RenderIfValidId>
+    </SubAccountPage>
   );
 };
 

@@ -1,8 +1,4 @@
-import React from "react";
-
-import { budgeting } from "lib";
-import { Portal, BreadCrumbs } from "components/layout";
-
+import { AccountsPage } from "app/Pages";
 import AccountsTable from "./AccountsTable";
 
 interface AccountsProps {
@@ -12,26 +8,9 @@ interface AccountsProps {
 
 const Accounts = ({ budget, budgetId }: AccountsProps): JSX.Element => {
   return (
-    <React.Fragment>
-      <Portal id={"breadcrumbs"}>
-        <BreadCrumbs
-          params={{ b: budget }}
-          items={[
-            {
-              requiredParams: ["b"],
-              func: ({ b }: { b: Model.Budget }) => ({
-                id: b.id,
-                primary: true,
-                text: b.name,
-                tooltip: { title: "Top Sheet", placement: "bottom" },
-                url: budgeting.urls.getUrl(b)
-              })
-            }
-          ]}
-        />
-      </Portal>
+    <AccountsPage budget={budget}>
       <AccountsTable budget={budget} budgetId={budgetId} />
-    </React.Fragment>
+    </AccountsPage>
   );
 };
 
