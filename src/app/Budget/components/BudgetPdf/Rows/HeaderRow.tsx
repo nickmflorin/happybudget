@@ -18,23 +18,15 @@ const HeaderRow = <R extends Table.RowData, M extends Model.HttpModel = Model.Ht
         return obj;
       },
       {}
-    ) as Table.BodyRow<R>;
+    ) as R;
   }, [props.columns]);
   return (
     <Row<R, M>
       {...props}
       className={classNames("header-tr", props.className)}
       row={headerRow}
-      renderCell={(params: { column: Table.PdfColumn<R, M>; location: Table.PdfCellLocation }) => {
-        return (
-          <HeaderCell<R, M>
-            key={`header-${params.location.index}-${params.location.colIndex}`}
-            location={params.location}
-            column={params.column}
-            row={headerRow}
-            {...cellProps}
-          />
-        );
+      renderCell={(params: { column: Table.PdfColumn<R, M>; colIndex: number }) => {
+        return <HeaderCell<R, M> colIndex={params.colIndex} column={params.column} row={headerRow} {...cellProps} />;
       }}
     />
   );

@@ -9,7 +9,7 @@ export const Breakpoints: Style.Breakpoints = {
   xxxl: 1580
 };
 
-export const DEFAULT_TAG_COLOR_SCHEME = [
+export const DEFAULT_TAG_COLOR_SCHEME: Style.HexColor[] = [
   "#d5d5e5",
   "#ffd2ba",
   "#beebff",
@@ -26,8 +26,8 @@ export const DEFAULT_TAG_COLOR_SCHEME = [
   "#beebff"
 ];
 
-export const Colors = {
-  TEXT_PRIMARY: "rgba(0, 0, 0, 0.85)",
+export const Colors: { [key: string]: Style.HexColor } = {
+  TEXT_PRIMARY: "#404152",
   TEXT_SECONDARY: "#424242",
   TABLE_BORDER: "#F7F7F7",
   DEFAULT_TAG_BACKGROUND: "#EFEFEF",

@@ -100,7 +100,7 @@ export const createBudgetTableChangeEventReducer = <
         the MarkupRow to reflect these new values, and then finally update the
         MarkupRow again to reflect the new children.
         */
-        let updatedMarkupRow = tabling.rows.updateMarkupRow({
+        let updatedMarkupRow = tabling.rows.updateMarkupRow<R, M>({
           row: markupRow,
           columns: config.columns,
           model: e.payload.data
@@ -153,7 +153,7 @@ export const createBudgetTableChangeEventReducer = <
           data: util.replaceInArray<Table.BodyRow<R>>(
             newState.data,
             { id: updatedMarkupRow.id },
-            tabling.rows.updateMarkupRow({
+            tabling.rows.updateMarkupRow<R, M>({
               row: updatedMarkupRow,
               columns: config.columns
             })
@@ -180,7 +180,7 @@ export const createBudgetTableChangeEventReducer = <
               {
                 ...mk,
                 children: filter(mk.children, (child: number) => !includes(ids, child)),
-                data: tabling.rows.updateMarkupRowData({
+                data: tabling.rows.updateMarkupRowData<R, M>({
                   columns: config.columns,
                   data: mk.data
                 })

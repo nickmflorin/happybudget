@@ -87,14 +87,14 @@ namespace Model {
   type AccountForm = Account | SimpleAccount | PdfAccount;
   type SubAccountForm = SubAccount | SimpleSubAccount | PdfSubAccount;
 
-  type ModelWithColor = HttpModel & { color: string | null };
+  type ModelWithColor = HttpModel & { color: Style.HexColor | null };
   type ModelWithName = HttpModel & { name: string | null };
 
   interface Tag extends TimestampTrackedModel {
     readonly title: string;
     readonly plural_title: string | null;
     readonly order: number;
-    readonly color: string | null;
+    readonly color: Style.HexColor | null;
   }
 
   interface SimpleUser extends HttpModel {
@@ -118,7 +118,7 @@ namespace Model {
 
   interface Fringe extends TrackedModel {
     readonly type: "fringe";
-    readonly color: string | null;
+    readonly color: Style.HexColor | null;
     readonly name: string | null;
     readonly description: string | null;
     readonly cutoff: number | null;
@@ -187,7 +187,7 @@ namespace Model {
   interface Group extends TrackedModel {
     readonly type: "group";
     readonly name: string;
-    readonly color: string | null;
+    readonly color: Style.HexColor | null;
     readonly children: number[];
   }
 

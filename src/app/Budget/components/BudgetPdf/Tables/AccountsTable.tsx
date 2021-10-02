@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { isNil, filter, reduce } from "lodash";
+import React, { useMemo } from "react";
+import { isNil, filter, reduce, find, map } from "lodash";
 
 import { tabling, hooks } from "lib";
 import Table from "./Table";
@@ -24,33 +24,40 @@ const AccountsTable = ({
     return filter(columns, (column: Table.PdfColumn<R, M>) => !isNil(column.footer)).length !== 0;
   }, [columns]);
 
-  const table: Table.BodyRow<R>[] = tabling.data.createTableRows<Tables.PdfAccountRowData, Model.PdfAccount>({
-    response: { models: data, groups },
-    columns
-  });
-
   const generateRows = hooks.useDynamicCallback((): JSX.Element[] => {
-    let runningIndex = 1;
     const rows = reduce(
-      table,
+      tabling.data.createTableRows<Tables.PdfAccountRowData, Model.PdfAccount>({
+        response: { models: data, groups },
+        columns
+      }),
       (rws: JSX.Element[], row: Table.BodyRow<R>) => {
-        runningIndex = runningIndex + 1;
-        if (tabling.typeguards.isDataRow(row)) {
-          return [...rws, <BodyRow key={runningIndex} index={runningIndex} columns={columns} row={row} />];
+        if (tabling.typeguards.isModelRow(row)) {
+          return [...rws, <BodyRow columns={columns} row={row.data} />];
         } else if (tabling.typeguards.isGroupRow(row)) {
-          return [...rws, <GroupRow row={row} index={runningIndex} key={runningIndex} columns={columns} />];
+          const group = find(groups, { id: tabling.rows.groupId(row.id) });
+          if (!isNil(group)) {
+            return [...rws, <GroupRow group={group} row={row.data} columns={columns} />];
+          }
+          return rws;
         }
         return rws;
       },
-      [<HeaderRow columns={columns} index={0} key={0} />]
+      [<HeaderRow columns={columns} />]
     );
     if (showFooterRow === true) {
-      rows.push(<FooterRow index={runningIndex} key={runningIndex} columns={columns} />);
+      rows.push(<FooterRow columns={columns} />);
     }
     return rows;
   });
 
-  return <Table>{generateRows()}</Table>;
+  const rows = generateRows();
+  return (
+    <Table>
+      {map(rows, (r: JSX.Element, index: number) => (
+        <React.Fragment key={index}>{r}</React.Fragment>
+      ))}
+    </Table>
+  );
 };
 
 export default AccountsTable;

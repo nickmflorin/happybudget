@@ -2,13 +2,13 @@ import { isNil, filter, find, map } from "lodash";
 import { util, tabling } from "lib";
 import { Colors } from "style/constants";
 
-export const getGroupColorDefinition = (group: Model.Group | Table.GroupRow<any>): Table.RowColorDef => {
+export const getGroupColorDefinition = (
+  group: Style.HexColor | Model.Group | Table.GroupRow<any>
+): Table.RowColorDef => {
   if (!isNil(group)) {
-    let color = tabling.typeguards.isRow(group) ? group.groupData.color : group.color;
+    let color =
+      typeof group === "string" ? group : tabling.typeguards.isRow(group) ? group.groupData.color : group.color;
     if (!isNil(color)) {
-      if (!color.startsWith("#")) {
-        color = `#${color}`;
-      }
       return {
         backgroundColor: color,
         color: util.colors.contrastedForegroundColor(color)

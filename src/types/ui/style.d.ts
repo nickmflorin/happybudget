@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Style {
+  type HexColor = `#${number | string}`;
+
   type FontFamily = "AvenirNext" | "Roboto";
   type FontWeight = 300 | 400 | 500 | 600 | 700;
   type FontWeightName = "Bold" | "Regular" | "Light" | "SemiBold" | "Medium";

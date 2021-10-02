@@ -39,7 +39,7 @@ type ColumnUpdates<
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel
 > = {
-  [key in keyof R]: Partial<C> | ((c: C) => Partial<C>);
+  [key in keyof R | string]: Partial<C> | ((c: C) => Partial<C>);
 };
 
 export const mergeColumns = <
@@ -50,7 +50,7 @@ export const mergeColumns = <
   columns: C[],
   updates: Partial<ColumnUpdates<C, R, M>>
 ): C[] => {
-  let key: keyof R;
+  let key: keyof R | string;
   let merged: C[] = [...columns];
   for (key in updates) {
     const fieldUpdates: Partial<C> | ((c: C) => Partial<C>) | undefined = updates[key];
@@ -88,13 +88,13 @@ export const updateColumnsOfField = <
   M extends Model.HttpModel = Model.HttpModel
 >(
   columns: C[],
-  field: keyof R,
+  field: keyof R | string,
   update: Partial<C> | ((c: C) => Partial<C>)
 ): C[] => {
   return reduce(
     columns,
     (curr: C[], col: C) => {
-      if (col.field === field) {
+      if (col.field === field || col.colId === field) {
         return [...curr, { ...col, ...(typeof update === "function" ? update(col) : update) }];
       }
       return [...curr, col];

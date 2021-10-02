@@ -7,8 +7,8 @@
  * <MultipleTags tags={[{ text: "foo", color: "red" }]} />
  */
  interface ITag {
-  readonly color?: string | undefined | null;
-  readonly textColor?: string | undefined | null;
+  readonly color?: Style.HexColor | undefined | null;
+  readonly textColor?: Style.HexColor | undefined | null;
   readonly uppercase?: boolean;
   readonly text: string;
 }
@@ -23,7 +23,7 @@ interface ITagRenderParams<S extends object = React.CSSProperties> {
   readonly textClassName: string | undefined;
   readonly style: S | undefined;
   readonly textStyle: S | undefined;
-  readonly color: string;
+  readonly color: Style.HexColor;
   readonly textColor: string;
   readonly uppercase: boolean;
   readonly fillWidth: boolean;
@@ -41,15 +41,15 @@ type TagProps<M extends Model.Model = Model.Model, S extends object = React.CSSP
   readonly children?: string | M | null;
   readonly text?: string | null;
   readonly pluralText?: string | null;
-  readonly textColor?: string;
-  readonly color?: string;
+  readonly textColor?: Style.HexColor;
+  readonly color?: Style.HexColor;
   readonly model?: M | null;
   readonly isPlural?: boolean;
   readonly modelTextField?: keyof M;
   readonly getModelText?: (m: M) => string | null;
   readonly modelColorField?: keyof M;
-  readonly getModelColor?: (m: M) => string | null;
-  readonly scheme?: string[];
+  readonly getModelColor?: (m: M) => Style.HexColor | null;
+  readonly scheme?: Style.HexColor[];
   readonly uppercase?: boolean;
   readonly colorIndex?: number;
   readonly fillWidth?: boolean;

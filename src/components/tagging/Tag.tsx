@@ -96,8 +96,8 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
     return "";
   }, [props]);
 
-  const tagColor = useMemo((): string => {
-    const validateAndReturnColor = (color: string | null | undefined, field: string): string => {
+  const tagColor = useMemo((): Style.HexColor => {
+    const validateAndReturnColor = (color: Style.HexColor | null | undefined, field: string): Style.HexColor => {
       if (isNil(color)) {
         return Colors.DEFAULT_TAG_BACKGROUND;
       } else if (typeof color !== "string") {
@@ -115,10 +115,10 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
       }
       return color;
     };
-    const getColorFromModel = (m: M): string => {
+    const getColorFromModel = (m: M): Style.HexColor => {
       if (!isNil(props.modelColorField)) {
         const modelColorFieldValue: unknown = m[props.modelColorField];
-        return validateAndReturnColor(modelColorFieldValue as string, props.modelColorField as string);
+        return validateAndReturnColor(modelColorFieldValue as Style.HexColor, props.modelColorField as string);
       } else if (!isNil(props.getModelColor)) {
         const color = props.getModelColor(m);
         if (!isNil(color)) {

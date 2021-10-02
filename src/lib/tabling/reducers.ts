@@ -82,7 +82,7 @@ const rowRemoveFromGroupReducer = <
           {
             ...g,
             children: filter(g.children, (child: number) => !includes(ids, child)),
-            data: tabling.rows.updateGroupRowData({
+            data: tabling.rows.updateGroupRowData<R, M>({
               columns,
               data: g.data
             })
@@ -128,7 +128,7 @@ const rowAddToGroupReducer = <
           {
             ...g,
             children: map(rws, (r: Table.ModelRow<R>) => r.id),
-            data: tabling.rows.updateGroupRowData({
+            data: tabling.rows.updateGroupRowData<R, M>({
               columns,
               data: g.data
             })
@@ -199,7 +199,7 @@ const removeRowsFromTheirGroupsIfTheyExist = <
           {
             ...alteration.groupRow,
             children: alteration.children,
-            data: tabling.rows.updateGroupRowData({
+            data: tabling.rows.updateGroupRowData<R, M>({
               columns,
               data: alteration.groupRow.data
             })
@@ -347,7 +347,7 @@ export const createTableChangeEventReducer = <
             data: util.replaceInArray<Table.BodyRow<R>>(
               s.data,
               { id: groupRow.id },
-              tabling.rows.updateGroupRow({
+              tabling.rows.updateGroupRow<R, M>({
                 columns: config.columns,
                 row: groupRow
               })
@@ -411,7 +411,7 @@ export const createTableChangeEventReducer = <
           data: util.replaceInArray<Table.BodyRow<R>>(
             newState.data,
             { id: groupRow.id },
-            tabling.rows.updateGroupRow({
+            tabling.rows.updateGroupRow<R, M>({
               model: e.payload.data,
               columns: config.columns,
               row: groupRow

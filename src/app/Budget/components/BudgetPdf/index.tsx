@@ -39,103 +39,103 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
 
   const subaccountColumns = useMemo(() => {
     return (account: Model.PdfAccount): Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>[] => {
-      let columns = tabling.columns.mergeColumns<
-        Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>,
-        Tables.PdfSubAccountRowData,
-        Model.PdfSubAccount
-      >(SubAccountColumns, {
-        description: (col: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
-          ...col,
-          footer: {
-            /* eslint-disable indent */
-            value: !isNil(account.description)
-              ? `${account.description} Total`
-              : !isNil(account.identifier)
-              ? `${account.identifier} Total`
-              : "Total"
-          },
-          childFooter: (m: Model.PdfSubAccount) => {
-            if (!isNil(m.description)) {
-              return { value: `${m.description} Total` };
-            } else if (!isNil(m.identifier)) {
-              return { value: `${m.identifier} Total` };
-            }
-            return { value: "Total" };
-          }
-        }),
-        contact: (col: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
-          ...col,
-          cellRenderer: (params: Table.PdfCellCallbackParams<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => {
-            if (params.rawValue !== null) {
-              const contact: Model.Contact | undefined = find(contacts, { id: params.rawValue });
-              if (!isNil(contact)) {
-                return (
-                  <Tag
-                    className={"tag tag--contact"}
-                    color={"#EFEFEF"}
-                    textColor={"#2182e4"}
-                    text={contact.full_name}
-                  />
-                );
+      type R = Tables.PdfSubAccountRowData;
+      type M = Model.PdfSubAccount;
+      type C = Table.PdfColumn<R, M>;
+
+      let columns = tabling.columns.mergeColumns<C, R, M>(
+        filter(SubAccountColumns, (c: C) => c.tableColumnType !== "fake"),
+        {
+          description: (col: C) => ({
+            ...col,
+            footer: {
+              /* eslint-disable indent */
+              value: !isNil(account.description)
+                ? `${account.description} Total`
+                : !isNil(account.identifier)
+                ? `${account.identifier} Total`
+                : "Total"
+            },
+            childFooter: (m: M) => {
+              if (!isNil(m.description)) {
+                return { value: `${m.description} Total` };
+              } else if (!isNil(m.identifier)) {
+                return { value: `${m.identifier} Total` };
               }
+              return { value: "Total" };
             }
-            return <span></span>;
-          }
-        }),
-        unit: (col: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
-          ...col,
-          cellRenderer: (params: Table.PdfCellCallbackParams<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) =>
-            params.rawValue !== null ? <Tag model={params.rawValue} /> : <span></span>
-        }),
-        estimated: (col: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
-          ...col,
-          footer: {
-            value: model.businessLogic.estimatedValue(account)
-          },
-          childFooter: (m: Model.PdfSubAccount) => {
-            return { value: model.businessLogic.estimatedValue(m) };
-          }
-        })
-      });
+          }),
+          contact: (col: C) => ({
+            ...col,
+            cellRenderer: (params: Table.PdfCellCallbackParams<R, M>) => {
+              if (params.rawValue !== null) {
+                const contact: Model.Contact | undefined = find(contacts, { id: params.rawValue });
+                if (!isNil(contact)) {
+                  return (
+                    <Tag
+                      className={"tag tag--contact"}
+                      color={"#EFEFEF"}
+                      textColor={"#2182e4"}
+                      text={contact.full_name}
+                    />
+                  );
+                }
+              }
+              return <span></span>;
+            }
+          }),
+          unit: (col: C) => ({
+            ...col,
+            cellRenderer: (params: Table.PdfCellCallbackParams<R, M>) =>
+              params.rawValue !== null ? <Tag model={params.rawValue} /> : <span></span>
+          }),
+          estimated: (col: C) => ({
+            ...col,
+            footer: {
+              value: model.businessLogic.estimatedValue(account)
+            },
+            childFooter: (m: M) => {
+              return { value: model.businessLogic.estimatedValue(m) };
+            }
+          })
+        }
+      );
+
+      // Determine the default width for columns that do not specify it.
+      const totalSpecifiedWidth = reduce(columns, (prev: number, column: C) => prev + (column.width || 0.0), 0.0);
+
+      // Determine what the default width should be for columns that do not specify it.
+      let defaultWidth = 0;
+      if (totalSpecifiedWidth < 1.0) {
+        defaultWidth = (1.0 - totalSpecifiedWidth) / filter(columns, (c: C) => !isNil(c.width)).length;
+      }
 
       // Calculate Total Column Width Before Filtering Out Unused Columns
-      const totalWidth = reduce(
-        columns,
-        (prev: number, column: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) =>
-          prev + column.width,
-        0.0
-      );
+      const totalWidth = reduce(columns, (prev: number, column: C) => prev + (column.width || defaultWidth), 0.0);
       if (totalWidth !== 0.0) {
         // Normalize Column Widths Before Filtering Out Unused Columns
-        columns = map(columns, (column: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
+        columns = map(columns, (column: C) => ({
           ...column,
-          width: column.width / totalWidth
+          width: (column.width || defaultWidth) / totalWidth
         }));
         // Filter Out Unused Columns
-        columns = filter(columns, (column: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) =>
-          includes(options.columns, column.field as string)
-        );
+        columns = filter(columns, (column: C) => includes(options.columns, column.field as string));
         // Calculate Total Column Width After Filtering Out Unused Columns
         const totalWidthWithFilter = reduce(
           columns,
-          (prev: number, column: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) =>
-            prev + column.width,
+          (prev: number, column: C) => prev + (column.width || defaultWidth),
           0.0
         );
         if (totalWidthWithFilter !== 0.0) {
           // Normalize Column Widths After Filtering Out Unused Columns
-          columns = map(columns, (column: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => ({
+          columns = map(columns, (column: C) => ({
             ...column,
-            width: column.width / totalWidthWithFilter
+            width: (column.width || defaultWidth) / totalWidthWithFilter
           }));
         }
       }
       // Order the Columns
-      return tabling.columns.orderColumns<
-        Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>,
-        Tables.PdfSubAccountRowData,
-        Model.PdfSubAccount
-      >(columns);
+      return tabling.columns.orderColumns<C, R, M>(columns);
     };
   }, []);
 
@@ -189,7 +189,12 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
         <Page>
           {map(accounts, (account: Model.PdfAccount, index: number) => (
             <View key={index} style={index !== 0 ? { marginTop: 20 } : {}}>
-              <AccountTable account={account} options={options} columns={subaccountColumns(account)} />
+              <AccountTable
+                account={account}
+                options={options}
+                columns={accountColumns}
+                subAccountColumns={subaccountColumns(account)}
+              />
             </View>
           ))}
         </Page>

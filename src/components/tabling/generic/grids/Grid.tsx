@@ -138,7 +138,9 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
           cellRendererParams: { ...col.cellRendererParams, columns, customCol: col, gridId: id },
           hide: includes(hiddenColumns, col.field),
           resizable: index === columns.length - 1 ? false : !isNil(col.resizable) ? col.resizable : true,
-          cellStyle: { ...tabling.columns.getColumnTypeCSSStyle(col.columnType), ...col.cellStyle }
+          cellStyle: !isNil(col.columnType)
+            ? { ...tabling.columns.getColumnTypeCSSStyle(col.columnType), ...col.cellStyle }
+            : col.cellStyle
         } as Table.Column<R, M>)
     );
     cs = !isNil(indexColumn) ? util.updateInArray<Table.Column<R, M>>(cs, { field: "index" }, indexColumn) : cs;
@@ -148,7 +150,7 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
   const colDefs = useMemo(
     () =>
       map(
-        filter(localColumns, (c: Table.Column<R, M>) => c.isFake !== true),
+        filter(localColumns, (c: Table.Column<R, M>) => c.tableColumnType !== "fake"),
         (col: Table.Column<R, M>): ColDef => {
           /*
         While AG Grid will not break if we include extra properties on the ColDef(s)
@@ -165,7 +167,6 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
             canBeHidden,
             isRead,
             isWrite,
-            isFake,
             columnType,
             tableColumnType,
             nullValue,

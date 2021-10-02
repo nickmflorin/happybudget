@@ -8,17 +8,16 @@ const BodyRow = <R extends Table.RowData, M extends Model.HttpModel = Model.Http
   cellProps,
   ...props
 }: RowProps<R, M> & {
-  readonly cellProps?: Omit<CellProps<R, M>, "column" | "location" | "row" | "debug" | "isHeader">;
+  readonly cellProps?: Omit<CellProps<R, M>, "column" | "colIndex" | "row" | "debug" | "isHeader">;
 }): JSX.Element => (
   /* eslint-disable indent */
   <Row
     {...props}
     className={classNames("body-tr", props.className)}
-    renderCell={(params: { column: Table.PdfColumn<R, M>; indented: boolean; location: Table.PdfCellLocation }) => {
+    renderCell={(params: { column: Table.PdfColumn<R, M>; indented: boolean; colIndex: number }) => {
       return (
         <BodyCell<R, M>
-          key={`${params.location.index}-${params.location.colIndex}`}
-          location={params.location}
+          colIndex={params.colIndex}
           column={params.column}
           row={props.row}
           indented={params.indented}

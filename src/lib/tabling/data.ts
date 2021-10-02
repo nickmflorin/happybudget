@@ -107,15 +107,19 @@ export const orderTableRows = <R extends Table.RowData, M extends Model.TypedHtt
   });
 };
 
-export const createTableRows = <R extends Table.RowData, M extends Model.TypedHttpModel>(
-  config: Table.CreateTableDataConfig<R, M>
+export const createTableRows = <
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel,
+  C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
+>(
+  config: Table.CreateTableDataConfig<R, M, C>
 ): Table.BodyRow<R>[] =>
   orderTableRows([
     ...reduce(
       config.response.models,
       (curr: Table.ModelRow<R>[], m: M) => [
         ...curr,
-        tabling.rows.createModelRow<R, M>({
+        tabling.rows.createModelRow<R, M, C>({
           model: m,
           columns: config.columns,
           getRowChildren: config.getModelRowChildren
@@ -127,7 +131,7 @@ export const createTableRows = <R extends Table.RowData, M extends Model.TypedHt
       config.response.groups === undefined ? [] : config.response.groups,
       (curr: Table.GroupRow<R>[], g: Model.Group) => [
         ...curr,
-        tabling.rows.createGroupRow<R, M>({
+        tabling.rows.createGroupRow<R, M, C>({
           columns: config.columns,
           model: g
         })
@@ -138,7 +142,7 @@ export const createTableRows = <R extends Table.RowData, M extends Model.TypedHt
       config.response.markups === undefined ? [] : config.response.markups,
       (curr: Table.MarkupRow<R>[], mk: Model.Markup) => [
         ...curr,
-        tabling.rows.createMarkupRow<R, M>({
+        tabling.rows.createMarkupRow<R, M, C>({
           model: mk,
           columns: config.columns
         })

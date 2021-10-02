@@ -6,6 +6,7 @@ namespace Table {
   type Name = "account-subaccounts" | "accounts" | "subaccount-subaccounts" | "fringes" | "actuals" | "contacts";
   type Id = `${Name}-table`;
   type AsyncId = `async-${Id}`;
+  type Domain = "pdf" | "aggrid";
 
   type AgGridProps = import("@ag-grid-community/react/lib/interfaces").AgGridReactProps;
 
@@ -134,9 +135,7 @@ namespace Table {
     | "currency"
     | "sum"
     | "percentage"
-    | "date"
-    | "fake"
-    | "action";
+    | "date";
 
   type ColumnAlignment = "right" | "left" | null;
   type TableColumnTypeId = "action" | "body" | "calculated" | "fake";
@@ -172,29 +171,26 @@ namespace Table {
     readonly columns: Column<R, M>[];
   };
 
-  type ColumnDomain = "pdf" | "aggrid";
-
   interface BaseColumn<
     R extends RowData,
     M extends Model.HttpModel = Model.HttpModel,
-    D extends ColumnDomain = ColumnDomain
+    D extends Domain = Domain
   > {
     readonly field?: keyof R;
+    readonly colId?: string;
     readonly domain: D;
-    readonly headerName: string;
-    readonly columnType: ColumnTypeId;
+    readonly headerName?: string;
+    readonly columnType?: ColumnTypeId;
     readonly tableColumnType: TableColumnTypeId;
     readonly nullValue?: NullValue<R>;
     readonly index?: number;
     readonly getRowValue?: (m: M) => R[keyof R];
   }
 
-  type PdfCellLocation = { index: number; colIndex: number };
-
   type PdfCellCallbackParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
-    readonly location: PdfCellLocation;
+    readonly colIndex: number;
     readonly column: PdfColumn<R, M>;
-    readonly row: BodyRow<R>;
+    readonly row: R;
     readonly isHeader: boolean;
     readonly rawValue: any;
     readonly value: any;
@@ -236,18 +232,19 @@ namespace Table {
     readonly textStyle?: import("@react-pdf/types").Style;
   }
 
-  type PdfFormatter = (value: string | number) => string;
+  type PdfFormatter<R extends RowData> = (value: string | number) => R[keyof R];
 
   interface PdfColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel> extends BaseColumn<R, M, "pdf"> {
     // In the PDF case, since we cannot dynamically resize columns, the width refers to a ratio
     // of the column width to the overall table width assuming that all columns are present.  When
     // columns are hidden/shown, this ratio is adjusted.
-    readonly width: number;
+    readonly width?: number;
     readonly cellProps?: PdfCellStandardProps<R, M>;
     readonly headerCellProps?: PdfCellStandardProps<R, M>;
     readonly footer?: PdfFooterColumn;
     readonly cellContentsVisible?: PdfOptionalCellCallback<R, M, boolean>;
-    readonly formatter?: PdfFormatter;
+    readonly formatter?: PdfFormatter<R>;
+    readonly valueGetter?: (r: R) => R[keyof R];
     readonly cellRenderer?: (params: PdfCellCallbackParams<R, M>) => JSX.Element;
     // NOTE: This only applies for the individual Account tables, not the the overall
     // Accounts table.
@@ -274,7 +271,6 @@ namespace Table {
     readonly page?: FooterColumn<R, M>;
     readonly isRead?: boolean;
     readonly isWrite?: boolean;
-    readonly isFake?: boolean;
     readonly cellRenderer?: string | Partial<GridSet<string>>;
     readonly cellClass?: CellClassName;
     readonly cellStyle?: React.CSSProperties;

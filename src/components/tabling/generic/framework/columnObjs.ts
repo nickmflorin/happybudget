@@ -40,8 +40,6 @@ export const FakeColumn = <R extends Table.RowData, M extends Model.HttpModel = 
 ): Table.Column<R, M> =>
   Column({
     ...col,
-    isFake: true,
-    columnType: "fake",
     tableColumnType: "fake"
   });
 

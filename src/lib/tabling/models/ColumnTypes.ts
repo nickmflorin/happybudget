@@ -1,6 +1,4 @@
 const ColumnTypes: Table.ColumnType[] = [
-  { id: "action" },
-  { id: "fake" },
   {
     id: "text",
     icon: "font-case",

@@ -60,8 +60,8 @@ const evaluateCellStyle = <R extends Table.RowData, M extends Model.HttpModel = 
 
 export interface CellProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
   readonly column: Table.PdfColumn<R, M>;
-  readonly row: Table.BodyRow<R>;
-  readonly location: Table.PdfCellLocation;
+  readonly row: R;
+  readonly colIndex: number;
   readonly style?: Table.PdfCellStyle<R, M>;
   readonly className?: Table.PdfCellClassName<R, M>;
   readonly textStyle?: Table.PdfCellStyle<R, M>;
@@ -72,7 +72,6 @@ export interface CellProps<R extends Table.RowData, M extends Model.HttpModel = 
   readonly indented?: boolean;
   readonly border?: boolean;
   readonly cellContentsVisible?: Table.PdfOptionalCellCallback<R, M, boolean>;
-  readonly valueCallback?: (params: Omit<Table.PdfCellCallbackParams<R, M>, "value" | "rawValue">) => any;
 }
 
 const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
@@ -80,24 +79,29 @@ const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
 ): JSX.Element => {
   const callbackParams = useMemo<Omit<Table.PdfCellCallbackParams<R, M>, "value" | "rawValue">>(() => {
     return {
-      location: props.location,
+      colIndex: props.colIndex,
       row: props.row,
       column: props.column,
       isHeader: props.isHeader || false,
       indented: props.indented === true
     };
-  }, [props.location, props.row, props.column, props.isHeader]);
+  }, [props.colIndex, props.row, props.column, props.isHeader]);
 
-  const rawValue = useMemo(() => {
-    return !isNil(props.valueCallback)
-      ? props.valueCallback(callbackParams)
-      : props.row[props.column.field as keyof Table.BodyRow<R>];
+  const rawValue: R[keyof R] = useMemo((): R[keyof R] => {
+    if (!isNil(props.column.valueGetter)) {
+      return props.column.valueGetter(props.row);
+    } else if (!isNil(props.column.field)) {
+      return props.row[props.column.field];
+    }
+    return props.column.nullValue === undefined
+      ? ("" as unknown as R[keyof R])
+      : (props.column.nullValue as R[keyof R]);
   }, [callbackParams, props.row, props.column]);
 
   const value = useMemo(() => {
     if (isNil(props.column.formatter) || props.formatting === false) {
       return rawValue;
-    } else if (rawValue !== null) {
+    } else if (rawValue !== null && (typeof rawValue === "string" || typeof rawValue === "number")) {
       return props.column.formatter(rawValue);
     }
     return "";
@@ -113,7 +117,8 @@ const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
         props.isHeader === true ? props.column.headerCellProps?.style : props.column.cellProps?.style,
         fullCallbackParams
       ),
-      width: `${props.column.width * 100.0}%`,
+      // The width will be configured before the column is plugged into this component.
+      width: `${(props.column.width || 0.0) * 100.0}%`,
       ...evaluateCellStyle<R, M>(props.style, fullCallbackParams)
     };
   }, [props.column]);
@@ -157,10 +162,12 @@ const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
               // column types, since these are also used for the AG Grid tables.  We need to
               // figure out a way to differentiate between the two, because here - we are just
               // assuming that the column type styling only applies to the text.
-              ...(tabling.columns.getColumnTypeCSSStyle(props.column.columnType, {
-                header: props.isHeader || false,
-                pdf: true
-              }) as Style),
+              ...(!isNil(props.column.columnType)
+                ? tabling.columns.getColumnTypeCSSStyle(props.column.columnType, {
+                    header: props.isHeader || false,
+                    pdf: true
+                  })
+                : ({} as Style)),
               ...evaluateOptionalCallbackProp<R, M, Style>(
                 props.isHeader === true ? props.column.headerCellProps?.textStyle : props.column.cellProps?.textStyle,
                 fullCallbackParams

@@ -38,25 +38,10 @@ namespace Tables {
     readonly subAccountsTree: Redux.ModelListResponseStore<Model.SubAccountTreeNode>;
   };
 
-  type PdfSubAccountRowData = {
-    readonly identifier: string | null;
-    readonly description: string | null;
-    readonly quantity: number | null;
-    readonly unit: Model.Tag | null;
-    readonly multiplier: number | null;
-    readonly rate: number | null;
-    readonly estimated: number | null;
-    readonly contact: number | null;
-  };
+  type PdfSubAccountRowData = SubAccountRowData;
   type PdfSubAccountRow = Table.BodyRow<PdfSubAccountRowData>;
 
-  type PdfAccountRowData = {
-    readonly identifier: string | null;
-    readonly description: string | null;
-    readonly estimated: number | null;
-    readonly variance: number | null;
-    readonly actual: number | null;
-  };
+  type PdfAccountRowData = AccountRowData;
   type PdfAccountRow = Table.BodyRow<PdfAccountRowData>;
 
   type ContactRowData = Pick<Model.Contact, "contact_type" | "company" | "position" | "phone_number" | "email"> & {

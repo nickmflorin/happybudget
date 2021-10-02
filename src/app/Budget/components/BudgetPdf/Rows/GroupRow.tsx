@@ -9,20 +9,20 @@ import { RowProps } from "./Row";
 import BodyRow from "./BodyRow";
 
 const GroupRow = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
-  props: Omit<RowProps<R, M>, "row"> & {
-    readonly row: Table.GroupRow<R>;
-    readonly cellProps?: Omit<CellProps<R, M>, "column" | "location" | "row" | "debug" | "isHeader">;
+  props: RowProps<R, M> & {
+    readonly group: Model.Group;
+    readonly cellProps?: Omit<CellProps<R, M>, "column" | "colIndex" | "row" | "debug" | "isHeader">;
   }
 ): JSX.Element => {
   const cellStyle = useMemo(() => {
-    const colorDef = model.util.getGroupColorDefinition(props.row);
+    const colorDef = model.util.getGroupColorDefinition(props.group);
     return {
       backgroundColor: !isNil(colorDef.backgroundColor) ? colorDef.backgroundColor : "#EFEFEF"
     };
   }, [props.row]);
 
   const cellTextStyle = useMemo(() => {
-    const colorDef = model.util.getGroupColorDefinition(props.row);
+    const colorDef = model.util.getGroupColorDefinition(props.group);
     return {
       color: !isNil(colorDef.color) ? colorDef.color : "#424242"
     };
@@ -43,7 +43,7 @@ const GroupRow = <R extends Table.RowData, M extends Model.HttpModel = Model.Htt
             // because the Row itself will not have a borderLeft attribute on it and the
             // Row starts one column to the right.
             /* eslint-disable indent */
-            return params.indented === false ? "group-tr-td" : params.location.colIndex === 0 ? "td-border-left" : "";
+            return params.indented === false ? "group-tr-td" : params.colIndex === 0 ? "td-border-left" : "";
           }
         ],
         // style: [props.cellProps?.style, cellStyle],
