@@ -22,7 +22,6 @@ export const ActionColumn = <R extends Table.RowData, M extends Model.HttpModel 
   Column({
     ...col,
     selectable: false,
-    columnType: "action",
     tableColumnType: "action",
     isRead: false,
     isWrite: false,
