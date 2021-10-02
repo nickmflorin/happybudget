@@ -117,7 +117,11 @@ export const orderColumns = <
     columns,
     (col: C) => isNil(col.index) && col.tableColumnType === "calculated"
   );
+  // It doesn't matter where the fake columns go in the ordering because they are not
+  // displayed - all we care about is that they are present.
+  const fakeColumns = filter(columns, (col: C) => col.tableColumnType === "fake");
   return [
+    ...fakeColumns,
     ...columnsWithoutIndexAction,
     ...orderBy(columnsWithIndex, ["index"], ["asc"]),
     ...columnsWithoutIndexBody,

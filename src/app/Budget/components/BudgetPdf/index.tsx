@@ -43,63 +43,60 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
       type M = Model.PdfSubAccount;
       type C = Table.PdfColumn<R, M>;
 
-      let columns = tabling.columns.mergeColumns<C, R, M>(
-        filter(SubAccountColumns, (c: C) => c.tableColumnType !== "fake"),
-        {
-          description: (col: C) => ({
-            ...col,
-            footer: {
-              /* eslint-disable indent */
-              value: !isNil(account.description)
-                ? `${account.description} Total`
-                : !isNil(account.identifier)
-                ? `${account.identifier} Total`
-                : "Total"
-            },
-            childFooter: (m: M) => {
-              if (!isNil(m.description)) {
-                return { value: `${m.description} Total` };
-              } else if (!isNil(m.identifier)) {
-                return { value: `${m.identifier} Total` };
+      let columns = tabling.columns.mergeColumns<C, R, M>(SubAccountColumns, {
+        description: (col: C) => ({
+          ...col,
+          footer: {
+            /* eslint-disable indent */
+            value: !isNil(account.description)
+              ? `${account.description} Total`
+              : !isNil(account.identifier)
+              ? `${account.identifier} Total`
+              : "Total"
+          },
+          childFooter: (m: M) => {
+            if (!isNil(m.description)) {
+              return { value: `${m.description} Total` };
+            } else if (!isNil(m.identifier)) {
+              return { value: `${m.identifier} Total` };
+            }
+            return { value: "Total" };
+          }
+        }),
+        contact: (col: C) => ({
+          ...col,
+          cellRenderer: (params: Table.PdfCellCallbackParams<R, M>) => {
+            if (params.rawValue !== null) {
+              const contact: Model.Contact | undefined = find(contacts, { id: params.rawValue });
+              if (!isNil(contact)) {
+                return (
+                  <Tag
+                    className={"tag tag--contact"}
+                    color={"#EFEFEF"}
+                    textColor={"#2182e4"}
+                    text={contact.full_name}
+                  />
+                );
               }
-              return { value: "Total" };
             }
-          }),
-          contact: (col: C) => ({
-            ...col,
-            cellRenderer: (params: Table.PdfCellCallbackParams<R, M>) => {
-              if (params.rawValue !== null) {
-                const contact: Model.Contact | undefined = find(contacts, { id: params.rawValue });
-                if (!isNil(contact)) {
-                  return (
-                    <Tag
-                      className={"tag tag--contact"}
-                      color={"#EFEFEF"}
-                      textColor={"#2182e4"}
-                      text={contact.full_name}
-                    />
-                  );
-                }
-              }
-              return <span></span>;
-            }
-          }),
-          unit: (col: C) => ({
-            ...col,
-            cellRenderer: (params: Table.PdfCellCallbackParams<R, M>) =>
-              params.rawValue !== null ? <Tag model={params.rawValue} /> : <span></span>
-          }),
-          estimated: (col: C) => ({
-            ...col,
-            footer: {
-              value: model.businessLogic.estimatedValue(account)
-            },
-            childFooter: (m: M) => {
-              return { value: model.businessLogic.estimatedValue(m) };
-            }
-          })
-        }
-      );
+            return <span></span>;
+          }
+        }),
+        unit: (col: C) => ({
+          ...col,
+          cellRenderer: (params: Table.PdfCellCallbackParams<R, M>) =>
+            params.rawValue !== null ? <Tag model={params.rawValue} /> : <span></span>
+        }),
+        estimated: (col: C) => ({
+          ...col,
+          footer: {
+            value: model.businessLogic.estimatedValue(account)
+          },
+          childFooter: (m: M) => {
+            return { value: model.businessLogic.estimatedValue(m) };
+          }
+        })
+      });
 
       // Determine the default width for columns that do not specify it.
       const totalSpecifiedWidth = reduce(columns, (prev: number, column: C) => prev + (column.width || 0.0), 0.0);
