@@ -43,7 +43,7 @@ const Template = (): JSX.Element => {
           activeIcon: <Icon icon={"file-spreadsheet"} weight={"solid"} />,
           onClick: () => {
             if (!isNaN(parseInt(templateId))) {
-              const templateLastVisited = budgeting.urls.getTemplateLastVisited(parseInt(templateId));
+              const templateLastVisited = budgeting.urls.getLastVisited("template-last-visited", parseInt(templateId));
               if (!isNil(templateLastVisited)) {
                 history.push(templateLastVisited);
               } else {

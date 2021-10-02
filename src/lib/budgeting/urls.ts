@@ -1,108 +1,120 @@
 import { isNil } from "lodash";
 import Cookies from "universal-cookie";
+import { model } from "lib";
 
-export const getUrl = (budget: Model.Budget | Model.Template, entity?: Model.Entity | Model.SimpleEntity): string => {
-  const designation = budget.type;
+type Designation = "budget" | "template";
+
+type CookieSubset = `${Designation}-last-visited`;
+
+type AccountsUrl<D extends Designation = Designation> = `/${D}s/${number}/accounts`;
+type AccountUrl<D extends Designation = Designation> = `/${D}s/${number}/accounts/${number}`;
+type SubAccountUrl<D extends Designation = Designation> = `/${D}s/${number}/subaccounts/${number}`;
+
+type BudgetingUrl<D extends Designation = Designation> = AccountsUrl<D> | AccountUrl<D> | SubAccountUrl<D>;
+
+type BudgetUrl = BudgetingUrl<"budget">;
+type TemplateUrl = BudgetingUrl<"template">;
+
+export const getBudgetUrl = (
+  budget: Model.Budget,
+  entity?: Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount
+): BudgetUrl => {
   if (isNil(entity)) {
-    return `/${designation}s/${budget.id}/accounts`;
+    return `/budgets/${budget.id}/accounts`;
+  } else if (model.typeguards.isAccount(entity)) {
+    return `/budgets/${budget.id}/accounts/${entity.id}`;
+  } else {
+    return `/budgets/${budget.id}/subaccounts/${entity.id}`;
   }
-  /* eslint-disable indent */
-  return entity.type === "subaccount"
-    ? `/${designation}s/${budget.id}/subaccounts/${entity.id}`
-    : entity.type === "account"
-    ? `/${designation}s/${budget.id}/accounts/${entity.id}`
-    : `/${designation}s/${budget.id}/accounts`;
 };
+
+export const getTemplateUrl = (
+  budget: Model.Template,
+  entity?: Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount
+): TemplateUrl => {
+  if (isNil(entity)) {
+    return `/templates/${budget.id}/accounts`;
+  } else if (model.typeguards.isAccount(entity)) {
+    return `/templates/${budget.id}/accounts/${entity.id}`;
+  } else {
+    return `/templates/${budget.id}/subaccounts/${entity.id}`;
+  }
+};
+
+export const getUrl = (
+  budget: Model.Budget | Model.Template,
+  entity?: Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount
+): BudgetUrl | TemplateUrl =>
+  model.typeguards.isBudget(budget) ? getBudgetUrl(budget, entity) : getTemplateUrl(budget, entity);
 
 type PluggableID = ID | "([0-9]+)";
 
-export const isAccountsUrl = (
+export const isAccountsUrl = <D extends Designation = Designation>(
   url: string,
   id: PluggableID = "([0-9]+)",
-  domain: "budgets" | "templates" = "budgets"
-): boolean => {
-  const regex = new RegExp(`^/${domain}/${id}/accounts/?$`);
+  designation: D
+): url is AccountsUrl<D> => {
+  const regex = new RegExp(`^/${designation}s/${id}/accounts/?$`);
   return url.match(regex) !== null ? true : false;
 };
 
-export const isAccountUrl = (
+export const isAccountUrl = <D extends Designation = Designation>(
   url: string,
   id: PluggableID = "([0-9]+)",
-  domain: "budgets" | "templates" = "budgets"
-): boolean => {
-  const regex = new RegExp(`^/${domain}/${id}/accounts/([0-9]+)/?$`);
+  designation: D
+): url is AccountUrl<D> => {
+  const regex = new RegExp(`^/${designation}s/${id}/accounts/([0-9]+)/?$`);
   return url.match(regex) !== null ? true : false;
 };
 
-export const isSubAccountUrl = (
+export const isSubAccountUrl = <D extends Designation = Designation>(
   url: string,
   id: PluggableID = "([0-9]+)",
-  domain: "budgets" | "templates" = "budgets"
-): boolean => {
-  const regex = new RegExp(`^/${domain}/${id}/subaccounts/([0-9]+)/?$`);
+  designation: D
+): url is SubAccountUrl<D> => {
+  const regex = new RegExp(`^/${designation}s/${id}/subaccounts/([0-9]+)/?$`);
   return url.match(regex) !== null ? true : false;
 };
 
-export const isBudgetRelatedUrl = (url: string, id: PluggableID = "([0-9]+)"): boolean =>
-  isAccountUrl(url, id, "budgets") || isAccountsUrl(url, id, "budgets") || isSubAccountUrl(url, id, "budgets");
+export const isBudgetRelatedUrl = (url: string, id: PluggableID = "([0-9]+)"): url is BudgetUrl =>
+  isSubAccountUrl(url, id, "budget") || isAccountUrl(url, id, "budget") || isAccountsUrl(url, id, "budget");
 
 export const isTemplateRelatedUrl = (url: string, id: PluggableID = "([0-9]+)"): boolean =>
-  isAccountUrl(url, id, "templates") || isAccountsUrl(url, id, "templates") || isSubAccountUrl(url, id, "templates");
+  isSubAccountUrl(url, id, "template") || isAccountUrl(url, id, "template") || isAccountsUrl(url, id, "template");
 
-const getBudgetLastVisitedCookies = (): { [key: string]: any } => {
+const getLastVisitedCookies = (subset: CookieSubset): { [key: string]: any } => {
   const cookies = new Cookies();
-  const lastVisited = cookies.get("budget-last-visited");
+  const lastVisited = cookies.get(subset);
   if (typeof lastVisited !== "object") {
-    cookies.set("budget-last-visited", {}, { path: "/" });
+    cookies.set(subset, {}, { path: "/" });
     return {};
   }
   return lastVisited;
 };
 
-export const getBudgetLastVisited = (id: ID): string | null => {
-  const cookies = getBudgetLastVisitedCookies();
+export const getLastVisited = (subset: CookieSubset, id: ID): string | null => {
+  const cookies = getLastVisitedCookies(subset);
   if (!isNil(cookies[`${id}`])) {
-    if (typeof cookies[`${id}`] === "string" && isBudgetRelatedUrl(cookies[`${id}`], id)) {
+    if (
+      (typeof cookies[`${id}`] === "string" &&
+        subset === "budget-last-visited" &&
+        isBudgetRelatedUrl(cookies[`${id}`], id)) ||
+      (subset === "template-last-visited" && isTemplateRelatedUrl(cookies[`${id}`], id))
+    ) {
       return cookies[`${id}`];
     }
   }
   return null;
 };
 
-export const setBudgetLastVisited = (id: ID, url: string): void => {
-  const budgetCookies = getBudgetLastVisitedCookies();
-  if (isBudgetRelatedUrl(url, id)) {
-    budgetCookies[id] = url;
-    const cookies = new Cookies();
-    cookies.set("budget-last-visited", budgetCookies, { path: "/" });
-  }
-};
-
-const getTemplateLastVisitedCookies = (): { [key: string]: any } => {
+export const setLastVisited = (
+  budget: Model.Budget | Model.Template,
+  entity?: Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount
+): void => {
+  const subSet: CookieSubset = model.typeguards.isBudget(budget) ? "budget-last-visited" : "template-last-visited";
+  const urlCookies = getLastVisitedCookies(subSet);
+  const url = getUrl(budget, entity);
+  urlCookies[budget.id] = url;
   const cookies = new Cookies();
-  const lastVisited = cookies.get("template-last-visited");
-  if (typeof lastVisited !== "object") {
-    cookies.set("template-last-visited", {}, { path: "/" });
-    return {};
-  }
-  return lastVisited;
-};
-
-export const setTemplateLastVisited = (id: ID, url: string): void => {
-  const templatesCookies = getTemplateLastVisitedCookies();
-  if (isTemplateRelatedUrl(url, id)) {
-    templatesCookies[id] = url;
-    const cookies = new Cookies();
-    cookies.set("template-last-visited", templatesCookies, { path: "/" });
-  }
-};
-
-export const getTemplateLastVisited = (id: ID): string | null => {
-  const cookies = getTemplateLastVisitedCookies();
-  if (!isNil(cookies[`${id}`])) {
-    if (typeof cookies[`${id}`] === "string" && isTemplateRelatedUrl(cookies[`${id}`], id)) {
-      return cookies[`${id}`];
-    }
-  }
-  return null;
+  cookies.set(subSet, urlCookies, { path: "/" });
 };

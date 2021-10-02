@@ -13,10 +13,10 @@ interface AccountsProps {
 
 const Accounts = ({ budget, budgetId }: AccountsProps): JSX.Element => {
   useEffect(() => {
-    if (!isNil(budgetId)) {
-      budgeting.urls.setBudgetLastVisited(budgetId, `/budgets/${budgetId}/accounts`);
+    if (!isNil(budget)) {
+      budgeting.urls.setLastVisited(budget);
     }
-  }, [budgetId]);
+  }, [budget]);
 
   return (
     <React.Fragment>

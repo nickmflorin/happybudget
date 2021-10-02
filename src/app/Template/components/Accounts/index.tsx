@@ -13,10 +13,10 @@ interface AccountsProps {
 
 const Accounts = ({ templateId, template }: AccountsProps): JSX.Element => {
   useEffect(() => {
-    if (!isNil(templateId)) {
-      budgeting.urls.setTemplateLastVisited(templateId, `/templates/${templateId}/accounts`);
+    if (!isNil(template)) {
+      budgeting.urls.setLastVisited(template);
     }
-  }, [templateId]);
+  }, [template]);
 
   return (
     <React.Fragment>

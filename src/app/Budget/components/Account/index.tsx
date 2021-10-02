@@ -33,10 +33,10 @@ const Account = ({ budgetId, budget }: AccountProps): JSX.Element => {
   }, [accountId]);
 
   useEffect(() => {
-    if (!isNil(budgetId) && !isNaN(parseInt(accountId))) {
-      budgeting.urls.setBudgetLastVisited(budgetId, `/budgets/${budgetId}/accounts/${accountId}`);
+    if (!isNil(budget) && !isNil(detail)) {
+      budgeting.urls.setLastVisited(budget, detail);
     }
-  }, [budgetId, accountId]);
+  }, [budget, detail]);
 
   return (
     <RenderIfValidId id={[accountId]}>

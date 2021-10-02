@@ -33,10 +33,10 @@ const SubAccount = ({ budgetId, budget }: SubAccountProps): JSX.Element => {
   }, [subaccountId]);
 
   useEffect(() => {
-    if (!isNil(budgetId) && !isNaN(parseInt(subaccountId))) {
-      budgeting.urls.setBudgetLastVisited(budgetId, `/budgets/${budgetId}/subaccounts/${subaccountId}`);
+    if (!isNil(budget) && !isNil(detail)) {
+      budgeting.urls.setLastVisited(budget, detail);
     }
-  }, [budgetId]);
+  }, [budget, detail]);
 
   return (
     <RenderIfValidId id={[subaccountId]}>
@@ -56,11 +56,14 @@ const SubAccount = ({ budgetId, budget }: SubAccountProps): JSX.Element => {
             },
             {
               requiredParams: ["b", "subaccount"],
-              func: ({ b, subaccount }: { b: Model.Budget; subaccount: Model.SubAccount }) => {
+              func: ({ b, subaccount }: { b: Model.Budget; subaccount: Model.SubAccount }): IBreadCrumbItem[] => {
                 const siblings = subaccount.siblings || [];
-                const ancestors = subaccount.ancestors || [];
+                const ancestors = (subaccount.ancestors || []).slice(1) as [
+                  Model.SimpleAccount,
+                  ...Array<Model.SimpleSubAccount>
+                ];
                 return [
-                  ...map(ancestors.slice(1), (ancestor: Model.Entity) => {
+                  ...map(ancestors, (ancestor: Model.SimpleAccount | Model.SimpleSubAccount) => {
                     return {
                       id: ancestor.id,
                       render: () => <EntityText fillEmpty={"---------"}>{ancestor}</EntityText>,

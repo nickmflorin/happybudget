@@ -53,9 +53,12 @@ const SubAccount = ({ budgetId, budget }: SubAccountProps): JSX.Element => {
               requiredParams: ["b", "subaccount"],
               func: ({ b, subaccount }: { b: Model.Budget; subaccount: Model.SubAccount }) => {
                 const siblings = subaccount.siblings || [];
-                const ancestors = subaccount.ancestors || [];
+                const ancestors = (subaccount.ancestors || []).slice(1) as [
+                  Model.SimpleAccount,
+                  ...Array<Model.SimpleSubAccount>
+                ];
                 return [
-                  ...map(ancestors.slice(1), (ancestor: Model.Entity) => {
+                  ...map(ancestors, (ancestor: Model.SimpleAccount | Model.SimpleSubAccount) => {
                     return {
                       id: ancestor.id,
                       render: () => <EntityText fillEmpty={"---------"}>{ancestor}</EntityText>,

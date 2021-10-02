@@ -34,10 +34,10 @@ const Account = ({ templateId, template }: AccountProps): JSX.Element => {
   }, [accountId]);
 
   useEffect(() => {
-    if (!isNil(templateId) && !isNaN(parseInt(accountId))) {
-      budgeting.urls.setTemplateLastVisited(templateId, `/templates/${templateId}/accounts/${accountId}`);
+    if (!isNil(template) && !isNil(detail)) {
+      budgeting.urls.setLastVisited(template, detail);
     }
-  }, [templateId]);
+  }, [template]);
 
   return (
     <RenderIfValidId id={[accountId]}>

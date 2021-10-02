@@ -1,18 +1,35 @@
 export const isMarkup = (m: Model.HttpModel): m is Model.Markup => (m as Model.Markup).type === "markup";
+
 export const isFringe = (m: Model.HttpModel): m is Model.Fringe => (m as Model.Fringe).type === "fringe";
+
 export const isGroup = (m: Model.HttpModel): m is Model.Group => (m as Model.Group).type === "group";
-export const isAccount = (m: Model.HttpModel): m is Model.Account => (m as Model.Account).type === "account";
-export const isSubAccount = (m: Model.HttpModel): m is Model.SubAccount =>
-  (m as Model.SubAccount).type === "subaccount";
+
+export const isAccount = <M extends Model.Account | Model.SimpleAccount = Model.Account | Model.SimpleAccount>(
+  m: Model.HttpModel
+): m is M => (m as M).type === "account";
+
+/* eslint-disable indent */
+export const isSubAccount = <
+  M extends Model.SubAccount | Model.SimpleSubAccount = Model.SubAccount | Model.SimpleSubAccount
+>(
+  m: Model.HttpModel
+): m is M => (m as M).type === "subaccount";
+
 export const isPdfAccount = (m: Model.HttpModel): m is Model.PdfAccount =>
   (m as Model.PdfAccount).type === "pdf-account";
+
 export const isPdfSubAccount = (m: Model.HttpModel): m is Model.PdfSubAccount =>
   (m as Model.PdfSubAccount).type === "pdf-subaccount";
+
 export const isPdfBudget = (m: Model.HttpModel): m is Model.PdfBudget => (m as Model.PdfBudget).type === "pdf-budget";
-export const isBudget = (m: Model.HttpModel): m is Model.Budget | Model.SimpleBudget =>
-  (m as Model.Budget | Model.SimpleBudget).type === "budget";
-export const isTemplate = (m: Model.HttpModel): m is Model.Template | Model.SimpleTemplate =>
-  (m as Model.Template | Model.SimpleTemplate).type === "template";
+
+export const isBudget = <M extends Model.Budget | Model.SimpleBudget = Model.Budget | Model.SimpleBudget>(
+  m: Model.HttpModel
+): m is M => (m as M).type === "budget";
+
+export const isTemplate = <M extends Model.Template | Model.SimpleTemplate = Model.Template | Model.SimpleTemplate>(
+  m: Model.HttpModel
+): m is M => (m as M).type === "template";
 
 export const isFieldAlterationEvent = (
   event: Model.FieldAlterationEvent | Model.CreateEvent

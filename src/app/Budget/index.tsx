@@ -72,7 +72,7 @@ const Budget = (): JSX.Element => {
           activeIcon: <Icon weight={"solid"} icon={"file-spreadsheet"} />,
           onClick: () => {
             if (!isNaN(parseInt(budgetId)) && !budgeting.urls.isBudgetRelatedUrl(location.pathname)) {
-              const budgetLastVisited = budgeting.urls.getBudgetLastVisited(parseInt(budgetId));
+              const budgetLastVisited = budgeting.urls.getLastVisited("budget-last-visited", budgetId);
               if (!isNil(budgetLastVisited)) {
                 history.push(budgetLastVisited);
               } else {

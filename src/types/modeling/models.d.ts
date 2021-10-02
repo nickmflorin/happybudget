@@ -226,7 +226,7 @@ namespace Model {
     readonly access: number[];
     readonly children: number[];
     readonly siblings?: SimpleAccount[]; // Only included for detail endpoints.
-    readonly ancestors?: Entity[]; // Only included for detail endpoints.
+    readonly ancestors?: [SimpleBudget | SimpleTemplate]; // Only included for detail endpoints.
   }
 
   interface PdfAccount extends AbstractAccount {
@@ -251,7 +251,7 @@ namespace Model {
     readonly parent_type: "account" | "subaccount";
     readonly fringes: number[];
     readonly siblings?: SimpleSubAccount[]; // Only included for detail endpoints.
-    readonly ancestors?: Entity[]; // Only included for detail endpoints.
+    readonly ancestors?: [SimpleBudget | SimpleTemplate, SimpleAccount, ...Array<SimpleSubAccount>]; // Only included for detail endpoints.
   }
 
   interface PdfSubAccount extends AbstractSubAccount {
