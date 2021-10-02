@@ -1,17 +1,12 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { isNil, map } from "lodash";
+import { isNil } from "lodash";
 
 import { budgeting } from "lib";
-
-import { RenderIfValidId } from "components";
-import { Portal, BreadCrumbs } from "components/layout";
-import { EntityTextButton } from "components/buttons";
-import { EntityText } from "components/typography";
+import { AccountPage } from "app/Pages";
 
 import { actions } from "../../store";
-
 import SubAccountsTable from "./SubAccountsTable";
 
 const selectDetail = (state: Application.Authenticated.Store) => state.budget.account.detail.data;
@@ -39,49 +34,10 @@ const Account = ({ budgetId, budget }: AccountProps): JSX.Element => {
   }, [budget, detail]);
 
   return (
-    <RenderIfValidId id={[accountId]}>
-      <Portal id={"breadcrumbs"}>
-        <BreadCrumbs
-          params={{ b: budget, account: detail }}
-          items={[
-            {
-              requiredParams: ["b"],
-              func: ({ b }: { b: Model.Budget }) => ({
-                id: b.id,
-                primary: true,
-                label: b.name,
-                tooltip: { title: "Top Sheet", placement: "bottom" },
-                url: budgeting.urls.getUrl(b)
-              })
-            },
-            {
-              requiredParams: ["b", "account"],
-              func: ({ b, account }: { b: Model.Budget; account: Model.Account }) => {
-                const siblings = account.siblings || [];
-                return {
-                  id: account.id,
-                  primary: true,
-                  url: budgeting.urls.getUrl(b, account),
-                  render: () => {
-                    if (siblings.length !== 0) {
-                      return <EntityTextButton fillEmpty={"---------"}>{account}</EntityTextButton>;
-                    }
-                    return <EntityText fillEmpty={"---------"}>{account}</EntityText>;
-                  },
-                  options: map(siblings, (option: Model.SimpleAccount) => ({
-                    id: option.id,
-                    url: budgeting.urls.getUrl(b, option),
-                    render: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
-                  }))
-                };
-              }
-            }
-          ]}
-        />
-      </Portal>
+    <AccountPage budget={budget} accountId={accountId} detail={detail}>
       <SubAccountsTable accountId={parseInt(accountId)} budget={budget} budgetId={budgetId} />
       {/* <AccountCommentsHistory /> */}
-    </RenderIfValidId>
+    </AccountPage>
   );
 };
 
