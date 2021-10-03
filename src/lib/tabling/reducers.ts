@@ -536,13 +536,15 @@ export const createAuthenticatedTableReducer = <
           if (!isNil(r)) {
             return {
               ...s,
-              data: util.replaceInArray<Table.BodyRow<R>>(
-                s.data,
-                { id: r.id },
-                rows.createModelRow({
-                  model: m,
-                  columns: config.columns
-                })
+              data: data.orderTableRows<R, M>(
+                util.replaceInArray<Table.BodyRow<R>>(
+                  s.data,
+                  { id: r.id },
+                  rows.createModelRow({
+                    model: m,
+                    columns: config.columns
+                  })
+                )
               )
             };
           }
