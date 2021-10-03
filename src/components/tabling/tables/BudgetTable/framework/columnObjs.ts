@@ -85,10 +85,18 @@ export const EstimatedColumn = <R extends Tables.BudgetRowData, M extends Model.
         if (tabling.typeguards.isBodyRow(row)) {
           if (tabling.typeguards.isDataRow(row)) {
             if (isSubAccountRowData(row.data)) {
-              console.log({ row });
-              return row.data.nominal_value + row.data.accumulated_markup_contribution + row.data.fringe_contribution;
+              return (
+                row.data.nominal_value +
+                row.data.accumulated_markup_contribution +
+                row.data.fringe_contribution +
+                row.data.accumulated_fringe_contribution
+              );
             }
-            return row.data.nominal_value + row.data.accumulated_markup_contribution;
+            return (
+              row.data.nominal_value +
+              row.data.accumulated_markup_contribution +
+              row.data.accumulated_fringe_contribution
+            );
           } else {
             // Note: We do not have to exclude row's by ID because the primary Row here
             // is already a MarkupRow and we are only looking at the BodyRow(s).
@@ -167,11 +175,17 @@ export const VarianceColumn = <R extends Tables.BudgetRowData, M extends Model.H
             return (
               row.data.nominal_value +
               row.data.accumulated_markup_contribution +
+              row.data.accumulated_fringe_contribution +
               row.data.fringe_contribution -
               row.data.actual
             );
           }
-          return row.data.nominal_value + row.data.accumulated_markup_contribution - row.data.actual;
+          return (
+            row.data.nominal_value +
+            row.data.accumulated_markup_contribution +
+            row.data.accumulated_fringe_contribution -
+            row.data.actual
+          );
         }
       }
       return 0.0;
