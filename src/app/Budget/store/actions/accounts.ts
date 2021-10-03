@@ -5,7 +5,7 @@ export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Table
   ActionType.Accounts.TableChanged
 );
 export const savingTableAction = createAction<boolean>(ActionType.Accounts.Saving);
-export const requestAction = createAction<null>(ActionType.Accounts.Request);
+export const requestAction = createAction<Redux.TableRequestPayload>(ActionType.Accounts.Request);
 export const loadingAction = createAction<boolean>(ActionType.Accounts.Loading);
 export const responseAction = createAction<Http.TableResponse<Model.Account>>(ActionType.Accounts.Response);
 export const clearAction = createAction<null>(ActionType.Accounts.Clear);

@@ -4,7 +4,7 @@ import { StrictEffect, call, put, select, fork, cancelled, all } from "redux-sag
 import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
-import * as tabling from "../../tabling";
+import { tabling, redux } from "lib";
 
 type R = Tables.AccountRowData;
 type C = Model.Account;
@@ -74,45 +74,64 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
 
-  function* request(action: Redux.Action<null>): SagaIterator {
+  function* request(action: Redux.Action<Redux.TableRequestPayload>): SagaIterator {
     const objId = yield select(config.selectObjId);
     if (!isNil(objId)) {
-      yield put(config.actions.loading(true));
-      yield put(config.actions.clear(null));
-      try {
-        const [models, groups, markups]: [
-          Http.ListResponse<C>,
-          Http.ListResponse<Model.Group>,
-          Http.ListResponse<Model.Markup>
-        ] = yield all([call(requestAccounts, objId), call(requestGroups, objId), call(requestMarkups, objId)]);
-        if (models.data.length === 0 && isAuthenticatedConfig(config)) {
-          // If there is no table data, we want to default create two rows.
-          const response: Http.BulkCreateChildrenResponse<B, C> = yield call(
-            config.services.bulkCreate,
-            objId,
-            { data: [{}, {}] },
-            { cancelToken: source.token }
-          );
-          yield put(config.actions.response({ models: response.children, groups: groups.data, markups: markups.data }));
-        } else {
-          yield put(config.actions.response({ models: models.data, groups: groups.data, markups: markups.data }));
+      if (redux.typeguards.isListRequestIdsAction(action)) {
+        if (isAuthenticatedConfig(config)) {
+          const actionHandler = config.actions.updateModelsInState;
+          if (!isNil(actionHandler)) {
+            const models = yield call(requestAccounts, objId, action.payload.ids);
+            yield put(actionHandler(models));
+          } else {
+            /* eslint-disable no-console */
+            console.warn(
+              `Trying to submit a request to update specific IDs of the model
+              but have not provided the action handler to update the models in
+              the table.`
+            );
+          }
         }
-      } catch (e: unknown) {
-        if (!(yield cancelled())) {
-          api.handleRequestError(e as Error, "There was an error retrieving the table data.");
-          yield put(config.actions.response({ models: [], groups: [], markups: [] }));
-        }
-      } finally {
-        yield put(config.actions.loading(false));
-        if (yield cancelled()) {
-          source.cancel();
+      } else {
+        yield put(config.actions.loading(true));
+        yield put(config.actions.clear(null));
+        try {
+          const [models, groups, markups]: [
+            Http.ListResponse<C>,
+            Http.ListResponse<Model.Group>,
+            Http.ListResponse<Model.Markup>
+          ] = yield all([call(requestAccounts, objId), call(requestGroups, objId), call(requestMarkups, objId)]);
+          if (models.data.length === 0 && isAuthenticatedConfig(config)) {
+            // If there is no table data, we want to default create two rows.
+            const response: Http.BulkCreateChildrenResponse<B, C> = yield call(
+              config.services.bulkCreate,
+              objId,
+              { data: [{}, {}] },
+              { cancelToken: source.token }
+            );
+            yield put(
+              config.actions.response({ models: response.children, groups: groups.data, markups: markups.data })
+            );
+          } else {
+            yield put(config.actions.response({ models: models.data, groups: groups.data, markups: markups.data }));
+          }
+        } catch (e: unknown) {
+          if (!(yield cancelled())) {
+            api.handleRequestError(e as Error, "There was an error retrieving the table data.");
+            yield put(config.actions.response({ models: [], groups: [], markups: [] }));
+          }
+        } finally {
+          yield put(config.actions.loading(false));
+          if (yield cancelled()) {
+            source.cancel();
+          }
         }
       }
     }
   }
 
-  const requestAccounts = (objId: number): Promise<Http.ListResponse<C>> =>
-    config.services.request(objId, { no_pagination: true }, { cancelToken: source.token });
+  const requestAccounts = (objId: number, ids?: number[]): Promise<Http.ListResponse<C>> =>
+    config.services.request(objId, { no_pagination: true, ids }, { cancelToken: source.token });
 
   const requestGroups = (objId: number): Promise<Http.ListResponse<Model.Group>> =>
     config.services.requestGroups(objId, { no_pagination: true }, { cancelToken: source.token });

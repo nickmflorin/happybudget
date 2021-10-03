@@ -119,6 +119,7 @@ const ActionType = {
       UpdateInState: "budget.account.comments.UpdateInState"
     },
     SubAccounts: {
+      Request: "budget.account.subaccounts.Request",
       TableChanged: "budget.account.subaccounts.TableChanged",
       Saving: "budget.account.subaccounts.Saving",
       Loading: "budget.account.subaccounts.Loading",

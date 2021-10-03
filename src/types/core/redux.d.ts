@@ -95,6 +95,8 @@ namespace Redux {
     data: Partial<T>;
   }
 
+  type TableRequestPayload = { ids: number[] } | null;
+
   interface ModelDetailResponseStore<T extends Model.HttpModel> {
     readonly data: T | null;
     readonly loading: boolean;
@@ -178,7 +180,7 @@ namespace Redux {
   type TableActionMap<M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
     readonly loading: boolean;
     readonly response: Http.TableResponse<M>;
-    readonly request?: null;
+    readonly request?: Redux.TableRequestPayload;
     readonly setSearch: string;
     readonly clear: null;
   };

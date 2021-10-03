@@ -12,7 +12,7 @@ export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Table
   ActionType.Actuals.TableChanged
 );
 export const savingTableAction = createAction<boolean>(ActionType.Actuals.Saving);
-export const requestAction = createAction<null>(ActionType.Actuals.Request);
+export const requestAction = createAction<Redux.TableRequestPayload>(ActionType.Actuals.Request);
 export const clearAction = createAction<null>(ActionType.Actuals.Clear);
 export const loadingAction = createAction<boolean>(ActionType.Actuals.Loading);
 export const responseAction = createAction<Http.TableResponse<Model.Actual>>(ActionType.Actuals.Response);

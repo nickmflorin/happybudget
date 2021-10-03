@@ -15,6 +15,7 @@ export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Table
 export const savingTableAction = createAction<boolean>(ActionType.Account.SubAccounts.Saving);
 export const clearAction = createAction<null>(ActionType.Account.SubAccounts.Clear);
 export const loadingAction = createAction<boolean>(ActionType.Account.SubAccounts.Loading);
+export const requestAction = createAction<Redux.TableRequestPayload>(ActionType.Account.SubAccounts.Request);
 export const responseAction = createAction<Http.TableResponse<Model.SubAccount>>(
   ActionType.Account.SubAccounts.Response
 );

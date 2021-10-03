@@ -99,6 +99,7 @@ const commentsSaga = budgeting.sagas.createCommentsListResponseSaga({
 });
 
 const ActionMap = {
+  request: actions.requestAction,
   updateParentInState: actions.updateInStateAction,
   tableChanged: actions.handleTableChangeEventAction,
   loading: actions.loadingAction,
@@ -148,7 +149,12 @@ function* watchForAccountIdChangedSaga(): SagaIterator {
   yield takeLatest(actions.setAccountIdAction.toString(), getData);
 }
 
+function* watchForRequestDataSaga(): SagaIterator {
+  yield takeLatest(actions.requestAction.toString(), getData);
+}
+
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForAccountIdChangedSaga);
+  yield spawn(watchForRequestDataSaga);
   yield spawn(tableSaga);
 }
