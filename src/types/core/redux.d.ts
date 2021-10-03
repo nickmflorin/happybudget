@@ -190,7 +190,7 @@ namespace Redux {
     readonly tableChanged: Table.ChangeEvent<R>;
     readonly saving: boolean;
     readonly addModelsToState: Redux.AddModelsToTablePayload<M>;
-    readonly updateModelsInState?: M[];
+    readonly updateModelsInState?: SingleOrArray<M>;
   };
 
   type TableStore<D extends Table.RowData = object> = {

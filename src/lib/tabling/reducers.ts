@@ -520,6 +520,36 @@ export const createAuthenticatedTableReducer = <
         },
         newState
       );
+    } else if (
+      !isNil(config.actions.updateModelsInState) &&
+      action.type === config.actions.updateModelsInState.toString()
+    ) {
+      const models: M[] = Array.isArray(action.payload) ? action.payload : [action.payload];
+      newState = reduce(
+        models,
+        (s: S, m: M) => {
+          const r: Table.ModelRow<R> | null = redux.reducers.findModelInData(
+            action,
+            filter(newState.data, (ri: Table.BodyRow<R>) => tabling.typeguards.isModelRow(ri)),
+            m.id
+          );
+          if (!isNil(r)) {
+            return {
+              ...s,
+              data: util.replaceInArray<Table.BodyRow<R>>(
+                s.data,
+                { id: r.id },
+                rows.createModelRow({
+                  model: m,
+                  columns: config.columns
+                })
+              )
+            };
+          }
+          return s;
+        },
+        newState
+      );
     }
     return newState;
   };
