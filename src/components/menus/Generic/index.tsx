@@ -88,6 +88,11 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
     return flattened;
   }, [hooks.useDeepEqualMemo(props.models)]);
 
+  const getModelIdentifier = useMemo(
+    () => (m: M) => !isNil(props.getModelIdentifier) ? props.getModelIdentifier(m) : m.id,
+    [props.getModelIdentifier]
+  );
+
   // This will only perform searching if clientSearching is not false.
   const models = ui.hooks.useDebouncedJSSearch<M>(search, _flattenedModels, {
     indices: props.searchIndices || ["id"],
@@ -97,10 +102,10 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   const indexMap = useMemo<{ [key: string]: number }>(() => {
     const mapping: { [key: string]: number } = {};
     map(models, (m: M, index: number) => {
-      mapping[String(m.id)] = index;
+      mapping[String(getModelIdentifier(m))] = index;
     });
     return mapping;
-  }, [hooks.useDeepEqualMemo(models)]);
+  }, [hooks.useDeepEqualMemo(models), getModelIdentifier]);
 
   const noData = useMemo(() => {
     return props.models.length === 0;
@@ -139,9 +144,11 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   }, [availableItems]);
 
   const topLevelModelItems = useMemo<GenericModelItem<M>[]>(() => {
-    const topLevelIds: (number | string)[] = map(props.models, (m: M) => m.id);
-    return filter(availableModelItems, (item: GenericModelItem<M>) => includes(topLevelIds, item.model.id));
-  }, [hooks.useDeepEqualMemo(props.models), hooks.useDeepEqualMemo(models), availableModelItems]);
+    const topLevelIds: (number | string)[] = map(props.models, (m: M) => getModelIdentifier(m));
+    return filter(availableModelItems, (item: GenericModelItem<M>) =>
+      includes(topLevelIds, getModelIdentifier(item.model))
+    );
+  }, [hooks.useDeepEqualMemo(props.models), hooks.useDeepEqualMemo(models), availableModelItems, getModelIdentifier]);
 
   const setIndexFromSelectedState = (selectedState: (number | string)[]) => {
     if (selectedState.length !== 0) {
@@ -153,7 +160,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
       forEach(selectedState, (id: ID | string) => {
         const m: GenericModelItem<M> | undefined = find(
           availableModelItems,
-          (item: GenericModelItem<M>) => item.model.id === id
+          (item: GenericModelItem<M>) => getModelIdentifier(item.model) === id
         );
         // It might be the case that the selected model does not exist in the
         // models, beacuse the models are filtered based on the search and the
@@ -243,7 +250,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
       const m: M = models[index];
       const menuElement = document.getElementById(menuId);
       if (!isNil(menuElement) && !isNil(m)) {
-        const item = document.getElementById(`${menuId}-item-${m.id}`);
+        const item = document.getElementById(`${menuId}-item-${getModelIdentifier(m)}`);
         if (!isNil(item)) {
           const top = menuElement.scrollTop;
           const bottom = menuElement.scrollTop + menuElement.clientHeight;
@@ -354,7 +361,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   const stateForModel = useMemo(
     () =>
       (sel: MenuItemId[], m: M): IMenuItemState<M> => ({
-        selected: includes(sel, m.id),
+        selected: includes(sel, getModelIdentifier(m)),
         model: m
       }),
     []
@@ -399,22 +406,22 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   const onMenuItemClick = hooks.useDynamicCallback((m: M, e: Table.CellDoneEditingEvent) => {
     m.onClick?.({ event: e, model: m, closeParentDropdown: props.closeParentDropdown });
     if (mode === "single") {
-      setSelected([m.id]);
+      setSelected([getModelIdentifier(m)]);
       props.onChange?.({
         event: e,
         model: m,
         selected: true,
-        state: stateFromSelected([m.id]),
+        state: stateFromSelected([getModelIdentifier(m)]),
         closeParentDropdown: props.closeParentDropdown
       });
     } else {
       let newSelected: MenuItemId[];
       let wasSelected: boolean;
-      if (includes(selected, m.id)) {
-        newSelected = filter(selected, (id: MenuItemId) => id !== m.id);
+      if (includes(selected, getModelIdentifier(m))) {
+        newSelected = filter(selected, (id: MenuItemId) => id !== getModelIdentifier(m));
         wasSelected = false;
       } else {
-        newSelected = [...selected, m.id];
+        newSelected = [...selected, getModelIdentifier(m)];
         wasSelected = true;
       }
       setSelected(newSelected);

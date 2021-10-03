@@ -86,6 +86,7 @@ type IMenu<M extends MenuItemModel> = StandardComponentProps & {
   readonly unfocusMenuOnSearchFocus?: boolean;
   readonly bordersForLevels?: boolean;
   readonly keepDropdownOpenOnClick?: boolean;
+  readonly getModelIdentifier?: (m: M) => ID;
   readonly getLabel?: (m: M) => string;
   readonly onChange?: (params: MenuChangeEvent<M>) => void;
   readonly onSearch?: (value: string) => void;

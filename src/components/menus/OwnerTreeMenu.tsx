@@ -17,14 +17,22 @@ export type OwnerTreeMenuProps = Omit<
   readonly childrenDefaultVisible?: boolean;
 };
 
+const isSubAccountTreeNode = (node: Model.OwnerTreeNode): node is Model.SubAccountOwnerTreeNode =>
+  (node as Model.SubAccountOwnerTreeNode).children !== undefined;
+
 const OwnerTreeMenu = ({ nodes, childrenDefaultVisible = true, ...props }: OwnerTreeMenuProps) => {
   return (
     <ModelMenu<Model.OwnerTreeNode>
       {...props}
       className={classNames("table-menu", "owner-tree-menu", props.className)}
       onChange={(params: MenuChangeEvent<Model.OwnerTreeNode>) => {
-        const { children, in_search_path, ...rest } = params.model;
-        props.onChange(rest, params.event);
+        if (isSubAccountTreeNode(params.model)) {
+          const { children, in_search_path, ...rest } = params.model;
+          props.onChange(rest, params.event);
+        } else {
+          const { in_search_path, ...rest } = params.model;
+          props.onChange(rest, params.event);
+        }
       }}
       getFirstSearchResult={(ms: Model.OwnerTreeNode[]) => {
         const inSearchPath = filter(ms, (m: Model.OwnerTreeNode) => m.in_search_path === true);
@@ -34,6 +42,7 @@ const OwnerTreeMenu = ({ nodes, childrenDefaultVisible = true, ...props }: Owner
         return null;
       }}
       models={nodes}
+      getModelIdentifier={(m: Model.OwnerTreeNode) => `${m.type}-${m.id}`}
       itemProps={{ className: "owner-tree-menu-item" }}
       levelIndent={6}
       bordersForLevels={true}

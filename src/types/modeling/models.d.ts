@@ -231,7 +231,6 @@ namespace Model {
   }
 
   interface MarkupOwnerTreeNode extends SimpleMarkup {
-    readonly children: OwnerTreeNode[];
     readonly in_search_path: boolean;
   }
 

@@ -114,7 +114,7 @@ export const getBudgetOwnerTree = async (
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.OwnerTreeNode>> => {
-  const url = services.URL.v1("budgets", id, "subaccounts", "tree");
+  const url = services.URL.v1("budgets", id, "subaccounts", "owner-tree");
   return client.list<Model.OwnerTreeNode>(url, query, options);
 };
 
