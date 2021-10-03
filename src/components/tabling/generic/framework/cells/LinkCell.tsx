@@ -8,7 +8,7 @@ import useFormattedValue from "./useFormattedValue";
 export type LinkCellProps<
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = Table.ValueCellProps<R, M, S> & {
   readonly href?: string | ((value: string | number | null) => string | undefined) | undefined;
   readonly rel?: string | undefined;
@@ -18,7 +18,7 @@ export type LinkCellProps<
 const LinkCell = <
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >({
   value,
   href,

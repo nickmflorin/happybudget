@@ -8,7 +8,7 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 const connectCellToStore = <
   R extends Table.RowData = object,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   T extends Table.CellProps<R, M, S> = Table.CellProps<R, M, S>
 >(
   Component: React.ComponentClass<T, {}> | React.FunctionComponent<T>

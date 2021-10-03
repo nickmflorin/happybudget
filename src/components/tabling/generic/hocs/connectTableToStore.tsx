@@ -5,11 +5,7 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 import { isNil } from "lodash";
 import { redux, tabling } from "lib";
 
-type ProvidedProps<
-  R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
-> = {
+type ProvidedProps<R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>> = {
   readonly search: string;
   readonly data: Table.BodyRow<R>[];
   readonly loading: boolean;
@@ -23,9 +19,8 @@ type ProvidedProps<
 export type WithConnectedTableProps<
   T,
   R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
-> = T & ProvidedProps<R, M, S>;
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
+> = T & ProvidedProps<R, S>;
 
 /* eslint-disable indent */
 const connectTableToStore =
@@ -33,14 +28,14 @@ const connectTableToStore =
     T,
     R extends Table.RowData,
     M extends Model.TypedHttpModel = Model.TypedHttpModel,
-    S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+    S extends Redux.TableStore<R> = Redux.TableStore<R>
   >(
     config: Table.StoreConfig<R, M, S>
   ) =>
   (
     Component:
-      | React.ComponentClass<WithConnectedTableProps<T, R, M, S>, {}>
-      | React.FunctionComponent<WithConnectedTableProps<T, R, M, S>>
+      | React.ComponentClass<WithConnectedTableProps<T, R, S>, {}>
+      | React.FunctionComponent<WithConnectedTableProps<T, R, S>>
   ): React.FunctionComponent<T> => {
     let selector: (state: Application.Store) => S = (state: Application.Store) =>
       redux.initialState.initialTableState as S;

@@ -10,7 +10,7 @@ export type UseModelMenuEditorParams<
   V = ID,
   R extends Table.RowData = Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = Table.EditorParams<R, M, S, V>;
 
 export type IEditor<
@@ -18,7 +18,7 @@ export type IEditor<
   C extends Model.Model = Model.Model,
   R extends Table.RowData = Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = Omit<UseModelMenuEditorParams<V, R, M, S>, "forwardedRef"> & {
   readonly onChange: (value: V | null, e: Table.CellDoneEditingEvent, stopEditing?: boolean) => void;
   readonly isFirstRender: boolean;
@@ -33,7 +33,7 @@ const useModelMenuEditor = <
   V = C,
   R extends Table.RowData = Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   params: UseModelMenuEditorParams<V, R, M, S> & { readonly forwardedRef: ForwardedRef<any> }
 ): [IEditor<V, C, R, M, S>] => {

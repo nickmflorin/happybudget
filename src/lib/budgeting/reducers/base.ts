@@ -8,11 +8,7 @@ import { redux, tabling, util, model } from "lib";
  * specific rowId.
  */
 /* eslint-disable indent */
-export const markupRowFromState = <
-  R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
->(
+export const markupRowFromState = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
   action: Redux.Action,
   st: S,
   id: Table.MarkupRowId,
@@ -34,14 +30,14 @@ export const markupRowFromState = <
 export type BudgetTableReducerConfig<
   R extends Tables.AccountRowData | Tables.SubAccountRowData,
   M extends Model.Account | Model.SubAccount,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
 > = Table.ReducerConfig<R, M, S, A>;
 
 export const createBudgetTableReducer = <
   R extends Tables.AccountRowData | Tables.SubAccountRowData,
   M extends Model.Account | Model.SubAccount,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
 >(
   config: BudgetTableReducerConfig<R, M, S, A>
@@ -52,7 +48,7 @@ export const createBudgetTableReducer = <
 export const createBudgetTableChangeEventReducer = <
   R extends Tables.AccountRowData | Tables.SubAccountRowData,
   M extends Model.Account | Model.SubAccount,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
   config: BudgetTableReducerConfig<R, M, S, A>
@@ -87,7 +83,7 @@ export const createBudgetTableChangeEventReducer = <
       need to perform any recalculations or manipulations of the Markup itself,
       just the children that belong to the Markup.
       */
-      const markupRow: Table.MarkupRow<R> | null = markupRowFromState<R, M, S>(
+      const markupRow: Table.MarkupRow<R> | null = markupRowFromState<R, S>(
         action,
         newState,
         tabling.rows.markupRowId(e.payload.id)
@@ -169,7 +165,7 @@ export const createBudgetTableChangeEventReducer = <
       */
       const ids: Table.ModelRowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
 
-      const mk = markupRowFromState<R, M, S>(action, newState, e.payload.markup);
+      const mk = markupRowFromState<R, S>(action, newState, e.payload.markup);
       if (!isNil(mk)) {
         newState = {
           ...newState,
@@ -197,7 +193,7 @@ export const createBudgetTableChangeEventReducer = <
 export const createAuthenticatedBudgetTableReducer = <
   R extends Tables.AccountRowData | Tables.SubAccountRowData,
   M extends Model.Account | Model.SubAccount,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
   config: BudgetTableReducerConfig<R, M, S, A> & {

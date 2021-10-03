@@ -38,7 +38,7 @@ const DataGrid =
     M extends Model.HttpModel = Model.HttpModel,
     T extends DataGridProps<R, M> = DataGridProps<R, M>
   >(
-    config?: TableUi.DataGridConfig<R, M>
+    config?: Table.DataGridConfig<R>
   ) =>
   (
     Component: React.ComponentClass<WithDataGridProps<T>, {}> | React.FunctionComponent<WithDataGridProps<T>>

@@ -3,18 +3,18 @@ import { framework } from "components/tabling/generic";
 import { ValueCell, GroupCell } from "components/tabling/generic/framework/cells";
 
 interface IdentifierCellProps<
-  R extends Table.RowData,
+  R extends Tables.BudgetRowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.BudgetTableStore<R, M> = Redux.BudgetTableStore<R, M>
+  S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
 > extends Table.ValueCellProps<R, M, S> {
   readonly onGroupEdit?: (group: Table.GroupRow<R>) => void;
 }
 
 /* eslint-disable indent */
 const IdentifierCell = <
-  R extends Table.RowData,
+  R extends Tables.BudgetRowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.BudgetTableStore<R, M> = Redux.BudgetTableStore<R, M>
+  S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
 >({
   onGroupEdit,
   ...props

@@ -66,9 +66,9 @@ const PageFooterGrid = FooterGrid<any, any, AuthenticatedGridProps<any, any>>({
 const AuthenticatedTable = <
   R extends Table.RowData,
   M extends Model.TypedHttpModel = Model.TypedHttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
-  props: WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<R, M>, R>, R, M, S>
+  props: WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<R, M>, R>, R, S>
 ): JSX.Element => {
   const [selectedRows, setSelectedRows] = useState<Table.EditableRow<R>[]>([]);
 

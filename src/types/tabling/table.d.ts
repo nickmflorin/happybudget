@@ -114,10 +114,10 @@ namespace Table {
   type BodyRow<D extends RowData = RowData> = ModelRow<D> | PlaceholderRow<D> | GroupRow<D> | MarkupRow<D>;
   type Row<D extends RowData = RowData> = BodyRow<D> | FooterRow;
 
-  type RowWithColor<D extends RowData = RowData> = BodyRow<D & { color: Style.HexColor | null }>
-  type RowWithName<D extends RowData = RowData> = BodyRow<D & { name: string | null }>
-  type RowWithDescription<D extends RowData = RowData> = BodyRow<D & { description: string | null }>
-  type RowWithIdentifier<D extends RowData = RowData> = BodyRow<D & { identifier: string | null }>
+  type RowWithColor<D extends RowData = RowData> = BodyRow<D & { color: Style.HexColor | null }>;
+  type RowWithName<D extends RowData = RowData> = BodyRow<D & { name: string | null }>;
+  type RowWithDescription<D extends RowData = RowData> = BodyRow<D & { description: string | null }>;
+  type RowWithIdentifier<D extends RowData = RowData> = BodyRow<D & { identifier: string | null }>;
 
   type CreateTableDataConfig<
     R extends RowData,
@@ -176,11 +176,7 @@ namespace Table {
     readonly columns: Column<R, M>[];
   };
 
-  interface BaseColumn<
-    R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
-    D extends Domain = Domain
-  > {
+  interface BaseColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel, D extends Domain = Domain> {
     readonly field?: keyof R;
     readonly colId?: string;
     readonly domain: D;
@@ -258,6 +254,7 @@ namespace Table {
 
   type OmitColDefParams =
     | "field"
+    | "colId"
     | "headerName"
     | "cellRenderer"
     | "cellClass"
@@ -572,7 +569,7 @@ namespace Table {
   interface EditorParams<
     R extends RowData,
     M extends Model.HttpModel = Model.HttpModel,
-    S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+    S extends Redux.TableStore<R> = Redux.TableStore<R>,
     V = any
   > {
     readonly value: V | null;
@@ -604,7 +601,7 @@ namespace Table {
   interface CellProps<
     R extends RowData,
     M extends Model.HttpModel = Model.HttpModel,
-    S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+    S extends Redux.TableStore<R> = Redux.TableStore<R>,
     V = any
   > extends Omit<import("@ag-grid-community/core").ICellRendererParams, "value">,
       StandardComponentProps {
@@ -629,7 +626,7 @@ namespace Table {
   type CellWithChildrenProps<
     R extends RowData,
     M extends Model.HttpModel = Model.HttpModel,
-    S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+    S extends Redux.TableStore<R> = Redux.TableStore<R>
   > = Omit<CellProps<R, M, S>, "value"> & {
     readonly children: import("react").ReactNode;
   };
@@ -637,7 +634,7 @@ namespace Table {
   type ValueCellProps<
     R extends RowData,
     M extends Model.HttpModel = Model.HttpModel,
-    S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+    S extends Redux.TableStore<R> = Redux.TableStore<R>
   > = CellProps<R, M, S, string | number | null> & {
     // This is used for extending cells.  Normally, the value formatter will be included on the ColDef
     // of the associated column.  But when extending a Cell, we sometimes want to provide a formatter
@@ -646,6 +643,27 @@ namespace Table {
   };
 
   type RowDataSelector<R extends RowData> = (state: Application.Store) => Partial<R>;
+
+  interface DataGridConfig<R extends RowData> {
+    readonly refreshRowExpandColumnOnCellHover?: (row: Row<R>) => boolean;
+  }
+
+  type AuthenticatedDataGridConfig<R extends RowData> = DataGridConfig<R> & {
+    readonly rowCanDelete?: (row: EditableRow<R>) => boolean;
+    readonly includeRowInNavigation?: (row: EditableRow<R>) => boolean;
+  };
+
+  type UnauthenticatedDataGridConfig<R extends RowData> = {
+    readonly includeRowInNavigation?: (row: EditableRow<R>) => boolean;
+  };
+
+  type FooterGridConfig<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
+    readonly id: "page" | "footer";
+    readonly rowClass: RowClassName;
+    readonly className: GeneralClassName;
+    readonly rowHeight?: number;
+    readonly getFooterColumn: (column: Column<R, M>) => FooterColumn<R, M> | null;
+  };
 
   type TaskConfig<
     R extends RowData,
@@ -658,7 +676,7 @@ namespace Table {
   type ReducerConfig<
     R extends RowData,
     M extends Model.TypedHttpModel = Model.TypedHttpModel,
-    S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+    S extends Redux.TableStore<R> = Redux.TableStore<R>,
     A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>,
     CFG extends CreateTableDataConfig<R, M, Column<R, M>> = CreateTableDataConfig<R, M, Column<R, M>>
   > = TaskConfig<R, M, A> &
@@ -677,7 +695,7 @@ namespace Table {
   type StoreConfig<
     R extends RowData,
     M extends Model.TypedHttpModel = Model.TypedHttpModel,
-    S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+    S extends Redux.TableStore<R> = Redux.TableStore<R>,
     A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
   > = {
     readonly autoRequest?: boolean;

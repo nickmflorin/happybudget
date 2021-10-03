@@ -8,7 +8,7 @@ export interface ModelSelectEditorProps<
   C extends Model.HttpModel,
   R extends Table.RowData = Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends GenericModelMenuEditorProps<C, C, R, M, S>,
     UseModelMenuEditorParams<C, R, M, S>,
     StandardComponentProps {
@@ -21,7 +21,7 @@ const ModelSelectEditor = <
   C extends Model.HttpModel,
   R extends Table.RowData = Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   { models, ...props }: ModelSelectEditorProps<C, R, M, S>,
   ref: ForwardedRef<any>
@@ -45,7 +45,7 @@ export default forwardRef(ModelSelectEditor) as {
     C extends Model.HttpModel,
     R extends Table.RowData = Table.RowData,
     M extends Model.HttpModel = Model.HttpModel,
-    S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+    S extends Redux.TableStore<R> = Redux.TableStore<R>
   >(
     props: ModelSelectEditorProps<C, R, M, S> & { ref: ForwardedRef<any> }
   ): JSX.Element;

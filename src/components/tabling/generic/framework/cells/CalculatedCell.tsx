@@ -8,7 +8,7 @@ import connectCellToStore from "./connectCellToStore";
 export interface CalculatedCellProps<
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends Table.ValueCellProps<R, M, S> {
   readonly renderRedIfNegative?: boolean;
 }
@@ -17,7 +17,7 @@ export interface CalculatedCellProps<
 const CalculatedCell = <
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >({
   renderRedIfNegative = false,
   ...props

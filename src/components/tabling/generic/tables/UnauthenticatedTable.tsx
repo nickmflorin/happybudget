@@ -58,7 +58,7 @@ const PageFooterGrid = FooterGrid<any, any, UnauthenticatedGridProps<any>>({
 
 /* eslint-disable indent */
 const UnauthenticatedTable = <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
-  props: WithConnectedTableProps<WithConfiguredTableProps<UnauthenticatedTableProps<R, M>, R>, R, M>
+  props: WithConnectedTableProps<WithConfiguredTableProps<UnauthenticatedTableProps<R, M>, R>, R>
 ): JSX.Element => {
   /**
    * Note: Ideally, we would be including the selector in the mechanics of the

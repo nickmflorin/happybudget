@@ -10,6 +10,10 @@ export interface ExportCSVDropdownProps<R extends Table.RowData, M extends Model
   readonly hiddenColumns?: (keyof R | string)[];
 }
 
+const colField = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  col: Table.Column<R, M>
+): keyof R | string | undefined => (col.field !== undefined ? col.field : col.colId);
+
 /* eslint-disable indent */
 const ExportCSVDropdown = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   props: ExportCSVDropdownProps<R, M>
@@ -17,7 +21,12 @@ const ExportCSVDropdown = <R extends Table.RowData, M extends Model.HttpModel = 
   const [selected, setSelected] = useState<(keyof R)[]>([]);
 
   const exportableColumns = useMemo<Table.Column<R, M>[]>(
-    () => filter(props.columns, (col: Table.Column<R, M>) => col.canBeExported !== false),
+    () =>
+      filter(
+        props.columns,
+        (col: Table.Column<R, M>) =>
+          col.canBeExported !== false && col.tableColumnType !== "fake" && !isNil(colField(col))
+      ),
     [props.columns]
   );
 

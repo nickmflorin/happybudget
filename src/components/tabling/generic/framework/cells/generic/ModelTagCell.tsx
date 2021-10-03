@@ -6,7 +6,7 @@ import Cell from "./Cell";
 export interface ModelTagCellProps<
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   V extends Model.HttpModel = Model.HttpModel
 > extends Table.CellProps<R, M, S, V | null> {
   readonly leftAlign?: boolean;
@@ -17,7 +17,7 @@ export interface ModelTagCellProps<
 const ModelTagCell = <
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   V extends Model.HttpModel = Model.HttpModel
 >({
   value,

@@ -2,7 +2,6 @@
 /// <reference path="./layout.d.ts" />
 /// <reference path="./tagging.d.ts" />
 /// <reference path="./style.d.ts" />
-/// <reference path="./table.d.ts" />
 /// <reference path="./forms.d.ts" />
 /// <reference path="./pdf.d.ts" />
 

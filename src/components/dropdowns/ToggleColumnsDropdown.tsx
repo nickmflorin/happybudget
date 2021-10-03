@@ -19,7 +19,12 @@ const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.HttpMode
   props: ToggleColumnsDropdownProps<R, M>
 ): JSX.Element => {
   const hideableColumns = useMemo<Table.Column<R, M>[]>(
-    () => filter(props.columns, (col: Table.Column<R, M>) => col.canBeHidden !== false && !isNil(colField(col))),
+    () =>
+      filter(
+        props.columns,
+        (col: Table.Column<R, M>) =>
+          col.canBeHidden !== false && col.tableColumnType !== "fake" && !isNil(colField(col))
+      ),
     [props.columns]
   );
 

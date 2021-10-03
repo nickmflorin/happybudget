@@ -5,7 +5,7 @@ import LinkCell, { LinkCellProps } from "./LinkCell";
 const EmailCell = <
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   props: LinkCellProps<R, M, S>
 ): JSX.Element => {

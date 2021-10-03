@@ -10,11 +10,7 @@ import * as rows from "./rows";
 import * as typeguards from "./typeguards";
 
 /* eslint-disable indent */
-export const groupRowFromState = <
-  R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
->(
+export const groupRowFromState = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
   action: Redux.Action,
   st: S,
   id: Table.GroupRowId,
@@ -33,11 +29,7 @@ export const groupRowFromState = <
   );
 };
 
-export const rowGroupRowFromState = <
-  R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
->(
+export const rowGroupRowFromState = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
   action: Redux.Action,
   st: S,
   rowId: Table.ModelRowId | Table.MarkupRowId,
@@ -55,7 +47,7 @@ export const rowGroupRowFromState = <
 const rowRemoveFromGroupReducer = <
   R extends Table.RowData,
   M extends Model.TypedHttpModel = Model.TypedHttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   st: S,
   action: Redux.Action<Table.RowRemoveFromGroupEvent>,
@@ -71,7 +63,7 @@ const rowRemoveFromGroupReducer = <
 
   const ids: Table.ModelRowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
 
-  const g: Table.GroupRow<R> | null = groupRowFromState<R, M, S>(action, st, e.payload.group);
+  const g: Table.GroupRow<R> | null = groupRowFromState<R, S>(action, st, e.payload.group);
   if (!isNil(g)) {
     return {
       ...st,
@@ -97,7 +89,7 @@ const rowRemoveFromGroupReducer = <
 const rowAddToGroupReducer = <
   R extends Table.RowData,
   M extends Model.TypedHttpModel = Model.TypedHttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   st: S,
   action: Redux.Action<Table.RowAddToGroupEvent>,
@@ -112,7 +104,7 @@ const rowAddToGroupReducer = <
 
   const ids: Table.ModelRowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
 
-  const g: Table.GroupRow<R> | null = groupRowFromState<R, M, S>(action, st, e.payload.group);
+  const g: Table.GroupRow<R> | null = groupRowFromState<R, S>(action, st, e.payload.group);
   if (!isNil(g)) {
     const rws = redux.reducers.findModelsInData<Table.ModelRow<R>>(
       action,
@@ -143,7 +135,7 @@ const rowAddToGroupReducer = <
 const removeRowsFromTheirGroupsIfTheyExist = <
   R extends Table.RowData,
   M extends Model.TypedHttpModel = Model.TypedHttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   st: S,
   action: Redux.Action,
@@ -172,7 +164,7 @@ const removeRowsFromTheirGroupsIfTheyExist = <
         r = rowId;
       }
       if (!isNil(r)) {
-        let groupRow = rowGroupRowFromState<R, M, S>(action, st, r.id, { warnIfMissing: false });
+        let groupRow = rowGroupRowFromState<R, S>(action, st, r.id, { warnIfMissing: false });
         if (!isNil(groupRow)) {
           // This will be overwrittten if a group belongs to multiple rows associated with the provided
           // IDS - but that is what we want, because we want the final values to have the most up to
@@ -215,7 +207,7 @@ const removeRowsFromTheirGroupsIfTheyExist = <
 const rowDeleteReducer = <
   R extends Table.RowData,
   M extends Model.TypedHttpModel = Model.TypedHttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   st: S,
   action: Redux.Action<Table.RowDeleteEvent>,
@@ -255,7 +247,7 @@ const rowDeleteReducer = <
 export const createTableChangeEventReducer = <
   R extends Table.RowData,
   M extends Model.TypedHttpModel = Model.TypedHttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
   config: Table.ReducerConfig<R, M, S, A> & {
@@ -400,7 +392,7 @@ export const createTableChangeEventReducer = <
         ])
       };
     } else if (typeguards.isGroupUpdateEvent(e)) {
-      const groupRow: Table.GroupRow<R> | null = groupRowFromState<R, M, S>(
+      const groupRow: Table.GroupRow<R> | null = groupRowFromState<R, S>(
         action,
         newState,
         tabling.rows.groupRowId(e.payload.id)
@@ -427,7 +419,7 @@ export const createTableChangeEventReducer = <
 export const createTableReducer = <
   R extends Table.RowData,
   M extends Model.TypedHttpModel = Model.TypedHttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
 >(
   config: Table.ReducerConfig<R, M, S, A>
@@ -445,8 +437,6 @@ export const createTableReducer = <
       if (!isNil(config.createTableRows)) {
         newState = {
           ...newState,
-          models: response.models,
-          groups: response.groups || [],
           data: config.createTableRows({
             ...config,
             response
@@ -455,8 +445,6 @@ export const createTableReducer = <
       } else {
         newState = {
           ...newState,
-          models: response.models,
-          groups: response.groups || [],
           data: data.createTableRows<R, M>({
             ...config,
             response
@@ -476,7 +464,7 @@ export const createTableReducer = <
 export const createUnauthenticatedTableReducer = <
   R extends Table.RowData,
   M extends Model.TypedHttpModel = Model.TypedHttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   config: Table.ReducerConfig<R, M, S, Redux.TableActionMap<M>>
 ): Redux.Reducer<S> => {
@@ -486,7 +474,7 @@ export const createUnauthenticatedTableReducer = <
 export const createAuthenticatedTableReducer = <
   R extends Table.RowData,
   M extends Model.TypedHttpModel = Model.TypedHttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
   config: Table.ReducerConfig<R, M, S, A> & {

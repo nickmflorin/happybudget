@@ -12,7 +12,7 @@ export type Props = Omit<AuthenticatedModelTableProps<R, M>, "columns"> & {
   readonly exportFileName: string;
 };
 
-const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Props, R, M>): JSX.Element => {
+const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Props, R>): JSX.Element => {
   const table = tabling.hooks.useTableIfNotDefined<R>(props.table);
   return (
     <AuthenticatedModelTable<R, M>

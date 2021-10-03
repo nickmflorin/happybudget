@@ -6,7 +6,7 @@ import connectCellToStore from "./connectCellToStore";
 const BodyCell = <
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >({
   value,
   ...props

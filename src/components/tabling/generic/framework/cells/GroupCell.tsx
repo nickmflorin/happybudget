@@ -9,7 +9,7 @@ import { Cell, ValueCell } from "components/tabling/generic/framework/cells";
 interface GroupCellProps<
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends Table.ValueCellProps<R, M, S> {
   readonly onEdit?: (group: Table.GroupRow<R>) => void;
 }
@@ -18,7 +18,7 @@ interface GroupCellProps<
 const GroupCell = <
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >({
   onEdit,
   ...props

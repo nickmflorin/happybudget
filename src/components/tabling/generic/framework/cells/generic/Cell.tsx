@@ -12,7 +12,7 @@ import LoadableCellWrapper from "./LoadableCellWrapper";
 const Cell = <
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   props: Table.CellWithChildrenProps<R, M, S>
 ): JSX.Element => {

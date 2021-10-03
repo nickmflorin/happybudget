@@ -28,7 +28,7 @@ const unauthenticatedDataGrid =
     M extends Model.HttpModel = Model.HttpModel,
     T extends UnauthenticateDataGridProps<R, M> = UnauthenticateDataGridProps<R, M>
   >(
-    config?: TableUi.UnauthenticatedDataGridConfig<R, M>
+    config?: Table.UnauthenticatedDataGridConfig<R>
   ) =>
   (
     Component:

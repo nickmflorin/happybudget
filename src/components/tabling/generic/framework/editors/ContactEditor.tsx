@@ -11,7 +11,7 @@ import { GenericModelMenuEditor } from "./generic";
 interface ContactEditorProps<
   R extends Table.RowData & { readonly contact: number | null },
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends Table.EditorParams<R, M, S> {
   readonly onNewContact: (params: { name?: string; change: Omit<Table.SoloCellChange<R>, "newValue"> }) => void;
 }
@@ -20,7 +20,7 @@ interface ContactEditorProps<
 const ContactEditor = <
   R extends Table.RowData & { readonly contact: number | null },
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   props: ContactEditorProps<R, M, S>,
   ref: ForwardedRef<any>

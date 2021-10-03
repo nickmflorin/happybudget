@@ -27,7 +27,7 @@ const ActualsTable = ({
   onNewContact,
   onEditContact,
   ...props
-}: WithConnectedTableProps<Props, R, M>): JSX.Element => {
+}: WithConnectedTableProps<Props, R>): JSX.Element => {
   const table = tabling.hooks.useTableIfNotDefined<R>(props.table);
 
   return (

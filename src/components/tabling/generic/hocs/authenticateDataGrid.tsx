@@ -48,10 +48,10 @@ export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Mo
   readonly tableId: Table.Id;
   readonly columns: Table.Column<R, M>[];
   readonly data: Table.BodyRow<R>[];
+  readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
   readonly generateNewRowData?: (rows: Table.BodyRow<R>[]) => Partial<R>;
   readonly rowHasCheckboxSelection: ((row: Table.EditableRow<R>) => boolean) | undefined;
   readonly onRowSelectionChanged: (rows: Table.EditableRow<R>[]) => void;
-  readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
   readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
   readonly isCellEditable?: (params: Table.CellCallbackParams<R, M>) => boolean;
   readonly onChangeEvent: (event: Table.ChangeEvent<R>) => void;
@@ -68,7 +68,7 @@ const authenticateDataGrid =
     M extends Model.HttpModel = Model.HttpModel,
     T extends AuthenticateDataGridProps<R, M> = AuthenticateDataGridProps<R, M>
   >(
-    config?: TableUi.AuthenticatedDataGridConfig<R, M>
+    config?: Table.AuthenticatedDataGridConfig<R>
   ) =>
   (
     Component:

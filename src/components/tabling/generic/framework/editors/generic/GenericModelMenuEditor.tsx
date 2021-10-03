@@ -7,7 +7,7 @@ export interface GenericModelMenuEditorProps<
   C extends Model.HttpModel = Model.HttpModel,
   R extends Table.RowData = Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends Table.EditorParams<R, M, S, V>,
     ModelTagsMenuProps<C>,
     StandardComponentProps {
@@ -22,7 +22,7 @@ const GenericModelMenuEditor = <
   V = ID,
   R extends Table.RowData = Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   props: GenericModelMenuEditorProps<V, C, R, M, S>
 ) => {

@@ -10,7 +10,7 @@ import { IconButton } from "components/buttons";
 export interface ExpandCellProps<
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends Table.CellProps<R, M, S, null> {
   readonly onEditRow?: (row: Table.BodyRow<R>) => void;
   readonly onExpand?: (row: Table.ModelRow<R>) => void;
@@ -59,7 +59,7 @@ const ExpandAction = <R extends Table.RowData>(props: {
 const ExpandCell = <
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >({
   rowCanExpand,
   onEditRow,

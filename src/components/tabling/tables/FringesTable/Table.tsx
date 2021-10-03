@@ -15,7 +15,7 @@ export interface Props extends Omit<AuthenticatedModelTableProps<R, M>, "columns
   readonly exportFileName: string;
 }
 
-const FringesTable: React.FC<WithConnectedTableProps<Props, R, M, S>> = ({ exportFileName, ...props }): JSX.Element => {
+const FringesTable: React.FC<WithConnectedTableProps<Props, R, S>> = ({ exportFileName, ...props }): JSX.Element => {
   const table = tabling.hooks.useTableIfNotDefined<R>(props.table);
 
   return (

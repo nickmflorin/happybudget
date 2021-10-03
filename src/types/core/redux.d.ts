@@ -56,14 +56,10 @@ namespace Redux {
 
   type Dispatch = import("redux").Dispatch<Redux.Action>;
 
-  type ActionOptions = {
-    readonly type: string;
-    // readonly asyncId?: Table.AsyncId;
-    readonly isAuthenticated?: boolean | undefined;
-  };
-
-  interface Action<P = any> extends import("redux").AnyAction, ActionOptions {
+  interface Action<P = any> {
     readonly payload: P;
+    readonly type: string;
+    readonly isAuthenticated?: boolean | undefined;
   }
 
   type AuthenticatedAction<P = any> = Action<P> & { readonly isAuthenticated?: true | undefined };
@@ -194,12 +190,11 @@ namespace Redux {
     readonly tableChanged: Table.ChangeEvent<R>;
     readonly saving: boolean;
     readonly addModelsToState: Redux.AddModelsToTablePayload<M>;
+    readonly updateModelsInState?: M[];
   };
 
-  type TableStore<D extends Table.RowData = object, M extends Model.HttpModel = Model.HttpModel> = {
+  type TableStore<D extends Table.RowData = object> = {
     readonly data: Table.BodyRow<D>[];
-    readonly models: M[];
-    readonly groups: Model.Group[];
     readonly search: string;
     readonly loading: boolean;
     readonly saving: boolean;
@@ -210,10 +205,7 @@ namespace Redux {
     readonly models: M[];
   };
 
-  type BudgetTableStore<
-    R extends Table.RowData = object,
-    M extends Model.HttpModel = Model.HttpModel
-  > = Redux.TableStore<R, M>;
+  type BudgetTableStore<R extends Tables.BudgetRowData> = Redux.TableStore<R>;
 
   interface CommentsListResponseStore extends Redux.ModelListResponseStore<Model.Comment> {
     readonly replying: number[];

@@ -10,7 +10,7 @@ import { Cell } from "./generic";
 interface ContactCellProps<
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends Table.CellProps<R, M, S, number | null> {
   readonly onEditContact: (id: number) => void;
 }
@@ -19,7 +19,7 @@ interface ContactCellProps<
 const ContactCell = <
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >({
   value,
   ...props

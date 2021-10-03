@@ -81,8 +81,8 @@ export type TableConfigurationProps<R extends Table.RowData, M extends Model.Htt
   readonly className?: Table.GeneralClassName;
   readonly columns: Table.Column<R, M>[];
   readonly expandActionBehavior?: Table.ExpandActionBehavior | ((r: Table.BodyRow<R>) => Table.ExpandActionBehavior);
-  readonly onEditRow?: (g: Table.EditableRow<R>) => void;
   readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
+  readonly onEditRow?: (g: Table.EditableRow<R>) => void;
   readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
   readonly isCellSelectable?: (params: Table.CellCallbackParams<R, M>) => boolean;
