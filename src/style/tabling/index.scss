@@ -25,6 +25,18 @@
   }
 }
 
+@mixin grid_row_height($height) {
+  .row {
+    > .cell {
+      line-height: $height;
+
+      &.ag-cell-inline-editing {
+        height: $height;
+      }
+    }
+  }
+}
+
 @mixin grid_background($color) {
   // Fixes problem with range selection and hover causing white "blocks" in table.
   .ag-root .ag-body-viewport:not(.ag-has-focus) .ag-cell-range-selected-1:not(.ag-cell-inline-editing) {
@@ -119,6 +131,8 @@
       z-index: 1;
     }
 
+    @include grid_row_height(36px);
+
     .row {
       border: none !important;
       color: #3a3a3a;
@@ -130,7 +144,6 @@
       }
 
       > .cell {
-        line-height: 36px;
         padding-left: 6px;
         padding-right: 6px;
         font-size: 13px;
@@ -180,7 +193,6 @@
         }
 
         &.ag-cell-inline-editing {
-          height: 36px;
           border-radius: 0px !important;
 
           .ag-input-field-input,
@@ -498,6 +510,7 @@
 
     .core-table {
       .grid--data {
+        @include grid_row_height(40px);
         @include grid_background($white);
         .row {
           > .cell {

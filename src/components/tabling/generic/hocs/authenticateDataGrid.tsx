@@ -232,7 +232,7 @@ const authenticateDataGrid =
       const getColumn = useMemo(
         () =>
           (field: keyof R | string): Table.Column<R, M> | null => {
-            const foundColumn = find(columns, { field } as any);
+            const foundColumn = find(columns, (c: Table.Column<R, M>) => c.field === field || c.colId === field);
             if (!isNil(foundColumn)) {
               return foundColumn;
             } else {
