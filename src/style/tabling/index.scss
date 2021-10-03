@@ -25,6 +25,34 @@
   }
 }
 
+@mixin grid_background($color) {
+  // Fixes problem with range selection and hover causing white "blocks" in table.
+  .ag-root .ag-body-viewport:not(.ag-has-focus) .ag-cell-range-selected-1:not(.ag-cell-inline-editing) {
+    background-color: $color !important;
+  }
+  .row:not(.ag-row-hover) {
+    > .cell {
+      background-color: $color;
+      &.ag-cell-range-selected {
+        background-color: $color;
+      }
+    }
+  }
+}
+
+@mixin footer_grid_background($color) {
+  @include grid_background($color);
+  .row {
+    > .cell {
+      // Here, we use the !important flag because the rows should not change color on hover.
+      background-color: $color !important;
+      &.ag-cell-range-selected {
+        background-color: $color !important;
+      }
+    }
+  }
+}
+
 .table {
   display: flex;
   flex-direction: column;
@@ -106,7 +134,6 @@
         padding-left: 6px;
         padding-right: 6px;
         font-size: 13px;
-        background-color: $white;
         font-family: $roboto;
         font-weight: 400;
         overflow: hidden;
@@ -289,10 +316,7 @@
     .grid--data {
       max-height: calc(100% - 40px);
 
-      // Fixes problem with range selection and hover causing white "blocks" in table.
-      .ag-root .ag-body-viewport:not(.ag-has-focus) .ag-cell-range-selected-1:not(.ag-cell-inline-editing) {
-        background-color: $white !important;
-      }
+      @include grid_background($white);
 
       .ag-root-wrapper {
         overflow: visible;
@@ -401,16 +425,11 @@
         border-bottom-right-radius: 8px;
       }
 
-      // Fixes problem with range selection and hover causing white "blocks" in table.
-      .ag-root .ag-body-viewport:not(.ag-has-focus) .ag-cell-range-selected-1:not(.ag-cell-inline-editing) {
-        background-color: $table-border-color !important;
-      }
+      @include footer_grid_background($table-border-color);
 
       .row {
         border-bottom: none !important;
-
         > .cell {
-          background-color: $table-border-color;
           border: none !important;
 
           &[aria-colindex="1"] {
@@ -418,9 +437,6 @@
           }
           &.ag-cell-range-right {
             border-bottom-right-radius: 8px;
-          }
-          &.ag-cell-range-selected {
-            background-color: $table-border-color;
           }
         }
       }
@@ -442,16 +458,12 @@
         border-radius: 8px;
       }
 
-      // Fixes problem with range selection and hover causing white "blocks" in table.
-      .ag-root .ag-body-viewport:not(.ag-has-focus) .ag-cell-range-selected-1:not(.ag-cell-inline-editing) {
-        background-color: #d3d3d3 !important;
-      }
+      @include footer_grid_background(#d3d3d3);
 
       .row {
         border-bottom: none !important;
 
         > .cell {
-          background-color: #d3d3d3 !important;
           border: none !important;
           line-height: 28px;
 
@@ -462,9 +474,6 @@
           &.ag-cell-range-right {
             border-bottom-right-radius: 8px;
             border-top-right-radius: 8px;
-          }
-          &.ag-cell-range-selected {
-            background-color: #d3d3d3 !important;
           }
         }
       }
@@ -489,11 +498,10 @@
 
     .core-table {
       .grid--data {
+        @include grid_background($white);
         .row {
           > .cell {
-            background-color: $white;
             font-family: $avenir;
-
             .link--table {
               font-family: $avenir;
               text-align: inherit !important;
@@ -502,9 +510,9 @@
         }
       }
       .grid--table-footer {
+        @include footer_grid_background($white);
         .row {
           > .cell {
-            background-color: $white;
             font-family: $avenir;
           }
         }
