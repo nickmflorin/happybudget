@@ -206,9 +206,9 @@ namespace Http {
     readonly group?: number | null;
   }
 
-  interface ActualPayload extends Omit<Http.ModelPayload<Model.Actual>, "subaccount" | "payment_method"> {
+  interface ActualPayload extends Omit<Http.ModelPayload<Model.Actual>, "owner" | "payment_method"> {
     readonly payment_method?: Model.PaymentMethodId | null;
-    readonly subaccount?: number | null;
+    readonly owner?: Model.GenericHttpModel<"subaccount"> | Model.GenericHttpModel<"markup"> | null;
   }
 
   interface CommentPayload {

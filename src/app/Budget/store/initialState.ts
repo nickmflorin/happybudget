@@ -56,7 +56,7 @@ const initialState: Modules.Budget.Store = {
   headerTemplates: initialHeaderTemplatesState,
   actuals: {
     ...redux.initialState.initialTableState,
-    subAccountsTree: redux.initialState.initialModelListResponseState
+    ownerTree: redux.initialState.initialModelListResponseState
   }
 };
 

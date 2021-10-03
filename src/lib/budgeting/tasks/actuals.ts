@@ -11,19 +11,19 @@ type M = Model.Actual;
 type P = Http.ActualPayload;
 
 export type ActualsTableActionMap = Redux.AuthenticatedTableActionMap<R, M> & {
-  readonly loadingSubAccountsTree: boolean;
-  readonly restoreSubAccountsTreeSearchCache: null;
-  readonly responseSubAccountsTree: Http.ListResponse<Model.SubAccountTreeNode>;
+  readonly loadingOwnerTree: boolean;
+  readonly restoreOwnerTreeSearchCache: null;
+  readonly responseOwnerTree: Http.ListResponse<Model.OwnerTreeNode>;
 };
 
 export type ActualsTableTaskConfig = Table.TaskConfig<R, M, ActualsTableActionMap> & {
   readonly selectObjId: (state: Application.Authenticated.Store) => number | null;
   readonly selectTreeSearch: (state: Application.Authenticated.Store) => string;
-  readonly selectTreeCache: (state: Application.Authenticated.Store) => Redux.SearchCache<Model.SubAccountTreeNode>;
+  readonly selectTreeCache: (state: Application.Authenticated.Store) => Redux.SearchCache<Model.OwnerTreeNode>;
 };
 
 export type ActualsTableTaskMap = Redux.TableTaskMap<R> & {
-  readonly requestSubAccountsTree: null;
+  readonly requestOwnerTree: null;
 };
 
 export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMapObject<ActualsTableTaskMap> => {
@@ -36,7 +36,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
       yield put(config.actions.loading(true));
       yield put(config.actions.clear(null));
       try {
-        yield all([call(requestActuals, budgetId), call(requestSubAccountsTree, action)]);
+        yield all([call(requestActuals, budgetId), call(requestOwnerTree, action)]);
       } catch (e: unknown) {
         if (!(yield cancelled())) {
           api.handleRequestError(e as Error, "There was an error retrieving the table data.");
@@ -72,7 +72,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
     }
   }
 
-  function* requestSubAccountsTree(action: Redux.Action<null>): SagaIterator {
+  function* requestOwnerTree(action: Redux.Action<null>): SagaIterator {
     // We have to perform the select() inside of this task, instead of providing budgetId as a param,
     // because there is a saga that listens for an search action to be dispatched and then calls this
     // task.
@@ -81,25 +81,25 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
       const search = yield select(config.selectTreeSearch);
       const cache = yield select(config.selectTreeCache);
       if (!isNil(cache[search])) {
-        yield put(config.actions.restoreSubAccountsTreeSearchCache(null));
+        yield put(config.actions.restoreOwnerTreeSearchCache(null));
       } else {
-        yield put(config.actions.loadingSubAccountsTree(true));
+        yield put(config.actions.loadingOwnerTree(true));
         try {
           // TODO: Eventually we will want to build in pagination for this.
           const response = yield call(
-            api.getBudgetSubAccountsTree,
+            api.getBudgetOwnerTree,
             budgetId,
             { no_pagination: true, search },
             { cancelToken: source.token }
           );
-          yield put(config.actions.responseSubAccountsTree(response));
+          yield put(config.actions.responseOwnerTree(response));
         } catch (e: unknown) {
           if (!(yield cancelled())) {
             api.handleRequestError(e as Error, "There was an error retrieving the budget's items.");
-            yield put(config.actions.responseSubAccountsTree({ count: 0, data: [] }));
+            yield put(config.actions.responseOwnerTree({ count: 0, data: [] }));
           }
         } finally {
-          yield put(config.actions.loadingSubAccountsTree(false));
+          yield put(config.actions.loadingOwnerTree(false));
           if (yield cancelled()) {
             source.cancel();
           }
@@ -214,7 +214,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
 
   return {
     request,
-    requestSubAccountsTree,
+    requestOwnerTree,
     handleChangeEvent: tabling.tasks.createChangeEventHandler({
       rowAdd: handleRowAddEvent,
       rowDelete: handleRowDeleteEvent,

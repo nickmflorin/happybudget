@@ -2,12 +2,12 @@ import React, { useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { isAccountOrSubAccountForm } from "lib/model/typeguards";
+import { model } from "lib";
 
 import "./EntityText.scss";
 
 export interface EntityTextProps extends StandardComponentProps {
-  readonly children: Model.Entity | Model.PdfEntity | Model.SimpleEntity;
+  readonly children: Model.HttpModel;
   readonly fillEmpty?: boolean | string;
 }
 
@@ -51,19 +51,21 @@ export const EntityTextIdentifier = ({ className, style, ...props }: TextProps):
   );
 };
 
+/* eslint-disable indent */
 const EntityText: React.FC<EntityTextProps> = ({ children, className, fillEmpty, style = {} }) => {
-  const identifier = useMemo(() => {
-    if (isAccountOrSubAccountForm(children)) {
-      return children.identifier;
-    }
-    return children.name;
-  }, [children]);
-  const description = useMemo(() => {
-    if (isAccountOrSubAccountForm(children)) {
-      return children.description;
-    }
-    return undefined;
-  }, [children]);
+  const identifier = useMemo(
+    () =>
+      model.typeguards.isModelWithIdentifier(children)
+        ? children.identifier
+        : model.typeguards.isModelWithName(children)
+        ? children.name
+        : undefined,
+    [children]
+  );
+  const description = useMemo(
+    () => (model.typeguards.isModelWithDescription(children) ? children.description : undefined),
+    [children]
+  );
 
   return (
     <span className={classNames("entity-text", className)} style={style}>

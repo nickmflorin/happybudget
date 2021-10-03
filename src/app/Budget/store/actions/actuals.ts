@@ -1,14 +1,12 @@
 import { createAction } from "@reduxjs/toolkit";
 import ActionType from "./ActionType";
 
-export const responseSubAccountsTreeAction = createAction<Http.ListResponse<Model.SubAccountTreeNode>>(
-  ActionType.SubAccountsTree.Response
+export const responseOwnerTreeAction = createAction<Http.ListResponse<Model.OwnerTreeNode>>(
+  ActionType.OwnerTree.Response
 );
-export const restoreSubAccountsTreeSearchCacheAction = createAction<null>(
-  ActionType.SubAccountsTree.RestoreSearchCache
-);
-export const setSubAccountsTreeSearchAction = createAction<string>(ActionType.SubAccountsTree.SetSearch);
-export const loadingSubAccountsTreeAction = createAction<boolean>(ActionType.SubAccountsTree.Loading);
+export const restoreOwnerTreeSearchCacheAction = createAction<null>(ActionType.OwnerTree.RestoreSearchCache);
+export const setOwnerTreeSearchAction = createAction<string>(ActionType.OwnerTree.SetSearch);
+export const loadingOwnerTreeAction = createAction<boolean>(ActionType.OwnerTree.Loading);
 
 export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.ActualRowData>>(
   ActionType.Actuals.TableChanged

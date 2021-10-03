@@ -4,12 +4,12 @@ import * as editors from "./editors";
 const FrameworkComponents: Table.Framework = {
   editors: {
     PaymentMethodEditor: editors.PaymentMethodEditor,
-    SubAccountsTreeEditor: editors.SubAccountsTreeEditor
+    OwnerTreeEditor: editors.OwnerTreeEditor
   },
   cells: {
     data: {
       PaymentMethodCell: cells.PaymentMethodCell,
-      SubAccountCell: cells.SubAccountCell
+      OwnerCell: cells.OwnerCell
     }
   }
 };

@@ -134,11 +134,11 @@ const ActionType = {
       Request: "budget.account.history.Request"
     }
   },
-  SubAccountsTree: {
-    Response: "budget.subaccountstree.Response",
-    Loading: "budget.subaccountstree.Loading",
-    SetSearch: "budget.subaccountstree.SetSearch",
-    RestoreSearchCache: "budget.subaccountstree.RestoreSearchCache"
+  OwnerTree: {
+    Response: "budget.ownertree.Response",
+    Loading: "budget.ownertree.Loading",
+    SetSearch: "budget.ownertree.SetSearch",
+    RestoreSearchCache: "budget.ownertree.RestoreSearchCache"
   },
   Actuals: {
     TableChanged: "budget.actuals.TableChanged",

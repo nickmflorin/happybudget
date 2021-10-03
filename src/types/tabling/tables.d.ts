@@ -30,12 +30,12 @@ namespace Tables {
 
   type ActualRowData = Pick<
     Model.Actual,
-    "description" | "purchase_order" | "date" | "payment_method" | "payment_id" | "value" | "contact" | "subaccount"
+    "description" | "purchase_order" | "date" | "payment_method" | "payment_id" | "value" | "contact" | "owner"
   >;
 
   type ActualRow = Table.BodyRow<ActualRowData>;
   type ActualTableStore = Redux.TableStore<ActualRowData, Model.Actual> & {
-    readonly subAccountsTree: Redux.ModelListResponseStore<Model.SubAccountTreeNode>;
+    readonly ownerTree: Redux.ModelListResponseStore<Model.OwnerTreeNode>;
   };
 
   type PdfSubAccountRowData = SubAccountRowData;

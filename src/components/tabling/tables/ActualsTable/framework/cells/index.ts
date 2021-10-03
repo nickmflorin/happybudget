@@ -1,2 +1,2 @@
-export { default as SubAccountCell } from "./SubAccountCell";
+export { default as OwnerCell } from "./OwnerCell";
 export { default as PaymentMethodCell } from "./PaymentMethodCell";

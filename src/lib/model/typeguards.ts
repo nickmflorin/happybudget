@@ -49,42 +49,24 @@ export const isModelWithGroup = <M extends Model.Model>(
 ): m is M & { readonly group: Model.Group | null } =>
   (m as M & { readonly group: Model.Group | null }).group !== undefined;
 
-export const isBudgetForm = (obj: Model.Entity | Model.SimpleEntity): obj is Model.BudgetForm => {
-  return (obj as Model.BudgetForm).type === "budget";
-};
-
-export const isTemplateForm = (obj: Model.Entity | Model.SimpleEntity): obj is Model.TemplateForm => {
-  return (obj as Model.TemplateForm).type === "template";
-};
-
-export const isAccountForm = (obj: Model.Entity | Model.PdfEntity | Model.SimpleEntity): obj is Model.AccountForm => {
-  return (obj as Model.AccountForm).type === "account";
-};
-
-export const isSubAccountForm = (
-  obj: Model.Entity | Model.PdfEntity | Model.SimpleEntity
-): obj is Model.SubAccountForm => {
-  return (obj as Model.SubAccountForm).type === "subaccount";
-};
-
-export const isAccountOrSubAccountForm = (
-  obj: Model.Entity | Model.PdfEntity | Model.SimpleEntity
-): obj is Model.AccountForm | Model.SubAccountForm => {
-  return isAccountForm(obj) || isSubAccountForm(obj);
-};
-
-export const isBudgetOrTemplateForm = (
-  obj: Model.Entity | Model.SimpleEntity
-): obj is Model.BudgetForm | Model.TemplateForm => {
-  return isBudgetForm(obj) || isTemplateForm(obj);
-};
-
 export const isModelWithColor = (model: Model.Model | Model.ModelWithColor): model is Model.ModelWithColor => {
   return (model as Model.ModelWithColor).color !== undefined;
 };
 
 export const isModelWithName = (model: Model.Model | Model.ModelWithName): model is Model.ModelWithName => {
   return (model as Model.ModelWithName).name !== undefined;
+};
+
+export const isModelWithDescription = (
+  model: Model.Model | Model.ModelWithDescription
+): model is Model.ModelWithDescription => {
+  return (model as Model.ModelWithDescription).description !== undefined;
+};
+
+export const isModelWithIdentifier = (
+  model: Model.Model | Model.ModelWithIdentifier
+): model is Model.ModelWithIdentifier => {
+  return (model as Model.ModelWithIdentifier).identifier !== undefined;
 };
 
 export const isTag = (model: Model.Model | Model.Tag): model is Model.Tag => {

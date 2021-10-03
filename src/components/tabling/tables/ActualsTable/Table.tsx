@@ -15,7 +15,7 @@ type PreContactCreate = Omit<Table.SoloCellChange<R>, "newValue">;
 export type Props = Omit<AuthenticatedModelTableProps<R, M>, "columns"> & {
   readonly exportFileName: string;
   readonly contacts: Model.Contact[];
-  readonly onSubAccountsTreeSearch: (value: string) => void;
+  readonly onOwnerTreeSearch: (value: string) => void;
   readonly onNewContact: (params: { name?: string; change: PreContactCreate }) => void;
   readonly onEditContact: (id: number) => void;
 };
@@ -23,7 +23,7 @@ export type Props = Omit<AuthenticatedModelTableProps<R, M>, "columns"> & {
 const ActualsTable = ({
   exportFileName,
   contacts,
-  onSubAccountsTreeSearch,
+  onOwnerTreeSearch,
   onNewContact,
   onEditContact,
   ...props
@@ -47,30 +47,33 @@ const ActualsTable = ({
         framework.actions.ExportCSVAction(table.current, params, exportFileName)
       ]}
       columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(Columns, {
-        subaccount: (col: Table.Column<R, M>) =>
+        owner: (col: Table.Column<R, M>) =>
           framework.columnObjs.SelectColumn<R, M>({
             ...col,
             processCellFromClipboard: (name: string) => {
               if (name.trim() === "") {
                 return null;
               }
-              const availableSubAccounts: Model.SimpleSubAccount[] = filter(
+              const availableOwners: (Model.SimpleSubAccount | Model.SimpleMarkup)[] = filter(
                 map(
                   filter(props.data, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)),
-                  (row: Table.BodyRow<R>) => row.data.subaccount
+                  (row: Table.BodyRow<R>) => row.data.owner
                 ),
-                (sub: Model.SimpleSubAccount | null) => sub !== null && sub.identifier !== null
+                (owner: Model.SimpleSubAccount | Model.SimpleMarkup | null) =>
+                  owner !== null && owner.identifier !== null
               ) as Model.SimpleSubAccount[];
-              // NOTE: If there are multiple sub accounts with the same identifier, this will
+              // NOTE: If there are multiple owners with the same identifier, this will
               // return the first and issue a warning.
-              const subaccount = model.util.inferModelFromName<Model.SimpleSubAccount>(availableSubAccounts, name, {
-                nameField: "identifier"
-              });
+              const subaccount = model.util.inferModelFromName<Model.SimpleSubAccount | Model.SimpleMarkup>(
+                availableOwners,
+                name,
+                { nameField: "identifier" }
+              );
               return subaccount;
             },
             cellEditorParams: {
               ...col.cellEditorParams,
-              setSearch: (value: string) => onSubAccountsTreeSearch(value)
+              setSearch: (value: string) => onOwnerTreeSearch(value)
             }
           }),
         contact: (col: Table.Column<R, M>) =>

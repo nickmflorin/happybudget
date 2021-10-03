@@ -233,19 +233,19 @@ const genericReducer = combineReducers({
       setSearch: actions.actuals.setSearchAction
     },
     columns: ActualsTable.Columns,
-    subAccountsTree: redux.reducers.createModelListResponseReducer<
-      Model.SubAccountTreeNode,
+    ownerTree: redux.reducers.createModelListResponseReducer<
+      Model.OwnerTreeNode,
       Pick<
-        Redux.ModelListResponseActionMap<Model.SubAccountTreeNode>,
+        Redux.ModelListResponseActionMap<Model.OwnerTreeNode>,
         "loading" | "response" | "restoreSearchCache" | "setSearch"
       >
     >({
       initialState: redux.initialState.initialModelListResponseState,
       actions: {
-        loading: actions.actuals.loadingSubAccountsTreeAction,
-        response: actions.actuals.responseSubAccountsTreeAction,
-        restoreSearchCache: actions.actuals.restoreSubAccountsTreeSearchCacheAction,
-        setSearch: actions.actuals.setSubAccountsTreeSearchAction
+        loading: actions.actuals.loadingOwnerTreeAction,
+        response: actions.actuals.responseOwnerTreeAction,
+        restoreSearchCache: actions.actuals.restoreOwnerTreeSearchCacheAction,
+        setSearch: actions.actuals.setOwnerTreeSearchAction
       }
     })
   }),

@@ -42,6 +42,11 @@ namespace Model {
     readonly updated_by: number;
   }
 
+  type GenericHttpModel<T extends HttpModelType> = {
+    readonly type: T;
+    readonly id: number;
+  }
+
   interface TrackedModel extends UserTrackedModel, TimestampTrackedModel {}
 
   interface Choice<I extends number, N extends string> {
@@ -78,8 +83,8 @@ namespace Model {
 
   type BudgetType = "budget" | "template";
   type EntityType = BudgetType | LineType;
-  type Entity = LineItem | Budget | Template;
-  type SimpleEntity = SimpleLineItem | SimpleBudget | SimpleTemplate;
+  type Entity = LineItem | Budget | Template | Markup;
+  type SimpleEntity = SimpleLineItem | SimpleBudget | SimpleTemplate | SimpleMarkup;
   type PdfEntity = PdfLineItem | PdfBudget;
 
   type TemplateForm = Template | SimpleTemplate;
@@ -89,6 +94,8 @@ namespace Model {
 
   type ModelWithColor = HttpModel & { color: Style.HexColor | null };
   type ModelWithName = HttpModel & { name: string | null };
+  type ModelWithDescription = HttpModel & { description: string | null };
+  type ModelWithIdentifier = HttpModel & { identifier: string | null };
 
   interface Tag extends TimestampTrackedModel {
     readonly title: string;
@@ -126,10 +133,14 @@ namespace Model {
     readonly unit: FringeUnit | null;
   }
 
-  interface Markup extends TrackedModel {
+  interface SimpleMarkup {
+    readonly id: number;
     readonly type: "markup";
     readonly identifier: string | null;
     readonly description: string | null;
+  }
+
+  interface Markup extends TrackedModel, SimpleMarkup {
     readonly unit: MarkupUnit | null;
     readonly rate: number | null;
     readonly children: number[];
@@ -214,10 +225,17 @@ namespace Model {
     readonly type: "subaccount";
   }
 
-  interface SubAccountTreeNode extends SimpleSubAccount {
-    readonly children: SubAccountTreeNode[];
+  interface SubAccountOwnerTreeNode extends SimpleSubAccount {
+    readonly children: OwnerTreeNode[];
     readonly in_search_path: boolean;
   }
+
+  interface MarkupOwnerTreeNode extends SimpleMarkup {
+    readonly children: OwnerTreeNode[];
+    readonly in_search_path: boolean;
+  }
+
+  type OwnerTreeNode = SubAccountOwnerTreeNode | MarkupOwnerTreeNode;
 
   // Abstract -- not meant for external reference.
   interface AbstractAccount extends SimpleAccount, LineMetrics {}
@@ -269,7 +287,7 @@ namespace Model {
     readonly payment_id: string | null;
     readonly value: number | null;
     readonly payment_method: PaymentMethod | null;
-    readonly subaccount: SimpleSubAccount | null;
+    readonly owner: SimpleSubAccount | SimpleMarkup | null;
   }
 
   interface Comment extends TimestampTrackedModel {

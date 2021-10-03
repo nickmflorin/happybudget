@@ -67,7 +67,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
       <ConnectedActualsTable
         tableId={"actuals-table"}
         contacts={contacts}
-        onSubAccountsTreeSearch={(value: string) => dispatch(actions.actuals.setSubAccountsTreeSearchAction(value))}
+        onOwnerTreeSearch={(value: string) => dispatch(actions.actuals.setOwnerTreeSearchAction(value))}
         exportFileName={!isNil(budget) ? `${budget.name}_actuals` : "actuals"}
         onNewContact={() => setCreateContactModalVisible(true)}
         onEditContact={(id: number) => setContactToEdit(id)}

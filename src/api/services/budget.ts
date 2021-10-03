@@ -109,13 +109,13 @@ export const getBudgetSubAccounts = async (
   return client.list<Model.SimpleSubAccount>(url, query, options);
 };
 
-export const getBudgetSubAccountsTree = async (
+export const getBudgetOwnerTree = async (
   id: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.SubAccountTreeNode>> => {
+): Promise<Http.ListResponse<Model.OwnerTreeNode>> => {
   const url = services.URL.v1("budgets", id, "subaccounts", "tree");
-  return client.list<Model.SubAccountTreeNode>(url, query, options);
+  return client.list<Model.OwnerTreeNode>(url, query, options);
 };
 
 export const getBudgetActuals = async (

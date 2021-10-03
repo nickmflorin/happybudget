@@ -15,21 +15,21 @@ const ActionMap: Redux.ActionMapObject<budgeting.tasks.actuals.ActualsTableActio
   saving: actions.savingTableAction,
   addModelsToState: actions.addModelsToStateAction,
   setSearch: actions.setSearchAction,
-  responseSubAccountsTree: actions.responseSubAccountsTreeAction,
-  restoreSubAccountsTreeSearchCache: actions.restoreSubAccountsTreeSearchCacheAction,
-  loadingSubAccountsTree: actions.loadingSubAccountsTreeAction
+  responseOwnerTree: actions.responseOwnerTreeAction,
+  restoreOwnerTreeSearchCache: actions.restoreOwnerTreeSearchCacheAction,
+  loadingOwnerTree: actions.loadingOwnerTreeAction
 };
 
 const tasks = budgeting.tasks.actuals.createTableTaskSet({
   columns: ActualsTable.Columns,
   selectObjId: (state: Application.Authenticated.Store) => state.budget.id,
-  selectTreeCache: (state: Application.Authenticated.Store) => state.budget.actuals.subAccountsTree.cache,
-  selectTreeSearch: (state: Application.Authenticated.Store) => state.budget.actuals.subAccountsTree.search,
+  selectTreeCache: (state: Application.Authenticated.Store) => state.budget.actuals.ownerTree.cache,
+  selectTreeSearch: (state: Application.Authenticated.Store) => state.budget.actuals.ownerTree.search,
   actions: ActionMap
 });
 
 function* searchTreeSaga(): SagaIterator {
-  yield debounce(250, actions.setSubAccountsTreeSearchAction.toString(), tasks.requestSubAccountsTree);
+  yield debounce(250, actions.setOwnerTreeSearchAction.toString(), tasks.requestOwnerTree);
 }
 
 const tableSaga = tabling.sagas.createAuthenticatedTableSaga<

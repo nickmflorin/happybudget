@@ -9,25 +9,27 @@ type M = Model.Actual;
 
 const Columns: Table.Column<R, M>[] = [
   framework.columnObjs.SelectColumn<R, M>({
-    field: "subaccount",
+    field: "owner",
     headerName: "Sub-Account",
     minWidth: 200,
     maxWidth: 200,
     width: 200,
-    getHttpValue: (value: Model.SimpleSubAccount | null): ID | null => {
+    getHttpValue: (
+      value: Model.SimpleSubAccount | Model.SimpleMarkup | null
+    ): Model.GenericHttpModel<"markup"> | Model.GenericHttpModel<"subaccount"> | null => {
       if (!isNil(value)) {
-        return value.id;
+        return { id: value.id, type: value.type };
       }
       return value;
     },
     processCellForClipboard: (row: R) => {
-      if (!isNil(row.subaccount)) {
-        return row.subaccount.identifier || "";
+      if (!isNil(row.owner)) {
+        return row.owner.identifier || "";
       }
       return "";
     },
-    cellRenderer: { data: "SubAccountCell" },
-    cellEditor: "SubAccountsTreeEditor"
+    cellRenderer: { data: "OwnerCell" },
+    cellEditor: "OwnerTreeEditor"
   }),
   framework.columnObjs.BodyColumn<R, M>({
     field: "description",

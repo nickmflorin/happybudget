@@ -8,7 +8,7 @@ export const createAuthenticatedActualsTableReducer = (
     Tables.ActualTableStore,
     Redux.AuthenticatedTableActionMap<Tables.ActualRowData, Model.Actual>
   > & {
-    readonly subAccountsTree: Redux.Reducer<Redux.ModelListResponseStore<Model.SubAccountTreeNode>>;
+    readonly ownerTree: Redux.Reducer<Redux.ModelListResponseStore<Model.OwnerTreeNode>>;
   }
 ): Redux.Reducer<Tables.ActualTableStore> => {
   type S = Tables.ActualTableStore;
@@ -21,6 +21,6 @@ export const createAuthenticatedActualsTableReducer = (
 
   return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
     let newState = generic(state, action);
-    return { ...newState, subAccountsTree: config.subAccountsTree(newState.subAccountsTree, action) };
+    return { ...newState, ownerTree: config.ownerTree(newState.ownerTree, action) };
   };
 };
