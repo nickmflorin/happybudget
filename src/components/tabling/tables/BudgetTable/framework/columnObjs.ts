@@ -132,7 +132,7 @@ export const ActualColumn = <R extends Tables.BudgetRowData, M extends Model.Htt
         const row: Table.Row<R> = params.node.data;
         // If the row is a FooterRow, the value will be provided via footerRowSelectors.
         if (tabling.typeguards.isBodyRow(row)) {
-          if (tabling.typeguards.isDataRow(row)) {
+          if (tabling.typeguards.isDataRow(row) || tabling.typeguards.isMarkupRow(row)) {
             return row.data.actual;
           } else {
             // Note: We do not have to exclude row's by ID because the primary Row here
@@ -141,11 +141,7 @@ export const ActualColumn = <R extends Tables.BudgetRowData, M extends Model.Htt
               tabling.aggrid.getRows<R, Table.BodyRow<R>>(params.api),
               (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) && includes(row.children, r.id)
             ) as Table.ModelRow<R>[];
-            if (tabling.typeguards.isMarkupRow(row)) {
-              return reduce(childrenRows, (curr: number, r: Table.ModelRow<R>) => curr + r.data.actual, 0.0);
-            } else {
-              return reduce(childrenRows, (curr: number, r: Table.ModelRow<R>) => curr + r.data.actual, 0.0);
-            }
+            return reduce(childrenRows, (curr: number, r: Table.ModelRow<R>) => curr + r.data.actual, 0.0);
           }
         }
       }
