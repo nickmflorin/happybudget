@@ -16,6 +16,10 @@ type FnWithTypedArgs<T, ARGS extends any[]> = (...args: ARGS) => T;
 
 type NonNullable<T> = Exclude<T, null | undefined>;
 
+type Writeable<T extends { [x: string]: any }, K extends string> = {
+  [P in K]: T[P];
+}
+
 type SingleOrArray<T> = T | T[];
 
 type FlattenIfArray<T> = T extends (infer R)[] ? R : T

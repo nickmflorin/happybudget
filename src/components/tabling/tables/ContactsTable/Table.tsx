@@ -26,11 +26,9 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
       indexColumnWidth={40}
       rowHeight={40}
       expandCellTooltip={"Edit"}
-      getModelRowName={(r: Table.ModelRow<R>) =>
-        util.conditionalJoinString(r.data.names_and_image.first_name, r.data.names_and_image.last_name)
-      }
+      getModelRowName={(r: Table.ModelRow<R>) => util.conditionalJoinString(r.data.first_name, r.data.last_name)}
       getPlaceholderRowName={(r: Table.PlaceholderRow<R>) =>
-        util.conditionalJoinString(r.data.names_and_image.first_name, r.data.names_and_image.last_name)
+        util.conditionalJoinString(r.data.first_name, r.data.last_name)
       }
       getModelRowLabel={"Contact"}
       getPlaceholderRowLabel={"Contact"}
@@ -39,13 +37,14 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
         framework.actions.ToggleColumnAction<R, M>(table.current, params),
         framework.actions.ExportCSVAction<R, M>(table.current, params, exportFileName)
       ]}
-      columns={util.updateInArray<Table.Column<R, M>>(
-        Columns,
-        { field: "names_and_image" },
-        {
-          onCellDoubleClicked: (row: Table.BodyRow<R>) => tabling.typeguards.isModelRow(row) && props.onRowExpand?.(row)
-        }
-      )}
+      columns={Columns}
+      // columns={util.updateInArray<Table.Column<R, M>>(
+      //   Columns,
+      //   { field: "names_and_image" },
+      //   {
+      //     onCellDoubleClicked: (row: Table.BodyRow<R>) => tabling.typeguards.isModelRow(row) && props.onRowExpand?.(row)
+      //   }
+      // )}
     />
   );
 };

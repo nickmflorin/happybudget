@@ -1,19 +1,43 @@
-import { model, tabling } from "lib";
+import { isNil } from "lodash";
+import { ValueGetterParams, ValueSetterParams } from "@ag-grid-community/core";
 
+import { model, tabling, util } from "lib";
 import { framework } from "components/tabling/generic";
 
 type R = Tables.ContactRowData;
 type M = Model.Contact;
 
 const Columns: Table.Column<Tables.ContactRowData, M>[] = [
+  framework.columnObjs.FakeColumn({ field: "first_name" }),
+  framework.columnObjs.FakeColumn({ field: "last_name" }),
+  framework.columnObjs.FakeColumn({ field: "image" }),
   framework.columnObjs.BodyColumn<R, M>({
-    field: "names_and_image",
+    colId: "names_and_image",
     headerName: "Name",
     columnType: "text",
     cellRenderer: { data: "ContactNameCell" },
-    editable: false,
+    editable: true,
     cellClass: "cell--renders-html",
-    getRowValue: (m: M) => ({ image: m.image, first_name: m.first_name, last_name: m.last_name })
+    valueSetter: (params: ValueSetterParams) => {
+      if (params.newValue === undefined || params.newValue === "" || params.newValue === null) {
+        params.data.data.first_name = null;
+        params.data.data.last_name = null;
+      } else {
+        const parsed = model.util.parseFirstAndLastName(params.newValue);
+        params.data.data.first_name = parsed[0];
+        params.data.data.last_name = parsed[1];
+      }
+      return true;
+    },
+    valueGetter: (params: ValueGetterParams) => {
+      if (!isNil(params.node)) {
+        const row: Table.Row<Tables.ContactRowData> = params.node.data;
+        if (tabling.typeguards.isBodyRow(row)) {
+          return util.conditionalJoinString(row.data.first_name, row.data.last_name);
+        }
+      }
+      return null;
+    }
   }),
   framework.columnObjs.ChoiceSelectColumn<R, M, Model.ContactType>({
     field: "contact_type",

@@ -44,9 +44,7 @@ namespace Tables {
   type PdfAccountRowData = AccountRowData;
   type PdfAccountRow = Table.BodyRow<PdfAccountRowData>;
 
-  type ContactRowData = Pick<Model.Contact, "contact_type" | "company" | "position" | "phone_number" | "email"> & {
-    readonly names_and_image: Model.ContactNamesAndImage;
-  };
+  type ContactRowData = Pick<Model.Contact, "contact_type" | "company" | "position" | "phone_number" | "email" | "first_name" | "last_name" | "image">;
 
   type ContactRow = Table.BodyRow<ContactRowData>;
   type ContactTableStore = Redux.TableStore<ContactRowData>;

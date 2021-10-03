@@ -16,14 +16,16 @@ export const patchPayloadForChange = <
   return reduce(
     cols,
     (p: P, col: Table.Column<R, M>) => {
-      const cellChange: Table.CellChange<R, Table.RowValue<R>> | undefined = change.data[col.field];
-      // We might not be including data for all of the cells in the row.
-      if (cellChange !== undefined) {
-        let httpValue = cellChange.newValue as unknown as M[keyof M];
-        if (!isNil(col.getHttpValue)) {
-          httpValue = col.getHttpValue(httpValue);
+      if (!isNil(col.field)) {
+        const cellChange: Table.CellChange<R, Table.RowValue<R>> | undefined = change.data[col.field];
+        // We might not be including data for all of the cells in the row.
+        if (cellChange !== undefined) {
+          let httpValue = cellChange.newValue as unknown as M[keyof M];
+          if (!isNil(col.getHttpValue)) {
+            httpValue = col.getHttpValue(httpValue);
+          }
+          return { ...p, [col.field as unknown as keyof P]: httpValue as unknown as P[keyof P] };
         }
-        return { ...p, [col.field as unknown as keyof P]: httpValue as unknown as P[keyof P] };
       }
       return p;
     },
