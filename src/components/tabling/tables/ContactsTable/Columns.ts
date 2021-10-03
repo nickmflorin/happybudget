@@ -10,7 +10,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     field: "names_and_image",
     headerName: "Name",
     columnType: "text",
-    cellRenderer: "ContactNameCell",
+    cellRenderer: { data: "ContactNameCell" },
     editable: false,
     cellClass: "cell--renders-html",
     getRowValue: (m: M) => ({ image: m.image, first_name: m.first_name, last_name: m.last_name })

@@ -171,6 +171,7 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
             tableColumnType,
             nullValue,
             domain,
+            defaultHidden,
             refreshColumns,
             onCellDoubleClicked,
             processCellForClipboard,

@@ -16,7 +16,7 @@ const AuthenticatedModelTable = <R extends Table.RowData, M extends Model.TypedH
 ): JSX.Element => {
   return (
     <AuthenticatedTable<R, M> {...props}>
-      {(params: AuthenticatedTableDataGridProps<R, M>) => <AuthenticatedDataGrid<R, M> {...params} />}
+      {(params: AuthenticatedTableDataGridProps<R, M>) => <AuthenticatedDataGrid<R, M> {...props} {...params} />}
     </AuthenticatedTable>
   );
 };

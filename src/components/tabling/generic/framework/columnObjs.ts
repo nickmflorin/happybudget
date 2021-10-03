@@ -92,7 +92,7 @@ export const ExpandColumn = <R extends Table.RowData, M extends Model.HttpModel 
 ): Table.Column<R, M> =>
   ActionColumn({
     /* eslint-disable indent */
-    cellRenderer: "ExpandCell",
+    cellRenderer: { data: "ExpandCell" },
     ...col,
     width: !isNil(width) ? width : 30,
     maxWidth: !isNil(width) ? width : 30,
