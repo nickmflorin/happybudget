@@ -145,16 +145,9 @@ function* getData(action: Redux.Action<any>): SagaIterator {
   yield all([call(getAccount, action), call(Tasks.request, action)]);
 }
 
-function* watchForAccountIdChangedSaga(): SagaIterator {
-  yield takeLatest(actions.setAccountIdAction.toString(), getData);
-}
-
-function* watchForRequestDataSaga(): SagaIterator {
-  yield takeLatest(actions.requestAction.toString(), getData);
-}
-
 export default function* rootSaga(): SagaIterator {
-  yield spawn(watchForAccountIdChangedSaga);
-  yield spawn(watchForRequestDataSaga);
+  yield takeLatest(actions.setAccountIdAction.toString(), getData);
+  yield takeLatest(actions.requestAction.toString(), getData);
+  yield takeLatest(actions.requestAccountAction.toString(), getAccount);
   yield spawn(tableSaga);
 }

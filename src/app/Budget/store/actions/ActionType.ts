@@ -64,6 +64,7 @@ const ActionType = {
     AddToState: "budget.history.AddToState"
   },
   SubAccount: {
+    Request: "budget.subaccount.Request",
     SetId: "budget.subaccount.SetId",
     Loading: "budget.subaccount.Loading",
     Response: "budget.subaccount.Response",
@@ -84,6 +85,7 @@ const ActionType = {
       UpdateInState: "budget.subaccount.comments.UpdateInState"
     },
     SubAccounts: {
+      Request: "budget.subaccount.subaccounts.Request",
       TableChanged: "budget.subaccount.subaccounts.TableChanged",
       Saving: "budget.subaccount.subaccounts.Saving",
       SetSearch: "budget.subaccount.subaccounts.SetSearch",
@@ -99,6 +101,7 @@ const ActionType = {
     }
   },
   Account: {
+    Request: "budget.account.Request",
     SetId: "budget.account.SetId",
     Loading: "budget.account.Loading",
     Response: "budget.account.Response",

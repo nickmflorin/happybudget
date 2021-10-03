@@ -44,28 +44,6 @@ export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
   }
 }
 
-function* getSubAccount(action: Redux.Action<null>): SagaIterator {
-  const subaccountId = yield select((state: Application.Authenticated.Store) => state.budget.subaccount.id);
-  if (!isNil(subaccountId)) {
-    const CancelToken = axios.CancelToken;
-    const source = CancelToken.source();
-
-    try {
-      const response: Model.SubAccount = yield call(api.getSubAccount, subaccountId, { cancelToken: source.token });
-      yield put(actions.responseSubAccountAction(response));
-    } catch (e: unknown) {
-      if (!(yield cancelled())) {
-        api.handleRequestError(e as Error, "There was an error retrieving the sub account.");
-        yield put(actions.responseSubAccountAction(null));
-      }
-    } finally {
-      if (yield cancelled()) {
-        source.cancel();
-      }
-    }
-  }
-}
-
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 const historySaga = redux.sagas.createModelListResponseSaga<Model.HistoryEvent>({
@@ -97,6 +75,27 @@ const commentsSaga = budgeting.sagas.createCommentsListResponseSaga({
   }),
   actions: CommentsActionMap
 });
+
+function* getSubAccount(action: Redux.Action<null>): SagaIterator {
+  const subaccountId = yield select((state: Application.Authenticated.Store) => state.budget.subaccount.id);
+  if (!isNil(subaccountId)) {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+    try {
+      const response: Model.SubAccount = yield call(api.getSubAccount, subaccountId, { cancelToken: source.token });
+      yield put(actions.responseSubAccountAction(response));
+    } catch (e: unknown) {
+      if (!(yield cancelled())) {
+        api.handleRequestError(e as Error, "There was an error retrieving the sub account.");
+        yield put(actions.responseSubAccountAction(null));
+      }
+    } finally {
+      if (yield cancelled()) {
+        source.cancel();
+      }
+    }
+  }
+}
 
 const ActionMap = {
   updateParentInState: actions.updateInStateAction,
@@ -144,11 +143,9 @@ function* getData(action: Redux.Action<any>): SagaIterator {
   yield all([call(getSubAccount, action), call(Tasks.request, action)]);
 }
 
-function* watchForSubAccountIdChangedSaga(): SagaIterator {
-  yield takeLatest(actions.setSubAccountIdAction.toString(), getData);
-}
-
 export default function* rootSaga(): SagaIterator {
-  yield spawn(watchForSubAccountIdChangedSaga);
+  yield takeLatest(actions.setSubAccountIdAction.toString(), getData);
+  yield takeLatest(actions.requestAction.toString(), getData);
+  yield takeLatest(actions.requestSubAccountAction.toString(), getSubAccount);
   yield spawn(tableSaga);
 }

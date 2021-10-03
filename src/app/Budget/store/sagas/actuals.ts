@@ -28,10 +28,6 @@ const tasks = budgeting.tasks.actuals.createTableTaskSet({
   actions: ActionMap
 });
 
-function* searchTreeSaga(): SagaIterator {
-  yield debounce(250, actions.setOwnerTreeSearchAction.toString(), tasks.requestOwnerTree);
-}
-
 const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   Tables.ActualRowData,
   Model.Actual,
@@ -43,5 +39,5 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
 
 export default function* rootSaga(): SagaIterator {
   yield spawn(tableSaga);
-  yield spawn(searchTreeSaga);
+  yield debounce(250, actions.setOwnerTreeSearchAction.toString(), tasks.requestOwnerTree);
 }

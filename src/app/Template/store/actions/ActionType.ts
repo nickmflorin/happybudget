@@ -31,12 +31,13 @@ const ActionType = {
     Response: "template.fringecolors.Response"
   },
   SubAccount: {
+    Request: "template.subaccount.Request",
     UpdateInState: "template.subaccount.UpdateInState",
     SetId: "template.subaccount.SetId",
     Loading: "template.subaccount.Loading",
     Response: "template.subaccount.Response",
-    Request: "template.subaccount.Request",
     SubAccounts: {
+      Request: "template.subaccount.subaccounts.Request",
       TableChanged: "template.subaccount.subaccounts.TableChanged",
       Saving: "template.subaccount.subaccounts.Saving",
       SetSearch: "template.subaccount.subaccounts.SetSearch",
@@ -53,6 +54,7 @@ const ActionType = {
     Response: "template.account.Response",
     Request: "template.account.Request",
     SubAccounts: {
+      Request: "template.account.subaccounts.Request",
       TableChanged: "template.account.subaccounts.TableChanged",
       Loading: "template.account.subaccounts.Loading",
       Response: "template.account.subaccounts.Response",

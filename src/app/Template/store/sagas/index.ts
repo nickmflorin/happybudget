@@ -17,6 +17,10 @@ const CancelToken = axios.CancelToken;
 const source = CancelToken.source();
 
 const FringesActionMap = {
+  requestAccount: actions.account.requestAccountAction,
+  requestSubAccount: actions.subAccount.requestSubAccountAction,
+  requestAccountTableData: actions.account.requestAction,
+  requestSubAccountTableData: actions.subAccount.requestAction,
   tableChanged: actions.handleFringesTableChangeEventAction,
   loading: actions.loadingFringesAction,
   response: actions.responseFringesAction,
@@ -31,7 +35,9 @@ const FringesActionMap = {
 
 const FringesTasks = budgeting.tasks.fringes.createTableTaskSet<Model.Template>({
   columns: FringesTable.Columns,
-  selectObjId: (state: Application.Authenticated.Store) => state.budget.id,
+  selectObjId: (state: Application.Authenticated.Store) => state.template.id,
+  selectAccountTableData: (state: Application.Authenticated.Store) => state.template.account.table.data,
+  selectSubAccountTableData: (state: Application.Authenticated.Store) => state.template.subaccount.table.data,
   actions: FringesActionMap,
   services: {
     request: api.getTemplateFringes,

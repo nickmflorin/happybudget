@@ -4,8 +4,8 @@ import ActionType from "./ActionType";
 export const updateInStateAction = createAction<Redux.UpdateActionPayload<Model.Account>>(
   ActionType.Account.UpdateInState
 );
-
 export const setAccountIdAction = createAction<number | null>(ActionType.Account.SetId);
+export const requestAccountAction = createAction<null>(ActionType.Account.Request);
 export const loadingAccountAction = createAction<boolean>(ActionType.Account.Loading);
 export const responseAccountAction = createAction<Model.Account | null>(ActionType.Account.Response);
 

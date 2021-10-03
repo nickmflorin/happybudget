@@ -87,11 +87,8 @@ function* getData(action: Redux.Action<any>): SagaIterator {
   yield all([call(getSubAccount, action), call(Tasks.request, action)]);
 }
 
-function* watchForSubAccountIdChangedSaga(): SagaIterator {
-  yield takeLatest(actions.setSubAccountIdAction.toString(), getData);
-}
-
 export default function* rootSaga(): SagaIterator {
-  yield spawn(watchForSubAccountIdChangedSaga);
+  yield takeLatest(actions.requestSubAccountAction.toString(), getSubAccount);
+  yield takeLatest(actions.setSubAccountIdAction.toString(), getData);
   yield spawn(tableSaga);
 }

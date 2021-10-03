@@ -7,6 +7,7 @@ export const updateInStateAction = createAction<Redux.UpdateActionPayload<Model.
 export const setSubAccountIdAction = createAction<number | null>(ActionType.SubAccount.SetId);
 export const requestSubAccountAction = createAction<null>(ActionType.SubAccount.Request);
 export const loadingSubAccountAction = createAction<boolean>(ActionType.SubAccount.Loading);
+export const requestAction = createAction<Redux.TableRequestPayload>(ActionType.SubAccount.SubAccounts.Request);
 export const responseSubAccountAction = createAction<Model.SubAccount | null>(ActionType.SubAccount.Response);
 export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.SubAccountRowData>>(
   ActionType.SubAccount.SubAccounts.TableChanged

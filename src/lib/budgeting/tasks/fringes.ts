@@ -1,7 +1,7 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { put, call, cancelled, fork, select, all } from "redux-saga/effects";
-import { map, isNil, filter } from "lodash";
+import { map, isNil, filter, intersection } from "lodash";
 
 import * as api from "api";
 import { tabling, budgeting } from "lib";
@@ -16,6 +16,10 @@ export interface FringeServiceSet {
 
 export type FringesTableActionMap<B extends Model.Template | Model.Budget> = Redux.AuthenticatedTableActionMap<R, M> & {
   readonly loadingBudget: boolean;
+  readonly requestAccount: null;
+  readonly requestAccountTableData: Redux.TableRequestPayload;
+  readonly requestSubAccount: null;
+  readonly requestSubAccountTableData: Redux.TableRequestPayload;
   readonly updateBudgetInState: Redux.UpdateActionPayload<B>;
   readonly responseFringeColors: Http.ListResponse<string>;
 };
@@ -46,6 +50,8 @@ export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Ta
 > & {
   readonly services: FringeTableServiceSet<B>;
   readonly selectObjId: (state: Application.Authenticated.Store) => number | null;
+  readonly selectAccountTableData: (state: Application.Authenticated.Store) => Tables.SubAccountRow[];
+  readonly selectSubAccountTableData: (state: Application.Authenticated.Store) => Tables.SubAccountRow[];
 };
 
 export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
@@ -150,10 +156,38 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       });
       yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
       const path = yield select((s: Application.Authenticated.Store) => s.router.location.pathname);
+
+      // If the Fringe(s) that were changed are associated with any models in the active table
+      // (either the AccountTable or the SubAccountTable), we need to request those SubAccount(s)
+      // and update them in the table.  We also need to update the overall Account or SubAccount.
       if (budgeting.urls.isAccountUrl(path)) {
-        console.log("ACCOUNT PATH");
+        const subaccounts = yield select(config.selectAccountTableData);
+        const fringeIds = map(response.children, (c: Model.Fringe) => c.id);
+        const subaccountsWithFringesChanged: Table.ModelRow<Tables.SubAccountRowData>[] = filter(
+          filter(subaccounts, (r: Tables.SubAccountRow) => tabling.typeguards.isModelRow(r)),
+          (r: Tables.SubAccountRow) => intersection(r.data.fringes, fringeIds).length !== 0
+        ) as Table.ModelRow<Tables.SubAccountRowData>[];
+        if (subaccountsWithFringesChanged.length !== 0) {
+          yield put(
+            config.actions.requestAccountTableData({
+              ids: map(subaccountsWithFringesChanged, (r: Table.ModelRow<Tables.SubAccountRowData>) => r.id)
+            })
+          );
+          yield put(config.actions.requestAccount(null));
+        }
       } else if (budgeting.urls.isSubAccountUrl(path)) {
-        console.log("SUBACCOUNT PATH");
+        const subaccounts = yield select(config.selectSubAccountTableData);
+        const fringeIds = map(response.children, (c: Model.Fringe) => c.id);
+        const subaccountsWithFringesChanged: Table.ModelRow<Tables.SubAccountRowData>[] = filter(
+          filter(subaccounts, (r: Tables.SubAccountRow) => tabling.typeguards.isModelRow(r)),
+          (r: Tables.SubAccountRow) => intersection(r.data.fringes, fringeIds).length !== 0
+        ) as Table.ModelRow<Tables.SubAccountRowData>[];
+        yield put(
+          config.actions.requestSubAccountTableData({
+            ids: map(subaccountsWithFringesChanged, (r: Table.ModelRow<Tables.SubAccountRowData>) => r.id)
+          })
+        );
+        yield put(config.actions.requestSubAccount(null));
       }
     } catch (err: unknown) {
       if (!(yield cancelled())) {

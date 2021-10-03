@@ -4,6 +4,7 @@ import ActionType from "./ActionType";
 export const updateInStateAction = createAction<Redux.UpdateActionPayload<Model.SubAccount>>(
   ActionType.SubAccount.UpdateInState
 );
+export const requestSubAccountAction = createAction<null>(ActionType.SubAccount.Request);
 export const setSubAccountIdAction = createAction<number | null>(ActionType.SubAccount.SetId);
 export const loadingSubAccountAction = createAction<boolean>(ActionType.SubAccount.Loading);
 export const responseSubAccountAction = createAction<Model.SubAccount | null>(ActionType.SubAccount.Response);
@@ -14,6 +15,7 @@ export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Table
 export const savingTableAction = createAction<boolean>(ActionType.SubAccount.SubAccounts.Saving);
 export const clearAction = createAction<null>(ActionType.SubAccount.SubAccounts.Clear);
 export const loadingAction = createAction<boolean>(ActionType.SubAccount.SubAccounts.Loading);
+export const requestAction = createAction<Redux.TableRequestPayload>(ActionType.SubAccount.SubAccounts.Request);
 export const responseAction = createAction<Http.TableResponse<Model.SubAccount>>(
   ActionType.SubAccount.SubAccounts.Response
 );

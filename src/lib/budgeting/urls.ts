@@ -2,18 +2,16 @@ import { isNil } from "lodash";
 import Cookies from "universal-cookie";
 import { model } from "lib";
 
-type Designation = "budget" | "template";
+type Designation = "budgets" | "templates";
 
-type CookieSubset = `${Designation}-last-visited`;
-
-type AccountsUrl<D extends Designation = Designation> = `/${D}s/${number}/accounts`;
-type AccountUrl<D extends Designation = Designation> = `/${D}s/${number}/accounts/${number}`;
-type SubAccountUrl<D extends Designation = Designation> = `/${D}s/${number}/subaccounts/${number}`;
+type AccountsUrl<D extends Designation = Designation> = `/${D}/${number}/accounts`;
+type AccountUrl<D extends Designation = Designation> = `/${D}/${number}/accounts/${number}`;
+type SubAccountUrl<D extends Designation = Designation> = `/${D}/${number}/subaccounts/${number}`;
 
 type BudgetingUrl<D extends Designation = Designation> = AccountsUrl<D> | AccountUrl<D> | SubAccountUrl<D>;
 
-type BudgetUrl = BudgetingUrl<"budget">;
-type TemplateUrl = BudgetingUrl<"template">;
+type BudgetUrl = BudgetingUrl<"budgets">;
+type TemplateUrl = BudgetingUrl<"templates">;
 
 export const getBudgetUrl = (
   budget: Model.Budget,
@@ -49,84 +47,55 @@ export const getUrl = (
 
 type PluggableID = ID | "([0-9]+)";
 
-const regexesMatch = (regexes: RegExp[], test: string) => {
-  for (let i = 0; i < regexes.length; i++) {
-    if (test.match(regexes[i])) {
-      return true;
-    }
-  }
-  return false;
-};
-
 export const isAccountsUrl = <D extends Designation = Designation>(
   url: string,
-  designation?: D,
+  designation: D | "templates|budgets" = "templates|budgets",
   id: PluggableID = "([0-9]+)"
 ): url is AccountsUrl<D> => {
-  if (!isNil(designation)) {
-    const regex = new RegExp(`^/${designation}s/${id}/accounts/?$`);
-    return url.match(regex) !== null ? true : false;
-  } else {
-    return regexesMatch([new RegExp(`^/budgets/${id}/accounts/?$`), new RegExp(`^/templates/${id}/accounts/?$`)], url);
-  }
+  const regex = new RegExp(`^/${designation}/${id}/accounts/?$`);
+  return url.match(regex) !== null ? true : false;
 };
 
 export const isAccountUrl = <D extends Designation = Designation>(
   url: string,
-  designation?: D,
+  designation: D | "templates|budgets" = "templates|budgets",
   id: PluggableID = "([0-9]+)"
 ): url is AccountUrl<D> => {
-  if (!isNil(designation)) {
-    const regex = new RegExp(`^/${designation}s/${id}/accounts/([0-9]+)/?$`);
-    return url.match(regex) !== null ? true : false;
-  } else {
-    return regexesMatch(
-      [new RegExp(`^/templates/${id}/accounts/([0-9]+)/?$`), new RegExp(`^/budgets/${id}/accounts/([0-9]+)/?$`)],
-      url
-    );
-  }
+  const regex = new RegExp(`^/${designation}/${id}/accounts/([0-9]+)/?$`);
+  return url.match(regex) !== null ? true : false;
 };
 
 export const isSubAccountUrl = <D extends Designation = Designation>(
   url: string,
-  designation?: D,
+  designation: D | "templates|budgets" = "templates|budgets",
   id: PluggableID = "([0-9]+)"
 ): url is SubAccountUrl<D> => {
-  if (isNil(designation)) {
-    const regex = new RegExp(`^/${designation}s/${id}/subaccounts/([0-9]+)/?$`);
-    return url.match(regex) !== null ? true : false;
-  } else {
-    return regexesMatch(
-      [new RegExp(`^/templates/${id}/subaccounts/([0-9]+)/?$`), new RegExp(`^/budgets/${id}/subaccounts/([0-9]+)/?$`)],
-      url
-    );
-  }
+  const regex = new RegExp(`^/${designation}/${id}/subaccounts/([0-9]+)/?$`);
+  return url.match(regex) !== null ? true : false;
 };
 
 export const isBudgetRelatedUrl = (url: string, id: PluggableID = "([0-9]+)"): url is BudgetUrl =>
-  isSubAccountUrl(url, "budget", id) || isAccountUrl(url, "budget", id) || isAccountsUrl(url, "budget", id);
+  isSubAccountUrl(url, "budgets", id) || isAccountUrl(url, "budgets", id) || isAccountsUrl(url, "budgets", id);
 
 export const isTemplateRelatedUrl = (url: string, id: PluggableID = "([0-9]+)"): boolean =>
-  isSubAccountUrl(url, "template", id) || isAccountUrl(url, "template", id) || isAccountsUrl(url, "template", id);
+  isSubAccountUrl(url, "templates", id) || isAccountUrl(url, "templates", id) || isAccountsUrl(url, "templates", id);
 
-const getLastVisitedCookies = (subset: CookieSubset): { [key: string]: any } => {
+const getLastVisitedCookies = (designation: Designation): { [key: string]: any } => {
   const cookies = new Cookies();
-  const lastVisited = cookies.get(subset);
+  const lastVisited = cookies.get(`${designation}-last-visited`);
   if (typeof lastVisited !== "object") {
-    cookies.set(subset, {}, { path: "/" });
+    cookies.set(`${designation}-last-visited`, {}, { path: "/" });
     return {};
   }
   return lastVisited;
 };
 
-export const getLastVisited = (subset: CookieSubset, id: ID): string | null => {
-  const cookies = getLastVisitedCookies(subset);
+export const getLastVisited = (designation: Designation, id: ID): string | null => {
+  const cookies = getLastVisitedCookies(designation);
   if (!isNil(cookies[`${id}`])) {
     if (
-      (typeof cookies[`${id}`] === "string" &&
-        subset === "budget-last-visited" &&
-        isBudgetRelatedUrl(cookies[`${id}`], id)) ||
-      (subset === "template-last-visited" && isTemplateRelatedUrl(cookies[`${id}`], id))
+      (typeof cookies[`${id}`] === "string" && designation === "budgets" && isBudgetRelatedUrl(cookies[`${id}`], id)) ||
+      (designation === "templates" && isTemplateRelatedUrl(cookies[`${id}`], id))
     ) {
       return cookies[`${id}`];
     }
@@ -138,10 +107,10 @@ export const setLastVisited = (
   budget: Model.Budget | Model.Template,
   entity?: Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount
 ): void => {
-  const subSet: CookieSubset = model.typeguards.isBudget(budget) ? "budget-last-visited" : "template-last-visited";
-  const urlCookies = getLastVisitedCookies(subSet);
+  const designation: Designation = model.typeguards.isBudget(budget) ? "budgets" : "templates";
+  const urlCookies = getLastVisitedCookies(designation);
   const url = getUrl(budget, entity);
   urlCookies[budget.id] = url;
   const cookies = new Cookies();
-  cookies.set(subSet, urlCookies, { path: "/" });
+  cookies.set(`${designation}-last-visited`, urlCookies, { path: "/" });
 };
