@@ -67,7 +67,7 @@ const ActionType = {
     SetId: "budget.subaccount.SetId",
     Loading: "budget.subaccount.Loading",
     Response: "budget.subaccount.Response",
-    UpdateInState: "budget.subaccount.UpdateInState", // Only used for post Markup create/update.
+    UpdateInState: "budget.subaccount.UpdateInState",
     Comments: {
       Loading: "budget.subaccount.comments.Loading",
       Response: "budget.subaccount.comments.Response",
@@ -102,7 +102,7 @@ const ActionType = {
     SetId: "budget.account.SetId",
     Loading: "budget.account.Loading",
     Response: "budget.account.Response",
-    UpdateInState: "budget.account.UpdateInState", // Only used for post Markup create/update.
+    UpdateInState: "budget.account.UpdateInState",
     Comments: {
       Loading: "budget.account.comments.Loading",
       Response: "budget.account.comments.Response",
@@ -123,7 +123,6 @@ const ActionType = {
       Saving: "budget.account.subaccounts.Saving",
       Loading: "budget.account.subaccounts.Loading",
       Response: "budget.account.subaccounts.Response",
-      // Request: "budget.account.subaccounts.Request",
       SetSearch: "budget.account.subaccounts.SetSearch",
       AddToState: "budget.account.subaccounts.AddToState",
       Clear: "budget.account.subaccounts.Clear"

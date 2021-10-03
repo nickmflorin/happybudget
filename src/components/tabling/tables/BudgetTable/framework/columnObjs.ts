@@ -85,6 +85,7 @@ export const EstimatedColumn = <R extends Tables.BudgetRowData, M extends Model.
         if (tabling.typeguards.isBodyRow(row)) {
           if (tabling.typeguards.isDataRow(row)) {
             if (isSubAccountRowData(row.data)) {
+              console.log({ row });
               return row.data.nominal_value + row.data.accumulated_markup_contribution + row.data.fringe_contribution;
             }
             return row.data.nominal_value + row.data.accumulated_markup_contribution;

@@ -1,6 +1,9 @@
 import { createAction } from "@reduxjs/toolkit";
 import ActionType from "./ActionType";
 
+export const updateInStateAction = createAction<Redux.UpdateActionPayload<Model.SubAccount>>(
+  ActionType.SubAccount.UpdateInState
+);
 export const setSubAccountIdAction = createAction<number | null>(ActionType.SubAccount.SetId);
 export const requestSubAccountAction = createAction<null>(ActionType.SubAccount.Request);
 export const loadingSubAccountAction = createAction<boolean>(ActionType.SubAccount.Loading);

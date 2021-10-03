@@ -40,6 +40,7 @@ function* getAccount(action: Redux.Action<null>): SagaIterator {
 }
 
 const ActionMap = {
+  updateParentInState: actions.updateInStateAction,
   tableChanged: actions.handleTableChangeEventAction,
   loading: actions.loadingAction,
   response: actions.responseAction,

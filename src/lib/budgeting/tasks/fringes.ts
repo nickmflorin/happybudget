@@ -117,7 +117,6 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         { cancelToken: source.token }
       );
       yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
-      // Note: We also have access to the updated budget here, we should use that.
       // Note: The logic in the reducer for activating the placeholder rows with real data relies on the
       // assumption that the models in the response are in the same order as the placeholder numbers.
       const placeholderIds: Table.PlaceholderRowId[] = map(

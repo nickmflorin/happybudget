@@ -58,14 +58,17 @@ export type SubAccountsTableActionMap = Redux.TableActionMap<C> & {
   readonly responseFringes: Http.TableResponse<Model.Fringe>;
 };
 
-export type AuthenticatedSubAccountsTableActionMap<B extends Model.Template | Model.Budget> =
-  Redux.AuthenticatedTableActionMap<R, C> & {
-    readonly loadingBudget: boolean;
-    readonly tableChanged: Table.ChangeEvent<R>;
-    readonly updateBudgetInState: Redux.UpdateActionPayload<B>;
-    readonly responseSubAccountUnits: Http.ListResponse<Model.Tag>;
-    readonly responseFringes: Http.TableResponse<Model.Fringe>;
-  };
+export type AuthenticatedSubAccountsTableActionMap<
+  M extends Model.Account | Model.SubAccount,
+  B extends Model.Template | Model.Budget
+> = Redux.AuthenticatedTableActionMap<R, C> & {
+  readonly loadingBudget: boolean;
+  readonly tableChanged: Table.ChangeEvent<R>;
+  readonly updateBudgetInState: Redux.UpdateActionPayload<B>;
+  readonly updateParentInState: Redux.UpdateActionPayload<M>;
+  readonly responseSubAccountUnits: Http.ListResponse<Model.Tag>;
+  readonly responseFringes: Http.TableResponse<Model.Fringe>;
+};
 
 export type SubAccountsTableTaskConfig = Table.TaskConfig<R, C, SubAccountsTableActionMap> & {
   readonly services: SubAccountsTableServiceSet;
@@ -76,7 +79,7 @@ export type SubAccountsTableTaskConfig = Table.TaskConfig<R, C, SubAccountsTable
 export type AuthenticatedSubAccountsTableTaskConfig<
   M extends Model.Account | Model.SubAccount,
   B extends Model.Template | Model.Budget
-> = Table.TaskConfig<R, C, AuthenticatedSubAccountsTableActionMap<B>> & {
+> = Table.TaskConfig<R, C, AuthenticatedSubAccountsTableActionMap<M, B>> & {
   readonly services: AuthenticatedSubAccountsTableServiceSet<M, B>;
   readonly selectBudgetId: (state: Application.Authenticated.Store) => number | null;
   readonly selectObjId: (state: Application.Authenticated.Store) => number | null;
@@ -181,13 +184,8 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
             cancelToken: source.token
           }
         );
-        /*
-        Note: We also have access to the updated Account from the response (as response.data)
-        so we could use this to update the overall Account in state.  However, the reducer handles
-        that logic pre-request currently, although in the future we may want to use the response
-        data as the fallback/source of truth.
-        */
         yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
+        yield put(config.actions.updateParentInState({ id: response.data.id, data: response.data }));
         // Note: The logic in the reducer for activating the placeholder rows with real data relies on the
         // assumption that the models in the response are in the same order as the placeholder numbers.
         const placeholderIds: Table.PlaceholderRowId[] = map(
@@ -221,16 +219,11 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         yield put(config.actions.loadingBudget(true));
       }
       try {
-        const response: Http.BudgetBulkResponse<B, C> = yield call(config.services.bulkUpdate, objId, requestPayload, {
+        const response: Http.BudgetBulkResponse<B, M> = yield call(config.services.bulkUpdate, objId, requestPayload, {
           cancelToken: source.token
         });
-        /*
-        Note: We also have access to the updated Account from the response (as response.data)
-        so we could use this to update the overall Account in state.  However, the reducer handles
-        that logic pre-request currently, although in the future we may want to use the response
-        data as the fallback/source of truth.
-        */
         yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
+        yield put(config.actions.updateParentInState({ id: response.data.id, data: response.data }));
       } catch (err: unknown) {
         if (!(yield cancelled())) {
           api.handleRequestError(err as Error, errorMessage);

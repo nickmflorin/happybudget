@@ -99,6 +99,7 @@ const commentsSaga = budgeting.sagas.createCommentsListResponseSaga({
 });
 
 const ActionMap = {
+  updateParentInState: actions.updateInStateAction,
   tableChanged: actions.handleTableChangeEventAction,
   loading: actions.loadingAction,
   clear: actions.clearAction,

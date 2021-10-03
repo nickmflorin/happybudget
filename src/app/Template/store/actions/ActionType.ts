@@ -31,6 +31,7 @@ const ActionType = {
     Response: "template.fringecolors.Response"
   },
   SubAccount: {
+    UpdateInState: "template.subaccount.UpdateInState",
     SetId: "template.subaccount.SetId",
     Loading: "template.subaccount.Loading",
     Response: "template.subaccount.Response",
@@ -46,6 +47,7 @@ const ActionType = {
     }
   },
   Account: {
+    UpdateInState: "template.account.UpdateInState",
     SetId: "template.account.SetId",
     Loading: "template.account.Loading",
     Response: "template.account.Response",

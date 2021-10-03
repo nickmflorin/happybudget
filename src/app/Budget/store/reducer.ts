@@ -85,9 +85,7 @@ const genericReducer = combineReducers({
       loading: actions.account.loadingAccountAction,
       response: actions.account.responseAccountAction,
       setId: actions.account.setAccountIdAction,
-      tableChanged: actions.account.handleTableChangeEventAction,
-      fringesTableChanged: actions.handleFringesTableChangeEventAction,
-      updateInState: actions.account.updateInStateAction // Only used for post Markup create/update.
+      updateInState: actions.account.updateInStateAction
     },
     reducers: {
       table: budgeting.reducers.createAuthenticatedSubAccountsTableReducer({
@@ -155,9 +153,7 @@ const genericReducer = combineReducers({
       setId: actions.subAccount.setSubAccountIdAction,
       loading: actions.subAccount.loadingSubAccountAction,
       response: actions.subAccount.responseSubAccountAction,
-      tableChanged: actions.subAccount.handleTableChangeEventAction,
-      fringesTableChanged: actions.handleFringesTableChangeEventAction,
-      updateInState: actions.subAccount.updateInStateAction // Only used for post Markup create/update.
+      updateInState: actions.subAccount.updateInStateAction
     },
     reducers: {
       table: budgeting.reducers.createAuthenticatedSubAccountsTableReducer({

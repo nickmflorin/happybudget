@@ -1,15 +1,10 @@
 import { combineReducers } from "redux";
-import { reduce, filter, isNil } from "lodash";
+import { redux } from "lib";
 
-import { redux, tabling } from "lib";
-
-type R = Tables.SubAccountRowData;
 type M = Model.Account;
 
 export type AccountDetailActionMap = Omit<Redux.ModelDetailResponseActionMap<M>, "updateInState"> & {
   readonly setId: number | null;
-  readonly tableChanged?: Table.ChangeEvent<Tables.SubAccountRowData>;
-  readonly fringesTableChanged?: Table.ChangeEvent<Tables.FringeRowData>;
   readonly updateInState?: Redux.UpdateActionPayload<Model.Account>;
 };
 
@@ -29,7 +24,7 @@ export type AccountDetailReducerConfig<S extends MinimalAccountStore> = Redux.Re
 export const createAccountDetailReducer = <S extends MinimalAccountStore>(
   config: AccountDetailReducerConfig<S>
 ): Redux.Reducer<S> => {
-  const genericReducer: Redux.Reducer<S> = combineReducers({
+  return combineReducers({
     ...config.reducers,
     detail: redux.reducers.createDetailResponseReducer<Model.Account, AccountDetailActionMap>({
       initialState: redux.initialState.initialDetailResponseState,
@@ -40,50 +35,4 @@ export const createAccountDetailReducer = <S extends MinimalAccountStore>(
       actions: { set: config.actions.setId }
     })
   }) as Redux.Reducer<S>;
-
-  return (state: S = config.initialState, action: Redux.Action<any>): S => {
-    let newState = genericReducer(state, action);
-    // These should be undefined for the unauthenticated cases.
-    if (!isNil(config.actions.tableChanged) && !isNil(config.actions.fringesTableChanged)) {
-      if (
-        action.type === config.actions.tableChanged.toString() ||
-        action.type === config.actions.fringesTableChanged.toString()
-      ) {
-        newState = {
-          ...newState,
-          detail: {
-            ...newState.detail,
-            data: {
-              ...newState.detail.data,
-              estimated: reduce(
-                filter(newState.table.data, (r: Table.BodyRow<R>) =>
-                  tabling.typeguards.isDataRow(r)
-                ) as Table.DataRow<R>[],
-                (curr: number, row: Table.DataRow<R>) => curr + (row.data.nominal_value || 0),
-                0
-              ),
-              actual: reduce(
-                filter(newState.table.data, (r: Table.BodyRow<R>) =>
-                  tabling.typeguards.isDataRow(r)
-                ) as Table.DataRow<R>[],
-                (curr: number, row: Table.DataRow<R>) => curr + (row.data.actual || 0),
-                0
-              )
-            }
-          }
-        };
-        newState = {
-          ...newState,
-          detail: {
-            ...newState.detail,
-            data: {
-              ...newState.detail.data,
-              variance: (newState.detail.data?.nominal_value || 0) - (newState.detail.data?.actual || 0)
-            }
-          }
-        };
-      }
-    }
-    return newState;
-  };
 };
