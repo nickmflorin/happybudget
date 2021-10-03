@@ -131,88 +131,88 @@ export const bulkDeleteBudgetMarkups = async (
   id: number,
   ids: number[],
   options: Http.RequestOptions = {}
-): Promise<Http.BulkModelResponse<Model.Budget>> => {
+): Promise<Http.BulkDeleteResponse<Model.Budget>> => {
   const url = services.URL.v1("budgets", id, "bulk-delete-markups");
-  return client.patch<Http.BulkModelResponse<Model.Budget>>(url, { ids }, options);
+  return client.patch<Http.BulkDeleteResponse<Model.Budget>>(url, { ids }, options);
 };
 
 export const bulkUpdateBudgetAccounts = async (
   id: number,
   data: Http.BulkUpdatePayload<Http.AccountPayload>,
   options: Http.RequestOptions = {}
-): Promise<Http.BulkModelResponse<Model.Budget>> => {
+): Promise<Http.BulkResponse<Model.Budget, Model.Account>> => {
   const url = services.URL.v1("budgets", id, "bulk-update-accounts");
-  return client.patch<Http.BulkModelResponse<Model.Budget>>(url, data, options);
+  return client.patch<Http.BulkResponse<Model.Budget, Model.Account>>(url, data, options);
 };
 
 export const bulkDeleteBudgetAccounts = async (
   id: number,
   ids: number[],
   options: Http.RequestOptions = {}
-): Promise<Http.BulkModelResponse<Model.Budget>> => {
+): Promise<Http.BulkDeleteResponse<Model.Budget>> => {
   const url = services.URL.v1("budgets", id, "bulk-delete-accounts");
-  return client.patch<Http.BulkModelResponse<Model.Budget>>(url, { ids }, options);
+  return client.patch<Http.BulkDeleteResponse<Model.Budget>>(url, { ids }, options);
 };
 
 export const bulkCreateBudgetAccounts = async (
   id: number,
   payload: Http.BulkCreatePayload<Http.AccountPayload>,
   options: Http.RequestOptions = {}
-): Promise<Http.BulkCreateChildrenResponse<Model.Budget, Model.Account>> => {
+): Promise<Http.BulkResponse<Model.Budget, Model.Account>> => {
   const url = services.URL.v1("budgets", id, "bulk-create-accounts");
-  return client.patch<Http.BulkCreateChildrenResponse<Model.Budget, Model.Account>>(url, payload, options);
+  return client.patch<Http.BulkResponse<Model.Budget, Model.Account>>(url, payload, options);
 };
 
 export const bulkUpdateBudgetActuals = async (
   id: number,
   data: Http.BulkUpdatePayload<Http.ActualPayload>,
   options: Http.RequestOptions = {}
-): Promise<Http.BulkModelResponse<Model.Budget>> => {
+): Promise<Http.BulkResponse<Model.Budget, Model.Actual>> => {
   const url = services.URL.v1("budgets", id, "bulk-update-actuals");
-  return client.patch<Http.BulkModelResponse<Model.Budget>>(url, data, options);
+  return client.patch<Http.BulkResponse<Model.Budget, Model.Actual>>(url, data, options);
 };
 
 export const bulkDeleteBudgetActuals = async (
   id: number,
   ids: number[],
   options: Http.RequestOptions = {}
-): Promise<Http.BulkModelResponse<Model.Budget>> => {
+): Promise<Http.BulkDeleteResponse<Model.Budget>> => {
   const url = services.URL.v1("budgets", id, "bulk-delete-actuals");
-  return client.patch<Http.BulkModelResponse<Model.Budget>>(url, { ids }, options);
+  return client.patch<Http.BulkDeleteResponse<Model.Budget>>(url, { ids }, options);
 };
 
 export const bulkCreateBudgetActuals = async (
   id: number,
   payload: Http.BulkCreatePayload<Http.ActualPayload>,
   options: Http.RequestOptions = {}
-): Promise<Http.BulkCreateChildrenResponse<Model.Budget, Model.Actual>> => {
+): Promise<Http.BulkResponse<Model.Budget, Model.Actual>> => {
   const url = services.URL.v1("budgets", id, "bulk-create-actuals");
-  return client.patch<Http.BulkCreateChildrenResponse<Model.Budget, Model.Actual>>(url, payload, options);
+  return client.patch<Http.BulkResponse<Model.Budget, Model.Actual>>(url, payload, options);
 };
 
 export const bulkUpdateBudgetFringes = async (
   id: number,
   data: Http.BulkUpdatePayload<Http.FringePayload>,
   options: Http.RequestOptions = {}
-): Promise<Http.BulkModelResponse<Model.Budget>> => {
+): Promise<Http.BulkResponse<Model.Budget, Model.Fringe>> => {
   const url = services.URL.v1("budgets", id, "bulk-update-fringes");
-  return client.patch<Http.BulkModelResponse<Model.Budget>>(url, data, options);
+  return client.patch<Http.BulkResponse<Model.Budget, Model.Fringe>>(url, data, options);
 };
 
 export const bulkDeleteBudgetFringes = async (
   id: number,
   ids: number[],
   options: Http.RequestOptions = {}
-): Promise<Http.BulkModelResponse<Model.Budget>> => {
+): Promise<Http.BulkDeleteResponse<Model.Budget>> => {
   const url = services.URL.v1("budgets", id, "bulk-delete-fringes");
-  return client.patch<Http.BulkModelResponse<Model.Budget>>(url, { ids }, options);
+  return client.patch<Http.BulkDeleteResponse<Model.Budget>>(url, { ids }, options);
 };
 
 export const bulkCreateBudgetFringes = async (
   id: number,
   payload: Http.BulkCreatePayload<Http.FringePayload>,
   options: Http.RequestOptions = {}
-): Promise<Http.BulkCreateChildrenResponse<Model.Budget, Model.Fringe>> => {
+): Promise<Http.BulkResponse<Model.Budget, Model.Fringe>> => {
   const url = services.URL.v1("budgets", id, "bulk-create-fringes");
-  return client.patch<Http.BulkCreateChildrenResponse<Model.Budget, Model.Fringe>>(url, payload, options);
+  return client.patch<Http.BulkResponse<Model.Budget, Model.Fringe>>(url, payload, options);
 };

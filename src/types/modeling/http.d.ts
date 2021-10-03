@@ -246,34 +246,27 @@ namespace Http {
   }
 
   type BulkCreatePayload<T extends Http.PayloadObj> = { data: Partial<T>[] };
-
   type ModelBulkUpdatePayload<T extends Http.PayloadObj> = (Partial<T> | {}) & { readonly id: number };
   type BulkUpdatePayload<T extends Http.PayloadObj> = { data: ModelBulkUpdatePayload<T>[] };
 
-  type BulkModelResponse<M extends Model.Model> = {
+  type BulkDeleteResponse<M extends Model.HttpModel> = {
     readonly data: M;
-  };
+  }
 
-  type BulkCreateResponse<M extends Model.Model> = {
+  type BulkModelResponse<M extends Model.HttpModel> = {
     readonly data: M[];
-  };
+  }
 
-  type BudgetBulkResponse<
-    B extends Model.Budget | Model.Template,
-    M extends Model.Model
-  > = Http.BulkModelResponse<M> & {
+  type BulkResponse<M extends Model.HttpModel, C extends Model.HttpModel> = {
+    readonly data: M;
+    readonly children: C[];
+  }
+
+  type BudgetBulkDeleteResponse<B extends Model.Budget | Model.Template, M extends Model.HttpModel> = BulkDeleteResponse<M> & {
     readonly budget: B;
   };
 
-  type BulkCreateChildrenResponse<M extends Model.Model, C extends Model.Model> = Http.BulkModelResponse<M> & {
-    readonly children: C[];
-  };
-
-  type BudgetBulkCreateResponse<
-    B extends Model.Budget | Model.Template,
-    M extends Model.Model,
-    C extends Model.Model
-  > = Http.BulkCreateChildrenResponse<M, C> & {
+  type BudgetBulkResponse<B extends Model.Budget | Model.Template, M extends Model.HttpModel, C extends Model.HttpModel> = BulkResponse<M, C> & {
     readonly budget: B;
   };
 }

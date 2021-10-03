@@ -49,38 +49,65 @@ export const getUrl = (
 
 type PluggableID = ID | "([0-9]+)";
 
+const regexesMatch = (regexes: RegExp[], test: string) => {
+  for (let i = 0; i < regexes.length; i++) {
+    if (test.match(regexes[i])) {
+      return true;
+    }
+  }
+  return false;
+};
+
 export const isAccountsUrl = <D extends Designation = Designation>(
   url: string,
-  id: PluggableID = "([0-9]+)",
-  designation: D
+  designation?: D,
+  id: PluggableID = "([0-9]+)"
 ): url is AccountsUrl<D> => {
-  const regex = new RegExp(`^/${designation}s/${id}/accounts/?$`);
-  return url.match(regex) !== null ? true : false;
+  if (!isNil(designation)) {
+    const regex = new RegExp(`^/${designation}s/${id}/accounts/?$`);
+    return url.match(regex) !== null ? true : false;
+  } else {
+    return regexesMatch([new RegExp(`^/budgets/${id}/accounts/?$`), new RegExp(`^/templates/${id}/accounts/?$`)], url);
+  }
 };
 
 export const isAccountUrl = <D extends Designation = Designation>(
   url: string,
-  id: PluggableID = "([0-9]+)",
-  designation: D
+  designation?: D,
+  id: PluggableID = "([0-9]+)"
 ): url is AccountUrl<D> => {
-  const regex = new RegExp(`^/${designation}s/${id}/accounts/([0-9]+)/?$`);
-  return url.match(regex) !== null ? true : false;
+  if (!isNil(designation)) {
+    const regex = new RegExp(`^/${designation}s/${id}/accounts/([0-9]+)/?$`);
+    return url.match(regex) !== null ? true : false;
+  } else {
+    return regexesMatch(
+      [new RegExp(`^/templates/${id}/accounts/([0-9]+)/?$`), new RegExp(`^/budgets/${id}/accounts/([0-9]+)/?$`)],
+      url
+    );
+  }
 };
 
 export const isSubAccountUrl = <D extends Designation = Designation>(
   url: string,
-  id: PluggableID = "([0-9]+)",
-  designation: D
+  designation?: D,
+  id: PluggableID = "([0-9]+)"
 ): url is SubAccountUrl<D> => {
-  const regex = new RegExp(`^/${designation}s/${id}/subaccounts/([0-9]+)/?$`);
-  return url.match(regex) !== null ? true : false;
+  if (isNil(designation)) {
+    const regex = new RegExp(`^/${designation}s/${id}/subaccounts/([0-9]+)/?$`);
+    return url.match(regex) !== null ? true : false;
+  } else {
+    return regexesMatch(
+      [new RegExp(`^/templates/${id}/subaccounts/([0-9]+)/?$`), new RegExp(`^/budgets/${id}/subaccounts/([0-9]+)/?$`)],
+      url
+    );
+  }
 };
 
 export const isBudgetRelatedUrl = (url: string, id: PluggableID = "([0-9]+)"): url is BudgetUrl =>
-  isSubAccountUrl(url, id, "budget") || isAccountUrl(url, id, "budget") || isAccountsUrl(url, id, "budget");
+  isSubAccountUrl(url, "budget", id) || isAccountUrl(url, "budget", id) || isAccountsUrl(url, "budget", id);
 
 export const isTemplateRelatedUrl = (url: string, id: PluggableID = "([0-9]+)"): boolean =>
-  isSubAccountUrl(url, id, "template") || isAccountUrl(url, id, "template") || isAccountsUrl(url, id, "template");
+  isSubAccountUrl(url, "template", id) || isAccountUrl(url, "template", id) || isAccountsUrl(url, "template", id);
 
 const getLastVisitedCookies = (subset: CookieSubset): { [key: string]: any } => {
   const cookies = new Cookies();

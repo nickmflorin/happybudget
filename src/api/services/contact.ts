@@ -44,9 +44,9 @@ export const bulkUpdateContacts = async (
 export const bulkCreateContacts = async (
   payload: Http.BulkCreatePayload<Http.ContactPayload>,
   options: Http.RequestOptions = {}
-): Promise<Http.BulkCreateResponse<Model.Contact>> => {
+): Promise<Http.BulkModelResponse<Model.Contact>> => {
   const url = services.URL.v1("contacts", "bulk-create");
-  return client.patch<Http.BulkCreateResponse<Model.Contact>>(url, payload, options);
+  return client.patch<Http.BulkModelResponse<Model.Contact>>(url, payload, options);
 };
 
 export const bulkDeleteContacts = async (ids: number[], options: Http.RequestOptions = {}): Promise<void> => {

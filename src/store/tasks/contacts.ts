@@ -63,7 +63,7 @@ export const createTableTaskSet = (
     );
     yield put(config.actions.saving(true));
     try {
-      const response: Http.BulkCreateResponse<M> = yield call(api.bulkCreateContacts, requestPayload, {
+      const response: Http.BulkModelResponse<M> = yield call(api.bulkCreateContacts, requestPayload, {
         cancelToken: source.token
       });
       // Note: The logic in the reducer for activating the placeholder rows with real data relies on the

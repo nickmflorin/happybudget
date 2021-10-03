@@ -60,7 +60,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
     );
     if (response.data.length === 0) {
       // If there is no table data, we want to default create two rows.
-      const createResponse: Http.BulkCreateChildrenResponse<Model.Budget, M> = yield call(
+      const createResponse: Http.BulkResponse<Model.Budget, M> = yield call(
         api.bulkCreateBudgetActuals,
         budgetId,
         { data: [{}, {}] },
@@ -115,7 +115,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
     );
     yield put(config.actions.saving(true));
     try {
-      const response: Http.BulkCreateChildrenResponse<Model.Budget, M> = yield call(
+      const response: Http.BulkResponse<Model.Budget, M> = yield call(
         api.bulkCreateBudgetActuals,
         budgetId,
         requestPayload,

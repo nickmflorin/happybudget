@@ -4,7 +4,7 @@ import { put, call, cancelled, fork, select, all } from "redux-saga/effects";
 import { map, isNil, filter } from "lodash";
 
 import * as api from "api";
-import * as tabling from "../../tabling";
+import { tabling, budgeting } from "lib";
 
 type R = Tables.FringeRowData;
 type M = Model.Fringe;
@@ -21,17 +21,17 @@ export type FringesTableActionMap<B extends Model.Template | Model.Budget> = Red
 };
 
 export type FringeTableServiceSet<B extends Model.Template | Model.Budget> = FringeServiceSet & {
-  bulkDelete: (id: number, ids: number[], options: Http.RequestOptions) => Promise<Http.BulkModelResponse<B>>;
+  bulkDelete: (id: number, ids: number[], options: Http.RequestOptions) => Promise<Http.BulkDeleteResponse<B>>;
   bulkUpdate: (
     id: number,
     data: Http.BulkUpdatePayload<Http.FringePayload>,
     options: Http.RequestOptions
-  ) => Promise<Http.BulkModelResponse<B>>;
+  ) => Promise<Http.BulkResponse<B, Model.Fringe>>;
   bulkCreate: (
     id: number,
     p: Http.BulkCreatePayload<P>,
     options: Http.RequestOptions
-  ) => Promise<Http.BulkCreateChildrenResponse<B, Model.Fringe>>;
+  ) => Promise<Http.BulkResponse<B, Model.Fringe>>;
 };
 
 export type FringesTaskConfig = Redux.TaskConfig<{ loading: boolean; response: Http.ListResponse<Model.Fringe> }> & {
@@ -84,7 +84,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     );
     if (response.data.length === 0) {
       // If there is no table data, we want to default create two rows.
-      const createResponse: Http.BulkCreateChildrenResponse<B, M> = yield call(
+      const createResponse: Http.BulkResponse<B, M> = yield call(
         config.services.bulkCreate,
         objId,
         { data: [{}, {}] },
@@ -110,12 +110,9 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     yield put(config.actions.saving(true));
     yield put(config.actions.loadingBudget(true));
     try {
-      const response: Http.BulkCreateChildrenResponse<B, M> = yield call(
-        config.services.bulkCreate,
-        objId,
-        requestPayload,
-        { cancelToken: source.token }
-      );
+      const response: Http.BulkResponse<B, M> = yield call(config.services.bulkCreate, objId, requestPayload, {
+        cancelToken: source.token
+      });
       yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
       // Note: The logic in the reducer for activating the placeholder rows with real data relies on the
       // assumption that the models in the response are in the same order as the placeholder numbers.
@@ -148,10 +145,16 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       yield put(config.actions.loadingBudget(true));
     }
     try {
-      const response: Http.BulkModelResponse<B> = yield call(config.services.bulkUpdate, objId, requestPayload, {
+      const response: Http.BulkResponse<B, M> = yield call(config.services.bulkUpdate, objId, requestPayload, {
         cancelToken: source.token
       });
       yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
+      const path = yield select((s: Application.Authenticated.Store) => s.router.location.pathname);
+      if (budgeting.urls.isAccountUrl(path)) {
+        console.log("ACCOUNT PATH");
+      } else if (budgeting.urls.isSubAccountUrl(path)) {
+        console.log("SUBACCOUNT PATH");
+      }
     } catch (err: unknown) {
       if (!(yield cancelled())) {
         api.handleRequestError(err as Error, errorMessage);
@@ -171,7 +174,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     yield put(config.actions.saving(true));
     yield put(config.actions.loadingBudget(true));
     try {
-      const response: Http.BulkModelResponse<B> = yield call(config.services.bulkDelete, budgetId, ids, {
+      const response: Http.BulkDeleteResponse<B> = yield call(config.services.bulkDelete, budgetId, ids, {
         cancelToken: source.token
       });
       yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));

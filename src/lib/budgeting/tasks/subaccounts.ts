@@ -34,22 +34,22 @@ export type AuthenticatedSubAccountsTableServiceSet<
   M extends Model.Account | Model.SubAccount,
   B extends Model.Template | Model.Budget
 > = SubAccountsTableServiceSet & {
-  bulkDelete: (id: number, ids: number[], options: Http.RequestOptions) => Promise<Http.BudgetBulkResponse<B, M>>;
+  bulkDelete: (id: number, ids: number[], options: Http.RequestOptions) => Promise<Http.BudgetBulkDeleteResponse<B, M>>;
   bulkDeleteMarkups?: (
     id: number,
     ids: number[],
     options: Http.RequestOptions
-  ) => Promise<Http.BudgetBulkResponse<B, M>>;
+  ) => Promise<Http.BudgetBulkDeleteResponse<B, M>>;
   bulkUpdate: (
     id: number,
     data: Http.BulkUpdatePayload<P>,
     options: Http.RequestOptions
-  ) => Promise<Http.BudgetBulkResponse<B, M>>;
+  ) => Promise<Http.BudgetBulkResponse<B, M, C>>;
   bulkCreate: (
     id: number,
     p: Http.BulkCreatePayload<P>,
     options: Http.RequestOptions
-  ) => Promise<Http.BudgetBulkCreateResponse<B, M, C>>;
+  ) => Promise<Http.BudgetBulkResponse<B, M, C>>;
 };
 
 export type SubAccountsTableActionMap = Redux.TableActionMap<C> & {
@@ -132,7 +132,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
           ] = yield all([call(requestSubAccounts, objId), call(requestGroups, objId), call(requestMarkups, objId)]);
           if (models.data.length === 0 && isAuthenticatedConfig(config)) {
             // If there is no table data, we want to default create two rows.
-            const response: Http.BudgetBulkCreateResponse<B, M, C> = yield call(
+            const response: Http.BudgetBulkResponse<B, M, C> = yield call(
               config.services.bulkCreate,
               objId,
               { data: [{}, {}] },
@@ -196,7 +196,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       yield put(config.actions.saving(true));
       yield put(config.actions.loadingBudget(true));
       try {
-        const response: Http.BudgetBulkCreateResponse<B, M, C> = yield call(
+        const response: Http.BudgetBulkResponse<B, M, C> = yield call(
           config.services.bulkCreate,
           objId,
           requestPayload,
@@ -239,9 +239,14 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         yield put(config.actions.loadingBudget(true));
       }
       try {
-        const response: Http.BudgetBulkResponse<B, M> = yield call(config.services.bulkUpdate, objId, requestPayload, {
-          cancelToken: source.token
-        });
+        const response: Http.BudgetBulkResponse<B, M, C> = yield call(
+          config.services.bulkUpdate,
+          objId,
+          requestPayload,
+          {
+            cancelToken: source.token
+          }
+        );
         yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
         yield put(config.actions.updateParentInState({ id: response.data.id, data: response.data }));
       } catch (err: unknown) {
@@ -302,7 +307,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
 
   function* bulkDeleteModelRows(objId: number, ids: number[]): SagaIterator {
     if (isAuthenticatedConfig(config) && ids.length !== 0) {
-      const response: Http.BudgetBulkResponse<B, C> = yield call(config.services.bulkDelete, objId, ids, {
+      const response: Http.BudgetBulkDeleteResponse<B, C> = yield call(config.services.bulkDelete, objId, ids, {
         cancelToken: source.token
       });
       yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.budget }));
@@ -311,7 +316,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
 
   function* bulkDeleteMarkupRows(objId: number, ids: number[]): SagaIterator {
     if (isAuthenticatedConfig(config) && ids.length !== 0 && !isNil(config.services.bulkDeleteMarkups)) {
-      const response: Http.BudgetBulkResponse<B, C> = yield call(config.services.bulkDeleteMarkups, objId, ids, {
+      const response: Http.BudgetBulkDeleteResponse<B, C> = yield call(config.services.bulkDeleteMarkups, objId, ids, {
         cancelToken: source.token
       });
       /*
