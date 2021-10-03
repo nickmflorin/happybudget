@@ -114,6 +114,11 @@ namespace Table {
   type BodyRow<D extends RowData = RowData> = ModelRow<D> | PlaceholderRow<D> | GroupRow<D> | MarkupRow<D>;
   type Row<D extends RowData = RowData> = BodyRow<D> | FooterRow;
 
+  type RowWithColor<D extends RowData = RowData> = BodyRow<D & { color: Style.HexColor | null }>
+  type RowWithName<D extends RowData = RowData> = BodyRow<D & { name: string | null }>
+  type RowWithDescription<D extends RowData = RowData> = BodyRow<D & { description: string | null }>
+  type RowWithIdentifier<D extends RowData = RowData> = BodyRow<D & { identifier: string | null }>
+
   type CreateTableDataConfig<
     R extends RowData,
     M extends Model.TypedHttpModel = Model.TypedHttpModel,

@@ -1,5 +1,32 @@
 import { SyntheticEvent } from "react";
 
+export const isRow = <R extends Table.RowData, M extends Model.Model>(obj: Table.Row<R> | M): obj is Table.Row<R> =>
+  (obj as Table.Row<R>).rowType !== undefined;
+
+export const isRowWithColor = <R extends Table.RowData>(
+  r: Table.Row<R> | Table.RowWithColor<R>
+): r is Table.RowWithColor<R> => {
+  return isBodyRow(r) && (r as Table.RowWithColor<R>).data.color !== undefined;
+};
+
+export const isRowWithName = <R extends Table.RowData>(
+  r: Table.Row<R> | Table.RowWithName<R>
+): r is Table.RowWithName<R> => {
+  return isBodyRow(r) && (r as Table.RowWithName<R>).data.name !== undefined;
+};
+
+export const isRowWithDescription = <R extends Table.RowData>(
+  r: Table.Row<R> | Table.RowWithDescription<R>
+): r is Table.RowWithDescription<R> => {
+  return isBodyRow(r) && (r as Table.RowWithDescription<R>).data.description !== undefined;
+};
+
+export const isRowWithIdentifier = <R extends Table.RowData>(
+  r: Table.Row<R> | Table.RowWithIdentifier<R>
+): r is Table.RowWithIdentifier<R> => {
+  return isBodyRow(r) && (r as Table.RowWithIdentifier<R>).data.identifier !== undefined;
+};
+
 export const isPlaceholderRow = <R extends Table.RowData = object>(row: Table.Row<R>): row is Table.PlaceholderRow<R> =>
   (row as Table.PlaceholderRow<R>).rowType === "placeholder";
 
@@ -51,9 +78,6 @@ export const isAuthenticatedActionMap = <
   a: Redux.ActionMapObject<Redux.TableActionMap<M>> | Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<R, M>>
 ): a is Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<R, M>> =>
   (a as Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<R, M>>).tableChanged !== undefined;
-
-export const isRow = <R extends Table.RowData, M extends Model.HttpModel>(obj: Table.Row<R> | M): obj is Table.Row<R> =>
-  (obj as Table.Row<R>).rowType !== undefined;
 
 export const isAgColumn = <R extends Table.RowData>(
   col: Table.Column<R, any, any> | Table.PdfColumn<R, any>

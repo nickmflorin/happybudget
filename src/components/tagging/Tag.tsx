@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { isNil, map } from "lodash";
 
 import { DEFAULT_TAG_COLOR_SCHEME, Colors } from "style/constants";
-import { model, util } from "lib";
+import { model, util, tabling } from "lib";
 
 const TagRenderer = <S extends object = React.CSSProperties>(params: ITagRenderParams<S>): JSX.Element => {
   const { contentRender, ...rest } = params;
@@ -78,6 +78,8 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
         return m.title;
       } else if (model.typeguards.isModelWithName(m)) {
         return m.name || "";
+      } else if (tabling.typeguards.isRow(m) && tabling.typeguards.isRowWithName(m)) {
+        return m.data.name || "";
       }
       return "";
     };
@@ -129,6 +131,8 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
         return validateAndReturnColor(m.color, "color");
       } else if (model.typeguards.isModelWithColor(m)) {
         return validateAndReturnColor(m.color, "color");
+      } else if (tabling.typeguards.isRow(m) && tabling.typeguards.isRowWithColor(m) && !isNil(m.data.color)) {
+        return m.data.color;
       } else if (typeof m.id === "number" && !isNil(colorScheme[m.id])) {
         return colorScheme[m.id];
       }

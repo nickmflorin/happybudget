@@ -12,17 +12,16 @@ export interface FringesCellProps
 }
 
 const FringesCell = ({ value, onAddFringes, ...props }: FringesCellProps): JSX.Element => {
-  const row: Tables.SubAccountRow = props.node.data;
-  const fringes = useSelector((state: Application.Store) => props.selector(state).fringes.data);
+  const fringes: Tables.FringeRow[] = useSelector((state: Application.Store) => props.selector(state).fringes.data);
 
-  const models = useMemo(() => {
-    return model.util.getModelsByIds(fringes, row.data.fringes);
-  }, [hooks.useDeepEqualMemo(fringes), row.data.fringes]);
+  const applicableFringes: Tables.FringeRow[] = useMemo(() => {
+    return model.util.getModelsByIds(fringes, value);
+  }, [hooks.useDeepEqualMemo(fringes), value]);
 
   return (
     <Cell<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore> {...props}>
       <div style={{ display: "flex", justifyContent: "left" }}>
-        <Tag.Multiple<Tables.FringeRow> models={models} />
+        <Tag.Multiple<Tables.FringeRow> models={applicableFringes} />
       </div>
     </Cell>
   );
