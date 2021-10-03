@@ -11,27 +11,23 @@ interface FormColumnItemProps extends FormItemProps {
   readonly columnType: Table.ColumnTypeId;
 }
 
-const FormColumnItem = (props: FormColumnItemProps): JSX.Element => {
-  const columnType: Table.ColumnType | undefined = useMemo(() => {
-    return find(tabling.models.ColumnTypes, obj => obj.id === props.columnType);
-  }, [props.columnType]);
+const FormColumnItem = ({ columnType, ...props }: FormColumnItemProps): JSX.Element => {
+  const cType: Table.ColumnType | undefined = useMemo(() => {
+    return find(tabling.models.ColumnTypes, obj => obj.id === columnType);
+  }, [columnType]);
 
   const label = useMemo(() => {
     return (
       <React.Fragment>
-        {!isNil(columnType) && !isNil(columnType.icon) && (
+        {!isNil(cType) && !isNil(cType.icon) && (
           <div className={"icon-wrapper"}>
-            {ui.typeguards.iconIsJSX(columnType.icon) ? (
-              columnType?.icon
-            ) : (
-              <Icon icon={columnType.icon} weight={"regular"} />
-            )}
+            {ui.typeguards.iconIsJSX(cType.icon) ? cType?.icon : <Icon icon={cType.icon} weight={"regular"} />}
           </div>
         )}
         {props.label}
       </React.Fragment>
     );
-  }, [props.columnType]);
+  }, [columnType]);
 
   return <FormItem {...props} className={"form-column-item"} label={label} />;
 };

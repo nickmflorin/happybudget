@@ -20,6 +20,7 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
       table={table}
       showPageFooter={false}
       minimal={true}
+      sizeToFit={true}
       cookieNames={{ hiddenColumns: "contacts-table-hidden-columns" }}
       leftAlignNewRowButton={true}
       indexColumnWidth={40}

@@ -75,6 +75,7 @@ export type TableConfigurationProps<R extends Table.RowData, M extends Model.Htt
   readonly rowHeight?: number;
   readonly menuPortalId?: string;
   readonly pinFirstColumn?: boolean;
+  readonly sizeToFit?: boolean;
   // TODO: We should restrict this to authenticated cases only.
   readonly savingChangesPortalId?: string;
   readonly framework?: Table.Framework;
@@ -149,7 +150,7 @@ const configureTable = <
             },
             0.0
           );
-          if (grid?.clientWidth && width < grid.clientWidth) {
+          if (props.sizeToFit === true || (grid?.clientWidth && width < grid.clientWidth)) {
             event.api.sizeColumnsToFit();
           }
         },

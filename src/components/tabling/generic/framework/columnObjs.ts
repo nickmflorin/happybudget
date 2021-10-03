@@ -78,9 +78,6 @@ export const BodyColumn = <
   col: Partial<Table.Column<R, M, V>>
 ): Table.Column<R, M, V> => {
   return Column<R, M, V>({
-    // Not using our own cell renderer here boosts performance.
-    // cellRenderer: "BodyCell",
-    suppressSizeToFit: true,
     ...col,
     tableColumnType: "body"
   });

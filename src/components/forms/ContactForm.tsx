@@ -16,7 +16,7 @@ const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialVa
       layout={"vertical"}
       initialValues={initialValues}
     >
-      <Form.ColumnItem name={"type"} label={"Type"} columnType={"singleSelect"}>
+      <Form.ColumnItem name={"contact_type"} label={"Type"} columnType={"singleSelect"}>
         <Select suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />} placeholder={"Select Type"}>
           {model.models.ContactTypes.map((m: Model.ContactType, index: number) => (
             <Select.Option key={index} value={m.id}>
