@@ -89,9 +89,17 @@ export const EstimatedColumn = <R extends Tables.BudgetRowData, M extends Model.
               (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) && includes(row.children, r.id)
             ) as Table.ModelRow<R>[];
             if (tabling.typeguards.isMarkupRow(row)) {
+              /*
+              The markup contribution of a given <ModelRow> (and thus the markup contribution from
+              a given model) represents the overall contribution of each <Markup> on that model
+              to the total value.  Here, we are concerned with the sum of the <Markup> contributions
+              for a series of models where each contribution is only to the specific <Markup> represented
+              by this <MarkupRow>.
+              */
               return reduce(
                 childrenRows,
-                (curr: number, r: Table.ModelRow<R>) => curr + r.data.markup_contribution,
+                (curr: number, r: Table.ModelRow<R>) =>
+                  curr + model.businessLogic.contributionFromMarkups(r.data.nominal_value, [row]),
                 0.0
               );
             } else {
