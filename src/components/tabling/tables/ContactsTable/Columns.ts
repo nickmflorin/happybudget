@@ -18,6 +18,24 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     cellRenderer: { data: "ContactNameCell" },
     editable: true,
     cellClass: "cell--renders-html",
+    getCellChanges: (id: Table.EditableRowId, oldValue: string | null, newValue: string | null) => {
+      const oldParsed = !isNil(oldValue) ? model.util.parseFirstAndLastName(oldValue) : null;
+      const parsed = !isNil(newValue) ? model.util.parseFirstAndLastName(newValue) : null;
+      return [
+        {
+          field: "first_name",
+          oldValue: !isNil(oldParsed) ? oldParsed[0] : null,
+          newValue: !isNil(parsed) ? parsed[0] : null,
+          id
+        },
+        {
+          field: "last_name",
+          oldValue: !isNil(oldParsed) ? oldParsed[1] : null,
+          newValue: !isNil(parsed) ? parsed[1] : null,
+          id
+        }
+      ];
+    },
     valueSetter: (params: ValueSetterParams) => {
       if (params.newValue === undefined || params.newValue === "" || params.newValue === null) {
         params.data.data.first_name = null;

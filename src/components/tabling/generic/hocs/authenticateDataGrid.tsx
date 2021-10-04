@@ -365,19 +365,27 @@ const authenticateDataGrid =
           return changes;
         });
 
-      const getCellChangeFromEvent: (
+      const getCellChangesFromEvent: (
         event: CellEditingStoppedEvent | CellValueChangedEvent
-      ) => Table.SoloCellChange<R> | null = (
+      ) => Table.SoloCellChange<R>[] = (
         event: CellEditingStoppedEvent | CellValueChangedEvent
-      ): Table.SoloCellChange<R> | null => {
+      ): Table.SoloCellChange<R>[] => {
+        const hasChanged = (ch: Table.SoloCellChange<R>): boolean => {
+          return ch.newValue !== ch.oldValue;
+        };
+
         const row: Table.BodyRow<R> = event.node.data;
         if (tabling.typeguards.isEditableRow(row)) {
-          const field = event.column.getColId() as keyof R;
-          // AG Grid treats cell values as undefined when they are cleared via edit,
-          // so we need to translate that back into a null representation.
-          const customCol: Table.Column<R, M> | undefined = find(columns, { field } as any);
+          // The field might not necessarily be a key of the RowData, if the colId was specified
+          // for the Column and the field was not.
+          const field = event.column.getColId() as keyof R | string;
+
+          const customCol: Table.Column<R, M> | null = getColumn(field);
           if (!isNil(customCol)) {
             /*
+            AG Grid treats cell values as undefined when they are cleared via edit,
+            so we need to translate that back into a null representation.
+
             Note: Converting undefined values back to the column's corresponding null
             values may now be handled by the valueSetter on the Table.Column object.
             We may be able to remove - but leave now for safety.
@@ -385,7 +393,11 @@ const authenticateDataGrid =
             const nullValue = customCol.nullValue === undefined ? null : customCol.nullValue;
             const oldValue = event.oldValue === undefined ? nullValue : event.oldValue;
             let newValue = event.newValue === undefined ? nullValue : event.newValue;
-            if (oldValue !== newValue) {
+
+            let changes: Table.SoloCellChange<R>[];
+            if (!isNil(customCol.getCellChanges)) {
+              changes = customCol.getCellChanges(row.id, oldValue, newValue);
+            } else {
               /*
               The logic inside this conditional is 100% a HACK - and this type of
               programming should not be encouraged.  However, in this case, it is
@@ -400,17 +412,19 @@ const authenticateDataGrid =
               if (field === "fringes" && !Array.isArray(newValue)) {
                 newValue = [newValue];
               }
-              const change: Table.SoloCellChange<R> = {
-                oldValue,
-                newValue,
-                field,
-                id: event.data.id
-              };
-              return change;
+              changes = [
+                {
+                  oldValue,
+                  newValue,
+                  field: field as keyof R,
+                  id: event.data.id
+                }
+              ];
             }
+            return filter(changes, (ch: Table.SoloCellChange<R>) => hasChanged(ch));
           }
         }
-        return null;
+        return [];
       };
 
       const clearCell: (row: Table.EditableRow<R>, def: Table.Column<R, M>) => void = hooks.useDynamicCallback(
@@ -430,10 +444,11 @@ const authenticateDataGrid =
       });
 
       const onPasteEnd: (event: PasteEndEvent) => void = hooks.useDynamicCallback((event: PasteEndEvent) => {
-        const changes = filter(
-          map(cellChangeEvents, (e: CellValueChangedEvent) => getCellChangeFromEvent(e)),
-          (change: Table.SoloCellChange<R> | null) => change !== null
-        ) as Table.SoloCellChange<R>[];
+        const changes: Table.SoloCellChange<R>[] = reduce(
+          cellChangeEvents,
+          (curr: Table.SoloCellChange<R>[], e: CellValueChangedEvent) => [...curr, ...getCellChangesFromEvent(e)],
+          []
+        );
         if (changes.length !== 0) {
           props.onChangeEvent({
             type: "dataChange",
@@ -607,9 +622,9 @@ const authenticateDataGrid =
             if (e.source === "paste") {
               setCellChangeEvents([...cellChangeEvents, e]);
             } else {
-              const change = getCellChangeFromEvent(e);
-              if (!isNil(change)) {
-                props.onChangeEvent({ type: "dataChange", payload: tabling.events.cellChangeToRowChange(change) });
+              const changes = getCellChangesFromEvent(e);
+              if (changes.length !== 0) {
+                props.onChangeEvent({ type: "dataChange", payload: tabling.events.consolidateCellChanges(changes) });
                 if (tabling.typeguards.isModelRow(row) && !isNil(props.onRowExpand) && !isNil(props.rowCanExpand)) {
                   const col = props.apis?.column.getColumn("expand");
                   if (

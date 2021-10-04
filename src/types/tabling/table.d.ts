@@ -285,6 +285,7 @@ namespace Table {
     readonly onCellUnfocus?: (params: CellFocusedParams<R, M>) => void;
     readonly refreshColumns?: (change: CellChange<R, V>) => keyof R | (keyof R)[] | null;
     readonly getHttpValue?: (value: any) => any;
+    readonly getCellChanges?: (id: Table.EditableRowId, oldValue: any, newValue: any) => SoloCellChange<R>[];
     readonly processCellForClipboard?: (row: R) => string;
     readonly processCellFromClipboard?: (value: string) => any;
     readonly onCellDoubleClicked?: (row: ModelRow<R>) => void;

@@ -60,7 +60,6 @@ export const bulkPatchPayloads = <
 
   const payload: Table.DataChangePayload<R, I> = isEvent(p) ? p.payload : p;
   const changes: Table.RowChange<R, I>[] = Array.isArray(payload) ? payload : [payload];
-
   return reduce(
     changes,
     (prev: Http.ModelBulkUpdatePayload<P>[], change: Table.RowChange<R, I>) => {
