@@ -59,7 +59,7 @@ const AuthenticatedBudgetSubAccountsTable = (
           cellEditor: "FringesEditor",
           cellEditorParams: { onAddFringes: props.onAddFringes },
           headerComponentParams: { onEdit: () => props.onEditFringes() },
-          processCellFromClipboard: (value: string) => {
+          processCellFromClipboard: (value: string): number[] => {
             // NOTE: When pasting from the clipboard, the values will be a comma-separated
             // list of Fringe Names (assuming a rational user).  Currently, Fringe Names are
             // enforced to be unique, so we can map the Name back to the ID.  However, this might

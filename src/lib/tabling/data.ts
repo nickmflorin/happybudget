@@ -113,8 +113,8 @@ export const createTableRows = <
   C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
 >(
   config: Table.CreateTableDataConfig<R, M, C>
-): Table.BodyRow<R>[] =>
-  orderTableRows([
+): Table.BodyRow<R>[] => {
+  return orderTableRows([
     ...reduce(
       config.response.models,
       (curr: Table.ModelRow<R>[], m: M) => [
@@ -150,3 +150,4 @@ export const createTableRows = <
       []
     )
   ]);
+};

@@ -1,12 +1,8 @@
 import { isNil, filter, map, findIndex, includes, reduce } from "lodash";
 import { ValueGetterParams } from "@ag-grid-community/core";
 
-import { tabling } from "lib";
+import { tabling, model } from "lib";
 import { framework } from "components/tabling/generic";
-
-const isSubAccountRowData = (
-  data: Tables.AccountRowData | Tables.SubAccountRowData
-): data is Tables.SubAccountRowData => (data as Tables.SubAccountRowData).fringe_contribution !== undefined;
 
 export const IdentifierColumn = <R extends Tables.BudgetRowData, M extends Model.HttpModel>(
   props: Partial<Table.Column<R, M>>
@@ -57,7 +53,7 @@ export const IdentifierColumn = <R extends Tables.BudgetRowData, M extends Model
         if (!isNil(agColumns)) {
           const originalCalculatedColumns = map(
             filter(params.columns, (c: Table.Column<R, M>) => c.tableColumnType === "calculated"),
-            (c: Table.Column<R, M>) => c.field
+            (c: Table.Column<R, M>) => tabling.columns.normalizedField(c)
           );
           const indexOfIdentifierColumn = findIndex(agColumns, (c: Table.AgColumn) => c.getColId() === "identifier");
           const indexOfFirstCalculatedColumn = findIndex(agColumns, (c: Table.AgColumn) =>
@@ -84,19 +80,7 @@ export const EstimatedColumn = <R extends Tables.BudgetRowData, M extends Model.
         // If the row is a FooterRow, the value will be provided via footerRowSelectors.
         if (tabling.typeguards.isBodyRow(row)) {
           if (tabling.typeguards.isDataRow(row)) {
-            if (isSubAccountRowData(row.data)) {
-              return (
-                row.data.nominal_value +
-                row.data.accumulated_markup_contribution +
-                row.data.fringe_contribution +
-                row.data.accumulated_fringe_contribution
-              );
-            }
-            return (
-              row.data.nominal_value +
-              row.data.accumulated_markup_contribution +
-              row.data.accumulated_fringe_contribution
-            );
+            return model.businessLogic.rowEstimatedValue(row.data);
           } else {
             // Note: We do not have to exclude row's by ID because the primary Row here
             // is already a MarkupRow and we are only looking at the BodyRow(s).
@@ -113,11 +97,7 @@ export const EstimatedColumn = <R extends Tables.BudgetRowData, M extends Model.
             } else {
               return reduce(
                 childrenRows,
-                (curr: number, r: Table.ModelRow<R>) =>
-                  curr +
-                  (isSubAccountRowData(row.data)
-                    ? row.data.nominal_value + row.data.fringe_contribution + row.data.markup_contribution
-                    : row.data.nominal_value + row.data.accumulated_markup_contribution + row.data.markup_contribution),
+                (curr: number, r: Table.ModelRow<R>) => curr + model.businessLogic.rowEstimatedValue(r.data),
                 0.0
               );
             }
@@ -171,21 +151,22 @@ export const VarianceColumn = <R extends Tables.BudgetRowData, M extends Model.H
         const row: Table.Row<R> = params.node.data;
         // If the row is a FooterRow, the value will be provided via footerRowSelectors.
         if (tabling.typeguards.isBodyRow(row)) {
-          if (isSubAccountRowData(row.data)) {
-            return (
-              row.data.nominal_value +
-              row.data.accumulated_markup_contribution +
-              row.data.accumulated_fringe_contribution +
-              row.data.fringe_contribution -
-              row.data.actual
+          if (tabling.typeguards.isDataRow(row)) {
+            return model.businessLogic.rowEstimatedValue(row.data) - row.data.actual;
+          } else {
+            // Note: We do not have to exclude row's by ID because the primary Row here
+            // is already a MarkupRow and we are only looking at the BodyRow(s).
+            const childrenRows: Table.ModelRow<R>[] = filter(
+              tabling.aggrid.getRows<R, Table.BodyRow<R>>(params.api),
+              (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) && includes(row.children, r.id)
+            ) as Table.ModelRow<R>[];
+            return reduce(
+              childrenRows,
+              (curr: number, r: Table.ModelRow<R>) =>
+                curr + model.businessLogic.rowEstimatedValue(r.data) - r.data.actual,
+              0.0
             );
           }
-          return (
-            row.data.nominal_value +
-            row.data.accumulated_markup_contribution +
-            row.data.accumulated_fringe_contribution -
-            row.data.actual
-          );
         }
       }
       return 0.0;
