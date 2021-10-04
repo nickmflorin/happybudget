@@ -43,7 +43,7 @@
     background-color: $color !important;
   }
   .row:not(.ag-row-hover) {
-    > .cell {
+    > .cell:not(.cell--calculated) {
       background-color: $color;
       &.ag-cell-range-selected {
         background-color: $color;
