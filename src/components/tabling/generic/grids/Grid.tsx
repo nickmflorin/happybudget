@@ -172,6 +172,7 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
             nullValue,
             domain,
             defaultHidden,
+            getCSVValue,
             getCellChanges,
             refreshColumns,
             onCellDoubleClicked,

@@ -18,6 +18,9 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     cellRenderer: { data: "ContactNameCell" },
     editable: true,
     cellClass: "cell--renders-html",
+    getCSVValue: (row: Table.BodyRow<Tables.ContactRowData>) => {
+      return util.conditionalJoinString(row.data.first_name, row.data.last_name);
+    },
     getCellChanges: (id: Table.EditableRowId, oldValue: string | null, newValue: string | null) => {
       const oldParsed = !isNil(oldValue) ? model.util.parseFirstAndLastName(oldValue) : null;
       const parsed = !isNil(newValue) ? model.util.parseFirstAndLastName(newValue) : null;

@@ -78,7 +78,12 @@ const useClipboard = <R extends Table.RowData, M extends Model.HttpModel>(
               cs,
               (current: CSVRow, column: Table.Column<R, M>) => [
                 ...current,
-                !isNil(column.field) ? processCellValueForClipboard(column, row, row.data[column.field]) : ""
+                /* eslint-disable indent */
+                !isNil(column.getCSVValue)
+                  ? column.getCSVValue(row)
+                  : !isNil(column.field)
+                  ? processCellValueForClipboard(column, row, row.data[column.field])
+                  : ""
               ],
               []
             )
