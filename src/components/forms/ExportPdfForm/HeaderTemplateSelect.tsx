@@ -41,7 +41,7 @@ const HeaderTemplateSelect = (props: HeaderTemplateSelectProps): JSX.Element => 
         {map(props.templates, (template: Model.HeaderTemplate, index: number) => {
           return (
             <Select.Option className={"header-template-select-option"} key={index + 1} value={template.id}>
-              <div className={"header-template-select-option-text"}>{template.name}</div>
+              {template.name}
               <div className={"header-template-select-option-icon-wrapper"}>
                 {template.id === props.deleting ? (
                   <Spinner />

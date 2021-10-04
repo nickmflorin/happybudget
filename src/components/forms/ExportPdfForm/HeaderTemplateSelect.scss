@@ -5,6 +5,10 @@
     width: 200px;
     margin-right: 10px;
   }
+
+  .header-template-select-option-icon-wrapper {
+    display: none;
+  }
 }
 
 .header-template-select-option {
@@ -12,11 +16,9 @@
     display: flex;
     width: 100%;
 
-    .header-template-select-option-text {
-      flex-grow: 100;
-    }
     .header-template-select-option-icon-wrapper {
       display: none;
+      margin-left: auto;
 
       .spinner {
         height: 16px !important;

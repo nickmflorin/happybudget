@@ -90,7 +90,7 @@ const SubAccountsTable = ({ budget, budgetId, ...props }: BudgetSubAccountsTable
         visible={previewModalVisible}
         onCancel={() => setPreviewModalVisible(false)}
         budgetId={budgetId}
-        budgetName={!isNil(budget) ? `${budget.name} Budget` : `Sample Budget ${new Date().getFullYear()}`}
+        budgetName={!isNil(budget) ? `${budget.name}` : `Sample Budget ${new Date().getFullYear()}`}
         filename={!isNil(budget) ? `${budget.name}.pdf` : "budget.pdf"}
       />
     </React.Fragment>
