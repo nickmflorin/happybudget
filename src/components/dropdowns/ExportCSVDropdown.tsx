@@ -18,7 +18,7 @@ const colField = <R extends Table.RowData, M extends Model.HttpModel = Model.Htt
 const ExportCSVDropdown = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   props: ExportCSVDropdownProps<R, M>
 ): JSX.Element => {
-  const [selected, setSelected] = useState<(keyof R)[]>([]);
+  const [selected, setSelected] = useState<(keyof R | string)[]>([]);
 
   const exportableColumns = useMemo<Table.Column<R, M>[]>(
     () =>
@@ -55,11 +55,11 @@ const ExportCSVDropdown = <R extends Table.RowData, M extends Model.HttpModel = 
           (s: IMenuItemState<MenuItemModel>) => s.selected === true
         ) as IMenuItemState<MenuItemModel>[];
         const selectedIds = map(selectedStates, (state: IMenuItemState<MenuItemModel>) => String(state.model.id));
-        setSelected(selectedIds as (keyof R)[]);
+        setSelected(selectedIds as (keyof R | string)[]);
       }}
       menuSelected={selected as string[]}
       menuItems={map(exportableColumns, (col: Table.Column<R, M>) => ({
-        id: col.field as string,
+        id: colField(col) as string,
         label: col.headerName || ""
       }))}
       menuButtons={[
