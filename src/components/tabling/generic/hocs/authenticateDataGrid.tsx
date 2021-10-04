@@ -583,24 +583,6 @@ const authenticateDataGrid =
 
       const processCellFromClipboard: (params: ProcessCellForExportParams) => string = hooks.useDynamicCallback(
         (params: ProcessCellForExportParams) => {
-          const processCellValueFromClipboard = (column: Table.Column<R, M>, value: any): any => {
-            const processor = column.processCellFromClipboard;
-            if (!isNil(processor)) {
-              value = processor(value);
-            } else {
-              // The value should never be undefined at this point.
-              if (typeof value === "string" && String(value).trim() === "") {
-                return column.nullValue === undefined ? null : column.nullValue;
-              }
-              return value;
-            }
-          };
-
-          const process = (column: Table.Column<R, M>, row: Table.BodyRow<R>, value?: any) => {
-            value = value === undefined ? util.getKeyValue<R, keyof R>(column.field as keyof R)(row.data) : value;
-            return processCellValueFromClipboard(column, value);
-          };
-
           if (!isNil(params.node)) {
             const node: Table.RowNode = params.node;
             const field = params.column.getColId();
@@ -614,8 +596,28 @@ const authenticateDataGrid =
                 });
                 setCellCutChange(null);
               }
-              console.log({ c });
-              return process(c, node.data as Table.BodyRow<R>, params.value) || "";
+              const row: Table.BodyRow<R> = node.data;
+              let value = params.value;
+              console.log({ value });
+              // If the value is undefined, it is something wonky with AG Grid.  We should return
+              // the current value as to not cause data loss.
+              if (value === undefined) {
+                if (!isNil(c.field)) {
+                  return util.getKeyValue<R, keyof R>(c.field as keyof R)(row.data);
+                }
+                return c.nullValue === undefined ? null : c.nullValue;
+              } else {
+                const processor = c.processCellFromClipboard;
+                if (!isNil(processor)) {
+                  value = processor(value);
+                  // The value should never be undefined at this point.
+                  if (typeof value === "string" && String(value).trim() === "") {
+                    return c.nullValue === undefined ? null : c.nullValue;
+                  }
+                  console.log({ value });
+                  return value;
+                }
+              }
             } else {
               /* eslint-disable no-console */
               console.error(`Could not find column for field ${field}!`);
