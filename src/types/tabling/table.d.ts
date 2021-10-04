@@ -303,12 +303,15 @@ namespace Table {
 
   type ExpandActionBehavior = "expand" | "edit";
 
-  type TableInstance<R extends RowData = RowData> = {
+  type DataGridInstance<R extends RowData = RowData> = {
+    readonly getCSVData: (fields?: string[]) => CSVData;
+  };
+
+  type TableInstance<R extends RowData = RowData> = DataGridInstance<R> & {
     readonly getFocusedRow: () => BodyRow<R> | null;
     readonly getRowsAboveAndIncludingFocusedRow: () => BodyRow<R>[];
     readonly applyTableChange: (event: SingleOrArray<ChangeEvent<R>>) => void;
     readonly applyGroupColorChange: (group: Model.Group) => void;
-    readonly getCSVData: (fields?: string[]) => CSVData;
     readonly changeColumnVisibility: (changes: SingleOrArray<ColumnVisibilityChange<R>>, sizeToFit?: boolean) => void;
   };
 

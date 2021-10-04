@@ -1,25 +1,34 @@
-import { useMemo } from "react";
+import { useMemo, useImperativeHandle } from "react";
 import { isNil, map } from "lodash";
 import hoistNonReactStatics from "hoist-non-react-statics";
 
-import { CellKeyDownEvent, NavigateToNextCellParams, TabToNextCellParams } from "@ag-grid-community/core";
+import {
+  ProcessCellForExportParams,
+  CellKeyDownEvent,
+  NavigateToNextCellParams,
+  TabToNextCellParams
+} from "@ag-grid-community/core";
 
 import { hooks } from "lib";
 
 import useCellNavigation from "./useCellNavigation";
+import useClipboard from "./useClipboard";
 
-type InjectedUnauthenticatedDataGridProps = {
-  readonly onCellKeyDown?: (event: CellKeyDownEvent) => void;
-  readonly navigateToNextCell?: (params: NavigateToNextCellParams) => Table.CellPosition;
-  readonly tabToNextCell?: (params: TabToNextCellParams) => Table.CellPosition;
+type InjectedUnauthenticatedDataGridProps<R extends Table.RowData> = {
+  readonly getCSVData: (fields?: (keyof R | string)[]) => CSVData;
+  readonly processCellForClipboard: (params: ProcessCellForExportParams) => string;
+  readonly onCellKeyDown: (event: CellKeyDownEvent) => void;
+  readonly navigateToNextCell: (params: NavigateToNextCellParams) => Table.CellPosition;
+  readonly tabToNextCell: (params: TabToNextCellParams) => Table.CellPosition;
 };
 
 export interface UnauthenticateDataGridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
+  readonly grid: NonNullRef<Table.DataGridInstance<R>>;
 }
 
-export type WithUnauthenticatedDataGridProps<T> = T & InjectedUnauthenticatedDataGridProps;
+export type WithUnauthenticatedDataGridProps<R extends Table.RowData, T> = T & InjectedUnauthenticatedDataGridProps<R>;
 
 /* eslint-disable indent */
 const unauthenticatedDataGrid =
@@ -32,10 +41,14 @@ const unauthenticatedDataGrid =
   ) =>
   (
     Component:
-      | React.ComponentClass<WithUnauthenticatedDataGridProps<T>, {}>
-      | React.FunctionComponent<WithUnauthenticatedDataGridProps<T>>
+      | React.ComponentClass<WithUnauthenticatedDataGridProps<R, T>, {}>
+      | React.FunctionComponent<WithUnauthenticatedDataGridProps<R, T>>
   ): React.FunctionComponent<T> => {
     function WithUnauthenticatedDataGrid(props: T) {
+      const [processCellForClipboard, getCSVData] = useClipboard<R, M>({
+        columns: props.columns,
+        apis: props.apis
+      });
       /* eslint-disable no-unused-vars */
       /* eslint-disable @typescript-eslint/no-unused-vars */
       const [navigateToNextCell, tabToNextCell, _, moveToNextRow] = useCellNavigation<R, M>({
@@ -60,10 +73,16 @@ const unauthenticatedDataGrid =
         }
       );
 
+      useImperativeHandle(props.grid, () => ({
+        getCSVData
+      }));
+
       return (
         <Component
           {...props}
           columns={columns}
+          processCellForClipboard={processCellForClipboard}
+          getCSVData={getCSVData}
           onCellKeyDown={onCellKeyDown}
           navigateToNextCell={navigateToNextCell}
           tabToNextCell={tabToNextCell}

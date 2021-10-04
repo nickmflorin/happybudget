@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { filter, map, includes, isNil } from "lodash";
 
+import { tabling } from "lib";
 import Dropdown, { DropdownMenuItemsProps } from "./Dropdown";
 
 type OmitDropdownProps = "menuMode" | "menuCheckbox" | "menuSelected" | "menuItems";
@@ -9,10 +10,6 @@ export interface ToggleColumnsDropdownProps<R extends Table.RowData, M extends M
   readonly columns: Table.Column<R, M>[];
   readonly hiddenColumns?: (keyof R | string)[];
 }
-
-const colField = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
-  col: Table.Column<R, M>
-): keyof R | string | undefined => (col.field !== undefined ? col.field : col.colId);
 
 /* eslint-disable indent */
 const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
@@ -23,7 +20,7 @@ const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.HttpMode
       filter(
         props.columns,
         (col: Table.Column<R, M>) =>
-          col.canBeHidden !== false && col.tableColumnType !== "fake" && !isNil(colField(col))
+          col.canBeHidden !== false && col.tableColumnType !== "fake" && !isNil(tabling.columns.normalizedField(col))
       ),
     [props.columns]
   );
@@ -31,8 +28,11 @@ const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.HttpMode
   const selected = useMemo<(keyof R | string)[]>(
     () =>
       map(
-        filter(hideableColumns, (col: Table.Column<R, M>) => !includes(props.hiddenColumns, colField(col))),
-        (col: Table.Column<R, M>) => colField(col)
+        filter(
+          hideableColumns,
+          (col: Table.Column<R, M>) => !includes(props.hiddenColumns, tabling.columns.normalizedField(col))
+        ),
+        (col: Table.Column<R, M>) => tabling.columns.normalizedField(col)
       ) as (keyof R | string)[],
     [hideableColumns, props.hiddenColumns]
   );
@@ -47,7 +47,7 @@ const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.HttpMode
       menuSelected={selected as string[]}
       keepDropdownOpenOnClick={true}
       menuItems={map(hideableColumns, (col: Table.Column<R, M>) => ({
-        id: colField(col) as string,
+        id: tabling.columns.normalizedField(col) as string,
         label: col.headerName || ""
       }))}
     />

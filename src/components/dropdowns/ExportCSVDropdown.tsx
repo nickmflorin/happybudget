@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { filter, map, includes, isNil } from "lodash";
 
+import { tabling } from "lib";
 import Dropdown from "./Dropdown";
 
 export interface ExportCSVDropdownProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
@@ -9,10 +10,6 @@ export interface ExportCSVDropdownProps<R extends Table.RowData, M extends Model
   readonly onDownload: (state: IMenuItemState<MenuItemModel>[]) => void;
   readonly hiddenColumns?: (keyof R | string)[];
 }
-
-const colField = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
-  col: Table.Column<R, M>
-): keyof R | string | undefined => (col.field !== undefined ? col.field : col.colId);
 
 /* eslint-disable indent */
 const ExportCSVDropdown = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
@@ -25,7 +22,7 @@ const ExportCSVDropdown = <R extends Table.RowData, M extends Model.HttpModel = 
       filter(
         props.columns,
         (col: Table.Column<R, M>) =>
-          col.canBeExported !== false && col.tableColumnType !== "fake" && !isNil(colField(col))
+          col.canBeExported !== false && col.tableColumnType !== "fake" && !isNil(tabling.columns.normalizedField(col))
       ),
     [props.columns]
   );
@@ -59,7 +56,7 @@ const ExportCSVDropdown = <R extends Table.RowData, M extends Model.HttpModel = 
       }}
       menuSelected={selected as string[]}
       menuItems={map(exportableColumns, (col: Table.Column<R, M>) => ({
-        id: colField(col) as string,
+        id: tabling.columns.normalizedField(col) as string,
         label: col.headerName || ""
       }))}
       menuButtons={[

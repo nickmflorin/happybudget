@@ -1,7 +1,7 @@
 import React, { useImperativeHandle, useMemo } from "react";
 import { map, isNil, filter, intersection } from "lodash";
 
-import { hooks } from "lib";
+import { hooks, tabling } from "lib";
 
 import { UnauthenticatedGrid, UnauthenticatedGridProps } from "../grids";
 import { UnauthenticatedMenu } from "../menus";
@@ -10,6 +10,7 @@ import {
   TableConfigurationProps,
   WithConfiguredTableProps,
   WithConnectedTableProps,
+  WithUnauthenticatedDataGridProps,
   DataGridProps,
   UnauthenticateDataGridProps,
   configureTable
@@ -52,14 +53,18 @@ const PageFooterGrid = FooterGrid<any, any, UnauthenticatedGridProps<any>>({
   getFooterColumn: (col: Table.Column<any, any, any>) => col.page || null
 })(UnauthenticatedGrid) as {
   <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
-    props: Omit<UnauthenticatedGridProps<R, M>, "id">
+    props: Omit<UnauthenticatedGridProps<R, M>, "id" | "grid">
   ): JSX.Element;
 };
 
 /* eslint-disable indent */
 const UnauthenticatedTable = <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
-  props: WithConnectedTableProps<WithConfiguredTableProps<UnauthenticatedTableProps<R, M>, R>, R>
+  props: WithUnauthenticatedDataGridProps<
+    R,
+    WithConnectedTableProps<WithConfiguredTableProps<UnauthenticatedTableProps<R, M>, R>, R>
+  >
 ): JSX.Element => {
+  const grid = tabling.hooks.useDataGrid();
   /**
    * Note: Ideally, we would be including the selector in the mechanics of the
    * connectTableToStore HOC.  However, that HOC is usually applied to tables after
@@ -100,7 +105,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.TypedHttp
   }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns]);
 
   useImperativeHandle(props.table, () => ({
-    getCSVData: props.getCSVData,
+    ...grid.current,
     changeColumnVisibility: props.changeColumnVisibility,
     applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R>>) => {},
     getRowsAboveAndIncludingFocusedRow: () => {
@@ -183,6 +188,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.TypedHttp
           ...props,
           apis: props.tableApis.get("data"),
           columns: columns,
+          grid,
           gridOptions: props.tableGridOptions.data,
           onGridReady: props.onDataGridReady
         })}
@@ -199,7 +205,10 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.TypedHttp
   );
 };
 
-type Props = WithConnectedTableProps<WithConfiguredTableProps<UnauthenticatedTableProps<any>, any>, any>;
+type Props = WithUnauthenticatedDataGridProps<
+  any,
+  WithConnectedTableProps<WithConfiguredTableProps<UnauthenticatedTableProps<any>, any>, any>
+>;
 
 export default configureTable<any, any, Props>(UnauthenticatedTable) as {
   <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(

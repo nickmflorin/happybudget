@@ -10,6 +10,7 @@ import {
   FooterGrid,
   TableConfigurationProps,
   WithConfiguredTableProps,
+  WithAuthenticatedDataGridProps,
   WithConnectedTableProps,
   AuthenticateDataGridProps,
   DataGridProps,
@@ -28,7 +29,7 @@ export type AuthenticatedTableProps<
 > = TableConfigurationProps<R, M> &
   Omit<
     AuthenticateDataGridProps<R, M>,
-    "onChangeEvent" | "columns" | "data" | "apis" | "onRowSelectionChanged" | "rowHasCheckboxSelection"
+    "onChangeEvent" | "columns" | "data" | "apis" | "onRowSelectionChanged" | "rowHasCheckboxSelection" | "grid"
   > & {
     readonly table?: NonNullRef<Table.TableInstance<R>>;
     readonly actions?: Table.AuthenticatedMenuActions<R, M>;
@@ -68,8 +69,12 @@ const AuthenticatedTable = <
   M extends Model.TypedHttpModel = Model.TypedHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
-  props: WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<R, M>, R>, R, S>
+  props: WithAuthenticatedDataGridProps<
+    R,
+    WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<R, M>, R>, R, S>
+  >
 ): JSX.Element => {
+  const grid = tabling.hooks.useDataGrid();
   const [selectedRows, setSelectedRows] = useState<Table.EditableRow<R>[]>([]);
 
   /**
@@ -202,7 +207,7 @@ const AuthenticatedTable = <
   );
 
   useImperativeHandle(props.table, () => ({
-    getCSVData: props.getCSVData,
+    ...grid.current,
     changeColumnVisibility: props.changeColumnVisibility,
     applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R>>) =>
       Array.isArray(event) ? map(event, (e: Table.ChangeEvent<R>) => _onChangeEvent(e)) : _onChangeEvent(event),
@@ -295,6 +300,7 @@ const AuthenticatedTable = <
           apis: props.tableApis.get("data"),
           columns: columns,
           gridOptions: props.tableGridOptions.data,
+          grid,
           onGridReady: props.onDataGridReady,
           onRowSelectionChanged: (rows: Table.EditableRow<R>[]) => setSelectedRows(rows),
           onChangeEvent: _onChangeEvent,
@@ -328,7 +334,10 @@ const AuthenticatedTable = <
   );
 };
 
-type Props = WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<any>, any>, any>;
+type Props = WithAuthenticatedDataGridProps<
+  any,
+  WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<any>, any>, any>
+>;
 
 export default configureTable<any, any, Props>(AuthenticatedTable) as {
   <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(

@@ -1,13 +1,12 @@
 import { useMemo, useReducer } from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
-import { map, isNil, filter, includes, reduce, uniqueId } from "lodash";
-import { GridReadyEvent, GridOptions, FirstDataRenderedEvent, RowNode } from "@ag-grid-community/core";
+import { map, isNil, filter, reduce, uniqueId } from "lodash";
+import { GridReadyEvent, GridOptions, FirstDataRenderedEvent } from "@ag-grid-community/core";
 
 import { Config } from "config";
-import { tabling, hooks, util } from "lib";
+import { tabling, hooks } from "lib";
 
 import * as framework from "../framework";
-import { typeguards } from "lib/tabling";
 
 export const DefaultDataGridOptions: GridOptions = {
   defaultColDef: {
@@ -50,7 +49,7 @@ type TableConfigurationProvidedProps<R extends Table.RowData> = {
   readonly menuPortalId?: string;
   readonly showPageFooter?: boolean;
   readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
-  readonly getCSVData: () => CSVData;
+  // readonly getCSVData: () => CSVData;
   readonly onDataGridReady: (event: GridReadyEvent) => void;
   readonly onFooterGridReady: (event: GridReadyEvent) => void;
   readonly onPageGridReady: (event: GridReadyEvent) => void;
@@ -221,48 +220,6 @@ const configureTable = <
       props.onEditRow
     ]);
 
-    const processCellForClipboard = hooks.useDynamicCallback(
-      (column: Table.Column<R, M>, row: Table.DataRow<R>, value?: any) => {
-        const processor = column.processCellForClipboard;
-        if (!isNil(processor)) {
-          return processor(row.data);
-        } else {
-          value = value === undefined ? util.getKeyValue<R, keyof R>(column.field as keyof R)(row.data) : value;
-          // The value should never be undefined at this point.
-          if (value === column.nullValue) {
-            return "";
-          }
-          return value;
-        }
-      }
-    );
-
-    const getCSVData = hooks.useDynamicCallback((fields?: (keyof R)[]) => {
-      const apis: Table.GridApis | null = _apis.get("data");
-      if (!isNil(apis)) {
-        const cs: Table.Column<R, M>[] = filter(
-          columns,
-          (column: Table.Column<R, M>) =>
-            column.canBeExported !== false && (isNil(fields) || includes(fields, column.field))
-        );
-        const csvData: CSVData = [map(cs, (col: Table.Column<R, M>) => col.headerName || "")];
-        apis.grid.forEachNode((node: RowNode, index: number) => {
-          const row: Table.BodyRow<R> = node.data;
-          if (typeguards.isDataRow(row)) {
-            csvData.push(
-              reduce(
-                cs,
-                (current: CSVRow, column: Table.Column<R, M>) => [...current, processCellForClipboard(column, row)],
-                []
-              )
-            );
-          }
-        });
-        return csvData;
-      }
-      return [];
-    });
-
     return (
       <Component
         {...props}
@@ -279,7 +236,6 @@ const configureTable = <
         tableGridOptions={tableGridOptions}
         hiddenColumns={hiddenColumns}
         rowCanExpand={props.rowCanExpand}
-        getCSVData={getCSVData}
         onDataGridReady={onDataGridReady}
         onFooterGridReady={onFooterGridReady}
         onPageGridReady={onPageGridReady}

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useImperativeHandle } from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
 import { map, isNil, includes, find, filter, flatten, forEach, reduce } from "lodash";
 
@@ -16,36 +16,39 @@ import {
   PasteStartEvent,
   ProcessDataFromClipboardParams,
   CellDoubleClickedEvent,
-  ColumnApi,
   NavigateToNextCellParams,
   TabToNextCellParams,
   CheckboxSelectionCallbackParams
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
-import { tabling, hooks, util } from "lib";
+import { tabling, hooks } from "lib";
 import useCellNavigation from "./useCellNavigation";
 import useContextMenu, { UseContextMenuParams } from "./useContextMenu";
+import useAuthenticatedClipboard from "./useAuthenticatedClipboard";
+import useColumnHelpers from "./useColumnHelpers";
 
-interface InjectedAuthenticatedDataGridProps {
+interface InjectedAuthenticatedDataGridProps<R extends Table.RowData> {
+  readonly getCSVData: (fields?: (keyof R | string)[]) => CSVData;
+  readonly processCellForClipboard: (params: ProcessCellForExportParams) => string;
   readonly onCellDoubleClicked?: (e: CellDoubleClickedEvent) => void;
-  readonly processDataFromClipboard?: (params: ProcessDataFromClipboardParams) => any;
-  readonly processCellFromClipboard?: (params: ProcessCellForExportParams) => string;
-  readonly onCellEditingStarted?: (event: CellEditingStartedEvent) => void;
-  readonly onPasteStart?: (event: PasteStartEvent) => void;
-  readonly onPasteEnd?: (event: PasteEndEvent) => void;
-  readonly onCellValueChanged?: (e: CellValueChangedEvent) => void;
-  readonly fillOperation?: (params: FillOperationParams) => boolean;
-  readonly onCellKeyDown?: (event: CellKeyDownEvent) => void;
-  readonly processCellForClipboard?: (params: ProcessCellForExportParams) => string;
-  readonly navigateToNextCell?: (params: NavigateToNextCellParams) => Table.CellPosition;
-  readonly tabToNextCell?: (params: TabToNextCellParams) => Table.CellPosition;
+  readonly processDataFromClipboard: (params: ProcessDataFromClipboardParams) => any;
+  readonly processCellFromClipboard: (params: ProcessCellForExportParams) => string;
+  readonly onCellEditingStarted: (event: CellEditingStartedEvent) => void;
+  readonly onPasteStart: (event: PasteStartEvent) => void;
+  readonly onPasteEnd: (event: PasteEndEvent) => void;
+  readonly onCellValueChanged: (e: CellValueChangedEvent) => void;
+  readonly fillOperation: (params: FillOperationParams) => boolean;
+  readonly onCellKeyDown: (event: CellKeyDownEvent) => void;
+  readonly navigateToNextCell: (params: NavigateToNextCellParams) => Table.CellPosition;
+  readonly tabToNextCell: (params: TabToNextCellParams) => Table.CellPosition;
 }
 
 export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
   extends UseContextMenuParams<R> {
   readonly apis: Table.GridApis | null;
   readonly tableId: Table.Id;
+  readonly grid: NonNullRef<Table.DataGridInstance<R>>;
   readonly columns: Table.Column<R, M>[];
   readonly data: Table.BodyRow<R>[];
   readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
@@ -59,7 +62,7 @@ export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Mo
   readonly onEditMarkup?: (g: Table.MarkupRow<R>) => void;
 }
 
-export type WithAuthenticatedDataGridProps<T> = T & InjectedAuthenticatedDataGridProps;
+export type WithAuthenticatedDataGridProps<R extends Table.RowData, T> = T & InjectedAuthenticatedDataGridProps<R>;
 
 /* eslint-disable indent */
 const authenticateDataGrid =
@@ -72,11 +75,22 @@ const authenticateDataGrid =
   ) =>
   (
     Component:
-      | React.ComponentClass<WithAuthenticatedDataGridProps<T>, {}>
-      | React.FunctionComponent<WithAuthenticatedDataGridProps<T>>
+      | React.ComponentClass<WithAuthenticatedDataGridProps<R, T>, {}>
+      | React.FunctionComponent<WithAuthenticatedDataGridProps<R, T>>
   ): React.FunctionComponent<T> => {
     function WithAuthenticatedDataGrid(props: T) {
-      const [cutCellChange, setCellCutChange] = useState<Table.SoloCellChange<R> | null>(null);
+      const [
+        processCellForClipboard,
+        getCSVData,
+        processCellFromClipboard,
+        processDataFromClipboard,
+        setCellCutChange
+      ] = useAuthenticatedClipboard<R, M>({
+        columns: props.columns,
+        apis: props.apis,
+        onChangeEvent: props.onChangeEvent
+      });
+      const [getColumn, callWithColumn] = useColumnHelpers(props.columns);
       const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
       const oldRow = useRef<Table.ModelRow<R> | null>(null); // TODO: Figure out a better way to do this.
 
@@ -228,41 +242,6 @@ const authenticateDataGrid =
       });
 
       const [getContextMenuItems] = useContextMenu(props);
-
-      const getColumn = useMemo(
-        () =>
-          (field: keyof R | string): Table.Column<R, M> | null => {
-            const foundColumn = find(columns, (c: Table.Column<R, M>) => c.field === field || c.colId === field);
-            if (!isNil(foundColumn)) {
-              return foundColumn;
-            } else {
-              /* eslint-disable no-console */
-              console.error(`Could not find column for field ${field}!`);
-              return null;
-            }
-          },
-        []
-      );
-
-      const checkValue = useMemo(
-        () => (value: any) => {
-          // AG Grid inserts a lot of undefined places where they shouldn't, but our entire mechanical
-          // process relies on empty or null values actually being NULL.
-          if (value === undefined) {
-            /* eslint-disable no-console */
-            console.warn("Detected undefined value when it is not expected.");
-          }
-        },
-        []
-      );
-
-      const callWithColumn = <RT extends any = any>(
-        field: keyof R | string,
-        callback: (col: Table.Column<R, M>) => RT | null
-      ) => {
-        const foundColumn = getColumn(field);
-        return !isNil(foundColumn) ? callback(foundColumn) : null;
-      };
 
       const onCellSpaceKey = (event: CellKeyDownEvent) => {
         if (!isNil(event.rowIndex)) {
@@ -469,159 +448,6 @@ const authenticateDataGrid =
         }
       });
 
-      const processDataFromClipboard: (params: ProcessDataFromClipboardParams) => CSVData = hooks.useDynamicCallback(
-        (params: ProcessDataFromClipboardParams) => {
-          // TODO: We need to test this in the case that we are copy and pasting starting at the action
-          // columns on the left and potentially the non editable columns on the right.
-          const getWritableColumnsAfter = (local: ColumnApi, col: Table.AgColumn): Table.Column<R, M>[] => {
-            const cols: Table.Column<R, M>[] = [];
-            let current: Table.AgColumn | null = col;
-            while (!isNil(current)) {
-              const c: Table.Column<R, M> | null = getColumn(col.getColId());
-              if (!isNil(c) && c.isWrite !== false) {
-                cols.push(c);
-              }
-              current = local.getDisplayedColAfter(current);
-            }
-            return cols;
-          };
-
-          const generateRowAddFromArray = (array: any[], cols: Table.Column<R, M>[]): Table.RowAdd<R> | null => {
-            if (cols.length < array.length) {
-              /* eslint-disable no-console */
-              console.warn(
-                `There are ${cols.length} writable displayed columns, but the data array
-                has length ${array.length} - this most likely means there is an issue with the
-                column configuration.`
-              );
-              return null;
-            } else {
-              return {
-                id: tabling.rows.placeholderRowId(),
-                data: reduce(
-                  cols,
-                  (curr: Partial<R>, c: Table.Column<R, M>, index: number) =>
-                    !isNil(c.field)
-                      ? {
-                          ...curr,
-                          [c.field]: { column: c, value: array[index] }
-                        }
-                      : curr,
-                  {}
-                )
-              };
-            }
-          };
-
-          const columnApi = props.apis?.column;
-          if (!isNil(columnApi)) {
-            const lastIndex = props.apis?.grid.getDisplayedRowCount();
-            const focusedCell = props.apis?.grid.getFocusedCell();
-            if (!isNil(focusedCell) && !isNil(lastIndex)) {
-              if (focusedCell.rowIndex + params.data.length - 1 > lastIndex) {
-                const resultLastIndex = focusedCell.rowIndex + params.data.length;
-                const addRowCount = resultLastIndex - lastIndex;
-
-                let rowsToAdd = [];
-                let addedRows = 0;
-                let currIndex = params.data.length - 1;
-                while (addedRows < addRowCount) {
-                  rowsToAdd.push(params.data.splice(currIndex, 1)[0]);
-                  addedRows++;
-                  currIndex--;
-                }
-                rowsToAdd = rowsToAdd.reverse();
-
-                const cols = getWritableColumnsAfter(columnApi, focusedCell.column);
-                props.onChangeEvent({
-                  type: "rowAdd",
-                  payload: filter(
-                    map(rowsToAdd, (row: any[]) => generateRowAddFromArray(row, cols)),
-                    (ra: Table.RowAdd<R> | null) => !isNil(ra)
-                  ) as Table.RowAdd<R>[]
-                });
-              }
-            }
-          }
-          return params.data;
-        }
-      );
-
-      const processCellForClipboard: (params: ProcessCellForExportParams) => string = hooks.useDynamicCallback(
-        (params: ProcessCellForExportParams): string => {
-          const processCellValueForClipboard = (column: Table.Column<R, M>, row: Table.BodyRow<R>): string => {
-            const processor = column.processCellForClipboard;
-            if (!isNil(processor)) {
-              return String(processor(row.data));
-            } else {
-              let value = params.value;
-              checkValue(value); // The value should never be undefined at this point.
-              if (value === column.nullValue || value === undefined) {
-                return "";
-              } else if (typeof value === "string" || typeof value === "number") {
-                return String(value);
-              }
-              return "";
-            }
-          };
-          if (!isNil(params.node)) {
-            const c: Table.Column<R, M> | null = getColumn(params.column.getColId());
-            if (!isNil(c)) {
-              setCellCutChange(null);
-              const row: Table.BodyRow<R> = params.node.data;
-              return processCellValueForClipboard(c, row);
-            }
-          }
-          return "";
-        }
-      );
-
-      /* @ts-ignore */
-      const processCellFromClipboard: (params: ProcessCellForExportParams) => string = hooks.useDynamicCallback(
-        (params: ProcessCellForExportParams) => {
-          if (!isNil(params.node)) {
-            const node: Table.RowNode = params.node;
-            const field = params.column.getColId();
-            const c = getColumn(field);
-            if (!isNil(c)) {
-              if (!isNil(cutCellChange)) {
-                params = { ...params, value: cutCellChange.oldValue };
-                props.onChangeEvent({
-                  type: "dataChange",
-                  payload: tabling.events.cellChangeToRowChange(cutCellChange)
-                });
-                setCellCutChange(null);
-              }
-              const row: Table.BodyRow<R> = node.data;
-              let value = params.value;
-              // If the value is undefined, it is something wonky with AG Grid.  We should return
-              // the current value as to not cause data loss.
-              if (value === undefined) {
-                if (!isNil(c.field)) {
-                  return util.getKeyValue<R, keyof R>(c.field as keyof R)(row.data);
-                }
-                return c.nullValue === undefined ? null : c.nullValue;
-              } else {
-                const processor = c.processCellFromClipboard;
-                if (!isNil(processor)) {
-                  value = processor(value);
-                  // The value should never be undefined at this point.
-                  if (typeof value === "string" && String(value).trim() === "") {
-                    return c.nullValue === undefined ? null : c.nullValue;
-                  }
-                }
-                return value;
-              }
-            } else {
-              /* eslint-disable no-console */
-              console.error(`Could not find column for field ${field}!`);
-              return "";
-            }
-          }
-          return "";
-        }
-      );
-
       const onCellValueChanged: (e: CellValueChangedEvent) => void = hooks.useDynamicCallback(
         (e: CellValueChangedEvent) => {
           const row: Table.BodyRow<R> = e.node.data;
@@ -669,10 +495,15 @@ const authenticateDataGrid =
         }
       });
 
+      useImperativeHandle(props.grid, () => ({
+        getCSVData
+      }));
+
       return (
         <Component
           {...props}
           columns={columns}
+          getCSVData={getCSVData}
           onCellKeyDown={onCellKeyDown}
           onCellCut={onCellCut}
           onCellSpaceKey={onCellSpaceKey}

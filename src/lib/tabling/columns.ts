@@ -3,6 +3,10 @@ import { find, isNil, reduce, filter, orderBy } from "lodash";
 
 import { ColumnTypes } from "./models";
 
+export const normalizedField = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  col: Table.Column<R, M>
+): keyof R | string | undefined => (col.field !== undefined ? col.field : col.colId);
+
 type ColumnTypeVariantOptions = {
   header?: boolean;
   pdf?: boolean;
