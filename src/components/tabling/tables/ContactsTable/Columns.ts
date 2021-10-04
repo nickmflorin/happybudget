@@ -18,10 +18,6 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     cellRenderer: { data: "ContactNameCell" },
     editable: true,
     cellClass: "cell--renders-html",
-    // processCellFromClipboard: (value: string) => {
-    //   console.log(value);
-    //   return value;
-    // },
     getCellChanges: (id: Table.EditableRowId, oldValue: string | null, newValue: string | null) => {
       const oldParsed = !isNil(oldValue) ? model.util.parseFirstAndLastName(oldValue) : null;
       const parsed = !isNil(newValue) ? model.util.parseFirstAndLastName(newValue) : null;

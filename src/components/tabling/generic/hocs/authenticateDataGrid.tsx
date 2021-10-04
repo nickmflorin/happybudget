@@ -549,18 +549,14 @@ const authenticateDataGrid =
 
       const processCellForClipboard: (params: ProcessCellForExportParams) => string = hooks.useDynamicCallback(
         (params: ProcessCellForExportParams): string => {
-          const processCellValueForClipboard = (
-            column: Table.Column<R, M>,
-            row: Table.BodyRow<R>,
-            value: R[keyof R] | undefined
-          ): string => {
+          const processCellValueForClipboard = (column: Table.Column<R, M>, row: Table.BodyRow<R>): string => {
             const processor = column.processCellForClipboard;
             if (!isNil(processor)) {
               return String(processor(row.data));
             } else {
-              value = value === undefined ? util.getKeyValue<R, keyof R>(column.field as keyof R)(row.data) : value;
+              let value = params.value;
               checkValue(value); // The value should never be undefined at this point.
-              if (value === column.nullValue) {
+              if (value === column.nullValue || value === undefined) {
                 return "";
               } else if (typeof value === "string" || typeof value === "number") {
                 return String(value);
@@ -569,18 +565,18 @@ const authenticateDataGrid =
             }
           };
           if (!isNil(params.node)) {
-            const customCol: Table.Column<R, M> | undefined = find(columns, {
-              field: params.column.getColId()
-            } as any);
-            if (!isNil(customCol)) {
+            const c: Table.Column<R, M> | null = getColumn(params.column.getColId());
+            if (!isNil(c)) {
               setCellCutChange(null);
-              return processCellValueForClipboard(customCol, params.node.data as Table.BodyRow<R>, params.value);
+              const row: Table.BodyRow<R> = params.node.data;
+              return processCellValueForClipboard(c, row);
             }
           }
           return "";
         }
       );
 
+      /* @ts-ignore */
       const processCellFromClipboard: (params: ProcessCellForExportParams) => string = hooks.useDynamicCallback(
         (params: ProcessCellForExportParams) => {
           if (!isNil(params.node)) {
@@ -613,8 +609,8 @@ const authenticateDataGrid =
                   if (typeof value === "string" && String(value).trim() === "") {
                     return c.nullValue === undefined ? null : c.nullValue;
                   }
-                  return value;
                 }
+                return value;
               }
             } else {
               /* eslint-disable no-console */
