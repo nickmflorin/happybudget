@@ -598,7 +598,6 @@ const authenticateDataGrid =
               }
               const row: Table.BodyRow<R> = node.data;
               let value = params.value;
-              console.log({ value });
               // If the value is undefined, it is something wonky with AG Grid.  We should return
               // the current value as to not cause data loss.
               if (value === undefined) {
@@ -614,7 +613,6 @@ const authenticateDataGrid =
                   if (typeof value === "string" && String(value).trim() === "") {
                     return c.nullValue === undefined ? null : c.nullValue;
                   }
-                  console.log({ value });
                   return value;
                 }
               }
