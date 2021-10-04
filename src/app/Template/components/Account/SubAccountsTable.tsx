@@ -94,7 +94,11 @@ const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableP
       <ConnectedTable
         tableId={"account-subaccounts-table"}
         table={table}
-        fringes={fringes}
+        fringes={
+          filter(fringes, (f: Table.BodyRow<Tables.FringeRowData>) =>
+            tabling.typeguards.isModelRow(f)
+          ) as Tables.FringeRow[]
+        }
         subAccountUnits={subAccountUnits}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}

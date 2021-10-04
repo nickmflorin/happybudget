@@ -7,7 +7,7 @@ namespace Tables {
 
   interface AccountRowData extends BudgetRowData {}
 
-  type AccountRow = Table.BodyRow<AccountRowData>;
+  type AccountRow = Table.ModelRow<AccountRowData>;
   type AccountTableStore = Redux.BudgetTableStore<AccountRowData>;
 
   interface SubAccountRowData
@@ -16,14 +16,14 @@ namespace Tables {
     readonly contact?: number | null;
   }
 
-  type SubAccountRow = Table.BodyRow<SubAccountRowData>;
+  type SubAccountRow = Table.ModelRow<SubAccountRowData>;
   type SubAccountTableStore = Redux.BudgetTableStore<SubAccountRowData> & {
     readonly fringes: FringeTableStore;
     readonly subaccountUnits: Model.Tag[];
   };
 
   type FringeRowData = Pick<Model.Fringe, "color" | "name" | "description" | "cutoff" | "rate" | "unit">;
-  type FringeRow = Table.BodyRow<FringeRowData>;
+  type FringeRow = Table.ModelRow<FringeRowData>;
   type FringeTableStore = Redux.TableStore<FringeRowData> & {
     readonly fringeColors: string[];
   };
@@ -33,19 +33,19 @@ namespace Tables {
     "description" | "purchase_order" | "date" | "payment_method" | "payment_id" | "value" | "contact" | "owner"
   >;
 
-  type ActualRow = Table.BodyRow<ActualRowData>;
+  type ActualRow = Table.ModelRow<ActualRowData>;
   type ActualTableStore = Redux.TableStore<ActualRowData> & {
     readonly ownerTree: Redux.ModelListResponseStore<Model.OwnerTreeNode>;
   };
 
   type PdfSubAccountRowData = SubAccountRowData;
-  type PdfSubAccountRow = Table.BodyRow<PdfSubAccountRowData>;
+  type PdfSubAccountRow = Table.ModelRow<PdfSubAccountRowData>;
 
   type PdfAccountRowData = AccountRowData;
-  type PdfAccountRow = Table.BodyRow<PdfAccountRowData>;
+  type PdfAccountRow = Table.ModelRow<PdfAccountRowData>;
 
   type ContactRowData = Pick<Model.Contact, "contact_type" | "company" | "position" | "phone_number" | "email" | "first_name" | "last_name" | "image">;
 
-  type ContactRow = Table.BodyRow<ContactRowData>;
+  type ContactRow = Table.ModelRow<ContactRowData>;
   type ContactTableStore = Redux.TableStore<ContactRowData>;
 }

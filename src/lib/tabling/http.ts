@@ -17,7 +17,7 @@ export const patchPayloadForChange = <
     cols,
     (p: P, col: Table.Column<R, M>) => {
       if (!isNil(col.field)) {
-        const cellChange: Table.CellChange<R, Table.RowValue<R>> | undefined = change.data[col.field];
+        const cellChange: Table.CellChange<R> | undefined = change.data[col.field];
         // We might not be including data for all of the cells in the row.
         if (cellChange !== undefined) {
           let httpValue = cellChange.newValue as unknown as M[keyof M];

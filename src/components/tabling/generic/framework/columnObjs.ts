@@ -4,11 +4,7 @@ import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
 import { tabling, util, model } from "lib";
 
 /* eslint-disable indent */
-export const Column = <
-  R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  V extends Table.RowValue<R> = Table.RowValue<R>
->(
+export const Column = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = R[keyof R]>(
   col: Partial<Table.Column<R, M, V>>
 ): Table.Column<R, M, V> =>
   ({
@@ -42,11 +38,7 @@ export const FakeColumn = <R extends Table.RowData, M extends Model.HttpModel = 
     tableColumnType: "fake"
   });
 
-export const CalculatedColumn = <
-  R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  V extends Table.RowValue<R> = Table.RowValue<R>
->(
+export const CalculatedColumn = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = R[keyof R]>(
   col: Partial<Table.Column<R, M, V>>,
   width?: number
 ): Table.Column<R, M, V> => {
@@ -70,11 +62,7 @@ export const CalculatedColumn = <
   });
 };
 
-export const BodyColumn = <
-  R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  V extends Table.RowValue<R> = Table.RowValue<R>
->(
+export const BodyColumn = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = R[keyof R]>(
   col: Partial<Table.Column<R, M, V>>
 ): Table.Column<R, M, V> => {
   return Column<R, M, V>({
@@ -110,21 +98,14 @@ export const IndexColumn = <R extends Table.RowData, M extends Model.HttpModel =
     maxWidth: !isNil(width) ? width : hasExpandColumn === false ? 40 : 25
   }) as Table.Column<R, M>;
 
-export interface SelectColumnProps<
-  R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  V extends Table.RowValue<R> = Table.RowValue<R>
-> extends Omit<Table.Column<R, M, V>, "columnType" | "tableColumnType" | "domain"> {
+export interface SelectColumnProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = R[keyof R]>
+  extends Omit<Table.Column<R, M, V>, "columnType" | "tableColumnType" | "domain"> {
   readonly columnType?: Table.ColumnTypeId;
 }
 
 // Abstract - not meant to be used by individual columns.  It just enforces that
 // the clipboard processing props are provided.
-export const SelectColumn = <
-  R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  V extends Table.RowValue<R> = Table.RowValue<R>
->(
+export const SelectColumn = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = R[keyof R]>(
   props: SelectColumnProps<R, M, V>
 ): Table.Column<R, M, V> => {
   return BodyColumn<R, M, V>({
@@ -148,7 +129,7 @@ export interface UnauthenticatedModelSelectColumnProps<
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
   C extends Model.HttpModel = Model.HttpModel
-> extends SetOptional<SelectColumnProps<R, M>, "processCellForClipboard"> {
+> extends SetOptional<SelectColumnProps<R, M, C>, "processCellForClipboard"> {
   readonly models: C[];
   readonly modelClipboardValue: (m: C) => string;
 }
@@ -161,7 +142,7 @@ export const UnauthenticatedModelSelectColumn = <
   props: UnauthenticatedModelSelectColumnProps<R, M, C>
 ): Table.Column<R, M> => {
   const { models, modelClipboardValue, ...column } = props;
-  return SelectColumn<R, M>({
+  return SelectColumn<R, M, C>({
     processCellForClipboard:
       column.processCellForClipboard ??
       ((row: R) => {
@@ -195,14 +176,14 @@ export const ModelSelectColumn = <
 };
 
 export interface TagSelectColumnProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
-  extends SetOptional<SelectColumnProps<R, M>, "processCellForClipboard"> {
+  extends SetOptional<SelectColumnProps<R, M, Model.Tag>, "processCellForClipboard"> {
   readonly models: Model.Tag[];
   readonly processCellFromClipboard?: (value: string) => Model.Tag | null;
 }
 
 export const TagSelectColumn = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   props: TagSelectColumnProps<R, M>
-): Table.Column<R, M> => {
+): Table.Column<R, M, Model.Tag> => {
   const { models, ...column } = props;
   return SelectColumn({
     processCellForClipboard: (row: R) => {
@@ -213,7 +194,7 @@ export const TagSelectColumn = <R extends Table.RowData, M extends Model.HttpMod
       return m.title;
     },
     getHttpValue: (value: Model.Tag | null): ID | null => (!isNil(value) ? value.id : null),
-    processCellFromClipboard: (name: string) =>
+    processCellFromClipboard: (name: string): Model.Tag | null =>
       // TODO: We might have to also consider the plural_title here.
       model.util.inferModelFromName<Model.Tag>(models, name, { nameField: "title" }),
     ...column
@@ -224,7 +205,7 @@ export interface ChoiceSelectColumnProps<
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
   C extends Model.Choice<any, any> = Model.Choice<any, any>
-> extends SetOptional<SelectColumnProps<R, M>, "processCellForClipboard"> {
+> extends SetOptional<SelectColumnProps<R, M, C>, "processCellForClipboard"> {
   readonly models: C[];
   readonly processCellFromClipboard?: (value: string) => C | null;
 }

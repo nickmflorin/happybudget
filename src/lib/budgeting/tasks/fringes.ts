@@ -50,8 +50,12 @@ export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Ta
 > & {
   readonly services: FringeTableServiceSet<B>;
   readonly selectObjId: (state: Application.Authenticated.Store) => number | null;
-  readonly selectAccountTableData: (state: Application.Authenticated.Store) => Tables.SubAccountRow[];
-  readonly selectSubAccountTableData: (state: Application.Authenticated.Store) => Tables.SubAccountRow[];
+  readonly selectAccountTableData: (
+    state: Application.Authenticated.Store
+  ) => Table.BodyRow<Tables.SubAccountRowData>[];
+  readonly selectSubAccountTableData: (
+    state: Application.Authenticated.Store
+  ) => Table.BodyRow<Tables.SubAccountRowData>[];
 };
 
 export const createTableTaskSet = <B extends Model.Template | Model.Budget>(

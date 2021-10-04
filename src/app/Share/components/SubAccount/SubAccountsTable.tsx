@@ -1,9 +1,9 @@
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
-import { isNil } from "lodash";
+import { isNil, filter } from "lodash";
 
-import { redux, model } from "lib";
+import { redux, model, tabling } from "lib";
 import { SubAccountsTable as GenericSubAccountsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../../store";
@@ -85,7 +85,11 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
   return (
     <ConnectedTable
       subAccountUnits={subAccountUnits}
-      fringes={fringes}
+      fringes={
+        filter(fringes, (f: Table.BodyRow<Tables.FringeRowData>) =>
+          tabling.typeguards.isModelRow(f)
+        ) as Tables.FringeRow[]
+      }
       // Right now, the SubAccount recursion only goes 1 layer deep.
       // Account -> SubAccount -> Detail (Recrusive SubAccount).
       rowCanExpand={false}

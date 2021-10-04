@@ -83,7 +83,6 @@ namespace Table {
   type RowStringGetter<R extends Row> = RowNameLabelType | FnWithTypedArgs<RowNameLabelType, [R]>;
 
   type RowData = object;
-  type RowValue<R extends RowData> = Exclude<R[keyof R], undefined>;
 
   type IRow<RId extends RowId, TP extends RowType, Grid extends GridId = GridId> = {
     readonly id: RId;
@@ -264,7 +263,7 @@ namespace Table {
     | "editable"
     | "onCellDoubleClicked";
 
-  interface Column<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V extends RowValue<R> = any>
+  interface Column<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any>
     extends Omit<ColDef, OmitColDefParams>,
       BaseColumn<R, M, "aggrid"> {
     readonly selectable?: boolean | ((params: CellCallbackParams<R, M>) => boolean) | undefined;
@@ -286,8 +285,8 @@ namespace Table {
     readonly refreshColumns?: (change: CellChange<R, V>) => keyof R | (keyof R)[] | null;
     readonly getHttpValue?: (value: any) => any;
     readonly getCellChanges?: (id: Table.EditableRowId, oldValue: any, newValue: any) => SoloCellChange<R>[];
-    readonly processCellForClipboard?: (row: R) => string;
-    readonly processCellFromClipboard?: (value: string) => any;
+    readonly processCellForClipboard?: (row: R) => string | number;
+    readonly processCellFromClipboard?: (value: string) => V | null;
     readonly onCellDoubleClicked?: (row: ModelRow<R>) => void;
   }
 
@@ -421,7 +420,7 @@ namespace Table {
     readonly type: ChangeEventId;
   };
 
-  type CellChange<R extends RowData, V extends RowValue<R> = RowValue<R>> = {
+  type CellChange<R extends RowData, V = R[keyof R]> = {
     readonly oldValue: V | null;
     readonly newValue: V | null;
   };
@@ -429,13 +428,13 @@ namespace Table {
   type SoloCellChange<
     R extends RowData,
     I extends EditableRowId = EditableRowId,
-    V extends RowValue<R> = RowValue<R>
+    V = R[keyof R]
   > = CellChange<R, V> & {
     readonly field: keyof R;
     readonly id: I;
   };
 
-  type RowChangeData<R extends RowData> = { [Property in keyof R]?: CellChange<R, RowValue<R>> };
+  type RowChangeData<R extends RowData> = { [Property in keyof R]?: CellChange<R> };
 
   type RowChange<R extends RowData, I extends EditableRowId = EditableRowId> = {
     readonly id: I;

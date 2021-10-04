@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
+import { filter } from "lodash";
 
-import { hooks, model } from "lib";
+import { hooks, model, tabling } from "lib";
 
 import { Tag } from "components/tagging";
 import { Cell } from "components/tabling/generic/framework/cells";
@@ -12,10 +13,17 @@ export interface FringesCellProps
 }
 
 const FringesCell = ({ value, onAddFringes, ...props }: FringesCellProps): JSX.Element => {
-  const fringes: Tables.FringeRow[] = useSelector((state: Application.Store) => props.selector(state).fringes.data);
+  const fringes: Table.BodyRow<Tables.FringeRowData>[] = useSelector(
+    (state: Application.Store) => props.selector(state).fringes.data
+  );
 
   const applicableFringes: Tables.FringeRow[] = useMemo(() => {
-    return model.util.getModelsByIds(fringes, value);
+    return model.util.getModelsByIds(
+      filter(fringes, (r: Table.BodyRow<Tables.FringeRowData>) =>
+        tabling.typeguards.isModelRow(r)
+      ) as Tables.FringeRow[],
+      value
+    );
   }, [hooks.useDeepEqualMemo(fringes), value]);
 
   return (

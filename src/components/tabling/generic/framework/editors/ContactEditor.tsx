@@ -13,7 +13,10 @@ interface ContactEditorProps<
   M extends Model.HttpModel = Model.HttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends Table.EditorParams<R, M, S> {
-  readonly onNewContact: (params: { name?: string; change: Omit<Table.SoloCellChange<R>, "newValue"> }) => void;
+  readonly onNewContact: (params: {
+    name?: string;
+    change: Omit<Table.SoloCellChange<R, number, number>, "newValue">;
+  }) => void;
 }
 
 /* eslint-disable indent */
@@ -53,7 +56,7 @@ const ContactEditor = <
                 props.onNewContact({
                   name: searchValue,
                   change: {
-                    oldValue: (row.data.contact || null) as unknown as Table.RowValue<R>,
+                    oldValue: row.data.contact || null,
                     field: props.column.field,
                     id: row.id
                   }
@@ -61,7 +64,7 @@ const ContactEditor = <
               } else {
                 props.onNewContact({
                   change: {
-                    oldValue: (row.data.contact || null) as unknown as Table.RowValue<R>,
+                    oldValue: row.data.contact || null,
                     field: props.column.field,
                     id: row.id
                   }

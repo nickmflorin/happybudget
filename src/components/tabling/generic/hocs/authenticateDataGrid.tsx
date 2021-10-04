@@ -244,6 +244,18 @@ const authenticateDataGrid =
         []
       );
 
+      const checkValue = useMemo(
+        () => (value: any) => {
+          // AG Grid inserts a lot of undefined places where they shouldn't, but our entire mechanical
+          // process relies on empty or null values actually being NULL.
+          if (value === undefined) {
+            /* eslint-disable no-console */
+            console.warn("Detected undefined value when it is not expected.");
+          }
+        },
+        []
+      );
+
       const callWithColumn = <RT extends any = any>(
         field: keyof R | string,
         callback: (col: Table.Column<R, M>) => RT | null
@@ -319,11 +331,11 @@ const authenticateDataGrid =
           if (
             tabling.typeguards.isModelRow(row) &&
             !isNil(colId) &&
-            (row.data[colId] === undefined || row.data[colId] !== (clearValue as unknown as R[keyof R]))
+            (row.data[colId] === undefined || row.data[colId] !== clearValue)
           ) {
             const change: Table.SoloCellChange<R> = {
-              oldValue: row.data[colId] as Table.RowValue<R>,
-              newValue: clearValue as unknown as Table.RowValue<R>,
+              oldValue: row.data[colId],
+              newValue: clearValue,
               id: row.id,
               field: colId
             };
@@ -535,62 +547,64 @@ const authenticateDataGrid =
         }
       );
 
-      const processCellValueFromClipboard: (column: Table.Column<R, M>, value: any) => string =
-        hooks.useDynamicCallback((column: Table.Column<R, M>, value: any) => {
-          const processor = column.processCellFromClipboard;
-          if (!isNil(processor)) {
-            return processor(value) || "";
-          } else {
-            // The value should never be undefined at this point.
-            if (typeof value === "string" && String(value).trim() === "") {
-              return !isNil(column.nullValue) ? column.nullValue : null;
-            }
-            return value;
-          }
-        });
-
-      const processCellFromClipboard: (column: Table.Column<R, M>, row: Table.BodyRow<R>, value?: any) => string =
-        hooks.useDynamicCallback((column: Table.Column<R, M>, row: Table.BodyRow<R>, value?: any) => {
-          value = value === undefined ? util.getKeyValue<R, keyof R>(column.field as keyof R)(row.data) : value;
-          return processCellValueFromClipboard(column, value);
-        });
-
-      const _processCellForClipboard: (column: Table.Column<R, M>, row: Table.BodyRow<R>, value?: any) => string =
-        hooks.useDynamicCallback((column: Table.Column<R, M>, row: Table.BodyRow<R>, value?: any) => {
-          const processor = column.processCellForClipboard;
-          if (!isNil(processor)) {
-            return processor(row.data);
-          } else {
-            value = value === undefined ? util.getKeyValue<R, keyof R>(column.field as keyof R)(row.data) : value;
-            // The value should never be undefined at this point.
-            if (value === column.nullValue) {
+      const processCellForClipboard: (params: ProcessCellForExportParams) => string = hooks.useDynamicCallback(
+        (params: ProcessCellForExportParams): string => {
+          const processCellValueForClipboard = (
+            column: Table.Column<R, M>,
+            row: Table.BodyRow<R>,
+            value: R[keyof R] | undefined
+          ): string => {
+            const processor = column.processCellForClipboard;
+            if (!isNil(processor)) {
+              return String(processor(row.data));
+            } else {
+              value = value === undefined ? util.getKeyValue<R, keyof R>(column.field as keyof R)(row.data) : value;
+              checkValue(value); // The value should never be undefined at this point.
+              if (value === column.nullValue) {
+                return "";
+              } else if (typeof value === "string" || typeof value === "number") {
+                return String(value);
+              }
               return "";
             }
-            return value;
-          }
-        });
-
-      const processCellForClipboard: (params: ProcessCellForExportParams) => string = hooks.useDynamicCallback(
-        (params: ProcessCellForExportParams) => {
+          };
           if (!isNil(params.node)) {
             const customCol: Table.Column<R, M> | undefined = find(columns, {
               field: params.column.getColId()
             } as any);
             if (!isNil(customCol)) {
               setCellCutChange(null);
-              return _processCellForClipboard(customCol, params.node.data as Table.BodyRow<R>, params.value);
+              return processCellValueForClipboard(customCol, params.node.data as Table.BodyRow<R>, params.value);
             }
           }
           return "";
         }
       );
 
-      const _processCellFromClipboard: (params: ProcessCellForExportParams) => string = hooks.useDynamicCallback(
+      const processCellFromClipboard: (params: ProcessCellForExportParams) => string = hooks.useDynamicCallback(
         (params: ProcessCellForExportParams) => {
+          const processCellValueFromClipboard = (column: Table.Column<R, M>, value: any): any => {
+            const processor = column.processCellFromClipboard;
+            if (!isNil(processor)) {
+              value = processor(value);
+            } else {
+              // The value should never be undefined at this point.
+              if (typeof value === "string" && String(value).trim() === "") {
+                return column.nullValue === undefined ? null : column.nullValue;
+              }
+              return value;
+            }
+          };
+
+          const process = (column: Table.Column<R, M>, row: Table.BodyRow<R>, value?: any) => {
+            value = value === undefined ? util.getKeyValue<R, keyof R>(column.field as keyof R)(row.data) : value;
+            return processCellValueFromClipboard(column, value);
+          };
+
           if (!isNil(params.node)) {
             const node: Table.RowNode = params.node;
             const field = params.column.getColId();
-            const c = find(columns, { field } as any);
+            const c = getColumn(field);
             if (!isNil(c)) {
               if (!isNil(cutCellChange)) {
                 params = { ...params, value: cutCellChange.oldValue };
@@ -600,7 +614,8 @@ const authenticateDataGrid =
                 });
                 setCellCutChange(null);
               }
-              return processCellFromClipboard(c, node.data as Table.BodyRow<R>, params.value) || "";
+              console.log({ c });
+              return process(c, node.data as Table.BodyRow<R>, params.value) || "";
             } else {
               /* eslint-disable no-console */
               console.error(`Could not find column for field ${field}!`);
@@ -668,7 +683,7 @@ const authenticateDataGrid =
           moveToNextRow={moveToNextRow}
           onCellDoubleClicked={onCellDoubleClicked}
           processDataFromClipboard={processDataFromClipboard}
-          processCellFromClipboard={_processCellFromClipboard}
+          processCellFromClipboard={processCellFromClipboard}
           processCellForClipboard={processCellForClipboard}
           onCellEditingStarted={onCellEditingStarted}
           onPasteStart={onPasteStart}

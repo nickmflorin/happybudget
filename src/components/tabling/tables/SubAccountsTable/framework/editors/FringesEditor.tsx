@@ -2,6 +2,8 @@ import { forwardRef, ForwardedRef } from "react";
 import { useSelector } from "react-redux";
 import { isNil, filter, map } from "lodash";
 
+import { tabling } from "lib";
+
 import { Icon } from "components";
 import { ModelTagsMenu } from "components/menus";
 import { framework } from "components/tabling/generic";
@@ -33,7 +35,13 @@ const FringesEditor = (props: FringesEditorProps, ref: ForwardedRef<any>) => {
       menu={editor.menu}
       includeSearch={true}
       selected={editor.value}
-      models={filter(fringes, (fringe: Tables.FringeRow) => !isNil(fringe.data.name) && fringe.data.name.trim() !== "")}
+      models={
+        filter(
+          fringes,
+          (fringe: Table.BodyRow<Tables.FringeRowData>) =>
+            tabling.typeguards.isModelRow(fringe) && !isNil(fringe.data.name) && fringe.data.name.trim() !== ""
+        ) as Tables.FringeRow[]
+      }
       tagProps={{
         getModelColor: (m: Tables.FringeRow) => m.data.color,
         getModelText: (m: Tables.FringeRow) => m.data.name

@@ -99,7 +99,11 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
         budget={budget}
         budgetId={budgetId}
         table={table}
-        fringes={fringes}
+        fringes={
+          filter(fringes, (f: Table.BodyRow<Tables.FringeRowData>) =>
+            tabling.typeguards.isModelRow(f)
+          ) as Tables.FringeRow[]
+        }
         subAccountUnits={subAccountUnits}
         onAddFringes={() => setFringesModalVisible(true)}
         onEditFringes={() => setFringesModalVisible(true)}

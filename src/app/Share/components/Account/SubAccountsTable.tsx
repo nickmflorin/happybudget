@@ -1,9 +1,9 @@
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
-import { isNil } from "lodash";
+import { isNil, filter } from "lodash";
 
-import { redux, model } from "lib";
+import { redux, model, tabling } from "lib";
 import { SubAccountsTable as GenericSubAccountsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../../store";
@@ -86,7 +86,11 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
 
   return (
     <ConnectedTable
-      fringes={fringes}
+      fringes={
+        filter(fringes, (f: Table.BodyRow<Tables.FringeRowData>) =>
+          tabling.typeguards.isModelRow(f)
+        ) as Tables.FringeRow[]
+      }
       subAccountUnits={subAccountUnits}
       exportFileName={!isNil(accountDetail) ? `account_${accountDetail.identifier}` : ""}
       categoryName={"Sub Account"}
