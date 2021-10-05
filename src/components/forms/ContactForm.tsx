@@ -4,7 +4,8 @@ import classNames from "classnames";
 import { model } from "lib";
 
 import { Form, Icon } from "components";
-import { Input, Select, PhoneNumberInput } from "components/fields";
+import { Input, Select, InputOnFocus } from "components/fields";
+import { Link } from "components/links";
 
 const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialValues, globalError, ...props }) => {
   return (
@@ -41,10 +42,14 @@ const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialVa
         <Input />
       </Form.ColumnItem>
       <Form.ColumnItem name={"email"} label={"Email"} columnType={"email"}>
-        <Input />
+        <InputOnFocus renderBlurredContentOnNoValue={true}>
+          {(value?: string) => <Link href={`mailto:${value}`}>{value}</Link>}
+        </InputOnFocus>
       </Form.ColumnItem>
       <Form.ColumnItem name={"phone_number"} label={"Phone Number"} columnType={"phone"}>
-        <PhoneNumberInput />
+        <InputOnFocus renderBlurredContentOnNoValue={true}>
+          {(value: string) => <Link href={`tel:${value}`}>{value}</Link>}
+        </InputOnFocus>
       </Form.ColumnItem>
       <Form.ColumnItem name={"rate"} label={"Rate"} columnType={"currency"}>
         <Input />

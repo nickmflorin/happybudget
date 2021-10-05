@@ -1,14 +1,16 @@
+/* eslint-disable indent */
 import React, { useState, useRef, useImperativeHandle, ForwardedRef, forwardRef } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 import { useEffect } from "react";
 
-interface InputOnFocusProps extends React.HTMLAttributes<any> {
+interface InputOnFocusProps extends React.HTMLProps<HTMLInputElement> {
   // When unfocused, the <input> will be hidden and other content will be shown.
   // This content can either be provided as the children of this component, or as
   // a render callback.
   readonly renderBlurredContent?: (value: string) => JSX.Element;
   readonly renderBlurredContentOnNoValue?: boolean;
+  readonly children: (value: string) => JSX.Element;
 }
 
 // TODO: Is there anyway we can find this in AntD?
@@ -21,7 +23,6 @@ const InputOnFocus = (
   { children, renderBlurredContent, renderBlurredContentOnNoValue = false, ...props }: InputOnFocusProps,
   ref: ForwardedRef<IInputRef>
 ): JSX.Element => {
-  const [_value, setValue] = useState<string>("");
   const innerRef = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
 
@@ -47,15 +48,9 @@ const InputOnFocus = (
       onFocus={(e: React.FocusEvent<HTMLDivElement>) => setFocused(true)}
       onBlur={(e: React.FocusEvent<HTMLDivElement>) => setFocused(false)}
     >
-      {focused === true || (renderBlurredContentOnNoValue === false && _value === "") ? (
-        <input
-          {...props}
-          ref={innerRef}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            setValue(e.target.value);
-            props.onChange?.(e);
-          }}
-        />
+      {focused === true ||
+      (renderBlurredContentOnNoValue === false && (props.value === undefined || props.value === "")) ? (
+        <input {...props} ref={innerRef} />
       ) : (
         /*
         The component that is rendered in the unfocused state must be *tightly*
@@ -77,7 +72,9 @@ const InputOnFocus = (
           onFocus={(e: React.FocusEvent<HTMLDivElement>) => e.stopPropagation()}
           onBlur={(e: React.FocusEvent<HTMLDivElement>) => e.stopPropagation()}
         >
-          {isNil(renderBlurredContent) ? <>{children}</> : renderBlurredContent(_value)}
+          {isNil(renderBlurredContent)
+            ? children(props.value === undefined ? "" : String(props.value))
+            : renderBlurredContent(props.value === undefined ? "" : String(props.value))}
         </div>
       )}
     </div>

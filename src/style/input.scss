@@ -145,6 +145,15 @@ input:focus-visible {
     // Line height of input text.  This is required so that the "input" AKA div
     // does not change height when the input is hidden.
     height: 22px !important;
+    line-height: 19px;
+
+    .link {
+      font-family: "AvenirNext", sans-serif;
+      font-weight: 500;
+      font-size: 13px;
+      letter-spacing: normal;
+      padding-left: 2px;
+    }
   }
 }
 
