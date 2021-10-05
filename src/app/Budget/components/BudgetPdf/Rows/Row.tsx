@@ -5,22 +5,15 @@ import { View } from "components/pdf";
 
 export type RowProps<
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  RW extends Table.BodyRow<R> = Table.BodyRow<R>
+  M extends Model.HttpModel = Model.HttpModel
 > = StandardPdfComponentProps & {
   readonly columns: Table.PdfColumn<R, M>[];
-  readonly row: RW;
-  readonly data: Table.BodyRow<R>[];
   readonly columnIndent?: number;
 };
 
 /* eslint-disable indent */
-const Row = <
-  R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  RW extends Table.BodyRow<R> = Table.BodyRow<R>
->(
-  props: RowProps<R, M, RW> & {
+const Row = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  props: RowProps<R, M> & {
     readonly renderCell: (params: {
       column: Table.PdfColumn<R, M>;
       indented: boolean;

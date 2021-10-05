@@ -174,7 +174,7 @@ const AccountTable = ({
         }
       },
       [
-        <HeaderRow className={"account-header-tr"} columns={subAccountColumns} data={table} />,
+        <HeaderRow className={"account-header-tr"} columns={subAccountColumns} />,
         <BodyRow<Tables.PdfAccountRowData, Model.PdfAccount>
           className={"account-sub-header-tr"}
           cellProps={{ textClassName: "account-sub-header-tr-td-text" }}

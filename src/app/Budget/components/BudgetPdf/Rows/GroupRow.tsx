@@ -4,14 +4,16 @@ import classNames from "classnames";
 
 import { model } from "lib";
 
-import { CellProps } from "../Cells/Cell";
-import { RowProps } from "./Row";
-import BodyRow from "./BodyRow";
+import { RowExplicitCellProps } from "../Cells/Cell";
+import BodyRow, { BodyRowProps } from "./BodyRow";
+
+interface GroupRowProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
+  extends BodyRowProps<R, M, Table.GroupRow<R>> {
+  readonly cellProps?: RowExplicitCellProps<R, M>;
+}
 
 const GroupRow = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
-  props: RowProps<R, M, Table.GroupRow<R>> & {
-    readonly cellProps?: Omit<CellProps<R, M>, "column" | "colIndex" | "row" | "debug" | "isHeader" | "data">;
-  }
+  props: GroupRowProps<R, M>
 ): JSX.Element => {
   const cellStyle = useMemo(() => {
     const colorDef = model.util.getGroupColorDefinition(props.row);

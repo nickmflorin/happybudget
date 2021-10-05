@@ -39,7 +39,7 @@ const AccountsTable = ({
         }
         return rws;
       },
-      [<HeaderRow columns={columns} data={rowData} />]
+      [<HeaderRow columns={columns} />]
     );
     if (showFooterRow === true) {
       rows.push(<FooterRow columns={columns} data={rowData} />);

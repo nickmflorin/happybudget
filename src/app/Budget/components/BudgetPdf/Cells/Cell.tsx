@@ -58,69 +58,52 @@ const evaluateCellStyle = <R extends Table.RowData, M extends Model.HttpModel = 
   }
 };
 
-export interface CellProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
-  readonly column: Table.PdfColumn<R, M>;
-  readonly row: Table.BodyRow<R>;
-  readonly data: Table.BodyRow<R>[];
-  readonly colIndex: number;
+export interface RowExplicitCellProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
   readonly style?: Table.PdfCellStyle<R, M>;
   readonly className?: Table.PdfCellClassName<R, M>;
   readonly textStyle?: Table.PdfCellStyle<R, M>;
   readonly textClassName?: Table.PdfCellClassName<R, M>;
-  readonly formatting?: boolean;
-  readonly isHeader?: boolean;
-  readonly debug?: boolean;
-  readonly indented?: boolean;
-  readonly border?: boolean;
   readonly cellContentsVisible?: Table.PdfOptionalCellCallback<R, M, boolean>;
 }
 
+export interface CellProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
+  extends RowExplicitCellProps<R, M> {
+  readonly column: Table.PdfColumn<R, M>;
+  readonly colIndex: number;
+  readonly isHeader?: boolean;
+  readonly debug?: boolean;
+  readonly indented?: boolean;
+}
+
+interface PrivateCellProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
+  extends CellProps<R, M> {
+  readonly rawValue: R[keyof R] | string | number;
+  readonly value: string;
+}
+
 const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
-  props: CellProps<R, M>
+  props: PrivateCellProps<R, M>
 ): JSX.Element => {
-  const callbackParams = useMemo<Omit<Table.PdfCellCallbackParams<R, M>, "value" | "rawValue">>(() => {
+  const callbackParams = useMemo<Table.PdfCellCallbackParams<R, M>>(() => {
     return {
       colIndex: props.colIndex,
-      row: props.row,
       column: props.column,
       isHeader: props.isHeader || false,
-      indented: props.indented === true
+      indented: props.indented === true,
+      rawValue: props.rawValue,
+      value: props.value
     };
-  }, [props.colIndex, props.row, props.column, props.isHeader]);
-
-  const rawValue: R[keyof R] = useMemo((): R[keyof R] => {
-    if (!isNil(props.column.valueGetter)) {
-      return props.column.valueGetter(props.row, props.data);
-    } else if (!isNil(props.column.field)) {
-      return props.row.data[props.column.field];
-    }
-    return props.column.nullValue === undefined
-      ? ("" as unknown as R[keyof R])
-      : (props.column.nullValue as R[keyof R]);
-  }, [callbackParams, props.row, props.column]);
-
-  const value = useMemo(() => {
-    if (isNil(props.column.formatter) || props.formatting === false) {
-      return rawValue;
-    } else if (rawValue !== null && (typeof rawValue === "string" || typeof rawValue === "number")) {
-      return props.column.formatter(rawValue);
-    }
-    return "";
-  }, [rawValue, props.column, props.formatting]);
-
-  const fullCallbackParams = useMemo<Table.PdfCellCallbackParams<R, M>>(() => {
-    return { ...callbackParams, rawValue, value };
-  }, [rawValue, value, callbackParams]);
+  }, [props.colIndex, props.column, props.isHeader, props.rawValue, props.value]);
 
   const cellStyle = useMemo(() => {
     return {
       ...evaluateOptionalCallbackProp<R, M, Style>(
         props.isHeader === true ? props.column.headerCellProps?.style : props.column.cellProps?.style,
-        fullCallbackParams
+        callbackParams
       ),
       // The width will be configured before the column is plugged into this component.
       width: `${(props.column.width || 0.0) * 100.0}%`,
-      ...evaluateCellStyle<R, M>(props.style, fullCallbackParams)
+      ...evaluateCellStyle<R, M>(props.style, callbackParams)
     };
   }, [props.column]);
 
@@ -129,9 +112,9 @@ const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
       className={classNames(
         evaluateClassName<R, M>(
           props.isHeader === true ? props.column.headerCellProps?.className : props.column.cellProps?.className,
-          fullCallbackParams
+          callbackParams
         ),
-        evaluateClassName<R, M>(props.className, fullCallbackParams),
+        evaluateClassName<R, M>(props.className, callbackParams),
         { indented: props.indented === true }
       )}
       style={cellStyle}
@@ -140,12 +123,12 @@ const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
       <ShowHide
         hide={
           props.indented === true ||
-          evaluateOptionalCallbackProp<R, M, boolean>(props.cellContentsVisible, fullCallbackParams) === false ||
-          evaluateOptionalCallbackProp<R, M, boolean>(props.column.cellContentsVisible, fullCallbackParams) === false
+          evaluateOptionalCallbackProp<R, M, boolean>(props.cellContentsVisible, callbackParams) === false ||
+          evaluateOptionalCallbackProp<R, M, boolean>(props.column.cellContentsVisible, callbackParams) === false
         }
       >
         {props.isHeader !== true && !isNil(props.column.cellRenderer) ? (
-          props.column.cellRenderer(fullCallbackParams)
+          props.column.cellRenderer(callbackParams)
         ) : (
           <Text
             className={classNames(
@@ -154,9 +137,9 @@ const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
                 props.isHeader === true
                   ? props.column.headerCellProps?.textClassName
                   : props.column.cellProps?.textClassName,
-                fullCallbackParams
+                callbackParams
               ),
-              evaluateClassName<R, M>(props.textClassName, fullCallbackParams)
+              evaluateClassName<R, M>(props.textClassName, callbackParams)
             )}
             style={{
               // NOTE: We do not differentiate between the text style and overall style for
@@ -171,12 +154,12 @@ const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
                 : ({} as Style)),
               ...evaluateOptionalCallbackProp<R, M, Style>(
                 props.isHeader === true ? props.column.headerCellProps?.textStyle : props.column.cellProps?.textStyle,
-                fullCallbackParams
+                callbackParams
               ),
-              ...evaluateCellStyle<R, M>(props.textStyle, fullCallbackParams)
+              ...evaluateCellStyle<R, M>(props.textStyle, callbackParams)
             }}
           >
-            {value}
+            {props.value}
           </Text>
         )}
       </ShowHide>

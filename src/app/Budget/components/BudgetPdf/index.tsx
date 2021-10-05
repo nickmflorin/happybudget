@@ -65,7 +65,7 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
         }),
         contact: (col: C) => ({
           ...col,
-          cellRenderer: (params: Table.PdfCellCallbackParams<R, M>) => {
+          cellRenderer: (params: Table.PdfCellCallbackParams<R, M, number>) => {
             if (params.rawValue !== null) {
               const contact: Model.Contact | undefined = find(contacts, { id: params.rawValue });
               if (!isNil(contact)) {

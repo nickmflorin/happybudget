@@ -98,7 +98,7 @@ export const createBodyRowData = <
     filter(config.columns, (c: C) => !typeguards.isAgColumn(c) || c.isRead !== false),
     (obj: R, c: C) => {
       if (!isNil(c.field)) {
-        const nullValue = c.nullValue === undefined ? null : c.nullValue;
+        const nullValue = typeguards.isAgColumn(c) ? (c.nullValue === undefined ? null : c.nullValue) : "";
         if (
           (!isNil(config.excludeColumns) &&
             typeof config.excludeColumns === "function" &&

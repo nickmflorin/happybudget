@@ -4,11 +4,10 @@ import classNames from "classnames";
 
 import { tabling, util } from "lib";
 
-import { RowProps } from "./Row";
-import BodyRow from "./BodyRow";
+import BodyRow, { BodyRowProps } from "./BodyRow";
 
 const FooterRow = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
-  props: Omit<RowProps<R, M>, "row">
+  props: Omit<BodyRowProps<R, M>, "row">
 ): JSX.Element => {
   const footerRow: Table.ModelRow<R> = useMemo(() => {
     return tabling.rows.createModelRow({

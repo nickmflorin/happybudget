@@ -184,49 +184,49 @@ namespace Table {
     readonly headerName?: string;
     readonly columnType?: ColumnTypeId;
     readonly tableColumnType: TableColumnTypeId;
-    readonly nullValue?: NullValue<R>;
     readonly index?: number;
     readonly getRowValue?: (m: M) => R[keyof R];
   }
 
-  type PdfCellCallbackParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
+  type PdfRawValue = R[keyof R] | string | number;
+
+  type PdfCellCallbackParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V extends PdfRawValue = PdfRawValue> = {
     readonly colIndex: number;
     readonly column: PdfColumn<R, M>;
-    readonly row: Table.BodyRow<R>;
     readonly isHeader: boolean;
-    readonly rawValue: any;
-    readonly value: any;
+    readonly rawValue: V;
+    readonly value: string;
     readonly indented: boolean;
   };
 
-  type PdfCellCallback<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> = (
-    params: PdfCellCallbackParams<R, M>
+  type PdfCellCallback<R extends RowData, M extends Model.HttpModel = Model.HttpModel, CV extends PdfRawValue = PdfRawValue, V = any> = (
+    params: PdfCellCallbackParams<R, M, CV>
   ) => V;
 
-  type PdfOptionalCellCallback<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> =
+  type PdfOptionalCellCallback<R extends RowData, M extends Model.HttpModel = Model.HttpModel, CV extends PdfRawValue = PdfRawValue, V = any> =
     | V
-    | PdfCellCallback<R, M, V>
+    | PdfCellCallback<R, M, CV, V>
     | undefined;
 
-  interface _PdfCellClassName<R extends RowData, M extends Model.HttpModel = Model.HttpModel> {
-    [n: number]: PdfOptionalCellCallback<R, M, string> | _PdfCellClassName<R, M>;
+  interface _PdfCellClassName<R extends RowData, M extends Model.HttpModel = Model.HttpModel, CV extends PdfRawValue = PdfRawValue> {
+    [n: number]: PdfOptionalCellCallback<R, M, CV, string> | _PdfCellClassName<R, M>;
   }
-  type PdfCellClassName<R extends RowData, M extends Model.HttpModel = Model.HttpModel> =
-    | PdfOptionalCellCallback<R, M, string>
-    | _PdfCellClassName<R, M>;
+  type PdfCellClassName<R extends RowData, M extends Model.HttpModel = Model.HttpModel, CV extends PdfRawValue = PdfRawValue> =
+    | PdfOptionalCellCallback<R, M, CV, string>
+    | _PdfCellClassName<R, M, CV>;
 
-  interface _PdfCellStyle<R extends RowData, M extends Model.HttpModel = Model.HttpModel> {
-    [n: number]: PdfOptionalCellCallback<R, M, import("@react-pdf/types").Style> | _PdfCellStyle<R, M>;
+  interface _PdfCellStyle<R extends RowData, M extends Model.HttpModel = Model.HttpModel, CV extends PdfRawValue = PdfRawValue> {
+    [n: number]: PdfOptionalCellCallback<R, M, CV, import("@react-pdf/types").Style> | _PdfCellStyle<R, M, CV>;
   }
-  type PdfCellStyle<R extends RowData, M extends Model.HttpModel = Model.HttpModel> =
-    | PdfOptionalCellCallback<R, M, import("@react-pdf/types").Style>
-    | _PdfCellStyle<R, M>;
+  type PdfCellStyle<R extends RowData, M extends Model.HttpModel = Model.HttpModel, CV extends PdfRawValue = PdfRawValue> =
+    | PdfOptionalCellCallback<R, M, CV, import("@react-pdf/types").Style>
+    | _PdfCellStyle<R, M, CV>;
 
-  type PdfCellStandardProps<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
-    readonly style?: PdfCellStyle<R, M>;
-    readonly className?: PdfCellClassName<R, M>;
-    readonly textStyle?: PdfCellStyle<R, M>;
-    readonly textClassName?: PdfCellClassName<R, M>;
+  type PdfCellStandardProps<R extends RowData, M extends Model.HttpModel = Model.HttpModel, CV extends PdfRawValue = PdfRawValue> = {
+    readonly style?: PdfCellStyle<R, M, CV>;
+    readonly className?: PdfCellClassName<R, M, CV>;
+    readonly textStyle?: PdfCellStyle<R, M, CV>;
+    readonly textClassName?: PdfCellClassName<R, M, CV>;
   };
 
   interface PdfFooterColumn {
@@ -234,20 +234,18 @@ namespace Table {
     readonly textStyle?: import("@react-pdf/types").Style;
   }
 
-  type PdfFormatter<R extends RowData> = (value: string | number) => R[keyof R];
-
-  interface PdfColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel> extends BaseColumn<R, M, "pdf"> {
+  interface PdfColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V extends PdfRawValue = PdfRawValue> extends BaseColumn<R, M, "pdf"> {
     // In the PDF case, since we cannot dynamically resize columns, the width refers to a ratio
     // of the column width to the overall table width assuming that all columns are present.  When
     // columns are hidden/shown, this ratio is adjusted.
     readonly width?: number;
-    readonly cellProps?: PdfCellStandardProps<R, M>;
-    readonly headerCellProps?: PdfCellStandardProps<R, M>;
+    readonly cellProps?: PdfCellStandardProps<R, M, V>;
+    readonly headerCellProps?: PdfCellStandardProps<R, M, V>;
     readonly footer?: PdfFooterColumn;
-    readonly cellContentsVisible?: PdfOptionalCellCallback<R, M, boolean>;
-    readonly formatter?: PdfFormatter<R>;
-    readonly valueGetter?: (r: Table.BodyRow<R>, rows: Table.BodyRow<R>[]) => R[keyof R];
-    readonly cellRenderer?: (params: PdfCellCallbackParams<R, M>) => JSX.Element;
+    readonly cellContentsVisible?: PdfOptionalCellCallback<R, M, V, boolean>;
+    readonly formatter?: (value: string | number) => string;
+    readonly valueGetter?: (r: Table.BodyRow<R>, rows: Table.BodyRow<R>[]) => string | number;
+    readonly cellRenderer?: (params: PdfCellCallbackParams<R, M, V>) => JSX.Element;
     // NOTE: This only applies for the individual Account tables, not the the overall
     // Accounts table.
     readonly childFooter?: (s: M) => PdfFooterColumn;
@@ -268,6 +266,7 @@ namespace Table {
   interface Column<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any>
     extends Omit<ColDef, OmitColDefParams>,
       BaseColumn<R, M, "aggrid"> {
+    readonly nullValue?: NullValue<R>;
     readonly selectable?: boolean | ((params: CellCallbackParams<R, M>) => boolean) | undefined;
     readonly editable?: boolean | ((params: CellCallbackParams<R, M>) => boolean);
     readonly footer?: FooterColumn<R, M>;

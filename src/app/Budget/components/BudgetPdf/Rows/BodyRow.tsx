@@ -1,15 +1,28 @@
 import classNames from "classnames";
 
 import { BodyCell } from "../Cells";
-import { CellProps } from "../Cells/Cell";
+import { RowExplicitCellProps } from "../Cells/Cell";
 import Row, { RowProps } from "./Row";
 
-const BodyRow = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>({
+export interface BodyRowProps<
+  R extends Table.RowData,
+  M extends Model.HttpModel = Model.HttpModel,
+  RW extends Table.BodyRow<R> = Table.BodyRow<R>
+> extends RowProps<R, M> {
+  readonly row: RW;
+  readonly cellProps?: RowExplicitCellProps<R, M>;
+  readonly data: Table.BodyRow<R>[];
+}
+
+/* eslint-disable indent */
+const BodyRow = <
+  R extends Table.RowData,
+  M extends Model.HttpModel = Model.HttpModel,
+  RW extends Table.BodyRow<R> = Table.BodyRow<R>
+>({
   cellProps,
   ...props
-}: RowProps<R, M> & {
-  readonly cellProps?: Omit<CellProps<R, M>, "column" | "colIndex" | "row" | "debug" | "isHeader" | "data">;
-}): JSX.Element => (
+}: BodyRowProps<R, M, RW>): JSX.Element => (
   /* eslint-disable indent */
   <Row
     {...props}
@@ -19,9 +32,9 @@ const BodyRow = <R extends Table.RowData, M extends Model.HttpModel = Model.Http
         <BodyCell<R, M>
           colIndex={params.colIndex}
           column={params.column}
-          row={props.row}
           indented={params.indented}
           data={props.data}
+          row={props.row}
           {...cellProps}
         />
       );

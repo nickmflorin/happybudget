@@ -8,7 +8,6 @@ export const AccountColumns: Table.PdfColumn<Tables.PdfAccountRowData, Model.Pdf
     columnType: "text",
     width: 0.1,
     tableColumnType: "body",
-    nullValue: "",
     cellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
   },
   {
@@ -18,7 +17,6 @@ export const AccountColumns: Table.PdfColumn<Tables.PdfAccountRowData, Model.Pdf
     columnType: "longText",
     width: 0.75,
     tableColumnType: "body",
-    nullValue: "",
     footer: {
       value: "Grand Total"
     },
@@ -26,7 +24,7 @@ export const AccountColumns: Table.PdfColumn<Tables.PdfAccountRowData, Model.Pdf
       if (tabling.typeguards.isGroupRow(r)) {
         return r.groupData.name;
       }
-      return r.data.description;
+      return r.data.description || "";
     }
   },
   { domain: "pdf", field: "nominal_value", tableColumnType: "fake" },
@@ -39,7 +37,6 @@ export const AccountColumns: Table.PdfColumn<Tables.PdfAccountRowData, Model.Pdf
     headerName: "Estimated",
     tableColumnType: "calculated",
     columnType: "sum",
-    nullValue: "",
     formatter: tabling.formatters.currencyValueFormatter,
     width: 0.15,
     valueGetter: budgeting.valueGetters.estimatedValueGetter
@@ -54,7 +51,6 @@ export const SubAccountColumns: Table.PdfColumn<Tables.PdfSubAccountRowData, Mod
     headerName: "Acct",
     width: 0.1,
     tableColumnType: "body",
-    nullValue: "",
     cellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
   },
   {
@@ -63,13 +59,12 @@ export const SubAccountColumns: Table.PdfColumn<Tables.PdfSubAccountRowData, Mod
     headerName: "Description",
     columnType: "longText",
     width: 0.3,
-    nullValue: "",
     tableColumnType: "body",
     valueGetter: (r: Table.BodyRow<Tables.PdfSubAccountRowData>) => {
       if (tabling.typeguards.isGroupRow(r)) {
         return r.groupData.name;
       }
-      return r.data.description;
+      return r.data.description || "";
     }
   },
   {
@@ -78,7 +73,6 @@ export const SubAccountColumns: Table.PdfColumn<Tables.PdfSubAccountRowData, Mod
     headerName: "Contact",
     columnType: "contact",
     width: 0.1,
-    nullValue: "",
     tableColumnType: "body"
   },
   {
@@ -87,7 +81,6 @@ export const SubAccountColumns: Table.PdfColumn<Tables.PdfSubAccountRowData, Mod
     headerName: "Qty",
     columnType: "number",
     width: 0.1,
-    nullValue: "",
     tableColumnType: "body"
   },
   {
@@ -96,7 +89,6 @@ export const SubAccountColumns: Table.PdfColumn<Tables.PdfSubAccountRowData, Mod
     headerName: "Unit",
     columnType: "singleSelect",
     width: 0.1,
-    nullValue: "",
     tableColumnType: "body"
   },
   {
@@ -105,7 +97,6 @@ export const SubAccountColumns: Table.PdfColumn<Tables.PdfSubAccountRowData, Mod
     headerName: "X",
     columnType: "number",
     width: 0.1,
-    nullValue: "",
     tableColumnType: "body"
   },
   {
@@ -115,7 +106,6 @@ export const SubAccountColumns: Table.PdfColumn<Tables.PdfSubAccountRowData, Mod
     formatter: tabling.formatters.currencyValueFormatter,
     columnType: "currency",
     width: 0.1,
-    nullValue: "",
     tableColumnType: "body"
   },
   {
@@ -125,7 +115,6 @@ export const SubAccountColumns: Table.PdfColumn<Tables.PdfSubAccountRowData, Mod
     tableColumnType: "calculated",
     columnType: "sum",
     width: 0.1,
-    nullValue: "",
     formatter: tabling.formatters.currencyValueFormatter,
     valueGetter: budgeting.valueGetters.estimatedValueGetter
   },
