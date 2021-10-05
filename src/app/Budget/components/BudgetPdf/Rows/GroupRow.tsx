@@ -11,7 +11,7 @@ import BodyRow from "./BodyRow";
 const GroupRow = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   props: RowProps<R, M> & {
     readonly group: Model.Group;
-    readonly cellProps?: Omit<CellProps<R, M>, "column" | "colIndex" | "row" | "debug" | "isHeader">;
+    readonly cellProps?: Omit<CellProps<R, M>, "column" | "colIndex" | "row" | "debug" | "isHeader" | "data">;
   }
 ): JSX.Element => {
   const cellStyle = useMemo(() => {

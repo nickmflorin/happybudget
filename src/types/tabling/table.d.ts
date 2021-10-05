@@ -66,7 +66,9 @@ namespace Table {
     readonly color?: string;
   }
 
-  type RowType = "placeholder" | "model" | "group" | "markup" | "footer";
+  type DataRowType = "placeholder" | "model";
+  type BodyRowType = DataRowType | "group" | "markup";
+  type RowType = BodyRowType | "footer";
 
   type ModelRowId = number;
   type FooterRowId = `footer-${FooterGridId}`;
@@ -90,7 +92,7 @@ namespace Table {
     readonly gridId: Grid;
   };
 
-  type IBodyRow<RId extends RowId, TP extends RowType, D extends RowData> = IRow<RId, TP, "data"> & {
+  type IBodyRow<RId extends RowId, TP extends BodyRowType, D extends RowData> = IRow<RId, TP, "data"> & {
     readonly data: D;
   };
 
@@ -190,7 +192,7 @@ namespace Table {
   type PdfCellCallbackParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
     readonly colIndex: number;
     readonly column: PdfColumn<R, M>;
-    readonly row: R;
+    readonly row: Table.BodyRow<R>;
     readonly isHeader: boolean;
     readonly rawValue: any;
     readonly value: any;
@@ -244,7 +246,7 @@ namespace Table {
     readonly footer?: PdfFooterColumn;
     readonly cellContentsVisible?: PdfOptionalCellCallback<R, M, boolean>;
     readonly formatter?: PdfFormatter<R>;
-    readonly valueGetter?: (r: R) => R[keyof R];
+    readonly valueGetter?: (r: Table.BodyRow<R>, rows: Table.BodyRow<R>[]) => R[keyof R];
     readonly cellRenderer?: (params: PdfCellCallbackParams<R, M>) => JSX.Element;
     // NOTE: This only applies for the individual Account tables, not the the overall
     // Accounts table.

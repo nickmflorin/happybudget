@@ -25,19 +25,6 @@ export const estimatedValue = (
   }
 };
 
-const isSubAccountRowData = (
-  data: Tables.AccountRowData | Tables.SubAccountRowData
-): data is Tables.SubAccountRowData => (data as Tables.SubAccountRowData).fringe_contribution !== undefined;
-
-export const rowEstimatedValue = (r: Tables.AccountRowData | Tables.SubAccountRowData): number => {
-  if (isSubAccountRowData(r)) {
-    return (
-      r.nominal_value + r.accumulated_markup_contribution + r.fringe_contribution + r.accumulated_fringe_contribution
-    );
-  }
-  return r.nominal_value + r.accumulated_markup_contribution + r.accumulated_fringe_contribution;
-};
-
 export const varianceValue = (m: Model.Account | Model.SubAccount | Model.Budget): number => {
   return estimatedValue(m) - m.actual;
 };

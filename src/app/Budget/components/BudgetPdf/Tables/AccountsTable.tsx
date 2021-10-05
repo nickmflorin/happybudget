@@ -25,27 +25,28 @@ const AccountsTable = ({
   }, [columns]);
 
   const generateRows = hooks.useDynamicCallback((): JSX.Element[] => {
+    const rowData = tabling.data.createTableRows<Tables.PdfAccountRowData, Model.PdfAccount>({
+      response: { models: data, groups },
+      columns
+    });
     const rows = reduce(
-      tabling.data.createTableRows<Tables.PdfAccountRowData, Model.PdfAccount>({
-        response: { models: data, groups },
-        columns
-      }),
+      rowData,
       (rws: JSX.Element[], row: Table.BodyRow<R>) => {
         if (tabling.typeguards.isModelRow(row)) {
-          return [...rws, <BodyRow columns={columns} row={row.data} />];
+          return [...rws, <BodyRow columns={columns} row={row} data={rowData} />];
         } else if (tabling.typeguards.isGroupRow(row)) {
           const group = find(groups, { id: tabling.rows.groupId(row.id) });
           if (!isNil(group)) {
-            return [...rws, <GroupRow group={group} row={row.data} columns={columns} />];
+            return [...rws, <GroupRow group={group} row={row} columns={columns} data={rowData} />];
           }
           return rws;
         }
         return rws;
       },
-      [<HeaderRow columns={columns} />]
+      [<HeaderRow columns={columns} data={rowData} />]
     );
     if (showFooterRow === true) {
-      rows.push(<FooterRow columns={columns} />);
+      rows.push(<FooterRow columns={columns} data={rowData} />);
     }
     return rows;
   });

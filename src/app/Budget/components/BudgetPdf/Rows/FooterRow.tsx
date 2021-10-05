@@ -2,25 +2,30 @@ import { useMemo } from "react";
 import { isNil, reduce } from "lodash";
 import classNames from "classnames";
 
+import { tabling, util } from "lib";
+
 import { RowProps } from "./Row";
 import BodyRow from "./BodyRow";
 
 const FooterRow = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   props: Omit<RowProps<R, M>, "row">
 ): JSX.Element => {
-  const footerRow = useMemo(() => {
-    return reduce(
-      props.columns,
-      (obj: { [key: string]: any }, col: Table.PdfColumn<R, M>) => {
-        if (!isNil(col.footer) && !isNil(col.footer.value)) {
-          obj[col.field as string] = col.footer.value;
-        } else {
-          obj[col.field as string] = null;
-        }
-        return obj;
-      },
-      {}
-    ) as R;
+  const footerRow: Table.ModelRow<R> = useMemo(() => {
+    return tabling.rows.createModelRow({
+      id: util.generateRandomNumericId(),
+      data: reduce(
+        props.columns,
+        (obj: { [key: string]: any }, col: Table.PdfColumn<R, M>) => {
+          if (!isNil(col.footer) && !isNil(col.footer.value)) {
+            obj[col.field as string] = col.footer.value;
+          } else {
+            obj[col.field as string] = null;
+          }
+          return obj;
+        },
+        {}
+      ) as R
+    });
   }, [props.columns]);
   return (
     <BodyRow<R, M>

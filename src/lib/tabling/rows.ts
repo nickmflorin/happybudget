@@ -9,7 +9,7 @@ type CreateBodyRowDataConfig<
   M extends Model.HttpModel = Model.HttpModel,
   C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
 > = {
-  readonly columns: C[];
+  readonly columns?: C[];
   readonly excludeColumns?: (keyof R)[] | ((c: C) => boolean);
   readonly getValue: (field: keyof R, col: C) => R[keyof R] | undefined;
 };
@@ -19,7 +19,7 @@ type UpdateBodyRowDataConfig<
   M extends Model.HttpModel = Model.HttpModel,
   MM extends Model.HttpModel = M
 > = {
-  readonly columns: Table.Column<R, M>[];
+  readonly columns?: Table.Column<R, M>[];
   readonly data: R;
   readonly model?: Partial<MM>;
   readonly getValue: (field: keyof R, col: Table.Column<R, M>) => R[keyof R] | undefined;
@@ -39,29 +39,6 @@ type CreateRowConfig<RId extends Table.RowId, TP extends Table.RowType, Grid ext
   readonly id: RId;
   readonly rowType: TP;
   readonly gridId: Grid;
-};
-
-type CreateBodyRowConfig<
-  RId extends Table.RowId,
-  TP extends Table.RowType,
-  R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel,
-  C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
-> = Omit<CreateRowConfig<RId, TP, "data">, "gridId"> &
-  Omit<CreateBodyRowDataConfig<R, M, C>, "getValue" | "model"> & {
-    readonly data: R;
-  };
-
-type CreateBodyRowFromModelConfig<
-  RId extends Table.RowId,
-  TP extends Table.RowType,
-  R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel,
-  MM extends Model.TypedHttpModel = M,
-  C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
-> = Omit<CreateBodyRowConfig<RId, TP, R, M, C>, "data"> & {
-  readonly data?: R;
-  readonly model: MM;
 };
 
 export const markupRowId = (r: number): Table.MarkupRowId => `markup-${r}`;
@@ -182,33 +159,41 @@ export const createFooterRow = <Grid extends Table.FooterGridId = Table.FooterGr
   config: Omit<CreateRowConfig<Table.FooterRowId, "footer", Grid>, "id" | "rowType">
 ): Table.FooterRow => createRow({ ...config, rowType: "footer", id: footerRowId(config.gridId) });
 
-export const createBodyRow = <
+type CreateBodyRowFromDataConfig<
   RId extends Table.RowId,
   TP extends Table.RowType,
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel = Model.TypedHttpModel,
+  C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
+> = Omit<CreateRowConfig<RId, TP, "data">, "gridId"> &
+  Omit<CreateBodyRowDataConfig<R, M, C>, "getValue" | "model"> & {
+    readonly data: R;
+  };
+
+type CreateBodyRowFromModelConfig<
+  RId extends Table.RowId,
+  TP extends Table.RowType,
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel = Model.TypedHttpModel,
+  MM extends Model.TypedHttpModel = M,
+  C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
+> = Omit<CreateRowConfig<RId, TP, "data">, "gridId"> &
+  Omit<CreateBodyRowDataConfig<R, M, C>, "getValue" | "model"> & {
+    readonly model: MM;
+  };
+
+export const createBodyRow = <
+  RId extends Table.BodyRowId,
+  TP extends Table.BodyRowType,
   R extends Table.RowData,
   M extends Model.TypedHttpModel,
   C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
 >(
-  config: CreateBodyRowConfig<RId, TP, R, M, C>
+  config: CreateBodyRowFromDataConfig<RId, TP, R, M, C>
 ): Table.IBodyRow<RId, TP, R> => {
   return {
     ...createRow({ ...config, gridId: "data" }),
     data: config.data
-  };
-};
-
-export const createBodyRowFromModel = <
-  RId extends Table.RowId,
-  TP extends Table.RowType,
-  R extends Table.RowData,
-  M extends Model.TypedHttpModel,
-  MM extends Model.TypedHttpModel = M,
-  C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
->(
-  config: SetRequired<CreateBodyRowFromModelConfig<RId, TP, R, M, MM, C>, "data">
-): Table.IBodyRow<RId, TP, R> => {
-  return {
-    ...createBodyRow<RId, TP, R, M, C>(config)
   };
 };
 
@@ -256,24 +241,68 @@ export const updateGroupRow = <R extends Table.RowData, M extends Model.HttpMode
   };
 };
 
+type CreateGroupRowFromModelConfig<
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel,
+  C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
+> = Omit<CreateBodyRowFromModelConfig<Table.GroupRowId, "group", R, M, Model.Group, C>, "rowType" | "id"> & {
+  readonly getRowChildren?: (m: M) => number[];
+  readonly getRowValue?: (m: M, col: C) => R[keyof R] | undefined;
+};
+
+type CreateGroupRowFromDataConfig<
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel,
+  C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
+> = Omit<CreateBodyRowFromDataConfig<Table.GroupRowId, "group", R, M, C>, "rowType"> & {
+  readonly getRowValue?: (m: M, col: C) => R[keyof R] | undefined;
+  readonly children?: number[];
+  readonly name: string;
+  readonly color: Style.HexColor | null;
+};
+
+const isGroupRowConfigWithModel = <
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel,
+  C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
+>(
+  config: CreateGroupRowFromModelConfig<R, M, C> | CreateGroupRowFromDataConfig<R, M, C>
+): config is CreateGroupRowFromModelConfig<R, M, C> =>
+  (config as CreateGroupRowFromModelConfig<R, M, C>).model !== undefined;
+
 export const createGroupRow = <
   R extends Table.RowData,
   M extends Model.TypedHttpModel,
   C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
 >(
-  config: Omit<CreateBodyRowFromModelConfig<Table.GroupRowId, "group", R, M, Model.Group, C>, "rowType" | "id">
+  config: CreateGroupRowFromModelConfig<R, M, C> | CreateGroupRowFromDataConfig<R, M, C>
 ): Table.GroupRow<R> => {
+  if (isGroupRowConfigWithModel(config)) {
+    return {
+      ...createBodyRow<Table.GroupRowId, "group", R, M, C>({
+        ...config,
+        id: groupRowId(config.model.id),
+        rowType: "group",
+        data: createGroupRowData<R, M, C>(config)
+      }),
+      children: config.model.children,
+      groupData: {
+        color: config.model.color,
+        name: config.model.name
+      }
+    };
+  }
   return {
-    ...createBodyRowFromModel<Table.GroupRowId, "group", R, M, Model.Group, C>({
+    ...createBodyRow<Table.GroupRowId, "group", R, M, C>({
       ...config,
-      id: groupRowId(config.model.id),
+      id: config.id,
       rowType: "group",
-      data: config.data || createGroupRowData<R, M, C>(config)
+      data: config.data
     }),
-    children: config.model.children,
+    children: config.children || [],
     groupData: {
-      color: config.model.color,
-      name: config.model.name
+      color: config.color,
+      name: config.name
     }
   };
 };
@@ -322,24 +351,68 @@ export const updateMarkupRow = <R extends Table.RowData, M extends Model.HttpMod
   };
 };
 
+type CreateMarkupRowFromModelConfig<
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel,
+  C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
+> = Omit<CreateBodyRowFromModelConfig<Table.MarkupRowId, "markup", R, M, Model.Markup, C>, "rowType" | "id"> & {
+  readonly getRowChildren?: (m: M) => number[];
+  readonly getRowValue?: (m: M, col: C) => R[keyof R] | undefined;
+};
+
+type CreateMarkupRowFromDataConfig<
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel,
+  C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
+> = Omit<CreateBodyRowFromDataConfig<Table.MarkupRowId, "markup", R, M, C>, "rowType"> & {
+  readonly getRowValue?: (m: M, col: C) => R[keyof R] | undefined;
+  readonly children?: number[];
+  readonly unit: Model.MarkupUnit | null;
+  readonly rate: number | null;
+};
+
+const isMarkupRowConfigWithModel = <
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel,
+  C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
+>(
+  config: CreateMarkupRowFromModelConfig<R, M, C> | CreateMarkupRowFromDataConfig<R, M, C>
+): config is CreateMarkupRowFromModelConfig<R, M, C> =>
+  (config as CreateMarkupRowFromModelConfig<R, M, C>).model !== undefined;
+
 export const createMarkupRow = <
   R extends Table.RowData,
   M extends Model.TypedHttpModel,
   C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
 >(
-  config: Omit<CreateBodyRowFromModelConfig<Table.MarkupRowId, "markup", R, M, Model.Markup, C>, "rowType" | "id">
+  config: CreateMarkupRowFromModelConfig<R, M, C> | CreateMarkupRowFromDataConfig<R, M, C>
 ): Table.MarkupRow<R> => {
+  if (isMarkupRowConfigWithModel(config)) {
+    return {
+      ...createBodyRow<Table.MarkupRowId, "markup", R, M, C>({
+        ...config,
+        id: markupRowId(config.model.id),
+        rowType: "markup",
+        data: createMarkupRowData<R, M, C>(config)
+      }),
+      children: config.model.children,
+      markupData: {
+        unit: config.model.unit,
+        rate: config.model.rate
+      }
+    };
+  }
   return {
-    ...createBodyRowFromModel<Table.MarkupRowId, "markup", R, M, Model.Markup, C>({
+    ...createBodyRow<Table.MarkupRowId, "markup", R, M, C>({
       ...config,
-      id: markupRowId(config.model.id),
+      id: config.id,
       rowType: "markup",
-      data: config.data || createMarkupRowData<R, M, C>(config)
+      data: config.data
     }),
-    children: config.model.children,
+    children: config.children || [],
     markupData: {
-      unit: config.model.unit,
-      rate: config.model.rate
+      unit: config.unit,
+      rate: config.rate
     }
   };
 };
@@ -358,7 +431,7 @@ export const createPlaceholderRowData = <R extends Table.RowData, M extends Mode
 
 export const createPlaceholderRow = <R extends Table.RowData, M extends Model.TypedHttpModel>(
   config: Omit<
-    CreateBodyRowConfig<Table.PlaceholderRowId, "placeholder", R, M, Table.Column<R, M>>,
+    CreateBodyRowFromDataConfig<Table.PlaceholderRowId, "placeholder", R, M, Table.Column<R, M>>,
     "rowType" | "data"
   > & {
     readonly data?: Partial<R>;
@@ -400,23 +473,58 @@ export const createModelRowData = <
     }
   });
 
+type CreateModelRowFromModelConfig<
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel,
+  C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
+> = Omit<CreateBodyRowFromModelConfig<Table.ModelRowId, "model", R, M, M, C>, "rowType" | "id"> & {
+  readonly getRowChildren?: (m: M) => number[];
+  readonly getRowValue?: (m: M, col: C) => R[keyof R] | undefined;
+};
+
+type CreateModelRowFromDataConfig<
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel,
+  C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
+> = Omit<CreateBodyRowFromDataConfig<Table.ModelRowId, "model", R, M, C>, "rowType"> & {
+  readonly getRowValue?: (m: M, col: C) => R[keyof R] | undefined;
+  readonly children?: number[];
+};
+
+const isModelRowConfigWithModel = <
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel,
+  C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
+>(
+  config: CreateModelRowFromModelConfig<R, M, C> | CreateModelRowFromDataConfig<R, M, C>
+): config is CreateModelRowFromModelConfig<R, M, C> =>
+  (config as CreateModelRowFromModelConfig<R, M, C>).model !== undefined;
+
 export const createModelRow = <
   R extends Table.RowData,
   M extends Model.TypedHttpModel,
   C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
 >(
-  config: Omit<CreateBodyRowFromModelConfig<Table.ModelRowId, "model", R, M, M, C>, "rowType" | "id"> & {
-    readonly getRowChildren?: (m: M) => number[];
-    readonly getRowValue?: (m: M, col: C) => R[keyof R] | undefined;
-  }
+  config: CreateModelRowFromModelConfig<R, M, C> | CreateModelRowFromDataConfig<R, M, C>
 ): Table.ModelRow<R> => {
+  if (isModelRowConfigWithModel(config)) {
+    return {
+      children: !isNil(config.getRowChildren) ? config.getRowChildren(config.model) : [],
+      ...createBodyRow<Table.ModelRowId, "model", R, M, C>({
+        ...config,
+        id: config.model.id,
+        rowType: "model",
+        data: createModelRowData<R, M, C>(config)
+      })
+    };
+  }
   return {
-    children: !isNil(config.getRowChildren) ? config.getRowChildren(config.model) : [],
-    ...createBodyRowFromModel<Table.ModelRowId, "model", R, M, M, C>({
+    children: config.children || [],
+    ...createBodyRow<Table.ModelRowId, "model", R, M, C>({
       ...config,
-      id: config.model.id,
+      id: config.id,
       rowType: "model",
-      data: config.data || createModelRowData<R, M, C>(config)
+      data: config.data
     })
   };
 };

@@ -8,7 +8,8 @@ export type RowProps<
   M extends Model.HttpModel = Model.HttpModel
 > = StandardPdfComponentProps & {
   readonly columns: Table.PdfColumn<R, M>[];
-  readonly row: R;
+  readonly row: Table.BodyRow<R>;
+  readonly data: Table.BodyRow<R>[];
   readonly columnIndent?: number;
 };
 

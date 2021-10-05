@@ -8,7 +8,7 @@ const BodyRow = <R extends Table.RowData, M extends Model.HttpModel = Model.Http
   cellProps,
   ...props
 }: RowProps<R, M> & {
-  readonly cellProps?: Omit<CellProps<R, M>, "column" | "colIndex" | "row" | "debug" | "isHeader">;
+  readonly cellProps?: Omit<CellProps<R, M>, "column" | "colIndex" | "row" | "debug" | "isHeader" | "data">;
 }): JSX.Element => (
   /* eslint-disable indent */
   <Row
@@ -21,6 +21,7 @@ const BodyRow = <R extends Table.RowData, M extends Model.HttpModel = Model.Http
           column={params.column}
           row={props.row}
           indented={params.indented}
+          data={props.data}
           {...cellProps}
         />
       );

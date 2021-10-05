@@ -1,4 +1,4 @@
-import { tabling } from "lib";
+import { tabling, budgeting } from "lib";
 
 export const AccountColumns: Table.PdfColumn<Tables.PdfAccountRowData, Model.PdfAccount>[] = [
   {
@@ -36,7 +36,7 @@ export const AccountColumns: Table.PdfColumn<Tables.PdfAccountRowData, Model.Pdf
     nullValue: "",
     formatter: tabling.formatters.currencyValueFormatter,
     width: 0.15,
-    valueGetter: (r: Tables.PdfAccountRowData) => r.nominal_value + r.accumulated_markup_contribution
+    valueGetter: budgeting.valueGetters.estimatedValueGetter
   }
 ];
 
@@ -115,8 +115,7 @@ export const SubAccountColumns: Table.PdfColumn<Tables.PdfSubAccountRowData, Mod
     width: 0.1,
     nullValue: "",
     formatter: tabling.formatters.currencyValueFormatter,
-    valueGetter: (r: Tables.PdfSubAccountRowData) =>
-      r.nominal_value + r.accumulated_markup_contribution + r.fringe_contribution
+    valueGetter: budgeting.valueGetters.estimatedValueGetter
   },
   { domain: "pdf", field: "nominal_value", tableColumnType: "fake" },
   { domain: "pdf", field: "markup_contribution", tableColumnType: "fake" },

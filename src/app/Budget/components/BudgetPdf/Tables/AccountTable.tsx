@@ -28,8 +28,8 @@ const AccountTable = ({
     return filter(columns, (column: Table.Column<R, M>) => !isNil(column.footer)).length !== 0;
   }, [columns]);
 
-  const accountSubHeaderRow: Tables.PdfAccountRowData = useMemo(() => {
-    return tabling.rows.createModelRowData<
+  const accountSubHeaderRow: Tables.PdfAccountRow = useMemo(() => {
+    return tabling.rows.createModelRow<
       Tables.PdfAccountRowData,
       Model.PdfAccount,
       Table.PdfColumn<Tables.PdfAccountRowData, Model.PdfAccount>
@@ -40,8 +40,8 @@ const AccountTable = ({
   }, [account, columns]);
 
   const generateRows = hooks.useDynamicCallback((): JSX.Element[] => {
-    const createSubAccountFooterRow = (subaccount: M): R => {
-      return tabling.rows.createModelRowData<R, M, Table.PdfColumn<R, M>>({
+    const createSubAccountFooterRow = (subaccount: M): Table.ModelRow<R> => {
+      return tabling.rows.createModelRow<R, M, Table.PdfColumn<R, M>>({
         model: subaccount,
         columns: subAccountColumns,
         getRowValue: (m: Model.PdfSubAccount, c: Table.PdfColumn<R, M>) => {
@@ -52,8 +52,8 @@ const AccountTable = ({
       });
     };
 
-    const createSubAccountHeaderRow = (subaccount: M): R => {
-      return tabling.rows.createModelRowData<R, M, Table.PdfColumn<R, M>>({
+    const createSubAccountHeaderRow = (subaccount: M): Table.ModelRow<R> => {
+      return tabling.rows.createModelRow<R, M, Table.PdfColumn<R, M>>({
         model: subaccount,
         columns: subAccountColumns,
         excludeColumns: (c: Table.PdfColumn<R, M>) =>
@@ -103,7 +103,8 @@ const AccountTable = ({
                     <BodyRow<R, M>
                       columns={subAccountColumns}
                       className={"detail-tr"}
-                      row={detailRow.data}
+                      row={detailRow}
+                      data={table}
                       cellProps={{
                         cellContentsVisible: (params: Table.PdfCellCallbackParams<R, M>) =>
                           params.column.field === "identifier" ? false : true,
@@ -124,7 +125,8 @@ const AccountTable = ({
                       ...rws,
                       <GroupRow
                         className={"detail-group-tr"}
-                        row={detailRow.data}
+                        row={detailRow}
+                        data={table}
                         group={group}
                         columns={subAccountColumns}
                         columnIndent={1}
@@ -147,6 +149,7 @@ const AccountTable = ({
                   cellProps={{ className: "subaccount-td", textClassName: "subaccount-tr-td-text" }}
                   className={"subaccount-tr"}
                   columns={subAccountColumns}
+                  data={table}
                   row={createSubAccountHeaderRow(subAccount)}
                 />
               ]
@@ -159,6 +162,7 @@ const AccountTable = ({
                   className={"subaccount-footer-tr"}
                   cellProps={{ className: "subaccount-footer-td", textClassName: "subaccount-footer-tr-td-text" }}
                   columns={subAccountColumns}
+                  data={table}
                   row={footerRow}
                   style={!isLastSubAccount ? { borderBottomWidth: 1 } : {}}
                 />
@@ -170,7 +174,7 @@ const AccountTable = ({
         } else if (tabling.typeguards.isGroupRow(subAccountRow)) {
           const group = find(account.groups, { id: tabling.rows.groupId(subAccountRow.id) });
           if (!isNil(group)) {
-            return [...rws, <GroupRow row={subAccountRow.data} group={group} columns={subAccountColumns} />];
+            return [...rws, <GroupRow row={subAccountRow} group={group} columns={subAccountColumns} data={table} />];
           }
           return rws;
         } else {
@@ -178,17 +182,18 @@ const AccountTable = ({
         }
       },
       [
-        <HeaderRow className={"account-header-tr"} columns={subAccountColumns} />,
+        <HeaderRow className={"account-header-tr"} columns={subAccountColumns} data={table} />,
         <BodyRow<Tables.PdfAccountRowData, Model.PdfAccount>
           className={"account-sub-header-tr"}
           cellProps={{ textClassName: "account-sub-header-tr-td-text" }}
           columns={columns}
+          data={table}
           row={accountSubHeaderRow}
         />
       ]
     );
     if (showFooterRow === true) {
-      rows = [...rows, <FooterRow columns={subAccountColumns} />];
+      rows = [...rows, <FooterRow columns={subAccountColumns} data={table} />];
     }
     return rows;
   });

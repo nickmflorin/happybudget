@@ -60,7 +60,8 @@ const evaluateCellStyle = <R extends Table.RowData, M extends Model.HttpModel = 
 
 export interface CellProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
   readonly column: Table.PdfColumn<R, M>;
-  readonly row: R;
+  readonly row: Table.BodyRow<R>;
+  readonly data: Table.BodyRow<R>[];
   readonly colIndex: number;
   readonly style?: Table.PdfCellStyle<R, M>;
   readonly className?: Table.PdfCellClassName<R, M>;
@@ -89,9 +90,9 @@ const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
 
   const rawValue: R[keyof R] = useMemo((): R[keyof R] => {
     if (!isNil(props.column.valueGetter)) {
-      return props.column.valueGetter(props.row);
+      return props.column.valueGetter(props.row, props.data);
     } else if (!isNil(props.column.field)) {
-      return props.row[props.column.field];
+      return props.row.data[props.column.field];
     }
     return props.column.nullValue === undefined
       ? ("" as unknown as R[keyof R])
