@@ -40,6 +40,54 @@ h6 {
   @extend .header-base;
 }
 
+h1.ce-header {
+  @extend .header-base;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 24px;
+  margin-bottom: 4px !important;
+}
+
+h2.ce-header {
+  @extend .header-base;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 22px;
+  margin-bottom: 4px !important;
+}
+
+h3.ce-header {
+  @extend .header-base;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  margin-bottom: 4px !important;
+}
+
+h4.ce-header {
+  @extend .header-base;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 20px;
+  margin-bottom: 4px !important;
+}
+
+h5.ce-header {
+  @extend .header-base;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  margin-bottom: 4px !important;
+}
+
+h6.ce-header {
+  @extend .header-base;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 18px;
+  margin-bottom: 4px !important;
+}
+
 .truncate {
   white-space: nowrap;
   overflow: hidden;

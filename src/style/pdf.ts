@@ -58,32 +58,44 @@ const TextStyles: Pdf.ExtensionStyles = {
   h1: {
     ext: ["header"],
     fontWeight: 700,
-    fontSize: 24
+    fontSize: 20,
+    lineHeight: "1.5pt",
+    marginBottom: 2
   },
   h2: {
     ext: ["header"],
     fontWeight: 700,
-    fontSize: 20
+    fontSize: 18,
+    lineHeight: "1.5pt",
+    marginBottom: 2
   },
   h3: {
     ext: ["header"],
     fontWeight: 600,
-    fontSize: 16
+    fontSize: 18,
+    lineHeight: "1.5pt",
+    marginBottom: 2
   },
   h4: {
     ext: ["header"],
     fontWeight: 600,
-    fontSize: 14
+    fontSize: 16,
+    lineHeight: "1.5pt",
+    marginBottom: 2
   },
   h5: {
     ext: ["header"],
-    fontWeight: 400,
-    fontSize: 12
+    fontWeight: 500,
+    fontSize: 16,
+    lineHeight: "1.5pt",
+    marginBottom: 2
   },
   h6: {
     ext: ["header"],
-    fontWeight: 400,
-    fontSize: 10
+    fontWeight: 500,
+    fontSize: 14,
+    lineHeight: "1.5pt",
+    marginBottom: 2
   },
   label: {
     fontFamily: "AvenirNext",
