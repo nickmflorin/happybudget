@@ -9,20 +9,19 @@ import { RowProps } from "./Row";
 import BodyRow from "./BodyRow";
 
 const GroupRow = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
-  props: RowProps<R, M> & {
-    readonly group: Model.Group;
+  props: RowProps<R, M, Table.GroupRow<R>> & {
     readonly cellProps?: Omit<CellProps<R, M>, "column" | "colIndex" | "row" | "debug" | "isHeader" | "data">;
   }
 ): JSX.Element => {
   const cellStyle = useMemo(() => {
-    const colorDef = model.util.getGroupColorDefinition(props.group);
+    const colorDef = model.util.getGroupColorDefinition(props.row);
     return {
       backgroundColor: !isNil(colorDef.backgroundColor) ? colorDef.backgroundColor : "#EFEFEF"
     };
   }, [props.row]);
 
   const cellTextStyle = useMemo(() => {
-    const colorDef = model.util.getGroupColorDefinition(props.group);
+    const colorDef = model.util.getGroupColorDefinition(props.row);
     return {
       color: !isNil(colorDef.color) ? colorDef.color : "#424242"
     };

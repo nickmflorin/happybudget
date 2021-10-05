@@ -119,28 +119,24 @@ const AccountTable = ({
                     />
                   ];
                 } else if (tabling.typeguards.isGroupRow(detailRow)) {
-                  const group = find(subAccount.groups, { id: tabling.rows.groupId(detailRow.id) });
-                  if (!isNil(group)) {
-                    return [
-                      ...rws,
-                      <GroupRow
-                        className={"detail-group-tr"}
-                        row={detailRow}
-                        data={table}
-                        group={group}
-                        columns={subAccountColumns}
-                        columnIndent={1}
-                        cellProps={{
-                          textClassName: (params: Table.PdfCellCallbackParams<R, M>) => {
-                            if (params.column.field === "description") {
-                              return "detail-group-indent-td";
-                            }
-                            return "";
+                  return [
+                    ...rws,
+                    <GroupRow
+                      className={"detail-group-tr"}
+                      row={detailRow}
+                      data={table}
+                      columns={subAccountColumns}
+                      columnIndent={1}
+                      cellProps={{
+                        textClassName: (params: Table.PdfCellCallbackParams<R, M>) => {
+                          if (params.column.field === "description") {
+                            return "detail-group-indent-td";
                           }
-                        }}
-                      />
-                    ];
-                  }
+                          return "";
+                        }
+                      }}
+                    />
+                  ];
                 }
                 return rws;
               },
@@ -172,11 +168,7 @@ const AccountTable = ({
           }
           return rws;
         } else if (tabling.typeguards.isGroupRow(subAccountRow)) {
-          const group = find(account.groups, { id: tabling.rows.groupId(subAccountRow.id) });
-          if (!isNil(group)) {
-            return [...rws, <GroupRow row={subAccountRow} group={group} columns={subAccountColumns} data={table} />];
-          }
-          return rws;
+          return [...rws, <GroupRow row={subAccountRow} columns={subAccountColumns} data={table} />];
         } else {
           return rws;
         }

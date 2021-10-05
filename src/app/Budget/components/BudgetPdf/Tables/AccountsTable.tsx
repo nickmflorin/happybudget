@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { isNil, filter, reduce, find, map } from "lodash";
+import { isNil, filter, reduce, map } from "lodash";
 
 import { tabling, hooks } from "lib";
 import Table from "./Table";
@@ -35,11 +35,7 @@ const AccountsTable = ({
         if (tabling.typeguards.isModelRow(row)) {
           return [...rws, <BodyRow columns={columns} row={row} data={rowData} />];
         } else if (tabling.typeguards.isGroupRow(row)) {
-          const group = find(groups, { id: tabling.rows.groupId(row.id) });
-          if (!isNil(group)) {
-            return [...rws, <GroupRow group={group} row={row} columns={columns} data={rowData} />];
-          }
-          return rws;
+          return [...rws, <GroupRow row={row} columns={columns} data={rowData} />];
         }
         return rws;
       },

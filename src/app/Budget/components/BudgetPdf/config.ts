@@ -21,6 +21,12 @@ export const AccountColumns: Table.PdfColumn<Tables.PdfAccountRowData, Model.Pdf
     nullValue: "",
     footer: {
       value: "Grand Total"
+    },
+    valueGetter: (r: Table.BodyRow<Tables.PdfAccountRowData>) => {
+      if (tabling.typeguards.isGroupRow(r)) {
+        return r.groupData.name;
+      }
+      return r.data.description;
     }
   },
   { domain: "pdf", field: "nominal_value", tableColumnType: "fake" },
@@ -58,7 +64,13 @@ export const SubAccountColumns: Table.PdfColumn<Tables.PdfSubAccountRowData, Mod
     columnType: "longText",
     width: 0.3,
     nullValue: "",
-    tableColumnType: "body"
+    tableColumnType: "body",
+    valueGetter: (r: Table.BodyRow<Tables.PdfSubAccountRowData>) => {
+      if (tabling.typeguards.isGroupRow(r)) {
+        return r.groupData.name;
+      }
+      return r.data.description;
+    }
   },
   {
     domain: "pdf",
