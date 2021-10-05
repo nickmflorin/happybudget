@@ -116,7 +116,8 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
           width: (column.width || defaultWidth) / totalWidth
         }));
         // Filter Out Unused Columns
-        columns = filter(columns, (column: C) => includes(options.columns, column.field as string));
+        columns = filter(columns, (column: C) => includes(options.columns, tabling.columns.normalizedField(column)));
+
         // Calculate Total Column Width After Filtering Out Unused Columns
         const totalWidthWithFilter = reduce(
           columns,
@@ -184,16 +185,18 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
       </ShowHide>
       <ShowHide show={showAccountSheets}>
         <Page>
-          {map(accounts, (account: Model.PdfAccount, index: number) => (
-            <View key={index} style={index !== 0 ? { marginTop: 20 } : {}}>
-              <AccountTable
-                account={account}
-                options={options}
-                columns={accountColumns}
-                subAccountColumns={subaccountColumns(account)}
-              />
-            </View>
-          ))}
+          {map(accounts, (account: Model.PdfAccount, index: number) => {
+            return (
+              <View key={index} style={index !== 0 ? { marginTop: 20 } : {}}>
+                <AccountTable
+                  account={account}
+                  options={options}
+                  columns={accountColumns}
+                  subAccountColumns={subaccountColumns(account)}
+                />
+              </View>
+            );
+          })}
         </Page>
       </ShowHide>
     </Document>

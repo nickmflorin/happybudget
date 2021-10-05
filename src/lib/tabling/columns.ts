@@ -4,7 +4,7 @@ import { find, isNil, reduce, filter, orderBy } from "lodash";
 import { ColumnTypes } from "./models";
 
 export const normalizedField = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
-  col: Table.Column<R, M>
+  col: Table.AnyColumn<R, M>
 ): keyof R | string | undefined => (col.field !== undefined ? col.field : col.colId);
 
 type ColumnTypeVariantOptions = {
@@ -114,21 +114,29 @@ export const orderColumns = <
 >(
   columns: C[]
 ): C[] => {
-  const columnsWithIndex = filter(columns, (col: C) => !isNil(col.index));
-  const columnsWithoutIndexAction = filter(columns, (col: C) => isNil(col.index) && col.tableColumnType === "action");
-  const columnsWithoutIndexBody = filter(columns, (col: C) => isNil(col.index) && col.tableColumnType === "body");
-  const columnsWithoutIndexCalculated = filter(
-    columns,
-    (col: C) => isNil(col.index) && col.tableColumnType === "calculated"
-  );
+  const actionColumns = filter(columns, (col: C) => col.tableColumnType === "action");
+  const calculatedColumns = filter(columns, (col: C) => col.tableColumnType === "calculated");
+  const bodyColumns = filter(columns, (col: C) => col.tableColumnType === "body");
   // It doesn't matter where the fake columns go in the ordering because they are not
   // displayed - all we care about is that they are present.
   const fakeColumns = filter(columns, (col: C) => col.tableColumnType === "fake");
+
+  const actionColumnsWithIndex = filter(actionColumns, (col: C) => !isNil(col.index));
+  const actionColumnsWithoutIndex = filter(actionColumns, (col: C) => isNil(col.index));
+
+  const calculatedColumnsWithIndex = filter(calculatedColumns, (col: C) => !isNil(col.index));
+  const calculatedColumnsWithoutIndex = filter(calculatedColumns, (col: C) => isNil(col.index));
+
+  const bodyColumnsWithIndex = filter(bodyColumns, (col: C) => !isNil(col.index));
+  const bodyColumnsWithoutIndex = filter(bodyColumns, (col: C) => isNil(col.index));
+
   return [
     ...fakeColumns,
-    ...columnsWithoutIndexAction,
-    ...orderBy(columnsWithIndex, ["index"], ["asc"]),
-    ...columnsWithoutIndexBody,
-    ...columnsWithoutIndexCalculated
+    ...orderBy(actionColumnsWithIndex, ["index"], ["asc"]),
+    ...actionColumnsWithoutIndex,
+    ...orderBy(bodyColumnsWithIndex, ["index"], ["asc"]),
+    ...bodyColumnsWithoutIndex,
+    ...orderBy(calculatedColumnsWithIndex, ["index"], ["asc"]),
+    ...calculatedColumnsWithoutIndex
   ];
 };

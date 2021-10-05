@@ -5,7 +5,7 @@ import { isNil, map, debounce, filter } from "lodash";
 
 import * as api from "api";
 import { registerFonts } from "style/pdf";
-import { util, redux } from "lib";
+import { util, redux, tabling } from "lib";
 
 import { Form, Modal } from "components";
 import { ExportPdfForm } from "components/forms";
@@ -70,9 +70,11 @@ const DEFAULT_OPTIONS: PdfBudgetTable.Options = {
   },
   includeNotes: false,
   columns: filter(
-    map(SubAccountColumns, (column: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => column.field),
-    (field: keyof Table.BodyRow<Tables.PdfSubAccountRowData> | undefined) => !isNil(field)
-  ) as (keyof Tables.PdfSubAccountRowData)[]
+    map(SubAccountColumns, (column: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) =>
+      tabling.columns.normalizedField(column)
+    ),
+    (field: string | undefined) => !isNil(field)
+  ) as string[]
 };
 
 interface PreviewModalProps {

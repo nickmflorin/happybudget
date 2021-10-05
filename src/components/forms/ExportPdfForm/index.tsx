@@ -1,14 +1,15 @@
-import React, { useState, useMemo, useRef, forwardRef, ForwardedRef, useImperativeHandle } from "react";
+import { useState, useMemo, useRef, forwardRef, ForwardedRef, useImperativeHandle } from "react";
 import classNames from "classnames";
-import { map, isNil, find } from "lodash";
+import { map, isNil, find, filter } from "lodash";
 
-import { Select, Switch, Tag, Checkbox } from "antd";
+import { Select, Switch, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import * as api from "api";
-import { hooks, model, util, tabling, ui } from "lib";
+import { hooks, model, util } from "lib";
 
 import { Icon, Form, ShowHide, Separator } from "components";
+import { ColumnSelect } from "components/fields";
 import { UploadPdfImage } from "components/uploaders";
 import { EntityText } from "components/typography";
 import { Editor } from "components/richtext";
@@ -18,15 +19,6 @@ import HeaderTemplateSaveForm, { IHeaderTemplateSaveFormRef } from "./HeaderTemp
 import useHeaderTemplate from "./useHeaderTemplate";
 
 import "./index.scss";
-
-// Does not seem to be exportable from AntD/RCSelect so we just copy it here.
-type CustomTagProps = {
-  label: React.ReactNode;
-  value: any;
-  disabled: boolean;
-  onClose: (event?: React.MouseEvent<HTMLElement, MouseEvent>) => void;
-  closable: boolean;
-};
 
 type NonFormFields = "includeNotes" | "notes" | "header";
 type RichTextFields = "notes" | "header";
@@ -381,45 +373,12 @@ const ExportForm = (
         labelStyle={{ marginBottom: "5px !important" }}
       >
         <Form.Item label={"Columns"} name={"columns"}>
-          <Select
-            suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
-            mode={"multiple"}
-            showArrow
-            tagRender={(params: CustomTagProps) => {
-              const column = find(columns, { field: params.value });
-              if (!isNil(column)) {
-                const colType = find(tabling.models.ColumnTypes, { id: column.columnType });
-                return (
-                  <Tag className={"column-select-tag"} style={{ marginRight: 3 }} {...params}>
-                    {!isNil(colType) && !isNil(colType.icon) && (
-                      <div className={"icon-wrapper"}>
-                        {ui.typeguards.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}
-                      </div>
-                    )}
-                    {column.headerName}
-                  </Tag>
-                );
-              }
-              return <></>;
-            }}
-          >
-            {map(
+          <ColumnSelect
+            columns={filter(
               columns,
-              (column: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>, index: number) => {
-                const colType = find(tabling.models.ColumnTypes, { id: column.columnType });
-                return (
-                  <Select.Option className={"column-select-option"} key={index + 1} value={column.field as string}>
-                    {!isNil(colType) && !isNil(colType.icon) && (
-                      <div className={"icon-wrapper"}>
-                        {ui.typeguards.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}
-                      </div>
-                    )}
-                    {column.headerName}
-                  </Select.Option>
-                );
-              }
+              (c: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => c.tableColumnType !== "fake"
             )}
-          </Select>
+          />
         </Form.Item>
 
         <Form.ItemStyle label={"Show All Tables"}>

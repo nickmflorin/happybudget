@@ -1,45 +1,5 @@
 @import "style/_imports";
 
-.ant-select-item-option {
-  &.column-select-option {
-    .ant-select-item-option-content {
-      display: flex;
-
-      .icon-wrapper {
-        height: 22px;
-        width: 22px;
-
-        svg {
-          height: 12px;
-          width: 12px;
-        }
-      }
-    }
-  }
-}
-
-.column-select-tag {
-  display: flex;
-  line-height: 22px;
-
-  .icon-wrapper {
-    height: 22px;
-    width: 22px;
-    margin-right: -4px;
-
-    svg {
-      height: 12px;
-      width: 12px;
-    }
-  }
-
-  .ant-tag-close-icon {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-}
-
 .export-form {
   display: flex;
   flex-direction: column;

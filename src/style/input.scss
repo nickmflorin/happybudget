@@ -183,6 +183,25 @@ textarea {
   }
 }
 
+// Must be outside of select because it does not render inside of select component.
+.ant-select-item-option {
+  &.column-select-option {
+    .ant-select-item-option-content {
+      display: flex;
+
+      .icon-wrapper {
+        height: 22px;
+        width: 22px;
+
+        svg {
+          height: 12px;
+          width: 12px;
+        }
+      }
+    }
+  }
+}
+
 .select {
   @extend .input-base;
   box-shadow: none !important;
@@ -209,6 +228,30 @@ textarea {
     background-color: $gray-light !important;
     .ant-select-selector {
       background-color: $gray-light !important;
+    }
+  }
+
+  &--column {
+    .column-select-tag {
+      display: flex;
+      line-height: 22px;
+
+      .icon-wrapper {
+        height: 22px;
+        width: 22px;
+        margin-right: -4px;
+
+        svg {
+          height: 12px;
+          width: 12px;
+        }
+      }
+
+      .ant-tag-close-icon {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
     }
   }
 }

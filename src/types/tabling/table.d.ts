@@ -719,7 +719,7 @@ namespace PdfBudgetTable {
 
   interface Options {
     readonly header: Omit<HeaderTemplateFormData, "name">;
-    readonly columns: (keyof Tables.PdfSubAccountRowData)[];
+    readonly columns: (keyof Tables.PdfSubAccountRowData | string)[];
     readonly tables?: TableOption[] | null | undefined;
     readonly excludeZeroTotals: boolean;
     readonly notes?: RichText.Block[];
