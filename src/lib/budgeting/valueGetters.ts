@@ -56,19 +56,5 @@ export const varianceValueGetter = <R extends Tables.BudgetRowData>(
   row: Table.BodyRow<R>,
   rows: Table.BodyRow<R>[]
 ): number => {
-  if (tabling.typeguards.isDataRow(row)) {
-    return businessLogic.estimatedValue(row) - row.data.actual;
-  } else {
-    // Note: We do not have to exclude row's by ID because the primary Row here
-    // is already a MarkupRow and we are only looking at the BodyRow(s).
-    const childrenRows: Table.ModelRow<R>[] = filter(
-      rows,
-      (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) && includes(row.children, r.id)
-    ) as Table.ModelRow<R>[];
-    return reduce(
-      childrenRows,
-      (curr: number, r: Table.ModelRow<R>) => curr + businessLogic.estimatedValue(r) - r.data.actual,
-      0.0
-    );
-  }
+  return estimatedValueGetter(row, rows) - actualValueGetter(row, rows);
 };
