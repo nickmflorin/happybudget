@@ -193,67 +193,68 @@ namespace Table {
     readonly getRowValue?: (m: M) => R[keyof R];
   }
 
-  type PdfRawValue = R[keyof R] | string | number | null;
-
-  type PdfCellCallbackParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V extends PdfRawValue = PdfRawValue> = {
+  type PdfCellCallbackParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> = {
     readonly colIndex: number;
     readonly column: PdfColumn<R, M, V>;
     readonly isHeader: boolean;
-    readonly rawValue: V;
+    readonly rawValue: V | null;
     readonly value: string;
     readonly indented: boolean;
   };
 
-  type PdfCellCallback<R extends RowData, M extends Model.HttpModel = Model.HttpModel, CV extends PdfRawValue = PdfRawValue, V = any> = (
-    params: PdfCellCallbackParams<R, M, CV>
-  ) => V;
+  type PdfCellCallback<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any, RV = any> = (
+    params: PdfCellCallbackParams<R, M, V>
+  ) => RV;
 
-  type PdfOptionalCellCallback<R extends RowData, M extends Model.HttpModel = Model.HttpModel, CV extends PdfRawValue = PdfRawValue, V = any> =
-    | V
-    | PdfCellCallback<R, M, CV, V>
-    | undefined;
+  type PdfOptionalCellCallback<
+    R extends RowData,
+    M extends Model.HttpModel = Model.HttpModel,
+    V = any,
+    RV = any
+  > = RV | PdfCellCallback<R, M, V> | undefined;
 
-  interface _PdfCellClassName<R extends RowData, M extends Model.HttpModel = Model.HttpModel, CV extends PdfRawValue = PdfRawValue> {
-    [n: number]: PdfOptionalCellCallback<R, M, CV, string> | _PdfCellClassName<R, M>;
+  interface _PdfCellClassName<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> {
+    [n: number]: PdfOptionalCellCallback<R, M, V, string> | _PdfCellClassName<R, M, V>;
   }
-  type PdfCellClassName<R extends RowData, M extends Model.HttpModel = Model.HttpModel, CV extends PdfRawValue = PdfRawValue> =
-    | PdfOptionalCellCallback<R, M, CV, string>
-    | _PdfCellClassName<R, M, CV>;
+  type PdfCellClassName<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> =
+    | PdfOptionalCellCallback<R, M, V, string>
+    | _PdfCellClassName<R, M, V>;
 
-  interface _PdfCellStyle<R extends RowData, M extends Model.HttpModel = Model.HttpModel, CV extends PdfRawValue = PdfRawValue> {
-    [n: number]: PdfOptionalCellCallback<R, M, CV, import("@react-pdf/types").Style> | _PdfCellStyle<R, M, CV>;
+  interface _PdfCellStyle<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> {
+    [n: number]: PdfOptionalCellCallback<R, M, V, import("@react-pdf/types").Style> | _PdfCellStyle<R, M, V>;
   }
-  type PdfCellStyle<R extends RowData, M extends Model.HttpModel = Model.HttpModel, CV extends PdfRawValue = PdfRawValue> =
-    | PdfOptionalCellCallback<R, M, CV, import("@react-pdf/types").Style>
-    | _PdfCellStyle<R, M, CV>;
+  type PdfCellStyle<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> =
+    | PdfOptionalCellCallback<R, M, V, import("@react-pdf/types").Style>
+    | _PdfCellStyle<R, M, V>;
 
-  type PdfCellStandardProps<R extends RowData, M extends Model.HttpModel = Model.HttpModel, CV extends PdfRawValue = PdfRawValue> = {
-    readonly style?: PdfCellStyle<R, M, CV>;
-    readonly className?: PdfCellClassName<R, M, CV>;
-    readonly textStyle?: PdfCellStyle<R, M, CV>;
-    readonly textClassName?: PdfCellClassName<R, M, CV>;
+  type PdfCellStandardProps<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> = {
+    readonly style?: PdfCellStyle<R, M, V>;
+    readonly className?: PdfCellClassName<R, M, V>;
+    readonly textStyle?: PdfCellStyle<R, M, V>;
+    readonly textClassName?: PdfCellClassName<R, M, V>;
   };
 
-  interface PdfFooterColumn {
-    readonly value?: any;
+  interface PdfFooterColumn<R extends RowData, V = any> {
+    readonly value?: V | null;
     readonly textStyle?: import("@react-pdf/types").Style;
   }
 
-  interface PdfColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V extends PdfRawValue = PdfRawValue> extends BaseColumn<R, M, "pdf"> {
+  interface PdfColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any>
+    extends BaseColumn<R, M, "pdf"> {
     // In the PDF case, since we cannot dynamically resize columns, the width refers to a ratio
     // of the column width to the overall table width assuming that all columns are present.  When
     // columns are hidden/shown, this ratio is adjusted.
     readonly width?: number;
     readonly cellProps?: PdfCellStandardProps<R, M, V>;
     readonly headerCellProps?: PdfCellStandardProps<R, M, V>;
-    readonly footer?: PdfFooterColumn;
+    readonly footer?: PdfFooterColumn<R, V>;
     readonly cellContentsVisible?: PdfOptionalCellCallback<R, M, V, boolean>;
     readonly formatter?: (value: string | number) => string;
-    readonly valueGetter?: (r: Table.BodyRow<R>, rows: Table.BodyRow<R>[]) => string | number;
+    readonly valueGetter?: (r: Table.BodyRow<R>, rows: Table.BodyRow<R>[]) => V | null;
     readonly cellRenderer?: (params: PdfCellCallbackParams<R, M, V>) => JSX.Element;
     // NOTE: This only applies for the individual Account tables, not the the overall
     // Accounts table.
-    readonly childFooter?: (s: M) => PdfFooterColumn;
+    readonly childFooter?: (s: M) => PdfFooterColumn<R, V>;
   }
 
   type OmitColDefParams =
@@ -297,7 +298,7 @@ namespace Table {
     readonly onCellDoubleClicked?: (row: ModelRow<R>) => void;
   }
 
-  type AnyColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = Column<R, M> | PdfColumn<R, M>;
+  type AnyColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = Column<R, M> | PdfColumn<R, M, any>;
 
   interface FooterColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel>
     extends Pick<Column<R, M>, "colSpan"> {
@@ -430,16 +431,12 @@ namespace Table {
     readonly type: ChangeEventId;
   };
 
-  type CellChange<R extends RowData, V = R[keyof R]> = {
+  type CellChange<R extends RowData, V = any> = {
     readonly oldValue: V | null;
     readonly newValue: V | null;
   };
 
-  type SoloCellChange<
-    R extends RowData,
-    I extends EditableRowId = EditableRowId,
-    V = R[keyof R]
-  > = CellChange<R, V> & {
+  type SoloCellChange<R extends RowData, I extends EditableRowId = EditableRowId, V = any> = CellChange<R, V> & {
     readonly field: keyof R;
     readonly id: I;
   };

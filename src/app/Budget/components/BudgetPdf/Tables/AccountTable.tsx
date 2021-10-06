@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { isNil, filter, reduce, find, map, includes } from "lodash";
+import { isNil, filter, reduce, find, map } from "lodash";
 import classNames from "classnames";
 
 import { tabling, hooks, model } from "lib";
@@ -52,26 +52,6 @@ const AccountTable = ({
       });
     };
 
-    const createSubAccountHeaderRow = (subaccount: M): Table.ModelRow<R> => {
-      return tabling.rows.createModelRow<R, M, Table.PdfColumn<R, M>>({
-        model: subaccount,
-        columns: subAccountColumns,
-        excludeColumns: (c: Table.PdfColumn<R, M>) => {
-          return (
-            subaccount.children.length !== 0 &&
-            c.tableColumnType !== "fake" &&
-            c.tableColumnType !== "calculated" &&
-            !includes(["identifier", "description"], c.field)
-          );
-        },
-        getRowValue: (m: Model.PdfSubAccount, c: Table.PdfColumn<R, M>) => {
-          if (!isNil(c.childFooter) && !isNil(c.childFooter(subaccount).value)) {
-            return c.childFooter(subaccount).value;
-          }
-        }
-      });
-    };
-
     const subaccounts = filter(
       account.children,
       (subaccount: M) => !(options.excludeZeroTotals === true) || model.businessLogic.estimatedValue(subaccount) !== 0
@@ -92,76 +72,85 @@ const AccountTable = ({
           if (!isNil(subAccount)) {
             const details = subAccount.children;
 
-            const showSubAccountFooterRow =
-              filter(columns, (column: Table.PdfColumn<R, M>) => !isNil(column.childFooter)).length !== 0 &&
-              details.length !== 0;
-            // const isLastSubAccount = subaccountRowGroupIndex === subaccounts.length - 1;
-            const isLastSubAccount = false;
-
-            const subTable: Table.BodyRow<R>[] = tabling.data.createTableRows<R, M>({
-              response: { models: details, groups: subAccount.groups },
-              columns: subAccountColumns
-            });
-
-            let subRows: JSX.Element[] = reduce(
-              filter(
-                subTable,
-                (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) || tabling.typeguards.isGroupRow(r)
-              ) as (Table.ModelRow<R> | Table.GroupRow<R>)[],
-              (subRws: JSX.Element[], detailRow: Table.ModelRow<R> | Table.GroupRow<R>) => {
-                if (tabling.typeguards.isModelRow(detailRow)) {
-                  return [
-                    ...subRws,
-                    <BodyRow<R, M>
-                      columns={subAccountColumns}
-                      className={"detail-tr"}
-                      row={detailRow}
-                      data={table}
-                      cellProps={{
-                        cellContentsVisible: (params: Table.PdfCellCallbackParams<R, M>) =>
-                          params.column.field === "identifier" ? false : true,
-                        textClassName: "detail-tr-td-text",
-                        className: (params: Table.PdfCellCallbackParams<R, M>) => {
-                          if (params.column.field === "description") {
-                            return classNames("detail-td", "indent-td");
-                          }
-                          return "detail-td";
-                        }
-                      }}
-                    />
-                  ];
-                } else {
-                  return [
-                    ...rws,
-                    <GroupRow
-                      className={"detail-group-tr"}
-                      row={detailRow}
-                      data={table}
-                      columns={subAccountColumns}
-                      columnIndent={1}
-                      cellProps={{
-                        textClassName: (params: Table.PdfCellCallbackParams<R, M>) => {
-                          if (params.column.field === "description") {
-                            return "detail-group-indent-td";
-                          }
-                          return "";
-                        }
-                      }}
-                    />
-                  ];
-                }
-              },
-              [
+            if (details.length === 0) {
+              return [
+                ...rws,
                 <BodyRow
                   cellProps={{ className: "subaccount-td", textClassName: "subaccount-tr-td-text" }}
                   className={"subaccount-tr"}
                   columns={subAccountColumns}
                   data={table}
-                  row={createSubAccountHeaderRow(subAccount)}
+                  row={subAccountRow}
                 />
-              ]
-            );
-            if (showSubAccountFooterRow === true) {
+              ];
+            } else {
+              const subTable: Table.BodyRow<R>[] = tabling.data.createTableRows<R, M>({
+                response: { models: details, groups: subAccount.groups },
+                columns: subAccountColumns
+              });
+              let subRows: JSX.Element[] = reduce(
+                filter(
+                  subTable,
+                  (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) || tabling.typeguards.isGroupRow(r)
+                ) as (Table.ModelRow<R> | Table.GroupRow<R>)[],
+                (subRws: JSX.Element[], detailRow: Table.ModelRow<R> | Table.GroupRow<R>) => {
+                  if (tabling.typeguards.isModelRow(detailRow)) {
+                    return [
+                      ...subRws,
+                      <BodyRow<R, M>
+                        columns={subAccountColumns}
+                        className={"detail-tr"}
+                        row={detailRow}
+                        data={table}
+                        cellProps={{
+                          cellContentsVisible: (params: Table.PdfCellCallbackParams<R, M>) =>
+                            params.column.field === "identifier" ? false : true,
+                          textClassName: "detail-tr-td-text",
+                          className: (params: Table.PdfCellCallbackParams<R, M>) => {
+                            if (params.column.field === "description") {
+                              return classNames("detail-td", "indent-td");
+                            }
+                            return "detail-td";
+                          }
+                        }}
+                      />
+                    ];
+                  } else {
+                    return [
+                      ...rws,
+                      <GroupRow
+                        className={"detail-group-tr"}
+                        row={detailRow}
+                        data={table}
+                        columns={subAccountColumns}
+                        columnIndent={1}
+                        cellProps={{
+                          textClassName: (params: Table.PdfCellCallbackParams<R, M>) => {
+                            if (params.column.field === "description") {
+                              return "detail-group-indent-td";
+                            }
+                            return "";
+                          }
+                        }}
+                      />
+                    ];
+                  }
+                },
+                [
+                  <BodyRow
+                    cellProps={{
+                      className: "subaccount-td",
+                      textClassName: "subaccount-tr-td-text",
+                      cellContentsInvisible: (params: Table.PdfCellCallbackParams<R, M>) =>
+                        tabling.columns.normalizedField(params.column) !== "description"
+                    }}
+                    className={"subaccount-tr"}
+                    columns={subAccountColumns}
+                    data={table}
+                    row={subAccountRow}
+                  />
+                ]
+              );
               const footerRow = createSubAccountFooterRow(subAccount);
               subRows = [
                 ...subRows,
@@ -171,11 +160,11 @@ const AccountTable = ({
                   columns={subAccountColumns}
                   data={table}
                   row={footerRow}
-                  style={!isLastSubAccount ? { borderBottomWidth: 1 } : {}}
+                  style={{ borderBottomWidth: 1 }}
                 />
               ];
+              return [...rws, ...subRows];
             }
-            return [...rws, ...subRows];
           }
           return rws;
         } else {

@@ -9,6 +9,7 @@ export interface BodyRowProps<
   M extends Model.HttpModel = Model.HttpModel,
   RW extends Table.BodyRow<R> = Table.BodyRow<R>
 > extends RowProps<R, M> {
+  readonly fillBlank?: (c: Table.PdfColumn<R, M>) => boolean;
   readonly row: RW;
   readonly cellProps?: RowExplicitCellProps<R, M>;
   readonly data: Table.BodyRow<R>[];

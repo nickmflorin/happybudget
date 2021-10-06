@@ -9,15 +9,16 @@ import Cell, { CellProps } from "./Cell";
 const BodyCell = <
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
-  RW extends Table.BodyRow<R> = Table.BodyRow<R>
+  RW extends Table.BodyRow<R> = Table.BodyRow<R>,
+  V = R[keyof R]
 >({
   data,
   ...props
-}: Omit<CellProps<R, M>, "value" | "rawValue"> & {
+}: Omit<CellProps<R, M, V>, "value" | "rawValue"> & {
   readonly data: Table.BodyRow<R>[];
   readonly row: RW;
 }): JSX.Element => {
-  const rawValue: R[keyof R] | string | number | null = useMemo((): R[keyof R] | string | number | null => {
+  const rawValue: V | null = useMemo((): V | null => {
     if (!isNil(props.column.valueGetter)) {
       return props.column.valueGetter(props.row, data);
     } else if (!isNil(props.column.field)) {
@@ -36,9 +37,9 @@ const BodyCell = <
           );
           return null;
         }
-        return value;
+        return value as unknown as V;
       }
-      return value;
+      return value as unknown as V;
     }
     return null;
   }, [props.row, props.column]);
