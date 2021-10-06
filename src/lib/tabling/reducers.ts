@@ -352,7 +352,7 @@ export const createTableChangeEventReducer = <
       const payload: Table.RowAdd<R>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
       newState = {
         ...newState,
-        data: [
+        data: data.orderTableRows<R, M>([
           ...newState.data,
           ...map(payload, (addition: Table.RowAdd<R>) =>
             rows.createPlaceholderRow<R, M>({
@@ -361,7 +361,7 @@ export const createTableChangeEventReducer = <
               columns: config.columns
             })
           )
-        ]
+        ])
       };
       applicationEvents.dispatchRowsAddedEvent({ tableId: config.tableId, numRows: newState.data.length });
     } else if (typeguards.isRowDeleteEvent(e)) {
