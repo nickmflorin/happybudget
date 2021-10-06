@@ -10,7 +10,6 @@ type CreateBodyRowDataConfig<
   C extends Table.AnyColumn<R, M> = Table.AnyColumn<R, M>
 > = {
   readonly columns?: C[];
-  readonly excludeColumns?: (keyof R)[] | ((c: C) => boolean);
   readonly getValue: (field: keyof R, col: C) => R[keyof R] | undefined;
 };
 
@@ -99,14 +98,6 @@ export const createBodyRowData = <
     (obj: R, c: C) => {
       if (!isNil(c.field)) {
         const nullValue = typeguards.isAgColumn(c) ? (c.nullValue === undefined ? null : c.nullValue) : null;
-        if (
-          (!isNil(config.excludeColumns) &&
-            typeof config.excludeColumns === "function" &&
-            config.excludeColumns(c) === true) ||
-          (Array.isArray(config.excludeColumns) && !isNil(c.field) && includes(config.excludeColumns, c.field))
-        ) {
-          return { ...obj, [c.field]: nullValue };
-        }
         const value = config.getValue(c.field, c);
         if (value === undefined) {
           return { ...obj, [c.field]: nullValue };
