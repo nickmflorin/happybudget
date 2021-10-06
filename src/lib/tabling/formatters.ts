@@ -1,40 +1,31 @@
-import { isNil } from "lodash";
-import { ValueFormatterParams } from "@ag-grid-community/core";
-import * as util from "../util";
+import { util } from "lib";
 
-export const agPercentageValueFormatter = (params: ValueFormatterParams): any => {
-  if (!isNil(params.value)) {
-    const numeric = parseFloat(String(params.value));
-    if (!isNaN(numeric)) {
-      return util.formatters.formatPercentage(numeric);
-    }
-    return numeric;
-  }
-  return params.value;
-};
+const isAgFormatterParams = <P extends string | number>(
+  params: Table.NativeFormatterParams<P> | Table.AGFormatterParams
+): params is Table.AGFormatterParams => typeof params === "object";
 
-export const currencyValueFormatter = (value: string | number) =>
-  util.formatters.formatCurrencyWithoutDollarSign(value);
+export const percentageValueFormatter = (
+  params: Table.AGFormatterParams | Table.NativeFormatterParams<string | number>
+): string =>
+  isAgFormatterParams<string | number>(params)
+    ? util.formatters.formatPercentage(params.value)
+    : util.formatters.formatPercentage(params);
 
-export const agCurrencyValueFormatter = (params: ValueFormatterParams): any => {
-  if (!isNil(params.value)) {
-    return currencyValueFormatter(params.value);
-  }
-  return params.value;
-};
+export const currencyValueFormatter = (
+  params: Table.AGFormatterParams | Table.NativeFormatterParams<string | number>
+): string =>
+  isAgFormatterParams<string | number>(params)
+    ? util.formatters.formatAsCurrency(params.value)
+    : util.formatters.formatAsCurrency(params);
 
-export const agDateValueFormatter = (params: ValueFormatterParams): any => {
-  if (!isNil(params.value)) {
-    return util.dates.toDisplayDate(params.value);
-  }
-  return params.value;
-};
+export const dateValueFormatter = (params: Table.AGFormatterParams | Table.NativeFormatterParams<string>): string =>
+  isAgFormatterParams<string>(params)
+    ? util.dates.toDisplayDate(params.value) || ""
+    : util.dates.toDisplayDate(params) || "";
 
-export const phoneNumberFormatter = (value: string | number) => util.formatters.formatAsPhoneNumber(value);
-
-export const agPhoneNumberValueFormatter = (params: ValueFormatterParams): any => {
-  if (!isNil(params.value)) {
-    return phoneNumberFormatter(params.value);
-  }
-  return params.value;
-};
+export const phoneNumberValueFormatter = (
+  params: Table.AGFormatterParams | Table.NativeFormatterParams<string | number>
+): string =>
+  isAgFormatterParams<string | number>(params)
+    ? util.formatters.formatAsPhoneNumber(params.value) || ""
+    : util.formatters.formatAsPhoneNumber(params) || "";

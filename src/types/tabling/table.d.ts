@@ -11,7 +11,12 @@ namespace Table {
   type AgGridProps = import("@ag-grid-community/react/lib/interfaces").AgGridReactProps;
 
   type NullValue<R extends RowData> = R[keyof R];
-  type ValueFormatter = (params: import("@ag-grid-community/core").ValueFormatterParams) => string | number | null;
+
+  type NativeFormatterParams<P extends string | number> = P | null;
+  type AGFormatterParams = import("@ag-grid-community/core").ValueFormatterParams;
+
+  type AGFormatter = (params: AGFormatterParams) => string;
+  type NativeFormatter<P extends string | number> = (params: NativeFormatterParams<P>) => string;
 
   type GridApi = import("@ag-grid-community/core").GridApi;
   type ColumnApi = import("@ag-grid-community/core").ColumnApi;
@@ -644,7 +649,7 @@ namespace Table {
     // This is used for extending cells.  Normally, the value formatter will be included on the ColDef
     // of the associated column.  But when extending a Cell, we sometimes want to provide a formatter
     // for that specific cell.
-    readonly valueFormatter?: ValueFormatter;
+    readonly valueFormatter?: AGFormatter;
   };
 
   type RowDataSelector<R extends RowData> = (state: Application.Store) => Partial<R>;

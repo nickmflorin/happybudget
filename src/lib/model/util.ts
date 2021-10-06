@@ -1,4 +1,4 @@
-import { isNil, filter, find, map } from "lodash";
+import { isNil, filter, find, map, forEach } from "lodash";
 import { util, tabling } from "lib";
 import { Colors } from "style/constants";
 
@@ -109,15 +109,31 @@ export const inferModelFromName = <M extends Model.Model>(
   }
 };
 
+/**
+ * Safely parses a name into the first and last name, even in the case that
+ * there are multiple name parts.
+ *
+ * For instance, if we have "Steven van Winkle" it will parse as
+ * >>> ["Steven", "van Winkle"]
+ *
+ * @param name The name that should be parsed into first/last name components.
+ */
 export const parseFirstAndLastName = (name: string): [string | null, string | null] => {
-  if (name.trim() === "") {
-    return [null, null];
+  const parts = name.trim().split(" ");
+  const names: any[] = ["", []];
+  forEach(parts, (part: string) => {
+    if (part !== "") {
+      if (names[0] === "") {
+        names[0] = part;
+      } else {
+        names[1].push(part);
+      }
+    }
+  });
+  if (names[1].length === 0) {
+    return names[0].trim() === "" ? [null, null] : [names[0], null];
   }
-  const split = name.split(" ");
-  if (split.length === 1) {
-    return [split[0].trim(), null];
-  }
-  return [split[0].trim(), map(split.slice(1), (comp: string) => comp.trim()).join(" ")];
+  return [names[0].trim(), names[1].join(" ")];
 };
 
 type GetModelsByIdOptions = {

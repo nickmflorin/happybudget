@@ -77,8 +77,11 @@ const AccountTable = ({
     });
 
     let rows = reduce(
-      table,
-      (rws: JSX.Element[], subAccountRow: Table.BodyRow<R>) => {
+      filter(table, (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) || tabling.typeguards.isGroupRow(r)) as (
+        | Table.ModelRow<R>
+        | Table.GroupRow<R>
+      )[],
+      (rws: JSX.Element[], subAccountRow: Table.ModelRow<R> | Table.GroupRow<R>) => {
         if (tabling.typeguards.isModelRow(subAccountRow)) {
           const subAccount: Model.PdfSubAccount | undefined = find(subaccounts, { id: subAccountRow.id });
           if (!isNil(subAccount)) {
@@ -95,9 +98,12 @@ const AccountTable = ({
             });
 
             let subRows: JSX.Element[] = reduce(
-              subTable,
-              (subRws: JSX.Element[], detailRow: Table.BodyRow<R>) => {
-                if (tabling.typeguards.isDataRow(detailRow)) {
+              filter(
+                subTable,
+                (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) || tabling.typeguards.isGroupRow(r)
+              ) as (Table.ModelRow<R> | Table.GroupRow<R>)[],
+              (subRws: JSX.Element[], detailRow: Table.ModelRow<R> | Table.GroupRow<R>) => {
+                if (tabling.typeguards.isModelRow(detailRow)) {
                   return [
                     ...subRws,
                     <BodyRow<R, M>
@@ -118,7 +124,7 @@ const AccountTable = ({
                       }}
                     />
                   ];
-                } else if (tabling.typeguards.isGroupRow(detailRow)) {
+                } else {
                   return [
                     ...rws,
                     <GroupRow
@@ -138,7 +144,6 @@ const AccountTable = ({
                     />
                   ];
                 }
-                return rws;
               },
               [
                 <BodyRow
@@ -167,10 +172,8 @@ const AccountTable = ({
             return [...rws, ...subRows];
           }
           return rws;
-        } else if (tabling.typeguards.isGroupRow(subAccountRow)) {
-          return [...rws, <GroupRow row={subAccountRow} columns={subAccountColumns} data={table} />];
         } else {
-          return rws;
+          return [...rws, <GroupRow row={subAccountRow} columns={subAccountColumns} data={table} />];
         }
       },
       [

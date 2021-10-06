@@ -30,7 +30,7 @@ const Columns: Table.Column<R, M>[] = [
   framework.columnObjs.BodyColumn<R, M>({
     field: "rate",
     headerName: "Rate",
-    valueFormatter: tabling.formatters.agPercentageValueFormatter,
+    valueFormatter: tabling.formatters.percentageValueFormatter,
     valueSetter: tabling.valueSetters.percentageToDecimalValueSetter<R>("rate"),
     columnType: "percentage",
     width: 100

@@ -59,7 +59,7 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "Date",
     flex: 1,
     cellEditor: "DateEditor",
-    valueFormatter: tabling.formatters.agDateValueFormatter,
+    valueFormatter: tabling.formatters.dateValueFormatter,
     valueSetter: tabling.valueSetters.dateTimeValueSetter<R>("date"),
     columnType: "date"
   }),
@@ -80,7 +80,7 @@ const Columns: Table.Column<R, M>[] = [
     field: "value",
     headerName: "Amount",
     flex: 1,
-    valueFormatter: tabling.formatters.agCurrencyValueFormatter,
+    valueFormatter: tabling.formatters.currencyValueFormatter,
     valueSetter: tabling.valueSetters.floatValueSetter<R>("value"),
     cellRenderer: "BodyCell",
     columnType: "currency"

@@ -1,3 +1,4 @@
+import { isNil } from "lodash";
 import { tabling, budgeting } from "lib";
 
 export const AccountColumns: Table.PdfColumn<Tables.PdfAccountRowData, Model.PdfAccount>[] = [
@@ -115,7 +116,8 @@ export const SubAccountColumns: Table.PdfColumn<Tables.PdfSubAccountRowData, Mod
     tableColumnType: "calculated",
     columnType: "sum",
     width: 0.1,
-    formatter: tabling.formatters.currencyValueFormatter,
+    formatter: (params: Table.NativeFormatterParams<string | number>) =>
+      isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     valueGetter: budgeting.valueGetters.estimatedValueGetter
   },
   { domain: "pdf", field: "nominal_value", tableColumnType: "fake" },

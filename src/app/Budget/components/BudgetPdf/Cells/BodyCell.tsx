@@ -22,7 +22,9 @@ const BodyCell = <
       return props.column.valueGetter(props.row, data);
     } else if (!isNil(props.column.field)) {
       const value = props.row.data[props.column.field];
-      if (typeof value !== "string" && typeof value !== "number") {
+      if (value === null) {
+        return "";
+      } else if (typeof value !== "string" && typeof value !== "number") {
         // If there is a custom cell renderer, the value can be anything since it will not be
         // directly rendered in the DOM.
         if (isNil(props.column.cellRenderer)) {
@@ -30,9 +32,9 @@ const BodyCell = <
           console.error(
             `Column ${tabling.columns.normalizedField(props.column)} did not return
           string or number type from data!
-          Returning empty string...
-          `
+          Returning empty string...`
           );
+          console.log(props.row.data);
           return "";
         }
         return value;

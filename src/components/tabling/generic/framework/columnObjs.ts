@@ -54,7 +54,7 @@ export const CalculatedColumn = <R extends Table.RowData, M extends Model.HttpMo
     width: !isNil(width) ? width : 100,
     // maxWidth: !isNil(width) ? width : 100,
     cellClass: tabling.aggrid.mergeClassNamesFn("cell--calculated", col.cellClass),
-    valueFormatter: tabling.formatters.agCurrencyValueFormatter,
+    valueFormatter: tabling.formatters.currencyValueFormatter,
     cellRendererParams: {
       ...col.cellRendererParams,
       renderRedIfNegative: true

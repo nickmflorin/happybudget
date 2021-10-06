@@ -54,7 +54,10 @@ export const toLocalizedMoment = (value: string | Moment, options?: Partial<IDat
  *
  * @param {string} formatter  Formatter string used to dictate the convertion
  */
-const Converter = (formatter: string) => (value: string | Moment, options?: Partial<IDateOptions>) => {
+const Converter = (formatter: string) => (value: string | null | Moment, options?: Partial<IDateOptions>) => {
+  if (value === null) {
+    return "";
+  }
   const Options = createDefaultMergedOptions(options);
   const mmt = toLocalizedMoment(value, Options);
   if (isNil(mmt)) {
