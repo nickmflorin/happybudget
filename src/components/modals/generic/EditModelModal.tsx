@@ -16,19 +16,19 @@ export interface EditModelModalProps<M extends Model.Model, P extends Http.Model
   readonly onCancel: () => void;
 }
 
-interface PrivateEditModelModalProps<M extends Model.Model, P extends Http.ModelPayload<M>, R = M>
+interface PrivateEditModelModalProps<M extends Model.Model, P extends Http.ModelPayload<M>, V = P, R = M>
   extends EditModelModalProps<M, P, R> {
-  readonly title?: string | JSX.Element | ((m: M, form: FormInstance<P>) => JSX.Element | string);
+  readonly title?: string | JSX.Element | ((m: M, form: FormInstance<V>) => JSX.Element | string);
   readonly autoFocusField?: number;
   readonly onModelLoaded?: (m: M) => void;
-  readonly setFormData: (m: M, form: FormInstance<P>) => void;
+  readonly setFormData: (m: M, form: FormInstance<V>) => void;
   readonly request: (id: number) => Promise<M>;
   readonly update?: (id: number, payload: P, options: Http.RequestOptions) => Promise<R>;
-  readonly children: (m: M | null, form: FormInstance<P>) => JSX.Element;
-  readonly interceptPayload?: (p: P) => P;
+  readonly children: (m: M | null, form: FormInstance<V>) => JSX.Element;
+  readonly interceptPayload?: (p: V) => P;
 }
 
-const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, R = M>(
+const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V = P, R = M>(
   {
     id,
     open,
@@ -43,10 +43,10 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, R
     interceptPayload,
     setFormData,
     ...props
-  }: PrivateEditModelModalProps<M, P, R>,
-  ref: ForwardedRef<FormInstance<P>>
+  }: PrivateEditModelModalProps<M, P, V, R>,
+  ref: ForwardedRef<FormInstance<V>>
 ): JSX.Element => {
-  const [form] = Form.useForm<P>({ isInModal: true, autoFocusField });
+  const [form] = Form.useForm<V>({ isInModal: true, autoFocusField });
   const cancelToken = api.useCancelToken();
   const [instance, loading, error] = model.hooks.useModel(id, {
     request,
@@ -99,12 +99,12 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, R
       onOk={() => {
         form
           .validateFields()
-          .then((values: P) => {
+          .then((values: V) => {
             const payload = !isNil(interceptPayload) ? interceptPayload(values) : values;
-            onUpdate?.(payload);
+            onUpdate?.(payload as P);
             if (!isNil(update) && isNil(onUpdate)) {
               form.setLoading(true);
-              update(id, payload, { cancelToken: cancelToken() })
+              update(id, payload as P, { cancelToken: cancelToken() })
                 .then((response: R) => {
                   form.resetFields();
                   onSuccess(response);

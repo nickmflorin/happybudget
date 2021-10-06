@@ -7,7 +7,9 @@ import { Form, Icon } from "components";
 import { Input, PercentInput, Select } from "components/fields";
 import { EntityText } from "components/typography";
 
-interface MarkupFormProps extends FormProps<Http.MarkupPayload> {
+type MarkupFormValues = Omit<Http.MarkupPayload, "rate"> & { readonly rate: string };
+
+interface MarkupFormProps extends FormProps<MarkupFormValues> {
   readonly availableChildren: (Model.SimpleAccount | Model.SimpleSubAccount)[];
   readonly availableChildrenLoading: boolean;
 }

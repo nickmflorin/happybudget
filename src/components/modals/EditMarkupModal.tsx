@@ -6,6 +6,8 @@ import { IMarkupForm } from "components/forms/MarkupForm";
 
 import { EditModelModal, EditModelModalProps } from "./generic";
 
+type MarkupFormValues = Omit<Http.MarkupPayload, "rate"> & { readonly rate: string };
+
 interface EditMarkupModalProps<R extends Http.MarkupResponseTypes = Http.MarkupResponseTypes>
   extends EditModelModalProps<Model.Markup, Http.MarkupPayload, R> {
   readonly id: number;
@@ -26,7 +28,7 @@ const EditMarkupModal = <
   ...props
 }: EditMarkupModalProps<R>): JSX.Element => {
   const cancelToken = api.useCancelToken();
-  const formRef = useRef<FormInstance<Http.MarkupPayload>>(null);
+  const formRef = useRef<FormInstance<MarkupFormValues>>(null);
   const markupRef = useRef<IMarkupForm>(null);
 
   const [availableChildren, setAvailableChildren] = useState<M[]>([]);
@@ -46,13 +48,23 @@ const EditMarkupModal = <
   }, [parentId]);
 
   return (
-    <EditModelModal<Model.Markup, Http.MarkupPayload, R>
+    <EditModelModal<Model.Markup, Http.MarkupPayload, MarkupFormValues, R>
       {...props}
       id={id}
       title={"Markup"}
       request={api.getMarkup}
       update={api.updateMarkup}
-      setFormData={(markup: Model.Markup, form: FormInstance<Http.MarkupPayload>) => {
+      interceptPayload={(p: MarkupFormValues) => {
+        let { rate, ...payload } = p;
+        if (!isNaN(parseFloat(rate))) {
+          return {
+            ...payload,
+            rate: parseFloat((parseFloat(rate) / 100.0).toFixed(2))
+          };
+        }
+        return payload;
+      }}
+      setFormData={(markup: Model.Markup, form: FormInstance<MarkupFormValues>) => {
         // Because AntD sucks and form.setFields does not trigger onValuesChanged.
         markupRef.current?.setUnitState(markup.unit?.id === undefined ? null : markup.unit?.id);
         form.setFields([
@@ -64,7 +76,7 @@ const EditMarkupModal = <
         ]);
       }}
     >
-      {(m: Model.Markup | null, form: FormInstance<Http.MarkupPayload>) => (
+      {(m: Model.Markup | null, form: FormInstance<MarkupFormValues>) => (
         <MarkupForm
           ref={markupRef}
           form={form}

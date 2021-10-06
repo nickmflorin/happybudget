@@ -28,7 +28,7 @@ const CreateMarkupModal = <
   onSuccess,
   onCancel
 }: CreateMarkupModalProps<R>): JSX.Element => {
-  const [form] = Form.useForm<Http.MarkupPayload>({ isInModal: true });
+  const [form] = Form.useForm<Omit<Http.MarkupPayload, "rate"> & { readonly rate: string }>({ isInModal: true });
   const cancelToken = api.useCancelToken();
 
   const [availableChildren, setAvailableChildren] = useState<M[]>([]);
@@ -60,10 +60,20 @@ const CreateMarkupModal = <
       onOk={() => {
         form
           .validateFields()
-          .then((values: Http.MarkupPayload) => {
+          .then((values: Omit<Http.MarkupPayload, "rate"> & { readonly rate: string }) => {
             form.setLoading(true);
+            let httpPayload: Http.MarkupPayload;
+            let { rate, ...payload } = values;
+            if (!isNaN(parseFloat(rate))) {
+              httpPayload = {
+                ...payload,
+                rate: parseFloat((parseFloat(rate) / 100.0).toFixed(2))
+              };
+            } else {
+              httpPayload = payload;
+            }
             api
-              .createTableMarkup<R>(id, parentType, values, { cancelToken: cancelToken() })
+              .createTableMarkup<R>(id, parentType, httpPayload, { cancelToken: cancelToken() })
               .then((response: R) => {
                 form.resetFields();
                 onSuccess(response);
