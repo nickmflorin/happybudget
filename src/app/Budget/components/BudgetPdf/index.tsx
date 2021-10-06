@@ -25,9 +25,7 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
     >(AccountColumns, {
       estimated: (col: Table.PdfColumn<Tables.PdfAccountRowData, Model.PdfAccount>) => ({
         ...col,
-        footer: {
-          value: model.businessLogic.estimatedValue(budget)
-        }
+        footerValueGetter: model.businessLogic.estimatedValue(budget)
       })
     });
     return tabling.columns.orderColumns<
@@ -42,18 +40,15 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
       type R = Tables.PdfSubAccountRowData;
       type M = Model.PdfSubAccount;
       type C = Table.PdfColumn<R, M>;
-
       let columns = tabling.columns.mergeColumns<C, R, M>(SubAccountColumns, {
         description: (col: C) => ({
           ...col,
-          footer: {
-            /* eslint-disable indent */
-            value: !isNil(account.description)
-              ? `${account.description} Total`
-              : !isNil(account.identifier)
-              ? `${account.identifier} Total`
-              : "Total"
-          },
+          /* eslint-disable indent */
+          footerValueGetter: !isNil(account.description)
+            ? `${account.description} Total`
+            : !isNil(account.identifier)
+            ? `${account.identifier} Total`
+            : "Total",
           childFooter: (m: M) => {
             if (!isNil(m.description)) {
               return { value: `${m.description} Total` };
@@ -89,9 +84,7 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
         }),
         estimated: (col: C) => ({
           ...col,
-          footer: {
-            value: model.businessLogic.estimatedValue(account)
-          },
+          footerValueGetter: model.businessLogic.estimatedValue(account),
           childFooter: (m: M) => {
             return { value: model.businessLogic.estimatedValue(m) };
           }

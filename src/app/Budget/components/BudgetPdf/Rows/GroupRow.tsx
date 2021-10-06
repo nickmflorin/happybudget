@@ -16,17 +16,23 @@ const GroupRow = <R extends Table.RowData, M extends Model.HttpModel = Model.Htt
   props: GroupRowProps<R, M>
 ): JSX.Element => {
   const cellStyle = useMemo(() => {
-    const colorDef = model.util.getGroupColorDefinition(props.row);
-    return {
-      backgroundColor: !isNil(colorDef.backgroundColor) ? colorDef.backgroundColor : "#EFEFEF"
-    };
+    if (!isNil(props.row)) {
+      const colorDef = model.util.getGroupColorDefinition(props.row);
+      return {
+        backgroundColor: !isNil(colorDef.backgroundColor) ? colorDef.backgroundColor : "#EFEFEF"
+      };
+    }
+    return {};
   }, [props.row]);
 
   const cellTextStyle = useMemo(() => {
-    const colorDef = model.util.getGroupColorDefinition(props.row);
-    return {
-      color: !isNil(colorDef.color) ? colorDef.color : "#424242"
-    };
+    if (!isNil(props.row)) {
+      const colorDef = model.util.getGroupColorDefinition(props.row);
+      return {
+        color: !isNil(colorDef.color) ? colorDef.color : "#424242"
+      };
+    }
+    return {};
   }, [props.row]);
 
   return (

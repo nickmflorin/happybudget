@@ -1,7 +1,7 @@
 import classNames from "classnames";
 
 import { BodyCell } from "../Cells";
-import { RowExplicitCellProps } from "../Cells/Cell";
+import { RowExplicitBodyCellProps } from "../Cells/BodyCell";
 import Row, { RowProps } from "./Row";
 
 export interface BodyRowProps<
@@ -10,8 +10,8 @@ export interface BodyRowProps<
   RW extends Table.BodyRow<R> = Table.BodyRow<R>
 > extends RowProps<R, M> {
   readonly fillBlank?: (c: Table.PdfColumn<R, M>) => boolean;
-  readonly row: RW;
-  readonly cellProps?: RowExplicitCellProps<R, M>;
+  readonly row?: RW;
+  readonly cellProps?: RowExplicitBodyCellProps<R, M>;
   readonly data: Table.BodyRow<R>[];
 }
 

@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import { isNil, filter, reduce, map } from "lodash";
+import React from "react";
+import { reduce, map } from "lodash";
 
 import { tabling, hooks } from "lib";
 import Table from "./Table";
@@ -20,31 +20,26 @@ const AccountsTable = ({
   data,
   groups
 }: AccountsTableProps): JSX.Element => {
-  const showFooterRow = useMemo(() => {
-    return filter(columns, (column: Table.PdfColumn<R, M>) => !isNil(column.footer)).length !== 0;
-  }, [columns]);
-
   const generateRows = hooks.useDynamicCallback((): JSX.Element[] => {
     const rowData = tabling.data.createTableRows<Tables.PdfAccountRowData, Model.PdfAccount>({
       response: { models: data, groups },
       columns
     });
-    const rows = reduce(
-      rowData,
-      (rws: JSX.Element[], row: Table.BodyRow<R>) => {
-        if (tabling.typeguards.isModelRow(row)) {
-          return [...rws, <BodyRow columns={columns} row={row} data={rowData} />];
-        } else if (tabling.typeguards.isGroupRow(row)) {
-          return [...rws, <GroupRow row={row} columns={columns} data={rowData} />];
-        }
-        return rws;
-      },
-      [<HeaderRow columns={columns} />]
-    );
-    if (showFooterRow === true) {
-      rows.push(<FooterRow columns={columns} data={rowData} />);
-    }
-    return rows;
+    return [
+      ...reduce(
+        rowData,
+        (rws: JSX.Element[], row: Table.BodyRow<R>) => {
+          if (tabling.typeguards.isModelRow(row)) {
+            return [...rws, <BodyRow columns={columns} row={row} data={rowData} />];
+          } else if (tabling.typeguards.isGroupRow(row)) {
+            return [...rws, <GroupRow row={row} columns={columns} data={rowData} />];
+          }
+          return rws;
+        },
+        [<HeaderRow columns={columns} />]
+      ),
+      <FooterRow columns={columns} data={rowData} />
+    ];
   });
 
   const rows = generateRows();

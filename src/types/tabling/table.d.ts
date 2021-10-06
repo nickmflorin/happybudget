@@ -206,12 +206,10 @@ namespace Table {
     params: PdfCellCallbackParams<R, M, V>
   ) => RV;
 
-  type PdfOptionalCellCallback<
-    R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
-    V = any,
-    RV = any
-  > = RV | PdfCellCallback<R, M, V> | undefined;
+  type PdfOptionalCellCallback<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any, RV = any> =
+    | RV
+    | PdfCellCallback<R, M, V>
+    | undefined;
 
   interface _PdfCellClassName<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> {
     [n: number]: PdfOptionalCellCallback<R, M, V, string> | _PdfCellClassName<R, M, V>;
@@ -234,10 +232,13 @@ namespace Table {
     readonly textClassName?: PdfCellClassName<R, M, V>;
   };
 
-  interface PdfFooterColumn<R extends RowData, V = any> {
+  interface PdfFooterColumn<V = any> {
     readonly value?: V | null;
     readonly textStyle?: import("@react-pdf/types").Style;
   }
+
+  type PdfValueGetter<R extends RowData, V = any> = (r: Table.BodyRow<R>, rows: Table.BodyRow<R>[]) => V | null;
+  type PdfFooterValueGetter<R extends RowData, V = any> = (rows: Table.BodyRow<R>[]) => V | null;
 
   interface PdfColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any>
     extends BaseColumn<R, M, "pdf"> {
@@ -247,14 +248,15 @@ namespace Table {
     readonly width?: number;
     readonly cellProps?: PdfCellStandardProps<R, M, V>;
     readonly headerCellProps?: PdfCellStandardProps<R, M, V>;
-    readonly footer?: PdfFooterColumn<R, V>;
+    readonly footer?: PdfFooterColumn<V>;
     readonly cellContentsVisible?: PdfOptionalCellCallback<R, M, V, boolean>;
     readonly formatter?: (value: string | number) => string;
-    readonly valueGetter?: (r: Table.BodyRow<R>, rows: Table.BodyRow<R>[]) => V | null;
+    readonly valueGetter?: PdfValueGetter<R, V>;
+    readonly footerValueGetter?: V | null | PdfFooterValueGetter<R, V>;
     readonly cellRenderer?: (params: PdfCellCallbackParams<R, M, V>) => JSX.Element;
     // NOTE: This only applies for the individual Account tables, not the the overall
     // Accounts table.
-    readonly childFooter?: (s: M) => PdfFooterColumn<R, V>;
+    readonly childFooter?: (s: M) => PdfFooterColumn<V>;
   }
 
   type OmitColDefParams =

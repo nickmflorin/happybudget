@@ -86,7 +86,7 @@ export interface CellProps<R extends Table.RowData, M extends Model.HttpModel = 
   readonly indented?: boolean;
 }
 
-interface PrivateCellProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = R[keyof R]>
+export interface PrivateCellProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = R[keyof R]>
   extends CellProps<R, M, V> {
   readonly rawValue: V | null;
   readonly value: string;
