@@ -30,7 +30,6 @@ const UnauthenticatedBudgetSubAccountsTable = (
     <UnauthenticatedBudgetTable<R, M>
       {...props}
       table={table}
-      pinFirstColumn={true}
       columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(props.columns, {
         identifier: (col: Table.Column<R, M>) =>
           budgetTableFramework.columnObjs.IdentifierColumn<R, M>({

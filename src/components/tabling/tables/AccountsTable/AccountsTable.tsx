@@ -2,7 +2,6 @@ import React from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
 
 type R = Tables.AccountRowData;
-type M = Model.Account;
 
 export type AccountsTableProps = {
   readonly cookieNames?: Omit<Table.CookieNames, "hiddenColumns">;
@@ -16,6 +15,7 @@ const AccountsTable = <T extends AccountsTableProps>(
       <Component
         {...props}
         showPageFooter={false}
+        pinFirstColumn={true}
         cookieNames={{ ...props.cookieNames, hiddenColumns: "account-table-hidden-columns" }}
         getModelRowName={(r: Table.ModelRow<R>) => r.data.identifier || r.data.description}
         getPlaceholderRowName={(r: Table.PlaceholderRow<R>) => r.data.identifier || r.data.description}

@@ -26,6 +26,7 @@ function SubAccountsTable<T extends SubAccountsTableProps>(
         {...props}
         columns={Columns}
         showPageFooter={true}
+        pinFirstColumn={true}
         cookieNames={{ ...props.cookieNames, hiddenColumns: "subaccount-table-hidden-columns" }}
         framework={Framework}
         getModelRowName={(r: Table.ModelRow<R>) => r.data.identifier || r.data.description}

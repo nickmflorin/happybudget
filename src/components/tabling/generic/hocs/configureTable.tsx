@@ -4,7 +4,7 @@ import { map, isNil, filter, reduce, uniqueId } from "lodash";
 import { GridReadyEvent, GridOptions, FirstDataRenderedEvent } from "@ag-grid-community/core";
 
 import { Config } from "config";
-import { tabling, hooks } from "lib";
+import { tabling, hooks, util } from "lib";
 
 import * as framework from "../framework";
 
@@ -74,6 +74,7 @@ export type TableConfigurationProps<R extends Table.RowData, M extends Model.Htt
   readonly rowHeight?: number;
   readonly menuPortalId?: string;
   readonly pinFirstColumn?: boolean;
+  readonly pinActionColumns?: boolean;
   readonly sizeToFit?: boolean;
   // TODO: We should restrict this to authenticated cases only.
   readonly savingChangesPortalId?: string;
@@ -173,16 +174,29 @@ const configureTable = <
     const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
       let orderedColumns = tabling.columns.orderColumns<Table.Column<R, M>, R, M>(props.columns);
 
+      const pinFirstColumn = (cs: Table.Column<R, M>[]) => {
+        const displayedCols = filter(cs, (c: Table.Column<R, M>) => c.tableColumnType !== "fake");
+        if (displayedCols.length !== 0) {
+          return util.replaceInArray<Table.Column<R, M>>(
+            cs,
+            (c: Table.Column<R, M>) =>
+              tabling.columns.normalizedField(c) === tabling.columns.normalizedField(displayedCols[0]),
+            { ...displayedCols[0], pinned: "left" }
+          );
+        }
+        return cs;
+      };
+
       if (hasExpandColumn === true) {
         return [
           framework.columnObjs.IndexColumn<R, M>(
-            { ...props.indexColumn, pinned: props.pinFirstColumn ? "left" : undefined },
+            { ...props.indexColumn, pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined },
             hasExpandColumn,
             props.indexColumnWidth
           ),
           framework.columnObjs.ExpandColumn<R, M>(
             {
-              pinned: props.pinFirstColumn ? "left" : undefined,
+              pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined,
               // These are only applicable for the non-footer grids, but it is easier to define them
               // at the top Table level than at the Grid level.
               cellRendererParams: {
@@ -196,20 +210,16 @@ const configureTable = <
             },
             props.expandColumnWidth
           ),
-          ...(orderedColumns.length !== 0
-            ? [{ ...orderedColumns[0], pinned: props.pinFirstColumn ? "left" : undefined }, ...orderedColumns.slice(1)]
-            : orderedColumns)
+          ...(props.pinFirstColumn ? pinFirstColumn(orderedColumns) : orderedColumns)
         ];
       }
       return [
         framework.columnObjs.IndexColumn<R, M>(
-          { ...props.indexColumn, pinned: props.pinFirstColumn ? "left" : undefined },
+          { ...props.indexColumn, pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined },
           hasExpandColumn || false,
           props.indexColumnWidth
         ),
-        ...(orderedColumns.length !== 0
-          ? [{ ...orderedColumns[0], pinned: props.pinFirstColumn ? "left" : undefined }, ...orderedColumns.slice(1)]
-          : orderedColumns)
+        ...(props.pinFirstColumn ? pinFirstColumn(orderedColumns) : orderedColumns)
       ];
     }, [
       hooks.useDeepEqualMemo(props.columns),
