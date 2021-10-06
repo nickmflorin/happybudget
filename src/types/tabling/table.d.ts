@@ -237,8 +237,8 @@ namespace Table {
     readonly textStyle?: import("@react-pdf/types").Style;
   }
 
-  type PdfValueGetter<R extends RowData, V = any> = (r: Table.BodyRow<R>, rows: Table.BodyRow<R>[]) => V | null;
-  type PdfFooterValueGetter<R extends RowData, V = any> = (rows: Table.BodyRow<R>[]) => V | null;
+  type PdfValueGetter<R extends RowData, V = any> = (r: BodyRow<R>, rows: BodyRow<R>[]) => V | null;
+  type PdfFooterValueGetter<R extends RowData, V = any> = (rows: BodyRow<R>[]) => V | null;
 
   interface PdfColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any>
     extends BaseColumn<R, M, "pdf"> {
@@ -288,13 +288,14 @@ namespace Table {
     readonly canBeHidden?: boolean;
     readonly canBeExported?: boolean;
     readonly requiresAuthentication?: boolean;
-    readonly getCSVValue?: (row: Table.BodyRow<R>) => string;
+    readonly onDataChange?: (id: Table.ModelRowId, event: CellChange<R>) => void;
+    readonly getCSVValue?: (row: BodyRow<R>) => string;
     readonly colSpan?: (params: ColSpanParams<R, M>) => number;
     readonly onCellFocus?: (params: CellFocusedParams<R, M>) => void;
     readonly onCellUnfocus?: (params: CellFocusedParams<R, M>) => void;
     readonly refreshColumns?: (change: CellChange<R, V>) => keyof R | (keyof R)[] | null;
     readonly getHttpValue?: (value: any) => any;
-    readonly getCellChanges?: (id: Table.EditableRowId, oldValue: any, newValue: any) => SoloCellChange<R>[];
+    readonly getCellChanges?: (id: EditableRowId, oldValue: any, newValue: any) => SoloCellChange<R>[];
     readonly processCellForClipboard?: (row: R) => string | number;
     readonly processCellFromClipboard?: (value: string) => V | null;
     readonly onCellDoubleClicked?: (row: ModelRow<R>) => void;
@@ -319,6 +320,7 @@ namespace Table {
 
   type TableInstance<R extends RowData = RowData> = DataGridInstance<R> & {
     readonly getFocusedRow: () => BodyRow<R> | null;
+    readonly getRow: (id: BodyRowId) => BodyRow<R> | null;
     readonly getRowsAboveAndIncludingFocusedRow: () => BodyRow<R>[];
     readonly applyTableChange: (event: SingleOrArray<ChangeEvent<R>>) => void;
     readonly applyGroupColorChange: (group: Model.Group) => void;

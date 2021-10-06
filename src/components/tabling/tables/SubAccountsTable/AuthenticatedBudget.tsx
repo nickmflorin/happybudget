@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { isNil, find, map, filter } from "lodash";
 
 import { model, tabling } from "lib";
@@ -13,8 +14,6 @@ import SubAccountsTable, { WithSubAccountsTableProps } from "./SubAccountsTable"
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
 
-type PreContactCreate = Omit<Table.SoloCellChange<R>, "newValue">;
-
 export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>, "columns"> & {
   readonly subAccountUnits: Model.Tag[];
   readonly fringes: Tables.FringeRow[];
@@ -24,7 +23,7 @@ export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>,
   readonly exportFileName: string;
   readonly onGroupRows: (rows: Table.ModelRow<R>[]) => void;
   readonly onExportPdf: () => void;
-  readonly onNewContact: (params: { name?: string; change: PreContactCreate }) => void;
+  readonly onNewContact: (params: { name?: string; id: Table.ModelRowId }) => void;
   readonly onEditMarkup: (row: Table.MarkupRow<R>) => void;
   readonly onMarkupRows?: (rows: Table.ModelRow<R>[]) => void;
   readonly onEditContact: (id: number) => void;
@@ -36,6 +35,15 @@ const AuthenticatedBudgetSubAccountsTable = (
   props: WithSubAccountsTableProps<AuthenticatedBudgetProps>
 ): JSX.Element => {
   const table = tabling.hooks.useTableIfNotDefined(props.table);
+
+  // I don't fully understand why yet, but we have to use a ref for the contacts to make them
+  // accessible inside the onDataChange callback.
+  const contactsRef = useRef<Model.Contact[]>([]);
+
+  useEffect(() => {
+    contactsRef.current = props.contacts;
+  }, [props.contacts]);
+
   return (
     <AuthenticatedBudgetTable<R, M>
       {...props}
@@ -80,6 +88,23 @@ const AuthenticatedBudgetSubAccountsTable = (
             cellRendererParams: { onEditContact: props.onEditContact },
             cellEditorParams: { onNewContact: props.onNewContact },
             models: props.contacts,
+            onDataChange: (id: Table.ModelRowId, change: Table.CellChange<R>) => {
+              // If a Row is assigned a Contact when it didn't previously have one, and the Row
+              // does not have a populated value for `rate`, auto fill the `rate` field from the
+              // Contact.
+              if (change.oldValue === null && change.newValue !== null) {
+                const row = table.current.getRow(id);
+                if (!isNil(row) && tabling.typeguards.isModelRow(row) && row.data.rate === null) {
+                  const contact: Model.Contact | undefined = find(contactsRef.current, { id: change.newValue });
+                  if (!isNil(contact) && !isNil(contact.rate)) {
+                    table.current.applyTableChange({
+                      type: "dataChange",
+                      payload: { id: row.id, data: { rate: { oldValue: row.data.rate, newValue: row.data.contact } } }
+                    });
+                  }
+                }
+              }
+            },
             modelClipboardValue: (m: Model.Contact) => m.full_name,
             processCellFromClipboard: (name: string): Model.Contact | null => {
               if (name.trim() === "") {

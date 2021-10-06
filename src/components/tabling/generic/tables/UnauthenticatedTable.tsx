@@ -131,6 +131,14 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.TypedHttp
       }
       return [];
     },
+    getRow: (id: Table.BodyRowId) => {
+      const apis = props.tableApis.get("data");
+      if (!isNil(apis)) {
+        const node: Table.RowNode | undefined = apis.grid.getRowNode(String(id));
+        return !isNil(node) ? (node.data as Table.BodyRow<R>) : null;
+      }
+      return null;
+    },
     getFocusedRow: () => {
       const apis = props.tableApis.get("data");
       if (!isNil(apis)) {

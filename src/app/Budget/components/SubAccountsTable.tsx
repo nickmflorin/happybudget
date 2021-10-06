@@ -9,8 +9,7 @@ import { SubAccountsTable as GenericSubAccountsTable } from "components/tabling"
 
 import PreviewModal from "./PreviewModal";
 
-type PreContactCreate = Omit<Table.SoloCellChange<Tables.SubAccountRowData>, "newValue">;
-
+type R = Tables.SubAccountRowData;
 type OmitTableProps = "contacts" | "onEditContact" | "onNewContact" | "menuPortalId" | "columns" | "onExportPdf";
 
 export interface BudgetSubAccountsTableProps
@@ -21,13 +20,13 @@ export interface BudgetSubAccountsTableProps
 
 const SubAccountsTable = ({ budget, budgetId, ...props }: BudgetSubAccountsTableProps): JSX.Element => {
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
-  const [preContactCreate, setPreContactCreate] = useState<PreContactCreate | null>(null);
+  const [preContactCreate, setPreContactCreate] = useState<{ name?: string; id: Table.EditableRowId } | null>(null);
   const [initialContactFormValues, setInitialContactFormValues] = useState<any>(null);
   const [contactToEdit, setContactToEdit] = useState<number | null>(null);
   const [createContactModalVisible, setCreateContactModalVisible] = useState(false);
 
   const contacts = useSelector(selectors.selectContacts);
-  const table = tabling.hooks.useTableIfNotDefined<Tables.SubAccountRowData>(props.table);
+  const table = tabling.hooks.useTableIfNotDefined<R>(props.table);
 
   return (
     <React.Fragment>
@@ -39,8 +38,8 @@ const SubAccountsTable = ({ budget, budgetId, ...props }: BudgetSubAccountsTable
         savingChangesPortalId={"saving-changes"}
         onEditContact={(contact: number) => setContactToEdit(contact)}
         onExportPdf={() => setPreviewModalVisible(true)}
-        onNewContact={(params: { name?: string; change: PreContactCreate }) => {
-          setPreContactCreate(params.change);
+        onNewContact={(params: { name?: string; id: Table.EditableRowId }) => {
+          setPreContactCreate(params);
           setInitialContactFormValues(null);
           if (!isNil(params.name)) {
             const [firstName, lastName] = model.util.parseFirstAndLastName(params.name);
@@ -72,14 +71,25 @@ const SubAccountsTable = ({ budget, budgetId, ...props }: BudgetSubAccountsTable
             // cell, combine that information with the new value to perform a table update, showing
             // the created contact in the new cell.
             if (!isNil(preContactCreate)) {
-              const cellChange: Table.SoloCellChange<Tables.SubAccountRowData> = {
-                ...preContactCreate,
-                newValue: contact.id
-              };
-              table.current.applyTableChange({
-                type: "dataChange",
-                payload: tabling.events.cellChangeToRowChange(cellChange)
-              });
+              const row: Table.BodyRow<R> | null = table.current.getRow(preContactCreate.id);
+              if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
+                let rowChange: Table.RowChange<R> = {
+                  id: row.id,
+                  data: { contact: { oldValue: row.data.contact || null, newValue: contact.id } }
+                };
+                // If the Row does not already specify a rate and the Contact does specify a rate,
+                // use the rate that is specified for the Contact.
+                if (contact.rate !== null && row.data.rate === null) {
+                  rowChange = {
+                    ...rowChange,
+                    data: { ...rowChange.data, rate: { oldValue: row.data.rate, newValue: contact.rate } }
+                  };
+                }
+                table.current.applyTableChange({
+                  type: "dataChange",
+                  payload: rowChange
+                });
+              }
             }
           }}
           onCancel={() => setCreateContactModalVisible(false)}

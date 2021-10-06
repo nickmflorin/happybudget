@@ -10,13 +10,11 @@ import Columns from "./Columns";
 type R = Tables.ActualRowData;
 type M = Model.Actual;
 
-type PreContactCreate = Omit<Table.SoloCellChange<R>, "newValue">;
-
 export type Props = Omit<AuthenticatedModelTableProps<R, M>, "columns"> & {
   readonly exportFileName: string;
   readonly contacts: Model.Contact[];
   readonly onOwnerTreeSearch: (value: string) => void;
-  readonly onNewContact: (params: { name?: string; change: PreContactCreate }) => void;
+  readonly onNewContact: (params: { name?: string; id: Table.ModelRowId }) => void;
   readonly onEditContact: (id: number) => void;
 };
 
