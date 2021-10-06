@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { isNil, map, filter, find, includes, reduce } from "lodash";
 
 import { ShowHide } from "components";
-import { Document, View, Page, Tag, NoDataPage } from "components/pdf";
+import { Document, View, Page, Tag, Text, NoDataPage } from "components/pdf";
 import { tabling, model } from "lib";
 
 import { AccountColumns, SubAccountColumns } from "./config";
@@ -79,13 +79,13 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
                 );
               }
             }
-            return <span></span>;
+            return <Text></Text>;
           }
         }),
         unit: (col: C) => ({
           ...col,
           cellRenderer: (params: Table.PdfCellCallbackParams<R, M>) =>
-            params.rawValue !== null ? <Tag model={params.rawValue} /> : <span></span>
+            params.rawValue !== null ? <Tag model={params.rawValue} /> : <Text></Text>
         }),
         estimated: (col: C) => ({
           ...col,

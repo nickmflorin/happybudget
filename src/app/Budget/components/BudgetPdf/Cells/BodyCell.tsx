@@ -17,13 +17,13 @@ const BodyCell = <
   readonly data: Table.BodyRow<R>[];
   readonly row: RW;
 }): JSX.Element => {
-  const rawValue: R[keyof R] | string | number = useMemo((): R[keyof R] | string | number => {
+  const rawValue: R[keyof R] | string | number | null = useMemo((): R[keyof R] | string | number | null => {
     if (!isNil(props.column.valueGetter)) {
       return props.column.valueGetter(props.row, data);
     } else if (!isNil(props.column.field)) {
       const value = props.row.data[props.column.field];
       if (value === null) {
-        return "";
+        return null;
       } else if (typeof value !== "string" && typeof value !== "number") {
         // If there is a custom cell renderer, the value can be anything since it will not be
         // directly rendered in the DOM.
@@ -32,16 +32,15 @@ const BodyCell = <
           console.error(
             `Column ${tabling.columns.normalizedField(props.column)} did not return
           string or number type from data!
-          Returning empty string...`
+          Returning null...`
           );
-          console.log(props.row.data);
-          return "";
+          return null;
         }
         return value;
       }
       return value;
     }
-    return "";
+    return null;
   }, [props.row, props.column]);
 
   const value = useMemo(() => {

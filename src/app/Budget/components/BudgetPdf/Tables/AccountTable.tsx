@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { isNil, filter, reduce, find, map } from "lodash";
+import { isNil, filter, reduce, find, map, includes } from "lodash";
 import classNames from "classnames";
 
 import { tabling, hooks, model } from "lib";
@@ -56,9 +56,14 @@ const AccountTable = ({
       return tabling.rows.createModelRow<R, M, Table.PdfColumn<R, M>>({
         model: subaccount,
         columns: subAccountColumns,
-        excludeColumns: (c: Table.PdfColumn<R, M>) =>
-          !isNil(subaccount[c.field as keyof M]) &&
-          (subaccount.children.length === 0 || c.tableColumnType !== "calculated"),
+        excludeColumns: (c: Table.PdfColumn<R, M>) => {
+          return (
+            subaccount.children.length !== 0 &&
+            c.tableColumnType !== "fake" &&
+            c.tableColumnType !== "calculated" &&
+            !includes(["identifier", "description"], c.field)
+          );
+        },
         getRowValue: (m: Model.PdfSubAccount, c: Table.PdfColumn<R, M>) => {
           if (!isNil(c.childFooter) && !isNil(c.childFooter(subaccount).value)) {
             return c.childFooter(subaccount).value;
@@ -86,6 +91,7 @@ const AccountTable = ({
           const subAccount: Model.PdfSubAccount | undefined = find(subaccounts, { id: subAccountRow.id });
           if (!isNil(subAccount)) {
             const details = subAccount.children;
+
             const showSubAccountFooterRow =
               filter(columns, (column: Table.PdfColumn<R, M>) => !isNil(column.childFooter)).length !== 0 &&
               details.length !== 0;

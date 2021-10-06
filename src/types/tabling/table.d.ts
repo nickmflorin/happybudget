@@ -193,11 +193,11 @@ namespace Table {
     readonly getRowValue?: (m: M) => R[keyof R];
   }
 
-  type PdfRawValue = R[keyof R] | string | number;
+  type PdfRawValue = R[keyof R] | string | number | null;
 
   type PdfCellCallbackParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V extends PdfRawValue = PdfRawValue> = {
     readonly colIndex: number;
-    readonly column: PdfColumn<R, M>;
+    readonly column: PdfColumn<R, M, V>;
     readonly isHeader: boolean;
     readonly rawValue: V;
     readonly value: string;

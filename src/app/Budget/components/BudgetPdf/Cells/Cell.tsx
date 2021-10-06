@@ -13,10 +13,15 @@ const isCallback = <R extends Table.RowData, M extends Model.HttpModel = Model.H
   return typeof prop === "function";
 };
 
-const evaluateOptionalCallbackProp = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, T = any>(
+const evaluateOptionalCallbackProp = <
+  R extends Table.RowData,
+  M extends Model.HttpModel = Model.HttpModel,
+  V extends Table.PdfRawValue = Table.PdfRawValue,
+  T = any
+>(
   /* eslint-disable indent */
-  prop: Table.PdfOptionalCellCallback<R, M, T> | undefined,
-  params: Table.PdfCellCallbackParams<R, M>
+  prop: Table.PdfOptionalCellCallback<R, M, V, T> | undefined,
+  params: Table.PdfCellCallbackParams<R, M, V>
 ) => {
   if (isCallback(prop)) {
     return prop(params);
@@ -77,7 +82,7 @@ export interface CellProps<R extends Table.RowData, M extends Model.HttpModel = 
 
 interface PrivateCellProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
   extends CellProps<R, M> {
-  readonly rawValue: R[keyof R] | string | number;
+  readonly rawValue: R[keyof R] | string | number | null;
   readonly value: string;
 }
 
@@ -159,7 +164,7 @@ const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
               ...evaluateCellStyle<R, M>(props.textStyle, callbackParams)
             }}
           >
-            {props.value}
+            {props.value || ""}
           </Text>
         )}
       </ShowHide>
