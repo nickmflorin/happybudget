@@ -34,12 +34,15 @@ const Columns: Table.Column<R, M>[] = [
   framework.columnObjs.BodyColumn<R, M>({
     field: "description",
     headerName: "Description",
+    minWidth: 200,
     flex: 3,
     columnType: "longText"
   }),
   framework.columnObjs.ModelSelectColumn<R, M, Model.Contact>({
     field: "contact",
     headerName: "Contact",
+    width: 120,
+    minWidth: 120,
     cellRenderer: { data: "ContactCell" },
     cellEditor: "ContactEditor",
     columnType: "contact",
@@ -49,7 +52,9 @@ const Columns: Table.Column<R, M>[] = [
   }),
   framework.columnObjs.BodyColumn<R, M>({
     field: "purchase_order",
-    headerName: "Purchase Order",
+    headerName: "PO",
+    width: 100,
+    minWidth: 100,
     flex: 1,
     columnType: "number",
     tableColumnType: "body"
@@ -57,6 +62,8 @@ const Columns: Table.Column<R, M>[] = [
   framework.columnObjs.BodyColumn<R, M>({
     field: "date",
     headerName: "Date",
+    width: 100,
+    minWidth: 100,
     flex: 1,
     cellEditor: "DateEditor",
     valueFormatter: tabling.formatters.dateValueFormatter,
@@ -66,6 +73,8 @@ const Columns: Table.Column<R, M>[] = [
   framework.columnObjs.ChoiceSelectColumn<R, M, Model.PaymentMethod>({
     field: "payment_method",
     headerName: "Pay Method",
+    width: 140,
+    minWidth: 140,
     cellRenderer: { data: "PaymentMethodCell" },
     cellEditor: "PaymentMethodEditor",
     models: model.models.PaymentMethods
@@ -73,12 +82,16 @@ const Columns: Table.Column<R, M>[] = [
   framework.columnObjs.BodyColumn<R, M>({
     field: "payment_id",
     headerName: "Pay ID",
+    width: 80,
+    minWidth: 80,
     flex: 1,
     columnType: "number"
   }),
   framework.columnObjs.BodyColumn<R, M>({
     field: "value",
     headerName: "Amount",
+    width: 100,
+    minWidth: 100,
     flex: 1,
     valueFormatter: tabling.formatters.currencyValueFormatter,
     valueSetter: tabling.valueSetters.floatValueSetter<R>("value"),
