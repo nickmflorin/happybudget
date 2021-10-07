@@ -18,8 +18,8 @@ export const InitialMenuRef: IMenuRef<any> = {
   decrementFocusedIndex: () => {},
   getModelAtFocusedIndex: () => null,
   performActionAtFocusedIndex: (e: KeyboardEvent) => {},
-  focusSearch: (value: boolean, search?: string) => {},
-  focusMenu: (value: boolean) => {}
+  focus: (value: boolean) => {},
+  focusSearch: (value: boolean, search?: string) => {}
 };
 
 export const useMenu = <M extends Model.Model>(): NonNullRef<IMenuRef<M>> => {

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef, useImperativeHandle } from "react";
+import React, { useState, useMemo, useEffect, useRef, useImperativeHandle, useReducer } from "react";
 import classNames from "classnames";
 import { map, isNil, includes, filter, find, uniqueId, forEach } from "lodash";
 
@@ -12,17 +12,6 @@ import { SearchInput } from "components/fields";
 import MenuItems from "./MenuItems";
 import { ExtraMenuItem } from "./MenuItem";
 
-type MenuUnfocusedState = {
-  readonly menuFocused: false;
-};
-
-type MenuFocusedState = {
-  readonly menuFocused: true;
-  readonly index: number;
-};
-
-type MenuState = MenuFocusedState | MenuUnfocusedState;
-
 type GenericExtraItem = { extra: ExtraMenuItemModel };
 type GenericModelItem<M extends MenuItemModel> = { model: M };
 type GenericItem<M extends MenuItemModel> = GenericExtraItem | GenericModelItem<M>;
@@ -31,20 +20,86 @@ const isModelItem = <M extends MenuItemModel>(item: GenericItem<M>): item is Gen
   return (item as GenericModelItem<M>).model !== undefined;
 };
 
-const isMenuFocusedState = (state: MenuState): state is MenuFocusedState => {
-  return (state as MenuFocusedState).menuFocused === true;
+type MenuState<M extends MenuItemModel> = {
+  readonly focusedIndex: number | null;
+  readonly availableItems: GenericItem<M>[];
 };
 
-const isMenuUnfocusedState = (state: MenuState): state is MenuUnfocusedState => {
-  return (state as MenuUnfocusedState).menuFocused === false;
+const initialMenuState: MenuState<any> = {
+  focusedIndex: 0,
+  availableItems: []
+};
+
+type FocusedIndexChangeAction = {
+  readonly type: "INCREMENT" | "DECREMENT";
+};
+
+type FocusedIndexSetAction = {
+  readonly type: "SET";
+  readonly payload: number;
+};
+
+type SetAvailableItemsAction<M extends MenuItemModel> = {
+  readonly type: "SET_AVAILABLE_ITEMS";
+  readonly models: M[];
+  readonly availableExtras: ExtraMenuItemModel[];
+};
+
+type MenuStateAction<M extends MenuItemModel> =
+  | FocusedIndexChangeAction
+  | FocusedIndexSetAction
+  | SetAvailableItemsAction<M>;
+
+const menuStateReducer = <M extends MenuItemModel>(
+  state: MenuState<M> = initialMenuState,
+  action: MenuStateAction<M>
+): MenuState<M> => {
+  let newState = { ...state };
+  if (action.type === "INCREMENT") {
+    if (state.focusedIndex === null) {
+      newState = { ...newState, focusedIndex: state.availableItems.length !== 0 ? 0 : null };
+    } else {
+      newState = {
+        ...newState,
+        focusedIndex: state.focusedIndex + 1 < state.availableItems.length ? state.focusedIndex + 1 : state.focusedIndex
+      };
+    }
+  } else if (action.type === "SET") {
+    newState = { ...newState, focusedIndex: action.payload };
+  } else if (action.type === "DECREMENT") {
+    if (state.focusedIndex === 0) {
+      newState = { ...newState, focusedIndex: null };
+    } else if (state.focusedIndex !== null) {
+      newState = {
+        ...newState,
+        focusedIndex: state.focusedIndex === null ? null : Math.max(state.focusedIndex - 1, 0)
+      };
+    }
+  } else if (action.type === "SET_AVAILABLE_ITEMS") {
+    newState = {
+      ...newState,
+      availableItems: [
+        ...map(action.models, (m: M) => ({ model: m })),
+        ...map(action.availableExtras, (e: ExtraMenuItemModel) => ({ extra: e }))
+      ]
+    };
+  }
+  return newState;
 };
 
 const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNullRef<IMenuRef<M>> }): JSX.Element => {
-  const firstRender = ui.hooks.useTrackFirstRender();
+  const ref = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLUListElement>(null);
   const searchRef = useRef<AntDInput>(null);
+  const [menuState, dispatchMenuState] = useReducer(menuStateReducer, initialMenuState);
+
+  const [focused, setFocused] = useState(false);
+  const [innerFocused, setInnerFocused] = useState(false);
+
+  const firstRender = ui.hooks.useTrackFirstRender();
   const menu = ui.hooks.useMenuIfNotDefined<M>(props.menu);
   const menuId = useMemo(() => (!isNil(props.id) ? props.id : uniqueId("menu-")), [props.id]);
-  const [internalState, setInternalState] = useState<MenuState>({ menuFocused: false });
+
   const [_selected, setSelected] = useState<MenuItemId[]>(
     /* eslint-disable indent */
     isNil(props.defaultSelected)
@@ -128,20 +183,21 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
     return [];
   }, [props.extra, noData, noSearchResults]);
 
-  const availableItems = useMemo((): GenericItem<M>[] => {
-    return [
-      ...map(models, (m: M) => ({ model: m })),
-      ...map(availableExtras, (e: ExtraMenuItemModel) => ({ extra: e }))
-    ];
+  useEffect(() => {
+    dispatchMenuState({
+      type: "SET_AVAILABLE_ITEMS",
+      models,
+      availableExtras
+    });
   }, [models, availableExtras]);
 
   const availableModelItems = useMemo<GenericModelItem<M>[]>(() => {
-    return filter(availableItems, (item: GenericItem<M>) => isModelItem(item)) as GenericModelItem<M>[];
-  }, [availableItems]);
+    return filter(menuState.availableItems, (item: GenericItem<M>) => isModelItem(item)) as GenericModelItem<M>[];
+  }, [menuState.availableItems]);
 
   const availableExtraItems = useMemo<GenericExtraItem[]>(() => {
-    return filter(availableItems, (item: GenericExtraItem) => !isModelItem(item)) as GenericExtraItem[];
-  }, [availableItems]);
+    return filter(menuState.availableItems, (item: GenericExtraItem) => !isModelItem(item)) as GenericExtraItem[];
+  }, [menuState.availableItems]);
 
   const topLevelModelItems = useMemo<GenericModelItem<M>[]>(() => {
     const topLevelIds: (number | string)[] = map(props.models, (m: M) => getModelIdentifier(m));
@@ -150,100 +206,93 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
     );
   }, [hooks.useDeepEqualMemo(props.models), hooks.useDeepEqualMemo(models), availableModelItems, getModelIdentifier]);
 
-  const setIndexFromSelectedState = (selectedState: (number | string)[]) => {
-    if (selectedState.length !== 0) {
-      let validSelectedModel: GenericModelItem<M> | null = null;
-      // TODO: In the case that there are multiple selected models (i.e. the Menu
-      // is operating as multiple = true) we should see if there is a way to recover
-      // the last active selection instead of defaulting to the first selected model
-      // in the array.
-      forEach(selectedState, (id: ID | string) => {
-        const m: GenericModelItem<M> | undefined = find(
-          availableModelItems,
-          (item: GenericModelItem<M>) => getModelIdentifier(item.model) === id
-        );
-        // It might be the case that the selected model does not exist in the
-        // models, beacuse the models are filtered based on the search and the
-        // search might exclude the selection.
-        if (!isNil(m)) {
-          validSelectedModel = m;
-          return false;
+  const getIndexFromSelectedState = useMemo(
+    () =>
+      (selectedState: (number | string)[]): number | null => {
+        if (selectedState.length !== 0) {
+          let validSelectedModel: GenericModelItem<M> | null = null;
+          // TODO: In the case that there are multiple selected models (i.e. the Menu
+          // is operating as multiple = true) we should see if there is a way to recover
+          // the last active selection instead of defaulting to the first selected model
+          // in the array.
+          forEach(selectedState, (id: ID | string) => {
+            const m: GenericModelItem<M> | undefined = find(
+              availableModelItems,
+              (item: GenericModelItem<M>) => getModelIdentifier(item.model) === id
+            );
+            // It might be the case that the selected model does not exist in the
+            // models, beacuse the models are filtered based on the search and the
+            // search might exclude the selection.
+            if (!isNil(m)) {
+              validSelectedModel = m;
+              return null;
+            }
+          });
+          if (validSelectedModel !== null) {
+            const index = menuState.availableItems.indexOf(validSelectedModel);
+            if (!isNil(index)) {
+              return index;
+            }
+          }
         }
-      });
-      if (validSelectedModel !== null) {
-        const index = availableItems.indexOf(validSelectedModel);
-        if (!isNil(index)) {
-          setInternalState({ menuFocused: true, index: index });
-          return true;
-        }
-      }
-    }
-    return false;
-  };
+        return null;
+      },
+    [availableModelItems]
+  );
 
   useEffect(() => {
-    setIndexFromSelectedState(selected);
-  }, [hooks.useDeepEqualMemo(selected)]);
-
-  useEffect(() => {
-    if (isMenuFocusedState(internalState)) {
+    if (focused === true) {
       if (noData === true) {
         const items: GenericExtraItem[] = filter(
-          availableItems,
+          menuState.availableItems,
           (item: GenericItem<M>) =>
             !isModelItem(item) && item.extra.showOnNoData === true && item.extra.focusOnNoData === true
         ) as GenericExtraItem[];
         if (items.length !== 0) {
-          setInternalState({
-            menuFocused: true,
-            index: availableItems.indexOf(items[0])
-          });
+          dispatchMenuState({ type: "SET", payload: menuState.availableItems.indexOf(items[0]) });
         }
       } else if (noSearchResults === true) {
         const items: GenericExtraItem[] = filter(
-          availableItems,
+          menuState.availableItems,
           (item: GenericItem<M>) =>
             !isModelItem(item) &&
             item.extra.showOnNoSearchResults === true &&
             item.extra.focusOnNoSearchResults === true
         ) as GenericExtraItem[];
         if (items.length !== 0) {
-          setInternalState({
-            menuFocused: true,
-            index: availableItems.indexOf(items[0])
-          });
+          dispatchMenuState({ type: "SET", payload: menuState.availableItems.indexOf(items[0]) });
         }
       } else {
-        // If we are not already in the index menuFocused state, first check to see
-        // if there is a selection (i.e. value) - in which case, we will set the
-        // index based on that value.
-        const setIndexFromSelected = setIndexFromSelectedState(selected);
-
-        if (setIndexFromSelected === false) {
-          // If we cannot set the index based on a selected value, check to see if
-          // there is a prop that returns the first model that we should select.
+        let setIndexFromSelectedState = false;
+        if (search === "") {
+          const indexFromSelectedState = getIndexFromSelectedState(selected);
+          if (!isNil(indexFromSelectedState)) {
+            dispatchMenuState({ type: "SET", payload: indexFromSelectedState });
+            setIndexFromSelectedState = true;
+          }
+        }
+        if (setIndexFromSelectedState === false) {
           let setIndexFromSearch = false;
+          // If we cannot set the index based on a selected value, check to see if
+          // there is a prop that returns the first model that we should select
+          // in the presence of a search.
           if (!isNil(props.getFirstSearchResult)) {
             const firstModel = props.getFirstSearchResult(models);
             if (!isNil(firstModel)) {
-              const index = availableItems.indexOf({ model: firstModel });
+              const index = menuState.availableItems.indexOf({ model: firstModel });
               if (!isNil(index)) {
                 setIndexFromSearch = true;
-                setInternalState({ menuFocused: true, index: index });
+                dispatchMenuState({ type: "SET", payload: index });
               }
             }
           }
-          // If we could not infer the index based on a selected model or the prop callback,
-          // set to the first index if there is a search.
-          if (setIndexFromSearch === false && props.search !== "") {
-            setInternalState({ menuFocused: true, index: 0 });
-          } else {
-            setInternalState({ menuFocused: false });
+          if (setIndexFromSearch === false && search !== "") {
+            dispatchMenuState({ type: "SET", payload: 0 });
           }
         }
       }
     }
-  }, [noData, noSearchResults, props.search, props.extra]);
+  }, [noData, noSearchResults, search, props.extra, props.getFirstSearchResult]);
 
   useEffect(() => {
     const scrollIndexIntoView = (index: number) => {
@@ -264,14 +313,15 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
         }
       }
     };
-    if (isMenuFocusedState(internalState)) {
-      scrollIndexIntoView(internalState.index);
+    if (!isNil(menuState.focusedIndex)) {
+      scrollIndexIntoView(menuState.focusedIndex);
     }
-  }, [internalState, menuId]);
+  }, [menuState.focusedIndex, menuId]);
 
   useEffect(() => {
     if (props.defaultFocusFirstItem === true && firstRender === true && models.length !== 0 && selected.length === 0) {
-      setInternalState({ menuFocused: true, index: 0 });
+      // setInternalState({ menuFocused: true, index: 0 });
+      innerRef.current?.focus();
     }
   }, [props.defaultFocusFirstItem, hooks.useDeepEqualMemo(models)]);
 
@@ -280,83 +330,42 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   useEffect(() => {
     if (
       ((models.length === 1 && props.defaultFocusOnlyItem === true) ||
-        (props.defaultFocusOnlyItemOnSearch && !isNil(props.search) && props.search !== "")) &&
+        (props.defaultFocusOnlyItemOnSearch && !isNil(search) && search !== "")) &&
       firstRender === false
     ) {
-      setInternalState({ menuFocused: true, index: 0 });
+      dispatchMenuState({ type: "SET", payload: 0 });
     }
-  }, [hooks.useDeepEqualMemo(models), props.search, props.defaultFocusOnlyItemOnSearch, props.defaultFocusOnlyItem]);
-
-  const _focusSearch = () => {
-    setTimeout(() => {
-      searchRef.current?.focus();
-      searchRef.current?.setState({ focused: true });
-    }, 25);
-  };
-  const _blurSearch = () => {
-    setTimeout(() => {
-      searchRef.current?.blur();
-      searchRef.current?.setState({ focused: false });
-    }, 25);
-  };
-
-  const focusSearch = hooks.useDynamicCallback((value: boolean, searchValue?: string, unfocusMenu = false) => {
-    if (value === true) {
-      _focusSearch();
-      if (unfocusMenu) {
-        setInternalState({ menuFocused: false });
-      } else {
-        setInternalState({ menuFocused: true, index: 0 });
-      }
-      if (!isNil(searchValue)) {
-        setSearch(searchValue);
-      }
-    } else {
-      _blurSearch();
-      setInternalState({ menuFocused: true, index: 0 });
-    }
-  });
+  }, [hooks.useDeepEqualMemo(models), search, props.defaultFocusOnlyItemOnSearch, props.defaultFocusOnlyItem]);
 
   useEffect(() => {
-    !isNil(props.onFocusCallback) && props.onFocusCallback(internalState.menuFocused);
+    !isNil(props.onFocusCallback) && props.onFocusCallback(innerFocused);
 
     const menuFocusedKeyListener = (e: KeyboardEvent) => {
       if (util.events.isCharacterKeyPress(e) || util.events.isBackspaceKeyPress(e)) {
-        const searchInput = searchRef.current;
-        if (!isNil(searchInput)) {
-          searchInput.focus();
-        }
+        searchRef.current?.focus();
       } else {
         if (e.code === "Enter" || e.code === "Tab") {
           performActionAtFocusedIndex(e);
         } else if (e.code === "ArrowDown") {
           e.stopPropagation();
           e.preventDefault();
-          incrementFocusedIndex();
+          dispatchMenuState({ type: "INCREMENT" });
         } else if (e.code === "ArrowUp") {
           e.stopPropagation();
           e.preventDefault();
-          decrementFocusedIndex();
+          dispatchMenuState({ type: "DECREMENT" });
         }
       }
     };
-
-    const menuUnfocusedKeyListener = (e: KeyboardEvent) => {
-      if (e.code === "ArrowDown") {
-        e.stopPropagation();
-        e.preventDefault();
-        focusSearch(false);
-      }
-    };
-
-    if (internalState.menuFocused === true) {
+    if (focused) {
       window.addEventListener("keydown", menuFocusedKeyListener);
-      return () => window.removeEventListener("keydown", menuFocusedKeyListener);
     } else {
-      window.addEventListener("keydown", menuUnfocusedKeyListener);
-      return () => window.removeEventListener("keydown", menuUnfocusedKeyListener);
+      window.removeEventListener("keydown", menuFocusedKeyListener);
     }
-  }, [internalState.menuFocused]);
+    return () => {
+      window.removeEventListener("keydown", menuFocusedKeyListener);
+    };
+  }, [focused]);
 
   const stateForModel = useMemo(
     () =>
@@ -382,26 +391,6 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   );
 
   const state = useMemo(() => stateFromSelected(selected), [selected, stateFromSelected]);
-
-  const incrementFocusedIndex = hooks.useDynamicCallback(() => {
-    if (isMenuFocusedState(internalState)) {
-      if (internalState.index + 1 < availableItems.length) {
-        setInternalState({ menuFocused: true, index: internalState.index + 1 });
-      }
-    } else {
-      focusSearch(false);
-    }
-  });
-
-  const decrementFocusedIndex = hooks.useDynamicCallback(() => {
-    if (isMenuFocusedState(internalState)) {
-      if (internalState.index > 0) {
-        setInternalState({ menuFocused: true, index: internalState.index - 1 });
-      } else {
-        focusSearch(true);
-      }
-    }
-  });
 
   const onMenuItemClick = hooks.useDynamicCallback((m: M, e: Table.CellDoneEditingEvent) => {
     m.onClick?.({ event: e, model: m, closeParentDropdown: props.closeParentDropdown });
@@ -436,8 +425,8 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   });
 
   const performActionAtFocusedIndex = hooks.useDynamicCallback((event: KeyboardEvent) => {
-    if (isMenuFocusedState(internalState)) {
-      const item = availableItems[internalState.index];
+    if (menuState.focusedIndex !== null && focused === true) {
+      const item = menuState.availableItems[menuState.focusedIndex];
       if (!isNil(item)) {
         if (isModelItem(item)) {
           onMenuItemClick(item.model, event);
@@ -454,25 +443,46 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
     /* eslint-disable indent */
     getState: () => state,
     getSearchValue: () => search,
-    incrementFocusedIndex,
-    decrementFocusedIndex,
-    focusMenu: (value: boolean) => {
-      // If the state is just { menuFocused: false }, the hook will set the specific
-      // state depending on the props supplied to the menu.
-      if (value === true && isMenuUnfocusedState(internalState) && availableItems.length !== 0) {
-        setInternalState({ menuFocused: true, index: 0 });
-      } else if (value === false && isMenuFocusedState(internalState)) {
-        setInternalState({ menuFocused: false });
+    incrementFocusedIndex: () => dispatchMenuState({ type: "INCREMENT" }),
+    decrementFocusedIndex: () => dispatchMenuState({ type: "DECREMENT" }),
+    focus: (value: boolean) => {
+      if (value === true) {
+        setTimeout(() => {
+          ref.current?.focus();
+          innerRef.current?.focus();
+          searchRef.current?.focus();
+        });
+      } else {
+        setTimeout(() => {
+          ref.current?.blur();
+          innerRef.current?.blur();
+          searchRef.current?.blur();
+        });
       }
     },
-    focusSearch: focusSearch,
+    focusSearch: (value: boolean, searchValue?: string) => {
+      if (value === true) {
+        setTimeout(() => {
+          searchRef.current?.focus();
+          searchRef.current?.setState({ focused: true });
+        }, 25);
+        if (!isNil(searchValue)) {
+          setSearch(searchValue);
+        }
+      } else {
+        setTimeout(() => {
+          searchRef.current?.blur();
+          searchRef.current?.setState({ focused: false });
+        }, 25);
+      }
+    },
     getModelAtFocusedIndex: () => {
-      if (isMenuFocusedState(internalState)) {
-        const modelItems: GenericModelItem<M>[] = filter(availableItems, (item: GenericItem<M>) =>
+      if (menuState.focusedIndex !== null && focused === true) {
+        const modelItems: GenericModelItem<M>[] = filter(menuState.availableItems, (item: GenericItem<M>) =>
           isModelItem(item)
         ) as GenericModelItem<M>[];
-        if (!isNil(modelItems[internalState.index])) {
-          return modelItems[internalState.index].model;
+        if (!isNil(modelItems[menuState.focusedIndex])) {
+          return modelItems[menuState.focusedIndex].model;
         }
       }
       return null;
@@ -485,16 +495,20 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
       className={classNames("menu", props.className, { "with-search": props.includeSearch })}
       style={props.style}
       id={props.id}
+      ref={ref}
+      onFocus={(e: React.FocusEvent<HTMLDivElement>) => setFocused(true)}
+      onBlur={(e: React.FocusEvent<HTMLDivElement>) => setFocused(false)}
     >
       <ShowHide show={props.includeSearch}>
         <div className={"search-container"}>
           <SearchInput
             className={"input--small"}
             placeholder={props.searchPlaceholder || "Search"}
-            autoFocus={true}
             value={search}
             ref={searchRef}
             style={{ maxWidth: 300, minWidth: 100 }}
+            // onFocus={(e: React.FocusEvent<HTMLInputElement>) => setSearchFocused(true)}
+            // onBlur={(e: React.FocusEvent<HTMLInputElement>) => setSearchFocused(false)}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setSearch(event.target.value);
             }}
@@ -503,13 +517,18 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
       </ShowHide>
       <div className={"ul-wrapper"} id={menuId}>
         <RenderWithSpinner loading={props.loading} size={22}>
-          <ul>
+          <ul
+            ref={innerRef}
+            onFocus={(e: React.FocusEvent<HTMLUListElement>) => setInnerFocused(true)}
+            onBlur={(e: React.FocusEvent<HTMLUListElement>) => setInnerFocused(false)}
+          >
             <React.Fragment>
               <MenuItems<M>
                 models={map(topLevelModelItems, (item: GenericModelItem<M>) => item.model)}
                 menuId={!isNil(props.id) ? props.id : menuId}
                 indexMap={indexMap}
-                focusedIndex={isMenuFocusedState(internalState) ? internalState.index : null}
+                // focusedIndex={isMenuFocusedState(internalState) ? internalState.index : null}
+                focusedIndex={menuState.focusedIndex}
                 checkbox={props.checkbox}
                 level={0}
                 selected={selected}
@@ -528,9 +547,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
                     key={index}
                     menuId={!isNil(props.id) ? props.id : menuId}
                     model={item.extra}
-                    focused={
-                      isMenuFocusedState(internalState) && internalState.index === index + availableModelItems.length
-                    }
+                    focused={menuState.focusedIndex === index + availableModelItems.length}
                   />
                 );
               })}

@@ -43,6 +43,7 @@ const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.HttpMode
       menuMode={"multiple"}
       includeSearch={true}
       searchIndices={["label"]}
+      clientSearching={true}
       menuCheckbox={true}
       menuSelected={selected as string[]}
       keepDropdownOpenOnClick={true}

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import classNames from "classnames";
 import ClickAwayListener from "react-click-away-listener";
 import { uniqueId, isNil } from "lodash";
@@ -7,7 +7,7 @@ import { Dropdown as AntdDropdown } from "antd";
 import { DropDownProps as AntdDropdownProps } from "antd/lib/dropdown";
 
 import { Menu } from "components/menus";
-import { util } from "lib";
+import { util, ui } from "lib";
 
 interface BaseDropdownProps extends Omit<AntdDropdownProps, "overlay" | "visible"> {
   readonly onClickAway?: () => void;
@@ -28,6 +28,7 @@ export interface DropdownMenuItemsProps extends BaseDropdownProps {
   readonly menuSelected?: MenuItemId[];
   readonly includeSearch?: boolean;
   readonly searchIndices?: SearchIndicies;
+  readonly clientSearching?: boolean;
   readonly keepDropdownOpenOnClick?: boolean;
   readonly onChange?: (params: MenuChangeEvent<MenuItemModel>) => void;
 }
@@ -41,6 +42,23 @@ const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
   const [visible, setVisible] = useState(false);
   const buttonId = useMemo(() => uniqueId("dropdown-button-"), []);
   const menuId = useMemo(() => uniqueId("dropdown-menu-"), []);
+  const menuRef = ui.hooks.useMenu();
+
+  useEffect(() => {
+    const keyListener = (e: KeyboardEvent) => {
+      if (e.code === "Escape") {
+        e.stopPropagation();
+        setVisible(false);
+      }
+    };
+    menuRef.current.focus(visible);
+    if (visible === true) {
+      window.addEventListener("keydown", keyListener);
+    } else {
+      window.removeEventListener("keydown", keyListener);
+    }
+    return () => window.removeEventListener("keydown", keyListener);
+  }, [visible]);
 
   return (
     <AntdDropdown
@@ -81,16 +99,20 @@ const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
               <Menu
                 {...props.menuProps}
                 id={menuId}
+                menu={menuRef}
                 keepDropdownOpenOnClick={props.keepDropdownOpenOnClick}
                 models={props.menuItems}
                 onChange={props.onChange}
-                closeParentDropdown={() => setVisible(false)}
+                closeParentDropdown={() => {
+                  setVisible(false);
+                }}
                 mode={props.menuMode}
                 checkbox={props.menuCheckbox}
                 buttons={props.menuButtons}
                 defaultSelected={props.menuDefaultSelected}
                 selected={props.menuSelected}
                 includeSearch={props.includeSearch}
+                clientSearching={props.clientSearching}
                 searchIndices={props.searchIndices}
               />
             )}

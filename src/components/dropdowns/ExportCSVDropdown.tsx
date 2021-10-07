@@ -45,6 +45,7 @@ const ExportCSVDropdown = <R extends Table.RowData, M extends Model.HttpModel = 
       menuCheckbox={true}
       includeSearch={true}
       keepDropdownOpenOnClick={true}
+      clientSearching={true}
       searchIndices={["label"]}
       onChange={(e: MenuChangeEvent<MenuItemModel>) => {
         const selectedStates = filter(

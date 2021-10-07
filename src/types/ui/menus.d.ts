@@ -114,8 +114,8 @@ type IMenuRef<M extends MenuItemModel> = {
   readonly decrementFocusedIndex: () => void;
   readonly getModelAtFocusedIndex: () => M | null;
   readonly performActionAtFocusedIndex: (e: KeyboardEvent) => void;
+  readonly focus: (value: boolean) => void;
   readonly focusSearch: (value: boolean, search?: string) => void;
-  readonly focusMenu: (value: boolean) => void;
 }
 
 interface IMenuButton<M extends MenuItemModel> {
