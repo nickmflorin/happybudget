@@ -171,6 +171,7 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
               (account: Model.PdfAccount) =>
                 !(options.excludeZeroTotals === true) || model.businessLogic.estimatedValue(account) !== 0
             )}
+            markups={budget.children_markups}
             groups={budget.groups}
             columns={accountColumns}
           />

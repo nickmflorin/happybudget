@@ -193,6 +193,7 @@ namespace Model {
     readonly accumulated_markup_contribution: number;
     readonly children: PdfAccount[];
     readonly groups: Group[];
+    readonly children_markups: Markup[];
   }
 
   interface Group extends TrackedModel {
@@ -250,6 +251,7 @@ namespace Model {
     readonly type: "pdf-account";
     readonly children: PdfSubAccount[];
     readonly groups: Group[];
+    readonly children_markups: Markup[];
   }
 
   // Abstract -- not meant for external reference.
@@ -275,6 +277,7 @@ namespace Model {
     readonly type: "pdf-subaccount";
     readonly children: PdfSubAccount[];
     readonly groups: Group[];
+    readonly children_markups: Markup[];
   }
 
   interface Actual extends TrackedModel {

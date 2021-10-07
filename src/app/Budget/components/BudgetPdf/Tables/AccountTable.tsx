@@ -53,7 +53,7 @@ const AccountTable = ({
       (subaccount: M) => !(options.excludeZeroTotals === true) || model.businessLogic.estimatedValue(subaccount) !== 0
     );
     const table: Table.BodyRow<R>[] = tabling.data.createTableRows<R, M>({
-      response: { models: subaccounts, groups: account.groups },
+      response: { models: subaccounts, groups: account.groups, markups: account.children_markups },
       columns: subAccountColumns
     });
 
@@ -61,15 +61,22 @@ const AccountTable = ({
       ...reduce(
         filter(
           table,
-          (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) || tabling.typeguards.isGroupRow(r)
-        ) as (Table.ModelRow<R> | Table.GroupRow<R>)[],
-        (rws: JSX.Element[], subAccountRow: Table.ModelRow<R> | Table.GroupRow<R>) => {
+          (r: Table.BodyRow<R>) =>
+            tabling.typeguards.isModelRow(r) || tabling.typeguards.isGroupRow(r) || tabling.typeguards.isMarkupRow(r)
+        ) as (Table.ModelRow<R> | Table.GroupRow<R> | Table.MarkupRow<R>)[],
+        (rws: JSX.Element[], subAccountRow: Table.ModelRow<R> | Table.GroupRow<R> | Table.MarkupRow<R>) => {
           if (tabling.typeguards.isModelRow(subAccountRow)) {
             const subAccount: Model.PdfSubAccount | undefined = find(subaccounts, { id: subAccountRow.id });
             if (!isNil(subAccount)) {
               const details = subAccount.children;
-
-              if (details.length === 0) {
+              const markups = subAccount.children_markups;
+              /*
+              Note: If there are no details, then there are no markups that are assigned to
+              a given detail.  And if a Markup is not assigned any children, it will be automatically
+              deleted by the backend.  However, we still include in the conditional check here for
+              completeness sake.
+              */
+              if (details.length === 0 && markups.length === 0) {
                 return [
                   ...rws,
                   <BodyRow
@@ -82,7 +89,7 @@ const AccountTable = ({
                 ];
               } else {
                 const subTable: Table.BodyRow<R>[] = tabling.data.createTableRows<R, M>({
-                  response: { models: details, groups: subAccount.groups },
+                  response: { models: details, groups: subAccount.groups, markups },
                   columns: subAccountColumns
                 });
                 let subRows: JSX.Element[] = reduce(
@@ -91,7 +98,7 @@ const AccountTable = ({
                     (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) || tabling.typeguards.isGroupRow(r)
                   ) as (Table.ModelRow<R> | Table.GroupRow<R>)[],
                   (subRws: JSX.Element[], detailRow: Table.ModelRow<R> | Table.GroupRow<R>) => {
-                    if (tabling.typeguards.isModelRow(detailRow)) {
+                    if (tabling.typeguards.isModelRow(detailRow) || tabling.typeguards.isMarkupRow(detailRow)) {
                       return [
                         ...subRws,
                         <BodyRow<R, M>
@@ -164,6 +171,17 @@ const AccountTable = ({
               }
             }
             return rws;
+          } else if (tabling.typeguards.isMarkupRow(subAccountRow)) {
+            return [
+              ...rws,
+              <BodyRow
+                cellProps={{ className: "subaccount-td", textClassName: "subaccount-tr-td-text" }}
+                className={"subaccount-tr"}
+                columns={subAccountColumns}
+                data={table}
+                row={subAccountRow}
+              />
+            ];
           } else {
             return [...rws, <GroupRow row={subAccountRow} columns={subAccountColumns} data={table} />];
           }
