@@ -177,6 +177,9 @@
           .page {
             display: flex;
             flex-direction: column;
+            // The budget card box shadow is getting cut off by the sub-content parent. This negative margin hack is needed to display the box shadow nad keep our preferred spacing
+            padding-left: 15px;
+            margin-left: -15px;
 
             .page-content {
               width: 100%;
