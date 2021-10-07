@@ -99,7 +99,7 @@ const AuthenticatedBudgetSubAccountsTable = (
                   if (!isNil(contact) && !isNil(contact.rate)) {
                     table.current.applyTableChange({
                       type: "dataChange",
-                      payload: { id: row.id, data: { rate: { oldValue: row.data.rate, newValue: row.data.contact } } }
+                      payload: { id: row.id, data: { rate: { oldValue: row.data.rate, newValue: contact.rate } } }
                     });
                   }
                 }
