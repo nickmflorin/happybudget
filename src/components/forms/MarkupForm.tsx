@@ -41,13 +41,11 @@ const MarkupForm = (
         props.onValuesChange?.(changedValues, values);
       }}
     >
-      <Form.Item name={"identifier"}>
-        <Input placeholder={"Account"} />
+      <Form.Item name={"description"} label={"Description"}>
+        <Input />
       </Form.Item>
-      <Form.Item name={"description"}>
-        <Input placeholder={"Description"} />
-      </Form.Item>
-      <Form.Item name={"unit"}>
+
+      <Form.Item name={"unit"} label={"Type"}>
         <Select suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />} placeholder={"Select Type"}>
           {model.models.MarkupUnits.map((m: Model.MarkupUnit, index: number) => (
             <Select.Option key={index} value={m.id}>
@@ -58,6 +56,7 @@ const MarkupForm = (
       </Form.Item>
       <Form.Item
         name={"rate"}
+        label={"Amount"}
         style={unitState !== model.models.MarkupUnitModels.PERCENT.id ? { display: "none" } : {}}
         rules={[
           { required: false },
@@ -71,10 +70,11 @@ const MarkupForm = (
           })
         ]}
       >
-        <PercentInput placeholder={"Rate"} />
+        <PercentInput />
       </Form.Item>
       <Form.Item
         name={"rate"}
+        label={"Amount"}
         style={unitState !== model.models.MarkupUnitModels.FLAT.id ? { display: "none" } : {}}
         rules={[
           { required: false },
@@ -88,10 +88,16 @@ const MarkupForm = (
           })
         ]}
       >
-        <Input placeholder={"Rate"} />
+        <Input />
       </Form.Item>
+
+      <Form.Item name={"identifier"} label={"Account #"}>
+        <Input />
+      </Form.Item>
+
       <Form.Item
         name={"children"}
+        label={"Include Accounts"}
         rules={[
           { required: false },
           ({ getFieldValue }: { getFieldValue: any }) => ({

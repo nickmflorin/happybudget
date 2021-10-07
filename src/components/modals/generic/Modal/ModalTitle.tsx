@@ -1,14 +1,18 @@
-import { ReactNode } from "react";
 import classNames from "classnames";
+import { ui } from "lib";
+
+import { Icon } from "components";
 
 interface ModalTitleProps extends StandardComponentProps {
-  readonly children: ReactNode;
+  readonly icon: IconOrElement;
+  readonly title: string;
 }
 
-const ModalTitle = (props: ModalTitleProps): JSX.Element => {
+const ModalTitle = ({ icon, title, ...props }: ModalTitleProps): JSX.Element => {
   return (
     <div {...props} className={classNames("ant-modal-title", "modal-title", props.className)}>
-      {props.children}
+      {ui.typeguards.iconIsJSX(icon) ? icon : <Icon icon={icon} weight={"regular"} />}
+      {title}
     </div>
   );
 };

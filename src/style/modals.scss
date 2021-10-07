@@ -34,6 +34,16 @@
       font-family: $avenir !important;
       font-weight: 700 !important;
       color: $text-secondary !important;
+
+      &.modal-title {
+        display: flex;
+        align-items: center;
+
+        .icon {
+          margin-right: 6px;
+          color: $text-secondary !important;
+        }
+      }
     }
   }
 

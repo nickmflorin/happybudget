@@ -55,6 +55,7 @@ const CreateMarkupModal = <
   return (
     <Modal
       title={"Markup"}
+      titleIcon={"badge-percent"}
       visible={open}
       onCancel={() => onCancel()}
       okText={"Create"}
