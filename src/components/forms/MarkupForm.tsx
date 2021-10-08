@@ -90,7 +90,20 @@ const MarkupForm = (
       >
         <Input placeholder={"Rate"} />
       </Form.Item>
-      <Form.Item name={"children"}>
+      <Form.Item
+        name={"children"}
+        rules={[
+          { required: false },
+          ({ getFieldValue }: { getFieldValue: any }) => ({
+            validator(rule: any, value: string) {
+              if (value !== "" && !isNil(value) && !util.validate.validateNumeric(value)) {
+                return Promise.reject("At least one account must be selected.");
+              }
+              return Promise.resolve();
+            }
+          })
+        ]}
+      >
         <Select
           suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
           showArrow
