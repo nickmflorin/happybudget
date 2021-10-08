@@ -52,17 +52,17 @@ export const createBudgetTableChangeEventReducer = <
   A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
   config: BudgetTableReducerConfig<R, M, S, A>
-): Redux.Reducer<S, Redux.Action<Table.ChangeEvent<R>>> => {
+): Redux.Reducer<S, Redux.Action<Table.ChangeEvent<R, M>>> => {
   const isSubAccountRowData = (
     data: Tables.AccountRowData | Tables.SubAccountRowData
   ): data is Tables.SubAccountRowData => (data as Tables.SubAccountRowData).fringe_contribution !== undefined;
 
   const generic = tabling.reducers.createTableChangeEventReducer<R, M, S, A>(config);
 
-  return (state: S = config.initialState, action: Redux.Action<Table.ChangeEvent<R>>): S => {
+  return (state: S = config.initialState, action: Redux.Action<Table.ChangeEvent<R, M>>): S => {
     let newState: S = generic(state, action);
 
-    const e: Table.ChangeEvent<R> = action.payload;
+    const e: Table.ChangeEvent<R, M> = action.payload;
     if (tabling.typeguards.isMarkupAddedEvent(e)) {
       const markup: Model.Markup = e.payload;
 

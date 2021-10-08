@@ -1,15 +1,17 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { isNil } from "lodash";
 
 import { model, tabling } from "lib";
-import { selectors } from "store";
+import { actions, selectors } from "store";
 import { EditContactModal, CreateContactModal } from "components/modals";
 import { SubAccountsTable as GenericSubAccountsTable } from "components/tabling";
 
 import PreviewModal from "./PreviewModal";
 
 type R = Tables.SubAccountRowData;
+type M = Model.SubAccount;
+
 type OmitTableProps = "contacts" | "onEditContact" | "onNewContact" | "menuPortalId" | "columns" | "onExportPdf";
 
 export interface BudgetSubAccountsTableProps
@@ -25,8 +27,9 @@ const SubAccountsTable = ({ budget, budgetId, ...props }: BudgetSubAccountsTable
   const [contactToEdit, setContactToEdit] = useState<number | null>(null);
   const [createContactModalVisible, setCreateContactModalVisible] = useState(false);
 
+  const dispatch = useDispatch();
   const contacts = useSelector(selectors.selectContacts);
-  const table = tabling.hooks.useTableIfNotDefined<R>(props.table);
+  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
 
   return (
     <React.Fragment>
@@ -55,7 +58,10 @@ const SubAccountsTable = ({ budget, budgetId, ...props }: BudgetSubAccountsTable
         <EditContactModal
           open={true}
           id={contactToEdit}
-          onSuccess={() => setContactToEdit(null)}
+          onSuccess={(m: Model.Contact) => {
+            dispatch(actions.authenticated.updateContactInStateAction({ id: m.id, data: m }));
+            setContactToEdit(null);
+          }}
           onCancel={() => setContactToEdit(null)}
         />
       )}

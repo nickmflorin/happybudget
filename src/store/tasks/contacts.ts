@@ -86,7 +86,7 @@ export const createTableTaskSet = (
   }
 
   function* bulkUpdateTask(
-    e: Table.ChangeEvent<R>,
+    e: Table.ChangeEvent<R, M>,
     requestPayload: Http.BulkUpdatePayload<P>,
     errorMessage: string
   ): SagaIterator {

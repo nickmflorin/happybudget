@@ -45,7 +45,7 @@ interface InjectedAuthenticatedDataGridProps<R extends Table.RowData> {
 }
 
 export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
-  extends UseContextMenuParams<R> {
+  extends UseContextMenuParams<R, M> {
   readonly apis: Table.GridApis | null;
   readonly tableId: Table.Id;
   readonly grid: NonNullRef<Table.DataGridInstance<R>>;
@@ -57,7 +57,7 @@ export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Mo
   readonly onRowSelectionChanged: (rows: Table.EditableRow<R>[]) => void;
   readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
   readonly isCellEditable?: (params: Table.CellCallbackParams<R, M>) => boolean;
-  readonly onChangeEvent: (event: Table.ChangeEvent<R>) => void;
+  readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
   readonly onEditGroup?: (g: Table.GroupRow<R>) => void;
   readonly onEditMarkup?: (g: Table.MarkupRow<R>) => void;
 }
@@ -237,7 +237,7 @@ const authenticateDataGrid =
           })
       });
 
-      const [getContextMenuItems] = useContextMenu(props);
+      const [getContextMenuItems] = useContextMenu<R, M>(props);
 
       const onCellSpaceKey = (event: CellKeyDownEvent) => {
         if (!isNil(event.rowIndex)) {

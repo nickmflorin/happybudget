@@ -84,7 +84,7 @@ export const useDataGrid = <R extends Table.RowData = object>(): NonNullRef<Tabl
   return useRef<Table.DataGridInstance<R>>(InitialGridRef);
 };
 
-export const InitialTableRef: Table.TableInstance<any> = {
+export const InitialTableRef: Table.TableInstance<any, any> = {
   ...InitialGridRef,
   getFocusedRow: () => null,
   getRow: () => null,
@@ -94,11 +94,13 @@ export const InitialTableRef: Table.TableInstance<any> = {
   applyGroupColorChange: (group: Model.Group) => {}
 };
 
-export const useTable = <R extends Table.RowData = object>(): NonNullRef<Table.TableInstance<R>> => {
-  return useRef<Table.TableInstance<R>>(InitialTableRef);
+export const useTable = <R extends Table.RowData = object, M extends Model.HttpModel = Model.HttpModel>(): NonNullRef<
+  Table.TableInstance<R, M>
+> => {
+  return useRef<Table.TableInstance<R, M>>(InitialTableRef);
 };
 
 /* eslint-disable indent */
-export const useTableIfNotDefined = <R extends Table.RowData = object>(
-  table?: NonNullRef<Table.TableInstance<R>>
-): NonNullRef<Table.TableInstance<R>> => hooks.useRefIfNotDefined<Table.TableInstance<R>>(useTable, table);
+export const useTableIfNotDefined = <R extends Table.RowData = object, M extends Model.HttpModel = Model.HttpModel>(
+  table?: NonNullRef<Table.TableInstance<R, M>>
+): NonNullRef<Table.TableInstance<R, M>> => hooks.useRefIfNotDefined<Table.TableInstance<R, M>>(useTable, table);

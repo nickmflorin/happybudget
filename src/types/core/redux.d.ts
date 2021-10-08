@@ -172,9 +172,9 @@ namespace Redux {
   // not using pagination anywhere that we are using this cache).
   type SearchCache<T extends Model.HttpModel> = { [key: string]: Http.ListResponse<T> };
 
-  type TableTaskMap<R extends Table.RowData> = {
+  type TableTaskMap<R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
     readonly request: null;
-    readonly handleChangeEvent: Table.ChangeEvent<R>;
+    readonly handleChangeEvent: Table.ChangeEvent<R, M>;
   };
 
   type TableActionMap<M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
@@ -189,7 +189,7 @@ namespace Redux {
     R extends Table.RowData = object,
     M extends Model.TypedHttpModel = Model.TypedHttpModel
   > = TableActionMap<M> & {
-    readonly tableChanged: Table.ChangeEvent<R>;
+    readonly tableChanged: Table.ChangeEvent<R, M>;
     readonly saving: boolean;
     readonly addModelsToState: Redux.AddModelsToTablePayload<M>;
     readonly updateModelsInState?: SingleOrArray<M>;

@@ -5,7 +5,11 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 import { isNil } from "lodash";
 import { redux, tabling } from "lib";
 
-type ProvidedProps<R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>> = {
+type ProvidedProps<
+  R extends Table.RowData,
+  M extends Model.HttpModel = Model.HttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
+> = {
   readonly search: string;
   readonly data: Table.BodyRow<R>[];
   readonly loading: boolean;
@@ -13,14 +17,15 @@ type ProvidedProps<R extends Table.RowData, S extends Redux.TableStore<R> = Redu
   readonly selector: (state: Application.Store) => S;
   readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
   readonly onSearch: (v: string) => void;
-  readonly onChangeEvent: (e: Table.ChangeEvent<R>) => void;
+  readonly onChangeEvent: (e: Table.ChangeEvent<R, M>) => void;
 };
 
 export type WithConnectedTableProps<
   T,
   R extends Table.RowData,
+  M extends Model.HttpModel = Model.HttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
-> = T & ProvidedProps<R, S>;
+> = T & ProvidedProps<R, M, S>;
 
 /* eslint-disable indent */
 const connectTableToStore =
@@ -34,8 +39,8 @@ const connectTableToStore =
   ) =>
   (
     Component:
-      | React.ComponentClass<WithConnectedTableProps<T, R, S>, {}>
-      | React.FunctionComponent<WithConnectedTableProps<T, R, S>>
+      | React.ComponentClass<WithConnectedTableProps<T, R, M, S>, {}>
+      | React.FunctionComponent<WithConnectedTableProps<T, R, M, S>>
   ): React.FunctionComponent<T> => {
     let selector: (state: Application.Store) => S = (state: Application.Store) =>
       redux.initialState.initialTableState as S;
@@ -83,7 +88,7 @@ const connectTableToStore =
           selector={selector}
           footerRowSelectors={config.footerRowSelectors}
           saving={saving}
-          onChangeEvent={(e: Table.ChangeEvent<R>) => {
+          onChangeEvent={(e: Table.ChangeEvent<R, M>) => {
             if (tabling.typeguards.isAuthenticatedActionMap<R, M>(config.actions)) {
               dispatch(config.actions.tableChanged(e));
             }

@@ -4,7 +4,7 @@ import { createSelector } from "reselect";
 import { isNil, reduce } from "lodash";
 
 import { redux } from "lib";
-import { selectors } from "store";
+import { actions as globalActions, selectors } from "store";
 
 import { Portal, BreadCrumbs } from "components/layout";
 import { EditContactModal, CreateContactModal } from "components/modals";
@@ -76,7 +76,10 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
         <EditContactModal
           open={true}
           id={contactToEdit}
-          onSuccess={() => setContactToEdit(null)}
+          onSuccess={(m: Model.Contact) => {
+            dispatch(globalActions.authenticated.updateContactInStateAction({ id: m.id, data: m }));
+            setContactToEdit(null);
+          }}
           onCancel={() => setContactToEdit(null)}
         />
       )}

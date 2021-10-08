@@ -27,7 +27,7 @@ export type AuthenticatedTemplateProps = Omit<AuthenticatedBudgetTableProps<R, M
 const AuthenticatedTemplateSubAccountsTable = (
   props: WithSubAccountsTableProps<AuthenticatedTemplateProps>
 ): JSX.Element => {
-  const table = tabling.hooks.useTableIfNotDefined<R>(props.table);
+  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
 
   return (
     <AuthenticatedBudgetTable<R, M>

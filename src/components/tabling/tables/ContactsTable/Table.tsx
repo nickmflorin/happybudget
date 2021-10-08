@@ -12,8 +12,8 @@ export type Props = Omit<AuthenticatedModelTableProps<R, M>, "columns"> & {
   readonly exportFileName: string;
 };
 
-const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Props, R>): JSX.Element => {
-  const table = tabling.hooks.useTableIfNotDefined<R>(props.table);
+const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Props, R, M>): JSX.Element => {
+  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
   return (
     <AuthenticatedModelTable<R, M>
       {...props}
@@ -38,13 +38,6 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
         framework.actions.ExportCSVAction<R, M>(table.current, params, exportFileName)
       ]}
       columns={Columns}
-      // columns={util.updateInArray<Table.Column<R, M>>(
-      //   Columns,
-      //   { field: "names_and_image" },
-      //   {
-      //     onCellDoubleClicked: (row: Table.BodyRow<R>) => tabling.typeguards.isModelRow(row) && props.onRowExpand?.(row)
-      //   }
-      // )}
     />
   );
 };

@@ -318,11 +318,11 @@ namespace Table {
     readonly getCSVData: (fields?: string[]) => CSVData;
   };
 
-  type TableInstance<R extends RowData = RowData> = DataGridInstance<R> & {
+  type TableInstance<R extends RowData = RowData, M extends Model.HttpModel = Model.HttpModel> = DataGridInstance<R> & {
     readonly getFocusedRow: () => BodyRow<R> | null;
     readonly getRow: (id: BodyRowId) => BodyRow<R> | null;
     readonly getRowsAboveAndIncludingFocusedRow: () => BodyRow<R>[];
-    readonly applyTableChange: (event: SingleOrArray<ChangeEvent<R>>) => void;
+    readonly applyTableChange: (event: SingleOrArray<ChangeEvent<R, M>>) => void;
     readonly applyGroupColorChange: (group: Model.Group) => void;
     readonly changeColumnVisibility: (changes: SingleOrArray<ColumnVisibilityChange<R>>, sizeToFit?: boolean) => void;
   };
@@ -420,6 +420,7 @@ namespace Table {
 
   type ChangeEventId =
     | "dataChange"
+    | "modelUpdated"
     | "rowAdd"
     | "rowDelete"
     | "rowRemoveFromGroup"
@@ -528,6 +529,13 @@ namespace Table {
     readonly payload: MarkupAddedPayload;
   };
 
+  type ModelUpdatedPayload<M extends Model.HttpModel = Model.HttpModel> = Redux.UpdateActionPayload<M, number>;
+  type ModelUpdatedEvent<M extends Model.HttpModel = Model.HttpModel> = {
+    readonly type: "modelUpdated";
+    // We need the full model to recreate the <ModelRow>.
+    readonly payload: M;
+  };
+
   type GroupUpdatedPayload = Redux.UpdateActionPayload<Model.Group, number>;
   type GroupUpdatedEvent = {
     readonly type: "groupUpdated";
@@ -540,7 +548,7 @@ namespace Table {
     readonly payload: MarkupUpdatedPayload;
   };
 
-  type ChangeEventTypeMap<R extends RowData> = {
+  type ChangeEventTypeMap<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
     dataChange: DataChangeEvent<R>;
     rowAdd: RowAddEvent<R>;
     rowDelete: RowDeleteEvent;
@@ -560,7 +568,7 @@ namespace Table {
 
   type GroupEvent = RowRemoveFromGroupEvent | RowAddToGroupEvent | GroupUpdatedEvent | GroupAddedEvent;
 
-  type ChangeEvent<R extends RowData> =
+  type TableChangeEvent<R extends RowData> =
     | DataChangeEvent<R>
     | RowAddEvent<R>
     | RowDeleteEvent
@@ -572,6 +580,10 @@ namespace Table {
     | RowAddToMarkupEvent
     | MarkupAddedEvent
     | MarkupUpdatedEvent;
+
+  type ChangeEvent<R extends RowData, M extends Model.HttpModel = Model.HttpModel> =
+    | TableChangeEvent<R>
+    | ModelUpdatedEvent<M>;
 
   type CellDoneEditingEvent = import("react").SyntheticEvent | KeyboardEvent;
 
@@ -631,7 +643,7 @@ namespace Table {
     readonly onClear?: (row: BodyRow<R>, column: Column<R, M>) => void;
     readonly showClear?: (row: BodyRow<R>, column: Column<R, M>) => boolean;
     readonly onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
-    readonly onChangeEvent?: (event: ChangeEvent<R>) => void;
+    readonly onChangeEvent?: (event: ChangeEvent<R, M>) => void;
   }
 
   type CellWithChildrenProps<

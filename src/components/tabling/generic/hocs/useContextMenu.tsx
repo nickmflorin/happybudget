@@ -4,7 +4,7 @@ import { map, isNil, includes, find, filter } from "lodash";
 
 import { tabling, hooks, util } from "lib";
 
-export type UseContextMenuParams<R extends Table.RowData> = {
+export type UseContextMenuParams<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {
   readonly apis: Table.GridApis | null;
   readonly data: Table.BodyRow<R>[];
   readonly getModelRowLabel?: Table.RowStringGetter<Table.ModelRow<R>>;
@@ -15,7 +15,7 @@ export type UseContextMenuParams<R extends Table.RowData> = {
   readonly getPlaceholderRowName?: Table.RowStringGetter<Table.PlaceholderRow<R>>;
   readonly getMarkupRowLabel?: Table.RowStringGetter<Table.MarkupRow<R>>;
   readonly getMarkupRowName?: Table.RowStringGetter<Table.MarkupRow<R>>;
-  readonly onChangeEvent: (event: Table.ChangeEvent<R>) => void;
+  readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
   readonly getGroupRowContextMenuItems?: (row: Table.GroupRow<R>, node: Table.RowNode) => Table.MenuItemDef[];
   readonly getModelRowContextMenuItems?: (row: Table.ModelRow<R>, node: Table.RowNode) => Table.MenuItemDef[];
   readonly getMarkupRowContextMenuItems?: (row: Table.MarkupRow<R>, node: Table.RowNode) => Table.MenuItemDef[];
@@ -30,8 +30,8 @@ const evaluateRowStringGetter = <R extends Table.BodyRow>(
 ): Table.RowNameLabelType | undefined => (typeof value === "function" ? value(row) : value);
 
 /* eslint-disable indent */
-const useContextMenu = <R extends Table.RowData>(
-  params: UseContextMenuParams<R>
+const useContextMenu = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  params: UseContextMenuParams<R, M>
 ): [(row: Table.BodyRow<R>, node: Table.RowNode) => Table.MenuItemDef[]] => {
   const getRowName = useMemo(
     () => (row: Table.BodyRow<R>) => {

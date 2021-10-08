@@ -47,29 +47,38 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
   ref: ForwardedRef<FormInstance<V>>
 ): JSX.Element => {
   const [form] = Form.useForm<V>({ isInModal: true, autoFocusField });
-  const cancelToken = api.useCancelToken();
+  const [cancelToken, cancel] = api.useCancel();
   const [instance, loading, error] = model.hooks.useModel(id, {
     request,
     onModelLoaded,
     conditional: () => open === true,
-    deps: [open]
+    deps: [open],
+    cancelToken
   });
 
   useEffect(() => {
-    form.setLoading(loading);
-  }, [loading]);
+    if (open === true) {
+      form.setLoading(loading);
+    }
+  }, [loading, open]);
 
   useEffect(() => {
-    if (!isNil(error)) {
+    if (!isNil(error) && open === true) {
       form.setGlobalError(error);
     }
-  }, [error]);
+  }, [error, open]);
 
   useEffect(() => {
-    if (!isNil(instance)) {
+    if (!isNil(instance) && open === true) {
       setFormData(instance, form);
     }
-  }, [instance]);
+  }, [instance, open]);
+
+  useEffect(() => {
+    if (open === false) {
+      cancel?.();
+    }
+  }, [open, cancel]);
 
   const title = useMemo(() => {
     if (typeof props.title === "function") {
@@ -81,6 +90,36 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
       return props.title;
     }
   }, [instance]);
+
+  const onOk = useMemo(
+    () => () => {
+      form
+        .validateFields()
+        .then((values: V) => {
+          const payload = !isNil(interceptPayload) ? interceptPayload(values) : values;
+          onUpdate?.(payload as P);
+          if (!isNil(update) && isNil(onUpdate)) {
+            form.setLoading(true);
+            update(id, payload as P, { cancelToken: cancelToken })
+              .then((response: R) => {
+                form.resetFields();
+                cancel?.();
+                onSuccess(response);
+              })
+              .catch((e: Error) => {
+                form.handleRequestError(e);
+              })
+              .finally(() => {
+                form.setLoading(false);
+              });
+          }
+        })
+        .catch(() => {
+          return;
+        });
+    },
+    [form, onUpdate, update, cancelToken, cancel, interceptPayload]
+  );
 
   useImperativeHandle(ref, () => ({
     ...form
@@ -96,31 +135,7 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
       getContainer={false}
       title={title}
       okButtonProps={{ disabled: form.loading || loading }}
-      onOk={() => {
-        form
-          .validateFields()
-          .then((values: V) => {
-            const payload = !isNil(interceptPayload) ? interceptPayload(values) : values;
-            onUpdate?.(payload as P);
-            if (!isNil(update) && isNil(onUpdate)) {
-              form.setLoading(true);
-              update(id, payload as P, { cancelToken: cancelToken() })
-                .then((response: R) => {
-                  form.resetFields();
-                  onSuccess(response);
-                })
-                .catch((e: Error) => {
-                  form.handleRequestError(e);
-                })
-                .finally(() => {
-                  form.setLoading(false);
-                });
-            }
-          })
-          .catch(() => {
-            return;
-          });
-      }}
+      onOk={onOk}
     >
       {children(instance, form)}
     </Modal>

@@ -76,9 +76,9 @@ export const updateCommunityTemplateInStateAction = createAction<Redux.UpdateAct
 export const addCommunityTemplateToStateAction = createAction<Model.SimpleTemplate>(ActionType.Community.AddToState);
 export const removeCommunityTemplateFromStateAction = createAction<number>(ActionType.Community.RemoveFromState);
 
-export const handleContactsTableChangeEventAction = createAction<Table.ChangeEvent<Tables.ContactRowData>>(
-  ActionType.Contacts.TableChanged
-);
+export const handleContactsTableChangeEventAction = createAction<
+  Table.ChangeEvent<Tables.ContactRowData, Model.Contact>
+>(ActionType.Contacts.TableChanged);
 export const savingContactsTableAction = createAction<boolean>(ActionType.Contacts.Saving);
 export const setContactsSearchAction = createAction<string>(ActionType.Contacts.SetSearch);
 export const requestContactsAction = createAction<Redux.TableRequestPayload>(ActionType.Contacts.Request);

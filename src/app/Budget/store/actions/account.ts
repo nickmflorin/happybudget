@@ -9,7 +9,7 @@ export const requestAccountAction = createAction<null>(ActionType.Account.Reques
 export const loadingAccountAction = createAction<boolean>(ActionType.Account.Loading);
 export const responseAccountAction = createAction<Model.Account | null>(ActionType.Account.Response);
 
-export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.SubAccountRowData>>(
+export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.SubAccountRowData, Model.SubAccount>>(
   ActionType.Account.SubAccounts.TableChanged
 );
 export const savingTableAction = createAction<boolean>(ActionType.Account.SubAccounts.Saving);

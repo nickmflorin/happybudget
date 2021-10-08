@@ -53,7 +53,7 @@ export const createAuthenticatedTableSaga = <
     // delete the same row twice.
     const changeChannel = yield actionChannel(config.actions.tableChanged.toString());
     while (true) {
-      const action: Redux.Action<Table.ChangeEvent<R>> = yield take(changeChannel);
+      const action: Redux.Action<Table.ChangeEvent<R, M>> = yield take(changeChannel);
       // Blocking call so that table changes happen sequentially.
       yield call(config.tasks.handleChangeEvent, action);
     }

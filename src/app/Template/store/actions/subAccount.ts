@@ -9,7 +9,7 @@ export const requestSubAccountAction = createAction<null>(ActionType.SubAccount.
 export const loadingSubAccountAction = createAction<boolean>(ActionType.SubAccount.Loading);
 export const requestAction = createAction<Redux.TableRequestPayload>(ActionType.SubAccount.SubAccounts.Request);
 export const responseSubAccountAction = createAction<Model.SubAccount | null>(ActionType.SubAccount.Response);
-export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.SubAccountRowData>>(
+export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.SubAccountRowData, Model.SubAccount>>(
   ActionType.SubAccount.SubAccounts.TableChanged
 );
 export const savingTableAction = createAction<boolean>(ActionType.SubAccount.SubAccounts.Saving);

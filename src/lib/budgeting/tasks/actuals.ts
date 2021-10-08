@@ -143,7 +143,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
 
   function* bulkUpdateTask(
     budgetId: number,
-    e: Table.ChangeEvent<R>,
+    e: Table.ChangeEvent<R, M>,
     requestPayload: Http.BulkUpdatePayload<P>,
     errorMessage: string
   ): SagaIterator {

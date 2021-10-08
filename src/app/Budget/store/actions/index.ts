@@ -23,7 +23,7 @@ export const loadingFringesAction = createAction<boolean>(ActionType.Fringes.Loa
 export const requestFringesAction = createAction<Redux.TableRequestPayload>(ActionType.Fringes.Request);
 export const clearFringesAction = createAction<null>(ActionType.Fringes.Clear);
 export const responseFringesAction = createAction<Http.TableResponse<Model.Fringe>>(ActionType.Fringes.Response);
-export const handleFringesTableChangeEventAction = createAction<Table.ChangeEvent<Tables.FringeRowData>>(
+export const handleFringesTableChangeEventAction = createAction<Table.ChangeEvent<Tables.FringeRowData, Model.Fringe>>(
   ActionType.Fringes.TableChanged
 );
 export const savingFringesTableAction = createAction<boolean>(ActionType.Fringes.Saving);

@@ -18,7 +18,7 @@ export type AuthenticatedBudgetProps = AccountsTableProps &
   };
 
 const AuthenticatedBudgetAccountsTable = (props: AuthenticatedBudgetProps): JSX.Element => {
-  const table = tabling.hooks.useTableIfNotDefined<R>(props.table);
+  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
 
   return (
     <AuthenticatedBudgetTable<R, M>

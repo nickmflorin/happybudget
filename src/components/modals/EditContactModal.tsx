@@ -1,9 +1,7 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useDispatch } from "react-redux";
+import React, { useState, useRef, useMemo } from "react";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { actions } from "store";
 
 import { ContactForm } from "components/forms";
 
@@ -17,7 +15,6 @@ const MemoizedContactForm = React.memo(ContactForm);
 
 const EditContactModal = (props: EditContactModalProps): JSX.Element => {
   const [image, setImage] = useState<UploadedImage | null | undefined>(undefined);
-  const dispatch: Redux.Dispatch = useDispatch();
   /*
   Note: We have to use a ref here, instead of storing firstName and lastName in the state
   of this component, because if we were storing it in this component, when the firstName and
@@ -25,14 +22,6 @@ const EditContactModal = (props: EditContactModalProps): JSX.Element => {
   when the form rerenders, which causes the auto focus to be lost on the first and last name fields.
   */
   const headerRef = useRef<IContactModalHeaderRef | null>(null);
-
-  useEffect(() => {
-    return () => {
-      headerRef.current?.setFirstName(null);
-      headerRef.current?.setLastName(null);
-      setImage(null);
-    };
-  }, []);
 
   const onValuesChange = useMemo(
     () => (changedValues: Partial<Http.ContactPayload>, values: Http.ContactPayload) => {
@@ -69,10 +58,6 @@ const EditContactModal = (props: EditContactModalProps): JSX.Element => {
           return { ...p, image: !isNil(image) ? image.data : null };
         }
         return p;
-      }}
-      onSuccess={(m: Model.Contact) => {
-        dispatch(actions.authenticated.updateContactInStateAction({ id: m.id, data: m }));
-        props.onSuccess?.(m);
       }}
       setFormData={(contact: Model.Contact, form: FormInstance<Http.ContactPayload>) =>
         form.setFields([

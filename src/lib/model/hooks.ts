@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { isNil } from "lodash";
+import { CancelToken } from "axios";
 
 import * as api from "api";
 
@@ -7,35 +8,41 @@ type ModelHookOptions<M extends Model.Model> = {
   readonly onModelLoaded?: (m: M) => void;
   readonly conditional?: () => boolean;
   readonly deps?: any[];
+  readonly cancelToken?: CancelToken | null;
 };
 
 export const useModel = <M extends Model.Model>(
   id: number,
   options: ModelHookOptions<M> & {
-    readonly request: (i: number) => Promise<M>;
+    readonly request: (i: number, opts?: Http.RequestOptions) => Promise<M>;
   }
 ): [M | null, boolean, Error | null] => {
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
   const [model, setModel] = useState<M | null>(null);
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  const [cancelToken, cancel] = api.useCancel();
 
   useEffect(() => {
-    if (isNil(options?.conditional) || options?.conditional() === true) {
-      setLoading(true);
-      options
-        .request(id)
-        .then((response: M) => {
-          setModel(response);
-          options?.onModelLoaded?.(response);
-        })
-        .catch((e: Error) => {
-          setError(e);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+    const token = options.cancelToken || cancelToken;
+    if (!isNil(token)) {
+      if (isNil(options?.conditional) || options?.conditional() === true) {
+        setLoading(true);
+        options
+          .request(id, { cancelToken: token })
+          .then((response: M) => {
+            setModel(response);
+            options?.onModelLoaded?.(response);
+          })
+          .catch((e: Error) => {
+            setError(e);
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      }
     }
-  }, options?.deps || []);
+  }, [...(options?.deps || []), cancelToken, options.cancelToken]);
 
   return [model, loading, error];
 };

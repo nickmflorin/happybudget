@@ -8,7 +8,7 @@ export const restoreOwnerTreeSearchCacheAction = createAction<null>(ActionType.O
 export const setOwnerTreeSearchAction = createAction<string>(ActionType.OwnerTree.SetSearch);
 export const loadingOwnerTreeAction = createAction<boolean>(ActionType.OwnerTree.Loading);
 
-export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.ActualRowData>>(
+export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.ActualRowData, Model.Actual>>(
   ActionType.Actuals.TableChanged
 );
 export const savingTableAction = createAction<boolean>(ActionType.Actuals.Saving);

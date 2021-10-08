@@ -41,7 +41,7 @@ export type AuthenticatedAccountsTableServiceSet<B extends Model.Template | Mode
 
 export type AuthenticatedAccountsTableActionMap<B extends Model.Template | Model.Budget> =
   Redux.AuthenticatedTableActionMap<R, C> & {
-    readonly tableChanged: Table.ChangeEvent<R>;
+    readonly tableChanged: Table.ChangeEvent<R, C>;
     readonly loadingBudget: boolean;
     readonly updateBudgetInState: Redux.UpdateActionPayload<B>;
   };

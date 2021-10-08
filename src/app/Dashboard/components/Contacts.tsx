@@ -35,12 +35,14 @@ const ConnectedContactsTable = connectTableToStore<ContactsTable.Props, R, M, Ta
 })(ContactsTable.Table);
 
 const Contacts = (): JSX.Element => {
+  const table = tabling.hooks.useTable<R, M>();
   const [contactToEdit, setContactToEdit] = useState<number | undefined>(undefined);
   const [newContactModalOpen, setNewContactModalOpen] = useState(false);
 
   return (
     <Page className={"contacts"} title={"My Contacts"}>
       <ConnectedContactsTable
+        table={table}
         tableId={"contacts-table"}
         onRowExpand={(row: Table.ModelRow<R>) => setContactToEdit(row.id)}
         exportFileName={"contacts"}
@@ -54,7 +56,13 @@ const Contacts = (): JSX.Element => {
         <EditContactModal
           id={contactToEdit}
           onCancel={() => setContactToEdit(undefined)}
-          onSuccess={() => setContactToEdit(undefined)}
+          onSuccess={(m: Model.Contact) => {
+            setContactToEdit(undefined);
+            table.current.applyTableChange({
+              type: "modelUpdated",
+              payload: m
+            });
+          }}
           open={true}
         />
       )}

@@ -253,16 +253,16 @@ export const createTableChangeEventReducer = <
   config: Table.ReducerConfig<R, M, S, A> & {
     readonly recalculateRow?: (
       state: S,
-      action: Redux.Action<Table.ChangeEvent<R>>,
+      action: Redux.Action<Table.ChangeEvent<R, M>>,
       row: Table.DataRow<R>
     ) => Partial<R>;
   },
   options?: Pick<Redux.FindModelOptions, "name">
-): Redux.Reducer<S, Redux.Action<Table.ChangeEvent<R>>> => {
-  return (state: S = config.initialState, action: Redux.Action<Table.ChangeEvent<R>>): S => {
+): Redux.Reducer<S, Redux.Action<Table.ChangeEvent<R, M>>> => {
+  return (state: S = config.initialState, action: Redux.Action<Table.ChangeEvent<R, M>>): S => {
     let newState: S = { ...state };
 
-    const e: Table.ChangeEvent<R> = action.payload;
+    const e: Table.ChangeEvent<R, M> = action.payload;
 
     if (typeguards.isDataChangeEvent<R>(e)) {
       const consolidated = events.consolidateRowChanges(e.payload);
@@ -348,6 +348,26 @@ export const createTableChangeEventReducer = <
         },
         newState
       );
+    } else if (typeguards.isModelUpdatedEvent(e)) {
+      const modelRow: Table.ModelRow<R> | null = redux.reducers.modelFromState<Table.ModelRow<R>>(
+        action,
+        filter(newState.data, (ri: Table.BodyRow<R>) => typeguards.isModelRow(ri)) as Table.ModelRow<R>[],
+        e.payload.id
+      );
+      if (!isNil(modelRow)) {
+        newState = {
+          ...newState,
+          data: util.replaceInArray<Table.BodyRow<R>>(
+            newState.data,
+            { id: modelRow.id },
+            tabling.rows.createModelRow<R, M>({
+              model: e.payload,
+              columns: config.columns,
+              getRowChildren: config.getModelRowChildren
+            })
+          )
+        };
+      }
     } else if (typeguards.isRowAddEvent(e)) {
       const payload: Table.RowAdd<R>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
       newState = {

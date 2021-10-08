@@ -146,7 +146,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
 
   function* bulkUpdateTask(
     objId: number,
-    e: Table.ChangeEvent<R>,
+    e: Table.ChangeEvent<R, M>,
     requestPayload: Http.BulkUpdatePayload<P>,
     errorMessage: string
   ): SagaIterator {

@@ -101,7 +101,6 @@ const Columns: Table.Column<R, M>[] = [
   framework.columnObjs.BodyColumn<R, M>({
     field: "rate",
     headerName: "Rate",
-    tableColumnType: "body",
     width: 100,
     valueFormatter: tabling.formatters.currencyValueFormatter,
     valueSetter: tabling.valueSetters.floatValueSetter<R>("rate"),

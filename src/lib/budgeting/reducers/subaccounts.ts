@@ -77,7 +77,7 @@ export type AuthenticatedSubAccountTableActionMap = Redux.AuthenticatedTableActi
 export const createAuthenticatedSubAccountsTableReducer = (
   config: BudgetTableReducerConfig<R, M, S, AuthenticatedSubAccountTableActionMap> & {
     readonly fringes: Redux.Reducer<Tables.FringeTableStore>;
-    readonly fringesTableChangedAction: PayloadActionCreator<Table.ChangeEvent<Tables.FringeRowData>>;
+    readonly fringesTableChangedAction: PayloadActionCreator<Table.ChangeEvent<Tables.FringeRowData, Model.Fringe>>;
   }
 ): Redux.Reducer<S> => {
   const generic = createAuthenticatedBudgetTableReducer<R, M, S>({
@@ -98,7 +98,7 @@ export const createAuthenticatedSubAccountsTableReducer = (
       changed we need to recalculate the SubAcccount(s) that have that Fringe so they display
       estimated values that are consistent with the change to the Fringe.
       */
-      const e: Table.ChangeEvent<Tables.FringeRowData> = action.payload;
+      const e: Table.ChangeEvent<Tables.FringeRowData, Model.Fringe> = action.payload;
 
       // There are no group related events for the Fringe Table, but we have to assert this with
       // a typeguard to make TS happy.

@@ -32,7 +32,7 @@ export type AuthenticatedTableProps<
     AuthenticateDataGridProps<R, M>,
     "onChangeEvent" | "columns" | "data" | "apis" | "onRowSelectionChanged" | "rowHasCheckboxSelection" | "grid"
   > & {
-    readonly table?: NonNullRef<Table.TableInstance<R>>;
+    readonly table?: NonNullRef<Table.TableInstance<R, M>>;
     readonly actions?: Table.AuthenticatedMenuActions<R, M>;
     readonly excludeColumns?:
       | SingleOrArray<keyof R | string | ((col: Table.Column<R, M>) => boolean)>
@@ -72,7 +72,7 @@ const AuthenticatedTable = <
 >(
   props: WithAuthenticatedDataGridProps<
     R,
-    WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<R, M>, R>, R, S>
+    WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<R, M>, R>, R, M, S>
   >
 ): JSX.Element => {
   const grid = tabling.hooks.useDataGrid();
@@ -128,7 +128,7 @@ const AuthenticatedTable = <
    * but then inspect whether or not the column associated with any of the fields
    * that were changed warrant refreshing another column.
    */
-  const _onChangeEvent = (event: Table.ChangeEvent<R>) => {
+  const _onChangeEvent = (event: Table.ChangeEvent<R, M>) => {
     const apis: Table.GridApis | null = props.tableApis.get("data");
 
     // TODO: We might have to also apply similiar logic for when a row is added?
@@ -224,8 +224,8 @@ const AuthenticatedTable = <
   useImperativeHandle(props.table, () => ({
     ...grid.current,
     changeColumnVisibility: props.changeColumnVisibility,
-    applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R>>) =>
-      Array.isArray(event) ? map(event, (e: Table.ChangeEvent<R>) => _onChangeEvent(e)) : _onChangeEvent(event),
+    applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R, M>>) =>
+      Array.isArray(event) ? map(event, (e: Table.ChangeEvent<R, M>) => _onChangeEvent(e)) : _onChangeEvent(event),
     getRowsAboveAndIncludingFocusedRow: () => {
       const apis = props.tableApis.get("data");
       if (!isNil(apis)) {

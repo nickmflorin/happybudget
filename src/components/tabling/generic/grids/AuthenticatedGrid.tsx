@@ -12,7 +12,7 @@ export interface AuthenticatedGridProps<R extends Table.RowData, M extends Model
   readonly apis: Table.GridApis | null;
   readonly framework?: Table.Framework;
   readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
-  readonly onChangeEvent: (event: Table.ChangeEvent<R>) => void;
+  readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
   readonly onRowSelectionChanged?: (rows: Table.EditableRow<R>[]) => void;
 }
 

@@ -26,7 +26,7 @@ export type UnauthenticatedTableProps<
   R extends Table.RowData,
   M extends Model.TypedHttpModel = Model.TypedHttpModel
 > = TableConfigurationProps<R, M> & {
-  readonly table?: NonNullRef<Table.TableInstance<R>>;
+  readonly table?: NonNullRef<Table.TableInstance<R, M>>;
   readonly actions?: Table.UnauthenticatedMenuActions<R, M>;
   readonly excludeColumns?:
     | SingleOrArray<keyof R | string | ((col: Table.Column<R, M>) => boolean)>
@@ -107,7 +107,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.TypedHttp
   useImperativeHandle(props.table, () => ({
     ...grid.current,
     changeColumnVisibility: props.changeColumnVisibility,
-    applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R>>) => {},
+    applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R, M>>) => {},
     getRowsAboveAndIncludingFocusedRow: () => {
       const apis = props.tableApis.get("data");
       if (!isNil(apis)) {

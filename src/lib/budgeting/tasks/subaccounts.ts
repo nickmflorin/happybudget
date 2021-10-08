@@ -64,7 +64,7 @@ export type AuthenticatedSubAccountsTableActionMap<
 > = Redux.AuthenticatedTableActionMap<R, C> & {
   readonly updateModelsInState?: SingleOrArray<C>;
   readonly loadingBudget: boolean;
-  readonly tableChanged: Table.ChangeEvent<R>;
+  readonly tableChanged: Table.ChangeEvent<R, M>;
   readonly updateBudgetInState: Redux.UpdateActionPayload<B>;
   readonly updateParentInState: Redux.UpdateActionPayload<M>;
   readonly responseSubAccountUnits: Http.ListResponse<Model.Tag>;

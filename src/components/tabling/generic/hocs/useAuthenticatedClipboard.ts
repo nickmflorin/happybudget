@@ -20,7 +20,7 @@ type UseAuthenticatedClipboardParams<R extends Table.RowData, M extends Model.Ht
   "setCellCutChange"
 > & {
   readonly apis: Table.GridApis | null;
-  readonly onChangeEvent: (event: Table.ChangeEvent<R>) => void;
+  readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
 };
 
 const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.HttpModel>(
