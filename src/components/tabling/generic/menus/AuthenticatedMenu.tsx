@@ -35,6 +35,7 @@ type InternalAuthenticatedMenuProps<
   readonly hiddenColumns: (keyof R | string)[];
   readonly selectedRows: Table.EditableRow<R>[];
   readonly rowHasCheckboxSelection?: (row: Table.EditableRow<R>) => boolean;
+  readonly hasExpandColumn: boolean;
 };
 
 /* eslint-disable indent */
@@ -42,7 +43,13 @@ const AuthenticatedMenu = <R extends Table.RowData, M extends Model.HttpModel = 
   props: Omit<InternalAuthenticatedMenuProps<R, M>, "menuPortalId"> & { readonly detached: boolean }
 ) => (
   /* eslint-disable indent */
-  <div className={classNames("table-action-menu", { detached: props.detached })}>
+  <div
+    className={classNames(
+      "table-action-menu",
+      { detached: props.detached },
+      { "has-expand-column": props.hasExpandColumn }
+    )}
+  >
     <Portal id={props.savingChangesPortalId}>
       <SavingChanges saving={props.saving} />
     </Portal>

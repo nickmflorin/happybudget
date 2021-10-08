@@ -4,12 +4,16 @@
   display: flex;
   // This will align the checkbox in the header with the checkboxes in the
   // rows vertically.
-  padding-left: 4px;
+  padding-left: 12px;
   height: 30px;
 
   &.detached {
     margin-bottom: 10px;
     padding-left: 12px;
+  }
+
+  &.has-expand-column {
+    padding-left: 4px;
   }
 
   .ant-checkbox-wrapper {

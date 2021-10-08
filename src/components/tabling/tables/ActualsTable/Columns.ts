@@ -12,7 +12,6 @@ const Columns: Table.Column<R, M>[] = [
     field: "owner",
     headerName: "Sub-Account",
     minWidth: 200,
-    maxWidth: 200,
     width: 200,
     getHttpValue: (
       value: Model.SimpleSubAccount | Model.SimpleMarkup | null

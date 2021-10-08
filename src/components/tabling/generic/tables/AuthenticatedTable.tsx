@@ -316,6 +316,7 @@ const AuthenticatedTable = <
           apis={props.tableApis.get("data")}
           actions={actions}
           selectedRows={selectedRows}
+          hasExpandColumn={props.hasExpandColumn}
         />
         {props.children({
           ...props,
