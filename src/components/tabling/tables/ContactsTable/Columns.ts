@@ -60,14 +60,6 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
       return null;
     }
   }),
-  framework.columnObjs.ChoiceSelectColumn<R, M, Model.ContactType>({
-    field: "contact_type",
-    headerName: "Type",
-    defaultHidden: true,
-    cellRenderer: { data: "ContactTypeCell" },
-    cellEditor: "ContactTypeEditor",
-    models: model.models.ContactTypes
-  }),
   framework.columnObjs.BodyColumn<R, M>({
     field: "company",
     headerName: "Company",
@@ -90,6 +82,21 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     columnType: "email",
     cellRenderer: { data: "EmailCell" },
     valueSetter: tabling.valueSetters.emailValueSetter<R>("email")
+  }),
+  framework.columnObjs.BodyColumn<R, M>({
+    field: "rate",
+    headerName: "Rate",
+    columnType: "currency",
+    valueFormatter: tabling.formatters.currencyValueFormatter,
+    valueSetter: tabling.valueSetters.floatValueSetter<R>("rate")
+  }),
+  framework.columnObjs.ChoiceSelectColumn<R, M, Model.ContactType>({
+    field: "contact_type",
+    headerName: "Type",
+    defaultHidden: true,
+    cellRenderer: { data: "ContactTypeCell" },
+    cellEditor: "ContactTypeEditor",
+    models: model.models.ContactTypes
   })
 ];
 
