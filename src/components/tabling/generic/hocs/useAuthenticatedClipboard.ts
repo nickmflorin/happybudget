@@ -113,7 +113,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.Http
                 !isNil(c.field)
                   ? {
                       ...curr,
-                      [c.field]: { column: c, value: array[index] }
+                      [c.field]: array[index]
                     }
                   : curr,
               {}

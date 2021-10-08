@@ -18,7 +18,7 @@ import {
 } from "../actions";
 
 function* getAccount(action: Redux.Action<null>): SagaIterator {
-  const accountId = yield select((state: Application.Authenticated.Store) => state.budget.account.id);
+  const accountId = yield select((state: Application.Authenticated.Store) => state.template.account.id);
   if (!isNil(accountId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -40,6 +40,7 @@ function* getAccount(action: Redux.Action<null>): SagaIterator {
 }
 
 const ActionMap = {
+  request: actions.requestAction,
   updateParentInState: actions.updateInStateAction,
   tableChanged: actions.handleTableChangeEventAction,
   loading: actions.loadingAction,
@@ -90,5 +91,6 @@ function* getData(action: Redux.Action<any>): SagaIterator {
 export default function* rootSaga(): SagaIterator {
   yield takeLatest(actions.requestAccountAction.toString(), getAccount);
   yield takeLatest(actions.setAccountIdAction.toString(), getData);
+  yield takeLatest(actions.requestAction.toString(), getData);
   yield spawn(tableSaga);
 }

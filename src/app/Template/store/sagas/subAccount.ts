@@ -18,7 +18,7 @@ import {
 } from "../actions";
 
 function* getSubAccount(action: Redux.Action<null>): SagaIterator {
-  const subaccountId = yield select((state: Application.Authenticated.Store) => state.budget.subaccount.id);
+  const subaccountId = yield select((state: Application.Authenticated.Store) => state.template.subaccount.id);
   if (!isNil(subaccountId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();

@@ -12,11 +12,11 @@ interface TemplateFormProps extends FormProps<Http.TemplatePayload> {
 
 const TemplateForm: React.FC<TemplateFormProps> = ({ originalImage, onImageChange, ...props }) => {
   return (
-    <Form.Form className={"template-form"} {...props}>
+    <Form.Form className={"template-form"} layout={"vertical"} {...props}>
       <Form.Item name={"name"} rules={[{ required: true, message: "Please provide a valid name for the template." }]}>
         <Input placeholder={"Name"} />
       </Form.Item>
-      <Form.Item label={"Avatar"}>
+      <Form.Item label={"Avatar"} rules={[{ required: false }]}>
         <UploadBudgetImage
           value={originalImage}
           onChange={(f: UploadedImage | null) => onImageChange?.(f)}

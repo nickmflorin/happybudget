@@ -200,9 +200,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
           config.services.bulkCreate,
           objId,
           requestPayload,
-          {
-            cancelToken: source.token
-          }
+          { cancelToken: source.token }
         );
         yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
         yield put(config.actions.updateParentInState({ id: response.data.id, data: response.data }));
@@ -243,9 +241,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
           config.services.bulkUpdate,
           objId,
           requestPayload,
-          {
-            cancelToken: source.token
-          }
+          { cancelToken: source.token }
         );
         yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
         yield put(config.actions.updateParentInState({ id: response.data.id, data: response.data }));

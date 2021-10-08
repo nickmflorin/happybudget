@@ -22,7 +22,8 @@ const AuthenticatedTemplateAccountsTable = (props: AuthenticatedTemplateProps): 
   return (
     <AuthenticatedBudgetTable<R, M>
       {...props}
-      excludeColumns={["actual", (col: Table.Column<R, M>) => col.headerName === "Variance"]}
+      table={table}
+      excludeColumns={["actual", "variance"]}
       actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
         {
           icon: "folder",

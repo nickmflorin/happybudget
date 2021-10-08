@@ -98,12 +98,11 @@ const AuthenticatedTable = <
           intersection(Array.isArray(props.excludeColumns) ? props.excludeColumns : [props.excludeColumns], [
             c.field,
             c.colId
-          ]).length === 0
+          ]).length !== 0
         );
       }
       return false;
     };
-
     return map(
       filter(props.columns, (c: Table.Column<R, M>) => !evaluateColumnExclusionProp(c)),
       (c: Table.Column<R, M>) => ({

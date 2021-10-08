@@ -3,15 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { isNil } from "lodash";
 
-import { redux, budgeting } from "lib";
+import { budgeting } from "lib";
 
 import { AccountPage } from "app/Pages";
 import { actions } from "../../store";
 import SubAccountsTable from "./SubAccountsTable";
 
-const selectDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.template.account.detail.data
-);
+const selectDetail = (state: Application.Authenticated.Store) => state.template.account.detail.data;
 
 interface AccountProps {
   readonly templateId: number;
