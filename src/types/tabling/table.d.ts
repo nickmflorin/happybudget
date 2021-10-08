@@ -155,7 +155,6 @@ namespace Table {
     readonly id: ColumnTypeId;
     readonly style?: React.CSSProperties;
     readonly icon?: IconOrElement;
-    readonly editorIsPopup?: boolean;
     readonly pdfOverrides?: Omit<Partial<ColumnType>, "id" | "editorIsPopup">;
     readonly headerOverrides?: Omit<Partial<ColumnType>, "id" | "editorIsPopup" | "icon" | "pdfOverrides">;
   }
@@ -288,6 +287,7 @@ namespace Table {
     readonly canBeHidden?: boolean;
     readonly canBeExported?: boolean;
     readonly requiresAuthentication?: boolean;
+    readonly editorIsPopup?: boolean;
     readonly onDataChange?: (id: Table.ModelRowId, event: CellChange<R>) => void;
     readonly getCSVValue?: (row: BodyRow<R>) => string;
     readonly colSpan?: (params: ColSpanParams<R, M>) => number;

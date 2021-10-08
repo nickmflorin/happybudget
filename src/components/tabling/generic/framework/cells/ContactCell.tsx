@@ -27,6 +27,8 @@ const ContactCell = <
   const contacts = useContacts();
   const model = useMemo(() => (!isNil(value) ? find(contacts, { id: value } as any) || null : null), [value, contacts]);
 
+  // TODO: This is a very, very render intensive piece of logic.  We should figure out if there
+  // is a better way to do this that doesn't involve getting the focused cell on every render.
   let isFocused = false;
   const focusedCell = props.api.getFocusedCell();
   if (!isNil(focusedCell)) {

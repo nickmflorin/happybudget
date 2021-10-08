@@ -14,8 +14,7 @@ const ColumnTypes: Table.ColumnType[] = [
     id: "singleSelect",
     icon: "caret-circle-down",
     style: { textAlign: "left" },
-    headerOverrides: { style: { textAlign: "center" } },
-    editorIsPopup: true
+    headerOverrides: { style: { textAlign: "center" } }
   },
   {
     id: "contact",

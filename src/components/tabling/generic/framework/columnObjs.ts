@@ -112,6 +112,7 @@ export const SelectColumn = <R extends Table.RowData, M extends Model.HttpModel 
     columnType: "singleSelect",
     suppressSizeToFit: true,
     ...props,
+    editorIsPopup: true,
     cellClass: tabling.aggrid.mergeClassNamesFn("cell--renders-html", props.cellClass),
     // Required to allow the dropdown to be selectable on Enter key.
     suppressKeyboardEvent: !isNil(props.suppressKeyboardEvent)
@@ -125,21 +126,22 @@ export const SelectColumn = <R extends Table.RowData, M extends Model.HttpModel 
   });
 };
 
-export interface UnauthenticatedModelSelectColumnProps<
+export interface ModelSelectColumnProps<
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
   C extends Model.HttpModel = Model.HttpModel
 > extends SetOptional<SelectColumnProps<R, M, C>, "processCellForClipboard"> {
   readonly models: C[];
   readonly modelClipboardValue: (m: C) => string;
+  readonly processCellFromClipboard: (value: string) => C | null;
 }
 
-export const UnauthenticatedModelSelectColumn = <
+export const ModelSelectColumn = <
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,
   C extends Model.HttpModel = Model.HttpModel
 >(
-  props: UnauthenticatedModelSelectColumnProps<R, M, C>
+  props: ModelSelectColumnProps<R, M, C>
 ): Table.Column<R, M> => {
   const { models, modelClipboardValue, ...column } = props;
   return SelectColumn<R, M, C>({
@@ -159,24 +161,6 @@ export const UnauthenticatedModelSelectColumn = <
       }),
     ...column
   });
-};
-
-export interface ModelSelectColumnProps<
-  R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  C extends Model.HttpModel = Model.HttpModel
-> extends UnauthenticatedModelSelectColumnProps<R, M, C> {
-  readonly processCellFromClipboard: (value: string) => C | null;
-}
-
-export const ModelSelectColumn = <
-  R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  C extends Model.HttpModel = Model.HttpModel
->(
-  props: ModelSelectColumnProps<R, M, C>
-): Table.Column<R, M> => {
-  return UnauthenticatedModelSelectColumn(props);
 };
 
 export interface TagSelectColumnProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>

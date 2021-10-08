@@ -160,12 +160,13 @@ const authenticateDataGrid =
                   return true;
                 } else if (params.editing && includes(["Tab"], params.event.code)) {
                   /*
-                Our custom cell editors have built in functionality that when editing is terminated via
-                a TAB key, we move one cell to the right without continuing in edit mode.  This however
-                does not work for the bland text cells, where we do not have cell editors controlling the
-                edit behavior.  So we need to suppress the TAB behavior when editing, and manually move
-                the cell over.
-                */
+                  Our custom cell editors have built in functionality that when editing is terminated via
+                  a TAB key, we move one cell to the right without continuing in edit mode.  This however
+                  does not work for the bland text cells, where we do not have cell editors controlling the
+                  edit behavior.  So we need to suppress the TAB behavior when editing, and manually move
+                  the cell over.
+                  */
+
                   return true;
                 } else if (!params.editing && includes(["Backspace", "Delete"], params.event.code)) {
                   const clearCellsOverRange = (range: CellRange | CellRange[], api: GridApi) => {
@@ -193,15 +194,10 @@ const authenticateDataGrid =
                     */
                     const column = params.column;
                     const row: Table.BodyRow<R> = params.node.data;
-                    const customCol = find(props.columns, (def: Table.Column<R, M>) => def.field === column.getColId());
-                    if (!isNil(customCol) && tabling.typeguards.isEditableRow(row)) {
-                      const columnType: Table.ColumnType | undefined = find(tabling.models.ColumnTypes, {
-                        id: customCol.columnType
-                      });
-                      if (!isNil(columnType) && columnType.editorIsPopup === true) {
-                        clearCell(row, customCol);
-                        return true;
-                      }
+                    const c: Table.Column<R, M> | null = getColumn(column.getColId());
+                    if (!isNil(c) && tabling.typeguards.isEditableRow(row) && c.editorIsPopup === true) {
+                      clearCell(row, c);
+                      return true;
                     }
                     return false;
                   }
