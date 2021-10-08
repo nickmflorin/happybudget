@@ -146,12 +146,16 @@ export const UnauthenticatedModelSelectColumn = <
     processCellForClipboard:
       column.processCellForClipboard ??
       ((row: R) => {
-        const id = util.getKeyValue<R, keyof R>(props.field as keyof R)(row);
-        if (isNil(id)) {
-          return "";
+        const field = props.field || (props.colId as keyof R);
+        if (!isNil(field)) {
+          const id = util.getKeyValue<R, keyof R>(field)(row);
+          if (isNil(id)) {
+            return "";
+          }
+          const m: C | undefined = find(models, { id } as any);
+          return !isNil(m) ? modelClipboardValue(m) : "";
         }
-        const m: C | undefined = find(models, { id } as any);
-        return !isNil(m) ? modelClipboardValue(m) : "";
+        return "";
       }),
     ...column
   });
@@ -187,11 +191,12 @@ export const TagSelectColumn = <R extends Table.RowData, M extends Model.HttpMod
   const { models, ...column } = props;
   return SelectColumn({
     processCellForClipboard: (row: R) => {
-      const m: Model.Tag | undefined = util.getKeyValue<R, keyof R>(props.field as keyof R)(row) as any;
-      if (isNil(m)) {
-        return "";
+      const field = props.field || (props.colId as keyof R);
+      if (!isNil(field)) {
+        const m: Model.Tag | undefined = util.getKeyValue<R, keyof R>(field)(row) as any;
+        return m?.title || "";
       }
-      return m.title;
+      return "";
     },
     getHttpValue: (value: Model.Tag | null): ID | null => (!isNil(value) ? value.id : null),
     processCellFromClipboard: (name: string): Model.Tag | null =>
@@ -221,11 +226,12 @@ export const ChoiceSelectColumn = <
   return SelectColumn({
     getHttpValue: (value: C | null): ID | null => (!isNil(value) ? value.id : null),
     processCellForClipboard: (row: R) => {
-      const m: C | undefined = util.getKeyValue<R, keyof R>(props.field as keyof R)(row) as any;
-      if (isNil(m)) {
-        return "";
+      const field = props.field || (props.colId as keyof R);
+      if (!isNil(field)) {
+        const m: C | undefined = util.getKeyValue<R, keyof R>(field)(row) as any;
+        return m?.name || "";
       }
-      return m.name;
+      return "";
     },
     processCellFromClipboard: (name: string) => model.util.findChoiceForName<C>(models, name),
     ...column

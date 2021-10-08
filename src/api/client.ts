@@ -30,16 +30,22 @@ export const instance = axios.create({
   withCredentials: true
 });
 
-instance.interceptors.request.use((config: AxiosRequestConfig): AxiosRequestConfig => {
-  config = config || {};
+export const getRequestHeaders = (): { [key: string]: string } => {
+  const headers: { [key: string]: string } = {};
   const cookies = new Cookies();
   // The CSRF Token needs to be set as a header for POST/PATCH/PUT requests
   // with Django - unfortunately, we cannot include it as a cookie only
   // because their middleware looks for it in the headers.
   const csrfToken: string = cookies.get("greenbudgetcsrftoken");
   if (!isNil(csrfToken)) {
-    config.headers["X-CSRFToken"] = csrfToken;
+    headers["X-CSRFToken"] = csrfToken;
   }
+  return headers;
+};
+
+instance.interceptors.request.use((config: AxiosRequestConfig): AxiosRequestConfig => {
+  config = config || {};
+  config.headers = { ...config.headers, ...getRequestHeaders() };
   return config;
 });
 
