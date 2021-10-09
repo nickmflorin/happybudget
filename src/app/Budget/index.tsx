@@ -7,10 +7,10 @@ import { budgeting } from "lib";
 import { Icon, RenderIfValidId } from "components";
 import { Layout } from "components/layout";
 
-import { Account, Accounts, SubAccount, Actuals, Analysis } from "./components";
+import { Budget, Actuals, Analysis } from "./components";
 import { actions, selectors } from "./store";
 
-const Budget = (): JSX.Element => {
+const RootBudget = (): JSX.Element => {
   const history = useHistory();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -107,17 +107,12 @@ const Budget = (): JSX.Element => {
           />
           <Route path={"/budgets/:budgetId/analysis"} component={Analysis} />
           <Route
-            exact
-            path={"/budgets/:budgetId/accounts/:accountId"}
-            render={() => <Account budgetId={parseInt(budgetId)} budget={budget} />}
-          />
-          <Route
-            path={"/budgets/:budgetId/accounts"}
-            render={() => <Accounts budgetId={parseInt(budgetId)} budget={budget} />}
-          />
-          <Route
-            path={"/budgets/:budgetId/subaccounts/:subaccountId"}
-            render={() => <SubAccount budgetId={parseInt(budgetId)} budget={budget} />}
+            path={[
+              "/budgets/:budgetId/accounts/:accountId",
+              "/budgets/:budgetId/accounts",
+              "/budgets/:budgetId/subaccounts/:subaccountId"
+            ]}
+            render={() => <Budget budgetId={parseInt(budgetId)} budget={budget} />}
           />
         </Switch>
       </RenderIfValidId>
@@ -125,4 +120,4 @@ const Budget = (): JSX.Element => {
   );
 };
 
-export default Budget;
+export default RootBudget;

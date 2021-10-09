@@ -4,6 +4,7 @@
 /// <reference path="./style.d.ts" />
 /// <reference path="./forms.d.ts" />
 /// <reference path="./pdf.d.ts" />
+/// <reference path="./richtext.d.ts" />
 
 type Order = 1 | -1 | 0;
 type DefinitiveOrder = 1 | -1;
@@ -67,13 +68,21 @@ interface ClickableProps extends StandardComponentProps {
 }
 
 type HeaderTemplateFormData = {
-  readonly header: RichText.Block[] | null;
+  readonly header: string | null;
   readonly left_image: UploadedImage | SavedImage | null;
-  readonly left_info: RichText.Block[] | null;
+  readonly left_info: string | null;
   readonly right_image: UploadedImage | SavedImage | null;
-  readonly right_info: RichText.Block[] | null;
+  readonly right_info: string | null;
 };
 
+interface ExportFormOptions {
+  readonly header: HeaderTemplateFormData;
+  readonly columns: string[];
+  readonly tables?: TableOption[] | null | undefined;
+  readonly excludeZeroTotals: boolean;
+  readonly notes?: string | null;
+  readonly includeNotes: boolean;
+}
 
 type PasswordValidationID = "lowercase" | "uppercase" | "number" | "character" | "minChar";
 type PasswordValidationName = { id: ValidationId; name: string };

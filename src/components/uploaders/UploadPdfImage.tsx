@@ -23,7 +23,7 @@ const UploadPdfImage = (props: UploaderProps): JSX.Element => {
         if (!isNil(params.error)) {
           return (
             <React.Fragment>
-              <Icon icon={"exclamation-circle"} weight={"solid"} />
+              <Icon icon={"exclamation-circle"} weight={"solid"} style={{ marginLeft: 6 }} />
               <div className={"upload-text error-text"}>
                 {typeof params.error === "string" ? params.error : params.error.message}
               </div>
@@ -32,13 +32,15 @@ const UploadPdfImage = (props: UploaderProps): JSX.Element => {
         } else if (typeguards.isUploadParamsWithImage(params)) {
           return (
             <React.Fragment>
-              <Icon icon={"check-circle"} weight={"solid"} />
+              <Icon icon={"check-circle"} weight={"solid"} style={{ marginLeft: 6 }} />
               <div className={"upload-text file-text"}>
                 {typeguards.isUploadedImage(params.image)
                   ? truncateFileName(params.image.fileName || params.image.name, 18)
                   : `Saved ${params.image.extension} Image`}
               </div>
               <ClearButton
+                size={"xxsmall"}
+                style={{ height: 28, width: 28, padding: 6 }}
                 onClick={(e: React.MouseEvent<HTMLInputElement>) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -50,7 +52,7 @@ const UploadPdfImage = (props: UploaderProps): JSX.Element => {
         }
         return (
           <React.Fragment>
-            <Icon icon={"images"} weight={"solid"} />
+            <Icon icon={"images"} weight={"solid"} style={{ marginLeft: 6 }} />
             <div className={"upload-text no-file-text"}>{"Upload File"}</div>
           </React.Fragment>
         );

@@ -1,6 +1,6 @@
 import { isNil, filter, map } from "lodash";
-import { toast } from "react-toastify";
 
+import { errors } from "lib";
 import { ClientError, NetworkError } from "./errors";
 import { standardizeError } from "./standardizer";
 
@@ -33,50 +33,19 @@ export const parseGlobalError = (error: ClientError | Http.ErrorResponse | Http.
   return e.length === 0 ? null : standardizeError(e[0]); // There will only ever be 1 global error in a given response.
 };
 
-export type RequestErrorHandler = (error: string) => void;
-export interface RequestErrorHandlers {
-  client?: RequestErrorHandler;
-  server?: RequestErrorHandler;
-}
-
-const isErrorHandlers = (handler: RequestErrorHandler | RequestErrorHandlers): handler is RequestErrorHandlers => {
-  return (
-    (handler as RequestErrorHandlers).client !== undefined || (handler as RequestErrorHandlers).server !== undefined
-  );
-};
-
-export const handleRequestError = (e: Error, message = "", handler?: RequestErrorHandler | RequestErrorHandlers) => {
-  const getHandler = (type: "client" | "server"): RequestErrorHandler | undefined => {
-    if (!isNil(handler)) {
-      if (isErrorHandlers(handler)) {
-        if (!isNil(handler[type])) {
-          return handler[type];
-        }
-        return undefined;
-      }
-      return handler;
-    }
-    return undefined;
-  };
-
-  const handle = (error: string, type: "client" | "server"): void => {
-    const _handler = getHandler(type);
-    if (!isNil(_handler)) {
-      _handler(error);
-    } else {
-      toast.error(error);
-    }
-  };
-
+export const handleRequestError = (e: Error, message = "") => {
   // TODO: Improve this - this most likely can be it's own saga (maybe even at the
   // global application level) that dispatches error messages to a queue.
   if (e instanceof ClientError) {
-    /* eslint-disable no-console */
-    console.error(e);
-    const outputMessage = message === "" ? "There was a problem with your request." : message;
-    handle(outputMessage, "client");
+    errors.silentFail({
+      message: message === "" ? "There was a problem with your request." : message,
+      error: e
+    });
   } else if (e instanceof NetworkError) {
-    handle("There was a problem communicating with the server.", "server");
+    errors.silentFail({
+      message: "There was a problem communicating with the server.",
+      error: e
+    });
   } else {
     throw e;
   }

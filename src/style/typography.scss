@@ -40,7 +40,7 @@ h6 {
   @extend .header-base;
 }
 
-h1.ce-header {
+.ck-heading_heading1 {
   @extend .header-base;
   font-weight: 700;
   font-size: 20px;
@@ -48,7 +48,7 @@ h1.ce-header {
   margin-bottom: 8px !important;
 }
 
-h2.ce-header {
+.ck-heading_heading2 {
   @extend .header-base;
   font-weight: 700;
   font-size: 18px;
@@ -56,7 +56,7 @@ h2.ce-header {
   margin-bottom: 6px !important;
 }
 
-h3.ce-header {
+.ck-heading_heading3 {
   @extend .header-base;
   font-weight: 600;
   font-size: 18px;
@@ -64,7 +64,7 @@ h3.ce-header {
   margin-bottom: 4px !important;
 }
 
-h4.ce-header {
+.ck-heading_heading4 {
   @extend .header-base;
   font-weight: 600;
   font-size: 16px;
@@ -72,7 +72,7 @@ h4.ce-header {
   margin-bottom: 4px !important;
 }
 
-h5.ce-header {
+.ck-heading_heading5 {
   @extend .header-base;
   font-weight: 500;
   font-size: 16px;
@@ -80,7 +80,7 @@ h5.ce-header {
   margin-bottom: 4px !important;
 }
 
-h6.ce-header {
+.ck-heading_heading6 {
   @extend .header-base;
   font-weight: 500;
   font-size: 14px;

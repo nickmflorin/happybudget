@@ -1,22 +1,21 @@
-import { useState, useMemo, useRef, forwardRef, ForwardedRef, useImperativeHandle } from "react";
+import { useState, useMemo, useRef, forwardRef, ForwardedRef, useImperativeHandle, useEffect } from "react";
 import classNames from "classnames";
-import { map, isNil, find, filter } from "lodash";
+import { map, isNil, find, filter, debounce } from "lodash";
 
 import { Select, Switch, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import * as api from "api";
-import { hooks, model, util } from "lib";
+import { model } from "lib";
 
 import { Icon, Form, ShowHide, Separator } from "components";
 import { ColumnSelect } from "components/fields";
 import { UploadPdfImage } from "components/uploaders";
 import { EntityText } from "components/typography";
-import { Editor } from "components/richtext";
+import { CKEditor } from "components/richtext";
 import { EntityTextDescription } from "components/typography/EntityText";
 
 import HeaderTemplateSaveForm, { IHeaderTemplateSaveFormRef } from "./HeaderTemplateSaveForm";
-import useHeaderTemplate from "./useHeaderTemplate";
 
 import "./index.scss";
 
@@ -24,10 +23,10 @@ type NonFormFields = "includeNotes" | "notes" | "header";
 type RichTextFields = "notes" | "header";
 
 export type IExportFormRef = {
-  readonly getFormData: () => PdfBudgetTable.Options;
+  readonly getFormData: () => ExportFormOptions;
 };
 
-interface ExportFormProps extends FormProps<PdfBudgetTable.Options> {
+interface ExportFormProps extends FormProps<ExportFormOptions> {
   readonly disabled?: boolean;
   readonly columns: Table.Column<Tables.SubAccountRowData, Model.PdfSubAccount>[];
   readonly accounts: Model.PdfAccount[];
@@ -60,71 +59,148 @@ const ExportForm = (
   }: ExportFormProps,
   ref: ForwardedRef<IExportFormRef>
 ): JSX.Element => {
+  const leftInfoEditor = useRef<IEditor>(null);
+  const rightInfoEditor = useRef<IEditor>(null);
+  const headerEditor = useRef<IEditor>(null);
+
   const saveFormRef = useRef<IHeaderTemplateSaveFormRef>(null);
   const [saving, setSaving] = useState(false);
   const [showAllTables, setShowAllTables] = useState(isNil(props.initialValues?.tables));
   const [includeNotes, setIncludeNotes] = useState(false);
-  const [notesBlocks, setNotesBlocks] = useState<RichText.Block[]>(props.initialValues?.notes || []);
+  const [notesHtml, setNotesHtml] = useState<string | null>(props.initialValues?.notes || null);
+  const [leftImage, setLeftImage] = useState<UploadedImage | SavedImage | null>(
+    displayedHeaderTemplate?.left_image || null
+  );
+  const [rightImage, setRightImage] = useState<UploadedImage | SavedImage | null>(
+    displayedHeaderTemplate?.right_image || null
+  );
 
   const _formDataWithoutHeader = useMemo(() => {
-    return (values: Omit<PdfBudgetTable.Options, NonFormFields>): Omit<PdfBudgetTable.Options, "header"> => {
-      let options: Partial<PdfBudgetTable.Options> = {
+    return (values: Omit<ExportFormOptions, NonFormFields>): Omit<ExportFormOptions, "header"> => {
+      let options: Partial<ExportFormOptions> = {
         ...values,
         includeNotes
       };
       if (includeNotes === true) {
-        options = { ...options, notes: notesBlocks };
+        options = { ...options, notes: notesHtml };
       }
-      return options as PdfBudgetTable.Options;
+      return options as ExportFormOptions;
     };
-  }, [notesBlocks, includeNotes]);
+  }, [notesHtml, includeNotes]);
 
-  const [headerTemplateData, setHeaderTemplateData] = useHeaderTemplate({
-    initialValues: props.initialValues?.header,
-    template: displayedHeaderTemplate,
-    onValuesChange: (changedValues: Partial<HeaderTemplateFormData>, values: HeaderTemplateFormData) => {
-      const formValues: PdfBudgetTable.Options = props.form.getFieldsValue();
-      // We need to use `_formDataWithoutHeader` to avoid recursion.
-      props.onValuesChange?.({ header: changedValues }, { ..._formDataWithoutHeader(formValues), header: values });
-    }
-  });
+  const getHeaderTemplateData = useMemo<() => HeaderTemplateFormData>(
+    /* eslint-disable indent */
+    () => (): HeaderTemplateFormData => {
+      return {
+        header: headerEditor.current?.getData() || null,
+        left_info: leftInfoEditor.current?.getData() || null,
+        right_info: rightInfoEditor.current?.getData() || null,
+        right_image: rightImage,
+        left_image: leftImage
+      };
+    },
+    [headerEditor.current, leftInfoEditor.current, rightInfoEditor.current, leftImage, rightImage]
+  );
 
   const formData = useMemo(() => {
-    return (values: Omit<PdfBudgetTable.Options, NonFormFields>): PdfBudgetTable.Options => {
-      return { ..._formDataWithoutHeader(values), header: headerTemplateData };
+    return (values: Omit<ExportFormOptions, NonFormFields>): ExportFormOptions => {
+      return { ..._formDataWithoutHeader(values), header: getHeaderTemplateData() };
     };
-  }, [notesBlocks, includeNotes, headerTemplateData]);
+  }, [_formDataWithoutHeader, getHeaderTemplateData]);
+
+  useEffect(() => {
+    if (!isNil(displayedHeaderTemplate)) {
+      headerEditor.current?.setData(displayedHeaderTemplate.header || "");
+      leftInfoEditor.current?.setData(displayedHeaderTemplate.left_info || "");
+      rightInfoEditor.current?.setData(displayedHeaderTemplate.right_info || "");
+
+      const values: ExportFormOptions = props.form.getFieldsValue();
+      setRightImage(displayedHeaderTemplate.right_image);
+      setLeftImage(displayedHeaderTemplate.left_image);
+      props.onValuesChange?.(
+        { header: displayedHeaderTemplate },
+        { ..._formDataWithoutHeader(values), header: displayedHeaderTemplate }
+      );
+    } else {
+      headerEditor.current?.setData(props.initialValues?.header.header || "");
+      leftInfoEditor.current?.setData(props.initialValues?.header.left_info || "");
+      rightInfoEditor.current?.setData(props.initialValues?.header.right_info || "");
+      setLeftImage(null);
+      setRightImage(null);
+    }
+  }, [displayedHeaderTemplate]);
+
+  const setHeader = useMemo(
+    () => (html: string) => {
+      const values: ExportFormOptions = props.form.getFieldsValue();
+      props.onValuesChange?.(
+        { header: { ...getHeaderTemplateData(), header: html } },
+        { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), header: html } }
+      );
+    },
+    [_formDataWithoutHeader, getHeaderTemplateData]
+  );
+
+  const setLeftInfo = useMemo(
+    () => (html: string) => {
+      const values: ExportFormOptions = props.form.getFieldsValue();
+      props.onValuesChange?.(
+        { header: { ...getHeaderTemplateData(), left_info: html } },
+        { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), left_info: html } }
+      );
+    },
+    [_formDataWithoutHeader, getHeaderTemplateData]
+  );
+
+  const setRightInfo = useMemo(
+    () => (html: string) => {
+      const values: ExportFormOptions = props.form.getFieldsValue();
+      props.onValuesChange?.(
+        { header: { ...getHeaderTemplateData(), right_info: html } },
+        { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), right_info: html } }
+      );
+    },
+    [_formDataWithoutHeader, getHeaderTemplateData]
+  );
 
   useImperativeHandle(ref, () => ({
     getFormData: () => {
-      const values: PdfBudgetTable.Options = props.form.getFieldsValue();
+      const values: ExportFormOptions = props.form.getFieldsValue();
       return formData(values);
     }
   }));
 
-  const rawFormInitialValues = useMemo<Omit<PdfBudgetTable.Options, RichTextFields> | undefined>(():
-    | Omit<PdfBudgetTable.Options, RichTextFields>
+  const rawFormInitialValues = useMemo<Omit<ExportFormOptions, RichTextFields> | undefined>(():
+    | Omit<ExportFormOptions, RichTextFields>
     | undefined => {
     if (!isNil(props.initialValues)) {
-      const { header, notes, ...rest } = props.initialValues as PdfBudgetTable.Options;
+      const { header, notes, ...rest } = props.initialValues as ExportFormOptions;
       return rest;
     }
     return undefined;
   }, [props.initialValues]);
 
-  // TODO: Since we are doing this outside of Redux, which is necessary, we need to debounce
-  // this in some manner.
-  const createHeaderTemplate = hooks.useDynamicCallback((name: string) => {
-    let requestPayload: Partial<Http.HeaderTemplatePayload> = {
-      header: headerTemplateData.header,
-      left_info: headerTemplateData.left_info,
-      right_info: headerTemplateData.right_info,
-      name
-    };
-
-    const submit = (values: Http.HeaderTemplatePayload) => {
+  const createTemplate = useMemo(
+    () => (name: string, original?: Model.HeaderTemplate) => {
+      let data: HeaderTemplateFormData = getHeaderTemplateData();
+      let requestPayload: Http.HeaderTemplatePayload = {
+        left_info: data.left_info,
+        header: data.header,
+        right_info: data.right_info,
+        name
+      };
+      if (!isNil(data.left_image) && model.typeguards.isUploadedImage(data.left_image)) {
+        requestPayload = { ...requestPayload, left_image: data.left_image.data };
+      }
+      if (!isNil(data.right_image) && model.typeguards.isUploadedImage(data.right_image)) {
+        requestPayload = { ...requestPayload, right_image: data.right_image.data };
+      }
+      if (!isNil(original)) {
+        requestPayload = { ...requestPayload, original: original.id };
+      }
+      setSaving(true);
       api
-        .createHeaderTemplate(values)
+        .createHeaderTemplate(requestPayload)
         .then((response: Model.HeaderTemplate) => {
           onHeaderTemplateCreated(response);
           if (!isNil(saveFormRef.current)) {
@@ -163,108 +239,33 @@ const ExportForm = (
         .finally(() => {
           setSaving(false);
         });
-    };
+    },
+    [getHeaderTemplateData]
+  );
 
-    setSaving(true);
-
-    /*
-    In the case of Save As, we are still creating the header template.  However,
-    the image may not have been changed, in which case it will still be a SavedImage.
-    In that case, we need to get the base64 representation.
-    */
-    const urlImages: { [key: string]: false | string } = { left_image: false, right_image: false };
-    if (!isNil(headerTemplateData.left_image)) {
-      if (!model.typeguards.isUploadedImage(headerTemplateData.left_image)) {
-        urlImages.left_image = headerTemplateData.left_image.url;
-      } else {
-        requestPayload = { ...requestPayload, left_image: headerTemplateData.left_image.data };
-      }
-    }
-    if (!isNil(headerTemplateData.right_image)) {
-      if (!model.typeguards.isUploadedImage(headerTemplateData.right_image)) {
-        urlImages.right_image = headerTemplateData.right_image.url;
-      } else {
-        requestPayload = { ...requestPayload, left_image: headerTemplateData.right_image.data };
-      }
-    }
-    // The Promise structure of getting a base64 string from a URL complicates the logic flow
-    // here quite a bit.
-    if (urlImages.left_image === false && urlImages.right_image === false) {
-      submit(requestPayload as Http.HeaderTemplatePayload);
-    } else if (urlImages.left_image !== false && urlImages.right_image === false) {
-      util.files
-        .getBase64FromUrl(urlImages.left_image)
-        .then((result: string | ArrayBuffer) => {
-          submit({ ...requestPayload, left_image: result } as Http.HeaderTemplatePayload);
-        })
-        .catch((e: Error) => {
-          /* eslint-disable no-console */
-          console.error("Error converting left image to base64 representation from URL.  It will not be saved.");
-          console.error(e);
-          // Still submit request without the image included, we don't want the app to break
-          // and we still want to save the template.
-          submit(requestPayload as Http.HeaderTemplatePayload);
-        });
-    } else if (urlImages.left_image === false && urlImages.right_image !== false) {
-      util.files
-        .getBase64FromUrl(urlImages.right_image)
-        .then((result: string | ArrayBuffer) => {
-          submit({ ...requestPayload, right_image: result } as Http.HeaderTemplatePayload);
-        })
-        .catch((e: Error) => {
-          /* eslint-disable no-console */
-          console.error("Error converting right image to base64 representation from URL.  It will not be saved.");
-          console.error(e);
-          // Still submit request without the image included, we don't want the app to break
-          // and we still want to save the template.
-          submit(requestPayload as Http.HeaderTemplatePayload);
-        });
-    } else {
-      const promises: [Promise<ArrayBuffer | string>, Promise<ArrayBuffer | string>] = [
-        util.files.getBase64FromUrl(urlImages.left_image as string),
-        util.files.getBase64FromUrl(urlImages.right_image as string)
-      ];
-      Promise.all(promises)
-        .then((result: [ArrayBuffer | string, ArrayBuffer | string]) => {
-          submit({ ...requestPayload, right_image: result[1], left_image: result[0] } as Http.HeaderTemplatePayload);
-        })
-        .catch((e: Error) => {
-          /* eslint-disable no-console */
-          console.error(
-            "Error converting both right and left images to base64 representation from URL.  It will not be saved."
-          );
-          console.error(e);
-          // Still submit request without the image included, we don't want the app to break
-          // and we still want to save the template.
-          submit(requestPayload as Http.HeaderTemplatePayload);
-        });
-    }
-  });
-
-  // TODO: Since we are doing this outside of Redux, which is necessary, we need to debounce
-  // this in some manner.
-  const updateHeaderTemplate = hooks.useDynamicCallback(() => {
-    if (!isNil(displayedHeaderTemplate)) {
-      let requestPayload: Partial<Http.HeaderTemplatePayload> = {
-        header: headerTemplateData.header,
-        left_info: headerTemplateData.left_info,
-        right_info: headerTemplateData.right_info
+  const updateTemplate = useMemo(
+    () => (template: Model.HeaderTemplate) => {
+      let data: HeaderTemplateFormData = getHeaderTemplateData();
+      let requestPayload: Http.HeaderTemplatePayload = {
+        left_info: data.left_info,
+        header: data.header,
+        right_info: data.right_info
       };
       // We only want to include the images in the payload if they were changed - this means they
       // are either null or of the UploadedImage form.
-      if (!isNil(headerTemplateData.left_image) && model.typeguards.isUploadedImage(headerTemplateData.left_image)) {
-        requestPayload = { ...requestPayload, left_image: headerTemplateData.left_image.data };
-      } else if (isNil(headerTemplateData.left_image)) {
+      if (!isNil(data.left_image) && model.typeguards.isUploadedImage(data.left_image)) {
+        requestPayload = { ...requestPayload, left_image: data.left_image.data };
+      } else if (isNil(data.left_image)) {
         requestPayload = { ...requestPayload, left_image: null };
       }
-      if (!isNil(headerTemplateData.right_image) && model.typeguards.isUploadedImage(headerTemplateData.right_image)) {
-        requestPayload = { ...requestPayload, right_image: headerTemplateData.right_image.data };
-      } else if (isNil(headerTemplateData.right_image)) {
+      if (!isNil(data.right_image) && model.typeguards.isUploadedImage(data.right_image)) {
+        requestPayload = { ...requestPayload, right_image: data.right_image.data };
+      } else if (isNil(data.right_image)) {
         requestPayload = { ...requestPayload, right_image: null };
       }
       setSaving(true);
       api
-        .updateHeaderTemplate(displayedHeaderTemplate.id, requestPayload)
+        .updateHeaderTemplate(template.id, requestPayload)
         .then((response: Model.HeaderTemplate) => {
           onHeaderTemplateUpdated?.(response);
           if (!isNil(saveFormRef.current)) {
@@ -277,8 +278,32 @@ const ExportForm = (
         .finally(() => {
           setSaving(false);
         });
-    }
-  });
+    },
+    [getHeaderTemplateData]
+  );
+
+  const onSave = useMemo(
+    () => (name?: string) => {
+      if (isNil(displayedHeaderTemplate) && !isNil(name)) {
+        createTemplate(name);
+      } else if (!isNil(displayedHeaderTemplate)) {
+        if (isNil(name)) {
+          updateTemplate(displayedHeaderTemplate);
+        } else {
+          createTemplate(name, displayedHeaderTemplate);
+        }
+      }
+    },
+    [createTemplate, updateTemplate, displayedHeaderTemplate]
+  );
+
+  const debouncedSave = useMemo(() => debounce(onSave, 400), [onSave]);
+
+  useEffect(() => {
+    return () => {
+      debouncedSave.cancel();
+    };
+  }, []);
 
   return (
     <Form.Form
@@ -286,12 +311,12 @@ const ExportForm = (
       autoFocusField={false}
       initialValues={rawFormInitialValues}
       className={classNames("export-form", "condensed", props.className)}
-      onFinish={(values: Omit<PdfBudgetTable.Options, NonFormFields>) => {
+      onFinish={(values: Omit<ExportFormOptions, NonFormFields>) => {
         props.onFinish?.(formData(values));
       }}
       onValuesChange={(
-        changedValues: Partial<Omit<PdfBudgetTable.Options, NonFormFields>>,
-        values: Omit<PdfBudgetTable.Options, NonFormFields>
+        changedValues: Partial<Omit<ExportFormOptions, NonFormFields>>,
+        values: Omit<ExportFormOptions, NonFormFields>
       ) => {
         // Note: Since the images are not included as a part of the underlying Form mechanics,
         // they will not trigger this hook.  This means that we have to manually call the
@@ -301,9 +326,10 @@ const ExportForm = (
     >
       <Form.ItemSection label={"Header"}>
         <Form.ItemStyle label={"Title"}>
-          <Editor
-            value={headerTemplateData.header}
-            onChange={(blocks?: RichText.Block[]) => setHeaderTemplateData({ header: blocks })}
+          <CKEditor
+            ref={headerEditor}
+            initialValue={props.initialValues?.header?.header || ""}
+            onChange={(html: string) => setHeader(html)}
           />
         </Form.ItemStyle>
 
@@ -311,31 +337,25 @@ const ExportForm = (
           <Form.ItemStyle label={"Left Side"} className={"export-header-side-item"}>
             <UploadPdfImage
               value={!isNil(displayedHeaderTemplate) ? displayedHeaderTemplate.left_image : null}
-              onChange={(left_image: UploadedImage | null) => {
-                // Images are not included in traditional form and thus do not trigger the
-                // onValuesChange() callback - so we have to do it manually here.
-                setHeaderTemplateData({ left_image });
-              }}
+              onChange={(left_image: UploadedImage | null) => setLeftImage(left_image)}
               onError={(error: Error | string) => props.form.setGlobalError(error)}
             />
-            <Editor
-              value={headerTemplateData.left_info}
-              onChange={(blocks?: RichText.Block[]) => setHeaderTemplateData({ left_info: blocks })}
+            <CKEditor
+              ref={leftInfoEditor}
+              initialValue={props.initialValues?.header?.left_info || ""}
+              onChange={(html: string) => setLeftInfo(html)}
             />
           </Form.ItemStyle>
 
           <Form.ItemStyle className={"export-header-side-item"} label={"Right Side"}>
             <UploadPdfImage
-              onChange={(right_image: UploadedImage | null) => {
-                // Images are not included in traditional form and thus do not trigger the
-                // onValuesChange() callback - so we have to do it manually here.
-                setHeaderTemplateData({ right_image });
-              }}
+              onChange={(right_image: UploadedImage | null) => setRightImage(right_image)}
               onError={(error: Error | string) => props.form.setGlobalError(error)}
             />
-            <Editor
-              value={headerTemplateData.right_info}
-              onChange={(blocks?: RichText.Block[]) => setHeaderTemplateData({ right_info: blocks })}
+            <CKEditor
+              ref={rightInfoEditor}
+              initialValue={props.initialValues?.header?.right_info || ""}
+              onChange={(html: string) => setRightInfo(html)}
             />
           </Form.ItemStyle>
         </div>
@@ -350,17 +370,7 @@ const ExportForm = (
           ref={saveFormRef}
           existing={!isNil(displayedHeaderTemplate)}
           saving={saving}
-          onSave={(name?: string) => {
-            if (isNil(displayedHeaderTemplate) && !isNil(name)) {
-              createHeaderTemplate(name);
-            } else if (!isNil(displayedHeaderTemplate)) {
-              if (isNil(name)) {
-                updateHeaderTemplate();
-              } else {
-                createHeaderTemplate(name);
-              }
-            }
-          }}
+          onSave={onSave}
           style={{ marginTop: 10 }}
         />
       </Form.ItemSection>
@@ -386,7 +396,7 @@ const ExportForm = (
             defaultChecked={isNil(rawFormInitialValues?.tables)}
             checked={showAllTables}
             onChange={(e: CheckboxChangeEvent) => {
-              const values: PdfBudgetTable.Options = props.form.getFieldsValue();
+              const values: ExportFormOptions = props.form.getFieldsValue();
               setShowAllTables(e.target.checked);
               if (e.target.checked === true) {
                 props.form.setFields([{ name: "tables", value: undefined }]);
@@ -438,7 +448,7 @@ const ExportForm = (
             unCheckedChildren={"OFF"}
             defaultChecked={false}
             onChange={(checked: boolean) => {
-              const values: PdfBudgetTable.Options = props.form.getFieldsValue();
+              const values: ExportFormOptions = props.form.getFieldsValue();
               props.onValuesChange?.({ includeNotes: checked }, { ...formData(values), includeNotes: checked });
               setIncludeNotes(checked);
             }}
@@ -447,14 +457,13 @@ const ExportForm = (
 
         <ShowHide show={includeNotes}>
           <Form.ItemStyle>
-            <Editor
+            <CKEditor
               style={{ height: 140 }}
-              value={props.initialValues?.notes}
-              onChange={(blocks?: RichText.Block[]) => {
-                blocks = !isNil(blocks) ? blocks : [];
-                setNotesBlocks(blocks);
-                const values: PdfBudgetTable.Options = props.form.getFieldsValue();
-                props.onValuesChange?.({ notes: blocks }, { ...formData(values), notes: blocks });
+              initialValue={props.initialValues?.header?.notes || ""}
+              onChange={(html: string) => {
+                setNotesHtml(html);
+                const values: ExportFormOptions = props.form.getFieldsValue();
+                props.onValuesChange?.({ notes: html }, { ...formData(values), notes: html });
               }}
             />
           </Form.ItemStyle>

@@ -132,10 +132,9 @@ const HeaderTemplateSaveForm = (
                     "with-error": !isNil(error)
                   })}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
-                  style={{ marginRight: 6 }}
                 />
                 <ClearButton
-                  size={"large"}
+                  size={"small"}
                   onClick={() => {
                     setError(null);
                     setRequestNameInput(false);

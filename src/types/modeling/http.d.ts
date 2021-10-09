@@ -219,6 +219,7 @@ namespace Http {
   interface HeaderTemplatePayload extends Http.ModelPayload<Model.HeaderTemplate> {
     readonly left_image?: string | ArrayBuffer | null;
     readonly right_image?: string | ArrayBuffer | null;
+    readonly original?: number;
   }
 
   interface ContactPayload {

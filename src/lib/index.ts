@@ -1,5 +1,4 @@
 export * as hooks from "./hooks";
-export * as richtext from "./richtext";
 export * as tabling from "./tabling";
 export * as util from "./util";
 export * as redux from "./redux";
@@ -8,3 +7,5 @@ export * as pdf from "./pdf";
 export * as budgeting from "./budgeting";
 export * as ui from "./ui";
 export * as events from "./events";
+export * as ckeditor from "./ckeditor";
+export * as errors from "./errors";

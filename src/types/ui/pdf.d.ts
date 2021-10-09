@@ -1,42 +1,5 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-namespace RichText {
-  type BlockType = "paragraph" | "header" | "list";
-
-  type GenericBlock<T extends RichText.BlockType, D extends object = any> = import("@editorjs/editorjs").OutputBlockData<T, D>;
-
-  type TextFragment = { text: string; styles?: FontStyleName[] };
-  type TextFragmentGroup = { data: TextData };
-  type TextDataElement = TextFragment | TextFragmentGroup
-  type TextData = TextDataElement[];
-
-  // Note that these blocks are different from the EditorJS blocks.  This is because
-  // we need to layer on additional functionality, and we need to model them more appropriately
-  // to work with a seamless backend/API.
-  type ParagraphBlock = {
-    readonly type: "paragraph";
-    readonly data: RichText.TextData;
-  }
-
-  type HeadingBlock = {
-    readonly type: "header";
-    readonly data: RichText.TextData;
-    readonly level: Pdf.HeadingLevel;
-  }
-
-  type ListBlockConfiguration = "orderered" | "unordered";
-  type ListBlock = {
-    readonly type: "list";
-    readonly items: string[];
-    readonly configuration: RichText.ListBlockConfiguration;
-
-  }
-
-  type Block = ListBlock | ParagraphBlock | HeadingBlock;
-}
-
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Pdf {
   type Style = import("@react-pdf/types").Style;
   type Styles = import("@react-pdf/renderer").default.Styles;
@@ -44,16 +7,51 @@ namespace Pdf {
   type ExtensionStyle = ReactPdfStyle & { ext?: SingleOrArray<string>, fontFamily?: FontFamily };
   type ExtensionStyles = {[key: string]: Pdf.ExtensionStyle};
 
+  type HTMLNodeType = "paragraph" | "header" | "text" | "fontStyle";
+  type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
+
+  type SupportedFontStyleTag = "i" | "b" | "strong";
+  type SupportedHeaderTag = `h${HeadingLevel}`;
+  type SupportedParagraphTag = "p";
+  type SupportedHTMLTag = SupportedHeaderTag | SupportedParagraphTag | SupportedFontStyleTag;
+
   type FontStyleName = "italic" | "bold";
-  type FontStyleTag = "i" | "b";
-  type SupportedFontStyle = { name: FontStyleName, tag: FontStyleTag };
+
+  interface IHTMLNode<
+    T extends HTMLNodeType,
+    D,
+    Tag extends SupportedHTMLTag | null
+  > {
+    readonly type: T;
+    readonly data: D;
+    readonly tag: Tag;
+  }
+
+  type HTMLTextNode = IHTMLNode<"text", string, null>;
+  type HTMLFontStyleNode = IHTMLNode<
+    "fontStyle",
+    string | Array<HTMLNode>,
+    SupportedFontStyleTag
+  >;
+  type HTMLParagraphNode = IHTMLNode<
+    "paragraph",
+    string | Array<HTMLNode>,
+    SupportedParagraphTag
+  >;
+  type HTMLHeadingNode = IHTMLNode<
+    "header",
+    string | Array<HTMLNode>,
+    SupportedHeaderTag
+  >;
+
+  type HTMLNode = HTMLTextNode | HTMLParagraphNode | HTMLHeadingNode | HTMLFontStyleNode;
+
+  type SupportedFontStyle = { name: FontStyleName, tag: SupportedFontStyleTag };
   type Font = {
     readonly src: any;
     readonly fontWeight: FontWeight;
     readonly fontStyle?: "italic";
   };
-
-  type HeadingLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
   type DocumentLoadedParams = {
     readonly numPages: number;

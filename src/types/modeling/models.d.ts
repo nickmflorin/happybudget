@@ -346,10 +346,10 @@ namespace Model {
   }
 
   interface HeaderTemplate extends SimpleHeaderTemplate {
-    readonly header: RichText.Block[] | null;
+    readonly header: string | null;
     readonly left_image: SavedImage | null;
-    readonly left_info: RichText.Block[] | null;
+    readonly left_info: string | null;
     readonly right_image: SavedImage | null;
-    readonly right_info: RichText.Block[] | null;
+    readonly right_info: string | null;
   }
 }
