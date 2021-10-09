@@ -173,6 +173,7 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
             domain,
             defaultHidden,
             editorIsPopup,
+            onDataChange,
             getCSVValue,
             getCellChanges,
             refreshColumns,
