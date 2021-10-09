@@ -11,7 +11,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
   framework.columnObjs.FakeColumn({ field: "first_name" }),
   framework.columnObjs.FakeColumn({ field: "last_name" }),
   framework.columnObjs.FakeColumn({ field: "image" }),
-  framework.columnObjs.BodyColumn<R, M>({
+  framework.columnObjs.BodyColumn<R, M, string | null>({
     colId: "names_and_image",
     headerName: "Name",
     columnType: "text",
@@ -21,24 +21,31 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     getCSVValue: (row: Table.BodyRow<Tables.ContactRowData>) => {
       return util.conditionalJoinString(row.data.first_name, row.data.last_name);
     },
-    getCellChanges: (id: Table.EditableRowId, oldValue: string | null, newValue: string | null) => {
-      const oldParsed = !isNil(oldValue) ? model.util.parseFirstAndLastName(oldValue) : null;
-      const parsed = !isNil(newValue) ? model.util.parseFirstAndLastName(newValue) : null;
+    parseIntoFields: (value: string | null) => {
+      const parsed = !isNil(value) ? model.util.parseFirstAndLastName(value) : null;
       return [
-        {
-          field: "first_name",
-          oldValue: !isNil(oldParsed) ? oldParsed[0] : null,
-          newValue: !isNil(parsed) ? parsed[0] : null,
-          id
-        },
-        {
-          field: "last_name",
-          oldValue: !isNil(oldParsed) ? oldParsed[1] : null,
-          newValue: !isNil(parsed) ? parsed[1] : null,
-          id
-        }
+        { field: "first_name", value: !isNil(parsed) ? parsed[0] : null },
+        { field: "last_name", value: !isNil(parsed) ? parsed[1] : null }
       ];
     },
+    // getCellChanges: (id: Table.EditableRowId, oldValue: string | null, newValue: string | null) => {
+    //   const oldParsed = !isNil(oldValue) ? model.util.parseFirstAndLastName(oldValue) : null;
+    //   const parsed = !isNil(newValue) ? model.util.parseFirstAndLastName(newValue) : null;
+    //   return [
+    //     {
+    //       field: "first_name",
+    //       oldValue: !isNil(oldParsed) ? oldParsed[0] : null,
+    //       newValue: !isNil(parsed) ? parsed[0] : null,
+    //       id
+    //     },
+    //     {
+    //       field: "last_name",
+    //       oldValue: !isNil(oldParsed) ? oldParsed[1] : null,
+    //       newValue: !isNil(parsed) ? parsed[1] : null,
+    //       id
+    //     }
+    //   ];
+    // },
     valueSetter: (params: ValueSetterParams) => {
       if (params.newValue === undefined || params.newValue === "" || params.newValue === null) {
         params.data.data.first_name = null;

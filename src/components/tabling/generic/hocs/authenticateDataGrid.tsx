@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, useImperativeHandle } from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
-import { map, isNil, includes, find, filter, flatten, forEach, reduce } from "lodash";
+import { map, isNil, includes, find, filter, flatten, forEach, reduce, uniq } from "lodash";
 
 import {
   GridApi,
@@ -385,8 +385,36 @@ const authenticateDataGrid =
             let newValue = event.newValue === undefined ? nullValue : event.newValue;
 
             let changes: Table.SoloCellChange<R>[];
-            if (!isNil(customCol.getCellChanges)) {
-              changes = customCol.getCellChanges(row.id, oldValue, newValue);
+            if (!isNil(customCol.parseIntoFields)) {
+              const oldParsed = customCol.parseIntoFields(oldValue);
+              const parsed = customCol.parseIntoFields(newValue);
+              // The fields for the parsed values of each value should be the same.
+              const fields: (keyof R)[] = uniq([
+                ...map(oldParsed, (p: Table.ParsedColumnField<R>) => p.field),
+                ...map(parsed, (p: Table.ParsedColumnField<R>) => p.field)
+              ]);
+              changes = reduce(
+                fields,
+                (chs: Table.SoloCellChange<R>[], fld: keyof R) => {
+                  const oldParsedForField = find(oldParsed, { field } as any);
+                  const parsedForField = find(parsed, { field } as any);
+                  // Since the fields for each set of parsed field-value pairs will be the
+                  // same, this is mostly just a check to satisfy TS.
+                  if (!isNil(oldParsedForField) && !isNil(parsedForField)) {
+                    return [
+                      ...chs,
+                      {
+                        id: row.id,
+                        field: fld,
+                        oldValue: oldParsedForField.value,
+                        newValue: parsedForField.value
+                      }
+                    ];
+                  }
+                  return chs;
+                },
+                []
+              );
             } else {
               /*
               The logic inside this conditional is 100% a HACK - and this type of

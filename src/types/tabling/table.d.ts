@@ -270,6 +270,8 @@ namespace Table {
     | "editable"
     | "onCellDoubleClicked";
 
+  type ParsedColumnField<R extends RowData, V = any> = {field: keyof R; value: V};
+
   interface Column<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any>
     extends Omit<ColDef, OmitColDefParams>,
       BaseColumn<R, M, "aggrid"> {
@@ -294,8 +296,9 @@ namespace Table {
     readonly onCellFocus?: (params: CellFocusedParams<R, M>) => void;
     readonly onCellUnfocus?: (params: CellFocusedParams<R, M>) => void;
     readonly refreshColumns?: (change: CellChange<R, V>) => keyof R | (keyof R)[] | null;
-    readonly getHttpValue?: (value: any) => any;
-    readonly getCellChanges?: (id: EditableRowId, oldValue: any, newValue: any) => SoloCellChange<R>[];
+    readonly getHttpValue?: (value: V) => any;
+    readonly parseIntoFields?: (value: V) => ParsedColumnField<R, V>[];
+    // readonly getCellChanges?: (id: EditableRowId, oldValue: any, newValue: any) => SoloCellChange<R>[];
     readonly processCellForClipboard?: (row: R) => string | number;
     readonly processCellFromClipboard?: (value: string) => V | null;
     readonly onCellDoubleClicked?: (row: ModelRow<R>) => void;

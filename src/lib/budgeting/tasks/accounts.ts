@@ -152,12 +152,9 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       yield put(config.actions.saving(true));
       yield put(config.actions.loadingBudget(true));
       try {
-        console.log({ e });
-        console.log({ requestPayload });
         const response: Http.BulkResponse<B, C> = yield call(config.services.bulkCreate, objId, requestPayload, {
           cancelToken: source.token
         });
-        console.log({ response });
         /*
         Note: We also have access to the updated Account from the response (as response.data)
         so we could use this to update the overall Account in state.  However, the reducer handles
@@ -198,6 +195,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         yield put(config.actions.loadingBudget(true));
       }
       try {
+        console.log({ requestPayload });
         const response: Http.BulkResponse<B, C> = yield call(config.services.bulkUpdate, objId, requestPayload, {
           cancelToken: source.token
         });

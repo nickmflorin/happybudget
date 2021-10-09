@@ -8,7 +8,7 @@ type R = Tables.ActualRowData;
 type M = Model.Actual;
 
 const Columns: Table.Column<R, M>[] = [
-  framework.columnObjs.SelectColumn<R, M>({
+  framework.columnObjs.SelectColumn<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>({
     field: "owner",
     headerName: "Sub-Account",
     minWidth: 200,

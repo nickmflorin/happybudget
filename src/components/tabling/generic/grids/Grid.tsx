@@ -175,7 +175,7 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
             editorIsPopup,
             onDataChange,
             getCSVValue,
-            getCellChanges,
+            parseIntoFields,
             refreshColumns,
             onCellDoubleClicked,
             processCellForClipboard,
