@@ -89,12 +89,12 @@ const menuStateReducer = <M extends MenuItemModel>(
 
 const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNullRef<IMenuRef<M>> }): JSX.Element => {
   const ref = useRef<HTMLDivElement>(null);
-  const innerRef = useRef<HTMLUListElement>(null);
+  // const innerRef = useRef<HTMLUListElement>(null);
   const searchRef = useRef<AntDInput>(null);
   const [menuState, dispatchMenuState] = useReducer(menuStateReducer, initialMenuState);
 
   const [focused, setFocused] = useState(false);
-  const [innerFocused, setInnerFocused] = useState(false);
+  // const [innerFocused, setInnerFocused] = useState(false);
 
   const firstRender = ui.hooks.useTrackFirstRender();
   const menu = ui.hooks.useMenuIfNotDefined<M>(props.menu);
@@ -112,6 +112,10 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
     () => (!isNil(props.selected) ? (Array.isArray(props.selected) ? props.selected : [props.selected]) : _selected),
     [props.selected, _selected]
   );
+
+  useEffect(() => {
+    return () => ref.current?.blur();
+  }, []);
 
   const [_search, _setSearch] = useState("");
   const search = useMemo(() => (!isNil(props.search) ? props.search : _search), [props.search, _search]);
@@ -320,8 +324,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
 
   useEffect(() => {
     if (props.defaultFocusFirstItem === true && firstRender === true && models.length !== 0 && selected.length === 0) {
-      // setInternalState({ menuFocused: true, index: 0 });
-      innerRef.current?.focus();
+      dispatchMenuState({ type: "SET", payload: 0 });
     }
   }, [props.defaultFocusFirstItem, hooks.useDeepEqualMemo(models)]);
 
@@ -338,7 +341,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   }, [hooks.useDeepEqualMemo(models), search, props.defaultFocusOnlyItemOnSearch, props.defaultFocusOnlyItem]);
 
   useEffect(() => {
-    !isNil(props.onFocusCallback) && props.onFocusCallback(innerFocused);
+    !isNil(props.onFocusCallback) && props.onFocusCallback(focused);
 
     const menuFocusedKeyListener = (e: KeyboardEvent) => {
       if (util.events.isCharacterKeyPress(e) || util.events.isBackspaceKeyPress(e)) {
@@ -449,13 +452,13 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
       if (value === true) {
         setTimeout(() => {
           ref.current?.focus();
-          innerRef.current?.focus();
+          // innerRef.current?.focus();
           searchRef.current?.focus();
         });
       } else {
         setTimeout(() => {
           ref.current?.blur();
-          innerRef.current?.blur();
+          // innerRef.current?.blur();
           searchRef.current?.blur();
         });
       }
@@ -518,9 +521,9 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
       <div className={"ul-wrapper"} id={menuId}>
         <RenderWithSpinner loading={props.loading} size={22}>
           <ul
-            ref={innerRef}
-            onFocus={(e: React.FocusEvent<HTMLUListElement>) => setInnerFocused(true)}
-            onBlur={(e: React.FocusEvent<HTMLUListElement>) => setInnerFocused(false)}
+          // ref={innerRef}
+          // onFocus={(e: React.FocusEvent<HTMLUListElement>) => setInnerFocused(true)}
+          // onBlur={(e: React.FocusEvent<HTMLUListElement>) => setInnerFocused(false)}
           >
             <React.Fragment>
               <MenuItems<M>

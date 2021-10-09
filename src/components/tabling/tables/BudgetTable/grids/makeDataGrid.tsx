@@ -56,21 +56,21 @@ const BudgetDataGrid = <R extends Tables.BudgetRowData, T extends BudgetDataGrid
     });
 
     useEffect(() => {
+      const instantiatedListeners: ((e: KeyboardEvent) => void)[] = [];
       const keyListeners = [moveDownKeyListener, moveUpKeyListener];
-      const gridApi = props.apis?.grid;
-      if (!isNil(gridApi)) {
-        const instantiatedListeners: ((e: KeyboardEvent) => void)[] = [];
+      const apis: Table.GridApis | null = props.apis;
+      if (!isNil(apis)) {
         for (let i = 0; i < keyListeners.length; i++) {
-          const listener = (e: KeyboardEvent) => keyListeners[i](gridApi, e);
+          const listener = (e: KeyboardEvent) => keyListeners[i](apis.grid, e);
           window.addEventListener("keydown", listener);
           instantiatedListeners.push(listener);
         }
-        return () => {
-          for (let i = 0; i < instantiatedListeners.length; i++) {
-            window.removeEventListener("keydown", instantiatedListeners[i]);
-          }
-        };
       }
+      return () => {
+        for (let i = 0; i < instantiatedListeners.length; i++) {
+          window.removeEventListener("keydown", instantiatedListeners[i]);
+        }
+      };
     }, [props.apis]);
 
     return <Component {...props} framework={tabling.aggrid.combineFrameworks(Framework, props.framework)} />;

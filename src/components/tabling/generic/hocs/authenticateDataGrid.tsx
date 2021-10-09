@@ -163,7 +163,6 @@ const authenticateDataGrid =
                   edit behavior.  So we need to suppress the TAB behavior when editing, and manually move
                   the cell over.
                   */
-
                   return true;
                 } else if (!params.editing && includes(["Backspace", "Delete"], params.event.code)) {
                   const clearCellsOverRange = (range: CellRange | CellRange[], api: GridApi) => {
@@ -179,6 +178,7 @@ const authenticateDataGrid =
                   const ranges = params.api.getCellRanges();
                   if (
                     !isNil(ranges) &&
+                    ranges.length !== 0 &&
                     (ranges.length !== 1 || !tabling.aggrid.rangeSelectionIsSingleCell(ranges[0]))
                   ) {
                     clearCellsOverRange(ranges, params.api);
@@ -189,11 +189,9 @@ const authenticateDataGrid =
                     edit mode but instead want to clear the values of the cells - so we prevent those key
                     presses from triggering edit mode in the Cell Editor and clear the value at this level.
                     */
-                    const column = params.column;
                     const row: Table.BodyRow<R> = params.node.data;
-                    const c: Table.Column<R, M> | null = getColumn(column.getColId());
-                    if (!isNil(c) && tabling.typeguards.isEditableRow(row) && c.editorIsPopup === true) {
-                      clearCell(row, c);
+                    if (tabling.typeguards.isEditableRow(row) && col.editorIsPopup === true) {
+                      clearCell(row, col);
                       return true;
                     }
                     return false;
