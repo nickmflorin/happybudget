@@ -50,7 +50,7 @@ const InputOnFocus = (
     >
       {focused === true ||
       (renderBlurredContentOnNoValue === false && (props.value === undefined || props.value === "")) ? (
-        <input {...props} ref={innerRef} />
+        <input {...props} value={!isNil(props.value) ? props.value : ""} ref={innerRef} />
       ) : (
         /*
         The component that is rendered in the unfocused state must be *tightly*
@@ -73,8 +73,8 @@ const InputOnFocus = (
           onBlur={(e: React.FocusEvent<HTMLDivElement>) => e.stopPropagation()}
         >
           {isNil(renderBlurredContent)
-            ? children(props.value === undefined ? "" : String(props.value))
-            : renderBlurredContent(props.value === undefined ? "" : String(props.value))}
+            ? children(!isNil(props.value) ? String(props.value) : "")
+            : renderBlurredContent(!isNil(props.value) ? String(props.value) : "")}
         </div>
       )}
     </div>
