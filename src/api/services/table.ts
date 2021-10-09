@@ -5,28 +5,32 @@ export const getTableChildren = <
   M extends Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount
 >(
   parentId: number,
-  parentType: Model.ParentType,
+  parentType: Model.ParentType | "template",
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<M>> => {
   const serviceMap: {
     /* eslint-disable-next-line no-unused-vars */
-    [key in Model.ParentType]: (
+    [key in Model.ParentType | "template"]: (
       id: number,
       q?: Http.ListQuery,
       o?: Http.RequestOptions
     ) => Promise<Http.ListResponse<any>>;
   } = {
     budget: api.getBudgetAccounts,
+    template: api.getTemplateAccounts,
     account: api.getAccountSubAccounts,
     subaccount: api.getSubAccountSubAccounts
   };
   return serviceMap[parentType](parentId, query, options);
 };
 
-export const createTableMarkup = <R extends Http.MarkupResponseTypes = Http.MarkupResponseTypes>(
+export const createTableMarkup = <
+  B extends Model.Budget | Model.Template,
+  R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
+>(
   parentId: number,
-  parentType: Model.ParentType,
+  parentType: Model.ParentType | "template",
   payload: Http.MarkupPayload,
   options: Http.RequestOptions = {}
 ): Promise<R> => {
@@ -37,9 +41,14 @@ export const createTableMarkup = <R extends Http.MarkupResponseTypes = Http.Mark
 
   const serviceMap: {
     /* eslint-disable-next-line no-unused-vars */
-    [key in Model.ParentType]: (id: number, p: Http.MarkupPayload, o?: Http.RequestOptions) => Promise<ResponseTypes>;
+    [key in Model.ParentType | "template"]: (
+      id: number,
+      p: Http.MarkupPayload,
+      o?: Http.RequestOptions
+    ) => Promise<ResponseTypes>;
   } = {
     budget: api.createBudgetAccountMarkup,
+    template: api.createTemplateAccountMarkup,
     account: api.createAccountSubAccountMarkup,
     subaccount: api.createSubAccountSubAccountMarkup
   };

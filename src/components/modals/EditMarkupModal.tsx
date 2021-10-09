@@ -8,25 +8,28 @@ import { EditModelModal, EditModelModalProps } from "./generic";
 
 type MarkupFormValues = Omit<Http.MarkupPayload, "rate"> & { readonly rate: string };
 
-interface EditMarkupModalProps<R extends Http.MarkupResponseTypes = Http.MarkupResponseTypes>
-  extends EditModelModalProps<Model.Markup, Http.MarkupPayload, R> {
+interface EditMarkupModalProps<
+  B extends Model.Budget | Model.Template,
+  R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
+> extends EditModelModalProps<Model.Markup, Http.MarkupPayload, R> {
   readonly id: number;
   readonly parentId: number;
-  readonly parentType: Model.ParentType;
+  readonly parentType: Model.ParentType | "template";
   readonly performUpdate?: boolean;
 }
 
 /* eslint-disable indent */
 const EditMarkupModal = <
   M extends Model.SimpleAccount | Model.SimpleSubAccount,
-  R extends Http.MarkupResponseTypes = Http.MarkupResponseTypes
+  B extends Model.Budget | Model.Template,
+  R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
 >({
   id,
   parentId,
   performUpdate,
   parentType,
   ...props
-}: EditMarkupModalProps<R>): JSX.Element => {
+}: EditMarkupModalProps<B, R>): JSX.Element => {
   const cancelToken = api.useCancelToken();
   const formRef = useRef<FormInstance<MarkupFormValues>>(null);
   const markupRef = useRef<IMarkupForm>(null);

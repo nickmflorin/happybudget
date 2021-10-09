@@ -69,9 +69,11 @@ const Tasks = budgeting.tasks.subaccounts.createTableTaskSet<Model.Account, Mode
     request: api.getAccountSubAccounts,
     requestGroups: api.getAccountSubAccountGroups,
     requestFringes: api.getTemplateFringes,
+    requestMarkups: api.getAccountSubAccountMarkups,
     bulkCreate: api.bulkCreateAccountSubAccounts,
     bulkDelete: api.bulkDeleteAccountSubAccounts,
-    bulkUpdate: api.bulkUpdateAccountSubAccounts
+    bulkUpdate: api.bulkUpdateAccountSubAccounts,
+    bulkDeleteMarkups: api.bulkDeleteAccountMarkups
   }
 });
 

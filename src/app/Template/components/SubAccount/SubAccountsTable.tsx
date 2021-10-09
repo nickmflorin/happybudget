@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
 import { isNil, map, filter } from "lodash";
 
 import { redux, tabling, model } from "lib";
 
-import { CreateGroupModal, EditGroupModal } from "components/modals";
+import { EditMarkupModal, CreateMarkupModal, CreateGroupModal, EditGroupModal } from "components/modals";
 import { SubAccountsTable as GenericSubAccountsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../../store";
@@ -78,11 +78,15 @@ interface SubAccountsTableProps {
 }
 
 const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTableProps): JSX.Element => {
+  const [markupSubAccounts, setMarkupSubAccounts] = useState<number[] | undefined>(undefined);
+  const [markupToEdit, setMarkupToEdit] = useState<number | null>(null);
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
   const [groupSubAccounts, setGroupSubAccounts] = useState<number[] | undefined>(undefined);
   const [groupToEdit, setGroupToEdit] = useState<Table.GroupRow<R> | undefined>(undefined);
 
   const history = useHistory();
+  const dispatch = useDispatch();
+
   const subaccountDetail = useSelector(selectSubAccountDetail);
   const subAccountUnits = useSelector(selectSubAccountUnits);
   const fringes = useSelector(selectFringes);
@@ -134,8 +138,43 @@ const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTab
             )
           )
         }
+        onMarkupRows={(rows: (Table.ModelRow<R> | Table.GroupRow<R>)[]) =>
+          setMarkupSubAccounts(
+            map(
+              filter(rows, (row: Table.ModelRow<R> | Table.GroupRow<R>) =>
+                tabling.typeguards.isModelRow(row)
+              ) as Table.ModelRow<R>[],
+              (row: Table.ModelRow<R>) => row.id
+            )
+          )
+        }
         onEditGroup={(group: Table.GroupRow<R>) => setGroupToEdit(group)}
+        onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(tabling.rows.markupId(row.id))}
       />
+      {!isNil(markupSubAccounts) && !isNil(subaccountId) && (
+        <CreateMarkupModal<
+          Model.SimpleSubAccount,
+          Model.Template,
+          Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, Model.Template>
+        >
+          id={subaccountId}
+          parentType={"subaccount"}
+          children={markupSubAccounts}
+          open={true}
+          onSuccess={(
+            response: Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, Model.Template>
+          ) => {
+            setMarkupSubAccounts(undefined);
+            table.current.applyTableChange({
+              type: "markupAdded",
+              payload: response.data
+            });
+            dispatch(actions.subAccount.updateInStateAction({ id: response.parent.id, data: response.parent }));
+            dispatch(actions.updateTemplateInStateAction({ id: response.budget.id, data: response.budget }));
+          }}
+          onCancel={() => setMarkupSubAccounts(undefined)}
+        />
+      )}
       {!isNil(groupSubAccounts) && (
         <CreateGroupModal
           id={subaccountId}
@@ -150,6 +189,30 @@ const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTab
             });
           }}
           onCancel={() => setGroupSubAccounts(undefined)}
+        />
+      )}
+      {!isNil(markupToEdit) && (
+        <EditMarkupModal<
+          Model.SimpleSubAccount,
+          Model.Template,
+          Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, Model.Template>
+        >
+          id={markupToEdit}
+          parentId={subaccountId}
+          parentType={"subaccount"}
+          open={true}
+          onCancel={() => setMarkupToEdit(null)}
+          onSuccess={(
+            response: Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, Model.Template>
+          ) => {
+            setMarkupToEdit(null);
+            table.current.applyTableChange({
+              type: "markupUpdated",
+              payload: { id: response.data.id, data: response.data }
+            });
+            dispatch(actions.subAccount.updateInStateAction({ id: response.parent.id, data: response.parent }));
+            dispatch(actions.updateTemplateInStateAction({ id: response.budget.id, data: response.budget }));
+          }}
         />
       )}
       {!isNil(groupToEdit) && (

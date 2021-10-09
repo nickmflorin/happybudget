@@ -42,10 +42,12 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
     actions: ActionMap,
     services: {
       request: api.getTemplateAccounts,
+      requestMarkups: api.getTemplateAccountMarkups,
       requestGroups: api.getTemplateAccountGroups,
       bulkCreate: api.bulkCreateTemplateAccounts,
       bulkDelete: api.bulkDeleteTemplateAccounts,
-      bulkUpdate: api.bulkUpdateTemplateAccounts
+      bulkUpdate: api.bulkUpdateTemplateAccounts,
+      bulkDeleteMarkups: api.bulkDeleteTemplateMarkups
     }
   })
 });

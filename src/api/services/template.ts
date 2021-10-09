@@ -2,101 +2,49 @@ import { client } from "api";
 import * as services from "./services";
 
 export const getTemplate = services.retrieveService<Model.Template>((id: number) => ["templates", id]);
-
-export const getTemplates = async (
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.SimpleTemplate>> => {
-  const url = services.URL.v1("templates");
-  return client.list<Model.SimpleTemplate>(url, query, options);
-};
-
-export const getCommunityTemplates = async (
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.SimpleTemplate>> => {
-  const url = services.URL.v1("templates", "community");
-  return client.list<Model.Template>(url, query, options);
-};
-
-export const updateTemplate = async (
-  id: number,
-  payload: Partial<Http.TemplatePayload> | FormData,
-  options: Http.RequestOptions = {}
-): Promise<Model.Template> => {
-  const url = services.URL.v1("templates", id);
-  return client.patch<Model.Template>(url, payload, options);
-};
+export const getTemplates = services.listService<Model.SimpleTemplate>(["templates"]);
+export const getCommunityTemplates = services.listService<Model.SimpleTemplate>(["templates", "community"]);
+export const getTemplateAccounts = services.listService<Model.Account>((id: number) => ["templates", id, "accounts"]);
+export const getTemplateAccountMarkups = services.listService<Model.Markup>((id: number) => [
+  "templates",
+  id,
+  "markups"
+]);
+export const getTemplateAccountGroups = services.listService<Model.Group>((id: number) => ["templates", id, "groups"]);
+export const getTemplateFringes = services.listService<Model.Fringe>((id: number) => ["templates", id, "fringes"]);
+export const deleteTemplate = services.deleteService((id: number) => ["templates", id]);
+export const updateTemplate = services.detailPatchService<Http.TemplatePayload, Model.Template>((id: number) => [
+  "templates",
+  id
+]);
+export const createTemplate = services.postService<Http.TemplatePayload, Model.Template>(["templates"]);
+export const createCommunityTemplate = services.postService<Http.TemplatePayload | FormData, Model.Template>([
+  "templates",
+  "community"
+]);
+export const createTemplateAccount = services.detailPostService<Http.AccountPayload, Model.Account>((id: number) => [
+  "templates",
+  id,
+  "accounts"
+]);
+export const createTemplateAccountGroup = services.detailPostService<Http.GroupPayload, Model.Group>((id: number) => [
+  "templates",
+  id,
+  "groups"
+]);
+export const createTemplateFringe = services.detailPostService<Http.FringePayload, Model.Fringe>((id: number) => [
+  "templates",
+  id,
+  "fringes"
+]);
+export const createTemplateAccountMarkup = services.detailPostService<
+  Http.MarkupPayload,
+  Http.BudgetContextDetailResponse<Model.Markup>
+>((id: number) => ["templates", id, "markups"]);
 
 export const duplicateTemplate = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Template> => {
   const url = services.URL.v1("templates", id, "duplicate");
   return client.post<Model.Template>(url, {}, options);
-};
-
-export const createTemplate = async (
-  payload: Http.TemplatePayload | FormData,
-  options: Http.RequestOptions = {}
-): Promise<Model.Template> => {
-  const url = services.URL.v1("templates");
-  return client.post<Model.Template>(url, payload, options);
-};
-
-export const createCommunityTemplate = async (
-  payload: Http.TemplatePayload | FormData,
-  options: Http.RequestOptions = {}
-): Promise<Model.Template> => {
-  const url = services.URL.v1("templates", "community");
-  return client.post<Model.Template>(url, payload, options);
-};
-
-export const deleteTemplate = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
-  const url = services.URL.v1("templates", id);
-  return client.delete<null>(url, options);
-};
-
-export const getTemplateAccounts = async (
-  id: number,
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.Account>> => {
-  const url = services.URL.v1("templates", id, "accounts");
-  return client.list<Model.Account>(url, query, options);
-};
-
-export const createTemplateAccount = async (
-  id: number,
-  payload: Http.AccountPayload,
-  options: Http.RequestOptions = {}
-): Promise<Model.Account> => {
-  const url = services.URL.v1("templates", id, "accounts");
-  return client.post<Model.Account>(url, payload, options);
-};
-
-export const getTemplateAccountGroups = async (
-  id: number,
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.Group>> => {
-  const url = services.URL.v1("templates", id, "groups");
-  return client.list<Model.Group>(url, query, options);
-};
-
-export const createTemplateAccountGroup = async (
-  id: number,
-  payload: Http.GroupPayload,
-  options: Http.RequestOptions = {}
-): Promise<Model.Group> => {
-  const url = services.URL.v1("templates", id, "groups");
-  return client.post<Model.Group>(url, payload, options);
-};
-
-export const getTemplateFringes = async (
-  id: number,
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.Fringe>> => {
-  const url = services.URL.v1("templates", id, "fringes");
-  return client.list<Model.Fringe>(url, query, options);
 };
 
 export const bulkDeleteTemplateFringes = async (
@@ -108,13 +56,13 @@ export const bulkDeleteTemplateFringes = async (
   return client.patch<Http.BulkDeleteResponse<Model.Template>>(url, { ids }, options);
 };
 
-export const createTemplateFringe = async (
+export const bulkDeleteTemplateMarkups = async (
   id: number,
-  payload: Http.FringePayload,
+  ids: number[],
   options: Http.RequestOptions = {}
-): Promise<Model.Fringe> => {
-  const url = services.URL.v1("templates", id, "fringes");
-  return client.post<Model.Fringe>(url, payload, options);
+): Promise<Http.BulkDeleteResponse<Model.Template>> => {
+  const url = services.URL.v1("templates", id, "bulk-delete-markups");
+  return client.patch<Http.BulkDeleteResponse<Model.Template>>(url, { ids }, options);
 };
 
 export const bulkUpdateTemplateAccounts = async (

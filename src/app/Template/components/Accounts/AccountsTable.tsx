@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { createSelector } from "reselect";
 import { isNil, map, filter, intersection } from "lodash";
 
 import { tabling, budgeting, redux, model } from "lib";
-import { CreateGroupModal, EditGroupModal } from "components/modals";
+import { EditMarkupModal, CreateMarkupModal, CreateGroupModal, EditGroupModal } from "components/modals";
 import { AccountsTable as GenericAccountsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../../store";
@@ -58,10 +59,13 @@ interface AccountsTableProps {
 }
 
 const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Element => {
+  const [markupAccounts, setMarkupAccounts] = useState<number[] | undefined>(undefined);
+  const [markupToEdit, setMarkupToEdit] = useState<number | null>(null);
   const [groupAccounts, setGroupAccounts] = useState<number[] | undefined>(undefined);
   const [groupToEdit, setGroupToEdit] = useState<Table.GroupRow<R> | undefined>(undefined);
 
   const history = useHistory();
+  const dispatch = useDispatch();
 
   const table = tabling.hooks.useTable<R>();
 
@@ -84,8 +88,40 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
             )
           )
         }
+        onMarkupRows={(rows: (Table.ModelRow<R> | Table.GroupRow<R>)[]) =>
+          setMarkupAccounts(
+            map(
+              filter(rows, (row: Table.ModelRow<R> | Table.GroupRow<R>) =>
+                tabling.typeguards.isModelRow(row)
+              ) as Table.ModelRow<R>[],
+              (row: Table.ModelRow<R>) => row.id
+            )
+          )
+        }
         onEditGroup={(group: Table.GroupRow<R>) => setGroupToEdit(group)}
+        onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(tabling.rows.markupId(row.id))}
       />
+      {!isNil(markupAccounts) && !isNil(templateId) && (
+        <CreateMarkupModal<
+          Model.SimpleSubAccount,
+          Model.Template,
+          Http.BudgetContextDetailResponse<Model.Markup, Model.Template>
+        >
+          id={templateId}
+          parentType={"template"}
+          children={markupAccounts}
+          open={true}
+          onSuccess={(response: Http.BudgetContextDetailResponse<Model.Markup, Model.Template>) => {
+            setMarkupAccounts(undefined);
+            table.current.applyTableChange({
+              type: "markupAdded",
+              payload: response.data
+            });
+            dispatch(actions.updateTemplateInStateAction({ id: response.budget.id, data: response.budget }));
+          }}
+          onCancel={() => setMarkupAccounts(undefined)}
+        />
+      )}
       {!isNil(groupAccounts) && !isNil(templateId) && (
         <CreateGroupModal
           id={templateId}
@@ -100,6 +136,27 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
             });
           }}
           onCancel={() => setGroupAccounts(undefined)}
+        />
+      )}
+      {!isNil(markupToEdit) && (
+        <EditMarkupModal<
+          Model.SimpleSubAccount,
+          Model.Template,
+          Http.BudgetContextDetailResponse<Model.Markup, Model.Template>
+        >
+          id={markupToEdit}
+          parentId={templateId}
+          parentType={"template"}
+          open={true}
+          onCancel={() => setMarkupToEdit(null)}
+          onSuccess={(response: Http.BudgetContextDetailResponse<Model.Markup, Model.Template>) => {
+            setMarkupToEdit(null);
+            table.current.applyTableChange({
+              type: "markupUpdated",
+              payload: { id: response.data.id, data: response.data }
+            });
+            dispatch(actions.updateTemplateInStateAction({ id: response.budget.id, data: response.budget }));
+          }}
         />
       )}
       {!isNil(groupToEdit) && (

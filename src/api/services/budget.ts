@@ -1,131 +1,50 @@
 import { client } from "api";
 import * as services from "./services";
 
-export const getBudgets = async (
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.SimpleBudget>> => {
-  const url = services.URL.v1("budgets");
-  return client.list<Model.SimpleBudget>(url, query, options);
-};
-
 export const getBudget = services.retrieveService<Model.Budget>((id: number) => ["budgets", id]);
-
-export const updateBudget = async (
-  id: number,
-  payload: Partial<Http.BudgetPayload> | FormData,
-  options: Http.RequestOptions = {}
-): Promise<Model.Budget> => {
-  const url = services.URL.v1("budgets", id);
-  return client.patch<Model.Budget>(url, payload, options);
-};
-
 export const getBudgetPdf = services.retrieveService<Model.PdfBudget>((id: number) => ["budgets", id, "pdf"]);
-
-export const createBudget = async (
-  payload: Http.BudgetPayload | FormData,
-  options: Http.RequestOptions = {}
-): Promise<Model.Budget> => {
-  const url = services.URL.v1("budgets");
-  return client.post<Model.Budget>(url, payload, options);
-};
-
-export const deleteBudget = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
-  const url = services.URL.v1("budgets", id);
-  return client.delete<null>(url, options);
-};
-
-export const getBudgetAccounts = async <M extends Model.Account | Model.SimpleAccount = Model.Account>(
-  budgetId: number,
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<M>> => {
-  const url = services.URL.v1("budgets", budgetId, "accounts");
-  return client.list<M>(url, query, options);
-};
-
-export const createBudgetAccount = async (
-  budgetId: number,
-  payload: Http.AccountPayload,
-  options: Http.RequestOptions = {}
-): Promise<Model.Account> => {
-  const url = services.URL.v1("budgets", budgetId, "accounts");
-  return client.post<Model.Account>(url, payload, options);
-};
-
-export const getBudgetAccountGroups = async (
-  id: number,
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.Group>> => {
-  const url = services.URL.v1("budgets", id, "groups");
-  return client.list<Model.Group>(url, query, options);
-};
-
+export const getBudgets = services.listService<Model.SimpleBudget>(["budgets"]);
+export const getBudgetAccounts = services.listService<Model.Account>((id: number) => ["budgets", id, "accounts"]);
+export const getBudgetSubAccounts = services.listService<Model.SimpleSubAccount>((id: number) => [
+  "budgets",
+  id,
+  "subaccounts"
+]);
+export const getBudgetAccountMarkups = services.listService<Model.Markup>((id: number) => ["budgets", id, "markups"]);
+export const getBudgetAccountGroups = services.listService<Model.Group>((id: number) => ["budgets", id, "groups"]);
+export const getBudgetOwnerTree = services.listService<Model.OwnerTreeNode>((id: number) => [
+  "budgets",
+  id,
+  "subaccounts",
+  "owner-tree"
+]);
+export const getBudgetFringes = services.listService<Model.Fringe>((id: number) => ["budgets", id, "fringes"]);
+export const getBudgetActuals = services.listService<Model.Actual>((id: number) => ["budgets", id, "actuals"]);
+export const deleteBudget = services.deleteService((id: number) => ["budgets", id]);
+export const updateBudget = services.detailPatchService<Http.BudgetPayload, Model.Budget>((id: number) => [
+  "budgets",
+  id
+]);
+export const createBudget = services.postService<Http.BudgetPayload, Model.Budget>(["budgets"]);
+export const createBudgetAccount = services.detailPostService<Http.AccountPayload, Model.Account>((id: number) => [
+  "budgets",
+  id,
+  "accounts"
+]);
 export const createBudgetAccountGroup = services.detailPostService<Http.GroupPayload, Model.Group>((id: number) => [
   "budgets",
   id,
   "groups"
 ]);
-
-export const getBudgetAccountMarkups = async (
-  id: number,
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.Markup>> => {
-  const url = services.URL.v1("budgets", id, "markups");
-  return client.list<Model.Markup>(url, query, options);
-};
-
+export const createBudgetFringe = services.detailPostService<Http.FringePayload, Model.Fringe>((id: number) => [
+  "budgets",
+  id,
+  "fringes"
+]);
 export const createBudgetAccountMarkup = services.detailPostService<
   Http.MarkupPayload,
   Http.BudgetContextDetailResponse<Model.Markup>
 >((id: number) => ["budgets", id, "markups"]);
-
-export const getBudgetFringes = async (
-  id: number,
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.Fringe>> => {
-  const url = services.URL.v1("budgets", id, "fringes");
-  return client.list<Model.Fringe>(url, query, options);
-};
-
-export const createBudgetFringe = async (
-  id: number,
-  payload: Http.FringePayload,
-  options: Http.RequestOptions = {}
-): Promise<Model.Fringe> => {
-  const url = services.URL.v1("budgets", id, "fringes");
-  return client.post<Model.Fringe>(url, payload, options);
-};
-
-export const getBudgetSubAccounts = async (
-  id: number,
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.SimpleSubAccount>> => {
-  const url = services.URL.v1("budgets", id, "subaccounts");
-  return client.list<Model.SimpleSubAccount>(url, query, options);
-};
-
-export const getBudgetOwnerTree = async (
-  id: number,
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.OwnerTreeNode>> => {
-  const url = services.URL.v1("budgets", id, "subaccounts", "owner-tree");
-  return client.list<Model.OwnerTreeNode>(url, query, options);
-};
-
-export const getBudgetActuals = async (
-  id: number,
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.Actual>> => {
-  const url = services.URL.v1("budgets", id, "actuals");
-  return client.list<Model.Actual>(url, query, options);
-};
 
 export const bulkDeleteBudgetMarkups = async (
   id: number,

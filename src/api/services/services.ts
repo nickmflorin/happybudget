@@ -43,6 +43,14 @@ export const detailPatchService = <P extends Http.Payload, R>(
   };
 };
 
+export const deleteService = (path: Http.PathParams | ((id: number) => Http.PathParams)) => {
+  return async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
+    const pt = typeof path === "function" ? path(id) : path;
+    const url = URL.v1(...pt);
+    return client.delete<null>(url, options);
+  };
+};
+
 export const retrieveService = <M extends Model.HttpModel>(
   path: Http.PathParams | ((id: number) => Http.PathParams)
 ) => {

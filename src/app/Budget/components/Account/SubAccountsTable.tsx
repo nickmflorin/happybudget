@@ -137,6 +137,7 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
       {!isNil(markupSubAccounts) && !isNil(accountId) && (
         <CreateMarkupModal<
           Model.SimpleSubAccount,
+          Model.Budget,
           Http.BudgetParentContextDetailResponse<Model.Markup, Model.Account, Model.Budget>
         >
           id={accountId}
@@ -174,6 +175,7 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
       {!isNil(markupToEdit) && (
         <EditMarkupModal<
           Model.SimpleSubAccount,
+          Model.Budget,
           Http.BudgetParentContextDetailResponse<Model.Markup, Model.Account, Model.Budget>
         >
           id={markupToEdit}

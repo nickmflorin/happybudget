@@ -104,7 +104,11 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
         onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(tabling.rows.markupId(row.id))}
       />
       {!isNil(markupAccounts) && !isNil(budgetId) && (
-        <CreateMarkupModal<Model.SimpleSubAccount, Http.BudgetContextDetailResponse<Model.Markup, Model.Budget>>
+        <CreateMarkupModal<
+          Model.SimpleSubAccount,
+          Model.Budget,
+          Http.BudgetContextDetailResponse<Model.Markup, Model.Budget>
+        >
           id={budgetId}
           parentType={"budget"}
           children={markupAccounts}
@@ -137,7 +141,11 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
         />
       )}
       {!isNil(markupToEdit) && (
-        <EditMarkupModal<Model.SimpleSubAccount, Http.BudgetContextDetailResponse<Model.Markup, Model.Budget>>
+        <EditMarkupModal<
+          Model.SimpleSubAccount,
+          Model.Budget,
+          Http.BudgetContextDetailResponse<Model.Markup, Model.Budget>
+        >
           id={markupToEdit}
           parentId={budgetId}
           parentType={"budget"}

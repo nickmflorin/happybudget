@@ -39,6 +39,20 @@ const AuthenticatedTemplateAccountsTable = (props: AuthenticatedTemplateProps): 
             }
           }
         },
+        {
+          icon: "badge-percent",
+          label: "Mark Up",
+          isWriteOnly: true,
+          onClick: () => {
+            const rows: Table.BodyRow<R>[] = table.current.getRowsAboveAndIncludingFocusedRow();
+            const modelRows: Table.ModelRow<R>[] = filter(rows, (r: Table.BodyRow<R>) =>
+              tabling.typeguards.isModelRow(r)
+            ) as Table.ModelRow<R>[];
+            if (modelRows.length !== 0) {
+              props.onMarkupRows?.(modelRows);
+            }
+          }
+        },
         ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
         framework.actions.ToggleColumnAction<R, M>(table.current, params),
         framework.actions.ExportCSVAction<R, M>(

@@ -10,28 +10,12 @@ export const getContacts = async (
 };
 
 export const getContact = services.retrieveService<Model.Contact>((id: number) => ["contacts", id]);
-
-export const updateContact = async (
-  id: number,
-  payload: Partial<Http.ContactPayload>,
-  options: Http.RequestOptions = {}
-): Promise<Model.Contact> => {
-  const url = services.URL.v1("contacts", id);
-  return client.patch<Model.Contact>(url, payload, options);
-};
-
-export const createContact = async (
-  payload: Http.ContactPayload,
-  options: Http.RequestOptions = {}
-): Promise<Model.Contact> => {
-  const url = services.URL.v1("contacts");
-  return client.post<Model.Contact>(url, payload, options);
-};
-
-export const deleteContact = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
-  const url = services.URL.v1("contacts", id);
-  return client.delete<null>(url, options);
-};
+export const updateContact = services.detailPatchService<Http.ContactPayload, Model.Contact>((id: number) => [
+  "contacts",
+  id
+]);
+export const deleteContact = services.deleteService((id: number) => ["contacts", id]);
+export const createContact = services.postService<Http.ContactPayload, Model.Contact>(["contacts"]);
 
 export const bulkUpdateContacts = async (
   data: Http.BulkUpdatePayload<Http.ContactPayload>,

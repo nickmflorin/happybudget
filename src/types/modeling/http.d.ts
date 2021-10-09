@@ -157,10 +157,10 @@ namespace Http {
     readonly color?: string | null;
   }
 
-  type MarkupResponseTypes =
-  | BudgetContextDetailResponse<Model.Markup>
-  | BudgetParentContextDetailResponse<Model.Markup, Model.Account>
-  | BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount>;
+  type MarkupResponseTypes<B extends Model.Budget | Model.Template> =
+  | BudgetContextDetailResponse<Model.Markup, B>
+  | BudgetParentContextDetailResponse<Model.Markup, Model.Account, B>
+  | BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, B>;
 
   interface MarkupPayload {
     readonly identifier?: string | null;

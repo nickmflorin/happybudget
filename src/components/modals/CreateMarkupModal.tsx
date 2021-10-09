@@ -7,19 +7,23 @@ import { MarkupForm } from "components/forms";
 
 import { Modal } from "./generic";
 
-interface CreateMarkupModalProps<R extends Http.MarkupResponseTypes = Http.MarkupResponseTypes> {
+interface CreateMarkupModalProps<
+  B extends Model.Budget | Model.Template,
+  R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
+> {
   readonly onSuccess: (response: R) => void;
   readonly onCancel: () => void;
   readonly id: number;
   readonly children: number[];
   readonly open: boolean;
-  readonly parentType: Model.ParentType;
+  readonly parentType: Model.ParentType | "template";
 }
 
 /* eslint-disable indent */
 const CreateMarkupModal = <
   M extends Model.SimpleAccount | Model.SimpleSubAccount,
-  R extends Http.MarkupResponseTypes = Http.MarkupResponseTypes
+  B extends Model.Budget | Model.Template,
+  R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
 >({
   id,
   children,
@@ -27,7 +31,7 @@ const CreateMarkupModal = <
   open,
   onSuccess,
   onCancel
-}: CreateMarkupModalProps<R>): JSX.Element => {
+}: CreateMarkupModalProps<B, R>): JSX.Element => {
   const [form] = Form.useForm<Omit<Http.MarkupPayload, "rate"> & { readonly rate: string }>({ isInModal: true });
   const cancelToken = api.useCancelToken();
 
@@ -73,7 +77,7 @@ const CreateMarkupModal = <
               httpPayload = payload;
             }
             api
-              .createTableMarkup<R>(id, parentType, httpPayload, { cancelToken: cancelToken() })
+              .createTableMarkup<B, R>(id, parentType, httpPayload, { cancelToken: cancelToken() })
               .then((response: R) => {
                 form.resetFields();
                 onSuccess(response);
