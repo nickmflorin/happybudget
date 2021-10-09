@@ -14,6 +14,7 @@ const CreateGroupModal = ({ id, children, parentType, ...props }: CreateGroupMod
     <CreateModelModal<Model.Group, Http.GroupPayload>
       {...props}
       title={"Create Sub-Total"}
+      interceptPayload={(p: Http.GroupPayload) => ({ ...p, children })}
       create={(payload: Http.GroupPayload, options?: Http.RequestOptions) =>
         api.createTableGroup(id, parentType, payload, options)
       }
