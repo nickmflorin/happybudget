@@ -23,21 +23,28 @@ const recalculateSubAccountRow = (
   const isValidToRecalculate =
     tabling.typeguards.isPlaceholderRow<R>(row) || (!isNil(row.children) && row.children.length === 0);
 
-  if (isValidToRecalculate && !isNil(row.data.quantity) && !isNil(row.data.rate)) {
-    const multiplier = row.data.multiplier || 1.0;
+  if (isValidToRecalculate) {
     const fringes: Tables.FringeRow[] = redux.reducers.findModelsInData(
       action,
       filter(st.fringes.data, (r: Table.BodyRow<Tables.FringeRowData>) => tabling.typeguards.isModelRow(r)),
       row.data.fringes,
       { name: "Fringe" }
     );
-    return {
-      nominal_value: row.data.quantity * row.data.rate * multiplier,
-      fringe_contribution: model.businessLogic.contributionFromFringes(
-        row.data.quantity * row.data.rate * multiplier,
-        fringes
-      )
-    };
+    if (!isNil(row.data.quantity) && !isNil(row.data.rate)) {
+      const multiplier = row.data.multiplier || 1.0;
+      return {
+        nominal_value: row.data.quantity * row.data.rate * multiplier,
+        fringe_contribution: model.businessLogic.contributionFromFringes(
+          row.data.quantity * row.data.rate * multiplier,
+          fringes
+        )
+      };
+    } else {
+      return {
+        nominal_value: 0.0,
+        fringe_contribution: model.businessLogic.contributionFromFringes(0.0, fringes)
+      };
+    }
   }
   return {
     nominal_value: row.data.nominal_value,
