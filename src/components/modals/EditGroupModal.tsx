@@ -4,7 +4,7 @@ import { GroupForm } from "components/forms";
 
 import { EditModelModal, EditModelModalProps } from "./generic";
 
-const EditGroupModal = (props: EditModelModalProps<Model.Group, Http.GroupPayload>): JSX.Element => {
+const EditGroupModal = (props: EditModelModalProps<Model.Group>): JSX.Element => {
   return (
     <EditModelModal<Model.Group, Http.GroupPayload>
       {...props}

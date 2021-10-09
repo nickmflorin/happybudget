@@ -10,7 +10,6 @@ import { ui } from "lib";
 import Error from "./Error";
 import FieldError from "./FieldError";
 import Footer from "./Footer";
-import useForm from "./useForm";
 import FormItemStyle from "./FormItemStyle";
 import FormItemSection from "./FormItemSection";
 import FormItemComp from "./FormItem";
@@ -238,7 +237,6 @@ const exportable = {
   Form: Form,
   Error: Error,
   FieldError: FieldError,
-  useForm: useForm,
   Footer: Footer,
   Item: FormItemComp,
   ColumnItem: FormColumnItem,

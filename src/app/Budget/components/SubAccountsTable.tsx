@@ -67,9 +67,10 @@ const SubAccountsTable = ({ budget, budgetId, ...props }: BudgetSubAccountsTable
       )}
       {createContactModalVisible && (
         <CreateContactModal
-          visible={true}
+          open={true}
           initialValues={initialContactFormValues}
-          onSuccess={(contact: Model.Contact) => {
+          onSuccess={(m: Model.Contact) => {
+            dispatch(actions.authenticated.addContactToStateAction(m));
             setPreContactCreate(null);
             setInitialContactFormValues(null);
             setCreateContactModalVisible(false);
@@ -81,14 +82,14 @@ const SubAccountsTable = ({ budget, budgetId, ...props }: BudgetSubAccountsTable
               if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
                 let rowChange: Table.RowChange<R> = {
                   id: row.id,
-                  data: { contact: { oldValue: row.data.contact || null, newValue: contact.id } }
+                  data: { contact: { oldValue: row.data.contact || null, newValue: m.id } }
                 };
                 // If the Row does not already specify a rate and the Contact does specify a rate,
                 // use the rate that is specified for the Contact.
-                if (contact.rate !== null && row.data.rate === null) {
+                if (m.rate !== null && row.data.rate === null) {
                   rowChange = {
                     ...rowChange,
-                    data: { ...rowChange.data, rate: { oldValue: row.data.rate, newValue: contact.rate } }
+                    data: { ...rowChange.data, rate: { oldValue: row.data.rate, newValue: m.rate } }
                   };
                 }
                 table.current.applyTableChange({

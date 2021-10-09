@@ -1,32 +1,23 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
-import { useDispatch } from "react-redux";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { actions } from "store";
-
-import { Form } from "components";
+import { ui } from "lib";
 import { ContactForm } from "components/forms";
-import { Modal } from "components";
 
+import { CreateModelModal, CreateModelModalProps } from "./generic";
 import ContactModalHeader, { IContactModalHeaderRef } from "./ContactModalHeader";
 import "./ContactModal.scss";
 
-interface CreateContactModalProps {
-  readonly visible: boolean;
-  readonly initialValues?: any;
-  readonly onCancel: () => void;
-  readonly onSuccess: (contact: Model.Contact) => void;
+interface CreateContactModalProps extends CreateModelModalProps<Model.Contact> {
+  readonly initialValues?: Partial<Http.ContactPayload>;
 }
 
 const MemoizedContactForm = React.memo(ContactForm);
 
-const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: CreateContactModalProps): JSX.Element => {
+const CreateContactModal = ({ initialValues, ...props }: CreateContactModalProps): JSX.Element => {
+  const form = ui.hooks.useForm<Http.ContactPayload>();
   const [image, setImage] = useState<UploadedImage | null>(null);
-  const cancelToken = api.useCancelToken();
-  const [loading, setLoading] = useState(false);
-  const [form] = Form.useForm<Http.ContactPayload>({ isInModal: true, autoFocusField: 1 });
-  const dispatch: Redux.Dispatch = useDispatch();
   /*
   Note: We have to use a ref here, instead of storing firstName and lastName in the state
   of this component, because if we were storing it in this component, when the firstName and
@@ -40,7 +31,6 @@ const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: Cre
       headerRef.current?.setFirstName(null);
       headerRef.current?.setLastName(null);
       setImage(null);
-      form.resetFields();
     };
   }, []);
 
@@ -57,8 +47,10 @@ const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: Cre
   );
 
   return (
-    <Modal
+    <CreateModelModal
+      {...props}
       className={"contact-modal"}
+      form={form}
       title={
         <ContactModalHeader
           value={image}
@@ -67,44 +59,16 @@ const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: Cre
           onError={(error: Error | string) => form.setGlobalError(error)}
         />
       }
-      visible={visible}
-      onCancel={() => onCancel()}
-      okText={"Create"}
-      cancelText={"Cancel"}
-      loading={loading}
-      getContainer={false}
-      onOk={() => {
-        form
-          .validateFields()
-          .then((values: Http.ContactPayload) => {
-            let payload = { ...values };
-            // We have to account for allowing the image to be null, which is the case
-            // when we are deleting the image for the contact.
-            if (image !== undefined) {
-              payload = { ...payload, image: !isNil(image) ? image.data : null };
-            }
-            setLoading(true);
-            api
-              .createContact(payload, { cancelToken: cancelToken() })
-              .then((contact: Model.Contact) => {
-                form.resetFields();
-                dispatch(actions.authenticated.addContactToStateAction(contact));
-                onSuccess(contact);
-              })
-              .catch((e: Error) => {
-                form.handleRequestError(e);
-              })
-              .finally(() => {
-                setLoading(false);
-              });
-          })
-          .catch(() => {
-            return;
-          });
+      interceptPayload={(p: Http.ContactPayload) => {
+        if (image !== undefined) {
+          return { ...p, image: !isNil(image) ? image.data : null };
+        }
+        return p;
       }}
+      create={api.createContact}
     >
-      <MemoizedContactForm form={form} initialValues={initialValues} onValuesChange={onValuesChange} />
-    </Modal>
+      {() => <MemoizedContactForm form={form} initialValues={initialValues} onValuesChange={onValuesChange} />}
+    </CreateModelModal>
   );
 };
 

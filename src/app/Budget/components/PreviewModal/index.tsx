@@ -5,9 +5,9 @@ import { isNil, map, debounce, filter } from "lodash";
 
 import * as api from "api";
 import { registerFonts } from "style/pdf";
-import { util, redux, tabling } from "lib";
+import { util, redux, tabling, ui } from "lib";
 
-import { Form, Modal } from "components";
+import { Modal } from "components";
 import { ExportPdfForm } from "components/forms";
 
 import { actions } from "../../store";
@@ -119,7 +119,7 @@ const PreviewModal = ({
   const [budgetResponse, setBudgetResponse] = useState<Model.PdfBudget | null>(null);
 
   const [file, setFile] = useState<string | ArrayBuffer | null>(null);
-  const [form] = Form.useForm<PdfBudgetTable.Options>({ isInModal: true });
+  const form = ui.hooks.useForm<PdfBudgetTable.Options>({ isInModal: true });
   const dispatch = useDispatch();
 
   const headerTemplatesLoading = useSelector(selectHeaderTemplatesLoading);

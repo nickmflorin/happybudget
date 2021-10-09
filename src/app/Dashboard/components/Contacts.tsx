@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { isNil } from "lodash";
 
+import { actions as globalActions } from "store";
 import { tabling, redux } from "lib";
 
 import { Page } from "components/layout";
@@ -39,6 +41,8 @@ const Contacts = (): JSX.Element => {
   const [contactToEdit, setContactToEdit] = useState<number | undefined>(undefined);
   const [newContactModalOpen, setNewContactModalOpen] = useState(false);
 
+  const dispatch = useDispatch();
+
   return (
     <Page className={"contacts"} title={"My Contacts"}>
       <ConnectedContactsTable
@@ -48,9 +52,12 @@ const Contacts = (): JSX.Element => {
         exportFileName={"contacts"}
       />
       <CreateContactModal
-        visible={newContactModalOpen}
+        open={newContactModalOpen}
         onCancel={() => setNewContactModalOpen(false)}
-        onSuccess={() => setNewContactModalOpen(false)}
+        onSuccess={(m: Model.Contact) => {
+          dispatch(globalActions.authenticated.addContactToStateAction(m));
+          setNewContactModalOpen(false);
+        }}
       />
       {!isNil(contactToEdit) && (
         <EditContactModal

@@ -9,7 +9,7 @@ import { EditModelModal, EditModelModalProps } from "./generic";
 import ContactModalHeader, { IContactModalHeaderRef } from "./ContactModalHeader";
 import "./ContactModal.scss";
 
-interface EditContactModalProps extends EditModelModalProps<Model.Contact, Http.ContactPayload> {}
+interface EditContactModalProps extends EditModelModalProps<Model.Contact> {}
 
 const MemoizedContactForm = React.memo(ContactForm);
 

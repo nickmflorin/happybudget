@@ -84,8 +84,11 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
         />
       )}
       <CreateContactModal
-        visible={createContactModalVisible}
-        onSuccess={() => setCreateContactModalVisible(false)}
+        open={createContactModalVisible}
+        onSuccess={(m: Model.Contact) => {
+          dispatch(globalActions.authenticated.addContactToStateAction(m));
+          setCreateContactModalVisible(false);
+        }}
         onCancel={() => setCreateContactModalVisible(false)}
       />
     </React.Fragment>

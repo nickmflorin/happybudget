@@ -4,15 +4,15 @@ import { useHistory } from "react-router-dom";
 import { Typography } from "antd";
 
 import * as api from "api";
+import { ui } from "lib";
 
-import { Form } from "components";
 import { Logo } from "components/svgs";
 
 import SignupForm, { ISignupFormValues } from "./SignupForm";
 
 const Signup = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const [form] = Form.useForm();
+  const form = ui.hooks.useForm();
   const history = useHistory();
 
   return (

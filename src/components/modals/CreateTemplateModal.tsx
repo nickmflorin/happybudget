@@ -2,67 +2,30 @@ import { useState } from "react";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { Form } from "components";
 import { TemplateForm } from "components/forms";
 import { useLoggedInUser } from "store/hooks";
 
-import { Modal } from "./generic";
+import { CreateModelModal, CreateModelModalProps } from "./generic";
 
-interface CreateTemplateModalProps {
-  onSuccess: (template: Model.Template) => void;
-  onCancel: () => void;
-  community?: boolean;
-  open: boolean;
+interface CreateTemplateModalProps extends CreateModelModalProps<Model.Template> {
+  readonly community?: boolean;
 }
 
-const CreateTemplateModal = ({
-  open,
-  community = false,
-  onSuccess,
-  onCancel
-}: CreateTemplateModalProps): JSX.Element => {
+const CreateTemplateModal = ({ community = false, ...props }: CreateTemplateModalProps): JSX.Element => {
   const user = useLoggedInUser();
   const [file, setFile] = useState<UploadedImage | null>(null);
-  const [form] = Form.useForm<Http.TemplatePayload>({ isInModal: true });
-  const cancelToken = api.useCancelToken();
 
   return (
-    <Modal
+    <CreateModelModal<Model.Template, Http.TemplatePayload>
+      {...props}
       title={"Create Template"}
-      visible={open}
-      onCancel={() => onCancel()}
-      okText={"Create"}
-      okButtonProps={{ disabled: form.loading }}
-      cancelText={"Cancel"}
-      getContainer={false}
-      onOk={() => {
-        form
-          .validateFields()
-          .then((values: Http.TemplatePayload) => {
-            let service = api.createTemplate;
-            if (community === true && user.is_staff === true) {
-              service = api.createCommunityTemplate;
-            }
-            form.setLoading(true);
-            service({ ...values, image: !isNil(file) ? file.data : null }, { cancelToken: cancelToken() })
-              .then((template: Model.Template) => {
-                form.resetFields();
-                onSuccess(template);
-              })
-              .catch((e: Error) => {
-                form.handleRequestError(e);
-              })
-              .finally(() => {
-                form.setLoading(false);
-              });
-          })
-          .catch(() => {
-            return;
-          });
-      }}
+      create={community === true && user.is_staff === true ? api.createCommunityTemplate : api.createTemplate}
+      interceptPayload={(p: Http.TemplatePayload) => ({ ...p, image: !isNil(file) ? file.data : null })}
     >
-      <TemplateForm form={form} onImageChange={(f: UploadedImage | null) => setFile(f)} initialValues={{}} />
-    </Modal>
+      {(form: FormInstance<Http.TemplatePayload>) => (
+        <TemplateForm form={form} onImageChange={(f: UploadedImage | null) => setFile(f)} initialValues={{}} />
+      )}
+    </CreateModelModal>
   );
 };
 

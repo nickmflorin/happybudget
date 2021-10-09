@@ -1,23 +1,21 @@
 import { useEffect, useState } from "react";
 
 import * as api from "api";
-
-import { Form } from "components";
+import { ui } from "lib";
 import { MarkupForm } from "components/forms";
 
-import { Modal } from "./generic";
+import { CreateModelModal, CreateModelModalProps } from "./generic";
 
 interface CreateMarkupModalProps<
   B extends Model.Budget | Model.Template,
   R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
-> {
-  readonly onSuccess: (response: R) => void;
-  readonly onCancel: () => void;
+> extends CreateModelModalProps<Model.Markup, R> {
   readonly id: number;
   readonly children: number[];
-  readonly open: boolean;
   readonly parentType: Model.ParentType | "template";
 }
+
+type MarkupFormValues = Omit<Http.MarkupPayload, "rate"> & { readonly rate: string };
 
 /* eslint-disable indent */
 const CreateMarkupModal = <
@@ -26,13 +24,10 @@ const CreateMarkupModal = <
   R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
 >({
   id,
-  children,
   parentType,
-  open,
-  onSuccess,
-  onCancel
+  ...props
 }: CreateMarkupModalProps<B, R>): JSX.Element => {
-  const [form] = Form.useForm<Omit<Http.MarkupPayload, "rate"> & { readonly rate: string }>({ isInModal: true });
+  const form = ui.hooks.useForm<MarkupFormValues>();
   const cancelToken = api.useCancelToken();
 
   const [availableChildren, setAvailableChildren] = useState<M[]>([]);
@@ -44,7 +39,6 @@ const CreateMarkupModal = <
       .getTableChildren<M>(id, parentType, { simple: true }, { cancelToken: cancelToken() })
       .then((response: Http.ListResponse<M>) => {
         setAvailableChildren(response.data);
-        form.setFields([{ name: "children", value: children }]);
       })
       .catch((e: Error) => {
         form.handleRequestError(e);
@@ -53,54 +47,33 @@ const CreateMarkupModal = <
   }, [id]);
 
   return (
-    <Modal
+    <CreateModelModal<Model.Markup, Http.MarkupPayload, MarkupFormValues, R>
+      {...props}
       title={"Markup"}
       titleIcon={"badge-percent"}
-      visible={open}
-      onCancel={() => onCancel()}
-      okText={"Create"}
-      okButtonProps={{ disabled: form.loading }}
-      cancelText={"Cancel"}
-      getContainer={false}
-      onOk={() => {
-        form
-          .validateFields()
-          .then((values: Omit<Http.MarkupPayload, "rate"> & { readonly rate: string }) => {
-            form.setLoading(true);
-            let httpPayload: Http.MarkupPayload;
-            let { rate, ...payload } = values;
-            if (!isNaN(parseFloat(rate))) {
-              httpPayload = {
-                ...payload,
-                rate: parseFloat((parseFloat(rate) / 100.0).toFixed(2))
-              };
-            } else {
-              httpPayload = payload;
-            }
-            api
-              .createTableMarkup<B, R>(id, parentType, httpPayload, { cancelToken: cancelToken() })
-              .then((response: R) => {
-                form.resetFields();
-                onSuccess(response);
-              })
-              .catch((e: Error) => {
-                form.handleRequestError(e);
-              })
-              .finally(() => {
-                form.setLoading(false);
-              });
-          })
-          .catch(() => {
-            return;
-          });
+      form={form}
+      create={(payload: Http.MarkupPayload, options?: Http.RequestOptions) =>
+        api.createTableMarkup(id, parentType, payload, options)
+      }
+      interceptPayload={(p: MarkupFormValues) => {
+        let { rate, ...payload } = p;
+        if (!isNaN(parseFloat(rate))) {
+          return {
+            ...payload,
+            rate: parseFloat((parseFloat(rate) / 100.0).toFixed(2))
+          };
+        }
+        return payload;
       }}
     >
-      <MarkupForm
-        form={form}
-        availableChildren={availableChildren}
-        availableChildrenLoading={availableChildrenLoading}
-      />
-    </Modal>
+      {() => (
+        <MarkupForm
+          form={form}
+          availableChildren={availableChildren}
+          availableChildrenLoading={availableChildrenLoading}
+        />
+      )}
+    </CreateModelModal>
   );
 };
 

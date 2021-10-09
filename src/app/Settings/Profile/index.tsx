@@ -4,9 +4,9 @@ import { toast } from "react-toastify";
 import { isNil } from "lodash";
 
 import * as api from "api";
+import { ui } from "lib";
 import { hooks, actions } from "store";
 
-import { Form } from "components";
 import { UserProfileForm } from "components/forms";
 import { Page } from "components/layout";
 
@@ -14,7 +14,7 @@ import "./index.scss";
 
 const Profile = (): JSX.Element => {
   const [file, setFile] = useState<UploadedImage | null>(null);
-  const [form] = Form.useForm<Http.UserPayload>();
+  const form = ui.hooks.useForm<Http.UserPayload>();
   const user = hooks.useLoggedInUser();
   const dispatch: Redux.Dispatch = useDispatch();
 

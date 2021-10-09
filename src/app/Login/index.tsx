@@ -4,15 +4,16 @@ import { isNil } from "lodash";
 
 import { Typography } from "antd";
 
-import { login, socialLogin } from "api/services";
-import { Form } from "components";
+import * as api from "api";
+import { ui } from "lib";
+
 import { Logo } from "components/svgs";
 
 import LoginForm, { ILoginFormValues } from "./LoginForm";
 
 const Login = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const [form] = Form.useForm();
+  const form = ui.hooks.useForm();
   const history = useHistory();
 
   return (
@@ -29,7 +30,8 @@ const Login = (): JSX.Element => {
           loading={loading}
           onGoogleSuccess={(token: string) => {
             setLoading(true);
-            socialLogin({ token_id: token, provider: "google" })
+            api
+              .socialLogin({ token_id: token, provider: "google" })
               .then((user: Model.User) => {
                 if (user.is_first_time === true) {
                   history.push("/discover");
@@ -52,7 +54,8 @@ const Login = (): JSX.Element => {
           }}
           onSubmit={(values: ILoginFormValues) => {
             if (!isNil(values.email) && !isNil(values.password)) {
-              login(values.email.toLowerCase(), values.password)
+              api
+                .login(values.email.toLowerCase(), values.password)
                 .then((user: Model.User) => {
                   if (user.is_first_time === true) {
                     history.push("/discover");

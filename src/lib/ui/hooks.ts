@@ -1,13 +1,14 @@
 import { useRef, useEffect, useState, useMemo } from "react";
-import { forEach, isNil, debounce } from "lodash";
+import { forEach, isNil, debounce, find } from "lodash";
 import * as JsSearch from "js-search";
-import AwesomeDebouncePromise from "awesome-debounce-promise";
-import useConstant from "use-constant";
-import { useAsync, UseAsyncReturn } from "react-async-hook";
+import axios from "axios";
 import { useMediaQuery } from "react-responsive";
+import { Form as RootForm } from "antd";
 
 import { Breakpoints } from "style/constants";
-import { useDeepEqualMemo } from "lib/hooks";
+
+import * as api from "api";
+import { util, hooks } from "lib";
 
 export * from "./tsxHooks";
 
@@ -30,6 +31,94 @@ export const useMenuIfNotDefined = <M extends Model.Model>(menu?: NonNullRef<IMe
   const ref = useRef<IMenuRef<M>>(InitialMenuRef);
   const returnRef = useMemo(() => (!isNil(menu) ? menu : ref), [menu, ref.current]);
   return returnRef;
+};
+
+export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormInstance<T> => {
+  const _useAntdForm = RootForm.useForm();
+  const antdForm = _useAntdForm[0];
+
+  const [globalError, setGlobalError] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState<boolean | undefined>(undefined);
+
+  const renderFieldErrors = (e: api.ClientError) => {
+    let fieldsWithErrors: { name: string; errors: string[] }[] = [];
+    forEach(api.parseFieldErrors(e), (error: Http.FieldError) => {
+      const existing = find(fieldsWithErrors, { name: error.field });
+      if (!isNil(existing)) {
+        fieldsWithErrors = util.replaceInArray<{ name: string; errors: string[] }>(
+          fieldsWithErrors,
+          { name: error.field },
+          { ...existing, errors: [...existing.errors, api.standardizeError(error).message] }
+        );
+      } else {
+        fieldsWithErrors.push({ name: error.field, errors: [api.standardizeError(error).message] });
+      }
+    });
+    antdForm.setFields(fieldsWithErrors);
+  };
+
+  const wrapForm = useMemo<FormInstance<T>>(() => {
+    return {
+      ...antdForm,
+      autoFocusField: form?.autoFocusField,
+      submit: () => {
+        setGlobalError(undefined);
+        antdForm.submit();
+      },
+      resetFields: () => {
+        setGlobalError(undefined);
+        antdForm.resetFields();
+      },
+      setLoading,
+      setGlobalError: (e: Error | string | undefined) => {
+        if (!isNil(e)) {
+          if (typeof e === "string") {
+            setGlobalError(e);
+          } else {
+            setGlobalError(!isNil(e.message) ? e.message : `${e}`);
+          }
+        } else {
+          setGlobalError(undefined);
+        }
+      },
+      renderFieldErrors: renderFieldErrors,
+      handleRequestError: (e: Error) => {
+        if (!axios.isCancel(e)) {
+          if (e instanceof api.ClientError) {
+            const global = api.parseGlobalError(e);
+            if (!isNil(global)) {
+              /* eslint-disable no-console */
+              console.error(e.errors);
+              setGlobalError(global.message);
+            }
+            // Render the errors for each field next to the form field.
+            renderFieldErrors(e);
+          } else if (e instanceof api.NetworkError) {
+            setGlobalError("There was a problem communicating with the server.");
+          } else if (e instanceof api.ServerError) {
+            /* eslint-disable no-console */
+            console.error(e);
+            setGlobalError("There was a problem communicating with the server.");
+          } else {
+            throw e;
+          }
+        }
+      },
+      globalError,
+      loading,
+      ...form
+    };
+  }, [form, antdForm, globalError, loading]);
+
+  return wrapForm;
+};
+
+export const useFormIfNotDefined = <T>(
+  options?: Partial<FormInstance<T>> | undefined,
+  form?: FormInstance<T>
+): FormInstance<T> => {
+  const newForm = useForm(options);
+  return useMemo(() => (!isNil(form) ? form : newForm), [form, newForm]);
 };
 
 export const useLessThanBreakpoint = (id: Style.BreakpointId): boolean => {
@@ -114,70 +203,6 @@ export const usePortal = (id: string | number | undefined): Element | null => {
   return parent;
 };
 
-/**
- * An awesome, reusable hook that allows asynchronous searching to be
- * debounced and maintains the relationship between the current search text
- * and the current search results.
- *
- * @param func          The search function which takes the search text and filters the results.
- * @param debounceTime  The debounce time for the search function.
- */
-export const useDebouncedFullSearch = <T>(
-  func: (input: string) => T[],
-  debounceTime: number = 300
-): [string, (value: string) => void, UseAsyncReturn<T[]>] => {
-  const [inputText, setInputText] = useState("");
-
-  // Create a debounced asynchronous version of the search function.  Use the
-  // useConstant hook to ensure that the function is only created once.
-  const debounced = useConstant((): ((input: string) => T[]) => AwesomeDebouncePromise(func, debounceTime));
-
-  // Create an asynchronous callback that will call the debounced, async search
-  // function whenever the text changes.
-  const searchResults = useAsync(async () => {
-    if (inputText.length === 0) {
-      return [];
-    } else {
-      const d = debounced(inputText);
-      return d;
-    }
-  }, [debounced, inputText]);
-
-  return [inputText, setInputText, searchResults];
-};
-
-/**
- * A slightly less powerful version of useDebouncedFullSearch that assumes the
- * handling of the search text is external and that the only thing that needs
- * to be done is debounce the actual searching based on this text.
- *
- * @param search        The search text to filter the results by.
- * @param func          The search function which takes the search text and filters the results.
- * @param debounceTime  The debounce time for the search function.
- */
-export const useDebouncedSearch = <T>(
-  search: string,
-  func: (input: string) => T[],
-  debounceTime: number = 300
-): UseAsyncReturn<T[]> => {
-  // Create a debounced asynchronous version of the search function.  Use the
-  // useConstant hook to ensure that the function is only created once.
-  const debounced = useConstant((): ((input: string) => T[]) => AwesomeDebouncePromise(func, debounceTime));
-
-  // Create an asynchronous callback that will call the debounced, async search
-  // function whenever the text changes.
-  const searchResults = useAsync(async () => {
-    if (search.length === 0) {
-      return [];
-    } else {
-      const d = debounced(search);
-      return d;
-    }
-  }, [debounced, search]);
-
-  return searchResults;
-};
-
 export interface SearchOptions {
   readonly indices: SearchIndicies;
   readonly debounceTime?: number;
@@ -220,7 +245,7 @@ export const useDebouncedJSSearch = <T>(search: string | undefined, models: T[],
     } else {
       setFilteredModels(models);
     }
-  }, [search, useDeepEqualMemo(models)]);
+  }, [search, hooks.useDeepEqualMemo(models)]);
 
   return filteredModels;
 };

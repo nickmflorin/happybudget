@@ -1,52 +1,57 @@
-import { useEffect, useMemo, useImperativeHandle, forwardRef, ForwardedRef } from "react";
+import { useEffect, useMemo } from "react";
 import { isNil } from "lodash";
 
-import { model } from "lib";
+import { model, ui } from "lib";
 import * as api from "api";
-import { Form } from "components";
 
 import Modal, { ModalProps } from "./Modal";
 
-export interface EditModelModalProps<M extends Model.Model, P extends Http.ModelPayload<M>, R = M>
-  extends Omit<ModalProps, "children"> {
+type OmitModalProps =
+  | "visible"
+  | "children"
+  | "onCancel"
+  | "okText"
+  | "cancelText"
+  | "okButtonProps"
+  | "title"
+  | "onOk";
+
+export interface EditModelModalProps<M extends Model.Model, R = M> extends Omit<ModalProps, OmitModalProps> {
   readonly id: number;
   readonly open: boolean;
-  readonly onUpdate?: (values: P) => void;
   readonly onSuccess: (m: R) => void;
   readonly onCancel: () => void;
 }
 
 interface PrivateEditModelModalProps<M extends Model.Model, P extends Http.ModelPayload<M>, V = P, R = M>
-  extends EditModelModalProps<M, P, R> {
+  extends EditModelModalProps<M, R> {
+  readonly form?: FormInstance<V>;
   readonly title?: string | JSX.Element | ((m: M, form: FormInstance<V>) => JSX.Element | string);
   readonly autoFocusField?: number;
   readonly onModelLoaded?: (m: M) => void;
   readonly setFormData: (m: M, form: FormInstance<V>) => void;
   readonly request: (id: number) => Promise<M>;
-  readonly update?: (id: number, payload: P, options: Http.RequestOptions) => Promise<R>;
+  readonly update: (id: number, payload: P, options: Http.RequestOptions) => Promise<R>;
   readonly children: (m: M | null, form: FormInstance<V>) => JSX.Element;
   readonly interceptPayload?: (p: V) => P;
 }
 
-const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V = P, R = M>(
-  {
-    id,
-    open,
-    autoFocusField,
-    onModelLoaded,
-    onSuccess,
-    onCancel,
-    request,
-    update,
-    onUpdate,
-    children,
-    interceptPayload,
-    setFormData,
-    ...props
-  }: PrivateEditModelModalProps<M, P, V, R>,
-  ref: ForwardedRef<FormInstance<V>>
-): JSX.Element => {
-  const [form] = Form.useForm<V>({ isInModal: true, autoFocusField });
+const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V = P, R = M>({
+  id,
+  open,
+  autoFocusField,
+  form,
+  onModelLoaded,
+  onSuccess,
+  onCancel,
+  request,
+  update,
+  children,
+  interceptPayload,
+  setFormData,
+  ...props
+}: PrivateEditModelModalProps<M, P, V, R>): JSX.Element => {
+  const Form = ui.hooks.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
   const [cancelToken, cancel] = api.useCancel();
   const [instance, loading, error] = model.hooks.useModel(id, {
     request,
@@ -58,19 +63,19 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
 
   useEffect(() => {
     if (open === true) {
-      form.setLoading(loading);
+      Form.setLoading(loading);
     }
   }, [loading, open]);
 
   useEffect(() => {
     if (!isNil(error) && open === true) {
-      form.setGlobalError(error);
+      Form.setGlobalError(error);
     }
   }, [error, open]);
 
   useEffect(() => {
     if (!isNil(instance) && open === true) {
-      setFormData(instance, form);
+      setFormData(instance, Form);
     }
   }, [instance, open]);
 
@@ -83,47 +88,39 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
   const title = useMemo(() => {
     if (typeof props.title === "function") {
       if (!isNil(instance)) {
-        return props.title(instance, form);
+        return props.title(instance, Form);
       }
       return "";
     } else {
       return props.title;
     }
-  }, [instance]);
+  }, [instance, props.title]);
 
   const onOk = useMemo(
     () => () => {
-      form
-        .validateFields()
+      Form.validateFields()
         .then((values: V) => {
           const payload = !isNil(interceptPayload) ? interceptPayload(values) : values;
-          onUpdate?.(payload as P);
-          if (!isNil(update) && isNil(onUpdate)) {
-            form.setLoading(true);
-            update(id, payload as P, { cancelToken: cancelToken })
-              .then((response: R) => {
-                form.resetFields();
-                cancel?.();
-                onSuccess(response);
-              })
-              .catch((e: Error) => {
-                form.handleRequestError(e);
-              })
-              .finally(() => {
-                form.setLoading(false);
-              });
-          }
+          Form.setLoading(true);
+          update(id, payload as P, { cancelToken: cancelToken })
+            .then((response: R) => {
+              Form.resetFields();
+              cancel?.();
+              onSuccess(response);
+            })
+            .catch((e: Error) => {
+              Form.handleRequestError(e);
+            })
+            .finally(() => {
+              Form.setLoading(false);
+            });
         })
         .catch(() => {
           return;
         });
     },
-    [form, onUpdate, update, cancelToken, cancel, interceptPayload]
+    [Form, update, cancelToken, cancel, interceptPayload]
   );
-
-  useImperativeHandle(ref, () => ({
-    ...form
-  }));
 
   return (
     <Modal
@@ -134,12 +131,12 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
       cancelText={"Cancel"}
       getContainer={false}
       title={title}
-      okButtonProps={{ disabled: form.loading || loading }}
+      okButtonProps={{ disabled: Form.loading || loading }}
       onOk={onOk}
     >
-      {children(instance, form)}
+      {children(instance, Form)}
     </Modal>
   );
 };
 
-export default forwardRef(EditModelModal) as typeof EditModelModal;
+export default EditModelModal;

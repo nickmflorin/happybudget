@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
+
 import * as api from "api";
+import { ui } from "lib";
 
 import { MarkupForm } from "components/forms";
 import { IMarkupForm } from "components/forms/MarkupForm";
@@ -11,7 +13,7 @@ type MarkupFormValues = Omit<Http.MarkupPayload, "rate"> & { readonly rate: stri
 interface EditMarkupModalProps<
   B extends Model.Budget | Model.Template,
   R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
-> extends EditModelModalProps<Model.Markup, Http.MarkupPayload, R> {
+> extends EditModelModalProps<Model.Markup, R> {
   readonly id: number;
   readonly parentId: number;
   readonly parentType: Model.ParentType | "template";
@@ -30,8 +32,8 @@ const EditMarkupModal = <
   parentType,
   ...props
 }: EditMarkupModalProps<B, R>): JSX.Element => {
+  const form = ui.hooks.useFormIfNotDefined<MarkupFormValues>({ isInModal: true });
   const cancelToken = api.useCancelToken();
-  const formRef = useRef<FormInstance<MarkupFormValues>>(null);
   const markupRef = useRef<IMarkupForm>(null);
 
   const [availableChildren, setAvailableChildren] = useState<M[]>([]);
@@ -45,7 +47,7 @@ const EditMarkupModal = <
         setAvailableChildren(response.data);
       })
       .catch((e: Error) => {
-        formRef.current?.handleRequestError(e);
+        form.handleRequestError(e);
       })
       .finally(() => setAvailableChildrenLoading(false));
   }, [parentId]);
@@ -55,6 +57,7 @@ const EditMarkupModal = <
       {...props}
       id={id}
       title={"Markup"}
+      form={form}
       request={api.getMarkup}
       update={api.updateMarkup}
       interceptPayload={(p: MarkupFormValues) => {
@@ -67,7 +70,7 @@ const EditMarkupModal = <
         }
         return payload;
       }}
-      setFormData={(markup: Model.Markup, form: FormInstance<MarkupFormValues>) => {
+      setFormData={(markup: Model.Markup) => {
         // Because AntD sucks and form.setFields does not trigger onValuesChanged.
         markupRef.current?.setUnitState(markup.unit?.id === undefined ? null : markup.unit?.id);
         form.setFields([
@@ -79,7 +82,7 @@ const EditMarkupModal = <
         ]);
       }}
     >
-      {(m: Model.Markup | null, form: FormInstance<MarkupFormValues>) => (
+      {(m: Model.Markup | null) => (
         <MarkupForm
           ref={markupRef}
           form={form}
