@@ -18,6 +18,7 @@ import {
   CellDoubleClickedEvent,
   NavigateToNextCellParams,
   TabToNextCellParams,
+  RangeSelectionChangedEvent,
   CheckboxSelectionCallbackParams
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
@@ -42,6 +43,7 @@ interface InjectedAuthenticatedDataGridProps<R extends Table.RowData> {
   readonly onCellKeyDown: (event: CellKeyDownEvent) => void;
   readonly navigateToNextCell: (params: NavigateToNextCellParams) => Table.CellPosition;
   readonly tabToNextCell: (params: TabToNextCellParams) => Table.CellPosition;
+  readonly onRangeSelectionChanged: (e: RangeSelectionChangedEvent) => void;
 }
 
 export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
@@ -93,6 +95,7 @@ const authenticateDataGrid =
       const [getColumn, callWithColumn] = useColumnHelpers(props.columns);
       const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
       const oldRow = useRef<Table.ModelRow<R> | null>(null); // TODO: Figure out a better way to do this.
+      const lastSelectionFromRange = useRef<boolean>(false);
 
       const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
         /*
@@ -491,6 +494,34 @@ const authenticateDataGrid =
         }
       });
 
+      const onRangeSelectionChanged = hooks.useDynamicCallback((e: RangeSelectionChangedEvent) => {
+        const ranges = e.api.getCellRanges();
+
+        const indices: [number | null, number | null] = tabling.aggrid.collapseRangeSelectionVertically(ranges || []);
+        if (indices[0] !== null && indices[1] !== null && indices[0] !== indices[1]) {
+          e.api.forEachNode((node: Table.RowNode) => {
+            const row: Table.Row<R> = node.data;
+            if (
+              !isNil(node.rowIndex) &&
+              tabling.typeguards.isEditableRow(row) &&
+              (isNil(props.rowHasCheckboxSelection) || props.rowHasCheckboxSelection(row))
+            ) {
+              lastSelectionFromRange.current = true;
+              if (node.rowIndex >= (indices[0] as number) && node.rowIndex <= (indices[1] as number)) {
+                node.setSelected(true);
+              } else {
+                node.setSelected(false);
+              }
+            }
+          });
+        } else if (indices[0] === indices[1] && lastSelectionFromRange.current === true) {
+          lastSelectionFromRange.current = false;
+          e.api.forEachNode((node: Table.RowNode) => {
+            node.setSelected(false);
+          });
+        }
+      });
+
       useImperativeHandle(props.grid, () => ({
         getCSVData
       }));
@@ -514,6 +545,7 @@ const authenticateDataGrid =
           onCellValueChanged={onCellValueChanged}
           navigateToNextCell={navigateToNextCell}
           tabToNextCell={tabToNextCell}
+          onRangeSelectionChanged={onRangeSelectionChanged}
           fillOperation={(params: FillOperationParams) => {
             if (params.initialValues.length === 1) {
               return false;

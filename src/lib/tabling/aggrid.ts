@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { reduce, map } from "lodash";
+import { reduce, map, isNil } from "lodash";
 import { CellRange } from "@ag-grid-community/core";
 
 export const getRows = <R extends Table.RowData, RW extends Table.Row<R> = Table.Row<R>>(api: Table.GridApi): RW[] => {
@@ -13,6 +13,39 @@ export const rangeSelectionIsSingleCell = (range: CellRange) => {
     return true;
   }
   return false;
+};
+
+export const collapseRangeSelectionVertically = (ranges: CellRange[]): [number | null, number | null] => {
+  let verticalRange: [number | null, number | null] = [null, null];
+  map(ranges, (range: CellRange) => {
+    const endRowIndex = range.endRow?.rowIndex;
+    const startRowIndex = range.startRow?.rowIndex;
+    if (!isNil(endRowIndex) && !isNil(startRowIndex)) {
+      if (endRowIndex > startRowIndex) {
+        // In this case, the range was selected starting at the top of the table dragging downwards.
+        if (verticalRange[0] === null || startRowIndex < verticalRange[0]) {
+          verticalRange[0] = startRowIndex;
+        }
+        if (verticalRange[1] === null || endRowIndex > verticalRange[1]) {
+          verticalRange[1] = endRowIndex;
+        }
+      } else if (startRowIndex > endRowIndex) {
+        // In this case, the range was selected starting at the bottom of the table dragging upwards.
+        if (verticalRange[0] === null || endRowIndex < verticalRange[0]) {
+          verticalRange[0] = endRowIndex;
+        }
+        if (verticalRange[1] === null || startRowIndex > verticalRange[1]) {
+          verticalRange[1] = startRowIndex;
+        }
+      } else {
+        verticalRange = [
+          verticalRange[0] === null ? startRowIndex : Math.min(verticalRange[0], startRowIndex),
+          verticalRange[1] === null ? startRowIndex : Math.max(verticalRange[1], startRowIndex)
+        ];
+      }
+    }
+  });
+  return verticalRange;
 };
 
 export const mergeClassNames = <T>(params: T, ...args: Table.ClassName<T>[]): string => {

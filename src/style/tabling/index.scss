@@ -39,10 +39,13 @@
 
 @mixin grid_background($color) {
   // Fixes problem with range selection and hover causing white "blocks" in table.
-  .ag-root .ag-body-viewport:not(.ag-has-focus) .ag-cell-range-selected-1:not(.ag-cell-inline-editing) {
+  .ag-root
+    .ag-body-viewport:not(.ag-has-focus)
+    .row:not(.row--group)
+    .ag-cell-range-selected-1:not(.ag-cell-inline-editing) {
     background-color: $color !important;
   }
-  .row:not(.ag-row-hover) {
+  .row:not(.ag-row-hover):not(.row--group) {
     > .cell:not(.cell--calculated) {
       background-color: $color;
       &.ag-cell-range-selected {
