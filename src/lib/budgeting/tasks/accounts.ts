@@ -195,7 +195,6 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         yield put(config.actions.loadingBudget(true));
       }
       try {
-        console.log({ requestPayload });
         const response: Http.BulkResponse<B, C> = yield call(config.services.bulkUpdate, objId, requestPayload, {
           cancelToken: source.token
         });
