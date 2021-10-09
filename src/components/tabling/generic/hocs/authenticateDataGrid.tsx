@@ -390,8 +390,8 @@ const authenticateDataGrid =
               changes = reduce(
                 fields,
                 (chs: Table.SoloCellChange<R>[], fld: keyof R) => {
-                  const oldParsedForField = find(oldParsed, { field } as any);
-                  const parsedForField = find(parsed, { field } as any);
+                  const oldParsedForField = find(oldParsed, { field: fld } as any);
+                  const parsedForField = find(parsed, { field: fld } as any);
                   // Since the fields for each set of parsed field-value pairs will be the
                   // same, this is mostly just a check to satisfy TS.
                   if (!isNil(oldParsedForField) && !isNil(parsedForField)) {
