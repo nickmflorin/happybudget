@@ -142,13 +142,7 @@ const authenticateDataGrid =
                 // value to undefined - but we have to set it to the null value associated
                 // with the column.
                 if (params.newValue === undefined || params.newValue === "") {
-                  const column: Table.Column<R, M> | undefined = find(props.columns, {
-                    field: params.column.getColId()
-                  } as any);
-                  if (!isNil(column)) {
-                    params.newValue = column.nullValue === undefined ? null : column.nullValue;
-                  }
-                  params.newValue = null;
+                  params.newValue = col.nullValue === undefined ? null : col.nullValue;
                 }
                 if (!isNil(col.valueSetter) && typeof col.valueSetter === "function") {
                   return col.valueSetter(params);

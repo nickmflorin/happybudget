@@ -181,12 +181,21 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.Http
                         /* eslint-disable indent */
                         (currD: Partial<R>, ci: Table.Column<R, M>, index: number): Partial<R> => {
                           if (!isNil(ci.parseIntoFields)) {
+                            // Note: We must apply the logic to nullify certain values because the
+                            // values here do not pass through the valueGetter in authenticateDataGrid
+                            // (which would otherwise nullify things like "").
                             const parsed = ci.parseIntoFields(rowData[index]);
                             return {
                               ...currD,
                               ...reduce(
                                 parsed,
                                 (v: Partial<R>, parsedField: Table.ParsedColumnField<R>) => {
+                                  if (parsedField.value === "") {
+                                    return {
+                                      ...v,
+                                      [parsedField.field]: ci.nullValue === undefined ? null : ci.nullValue
+                                    };
+                                  }
                                   return { ...v, [parsedField.field]: parsedField.value };
                                 },
                                 {} as Partial<R>
@@ -196,6 +205,12 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.Http
                             // Note: We do not use the colId for creating the RowData object - the colId
                             // is used for cases where the Column is not associated with a field of the
                             // Row Data.
+                            if (rowData[index] === "") {
+                              return {
+                                ...currD,
+                                [ci.field]: ci.nullValue === undefined ? null : ci.nullValue
+                              };
+                            }
                             return { ...currD, [ci.field]: rowData[index] };
                           }
                           return currD;
