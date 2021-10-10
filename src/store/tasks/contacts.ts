@@ -41,7 +41,11 @@ export const createTableTaskSet = (
   function* tableRequest(action: Redux.Action): SagaIterator {
     yield put(config.actions.loading(true));
     try {
-      const response: Http.ListResponse<M> = yield call(api.getContacts, {}, { cancelToken: source.token });
+      const response: Http.ListResponse<M> = yield call(
+        api.getContacts,
+        { no_pagination: true },
+        { cancelToken: source.token }
+      );
       yield put(config.actions.response({ models: response.data }));
     } catch (e: unknown) {
       if (!(yield cancelled())) {
