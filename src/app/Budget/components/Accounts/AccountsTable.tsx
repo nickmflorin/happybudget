@@ -46,7 +46,7 @@ const ConnectedTable = connectTableToStore<
   },
   reducer: budgeting.reducers.createAuthenticatedAccountsTableReducer({
     tableId: "accounts-table",
-    columns: GenericAccountsTable.Columns,
+    columns: map(GenericAccountsTable.Columns, (c: Table.LazyColumn<R, M>) => c.column({})),
     actions: ActionMap,
     getModelRowChildren: (m: Model.Account) => m.children,
     initialState: redux.initialState.initialTableState

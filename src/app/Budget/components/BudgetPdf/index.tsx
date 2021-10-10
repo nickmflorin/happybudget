@@ -3,9 +3,9 @@ import { isNil, map, filter, find, includes, reduce } from "lodash";
 
 import { ShowHide } from "components";
 import { Document, View, Page, Tag, Text, NoDataPage } from "components/pdf";
+import { AccountsTable as GenericAccountsTable, SubAccountsTable as GenericSubAccountsTable } from "components/tabling";
 import { tabling, model } from "lib";
 
-import { AccountColumns, SubAccountColumns } from "./config";
 import PageHeader from "./PageHeader";
 import Notes from "./Notes";
 import { AccountsTable, AccountTable } from "./Tables";
@@ -16,40 +16,41 @@ interface BudgetPdfProps {
   readonly options: PdfBudgetTable.Options;
 }
 
+const AccountColumns = filter(
+  GenericAccountsTable.Columns as Table.LazyPdfColumn<Tables.AccountRowData, Model.PdfAccount>[],
+  (c: Table.LazyPdfColumn<Tables.AccountRowData, Model.PdfAccount>) => c.includeInPdf !== false
+);
+
+const SubAccountColumns = filter(
+  GenericSubAccountsTable.Columns as Table.LazyPdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>[],
+  (c: Table.LazyPdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>) => c.includeInPdf !== false
+);
+
 const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element => {
-  const accountColumns = useMemo<Table.PdfColumn<Tables.PdfAccountRowData, Model.PdfAccount>[]>(() => {
-    const columns = tabling.columns.mergeColumns<
-      Table.PdfColumn<Tables.PdfAccountRowData, Model.PdfAccount>,
-      Tables.PdfAccountRowData,
-      Model.PdfAccount
-    >(AccountColumns, {
-      estimated: (col: Table.PdfColumn<Tables.PdfAccountRowData, Model.PdfAccount>) => ({
-        ...col,
-        footerValueGetter: model.businessLogic.estimatedValue(budget)
-      })
+  const accountColumns = useMemo<Table.PdfColumn<Tables.AccountRowData, Model.PdfAccount>[]>(() => {
+    const columns = tabling.columns.normalizeColumns(AccountColumns, {
+      estimated: {
+        pdfFooterValueGetter: model.businessLogic.estimatedValue(budget)
+      }
     });
-    return tabling.columns.orderColumns<
-      Table.PdfColumn<Tables.PdfAccountRowData, Model.PdfAccount>,
-      Tables.PdfAccountRowData,
-      Model.PdfAccount
-    >(columns);
+    return tabling.columns.orderColumns(columns);
   }, []);
 
   const subaccountColumns = useMemo(() => {
-    return (account: Model.PdfAccount): Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>[] => {
-      type R = Tables.PdfSubAccountRowData;
+    return (account: Model.PdfAccount): Table.PdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>[] => {
+      type R = Tables.SubAccountRowData;
       type M = Model.PdfSubAccount;
       type C = Table.PdfColumn<R, M>;
-      let columns = tabling.columns.mergeColumns<C, R, M>(SubAccountColumns, {
-        description: (col: C) => ({
-          ...col,
+
+      let columns = tabling.columns.normalizeColumns(SubAccountColumns, {
+        description: {
           /* eslint-disable indent */
-          footerValueGetter: !isNil(account.description)
+          pdfFooterValueGetter: !isNil(account.description)
             ? `${account.description} Total`
             : !isNil(account.identifier)
             ? `${account.identifier} Total`
             : "Total",
-          childFooter: (m: M) => {
+          pdfChildFooter: (m: M) => {
             if (!isNil(m.description)) {
               return { value: `${m.description} Total` };
             } else if (!isNil(m.identifier)) {
@@ -57,10 +58,9 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
             }
             return { value: "Total" };
           }
-        }),
-        contact: (col: C) => ({
-          ...col,
-          cellRenderer: (params: Table.PdfCellCallbackParams<R, M, number>) => {
+        },
+        contact: {
+          pdfCellRenderer: (params: Table.PdfCellCallbackParams<R, M, number>) => {
             if (params.rawValue !== null) {
               const contact: Model.Contact | undefined = find(contacts, { id: params.rawValue });
               if (!isNil(contact)) {
@@ -76,19 +76,17 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
             }
             return <Text></Text>;
           }
-        }),
-        unit: (col: C) => ({
-          ...col,
-          cellRenderer: (params: Table.PdfCellCallbackParams<R, M>) =>
+        },
+        unit: {
+          pdfCellRenderer: (params: Table.PdfCellCallbackParams<R, M>) =>
             params.rawValue !== null ? <Tag model={params.rawValue} /> : <Text></Text>
-        }),
-        estimated: (col: C) => ({
-          ...col,
-          footerValueGetter: model.businessLogic.estimatedValue(account),
-          childFooter: (m: M) => {
+        },
+        estimated: {
+          pdfFooterValueGetter: model.businessLogic.estimatedValue(account),
+          pdfChildFooter: (m: M) => {
             return { value: model.businessLogic.estimatedValue(m) };
           }
-        })
+        }
       });
 
       // Determine the default width for columns that do not specify it.
@@ -126,7 +124,7 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
         }
       }
       // Order the Columns
-      return tabling.columns.orderColumns<C, R, M>(columns);
+      return tabling.columns.orderColumns<R, M>(columns);
     };
   }, []);
 

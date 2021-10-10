@@ -3,7 +3,6 @@ import * as editors from "./editors";
 
 export * as editors from "./editors";
 export * as cells from "./cells";
-export * as columnObjs from "./columnObjs";
 export * as actions from "./actions";
 export { default as excludeRowsOfType } from "./cells/excludeRowsOfType";
 export { default as renderOnRowType } from "./cells/renderOnRowType";

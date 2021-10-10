@@ -117,95 +117,91 @@ const authenticateDataGrid =
             }
           }
         };
-        const cs = tabling.columns.updateColumnsOfField<Table.Column<R, M>, R, M>(
-          tabling.columns.updateColumnsOfTableType<Table.Column<R, M>, R, M>(
-            props.columns,
-            "body",
-            (col: Table.Column<R, M>) => ({
-              cellRendererParams: { ...col.cellRendererParams, generateNewRowData: props.generateNewRowData },
-              cellEditorParams: { ...col.cellEditorParams, onDoneEditing },
-              editable: (params: Table.CellCallbackParams<R, M>) => {
-                if (!tabling.typeguards.isEditableRow(params.row)) {
-                  return false;
-                } else if (!isNil(props.isCellEditable)) {
-                  return props.isCellEditable(params);
-                } else {
-                  const colEditable = col.editable;
-                  if (!isNil(colEditable)) {
-                    return typeof colEditable === "function" ? colEditable(params) : colEditable;
-                  }
-                  return true;
+        const cs = tabling.columns.updateColumnsOfField<R, M>(
+          tabling.columns.updateColumnsOfTableType<R, M>(props.columns, "body", (col: Table.Column<R, M>) => ({
+            cellRendererParams: { ...col.cellRendererParams, generateNewRowData: props.generateNewRowData },
+            cellEditorParams: { ...col.cellEditorParams, onDoneEditing },
+            editable: (params: Table.CellCallbackParams<R, M>) => {
+              if (!tabling.typeguards.isEditableRow(params.row)) {
+                return false;
+              } else if (!isNil(props.isCellEditable)) {
+                return props.isCellEditable(params);
+              } else {
+                const colEditable = col.editable;
+                if (!isNil(colEditable)) {
+                  return typeof colEditable === "function" ? colEditable(params) : colEditable;
                 }
-              },
-              valueSetter: (params: ValueSetterParams) => {
-                // By default, AG Grid treats Backspace clearing the cell as setting the
-                // value to undefined - but we have to set it to the null value associated
-                // with the column.
-                if (params.newValue === undefined || params.newValue === "") {
-                  params.newValue = col.nullValue === undefined ? null : col.nullValue;
-                }
-                if (!isNil(col.valueSetter) && typeof col.valueSetter === "function") {
-                  return col.valueSetter(params);
-                }
-                // We can apply this mutation to the immutable data from the store because we deep
-                // clone each row before feeding it into the AG Grid tables.
-                params.data.data[params.column.getColId()] = params.newValue;
                 return true;
-              },
-              suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
-                if (!isNil(col.suppressKeyboardEvent) && col.suppressKeyboardEvent(params) === true) {
-                  return true;
-                } else if (params.editing && includes(["Tab"], params.event.code)) {
-                  /*
+              }
+            },
+            valueSetter: (params: ValueSetterParams) => {
+              // By default, AG Grid treats Backspace clearing the cell as setting the
+              // value to undefined - but we have to set it to the null value associated
+              // with the column.
+              if (params.newValue === undefined || params.newValue === "") {
+                params.newValue = col.nullValue === undefined ? null : col.nullValue;
+              }
+              if (!isNil(col.valueSetter) && typeof col.valueSetter === "function") {
+                return col.valueSetter(params);
+              }
+              // We can apply this mutation to the immutable data from the store because we deep
+              // clone each row before feeding it into the AG Grid tables.
+              params.data.data[params.column.getColId()] = params.newValue;
+              return true;
+            },
+            suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
+              if (!isNil(col.suppressKeyboardEvent) && col.suppressKeyboardEvent(params) === true) {
+                return true;
+              } else if (params.editing && includes(["Tab"], params.event.code)) {
+                /*
                   Our custom cell editors have built in functionality that when editing is terminated via
                   a TAB key, we move one cell to the right without continuing in edit mode.  This however
                   does not work for the bland text cells, where we do not have cell editors controlling the
                   edit behavior.  So we need to suppress the TAB behavior when editing, and manually move
                   the cell over.
                   */
+                return true;
+              } else if (!params.editing && includes(["Backspace", "Delete"], params.event.code)) {
+                const clearCellsOverRange = (range: CellRange | CellRange[], api: GridApi) => {
+                  const changes: Table.SoloCellChange<R>[] = !Array.isArray(range)
+                    ? getTableChangesFromRangeClear(range, api)
+                    : flatten(map(range, (rng: CellRange) => getTableChangesFromRangeClear(rng, api)));
+                  props.onChangeEvent({
+                    type: "dataChange",
+                    payload: tabling.events.consolidateCellChanges(changes)
+                  });
+                };
+                // Suppress Backspace/Delete events when multiple cells are selected in a range.
+                const ranges = params.api.getCellRanges();
+                if (
+                  !isNil(ranges) &&
+                  ranges.length !== 0 &&
+                  (ranges.length !== 1 || !tabling.aggrid.rangeSelectionIsSingleCell(ranges[0]))
+                ) {
+                  clearCellsOverRange(ranges, params.api);
                   return true;
-                } else if (!params.editing && includes(["Backspace", "Delete"], params.event.code)) {
-                  const clearCellsOverRange = (range: CellRange | CellRange[], api: GridApi) => {
-                    const changes: Table.SoloCellChange<R>[] = !Array.isArray(range)
-                      ? getTableChangesFromRangeClear(range, api)
-                      : flatten(map(range, (rng: CellRange) => getTableChangesFromRangeClear(rng, api)));
-                    props.onChangeEvent({
-                      type: "dataChange",
-                      payload: tabling.events.consolidateCellChanges(changes)
-                    });
-                  };
-                  // Suppress Backspace/Delete events when multiple cells are selected in a range.
-                  const ranges = params.api.getCellRanges();
-                  if (
-                    !isNil(ranges) &&
-                    ranges.length !== 0 &&
-                    (ranges.length !== 1 || !tabling.aggrid.rangeSelectionIsSingleCell(ranges[0]))
-                  ) {
-                    clearCellsOverRange(ranges, params.api);
-                    return true;
-                  } else {
-                    /*
+                } else {
+                  /*
                     For custom Cell Editor(s) with a Pop-Up, we do not want Backspace/Delete to go into
                     edit mode but instead want to clear the values of the cells - so we prevent those key
                     presses from triggering edit mode in the Cell Editor and clear the value at this level.
                     */
-                    const row: Table.BodyRow<R> = params.node.data;
-                    if (tabling.typeguards.isEditableRow(row) && col.editorIsPopup === true) {
-                      clearCell(row, col);
-                      return true;
-                    }
-                    return false;
+                  const row: Table.BodyRow<R> = params.node.data;
+                  if (tabling.typeguards.isEditableRow(row) && col.editorIsPopup === true) {
+                    clearCell(row, col);
+                    return true;
                   }
-                } else if (
-                  (params.event.key === "ArrowDown" || params.event.key === "ArrowUp") &&
-                  (params.event.ctrlKey || params.event.metaKey)
-                ) {
-                  return true;
+                  return false;
                 }
-                return false;
+              } else if (
+                (params.event.key === "ArrowDown" || params.event.key === "ArrowUp") &&
+                (params.event.ctrlKey || params.event.metaKey)
+              ) {
+                return true;
               }
-            })
-          ),
+              return false;
+            }
+          })),
           "index" as keyof R,
           {
             checkboxSelection: (params: CheckboxSelectionCallbackParams) => {

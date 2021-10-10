@@ -1,19 +1,21 @@
 import { findIndex, isNil, map, filter, includes } from "lodash";
 import { Column } from "@ag-grid-community/core";
 
-import { tabling } from "lib";
+import { tabling, budgeting } from "lib";
 import { Icon } from "components";
-import { framework } from "components/tabling/generic";
-import { framework as budgetFramework } from "../BudgetTable";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
+type PDFM = Model.PdfSubAccount;
 
-const Columns: Table.Column<R, M>[] = [
-  budgetFramework.columnObjs.IdentifierColumn<R, M>({
-    headerName: "" // Will be populated by Table.
+const Columns: Table.LazyColumn<R, M, any, PDFM>[] = [
+  budgeting.columns.LazyIdentifierColumn<R, M, PDFM>({
+    field: "identifier",
+    pdfHeaderName: "Acct #",
+    pdfWidth: 0.1,
+    pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
   }),
-  framework.columnObjs.BodyColumn<R, M>({
+  tabling.columns.LazyBodyColumn<R, M, string | null, PDFM>({
     field: "description",
     minWidth: 200,
     flex: 100,
@@ -21,6 +23,15 @@ const Columns: Table.Column<R, M>[] = [
     index: 1,
     suppressSizeToFit: false,
     cellRenderer: "BodyCell",
+    pdfHeaderName: "Category Description",
+    pdfWidth: 0.75,
+    pdfFooter: { value: "Grand Total" },
+    pdfValueGetter: (r: Table.BodyRow<Tables.SubAccountRowData>) => {
+      if (tabling.typeguards.isGroupRow(r)) {
+        return r.groupData.name;
+      }
+      return r.data.description || "";
+    },
     cellRendererParams: {
       icon: (row: Table.BodyRow<R>) =>
         tabling.typeguards.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined
@@ -47,7 +58,7 @@ const Columns: Table.Column<R, M>[] = [
       return 1;
     }
   }),
-  framework.columnObjs.ModelSelectColumn<R, M, Model.Contact>({
+  tabling.columns.LazyModelSelectColumn({
     field: "contact",
     headerName: "Contact",
     cellRenderer: { data: "ContactCell" },
@@ -55,14 +66,14 @@ const Columns: Table.Column<R, M>[] = [
     columnType: "contact",
     index: 2,
     width: 120,
+    pdfWidth: 0.1,
     requiresAuthentication: true,
-    models: [], // Will be populated by Table.
-    modelClipboardValue: (m: Model.Contact) => m.full_name,
-    processCellFromClipboard: (name: string): Model.Contact | null => null // Will be populated by Table.
+    processCellFromClipboard: (name: string): number | null => null
   }),
-  framework.columnObjs.BodyColumn<R, M, number>({
+  tabling.columns.LazyBodyColumn<R, M, number, PDFM>({
     field: "quantity",
     headerName: "Qty",
+    pdfWidth: 0.1,
     width: 60,
     valueSetter: tabling.valueSetters.integerValueSetter<R>("quantity"),
     columnType: "number",
@@ -83,45 +94,54 @@ const Columns: Table.Column<R, M>[] = [
       }
     }
   }),
-  framework.columnObjs.TagSelectColumn<R, M>({
+  tabling.columns.LazyTagSelectColumn({
     field: "unit",
     headerName: "Unit",
     cellRenderer: { data: "SubAccountUnitCell" },
     cellEditor: "SubAccountUnitEditor",
-    models: [], // Will be populated by Table.
-    width: 100
+    width: 100,
+    pdfWidth: 0.1
   }),
-  framework.columnObjs.BodyColumn<R, M>({
+  tabling.columns.LazyBodyColumn<R, M, number | null, PDFM>({
     field: "multiplier",
     headerName: "X",
     width: 60,
+    pdfWidth: 0.1,
     valueSetter: tabling.valueSetters.floatValueSetter<R>("multiplier"),
     columnType: "number"
   }),
-  framework.columnObjs.BodyColumn<R, M>({
+  tabling.columns.LazyBodyColumn<R, M, number | null, PDFM>({
     field: "rate",
     headerName: "Rate",
     width: 100,
+    pdfWidth: 0.1,
     valueFormatter: tabling.formatters.currencyValueFormatter,
     valueSetter: tabling.valueSetters.floatValueSetter<R>("rate"),
     columnType: "currency"
   }),
-  framework.columnObjs.SelectColumn<R, M>({
+  tabling.columns.LazySelectColumn<R, M, number[], PDFM>({
     field: "fringes",
     headerName: "Fringes",
     cellRenderer: { data: "FringesCell" },
     width: 140,
     nullValue: [],
+    includeInPdf: false,
     processCellForClipboard: (row: R) => "" // Will be populated by Table.
   }),
-  budgetFramework.columnObjs.EstimatedColumn<R, M>({}),
-  budgetFramework.columnObjs.ActualColumn<R, M>({}),
-  budgetFramework.columnObjs.VarianceColumn<R, M>({}),
-  framework.columnObjs.FakeColumn<R, M>({ field: "nominal_value" }),
-  framework.columnObjs.FakeColumn<R, M>({ field: "markup_contribution" }),
-  framework.columnObjs.FakeColumn<R, M>({ field: "fringe_contribution" }),
-  framework.columnObjs.FakeColumn<R, M>({ field: "accumulated_fringe_contribution" }),
-  framework.columnObjs.FakeColumn<R, M>({ field: "accumulated_markup_contribution" })
+  budgeting.columns.LazyEstimatedColumn<R, M, PDFM>({
+    colId: "estimated",
+    pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
+      isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
+    pdfValueGetter: budgeting.valueGetters.estimatedValueGetter,
+    pdfWidth: 0.1
+  }),
+  budgeting.columns.LazyActualColumn<R, M, PDFM>({ includeInPdf: false, field: "actual" }),
+  budgeting.columns.LazyVarianceColumn<R, M, PDFM>({ includeInPdf: false, colId: "variance" }),
+  tabling.columns.LazyFakeColumn<R, M, PDFM>({ field: "nominal_value" }),
+  tabling.columns.LazyFakeColumn<R, M, PDFM>({ field: "markup_contribution" }),
+  tabling.columns.LazyFakeColumn<R, M, PDFM>({ field: "fringe_contribution" }),
+  tabling.columns.LazyFakeColumn<R, M, PDFM>({ field: "accumulated_fringe_contribution" }),
+  tabling.columns.LazyFakeColumn<R, M, PDFM>({ field: "accumulated_markup_contribution" })
 ];
 
 export default Columns;

@@ -6,11 +6,8 @@ namespace Table {
   type Name = "account-subaccounts" | "accounts" | "subaccount-subaccounts" | "fringes" | "actuals" | "contacts";
   type Id = `${Name}-table`;
   type AsyncId = `async-${Id}`;
-  type Domain = "pdf" | "aggrid";
 
   type AgGridProps = import("@ag-grid-community/react/lib/interfaces").AgGridReactProps;
-
-  type NullValue<R extends RowData> = R[keyof R];
 
   type NativeFormatterParams<P extends string | number> = P | null;
   type AGFormatterParams = import("@ag-grid-community/core").ValueFormatterParams;
@@ -125,13 +122,9 @@ namespace Table {
   type RowWithDescription<D extends RowData = RowData> = BodyRow<D & { description: string | null }>;
   type RowWithIdentifier<D extends RowData = RowData> = BodyRow<D & { identifier: string | null }>;
 
-  type CreateTableDataConfig<
-    R extends RowData,
-    M extends Model.TypedHttpModel = Model.TypedHttpModel,
-    C extends AnyColumn<R, M> = AnyColumn<R, M>
-  > = {
+  type CreateTableDataConfig<R extends RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
     readonly response: Http.TableResponse<M>;
-    readonly columns: C[];
+    readonly columns: Column<R, M>[];
     readonly getModelRowChildren?: (m: M) => number[];
   };
 
@@ -181,20 +174,9 @@ namespace Table {
     readonly columns: Column<R, M>[];
   };
 
-  interface BaseColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel, D extends Domain = Domain> {
-    readonly field?: keyof R;
-    readonly colId?: string;
-    readonly domain: D;
-    readonly headerName?: string;
-    readonly columnType?: ColumnTypeId;
-    readonly tableColumnType: TableColumnTypeId;
-    readonly index?: number;
-    readonly getRowValue?: (m: M) => R[keyof R];
-  }
-
   type PdfCellCallbackParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> = {
     readonly colIndex: number;
-    readonly column: PdfColumn<R, M, V>;
+    readonly column: Column<R, M, V>;
     readonly isHeader: boolean;
     readonly rawValue: V | null;
     readonly value: string;
@@ -239,25 +221,6 @@ namespace Table {
   type PdfValueGetter<R extends RowData, V = any> = (r: BodyRow<R>, rows: BodyRow<R>[]) => V | null;
   type PdfFooterValueGetter<R extends RowData, V = any> = (rows: BodyRow<R>[]) => V | null;
 
-  interface PdfColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any>
-    extends BaseColumn<R, M, "pdf"> {
-    // In the PDF case, since we cannot dynamically resize columns, the width refers to a ratio
-    // of the column width to the overall table width assuming that all columns are present.  When
-    // columns are hidden/shown, this ratio is adjusted.
-    readonly width?: number;
-    readonly cellProps?: PdfCellStandardProps<R, M, V>;
-    readonly headerCellProps?: PdfCellStandardProps<R, M, V>;
-    readonly footer?: PdfFooterColumn<V>;
-    readonly cellContentsVisible?: PdfOptionalCellCallback<R, M, V, boolean>;
-    readonly formatter?: (value: string | number) => string;
-    readonly valueGetter?: PdfValueGetter<R, V>;
-    readonly footerValueGetter?: V | null | PdfFooterValueGetter<R, V>;
-    readonly cellRenderer?: (params: PdfCellCallbackParams<R, M, V>) => JSX.Element;
-    // NOTE: This only applies for the individual Account tables, not the the overall
-    // Accounts table.
-    readonly childFooter?: (s: M) => PdfFooterColumn<V>;
-  }
-
   type OmitColDefParams =
     | "field"
     | "colId"
@@ -270,12 +233,59 @@ namespace Table {
     | "editable"
     | "onCellDoubleClicked";
 
-  type ParsedColumnField<R extends RowData, V = any> = {field: keyof R; value: V};
+  type ParsedColumnField<R extends RowData, V = any> = { field: keyof R; value: V };
 
-  interface Column<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any>
-    extends Omit<ColDef, OmitColDefParams>,
-      BaseColumn<R, M, "aggrid"> {
-    readonly nullValue?: NullValue<R>;
+  type FactoryFn<D> = (data: D) => Table.Column<any, any, any, any>;
+  type InferFactoryParams<T> = T extends FactoryFn<infer D> ? D : never;
+
+  interface LazyColumn<
+    R extends RowData,
+    M extends Model.HttpModel = Model.HttpModel,
+    V = any,
+    PDFM extends Model.HttpModel = any,
+    D extends Table.Column<R, M, V, PDFM> = any
+  > {
+    readonly id: keyof R | string;
+    readonly includeInPdf: boolean;
+    readonly column: FactoryFn<import("utility-types").Subtract<D, Table.Column<R, M, V, PDFM>> & Partial<Table.Column<R, M, V, PDFM>>>;
+  }
+
+  type MaybeLazyColumn<
+    R extends RowData,
+    M extends Model.HttpModel = Model.HttpModel,
+    V = any,
+    PDFM extends Model.HttpModel = any,
+    D extends Table.Column<R, M, V, PDFM> = any
+  > = LazyColumn<R, M, V, PDFM, D> | Column<R, M, V, PDFM>;
+
+  type LazyPdfColumn<
+    R extends RowData,
+    M extends Model.HttpModel = Model.HttpModel,
+    V = any,
+    D extends Table.Column<R, M, V, PDFM> = any
+  > = LazyColumn<R, any, V, M, D>;
+
+  type MaybeLazyPdfColumn<
+    R extends RowData,
+    M extends Model.HttpModel = Model.HttpModel,
+    V = any,
+    D extends Table.Column<R, M, V, PDFM> = any
+  > = LazyPdfColumn<R, M, V, D> | PdfColumn<R, M, V>;
+
+  interface Column<
+    R extends RowData,
+    M extends Model.HttpModel = Model.HttpModel,
+    V = any,
+    PDFM extends Model.HttpModel = any
+  > extends Omit<ColDef, OmitColDefParams> {
+    readonly field?: keyof R;
+    readonly colId?: string;
+    readonly headerName?: string;
+    readonly pdfHeaderName?: string;
+    readonly columnType?: ColumnTypeId;
+    readonly tableColumnType: TableColumnTypeId;
+    readonly index?: number;
+    readonly nullValue?: R[keyof R] | null;
     readonly selectable?: boolean | ((params: CellCallbackParams<R, M>) => boolean) | undefined;
     readonly editable?: boolean | ((params: CellCallbackParams<R, M>) => boolean);
     readonly footer?: FooterColumn<R, M>;
@@ -290,21 +300,38 @@ namespace Table {
     readonly canBeExported?: boolean;
     readonly requiresAuthentication?: boolean;
     readonly editorIsPopup?: boolean;
-    readonly onDataChange?: (id: Table.ModelRowId, event: CellChange<R>) => void;
+    readonly getRowValue?: (m: M) => R[keyof R];
+    readonly getHttpValue?: (value: V) => any;
     readonly getCSVValue?: (row: BodyRow<R>) => string;
+    readonly onDataChange?: (id: ModelRowId, event: CellChange<R>) => void;
     readonly colSpan?: (params: ColSpanParams<R, M>) => number;
     readonly onCellFocus?: (params: CellFocusedParams<R, M>) => void;
     readonly onCellUnfocus?: (params: CellFocusedParams<R, M>) => void;
     readonly refreshColumns?: (change: CellChange<R, V>) => keyof R | (keyof R)[] | null;
-    readonly getHttpValue?: (value: V) => any;
     readonly parseIntoFields?: (value: V) => ParsedColumnField<R, V>[];
     // readonly getCellChanges?: (id: EditableRowId, oldValue: any, newValue: any) => SoloCellChange<R>[];
     readonly processCellForClipboard?: (row: R) => string | number;
     readonly processCellFromClipboard?: (value: string) => V | null;
     readonly onCellDoubleClicked?: (row: ModelRow<R>) => void;
+    readonly includeInPdf?: boolean;
+    // In the PDF case, since we cannot dynamically resize columns, the width refers to a ratio
+    // of the column width to the overall table width assuming that all columns are present.  When
+    // columns are hidden/shown, this ratio is adjusted.
+    readonly pdfWidth?: number;
+    readonly pdfCellProps?: PdfCellStandardProps<R, PDFM, V>;
+    readonly pdfHeaderCellProps?: PdfCellStandardProps<R, PDFM, V>;
+    readonly pdfFooter?: PdfFooterColumn<V>;
+    readonly pdfCellContentsVisible?: PdfOptionalCellCallback<R, PDFM, V, boolean>;
+    readonly pdfFormatter?: (value: string | number) => string;
+    readonly pdfValueGetter?: PdfValueGetter<R, V>;
+    readonly pdfFooterValueGetter?: V | null | PdfFooterValueGetter<R, V>;
+    readonly pdfCellRenderer?: (params: PdfCellCallbackParams<R, PDFM, V>) => JSX.Element;
+    // NOTE: This only applies for the individual Account tables, not the the overall
+    // Accounts
+    readonly pdfChildFooter?: (s: PDFM) => PdfFooterColumn<V>;
   }
 
-  type AnyColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = Column<R, M> | PdfColumn<R, M, any>;
+  type PdfColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> = Column<R, any, V, M>;
 
   interface FooterColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel>
     extends Pick<Column<R, M>, "colSpan"> {
@@ -704,7 +731,7 @@ namespace Table {
     M extends Model.TypedHttpModel = Model.TypedHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>,
-    CFG extends CreateTableDataConfig<R, M, Column<R, M>> = CreateTableDataConfig<R, M, Column<R, M>>
+    CFG extends CreateTableDataConfig<R, M> = CreateTableDataConfig<R, M>
   > = TaskConfig<R, M, A> &
     Omit<CFG, "gridId" | "response"> & {
       readonly initialState: S;
@@ -739,7 +766,7 @@ namespace PdfBudgetTable {
 
   interface Options {
     readonly header: Omit<HeaderTemplateFormData, "name">;
-    readonly columns: (keyof Tables.PdfSubAccountRowData | string)[];
+    readonly columns: string[];
     readonly tables?: TableOption[] | null | undefined;
     readonly excludeZeroTotals: boolean;
     readonly notes?: RichText.Block[];

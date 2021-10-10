@@ -61,14 +61,13 @@ const AuthenticatedTemplateAccountsTable = (props: AuthenticatedTemplateProps): 
           !isNil(props.budget) ? `${props.budget.type}_${props.budget.name}_accounts` : ""
         )
       ]}
-      columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(Columns, {
-        identifier: (col: Table.Column<R, M>) => ({
-          ...col,
-          cellRendererParams: {
-            ...col.cellRendererParams,
+      columns={tabling.columns.normalizeColumns<R, M>(Columns, {
+        identifier: {
+          cellRendererParams: (c: Table.Column<R, M>) => ({
+            ...c.cellRendererParams,
             onGroupEdit: props.onEditGroup
-          }
-        })
+          })
+        }
       })}
     />
   );

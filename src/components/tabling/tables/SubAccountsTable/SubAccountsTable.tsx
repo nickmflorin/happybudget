@@ -2,18 +2,14 @@ import React from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
 
 import { Framework } from "./framework";
-import Columns from "./Columns";
 
 type R = Tables.SubAccountRowData;
-type M = Model.SubAccount;
 
 type SubAccountsTableProps = {
   readonly cookieNames?: Omit<Table.CookieNames, "hiddenColumns">;
 };
 
-export type WithSubAccountsTableProps<T> = T & {
-  readonly columns: Table.Column<R, M>[];
-};
+export type WithSubAccountsTableProps<T> = T;
 
 function SubAccountsTable<T extends SubAccountsTableProps>(
   Component:
@@ -24,7 +20,6 @@ function SubAccountsTable<T extends SubAccountsTableProps>(
     return (
       <Component
         {...props}
-        columns={Columns}
         showPageFooter={true}
         pinFirstColumn={true}
         cookieNames={{ ...props.cookieNames, hiddenColumns: "subaccount-table-hidden-columns" }}

@@ -1,14 +1,12 @@
+import { useMemo } from "react";
 import { isNil, filter, map } from "lodash";
 
 import { tabling } from "lib";
 import { framework } from "components/tabling/generic";
 
-import {
-  AuthenticatedBudgetTable,
-  AuthenticatedBudgetTableProps,
-  framework as budgetTableFramework
-} from "../BudgetTable";
+import { AuthenticatedBudgetTable, AuthenticatedBudgetTableProps } from "../BudgetTable";
 import SubAccountsTable, { WithSubAccountsTableProps } from "./SubAccountsTable";
+import Columns from "./Columns";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
@@ -29,25 +27,29 @@ const AuthenticatedTemplateSubAccountsTable = (
 ): JSX.Element => {
   const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
 
+  const columns = useMemo(
+    () =>
+      tabling.columns.normalizeColumns(Columns, {
+        identifier: (col: Table.Column<R, M>) => ({
+          ...col,
+          cellRendererParams: {
+            ...col.cellRendererParams,
+            onGroupEdit: props.onEditGroup
+          },
+          headerName: props.identifierFieldHeader
+        }),
+        description: { headerName: `${props.categoryName} Description` },
+        unit: (col: Table.Column<R, M>) => ({ ...col, models: props.subAccountUnits })
+      }),
+    [props.onEditGroup, props.identifierFieldHeader]
+  );
+
   return (
     <AuthenticatedBudgetTable<R, M>
       {...props}
       table={table}
       excludeColumns={["actual", "contact", "variance"]}
-      columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(props.columns, {
-        identifier: (col: Table.Column<R, M>) =>
-          budgetTableFramework.columnObjs.IdentifierColumn<R, M>({
-            ...col,
-            cellRendererParams: {
-              ...col.cellRendererParams,
-              onGroupEdit: props.onEditGroup
-            },
-            headerName: props.identifierFieldHeader
-          }),
-        description: { headerName: `${props.categoryName} Description` },
-        unit: (col: Table.Column<R, M>) =>
-          framework.columnObjs.TagSelectColumn<R, M>({ ...col, models: props.subAccountUnits })
-      })}
+      columns={columns}
       generateNewRowData={(rows: Table.BodyRow<R>[]) => {
         const dataRows = filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[];
         const numericIdentifiers: number[] = map(

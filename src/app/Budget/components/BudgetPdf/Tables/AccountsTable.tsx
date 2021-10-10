@@ -6,7 +6,7 @@ import Table from "./Table";
 import { BodyRow, GroupRow, HeaderRow, FooterRow } from "../Rows";
 
 type M = Model.PdfAccount;
-type R = Tables.PdfAccountRowData;
+type R = Tables.AccountRowData;
 
 type AccountsTableProps = {
   readonly data: Model.PdfAccount[];
@@ -23,7 +23,7 @@ const AccountsTable = ({
   groups
 }: AccountsTableProps): JSX.Element => {
   const generateRows = hooks.useDynamicCallback((): JSX.Element[] => {
-    const rowData = tabling.data.createTableRows<Tables.PdfAccountRowData, Model.PdfAccount>({
+    const rowData = tabling.data.createTableRows<R, M>({
       response: { models: data, groups, markups },
       columns
     });

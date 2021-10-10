@@ -1,7 +1,6 @@
 import { framework } from "components/tabling/generic";
 
 import * as cells from "./cells";
-export * as columnObjs from "./columnObjs";
 
 export const Framework: Table.Framework = {
   editors: {},

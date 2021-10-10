@@ -13,6 +13,11 @@ import { actions } from "../../store";
 type R = Tables.AccountRowData;
 type M = Model.Account;
 
+const AccountColumns = tabling.columns.normalizeColumns(GenericAccountsTable.Columns) as Table.Column<
+  Tables.AccountRowData,
+  Model.Account
+>[];
+
 const ActionMap = {
   tableChanged: actions.accounts.handleTableChangeEventAction,
   request: actions.accounts.requestAction,
@@ -44,7 +49,7 @@ const ConnectedTable = connectTableToStore<
   reducer: budgeting.reducers.createAuthenticatedAccountsTableReducer({
     tableId: "accounts-table",
     columns: filter(
-      GenericAccountsTable.Columns,
+      AccountColumns,
       (c: Table.Column<R, M>) => intersection([c.field, c.colId], ["variance", "actual"]).length === 0
     ),
     actions: ActionMap,

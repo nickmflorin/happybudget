@@ -44,56 +44,51 @@ const ActualsTable = ({
         framework.actions.ToggleColumnAction(table.current, params),
         framework.actions.ExportCSVAction(table.current, params, exportFileName)
       ]}
-      columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(Columns, {
-        owner: (col: Table.Column<R, M>) =>
-          framework.columnObjs.SelectColumn<R, M>({
-            ...col,
-            processCellFromClipboard: (name: string) => {
-              if (name.trim() === "") {
-                return null;
-              }
-              const availableOwners: (Model.SimpleSubAccount | Model.SimpleMarkup)[] = filter(
-                map(
-                  filter(props.data, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)),
-                  (row: Table.BodyRow<R>) => row.data.owner
-                ),
-                (owner: Model.SimpleSubAccount | Model.SimpleMarkup | null) =>
-                  owner !== null && owner.identifier !== null
-              ) as Model.SimpleSubAccount[];
-              // NOTE: If there are multiple owners with the same identifier, this will
-              // return the first and issue a warning.
-              const subaccount = model.util.inferModelFromName<Model.SimpleSubAccount | Model.SimpleMarkup>(
-                availableOwners,
-                name,
-                { nameField: "identifier" }
-              );
-              return subaccount;
-            },
-            cellEditorParams: {
-              ...col.cellEditorParams,
-              setSearch: (value: string) => onOwnerTreeSearch(value)
+      columns={tabling.columns.normalizeColumns<R, M>(Columns, {
+        owner: (col: Table.Column<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>) => ({
+          processCellFromClipboard: (name: string): Model.SimpleSubAccount | Model.SimpleMarkup | null => {
+            if (name.trim() === "") {
+              return null;
             }
-          }),
-        contact: (col: Table.Column<R, M>) =>
-          framework.columnObjs.ModelSelectColumn<R, M, Model.Contact>({
-            ...col,
-            cellRendererParams: { onEditContact },
-            cellEditorParams: { onNewContact },
-            models: contacts,
-            modelClipboardValue: (m: Model.Contact) => m.full_name,
-            processCellFromClipboard: (name: string): Model.Contact | null => {
-              if (name.trim() === "") {
-                return null;
-              } else {
-                const names = model.util.parseFirstAndLastName(name);
-                const contact: Model.Contact | undefined = find(contacts, {
-                  first_name: names[0],
-                  last_name: names[1]
-                });
-                return contact || null;
-              }
+            const availableOwners: (Model.SimpleSubAccount | Model.SimpleMarkup)[] = filter(
+              map(
+                filter(props.data, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)),
+                (row: Table.BodyRow<R>) => row.data.owner
+              ),
+              (owner: Model.SimpleSubAccount | Model.SimpleMarkup | null) => owner !== null && owner.identifier !== null
+            ) as Model.SimpleSubAccount[];
+            // NOTE: If there are multiple owners with the same identifier, this will
+            // return the first and issue a warning.
+            const subaccount = model.util.inferModelFromName<Model.SimpleSubAccount | Model.SimpleMarkup>(
+              availableOwners,
+              name,
+              { nameField: "identifier" }
+            );
+            return subaccount;
+          },
+          cellEditorParams: {
+            ...col.cellEditorParams,
+            setSearch: (value: string) => onOwnerTreeSearch(value)
+          }
+        }),
+        contact: {
+          cellRendererParams: { onEditContact },
+          cellEditorParams: { onNewContact },
+          models: contacts,
+          modelClipboardValue: (m: Model.Contact) => m.full_name,
+          processCellFromClipboard: (name: string): number | null => {
+            if (name.trim() === "") {
+              return null;
+            } else {
+              const names = model.util.parseFirstAndLastName(name);
+              const contact: Model.Contact | undefined = find(contacts, {
+                first_name: names[0],
+                last_name: names[1]
+              });
+              return contact?.id || null;
             }
-          })
+          }
+        }
       })}
     />
   );

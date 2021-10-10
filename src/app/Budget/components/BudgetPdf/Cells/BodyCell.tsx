@@ -50,8 +50,8 @@ const BodyCell = <
         return valueFromValueGetter;
       }
     } else if (!isNil(props.row)) {
-      if (!isNil(props.column.valueGetter)) {
-        return props.column.valueGetter(props.row, data);
+      if (!isNil(props.column.pdfValueGetter)) {
+        return props.column.pdfValueGetter(props.row, data);
       } else if (!isNil(props.column.field)) {
         const value = props.row.data[props.column.field];
         if (value === null) {
@@ -77,10 +77,10 @@ const BodyCell = <
   }, [props.row, props.column]);
 
   const value = useMemo(() => {
-    if (isNil(props.column.formatter)) {
+    if (isNil(props.column.pdfFormatter)) {
       return typeof rawValue === "string" || typeof rawValue === "number" ? String(rawValue) : "";
     }
-    return typeof rawValue === "string" || typeof rawValue === "number" ? props.column.formatter(rawValue) : "";
+    return typeof rawValue === "string" || typeof rawValue === "number" ? props.column.pdfFormatter(rawValue) : "";
   }, [rawValue, props.column]);
 
   return (

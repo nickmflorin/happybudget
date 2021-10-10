@@ -67,7 +67,8 @@ const useClipboard = <R extends Table.RowData, M extends Model.HttpModel>(
       const cs: Table.Column<R, M>[] = filter(
         params.columns,
         (column: Table.Column<R, M>) =>
-          column.canBeExported !== false && (isNil(fields) || includes(fields, tabling.columns.normalizedField(column)))
+          column.canBeExported !== false &&
+          (isNil(fields) || includes(fields as string[], tabling.columns.normalizedField(column)))
       );
       const csvData: CSVData = [map(cs, (col: Table.Column<R, M>) => col.headerName || "")];
       params.apis.grid.forEachNode((node: Table.RowNode, index: number) => {

@@ -1,10 +1,14 @@
 import { combineReducers } from "redux";
 
-import { redux, budgeting } from "lib";
+import { redux, budgeting, tabling } from "lib";
 import { SubAccountsTable, FringesTable, ActualsTable } from "components/tabling";
 
 import * as actions from "./actions";
 import initialState, { initialHeaderTemplatesState } from "./initialState";
+
+const SubAccountColumns = tabling.columns.normalizeColumns(SubAccountsTable.Columns);
+const ActualColumns = tabling.columns.normalizeColumns(ActualsTable.Columns);
+const FringesColumns = tabling.columns.normalizeColumns(FringesTable.Columns);
 
 const headerTemplatesRootReducer: Redux.Reducer<Modules.Budget.HeaderTemplatesStore> = (
   state: Modules.Budget.HeaderTemplatesStore = initialHeaderTemplatesState,
@@ -101,13 +105,13 @@ const genericReducer = combineReducers({
           setSearch: actions.account.setSearchAction
         },
         tableId: "account-subaccounts-table",
-        columns: SubAccountsTable.Columns,
+        columns: SubAccountColumns,
         fringesTableChangedAction: actions.handleFringesTableChangeEventAction,
         getModelRowChildren: (m: Model.SubAccount) => m.children,
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
           tableId: "fringes-table",
           initialState: initialState.account.table.fringes,
-          columns: FringesTable.Columns,
+          columns: FringesColumns,
           actions: {
             clear: actions.clearFringesAction,
             responseFringeColors: actions.responseFringeColorsAction,
@@ -169,13 +173,13 @@ const genericReducer = combineReducers({
           addModelsToState: actions.subAccount.addModelsToStateAction,
           setSearch: actions.subAccount.setSearchAction
         },
-        columns: SubAccountsTable.Columns,
+        columns: SubAccountColumns,
         getModelRowChildren: (m: Model.SubAccount) => m.children,
         fringesTableChangedAction: actions.handleFringesTableChangeEventAction,
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
           tableId: "fringes-table",
           initialState: initialState.subaccount.table.fringes,
-          columns: FringesTable.Columns,
+          columns: FringesColumns,
           actions: {
             responseFringeColors: actions.responseFringeColorsAction,
             tableChanged: actions.handleFringesTableChangeEventAction,
@@ -228,7 +232,7 @@ const genericReducer = combineReducers({
       addModelsToState: actions.actuals.addModelsToStateAction,
       setSearch: actions.actuals.setSearchAction
     },
-    columns: ActualsTable.Columns,
+    columns: ActualColumns,
     ownerTree: redux.reducers.createModelListResponseReducer<
       Model.OwnerTreeNode,
       Pick<

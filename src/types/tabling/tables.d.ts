@@ -38,12 +38,6 @@ namespace Tables {
     readonly ownerTree: Redux.ModelListResponseStore<Model.OwnerTreeNode>;
   };
 
-  type PdfSubAccountRowData = SubAccountRowData;
-  type PdfSubAccountRow = Table.ModelRow<PdfSubAccountRowData>;
-
-  type PdfAccountRowData = AccountRowData;
-  type PdfAccountRow = Table.ModelRow<PdfAccountRowData>;
-
   type ContactRowData = Pick<Model.Contact, "contact_type" | "company" | "position" | "rate" | "phone_number" | "email" | "first_name" | "last_name" | "image">;
 
   type ContactRow = Table.ModelRow<ContactRowData>;

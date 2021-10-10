@@ -17,7 +17,7 @@ type CustomTagProps = {
 };
 
 export interface ColumnSelectProps<R extends Table.RowData, M extends Model.HttpModel> extends SelectProps<string> {
-  readonly columns: Table.AnyColumn<R, M>[];
+  readonly columns: Table.Column<R, M>[];
 }
 
 const ColumnSelect = <R extends Table.RowData, M extends Model.HttpModel>(
@@ -33,7 +33,7 @@ const ColumnSelect = <R extends Table.RowData, M extends Model.HttpModel>(
       tagRender={(params: CustomTagProps) => {
         const column = find(
           props.columns,
-          (c: Table.AnyColumn<R, M>) => tabling.columns.normalizedField(c) === params.value
+          (c: Table.Column<R, M>) => tabling.columns.normalizedField(c) === params.value
         );
         if (!isNil(column)) {
           const colType: Table.ColumnType | undefined = !isNil(column.columnType)
@@ -53,7 +53,7 @@ const ColumnSelect = <R extends Table.RowData, M extends Model.HttpModel>(
         return <></>;
       }}
     >
-      {map(props.columns, (column: Table.AnyColumn<R, M>, index: number) => {
+      {map(props.columns, (column: Table.Column<R, M>, index: number) => {
         const colType = find(tabling.models.ColumnTypes, { id: column.columnType });
         return (
           <Select.Option className={"column-select-option"} key={index + 1} value={column.field as string}>

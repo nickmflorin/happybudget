@@ -109,7 +109,7 @@ const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
   const cellStyle = useMemo(() => {
     return {
       ...evaluateOptionalCallbackProp<R, M, V, Style>(
-        props.isHeader === true ? props.column.headerCellProps?.style : props.column.cellProps?.style,
+        props.isHeader === true ? props.column.pdfHeaderCellProps?.style : props.column.pdfCellProps?.style,
         callbackParams
       ),
       // The width will be configured before the column is plugged into this component.
@@ -122,7 +122,7 @@ const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
     <View
       className={classNames(
         evaluateClassName<R, M, V>(
-          props.isHeader === true ? props.column.headerCellProps?.className : props.column.cellProps?.className,
+          props.isHeader === true ? props.column.pdfHeaderCellProps?.className : props.column.pdfCellProps?.className,
           callbackParams
         ),
         evaluateClassName<R, M, V>(props.className, callbackParams),
@@ -136,19 +136,19 @@ const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
           props.indented === true ||
           evaluateOptionalCallbackProp<R, M, V, boolean>(props.cellContentsVisible, callbackParams) === false ||
           evaluateOptionalCallbackProp<R, M, V, boolean>(props.cellContentsInvisible, callbackParams) === true ||
-          evaluateOptionalCallbackProp<R, M, V, boolean>(props.column.cellContentsVisible, callbackParams) === false
+          evaluateOptionalCallbackProp<R, M, V, boolean>(props.column.pdfCellContentsVisible, callbackParams) === false
         }
       >
-        {props.isHeader !== true && !isNil(props.column.cellRenderer) ? (
-          props.column.cellRenderer(callbackParams)
+        {props.isHeader !== true && !isNil(props.column.pdfCellRenderer) ? (
+          props.column.pdfCellRenderer(callbackParams)
         ) : (
           <Text
             className={classNames(
               "cell-text",
               evaluateClassName<R, M, V>(
                 props.isHeader === true
-                  ? props.column.headerCellProps?.textClassName
-                  : props.column.cellProps?.textClassName,
+                  ? props.column.pdfHeaderCellProps?.textClassName
+                  : props.column.pdfCellProps?.textClassName,
                 callbackParams
               ),
               evaluateClassName<R, M, V>(props.textClassName, callbackParams)
@@ -165,7 +165,9 @@ const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
                   })
                 : ({} as Style)),
               ...evaluateOptionalCallbackProp<R, M, V, Style>(
-                props.isHeader === true ? props.column.headerCellProps?.textStyle : props.column.cellProps?.textStyle,
+                props.isHeader === true
+                  ? props.column.pdfHeaderCellProps?.textStyle
+                  : props.column.pdfCellProps?.textStyle,
                 callbackParams
               ),
               ...evaluateCellStyle<R, M, V>(props.textStyle, callbackParams)

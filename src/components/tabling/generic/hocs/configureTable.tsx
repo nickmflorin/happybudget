@@ -6,8 +6,6 @@ import { GridReadyEvent, GridOptions, FirstDataRenderedEvent } from "@ag-grid-co
 import { Config } from "config";
 import { tabling, hooks, util } from "lib";
 
-import * as framework from "../framework";
-
 export const DefaultDataGridOptions: GridOptions = {
   defaultColDef: {
     resizable: true,
@@ -172,7 +170,7 @@ const configureTable = <
     );
 
     const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-      let orderedColumns = tabling.columns.orderColumns<Table.Column<R, M>, R, M>(props.columns);
+      let orderedColumns = tabling.columns.orderColumns<R, M>(props.columns);
 
       const pinFirstColumn = (cs: Table.Column<R, M>[]) => {
         const displayedCols = filter(cs, (c: Table.Column<R, M>) => c.tableColumnType !== "fake");
@@ -189,12 +187,12 @@ const configureTable = <
 
       if (hasExpandColumn === true) {
         return [
-          framework.columnObjs.IndexColumn<R, M>(
+          tabling.columns.IndexColumn<R, M>(
             { ...props.indexColumn, pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined },
             hasExpandColumn,
             props.indexColumnWidth
           ),
-          framework.columnObjs.ExpandColumn<R, M>(
+          tabling.columns.ExpandColumn<R, M>(
             {
               pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined,
               // These are only applicable for the non-footer grids, but it is easier to define them
@@ -214,7 +212,7 @@ const configureTable = <
         ];
       }
       return [
-        framework.columnObjs.IndexColumn<R, M>(
+        tabling.columns.IndexColumn<R, M>(
           { ...props.indexColumn, pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined },
           hasExpandColumn || false,
           props.indexColumnWidth

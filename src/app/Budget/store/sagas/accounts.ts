@@ -86,6 +86,11 @@ const ActionMap: Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<Tables.
   setSearch: actions.setSearchAction
 };
 
+const AccountColumns = tabling.columns.normalizeColumns(AccountsTable.Columns) as Table.Column<
+  Tables.AccountRowData,
+  Model.Account
+>[];
+
 const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   Tables.AccountRowData,
   Model.Account,
@@ -93,7 +98,7 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
 >({
   actions: ActionMap,
   tasks: budgeting.tasks.accounts.createTableTaskSet<Model.Budget>({
-    columns: AccountsTable.Columns,
+    columns: AccountColumns,
     selectObjId: (state: Application.Authenticated.Store) => state.budget.id,
     actions: ActionMap,
     services: {

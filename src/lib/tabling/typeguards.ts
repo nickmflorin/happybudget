@@ -79,10 +79,6 @@ export const isAuthenticatedActionMap = <
 ): a is Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<R, M>> =>
   (a as Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<R, M>>).tableChanged !== undefined;
 
-export const isAgColumn = <R extends Table.RowData>(
-  col: Table.Column<R, any, any> | Table.PdfColumn<R, any>
-): col is Table.Column<R, any, any> => (col as Table.Column<R, any, any>).domain === "aggrid";
-
 export const isKeyboardEvent = (e: Table.CellDoneEditingEvent): e is KeyboardEvent => {
   return (e as KeyboardEvent).type === "keydown" && (e as KeyboardEvent).code !== undefined;
 };
@@ -90,6 +86,16 @@ export const isKeyboardEvent = (e: Table.CellDoneEditingEvent): e is KeyboardEve
 export const isSyntheticClickEvent = (e: Table.CellDoneEditingEvent): e is SyntheticEvent => {
   return (e as SyntheticEvent).type === "click";
 };
+
+export const isLazyColumn = <
+  R extends Table.RowData,
+  M extends Model.HttpModel,
+  V = any,
+  PDFM extends Model.HttpModel = any,
+  D extends Table.Column<R, M, V, PDFM> = any
+>(
+  c: Table.MaybeLazyColumn<R, M, V, PDFM, D>
+): c is Table.LazyColumn<R, M, V, PDFM, D> => (c as Table.LazyColumn<R, M, V, PDFM, D>).column !== undefined;
 
 export const isDataChangeEvent = <
   R extends Table.RowData,

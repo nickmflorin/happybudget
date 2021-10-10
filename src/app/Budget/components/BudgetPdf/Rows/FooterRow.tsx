@@ -14,8 +14,8 @@ const FooterRow = <R extends Table.RowData, M extends Model.HttpModel = Model.Ht
       cellProps={{
         textClassName: "footer-tr-td-text",
         valueGetter: (c: Table.PdfColumn<R, M>, rows: Table.BodyRow<R>[]) => {
-          if (!isNil(c.footerValueGetter)) {
-            return typeof c.footerValueGetter === "function" ? c.footerValueGetter(rows) : c.footerValueGetter;
+          if (!isNil(c.pdfFooterValueGetter)) {
+            return typeof c.pdfFooterValueGetter === "function" ? c.pdfFooterValueGetter(rows) : c.pdfFooterValueGetter;
           }
         }
       }}

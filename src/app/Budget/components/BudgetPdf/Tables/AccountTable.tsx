@@ -8,12 +8,12 @@ import Table from "./Table";
 import { BodyRow, HeaderRow, FooterRow, GroupRow } from "../Rows";
 
 type M = Model.PdfSubAccount;
-type R = Tables.PdfSubAccountRowData;
+type R = Tables.SubAccountRowData;
 
 type AccountTableProps = {
   readonly account: Model.PdfAccount;
   readonly subAccountColumns: Table.PdfColumn<R, M>[];
-  readonly columns: Table.PdfColumn<Tables.PdfAccountRowData, Model.PdfAccount>[];
+  readonly columns: Table.PdfColumn<Tables.AccountRowData, Model.PdfAccount>[];
   readonly options: PdfBudgetTable.Options;
 };
 
@@ -24,12 +24,8 @@ const AccountTable = ({
   account,
   options
 }: AccountTableProps): JSX.Element => {
-  const accountSubHeaderRow: Tables.PdfAccountRow = useMemo(() => {
-    return tabling.rows.createModelRow<
-      Tables.PdfAccountRowData,
-      Model.PdfAccount,
-      Table.PdfColumn<Tables.PdfAccountRowData, Model.PdfAccount>
-    >({
+  const accountSubHeaderRow: Tables.AccountRow = useMemo(() => {
+    return tabling.rows.createModelRow<Tables.AccountRowData, Model.PdfAccount>({
       model: account,
       columns
     });
@@ -37,12 +33,12 @@ const AccountTable = ({
 
   const generateRows = hooks.useDynamicCallback((): JSX.Element[] => {
     const createSubAccountFooterRow = (subaccount: M): Table.ModelRow<R> => {
-      return tabling.rows.createModelRow<R, M, Table.PdfColumn<R, M>>({
+      return tabling.rows.createModelRow<R, M>({
         model: subaccount,
         columns: subAccountColumns,
         getRowValue: (m: Model.PdfSubAccount, c: Table.PdfColumn<R, M>) => {
-          if (!isNil(c.childFooter) && !isNil(c.childFooter(subaccount).value)) {
-            return c.childFooter(subaccount).value;
+          if (!isNil(c.pdfChildFooter) && !isNil(c.pdfChildFooter(subaccount).value)) {
+            return c.pdfChildFooter(subaccount).value;
           }
         }
       });
@@ -188,7 +184,7 @@ const AccountTable = ({
         },
         [
           <HeaderRow className={"account-header-tr"} columns={subAccountColumns} />,
-          <BodyRow<Tables.PdfAccountRowData, Model.PdfAccount>
+          <BodyRow<Tables.AccountRowData, Model.PdfAccount>
             className={"account-sub-header-tr"}
             cellProps={{ textClassName: "account-sub-header-tr-td-text" }}
             columns={columns}

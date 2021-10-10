@@ -1,14 +1,12 @@
+import { useMemo } from "react";
 import { isNil, map } from "lodash";
 
 import { model, tabling } from "lib";
 import { framework } from "components/tabling/generic";
 
-import {
-  UnauthenticatedBudgetTable,
-  UnauthenticatedBudgetTableProps,
-  framework as budgetTableFramework
-} from "../BudgetTable";
+import { UnauthenticatedBudgetTable, UnauthenticatedBudgetTableProps } from "../BudgetTable";
 import SubAccountsTable, { WithSubAccountsTableProps } from "./SubAccountsTable";
+import Columns from "./Columns";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
@@ -26,26 +24,30 @@ const UnauthenticatedBudgetSubAccountsTable = (
 ): JSX.Element => {
   const table = tabling.hooks.useTableIfNotDefined(props.table);
 
-  return (
-    <UnauthenticatedBudgetTable<R, M>
-      {...props}
-      table={table}
-      columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(props.columns, {
-        identifier: (col: Table.Column<R, M>) =>
-          budgetTableFramework.columnObjs.IdentifierColumn<R, M>({
-            ...col,
-            headerName: props.identifierFieldHeader
-          }),
+  const columns = useMemo(
+    () =>
+      tabling.columns.normalizeColumns(Columns, {
+        identifier: (col: Table.Column<R, M>) => ({
+          ...col,
+          headerName: props.identifierFieldHeader
+        }),
         description: { headerName: `${props.categoryName} Description` },
-        unit: (col: Table.Column<R, M>) =>
-          framework.columnObjs.TagSelectColumn<R, M>({ ...col, models: props.subAccountUnits }),
+        unit: (col: Table.Column<R, M>) => ({ ...col, models: props.subAccountUnits }),
         fringes: {
           processCellForClipboard: (row: R) => {
             const fringes = model.util.getModelsByIds<Tables.FringeRow>(props.fringes, row.fringes);
             return map(fringes, (fringe: Tables.FringeRow) => fringe.data.name).join(", ");
           }
         }
-      })}
+      }),
+    [props.fringes, props.categoryName, props.subAccountUnits, props.identifierFieldHeader]
+  );
+
+  return (
+    <UnauthenticatedBudgetTable<R, M>
+      {...props}
+      table={table}
+      columns={columns}
       actions={(params: Table.UnauthenticatedMenuActionParams<R, M>) => [
         ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
         framework.actions.ToggleColumnAction<R, M>(table.current, params),

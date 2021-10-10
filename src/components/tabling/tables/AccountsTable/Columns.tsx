@@ -1,18 +1,20 @@
-import { tabling } from "lib";
+import { tabling, budgeting } from "lib";
 
 import { Icon } from "components";
-import { framework } from "components/tabling/generic";
-import { framework as budgetFramework } from "../BudgetTable";
 
 type R = Tables.AccountRowData;
 type M = Model.Account;
+type PDFM = Model.PdfAccount;
 
-const Columns: Table.Column<R, M>[] = [
-  budgetFramework.columnObjs.IdentifierColumn<R, M>({
+const Columns: Table.LazyColumn<R, M>[] = [
+  budgeting.columns.LazyIdentifierColumn<R, M, PDFM>({
     field: "identifier",
-    headerName: "Account"
+    headerName: "Account",
+    pdfHeaderName: "Acct #",
+    pdfWidth: 0.1,
+    pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
   }),
-  framework.columnObjs.BodyColumn<R, M>({
+  tabling.columns.LazyBodyColumn<R, M, string | null, PDFM>({
     field: "description",
     headerName: "Account Description",
     minWidth: 200,
@@ -22,15 +24,30 @@ const Columns: Table.Column<R, M>[] = [
     cellRendererParams: {
       icon: (row: Table.BodyRow<R>) =>
         tabling.typeguards.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined
+    },
+    pdfHeaderName: "Category Description",
+    pdfWidth: 0.75,
+    pdfFooter: { value: "Grand Total" },
+    pdfValueGetter: (r: Table.BodyRow<Tables.AccountRowData>) => {
+      if (tabling.typeguards.isGroupRow(r)) {
+        return r.groupData.name;
+      }
+      return r.data.description || "";
     }
   }),
-  budgetFramework.columnObjs.EstimatedColumn<R, M>({}),
-  budgetFramework.columnObjs.ActualColumn<R, M>({}),
-  budgetFramework.columnObjs.VarianceColumn<R, M>({}),
-  framework.columnObjs.FakeColumn<R, M>({ field: "nominal_value" }),
-  framework.columnObjs.FakeColumn<R, M>({ field: "markup_contribution" }),
-  framework.columnObjs.FakeColumn<R, M>({ field: "accumulated_fringe_contribution" }),
-  framework.columnObjs.FakeColumn<R, M>({ field: "accumulated_markup_contribution" })
+  budgeting.columns.LazyEstimatedColumn<R, M, PDFM>({
+    colId: "estimated",
+    pdfHeaderName: "Estimated",
+    pdfFormatter: tabling.formatters.currencyValueFormatter,
+    pdfWidth: 0.15,
+    pdfValueGetter: budgeting.valueGetters.estimatedValueGetter
+  }),
+  budgeting.columns.LazyActualColumn<R, M, PDFM>({ includeInPdf: false, field: "actual" }),
+  budgeting.columns.LazyVarianceColumn<R, M, PDFM>({ includeInPdf: false, colId: "variance" }),
+  tabling.columns.LazyFakeColumn<R, M, PDFM>({ field: "nominal_value" }),
+  tabling.columns.LazyFakeColumn<R, M, PDFM>({ field: "markup_contribution" }),
+  tabling.columns.LazyFakeColumn<R, M, PDFM>({ field: "accumulated_fringe_contribution" }),
+  tabling.columns.LazyFakeColumn<R, M, PDFM>({ field: "accumulated_markup_contribution" })
 ];
 
 export default Columns;

@@ -31,7 +31,7 @@ const UnauthenticatedBudgetAccountsTable = (props: UnauthenticatedBudgetProps): 
           !isNil(props.budget) ? `${props.budget.type}_${props.budget.name}_accounts` : ""
         )
       ]}
-      columns={Columns}
+      columns={tabling.columns.normalizeColumns<R, M>(Columns)}
     />
   );
 };

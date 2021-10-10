@@ -5,20 +5,25 @@ import { isNil, map, debounce, filter } from "lodash";
 
 import * as api from "api";
 import { registerFonts } from "style/pdf";
-import { util, redux, tabling, ui } from "lib";
+import { util, redux, ui } from "lib";
 
 import { Modal } from "components";
 import { ExportPdfForm } from "components/forms";
+import { SubAccountsTable } from "components/tabling";
 
 import { actions } from "../../store";
 
 import BudgetPdf from "../BudgetPdf";
 import Previewer from "./Previewer";
-import { SubAccountColumns } from "../BudgetPdf/config";
 import "./index.scss";
 
 const BudgetPdfFunc = (budget: Model.PdfBudget, contacts: Model.Contact[], options: PdfBudgetTable.Options) => (
   <BudgetPdf budget={budget} contacts={contacts} options={options} />
+);
+
+const SubAccountColumns = filter(
+  SubAccountsTable.Columns as Table.LazyPdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>[],
+  (c: Table.LazyPdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>) => c.includeInPdf !== false
 );
 
 const DEFAULT_OPTIONS: PdfBudgetTable.Options = {
@@ -70,9 +75,7 @@ const DEFAULT_OPTIONS: PdfBudgetTable.Options = {
   },
   includeNotes: false,
   columns: filter(
-    map(SubAccountColumns, (column: Table.PdfColumn<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) =>
-      tabling.columns.normalizedField(column)
-    ),
+    map(SubAccountColumns, (column: Table.LazyPdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>) => column.id),
     (field: string | undefined) => !isNil(field)
   ) as string[]
 };
@@ -226,7 +229,9 @@ const PreviewModal = ({
           accountsLoading={loadingData}
           accounts={!isNil(budgetResponse) ? budgetResponse.children : []}
           disabled={isNil(budgetResponse) || isNil(contactsResponse)}
-          columns={Object.values(SubAccountColumns)}
+          columns={map(SubAccountColumns, (c: Table.LazyPdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>) =>
+            c.column({})
+          )}
           onValuesChange={(changedValues: Partial<PdfBudgetTable.Options>, values: PdfBudgetTable.Options) => {
             const debouncedSetOptions = debounce(() => setOptions(values), 400);
             // We only care about debouncing the state set if the state set will result in

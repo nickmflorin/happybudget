@@ -2,13 +2,16 @@ import { isNil, filter, map, findIndex, includes } from "lodash";
 import { ValueGetterParams } from "@ag-grid-community/core";
 
 import { tabling, budgeting } from "lib";
-import { framework } from "components/tabling/generic";
 
-export const IdentifierColumn = <R extends Tables.BudgetRowData, M extends Model.HttpModel>(
-  props: Partial<Table.Column<R, M>>
-): Table.Column<R, M> => {
-  return framework.columnObjs.BodyColumn<R, M>({
-    field: "identifier",
+/* eslint-disable indent */
+export const IdentifierColumn = <
+  R extends Tables.BudgetRowData,
+  M extends Model.HttpModel,
+  PDFM extends Model.HttpModel = any
+>(
+  props: Partial<Table.Column<R, M, string | null, PDFM>>
+): Table.Column<R, M, string | null, PDFM> => {
+  return tabling.columns.BodyColumn<R, M, string | null, PDFM>({
     columnType: "number",
     ...props,
     footer: {
@@ -57,7 +60,7 @@ export const IdentifierColumn = <R extends Tables.BudgetRowData, M extends Model
           );
           const indexOfIdentifierColumn = findIndex(agColumns, (c: Table.AgColumn) => c.getColId() === "identifier");
           const indexOfFirstCalculatedColumn = findIndex(agColumns, (c: Table.AgColumn) =>
-            includes(originalCalculatedColumns, c.getColId() as keyof R)
+            includes(originalCalculatedColumns, c.getColId())
           );
           return indexOfFirstCalculatedColumn - indexOfIdentifierColumn;
         }
@@ -67,12 +70,17 @@ export const IdentifierColumn = <R extends Tables.BudgetRowData, M extends Model
   });
 };
 
-export const EstimatedColumn = <R extends Tables.BudgetRowData, M extends Model.HttpModel>(
-  props: Partial<Table.Column<R, M>>
-): Table.Column<R, M> => {
-  return framework.columnObjs.CalculatedColumn<R, M>({
+export const LazyIdentifierColumn = tabling.columns.Lazy(IdentifierColumn);
+
+export const EstimatedColumn = <
+  R extends Tables.BudgetRowData,
+  M extends Model.HttpModel,
+  PDFM extends Model.HttpModel = any
+>(
+  props: Partial<Table.Column<R, M, number, PDFM>>
+): Table.Column<R, M, number, PDFM> => {
+  return tabling.columns.CalculatedColumn<R, M, PDFM>({
     ...props,
-    colId: "estimated",
     headerName: "Estimated",
     valueGetter: (params: ValueGetterParams) => {
       if (!isNil(params.node)) {
@@ -87,12 +95,17 @@ export const EstimatedColumn = <R extends Tables.BudgetRowData, M extends Model.
   });
 };
 
-export const ActualColumn = <R extends Tables.BudgetRowData, M extends Model.HttpModel>(
-  props: Partial<Table.Column<R, M>>
-): Table.Column<R, M> => {
-  return framework.columnObjs.CalculatedColumn<R, M>({
+export const LazyEstimatedColumn = tabling.columns.Lazy(EstimatedColumn);
+
+export const ActualColumn = <
+  R extends Tables.BudgetRowData,
+  M extends Model.HttpModel,
+  PDFM extends Model.HttpModel = any
+>(
+  props: Partial<Table.Column<R, M, number, PDFM>>
+): Table.Column<R, M, number, PDFM> => {
+  return tabling.columns.CalculatedColumn<R, M, PDFM>({
     ...props,
-    field: "actual",
     headerName: "Actual",
     valueGetter: (params: ValueGetterParams) => {
       if (!isNil(params.node)) {
@@ -107,12 +120,17 @@ export const ActualColumn = <R extends Tables.BudgetRowData, M extends Model.Htt
   });
 };
 
-export const VarianceColumn = <R extends Tables.BudgetRowData, M extends Model.HttpModel>(
-  props: Partial<Table.Column<R, M>>
-): Table.Column<R, M> => {
-  return framework.columnObjs.CalculatedColumn<R, M>({
+export const LazyActualColumn = tabling.columns.Lazy(ActualColumn);
+
+export const VarianceColumn = <
+  R extends Tables.BudgetRowData,
+  M extends Model.HttpModel,
+  PDFM extends Model.HttpModel = any
+>(
+  props: Partial<Table.Column<R, M, number, PDFM>>
+): Table.Column<R, M, number, PDFM> => {
+  return tabling.columns.CalculatedColumn<R, M, PDFM>({
     ...props,
-    colId: "variance",
     headerName: "Variance",
     valueGetter: (params: ValueGetterParams) => {
       if (!isNil(params.node)) {
@@ -126,3 +144,5 @@ export const VarianceColumn = <R extends Tables.BudgetRowData, M extends Model.H
     }
   });
 };
+
+export const LazyVarianceColumn = tabling.columns.Lazy(VarianceColumn);

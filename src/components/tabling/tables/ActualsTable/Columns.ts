@@ -2,13 +2,11 @@ import { isNil } from "lodash";
 
 import { model, tabling } from "lib";
 
-import { framework } from "components/tabling/generic";
-
 type R = Tables.ActualRowData;
 type M = Model.Actual;
 
-const Columns: Table.Column<R, M>[] = [
-  framework.columnObjs.SelectColumn<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>({
+const Columns: Table.MaybeLazyColumn<R, M, any, any, any>[] = [
+  tabling.columns.LazySelectColumn<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>({
     field: "owner",
     headerName: "Sub-Account",
     minWidth: 200,
@@ -30,14 +28,14 @@ const Columns: Table.Column<R, M>[] = [
     cellRenderer: { data: "OwnerCell" },
     cellEditor: "OwnerTreeEditor"
   }),
-  framework.columnObjs.BodyColumn<R, M>({
+  tabling.columns.BodyColumn<R, M>({
     field: "description",
     headerName: "Description",
     minWidth: 200,
     flex: 3,
     columnType: "longText"
   }),
-  framework.columnObjs.ModelSelectColumn<R, M, Model.Contact>({
+  tabling.columns.LazyModelSelectColumn({
     field: "contact",
     headerName: "Contact",
     width: 120,
@@ -45,11 +43,9 @@ const Columns: Table.Column<R, M>[] = [
     cellRenderer: { data: "ContactCell" },
     cellEditor: "ContactEditor",
     columnType: "contact",
-    modelClipboardValue: (m: Model.Contact) => m.full_name,
-    models: [], // Will be populated by table.
-    processCellFromClipboard: (name: string): Model.Contact | null => null // Will be populated by table.
+    processCellFromClipboard: (name: string): number | null => null
   }),
-  framework.columnObjs.BodyColumn<R, M>({
+  tabling.columns.LazyBodyColumn<R, M>({
     field: "purchase_order",
     headerName: "PO",
     width: 100,
@@ -58,7 +54,7 @@ const Columns: Table.Column<R, M>[] = [
     columnType: "number",
     tableColumnType: "body"
   }),
-  framework.columnObjs.BodyColumn<R, M>({
+  tabling.columns.LazyBodyColumn<R, M>({
     field: "date",
     headerName: "Date",
     width: 100,
@@ -69,7 +65,7 @@ const Columns: Table.Column<R, M>[] = [
     valueSetter: tabling.valueSetters.dateTimeValueSetter<R>("date"),
     columnType: "date"
   }),
-  framework.columnObjs.ChoiceSelectColumn<R, M, Model.PaymentMethod>({
+  tabling.columns.ChoiceSelectColumn<R, M, Model.PaymentMethod>({
     field: "payment_method",
     headerName: "Pay Method",
     width: 140,
@@ -78,7 +74,7 @@ const Columns: Table.Column<R, M>[] = [
     cellEditor: "PaymentMethodEditor",
     models: model.models.PaymentMethods
   }),
-  framework.columnObjs.BodyColumn<R, M>({
+  tabling.columns.LazyBodyColumn<R, M>({
     field: "payment_id",
     headerName: "Pay ID",
     width: 80,
@@ -86,7 +82,7 @@ const Columns: Table.Column<R, M>[] = [
     flex: 1,
     columnType: "number"
   }),
-  framework.columnObjs.BodyColumn<R, M>({
+  tabling.columns.LazyBodyColumn<R, M>({
     field: "value",
     headerName: "Amount",
     width: 100,

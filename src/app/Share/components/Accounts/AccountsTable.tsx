@@ -1,6 +1,6 @@
 import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
-import { isNil } from "lodash";
+import { isNil, map } from "lodash";
 
 import { budgeting, redux, model } from "lib";
 import { AccountsTable as GenericAccountsTable, connectTableToStore } from "components/tabling";
@@ -39,7 +39,7 @@ const ConnectedTable = connectTableToStore<
   },
   reducer: budgeting.reducers.createUnauthenticatedAccountsTableReducer({
     tableId: "accounts-table",
-    columns: GenericAccountsTable.Columns,
+    columns: map(GenericAccountsTable.Columns, (c: Table.LazyColumn<R, M>) => c.column({})),
     actions: ActionMap,
     getModelRowChildren: (m: Model.Account) => m.children,
     initialState: redux.initialState.initialTableState

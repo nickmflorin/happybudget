@@ -1,11 +1,17 @@
 import { combineReducers } from "redux";
 import { filter, intersection } from "lodash";
 
-import { redux, budgeting } from "lib";
+import { redux, budgeting, tabling } from "lib";
 import { SubAccountsTable, FringesTable } from "components/tabling";
 
 import * as actions from "./actions";
 import initialState from "./initialState";
+
+const SubAccountColumns = tabling.columns.normalizeColumns(SubAccountsTable.Columns) as Table.Column<
+  Tables.SubAccountRowData,
+  Model.SubAccount
+>[];
+const FringesColumns = tabling.columns.normalizeColumns(FringesTable.Columns);
 
 const genericReducer = combineReducers({
   id: redux.reducers.createSimplePayloadReducer<number | null>({
@@ -44,7 +50,7 @@ const genericReducer = combineReducers({
         },
         getModelRowChildren: (m: Model.SubAccount) => m.children,
         columns: filter(
-          SubAccountsTable.Columns,
+          SubAccountColumns,
           (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
             intersection([c.field, c.colId], ["variance", "contact", "actual"]).length === 0
         ),
@@ -52,7 +58,7 @@ const genericReducer = combineReducers({
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
           tableId: "fringes-table",
           initialState: initialState.account.table.fringes,
-          columns: FringesTable.Columns,
+          columns: FringesColumns,
           actions: {
             responseFringeColors: actions.responseFringeColorsAction,
             tableChanged: actions.handleFringesTableChangeEventAction,
@@ -91,7 +97,7 @@ const genericReducer = combineReducers({
           clear: actions.subAccount.clearAction
         },
         columns: filter(
-          SubAccountsTable.Columns,
+          SubAccountColumns,
           (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
             intersection([c.field, c.colId], ["variance", "contact", "actual"]).length === 0
         ),
@@ -100,7 +106,7 @@ const genericReducer = combineReducers({
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
           tableId: "fringes-table",
           initialState: initialState.subaccount.table.fringes,
-          columns: FringesTable.Columns,
+          columns: FringesColumns,
           actions: {
             responseFringeColors: actions.responseFringeColorsAction,
             tableChanged: actions.handleFringesTableChangeEventAction,

@@ -11,8 +11,8 @@ const HeaderCell = <R extends Table.RowData, M extends Model.HttpModel = Model.H
       className={classNames("th", props.className)}
       textClassName={classNames("th-text", props.textClassName)}
       isHeader={true}
-      rawValue={(props.column.headerName || "") as unknown as R[keyof R]}
-      value={props.column.headerName || ""}
+      rawValue={(props.column.pdfHeaderName || props.column.headerName || "") as unknown as R[keyof R]}
+      value={props.column.pdfHeaderName || props.column.headerName || ""}
     />
   );
 };
