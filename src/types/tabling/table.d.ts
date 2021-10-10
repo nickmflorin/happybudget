@@ -351,6 +351,7 @@ namespace Table {
   type TableInstance<R extends RowData = RowData, M extends Model.HttpModel = Model.HttpModel> = DataGridInstance<R> & {
     readonly getFocusedRow: () => BodyRow<R> | null;
     readonly getRow: (id: BodyRowId) => BodyRow<R> | null;
+    readonly getRows: () => BodyRow<R>[];
     readonly getRowsAboveAndIncludingFocusedRow: () => BodyRow<R>[];
     readonly applyTableChange: (event: SingleOrArray<ChangeEvent<R, M>>) => void;
     readonly applyGroupColorChange: (group: Model.Group) => void;

@@ -83,26 +83,8 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
         onRowExpand={(row: Table.ModelRow<R>) => history.push(`/templates/${templateId}/accounts/${row.id}`)}
-        onGroupRows={(rows: (Table.ModelRow<R> | Table.MarkupRow<R>)[]) =>
-          setGroupAccounts(
-            map(
-              filter(rows, (row: Table.ModelRow<R> | Table.MarkupRow<R>) =>
-                tabling.typeguards.isModelRow(row)
-              ) as Table.ModelRow<R>[],
-              (row: Table.ModelRow<R>) => row.id
-            )
-          )
-        }
-        onMarkupRows={(rows: (Table.ModelRow<R> | Table.GroupRow<R>)[]) =>
-          setMarkupAccounts(
-            map(
-              filter(rows, (row: Table.ModelRow<R> | Table.GroupRow<R>) =>
-                tabling.typeguards.isModelRow(row)
-              ) as Table.ModelRow<R>[],
-              (row: Table.ModelRow<R>) => row.id
-            )
-          )
-        }
+        onGroupRows={(rows: Table.ModelRow<R>[]) => setGroupAccounts(map(rows, (row: Table.ModelRow<R>) => row.id))}
+        onMarkupRows={(rows: Table.ModelRow<R>[]) => setMarkupAccounts(map(rows, (row: Table.ModelRow<R>) => row.id))}
         onEditGroup={(group: Table.GroupRow<R>) => setGroupToEdit(group)}
         onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(tabling.rows.markupId(row.id))}
       />

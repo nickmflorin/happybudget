@@ -131,6 +131,13 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.TypedHttp
       }
       return [];
     },
+    getRows: () => {
+      const apis = props.tableApis.get("data");
+      if (!isNil(apis)) {
+        return tabling.aggrid.getRows(apis.grid);
+      }
+      return [];
+    },
     getRow: (id: Table.BodyRowId) => {
       const apis = props.tableApis.get("data");
       if (!isNil(apis)) {

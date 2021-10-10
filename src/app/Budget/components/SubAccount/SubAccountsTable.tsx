@@ -127,25 +127,9 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
             }
           }
         }}
-        onGroupRows={(rows: (Table.ModelRow<R> | Table.MarkupRow<R>)[]) =>
-          setGroupSubAccounts(
-            map(
-              filter(rows, (row: Table.ModelRow<R> | Table.MarkupRow<R>) =>
-                tabling.typeguards.isModelRow(row)
-              ) as Table.ModelRow<R>[],
-              (row: Table.ModelRow<R>) => row.id
-            )
-          )
-        }
-        onMarkupRows={(rows: (Table.ModelRow<R> | Table.GroupRow<R>)[]) =>
-          setMarkupSubAccounts(
-            map(
-              filter(rows, (row: Table.ModelRow<R> | Table.GroupRow<R>) =>
-                tabling.typeguards.isModelRow(row)
-              ) as Table.ModelRow<R>[],
-              (row: Table.ModelRow<R>) => row.id
-            )
-          )
+        onGroupRows={(rows: Table.ModelRow<R>[]) => setGroupSubAccounts(map(rows, (row: Table.ModelRow<R>) => row.id))}
+        onMarkupRows={(rows: Table.ModelRow<R>[]) =>
+          setMarkupSubAccounts(map(rows, (row: Table.ModelRow<R>) => row.id))
         }
         onEditGroup={(group: Table.GroupRow<R>) => setGroupToEdit(group)}
         onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(tabling.rows.markupId(row.id))}

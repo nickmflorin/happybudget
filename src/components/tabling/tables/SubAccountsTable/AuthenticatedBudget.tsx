@@ -171,12 +171,18 @@ const AuthenticatedBudgetSubAccountsTable = (
           label: "Mark Up",
           isWriteOnly: true,
           onClick: () => {
-            const rows: Table.BodyRow<R>[] = table.current.getRowsAboveAndIncludingFocusedRow();
-            const modelRows: Table.ModelRow<R>[] = filter(rows, (r: Table.BodyRow<R>) =>
+            const selectedRows = filter(params.selectedRows, (r: Table.BodyRow<R>) =>
               tabling.typeguards.isModelRow(r)
             ) as Table.ModelRow<R>[];
-            if (modelRows.length !== 0) {
-              props.onMarkupRows?.(modelRows);
+            /* eslint-disable indent */
+            const rows: Table.ModelRow<R>[] =
+              selectedRows.length !== 0
+                ? selectedRows
+                : (filter(table.current.getRows(), (r: Table.BodyRow<R>) =>
+                    tabling.typeguards.isModelRow(r)
+                  ) as Table.ModelRow<R>[]);
+            if (rows.length !== 0) {
+              props.onMarkupRows?.(rows);
             }
           }
         },

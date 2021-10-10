@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
-import { isNil, map, filter } from "lodash";
+import { isNil, map } from "lodash";
 
 import { budgeting, redux, tabling, model } from "lib";
 import { CreateGroupModal, EditGroupModal, CreateMarkupModal, EditMarkupModal } from "components/modals";
@@ -80,26 +80,8 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
         savingChangesPortalId={"saving-changes"}
         onExportPdf={() => setPreviewModalVisible(true)}
         onRowExpand={(row: Table.ModelRow<R>) => history.push(`/budgets/${budgetId}/accounts/${row.id}`)}
-        onGroupRows={(rows: (Table.ModelRow<R> | Table.MarkupRow<R>)[]) =>
-          setGroupAccounts(
-            map(
-              filter(rows, (row: Table.ModelRow<R> | Table.MarkupRow<R>) =>
-                tabling.typeguards.isModelRow(row)
-              ) as Table.ModelRow<R>[],
-              (row: Table.ModelRow<R>) => row.id
-            )
-          )
-        }
-        onMarkupRows={(rows: (Table.ModelRow<R> | Table.GroupRow<R>)[]) =>
-          setMarkupAccounts(
-            map(
-              filter(rows, (row: Table.ModelRow<R> | Table.GroupRow<R>) =>
-                tabling.typeguards.isModelRow(row)
-              ) as Table.ModelRow<R>[],
-              (row: Table.ModelRow<R>) => row.id
-            )
-          )
-        }
+        onGroupRows={(rows: Table.ModelRow<R>[]) => setGroupAccounts(map(rows, (row: Table.ModelRow<R>) => row.id))}
+        onMarkupRows={(rows: Table.ModelRow<R>[]) => setMarkupAccounts(map(rows, (row: Table.ModelRow<R>) => row.id))}
         onEditGroup={(group: Table.GroupRow<R>) => setGroupToEdit(group)}
         onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(tabling.rows.markupId(row.id))}
       />

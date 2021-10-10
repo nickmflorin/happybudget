@@ -88,6 +88,7 @@ export const InitialTableRef: Table.TableInstance<any, any> = {
   ...InitialGridRef,
   getFocusedRow: () => null,
   getRow: () => null,
+  getRows: () => [],
   getRowsAboveAndIncludingFocusedRow: () => [],
   changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange<any>>, sizeToFit?: boolean) => {},
   applyTableChange: (event: SingleOrArray<Table.ChangeEvent<any>>) => {},

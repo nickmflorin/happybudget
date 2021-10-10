@@ -39,6 +39,7 @@ const CreateMarkupModal = <
       .getTableChildren<M>(id, parentType, { simple: true }, { cancelToken: cancelToken() })
       .then((response: Http.ListResponse<M>) => {
         setAvailableChildren(response.data);
+        form.setFields([{ name: "children", value: props.children }]);
       })
       .catch((e: Error) => {
         form.handleRequestError(e);
