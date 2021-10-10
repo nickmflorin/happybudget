@@ -38,7 +38,6 @@ const CreateModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>,
   form,
   create,
   onSuccess,
-  onCancel,
   children,
   interceptPayload,
   ...props
