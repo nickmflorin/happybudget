@@ -38,7 +38,7 @@ const AuthenticatedTemplateSubAccountsTable = (
           headerName: props.identifierFieldHeader
         }),
         description: { headerName: `${props.categoryName} Description` },
-        unit: (col: Table.Column<R, M>) => ({ ...col, models: props.subAccountUnits })
+        unit: { models: props.subAccountUnits }
       }),
     [props.onEditGroup, props.identifierFieldHeader]
   );
