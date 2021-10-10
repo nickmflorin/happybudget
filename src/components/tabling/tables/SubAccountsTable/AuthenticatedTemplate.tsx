@@ -31,7 +31,6 @@ const AuthenticatedTemplateSubAccountsTable = (
     () =>
       tabling.columns.normalizeColumns(Columns, {
         identifier: (col: Table.Column<R, M>) => ({
-          ...col,
           cellRendererParams: {
             ...col.cellRendererParams,
             onGroupEdit: props.onEditGroup
