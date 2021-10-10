@@ -20,13 +20,8 @@ const ActionMap: Redux.ActionMapObject<budgeting.tasks.actuals.ActualsTableActio
   loadingOwnerTree: actions.loadingOwnerTreeAction
 };
 
-const ActualColumns = tabling.columns.normalizeColumns(ActualsTable.Columns) as Table.Column<
-  Tables.ActualRowData,
-  Model.Actual
->[];
-
 const tasks = budgeting.tasks.actuals.createTableTaskSet({
-  columns: ActualColumns,
+  columns: ActualsTable.Columns,
   selectObjId: (state: Application.Authenticated.Store) => state.budget.id,
   selectTreeCache: (state: Application.Authenticated.Store) => state.budget.actuals.ownerTree.cache,
   selectTreeSearch: (state: Application.Authenticated.Store) => state.budget.actuals.ownerTree.search,

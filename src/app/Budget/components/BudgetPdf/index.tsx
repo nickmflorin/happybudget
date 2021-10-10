@@ -17,14 +17,14 @@ interface BudgetPdfProps {
 }
 
 const AccountColumns = filter(
-  GenericAccountsTable.Columns as Table.LazyPdfColumn<Tables.AccountRowData, Model.PdfAccount>[],
-  (c: Table.LazyPdfColumn<Tables.AccountRowData, Model.PdfAccount>) => c.includeInPdf !== false
-);
+  GenericAccountsTable.Columns,
+  (c: Table.PdfColumn<Tables.AccountRowData, Model.PdfAccount>) => c.includeInPdf !== false
+) as Table.PdfColumn<Tables.AccountRowData, Model.PdfAccount>[];
 
 const SubAccountColumns = filter(
-  GenericSubAccountsTable.Columns as Table.LazyPdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>[],
-  (c: Table.LazyPdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>) => c.includeInPdf !== false
-);
+  GenericSubAccountsTable.Columns,
+  (c: Table.PdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>) => c.includeInPdf !== false
+) as Table.PdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>[];
 
 const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element => {
   const accountColumns = useMemo<Table.PdfColumn<Tables.AccountRowData, Model.PdfAccount>[]>(() => {

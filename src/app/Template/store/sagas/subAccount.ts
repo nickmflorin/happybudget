@@ -55,14 +55,9 @@ const ActionMap = {
   responseFringeColors: responseFringeColorsAction
 };
 
-const SubAccountColumns = tabling.columns.normalizeColumns(SubAccountsTable.Columns) as Table.Column<
-  Tables.SubAccountRowData,
-  Model.SubAccount
->[];
-
 const Tasks = budgeting.tasks.subaccounts.createTableTaskSet<Model.SubAccount, Model.Template>({
   columns: filter(
-    SubAccountColumns,
+    SubAccountsTable.Columns as Table.Column<Tables.SubAccountRowData, Model.SubAccount>[],
     (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
       intersection([c.field, c.colId], ["variance", "contact", "actual"]).length === 0
   ),

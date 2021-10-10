@@ -33,6 +33,50 @@ const AuthenticatedBudgetSubAccountsTable = (
 ): JSX.Element => {
   const table = tabling.hooks.useTableIfNotDefined(props.table);
 
+  const processUnitCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
+    model.util.inferModelFromName<Model.Tag>(props.subAccountUnits, name, { nameField: "title" })
+  );
+
+  const processContactCellForClipboard = hooks.useDynamicCallback((row: R) => {
+    const id = row.contact;
+    if (isNil(id)) {
+      return "";
+    }
+    const m: Model.Contact | undefined = find(props.contacts, { id } as any);
+    return m?.full_name || "";
+  });
+
+  const processContactCellFromClipboard = hooks.useDynamicCallback((name: string) => {
+    if (name.trim() === "") {
+      return null;
+    } else {
+      const names = model.util.parseFirstAndLastName(name);
+      const contact: Model.Contact | undefined = find(props.contacts, {
+        first_name: names[0],
+        last_name: names[1]
+      });
+      return contact?.id || null;
+    }
+  });
+
+  const processFringesCellForClipboard = hooks.useDynamicCallback((row: R) => {
+    const fringes = model.util.getModelsByIds<Tables.FringeRow>(props.fringes, row.fringes);
+    return map(fringes, (fringe: Tables.FringeRow) => fringe.data.name).join(", ");
+  });
+
+  const processFringesCellFromClipboard = hooks.useDynamicCallback((value: string) => {
+    // NOTE: When pasting from the clipboard, the values will be a comma-separated
+    // list of Fringe Names (assuming a rational user).  Currently, Fringe Names are
+    // enforced to be unique, so we can map the Name back to the ID.  However, this might
+    // not always be the case, in which case this logic breaks down.
+    const names = value.split(",");
+    const fs: Tables.FringeRow[] = filter(
+      map(names, (name: string) => model.util.inferModelFromName<Tables.FringeRow>(props.fringes, name)),
+      (f: Tables.FringeRow | null) => f !== null
+    ) as Tables.FringeRow[];
+    return map(fs, (f: Tables.FringeRow) => f.id);
+  });
+
   const columns = useMemo(() => {
     return tabling.columns.normalizeColumns(Columns, {
       identifier: (col: Table.Column<R, M>) => ({
@@ -44,34 +88,18 @@ const AuthenticatedBudgetSubAccountsTable = (
       }),
       description: { headerName: `${props.categoryName} Description` },
       unit: {
-        models: props.subAccountUnits
+        processCellFromClipboard: processUnitCellFromClipboard
       },
       fringes: {
         cellEditor: "FringesEditor",
         cellEditorParams: { onAddFringes: props.onAddFringes },
         headerComponentParams: { onEdit: () => props.onEditFringes() },
-        processCellFromClipboard: (value: string): number[] => {
-          // NOTE: When pasting from the clipboard, the values will be a comma-separated
-          // list of Fringe Names (assuming a rational user).  Currently, Fringe Names are
-          // enforced to be unique, so we can map the Name back to the ID.  However, this might
-          // not always be the case, in which case this logic breaks down.
-          const names = value.split(",");
-          const fs: Tables.FringeRow[] = filter(
-            map(names, (name: string) => model.util.inferModelFromName<Tables.FringeRow>(props.fringes, name)),
-            (f: Tables.FringeRow | null) => f !== null
-          ) as Tables.FringeRow[];
-          return map(fs, (f: Tables.FringeRow) => f.id);
-        },
-        processCellForClipboard: (row: R) => {
-          const fringes = model.util.getModelsByIds<Tables.FringeRow>(props.fringes, row.fringes);
-          return map(fringes, (fringe: Tables.FringeRow) => fringe.data.name).join(", ");
-        }
+        processCellFromClipboard: processFringesCellFromClipboard,
+        processCellForClipboard: processFringesCellForClipboard
       },
       contact: {
         cellRendererParams: { onEditContact: props.onEditContact },
         cellEditorParams: { onNewContact: props.onNewContact },
-        models: props.contacts,
-        modelClipboardValue: (m: Model.Contact) => m.full_name,
         onDataChange: (id: Table.ModelRowId, change: Table.CellChange<R>) => {
           // If a Row is assigned a Contact when it didn't previously have one, and the Row
           // does not have a populated value for `rate`, auto fill the `rate` field from the
@@ -89,18 +117,8 @@ const AuthenticatedBudgetSubAccountsTable = (
             }
           }
         },
-        processCellFromClipboard: (name: string): number | null => {
-          if (name.trim() === "") {
-            return null;
-          } else {
-            const names = model.util.parseFirstAndLastName(name);
-            const contact: Model.Contact | undefined = find(props.contacts, {
-              first_name: names[0],
-              last_name: names[1]
-            });
-            return contact?.id || null;
-          }
-        }
+        processCellForClipboard: processContactCellForClipboard,
+        processCellFromClipboard: processContactCellFromClipboard
       }
     });
   }, [

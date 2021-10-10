@@ -1,16 +1,11 @@
 import { combineReducers } from "redux";
 import { filter } from "lodash";
 
-import { redux, budgeting, tabling } from "lib";
+import { redux, budgeting } from "lib";
 import { SubAccountsTable, FringesTable } from "components/tabling";
 
 import * as actions from "./actions";
 import initialState from "./initialState";
-
-const SubAccountColumns = tabling.columns.normalizeColumns(SubAccountsTable.Columns) as Table.Column<
-  Tables.SubAccountRowData,
-  Model.SubAccount
->[];
 
 const genericReducer = combineReducers({
   id: redux.reducers.createSimplePayloadReducer<number | null>({
@@ -48,7 +43,7 @@ const genericReducer = combineReducers({
         },
         getModelRowChildren: (m: Model.SubAccount) => m.children,
         columns: filter(
-          SubAccountColumns,
+          SubAccountsTable.Columns as Table.Column<Tables.SubAccountRowData, Model.SubAccount>[],
           (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) => c.requiresAuthentication !== true
         ),
         fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
@@ -88,7 +83,7 @@ const genericReducer = combineReducers({
         },
         getModelRowChildren: (m: Model.SubAccount) => m.children,
         columns: filter(
-          SubAccountColumns,
+          SubAccountsTable.Columns as Table.Column<Tables.SubAccountRowData, Model.SubAccount>[],
           (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) => c.requiresAuthentication !== true
         ),
         fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({

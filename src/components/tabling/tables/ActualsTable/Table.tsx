@@ -1,6 +1,6 @@
-import { map, filter, find } from "lodash";
+import { map, filter, find, isNil } from "lodash";
 
-import { model, tabling } from "lib";
+import { model, tabling, hooks } from "lib";
 
 import { framework, WithConnectedTableProps } from "components/tabling/generic";
 import { AuthenticatedModelTable, AuthenticatedModelTableProps } from "../ModelTable";
@@ -28,6 +28,49 @@ const ActualsTable = ({
 }: WithConnectedTableProps<Props, R, M>): JSX.Element => {
   const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
 
+  const processContactCellForClipboard = hooks.useDynamicCallback((row: R) => {
+    const id = row.contact;
+    if (isNil(id)) {
+      return "";
+    }
+    const m: Model.Contact | undefined = find(contacts, { id } as any);
+    return m?.full_name || "";
+  });
+
+  const processContactCellFromClipboard = hooks.useDynamicCallback((name: string) => {
+    if (name.trim() === "") {
+      return null;
+    } else {
+      const names = model.util.parseFirstAndLastName(name);
+      const contact: Model.Contact | undefined = find(contacts, {
+        first_name: names[0],
+        last_name: names[1]
+      });
+      return contact?.id || null;
+    }
+  });
+
+  const processOwnerCellFromClipboard = hooks.useDynamicCallback((name: string) => {
+    if (name.trim() === "") {
+      return null;
+    }
+    const availableOwners: (Model.SimpleSubAccount | Model.SimpleMarkup)[] = filter(
+      map(
+        filter(props.data, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)),
+        (row: Table.BodyRow<R>) => row.data.owner
+      ),
+      (owner: Model.SimpleSubAccount | Model.SimpleMarkup | null) => owner !== null && owner.identifier !== null
+    ) as Model.SimpleSubAccount[];
+    // NOTE: If there are multiple owners with the same identifier, this will
+    // return the first and issue a warning.
+    const subaccount = model.util.inferModelFromName<Model.SimpleSubAccount | Model.SimpleMarkup>(
+      availableOwners,
+      name,
+      { nameField: "identifier" }
+    );
+    return subaccount;
+  });
+
   return (
     <AuthenticatedModelTable<R, M>
       {...props}
@@ -46,26 +89,7 @@ const ActualsTable = ({
       ]}
       columns={tabling.columns.normalizeColumns<R, M>(Columns, {
         owner: (col: Table.Column<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>) => ({
-          processCellFromClipboard: (name: string): Model.SimpleSubAccount | Model.SimpleMarkup | null => {
-            if (name.trim() === "") {
-              return null;
-            }
-            const availableOwners: (Model.SimpleSubAccount | Model.SimpleMarkup)[] = filter(
-              map(
-                filter(props.data, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)),
-                (row: Table.BodyRow<R>) => row.data.owner
-              ),
-              (owner: Model.SimpleSubAccount | Model.SimpleMarkup | null) => owner !== null && owner.identifier !== null
-            ) as Model.SimpleSubAccount[];
-            // NOTE: If there are multiple owners with the same identifier, this will
-            // return the first and issue a warning.
-            const subaccount = model.util.inferModelFromName<Model.SimpleSubAccount | Model.SimpleMarkup>(
-              availableOwners,
-              name,
-              { nameField: "identifier" }
-            );
-            return subaccount;
-          },
+          processCellFromClipboard: processOwnerCellFromClipboard,
           cellEditorParams: {
             ...col.cellEditorParams,
             setSearch: (value: string) => onOwnerTreeSearch(value)
@@ -74,20 +98,8 @@ const ActualsTable = ({
         contact: {
           cellRendererParams: { onEditContact },
           cellEditorParams: { onNewContact },
-          models: contacts,
-          modelClipboardValue: (m: Model.Contact) => m.full_name,
-          processCellFromClipboard: (name: string): number | null => {
-            if (name.trim() === "") {
-              return null;
-            } else {
-              const names = model.util.parseFirstAndLastName(name);
-              const contact: Model.Contact | undefined = find(contacts, {
-                first_name: names[0],
-                last_name: names[1]
-              });
-              return contact?.id || null;
-            }
-          }
+          processCellForClipboard: processContactCellForClipboard,
+          processCellFromClipboard: processContactCellFromClipboard
         }
       })}
     />

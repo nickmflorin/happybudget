@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { isNil, filter, map } from "lodash";
 
-import { tabling, hooks } from "lib";
+import { tabling, hooks, model } from "lib";
 import { framework } from "components/tabling/generic";
 
 import { AuthenticatedBudgetTable, AuthenticatedBudgetTableProps } from "../BudgetTable";
@@ -27,6 +27,10 @@ const AuthenticatedTemplateSubAccountsTable = (
 ): JSX.Element => {
   const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
 
+  const processUnitCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
+    model.util.inferModelFromName<Model.Tag>(props.subAccountUnits, name, { nameField: "title" })
+  );
+
   const columns = useMemo(
     () =>
       tabling.columns.normalizeColumns(Columns, {
@@ -38,7 +42,7 @@ const AuthenticatedTemplateSubAccountsTable = (
           headerName: props.identifierFieldHeader
         }),
         description: { headerName: `${props.categoryName} Description` },
-        unit: { models: props.subAccountUnits }
+        unit: { processCellFromClipboard: processUnitCellFromClipboard }
       }),
     [props.onEditGroup, props.identifierFieldHeader, hooks.useDeepEqualMemo(props.subAccountUnits)]
   );

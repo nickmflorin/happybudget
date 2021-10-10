@@ -113,13 +113,8 @@ const ActionMap = {
   responseSubAccountUnits: responseSubAccountUnitsAction
 };
 
-const SubAccountColumns = tabling.columns.normalizeColumns(SubAccountsTable.Columns) as Table.Column<
-  Tables.SubAccountRowData,
-  Model.SubAccount
->[];
-
 const Tasks = budgeting.tasks.subaccounts.createTableTaskSet<Model.SubAccount, Model.Budget>({
-  columns: SubAccountColumns,
+  columns: SubAccountsTable.Columns,
   selectBudgetId: (state: Application.Authenticated.Store) => state.budget.id,
   selectObjId: (state: Application.Authenticated.Store) => state.budget.subaccount.id,
   actions: ActionMap,

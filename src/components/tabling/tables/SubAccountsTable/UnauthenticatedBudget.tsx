@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { isNil, map } from "lodash";
 
-import { model, tabling } from "lib";
+import { model, tabling, hooks } from "lib";
 import { framework } from "components/tabling/generic";
 
 import { UnauthenticatedBudgetTable, UnauthenticatedBudgetTableProps } from "../BudgetTable";
@@ -24,6 +24,11 @@ const UnauthenticatedBudgetSubAccountsTable = (
 ): JSX.Element => {
   const table = tabling.hooks.useTableIfNotDefined(props.table);
 
+  const processFringesCellForClipboard = hooks.useDynamicCallback((row: R) => {
+    const fringes = model.util.getModelsByIds<Tables.FringeRow>(props.fringes, row.fringes);
+    return map(fringes, (fringe: Tables.FringeRow) => fringe.data.name).join(", ");
+  });
+
   const columns = useMemo(
     () =>
       tabling.columns.normalizeColumns(Columns, {
@@ -34,10 +39,7 @@ const UnauthenticatedBudgetSubAccountsTable = (
         description: { headerName: `${props.categoryName} Description` },
         unit: (col: Table.Column<R, M>) => ({ ...col, models: props.subAccountUnits }),
         fringes: {
-          processCellForClipboard: (row: R) => {
-            const fringes = model.util.getModelsByIds<Tables.FringeRow>(props.fringes, row.fringes);
-            return map(fringes, (fringe: Tables.FringeRow) => fringe.data.name).join(", ");
-          }
+          processCellForClipboard: processFringesCellForClipboard
         }
       }),
     [props.fringes, props.categoryName, props.subAccountUnits, props.identifierFieldHeader]

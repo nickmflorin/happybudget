@@ -235,42 +235,8 @@ namespace Table {
 
   type ParsedColumnField<R extends RowData, V = any> = { field: keyof R; value: V };
 
-  type FactoryFn<D> = (data: D) => Table.Column<any, any, any, any>;
+  type FactoryFn<D> = (data: Partial<D>) => Table.Column<any, any, any, any>;
   type InferFactoryParams<T> = T extends FactoryFn<infer D> ? D : never;
-
-  interface LazyColumn<
-    R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
-    V = any,
-    PDFM extends Model.HttpModel = any,
-    D extends Table.Column<R, M, V, PDFM> = any
-  > {
-    readonly id: keyof R | string;
-    readonly includeInPdf: boolean;
-    readonly column: FactoryFn<import("utility-types").Subtract<D, Table.Column<R, M, V, PDFM>> & Partial<Table.Column<R, M, V, PDFM>>>;
-  }
-
-  type MaybeLazyColumn<
-    R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
-    V = any,
-    PDFM extends Model.HttpModel = any,
-    D extends Table.Column<R, M, V, PDFM> = any
-  > = LazyColumn<R, M, V, PDFM, D> | Column<R, M, V, PDFM>;
-
-  type LazyPdfColumn<
-    R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
-    V = any,
-    D extends Table.Column<R, M, V, PDFM> = any
-  > = LazyColumn<R, any, V, M, D>;
-
-  type MaybeLazyPdfColumn<
-    R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
-    V = any,
-    D extends Table.Column<R, M, V, PDFM> = any
-  > = LazyPdfColumn<R, M, V, D> | PdfColumn<R, M, V>;
 
   interface Column<
     R extends RowData,
@@ -331,7 +297,7 @@ namespace Table {
     readonly pdfChildFooter?: (s: PDFM) => PdfFooterColumn<V>;
   }
 
-  type PdfColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> = Column<R, any, V, M>;
+  type PdfColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any, MM extends Model.HttpModel = any> = Column<R, MM, V, M>;
 
   interface FooterColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel>
     extends Pick<Column<R, M>, "colSpan"> {

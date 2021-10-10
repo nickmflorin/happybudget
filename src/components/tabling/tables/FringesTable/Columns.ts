@@ -38,7 +38,8 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "Unit",
     cellRenderer: { data: "FringeUnitCell" },
     cellEditor: "FringeUnitEditor",
-    models: model.models.FringeUnits
+    processCellFromClipboard: (name: string) =>
+      model.util.findChoiceForName<Model.FringeUnit>(model.models.FringeUnits, name)
   }),
   tabling.columns.BodyColumn<R, M>({
     field: "cutoff",

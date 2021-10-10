@@ -5,8 +5,8 @@ import { model, tabling } from "lib";
 type R = Tables.ActualRowData;
 type M = Model.Actual;
 
-const Columns: Table.MaybeLazyColumn<R, M, any, any, any>[] = [
-  tabling.columns.LazySelectColumn<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>({
+const Columns: Table.Column<R, M>[] = [
+  tabling.columns.SelectColumn<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>({
     field: "owner",
     headerName: "Sub-Account",
     minWidth: 200,
@@ -35,17 +35,16 @@ const Columns: Table.MaybeLazyColumn<R, M, any, any, any>[] = [
     flex: 3,
     columnType: "longText"
   }),
-  tabling.columns.LazyModelSelectColumn({
+  tabling.columns.SelectColumn({
     field: "contact",
     headerName: "Contact",
     width: 120,
     minWidth: 120,
     cellRenderer: { data: "ContactCell" },
     cellEditor: "ContactEditor",
-    columnType: "contact",
-    processCellFromClipboard: (name: string): number | null => null
+    columnType: "contact"
   }),
-  tabling.columns.LazyBodyColumn<R, M>({
+  tabling.columns.BodyColumn<R, M>({
     field: "purchase_order",
     headerName: "PO",
     width: 100,
@@ -54,7 +53,7 @@ const Columns: Table.MaybeLazyColumn<R, M, any, any, any>[] = [
     columnType: "number",
     tableColumnType: "body"
   }),
-  tabling.columns.LazyBodyColumn<R, M>({
+  tabling.columns.BodyColumn<R, M>({
     field: "date",
     headerName: "Date",
     width: 100,
@@ -72,9 +71,10 @@ const Columns: Table.MaybeLazyColumn<R, M, any, any, any>[] = [
     minWidth: 140,
     cellRenderer: { data: "PaymentMethodCell" },
     cellEditor: "PaymentMethodEditor",
-    models: model.models.PaymentMethods
+    processCellFromClipboard: (name: string) =>
+      model.util.findChoiceForName<Model.PaymentMethod>(model.models.PaymentMethods, name)
   }),
-  tabling.columns.LazyBodyColumn<R, M>({
+  tabling.columns.BodyColumn<R, M>({
     field: "payment_id",
     headerName: "Pay ID",
     width: 80,
@@ -82,7 +82,7 @@ const Columns: Table.MaybeLazyColumn<R, M, any, any, any>[] = [
     flex: 1,
     columnType: "number"
   }),
-  tabling.columns.LazyBodyColumn<R, M>({
+  tabling.columns.BodyColumn<R, M>({
     field: "value",
     headerName: "Amount",
     width: 100,

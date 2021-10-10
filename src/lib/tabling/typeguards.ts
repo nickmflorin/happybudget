@@ -87,16 +87,6 @@ export const isSyntheticClickEvent = (e: Table.CellDoneEditingEvent): e is Synth
   return (e as SyntheticEvent).type === "click";
 };
 
-export const isLazyColumn = <
-  R extends Table.RowData,
-  M extends Model.HttpModel,
-  V = any,
-  PDFM extends Model.HttpModel = any,
-  D extends Table.Column<R, M, V, PDFM> = any
->(
-  c: Table.MaybeLazyColumn<R, M, V, PDFM, D>
-): c is Table.LazyColumn<R, M, V, PDFM, D> => (c as Table.LazyColumn<R, M, V, PDFM, D>).column !== undefined;
-
 export const isDataChangeEvent = <
   R extends Table.RowData,
   M extends Model.TypedHttpModel = Model.TypedHttpModel,

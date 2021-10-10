@@ -1,14 +1,14 @@
 import { combineReducers } from "redux";
 
-import { redux, budgeting, tabling } from "lib";
+import { redux, budgeting } from "lib";
 import { SubAccountsTable, FringesTable, ActualsTable } from "components/tabling";
 
 import * as actions from "./actions";
 import initialState, { initialHeaderTemplatesState } from "./initialState";
 
-const SubAccountColumns = tabling.columns.normalizeColumns(SubAccountsTable.Columns);
-const ActualColumns = tabling.columns.normalizeColumns(ActualsTable.Columns);
-const FringesColumns = tabling.columns.normalizeColumns(FringesTable.Columns);
+const SubAccountColumns = SubAccountsTable.Columns;
+const ActualColumns = ActualsTable.Columns;
+const FringesColumns = FringesTable.Columns;
 
 const headerTemplatesRootReducer: Redux.Reducer<Modules.Budget.HeaderTemplatesStore> = (
   state: Modules.Budget.HeaderTemplatesStore = initialHeaderTemplatesState,

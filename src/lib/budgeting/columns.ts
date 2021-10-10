@@ -70,8 +70,6 @@ export const IdentifierColumn = <
   });
 };
 
-export const LazyIdentifierColumn = tabling.columns.Lazy(IdentifierColumn);
-
 export const EstimatedColumn = <
   R extends Tables.BudgetRowData,
   M extends Model.HttpModel,
@@ -94,8 +92,6 @@ export const EstimatedColumn = <
     }
   });
 };
-
-export const LazyEstimatedColumn = tabling.columns.Lazy(EstimatedColumn);
 
 export const ActualColumn = <
   R extends Tables.BudgetRowData,
@@ -120,8 +116,6 @@ export const ActualColumn = <
   });
 };
 
-export const LazyActualColumn = tabling.columns.Lazy(ActualColumn);
-
 export const VarianceColumn = <
   R extends Tables.BudgetRowData,
   M extends Model.HttpModel,
@@ -144,5 +138,3 @@ export const VarianceColumn = <
     }
   });
 };
-
-export const LazyVarianceColumn = tabling.columns.Lazy(VarianceColumn);

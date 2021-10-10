@@ -26,11 +26,6 @@ const ActionMap: Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<Tables.
   setSearch: actions.setSearchAction
 };
 
-const AccountColumns = tabling.columns.normalizeColumns(AccountsTable.Columns) as Table.Column<
-  Tables.AccountRowData,
-  Model.Account
->[];
-
 const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   Tables.AccountRowData,
   Model.Account,
@@ -39,7 +34,7 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   actions: ActionMap,
   tasks: budgeting.tasks.accounts.createTableTaskSet<Model.Template>({
     columns: filter(
-      AccountColumns,
+      AccountsTable.Columns,
       (c: Table.Column<Tables.AccountRowData, Model.Account>) =>
         intersection([c.field, c.colId], ["variance", "actual"]).length === 0
     ),

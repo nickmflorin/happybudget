@@ -117,8 +117,8 @@ const authenticateDataGrid =
             }
           }
         };
-        const cs = tabling.columns.updateColumnsOfField<R, M>(
-          tabling.columns.updateColumnsOfTableType<R, M>(props.columns, "body", (col: Table.Column<R, M>) => ({
+        const cs = tabling.columns.normalizeColumns<R, M>(props.columns, {
+          body: (col: Table.Column<R, M>) => ({
             cellRendererParams: { ...col.cellRendererParams, generateNewRowData: props.generateNewRowData },
             cellEditorParams: { ...col.cellEditorParams, onDoneEditing },
             editable: (params: Table.CellCallbackParams<R, M>) => {
@@ -201,9 +201,8 @@ const authenticateDataGrid =
               }
               return false;
             }
-          })),
-          "index" as keyof R,
-          {
+          }),
+          index: {
             checkboxSelection: (params: CheckboxSelectionCallbackParams) => {
               const row: Table.BodyRow<R> = params.data;
               if (tabling.typeguards.isEditableRow(row)) {
@@ -212,7 +211,7 @@ const authenticateDataGrid =
               return false;
             }
           }
-        );
+        });
         return cs;
       }, [hooks.useDeepEqualMemo(props.columns)]);
 
