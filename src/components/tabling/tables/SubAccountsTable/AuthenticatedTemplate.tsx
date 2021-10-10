@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { isNil, filter, map } from "lodash";
 
-import { tabling } from "lib";
+import { tabling, hooks } from "lib";
 import { framework } from "components/tabling/generic";
 
 import { AuthenticatedBudgetTable, AuthenticatedBudgetTableProps } from "../BudgetTable";
@@ -40,7 +40,7 @@ const AuthenticatedTemplateSubAccountsTable = (
         description: { headerName: `${props.categoryName} Description` },
         unit: { models: props.subAccountUnits }
       }),
-    [props.onEditGroup, props.identifierFieldHeader]
+    [props.onEditGroup, props.identifierFieldHeader, hooks.useDeepEqualMemo(props.subAccountUnits)]
   );
 
   return (
