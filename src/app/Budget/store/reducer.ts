@@ -230,7 +230,8 @@ const genericReducer = combineReducers({
       response: actions.actuals.responseAction,
       saving: actions.actuals.savingTableAction,
       addModelsToState: actions.actuals.addModelsToStateAction,
-      setSearch: actions.actuals.setSearchAction
+      setSearch: actions.actuals.setSearchAction,
+      responseActualTypes: actions.actuals.responseActualTypesAction
     },
     columns: ActualColumns,
     ownerTree: redux.reducers.createModelListResponseReducer<

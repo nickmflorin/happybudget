@@ -1,2 +1,2 @@
 export { default as OwnerCell } from "./OwnerCell";
-export { default as PaymentMethodCell } from "./PaymentMethodCell";
+export { default as ActualTypeCell } from "./ActualTypeCell";

@@ -1,6 +1,6 @@
 import { isNil } from "lodash";
 
-import { model, tabling } from "lib";
+import { tabling } from "lib";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;
@@ -64,15 +64,13 @@ const Columns: Table.Column<R, M>[] = [
     valueSetter: tabling.valueSetters.dateTimeValueSetter<R>("date"),
     columnType: "date"
   }),
-  tabling.columns.ChoiceSelectColumn<R, M, Model.PaymentMethod>({
-    field: "payment_method",
-    headerName: "Pay Method",
+  tabling.columns.TagSelectColumn({
+    field: "actual_type",
+    headerName: "Type",
+    cellRenderer: { data: "ActualTypeCell" },
+    cellEditor: "ActualTypeEditor",
     width: 140,
-    minWidth: 140,
-    cellRenderer: { data: "PaymentMethodCell" },
-    cellEditor: "PaymentMethodEditor",
-    processCellFromClipboard: (name: string) =>
-      model.util.findChoiceForName<Model.PaymentMethod>(model.models.PaymentMethods, name)
+    minWidth: 140
   }),
   tabling.columns.BodyColumn<R, M>({
     field: "payment_id",

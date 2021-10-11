@@ -1,2 +1,2 @@
-export { default as PaymentMethodEditor } from "./PaymentMethodEditor";
+export { default as ActualTypeEditor } from "./ActualTypeEditor";
 export { default as OwnerTreeEditor } from "./OwnerTreeEditor";

@@ -1,3 +1,4 @@
+import { client } from "api";
 import * as services from "./services";
 
 export const getActual = services.retrieveService<Model.Actual>((id: number) => ["actuals", id]);
@@ -6,3 +7,7 @@ export const updateActual = services.detailPatchService<Http.ActualPayload, Mode
   "actuals",
   id
 ]);
+export const getActualTypes = async (options: Http.RequestOptions = {}): Promise<Http.ListResponse<Model.Tag>> => {
+  const url = services.URL.v1("actuals", "types");
+  return client.list<Model.Tag>(url, { no_pagination: true }, options);
+};

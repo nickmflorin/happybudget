@@ -44,6 +44,9 @@ const ActionType = {
   FringeColors: {
     Response: "budget.fringecolors.Response"
   },
+  ActualTypes: {
+    Response: "budget.actualtypes.Response"
+  },
   SubAccountUnits: {
     Response: "budget.subaccountunits.Response"
   },

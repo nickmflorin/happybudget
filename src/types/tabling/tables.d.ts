@@ -30,12 +30,13 @@ namespace Tables {
 
   type ActualRowData = Pick<
     Model.Actual,
-    "description" | "purchase_order" | "date" | "payment_method" | "payment_id" | "value" | "contact" | "owner"
+    "description" | "purchase_order" | "date" | "actual_type" | "payment_id" | "value" | "contact" | "owner"
   >;
 
   type ActualRow = Table.ModelRow<ActualRowData>;
   type ActualTableStore = Redux.TableStore<ActualRowData> & {
     readonly ownerTree: Redux.ModelListResponseStore<Model.OwnerTreeNode>;
+    readonly actualTypes: Model.Tag[];
   };
 
   type ContactRowData = Pick<Model.Contact, "contact_type" | "company" | "position" | "rate" | "phone_number" | "email" | "first_name" | "last_name" | "image">;

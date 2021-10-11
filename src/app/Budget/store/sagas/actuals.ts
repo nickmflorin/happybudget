@@ -17,7 +17,8 @@ const ActionMap: Redux.ActionMapObject<budgeting.tasks.actuals.ActualsTableActio
   setSearch: actions.setSearchAction,
   responseOwnerTree: actions.responseOwnerTreeAction,
   restoreOwnerTreeSearchCache: actions.restoreOwnerTreeSearchCacheAction,
-  loadingOwnerTree: actions.loadingOwnerTreeAction
+  loadingOwnerTree: actions.loadingOwnerTreeAction,
+  responseActualTypes: actions.responseActualTypesAction
 };
 
 const tasks = budgeting.tasks.actuals.createTableTaskSet({

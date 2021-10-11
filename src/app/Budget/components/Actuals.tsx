@@ -25,6 +25,10 @@ const ActionMap = {
   clear: actions.actuals.clearAction
 };
 
+const selectActualTypes = redux.selectors.simpleDeepEqualSelector(
+  (state: Application.Authenticated.Store) => state.budget.actuals.actualTypes
+);
+
 const ConnectedActualsTable = connectTableToStore<ActualsTable.Props, R, M, Tables.ActualTableStore>({
   actions: ActionMap,
   selector: redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.actuals),
@@ -49,6 +53,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
 
   const dispatch = useDispatch();
   const contacts = useSelector(selectors.selectContacts);
+  const actualTypes = useSelector(selectActualTypes);
 
   return (
     <React.Fragment>
@@ -67,6 +72,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
       <ConnectedActualsTable
         tableId={"actuals-table"}
         contacts={contacts}
+        actualTypes={actualTypes}
         onOwnerTreeSearch={(value: string) => dispatch(actions.actuals.setOwnerTreeSearchAction(value))}
         exportFileName={!isNil(budget) ? `${budget.name}_actuals` : "actuals"}
         onNewContact={() => setCreateContactModalVisible(true)}

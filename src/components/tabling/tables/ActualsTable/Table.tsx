@@ -13,6 +13,7 @@ type M = Model.Actual;
 export type Props = Omit<AuthenticatedModelTableProps<R, M>, "columns"> & {
   readonly exportFileName: string;
   readonly contacts: Model.Contact[];
+  readonly actualTypes: Model.Tag[];
   readonly onOwnerTreeSearch: (value: string) => void;
   readonly onNewContact: (params: { name?: string; id: Table.ModelRowId }) => void;
   readonly onEditContact: (id: number) => void;
@@ -27,6 +28,10 @@ const ActualsTable = ({
   ...props
 }: WithConnectedTableProps<Props, R, M>): JSX.Element => {
   const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
+
+  const processActualTypeCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
+    model.util.inferModelFromName<Model.Tag>(props.actualTypes, name, { nameField: "title" })
+  );
 
   const processContactCellForClipboard = hooks.useDynamicCallback((row: R) => {
     const id = row.contact;
@@ -95,6 +100,9 @@ const ActualsTable = ({
             setSearch: (value: string) => onOwnerTreeSearch(value)
           }
         }),
+        actual_type: {
+          processCellFromClipboard: processActualTypeCellFromClipboard
+        },
         contact: {
           cellRendererParams: { onEditContact },
           cellEditorParams: { onNewContact },

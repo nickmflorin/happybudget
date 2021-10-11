@@ -20,3 +20,4 @@ export const setSearchAction = createAction<string>(ActionType.Actuals.SetSearch
 export const addModelsToStateAction = createAction<Redux.AddModelsToTablePayload<Model.Actual>>(
   ActionType.Actuals.AddToState
 );
+export const responseActualTypesAction = createAction<Http.ListResponse<Model.Tag>>(ActionType.ActualTypes.Response);

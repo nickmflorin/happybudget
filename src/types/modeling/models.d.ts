@@ -58,10 +58,6 @@ namespace Model {
   type ProductionTypeId = 0 | 1 | 2 | 3 | 4 | 5;
   type ProductionType = Choice<ProductionTypeId, ProductionTypeName>;
 
-  type PaymentMethodName = "Check" | "Card" | "Wire";
-  type PaymentMethodId = 0 | 1 | 2;
-  type PaymentMethod = Choice<PaymentMethodId, PaymentMethodName>;
-
   type MarkupUnitId = 0 | 1;
   type MarkupUnitName = "Percent" | "Flat";
   type MarkupUnit = Choice<MarkupUnitId, MarkupUnitName>;
@@ -288,7 +284,7 @@ namespace Model {
     readonly date: string | null;
     readonly payment_id: string | null;
     readonly value: number | null;
-    readonly payment_method: PaymentMethod | null;
+    readonly actual_type: Tag | null;
     readonly owner: SimpleSubAccount | SimpleMarkup | null;
   }
 

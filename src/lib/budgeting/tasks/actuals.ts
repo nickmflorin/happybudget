@@ -14,6 +14,7 @@ export type ActualsTableActionMap = Redux.AuthenticatedTableActionMap<R, M> & {
   readonly loadingOwnerTree: boolean;
   readonly restoreOwnerTreeSearchCache: null;
   readonly responseOwnerTree: Http.ListResponse<Model.OwnerTreeNode>;
+  readonly responseActualTypes: Http.ListResponse<Model.Tag>;
 };
 
 export type ActualsTableTaskConfig = Table.TaskConfig<R, M, ActualsTableActionMap> & {
@@ -36,7 +37,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
       yield put(config.actions.loading(true));
       yield put(config.actions.clear(null));
       try {
-        yield all([call(requestActuals, budgetId), call(requestOwnerTree, action)]);
+        yield all([call(requestActuals, budgetId), call(requestActualTypes), call(requestOwnerTree, action)]);
       } catch (e: unknown) {
         if (!(yield cancelled())) {
           api.handleRequestError(e as Error, "There was an error retrieving the table data.");
@@ -49,6 +50,11 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
         }
       }
     }
+  }
+
+  function* requestActualTypes(): SagaIterator {
+    const response = yield call(api.getActualTypes, { cancelToken: source.token });
+    yield put(config.actions.responseActualTypes(response));
   }
 
   function* requestActuals(budgetId: number): SagaIterator {

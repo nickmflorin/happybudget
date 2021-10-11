@@ -45,7 +45,7 @@ export const getSubAccountSubAccounts = async <M extends Model.SubAccount | Mode
 
 export const getSubAccountUnits = async (options: Http.RequestOptions = {}): Promise<Http.ListResponse<Model.Tag>> => {
   const url = services.URL.v1("subaccounts", "units");
-  return client.list<Model.Tag>(url, {}, options);
+  return client.list<Model.Tag>(url, { no_pagination: true }, options);
 };
 
 export const bulkUpdateSubAccountSubAccounts = async <B extends Model.Budget | Model.Template>(
