@@ -5,7 +5,7 @@ import { createSelector } from "reselect";
 import { isNil, map, filter, intersection } from "lodash";
 
 import { tabling, budgeting, redux, model } from "lib";
-import { EditMarkupModal, CreateMarkupModal, CreateGroupModal, EditGroupModal } from "components/modals";
+import { EditMarkupModal, CreateMarkupModal } from "components/modals";
 import { AccountsTable as GenericAccountsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../../store";
@@ -61,13 +61,24 @@ interface AccountsTableProps {
 const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Element => {
   const [markupAccounts, setMarkupAccounts] = useState<number[] | undefined>(undefined);
   const [markupToEdit, setMarkupToEdit] = useState<number | null>(null);
-  const [groupAccounts, setGroupAccounts] = useState<number[] | undefined>(undefined);
-  const [groupToEdit, setGroupToEdit] = useState<Table.GroupRow<R> | undefined>(undefined);
 
   const history = useHistory();
   const dispatch = useDispatch();
 
   const table = tabling.hooks.useTable<R>();
+
+  const [groupModals, onEditGroup, onCreateGroup] = budgeting.hooks.useGrouping({
+    parentId: templateId,
+    parentType: "template",
+    table: table.current,
+    onGroupUpdated: (group: Model.Group) =>
+      dispatch(
+        actions.account.handleTableChangeEventAction({
+          type: "groupUpdated",
+          payload: { id: group.id, data: group }
+        })
+      )
+  });
 
   return (
     <React.Fragment>
@@ -78,11 +89,12 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
         onRowExpand={(row: Table.ModelRow<R>) => history.push(`/templates/${templateId}/accounts/${row.id}`)}
-        onGroupRows={(rows: Table.ModelRow<R>[]) => setGroupAccounts(map(rows, (row: Table.ModelRow<R>) => row.id))}
+        onGroupRows={(rows: Table.ModelRow<R>[]) => onCreateGroup(map(rows, (row: Table.ModelRow<R>) => row.id))}
         onMarkupRows={(rows: Table.ModelRow<R>[]) => setMarkupAccounts(map(rows, (row: Table.ModelRow<R>) => row.id))}
-        onEditGroup={(group: Table.GroupRow<R>) => setGroupToEdit(group)}
+        onEditGroup={(group: Table.GroupRow<R>) => onEditGroup(group)}
         onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(tabling.rows.markupId(row.id))}
       />
+      {groupModals}
       {!isNil(markupAccounts) && !isNil(templateId) && (
         <CreateMarkupModal<
           Model.SimpleSubAccount,
@@ -104,22 +116,6 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
           onCancel={() => setMarkupAccounts(undefined)}
         />
       )}
-      {!isNil(groupAccounts) && !isNil(templateId) && (
-        <CreateGroupModal
-          id={templateId}
-          parentType={"template"}
-          children={groupAccounts}
-          open={true}
-          onSuccess={(group: Model.Group) => {
-            setGroupAccounts(undefined);
-            table.current.applyTableChange({
-              type: "groupAdded",
-              payload: group
-            });
-          }}
-          onCancel={() => setGroupAccounts(undefined)}
-        />
-      )}
       {!isNil(markupToEdit) && (
         <EditMarkupModal<
           Model.SimpleSubAccount,
@@ -138,25 +134,6 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
               payload: { id: response.data.id, data: response.data }
             });
             dispatch(actions.updateTemplateInStateAction({ id: response.budget.id, data: response.budget }));
-          }}
-        />
-      )}
-      {!isNil(groupToEdit) && (
-        <EditGroupModal
-          id={tabling.rows.groupId(groupToEdit.id)}
-          parentId={templateId}
-          parentType={"template"}
-          open={true}
-          onCancel={() => setGroupToEdit(undefined)}
-          onSuccess={(group: Model.Group) => {
-            setGroupToEdit(undefined);
-            table.current.applyTableChange({
-              type: "groupUpdated",
-              payload: { id: group.id, data: group }
-            });
-            if (group.color !== groupToEdit.groupData.color) {
-              table.current.applyGroupColorChange(group);
-            }
           }}
         />
       )}

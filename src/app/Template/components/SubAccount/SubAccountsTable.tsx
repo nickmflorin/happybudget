@@ -4,9 +4,9 @@ import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
 import { isNil, map, filter } from "lodash";
 
-import { redux, tabling, model } from "lib";
+import { redux, tabling, model, budgeting } from "lib";
 
-import { EditMarkupModal, CreateMarkupModal, CreateGroupModal, EditGroupModal } from "components/modals";
+import { EditMarkupModal, CreateMarkupModal } from "components/modals";
 import { SubAccountsTable as GenericSubAccountsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../../store";
@@ -81,8 +81,6 @@ const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTab
   const [markupSubAccounts, setMarkupSubAccounts] = useState<number[] | undefined>(undefined);
   const [markupToEdit, setMarkupToEdit] = useState<number | null>(null);
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
-  const [groupSubAccounts, setGroupSubAccounts] = useState<number[] | undefined>(undefined);
-  const [groupToEdit, setGroupToEdit] = useState<Table.GroupRow<R> | undefined>(undefined);
 
   const history = useHistory();
   const dispatch = useDispatch();
@@ -92,6 +90,19 @@ const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTab
   const fringes = useSelector(selectFringes);
 
   const table = tabling.hooks.useTable<R>();
+
+  const [groupModals, onEditGroup, onCreateGroup] = budgeting.hooks.useGrouping({
+    parentId: subaccountId,
+    parentType: "subaccount",
+    table: table.current,
+    onGroupUpdated: (group: Model.Group) =>
+      dispatch(
+        actions.account.handleTableChangeEventAction({
+          type: "groupUpdated",
+          payload: { id: group.id, data: group }
+        })
+      )
+  });
 
   return (
     <React.Fragment>
@@ -128,13 +139,14 @@ const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTab
             }
           }
         }}
-        onGroupRows={(rows: Table.ModelRow<R>[]) => setGroupSubAccounts(map(rows, (row: Table.ModelRow<R>) => row.id))}
+        onGroupRows={(rows: Table.ModelRow<R>[]) => onCreateGroup(map(rows, (row: Table.ModelRow<R>) => row.id))}
         onMarkupRows={(rows: Table.ModelRow<R>[]) =>
           setMarkupSubAccounts(map(rows, (row: Table.ModelRow<R>) => row.id))
         }
-        onEditGroup={(group: Table.GroupRow<R>) => setGroupToEdit(group)}
+        onEditGroup={(group: Table.GroupRow<R>) => onEditGroup(group)}
         onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(tabling.rows.markupId(row.id))}
       />
+      {groupModals}
       {!isNil(markupSubAccounts) && !isNil(subaccountId) && (
         <CreateMarkupModal<
           Model.SimpleSubAccount,
@@ -159,22 +171,6 @@ const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTab
           onCancel={() => setMarkupSubAccounts(undefined)}
         />
       )}
-      {!isNil(groupSubAccounts) && (
-        <CreateGroupModal
-          id={subaccountId}
-          parentType={"subaccount"}
-          children={groupSubAccounts}
-          open={true}
-          onSuccess={(group: Model.Group) => {
-            setGroupSubAccounts(undefined);
-            table.current.applyTableChange({
-              type: "groupAdded",
-              payload: group
-            });
-          }}
-          onCancel={() => setGroupSubAccounts(undefined)}
-        />
-      )}
       {!isNil(markupToEdit) && (
         <EditMarkupModal<
           Model.SimpleSubAccount,
@@ -196,25 +192,6 @@ const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTab
             });
             dispatch(actions.subAccount.updateInStateAction({ id: response.parent.id, data: response.parent }));
             dispatch(actions.updateTemplateInStateAction({ id: response.budget.id, data: response.budget }));
-          }}
-        />
-      )}
-      {!isNil(groupToEdit) && (
-        <EditGroupModal
-          id={tabling.rows.groupId(groupToEdit.id)}
-          parentId={subaccountId}
-          parentType={"subaccount"}
-          open={true}
-          onCancel={() => setGroupToEdit(undefined)}
-          onSuccess={(group: Model.Group) => {
-            setGroupToEdit(undefined);
-            table.current.applyTableChange({
-              type: "groupUpdated",
-              payload: { id: group.id, data: group }
-            });
-            if (group.color !== groupToEdit.groupData.color) {
-              table.current.applyGroupColorChange(group);
-            }
           }}
         />
       )}
