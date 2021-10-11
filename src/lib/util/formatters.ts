@@ -14,7 +14,7 @@ export const formatAsCurrency: Table.NativeFormatter<number | string> = (value: 
     console.error(`Could not parse value ${value} into currency!`);
     return "";
   }
-  return numericValue.toFixed(2);
+  return numericValue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
 };
 
 export const formatPercentage: Table.NativeFormatter<number | string> = (value: number | string | null): string => {
