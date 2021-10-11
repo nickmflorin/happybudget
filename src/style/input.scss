@@ -211,6 +211,21 @@ textarea {
       }
     }
   }
+  &.group-select-option {
+    .ant-select-item-option-content {
+      display: flex;
+
+      .icon-wrapper {
+        height: 22px;
+        width: 22px;
+
+        .color {
+          height: 16px;
+          width: 16px;
+        }
+      }
+    }
+  }
 }
 
 .select {
@@ -239,6 +254,30 @@ textarea {
     background-color: $gray-light !important;
     .ant-select-selector {
       background-color: $gray-light !important;
+    }
+  }
+
+  &--group {
+    .group-select-tag {
+      display: flex;
+      line-height: 22px;
+
+      .icon-wrapper {
+        height: 22px;
+        width: 22px;
+        margin-right: -4px;
+
+        .color {
+          height: 12px;
+          width: 12px;
+        }
+      }
+
+      .ant-tag-close-icon {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
     }
   }
 

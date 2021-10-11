@@ -175,12 +175,17 @@ const AuthenticatedBudgetSubAccountsTable = (
           label: "Group",
           isWriteOnly: true,
           onClick: () => {
-            const rows: Table.BodyRow<R>[] = table.current.getRowsAboveAndIncludingFocusedRow();
-            const modelRows: Table.ModelRow<R>[] = filter(rows, (r: Table.BodyRow<R>) =>
+            let rows = filter(params.selectedRows, (r: Table.BodyRow<R>) =>
               tabling.typeguards.isModelRow(r)
             ) as Table.ModelRow<R>[];
-            if (modelRows.length !== 0) {
-              props.onGroupRows?.(modelRows);
+            if (rows.length === 0) {
+              const focusedRow = table.current.getFocusedRow();
+              if (!isNil(focusedRow) && tabling.typeguards.isModelRow(focusedRow)) {
+                rows = [focusedRow];
+              }
+            }
+            if (rows.length !== 0) {
+              props.onGroupRows?.(rows);
             }
           }
         },

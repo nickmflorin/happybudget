@@ -55,6 +55,28 @@ export const createTableMarkup = <
   return serviceMap[parentType](parentId, payload, options) as Promise<R>;
 };
 
+export const getTableGroups = (
+  parentId: number,
+  parentType: Model.ParentType | "template",
+  query: Http.ListQuery = {},
+  options: Http.RequestOptions = {}
+): Promise<Http.ListResponse<Model.Group>> => {
+  const serviceMap: {
+    /* eslint-disable-next-line no-unused-vars */
+    [key in Model.ParentType | "template"]: (
+      id: number,
+      q?: Http.ListQuery,
+      o?: Http.RequestOptions
+    ) => Promise<Http.ListResponse<Model.Group>>;
+  } = {
+    budget: api.getBudgetAccountGroups,
+    template: api.getTemplateAccountGroups,
+    account: api.getAccountSubAccountGroups,
+    subaccount: api.getSubAccountSubAccountGroups
+  };
+  return serviceMap[parentType](parentId, query, options);
+};
+
 export const createTableGroup = (
   parentId: number,
   parentType: Model.ParentType | "template",

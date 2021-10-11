@@ -14,10 +14,8 @@ interface EditMarkupModalProps<
   B extends Model.Budget | Model.Template,
   R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
 > extends EditModelModalProps<Model.Markup, R> {
-  readonly id: number;
   readonly parentId: number;
   readonly parentType: Model.ParentType | "template";
-  readonly performUpdate?: boolean;
 }
 
 /* eslint-disable indent */
@@ -26,9 +24,7 @@ const EditMarkupModal = <
   B extends Model.Budget | Model.Template,
   R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
 >({
-  id,
   parentId,
-  performUpdate,
   parentType,
   ...props
 }: EditMarkupModalProps<B, R>): JSX.Element => {
@@ -55,7 +51,6 @@ const EditMarkupModal = <
   return (
     <EditModelModal<Model.Markup, Http.MarkupPayload, MarkupFormValues, R>
       {...props}
-      id={id}
       title={"Markup"}
       form={form}
       request={api.getMarkup}

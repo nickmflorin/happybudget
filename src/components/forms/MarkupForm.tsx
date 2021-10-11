@@ -102,7 +102,7 @@ const MarkupForm = (
           { required: false },
           ({ getFieldValue }: { getFieldValue: any }) => ({
             validator(rule: any, value: string) {
-              if (value !== "" && !isNil(value) && !util.validate.validateNumeric(value)) {
+              if (value.length === 0) {
                 return Promise.reject("At least one account must be selected.");
               }
               return Promise.resolve();

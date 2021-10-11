@@ -11,3 +11,4 @@ export { default as Select } from "./Select";
 export { default as SearchInput } from "./SearchInput";
 export { default as PercentInput } from "./PercentInput";
 export { default as ColumnSelect } from "./ColumnSelect";
+export { default as GroupSelect } from "./GroupSelect";

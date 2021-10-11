@@ -1,6 +1,6 @@
-import { includes, reduce, filter, map, isNil, find } from "lodash";
+import { includes, reduce, filter, map, isNil, findIndex, orderBy } from "lodash";
 
-import { tabling, model } from "lib";
+import { tabling } from "lib";
 
 type InjectMarkupsAndGroupsConfig<
   R extends Table.RowData,
@@ -24,73 +24,66 @@ export const injectMarkupsAndGroups = <
 >(
   config: InjectMarkupsAndGroupsConfig<R, M, A, B, C>
 ): (A | B | C)[] => {
-  let data: (A | B | C)[] = [];
   let modelsWithoutGroups: A[] = [];
 
-  const isA = (obj: A | B | C): obj is A => {
-    return (
-      (tabling.typeguards.isRow(obj) && tabling.typeguards.isDataRow(obj)) ||
-      (!tabling.typeguards.isRow(obj) && !model.typeguards.isMarkup(obj))
-    );
-  };
-  const isB = (obj: A | B | C): obj is B => {
-    return (
-      (tabling.typeguards.isRow(obj) && tabling.typeguards.isMarkupRow(obj)) ||
-      (!tabling.typeguards.isRow(obj) && model.typeguards.isMarkup(obj))
-    );
-  };
-  const isC = (obj: A | B | C): obj is C => {
-    return (
-      (tabling.typeguards.isRow(obj) && tabling.typeguards.isGroupRow(obj)) ||
-      (!tabling.typeguards.isRow(obj) && model.typeguards.isGroup(obj))
-    );
-  };
-
-  const markupId = (obj: B) => (tabling.typeguards.isRow(obj) ? tabling.rows.markupId(obj.id) : obj.id);
   const groupId = (obj: C) => (tabling.typeguards.isRow(obj) ? tabling.rows.groupId(obj.id) : obj.id);
 
   const modelGroup = (obj: A): C | null => {
-    const groupsForModel: C | undefined = find(config.groups, (g: C) => includes(g.children, obj.id));
-    return groupsForModel === undefined ? null : groupsForModel;
-  };
-
-  const isAllocated = (mdli: A | B | C) =>
-    isA(mdli)
-      ? includes(
-          map(filter(data, (obj: A | B | C) => isA(obj)) as A[], (obj: A) => obj.id),
-          mdli.id
-        )
-      : isB(mdli)
-      ? includes(
-          map(filter(data, (obj: A | B | C) => isB(obj)) as B[], (obj: B) => markupId(obj)),
-          markupId(mdli as B)
-        )
-      : includes(
-          map(filter(data, (obj: A | B | C) => isC(obj)) as C[], (obj: C) => groupId(obj)),
-          groupId(mdli as C)
-        );
-
-  const allocateGroup = (g: C) => {
-    if (isAllocated(g)) {
-      data = filter(data, (m: A | B | C) => !(isC(m) && groupId(m) === groupId(g)));
+    const groupsForModel: C[] | undefined = filter(config.groups, (g: C) => includes(g.children, obj.id));
+    if (groupsForModel.length > 1) {
+      /* eslint-disable no-console */
+      console.error(`Corrupted Data: Model ${obj.id} is associated with multiple groups!`);
     }
-    data = [...data, g];
+    return groupsForModel.length === 0 ? null : groupsForModel[0];
   };
 
-  for (let i = 0; i < config.current.length; i++) {
-    let mdl: A = config.current[i];
+  type ModelsAndGroup = { models: A[]; group: C };
 
-    if (!isAllocated(mdl)) {
-      const g = modelGroup(mdl);
-      if (isNil(g)) {
-        modelsWithoutGroups = [...modelsWithoutGroups, mdl];
+  const grouped = reduce(
+    config.current,
+    (curr: ModelsAndGroup[], m: A): ModelsAndGroup[] => {
+      const group = modelGroup(m);
+      if (!isNil(group)) {
+        const index = findIndex(curr, (mg: ModelsAndGroup) => groupId(mg.group) === groupId(group));
+        if (index === -1) {
+          return [...curr, { models: [m], group }];
+        } else {
+          return [
+            ...curr.slice(0, index),
+            { ...curr[index], models: [...curr[index].models, m] },
+            ...curr.slice(index + 1)
+          ];
+        }
       } else {
-        data = [...data, mdl];
-        allocateGroup(g);
+        modelsWithoutGroups = [...modelsWithoutGroups, m];
+        return curr;
       }
-    }
-  }
-  return [...data, ...modelsWithoutGroups, ...(config.markups || [])];
+    },
+    []
+  );
+
+  return [
+    ...reduce(
+      // We want to order the groups by the model in it's set that occurs earliest in
+      // the original data.
+      orderBy(grouped, (mg: ModelsAndGroup) =>
+        Math.min(
+          ...map(mg.models, (m: A) =>
+            Math.max(
+              findIndex(config.current, (mi: A) => mi.id === m.id),
+              0
+            )
+          )
+        )
+      ),
+      (curr: (A | C)[], mg: ModelsAndGroup) => {
+        return [...curr, ...mg.models, mg.group];
+      },
+      []
+    ),
+    ...modelsWithoutGroups,
+    ...(config.markups || [])
+  ];
 };
 
 export const orderTableRows = <R extends Table.RowData, M extends Model.TypedHttpModel>(

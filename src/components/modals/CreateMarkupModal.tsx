@@ -25,6 +25,7 @@ const CreateMarkupModal = <
 >({
   id,
   parentType,
+  children,
   ...props
 }: CreateMarkupModalProps<B, R>): JSX.Element => {
   const form = ui.hooks.useForm<MarkupFormValues>();
@@ -39,7 +40,7 @@ const CreateMarkupModal = <
       .getTableChildren<M>(id, parentType, { simple: true }, { cancelToken: cancelToken() })
       .then((response: Http.ListResponse<M>) => {
         setAvailableChildren(response.data);
-        form.setFields([{ name: "children", value: props.children }]);
+        form.setFields([{ name: "children", value: children }]);
       })
       .catch((e: Error) => {
         form.handleRequestError(e);

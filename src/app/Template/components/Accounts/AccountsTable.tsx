@@ -144,6 +144,8 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
       {!isNil(groupToEdit) && (
         <EditGroupModal
           id={tabling.rows.groupId(groupToEdit.id)}
+          parentId={templateId}
+          parentType={"template"}
           open={true}
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.Group) => {

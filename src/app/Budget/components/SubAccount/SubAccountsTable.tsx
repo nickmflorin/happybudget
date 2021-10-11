@@ -201,6 +201,8 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
       {!isNil(groupToEdit) && (
         <EditGroupModal
           id={tabling.rows.groupId(groupToEdit.id)}
+          parentId={subaccountId}
+          parentType={"subaccount"}
           open={true}
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.Group) => {
