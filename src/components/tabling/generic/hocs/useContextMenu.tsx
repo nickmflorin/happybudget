@@ -65,13 +65,6 @@ const useContextMenu = <R extends Table.RowData, M extends Model.HttpModel = Mod
     [params.getModelRowLabel, params.getMarkupRowLabel, params.getPlaceholderRowLabel, params.getGroupRowLabel]
   );
 
-  const getFullRowName = useMemo(
-    () => (row: Table.BodyRow<R>) => {
-      return util.conditionalJoinString(getRowLabel(row) || null, getRowName(row) || null, { replaceMissing: "Row" });
-    },
-    [getRowLabel, getRowName]
-  );
-
   const findGroupableRowsAbove = hooks.useDynamicCallback((node: Table.RowNode): Table.ModelRow<R>[] => {
     const firstRow: Table.BodyRow<R> = node.data;
     if (tabling.typeguards.isModelRow(firstRow)) {
@@ -148,7 +141,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.HttpModel = Mod
           if (groupableRowsAbove.length !== 0) {
             let label: string;
             if (groupableRowsAbove.length === 1) {
-              label = `Group ${getFullRowName(groupableRowsAbove[0])}`;
+              label = `Group Line`;
             } else {
               label = `Group ${getRowLabel(row) || "Row"}s Above`;
               const lastRow: Table.ModelRow<R> | Table.MarkupRow<R> | undefined =

@@ -28,8 +28,8 @@ function SubAccountsTable<T extends SubAccountsTableProps>(
         getPlaceholderRowName={(r: Table.PlaceholderRow<R>) => r.data.identifier || r.data.description}
         getMarkupRowName={(r: Table.MarkupRow<R>) => r.data.identifier}
         getMarkupRowLabel={"Markup"}
-        getModelRowLabel={"Sub Account"}
-        getPlaceholderRowLabel={"Sub Account"}
+        getModelRowLabel={"Line"}
+        getPlaceholderRowLabel={"Line"}
       />
     );
   };
