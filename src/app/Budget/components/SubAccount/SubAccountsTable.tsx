@@ -4,8 +4,8 @@ import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
 import { isNil, map, filter } from "lodash";
 
-import { redux, tabling, model, budgeting } from "lib";
-import { CreateMarkupModal, EditMarkupModal } from "components/modals";
+import { redux, tabling, model } from "lib";
+import { useGrouping, useMarkup } from "components/hooks";
 import { connectTableToStore } from "components/tabling";
 
 import { actions } from "../../store";
@@ -78,9 +78,6 @@ interface SubAccountsTableProps {
 
 const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTableProps): JSX.Element => {
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
-  const [markupSubAccounts, setMarkupSubAccounts] = useState<number[] | undefined>(undefined);
-  const [markupToEdit, setMarkupToEdit] = useState<number | null>(null);
-
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -90,7 +87,7 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
 
   const table = tabling.hooks.useTable<R>();
 
-  const [groupModals, onEditGroup, onCreateGroup] = budgeting.hooks.useGrouping({
+  const [groupModals, onEditGroup, onCreateGroup] = useGrouping({
     parentId: subaccountId,
     parentType: "subaccount",
     table: table.current,
@@ -101,6 +98,16 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
           payload: { id: group.id, data: group }
         })
       )
+  });
+
+  const [markupModals, onEditMarkup, onCreateMarkup] = useMarkup({
+    parentId: subaccountId,
+    parentType: "subaccount",
+    table: table.current,
+    onResponse: (response: Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, Model.Budget>) => {
+      dispatch(actions.subAccount.updateInStateAction({ id: response.parent.id, data: response.parent }));
+      dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
+    }
   });
 
   return (
@@ -139,61 +146,12 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
           }
         }}
         onGroupRows={(rows: Table.ModelRow<R>[]) => onCreateGroup(map(rows, (row: Table.ModelRow<R>) => row.id))}
-        onMarkupRows={(rows: Table.ModelRow<R>[]) =>
-          setMarkupSubAccounts(map(rows, (row: Table.ModelRow<R>) => row.id))
-        }
+        onMarkupRows={(rows: Table.ModelRow<R>[]) => onCreateMarkup(map(rows, (row: Table.ModelRow<R>) => row.id))}
         onEditGroup={(group: Table.GroupRow<R>) => onEditGroup(group)}
-        onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(tabling.rows.markupId(row.id))}
+        onEditMarkup={(row: Table.MarkupRow<R>) => onEditMarkup(tabling.rows.markupId(row.id))}
       />
       {groupModals}
-      {!isNil(markupSubAccounts) && !isNil(subaccountId) && (
-        <CreateMarkupModal<
-          Model.SimpleSubAccount,
-          Model.Budget,
-          Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, Model.Budget>
-        >
-          id={subaccountId}
-          parentType={"subaccount"}
-          children={markupSubAccounts}
-          open={true}
-          onSuccess={(
-            response: Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, Model.Budget>
-          ) => {
-            setMarkupSubAccounts(undefined);
-            table.current.applyTableChange({
-              type: "markupAdded",
-              payload: response.data
-            });
-            dispatch(actions.subAccount.updateInStateAction({ id: response.parent.id, data: response.parent }));
-            dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
-          }}
-          onCancel={() => setMarkupSubAccounts(undefined)}
-        />
-      )}
-      {!isNil(markupToEdit) && (
-        <EditMarkupModal<
-          Model.SimpleSubAccount,
-          Model.Budget,
-          Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, Model.Budget>
-        >
-          id={markupToEdit}
-          parentId={subaccountId}
-          parentType={"subaccount"}
-          open={true}
-          onCancel={() => setMarkupToEdit(null)}
-          onSuccess={(
-            response: Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, Model.Budget>
-          ) => {
-            setMarkupToEdit(null);
-            table.current.applyTableChange({
-              type: "markupUpdated",
-              payload: { id: response.data.id, data: response.data }
-            });
-            dispatch(actions.subAccount.updateInStateAction({ id: response.parent.id, data: response.parent }));
-            dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
-          }}
-        />
-      )}
+      {markupModals}
       <FringesModal budget={budget} open={fringesModalVisible} onCancel={() => setFringesModalVisible(false)} />
     </React.Fragment>
   );

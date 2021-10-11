@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { createSelector } from "reselect";
 import { isNil, map, filter, intersection } from "lodash";
 
 import { tabling, budgeting, redux, model } from "lib";
-import { EditMarkupModal, CreateMarkupModal } from "components/modals";
+import { useGrouping, useMarkup } from "components/hooks";
 import { AccountsTable as GenericAccountsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../../store";
@@ -59,15 +59,12 @@ interface AccountsTableProps {
 }
 
 const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Element => {
-  const [markupAccounts, setMarkupAccounts] = useState<number[] | undefined>(undefined);
-  const [markupToEdit, setMarkupToEdit] = useState<number | null>(null);
-
   const history = useHistory();
   const dispatch = useDispatch();
 
   const table = tabling.hooks.useTable<R>();
 
-  const [groupModals, onEditGroup, onCreateGroup] = budgeting.hooks.useGrouping({
+  const [groupModals, onEditGroup, onCreateGroup] = useGrouping({
     parentId: templateId,
     parentType: "template",
     table: table.current,
@@ -80,6 +77,15 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
       )
   });
 
+  const [markupModals, onEditMarkup, onCreateMarkup] = useMarkup({
+    parentId: templateId,
+    parentType: "template",
+    table: table.current,
+    onResponse: (response: Http.BudgetContextDetailResponse<Model.Markup, Model.Template>) => {
+      dispatch(actions.updateTemplateInStateAction({ id: response.budget.id, data: response.budget }));
+    }
+  });
+
   return (
     <React.Fragment>
       <ConnectedTable
@@ -90,53 +96,12 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
         savingChangesPortalId={"saving-changes"}
         onRowExpand={(row: Table.ModelRow<R>) => history.push(`/templates/${templateId}/accounts/${row.id}`)}
         onGroupRows={(rows: Table.ModelRow<R>[]) => onCreateGroup(map(rows, (row: Table.ModelRow<R>) => row.id))}
-        onMarkupRows={(rows: Table.ModelRow<R>[]) => setMarkupAccounts(map(rows, (row: Table.ModelRow<R>) => row.id))}
+        onMarkupRows={(rows: Table.ModelRow<R>[]) => onCreateMarkup(map(rows, (row: Table.ModelRow<R>) => row.id))}
         onEditGroup={(group: Table.GroupRow<R>) => onEditGroup(group)}
-        onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(tabling.rows.markupId(row.id))}
+        onEditMarkup={(row: Table.MarkupRow<R>) => onEditMarkup(tabling.rows.markupId(row.id))}
       />
       {groupModals}
-      {!isNil(markupAccounts) && !isNil(templateId) && (
-        <CreateMarkupModal<
-          Model.SimpleSubAccount,
-          Model.Template,
-          Http.BudgetContextDetailResponse<Model.Markup, Model.Template>
-        >
-          id={templateId}
-          parentType={"template"}
-          children={markupAccounts}
-          open={true}
-          onSuccess={(response: Http.BudgetContextDetailResponse<Model.Markup, Model.Template>) => {
-            setMarkupAccounts(undefined);
-            table.current.applyTableChange({
-              type: "markupAdded",
-              payload: response.data
-            });
-            dispatch(actions.updateTemplateInStateAction({ id: response.budget.id, data: response.budget }));
-          }}
-          onCancel={() => setMarkupAccounts(undefined)}
-        />
-      )}
-      {!isNil(markupToEdit) && (
-        <EditMarkupModal<
-          Model.SimpleSubAccount,
-          Model.Template,
-          Http.BudgetContextDetailResponse<Model.Markup, Model.Template>
-        >
-          id={markupToEdit}
-          parentId={templateId}
-          parentType={"template"}
-          open={true}
-          onCancel={() => setMarkupToEdit(null)}
-          onSuccess={(response: Http.BudgetContextDetailResponse<Model.Markup, Model.Template>) => {
-            setMarkupToEdit(null);
-            table.current.applyTableChange({
-              type: "markupUpdated",
-              payload: { id: response.data.id, data: response.data }
-            });
-            dispatch(actions.updateTemplateInStateAction({ id: response.budget.id, data: response.budget }));
-          }}
-        />
-      )}
+      {markupModals}
     </React.Fragment>
   );
 };

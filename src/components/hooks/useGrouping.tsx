@@ -17,7 +17,7 @@ type UseGroupingReturnType<R extends Tables.BudgetRowData> = [
   (gs: number[]) => void
 ];
 
-export const useGrouping = <R extends Tables.BudgetRowData, M extends Model.HttpModel>(
+const useGrouping = <R extends Tables.BudgetRowData, M extends Model.HttpModel>(
   props: UseGroupingProps<R, M>
 ): UseGroupingReturnType<R> => {
   const [groupAccounts, setGroupAccounts] = useState<number[] | undefined>(undefined);
@@ -78,3 +78,5 @@ export const useGrouping = <R extends Tables.BudgetRowData, M extends Model.Http
 
   return [modals, setGroupToEdit, setGroupAccounts];
 };
+
+export default useGrouping;

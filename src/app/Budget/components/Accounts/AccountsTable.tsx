@@ -5,7 +5,7 @@ import { createSelector } from "reselect";
 import { isNil, map } from "lodash";
 
 import { budgeting, redux, tabling, model } from "lib";
-import { CreateMarkupModal, EditMarkupModal } from "components/modals";
+import { useGrouping, useMarkup } from "components/hooks";
 import { AccountsTable as GenericAccountsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../../store";
@@ -60,15 +60,12 @@ interface AccountsTableProps {
 
 const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element => {
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
-  const [markupAccounts, setMarkupAccounts] = useState<number[] | undefined>(undefined);
-  const [markupToEdit, setMarkupToEdit] = useState<number | null>(null);
-
   const dispatch = useDispatch();
   const history = useHistory();
 
   const table = tabling.hooks.useTable<R>();
 
-  const [groupModals, onEditGroup, onCreateGroup] = budgeting.hooks.useGrouping({
+  const [groupModals, onEditGroup, onCreateGroup] = useGrouping({
     parentId: budgetId,
     parentType: "budget",
     table: table.current,
@@ -79,6 +76,15 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
           payload: { id: group.id, data: group }
         })
       )
+  });
+
+  const [markupModals, onEditMarkup, onCreateMarkup] = useMarkup({
+    parentId: budgetId,
+    parentType: "budget",
+    table: table.current,
+    onResponse: (response: Http.BudgetContextDetailResponse<Model.Markup, Model.Budget>) => {
+      dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
+    }
   });
 
   return (
@@ -92,53 +98,12 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
         onExportPdf={() => setPreviewModalVisible(true)}
         onRowExpand={(row: Table.ModelRow<R>) => history.push(`/budgets/${budgetId}/accounts/${row.id}`)}
         onGroupRows={(rows: Table.ModelRow<R>[]) => onCreateGroup(map(rows, (row: Table.ModelRow<R>) => row.id))}
-        onMarkupRows={(rows: Table.ModelRow<R>[]) => setMarkupAccounts(map(rows, (row: Table.ModelRow<R>) => row.id))}
+        onMarkupRows={(rows: Table.ModelRow<R>[]) => onCreateMarkup(map(rows, (row: Table.ModelRow<R>) => row.id))}
         onEditGroup={(group: Table.GroupRow<R>) => onEditGroup(group)}
-        onEditMarkup={(row: Table.MarkupRow<R>) => setMarkupToEdit(tabling.rows.markupId(row.id))}
+        onEditMarkup={(row: Table.MarkupRow<R>) => onEditMarkup(tabling.rows.markupId(row.id))}
       />
       {groupModals}
-      {!isNil(markupAccounts) && !isNil(budgetId) && (
-        <CreateMarkupModal<
-          Model.SimpleSubAccount,
-          Model.Budget,
-          Http.BudgetContextDetailResponse<Model.Markup, Model.Budget>
-        >
-          id={budgetId}
-          parentType={"budget"}
-          children={markupAccounts}
-          open={true}
-          onSuccess={(response: Http.BudgetContextDetailResponse<Model.Markup, Model.Budget>) => {
-            setMarkupAccounts(undefined);
-            table.current.applyTableChange({
-              type: "markupAdded",
-              payload: response.data
-            });
-            dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
-          }}
-          onCancel={() => setMarkupAccounts(undefined)}
-        />
-      )}
-      {!isNil(markupToEdit) && (
-        <EditMarkupModal<
-          Model.SimpleSubAccount,
-          Model.Budget,
-          Http.BudgetContextDetailResponse<Model.Markup, Model.Budget>
-        >
-          id={markupToEdit}
-          parentId={budgetId}
-          parentType={"budget"}
-          open={true}
-          onCancel={() => setMarkupToEdit(null)}
-          onSuccess={(response: Http.BudgetContextDetailResponse<Model.Markup, Model.Budget>) => {
-            setMarkupToEdit(null);
-            table.current.applyTableChange({
-              type: "markupUpdated",
-              payload: { id: response.data.id, data: response.data }
-            });
-            dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
-          }}
-        />
-      )}
+      {markupModals}
       <PreviewModal
         autoRenderPdf={false}
         visible={previewModalVisible}
