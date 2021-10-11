@@ -27,7 +27,8 @@ const AccountTable = ({
   const accountSubHeaderRow: Tables.AccountRow = useMemo(() => {
     return tabling.rows.createModelRow<Tables.AccountRowData, Model.PdfAccount>({
       model: account,
-      columns
+      columns,
+      originalIndex: 0 // Irrelevant for this row since we are not ordering it.
     });
   }, [account, columns]);
 
@@ -35,6 +36,7 @@ const AccountTable = ({
     const createSubAccountFooterRow = (subaccount: M): Table.ModelRow<R> => {
       return tabling.rows.createModelRow<R, M>({
         model: subaccount,
+        originalIndex: 0, // Irrelevant for this row since we are not ordering it.
         columns: subAccountColumns,
         getRowValue: (m: Model.PdfSubAccount, c: Table.PdfColumn<R, M>) => {
           if (!isNil(c.pdfChildFooter) && !isNil(c.pdfChildFooter(subaccount).value)) {

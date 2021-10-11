@@ -37,6 +37,14 @@ export const injectMarkupsAndGroups = <
     return groupsForModel.length === 0 ? null : groupsForModel[0];
   };
 
+  const modelIndex = (obj: A): number =>
+    tabling.typeguards.isRow(obj)
+      ? obj.originalIndex
+      : Math.max(
+          findIndex(config.current, (mi: A) => mi.id === obj.id),
+          0
+        );
+
   type ModelsAndGroup = { models: A[]; group: C };
 
   const grouped = reduce(
@@ -50,7 +58,7 @@ export const injectMarkupsAndGroups = <
         } else {
           return [
             ...curr.slice(0, index),
-            { ...curr[index], models: [...curr[index].models, m] },
+            { ...curr[index], models: orderBy([...curr[index].models, m], modelIndex) },
             ...curr.slice(index + 1)
           ];
         }
@@ -66,22 +74,13 @@ export const injectMarkupsAndGroups = <
     ...reduce(
       // We want to order the groups by the model in it's set that occurs earliest in
       // the original data.
-      orderBy(grouped, (mg: ModelsAndGroup) =>
-        Math.min(
-          ...map(mg.models, (m: A) =>
-            Math.max(
-              findIndex(config.current, (mi: A) => mi.id === m.id),
-              0
-            )
-          )
-        )
-      ),
+      orderBy(grouped, (mg: ModelsAndGroup) => Math.min(...map(mg.models, (m: A) => modelIndex(m)))),
       (curr: (A | C)[], mg: ModelsAndGroup) => {
         return [...curr, ...mg.models, mg.group];
       },
       []
     ),
-    ...modelsWithoutGroups,
+    ...orderBy(modelsWithoutGroups, modelIndex),
     ...(config.markups || [])
   ];
 };
@@ -106,9 +105,10 @@ export const createTableRows = <R extends Table.RowData, M extends Model.TypedHt
   return orderTableRows([
     ...reduce(
       config.response.models,
-      (curr: Table.ModelRow<R>[], m: M) => [
+      (curr: Table.ModelRow<R>[], m: M, index: number) => [
         ...curr,
         tabling.rows.createModelRow<R, M>({
+          originalIndex: index,
           model: m,
           columns: config.columns,
           getRowChildren: config.getModelRowChildren

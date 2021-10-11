@@ -239,7 +239,7 @@ const rowDeleteReducer = <
   st = removeRowsFromTheirGroupsIfTheyExist(st, action, modelRows, columns);
   return {
     ...st,
-    data: filter(st.data, (ri: Table.BodyRow<R>) => !includes(ids, ri.id))
+    data: data.orderTableRows<R, M>(filter(st.data, (ri: Table.BodyRow<R>) => !includes(ids, ri.id)))
   };
 };
 
@@ -356,6 +356,7 @@ export const createTableChangeEventReducer = <
             newState.data,
             { id: modelRow.id },
             rows.createModelRow<R, M>({
+              originalIndex: modelRow.originalIndex,
               model: e.payload,
               columns: config.columns,
               getRowChildren: config.getModelRowChildren
@@ -367,16 +368,23 @@ export const createTableChangeEventReducer = <
       const payload: Table.RowAdd<R>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
       newState = {
         ...newState,
-        data: data.orderTableRows<R, M>([
-          ...newState.data,
-          ...map(payload, (addition: Table.RowAdd<R>) =>
-            rows.createPlaceholderRow<R, M>({
-              id: addition.id,
-              data: addition.data,
-              columns: config.columns
-            })
+        data: data.orderTableRows<R, M>(
+          reduce(
+            payload,
+            (d: Table.BodyRow<R>[], addition: Table.RowAdd<R>) => {
+              return [
+                ...d,
+                rows.createPlaceholderRow<R, M>({
+                  id: addition.id,
+                  data: addition.data,
+                  columns: config.columns,
+                  originalIndex: filter(data, (r: Table.BodyRow<R>) => typeguards.isDataRow(r)).length
+                })
+              ];
+            },
+            newState.data
           )
-        ])
+        )
       };
       applicationEvents.dispatchRowsAddedEvent({ tableId: config.tableId, numRows: newState.data.length });
     } else if (typeguards.isRowDeleteEvent(e)) {
@@ -574,7 +582,8 @@ export const createAuthenticatedTableReducer = <
                 { id: r.id },
                 rows.createModelRow({
                   model: payload.models[index],
-                  columns: config.columns
+                  columns: config.columns,
+                  originalIndex: r.originalIndex
                 })
               )
             };
@@ -605,7 +614,8 @@ export const createAuthenticatedTableReducer = <
                   { id: r.id },
                   rows.createModelRow({
                     model: m,
-                    columns: config.columns
+                    columns: config.columns,
+                    originalIndex: r.originalIndex
                   })
                 )
               )

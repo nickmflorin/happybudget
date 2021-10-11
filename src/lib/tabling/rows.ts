@@ -380,9 +380,11 @@ export const createPlaceholderRowData = <R extends Table.RowData, M extends Mode
 export const createPlaceholderRow = <R extends Table.RowData, M extends Model.TypedHttpModel>(
   config: Omit<CreateBodyRowFromDataConfig<Table.PlaceholderRowId, "placeholder", R, M>, "rowType" | "data"> & {
     readonly data?: Partial<R>;
+    readonly originalIndex: number;
   }
 ): Table.PlaceholderRow<R> => {
   return {
+    originalIndex: config.originalIndex,
     ...createBodyRow<Table.PlaceholderRowId, "placeholder", R, M>({
       ...config,
       id: config.id,
@@ -418,6 +420,7 @@ type CreateModelRowFromModelConfig<R extends Table.RowData, M extends Model.Type
   CreateBodyRowFromModelConfig<Table.ModelRowId, "model", R, M, M>,
   "rowType" | "id"
 > & {
+  readonly originalIndex: number;
   readonly getRowChildren?: (m: M) => number[];
   readonly getRowValue?: (m: M, col: Table.Column<R, M>) => R[keyof R] | undefined;
 };
@@ -426,6 +429,7 @@ type CreateModelRowFromDataConfig<R extends Table.RowData, M extends Model.Typed
   CreateBodyRowFromDataConfig<Table.ModelRowId, "model", R, M>,
   "rowType"
 > & {
+  readonly originalIndex: number;
   readonly getRowValue?: (m: M, col: Table.Column<R, M>) => R[keyof R] | undefined;
   readonly children?: number[];
 };
@@ -439,6 +443,7 @@ export const createModelRow = <R extends Table.RowData, M extends Model.TypedHtt
 ): Table.ModelRow<R> => {
   if (isModelRowConfigWithModel(config)) {
     return {
+      originalIndex: config.originalIndex,
       children: !isNil(config.getRowChildren) ? config.getRowChildren(config.model) : [],
       ...createBodyRow<Table.ModelRowId, "model", R, M>({
         ...config,
@@ -449,6 +454,7 @@ export const createModelRow = <R extends Table.RowData, M extends Model.TypedHtt
     };
   }
   return {
+    originalIndex: config.originalIndex,
     children: config.children || [],
     ...createBodyRow<Table.ModelRowId, "model", R, M>({
       ...config,

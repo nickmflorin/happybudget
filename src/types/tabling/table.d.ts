@@ -100,9 +100,14 @@ namespace Table {
 
   type FooterRow<Grid extends FooterGridId = FooterGridId> = IRow<FooterRowId, "footer", Grid>;
   type ModelRow<R extends RowData> = IBodyRow<ModelRowId, "model", R> & {
+    // The index (location) of the model in the original set of models returned from the backend,
+    // before grouping is applied.
+    readonly originalIndex: number;
     readonly children: number[];
   };
-  type PlaceholderRow<R extends RowData> = IBodyRow<PlaceholderRowId, "placeholder", R>;
+  type PlaceholderRow<R extends RowData> = IBodyRow<PlaceholderRowId, "placeholder", R> & {
+    readonly originalIndex: number;
+  }
   type GroupRow<R extends RowData> = IBodyRow<GroupRowId, "group", R> & {
     readonly children: number[];
     readonly groupData: Pick<Model.Group, "name" | "color">;
