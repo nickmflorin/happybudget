@@ -68,10 +68,10 @@ const ExportForm = (
   const [showAllTables, setShowAllTables] = useState(isNil(props.initialValues?.tables));
   const [includeNotes, setIncludeNotes] = useState(false);
   const [notesHtml, setNotesHtml] = useState<string | null>(props.initialValues?.notes || null);
-  const [leftImage, setLeftImage] = useState<UploadedImage | SavedImage | null>(
+  const [leftImage, _setLeftImage] = useState<UploadedImage | SavedImage | null>(
     displayedHeaderTemplate?.left_image || null
   );
-  const [rightImage, setRightImage] = useState<UploadedImage | SavedImage | null>(
+  const [rightImage, _setRightImage] = useState<UploadedImage | SavedImage | null>(
     displayedHeaderTemplate?.right_image || null
   );
 
@@ -129,6 +129,30 @@ const ExportForm = (
       setRightImage(null);
     }
   }, [displayedHeaderTemplate]);
+
+  const setLeftImage = useMemo(
+    () => (img: UploadedImage | SavedImage | null) => {
+      _setLeftImage(img);
+      const values: ExportFormOptions = props.form.getFieldsValue();
+      props.onValuesChange?.(
+        { header: { ...getHeaderTemplateData(), left_image: img } },
+        { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), left_image: img } }
+      );
+    },
+    [_formDataWithoutHeader, getHeaderTemplateData]
+  );
+
+  const setRightImage = useMemo(
+    () => (img: UploadedImage | SavedImage | null) => {
+      _setRightImage(img);
+      const values: ExportFormOptions = props.form.getFieldsValue();
+      props.onValuesChange?.(
+        { header: { ...getHeaderTemplateData(), right_image: img } },
+        { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), right_image: img } }
+      );
+    },
+    [_formDataWithoutHeader, getHeaderTemplateData]
+  );
 
   const setHeader = useMemo(
     () => (html: string) => {
