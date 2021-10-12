@@ -113,7 +113,7 @@ const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
         callbackParams
       ),
       // The width will be configured before the column is plugged into this component.
-      width: `${(props.column.width || 0.0) * 100.0}%`,
+      width: `${(props.column.pdfWidth || 0.0) * 100.0}%`,
       ...evaluateCellStyle<R, M, V>(props.style, callbackParams)
     };
   }, [props.column]);

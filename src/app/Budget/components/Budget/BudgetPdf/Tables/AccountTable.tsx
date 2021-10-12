@@ -24,6 +24,33 @@ const AccountTable = ({
   account,
   options
 }: AccountTableProps): JSX.Element => {
+  const accountSubAccountColumns = useMemo(() => {
+    return reduce(
+      subAccountColumns,
+      (curr: Table.PdfColumn<Tables.AccountRowData, Model.PdfAccount>[], c: Table.PdfColumn<R, M>) => {
+        return [
+          ...curr,
+          {
+            field: c.field,
+            colId: c.colId,
+            tableColumnType: c.tableColumnType,
+            pdfWidth: c.pdfWidth,
+            pdfCellProps: c.pdfCellProps,
+            pdfHeaderCellProps: c.pdfHeaderCellProps,
+            pdfFooter: c.pdfFooter,
+            pdfFormatter: c.pdfFormatter,
+            pdfCellContentsVisible: c.pdfCellContentsVisible,
+            pdfValueGetter: c.pdfValueGetter,
+            pdfFooterValueGetter: c.pdfFooterValueGetter,
+            pdfCellRenderer: c.pdfCellRenderer,
+            pdfChildFooter: c.pdfChildFooter
+          } as Table.PdfColumn<Tables.AccountRowData, Model.PdfAccount>
+        ];
+      },
+      []
+    );
+  }, [columns, subAccountColumns]);
+
   const accountSubHeaderRow: Tables.AccountRow = useMemo(() => {
     return tabling.rows.createModelRow<Tables.AccountRowData, Model.PdfAccount>({
       model: account,
@@ -189,7 +216,7 @@ const AccountTable = ({
           <BodyRow<Tables.AccountRowData, Model.PdfAccount>
             className={"account-sub-header-tr"}
             cellProps={{ textClassName: "account-sub-header-tr-td-text" }}
-            columns={columns}
+            columns={accountSubAccountColumns}
             data={table}
             row={accountSubHeaderRow}
           />

@@ -1,5 +1,5 @@
 import React from "react";
-import { find, isNil, reduce, filter, orderBy } from "lodash";
+import { find, isNil, reduce, filter, orderBy, map } from "lodash";
 import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
 import { util } from "lib";
@@ -22,6 +22,63 @@ export const normalizedField = <
 type ColumnTypeVariantOptions = {
   header?: boolean;
   pdf?: boolean;
+};
+
+export const normalizePdfColumnWidths = <
+  R extends Table.RowData = any,
+  M extends Model.HttpModel = any,
+  V = any,
+  PDFM extends Model.HttpModel = any
+>(
+  cs: Table.Column<R, M, V, PDFM>[],
+  flt?: (c: Table.Column<R, M, V, PDFM>) => boolean
+) => {
+  let columns = [...cs];
+  // Determine the total width of all the columns that have a specified width.
+  const totalSpecifiedWidth = reduce(
+    columns,
+    (prev: number, column: Table.Column<R, M, V, PDFM>) =>
+      column.tableColumnType !== "fake" ? prev + (column.pdfWidth || 0.0) : prev,
+    0.0
+  );
+  // Determine what the default width should be for columns that do not specify it.
+  let defaultWidth = 0;
+  if (totalSpecifiedWidth < 1.0) {
+    defaultWidth =
+      (1.0 - totalSpecifiedWidth) /
+      filter(columns, (c: Table.Column<R, M, V, PDFM>) => c.tableColumnType !== "fake" && !isNil(c.pdfWidth)).length;
+  }
+  // Calculate Total Column Width Before Filtering Out Unused Columns
+  const totalWidth = reduce(
+    columns,
+    (prev: number, column: Table.Column<R, M, V, PDFM>) =>
+      column.tableColumnType !== "fake" ? prev + (column.pdfWidth || defaultWidth) : prev,
+    0.0
+  );
+  if (totalWidth !== 0.0) {
+    // Normalize Column Widths Before Filtering Out Unused Columns
+    columns = map(columns, (c: Table.Column<R, M, V, PDFM>) => ({
+      ...c,
+      width: c.tableColumnType !== "fake" ? (c.pdfWidth || defaultWidth) / totalWidth : 0.0
+    }));
+    // Filter Out Unused Columns
+    columns = isNil(flt) ? columns : filter(columns, flt);
+    // Calculate Total Column Width After Filtering Out Unused Columns
+    const totalWidthWithFilter = reduce(
+      columns,
+      (prev: number, c: Table.Column<R, M, V, PDFM>) =>
+        c.tableColumnType !== "fake" ? prev + (c.pdfWidth || defaultWidth) : 0.0,
+      0.0
+    );
+    if (totalWidthWithFilter !== 0.0) {
+      // Normalize Column Widths After Filtering Out Unused Columns
+      columns = map(columns, (c: Table.Column<R, M, V, PDFM>) => ({
+        ...c,
+        width: c.tableColumnType !== "fake" ? (c.pdfWidth || defaultWidth) / totalWidthWithFilter : 0.0
+      }));
+    }
+  }
+  return columns;
 };
 
 export const getColumnTypeCSSStyle = (

@@ -24,7 +24,7 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     suppressSizeToFit: false,
     cellRenderer: "BodyCell",
     pdfHeaderName: "Category Description",
-    pdfWidth: 0.75,
+    pdfWidth: 0.6,
     pdfFooter: { value: "Grand Total" },
     pdfValueGetter: (r: Table.BodyRow<Tables.SubAccountRowData>) => {
       if (tabling.typeguards.isGroupRow(r)) {
@@ -66,7 +66,7 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     columnType: "contact",
     index: 2,
     width: 120,
-    pdfWidth: 0.1,
+    pdfWidth: 0.2,
     requiresAuthentication: true
   }),
   tabling.columns.BodyColumn<R, M, number, PDFM>({
@@ -131,7 +131,7 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfValueGetter: budgeting.valueGetters.estimatedValueGetter,
-    pdfWidth: 0.1
+    pdfWidth: 0.15
   }),
   budgeting.columns.ActualColumn<R, M, PDFM>({ includeInPdf: false, field: "actual" }),
   budgeting.columns.VarianceColumn<R, M, PDFM>({ includeInPdf: false, colId: "variance" }),

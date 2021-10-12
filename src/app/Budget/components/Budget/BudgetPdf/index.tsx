@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { isNil, map, filter, find, includes, reduce } from "lodash";
+import { isNil, map, filter, find, includes } from "lodash";
 
 import { ShowHide } from "components";
 import { Document, View, Page, Tag, Text, NoDataPage } from "components/pdf";
@@ -28,11 +28,12 @@ const SubAccountColumns = filter(
 
 const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element => {
   const accountColumns = useMemo<Table.PdfColumn<Tables.AccountRowData, Model.PdfAccount>[]>(() => {
-    const columns = tabling.columns.normalizeColumns(AccountColumns, {
+    let columns = tabling.columns.normalizeColumns(AccountColumns, {
       estimated: {
         pdfFooterValueGetter: model.businessLogic.estimatedValue(budget)
       }
     });
+    columns = tabling.columns.normalizePdfColumnWidths(columns);
     return tabling.columns.orderColumns(columns);
   }, []);
 
@@ -88,42 +89,9 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
           }
         }
       });
-
-      // Determine the default width for columns that do not specify it.
-      const totalSpecifiedWidth = reduce(columns, (prev: number, column: C) => prev + (column.width || 0.0), 0.0);
-
-      // Determine what the default width should be for columns that do not specify it.
-      let defaultWidth = 0;
-      if (totalSpecifiedWidth < 1.0) {
-        defaultWidth = (1.0 - totalSpecifiedWidth) / filter(columns, (c: C) => !isNil(c.width)).length;
-      }
-
-      // Calculate Total Column Width Before Filtering Out Unused Columns
-      const totalWidth = reduce(columns, (prev: number, column: C) => prev + (column.width || defaultWidth), 0.0);
-      if (totalWidth !== 0.0) {
-        // Normalize Column Widths Before Filtering Out Unused Columns
-        columns = map(columns, (column: C) => ({
-          ...column,
-          width: (column.width || defaultWidth) / totalWidth
-        }));
-        // Filter Out Unused Columns
-        columns = filter(columns, (column: C) => includes(options.columns, tabling.columns.normalizedField(column)));
-
-        // Calculate Total Column Width After Filtering Out Unused Columns
-        const totalWidthWithFilter = reduce(
-          columns,
-          (prev: number, column: C) => prev + (column.width || defaultWidth),
-          0.0
-        );
-        if (totalWidthWithFilter !== 0.0) {
-          // Normalize Column Widths After Filtering Out Unused Columns
-          columns = map(columns, (column: C) => ({
-            ...column,
-            width: (column.width || defaultWidth) / totalWidthWithFilter
-          }));
-        }
-      }
-      // Order the Columns
+      columns = tabling.columns.normalizePdfColumnWidths(columns, (c: C) =>
+        includes(options.columns, tabling.columns.normalizedField(c))
+      );
       return tabling.columns.orderColumns<R, M>(columns);
     };
   }, []);

@@ -1,8 +1,6 @@
 import { useMemo } from "react";
 import { isNil } from "lodash";
 
-import { tabling } from "lib";
-
 import Cell, { PrivateCellProps, RowExplicitCellProps, CellProps } from "./Cell";
 
 type ValueGetter<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = R[keyof R]> = (
@@ -60,12 +58,6 @@ const BodyCell = <
           // If there is a custom cell renderer, the value can be anything since it will not be
           // directly rendered in the DOM.
           if (isNil(props.column.cellRenderer)) {
-            /* eslint-disable no-console */
-            console.error(
-              `Column ${tabling.columns.normalizedField(props.column)} did not return
-            string or number type from data!
-            Returning null...`
-            );
             return null;
           }
           return value as unknown as V;
