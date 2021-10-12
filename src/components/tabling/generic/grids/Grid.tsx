@@ -65,13 +65,12 @@ Note: Right now, we are restricting the use of AG Grid props to those that are
       Grid prop anywhere when they are created, we can simply set
       ExtendAgGridProps to true above.
 */
-type UseAgProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = ExtensionProps & {
+type UseAgProps<R extends Table.RowData> = ExtensionProps & {
   readonly allowContextMenuWithControlKey?: boolean;
   readonly frameworkComponents?: Table.FrameworkGroup;
   readonly suppressCopyRowsToClipboard?: boolean;
   readonly cellStyle?: React.CSSProperties;
   readonly getRowStyle?: Table.GetRowStyle;
-  // readonly getRowClass?: Table.GetRowClassName;
   readonly navigateToNextCell?: (params: NavigateToNextCellParams) => Table.CellPosition;
   readonly processCellForClipboard?: (params: ProcessCellForExportParams) => void;
   readonly tabToNextCell?: (params: TabToNextCellParams) => Table.CellPosition;
@@ -92,8 +91,7 @@ type UseAgProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpM
   readonly getContextMenuItems?: (row: Table.BodyRow<R>, node: Table.RowNode) => Table.MenuItemDef[];
 };
 
-export interface GridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
-  extends UseAgProps<R, M> {
+export interface GridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> extends UseAgProps<R> {
   readonly id: Table.GridId;
   readonly data?: Table.BodyRow<R>[];
   readonly hiddenColumns: (keyof R | string)[];
@@ -145,7 +143,7 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
     );
     cs = !isNil(indexColumn) ? util.updateInArray<Table.Column<R, M>>(cs, { field: "index" }, indexColumn) : cs;
     return cs;
-  }, [hooks.useDeepEqualMemo(columns)]);
+  }, []);
 
   const colDefs = useMemo(
     () =>
@@ -252,22 +250,67 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
           };
         }
       ),
-    [hooks.useDeepEqualMemo(localColumns)]
+    []
   );
 
-  const navigateToNextCell = (params: NavigateToNextCellParams): CellPosition => {
-    if (!isNil(props.navigateToNextCell)) {
-      return { ...props.navigateToNextCell(params), rowPinned: null };
-    }
-    return params.nextCellPosition || params.previousCellPosition;
-  };
+  const navigateToNextCell = useMemo(
+    () =>
+      (params: NavigateToNextCellParams): CellPosition => {
+        if (!isNil(props.navigateToNextCell)) {
+          return { ...props.navigateToNextCell(params), rowPinned: null };
+        }
+        return params.nextCellPosition || params.previousCellPosition;
+      },
+    []
+  );
 
-  const tabToNextCell = (params: TabToNextCellParams): CellPosition => {
-    if (!isNil(props.tabToNextCell)) {
-      return { ...props.tabToNextCell(params), rowPinned: null };
-    }
-    return params.nextCellPosition;
-  };
+  const tabToNextCell = useMemo(
+    () =>
+      (params: TabToNextCellParams): CellPosition => {
+        if (!isNil(props.tabToNextCell)) {
+          return { ...props.tabToNextCell(params), rowPinned: null };
+        }
+        return params.nextCellPosition;
+      },
+    []
+  );
+
+  const getRowStyle = useMemo(
+    () =>
+      !isNil(props.getRowStyle)
+        ? (props.getRowStyle as (params: RowClassParams) => { [key: string]: string })
+        : undefined,
+    [props.getRowStyle]
+  );
+
+  /*
+  We have to deep clone the row data because it is being pulled directly from the store
+  and as such, is immutable.  If we did not do this, than AG Grid would be applying the
+  updates to the elements of the data in the store, i.e. mutating the store.  This only
+  becomes a problem since we are nestling the actual underlying row data in a `data` property
+  of the <Row> model.
+  */
+  const rowData = useMemo(() => map(data, (r: Table.BodyRow<R>) => cloneDeep(r)), [hooks.useDeepEqualMemo(data)]);
+
+  const getContextMenuItems = useMemo(
+    () => (params: GetContextMenuItemsParams) => {
+      if (!isNil(props.getContextMenuItems) && !isNil(params.node)) {
+        const row: Table.Row<R> = params.node.data;
+        if (tabling.typeguards.isBodyRow(row)) {
+          return props.getContextMenuItems(row, params.node);
+        }
+      }
+      return [];
+    },
+    [props.getContextMenuItems]
+  );
+
+  const getRowClass = useMemo(
+    () => (params: RowClassParams) => tabling.aggrid.mergeClassNames<RowClassParams>(params, "row", rowClass),
+    []
+  );
+
+  const getRowNodeId = useMemo(() => (r: any) => r.id, []);
 
   return (
     <div className={classNames("ag-theme-alpine", "grid", className)} style={style}>
@@ -281,40 +324,15 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
         animateRows={true}
         enterMovesDown={false}
         immutableData={true}
-        getRowNodeId={(r: any) => r.id}
+        getRowNodeId={getRowNodeId}
         {...props}
         rowHeight={props.rowHeight === undefined ? 36 : props.rowHeight}
         navigateToNextCell={navigateToNextCell}
         tabToNextCell={tabToNextCell}
-        getRowStyle={
-          // Because AG Grid is terrible with their type bindings, we have to do this
-          // to keep things quiet.
-          !isNil(props.getRowStyle)
-            ? (props.getRowStyle as (params: RowClassParams) => { [key: string]: string })
-            : undefined
-        }
-        getContextMenuItems={(params: GetContextMenuItemsParams) => {
-          if (!isNil(props.getContextMenuItems) && !isNil(params.node)) {
-            const row: Table.Row<R> = params.node.data;
-            if (tabling.typeguards.isBodyRow(row)) {
-              return props.getContextMenuItems(row, params.node);
-            }
-          }
-          return [];
-        }}
-        getRowClass={(params: RowClassParams) =>
-          tabling.aggrid.mergeClassNames<RowClassParams>(params, "row", rowClass)
-        }
-        rowData={map(data, (r: Table.BodyRow<R>) => {
-          /*
-          We have to deep clone the row data because it is being pulled directly from the store
-          and as such, is immutable.  If we did not do this, than AG Grid would be applying the
-          updates to the elements of the data in the store, i.e. mutating the store.  This only
-          becomes a problem since we are nestling the actual underlying row data in a `data` property
-          of the <Row> model.
-          */
-          return cloneDeep(r);
-        })}
+        getRowStyle={getRowStyle}
+        getContextMenuItems={getContextMenuItems}
+        getRowClass={getRowClass}
+        rowData={rowData}
         columnDefs={colDefs}
         debug={Config.tableDebug}
         modules={AllModules}

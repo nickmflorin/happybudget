@@ -541,6 +541,18 @@ const authenticateDataGrid =
         getCSVData
       }));
 
+      const fillOperation = useMemo(
+        () => (params: FillOperationParams) => {
+          if (params.initialValues.length === 1) {
+            return false;
+          }
+          return params.initialValues[
+            (params.values.length - params.initialValues.length) % params.initialValues.length
+          ];
+        },
+        []
+      );
+
       return (
         <Component
           {...props}
@@ -561,14 +573,7 @@ const authenticateDataGrid =
           navigateToNextCell={navigateToNextCell}
           tabToNextCell={tabToNextCell}
           onRangeSelectionChanged={onRangeSelectionChanged}
-          fillOperation={(params: FillOperationParams) => {
-            if (params.initialValues.length === 1) {
-              return false;
-            }
-            return params.initialValues[
-              (params.values.length - params.initialValues.length) % params.initialValues.length
-            ];
-          }}
+          fillOperation={fillOperation}
           getContextMenuItems={getContextMenuItems}
         />
       );
