@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { isNil, filter } from "lodash";
 
 import { tabling } from "lib";
@@ -19,6 +20,17 @@ export type AuthenticatedBudgetProps = AccountsTableProps &
 
 const AuthenticatedBudgetAccountsTable = (props: AuthenticatedBudgetProps): JSX.Element => {
   const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
+
+  const columns = useMemo(() => {
+    return tabling.columns.normalizeColumns<R, M>(Columns, {
+      identifier: (col: Table.Column<R, M>) => ({
+        cellRendererParams: {
+          ...col.cellRendererParams,
+          onGroupEdit: props.onEditGroup
+        }
+      })
+    });
+  }, [props.onEditGroup]);
 
   return (
     <AuthenticatedBudgetTable<R, M>
@@ -68,14 +80,7 @@ const AuthenticatedBudgetAccountsTable = (props: AuthenticatedBudgetProps): JSX.
           !isNil(props.budget) ? `${props.budget.type}_${props.budget.name}_accounts` : ""
         )
       ]}
-      columns={tabling.columns.normalizeColumns<R, M>(Columns, {
-        identifier: {
-          cellRendererParams: (c: Table.Column<R, M>) => ({
-            ...c.cellRendererParams,
-            onGroupEdit: props.onEditGroup
-          })
-        }
-      })}
+      columns={columns}
     />
   );
 };
