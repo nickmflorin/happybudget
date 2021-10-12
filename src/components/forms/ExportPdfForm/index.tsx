@@ -408,6 +408,9 @@ const ExportForm = (
       >
         <Form.Item label={"Columns"} name={"columns"}>
           <ColumnSelect
+            getLabel={(c: Table.Column<Tables.SubAccountRowData, Model.PdfSubAccount>) =>
+              c.pdfHeaderName || c.headerName || ""
+            }
             columns={filter(
               columns,
               (c: Table.Column<Tables.SubAccountRowData, Model.PdfSubAccount>) => c.tableColumnType !== "fake"

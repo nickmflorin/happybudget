@@ -18,11 +18,14 @@ type CustomTagProps = {
 
 export interface ColumnSelectProps<R extends Table.RowData, M extends Model.HttpModel> extends SelectProps<string> {
   readonly columns: Table.Column<R, M>[];
+  readonly getLabel: (c: Table.Column<R, M>) => string;
 }
 
-const ColumnSelect = <R extends Table.RowData, M extends Model.HttpModel>(
-  props: ColumnSelectProps<R, M>
-): JSX.Element => {
+const ColumnSelect = <R extends Table.RowData, M extends Model.HttpModel>({
+  columns,
+  getLabel,
+  ...props
+}: ColumnSelectProps<R, M>): JSX.Element => {
   return (
     <Select
       suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
@@ -31,10 +34,7 @@ const ColumnSelect = <R extends Table.RowData, M extends Model.HttpModel>(
       mode={"multiple"}
       showArrow
       tagRender={(params: CustomTagProps) => {
-        const column = find(
-          props.columns,
-          (c: Table.Column<R, M>) => tabling.columns.normalizedField(c) === params.value
-        );
+        const column = find(columns, (c: Table.Column<R, M>) => tabling.columns.normalizedField(c) === params.value);
         if (!isNil(column)) {
           const colType: Table.ColumnType | undefined = !isNil(column.columnType)
             ? find(tabling.models.ColumnTypes, { id: column.columnType })
@@ -46,14 +46,14 @@ const ColumnSelect = <R extends Table.RowData, M extends Model.HttpModel>(
                   {ui.typeguards.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}
                 </div>
               )}
-              {column.headerName}
+              {getLabel(column)}
             </Tag>
           );
         }
         return <></>;
       }}
     >
-      {map(props.columns, (column: Table.Column<R, M>, index: number) => {
+      {map(columns, (column: Table.Column<R, M>, index: number) => {
         const colType = find(tabling.models.ColumnTypes, { id: column.columnType });
         return (
           <Select.Option className={"column-select-option"} key={index + 1} value={column.field as string}>
@@ -62,7 +62,7 @@ const ColumnSelect = <R extends Table.RowData, M extends Model.HttpModel>(
                 {ui.typeguards.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}
               </div>
             )}
-            {column.headerName}
+            {getLabel(column)}
           </Select.Option>
         );
       })}
