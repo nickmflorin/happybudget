@@ -29,13 +29,16 @@ const Action = <R extends Table.RowData, RW extends Table.BodyRow<R> = Table.Bod
   readonly tooltip: string;
   readonly row: RW;
   readonly disabled?: boolean;
+  readonly style?: React.CSSProperties;
   readonly onClick: (row: RW) => void;
 }): JSX.Element => {
   return (
     <IconButton
-      className={classNames("ag-grid-action-button", { "fake-disabled": props.disabled })}
+      className={classNames("ag-grid-action-button", {
+        "fake-disabled": props.disabled
+      })}
       size={"small"}
-      icon={<Icon icon={props.icon} weight={"regular"} />}
+      icon={<Icon icon={props.icon} weight={"regular"} style={props.style} />}
       onClick={() => props.onClick(props.row)}
       tooltip={{ title: props.tooltip, placement: "bottom", overlayClassName: "tooltip-lower" }}
     />
@@ -45,6 +48,7 @@ const Action = <R extends Table.RowData, RW extends Table.BodyRow<R> = Table.Bod
 const EditAction = <R extends Table.RowData>(props: {
   readonly row: Table.BodyRow<R>;
   readonly disabled?: boolean;
+  readonly style?: React.CSSProperties;
   readonly onClick: (row: Table.BodyRow<R>) => void;
 }): JSX.Element => <Action {...props} icon={"pencil"} tooltip={"Edit"} />;
 
@@ -91,6 +95,10 @@ const ExpandCell = <
     return !isNil(alwaysShow) && alwaysShow(row);
   }, [alwaysShow, row]);
 
+  const colorDef = useMemo<Table.RowColorDef>(() => {
+    return props.getRowColorDef(row);
+  }, [row]);
+
   if (behavior === "expand" && tabling.typeguards.isModelRow(row) && !isNil(onExpand)) {
     if (
       isNil(rowCanExpand) ||
@@ -108,7 +116,13 @@ const ExpandCell = <
     }
   } else if (behavior === "edit" && !isNil(onEditRow)) {
     if (showAlways || rowIsHovered()) {
-      return <EditAction onClick={onEditRow} row={row} />;
+      return (
+        <EditAction
+          onClick={onEditRow}
+          row={row}
+          style={tabling.typeguards.isGroupRow(row) && !isNil(colorDef.color) ? { color: colorDef.color } : {}}
+        />
+      );
     }
     return <span></span>;
   } else {

@@ -1,6 +1,5 @@
-import { tabling } from "lib";
 import { framework } from "components/tabling/generic";
-import { ValueCell, GroupCell } from "components/tabling/generic/framework/cells";
+import { ValueCell } from "components/tabling/generic/framework/cells";
 
 interface IdentifierCellProps<
   R extends Tables.BudgetRowData,
@@ -19,12 +18,7 @@ const IdentifierCell = <
   onGroupEdit,
   ...props
 }: IdentifierCellProps<R, M, S>): JSX.Element => {
-  const row: Table.BodyRow<R> = props.node.data;
-  return tabling.typeguards.isGroupRow(row) ? (
-    <GroupCell<R, M> onEdit={onGroupEdit} {...props} />
-  ) : (
-    <ValueCell<R, M> {...props} />
-  );
+  return <ValueCell<R, M> {...props} />;
 };
 
 export default framework.connectCellToStore<any, any>(IdentifierCell) as typeof IdentifierCell;

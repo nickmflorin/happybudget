@@ -16,18 +16,25 @@ export type AuthenticatedBudgetTableProps<
   readonly onBack?: () => void;
   // Markup is currently not applicable for Templates.
   readonly onEditMarkup?: (row: Table.MarkupRow<R>) => void;
+  readonly onEditGroup?: (row: Table.GroupRow<R>) => void;
 };
 
 /* eslint-disable indent */
 const AuthenticatedBudgetTable = <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>({
   onEditMarkup,
+  onEditGroup,
   ...props
 }: AuthenticatedBudgetTableProps<R, M>): JSX.Element => {
   return (
     <AuthenticatedTable<R, M>
       {...props}
-      onEditRow={(r: Table.EditableRow<R>) => tabling.typeguards.isMarkupRow(r) && onEditMarkup?.(r)}
-      expandActionBehavior={(r: Table.BodyRow<R>) => (tabling.typeguards.isMarkupRow(r) ? "edit" : "expand")}
+      onEditRow={(r: Table.EditableRow<R>) =>
+        (tabling.typeguards.isMarkupRow(r) && onEditMarkup?.(r)) ||
+        (tabling.typeguards.isGroupRow(r) && onEditGroup?.(r))
+      }
+      expandActionBehavior={(r: Table.BodyRow<R>) =>
+        tabling.typeguards.isMarkupRow(r) || tabling.typeguards.isGroupRow(r) ? "edit" : "expand"
+      }
       framework={tabling.aggrid.combineFrameworks(Framework, props.framework)}
     >
       {(params: AuthenticatedTableDataGridProps<R, M>) => (

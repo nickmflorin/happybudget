@@ -6,7 +6,7 @@ export const Framework: Table.Framework = {
   editors: {},
   cells: {
     data: {
-      ExpandCell: framework.excludeRowsOfType(["placeholder", "group"])(cells.ExpandCell),
+      ExpandCell: framework.excludeRowsOfType(["placeholder"])(cells.ExpandCell),
       IdentifierCell: cells.IdentifierCell
     },
     footer: { IdentifierCell: cells.IdentifierCell },

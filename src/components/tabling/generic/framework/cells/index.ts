@@ -10,7 +10,6 @@ export * from "./BodyCell";
 export { default as EmptyCell } from "./EmptyCell";
 export { default as NewRowCell } from "./NewRowCell";
 export { default as ContactCell } from "./ContactCell";
-export { default as GroupCell } from "./GroupCell";
 export * from "./generic";
 export { default as useFormattedValue } from "./useFormattedValue";
 export { default as LinkCell } from "./LinkCell";

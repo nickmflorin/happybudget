@@ -15,7 +15,7 @@ export const Framework: Table.Framework = {
   },
   cells: {
     data: {
-      ExpandCell: cells.excludeRowsOfType(["group", "placeholder"])(cells.ExpandCell),
+      ExpandCell: cells.excludeRowsOfType(["placeholder"])(cells.ExpandCell),
       EmptyCell: cells.EmptyCell,
       NewRowCell: cells.NewRowCell,
       BodyCell: cells.BodyCell,

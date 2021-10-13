@@ -419,6 +419,14 @@
               border-right: 0px;
               overflow: visible;
             }
+
+            .btn--icon-only {
+              &.ag-grid-action-button {
+                &:hover {
+                  background-color: transparent;
+                }
+              }
+            }
           }
         }
       }
