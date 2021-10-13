@@ -18,7 +18,7 @@
   --ck-inline-image-style-spacing: calc(var(--ck-image-style-spacing) / 2);
   --ck-todo-list-checkmark-size: 16px;
 
-  --ck-border-radius: 2px;
+  --ck-border-radius: 8px;
   --ck-inner-shadow: 2px 2px 3px var(--ck-color-shadow-inner) inset;
   --ck-drop-shadow: 0 1px 2px 1px var(--ck-color-shadow-drop);
   --ck-drop-shadow-active: 0 3px 6px 1px var(--ck-color-shadow-drop-active);
@@ -29,6 +29,11 @@
   --ck-spacing-small: calc(var(--ck-spacing-unit) * 0.5);
   --ck-spacing-tiny: calc(var(--ck-spacing-unit) * 0.3);
   --ck-spacing-extra-tiny: calc(var(--ck-spacing-unit) * 0.16);
+}
+
+.ck-content {
+  background: $gray-light;
+  border-radius: var(--ck-border-radius);
 }
 
 .ck-content p {

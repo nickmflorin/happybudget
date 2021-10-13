@@ -6,23 +6,23 @@ declare module "@editorjs/table";
 declare module "@editorjs/link";
 declare module "@editorjs/list";
 declare module "@ckeditor/ckeditor5-react" {
-  import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+  import BalloonEditor from "@ckeditor/ckeditor5-build-balloon";
   import Event from "@ckeditor/ckeditor5-utils/src/eventinfo";
   import { EditorConfig } from "@ckeditor/ckeditor5-core/src/editor/editorconfig";
   import * as React from "react";
 
   type CKEditorProps = {
       disabled?: boolean;
-      editor: typeof ClassicEditor;
+      editor: typeof BalloonEditor;
       data?: string;
       id?: string;
       config?: EditorConfig;
-      onReady?: (editor: ClassicEditor) => void;
-      onChange?: (event: Event, editor: ClassicEditor) => void;
-      onBlur?: (event: Event, editor: ClassicEditor) => void;
-      onFocus?: (event: Event, editor: ClassicEditor) => void;
-      onError?: (event: Event, editor: ClassicEditor) => void;
+      onReady?: (editor: BalloonEditor) => void;
+      onChange?: (event: Event, editor: BalloonEditor) => void;
+      onBlur?: (event: Event, editor: BalloonEditor) => void;
+      onFocus?: (event: Event, editor: BalloonEditor) => void;
+      onError?: (event: Event, editor: BalloonEditor) => void;
   }
   const CKEditor: React.FunctionComponent<CKEditorProps>;
-  export { CKEditor, CKEditorProps, Event as CKEditorEvent, ClassicEditor as EditorInstance };
+  export { CKEditor, CKEditorProps, Event as CKEditorEvent, BalloonEditor as EditorInstance };
 }

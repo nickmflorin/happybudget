@@ -2,7 +2,7 @@ import React, { useEffect, useRef, forwardRef, useImperativeHandle, ForwardedRef
 import { isNil } from "lodash";
 import classNames from "classnames";
 import { CKEditor, CKEditorProps, CKEditorEvent, EditorInstance } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import BalloonEditor from "@ckeditor/ckeditor5-build-balloon";
 
 import "style/ckeditor.scss";
 
@@ -45,7 +45,7 @@ const Editor = (
       <CKEditor
         {...props}
         data={initialValue}
-        editor={ClassicEditor}
+        editor={BalloonEditor}
         config={{
           toolbar: ["heading", "|", "bold", "italic", "undo", "redo"],
           heading: {
