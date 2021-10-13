@@ -378,7 +378,7 @@ export const createTableChangeEventReducer = <
                   id: addition.id,
                   data: addition.data,
                   columns: config.columns,
-                  originalIndex: filter(data, (r: Table.BodyRow<R>) => typeguards.isDataRow(r)).length
+                  originalIndex: filter(d, (r: Table.BodyRow<R>) => typeguards.isDataRow(r)).length
                 })
               ];
             },
