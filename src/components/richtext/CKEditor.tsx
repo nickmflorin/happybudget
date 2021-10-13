@@ -4,18 +4,16 @@ import classNames from "classnames";
 import { CKEditor, CKEditorProps, CKEditorEvent, EditorInstance } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
-import { ckeditor } from "lib";
-
-interface EditorProps extends Omit<CKEditorProps, "editor" | "config" | "onChange" | "data"> {
+interface EditorProps extends Omit<CKEditorProps, "editor" | "config" | "onChange" | "onBlur" | "data"> {
   readonly className?: string;
   readonly style?: React.CSSProperties;
   readonly initialValue?: string;
   readonly onChange?: (html: string) => void;
-  readonly onDataChange?: (data: Pdf.HTMLNode[] | null) => void;
+  readonly onBlur?: (html: string) => void;
 }
 
 const Editor = (
-  { initialValue, onChange, onDataChange, className, style, ...props }: EditorProps,
+  { initialValue, onChange, onBlur, className, style, ...props }: EditorProps,
   ref: ForwardedRef<IEditor>
 ): JSX.Element => {
   const editor = useRef<EditorInstance | null>(null);
@@ -61,13 +59,13 @@ const Editor = (
           }
         }}
         onReady={(e: EditorInstance) => (editor.current = e)}
+        onBlur={(event: CKEditorEvent, e: EditorInstance) => {
+          const html = e.getData();
+          onBlur?.(html);
+        }}
         onChange={(event: CKEditorEvent, e: EditorInstance) => {
           const html = e.getData();
           onChange?.(html);
-          if (!isNil(onDataChange)) {
-            const data = ckeditor.parsers.convertHtmlIntoNodes(html);
-            onDataChange(data);
-          }
         }}
       />
     </div>
