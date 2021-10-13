@@ -12,6 +12,8 @@ export const initialModelListResponseState: Redux.ModelListResponseStore<any> = 
 export const initialAuthenticatedModelListResponseState: Redux.AuthenticatedModelListResponseStore<any> = {
   ...initialModelListResponseState,
   search: "",
+  page: 1,
+  pageSize: 10,
   cache: {},
   selected: [],
   creating: false,

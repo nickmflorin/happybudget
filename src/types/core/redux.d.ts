@@ -183,6 +183,8 @@ namespace Redux {
   interface AuthenticatedModelListResponseStore<T extends Model.HttpModel> extends ModelListResponseStore<T> {
     readonly cache: SearchCache<T>;
     readonly search: string;
+    readonly page: number;
+    readonly pageSize: number;
     readonly deleting: ModelListActionStore;
     readonly updating: ModelListActionStore;
     readonly creating: boolean;
@@ -200,6 +202,7 @@ namespace Redux {
     readonly addToState: M;
     readonly updateInState: UpdateActionPayload<M>;
     readonly setSearch?: string;
+    readonly setPagination: Pagination;
     readonly restoreSearchCache: null;
   };
 

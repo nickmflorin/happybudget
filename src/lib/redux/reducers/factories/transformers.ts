@@ -152,5 +152,10 @@ export const authenticatedModelListResponseReducerTransformers = <
       }
     }
     return st;
+  },
+  setPagination: (st: S = initialState, action: Redux.Action<Pagination>) => {
+    return !isNil(action.payload.pageSize)
+      ? { ...st, page: action.payload.page, pageSize: action.payload.pageSize }
+      : { ...st, page: action.payload.page };
   }
 });

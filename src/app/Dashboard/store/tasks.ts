@@ -6,11 +6,12 @@ import { notifications } from "lib";
 import * as actions from "./actions";
 
 export function* getBudgetsTask(action: Redux.Action): SagaIterator {
-  const query = yield select((state: Application.Authenticated.Store) => {
-    return {
-      search: state.dashboard.budgets.search
-    };
-  });
+  const query = yield select((state: Application.Authenticated.Store) => ({
+    search: state.dashboard.budgets.search,
+    page: state.dashboard.budgets.page,
+    page_size: state.dashboard.budgets.pageSize
+  }));
+
   yield put(actions.loadingBudgetsAction(true));
   try {
     const response: Http.ListResponse<Model.SimpleBudget> = yield api.request(api.getBudgets, query);
@@ -26,7 +27,9 @@ export function* getBudgetsTask(action: Redux.Action): SagaIterator {
 export function* getTemplatesTask(action: Redux.Action): SagaIterator {
   const query = yield select((state: Application.Authenticated.Store) => {
     return {
-      search: state.dashboard.templates.search
+      search: state.dashboard.templates.search,
+      page: state.dashboard.templates.page,
+      page_size: state.dashboard.templates.pageSize
     };
   });
   yield put(actions.loadingTemplatesAction(true));
@@ -44,7 +47,9 @@ export function* getTemplatesTask(action: Redux.Action): SagaIterator {
 export function* getCommunityTemplatesTask(action: Redux.Action): SagaIterator {
   const query = yield select((state: Application.Authenticated.Store) => {
     return {
-      search: state.dashboard.community.search
+      search: state.dashboard.community.search,
+      page: state.dashboard.community.page,
+      page_size: state.dashboard.community.pageSize
     };
   });
   yield put(actions.loadingCommunityTemplatesAction(true));

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { map, isNil } from "lodash";
+import { Pagination } from "antd";
 
 import * as api from "api";
 import { redux, notifications } from "lib";
@@ -19,6 +20,9 @@ const selectBudgets = (state: Application.Authenticated.Store) => state.dashboar
 const selectBudgetsResponseReceived = (state: Application.Authenticated.Store) =>
   state.dashboard.budgets.responseWasReceived;
 const selectLoadingBudgets = (state: Application.Authenticated.Store) => state.dashboard.budgets.loading;
+const selectBudgetPage = (state: Application.Authenticated.Store) => state.dashboard.budgets.page;
+const selectBudgetPageSize = (state: Application.Authenticated.Store) => state.dashboard.budgets.pageSize;
+const selectBudgetsCount = (state: Application.Authenticated.Store) => state.dashboard.budgets.count;
 
 const Budgets = (): JSX.Element => {
   const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
@@ -33,6 +37,9 @@ const Budgets = (): JSX.Element => {
   const budgets = useSelector(selectBudgets);
   const loading = useSelector(selectLoadingBudgets);
   const responseWasReceived = useSelector(selectBudgetsResponseReceived);
+  const currentPage = useSelector(selectBudgetPage);
+  const currentPageSize = useSelector(selectBudgetPageSize);
+  const budgetsCount = useSelector(selectBudgetsCount);
 
   useEffect(() => {
     dispatch(actions.requestBudgetsAction(null));
@@ -88,6 +95,20 @@ const Budgets = (): JSX.Element => {
               );
             })}
           </div>
+        )}
+        {budgets.length !== 0 && responseWasReceived && (
+          <Page.Footer>
+            <Pagination
+              hideOnSinglePage={false}
+              showSizeChanger={true}
+              defaultPageSize={currentPageSize}
+              defaultCurrent={currentPage}
+              total={budgetsCount}
+              onChange={(page: number, pageSize: number | undefined) => {
+                dispatch(actions.setBudgetsPaginationAction(pageSize === undefined ? { page } : { page, pageSize }));
+              }}
+            />
+          </Page.Footer>
         )}
       </Page>
       {!isNil(budgetToEdit) && (

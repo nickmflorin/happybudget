@@ -89,3 +89,8 @@ type PasswordValidationID = "lowercase" | "uppercase" | "number" | "character" |
 type PasswordValidationName = { id: ValidationId; name: string };
 /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
 type PasswordValidationState = { [key in ValidationId]: boolean };
+
+type Pagination = {
+  readonly page: number;
+  readonly pageSize?: number;
+}

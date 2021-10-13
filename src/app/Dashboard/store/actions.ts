@@ -8,7 +8,8 @@ export const ActionType = {
     SetSearch: "dashboard.budgets.SetSearch",
     UpdateInState: "dashboard.budgets.UpdateInState",
     RemoveFromState: "dashboard.budgets.RemoveFromState",
-    AddToState: "dashboard.budgets.AddToState"
+    AddToState: "dashboard.budgets.AddToState",
+    SetPagination: "dashboard.budgets.SetPagination"
   },
   Templates: {
     Loading: "dashboard.templates.Loading",
@@ -17,7 +18,8 @@ export const ActionType = {
     SetSearch: "dashboard.templates.SetSearch",
     UpdateInState: "dashboard.templates.UpdateInState",
     RemoveFromState: "dashboard.templates.RemoveFromState",
-    AddToState: "dashboard.templates.AddToState"
+    AddToState: "dashboard.templates.AddToState",
+    SetPagination: "dashboard.templates.SetPagination"
   },
   Community: {
     Loading: "dashboard.community.Loading",
@@ -26,7 +28,8 @@ export const ActionType = {
     SetSearch: "dashboard.community.SetSearch",
     UpdateInState: "dashboard.community.UpdateInState",
     RemoveFromState: "dashboard.community.RemoveFromState",
-    AddToState: "dashboard.community.AddToState"
+    AddToState: "dashboard.community.AddToState",
+    SetPagination: "dashboard.community.SetPagination"
   },
   Contacts: {
     TableChanged: "dashboard.contacts.TableChanged",
@@ -46,6 +49,7 @@ export const requestBudgetsAction = createAction<null>(ActionType.Budgets.Reques
 export const loadingBudgetsAction = createAction<boolean>(ActionType.Budgets.Loading);
 export const responseBudgetsAction = createAction<Http.ListResponse<Model.SimpleBudget>>(ActionType.Budgets.Response);
 export const setBudgetsSearchAction = createAction<string>(ActionType.Budgets.SetSearch);
+export const setBudgetsPaginationAction = createAction<Pagination>(ActionType.Budgets.SetPagination);
 export const updateBudgetInStateAction = createAction<Redux.UpdateActionPayload<Model.Budget>>(
   ActionType.Budgets.UpdateInState
 );
@@ -58,6 +62,7 @@ export const responseTemplatesAction = createAction<Http.ListResponse<Model.Simp
   ActionType.Templates.Response
 );
 export const setTemplatesSearchAction = createAction<string>(ActionType.Templates.SetSearch);
+export const setTemplatesPaginationAction = createAction<Pagination>(ActionType.Templates.SetPagination);
 export const updateTemplateInStateAction = createAction<Redux.UpdateActionPayload<Model.Template>>(
   ActionType.Templates.UpdateInState
 );
@@ -70,6 +75,7 @@ export const responseCommunityTemplatesAction = createAction<Http.ListResponse<M
   ActionType.Community.Response
 );
 export const setCommunityTemplatesSearchAction = createAction<string>(ActionType.Community.SetSearch);
+export const setCommunityTemplatesPaginationAction = createAction<Pagination>(ActionType.Community.SetPagination);
 export const updateCommunityTemplateInStateAction = createAction<Redux.UpdateActionPayload<Model.Template>>(
   ActionType.Community.UpdateInState
 );

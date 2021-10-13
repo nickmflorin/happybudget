@@ -9,15 +9,24 @@ import * as actions from "./actions";
 import * as tasks from "./tasks";
 
 function* watchForBudgetsRefreshSaga(): SagaIterator {
-  yield takeLatest([actions.requestBudgetsAction.toString()], tasks.getBudgetsTask);
+  yield takeLatest(
+    [actions.requestBudgetsAction.toString(), actions.setBudgetsPaginationAction.toString()],
+    tasks.getBudgetsTask
+  );
 }
 
 function* watchForTemplatesRefreshSaga(): SagaIterator {
-  yield takeLatest([actions.requestTemplatesAction.toString()], tasks.getTemplatesTask);
+  yield takeLatest(
+    [actions.requestTemplatesAction.toString(), actions.setTemplatesPaginationAction.toString()],
+    tasks.getTemplatesTask
+  );
 }
 
 function* watchForCommunityTemplatesRefreshSaga(): SagaIterator {
-  yield takeLatest([actions.requestCommunityTemplatesAction.toString()], tasks.getCommunityTemplatesTask);
+  yield takeLatest(
+    [actions.requestCommunityTemplatesAction.toString(), actions.setCommunityTemplatesPaginationAction.toString()],
+    tasks.getCommunityTemplatesTask
+  );
 }
 
 function* watchForSearchBudgetsSaga(): SagaIterator {
