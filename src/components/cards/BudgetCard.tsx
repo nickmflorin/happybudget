@@ -7,15 +7,26 @@ import { util } from "lib";
 import Card from "./Card";
 
 interface BudgetCardProps {
-  budget: Model.Budget;
-  loading?: boolean;
-  deleting: boolean;
-  onDelete: (e: MenuItemClickEvent<MenuItemModel>) => void;
-  onEdit: () => void;
-  onClick: () => void;
+  readonly budget: Model.Budget;
+  readonly loading?: boolean;
+  readonly deleting: boolean;
+  readonly duplicating: boolean;
+  readonly onEdit: () => void;
+  readonly onClick: () => void;
+  readonly onDelete: (e: MenuItemClickEvent<MenuItemModel>) => void;
+  readonly onDuplicate: (e: MenuItemClickEvent<MenuItemModel>) => void;
 }
 
-const BudgetCard = ({ budget, loading, deleting, onEdit, onDelete, onClick }: BudgetCardProps): JSX.Element => {
+const BudgetCard = ({
+  budget,
+  loading,
+  deleting,
+  duplicating,
+  onEdit,
+  onDelete,
+  onClick,
+  onDuplicate
+}: BudgetCardProps): JSX.Element => {
   const user = useLoggedInUser();
   const tz = useTimezone();
 
@@ -40,6 +51,15 @@ const BudgetCard = ({ budget, loading, deleting, onEdit, onDelete, onClick }: Bu
           label: "Edit Name/Image",
           icon: <Icon icon={"image"} weight={"light"} />,
           onClick: () => onEdit()
+        },
+        {
+          id: "duplicate",
+          label: "Duplicate",
+          icon: <Icon icon={"clone"} weight={"light"} />,
+          onClick: (e: MenuItemClickEvent<MenuItemModel>) => onDuplicate(e),
+          keepDropdownOpenOnClick: true,
+          loading: duplicating,
+          disabled: duplicating
         },
         {
           id: "delete",

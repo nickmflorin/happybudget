@@ -26,21 +26,30 @@ export const updateBudget = services.detailPatchService<Http.BudgetPayload, Mode
   id
 ]);
 export const createBudget = services.postService<Http.BudgetPayload, Model.Budget>(["budgets"]);
+
 export const createBudgetAccount = services.detailPostService<Http.AccountPayload, Model.Account>((id: number) => [
   "budgets",
   id,
   "accounts"
 ]);
+
 export const createBudgetAccountGroup = services.detailPostService<Http.GroupPayload, Model.Group>((id: number) => [
   "budgets",
   id,
   "groups"
 ]);
+
 export const createBudgetFringe = services.detailPostService<Http.FringePayload, Model.Fringe>((id: number) => [
   "budgets",
   id,
   "fringes"
 ]);
+
+export const duplicateBudget = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Budget> => {
+  const url = services.URL.v1("budgets", id, "duplicate");
+  return client.post<Model.Budget>(url, {}, options);
+};
+
 export const createBudgetAccountMarkup = services.detailPostService<
   Http.MarkupPayload,
   Http.BudgetContextDetailResponse<Model.Markup>

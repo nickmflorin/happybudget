@@ -18,9 +18,11 @@ const selectLoadingBudgets = (state: Application.Authenticated.Store) => state.d
 
 const Budgets = (): JSX.Element => {
   const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
+  const [isDuplicating, setDuplicating, setDuplicated] = redux.hooks.useTrackModelActions([]);
 
   const [budgetToEdit, setBudgetToEdit] = useState<number | null>(null);
   const [createBudgetModalOpen, setCreateBudgetModalOpen] = useState(false);
+
   const history = useHistory();
 
   const dispatch: Redux.Dispatch = useDispatch();
@@ -45,6 +47,7 @@ const Budgets = (): JSX.Element => {
               key={index}
               budget={budget}
               deleting={isDeleting(budget.id)}
+              duplicating={isDuplicating(budget.id)}
               onClick={() => history.push(`/budgets/${budget.id}`)}
               onEdit={() => setBudgetToEdit(budget.id)}
               onDelete={(e: MenuItemClickEvent<MenuItemModel>) => {
@@ -57,6 +60,17 @@ const Budgets = (): JSX.Element => {
                   })
                   .catch((err: Error) => api.handleRequestError(err))
                   .finally(() => setDeleted(budget.id));
+              }}
+              onDuplicate={(e: MenuItemClickEvent<MenuItemModel>) => {
+                setDuplicating(budget.id);
+                api
+                  .duplicateBudget(budget.id)
+                  .then((response: Model.Budget) => {
+                    e.closeParentDropdown?.();
+                    dispatch(actions.addBudgetToStateAction(response));
+                  })
+                  .catch((err: Error) => api.handleRequestError(err))
+                  .finally(() => setDuplicated(budget.id));
               }}
             />
           );
