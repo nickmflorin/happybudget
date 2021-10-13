@@ -115,8 +115,8 @@ const ExportForm = (
       rightInfoEditor.current?.setData(displayedHeaderTemplate.right_info || "");
 
       const values: ExportFormOptions = props.form.getFieldsValue();
-      setRightImage(displayedHeaderTemplate.right_image);
-      setLeftImage(displayedHeaderTemplate.left_image);
+      _setRightImage(displayedHeaderTemplate.right_image);
+      _setLeftImage(displayedHeaderTemplate.left_image);
       props.onValuesChange?.(
         { header: displayedHeaderTemplate },
         { ..._formDataWithoutHeader(values), header: displayedHeaderTemplate }
@@ -125,8 +125,8 @@ const ExportForm = (
       headerEditor.current?.setData(props.initialValues?.header.header || "");
       leftInfoEditor.current?.setData(props.initialValues?.header.left_info || "");
       rightInfoEditor.current?.setData(props.initialValues?.header.right_info || "");
-      setLeftImage(null);
-      setRightImage(null);
+      _setLeftImage(props.initialValues?.header.left_image || null);
+      _setRightImage(props.initialValues?.header.right_image || null);
     }
   }, [displayedHeaderTemplate]);
 

@@ -76,7 +76,7 @@ const PreviewModal = ({
 }: PreviewModalProps): JSX.Element => {
   const [loadingData, setLoadingData] = useState(false);
   const [generatingPdf, setGeneratingPdf] = useState(false);
-  const [options, setOptions] = useState<ExportFormOptions>({ ...DEFAULT_OPTIONS });
+  const [options, setOptions] = useState<ExportFormOptions>(DEFAULT_OPTIONS);
 
   // TODO: Should we just use the useContacts hook?
   const [contactsResponse, setContactsResponse] = useState<Http.ListResponse<Model.Contact> | null>(null);
