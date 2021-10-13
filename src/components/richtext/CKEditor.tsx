@@ -4,6 +4,8 @@ import classNames from "classnames";
 import { CKEditor, CKEditorProps, CKEditorEvent, EditorInstance } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
+import "style/ckeditor.scss";
+
 interface EditorProps extends Omit<CKEditorProps, "editor" | "config" | "onChange" | "onBlur" | "data"> {
   readonly className?: string;
   readonly style?: React.CSSProperties;

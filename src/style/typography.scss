@@ -1,9 +1,15 @@
+@import "./imports";
+
 .header-base {
   color: $text-primary;
   margin-top: 0;
   margin-bottom: 0;
   font-family: $avenir;
   font-weight: 600;
+}
+
+p {
+  margin-bottom: 0;
 }
 
 h1 {
@@ -38,54 +44,6 @@ h5 {
 
 h6 {
   @extend .header-base;
-}
-
-.ck-heading_heading1 {
-  @extend .header-base;
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 24px;
-  margin-bottom: 8px !important;
-}
-
-.ck-heading_heading2 {
-  @extend .header-base;
-  font-weight: 700;
-  font-size: 18px;
-  line-height: 22px;
-  margin-bottom: 6px !important;
-}
-
-.ck-heading_heading3 {
-  @extend .header-base;
-  font-weight: 600;
-  font-size: 18px;
-  line-height: 22px;
-  margin-bottom: 4px !important;
-}
-
-.ck-heading_heading4 {
-  @extend .header-base;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 20px;
-  margin-bottom: 4px !important;
-}
-
-.ck-heading_heading5 {
-  @extend .header-base;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 20px;
-  margin-bottom: 4px !important;
-}
-
-.ck-heading_heading6 {
-  @extend .header-base;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 18px;
-  margin-bottom: 4px !important;
 }
 
 .truncate {
