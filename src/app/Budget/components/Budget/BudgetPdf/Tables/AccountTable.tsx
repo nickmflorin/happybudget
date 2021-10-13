@@ -34,14 +34,15 @@ const AccountTable = ({
             field: c.field,
             colId: c.colId,
             tableColumnType: c.tableColumnType,
+            columnType: c.columnType,
             pdfWidth: c.pdfWidth,
             pdfCellProps: c.pdfCellProps,
             pdfHeaderCellProps: c.pdfHeaderCellProps,
             pdfFooter: c.pdfFooter,
-            pdfFormatter: c.pdfFormatter,
             pdfCellContentsVisible: c.pdfCellContentsVisible,
-            pdfValueGetter: c.pdfValueGetter,
             pdfFooterValueGetter: c.pdfFooterValueGetter,
+            pdfFormatter: c.pdfFormatter,
+            pdfValueGetter: c.pdfValueGetter,
             pdfCellRenderer: c.pdfCellRenderer,
             pdfChildFooter: c.pdfChildFooter
           } as Table.PdfColumn<Tables.AccountRowData, Model.PdfAccount>
