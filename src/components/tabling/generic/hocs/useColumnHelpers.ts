@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { isNil, find } from "lodash";
+import { hooks } from "lib";
 
 type CallWithColumn<R extends Table.RowData, M extends Model.HttpModel, RT extends any = any> = (
   field: keyof R | string,
@@ -26,7 +27,7 @@ const useColumnHelpers = <R extends Table.RowData, M extends Model.HttpModel>(
           return null;
         }
       },
-    []
+    [hooks.useDeepEqualMemo(columns)]
   );
   const callWithColumn = <RT extends any = any>(
     field: keyof R | string,

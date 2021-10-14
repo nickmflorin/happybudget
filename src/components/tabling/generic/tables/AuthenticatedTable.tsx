@@ -126,68 +126,71 @@ const AuthenticatedTable = <
    * but then inspect whether or not the column associated with any of the fields
    * that were changed warrant refreshing another column.
    */
-  const _onChangeEvent = (event: Table.ChangeEvent<R, M>) => {
-    const apis: Table.GridApis | null = props.tableApis.get("data");
+  const _onChangeEvent = useMemo(
+    () => (event: Table.ChangeEvent<R, M>) => {
+      const apis: Table.GridApis | null = props.tableApis.get("data");
 
-    // TODO: We might have to also apply similiar logic for when a row is added?
-    if (tabling.typeguards.isDataChangeEvent(event)) {
-      let nodesToRefresh: Table.RowNode[] = [];
-      let columnsToRefresh: (keyof R)[] = [];
+      // TODO: We might have to also apply similiar logic for when a row is added?
+      if (tabling.typeguards.isDataChangeEvent(event)) {
+        let nodesToRefresh: Table.RowNode[] = [];
+        let columnsToRefresh: (keyof R)[] = [];
 
-      const changes: Table.RowChange<R>[] = tabling.events.consolidateRowChanges(event.payload);
+        const changes: Table.RowChange<R>[] = tabling.events.consolidateRowChanges(event.payload);
 
-      forEach(changes, (rowChange: Table.RowChange<R>) => {
-        const node = apis?.grid.getRowNode(String(rowChange.id));
-        if (!isNil(node)) {
-          let hasColumnsToRefresh = false;
+        forEach(changes, (rowChange: Table.RowChange<R>) => {
+          const node = apis?.grid.getRowNode(String(rowChange.id));
+          if (!isNil(node)) {
+            let hasColumnsToRefresh = false;
 
-          let field: keyof R;
-          for (field in rowChange.data) {
-            const change = util.getKeyValue<Table.RowChangeData<R>, keyof R>(field)(
-              rowChange.data
-            ) as Table.CellChange<R>;
-            const col: Table.Column<R, M> | null = getColumn(field);
+            let field: keyof R;
+            for (field in rowChange.data) {
+              const change = util.getKeyValue<Table.RowChangeData<R>, keyof R>(field)(
+                rowChange.data
+              ) as Table.CellChange<R>;
+              const col: Table.Column<R, M> | null = getColumn(field);
 
-            if (!isNil(col)) {
-              // Check if the cellChange is associated with a Column that has it's own change
-              // event handler.
-              if (tabling.typeguards.isModelRowId(rowChange.id)) {
-                col.onDataChange?.(rowChange.id, change);
-              }
+              if (!isNil(col)) {
+                // Check if the cellChange is associated with a Column that has it's own change
+                // event handler.
+                if (tabling.typeguards.isModelRowId(rowChange.id)) {
+                  col.onDataChange?.(rowChange.id, change);
+                }
 
-              // Check if the cellChange is associated with a Column that when changed,
-              // should refresh other columns.
-              if (!isNil(col.refreshColumns)) {
-                const fieldsToRefresh = col.refreshColumns(change);
-                if (!isNil(fieldsToRefresh) && (!Array.isArray(fieldsToRefresh) || fieldsToRefresh.length !== 0)) {
-                  hasColumnsToRefresh = true;
-                  columnsToRefresh = uniq([
-                    ...columnsToRefresh,
-                    ...(Array.isArray(fieldsToRefresh) ? fieldsToRefresh : [fieldsToRefresh])
-                  ]);
+                // Check if the cellChange is associated with a Column that when changed,
+                // should refresh other columns.
+                if (!isNil(col.refreshColumns)) {
+                  const fieldsToRefresh = col.refreshColumns(change);
+                  if (!isNil(fieldsToRefresh) && (!Array.isArray(fieldsToRefresh) || fieldsToRefresh.length !== 0)) {
+                    hasColumnsToRefresh = true;
+                    columnsToRefresh = uniq([
+                      ...columnsToRefresh,
+                      ...(Array.isArray(fieldsToRefresh) ? fieldsToRefresh : [fieldsToRefresh])
+                    ]);
+                  }
                 }
               }
             }
+            if (hasColumnsToRefresh === true) {
+              nodesToRefresh.push(node);
+            }
           }
-          if (hasColumnsToRefresh === true) {
-            nodesToRefresh.push(node);
-          }
-        }
-      });
-      if (columnsToRefresh.length !== 0) {
-        apis?.grid.refreshCells({
-          force: true,
-          rowNodes: nodesToRefresh,
-          columns: columnsToRefresh as string[]
         });
+        if (columnsToRefresh.length !== 0) {
+          apis?.grid.refreshCells({
+            force: true,
+            rowNodes: nodesToRefresh,
+            columns: columnsToRefresh as string[]
+          });
+        }
       }
-    }
 
-    // Wait until the end to trigger the onChangeEvent.  The onChangeEvent handler is
-    // synchronous, and if we execute before hand the callbacks will not be able to access the
-    // previous state of a given row because it will already have been changed.
-    props.onChangeEvent(event);
-  };
+      // Wait until the end to trigger the onChangeEvent.  The onChangeEvent handler is
+      // synchronous, and if we execute before hand the callbacks will not be able to access the
+      // previous state of a given row because it will already have been changed.
+      props.onChangeEvent(event);
+    },
+    [props.onChangeEvent, getColumn]
+  );
 
   const actions = useMemo<Table.AuthenticatedMenuActions<R, M>>(
     (): Table.AuthenticatedMenuActions<R, M> =>
