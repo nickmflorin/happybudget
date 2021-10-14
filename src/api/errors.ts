@@ -1,4 +1,5 @@
 import { AxiosResponse } from "axios";
+import { isNil, map } from "lodash";
 
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -14,8 +15,23 @@ export enum HttpErrorTypes {
  * one of ClientError or NetworkError or ServerError should be used.
  */
 export class HttpError extends Error {
-  public static message = "There was an HTTP error.";
+  constructor(message: string, name?: string) {
+    super("");
+    this.message = message;
+    this.name = name || "HttpError";
+  }
 }
+
+const stringifyErrors = (errors: Http.Error[]): string => {
+  if (errors.length === 0) {
+    return "";
+  } else if (errors.length === 1) {
+    return errors[0].message;
+  } else {
+    const errorStrings: string[] = map(errors, (e: Http.Error, index: number) => `${index + 1}. ${e.message}`);
+    return "\n" + errorStrings.join("\n");
+  }
+};
 
 /**
  * A ClientError refers to an HTTP request error where there is a response
@@ -55,8 +71,11 @@ export class ClientError<E extends Http.Error = Http.Error> extends HttpError im
   public response: AxiosResponse<Http.ErrorResponse>;
   public errors: E[];
 
-  constructor(config: Omit<Http.IHttpClientError<E>, "message" | "name">) {
-    super();
+  constructor(config: Omit<Http.IHttpClientError<E>, "message" | "name"> & { readonly name?: string }) {
+    super(
+      `[${config.status}] There was an error making a request to ${config.url}: ${stringifyErrors(config.errors)}`,
+      config.name || "ClientError"
+    );
     this.url = config.url;
     this.response = config.response;
     this.status = config.status;
@@ -68,7 +87,7 @@ export class AuthenticationError extends ClientError<Http.AuthError> implements 
   public readonly forceLogout: boolean = false;
 
   constructor(config: Omit<Http.IHttpAuthenticationError, "message" | "name">) {
-    super(config);
+    super({ ...config, name: "AuthenticationError" });
     this.forceLogout = config.forceLogout || false;
   }
 }
@@ -84,7 +103,12 @@ export class ServerError extends HttpError implements Http.IHttpServerError {
   public status: number;
 
   constructor(config: Omit<Http.IHttpServerError, "message" | "name">) {
-    super();
+    super(
+      !isNil(config.url)
+        ? `There was a ${config.status} server error making a request to ${config.url}.`
+        : `There was a ${config.status} server error making a request.`,
+      "ServerError"
+    );
     this.url = config.url;
     this.status = config.status;
   }
@@ -99,7 +123,12 @@ export class NetworkError extends HttpError implements Http.IHttpNetworkError {
   public url?: string | undefined;
 
   constructor(config?: Omit<Http.IHttpNetworkError, "message" | "name">) {
-    super();
+    super(
+      !isNil(config?.url)
+        ? `There was a network error making a request to ${config?.url}.`
+        : "There was a network error.",
+      "NetworkError"
+    );
     this.url = config?.url;
   }
 }

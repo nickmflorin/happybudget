@@ -37,8 +37,8 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
   const _useAntdForm = RootForm.useForm();
   const antdForm = _useAntdForm[0];
 
-  const [renderedError, renderNotification] = useState<JSX.Element | undefined>(undefined);
-  const [globalError, setGlobalError] = useState<string | undefined>(undefined);
+  const [renderedNotification, _renderNotification] = useState<JSX.Element | undefined>(undefined);
+  const [globalError, _setGlobalError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
 
   const renderFieldErrors = (e: api.ClientError) => {
@@ -58,42 +58,62 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
     antdForm.setFields(fieldsWithErrors);
   };
 
+  const setGlobalError = useMemo(
+    () => (e: Error | string | undefined) => {
+      if (!isNil(e)) {
+        _renderNotification(undefined);
+        if (typeof e === "string") {
+          _setGlobalError(e);
+        } else {
+          _setGlobalError(!isNil(e.message) ? e.message : `${e}`);
+        }
+      } else {
+        _setGlobalError(undefined);
+      }
+    },
+    []
+  );
+
+  const renderNotification = useMemo(
+    () => (e: JSX.Element | undefined) => {
+      if (!isNil(e)) {
+        _setGlobalError(undefined);
+      }
+      _renderNotification(e);
+    },
+    []
+  );
+
   const wrapForm = useMemo<FormInstance<T>>(() => {
     return {
       ...antdForm,
       autoFocusField: form?.autoFocusField,
       submit: () => {
-        setGlobalError(undefined);
-        renderNotification(undefined);
+        _setGlobalError(undefined);
+        _renderNotification(undefined);
         antdForm.submit();
       },
       resetFields: () => {
-        setGlobalError(undefined);
-        renderNotification(undefined);
+        _setGlobalError(undefined);
+        _renderNotification(undefined);
         antdForm.resetFields();
       },
-      renderedError,
+      renderedNotification,
       renderNotification,
       setLoading,
-      setGlobalError: (e: Error | string | undefined) => {
-        if (!isNil(e)) {
-          if (typeof e === "string") {
-            setGlobalError(e);
-          } else {
-            setGlobalError(!isNil(e.message) ? e.message : `${e}`);
-          }
-        } else {
-          setGlobalError(undefined);
-        }
-      },
+      setGlobalError: setGlobalError,
       renderFieldErrors: renderFieldErrors,
       handleRequestError: (e: Error) => {
         if (!axios.isCancel(e)) {
-          if (e instanceof api.ClientError) {
+          if (e instanceof api.AuthenticationError) {
+            /* eslint-disable no-console */
+            console.warn(e);
+            setGlobalError(e.errors[0].message);
+          } else if (e instanceof api.ClientError) {
             const global = api.parseGlobalError(e);
             if (!isNil(global)) {
               /* eslint-disable no-console */
-              console.error(e.errors);
+              console.warn(e);
               setGlobalError(global.message);
             }
             // Render the errors for each field next to the form field.
@@ -113,7 +133,7 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
       loading,
       ...form
     };
-  }, [form, antdForm, globalError, loading, renderedError]);
+  }, [form, antdForm, globalError, loading, renderedNotification]);
 
   return wrapForm;
 };

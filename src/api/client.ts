@@ -58,7 +58,7 @@ export const filterPayload = <T extends { [key: string]: any } = { [key: string]
  *
  * @param error The AxiosError that was raised.
  */
-const createClientError = (error: AxiosError<Http.ErrorResponse>): ClientError | AuthenticationError | undefined => {
+const throwClientError = (error: AxiosError<Http.ErrorResponse>) => {
   if (isNil(error.response) || isNil(error.response.data)) {
     return;
   }
@@ -69,7 +69,7 @@ const createClientError = (error: AxiosError<Http.ErrorResponse>): ClientError |
     if (response.status === 403 || response.status === 401) {
       const authError = parseAuthError(response.data);
       if (!isNil(authError)) {
-        return new AuthenticationError({
+        throw new AuthenticationError({
           status: response.status,
           response,
           errors: [authError],
@@ -84,13 +84,13 @@ const createClientError = (error: AxiosError<Http.ErrorResponse>): ClientError |
         );
       }
     }
-    return new ClientError({ response, errors: response.data.errors, status: response.status, url });
+    throw new ClientError({ response, errors: response.data.errors, status: response.status, url });
   } else {
     // On 404's Django will sometimes bypass DRF exception handling and
     // return a 404.html template response.  We should bypass this in the
     // backend, but for the time being we can manually raise a ClientError.
     if (error.response.status === 404) {
-      return new ClientError({
+      throw new ClientError({
         response,
         errors: [
           {
@@ -108,7 +108,7 @@ const createClientError = (error: AxiosError<Http.ErrorResponse>): ClientError |
         The response body from the backend does not conform to a standard convention for indicating
         a client error - the specific type of error cannot be determined.
     `);
-      return new ClientError({
+      throw new ClientError({
         response,
         errors: [{ message: "Unknown client error.", error_type: "unknown", code: "unknown" }],
         status: response.status,
@@ -124,10 +124,7 @@ instance.interceptors.response.use(
     if (!isNil(error.response)) {
       const response = error.response;
       if (response.status >= 400 && response.status < 500) {
-        const clientError: ClientError | AuthenticationError | undefined = createClientError(error);
-        if (!isNil(clientError)) {
-          throw clientError;
-        }
+        throwClientError(error);
       } else {
         const url = !isNil(error.request.config) ? error.request.config.url : undefined;
         throw new ServerError({ status: error.response.status, url });
@@ -216,7 +213,6 @@ export class ApiClient {
       });
       return response.data;
     } catch (e: unknown) {
-      console.error({ e });
       if (e instanceof AuthenticationError && options.ignoreForceLogout !== true && e.forceLogout === true) {
         window.location.href = "/login";
       }

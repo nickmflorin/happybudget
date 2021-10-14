@@ -7,7 +7,7 @@ interface FormInstance<T> extends RootFormInstance<T> {
   readonly setGlobalError: (e: Error | string | undefined) => void;
   readonly renderNotification: (e: JSX.Element | undefined) => void;
   readonly setLoading: (value: boolean) => void;
-  readonly renderedError: JSX.Element | undefined;
+  readonly renderedNotification: JSX.Element | undefined;
   readonly globalError: string | undefined;
   readonly loading: boolean | undefined;
   readonly isInModal?: boolean;

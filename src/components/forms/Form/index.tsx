@@ -223,8 +223,10 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
           )
         )}
         <div className={"form-alert-wrapper"}>
-          {!isNil(props.form?.renderedError) && props.form?.renderedError}
-          {/* {isNil(props.form?.renderedError) && <Error>{(props.form && props.form.globalError) || globalError}</Error>} */}
+          {!isNil(props.form?.renderedNotification) && props.form?.renderedNotification}
+          {isNil(props.form?.renderedNotification) && (
+            <FormNotification>{(props.form && props.form.globalError) || globalError}</FormNotification>
+          )}
         </div>
         {!isNil(footer) && footer}
       </RenderWithSpinner>
