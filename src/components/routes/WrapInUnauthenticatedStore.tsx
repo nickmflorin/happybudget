@@ -18,10 +18,6 @@ const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): 
   );
 
   useEffect(() => {
-    // TODO: Is this where we might want to authenticate based on the share param of the URL?
-  }, []);
-
-  useEffect(() => {
     setAuthenticating(true);
     const store = configureUnauthenticatedStore();
     setReduxStore(store);

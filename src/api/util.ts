@@ -1,8 +1,34 @@
-import { isNil, filter, map } from "lodash";
+import { isNil, filter, map, isMatch, reduce } from "lodash";
 
 import { errors } from "lib";
 import { ClientError, NetworkError } from "./errors";
-import { standardizeError } from "./standardizer";
+
+export type ErrorFilter = ((error: Http.Error) => boolean) | { [key: string]: any };
+export type ErrorStandardizer<T> = (error: T) => T;
+
+const testError = (filt: ErrorFilter, error: Http.Error): boolean =>
+  typeof filt === "function" ? filt(error) : isMatch(error, filt);
+
+/* prettier-ignore */
+export const Standard =
+  <T extends Http.Error = Http.Error>(f: ErrorFilter, standardizer: ErrorStandardizer<T>): ErrorStandardizer<T> =>
+    (error: T): T => {
+      if (testError(f, error)) {
+        return standardizer(error);
+      }
+      return error;
+    };
+
+export const STANDARDS: ErrorStandardizer<any>[] = [
+  Standard<Http.FieldError>(
+    (error: Http.Error) => error.error_type === "field" && error.code === "unique",
+    (error: Http.FieldError) => ({ ...error, message: `The field ${error.field} must be unique.` })
+  )
+];
+
+export const standardizeError = <T extends Http.IApiError<any> = Http.IApiError<any>>(error: T) => {
+  return reduce(STANDARDS, (e: T, standard) => standard(e), error);
+};
 
 export const isHttpError = (error: Http.Error | any): error is Http.Error => {
   return (

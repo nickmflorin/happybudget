@@ -5,15 +5,8 @@ import { isNil } from "lodash";
 
 import { util } from "lib";
 
-import { ClientError, NetworkError, ServerError, ForceLogout, AuthenticationError } from "./errors";
+import { ClientError, NetworkError, ServerError, AuthenticationError } from "./errors";
 import { parseAuthError } from "./util";
-
-/* eslint-disable no-shadow */
-/* eslint-disable no-unused-vars */
-export enum ErrorCodes {
-  UNKNOWN = "unknown",
-  NOT_FOUND = "not_found"
-}
 
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars */
@@ -65,7 +58,7 @@ export const filterPayload = <T extends { [key: string]: any } = { [key: string]
  *
  * @param error The AxiosError that was raised.
  */
-const createClientError = (error: AxiosError<Http.ErrorResponse>): ClientError | ForceLogout | undefined => {
+const createClientError = (error: AxiosError<Http.ErrorResponse>): ClientError | AuthenticationError | undefined => {
   if (isNil(error.response) || isNil(error.response.data)) {
     return;
   }
@@ -75,42 +68,44 @@ const createClientError = (error: AxiosError<Http.ErrorResponse>): ClientError |
   if (!isNil(response.data.errors)) {
     if (response.status === 403 || response.status === 401) {
       const authError = parseAuthError(response.data);
-      if (!isNil(authError) && authError.force_logout === true) {
-        return new ForceLogout();
-      } else {
-        return new AuthenticationError(response, response.data.errors, url);
-      }
+      return new AuthenticationError({
+        status: response.status,
+        response,
+        errors: response.data.errors,
+        url,
+        forceLogout: !isNil(authError) && authError.force_logout
+      });
     }
-    return new ClientError(response, response.data.errors, response.status, url);
+    return new ClientError({ response, errors: response.data.errors, status: response.status, url });
   } else {
     // On 404's Django will sometimes bypass DRF exception handling and
     // return a 404.html template response.  We should bypass this in the
     // backend, but for the time being we can manually raise a ClientError.
     if (error.response.status === 404) {
-      return new ClientError(
+      return new ClientError({
         response,
-        [
+        errors: [
           {
             message: "The requested resource could not be found.",
-            code: ErrorCodes.NOT_FOUND,
+            code: "not_found",
             error_type: "http"
           }
         ],
-        response.status,
+        status: response.status,
         url
-      );
+      });
     } else {
       /* eslint-disable no-console */
       console.warn(`
         The response body from the backend does not conform to a standard convention for indicating
         a client error - the specific type of error cannot be determined.
     `);
-      return new ClientError(
+      return new ClientError({
         response,
-        [{ message: "Unknown client error.", error_type: "unknown", code: ErrorCodes.UNKNOWN }],
-        response.status,
+        errors: [{ message: "Unknown client error.", error_type: "unknown", code: "unknown" }],
+        status: response.status,
         url
-      );
+      });
     }
   }
 };
@@ -121,16 +116,16 @@ instance.interceptors.response.use(
     if (!isNil(error.response)) {
       const response = error.response;
       if (response.status >= 400 && response.status < 500) {
-        const clientError: ClientError | ForceLogout | undefined = createClientError(error);
+        const clientError: ClientError | AuthenticationError | undefined = createClientError(error);
         if (!isNil(clientError)) {
           throw clientError;
         }
       } else {
         const url = !isNil(error.request.config) ? error.request.config.url : undefined;
-        throw new ServerError(error.response.status, url);
+        throw new ServerError({ status: error.response.status, url });
       }
     } else if (!isNil(error.request)) {
-      throw new NetworkError(!isNil(error.request.config) ? error.request.conf.url : undefined);
+      throw new NetworkError({ url: !isNil(error.request.config) ? error.request.conf.url : undefined });
     } else {
       throw error;
     }
@@ -213,7 +208,7 @@ export class ApiClient {
       });
       return response.data;
     } catch (e: unknown) {
-      if (e instanceof ForceLogout) {
+      if (e instanceof AuthenticationError && options.ignoreForceLogout !== true && e.forceLogout === true) {
         window.location.href = "/login";
       }
       throw e;
@@ -276,7 +271,7 @@ export class ApiClient {
   ): Promise<AxiosResponse<T>> => {
     url = this._prepare_url(url, {}, HttpRequestMethods.POST);
     return this.instance.post(url, payload, {
-      cancelToken: options.cancelToken,
+      cancelToken: options.cancelToken || undefined,
       headers: options.headers
     });
   };

@@ -55,7 +55,7 @@ const Login = (): JSX.Element => {
           onSubmit={(values: ILoginFormValues) => {
             if (!isNil(values.email) && !isNil(values.password)) {
               api
-                .login(values.email.toLowerCase(), values.password)
+                .login(values.email.toLowerCase(), values.password, { ignoreForceLogout: true })
                 .then((user: Model.User) => {
                   if (user.is_first_time === true) {
                     history.push("/discover");
