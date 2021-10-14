@@ -71,7 +71,7 @@ const Login = (): JSX.Element => {
                       <FormNotification type={"warning"} title={"Your email address is not verified."}>
                         <span>
                           {"Your email address needs to be verified in order to login."}
-                          <ButtonLink style={{ marginLeft: 4 }} onClick={() => {}}>
+                          <ButtonLink loading={false} style={{ marginLeft: 6 }} onClick={() => {}}>
                             {"Resend Email"}
                           </ButtonLink>
                         </span>

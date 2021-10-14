@@ -17,11 +17,11 @@ const DefaultSizeMap: { [key in SpinnerSize]: number } = {
 };
 
 export interface SpinnerProps extends StandardComponentProps {
-  size?: number | SpinnerSize;
-  color?: string;
-  large?: boolean;
-  medium?: boolean;
-  small?: boolean;
+  readonly size?: number | SpinnerSize;
+  readonly color?: Style.HexColor;
+  readonly large?: boolean;
+  readonly medium?: boolean;
+  readonly small?: boolean;
 }
 
 const Spinner = ({

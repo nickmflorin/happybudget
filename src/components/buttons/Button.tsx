@@ -6,7 +6,8 @@ import { ButtonProps as AntDButtonProps } from "antd/lib/button";
 import { isNil } from "lodash";
 
 import { ui } from "lib";
-import { TooltipWrapper, Spinner, ShowHide, Icon } from "components";
+import { TooltipWrapper, Spinner, ShowHide, Icon, VerticalFlexCenter } from "components";
+import { SpinnerProps } from "components/loading/Spinner";
 
 export interface ButtonProps
   extends Omit<AntDButtonProps, "disabled" | "icon" | StandardComponentPropNames>,
@@ -16,6 +17,7 @@ export interface ButtonProps
   readonly showLoadingIndicatorOverIcon?: boolean;
   readonly withDropdownCaret?: boolean;
   readonly dropdownCaretState?: "open" | "closed" | undefined;
+  readonly spinnerProps?: SpinnerProps;
 }
 
 /**
@@ -32,6 +34,7 @@ const Button = (
     className,
     tooltip,
     withDropdownCaret,
+    spinnerProps,
     ...props
   }: ButtonProps,
   ref: any
@@ -48,13 +51,13 @@ const Button = (
 
   const prefix = useMemo(() => {
     if (isNil(iC)) {
-      return loading === true ? <Spinner /> : <></>;
+      return loading === true ? <Spinner {...spinnerProps} /> : null;
     } else if (showLoadingIndicatorOverIcon !== false) {
-      return loading === true ? <Spinner /> : iC;
+      return loading === true ? <Spinner {...spinnerProps} /> : iC;
     } else if (loading === true) {
       return (
         <React.Fragment>
-          <Spinner />
+          <Spinner {...spinnerProps} />
           {iC}
         </React.Fragment>
       );
@@ -77,7 +80,7 @@ const Button = (
         onMouseEnter={() => setIsHovered(!isHovered)}
         onMouseLeave={() => setIsHovered(!isHovered)}
       >
-        {prefix}
+        {!isNil(prefix) ? <VerticalFlexCenter>{prefix}</VerticalFlexCenter> : <></>}
         {children}
         <ShowHide show={withDropdownCaret}>
           <Icon
