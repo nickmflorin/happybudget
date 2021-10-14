@@ -1,5 +1,5 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+
 namespace Http {
   type ErrorType = "unknown" | "http" | "field" | "global" | "auth";
 

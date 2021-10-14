@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { isNil } from "lodash";
 
 import * as api from "api";
@@ -43,13 +43,8 @@ const CreateModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>,
   ...props
 }: PrivateCreateModelModalProps<M, P, V, R>): JSX.Element => {
   const Form = ui.hooks.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
-  const [cancelToken, cancel] = api.useCancel();
-
-  useEffect(() => {
-    if (open === false) {
-      cancel?.();
-    }
-  }, [open, cancel]);
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  const [cancelToken, cancel] = api.useCancelToken();
 
   const title = useMemo(() => {
     if (typeof props.title === "function") {
@@ -65,10 +60,9 @@ const CreateModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>,
         .then((values: V) => {
           const payload = !isNil(interceptPayload) ? interceptPayload(values) : values;
           Form.setLoading(true);
-          create(payload as P, { cancelToken: cancelToken })
+          create(payload as P, { cancelToken: cancelToken() })
             .then((response: R) => {
               Form.resetFields();
-              cancel?.();
               onSuccess(response);
             })
             .catch((e: Error) => {
@@ -82,7 +76,7 @@ const CreateModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>,
           return;
         });
     },
-    [Form, create, cancelToken, cancel, interceptPayload]
+    [Form, create, cancelToken, interceptPayload]
   );
 
   return (

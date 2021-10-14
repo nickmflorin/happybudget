@@ -26,8 +26,7 @@ type UseAuthenticatedClipboardParams<R extends Table.RowData, M extends Model.Ht
 const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.HttpModel>(
   params: UseAuthenticatedClipboardParams<R, M>
 ): UseAuthenticatedClipboardReturnType<R> => {
-  /* eslint-disable no-unused-vars */
-  /* eslint-disable @typescript-eslint/no-unused-vars */
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   const [getColumn, callWithColumn] = useColumnHelpers(params.columns);
   const [cutCellChange, setCellCutChange] = useState<Table.SoloCellChange<R> | null>(null);
   const [processCellForClipboard, getCSVData] = useClipboard({ ...params, setCellCutChange });
@@ -115,6 +114,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.Http
           // If the first column from the focused cell is not writable, that means we are
           // trying to copy and paste with the focused cell being associated with a column
           // like the index column.
+          /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
           const [c, writable] = columnIsWritable(focusedCell.column);
           if (writable === false) {
             return [];

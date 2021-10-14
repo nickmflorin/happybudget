@@ -87,5 +87,5 @@ interface ExportFormOptions {
 
 type PasswordValidationID = "lowercase" | "uppercase" | "number" | "character" | "minChar";
 type PasswordValidationName = { id: ValidationId; name: string };
-// eslint-disable-next-line no-unused-vars
+/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
 type PasswordValidationState = { [key in ValidationId]: boolean };

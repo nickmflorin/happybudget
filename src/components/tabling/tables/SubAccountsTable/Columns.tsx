@@ -78,7 +78,7 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     columnType: "number",
     // If the plurality of the quantity changes, we need to refresh the refresh
     // the unit column to change the plurality of the tag in the cell.
-    refreshColumns: (change: Table.CellChange<R, number>) => {
+    refreshColumns: (change: Table.CellChange<number>) => {
       if (isNil(change.newValue) && isNil(change.oldValue)) {
         return [];
       } else if (

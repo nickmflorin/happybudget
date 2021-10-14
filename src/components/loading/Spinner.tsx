@@ -7,7 +7,7 @@ import "./Spinner.scss";
 
 type SpinnerSize = "xsmall" | "small" | "medium" | "large" | "xlarge";
 
-/* eslint-disable no-unused-vars */
+/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
 const DefaultSizeMap: { [key in SpinnerSize]: number } = {
   xsmall: 15,
   small: 20,

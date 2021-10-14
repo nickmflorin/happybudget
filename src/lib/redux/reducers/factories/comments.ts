@@ -78,7 +78,7 @@ export const createCommentsListResponseReducer = (
     Redux.ReducerConfig<Redux.CommentsListResponseStore, Redux.CommentsListResponseActionMap>,
     "initialState"
   >,
-  /* eslint-disable no-unused-vars */
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   subReducers?: { [Property in keyof Partial<Redux.CommentsListResponseStore>]: Redux.Reducer<any> } | null | {}
 ): Redux.Reducer<Redux.CommentsListResponseStore> => {
   subReducers = {

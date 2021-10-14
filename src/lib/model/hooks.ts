@@ -21,10 +21,10 @@ export const useModel = <M extends Model.Model>(
   const [loading, setLoading] = useState(false);
   const [model, setModel] = useState<M | null>(null);
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  const [cancelToken, cancel] = api.useCancel();
+  const [cancelToken, cancel] = api.useCancelToken();
 
   useEffect(() => {
-    const token = options.cancelToken || cancelToken;
+    const token = options.cancelToken || cancelToken();
     if (!isNil(token)) {
       if (isNil(options?.conditional) || options?.conditional() === true) {
         setLoading(true);

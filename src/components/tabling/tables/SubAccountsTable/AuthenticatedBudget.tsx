@@ -107,7 +107,7 @@ const AuthenticatedBudgetSubAccountsTable = (
           if (change.oldValue === null && change.newValue !== null) {
             const row = table.current.getRow(id);
             if (!isNil(row) && tabling.typeguards.isModelRow(row) && row.data.rate === null) {
-              const contact: Model.Contact | undefined = find(props.contacts, { id: change.newValue });
+              const contact: Model.Contact | undefined = find(props.contacts, { id: change.newValue } as any);
               if (!isNil(contact) && !isNil(contact.rate)) {
                 table.current.applyTableChange({
                   type: "dataChange",

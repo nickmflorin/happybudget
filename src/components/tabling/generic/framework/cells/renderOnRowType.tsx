@@ -1,9 +1,9 @@
 import React from "react";
 import { isNil } from "lodash";
 
-/* eslint-disable no-unused-vars */
 type RowTypeRender<T extends { node: Table.RowNode } = any> = Partial<
   {
+    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
     [key in Table.RowType | "default"]: React.ComponentClass<T, {}> | React.FunctionComponent<T>;
   }
 >;

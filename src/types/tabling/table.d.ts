@@ -1,18 +1,19 @@
 /// <reference path="../modeling/models.d.ts" />
 
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
 namespace Table {
   type Name = "account-subaccounts" | "accounts" | "subaccount-subaccounts" | "fringes" | "actuals" | "contacts";
   type Id = `${Name}-table`;
   type AsyncId = `async-${Id}`;
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type AgGridProps = import("@ag-grid-community/react/lib/interfaces").AgGridReactProps;
 
   type NativeFormatterParams<P extends string | number> = P | null;
   type AGFormatterParams = import("@ag-grid-community/core").ValueFormatterParams;
 
   type AGFormatter = (params: AGFormatterParams) => string;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type NativeFormatter<P extends string | number> = (params: NativeFormatterParams<P>) => string;
 
   type GridApi = import("@ag-grid-community/core").GridApi;
@@ -24,32 +25,48 @@ namespace Table {
 
   type FooterGridId = "footer" | "page";
   type GridId = "data" | FooterGridId;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type GridSet<T> = { [key in GridId]: T };
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type FooterGridSet<T> = { [key in FooterGridId]: T };
 
   type TableApiSet = GridSet<GridApis | null>;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type GridOptions = import("@ag-grid-community/core").GridOptions;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type TableOptionsSet = GridSet<import("@ag-grid-community/core").GridOptions>;
 
   type GeneralClassName = string | undefined | null;
   type RowClassParams = import("@ag-grid-community/core").RowClassParams;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type GetRowStyle = (params: RowClassParams) => import("react").CSSProperties | null | undefined;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type GetRowClassName = (params: RowClassParams) => RowClassName;
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type CellPosition = Omit<import("@ag-grid-community/core").CellPosition, "rowPinned">;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type CellKeyDownEvent = import("@ag-grid-community/core").CellKeyDownEvent;
+
   type ColDef = import("@ag-grid-community/core").ColDef;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type AgColumn = import("@ag-grid-community/core").Column;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type RowNode = import("@ag-grid-community/core").RowNode;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type MenuItemDef = import("@ag-grid-community/core").MenuItemDef | string;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type GridReadyEvent = import("@ag-grid-community/core").GridReadyEvent;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type FirstDataRenderedEvent = import("@ag-grid-community/core").FirstDataRenderedEvent;
 
   type FrameworkGroup = { [key: string]: React.ComponentType<any> };
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type GridFramework = {
     readonly editors?: FrameworkGroup;
     readonly cells?: FrameworkGroup;
   };
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type Framework = {
     readonly editors?: FrameworkGroup;
     readonly cells?: Partial<GridSet<FrameworkGroup>>;
@@ -59,6 +76,7 @@ namespace Table {
     readonly store: Partial<TableApiSet>;
     readonly get: (id: GridId) => GridApis | null;
     readonly set: (id: GridId, apis: GridApis) => void;
+    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
     readonly clone: () => ITableApis;
     readonly gridApis: GridApi[];
   }
@@ -77,6 +95,7 @@ namespace Table {
   type PlaceholderRowId = `placeholder-${number}`;
   type GroupRowId = `group-${number}`;
   type MarkupRowId = `markup-${number}`;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type DataRowId = ModelRowId | PlaceholderRowId;
   type EditableRowId = ModelRowId | MarkupRowId;
   type BodyRowId = ModelRowId | PlaceholderRowId | GroupRowId | MarkupRowId;
@@ -84,6 +103,7 @@ namespace Table {
   type RowId = BodyRowId | FooterRowId;
 
   type RowNameLabelType = number | string | null;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type RowStringGetter<R extends Row> = RowNameLabelType | FnWithTypedArgs<RowNameLabelType, [R]>;
 
   type RowData = object;
@@ -107,7 +127,7 @@ namespace Table {
   };
   type PlaceholderRow<R extends RowData> = IBodyRow<PlaceholderRowId, "placeholder", R> & {
     readonly originalIndex: number;
-  }
+  };
   type GroupRow<R extends RowData> = IBodyRow<GroupRowId, "group", R> & {
     readonly children: number[];
     readonly groupData: Pick<Model.Group, "name" | "color">;
@@ -116,15 +136,20 @@ namespace Table {
     readonly children: number[];
     readonly markupData: Pick<Model.Markup, "unit" | "rate">;
   };
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type DataRow<D extends RowData> = ModelRow<D> | PlaceholderRow<D>;
   type EditableRow<D extends RowData> = ModelRow<D> | MarkupRow<D>;
 
   type BodyRow<D extends RowData = RowData> = ModelRow<D> | PlaceholderRow<D> | GroupRow<D> | MarkupRow<D>;
   type Row<D extends RowData = RowData> = BodyRow<D> | FooterRow;
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type RowWithColor<D extends RowData = RowData> = BodyRow<D & { color: Style.HexColor | null }>;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type RowWithName<D extends RowData = RowData> = BodyRow<D & { name: string | null }>;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type RowWithDescription<D extends RowData = RowData> = BodyRow<D & { description: string | null }>;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type RowWithIdentifier<D extends RowData = RowData> = BodyRow<D & { identifier: string | null }>;
 
   type CreateTableDataConfig<R extends RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
@@ -146,6 +171,7 @@ namespace Table {
     | "percentage"
     | "date";
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ColumnAlignment = "right" | "left" | null;
   type TableColumnTypeId = "action" | "body" | "calculated" | "fake";
 
@@ -154,6 +180,7 @@ namespace Table {
     readonly style?: React.CSSProperties;
     readonly icon?: IconOrElement;
     readonly pdfOverrides?: Omit<Partial<ColumnType>, "id" | "editorIsPopup">;
+    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
     readonly headerOverrides?: Omit<Partial<ColumnType>, "id" | "editorIsPopup" | "icon" | "pdfOverrides">;
   }
 
@@ -240,7 +267,9 @@ namespace Table {
 
   type ParsedColumnField<R extends RowData, V = any> = { field: keyof R; value: V };
 
-  type FactoryFn<D> = (data: Partial<D>) => Table.Column<any, any, any, any>;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type FactoryFn<D> = (data: Partial<D>) => Column<any, any, any, any>;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type InferFactoryParams<T> = T extends FactoryFn<infer D> ? D : never;
 
   interface Column<
@@ -278,7 +307,7 @@ namespace Table {
     readonly colSpan?: (params: ColSpanParams<R, M>) => number;
     readonly onCellFocus?: (params: CellFocusedParams<R, M>) => void;
     readonly onCellUnfocus?: (params: CellFocusedParams<R, M>) => void;
-    readonly refreshColumns?: (change: CellChange<R, V>) => keyof R | (keyof R)[] | null;
+    readonly refreshColumns?: (change: CellChange<V>) => keyof R | (keyof R)[] | null;
     readonly parseIntoFields?: (value: V) => ParsedColumnField<R, V>[];
     // readonly getCellChanges?: (id: EditableRowId, oldValue: any, newValue: any) => SoloCellChange<R>[];
     readonly processCellForClipboard?: (row: R) => string | number;
@@ -302,23 +331,32 @@ namespace Table {
     readonly pdfChildFooter?: (s: PDFM) => PdfFooterColumn<V>;
   }
 
-  type PdfColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any, MM extends Model.HttpModel = any> = Column<R, MM, V, M>;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type PdfColumn<
+    R extends RowData,
+    M extends Model.HttpModel = Model.HttpModel,
+    V = any,
+    MM extends Model.HttpModel = any
+  > = Column<R, MM, V, M>;
 
   interface FooterColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel>
     extends Pick<Column<R, M>, "colSpan"> {
     readonly cellStyle?: React.CSSProperties;
   }
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface CookieNames {
     readonly hiddenColumns?: string;
   }
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ExpandActionBehavior = "expand" | "edit";
 
   type DataGridInstance<R extends RowData = RowData> = {
     readonly getCSVData: (fields?: string[]) => CSVData;
   };
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type TableInstance<R extends RowData = RowData, M extends Model.HttpModel = Model.HttpModel> = DataGridInstance<R> & {
     readonly getFocusedRow: () => BodyRow<R> | null;
     readonly getRow: (id: BodyRowId) => BodyRow<R> | null;
@@ -377,21 +415,25 @@ namespace Table {
     T extends MenuActionParams<R, M> = MenuActionParams<R, M>
   > = Array<MenuAction<R, M, T>> | MenuActionCallback<MenuAction<R, M, T>[], R, M, T>;
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type UnauthenticatedMenuAction<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = MenuAction<
     R,
     M,
     UnauthenticatedMenuActionParams<R, M>
   >;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type AuthenticatedMenuAction<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = MenuAction<
     R,
     M,
     AuthenticatedMenuActionParams<R, M>
   >;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type UnauthenticatedMenuActions<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = MenuActions<
     R,
     M,
     UnauthenticatedMenuActionParams<R, M>
   >;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type AuthenticatedMenuActions<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = MenuActions<
     R,
     M,
@@ -414,6 +456,7 @@ namespace Table {
     readonly apis: GridApis;
   };
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type CellFocusChangedParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
     readonly cell: Cell<R, M>;
     readonly previousCell: Cell<R, M> | null;
@@ -434,21 +477,24 @@ namespace Table {
     | "markupAdded"
     | "markupUpdated";
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type BaseChangeEvent = {
     readonly type: ChangeEventId;
   };
 
-  type CellChange<R extends RowData, V = any> = {
+  type CellChange<V = any> = {
     readonly oldValue: V | null;
     readonly newValue: V | null;
   };
 
-  type SoloCellChange<R extends RowData, I extends EditableRowId = EditableRowId, V = any> = CellChange<R, V> & {
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type SoloCellChange<R extends RowData, I extends EditableRowId = EditableRowId, V = any> = CellChange<V> & {
     readonly field: keyof R;
     readonly id: I;
   };
 
-  type RowChangeData<R extends RowData> = { [Property in keyof R]?: CellChange<R> };
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type RowChangeData<R extends RowData> = { [Property in keyof R]?: CellChange };
 
   type RowChange<R extends RowData, I extends EditableRowId = EditableRowId> = {
     readonly id: I;
@@ -462,6 +508,7 @@ namespace Table {
 
   type DataChangePayload<R extends RowData, I extends EditableRowId = EditableRowId> = SingleOrArray<RowChange<R, I>>;
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ConsolidatedChange<R extends RowData, I extends EditableRowId = EditableRowId> = RowChange<R, I>[];
 
   type DataChangeEvent<R extends RowData, I extends EditableRowId = EditableRowId> = {
@@ -531,6 +578,7 @@ namespace Table {
     readonly payload: MarkupAddedPayload;
   };
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ModelUpdatedPayload<M extends Model.HttpModel = Model.HttpModel> = Redux.UpdateActionPayload<M, number>;
   type ModelUpdatedEvent<M extends Model.HttpModel = Model.HttpModel> = {
     readonly type: "modelUpdated";
@@ -550,7 +598,7 @@ namespace Table {
     readonly payload: MarkupUpdatedPayload;
   };
 
-  type ChangeEventTypeMap<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
+  type ChangeEventTypeMap<R extends RowData> = {
     dataChange: DataChangeEvent<R>;
     rowAdd: RowAddEvent<R>;
     rowDelete: RowDeleteEvent;
@@ -564,10 +612,13 @@ namespace Table {
     rowRemoveFromMarkup: RowRemoveFromMarkupEvent;
   };
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ChangeEventTaskMap<R extends RowData> = Redux.TaskMapObject<ChangeEventTypeMap<R>>;
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type FullRowEvent = RowDeleteEvent | RowRemoveFromGroupEvent | RowAddToGroupEvent;
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type GroupEvent = RowRemoveFromGroupEvent | RowAddToGroupEvent | GroupUpdatedEvent | GroupAddedEvent;
 
   type TableChangeEvent<R extends RowData> =
@@ -591,6 +642,7 @@ namespace Table {
 
   // I really don't know why, but extending import("@ag-grid-community/core").IEditorParams
   // does not work here.
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface EditorParams<
     R extends RowData,
     M extends Model.HttpModel = Model.HttpModel,
@@ -648,6 +700,7 @@ namespace Table {
     readonly onChangeEvent?: (event: ChangeEvent<R, M>) => void;
   }
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type CellWithChildrenProps<
     R extends RowData,
     M extends Model.HttpModel = Model.HttpModel,
@@ -656,6 +709,7 @@ namespace Table {
     readonly children: import("react").ReactNode;
   };
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ValueCellProps<
     R extends RowData,
     M extends Model.HttpModel = Model.HttpModel,
@@ -673,15 +727,18 @@ namespace Table {
     readonly refreshRowExpandColumnOnCellHover?: (row: Row<R>) => boolean;
   }
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type AuthenticatedDataGridConfig<R extends RowData> = DataGridConfig<R> & {
     readonly rowCanDelete?: (row: EditableRow<R>) => boolean;
     readonly includeRowInNavigation?: (row: EditableRow<R>) => boolean;
   };
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type UnauthenticatedDataGridConfig<R extends RowData> = {
     readonly includeRowInNavigation?: (row: EditableRow<R>) => boolean;
   };
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type FooterGridConfig<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
     readonly id: "page" | "footer";
     readonly rowClass: RowClassName;
@@ -698,6 +755,7 @@ namespace Table {
     readonly columns: Column<R, M>[];
   };
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ReducerConfig<
     R extends RowData,
     M extends Model.TypedHttpModel = Model.TypedHttpModel,
@@ -711,12 +769,14 @@ namespace Table {
       readonly createTableRows?: (config: CFG) => BodyRow<R>[];
     };
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type SagaConfig<
     R extends RowData,
     M extends Model.TypedHttpModel = Model.TypedHttpModel,
     A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
   > = Redux.SagaConfig<Redux.TableTaskMap<R>, A>;
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type StoreConfig<
     R extends RowData,
     M extends Model.TypedHttpModel = Model.TypedHttpModel,
@@ -732,6 +792,7 @@ namespace Table {
   };
 }
 
+/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
 namespace PdfBudgetTable {
   // Either the TopSheet page or an ID of the account.
   type TableOption = "topsheet" | number;
@@ -744,6 +805,7 @@ namespace PdfBudgetTable {
     readonly right_info: Pdf.HTMLNode[] | null;
   };
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface Options {
     readonly header: HeaderOptions;
     readonly columns: string[];

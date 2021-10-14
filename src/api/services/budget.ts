@@ -4,22 +4,30 @@ import * as services from "./services";
 export const getBudget = services.retrieveService<Model.Budget>((id: number) => ["budgets", id]);
 export const getBudgetPdf = services.retrieveService<Model.PdfBudget>((id: number) => ["budgets", id, "pdf"]);
 export const getBudgets = services.listService<Model.SimpleBudget>(["budgets"]);
-export const getBudgetAccounts = services.listService<Model.Account>((id: number) => ["budgets", id, "accounts"]);
-export const getBudgetSubAccounts = services.listService<Model.SimpleSubAccount>((id: number) => [
+export const getBudgetAccounts = services.detailListService<Model.Account>((id: number) => ["budgets", id, "accounts"]);
+export const getBudgetSubAccounts = services.detailListService<Model.SimpleSubAccount>((id: number) => [
   "budgets",
   id,
   "subaccounts"
 ]);
-export const getBudgetAccountMarkups = services.listService<Model.Markup>((id: number) => ["budgets", id, "markups"]);
-export const getBudgetAccountGroups = services.listService<Model.Group>((id: number) => ["budgets", id, "groups"]);
-export const getBudgetOwnerTree = services.listService<Model.OwnerTreeNode>((id: number) => [
+export const getBudgetAccountMarkups = services.detailListService<Model.Markup>((id: number) => [
+  "budgets",
+  id,
+  "markups"
+]);
+export const getBudgetAccountGroups = services.detailListService<Model.Group>((id: number) => [
+  "budgets",
+  id,
+  "groups"
+]);
+export const getBudgetOwnerTree = services.detailListService<Model.OwnerTreeNode>((id: number) => [
   "budgets",
   id,
   "subaccounts",
   "owner-tree"
 ]);
-export const getBudgetFringes = services.listService<Model.Fringe>((id: number) => ["budgets", id, "fringes"]);
-export const getBudgetActuals = services.listService<Model.Actual>((id: number) => ["budgets", id, "actuals"]);
+export const getBudgetFringes = services.detailListService<Model.Fringe>((id: number) => ["budgets", id, "fringes"]);
+export const getBudgetActuals = services.detailListService<Model.Actual>((id: number) => ["budgets", id, "actuals"]);
 export const deleteBudget = services.deleteService((id: number) => ["budgets", id]);
 export const updateBudget = services.detailPatchService<Http.BudgetPayload, Model.Budget>((id: number) => [
   "budgets",

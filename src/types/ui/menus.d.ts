@@ -100,7 +100,7 @@ interface IMenuItems<M extends MenuItemModel> extends Omit<IMenuItem, "selected"
   readonly selected?: MenuItemId[];
   readonly focusedIndex: number | null;
   readonly checkbox?: boolean;
-  /* eslint-disable no-unused-vars */
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   readonly indexMap: {[key in MenuItemId]: number};
   readonly itemProps?: Omit<StandardComponentProps, "id">;
   readonly onClick?: (params: MenuItemClickEvent<M>) => void;

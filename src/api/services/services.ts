@@ -61,7 +61,9 @@ export const retrieveService = <M extends Model.HttpModel>(
   };
 };
 
-export const listService = <M extends Model.HttpModel>(path: Http.PathParams | ((id: number) => Http.PathParams)) => {
+export const detailListService = <M extends Model.HttpModel>(
+  path: Http.PathParams | ((id: number) => Http.PathParams)
+) => {
   return async (
     id: number,
     query: Http.ListQuery = {},
@@ -69,6 +71,13 @@ export const listService = <M extends Model.HttpModel>(path: Http.PathParams | (
   ): Promise<Http.ListResponse<M>> => {
     const pt = typeof path === "function" ? path(id) : path;
     const url = URL.v1(...pt);
+    return client.list<M>(url, query, options);
+  };
+};
+
+export const listService = <M extends Model.HttpModel>(path: Http.PathParams) => {
+  return async (query: Http.ListQuery = {}, options: Http.RequestOptions = {}): Promise<Http.ListResponse<M>> => {
+    const url = URL.v1(...path);
     return client.list<M>(url, query, options);
   };
 };

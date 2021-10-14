@@ -19,7 +19,7 @@ export const createDetailResponseReducer = <
 >(
   /* eslint-disable indent */
   config: Redux.ReducerConfig<S, A>,
-  /* eslint-disable no-unused-vars */
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   subReducers?: { [Property in keyof Partial<S>]: Redux.Reducer<any> } | null | {}
 ): Redux.Reducer<S> => {
   const transformers: Redux.Transformers<S, Redux.ModelDetailResponseActionMap<M>> = {

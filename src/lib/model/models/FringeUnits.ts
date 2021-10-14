@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-/* eslint-disable no-unused-vars */
+/* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
 export enum FringeUnitNames {
   PERCENT = "Percent",
   FLAT = "Flat"

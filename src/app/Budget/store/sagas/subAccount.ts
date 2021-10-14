@@ -44,8 +44,7 @@ export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
   }
 }
 
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
 const historySaga = redux.sagas.createModelListResponseSaga<Model.HistoryEvent>({
   tasks: { request: getHistoryTask },
   actions: {
@@ -69,6 +68,7 @@ const CommentsActionMap = {
   addToState: actions.addCommentToStateAction
 };
 
+/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
 const commentsSaga = budgeting.sagas.createCommentsListResponseSaga({
   tasks: budgeting.tasks.comments.createListResponseTaskSet({
     actions: CommentsActionMap

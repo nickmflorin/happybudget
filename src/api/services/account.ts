@@ -2,13 +2,17 @@ import { client } from "api";
 import * as services from "./services";
 
 export const getAccount = services.retrieveService<Model.Account>((id: number) => ["accounts", id]);
-export const getAccountSubAccountMarkups = services.listService<Model.Markup>((id: number) => [
+export const getAccountSubAccountMarkups = services.detailListService<Model.Markup>((id: number) => [
   "accounts",
   id,
   "markups"
 ]);
-export const getAccountSubAccountGroups = services.listService<Model.Group>((id: number) => ["accounts", id, "groups"]);
-export const getAccountActuals = services.listService<Model.Actual>((id: number) => ["accounts", id, "actuals"]);
+export const getAccountSubAccountGroups = services.detailListService<Model.Group>((id: number) => [
+  "accounts",
+  id,
+  "groups"
+]);
+export const getAccountActuals = services.detailListService<Model.Actual>((id: number) => ["accounts", id, "actuals"]);
 export const deleteAccount = services.deleteService((id: number) => ["accounts", id]);
 export const updateAccount = services.detailPatchService<Http.AccountPayload, Model.Account>((id: number) => [
   "accounts",

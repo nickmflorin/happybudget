@@ -51,13 +51,27 @@ const Button = (
 
   const prefix = useMemo(() => {
     if (isNil(iC)) {
-      return loading === true ? <Spinner {...spinnerProps} /> : null;
+      return loading === true ? (
+        <VerticalFlexCenter>
+          <Spinner {...spinnerProps} />
+        </VerticalFlexCenter>
+      ) : (
+        <></>
+      );
     } else if (showLoadingIndicatorOverIcon !== false) {
-      return loading === true ? <Spinner {...spinnerProps} /> : iC;
+      return loading === true ? (
+        <VerticalFlexCenter>
+          <Spinner {...spinnerProps} />
+        </VerticalFlexCenter>
+      ) : (
+        iC
+      );
     } else if (loading === true) {
       return (
         <React.Fragment>
-          <Spinner {...spinnerProps} />
+          <VerticalFlexCenter>
+            <Spinner {...spinnerProps} />
+          </VerticalFlexCenter>
           {iC}
         </React.Fragment>
       );
@@ -80,7 +94,7 @@ const Button = (
         onMouseEnter={() => setIsHovered(!isHovered)}
         onMouseLeave={() => setIsHovered(!isHovered)}
       >
-        {!isNil(prefix) ? <VerticalFlexCenter>{prefix}</VerticalFlexCenter> : <></>}
+        {prefix}
         {children}
         <ShowHide show={withDropdownCaret}>
           <Icon

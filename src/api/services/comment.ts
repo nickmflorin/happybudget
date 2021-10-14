@@ -1,9 +1,17 @@
 import { client } from "api";
 import * as services from "./services";
 
-export const getBudgetComments = services.listService<Model.Comment>((id: number) => ["budgets", id, "comments"]);
-export const getAccountComments = services.listService<Model.Comment>((id: number) => ["accounts", id, "comments"]);
-export const getSubAccountComments = services.listService<Model.Comment>((id: number) => ["accounts", id, "comments"]);
+export const getBudgetComments = services.detailListService<Model.Comment>((id: number) => ["budgets", id, "comments"]);
+export const getAccountComments = services.detailListService<Model.Comment>((id: number) => [
+  "accounts",
+  id,
+  "comments"
+]);
+export const getSubAccountComments = services.detailListService<Model.Comment>((id: number) => [
+  "accounts",
+  id,
+  "comments"
+]);
 export const getComment = services.retrieveService<Model.Comment>((id: number) => ["comments", id]);
 export const deleteComment = services.deleteService((id: number) => ["comments", id]);
 export const updateComment = services.detailPatchService<Http.CommentPayload, Model.Comment>((id: number) => [

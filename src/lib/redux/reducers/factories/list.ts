@@ -21,7 +21,7 @@ export const createListResponseReducer = <
   S extends Redux.ListResponseStore<M> = Redux.ListResponseStore<M>
 >(
   config: Redux.ReducerConfig<S, A>,
-  /* eslint-disable no-unused-vars */
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   subReducers?: { [Property in keyof Partial<S>]: Redux.Reducer<any> } | null | {}
 ): Redux.Reducer<S> => {
   return createObjectReducerFromTransformers<S, A>(
@@ -37,7 +37,7 @@ export const createModelListResponseReducer = <
   S extends Redux.ModelListResponseStore<M> = Redux.ModelListResponseStore<M>
 >(
   config: Redux.ReducerConfig<S, A>,
-  /* eslint-disable no-unused-vars */
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   subReducers?: { [Property in keyof Partial<S>]: Redux.Reducer<any> } | null | {}
 ): Redux.Reducer<S> => {
   return createObjectReducerFromTransformers<S, A>(

@@ -4,14 +4,26 @@ import * as services from "./services";
 export const getTemplate = services.retrieveService<Model.Template>((id: number) => ["templates", id]);
 export const getTemplates = services.listService<Model.SimpleTemplate>(["templates"]);
 export const getCommunityTemplates = services.listService<Model.SimpleTemplate>(["templates", "community"]);
-export const getTemplateAccounts = services.listService<Model.Account>((id: number) => ["templates", id, "accounts"]);
-export const getTemplateAccountMarkups = services.listService<Model.Markup>((id: number) => [
+export const getTemplateAccounts = services.detailListService<Model.Account>((id: number) => [
+  "templates",
+  id,
+  "accounts"
+]);
+export const getTemplateAccountMarkups = services.detailListService<Model.Markup>((id: number) => [
   "templates",
   id,
   "markups"
 ]);
-export const getTemplateAccountGroups = services.listService<Model.Group>((id: number) => ["templates", id, "groups"]);
-export const getTemplateFringes = services.listService<Model.Fringe>((id: number) => ["templates", id, "fringes"]);
+export const getTemplateAccountGroups = services.detailListService<Model.Group>((id: number) => [
+  "templates",
+  id,
+  "groups"
+]);
+export const getTemplateFringes = services.detailListService<Model.Fringe>((id: number) => [
+  "templates",
+  id,
+  "fringes"
+]);
 export const deleteTemplate = services.deleteService((id: number) => ["templates", id]);
 export const updateTemplate = services.detailPatchService<Http.TemplatePayload, Model.Template>((id: number) => [
   "templates",

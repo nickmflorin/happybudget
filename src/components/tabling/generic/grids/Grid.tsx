@@ -33,8 +33,6 @@ import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/g
 import { Config } from "config";
 import { tabling, hooks, util } from "lib";
 
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 type OverriddenAgProps =
   | "getRowClass"
   | "rowClass"

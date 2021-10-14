@@ -3,10 +3,10 @@
 /// <reference path="../modeling/models.d.ts" />
 /// <reference path="./redux.d.ts" />
 
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
 namespace Modules {
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   namespace Template {
     type AccountOrSubAccountStore<D extends Model.HttpModel> = {
       readonly id: number | null;
@@ -22,6 +22,7 @@ namespace Modules {
     }
 
     /* eslint-disable no-shadow */
+    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
     interface Store {
       readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<Model.Template>;
@@ -30,6 +31,7 @@ namespace Modules {
     }
   }
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   namespace Budget {
     interface HeaderTemplatesStore extends Redux.ModelListResponseStore<Model.HeaderTemplate> {
       readonly displayedTemplate: Model.HeaderTemplate | null;
@@ -56,6 +58,7 @@ namespace Modules {
     }
 
     /* eslint-disable no-shadow */
+    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
     interface Store {
       readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<Model.Budget>;
@@ -69,8 +72,10 @@ namespace Modules {
     }
   }
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   namespace Dashboard {
     /* eslint-disable no-shadow */
+    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
     interface Store {
       readonly budgets: Redux.ModelListResponseStore<Model.SimpleBudget>;
       readonly templates: Redux.ModelListResponseStore<Model.SimpleTemplate>;
@@ -78,6 +83,7 @@ namespace Modules {
     }
   }
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   namespace Share {
     type AccountOrSubAccountStore<D extends Model.HttpModel> = {
       readonly id: number | null;
@@ -93,6 +99,7 @@ namespace Modules {
     }
 
     /* eslint-disable no-shadow */
+    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
     interface Store {
       readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<Model.Budget>;

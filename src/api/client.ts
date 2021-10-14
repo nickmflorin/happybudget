@@ -9,7 +9,7 @@ import { ClientError, NetworkError, ServerError, AuthenticationError } from "./e
 import { parseAuthError } from "./util";
 
 /* eslint-disable no-shadow */
-/* eslint-disable no-unused-vars */
+/* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
 export enum HttpRequestMethods {
   GET = "GET",
   POST = "POST",
@@ -216,6 +216,7 @@ export class ApiClient {
       });
       return response.data;
     } catch (e: unknown) {
+      console.error({ e });
       if (e instanceof AuthenticationError && options.ignoreForceLogout !== true && e.forceLogout === true) {
         window.location.href = "/login";
       }

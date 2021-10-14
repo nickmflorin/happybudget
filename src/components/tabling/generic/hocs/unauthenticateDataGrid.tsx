@@ -49,8 +49,7 @@ const unauthenticatedDataGrid =
         columns: props.columns,
         apis: props.apis
       });
-      /* eslint-disable no-unused-vars */
-      /* eslint-disable @typescript-eslint/no-unused-vars */
+      /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
       const [navigateToNextCell, tabToNextCell, _, moveToNextRow] = useCellNavigation<R, M>({
         apis: props.apis,
         columns: props.columns,

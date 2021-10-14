@@ -21,8 +21,7 @@ export type UseClipboardParams<R extends Table.RowData, M extends Model.HttpMode
 const useClipboard = <R extends Table.RowData, M extends Model.HttpModel>(
   params: UseClipboardParams<R, M>
 ): UseClipboardReturnType<R> => {
-  /* eslint-disable no-unused-vars */
-  /* eslint-disable @typescript-eslint/no-unused-vars */
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   const [getColumn, callWithColumn] = useColumnHelpers(params.columns);
 
   const processCellValueForClipboard = useMemo(

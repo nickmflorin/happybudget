@@ -1,7 +1,7 @@
 import { AxiosResponse } from "axios";
 
 /* eslint-disable no-shadow */
-/* eslint-disable no-unused-vars */
+/* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
 export enum HttpErrorTypes {
   CLIENT = "CLIENT",
   NETWORK = "NETWORK",

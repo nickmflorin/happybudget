@@ -85,8 +85,7 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.HttpModel = 
 
         if (verticalAscend === true || verticalDescend === true) {
           const direction: "asc" | "desc" = verticalAscend === true ? "asc" : "desc";
-          /* eslint-disable no-unused-vars */
-          /* eslint-disable @typescript-eslint/no-unused-vars */
+          /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
           const [rowNode, _, additionalIndex] = findNextNavigatableRow(p.nextCellPosition.rowIndex, direction);
           if (!isNil(rowNode)) {
             return {
@@ -115,6 +114,7 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.HttpModel = 
       if (!p.editing) {
         if (includes(["index", "expand"], p.nextCellPosition.column.getColId())) {
           let nextCellPosition = { ...p.nextCellPosition };
+          /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
           const [rowNode, _, additionalIndex] = findNextNavigatableRow(p.nextCellPosition.rowIndex);
           if (!isNil(rowNode)) {
             nextCellPosition = {
@@ -157,8 +157,7 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.HttpModel = 
   });
 
   const moveToNextRow: (loc: Table.CellPosition) => void = hooks.useDynamicCallback((loc: Table.CellPosition) => {
-    /* eslint-disable no-unused-vars */
-    /* eslint-disable @typescript-eslint/no-unused-vars */
+    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
     const [node, rowIndex, _] = findNextNavigatableRow(loc.rowIndex + 1);
     if (node === null) {
       if (!isNil(params.onNewRowRequired)) {

@@ -52,13 +52,13 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
   ...props
 }: PrivateEditModelModalProps<M, P, V, R>): JSX.Element => {
   const Form = ui.hooks.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
-  const [cancelToken, cancel] = api.useCancel();
+  const [cancelToken, cancel] = api.useCancelToken();
   const [instance, loading, error] = model.hooks.useModel(id, {
     request,
     onModelLoaded,
     conditional: () => open === true,
     deps: [open],
-    cancelToken
+    cancelToken: cancelToken()
   });
 
   useEffect(() => {
@@ -102,7 +102,7 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
         .then((values: V) => {
           const payload = !isNil(interceptPayload) ? interceptPayload(values) : values;
           Form.setLoading(true);
-          update(id, payload as P, { cancelToken: cancelToken })
+          update(id, payload as P, { cancelToken: cancelToken() })
             .then((response: R) => {
               Form.resetFields();
               cancel?.();

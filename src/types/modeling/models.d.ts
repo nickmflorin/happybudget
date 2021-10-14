@@ -1,11 +1,7 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
 namespace Model {
-  interface StringObj {
-    [key: string]: any;
-  }
-
   /* eslint-disable no-shadow */
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface Model {
     readonly id: ID;
   }
@@ -42,6 +38,7 @@ namespace Model {
     readonly updated_by: number;
   }
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type GenericHttpModel<T extends HttpModelType> = {
     readonly type: T;
     readonly id: number;
@@ -71,6 +68,7 @@ namespace Model {
   type ContactType = Choice<ContactTypeId, ContactTypeName>;
 
   type LineType = "account" | "subaccount";
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ParentType = LineType | "budget";
 
   type SimpleLineItem = SimpleAccount | SimpleSubAccount;
@@ -78,19 +76,29 @@ namespace Model {
   type PdfLineItem = PdfAccount | PdfSubAccount;
 
   type BudgetType = "budget" | "template";
+
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type EntityType = BudgetType | LineType;
+
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type Entity = LineItem | Budget | Template | Markup;
+
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type SimpleEntity = SimpleLineItem | SimpleBudget | SimpleTemplate | SimpleMarkup;
+
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type PdfEntity = PdfLineItem | PdfBudget;
 
-  type TemplateForm = Template | SimpleTemplate;
-  type BudgetForm = Budget | SimpleBudget;
-  type AccountForm = Account | SimpleAccount | PdfAccount;
-  type SubAccountForm = SubAccount | SimpleSubAccount | PdfSubAccount;
-
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ModelWithColor = HttpModel & { color: Style.HexColor | null };
+
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ModelWithName = HttpModel & { name: string | null };
+
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ModelWithDescription = HttpModel & { description: string | null };
+
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ModelWithIdentifier = HttpModel & { identifier: string | null };
 
   interface Tag extends TimestampTrackedModel {
@@ -119,6 +127,7 @@ namespace Model {
     readonly is_superuser: boolean;
   }
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface Fringe extends TrackedModel {
     readonly type: "fringe";
     readonly color: Style.HexColor | null;
@@ -276,6 +285,7 @@ namespace Model {
     readonly children_markups: Markup[];
   }
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface Actual extends TrackedModel {
     readonly type: "actual";
     readonly contact: number | null;
@@ -288,12 +298,13 @@ namespace Model {
     readonly owner: SimpleSubAccount | SimpleMarkup | null;
   }
 
-  interface Comment extends TimestampTrackedModel {
+  type Comment = TimestampTrackedModel & {
     readonly likes: SimpleUser[];
     readonly user: SimpleUser;
     readonly text: string;
     readonly object_id: number;
     readonly content_object_type: "budget" | "account" | "subaccount" | "comment";
+    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
     readonly comments: Comment[];
   }
 
@@ -317,6 +328,7 @@ namespace Model {
     readonly updated_at: string;
   }
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type UserWithImage =
     | (User & { profile_image: SavedImage })
     | (SimpleUser & { profile_image: SavedImage })
@@ -339,12 +351,14 @@ namespace Model {
 
   interface CreateEvent extends PolymorphicEvent {}
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type HistoryEvent = FieldAlterationEvent | CreateEvent;
 
   interface SimpleHeaderTemplate extends TimestampTrackedModel {
     readonly name: string;
   }
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface HeaderTemplate extends SimpleHeaderTemplate {
     readonly header: string | null;
     readonly left_image: SavedImage | null;

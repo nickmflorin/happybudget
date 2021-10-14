@@ -117,8 +117,7 @@ const AuthenticatedTable = <
     );
   }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns]);
 
-  /* eslint-disable no-unused-vars */
-  /* eslint-disable @typescript-eslint/no-unused-vars */
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   const [getColumn, callWithColumn] = useColumnHelpers(columns);
 
   /**

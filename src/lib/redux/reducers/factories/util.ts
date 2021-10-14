@@ -34,7 +34,7 @@ const reduceAction = <S, A>(
 export const createObjectReducerFromTransformers = <S extends Record<string, any>, A>(
   config: Redux.ReducerConfig<S, A>,
   reducers: Redux.Transformers<S>,
-  /* eslint-disable no-unused-vars */
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   subReducers?: { [Property in keyof Partial<S>]: Redux.Reducer<any> } | null | {}
 ): Redux.Reducer<S> => {
   const reducer: Redux.Reducer<S> = (state: S = config.initialState, action: Redux.Action): S => {
