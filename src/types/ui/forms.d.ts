@@ -5,7 +5,9 @@ interface FormInstance<T> extends RootFormInstance<T> {
   readonly handleRequestError: (e: Error) => void;
   readonly renderFieldErrors: (e: Http.IHttpClientError) => void;
   readonly setGlobalError: (e: Error | string | undefined) => void;
+  readonly renderNotification: (e: JSX.Element | undefined) => void;
   readonly setLoading: (value: boolean) => void;
+  readonly renderedError: JSX.Element | undefined;
   readonly globalError: string | undefined;
   readonly loading: boolean | undefined;
   readonly isInModal?: boolean;
@@ -23,7 +25,4 @@ interface FormProps<T> extends Omit<RootFormProps, "style" | "id" | "className">
   // whether or not the boolean is true.  If it is a number, it will automatically
   // focus the field at that index.
   readonly autoFocusField?: boolean | number;
-  // Typing things internal to AntD's form seem to rely on generic typing of the forwardRef which
-  // is most likely not possible.
-  // readonly onFinish?: (values: T) => void;
 }

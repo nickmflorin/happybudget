@@ -5,6 +5,7 @@
 /// <reference path="./forms.d.ts" />
 /// <reference path="./pdf.d.ts" />
 /// <reference path="./richtext.d.ts" />
+/// <reference path="./feedback.d.ts" />
 
 type Order = 1 | -1 | 0;
 type DefinitiveOrder = 1 | -1;

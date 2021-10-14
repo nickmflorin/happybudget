@@ -68,13 +68,21 @@ const createClientError = (error: AxiosError<Http.ErrorResponse>): ClientError |
   if (!isNil(response.data.errors)) {
     if (response.status === 403 || response.status === 401) {
       const authError = parseAuthError(response.data);
-      return new AuthenticationError({
-        status: response.status,
-        response,
-        errors: response.data.errors,
-        url,
-        forceLogout: !isNil(authError) && authError.force_logout
-      });
+      if (!isNil(authError)) {
+        return new AuthenticationError({
+          status: response.status,
+          response,
+          errors: [authError],
+          url,
+          forceLogout: authError.force_logout
+        });
+      } else {
+        /* eslint-disable no-console */
+        console.warn(
+          `The response returned a ${response.status} status code but the errors
+          in the response did not indicate that an authentication error occurred.`
+        );
+      }
     }
     return new ClientError({ response, errors: response.data.errors, status: response.status, url });
   } else {

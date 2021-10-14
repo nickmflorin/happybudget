@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { isNil } from "lodash";
 
@@ -7,6 +7,8 @@ import { Typography } from "antd";
 import * as api from "api";
 import { ui } from "lib";
 
+import { ButtonLink } from "components/buttons";
+import { FormNotification } from "components/forms";
 import { Logo } from "components/svgs";
 
 import LoginForm, { ILoginFormValues } from "./LoginForm";
@@ -17,7 +19,7 @@ const Login = (): JSX.Element => {
   const history = useHistory();
 
   return (
-    <div className={"landing-page-left-container"}>
+    <React.Fragment>
       <div className={"logo-container"}>
         <Logo color={"green"} />
       </div>
@@ -64,7 +66,20 @@ const Login = (): JSX.Element => {
                   }
                 })
                 .catch((e: Error) => {
-                  form.handleRequestError(e);
+                  if (e instanceof api.AuthenticationError && e.errors[0].code === "email_not_verified") {
+                    form.renderNotification(
+                      <FormNotification type={"warning"} title={"Your email address is not verified."}>
+                        <span>
+                          {"Your email address needs to be verified in order to login."}
+                          <ButtonLink style={{ marginLeft: 4 }} onClick={() => {}}>
+                            {"Resend Email"}
+                          </ButtonLink>
+                        </span>
+                      </FormNotification>
+                    );
+                  } else {
+                    form.handleRequestError(e);
+                  }
                 })
                 .finally(() => {
                   setLoading(false);
@@ -73,7 +88,7 @@ const Login = (): JSX.Element => {
           }}
         />
       </div>
-    </div>
+    </React.Fragment>
   );
 };
 

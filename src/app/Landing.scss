@@ -14,10 +14,10 @@
     justify-content: flex-start;
     -webkit-box-pack: center;
     -webkit-box-align: center;
+    width: 100%;
 
     @include media(">=xl") {
-      min-width: 500px;
-      max-width: 600px;
+      width: 550px;
     }
 
     .logo {
@@ -33,14 +33,17 @@
     }
 
     .landing-form-container {
-      padding: 20px;
-
-      @include media(">=small") {
-        padding: 20px 30px;
-      }
+      margin-top: 40px;
+      width: 100%;
+      max-width: 550px;
+      padding: 20px 60px;
 
       @include media(">=medium") {
-        padding: 20px 50px;
+        padding: 20px 100px;
+      }
+
+      @include media(">=xl") {
+        margin-top: 0px;
       }
 
       .title {

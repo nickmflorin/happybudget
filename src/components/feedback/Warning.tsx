@@ -3,9 +3,9 @@ import Alert, { AlertProps } from "./Alert";
 
 export interface WarningProps extends Omit<AlertProps, "type"> {}
 
-const Warning: React.FC<WarningProps> = ({ children, className, title, detail, ...props }) => {
+const Warning: React.FC<WarningProps> = ({ children, className, ...props }) => {
   return (
-    <Alert className={classNames("warning", className)} type={"warning"} {...props}>
+    <Alert className={classNames("info", className)} type={"info"} {...props}>
       {children}
     </Alert>
   );

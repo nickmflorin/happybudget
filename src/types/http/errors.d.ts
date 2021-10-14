@@ -35,14 +35,14 @@ namespace Http {
     readonly url?: string;
   }
 
-  interface IHttpClientError extends IBaseError {
+  interface IHttpClientError<E extends Http.Error = Http.Error> extends IBaseError {
     readonly url: string;
     readonly status: number;
     readonly response: import("axios").AxiosResponse<any>;
-    readonly errors: Http.Error[];
+    readonly errors: E[];
   }
 
-  interface IHttpAuthenticationError extends IHttpClientError {
+  interface IHttpAuthenticationError extends IHttpClientError<AuthError> {
     readonly forceLogout?: boolean;
   }
 

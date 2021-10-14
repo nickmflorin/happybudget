@@ -37,6 +37,7 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
   const _useAntdForm = RootForm.useForm();
   const antdForm = _useAntdForm[0];
 
+  const [renderedError, renderNotification] = useState<JSX.Element | undefined>(undefined);
   const [globalError, setGlobalError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
 
@@ -63,12 +64,16 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
       autoFocusField: form?.autoFocusField,
       submit: () => {
         setGlobalError(undefined);
+        renderNotification(undefined);
         antdForm.submit();
       },
       resetFields: () => {
         setGlobalError(undefined);
+        renderNotification(undefined);
         antdForm.resetFields();
       },
+      renderedError,
+      renderNotification,
       setLoading,
       setGlobalError: (e: Error | string | undefined) => {
         if (!isNil(e)) {
@@ -108,7 +113,7 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
       loading,
       ...form
     };
-  }, [form, antdForm, globalError, loading]);
+  }, [form, antdForm, globalError, loading, renderedError]);
 
   return wrapForm;
 };

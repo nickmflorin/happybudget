@@ -7,7 +7,7 @@ import { Form as RootForm, Input } from "antd";
 import { RenderWithSpinner } from "components";
 import { ui } from "lib";
 
-import Error from "./Error";
+import FormNotification from "./Notification";
 import FieldError from "./FieldError";
 import Footer from "./Footer";
 import FormItemStyle from "./FormItemStyle";
@@ -223,7 +223,8 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
           )
         )}
         <div className={"form-alert-wrapper"}>
-          <Error>{(props.form && props.form.globalError) || globalError}</Error>
+          {!isNil(props.form?.renderedError) && props.form?.renderedError}
+          {/* {isNil(props.form?.renderedError) && <Error>{(props.form && props.form.globalError) || globalError}</Error>} */}
         </div>
         {!isNil(footer) && footer}
       </RenderWithSpinner>
@@ -233,9 +234,11 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
 
 const Form = forwardRef(PrivateForm);
 
+export { default as FormNotification } from "./Notification";
+
 const exportable = {
   Form: Form,
-  Error: Error,
+  Notification: FormNotification,
   FieldError: FieldError,
   Footer: Footer,
   Item: FormItemComp,

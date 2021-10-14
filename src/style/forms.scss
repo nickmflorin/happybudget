@@ -14,6 +14,7 @@ form {
 .form {
   .form-alert-wrapper {
     margin-top: 15px;
+    width: 100%;
   }
   .form-footer {
     margin-top: 15px;
@@ -25,34 +26,6 @@ form {
       &:last-child {
         margin-bottom: 0px !important;
       }
-    }
-  }
-  .form-error {
-    padding: 8px 20px 8px 40px !important;
-    border-radius: 6px;
-
-    .ant-alert-icon {
-      position: absolute;
-      top: 8px !important;
-      left: 10px !important;
-      font-size: 16px !important;
-    }
-
-    .ant-alert-message {
-      font-weight: 500;
-      font-size: 14px !important;
-      line-height: 16px !important;
-      margin-bottom: 6px !important;
-      color: $text-primary !important;
-      font-family: $avenir;
-    }
-
-    .ant-alert-description {
-      font-size: 12px !important;
-      line-height: 14px !important;
-      font-family: $avenir;
-      font-weight: 400;
-      color: $text-secondary !important;
     }
   }
 

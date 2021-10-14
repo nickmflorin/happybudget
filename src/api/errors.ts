@@ -48,14 +48,14 @@ export class HttpError extends Error {
  * the errors for individual fields have the potential to contain more than 1
  * detail.
  */
-export class ClientError extends HttpError implements Http.IHttpClientError {
+export class ClientError<E extends Http.Error = Http.Error> extends HttpError implements Http.IHttpClientError<E> {
   public static type = HttpErrorTypes.CLIENT;
   public status: number;
   public url: string;
   public response: AxiosResponse<Http.ErrorResponse>;
-  public errors: Http.Error[];
+  public errors: E[];
 
-  constructor(config: Omit<Http.IHttpClientError, "message" | "name">) {
+  constructor(config: Omit<Http.IHttpClientError<E>, "message" | "name">) {
     super();
     this.url = config.url;
     this.response = config.response;
@@ -64,7 +64,7 @@ export class ClientError extends HttpError implements Http.IHttpClientError {
   }
 }
 
-export class AuthenticationError extends ClientError implements Http.IHttpAuthenticationError {
+export class AuthenticationError extends ClientError<Http.AuthError> implements Http.IHttpAuthenticationError {
   public readonly forceLogout: boolean = false;
 
   constructor(config: Omit<Http.IHttpAuthenticationError, "message" | "name">) {

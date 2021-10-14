@@ -3,7 +3,7 @@ import Alert, { AlertProps } from "./Alert";
 
 export interface InfoProps extends Omit<AlertProps, "type"> {}
 
-const Info: React.FC<InfoProps> = ({ children, className, title, detail, ...props }) => {
+const Info: React.FC<InfoProps> = ({ children, className, ...props }) => {
   return (
     <Alert className={classNames("info", className)} type={"info"} {...props}>
       {children}
