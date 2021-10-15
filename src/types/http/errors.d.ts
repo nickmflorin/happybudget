@@ -61,6 +61,7 @@ namespace Http {
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ErrorResponse = {
+    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
     errors: Http.Error[];
     [key: string]: any;
   };
