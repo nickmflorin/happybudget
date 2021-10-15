@@ -8,34 +8,28 @@ import { RouterLink } from "components/links";
 import { util } from "lib";
 
 export interface ILoginFormValues {
-  email?: string;
-  password?: string;
+  readonly email?: string;
+  readonly password?: string;
 }
 
-interface LoginFormProps extends StandardComponentProps {
-  form: any;
-  loading: boolean;
-  style?: React.CSSProperties;
-  className?: string;
-  onSubmit: (values: ILoginFormValues) => void;
-  onGoogleSuccess: (tokenId: string) => void;
-  onGoogleError: (error: any) => void;
+interface LoginFormProps extends FormProps<ILoginFormValues> {
+  readonly loading: boolean;
+  readonly onSubmit: (values: ILoginFormValues) => void;
+  readonly onGoogleSuccess: (tokenId: string) => void;
+  readonly onGoogleError: (error: any) => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({
-  style,
-  className,
-  form,
   loading,
   onSubmit,
   onGoogleSuccess,
-  onGoogleError
+  onGoogleError,
+  ...props
 }: LoginFormProps): JSX.Element => {
   return (
     <Form.Form
-      style={style}
-      form={form}
-      className={classNames("landing-form", className)}
+      {...props}
+      className={classNames("landing-form", props.className)}
       onFinish={(values: ILoginFormValues) => onSubmit(values)}
     >
       <Form.Item

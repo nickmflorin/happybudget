@@ -38,7 +38,7 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
   const antdForm = _useAntdForm[0];
 
   const [renderedNotification, _renderNotification] = useState<JSX.Element | undefined>(undefined);
-  const [globalError, _setGlobalError] = useState<string | undefined>(undefined);
+  const [globalError, _setGlobalError] = useState<GlobalFormError | string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
 
   const renderFieldErrors = (e: api.ClientError) => {
@@ -59,13 +59,13 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
   };
 
   const setGlobalError = useMemo(
-    () => (e: Error | string | undefined) => {
+    () => (e: Error | GlobalFormError | string | undefined) => {
       if (!isNil(e)) {
         _renderNotification(undefined);
         if (typeof e === "string") {
           _setGlobalError(e);
         } else {
-          _setGlobalError(!isNil(e.message) ? e.message : `${e}`);
+          _setGlobalError(e instanceof Error ? e.message : e);
         }
       } else {
         _setGlobalError(undefined);

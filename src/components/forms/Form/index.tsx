@@ -208,6 +208,15 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
     return find(childrenArray, (child: JSX.Element) => child.type === Footer);
   }, [childrenArray]);
 
+  const globalErrorDescription = useMemo(
+    () => (e: GlobalFormError | string | undefined) => typeof e === "string" ? e : e?.description,
+    []
+  );
+  const globalErrorTitle = useMemo(
+    () => (e: GlobalFormError | string | undefined) => typeof e !== "string" ? e?.title : undefined,
+    []
+  );
+
   return (
     <RootForm
       {...props}
@@ -225,7 +234,11 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
         <div className={"form-alert-wrapper"}>
           {!isNil(props.form?.renderedNotification) && props.form?.renderedNotification}
           {isNil(props.form?.renderedNotification) && (
-            <FormNotification>{(props.form && props.form.globalError) || globalError}</FormNotification>
+            <FormNotification
+              title={(props.form && globalErrorTitle(props.form.globalError)) || globalErrorTitle(globalError)}
+            >
+              {(props.form && globalErrorDescription(props.form.globalError)) || globalErrorDescription(globalError)}
+            </FormNotification>
           )}
         </div>
         {!isNil(footer) && footer}

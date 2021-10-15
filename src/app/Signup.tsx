@@ -7,12 +7,11 @@ import * as api from "api";
 import { ui } from "lib";
 
 import { Logo } from "components/svgs";
-
-import SignupForm, { ISignupFormValues } from "./SignupForm";
+import SignupForm, { ISignupFormValues } from "components/forms/SignupForm";
 
 const Signup = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const form = ui.hooks.useForm();
+  const form = ui.hooks.useForm<ISignupFormValues>();
   const history = useHistory();
 
   return (

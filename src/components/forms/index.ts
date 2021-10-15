@@ -5,4 +5,6 @@ export { default as BudgetForm } from "./BudgetForm";
 export { default as TemplateForm } from "./TemplateForm";
 export { default as ExportPdfForm } from "./ExportPdfForm";
 export { default as MarkupForm } from "./MarkupForm";
+export { default as LoginForm } from "./LoginForm";
+export { default as SignupForm } from "./SignupForm";
 export * from "./Form";

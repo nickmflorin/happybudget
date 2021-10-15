@@ -15,6 +15,13 @@ export const verifyEmail = async (token: string, options?: Http.RequestOptions):
   return client.post<null>(url, { token }, options);
 };
 
+// ToDo: We need to investigate whether or not opening up an endpoint to send a verification email
+// to the provided email address is a security risk.
+export const sendVerificationEmail = async (email: string, options?: Http.RequestOptions): Promise<null> => {
+  const url = services.URL.v1("users", "send-verification-email");
+  return client.post<null>(url, { email }, options);
+};
+
 export const updateActiveUser = async (
   payload: Partial<Http.UserPayload> | FormData,
   options?: Http.RequestOptions

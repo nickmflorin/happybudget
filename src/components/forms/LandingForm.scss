@@ -1,0 +1,44 @@
+@import "style/_imports";
+
+.landing-form {
+  button[type="submit"] {
+    width: 100%;
+    &:not(:last-child) {
+      margin-bottom: 12px;
+    }
+  }
+
+  .btn--google {
+    width: 100% !important;
+  }
+
+  .forgot-password-text {
+    text-align: right;
+
+    a {
+      font-family: $roboto;
+      font-weight: 400;
+      font-size: 13px;
+    }
+    @include media("<=xl") {
+      margin-bottom: 45px;
+    }
+  }
+
+  .switch-text {
+    font-size: 13px;
+    text-align: center;
+    margin-top: 12px;
+    font-family: $roboto;
+    font-weight: 400;
+    color: $text-secondary;
+
+    a {
+      margin-left: 6px;
+      font-family: $roboto;
+      font-weight: 400;
+      font-size: 13px;
+      line-height: 15px;
+    }
+  }
+}

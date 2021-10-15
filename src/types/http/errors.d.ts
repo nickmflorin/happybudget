@@ -1,11 +1,18 @@
-/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-
 namespace Http {
   type ErrorType = "unknown" | "http" | "field" | "global" | "auth";
 
-  type FieldErrorCode = "unique" | "invalid" | "required" | "email_not_verified" | "email_does_not_exist" | "invalid_credentials";
+  type FieldErrorCode =
+    | "unique"
+    | "invalid"
+    | "required"
+    | "email_does_not_exist"
+    | "invalid_credentials"
+    | "not_authenticated";
   type AuthErrorCode =
+    | "email_not_verified"
     | "account_disabled"
+    | "token_expired"
+    | "token_not_valid"
     | "invalid_social_token"
     | "invalid_social_provider";
   type HttpErrorCode = "not_found";

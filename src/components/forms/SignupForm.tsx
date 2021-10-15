@@ -1,4 +1,3 @@
-import React from "react";
 import classNames from "classnames";
 
 import { Form } from "components";
@@ -8,36 +7,25 @@ import { RouterLink } from "components/links";
 import { util } from "lib";
 
 export interface ISignupFormValues {
-  email: string;
-  password: string;
-  first_name: string;
-  last_name: string;
+  readonly email: string;
+  readonly password: string;
+  readonly first_name: string;
+  readonly last_name: string;
 }
 
-interface SignupFormProps {
-  form: any;
-  loading: boolean;
-  style?: React.CSSProperties;
-  className?: string;
-  onSubmit: (values: ISignupFormValues) => void;
-  onGoogleSuccess: (tokenId: string) => void;
-  onGoogleError: (error: any) => void;
+interface SignupFormProps extends FormProps<ISignupFormValues> {
+  readonly form: FormInstance<ISignupFormValues>;
+  readonly loading: boolean;
+  readonly onSubmit: (values: ISignupFormValues) => void;
+  readonly onGoogleSuccess: (tokenId: string) => void;
+  readonly onGoogleError: (error: any) => void;
 }
 
-const SignupForm = ({
-  style,
-  className,
-  form,
-  loading,
-  onSubmit,
-  onGoogleSuccess,
-  onGoogleError
-}: SignupFormProps): JSX.Element => {
+const SignupForm = ({ loading, onSubmit, onGoogleSuccess, onGoogleError, ...props }: SignupFormProps): JSX.Element => {
   return (
     <Form.Form
-      style={style}
-      form={form}
-      className={classNames("landing-form", className)}
+      {...props}
+      className={classNames("landing-form", props.className)}
       onFinish={(values: ISignupFormValues) => onSubmit(values)}
     >
       <Form.Item name={"first_name"} rules={[{ required: true, message: "Please enter a valid first name." }]}>

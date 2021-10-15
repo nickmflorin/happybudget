@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Router, Switch } from "react-router-dom";
+import { Router, Switch, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
@@ -13,6 +13,7 @@ import { history } from "store";
 
 const Landing = config.lazyWithRetry(() => import("./Landing"));
 const Application = config.lazyWithRetry(() => import("./Application"));
+const EmailVerification = config.lazyWithRetry(() => import("./EmailVerification"));
 
 let prevPath: string | null = null;
 
@@ -47,6 +48,7 @@ function App(): JSX.Element {
         <div id={"application-spinner-container"}></div>
         <Suspense fallback={<ApplicationSpinner visible={true} />}>
           <Switch>
+            <Route exact path={"/verify"} component={EmailVerification} />
             <UnauthenticatedReduxRoute path={["/login", "/signup"]} component={Landing} />
             <AuthenticatedReduxRoute path={["/"]} component={Application} />
           </Switch>
