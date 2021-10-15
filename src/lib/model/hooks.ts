@@ -8,7 +8,7 @@ type ModelHookOptions<M extends Model.Model> = {
   readonly onModelLoaded?: (m: M) => void;
   readonly conditional?: () => boolean;
   readonly deps?: any[];
-  readonly cancelToken?: CancelToken | null;
+  readonly getToken?: null | (() => CancelToken);
 };
 
 export const useModel = <M extends Model.Model>(
@@ -20,29 +20,24 @@ export const useModel = <M extends Model.Model>(
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
   const [model, setModel] = useState<M | null>(null);
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  const [cancelToken, cancel] = api.useCancelToken();
 
   useEffect(() => {
-    const token = options.cancelToken || cancelToken();
-    if (!isNil(token)) {
-      if (isNil(options?.conditional) || options?.conditional() === true) {
-        setLoading(true);
-        options
-          .request(id, { cancelToken: token })
-          .then((response: M) => {
-            setModel(response);
-            options?.onModelLoaded?.(response);
-          })
-          .catch((e: Error) => {
-            setError(e);
-          })
-          .finally(() => {
-            setLoading(false);
-          });
-      }
+    if (isNil(options?.conditional) || options?.conditional() === true) {
+      setLoading(true);
+      options
+        .request(id, { cancelToken: options.getToken?.() })
+        .then((response: M) => {
+          setModel(response);
+          options?.onModelLoaded?.(response);
+        })
+        .catch((e: Error) => {
+          setError(e);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
-  }, [...(options?.deps || []), cancelToken, options.cancelToken]);
+  }, [...(options?.deps || [])]);
 
   return [model, loading, error];
 };

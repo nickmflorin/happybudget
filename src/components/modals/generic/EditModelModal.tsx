@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import { isNil } from "lodash";
 
 import { model, ui } from "lib";
@@ -52,20 +52,20 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
   ...props
 }: PrivateEditModelModalProps<M, P, V, R>): JSX.Element => {
   const Form = ui.hooks.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
-  const [cancelToken, cancel] = api.useCancelToken();
+  const [getToken, cancel] = api.useCancelToken({ preserve: true, createOnInit: true });
   const [instance, loading, error] = model.hooks.useModel(id, {
     request,
     onModelLoaded,
     conditional: () => open === true,
     deps: [open],
-    cancelToken: cancelToken()
+    getToken
   });
 
   useEffect(() => {
     if (open === true) {
       Form.setLoading(loading);
     }
-  }, [loading, open]);
+  }, [loading]);
 
   useEffect(() => {
     if (!isNil(error) && open === true) {
@@ -79,12 +79,6 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
     }
   }, [instance, open]);
 
-  useEffect(() => {
-    if (open === false) {
-      cancel?.();
-    }
-  }, [open, cancel]);
-
   const title = useMemo(() => {
     if (typeof props.title === "function") {
       if (!isNil(instance)) {
@@ -96,36 +90,33 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
     }
   }, [instance, props.title]);
 
-  const onOk = useMemo(
-    () => () => {
-      Form.validateFields()
-        .then((values: V) => {
-          const payload = !isNil(interceptPayload) ? interceptPayload(values) : values;
-          Form.setLoading(true);
-          update(id, payload as P, { cancelToken: cancelToken() })
-            .then((response: R) => {
-              Form.resetFields();
-              cancel?.();
-              onSuccess(response);
-            })
-            .catch((e: Error) => {
-              Form.handleRequestError(e);
-            })
-            .finally(() => {
-              Form.setLoading(false);
-            });
-        })
-        .catch(() => {
-          return;
-        });
-    },
-    [Form, update, cancelToken, cancel, interceptPayload]
-  );
+  const onOk = useCallback(async () => {
+    Form.validateFields()
+      .then((values: V) => {
+        const payload = !isNil(interceptPayload) ? interceptPayload(values) : values;
+        Form.setLoading(true);
+        update(id, payload as P, { cancelToken: getToken() })
+          .then((response: R) => {
+            Form.resetFields();
+            onSuccess(response);
+          })
+          .catch((e: Error) => {
+            Form.handleRequestError(e);
+          })
+          .finally(() => {
+            Form.setLoading(false);
+          });
+      })
+      .catch(() => {
+        return;
+      });
+  }, [Form, update, getToken, cancel, interceptPayload]);
 
   return (
     <Modal
       {...props}
       visible={open}
+      destroyOnClose={true}
       onCancel={() => onCancel()}
       okText={"Save"}
       cancelText={"Cancel"}
