@@ -16,6 +16,7 @@ const SidebarItem = ({
   activePathRegexes,
   tooltip,
   collapsed = false,
+  closeSidebarOnClick,
   onClick,
   onActivated
 }: ISidebarItem): JSX.Element => {
@@ -64,6 +65,7 @@ const SidebarItem = ({
         <div
           className={"sidebar-menu-item-item"}
           onClick={() => {
+            closeSidebarOnClick?.();
             if (!isNil(to)) {
               history.push(to);
             } else if (!isNil(onClick)) {

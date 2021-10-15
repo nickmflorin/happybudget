@@ -21,6 +21,7 @@ interface ISidebarItem {
   readonly separatorAfter?: boolean;
   readonly activePathRegexes?: RegExp[];
   readonly tooltip?: Tooltip;
+  readonly closeSidebarOnClick?: () => void;
   readonly onClick?: () => void;
   readonly onActivated?: () => void;
 }

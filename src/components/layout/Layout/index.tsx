@@ -43,6 +43,7 @@ const Layout = (props: LayoutProps): JSX.Element => {
             className={classNames(layoutClassNameProps)}
             sidebarVisible={sidebarVisible}
             toggleSidebar={() => setSidebarVisible(!sidebarVisible)}
+            closeSidebarOnClick={isMobile ? () => setSidebarVisible(false) : undefined}
           />
         </div>
       )}

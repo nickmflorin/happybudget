@@ -16,6 +16,7 @@ export interface SidebarProps extends StandardComponentProps {
   readonly sidebar?: ISidebarItem[];
   readonly collapsed?: boolean;
   readonly sidebarVisible: boolean;
+  readonly closeSidebarOnClick?: () => void;
   readonly toggleSidebar: () => void;
 }
 
@@ -23,6 +24,7 @@ const Sidebar = ({
   sidebar = [],
   collapsed = false,
   sidebarVisible,
+  closeSidebarOnClick,
   toggleSidebar,
   ...props
 }: SidebarProps): JSX.Element => {
@@ -59,7 +61,7 @@ const Sidebar = ({
       <ShowHide show={sidebar.length !== 0}>
         <div className={"sidebar-menu"}>
           {map(sidebar, (item: ISidebarItem, index: number) => (
-            <SidebarItem key={index} collapsed={collapsed} {...item} />
+            <SidebarItem key={index} collapsed={collapsed} closeSidebarOnClick={closeSidebarOnClick} {...item} />
           ))}
         </div>
       </ShowHide>
