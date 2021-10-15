@@ -8,7 +8,8 @@ import * as api from "api";
 import { ui } from "lib";
 
 import { ButtonLink } from "components/buttons";
-import { FormNotification, LoginForm } from "components/forms";
+import { Notify } from "components/feedback";
+import { LoginForm } from "components/forms";
 import { ILoginFormValues } from "components/forms/LoginForm";
 import { Logo } from "components/svgs";
 
@@ -22,7 +23,7 @@ const ExpiredTokenNotification = (props: NotificationProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
 
   return (
-    <FormNotification type={"warning"} title={"There was an error verifying your email."}>
+    <Notify type={"warning"} title={"There was an error verifying your email."}>
       <span>
         {"The previously created token has expired."}
         <ButtonLink
@@ -40,7 +41,7 @@ const ExpiredTokenNotification = (props: NotificationProps): JSX.Element => {
           {"Resend Email"}
         </ButtonLink>
       </span>
-    </FormNotification>
+    </Notify>
   );
 };
 
@@ -48,7 +49,7 @@ const UnverifiedEmailNotification = (props: NotificationProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
 
   return (
-    <FormNotification type={"warning"} title={"Your email address is not verified."}>
+    <Notify type={"warning"} title={"Your email address is not verified."}>
       <span>
         {"Your email address needs to be verified in order to login."}
         <ButtonLink
@@ -66,7 +67,7 @@ const UnverifiedEmailNotification = (props: NotificationProps): JSX.Element => {
           {"Resend Email"}
         </ButtonLink>
       </span>
-    </FormNotification>
+    </Notify>
   );
 };
 
@@ -81,17 +82,16 @@ const Login = (): JSX.Element => {
       const e = location.state.error;
       const { state, ...statelessLocation } = location;
       history.replace(statelessLocation);
-      if (e instanceof api.AuthenticationError) {
-        if (e.errors[0].code === "token_expired") {
+      if (e instanceof api.ClientError) {
+        if (e.authenticationErrors.length !== 0 && e.authenticationErrors[0].code === "token_expired") {
           // TODO: We need to get the email address in the case that we are being redirected
           // from the verification page.
-          form.renderNotification(
-            <ExpiredTokenNotification email={""} onError={(err: Error) => {}} onSuccess={() => {}} />
-          );
+          form.notify(<ExpiredTokenNotification email={""} onError={(err: Error) => {}} onSuccess={() => {}} />);
         } else if (e.errors[0].code === "token_not_valid") {
-          form.setGlobalError({
+          form.notify({
+            type: "error",
             title: "There was an error verifying your email.",
-            description: "The token is malformed or corrupted."
+            message: "The token is malformed or corrupted."
           });
         }
       } else {
@@ -134,7 +134,7 @@ const Login = (): JSX.Element => {
             // TODO: Try to do a better job parsing the error.
             /* eslint-disable no-console */
             console.error(error);
-            form.setGlobalError("There was an error authenticating with Google.");
+            form.notify("There was an error authenticating with Google.");
           }}
           onSubmit={(values: ILoginFormValues) => {
             let email = values.email;
@@ -149,8 +149,12 @@ const Login = (): JSX.Element => {
                   }
                 })
                 .catch((e: Error) => {
-                  if (e instanceof api.AuthenticationError && e.errors[0].code === "email_not_verified") {
-                    form.renderNotification(
+                  if (
+                    e instanceof api.ClientError &&
+                    e.authenticationErrors.length !== 0 &&
+                    e.authenticationErrors[0].code === "email_not_verified"
+                  ) {
+                    form.notify(
                       <UnverifiedEmailNotification
                         email={(email as string).toLowerCase()}
                         onSuccess={() => {}}

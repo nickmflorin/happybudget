@@ -69,7 +69,7 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
 
   useEffect(() => {
     if (!isNil(error) && open === true) {
-      Form.setGlobalError(error);
+      Form.handleRequestError(error);
     }
   }, [error, open]);
 

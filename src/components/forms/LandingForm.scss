@@ -18,7 +18,7 @@
     a {
       font-family: $roboto;
       font-weight: 400;
-      font-size: 13px;
+      font-size: 12px;
     }
     @include media("<=xl") {
       margin-bottom: 45px;
@@ -26,7 +26,7 @@
   }
 
   .switch-text {
-    font-size: 13px;
+    font-size: 12px;
     text-align: center;
     margin-top: 12px;
     font-family: $roboto;
@@ -37,7 +37,7 @@
       margin-left: 6px;
       font-family: $roboto;
       font-weight: 400;
-      font-size: 13px;
+      font-size: 12px;
       line-height: 15px;
     }
   }

@@ -5,8 +5,7 @@ import { isNil } from "lodash";
 
 import { util } from "lib";
 
-import { ClientError, NetworkError, ServerError, AuthenticationError } from "./errors";
-import { parseAuthError } from "./util";
+import { ClientError, NetworkError, ServerError } from "./errors";
 
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -64,26 +63,7 @@ const throwClientError = (error: AxiosError<Http.ErrorResponse>) => {
   }
   const response = error.response;
   const url = !isNil(error.response.config.url) ? error.response.config.url : "";
-
   if (!isNil(response.data.errors)) {
-    if (response.status === 403 || response.status === 401) {
-      const authError = parseAuthError(response.data);
-      if (!isNil(authError)) {
-        throw new AuthenticationError({
-          status: response.status,
-          response,
-          errors: [authError],
-          url,
-          forceLogout: authError.force_logout
-        });
-      } else {
-        /* eslint-disable no-console */
-        console.warn(
-          `The response returned a ${response.status} status code but the errors
-          in the response did not indicate that an authentication error occurred.`
-        );
-      }
-    }
     throw new ClientError({ response, errors: response.data.errors, status: response.status, url });
   } else {
     // On 404's Django will sometimes bypass DRF exception handling and
@@ -213,7 +193,7 @@ export class ApiClient {
       });
       return response.data;
     } catch (e: unknown) {
-      if (e instanceof AuthenticationError && options.ignoreForceLogout !== true && e.forceLogout === true) {
+      if (e instanceof ClientError && options.ignoreForceLogout !== true && e.forceLogout === true) {
         window.location.href = "/login";
       }
       throw e;

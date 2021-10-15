@@ -240,12 +240,10 @@ const ExportForm = (
           // take effect.
           let manuallySetFieldError = false;
           if (e instanceof api.ClientError && !isNil(saveFormRef.current)) {
-            const global = api.parseGlobalError(e);
-            if (isNil(global)) {
+            if (e.fieldErrors.length !== 0) {
               // There is a small chance there are multiple errors for the `name` field,
               // but we can only display 1.
-              const parsed = api.parseFieldErrors(e);
-              const nameError: Http.FieldError | undefined = find(parsed, { field: "name" });
+              const nameError: Http.FieldError | undefined = find(e.fieldErrors, { field: "name" });
               if (!isNil(nameError)) {
                 manuallySetFieldError = true;
                 if (nameError.code === "unique") {
@@ -362,7 +360,7 @@ const ExportForm = (
             <UploadPdfImage
               value={!isNil(displayedHeaderTemplate) ? displayedHeaderTemplate.left_image : null}
               onChange={(left_image: UploadedImage | null) => setLeftImage(left_image)}
-              onError={(error: Error | string) => props.form.setGlobalError(error)}
+              onError={(error: Error | string) => props.form.notify(typeof error === "string" ? error : error.message)}
             />
             <CKEditor
               ref={leftInfoEditor}
@@ -374,7 +372,7 @@ const ExportForm = (
           <Form.ItemStyle className={"export-header-side-item"} label={"Right Side"}>
             <UploadPdfImage
               onChange={(right_image: UploadedImage | null) => setRightImage(right_image)}
-              onError={(error: Error | string) => props.form.setGlobalError(error)}
+              onError={(error: Error | string) => props.form.notify(typeof error === "string" ? error : error.message)}
             />
             <CKEditor
               ref={rightInfoEditor}

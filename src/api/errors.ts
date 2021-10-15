@@ -1,5 +1,6 @@
 import { AxiosResponse } from "axios";
-import { isNil, map } from "lodash";
+import { isNil, map, filter } from "lodash";
+import * as util from "./util";
 
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -64,31 +65,58 @@ const stringifyErrors = (errors: Http.Error[]): string => {
  * the errors for individual fields have the potential to contain more than 1
  * detail.
  */
-export class ClientError<E extends Http.Error = Http.Error> extends HttpError implements Http.IHttpClientError<E> {
+export class ClientError extends HttpError implements Http.IHttpClientError {
   public static type = HttpErrorTypes.CLIENT;
   public status: number;
   public url: string;
   public response: AxiosResponse<Http.ErrorResponse>;
-  public errors: E[];
+  public errors: Http.Error[];
 
-  constructor(config: Omit<Http.IHttpClientError<E>, "message" | "name"> & { readonly name?: string }) {
+  constructor(
+    config: Omit<
+      Http.IHttpClientError,
+      | "message"
+      | "name"
+      | "forceLogout"
+      | "authenticationErrors"
+      | "httpErrors"
+      | "fieldErrors"
+      | "globalErrors"
+      | "unknownErrors"
+    >
+  ) {
     super(
       `[${config.status}] There was an error making a request to ${config.url}: ${stringifyErrors(config.errors)}`,
-      config.name || "ClientError"
+      "ClientError"
     );
     this.url = config.url;
     this.response = config.response;
     this.status = config.status;
-    this.errors = config.errors;
+    this.errors = map(config.errors, (e: Http.Error) => util.standardizeError(e));
   }
-}
 
-export class AuthenticationError extends ClientError<Http.AuthError> implements Http.IHttpAuthenticationError {
-  public readonly forceLogout: boolean = false;
+  public get forceLogout(): boolean {
+    return filter(this.authenticationErrors, (e: Http.AuthError) => e.force_logout === true).length !== 0;
+  }
 
-  constructor(config: Omit<Http.IHttpAuthenticationError, "message" | "name">) {
-    super({ ...config, name: "AuthenticationError" });
-    this.forceLogout = config.forceLogout || false;
+  public get authenticationErrors(): Http.AuthError[] {
+    return util.parseAuthErrors(this);
+  }
+
+  public get httpErrors(): Http.HttpError[] {
+    return util.parseHttpErrors(this);
+  }
+
+  public get fieldErrors(): Http.FieldError[] {
+    return util.parseFieldErrors(this);
+  }
+
+  public get globalErrors(): Http.GlobalError[] {
+    return util.parseGlobalErrors(this);
+  }
+
+  public get unknownErrors(): Http.UnknownError[] {
+    return util.parseUnknownErrors(this);
   }
 }
 

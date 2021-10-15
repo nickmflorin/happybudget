@@ -50,7 +50,7 @@ const Signup = (): JSX.Element => {
             // TODO: Try to do a better job parsing the error.
             /* eslint-disable no-console */
             console.error(error);
-            form.setGlobalError("There was an error authenticating with Google.");
+            form.notify("There was an error authenticating with Google.");
           }}
           onSubmit={(values: ISignupFormValues) => {
             api

@@ -18,7 +18,7 @@ namespace Http {
   type HttpErrorCode = "not_found";
   type UnknownErrorCode = "unknown";
 
-  interface IApiError<T extends ErrorType, C extends string = string> {
+  interface IApiError<T extends ErrorType = ErrorType, C extends string = string> {
     readonly code: C;
     readonly message: string;
     readonly error_type: T;
@@ -41,16 +41,18 @@ namespace Http {
     readonly url?: string;
   }
 
-  interface IHttpClientError<E extends Http.Error = Http.Error> extends IBaseError {
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  interface IHttpClientError extends IBaseError {
     readonly url: string;
     readonly status: number;
     readonly response: import("axios").AxiosResponse<any>;
-    readonly errors: E[];
-  }
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  interface IHttpAuthenticationError extends IHttpClientError<AuthError> {
-    readonly forceLogout?: boolean;
+    readonly errors: Http.Error[];
+    readonly forceLogout: boolean;
+    readonly globalErrors: GlobalError[];
+    readonly authenticationErrors: AuthError[];
+    readonly httpErrors: HttpError[];
+    readonly unknownErrors: UnknownError[];
+    readonly fieldErrors: FieldError[];
   }
 
   type UnknownError = IApiError<"unknown", UnknownErrorCode>;

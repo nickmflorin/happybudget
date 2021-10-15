@@ -38,7 +38,7 @@ const BudgetForm: React.FC<BudgetFormProps> = ({ originalImage, onImageChange, .
         <UploadBudgetImage
           value={originalImage}
           onChange={(f: UploadedImage | null) => onImageChange?.(f)}
-          onError={(error: Error | string) => props.form.setGlobalError(error)}
+          onError={(error: Error | string) => props.form.notify(typeof error === "string" ? error : error.message)}
         />
       </Form.Item>
     </Form.Form>

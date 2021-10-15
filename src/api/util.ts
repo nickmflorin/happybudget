@@ -1,4 +1,4 @@
-import { isNil, filter, map, isMatch, reduce } from "lodash";
+import { isMatch, reduce, filter } from "lodash";
 
 import { errors } from "lib";
 import { ClientError, NetworkError } from "./errors";
@@ -30,34 +30,29 @@ export const standardizeError = <T extends Http.IApiError<any> = Http.IApiError<
   return reduce(STANDARDS, (e: T, standard) => standard(e), error);
 };
 
-export const isHttpError = (error: Http.Error | any): error is Http.Error => {
-  return (
-    !isNil(error) &&
-    (error as Http.Error).message !== undefined &&
-    (error as Http.Error).code !== undefined &&
-    (error as Http.Error).error_type !== undefined
-  );
-};
-
-export const parseErrors = (error: ClientError | Http.ErrorResponse | Http.Error[]): Http.Error[] => {
+export const parseErrors = (error: Http.IHttpClientError | Http.ErrorResponse | Http.Error[]): Http.Error[] => {
   return error instanceof ClientError ? error.errors : Array.isArray(error) ? error : error.errors;
 };
 
-export const parseFieldErrors = (error: ClientError | Http.ErrorResponse | Http.Error[]): Http.FieldError[] => {
-  return map(filter(parseErrors(error), { error_type: "field" }) as Http.FieldError[], (e: Http.FieldError) =>
-    standardizeError(e)
-  );
+export const parseFieldErrors = (
+  error: Http.IHttpClientError | Http.ErrorResponse | Http.Error[]
+): Http.FieldError[] => {
+  return filter(parseErrors(error), { error_type: "field" }) as Http.FieldError[];
 };
 
-export const parseAuthError = (error: ClientError | Http.ErrorResponse | Http.Error[]): Http.AuthError | null => {
-  const e = filter(parseErrors(error), { error_type: "auth" }) as Http.AuthError[];
-  return e.length === 0 ? null : standardizeError(e[0]); // There will only ever be 1 auth error in a given response.
-};
+export const parseAuthErrors = (error: Http.IHttpClientError | Http.ErrorResponse | Http.Error[]): Http.AuthError[] =>
+  filter(parseErrors(error), { error_type: "auth" }) as Http.AuthError[];
 
-export const parseGlobalError = (error: ClientError | Http.ErrorResponse | Http.Error[]): Http.GlobalError | null => {
-  const e = filter(parseErrors(error), { error_type: "global" }) as Http.GlobalError[];
-  return e.length === 0 ? null : standardizeError(e[0]); // There will only ever be 1 global error in a given response.
-};
+export const parseGlobalErrors = (
+  error: Http.IHttpClientError | Http.ErrorResponse | Http.Error[]
+): Http.GlobalError[] => filter(parseErrors(error), { error_type: "global" }) as Http.GlobalError[];
+
+export const parseUnknownErrors = (
+  error: Http.IHttpClientError | Http.ErrorResponse | Http.Error[]
+): Http.UnknownError[] => filter(parseErrors(error), { error_type: "unknown" }) as Http.UnknownError[];
+
+export const parseHttpErrors = (error: Http.IHttpClientError | Http.ErrorResponse | Http.Error[]): Http.HttpError[] =>
+  filter(parseErrors(error), { error_type: "http" }) as Http.HttpError[];
 
 export const handleRequestError = (e: Error, message = "") => {
   // TODO: Improve this - this most likely can be it's own saga (maybe even at the

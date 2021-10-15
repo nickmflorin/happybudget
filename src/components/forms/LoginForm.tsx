@@ -7,6 +7,8 @@ import { Button, SocialButton } from "components/buttons";
 import { RouterLink } from "components/links";
 import { util } from "lib";
 
+import "./LandingForm.scss";
+
 export interface ILoginFormValues {
   readonly email?: string;
   readonly password?: string;

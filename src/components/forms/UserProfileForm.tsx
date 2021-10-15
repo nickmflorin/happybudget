@@ -49,7 +49,7 @@ const UserProfileForm: React.FC<UserProfileFormProps> = ({ originalImage, onImag
         <UploadUserImage
           value={originalImage}
           onChange={(f: UploadedImage | null) => onImageChange?.(f)}
-          onError={(error: Error | string) => props.form.setGlobalError(error)}
+          onError={(error: Error | string) => props.form.notify(typeof error === "string" ? error : error.message)}
           firstName={firstName}
           lastName={lastName}
         />

@@ -7,13 +7,12 @@ import { Form, Icon } from "components";
 import { Input, Select, InputOnFocus } from "components/fields";
 import { Link } from "components/links";
 
-const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialValues, globalError, ...props }) => {
+const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialValues, ...props }) => {
   return (
     <Form.Form
       {...props}
       className={classNames("contact-form", props.className)}
       form={form}
-      globalError={globalError}
       layout={"vertical"}
       initialValues={initialValues}
     >

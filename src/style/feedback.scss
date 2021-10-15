@@ -24,5 +24,10 @@
     font-family: $avenir;
     font-weight: 400;
     color: $text-secondary !important;
+
+    .link {
+      line-height: 14px;
+      font-size: 12px;
+    }
   }
 }

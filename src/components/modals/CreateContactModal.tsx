@@ -56,7 +56,7 @@ const CreateContactModal = ({ initialValues, ...props }: CreateContactModalProps
           value={image}
           ref={headerRef}
           onChange={(f: UploadedImage | null) => setImage(f)}
-          onError={(error: Error | string) => form.setGlobalError(error)}
+          onError={(error: Error | string) => form.notify(typeof error === "string" ? error : error.message)}
         />
       }
       interceptPayload={(p: Http.ContactPayload) => {

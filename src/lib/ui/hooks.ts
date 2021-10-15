@@ -1,5 +1,5 @@
-import { useRef, useEffect, useState, useMemo } from "react";
-import { forEach, isNil, debounce, find } from "lodash";
+import { useRef, useEffect, useState, useMemo, useReducer } from "react";
+import { forEach, isNil, debounce, find, reduce, filter, map } from "lodash";
 import * as JsSearch from "js-search";
 import axios from "axios";
 import { useMediaQuery } from "react-responsive";
@@ -9,6 +9,7 @@ import { Breakpoints } from "style/constants";
 
 import * as api from "api";
 import { util, hooks } from "lib";
+import * as typeguards from "./typeguards";
 
 export * from "./tsxHooks";
 
@@ -33,107 +34,160 @@ export const useMenuIfNotDefined = <M extends Model.Model>(menu?: NonNullRef<IMe
   return returnRef;
 };
 
+type FormNotifyAction = {
+  readonly type: "NOTIFY";
+  readonly notifications: SingleOrArray<FormNotification>;
+  readonly level?: AlertType;
+  readonly append?: boolean;
+};
+
+type FormClearNotificationsAction = {
+  readonly type: "CLEAR";
+};
+
+type FormNotificationAction = FormNotifyAction | FormClearNotificationsAction;
+
+const formNotificationReducer = (
+  state: FormNotification[] = [],
+  action: FormNotificationAction
+): FormNotification[] => {
+  if (action.type === "NOTIFY") {
+    const notifications = Array.isArray(action.notifications) ? action.notifications : [];
+    return reduce(
+      notifications,
+      (curr: FormNotification[], n: FormNotification): FormNotification[] => {
+        if (!typeguards.isRawFormNotification(n)) {
+          return [
+            ...curr,
+            {
+              notification: n.notification,
+              level: n.level || action.level
+            }
+          ];
+        } else if (!isNil(action.level) && (api.typeguards.isHttpError(n) || typeof n === "string")) {
+          return [...curr, { notification: n, level: action.level }];
+        }
+        return [...curr, n];
+      },
+      action.append === true ? state : []
+    );
+  } else {
+    return [];
+  }
+};
+
+type FieldWithErrors = { readonly name: string; readonly errors: string[] };
+
 export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormInstance<T> => {
   const _useAntdForm = RootForm.useForm();
   const antdForm = _useAntdForm[0];
 
-  const [renderedNotification, _renderNotification] = useState<JSX.Element | undefined>(undefined);
-  const [globalError, _setGlobalError] = useState<GlobalFormError | string | undefined>(undefined);
+  const [notifications, dispatchNotification] = useReducer(formNotificationReducer, []);
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
 
-  const renderFieldErrors = (e: api.ClientError) => {
-    let fieldsWithErrors: { name: string; errors: string[] }[] = [];
-    forEach(api.parseFieldErrors(e), (error: Http.FieldError) => {
-      const existing = find(fieldsWithErrors, { name: error.field });
-      if (!isNil(existing)) {
-        fieldsWithErrors = util.replaceInArray<{ name: string; errors: string[] }>(
-          fieldsWithErrors,
-          { name: error.field },
-          { ...existing, errors: [...existing.errors, api.standardizeError(error).message] }
-        );
-      } else {
-        fieldsWithErrors.push({ name: error.field, errors: [api.standardizeError(error).message] });
-      }
-    });
-    antdForm.setFields(fieldsWithErrors);
-  };
-
-  const setGlobalError = useMemo(
-    () => (e: Error | GlobalFormError | string | undefined) => {
-      if (!isNil(e)) {
-        _renderNotification(undefined);
-        if (typeof e === "string") {
-          _setGlobalError(e);
-        } else {
-          _setGlobalError(e instanceof Error ? e.message : e);
-        }
-      } else {
-        _setGlobalError(undefined);
-      }
+  const renderFieldErrors = useMemo(
+    () => (errors: (Http.FieldError | FormFieldNotification)[]) => {
+      let fieldsWithErrors = reduce(
+        errors,
+        (curr: FieldWithErrors[], e: Http.FieldError | FormFieldNotification): FieldWithErrors[] => {
+          const existing = find(curr, { name: e.field });
+          if (!isNil(existing)) {
+            return util.replaceInArray<FieldWithErrors>(
+              curr,
+              { name: e.field },
+              { ...existing, errors: [...existing.errors, e.message] }
+            );
+          } else {
+            return [...curr, { name: e.field, errors: [e.message] }];
+          }
+        },
+        []
+      );
+      antdForm.setFields(fieldsWithErrors);
     },
-    []
+    [antdForm.setFields]
   );
 
-  const renderNotification = useMemo(
-    () => (e: JSX.Element | undefined) => {
-      if (!isNil(e)) {
-        _setGlobalError(undefined);
-      }
-      _renderNotification(e);
+  const notify = useMemo(
+    () => (notes: SingleOrArray<FormNotification>, opts?: FormNotifyOptions) => {
+      const notices = Array.isArray(notes) ? notes : [notes];
+
+      const isFieldNotice = (e: FormNotification) => {
+        if (typeguards.isRawFormNotification(e)) {
+          if (api.typeguards.isHttpError(e)) {
+            return e.error_type === "field";
+          }
+          return typeguards.isFormFieldNotification(e);
+        }
+        return typeguards.isFormFieldNotification(e.notification);
+      };
+      // For the notification sources that pertain to field level errors, render those
+      // next to the individual fields of the form.
+      renderFieldErrors(
+        map(
+          filter(notices, (n: FormNotification) => isFieldNotice(n)) as (
+            | Http.FieldError
+            | FormFieldNotification
+            | FormNotificationWithLevel<Http.FieldError>
+          )[],
+          (f: Http.FieldError | FormFieldNotification | FormNotificationWithLevel<Http.FieldError>) =>
+            typeguards.isRawFormNotification(f) ? f : f.notification
+        ) as (Http.FieldError | FormFieldNotification)[]
+      );
+      // Filter out the notifications that do not pertain to individual fields of the form
+      // and dispatch them to the notifications store.
+      dispatchNotification({
+        type: "NOTIFY",
+        notifications: filter(notices, (n: FormNotification) => !isFieldNotice(n)) as FormNotification[],
+        level: opts?.level,
+        append: opts?.append
+      });
     },
-    []
+    [renderFieldErrors]
   );
 
   const wrapForm = useMemo<FormInstance<T>>(() => {
     return {
       ...antdForm,
       autoFocusField: form?.autoFocusField,
+      notifications,
+      clearNotifications: () => dispatchNotification({ type: "CLEAR" }),
       submit: () => {
-        _setGlobalError(undefined);
-        _renderNotification(undefined);
+        dispatchNotification({ type: "CLEAR" });
         antdForm.submit();
       },
       resetFields: () => {
-        _setGlobalError(undefined);
-        _renderNotification(undefined);
+        dispatchNotification({ type: "CLEAR" });
         antdForm.resetFields();
       },
-      renderedNotification,
-      renderNotification,
+      notify,
       setLoading,
-      setGlobalError: setGlobalError,
-      renderFieldErrors: renderFieldErrors,
       handleRequestError: (e: Error) => {
         if (!axios.isCancel(e)) {
-          if (e instanceof api.AuthenticationError) {
+          if (e instanceof api.ClientError) {
             /* eslint-disable no-console */
             console.warn(e);
-            setGlobalError(e.errors[0].message);
-          } else if (e instanceof api.ClientError) {
-            const global = api.parseGlobalError(e);
-            if (!isNil(global)) {
-              /* eslint-disable no-console */
-              console.warn(e);
-              setGlobalError(global.message);
-            }
-            // Render the errors for each field next to the form field.
-            renderFieldErrors(e);
+            notify(
+              map(e.errors, (ei: Http.Error) => ({
+                message: ei.message,
+                type: "error"
+              }))
+            );
           } else if (e instanceof api.NetworkError) {
-            setGlobalError("There was a problem communicating with the server.");
+            notify("There was a problem communicating with the server.");
           } else if (e instanceof api.ServerError) {
             /* eslint-disable no-console */
             console.error(e);
-            setGlobalError("There was a problem communicating with the server.");
+            notify("There was a problem communicating with the server.");
           } else {
             throw e;
           }
         }
       },
-      globalError,
       loading,
       ...form
     };
-  }, [form, antdForm, globalError, loading, renderedNotification]);
+  }, [form, antdForm, loading, notifications, notify]);
 
   return wrapForm;
 };

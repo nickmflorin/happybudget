@@ -5,7 +5,7 @@ import { Redirect } from "react-router-dom";
 import { ConnectedRouter } from "connected-react-router";
 import { isNil } from "lodash";
 
-import { NetworkError, ServerError, ClientError, AuthenticationError } from "api";
+import { NetworkError, ServerError, ClientError } from "api";
 import { ApplicationSpinner } from "components";
 import { validateToken } from "api/services";
 import { history, configureAuthenticatedStore } from "store/configureStore";
@@ -29,7 +29,7 @@ const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): 
         setReduxStore(store);
       })
       .catch((e: Error) => {
-        if (e instanceof AuthenticationError) {
+        if (e instanceof ClientError && e.authenticationErrors.length !== 0) {
           setRedirect(true);
         } else {
           if (e instanceof NetworkError || e instanceof ClientError || e instanceof ServerError) {

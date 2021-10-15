@@ -1,55 +1,49 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Alert as RootAlert } from "antd";
 import { isNil } from "lodash";
 import classNames from "classnames";
-import { isHttpError, standardizeError } from "api";
-import { toTitleCase } from "lib/util/formatters";
+
+import * as api from "api";
+import { util } from "lib";
 
 export interface AlertProps extends StandardComponentProps {
-  readonly children?: string | JSX.Element | Http.Error | undefined;
+  readonly children?: string | Http.Error | JSX.Element | undefined;
   readonly title?: string;
   readonly visible?: boolean;
   readonly type: AlertType;
+  readonly alert?: Omit<IAlert, "type">;
 }
 
-const Alert: React.FC<AlertProps> = ({ children, visible, type, className, title, style }) => {
-  const [_visible, setVisible] = useState(false);
+const Alert: React.FC<AlertProps> = (props: AlertProps) => {
+  const data: { readonly message: string | JSX.Element | undefined; readonly title: string | undefined } =
+    useMemo(() => {
+      let message = props.children;
+      if (isNil(message) && !isNil(props.alert)) {
+        message = props.alert.message;
+      }
+      let title = props.title;
+      if (isNil(title) && !isNil(props.alert)) {
+        title = props.alert.title;
+      }
+      return !isNil(message) && api.typeguards.isHttpError(message)
+        ? { title: title || "There was an error with the request.", message: api.standardizeError(message).message }
+        : { title: title || util.formatters.toTitleCase(props.type), message };
+    }, [props.children, props.alert, props.type]);
 
-  const _children = useMemo(() => {
-    if (!isNil(children) && isHttpError(children)) {
-      return standardizeError(children).message;
-    }
-    return children;
-  }, [children]);
+  const visible = useMemo(
+    () => (!isNil(props.visible) ? props.visible : !isNil(data.message)),
+    [data.message, props.visible]
+  );
 
-  const _title = useMemo(() => {
-    if (!isNil(title)) {
-      return title;
-    } else if (isHttpError(children)) {
-      return "There was an error with the request.";
-    }
-    return !isNil(type) ? toTitleCase(type) : "";
-  }, [title, children]);
-
-  useEffect(() => {
-    if (!isNil(visible)) {
-      setVisible(visible);
-    } else if (!isNil(_children)) {
-      setVisible(true);
-    } else {
-      setVisible(false);
-    }
-  }, [visible, _children]);
-
-  if (_visible === true) {
+  if (visible === true) {
     return (
       <RootAlert
-        className={classNames("alert", className)}
-        message={_title}
-        type={type}
+        className={classNames("alert", props.className)}
+        message={data.title}
+        type={props.type}
         showIcon={true}
-        style={style}
-        description={_children}
+        style={props.style}
+        description={data.message}
       />
     );
   }

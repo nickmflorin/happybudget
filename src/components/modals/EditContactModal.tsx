@@ -46,7 +46,7 @@ const EditContactModal = (props: EditContactModalProps): JSX.Element => {
         <ContactModalHeader
           value={contact.image}
           onChange={(f: UploadedImage | null) => setImage(f)}
-          onError={(error: Error | string) => form.setGlobalError(error)}
+          onError={(error: Error | string) => form.notify(typeof error === "string" ? error : error.message)}
           ref={headerRef}
           initialValues={{ first_name: contact.first_name, last_name: contact.last_name }}
         />
