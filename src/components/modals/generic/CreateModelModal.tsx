@@ -86,6 +86,7 @@ const CreateModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>,
       okText={"Create"}
       cancelText={"Cancel"}
       getContainer={false}
+      destroyOnClose={true}
       title={title}
       okButtonProps={{ disabled: Form.loading }}
       onOk={onOk}

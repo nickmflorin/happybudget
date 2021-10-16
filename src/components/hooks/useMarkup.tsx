@@ -59,7 +59,7 @@ const useMarkup = <
         <EditMarkupModal<MM, B, RSP>
           id={markupToEdit}
           parentId={props.parentId}
-          parentType={"account"}
+          parentType={props.parentType}
           open={true}
           onCancel={() => setMarkupToEdit(null)}
           onSuccess={(response: RSP) => {
