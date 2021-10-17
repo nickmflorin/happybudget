@@ -6,8 +6,9 @@ type FormFieldNotification = {
   readonly message: string;
 };
 
-type FormNotificationWithLevel<S> = {
-  readonly level: AlertType;
+type FormNotificationWithMeta<S> = {
+  readonly type?: AlertType;
+  readonly closable?: boolean;
   readonly notification: S;
 };
 
@@ -20,18 +21,19 @@ type RawFormNotification =
 
 type FormNotification =
   | RawFormNotification
-  | FormNotificationWithLevel<Http.Error | string>;
+  | FormNotificationWithMeta<Http.Error | string>;
 
 type FormNotifyOptions = {
-  readonly level?: AlertType;
+  readonly type?: AlertType;
   readonly append?: boolean;
+  readonly closable?: boolean;
 };
 
 interface FormInstance<T> extends RootFormInstance<T> {
   readonly notify: (notifications: SingleOrArray<FormNotification>, opts?: FormNotifyOptions) => void;
   readonly clearNotifications: () => void;
   readonly setLoading: (value: boolean) => void;
-  readonly handleRequestError: (e: Error) => void;
+  readonly handleRequestError: (e: Error, opts?: FormNotifyOptions) => void;
   readonly notifications: FormNotification[];
   readonly loading: boolean | undefined;
   readonly isInModal?: boolean;

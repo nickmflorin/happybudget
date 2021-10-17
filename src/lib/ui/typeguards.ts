@@ -8,7 +8,7 @@ export const clickableIconIsCallback = (icon: ClickableIconOrElement): icon is C
 
 export const isRawFormNotification = (obj: FormNotification): obj is RawFormNotification =>
   /* eslint-disable-next-line indent */
-  (obj as FormNotificationWithLevel<string | Error>).level === undefined;
+  (obj as FormNotificationWithMeta<string | Error>).notification === undefined;
 
 export const isFormFieldNotification = (obj: FormNotification): obj is FormFieldNotification =>
   (obj as FormFieldNotification).field !== undefined;
@@ -17,4 +17,4 @@ export const isAlert = (a: IAlert | any): a is IAlert =>
   !isNil(a) &&
   typeof a === "object" &&
   (a as IAlert).type !== undefined &&
-  includes(["error", "warning", "info"], (a as IAlert).type);
+  includes(["error", "warning", "info", "success"], (a as IAlert).type);

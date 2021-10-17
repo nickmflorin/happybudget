@@ -187,8 +187,18 @@ const Login = (): JSX.Element => {
                     form.notify(
                       <UnverifiedEmailNotification
                         userId={e.userId}
-                        onSuccess={() => form.notify("Success")}
-                        onError={(err: Error) => {}}
+                        onSuccess={() =>
+                          form.notify(
+                            {
+                              type: "success",
+                              title: "Confirmation email successfully sent.",
+                              message: "Please check your inbox.",
+                              closable: true
+                            },
+                            { append: true }
+                          )
+                        }
+                        onError={(err: Error) => form.handleRequestError(e, { closable: true })}
                       />
                     );
                   } else {

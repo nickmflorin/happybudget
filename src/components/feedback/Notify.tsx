@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 import { AlertProps } from "./Alert";
 import Error from "./Error";
 import Warning from "./Warning";
-import Success from "./Warning";
+import Success from "./Success";
 import Info from "./Info";
 
 export type NotifyProps = Omit<AlertProps, "type" | "alert"> & {

@@ -225,7 +225,7 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
         )}
         <div className={"form-alert-wrapper"}>
           {map(props.form.notifications, (n: FormNotification, index: number) => {
-            const type: AlertType | undefined = ui.typeguards.isRawFormNotification(n) ? undefined : n.level;
+            const type: AlertType | undefined = ui.typeguards.isRawFormNotification(n) ? undefined : n.type;
             const notification = ui.typeguards.isRawFormNotification(n) ? n : n.notification;
             if (!ui.typeguards.isFormFieldNotification(notification)) {
               if (typeof notification === "string" || api.typeguards.isHttpError(notification)) {

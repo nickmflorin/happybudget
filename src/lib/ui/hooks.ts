@@ -35,23 +35,17 @@ export const useMenuIfNotDefined = <M extends Model.Model>(menu?: NonNullRef<IMe
 };
 
 type FormNotifyAction = {
-  readonly type: "NOTIFY";
   readonly notifications: SingleOrArray<FormNotification>;
-  readonly level?: AlertType;
+  readonly type?: AlertType;
   readonly append?: boolean;
+  readonly closable?: boolean;
 };
-
-type FormClearNotificationsAction = {
-  readonly type: "CLEAR";
-};
-
-type FormNotificationAction = FormNotifyAction | FormClearNotificationsAction;
 
 const formNotificationReducer = (
   state: FormNotification[] = [],
-  action: FormNotificationAction
+  action: FormNotifyAction | undefined
 ): FormNotification[] => {
-  if (action.type === "NOTIFY") {
+  if (!isNil(action)) {
     const notifications = Array.isArray(action.notifications) ? action.notifications : [];
     return reduce(
       notifications,
@@ -61,11 +55,12 @@ const formNotificationReducer = (
             ...curr,
             {
               notification: n.notification,
-              level: n.level || action.level
+              type: n.type || action.type,
+              closable: n.closable === undefined ? action.closable : n.closable
             }
           ];
-        } else if (!isNil(action.level) && (api.typeguards.isHttpError(n) || typeof n === "string")) {
-          return [...curr, { notification: n, level: action.level }];
+        } else if (!isNil(action.type) && (api.typeguards.isHttpError(n) || typeof n === "string")) {
+          return [...curr, { notification: n, type: action.type, closable: action.closable }];
         }
         return [...curr, n];
       },
@@ -120,25 +115,25 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
         }
         return typeguards.isFormFieldNotification(e.notification);
       };
-      // For the notification sources that pertain to field level errors, render those
+      // For the notification sources that pertain to field type errors, render those
       // next to the individual fields of the form.
       renderFieldErrors(
         map(
           filter(notices, (n: FormNotification) => isFieldNotice(n)) as (
             | Http.FieldError
             | FormFieldNotification
-            | FormNotificationWithLevel<Http.FieldError>
+            | FormNotificationWithMeta<Http.FieldError>
           )[],
-          (f: Http.FieldError | FormFieldNotification | FormNotificationWithLevel<Http.FieldError>) =>
+          (f: Http.FieldError | FormFieldNotification | FormNotificationWithMeta<Http.FieldError>) =>
             typeguards.isRawFormNotification(f) ? f : f.notification
         ) as (Http.FieldError | FormFieldNotification)[]
       );
       // Filter out the notifications that do not pertain to individual fields of the form
       // and dispatch them to the notifications store.
       dispatchNotification({
-        type: "NOTIFY",
         notifications: filter(notices, (n: FormNotification) => !isFieldNotice(n)) as FormNotification[],
-        level: opts?.level,
+        type: opts?.type,
+        closable: opts?.closable,
         append: opts?.append
       });
     },
@@ -150,29 +145,29 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
       ...antdForm,
       autoFocusField: form?.autoFocusField,
       notifications,
-      clearNotifications: () => dispatchNotification({ type: "CLEAR" }),
+      clearNotifications: () => dispatchNotification(undefined),
       submit: () => {
-        dispatchNotification({ type: "CLEAR" });
+        dispatchNotification(undefined);
         antdForm.submit();
       },
       resetFields: () => {
-        dispatchNotification({ type: "CLEAR" });
+        dispatchNotification(undefined);
         antdForm.resetFields();
       },
       notify,
       setLoading,
-      handleRequestError: (e: Error) => {
+      handleRequestError: (e: Error, opts?: FormNotifyOptions) => {
         if (!axios.isCancel(e)) {
           if (e instanceof api.ClientError) {
             /* eslint-disable no-console */
             console.warn(e);
-            notify(e.errors);
+            notify(e.errors, opts);
           } else if (e instanceof api.NetworkError) {
-            notify("There was a problem communicating with the server.");
+            notify("There was a problem communicating with the server.", opts);
           } else if (e instanceof api.ServerError) {
             /* eslint-disable no-console */
             console.warn(e);
-            notify("There was a problem communicating with the server.");
+            notify("There was a problem communicating with the server.", opts);
           } else {
             throw e;
           }

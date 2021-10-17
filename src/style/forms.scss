@@ -15,7 +15,14 @@ form {
   .form-alert-wrapper {
     margin-top: 15px;
     width: 100%;
+
+    > .alert {
+      &:not(:last-child) {
+        margin-bottom: 8px;
+      }
+    }
   }
+
   .form-footer {
     margin-top: 15px;
 
