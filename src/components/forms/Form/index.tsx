@@ -224,16 +224,20 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
           )
         )}
         <div className={"form-alert-wrapper"}>
-          {map(props.form.notifications, (n: FormNotification) => {
+          {map(props.form.notifications, (n: FormNotification, index: number) => {
             const type: AlertType | undefined = ui.typeguards.isRawFormNotification(n) ? undefined : n.level;
             const notification = ui.typeguards.isRawFormNotification(n) ? n : n.notification;
             if (!ui.typeguards.isFormFieldNotification(notification)) {
               if (typeof notification === "string" || api.typeguards.isHttpError(notification)) {
-                return <Notify type={type}>{notification}</Notify>;
+                return (
+                  <Notify key={index} type={type}>
+                    {notification}
+                  </Notify>
+                );
               } else if (ui.typeguards.isAlert(notification)) {
-                return <Notify type={notification.type} alert={notification} />;
+                return <Notify key={index} type={notification.type} alert={notification} />;
               } else {
-                return notification;
+                return <React.Fragment key={index}>{notification}</React.Fragment>;
               }
             }
             return <></>;

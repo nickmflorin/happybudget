@@ -171,7 +171,7 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
             notify("There was a problem communicating with the server.");
           } else if (e instanceof api.ServerError) {
             /* eslint-disable no-console */
-            console.error(e);
+            console.warn(e);
             notify("There was a problem communicating with the server.");
           } else {
             throw e;

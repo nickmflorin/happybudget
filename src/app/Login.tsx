@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { isNil } from "lodash";
 
@@ -14,32 +14,40 @@ import { ILoginFormValues } from "components/forms/LoginForm";
 import { Logo } from "components/svgs";
 
 interface NotificationProps {
-  readonly email: string;
+  readonly userId?: number;
   readonly onError: (e: Error) => void;
   readonly onSuccess: () => void;
 }
 
 const ExpiredTokenNotification = (props: NotificationProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
+  const message = useMemo(() => {
+    if (isNil(props.userId)) {
+      return "The previously created token has expired.";
+    }
+    return "The previously created token has expired. Please contact support.";
+  }, [props.userId]);
 
   return (
     <Notify type={"warning"} title={"There was an error verifying your email."}>
       <span>
-        {"The previously created token has expired."}
-        <ButtonLink
-          loading={loading}
-          style={{ marginLeft: 6 }}
-          onClick={() => {
-            setLoading(true);
-            api
-              .sendVerificationEmail(props.email)
-              .then(() => props.onSuccess())
-              .catch((e: Error) => props.onError(e))
-              .finally(() => setLoading(false));
-          }}
-        >
-          {"Resend Email"}
-        </ButtonLink>
+        {message}
+        {!isNil(props.userId) && (
+          <ButtonLink
+            loading={loading}
+            style={{ marginLeft: 6 }}
+            onClick={() => {
+              setLoading(true);
+              api
+                .sendVerificationEmail(props.userId as number)
+                .then(() => props.onSuccess())
+                .catch((e: Error) => props.onError(e))
+                .finally(() => setLoading(false));
+            }}
+          >
+            {"Resend Email"}
+          </ButtonLink>
+        )}
       </span>
     </Notify>
   );
@@ -47,25 +55,33 @@ const ExpiredTokenNotification = (props: NotificationProps): JSX.Element => {
 
 const UnverifiedEmailNotification = (props: NotificationProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
+  const message = useMemo(() => {
+    if (isNil(props.userId)) {
+      return "Your email address needs to be verified in order to login.";
+    }
+    return "Your email address needs to be verified in order to login. Please contact support.";
+  }, [props.userId]);
 
   return (
     <Notify type={"warning"} title={"Your email address is not verified."}>
       <span>
-        {"Your email address needs to be verified in order to login."}
-        <ButtonLink
-          loading={loading}
-          style={{ marginLeft: 6 }}
-          onClick={() => {
-            setLoading(true);
-            api
-              .sendVerificationEmail(props.email)
-              .then(() => props.onSuccess())
-              .catch((e: Error) => props.onError(e))
-              .finally(() => setLoading(false));
-          }}
-        >
-          {"Resend Email"}
-        </ButtonLink>
+        {message}
+        {!isNil(props.userId) && (
+          <ButtonLink
+            loading={loading}
+            style={{ marginLeft: 6 }}
+            onClick={() => {
+              setLoading(true);
+              api
+                .sendVerificationEmail(props.userId as number)
+                .then(() => props.onSuccess())
+                .catch((e: Error) => props.onError(e))
+                .finally(() => setLoading(false));
+            }}
+          >
+            {"Resend Email"}
+          </ButtonLink>
+        )}
       </span>
     </Notify>
   );
@@ -84,14 +100,20 @@ const Login = (): JSX.Element => {
       history.replace(statelessLocation);
       if (e instanceof api.ClientError) {
         if (e.authenticationErrors.length !== 0 && e.authenticationErrors[0].code === "token_expired") {
-          // TODO: We need to get the email address in the case that we are being redirected
-          // from the verification page.
-          form.notify(<ExpiredTokenNotification email={""} onError={(err: Error) => {}} onSuccess={() => {}} />);
+          if (isNil(e.userId)) {
+            /* eslint-disable no-console */
+            console.error(
+              `The user's email confirmation token has expired, but we cannot
+              resend the verification email because the response did not include
+              the user's ID.`
+            );
+          }
+          form.notify(<ExpiredTokenNotification userId={e.userId} onError={(err: Error) => {}} onSuccess={() => {}} />);
         } else if (e.errors[0].code === "token_not_valid") {
           form.notify({
             type: "error",
             title: "There was an error verifying your email.",
-            message: "The token is malformed or corrupted."
+            message: "The token is malformed or corrupted.  Please contact support."
           });
         }
       } else {
@@ -154,10 +176,18 @@ const Login = (): JSX.Element => {
                     e.authenticationErrors.length !== 0 &&
                     e.authenticationErrors[0].code === "email_not_verified"
                   ) {
+                    if (isNil(e.userId)) {
+                      /* eslint-disable no-console */
+                      console.error(
+                        `The user's email confirmation token has expired, but we cannot
+                        resend the verification email because the response did not include
+                        the user's ID.`
+                      );
+                    }
                     form.notify(
                       <UnverifiedEmailNotification
-                        email={(email as string).toLowerCase()}
-                        onSuccess={() => {}}
+                        userId={e.userId}
+                        onSuccess={() => form.notify("Success")}
                         onError={(err: Error) => {}}
                       />
                     );

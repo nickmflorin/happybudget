@@ -31,7 +31,7 @@ export const silentFail = (params: SilentFailProps) => {
 
   if (!isNil(params.error)) {
     /* eslint-disable no-console */
-    console.error(params.error);
+    console.warn(params.error);
     if (typeof params.error === "string" || typeof params.message === "string") {
       notify(typeof params.message === "string" ? params.message : String(params.error));
     }

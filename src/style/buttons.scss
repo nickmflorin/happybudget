@@ -313,7 +313,8 @@
     height: auto;
     border: none !important;
 
-    &:hover {
+    &:hover,
+    &:focus {
       background-color: transparent;
     }
   }
