@@ -5,7 +5,7 @@ export interface ErrorProps extends Omit<AlertProps, "type"> {}
 
 const Error: React.FC<ErrorProps> = ({ children, className, ...props }) => {
   return (
-    <Alert className={classNames("error", className)} type={"error"} {...props}>
+    <Alert {...props} className={classNames("error", className)} type={"error"}>
       {children}
     </Alert>
   );

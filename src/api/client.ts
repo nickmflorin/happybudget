@@ -63,37 +63,47 @@ const throwClientError = (error: AxiosError<Http.ErrorResponse>) => {
   }
   const response = error.response;
   const url = !isNil(error.response.config.url) ? error.response.config.url : "";
-  if (!isNil(response.data.errors)) {
-    throw new ClientError({ response, errors: response.data.errors, status: response.status, url });
+  if (!isNil(response.data.force_logout)) {
+    window.location.href = "/login";
   } else {
-    // On 404's Django will sometimes bypass DRF exception handling and
-    // return a 404.html template response.  We should bypass this in the
-    // backend, but for the time being we can manually raise a ClientError.
-    if (error.response.status === 404) {
+    if (!isNil(response.data.errors)) {
       throw new ClientError({
         response,
-        errors: [
-          {
-            message: "The requested resource could not be found.",
-            code: "not_found",
-            error_type: "http"
-          }
-        ],
+        errors: response.data.errors,
         status: response.status,
-        url
+        url,
+        userId: response.data.user_id
       });
     } else {
-      /* eslint-disable no-console */
-      console.warn(`
-        The response body from the backend does not conform to a standard convention for indicating
-        a client error - the specific type of error cannot be determined.
-    `);
-      throw new ClientError({
-        response,
-        errors: [{ message: "Unknown client error.", error_type: "unknown", code: "unknown" }],
-        status: response.status,
-        url
-      });
+      // On 404's Django will sometimes bypass DRF exception handling and
+      // return a 404.html template response.  We should bypass this in the
+      // backend, but for the time being we can manually raise a ClientError.
+      if (error.response.status === 404) {
+        throw new ClientError({
+          response,
+          errors: [
+            {
+              message: "The requested resource could not be found.",
+              code: "not_found",
+              error_type: "http"
+            }
+          ],
+          status: response.status,
+          url
+        });
+      } else {
+        /* eslint-disable no-console */
+        console.warn(`
+          The response body from the backend does not conform to a standard convention for indicating
+          a client error - the specific type of error cannot be determined.
+      `);
+        throw new ClientError({
+          response,
+          errors: [{ message: "Unknown client error.", error_type: "unknown", code: "unknown" }],
+          status: response.status,
+          url
+        });
+      }
     }
   }
 };
@@ -184,20 +194,11 @@ export class ApiClient {
       [HttpRequestMethods.PATCH]: this.instance.patch
     };
     url = this._prepare_url(url, query, method);
-    let response: AxiosResponse<T>;
-
-    try {
-      response = await lookup[method](url, filterPayload(payload), {
-        cancelToken: options.cancelToken,
-        headers: options.headers
-      });
-      return response.data;
-    } catch (e: unknown) {
-      if (e instanceof ClientError && options.ignoreForceLogout !== true && e.forceLogout === true) {
-        window.location.href = "/login";
-      }
-      throw e;
-    }
+    const response: AxiosResponse<T> = await lookup[method](url, filterPayload(payload), {
+      cancelToken: options.cancelToken,
+      headers: options.headers
+    });
+    return response.data;
   };
 
   /**

@@ -32,7 +32,7 @@ const ExpiredTokenNotification = (props: NotificationProps): JSX.Element => {
           onClick={() => {
             setLoading(true);
             api
-              .sendVerificationEmail(props.email, { ignoreForceLogout: true })
+              .sendVerificationEmail(props.email)
               .then(() => props.onSuccess())
               .catch((e: Error) => props.onError(e))
               .finally(() => setLoading(false));
@@ -58,7 +58,7 @@ const UnverifiedEmailNotification = (props: NotificationProps): JSX.Element => {
           onClick={() => {
             setLoading(true);
             api
-              .sendVerificationEmail(props.email, { ignoreForceLogout: true })
+              .sendVerificationEmail(props.email)
               .then(() => props.onSuccess())
               .catch((e: Error) => props.onError(e))
               .finally(() => setLoading(false));
@@ -140,7 +140,7 @@ const Login = (): JSX.Element => {
             let email = values.email;
             if (!isNil(email) && !isNil(values.password)) {
               api
-                .login(email.toLowerCase(), values.password, { ignoreForceLogout: true })
+                .login(email.toLowerCase(), values.password)
                 .then((user: Model.User) => {
                   if (user.is_first_time === true) {
                     history.push("/discover");

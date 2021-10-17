@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import { isNil, map, filter } from "lodash";
+import { isNil, map } from "lodash";
 import * as util from "./util";
 
 /* eslint-disable no-shadow */
@@ -71,32 +71,23 @@ export class ClientError extends HttpError implements Http.IHttpClientError {
   public url: string;
   public response: AxiosResponse<Http.ErrorResponse>;
   public errors: Http.Error[];
+  public userId: number | undefined;
 
   constructor(
     config: Omit<
       Http.IHttpClientError,
-      | "message"
-      | "name"
-      | "forceLogout"
-      | "authenticationErrors"
-      | "httpErrors"
-      | "fieldErrors"
-      | "globalErrors"
-      | "unknownErrors"
+      "message" | "name" | "authenticationErrors" | "httpErrors" | "fieldErrors" | "globalErrors" | "unknownErrors"
     >
   ) {
     super(
       `[${config.status}] There was an error making a request to ${config.url}: ${stringifyErrors(config.errors)}`,
       "ClientError"
     );
+    this.userId = config.userId;
     this.url = config.url;
     this.response = config.response;
     this.status = config.status;
     this.errors = map(config.errors, (e: Http.Error) => util.standardizeError(e));
-  }
-
-  public get forceLogout(): boolean {
-    return filter(this.authenticationErrors, (e: Http.AuthError) => e.force_logout === true).length !== 0;
   }
 
   public get authenticationErrors(): Http.AuthError[] {

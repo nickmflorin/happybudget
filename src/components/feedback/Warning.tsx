@@ -5,7 +5,7 @@ export interface WarningProps extends Omit<AlertProps, "type"> {}
 
 const Warning: React.FC<WarningProps> = ({ children, className, ...props }) => {
   return (
-    <Alert className={classNames("info", className)} type={"info"} {...props}>
+    <Alert {...props} className={classNames("info", className)} type={"info"}>
       {children}
     </Alert>
   );

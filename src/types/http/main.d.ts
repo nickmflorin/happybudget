@@ -1,5 +1,6 @@
 /// <reference path="./payloads.d.ts" />
 /// <reference path="./errors.d.ts" />
+/// <reference path="./response.d.ts" />
 
 /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
 namespace Http {
@@ -9,7 +10,6 @@ namespace Http {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface RequestOptions {
     readonly retries?: number;
-    readonly ignoreForceLogout?: boolean;
     readonly headers?: { [key: string]: string };
     readonly cancelToken?: import("axios").CancelToken | undefined | null;
   }

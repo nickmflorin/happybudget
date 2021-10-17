@@ -13,26 +13,6 @@ namespace Http {
   };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  interface ListResponse<T> {
-    readonly count: number;
-    readonly data: T[];
-    readonly next?: string | null;
-    readonly previous?: string | null;
-  }
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type TableResponse<M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
-    readonly models: M[];
-    readonly groups?: Model.Group[];
-    readonly markups?: Model.Markup[];
-  };
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  interface TokenValidationResponse {
-    readonly user: Model.User;
-  }
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface SocialPayload {
     readonly token_id: string;
     readonly provider: string;
@@ -55,11 +35,6 @@ namespace Http {
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  interface FileUploadResponse {
-    readonly fileUrl: string;
-  }
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface FringePayload {
     readonly name: string;
     readonly description?: string | null;
@@ -68,12 +43,6 @@ namespace Http {
     readonly unit?: Model.FringeUnit;
     readonly color?: string | null;
   }
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type MarkupResponseTypes<B extends Model.Budget | Model.Template> =
-    | BudgetContextDetailResponse<Model.Markup, B>
-    | BudgetParentContextDetailResponse<Model.Markup, Model.Account, B>
-    | BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, B>;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface MarkupPayload {
@@ -159,58 +128,9 @@ namespace Http {
     readonly image?: ArrayBuffer | string | null;
   }
 
-  type BudgetContextDetailResponse<
-    M extends Model.HttpModel,
-    B extends Model.Budget | Model.Template = Model.Budget
-  > = {
-    readonly data: M;
-    readonly budget: B;
-  };
-
-  type BudgetParentContextDetailResponse<
-    M extends Model.HttpModel,
-    P extends Model.Account | Model.SubAccount,
-    B extends Model.Budget | Model.Template = Model.Budget
-  > = {
-    readonly data: M;
-    readonly budget: B;
-    readonly parent: P;
-  };
-
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type BulkCreatePayload<T extends Payload> = { data: Partial<T>[] };
   type ModelBulkUpdatePayload<T extends Payload> = (Partial<T> | {}) & { readonly id: number };
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type BulkUpdatePayload<T extends Payload> = { data: ModelBulkUpdatePayload<T>[] };
-
-  type BulkDeleteResponse<M extends Model.HttpModel> = {
-    readonly data: M;
-  };
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type BulkModelResponse<M extends Model.HttpModel> = {
-    readonly data: M[];
-  };
-
-  type BulkResponse<M extends Model.HttpModel, C extends Model.HttpModel> = {
-    readonly data: M;
-    readonly children: C[];
-  };
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type BudgetBulkDeleteResponse<
-    B extends Model.Budget | Model.Template,
-    M extends Model.HttpModel
-  > = BulkDeleteResponse<M> & {
-    readonly budget: B;
-  };
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type BudgetBulkResponse<
-    B extends Model.Budget | Model.Template,
-    M extends Model.HttpModel,
-    C extends Model.HttpModel
-  > = BulkResponse<M, C> & {
-    readonly budget: B;
-  };
 }

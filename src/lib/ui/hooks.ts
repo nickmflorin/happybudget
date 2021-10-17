@@ -111,7 +111,6 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
   const notify = useMemo(
     () => (notes: SingleOrArray<FormNotification>, opts?: FormNotifyOptions) => {
       const notices = Array.isArray(notes) ? notes : [notes];
-
       const isFieldNotice = (e: FormNotification) => {
         if (typeguards.isRawFormNotification(e)) {
           if (api.typeguards.isHttpError(e)) {
@@ -167,12 +166,7 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
           if (e instanceof api.ClientError) {
             /* eslint-disable no-console */
             console.warn(e);
-            notify(
-              map(e.errors, (ei: Http.Error) => ({
-                message: ei.message,
-                type: "error"
-              }))
-            );
+            notify(e.errors);
           } else if (e instanceof api.NetworkError) {
             notify("There was a problem communicating with the server.");
           } else if (e instanceof api.ServerError) {
