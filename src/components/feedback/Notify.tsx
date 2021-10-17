@@ -4,6 +4,7 @@ import { isNil } from "lodash";
 import { AlertProps } from "./Alert";
 import Error from "./Error";
 import Warning from "./Warning";
+import Success from "./Warning";
 import Info from "./Info";
 
 export type NotifyProps = Omit<AlertProps, "type" | "alert"> & {
@@ -19,6 +20,8 @@ const Notify: React.FC<NotifyProps> = ({ children, ...props }) => {
     return <Warning {...props}>{children}</Warning>;
   } else if (type === "error") {
     return <Error {...props}>{children}</Error>;
+  } else if (type === "success") {
+    return <Success {...props}>{children}</Success>;
   } else {
     return <Info {...props}>{children}</Info>;
   }

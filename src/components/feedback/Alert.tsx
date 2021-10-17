@@ -12,6 +12,7 @@ export interface AlertProps extends StandardComponentProps {
   readonly visible?: boolean;
   readonly type: AlertType;
   readonly alert?: Omit<IAlert, "type">;
+  readonly closable?: boolean;
 }
 
 const Alert: React.FC<AlertProps> = (props: AlertProps) => {
@@ -40,6 +41,7 @@ const Alert: React.FC<AlertProps> = (props: AlertProps) => {
       <RootAlert
         className={classNames("alert", props.className)}
         message={data.title}
+        closable={!isNil(props.closable) ? props.closable : props.alert?.closable}
         type={props.type}
         showIcon={true}
         style={props.style}
