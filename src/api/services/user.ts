@@ -10,16 +10,6 @@ export const register = async (
   return client.post<Model.User>(url, payload, options);
 };
 
-export const verifyEmail = async (token: string, options?: Http.RequestOptions): Promise<null> => {
-  const url = services.URL.v1("users", "verify-email");
-  return client.post<null>(url, { token }, options);
-};
-
-export const sendVerificationEmail = async (id: number, options?: Http.RequestOptions): Promise<null> => {
-  const url = services.URL.v1("users", "send-verification-email");
-  return client.post<null>(url, { user: id }, options);
-};
-
 export const updateActiveUser = async (
   payload: Partial<Http.UserPayload> | FormData,
   options?: Http.RequestOptions

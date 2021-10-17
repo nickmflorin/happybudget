@@ -20,3 +20,13 @@ export const validateToken = async (): Promise<Http.TokenValidationResponse> => 
   const url = services.URL.v1("jwt", "validate");
   return client.post<Http.TokenValidationResponse>(url);
 };
+
+export const verifyEmail = async (token: string, options?: Http.RequestOptions): Promise<null> => {
+  const url = services.URL.v1("auth", "verify-email");
+  return client.post<null>(url, { token }, options);
+};
+
+export const sendVerificationEmail = async (id: number, options?: Http.RequestOptions): Promise<null> => {
+  const url = services.URL.v1("auth", "send-verification-email");
+  return client.post<null>(url, { user: id }, options);
+};
