@@ -15,7 +15,7 @@ const PrivateRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
     setAuthenticating(true);
     api
       .validateToken()
-      .then((response: Http.TokenValidationResponse) => {
+      .then((response: Model.User) => {
         dispatch(actions.authenticated.updateLoggedInUserAction(response.user));
         // TODO: Figure out how to do this just on login.
         if (process.env.NODE_ENV !== "development") {

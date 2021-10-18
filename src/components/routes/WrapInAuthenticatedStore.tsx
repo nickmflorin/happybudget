@@ -24,7 +24,7 @@ const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): 
   useEffect(() => {
     setAuthenticating(true);
     validateToken()
-      .then((response: Http.TokenValidationResponse) => {
+      .then((response: Model.User) => {
         const store = configureAuthenticatedStore(response.user);
         setReduxStore(store);
       })

@@ -27,11 +27,6 @@ namespace Http {
   };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  interface TokenValidationResponse {
-    readonly user: Model.User;
-  }
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface FileUploadResponse {
     readonly fileUrl: string;
   }

@@ -16,34 +16,34 @@ export const logout = async (): Promise<null> => {
   return client.post<null>(url);
 };
 
-export const validateToken = async (): Promise<Http.TokenValidationResponse> => {
+export const validateToken = async (): Promise<Model.User> => {
   const url = services.URL.v1("auth", "validate");
-  return client.post<Http.TokenValidationResponse>(url);
+  return client.post<Model.User>(url);
 };
 
 export const validateEmailConfirmationToken = async (
   token: string,
   options?: Http.RequestOptions
-): Promise<Http.TokenValidationResponse> => {
-  const url = services.URL.v1("auth", "validate-email-confirmation-token");
-  return client.post<Http.TokenValidationResponse>(url, { token }, options);
+): Promise<Model.User> => {
+  const url = services.URL.v1("auth", "validate-email-verification-token");
+  return client.post<Model.User>(url, { token }, options);
 };
 
 export const validatePasswordRecoveryToken = async (
   token: string,
   options?: Http.RequestOptions
-): Promise<Http.TokenValidationResponse> => {
+): Promise<Model.User> => {
   const url = services.URL.v1("auth", "validate-password-recovery-token");
-  return client.post<Http.TokenValidationResponse>(url, { token }, options);
+  return client.post<Model.User>(url, { token }, options);
 };
 
-export const sendEmailConfirmationEmail = async (id: number, options?: Http.RequestOptions): Promise<null> => {
-  const url = services.URL.v1("auth", "send-verification-email");
+export const verifyEmail = async (id: number, options?: Http.RequestOptions): Promise<null> => {
+  const url = services.URL.v1("auth", "verify-email");
   return client.post<null>(url, { user: id }, options);
 };
 
-export const sendForgotPasswordEmail = async (email: string, options?: Http.RequestOptions): Promise<null> => {
-  const url = services.URL.v1("auth", "send-forgot-password-email");
+export const recoverPassword = async (email: string, options?: Http.RequestOptions): Promise<null> => {
+  const url = services.URL.v1("auth", "recover-password");
   return client.post<null>(url, { email }, options);
 };
 

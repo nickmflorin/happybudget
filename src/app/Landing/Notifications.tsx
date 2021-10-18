@@ -51,7 +51,7 @@ export const TokenNotification = (props: TokenNotificationProps): JSX.Element =>
         onClick: () => {
           setLoading(true);
           api
-            .sendEmailConfirmationEmail(props.userId as number)
+            .verifyEmail(props.userId as number)
             .then(() => props.onSuccess?.())
             .catch((e: Error) => props.onError?.(e))
             .finally(() => setLoading(false));
@@ -95,7 +95,7 @@ export const UnverifiedEmailNotification = (props: UnverifiedEmailNotificationPr
         onClick: () => {
           setLoading(true);
           api
-            .sendEmailConfirmationEmail(props.userId as number)
+            .verifyEmail(props.userId as number)
             .then(() => props.onSuccess?.())
             .catch((e: Error) => props.onError?.(e))
             .finally(() => setLoading(false));

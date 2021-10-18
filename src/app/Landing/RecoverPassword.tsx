@@ -37,7 +37,7 @@ const RecoverPassword = (): JSX.Element => {
         onSubmit={(values: IRecoverPasswordFormValues) => {
           setLoading(true);
           api
-            .sendForgotPasswordEmail(values.email)
+            .recoverPassword(values.email)
             .then(() => {
               form.notify({
                 type: "success",
