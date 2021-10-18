@@ -16,12 +16,12 @@ const PrivateRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
     api
       .validateToken()
       .then((response: Model.User) => {
-        dispatch(actions.authenticated.updateLoggedInUserAction(response.user));
+        dispatch(actions.authenticated.updateLoggedInUserAction(response));
         // TODO: Figure out how to do this just on login.
         if (process.env.NODE_ENV !== "development") {
-          window.analytics.identify(response.user.id, {
-            name: response.user.full_name,
-            email: response.user.email
+          window.analytics.identify(response.id, {
+            name: response.full_name,
+            email: response.email
           });
         }
       })
