@@ -29,15 +29,28 @@ export const validateEmailConfirmationToken = async (
   return client.post<Http.TokenValidationResponse>(url, { token }, options);
 };
 
-export const validatePasswordConfirmationToken = async (
+export const validatePasswordRecoveryToken = async (
   token: string,
   options?: Http.RequestOptions
 ): Promise<Http.TokenValidationResponse> => {
-  const url = services.URL.v1("auth", "validate-password-confirmation-token");
+  const url = services.URL.v1("auth", "validate-password-recovery-token");
   return client.post<Http.TokenValidationResponse>(url, { token }, options);
 };
 
-export const sendVerificationEmail = async (id: number, options?: Http.RequestOptions): Promise<null> => {
+export const sendEmailConfirmationEmail = async (id: number, options?: Http.RequestOptions): Promise<null> => {
   const url = services.URL.v1("auth", "send-verification-email");
   return client.post<null>(url, { user: id }, options);
+};
+
+export const sendForgotPasswordEmail = async (email: string, options?: Http.RequestOptions): Promise<null> => {
+  const url = services.URL.v1("auth", "send-forgot-password-email");
+  return client.post<null>(url, { email }, options);
+};
+
+export const resetPassword = async (
+  payload: Http.ResetPasswordPayload,
+  options?: Http.RequestOptions
+): Promise<Model.User> => {
+  const url = services.URL.v1("auth", "reset-password");
+  return client.post<Model.User>(url, payload, options);
 };

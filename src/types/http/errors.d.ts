@@ -7,12 +7,12 @@ namespace Http {
     | "required"
     | "email_does_not_exist"
     | "invalid_credentials";
+  type TokenErrorCode = "token_expired" | "token_not_valid";
   type AuthErrorCode =
+    | TokenErrorCode
     | "email_not_verified"
     | "account_disabled"
     | "account_not_authenticated"
-    | "token_expired"
-    | "token_not_valid"
     | "invalid_social_token"
     | "invalid_social_provider";
   type HttpErrorCode = "not_found";

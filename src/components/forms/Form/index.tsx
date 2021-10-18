@@ -6,7 +6,7 @@ import { Form as RootForm, Input } from "antd";
 
 import * as api from "api";
 import { RenderWithSpinner } from "components";
-import { Notify } from "components/feedback";
+import { Notification } from "components/feedback";
 import { ui } from "lib";
 
 import FieldError from "./FieldError";
@@ -230,12 +230,12 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
             if (!ui.typeguards.isFormFieldNotification(notification)) {
               if (typeof notification === "string" || api.typeguards.isHttpError(notification)) {
                 return (
-                  <Notify key={index} type={type}>
+                  <Notification key={index} type={type}>
                     {notification}
-                  </Notify>
+                  </Notification>
                 );
               } else if (ui.typeguards.isAlert(notification)) {
-                return <Notify key={index} type={notification.type} alert={notification} />;
+                return <Notification key={index} type={notification.type} alert={notification} />;
               } else {
                 return <React.Fragment key={index}>{notification}</React.Fragment>;
               }

@@ -18,6 +18,9 @@ namespace Http {
     [key: string]: any;
   }
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type TokenType = "email-confirmation" | "password-recovery";
+
   type PathParam = string | number;
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type PathParams = Array<PathParam>;

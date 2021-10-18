@@ -32,7 +32,7 @@ const Alert: React.FC<AlertProps> = (props: AlertProps) => {
     }, [props.children, props.alert, props.type]);
 
   const visible = useMemo(
-    () => (!isNil(props.visible) ? props.visible : !isNil(data.message)),
+    () => (!isNil(props.visible) ? props.visible : !isNil(data.message) || !isNil(data.title)),
     [data.message, props.visible]
   );
 

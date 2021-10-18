@@ -13,7 +13,8 @@ import { history } from "store";
 
 const Landing = config.lazyWithRetry(() => import("./Landing"));
 const Application = config.lazyWithRetry(() => import("./Application"));
-const EmailVerification = config.lazyWithRetry(() => import("./EmailVerification"));
+const EmailVerification = config.lazyWithRetry(() => import("./Landing/EmailVerification"));
+const PasswordRecovery = config.lazyWithRetry(() => import("./Landing/PasswordRecovery"));
 
 let prevPath: string | null = null;
 
@@ -49,7 +50,11 @@ function App(): JSX.Element {
         <Suspense fallback={<ApplicationSpinner visible={true} />}>
           <Switch>
             <Route exact path={"/verify"} component={EmailVerification} />
-            <UnauthenticatedReduxRoute path={["/login", "/signup"]} component={Landing} />
+            <Route exact path={"/recovery"} component={PasswordRecovery} />
+            <UnauthenticatedReduxRoute
+              path={["/login", "/signup", "/reset-password", "/recover-password"]}
+              component={Landing}
+            />
             <AuthenticatedReduxRoute path={["/"]} component={Application} />
           </Switch>
         </Suspense>

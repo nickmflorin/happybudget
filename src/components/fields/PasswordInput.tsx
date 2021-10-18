@@ -39,7 +39,7 @@ const ValidationItems = (props: { validationState: PasswordValidationState }) =>
 
 const MemoizedValidationItems = React.memo(ValidationItems);
 
-const PasswordInput = (props: PasswordInputProps): JSX.Element => {
+const PasswordInput = ({ hasValidator, ...props }: PasswordInputProps): JSX.Element => {
   const [validationState, setValidationState] = useState<PasswordValidationState>(initialValidationState);
 
   const handleValidation = useMemo(
@@ -68,7 +68,7 @@ const PasswordInput = (props: PasswordInputProps): JSX.Element => {
     );
   }, [props, handleValidation]);
 
-  if (props.hasValidator) {
+  if (hasValidator) {
     return (
       <AntDPopover
         placement={"right"}

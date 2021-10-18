@@ -59,7 +59,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
         <PasswordInput size={"large"} />
       </Form.Item>
       <div className={"forgot-password-text"}>
-        <RouterLink to={"#"} className={"forgot-link"}>
+        <RouterLink to={"/recover-password"} className={"forgot-link"}>
           {"Forgot Password?"}
         </RouterLink>
       </div>
@@ -75,7 +75,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
         />
         <div className={"switch-text"}>
           {"Don't have an account yet?"}
-          <RouterLink to={"/signup"}>{"Sign up"}</RouterLink>
+          <RouterLink to={"/signup"}>{"Sign Up"}</RouterLink>
         </div>
       </Form.Footer>
     </Form.Form>

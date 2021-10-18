@@ -7,4 +7,6 @@ export { default as ExportPdfForm } from "./ExportPdfForm";
 export { default as MarkupForm } from "./MarkupForm";
 export { default as LoginForm } from "./LoginForm";
 export { default as SignupForm } from "./SignupForm";
+export { default as ResetPasswordForm } from "./ResetPasswordForm";
+export { default as RecoverPasswordForm } from "./RecoverPasswordForm";
 export * from "./Form";

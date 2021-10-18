@@ -95,8 +95,8 @@ const SignupForm = ({ loading, onSubmit, onGoogleSuccess, onGoogleError, ...prop
           onGoogleError={onGoogleError}
         />
         <div className={"switch-text"}>
-          {"Already have an account?"}
-          <RouterLink to={"/login"}>{"Log in"}</RouterLink>
+          {"Back to"}
+          <RouterLink to={"/login"}>{"Log In"}</RouterLink>
         </div>
       </Form.Footer>
     </Form.Form>

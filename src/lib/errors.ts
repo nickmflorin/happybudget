@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import * as Sentry from "@sentry/react";
 
 interface SilentFailProps {
-  readonly error?: Error | string;
+  readonly error?: Error | string | object;
   readonly message?: string;
   readonly dispatchToSentry?: boolean;
   readonly notifyUser?: boolean;
@@ -13,13 +13,13 @@ export const silentFail = (params: SilentFailProps) => {
   const notifyUser = params.notifyUser === undefined ? true : params.notifyUser;
   const dispatchToSentry = params.dispatchToSentry === undefined ? true : params.dispatchToSentry;
 
-  const dispatch = (error: Error | string) => {
+  const errorToString = (e: Error | string | object) => {
+    return e instanceof Error ? String(e) : typeof e === "string" ? e : JSON.stringify(e);
+  };
+
+  const dispatch = (error: Error | string | object) => {
     if (dispatchToSentry === true) {
-      if (typeof error === "string") {
-        Sentry.captureMessage(error);
-      } else {
-        Sentry.captureException(error);
-      }
+      error instanceof Error ? Sentry.captureException(error) : Sentry.captureMessage(errorToString(error));
     }
   };
 
@@ -30,15 +30,16 @@ export const silentFail = (params: SilentFailProps) => {
   };
 
   if (!isNil(params.error)) {
-    /* eslint-disable no-console */
+    /* eslint-disable-next-line no-console */
     console.warn(params.error);
     if (typeof params.error === "string" || typeof params.message === "string") {
-      notify(typeof params.message === "string" ? params.message : String(params.error));
+      notify(typeof params.message === "string" ? params.message : errorToString(params.error));
     }
     dispatch(params.error);
   } else if (!isNil(params.message)) {
+    /* eslint-disable-next-line no-console */
     console.error(params.message);
-    notify(typeof params.message);
+    notify(params.message);
     dispatch(params.message);
   }
 };
