@@ -39,11 +39,11 @@ const SignupForm = ({ loading, onSubmit, onGoogleSuccess, onGoogleError, ...prop
       <Form.Item
         name={"email"}
         rules={[
-          { required: true, message: "Please enter an email." },
+          { required: true, message: "Please enter a valid email." },
           ({ getFieldValue }: { getFieldValue: any }) => ({
             validator(rule: any, value: string) {
               if (value !== "" && !util.validate.validateEmail(value)) {
-                return Promise.reject("Please enter a valid email.");
+                return Promise.reject("The email does not meet our requirements.");
               }
               return Promise.resolve();
             }
@@ -71,18 +71,18 @@ const SignupForm = ({ loading, onSubmit, onGoogleSuccess, onGoogleError, ...prop
       <Form.Item
         name={"confirm"}
         rules={[
-          { required: true, message: "Please confirm your password.", min: 8 },
-          ({ getFieldValue }: { getFieldValue: any }) => ({
-            validator(rule: any, value: string) {
-              if (value !== "" && !util.validate.validatePassword(value)) {
-                return Promise.reject("The password does not meet our requirements.");
+          { required: true, message: "Please confirm your password." },
+          ({ getFieldValue }) => ({
+            validator(_, value) {
+              if (!value || getFieldValue("password") === value) {
+                return Promise.resolve();
               }
-              return Promise.resolve();
+              return Promise.reject("The two passwords that you entered do not match!");
             }
           })
         ]}
       >
-        <PasswordInput size={"large"} placeholder={"Confirm"} hasValidator={true} />
+        <PasswordInput size={"large"} placeholder={"Confirm"} />
       </Form.Item>
       <Form.Footer style={{ marginTop: 20 }}>
         <Button loading={loading} className={"btn btn--login"} htmlType={"submit"}>

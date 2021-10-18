@@ -60,7 +60,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
           }) => ({
             validator(rule: any, value: string) {
               if (value !== "" && getFieldValue("password") !== value) {
-                return Promise.reject("The passwords do not match.");
+                return Promise.reject("The two passwords that you entered do not match!");
               }
               return Promise.resolve();
             }

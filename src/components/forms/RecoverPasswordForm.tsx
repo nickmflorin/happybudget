@@ -33,12 +33,12 @@ const RecoverPasswordForm: React.FC<RecoverPasswordFormProps> = ({
       <Form.Item
         name={"email"}
         rules={[
-          { required: true, message: "Please enter an email." },
+          { required: true, message: "Please enter a valid email." },
           () => ({
             validateTrigger: "onSubmit",
             validator(rule: any, value: string) {
               if (value !== "" && !util.validate.validateEmail(value)) {
-                return Promise.reject("Please enter a valid email.");
+                return Promise.reject("The email does not meet our requirements.");
               }
               return Promise.resolve();
             }
