@@ -17,13 +17,24 @@ export const logout = async (): Promise<null> => {
 };
 
 export const validateToken = async (): Promise<Http.TokenValidationResponse> => {
-  const url = services.URL.v1("jwt", "validate");
+  const url = services.URL.v1("auth", "validate");
   return client.post<Http.TokenValidationResponse>(url);
 };
 
-export const verifyEmail = async (token: string, options?: Http.RequestOptions): Promise<null> => {
-  const url = services.URL.v1("auth", "verify-email");
-  return client.post<null>(url, { token }, options);
+export const validateEmailConfirmationToken = async (
+  token: string,
+  options?: Http.RequestOptions
+): Promise<Http.TokenValidationResponse> => {
+  const url = services.URL.v1("auth", "validate-email-confirmation-token");
+  return client.post<Http.TokenValidationResponse>(url, { token }, options);
+};
+
+export const validatePasswordConfirmationToken = async (
+  token: string,
+  options?: Http.RequestOptions
+): Promise<Http.TokenValidationResponse> => {
+  const url = services.URL.v1("auth", "validate-password-confirmation-token");
+  return client.post<Http.TokenValidationResponse>(url, { token }, options);
 };
 
 export const sendVerificationEmail = async (id: number, options?: Http.RequestOptions): Promise<null> => {

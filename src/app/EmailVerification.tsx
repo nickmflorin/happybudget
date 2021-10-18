@@ -15,7 +15,7 @@ const EmailVerification = (): JSX.Element => {
     const searchParams = util.urls.getQueryParams(location.search);
     if (!isNil(searchParams.token)) {
       api
-        .verifyEmail(searchParams.token)
+        .validateEmailConfirmationToken(searchParams.token)
         .then(() => setRedirect(true))
         .catch((e: Error) => {
           setRedirectError(e);
