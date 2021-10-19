@@ -1,3 +1,5 @@
+import { isNil, map, filter } from "lodash";
+
 import {
   AuthenticatedTable,
   AuthenticatedTableProps,
@@ -20,7 +22,10 @@ export type AuthenticatedBudgetTableProps<
 };
 
 /* eslint-disable indent */
-const AuthenticatedBudgetTable = <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>({
+const AuthenticatedBudgetTable = <
+  R extends Tables.BudgetRowData,
+  M extends Model.TypedHttpModel = Model.TypedHttpModel
+>({
   onEditMarkup,
   onEditGroup,
   ...props
@@ -28,6 +33,17 @@ const AuthenticatedBudgetTable = <R extends Table.RowData, M extends Model.Typed
   return (
     <AuthenticatedTable<R, M>
       {...props}
+      generateNewRowData={(rows: Table.BodyRow<R>[]) => {
+        const dataRows = filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[];
+        const numericIdentifiers: number[] = map(
+          filter(dataRows, (r: Table.DataRow<R>) => !isNil(r.data.identifier) && !isNaN(parseInt(r.data.identifier))),
+          (r: Table.DataRow<R>) => parseInt(r.data.identifier as string)
+        );
+        if (numericIdentifiers.length !== 0) {
+          return { identifier: String(Math.max(...numericIdentifiers) + 1) } as Partial<R>;
+        }
+        return {};
+      }}
       onEditRow={(r: Table.EditableRow<R>) =>
         (tabling.typeguards.isMarkupRow(r) && onEditMarkup?.(r)) ||
         (tabling.typeguards.isGroupRow(r) && onEditGroup?.(r))
