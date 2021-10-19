@@ -128,7 +128,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.Http
           // rows being updated such the paste operation will skip Group Rows.
           for (let i = 0; i < p.data.length; i++) {
             const rowIndex = focusedCell.rowIndex + i;
-            if (rowIndex > lastIndex) {
+            if (rowIndex >= lastIndex) {
               newRowData = [...newRowData, p.data[i]];
             } else {
               const node = params.apis.grid.getDisplayedRowAtIndex(rowIndex);
