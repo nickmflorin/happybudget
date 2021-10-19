@@ -9,9 +9,12 @@ import { redux } from "lib";
 import { BudgetCard } from "components/cards";
 import { Page } from "components/layout";
 import { EditBudgetModal, CreateBudgetModal } from "components/modals";
+import { NoBudgets } from "components/empty";
 
 import { actions } from "../../store";
 import BudgetsSubTitle from "./BudgetsSubTitle";
+
+import { BudgetEmptyIcon } from "components/svgs";
 
 const selectBudgets = (state: Application.Authenticated.Store) => state.dashboard.budgets.data;
 const selectLoadingBudgets = (state: Application.Authenticated.Store) => state.dashboard.budgets.loading;
@@ -40,42 +43,48 @@ const Budgets = (): JSX.Element => {
       title={"My Budgets"}
       subTitle={<BudgetsSubTitle onNewBudget={() => setCreateBudgetModalOpen(true)} />}
     >
-      <div className={"dashboard-card-grid"}>
-        {map(budgets, (budget: Model.Budget, index: number) => {
-          return (
-            <BudgetCard
-              key={index}
-              budget={budget}
-              deleting={isDeleting(budget.id)}
-              duplicating={isDuplicating(budget.id)}
-              onClick={() => history.push(`/budgets/${budget.id}`)}
-              onEdit={() => setBudgetToEdit(budget.id)}
-              onDelete={(e: MenuItemClickEvent<MenuItemModel>) => {
-                setDeleting(budget.id);
-                api
-                  .deleteBudget(budget.id)
-                  .then(() => {
-                    e.closeParentDropdown?.();
-                    dispatch(actions.removeBudgetFromStateAction(budget.id));
-                  })
-                  .catch((err: Error) => api.handleRequestError(err))
-                  .finally(() => setDeleted(budget.id));
-              }}
-              onDuplicate={(e: MenuItemClickEvent<MenuItemModel>) => {
-                setDuplicating(budget.id);
-                api
-                  .duplicateBudget(budget.id)
-                  .then((response: Model.Budget) => {
-                    e.closeParentDropdown?.();
-                    dispatch(actions.addBudgetToStateAction(response));
-                  })
-                  .catch((err: Error) => api.handleRequestError(err))
-                  .finally(() => setDuplicated(budget.id));
-              }}
-            />
-          );
-        })}
-      </div>
+      {budgets.length === 0 ? (
+        <NoBudgets title={"You don't have any templates yet! Create a new budget."} subTitle>
+          <BudgetEmptyIcon />
+        </NoBudgets>
+      ) : (
+        <div className={"dashboard-card-grid"}>
+          {map(budgets, (budget: Model.Budget, index: number) => {
+            return (
+              <BudgetCard
+                key={index}
+                budget={budget}
+                deleting={isDeleting(budget.id)}
+                duplicating={isDuplicating(budget.id)}
+                onClick={() => history.push(`/budgets/${budget.id}`)}
+                onEdit={() => setBudgetToEdit(budget.id)}
+                onDelete={(e: MenuItemClickEvent<MenuItemModel>) => {
+                  setDeleting(budget.id);
+                  api
+                    .deleteBudget(budget.id)
+                    .then(() => {
+                      e.closeParentDropdown?.();
+                      dispatch(actions.removeBudgetFromStateAction(budget.id));
+                    })
+                    .catch((err: Error) => api.handleRequestError(err))
+                    .finally(() => setDeleted(budget.id));
+                }}
+                onDuplicate={(e: MenuItemClickEvent<MenuItemModel>) => {
+                  setDuplicating(budget.id);
+                  api
+                    .duplicateBudget(budget.id)
+                    .then((response: Model.Budget) => {
+                      e.closeParentDropdown?.();
+                      dispatch(actions.addBudgetToStateAction(response));
+                    })
+                    .catch((err: Error) => api.handleRequestError(err))
+                    .finally(() => setDuplicated(budget.id));
+                }}
+              />
+            );
+          })}
+        </div>
+      )}
       {!isNil(budgetToEdit) && (
         <EditBudgetModal
           open={true}

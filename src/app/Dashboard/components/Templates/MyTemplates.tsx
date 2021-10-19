@@ -10,7 +10,11 @@ import { WrapInApplicationSpinner } from "components";
 import { TemplateCard, EmptyCard } from "components/cards";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
 
+import { NoBudgets } from "components/empty";
+
 import { actions } from "../../store";
+
+import { TemplateEmptyIcon } from "components/svgs";
 
 const selectTemplates = (state: Application.Authenticated.Store) => state.dashboard.templates.data;
 const selectLoadingTemplates = (state: Application.Authenticated.Store) => state.dashboard.templates.loading;
@@ -39,57 +43,69 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
   return (
     <div className={"my-templates"}>
       <WrapInApplicationSpinner loading={loading}>
-        <div className={"dashboard-card-grid"}>
-          {map(templates, (template: Model.Template, index: number) => {
-            return (
-              <TemplateCard
-                key={index}
-                template={template}
-                duplicating={isDuplicating(template.id)}
-                moving={isMoving(template.id)}
-                deleting={isDeleting(template.id)}
-                onEdit={() => history.push(`/templates/${template.id}/accounts`)}
-                onEditNameImage={() => setTemplateToEdit(template.id)}
-                onDelete={(e: MenuItemClickEvent<MenuItemModel>) => {
-                  setDeleting(template.id);
-                  api
-                    .deleteTemplate(template.id)
-                    .then(() => {
-                      e.closeParentDropdown?.();
-                      dispatch(actions.removeTemplateFromStateAction(template.id));
-                    })
-                    .catch((err: Error) => api.handleRequestError(err))
-                    .finally(() => setDeleted(template.id));
-                }}
-                onClick={() => setTemplateToDerive(template.id)}
-                onMoveToCommunity={(e: MenuItemClickEvent<MenuItemModel>) => {
-                  setMoving(template.id);
-                  api
-                    .updateTemplate(template.id, { community: true })
-                    .then((response: Model.Template) => {
-                      e.closeParentDropdown?.();
-                      dispatch(actions.removeTemplateFromStateAction(template.id));
-                      dispatch(actions.addCommunityTemplateToStateAction(response));
-                    })
-                    .catch((err: Error) => api.handleRequestError(err))
-                    .finally(() => setMoved(template.id));
-                }}
-                onDuplicate={(e: MenuItemClickEvent<MenuItemModel>) => {
-                  setDuplicating(template.id);
-                  api
-                    .duplicateTemplate(template.id)
-                    .then((response: Model.Template) => {
-                      e.closeParentDropdown?.();
-                      dispatch(actions.addTemplateToStateAction(response));
-                    })
-                    .catch((err: Error) => api.handleRequestError(err))
-                    .finally(() => setDuplicated(template.id));
-                }}
-              />
-            );
-          })}
-          <EmptyCard title={"New Template"} icon={"plus"} onClick={() => setCreateTempateModalOpen(true)} />
-        </div>
+        {templates.length === 0 ? (
+          <NoBudgets
+            title={"You don't have any templates yet!"}
+            button={{
+              onClick: () => setCreateTempateModalOpen(true),
+              text: "Create a Template"
+            }}
+          >
+            <TemplateEmptyIcon />
+          </NoBudgets>
+        ) : (
+          <div className={"dashboard-card-grid"}>
+            {map(templates, (template: Model.Template, index: number) => {
+              return (
+                <TemplateCard
+                  key={index}
+                  template={template}
+                  duplicating={isDuplicating(template.id)}
+                  moving={isMoving(template.id)}
+                  deleting={isDeleting(template.id)}
+                  onEdit={() => history.push(`/templates/${template.id}/accounts`)}
+                  onEditNameImage={() => setTemplateToEdit(template.id)}
+                  onDelete={(e: MenuItemClickEvent<MenuItemModel>) => {
+                    setDeleting(template.id);
+                    api
+                      .deleteTemplate(template.id)
+                      .then(() => {
+                        e.closeParentDropdown?.();
+                        dispatch(actions.removeTemplateFromStateAction(template.id));
+                      })
+                      .catch((err: Error) => api.handleRequestError(err))
+                      .finally(() => setDeleted(template.id));
+                  }}
+                  onClick={() => setTemplateToDerive(template.id)}
+                  onMoveToCommunity={(e: MenuItemClickEvent<MenuItemModel>) => {
+                    setMoving(template.id);
+                    api
+                      .updateTemplate(template.id, { community: true })
+                      .then((response: Model.Template) => {
+                        e.closeParentDropdown?.();
+                        dispatch(actions.removeTemplateFromStateAction(template.id));
+                        dispatch(actions.addCommunityTemplateToStateAction(response));
+                      })
+                      .catch((err: Error) => api.handleRequestError(err))
+                      .finally(() => setMoved(template.id));
+                  }}
+                  onDuplicate={(e: MenuItemClickEvent<MenuItemModel>) => {
+                    setDuplicating(template.id);
+                    api
+                      .duplicateTemplate(template.id)
+                      .then((response: Model.Template) => {
+                        e.closeParentDropdown?.();
+                        dispatch(actions.addTemplateToStateAction(response));
+                      })
+                      .catch((err: Error) => api.handleRequestError(err))
+                      .finally(() => setDuplicated(template.id));
+                  }}
+                />
+              );
+            })}
+            <EmptyCard title={"New Template"} icon={"plus"} onClick={() => setCreateTempateModalOpen(true)} />
+          </div>
+        )}
       </WrapInApplicationSpinner>
       {!isNil(templateToEdit) && (
         <EditTemplateModal

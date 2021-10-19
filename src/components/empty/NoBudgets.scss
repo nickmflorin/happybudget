@@ -1,0 +1,43 @@
+@import "style/_imports";
+
+.no-budgets {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 500px;
+  text-align: center;
+  margin: 50px 20px 0;
+
+  @include media(">=large") {
+    margin: 100px auto 0;
+  }
+
+  svg:not(.btn svg) {
+    width: 100%;
+    max-width: 475px;
+    margin-bottom: 30px;
+  }
+
+  h1 {
+    font-size: 18px;
+    line-height: 20px;
+    width: 100%;
+    max-width: 462px;
+
+    @include media(">=large") {
+      line-height: 30px;
+      font-size: 28px;
+    }
+  }
+
+  p {
+    font-size: 12px;
+    margin-top: 10px;
+    font-weight: 500;
+
+    @include media(">=large") {
+      font-size: 15px;
+    }
+  }
+}
