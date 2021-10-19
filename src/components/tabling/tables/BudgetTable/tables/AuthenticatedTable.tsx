@@ -1,4 +1,4 @@
-import { isNil, map, filter } from "lodash";
+import { isNil, filter } from "lodash";
 
 import {
   AuthenticatedTable,
@@ -35,12 +35,11 @@ const AuthenticatedBudgetTable = <
       {...props}
       generateNewRowData={(rows: Table.BodyRow<R>[]) => {
         const dataRows = filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[];
-        const numericIdentifiers: number[] = map(
-          filter(dataRows, (r: Table.DataRow<R>) => !isNil(r.data.identifier) && !isNaN(parseInt(r.data.identifier))),
-          (r: Table.DataRow<R>) => parseInt(r.data.identifier as string)
-        );
-        if (numericIdentifiers.length !== 0) {
-          return { identifier: String(Math.max(...numericIdentifiers) + 1) } as Partial<R>;
+        if (dataRows.length !== 0) {
+          const lastRow: Table.DataRow<R> = dataRows[dataRows.length - 1];
+          if (!isNil(lastRow.data.identifier) && !isNaN(parseInt(lastRow.data.identifier))) {
+            return { identifier: String(parseInt(lastRow.data.identifier) + 1) } as Partial<R>;
+          }
         }
         return {};
       }}
