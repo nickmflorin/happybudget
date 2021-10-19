@@ -2,33 +2,5 @@
   .ant-modal-header {
     display: flex;
     height: 142px;
-
-    .contact-modal-header {
-      display: flex;
-      height: 100%;
-
-      .user-image-uploader {
-        // With the header height at 118px, after the header padding there is 72px
-        // left of space.
-        height: 96px;
-        width: 96px;
-      }
-
-      .contact-name-wrapper {
-        margin-left: 12px;
-        display: flex;
-        height: 100%;
-
-        .contact-name {
-          // AndD Modal Title Text has Line Height = 24px, 0.5*(96px - 24px) = 36px;
-          padding-top: 36px;
-          padding-bottom: 36px;
-
-          &:not(:first-child) {
-            margin-left: 8px;
-          }
-        }
-      }
-    }
   }
 }

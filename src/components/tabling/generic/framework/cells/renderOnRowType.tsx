@@ -1,10 +1,12 @@
 import React from "react";
 import { isNil } from "lodash";
 
-type RowTypeRender<T extends { node: Table.RowNode } = any> = Partial<{
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  [key in Table.RowType | "default"]: React.ComponentClass<T, {}> | React.FunctionComponent<T>;
-}>;
+type RowTypeRender<T extends { node: Table.RowNode } = any> = Partial<
+  {
+    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+    [key in Table.RowType | "default"]: React.ComponentClass<T, {}> | React.FunctionComponent<T>;
+  }
+>;
 
 /* eslint-disable indent */
 const renderOnRowType = <T extends { node: Table.RowNode } = any, R extends Table.RowData = object>(

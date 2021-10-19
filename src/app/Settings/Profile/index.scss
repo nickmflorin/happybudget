@@ -1,17 +1,7 @@
 .profile {
   display: flex;
-  justify-content: center;
 
-  .profile-form-container {
+  .form-container {
     max-width: 500px;
-    min-width: 400px;
-
-    .user-profile-form {
-      .user-image-uploader {
-        height: 318px;
-        width: 318px;
-        margin-left: 28px;
-      }
-    }
   }
 }

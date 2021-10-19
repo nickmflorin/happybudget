@@ -40,14 +40,14 @@ namespace Http {
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface UserPayload {
+    readonly profile_image?: string | ArrayBuffer | null;
     readonly first_name: string;
     readonly last_name: string;
-    readonly profile_image?: string | ArrayBuffer | null;
-    readonly timezone?: string;
     readonly company?: string | null;
     readonly position?: string | null;
-    readonly address?: string | null;
-    readonly phone_number?: number | null;
+    readonly city?: string | null;
+    readonly phone_number?: string | null;
+    readonly timezone?: string;
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */

@@ -6,7 +6,8 @@ import * as api from "api";
 import { ContactForm } from "components/forms";
 
 import { EditModelModal, EditModelModalProps } from "./generic";
-import ContactModalHeader, { IContactModalHeaderRef } from "./ContactModalHeader";
+import { ImageAndName } from "components/fields";
+import { IImageAndNameRef } from "components/fields/ImageAndName";
 import "./ContactModal.scss";
 
 interface EditContactModalProps extends EditModelModalProps<Model.Contact> {}
@@ -21,7 +22,7 @@ const EditContactModal = (props: EditContactModalProps): JSX.Element => {
   lastName change it causes the entire component to rerender, and AntD rerenders all form fields
   when the form rerenders, which causes the auto focus to be lost on the first and last name fields.
   */
-  const headerRef = useRef<IContactModalHeaderRef | null>(null);
+  const headerRef = useRef<IImageAndNameRef | null>(null);
 
   const onValuesChange = useMemo(
     () => (changedValues: Partial<Http.ContactPayload>, values: Http.ContactPayload) => {
@@ -43,7 +44,7 @@ const EditContactModal = (props: EditContactModalProps): JSX.Element => {
       request={api.getContact}
       autoFocusField={1}
       title={(contact: Model.Contact, form: FormInstance<Http.ContactPayload>) => (
-        <ContactModalHeader
+        <ImageAndName
           value={contact.image}
           onChange={(f: UploadedImage | null) => setImage(f)}
           onError={(error: Error | string) => form.notify(typeof error === "string" ? error : error.message)}

@@ -53,4 +53,6 @@ interface FormProps<T> extends Omit<RootFormProps, "style" | "id" | "className">
   // whether or not the boolean is true.  If it is a number, it will automatically
   // focus the field at that index.
   readonly autoFocusField?: boolean | number;
+  readonly titleIcon?: IconOrElement;
+  readonly title?: string | JSX.Element;
 }

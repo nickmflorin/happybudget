@@ -6,7 +6,8 @@ import { ui } from "lib";
 import { ContactForm } from "components/forms";
 
 import { CreateModelModal, CreateModelModalProps } from "./generic";
-import ContactModalHeader, { IContactModalHeaderRef } from "./ContactModalHeader";
+import { ImageAndName } from "components/fields";
+import { IImageAndNameRef } from "components/fields/ImageAndName";
 import "./ContactModal.scss";
 
 interface CreateContactModalProps extends CreateModelModalProps<Model.Contact> {
@@ -24,7 +25,7 @@ const CreateContactModal = ({ initialValues, ...props }: CreateContactModalProps
   lastName change it causes the entire component to rerender, and AntD rerenders all form fields
   when the form rerenders, which causes the auto focus to be lost on the first and last name fields.
   */
-  const headerRef = useRef<IContactModalHeaderRef | null>(null);
+  const headerRef = useRef<IImageAndNameRef | null>(null);
 
   useEffect(() => {
     return () => {
@@ -52,7 +53,7 @@ const CreateContactModal = ({ initialValues, ...props }: CreateContactModalProps
       className={"contact-modal"}
       form={form}
       title={
-        <ContactModalHeader
+        <ImageAndName
           value={image}
           ref={headerRef}
           onChange={(f: UploadedImage | null) => setImage(f)}

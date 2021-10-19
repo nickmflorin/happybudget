@@ -16,6 +16,7 @@ import FormItemSection from "./FormItemSection";
 import FormItemComp from "./FormItem";
 import FormLabel from "./FormLabel";
 import FormColumnItem from "./FormColumnItem";
+import FormTitle from "./FormTitle";
 
 interface PrivateFormProps<T = any> extends FormProps<T> {
   children: JSX.Element[] | JSX.Element;
@@ -138,7 +139,7 @@ const withFormItemFirstInputFocused = <
 };
 
 const PrivateForm = <T extends { [key: string]: any } = any>(
-  { loading, children, autoFocusField, ...props }: PrivateFormProps<T>,
+  { loading, children, autoFocusField, title, titleIcon, ...props }: PrivateFormProps<T>,
   ref: any
 ): JSX.Element => {
   const firstRender = ui.hooks.useTrackFirstRender();
@@ -216,6 +217,14 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
       ref={ref}
       className={classNames(props.className, "form")}
     >
+      {!isNil(title) &&
+        (typeof title === "string" && !isNil(titleIcon) ? (
+          <div className={"form-header"}>
+            <FormTitle icon={titleIcon} title={title} />
+          </div>
+        ) : (
+          <div className={"form-header"}>{title}</div>
+        ))}
       <RenderWithSpinner loading={!isNil(props.form.loading) ? props.form.loading : loading}>
         {map(
           filter(childrenArray, (child: JSX.Element) => child.type !== Footer),
