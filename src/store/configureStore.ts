@@ -27,8 +27,6 @@ const configureGenericStore = <S extends Application.Store>(
   staticReducers: Redux.ReducersMapObject<S>,
   rootSaga: Saga<any[]>
 ): Redux.Store<S> => {
-  const sentryReduxEnhancer = Sentry.createReduxEnhancer();
-
   // Create the redux-saga middleware that allows the sagas to run as side-effects
   // in the application.
   const sagaMiddleware = createSagaMiddleware();
@@ -41,14 +39,15 @@ const configureGenericStore = <S extends Application.Store>(
   const reducerManager = createReducerManager<S>(staticReducers, initialState);
 
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+  let enhancers = composeEnhancers(applyMiddleware(...baseMiddleware, routerMiddleware(history)));
+  if (process.env.NODE_ENV === "production") {
+    const sentryReduxEnhancer = Sentry.createReduxEnhancer();
+    enhancers = composeEnhancers(applyMiddleware(...baseMiddleware, routerMiddleware(history)), sentryReduxEnhancer);
+  }
 
   const store: Redux.Store<S> = {
     reducerManager,
-    ...createStore<S, Redux.Action, any, any>(
-      reducerManager.reduce,
-      initialState,
-      composeEnhancers(applyMiddleware(...baseMiddleware, routerMiddleware(history)), sentryReduxEnhancer)
-    )
+    ...createStore<S, Redux.Action, any, any>(reducerManager.reduce, initialState, enhancers)
   };
 
   // Start the application saga.

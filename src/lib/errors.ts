@@ -18,7 +18,7 @@ export const silentFail = (params: SilentFailProps) => {
   };
 
   const dispatch = (error: Error | string | object) => {
-    if (dispatchToSentry === true) {
+    if (dispatchToSentry === true && process.env.NODE_ENV === "production") {
       error instanceof Error ? Sentry.captureException(error) : Sentry.captureMessage(errorToString(error));
     }
   };
