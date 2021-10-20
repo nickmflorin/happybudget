@@ -89,18 +89,15 @@ const menuStateReducer = <M extends MenuItemModel>(
 
 const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNullRef<IMenuRef<M>> }): JSX.Element => {
   const ref = useRef<HTMLDivElement>(null);
-  // const innerRef = useRef<HTMLUListElement>(null);
   const searchRef = useRef<AntDInput>(null);
   const [menuState, dispatchMenuState] = useReducer(menuStateReducer, initialMenuState);
-
   const [focused, setFocused] = useState(false);
-  // const [innerFocused, setInnerFocused] = useState(false);
 
   const firstRender = ui.hooks.useTrackFirstRender();
   const menu = ui.hooks.useMenuIfNotDefined<M>(props.menu);
   const menuId = useMemo(() => (!isNil(props.id) ? props.id : uniqueId("menu-")), [props.id]);
 
-  const [_selected, setSelected] = useState<MenuItemId[]>(
+  const [_selected, setSelected] = useState<ID[]>(
     /* eslint-disable indent */
     isNil(props.defaultSelected)
       ? []
@@ -296,7 +293,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
         }
       }
     }
-  }, [noData, noSearchResults, search, props.extra, props.getFirstSearchResult]);
+  }, [noData, noSearchResults, focused, search, selected, props.extra, props.getFirstSearchResult]);
 
   useEffect(() => {
     const scrollIndexIntoView = (index: number) => {
@@ -372,7 +369,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
 
   const stateForModel = useMemo(
     () =>
-      (sel: MenuItemId[], m: M): IMenuItemState<M> => ({
+      (sel: ID[], m: M): IMenuItemState<M> => ({
         selected: includes(sel, getModelIdentifier(m)),
         model: m
       }),
@@ -381,10 +378,10 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
 
   const stateFromSelected = useMemo(
     () =>
-      (sel: MenuItemId[]): IMenuItemState<M>[] => {
+      (sel: ID[]): IMenuItemState<M>[] => {
         return map(
           filter(
-            map(sel, (id: MenuItemId) => find(props.models, { id } as any)),
+            map(sel, (id: ID) => find(props.models, { id } as any)),
             (item: M | undefined) => !isNil(item)
           ) as M[],
           (item: M) => stateForModel(sel, item)
@@ -407,10 +404,10 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
         closeParentDropdown: props.closeParentDropdown
       });
     } else {
-      let newSelected: MenuItemId[];
+      let newSelected: ID[];
       let wasSelected: boolean;
       if (includes(selected, getModelIdentifier(m))) {
-        newSelected = filter(selected, (id: MenuItemId) => id !== getModelIdentifier(m));
+        newSelected = filter(selected, (id: ID) => id !== getModelIdentifier(m));
         wasSelected = false;
       } else {
         newSelected = [...selected, getModelIdentifier(m)];
@@ -520,18 +517,11 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
       </ShowHide>
       <div className={"ul-wrapper"} id={menuId}>
         <RenderWithSpinner loading={props.loading} size={22}>
-          <ul
-          // ref={innerRef}
-          // onFocus={(e: React.FocusEvent<HTMLUListElement>) => setInnerFocused(true)}
-          // onBlur={(e: React.FocusEvent<HTMLUListElement>) => setInnerFocused(false)}
-          >
+          <ul>
             <React.Fragment>
               <MenuItems<M>
                 models={map(topLevelModelItems, (item: GenericModelItem<M>) => item.model)}
                 menuId={!isNil(props.id) ? props.id : menuId}
-                indexMap={indexMap}
-                // focusedIndex={isMenuFocusedState(internalState) ? internalState.index : null}
-                focusedIndex={menuState.focusedIndex}
                 checkbox={props.checkbox}
                 level={0}
                 selected={selected}
@@ -542,6 +532,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
                 onClick={(event: MenuItemClickEvent<M>) => onMenuItemClick(event.model, event.event)}
                 renderContent={props.renderItemContent}
                 closeParentDropdown={props.closeParentDropdown}
+                isFocused={(m: M) => menuState.focusedIndex === indexMap[getModelIdentifier(m)]}
                 getLabel={props.getLabel}
               />
               {map(availableExtraItems, (item: GenericExtraItem, index: number) => {

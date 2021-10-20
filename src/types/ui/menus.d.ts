@@ -1,25 +1,24 @@
-type MenuItemId = string | number;
 type MenuMode = "single" | "multiple";
 
 type IMenuItemState<M extends MenuItemModel> = {
   readonly model: M;
   readonly selected: boolean;
-}
+};
 
 type MenuItemClickEvent<M extends MenuItemModel> = {
   readonly model: M;
   readonly event: Table.CellDoneEditingEvent;
   readonly closeParentDropdown: (() => void) | undefined;
-}
+};
 
 type MenuChangeEvent<M extends MenuItemModel> = MenuItemClickEvent<M> & {
   readonly selected: boolean;
   readonly state: IMenuItemState<M>[];
-}
+};
 
 type MenuButtonClickEvent<M extends MenuItemModel> = {
   readonly state: IMenuItemState<M>[];
-}
+};
 
 type MenuItemModel = Model.Model & {
   readonly label?: string | number | null;
@@ -28,10 +27,10 @@ type MenuItemModel = Model.Model & {
   readonly url?: string;
   readonly visible?: boolean;
   readonly disabled?: boolean;
-  readonly onClick?: (params: MenuItemClickEvent<this>) => void;
   readonly keepDropdownOpenOnClick?: boolean;
-  readonly render?: () => ReactNode;
-}
+  readonly onClick?: (params: MenuItemClickEvent<MenuItemModel>) => void;
+  readonly render?: () => import("react").ReactNode;
+};
 
 type ExtraMenuItemModel = MenuItemModel & {
   readonly showOnNoSearchResults?: boolean;
@@ -56,7 +55,8 @@ interface IMenuItem<M extends MenuItemModel> extends StandardComponentProps, ICo
   readonly checkbox?: boolean;
   readonly levelIndent?: number;
   readonly bordersForLevels?: boolean;
-  readonly renderContent: (model: M, context: { level: number }) => JSX.Element;
+  readonly getLabel?: (m: M) => string;
+  readonly renderContent?: (model: M, context: { level: number }) => JSX.Element;
 }
 
 type IExtraMenuItem = Omit<StandardComponentProps, "id"> & ICommonMenuItem<ExtraMenuItemModel>;
@@ -64,9 +64,9 @@ type IExtraMenuItem = Omit<StandardComponentProps, "id"> & ICommonMenuItem<Extra
 type IMenu<M extends MenuItemModel> = StandardComponentProps & {
   readonly models: M[];
   readonly checkbox?: boolean;
-  readonly selected?: MenuItemId[] | null | undefined | MenuItemId;
+  readonly selected?: ID[] | null | undefined | ID;
   readonly mode?: MenuMode;
-  readonly defaultSelected?: MenuItemId[] | MenuItemId;
+  readonly defaultSelected?: ID[] | ID;
   readonly itemProps?: StandardComponentProps;
   readonly levelIndent?: number;
   readonly loading?: boolean;
@@ -76,7 +76,6 @@ type IMenu<M extends MenuItemModel> = StandardComponentProps & {
   readonly focusSearchOnCharPress?: boolean;
   readonly searchPlaceholder?: string;
   readonly autoFocusMenu?: boolean;
-  readonly unfocusMenuOnSearchFocus?: boolean;
   readonly buttons?: IMenuButton<M>[];
   readonly defaultFocusFirstItem?: boolean;
   readonly defaultFocusOnlyItem?: boolean;
@@ -96,13 +95,13 @@ type IMenu<M extends MenuItemModel> = StandardComponentProps & {
   readonly closeParentDropdown?: () => void;
 };
 
-interface IMenuItems<M extends MenuItemModel> extends Omit<IMenuItem, "selected" | "focused"> {
-  readonly selected?: MenuItemId[];
-  readonly focusedIndex: number | null;
+interface IMenuItems<M extends MenuItemModel> extends Omit<IMenuItem<M>, "selected" | "focused" | "model"> {
+  readonly models: M[];
+  readonly selected?: ID[];
   readonly checkbox?: boolean;
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  readonly indexMap: {[key in MenuItemId]: number};
   readonly itemProps?: Omit<StandardComponentProps, "id">;
+  readonly getLabel?: (m: M) => string;
+  readonly isFocused: (m: M) => boolean;
   readonly onClick?: (params: MenuItemClickEvent<M>) => void;
   readonly closeParentDropdown?: () => void;
 }
@@ -116,7 +115,7 @@ type IMenuRef<M extends MenuItemModel> = {
   readonly performActionAtFocusedIndex: (e: KeyboardEvent) => void;
   readonly focus: (value: boolean) => void;
   readonly focusSearch: (value: boolean, search?: string) => void;
-}
+};
 
 interface IMenuButton<M extends MenuItemModel> {
   readonly label: string;

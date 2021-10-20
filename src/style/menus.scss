@@ -55,7 +55,7 @@
   }
 
   &.selected {
-    background-color: #fbfbfb !important;
+    background-color: #f1f1f1 !important;
     span.text-container {
       color: $text-primary !important;
     }
@@ -63,7 +63,7 @@
   &:focus:not(.selected),
   &.focused:not(.selected),
   &:hover:not(.selected) {
-    background-color: #fbfbfb !important;
+    background-color: #f1f1f1 !important;
     span.text-container {
       color: $text-primary !important;
     }
@@ -135,15 +135,6 @@
 
       &:first-child {
         border-top: none !important;
-      }
-
-      &:hover,
-      &.focus,
-      &.focused {
-        background-color: rgb(33 150 243 / 45%) !important;
-      }
-      &.selected {
-        background-color: rgb(33 150 243 / 65%) !important;
       }
     }
   }

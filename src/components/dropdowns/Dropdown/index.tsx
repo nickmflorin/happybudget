@@ -24,8 +24,8 @@ export interface DropdownMenuItemsProps extends BaseDropdownProps {
   readonly menuMode?: "single" | "multiple";
   readonly menuButtons?: IMenuButton<MenuItemModel>[];
   readonly menuCheckbox?: boolean;
-  readonly menuDefaultSelected?: MenuItemId[];
-  readonly menuSelected?: MenuItemId[];
+  readonly menuDefaultSelected?: ID[];
+  readonly menuSelected?: ID[];
   readonly includeSearch?: boolean;
   readonly searchIndices?: SearchIndicies;
   readonly clientSearching?: boolean;

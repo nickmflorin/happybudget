@@ -75,9 +75,7 @@ export const ExtraMenuItem = (props: IExtraMenuItem): JSX.Element => {
   );
 };
 
-const PrivateMenuItem = <M extends MenuItemModel>(
-  props: IMenuItem<M> & { readonly label?: string; readonly getLabel?: (m: M) => string }
-): JSX.Element => {
+const PrivateMenuItem = <M extends MenuItemModel>(props: IMenuItem<M> & { readonly label?: string }): JSX.Element => {
   const m = useMemo(() => {
     if (!isNil(props.label)) {
       return { ...props.model, label: props.label };
@@ -96,7 +94,6 @@ const PrivateMenuItem = <M extends MenuItemModel>(
     <CommonMenuItem
       {...props}
       isExtra={false}
-      className={classNames({ focused: props.focused }, props.className)}
       style={{
         ...props.style,
         ...(!isNil(props.levelIndent) && !isNil(props.level)
@@ -152,7 +149,6 @@ const PrivateRecursiveMenuItem = <M extends MenuItemModel>(
         !isNil(props.recursion) && (
           <MenuItems<M>
             {...props.recursion}
-            label={props.label}
             getLabel={props.getLabel}
             models={props.model.children}
             level={props.level + 1}
