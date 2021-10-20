@@ -33,6 +33,12 @@ namespace Http {
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  interface ChangePasswordPayload {
+    readonly password: string;
+    readonly new_password: string;
+  }
+
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface UserPayload {
     readonly first_name: string;
     readonly last_name: string;
