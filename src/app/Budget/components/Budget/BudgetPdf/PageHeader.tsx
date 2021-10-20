@@ -74,6 +74,8 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
           {!isNil(subHeaderLeft) && (
             <View className={"budget-page-sub-header-left"}>
               {subHeaderItemHasImage(subHeaderLeft) && (
+                // We need to include Cache-Control headers in the passed in src object because
+                // there is a bug with React PDF as it relates to AWS.
                 <Image
                   className={"budget-page-sub-header-image"}
                   src={{ uri: subHeaderLeft.image, method: "GET", body: "", headers: { "Cache-Control": "no-cache" } }}
@@ -87,6 +89,8 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
           {!isNil(subHeaderRight) && (
             <View className={"budget-page-sub-header-right"}>
               {subHeaderItemHasImage(subHeaderRight) && (
+                // We need to include Cache-Control headers in the passed in src object because
+                // there is a bug with React PDF as it relates to AWS.
                 <Image
                   className={"budget-page-sub-header-image"}
                   src={{ uri: subHeaderRight.image, method: "GET", body: "", headers: { "Cache-Control": "no-cache" } }}
