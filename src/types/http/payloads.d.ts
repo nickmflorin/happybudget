@@ -38,6 +38,10 @@ namespace Http {
     readonly last_name: string;
     readonly profile_image?: string | ArrayBuffer | null;
     readonly timezone?: string;
+    readonly company?: string | null;
+    readonly position?: string | null;
+    readonly address?: string | null;
+    readonly phone_number?: number | null;
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */

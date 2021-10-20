@@ -125,6 +125,10 @@ namespace Model {
     readonly is_staff: boolean;
     readonly is_admin: boolean;
     readonly is_superuser: boolean;
+    readonly company: string | null;
+    readonly position: string | null;
+    readonly address: string | null;
+    readonly phone_number: number | null;
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
