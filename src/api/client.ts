@@ -97,6 +97,7 @@ const throwClientError = (error: AxiosError<Http.ErrorResponse>) => {
           The response body from the backend does not conform to a standard convention for indicating
           a client error - the specific type of error cannot be determined.
       `);
+        console.log(error.response);
         throw new ClientError({
           response,
           errors: [{ message: "Unknown client error.", error_type: "unknown", code: "unknown" }],

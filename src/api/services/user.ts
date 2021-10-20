@@ -18,6 +18,11 @@ export const updateActiveUser = async (
   return client.patch<Model.User>(url, payload, options);
 };
 
+export const changeUserPassword = async (password: string, options?: Http.RequestOptions): Promise<Model.User> => {
+  const url = services.URL.v1("users", "change-password");
+  return client.patch<Model.User>(url, { password }, options);
+};
+
 export const tempUploadImage = async (
   data: FormData,
   options?: Http.RequestOptions
