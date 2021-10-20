@@ -78,7 +78,12 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
                 // there is a bug with React PDF as it relates to AWS.
                 <Image
                   className={"budget-page-sub-header-image"}
-                  src={{ uri: subHeaderLeft.image, method: "GET", body: "", headers: { "Cache-Control": "no-cache" } }}
+                  src={{
+                    uri: subHeaderLeft.image,
+                    method: "GET",
+                    body: "",
+                    headers: { "Cache-Control": "no-cache", "Access-Control-Allow-Origin": "*" }
+                  }}
                 />
               )}
               {subHeaderItemHasInfo(subHeaderLeft) && (
@@ -93,7 +98,12 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
                 // there is a bug with React PDF as it relates to AWS.
                 <Image
                   className={"budget-page-sub-header-image"}
-                  src={{ uri: subHeaderRight.image, method: "GET", body: "", headers: { "Cache-Control": "no-cache" } }}
+                  src={{
+                    uri: subHeaderRight.image,
+                    method: "GET",
+                    body: "",
+                    headers: { "Cache-Control": "no-cache", "Access-Control-Allow-Origin": "*" }
+                  }}
                 />
               )}
               {subHeaderItemHasInfo(subHeaderRight) && (
