@@ -74,6 +74,9 @@ export const TokenNotification = (props: TokenNotificationProps): JSX.Element =>
 
 interface UnverifiedEmailNotificationProps {
   readonly userId: number | undefined;
+  readonly message?: string;
+  readonly title?: string;
+  readonly type?: AlertType;
   readonly onError?: (e: Error) => void;
   readonly onSuccess?: () => void;
 }
@@ -81,7 +84,9 @@ interface UnverifiedEmailNotificationProps {
 export const UnverifiedEmailNotification = (props: UnverifiedEmailNotificationProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const message = useMemo(() => {
-    if (!isNil(props.userId)) {
+    if (!isNil(props.message)) {
+      return props.message;
+    } else if (!isNil(props.userId)) {
       return "Your email address needs to be verified in order to login.";
     }
     return "Your email address needs to be verified in order to login. Please contact support.";
@@ -106,7 +111,11 @@ export const UnverifiedEmailNotification = (props: UnverifiedEmailNotificationPr
   }, [props.userId, loading]);
 
   return (
-    <Notification type={"warning"} title={"Your email address is not verified."} includeLink={notificationLink}>
+    <Notification
+      type={props.type || "warning"}
+      title={props.title || "Your email address is not verified."}
+      includeLink={notificationLink}
+    >
       {message}
     </Notification>
   );

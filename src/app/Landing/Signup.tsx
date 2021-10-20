@@ -2,10 +2,10 @@ import { useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import * as api from "api";
-import { ui } from "lib";
+import { ui, errors } from "lib";
 
 import SignupForm, { ISignupFormValues } from "components/forms/SignupForm";
-
+import { UnverifiedEmailNotification } from "./Notifications";
 import LandingFormContainer from "./LandingFormContainer";
 
 const Signup = (): JSX.Element => {
@@ -41,19 +41,33 @@ const Signup = (): JSX.Element => {
         }}
         onGoogleError={(error: any) => {
           // TODO: Try to do a better job parsing the error.
-          /* eslint-disable no-console */
-          console.error(error);
+          errors.silentFail(error);
           form.notify("There was an error authenticating with Google.");
         }}
         onSubmit={(values: ISignupFormValues) => {
           api
             .register(values)
             .then((user: Model.User) => {
-              if (user.is_first_time === true) {
-                history.push("/discover");
-              } else {
-                history.push("/");
-              }
+              form.notify(
+                <UnverifiedEmailNotification
+                  userId={user.id}
+                  title={"Verify Email"}
+                  type={"success"}
+                  message={`Successfully registered.  An email was sent to ${user.email} to verify the email address on the account.  Didn't receive it?`}
+                  onSuccess={() =>
+                    form.notify(
+                      {
+                        type: "success",
+                        title: "Confirmation email successfully sent.",
+                        message: "Please check your inbox.",
+                        closable: true
+                      },
+                      { append: true }
+                    )
+                  }
+                  onError={(err: Error) => form.handleRequestError(err, { closable: true })}
+                />
+              );
             })
             .catch((e: Error) => {
               form.handleRequestError(e);
