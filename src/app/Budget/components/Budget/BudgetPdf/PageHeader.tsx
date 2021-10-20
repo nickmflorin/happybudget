@@ -76,7 +76,7 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
               {subHeaderItemHasImage(subHeaderLeft) && (
                 <Image
                   className={"budget-page-sub-header-image"}
-                  src={{ uri: subHeaderLeft.image, method: "GET", body: "", headers: "" }}
+                  src={{ uri: subHeaderLeft.image, method: "GET", body: "", headers: { "Cache-Control": "no-cache" } }}
                 />
               )}
               {subHeaderItemHasInfo(subHeaderLeft) && (
@@ -89,7 +89,7 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
               {subHeaderItemHasImage(subHeaderRight) && (
                 <Image
                   className={"budget-page-sub-header-image"}
-                  src={{ uri: subHeaderRight.image, method: "GET", body: "", headers: "" }}
+                  src={{ uri: subHeaderRight.image, method: "GET", body: "", headers: { "Cache-Control": "no-cache" } }}
                 />
               )}
               {subHeaderItemHasInfo(subHeaderRight) && (
