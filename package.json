@@ -106,7 +106,6 @@
     "@types/react-pdf": "^5.0.5",
     "@types/react-redux": "^7.1.16",
     "@types/react-router-dom": "^5.1.7",
-    "@types/redux-saga": "^0.10.5",
     "@types/url-join": "^4.0.0",
     "@types/uuid": "^8.3.0",
     "@welldone-software/why-did-you-render": "^6.2.1",
