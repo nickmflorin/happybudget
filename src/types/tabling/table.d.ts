@@ -139,6 +139,8 @@ namespace Table {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type DataRow<D extends RowData> = ModelRow<D> | PlaceholderRow<D>;
   type EditableRow<D extends RowData> = ModelRow<D> | MarkupRow<D>;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type NonPlaceholderBodyRow<D extends RowData> = ModelRow<D> | MarkupRow<D> | GroupRow<D>;
 
   type BodyRow<D extends RowData = RowData> = ModelRow<D> | PlaceholderRow<D> | GroupRow<D> | MarkupRow<D>;
   type Row<D extends RowData = RowData> = BodyRow<D> | FooterRow;

@@ -43,9 +43,9 @@ const AuthenticatedBudgetTable = <
         }
         return {};
       }}
-      onEditRow={(r: Table.EditableRow<R>) =>
-        (tabling.typeguards.isMarkupRow(r) && onEditMarkup?.(r)) ||
-        (tabling.typeguards.isGroupRow(r) && onEditGroup?.(r))
+      onEditRow={(g: Table.NonPlaceholderBodyRow<R>) =>
+        (tabling.typeguards.isMarkupRow(g) && onEditMarkup?.(g)) ||
+        (tabling.typeguards.isGroupRow(g) && onEditGroup?.(g))
       }
       expandActionBehavior={(r: Table.BodyRow<R>) =>
         tabling.typeguards.isMarkupRow(r) || tabling.typeguards.isGroupRow(r) ? "edit" : "expand"

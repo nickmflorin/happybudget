@@ -71,6 +71,11 @@ export const isEditableRow = <R extends Table.RowData = object>(row: Table.Row<R
   (isModelRow(row) && row.gridId === "data") || isMarkupRow(row);
 
 /* eslint-disable indent */
+export const isNonPlaceholderBodyRow = <R extends Table.RowData = object>(
+  row: Table.Row<R>
+): row is Table.NonPlaceholderBodyRow<R> => isEditableRow(row) || isGroupRow(row);
+
+/* eslint-disable indent */
 export const isAuthenticatedActionMap = <
   R extends Table.RowData,
   M extends Model.TypedHttpModel = Model.TypedHttpModel

@@ -81,7 +81,7 @@ export type TableConfigurationProps<R extends Table.RowData, M extends Model.Htt
   readonly columns: Table.Column<R, M>[];
   readonly expandActionBehavior?: Table.ExpandActionBehavior | ((r: Table.BodyRow<R>) => Table.ExpandActionBehavior);
   readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
-  readonly onEditRow?: (g: Table.EditableRow<R>) => void;
+  readonly onEditRow?: (g: Table.NonPlaceholderBodyRow<R>) => void;
   readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
   readonly isCellSelectable?: (params: Table.CellCallbackParams<R, M>) => boolean;
@@ -200,7 +200,8 @@ const configureTable = <
               cellRendererParams: {
                 ...props.expandColumn?.cellRendererParams,
                 expandActionBehavior: props.expandActionBehavior,
-                onEditRow: (row: Table.BodyRow<R>) => tabling.typeguards.isEditableRow(row) && props.onEditRow?.(row),
+                onEditRow: (row: Table.BodyRow<R>) =>
+                  tabling.typeguards.isNonPlaceholderBodyRow(row) && props.onEditRow?.(row),
                 onExpand: (row: Table.ModelRow<R>) => tabling.typeguards.isDataRow(row) && props.onRowExpand?.(row),
                 rowCanExpand: props.rowCanExpand,
                 tooltip: props.expandCellTooltip
