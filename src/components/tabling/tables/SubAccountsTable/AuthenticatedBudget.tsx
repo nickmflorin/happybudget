@@ -80,10 +80,6 @@ const AuthenticatedBudgetSubAccountsTable = (
   const columns = useMemo(() => {
     return tabling.columns.normalizeColumns(Columns, {
       identifier: (col: Table.Column<R, M>) => ({
-        cellRendererParams: {
-          ...col.cellRendererParams,
-          onGroupEdit: props.onEditGroup
-        },
         headerName: props.identifierFieldHeader
       }),
       description: { headerName: `${props.categoryName} Description` },
@@ -122,7 +118,6 @@ const AuthenticatedBudgetSubAccountsTable = (
       }
     });
   }, [
-    props.onEditGroup,
     props.onEditContact,
     props.onNewContact,
     props.onAddFringes,

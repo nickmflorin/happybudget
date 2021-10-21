@@ -35,16 +35,12 @@ const AuthenticatedTemplateSubAccountsTable = (
     () =>
       tabling.columns.normalizeColumns(Columns, {
         identifier: (col: Table.Column<R, M>) => ({
-          cellRendererParams: {
-            ...col.cellRendererParams,
-            onGroupEdit: props.onEditGroup
-          },
           headerName: props.identifierFieldHeader
         }),
         description: { headerName: `${props.categoryName} Description` },
         unit: { processCellFromClipboard: processUnitCellFromClipboard }
       }),
-    [props.onEditGroup, props.identifierFieldHeader, hooks.useDeepEqualMemo(props.subAccountUnits)]
+    [props.identifierFieldHeader, hooks.useDeepEqualMemo(props.subAccountUnits)]
   );
 
   return (

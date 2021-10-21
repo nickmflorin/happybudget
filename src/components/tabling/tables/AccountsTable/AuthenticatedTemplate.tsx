@@ -67,14 +67,7 @@ const AuthenticatedTemplateAccountsTable = (props: AuthenticatedTemplateProps): 
           !isNil(props.budget) ? `${props.budget.type}_${props.budget.name}_accounts` : ""
         )
       ]}
-      columns={tabling.columns.normalizeColumns<R, M>(Columns, {
-        identifier: {
-          cellRendererParams: (c: Table.Column<R, M>) => ({
-            ...c.cellRendererParams,
-            onGroupEdit: props.onEditGroup
-          })
-        }
-      })}
+      columns={Columns}
     />
   );
 };
