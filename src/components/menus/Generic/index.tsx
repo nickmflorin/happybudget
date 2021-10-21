@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef, useImperativeHandle, useReducer } from "react";
 import classNames from "classnames";
-import { map, isNil, includes, filter, find, uniqueId, forEach } from "lodash";
+import { map, isNil, includes, filter, find, uniqueId, forEach, findIndex } from "lodash";
 
 import { Input as AntDInput } from "antd";
 
@@ -90,10 +90,13 @@ const menuStateReducer = <M extends MenuItemModel>(
 const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNullRef<IMenuRef<M>> }): JSX.Element => {
   const ref = useRef<HTMLDivElement>(null);
   const searchRef = useRef<AntDInput>(null);
-  const [menuState, dispatchMenuState] = useReducer(menuStateReducer, initialMenuState);
+  const [menuState, dispatchMenuState]: [MenuState<M>, (action: MenuStateAction<M>) => void] = useReducer(
+    menuStateReducer,
+    initialMenuState
+  ) as [MenuState<M>, (action: MenuStateAction<M>) => void];
+
   const [focused, setFocused] = useState(false);
 
-  const firstRender = ui.hooks.useTrackFirstRender();
   const menu = ui.hooks.useMenuIfNotDefined<M>(props.menu);
   const menuId = useMemo(() => (!isNil(props.id) ? props.id : uniqueId("menu-")), [props.id]);
 
@@ -278,10 +281,13 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
           // there is a prop that returns the first model that we should select
           // in the presence of a search.
           if (!isNil(props.getFirstSearchResult)) {
-            const firstModel = props.getFirstSearchResult(models);
-            if (!isNil(firstModel)) {
-              const index = menuState.availableItems.indexOf({ model: firstModel });
-              if (!isNil(index)) {
+            const firstId = props.getFirstSearchResult(models);
+            if (!isNil(firstId)) {
+              const index = findIndex(
+                menuState.availableItems,
+                (mi: GenericItem<M>) => isModelItem(mi) && getModelIdentifier(mi.model) === firstId
+              );
+              if (index !== -1) {
                 setIndexFromSearch = true;
                 dispatchMenuState({ type: "SET", payload: index });
               }
@@ -293,7 +299,16 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
         }
       }
     }
-  }, [noData, noSearchResults, focused, search, selected, props.extra, props.getFirstSearchResult]);
+  }, [
+    noData,
+    noSearchResults,
+    focused,
+    search,
+    selected,
+    props.extra,
+    menuState.availableItems,
+    props.getFirstSearchResult
+  ]);
 
   useEffect(() => {
     const scrollIndexIntoView = (index: number) => {
@@ -318,24 +333,6 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
       scrollIndexIntoView(menuState.focusedIndex);
     }
   }, [menuState.focusedIndex, menuId]);
-
-  useEffect(() => {
-    if (props.defaultFocusFirstItem === true && firstRender === true && models.length !== 0 && selected.length === 0) {
-      dispatchMenuState({ type: "SET", payload: 0 });
-    }
-  }, [props.defaultFocusFirstItem, hooks.useDeepEqualMemo(models)]);
-
-  // If there is only one model that is visible, either from a search or from only
-  // 1 model being present, we may want it to be active/selected by default.
-  useEffect(() => {
-    if (
-      ((models.length === 1 && props.defaultFocusOnlyItem === true) ||
-        (props.defaultFocusOnlyItemOnSearch && !isNil(search) && search !== "")) &&
-      firstRender === false
-    ) {
-      dispatchMenuState({ type: "SET", payload: 0 });
-    }
-  }, [hooks.useDeepEqualMemo(models), search, props.defaultFocusOnlyItemOnSearch, props.defaultFocusOnlyItem]);
 
   useEffect(() => {
     !isNil(props.onFocusCallback) && props.onFocusCallback(focused);

@@ -32,12 +32,9 @@ const OwnerTreeEditor = ({ setSearch, ...props }: OwnerTreeEditorProps, ref: For
       loading={loading}
       onSearch={(v: string) => setSearch(v)}
       search={search}
-      selected={!isNil(editor.value) ? editor.value.id : null}
+      selected={!isNil(editor.value) ? `${editor.value.type}-${editor.value.id}` : null}
       nodes={tree}
-      defaultFocusOnlyItem={true}
-      defaultFocusFirstItem={true}
       includeSearch={true}
-      autoFocusMenu={true}
       onChange={(m: Model.SimpleSubAccount | Model.SimpleMarkup, e: Table.CellDoneEditingEvent) => {
         editor.onChange(m, e);
       }}

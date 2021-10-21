@@ -56,9 +56,6 @@ const FringesEditor = (props: FringesEditorProps, ref: ForwardedRef<any>) => {
       }}
       searchIndices={["data.name"]}
       focusSearchOnCharPress={true}
-      defaultFocusOnlyItem={true}
-      defaultFocusFirstItem={true}
-      autoFocusMenu={true}
       extra={[
         {
           id: "add-fringes",

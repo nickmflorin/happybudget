@@ -29,13 +29,10 @@ const GenericModelMenuEditor = <
   return (
     <ModelTagsMenu<C>
       {...props}
-      defaultFocusOnlyItem={true}
       menu={props.editor.menu}
       includeSearch={true}
-      autoFocusMenu={true}
       clientSearching={true}
       focusSearchOnCharPress={true}
-      defaultFocusFirstItem={false}
       className={classNames("table-menu", props.className)}
     />
   );
