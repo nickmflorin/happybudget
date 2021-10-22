@@ -4,10 +4,10 @@ import { isNil } from "lodash";
 import * as api from "api";
 
 import { ContactForm } from "components/forms";
-
-import { EditModelModal, EditModelModalProps } from "./generic";
 import { ImageAndName } from "components/fields";
 import { IImageAndNameRef } from "components/fields/ImageAndName";
+
+import { EditModelModal, EditModelModalProps } from "./generic";
 import "./ContactModal.scss";
 
 interface EditContactModalProps extends EditModelModalProps<Model.Contact> {}

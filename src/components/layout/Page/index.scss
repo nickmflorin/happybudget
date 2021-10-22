@@ -5,7 +5,7 @@
   height: 100%;
 
   .page-header {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     display: flex;
     flex-direction: column;
 
@@ -13,7 +13,7 @@
       flex-grow: 100;
 
       &.with-subtitle {
-        margin-bottom: 10px;
+        margin-bottom: 20px;
       }
 
       .title-text-wrapper {
@@ -35,7 +35,7 @@
 
     .page-header-subtitle {
       display: flex;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
     }
   }
 

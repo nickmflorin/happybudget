@@ -47,12 +47,11 @@ const UserProfileForm: React.FC<UserProfileFormProps> = ({ originalImage, onImag
       >
         <TimezoneSelect />
       </Form.Item>
-
-      <Form.Item>
+      <Form.Footer>
         <Button className={"btn btn--primary"} htmlType={"submit"} style={{ width: "100%" }}>
           {"Save"}
         </Button>
-      </Form.Item>
+      </Form.Footer>
     </Form.Form>
   );
 };
