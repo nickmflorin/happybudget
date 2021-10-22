@@ -153,7 +153,9 @@ const SubAccountsTable = ({
           }
         }}
         onGroupRows={(rows: Table.ModelRow<R>[]) => onCreateGroup(map(rows, (row: Table.ModelRow<R>) => row.id))}
-        onMarkupRows={(rows: Table.ModelRow<R>[]) => onCreateMarkup(map(rows, (row: Table.ModelRow<R>) => row.id))}
+        onMarkupRows={(rows?: Table.ModelRow<R>[]) =>
+          rows === undefined ? onCreateMarkup() : onCreateMarkup(map(rows, (row: Table.ModelRow<R>) => row.id))
+        }
         onEditGroup={(group: Table.GroupRow<R>) => onEditGroup(group)}
         onEditMarkup={(row: Table.MarkupRow<R>) => onEditMarkup(tabling.rows.markupId(row.id))}
       />

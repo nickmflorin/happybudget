@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import { isNil } from "lodash";
 
 import * as api from "api";
-import { ui } from "lib";
+import { ui, model } from "lib";
 import { MarkupForm } from "components/forms";
 
 import { CreateModelModal, CreateModelModalProps } from "./generic";
@@ -11,7 +12,7 @@ interface CreateMarkupModalProps<
   R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
 > extends CreateModelModalProps<Model.Markup, R> {
   readonly id: number;
-  readonly children: number[];
+  readonly children?: number[];
   readonly parentType: Model.ParentType | "template";
 }
 
@@ -41,13 +42,17 @@ const CreateMarkupModal = <
       .getTableChildren<M>(id, parentType, { simple: true }, { cancelToken: cancelToken() })
       .then((response: Http.ListResponse<M>) => {
         setAvailableChildren(response.data);
-        form.setFields([{ name: "children", value: children }]);
+        // Wait until the available children are set in the Form so the select doesn't
+        // render selected children with missing labels.
+        if (!isNil(children)) {
+          form.setFields([{ name: "children", value: children }]);
+        }
       })
       .catch((e: Error) => {
         form.handleRequestError(e);
       })
       .finally(() => setAvailableChildrenLoading(false));
-  }, [id]);
+  }, [id, children]);
 
   return (
     <CreateModelModal<Model.Markup, Http.MarkupPayload, MarkupFormValues, R>
@@ -59,14 +64,21 @@ const CreateMarkupModal = <
         api.createTableMarkup(id, parentType, payload, options)
       }
       interceptPayload={(p: MarkupFormValues) => {
-        let { rate, ...payload } = p;
+        let { rate, children: markupChildren, ...payload } = p;
+        let mutated = { ...payload } as Http.MarkupPayload;
         if (!isNaN(parseFloat(rate))) {
-          return {
-            ...payload,
+          mutated = {
+            ...mutated,
             rate: parseFloat((parseFloat(rate) / 100.0).toFixed(2))
           };
         }
-        return payload;
+        // FLAT Markups do not have any children.
+        if (mutated.unit === model.models.MarkupUnitModels.PERCENT.id) {
+          // The children should not be an empty list as the Form should have already validated
+          // that.
+          mutated = { ...mutated, children: markupChildren };
+        }
+        return mutated;
       }}
     >
       {() => (
@@ -74,6 +86,11 @@ const CreateMarkupModal = <
           form={form}
           availableChildren={availableChildren}
           availableChildrenLoading={availableChildrenLoading}
+          initialValues={
+            children === undefined
+              ? { unit: model.models.MarkupUnitModels.FLAT.id }
+              : { unit: model.models.MarkupUnitModels.PERCENT.id }
+          }
         />
       )}
     </CreateModelModal>

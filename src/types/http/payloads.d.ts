@@ -64,7 +64,7 @@ namespace Http {
   interface MarkupPayload {
     readonly identifier?: string | null;
     readonly description?: string | null;
-    readonly unit?: Model.MarkupUnitId | null;
+    readonly unit: Model.MarkupUnitId;
     readonly rate?: number | null;
     readonly children?: number[];
     readonly groups?: number[];

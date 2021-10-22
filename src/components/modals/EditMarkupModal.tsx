@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 import * as api from "api";
-import { ui } from "lib";
+import { ui, model } from "lib";
 
 import { MarkupForm } from "components/forms";
 import { IMarkupForm } from "components/forms/MarkupForm";
@@ -57,25 +57,35 @@ const EditMarkupModal = <
       request={api.getMarkup}
       update={api.updateMarkup}
       interceptPayload={(p: MarkupFormValues) => {
-        let { rate, ...payload } = p;
+        let { rate, children, ...payload } = p;
+        let mutated = { ...payload } as Http.MarkupPayload;
         if (!isNaN(parseFloat(rate))) {
-          return {
-            ...payload,
+          mutated = {
+            ...mutated,
             rate: parseFloat((parseFloat(rate) / 100.0).toFixed(2))
           };
         }
-        return payload;
+        // FLAT Markups do not have any children.
+        if (mutated.unit === model.models.MarkupUnitModels.PERCENT.id) {
+          // The children should not be an empty list as the Form should have already validated
+          // that.
+          mutated = { ...mutated, children };
+        }
+        return mutated;
       }}
       setFormData={(markup: Model.Markup) => {
         // Because AntD sucks and form.setFields does not trigger onValuesChanged.
         markupRef.current?.setUnitState(markup.unit?.id === undefined ? null : markup.unit?.id);
-        form.setFields([
+        let fields: (FormField<Model.FlatMarkup> | FormField<Model.PercentMarkup>)[] = [
           { name: "identifier", value: markup.identifier },
           { name: "description", value: markup.description },
           { name: "unit", value: markup.unit?.id === undefined ? null : markup.unit?.id },
-          { name: "rate", value: markup.rate },
-          { name: "children", value: markup.children }
-        ]);
+          { name: "rate", value: markup.rate }
+        ];
+        if (model.typeguards.isPercentMarkup(markup)) {
+          fields = [...fields, { name: "children", value: markup.children }];
+        }
+        form.setFields(fields);
       }}
     >
       {(m: Model.Markup | null) => (

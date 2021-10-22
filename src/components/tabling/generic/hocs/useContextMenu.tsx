@@ -21,7 +21,7 @@ export type UseContextMenuParams<R extends Table.RowData, M extends Model.HttpMo
   readonly getMarkupRowContextMenuItems?: (row: Table.MarkupRow<R>, node: Table.RowNode) => Table.MenuItemDef[];
   readonly rowCanDelete?: (row: Table.ModelRow<R> | Table.MarkupRow<R>) => boolean;
   readonly onGroupRows?: (rows: Table.ModelRow<R>[]) => void;
-  readonly onMarkupRows?: (rows: Table.ModelRow<R>[]) => void;
+  readonly onMarkupRows?: (rows?: Table.ModelRow<R>[]) => void;
 };
 
 const evaluateRowStringGetter = <R extends Table.BodyRow>(

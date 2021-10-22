@@ -1,5 +1,13 @@
 export const isMarkup = (m: Model.HttpModel): m is Model.Markup => (m as Model.Markup).type === "markup";
 
+export const isFlatMarkup = (
+  m: Omit<Partial<Model.Markup>, "unit"> & Pick<Model.Markup, "unit">
+): m is Model.FlatMarkup => (m as Model.FlatMarkup).unit.id === 1;
+
+export const isPercentMarkup = (
+  m: Omit<Partial<Model.Markup>, "unit"> & Pick<Model.Markup, "unit">
+): m is Model.PercentMarkup => (m as Model.PercentMarkup).unit.id === 0;
+
 export const isFringe = (m: Model.HttpModel): m is Model.Fringe => (m as Model.Fringe).type === "fringe";
 
 export const isGroup = (m: Model.HttpModel): m is Model.Group => (m as Model.Group).type === "group";

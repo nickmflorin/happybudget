@@ -45,7 +45,7 @@ const MarkupForm = (
         <Input />
       </Form.Item>
 
-      <Form.Item name={"unit"} label={"Type"}>
+      <Form.Item name={"unit"} label={"Type"} rules={[{ required: true, message: "Please select a type." }]}>
         <Select suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />} placeholder={"Select Type"}>
           {model.models.MarkupUnits.map((m: Model.MarkupUnit, index: number) => (
             <Select.Option key={index} value={m.id}>
@@ -54,6 +54,7 @@ const MarkupForm = (
           ))}
         </Select>
       </Form.Item>
+
       <Form.Item
         name={"rate"}
         label={"Amount"}
@@ -98,11 +99,16 @@ const MarkupForm = (
       <Form.Item
         name={"children"}
         label={"Include Accounts"}
+        style={unitState !== model.models.MarkupUnitModels.PERCENT.id ? { display: "none" } : {}}
         rules={[
           { required: false },
           ({ getFieldValue }: { getFieldValue: any }) => ({
             validator(rule: any, value: string) {
-              if (value.length === 0) {
+              // If the unit is FLAT, we do not allow children - but we have to just filter those
+              // out in the payload before the API request as doing that validation here will
+              // prevent the form from submitting in the FLAT state.
+              const unit = getFieldValue("unit");
+              if (unit === model.models.MarkupUnitModels.PERCENT.id && value.length === 0) {
                 return Promise.reject("At least one account must be selected.");
               }
               return Promise.resolve();

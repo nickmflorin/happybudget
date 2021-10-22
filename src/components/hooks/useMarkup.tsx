@@ -15,7 +15,7 @@ interface UseMarkupProps<
   readonly onResponse: (response: RSP) => void;
 }
 
-type UseMarkupReturnType = [JSX.Element, (m: number) => void, (ms: number[]) => void];
+type UseMarkupReturnType = [JSX.Element, (m: number) => void, (ms?: number[]) => void];
 
 /* eslint-disable indent */
 const useMarkup = <
@@ -27,11 +27,11 @@ const useMarkup = <
 >(
   props: UseMarkupProps<R, M, B, RSP>
 ): UseMarkupReturnType => {
-  const [markupAccounts, setMarkupAccounts] = useState<number[] | undefined>(undefined);
+  const [markupAccounts, setMarkupAccounts] = useState<number[] | null | undefined>(null);
   const [markupToEdit, setMarkupToEdit] = useState<number | null>(null);
 
   const createMarkupModal = useMemo((): JSX.Element => {
-    if (!isNil(markupAccounts)) {
+    if (markupAccounts !== null) {
       return (
         <CreateMarkupModal<MM, B, RSP>
           id={props.parentId}
@@ -39,14 +39,14 @@ const useMarkup = <
           children={markupAccounts}
           open={true}
           onSuccess={(response: RSP) => {
-            setMarkupAccounts(undefined);
+            setMarkupAccounts(null);
             props.onResponse(response);
             props.table.applyTableChange({
               type: "markupAdded",
               payload: response.data
             });
           }}
-          onCancel={() => setMarkupAccounts(undefined)}
+          onCancel={() => setMarkupAccounts(null)}
         />
       );
     }

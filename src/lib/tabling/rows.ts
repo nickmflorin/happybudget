@@ -1,4 +1,5 @@
 import { isNil, reduce, filter } from "lodash";
+import { model } from "lib";
 
 import * as util from "../util";
 import * as events from "./events";
@@ -298,10 +299,15 @@ export const createMarkupRowData = <R extends Table.RowData, M extends Model.Htt
 export const updateMarkupRow = <R extends Table.RowData, M extends Model.HttpModel>(
   config: UpdateBodyRowConfig<Table.MarkupRow<R>, R, M, Model.Markup>
 ): Table.MarkupRow<R> => {
+  let modelChildren: number[] | undefined;
+  if (!isNil(config.model) && !isNil(config.model.unit)) {
+    const mdl = config.model as Omit<Partial<Model.Markup>, "unit"> & Pick<Model.Markup, "unit">;
+    modelChildren = model.typeguards.isPercentMarkup(mdl) ? mdl.children : [];
+  }
   return {
     ...config.row,
     data: updateMarkupRowData<R, M>({ ...config, data: config.row.data }),
-    children: config.model?.children || config.row.children,
+    children: modelChildren === undefined ? config.row.children : modelChildren,
     markupData: {
       unit: config.model?.unit === undefined ? config.row.markupData.unit : config.model.unit,
       rate: config.model?.rate === undefined ? config.row.markupData.rate : config.model.rate
@@ -323,7 +329,7 @@ type CreateMarkupRowFromDataConfig<R extends Table.RowData, M extends Model.Type
 > & {
   readonly getRowValue?: (m: M, col: Table.Column<R, M>) => R[keyof R] | undefined;
   readonly children?: number[];
-  readonly unit: Model.MarkupUnit | null;
+  readonly unit: Model.MarkupUnit;
   readonly rate: number | null;
 };
 
@@ -343,7 +349,7 @@ export const createMarkupRow = <R extends Table.RowData, M extends Model.TypedHt
         rowType: "markup",
         data: createMarkupRowData<R, M>(config)
       }),
-      children: config.model.children,
+      children: model.typeguards.isPercentMarkup(config.model) ? config.model.children : [],
       markupData: {
         unit: config.model.unit,
         rate: config.model.rate

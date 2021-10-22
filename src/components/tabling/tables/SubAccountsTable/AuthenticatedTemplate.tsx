@@ -80,15 +80,18 @@ const AuthenticatedTemplateSubAccountsTable = (
             const selectedRows = filter(params.selectedRows, (r: Table.BodyRow<R>) =>
               tabling.typeguards.isModelRow(r)
             ) as Table.ModelRow<R>[];
-            /* eslint-disable indent */
-            const rows: Table.ModelRow<R>[] =
-              selectedRows.length !== 0
-                ? selectedRows
-                : (filter(table.current.getRows(), (r: Table.BodyRow<R>) =>
-                    tabling.typeguards.isModelRow(r)
-                  ) as Table.ModelRow<R>[]);
-            if (rows.length !== 0) {
-              props.onMarkupRows?.(rows);
+            // If rows are explicitly selected for the Markup, we want to include them
+            // as the default children for the Markup in the modal, which will default the
+            // unit in the modal to PERCENT.
+            if (selectedRows.length !== 0) {
+              props.onMarkupRows?.(selectedRows);
+            } else {
+              const rows: Table.ModelRow<R>[] = filter(table.current.getRows(), (r: Table.BodyRow<R>) =>
+                tabling.typeguards.isModelRow(r)
+              ) as Table.ModelRow<R>[];
+              if (rows.length !== 0) {
+                props.onMarkupRows?.();
+              }
             }
           }
         },

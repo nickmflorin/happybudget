@@ -43,6 +43,9 @@ interface FormInstance<T> extends RootFormInstance<T> {
   readonly autoFocusField?: boolean | number;
 }
 
+// The type of iterable passed to AntD's form.setFields([...])
+type FormField<M> = { readonly name: keyof M; readonly value: M[keyof M] };
+
 interface FormProps<T> extends Omit<RootFormProps, "style" | "id" | "className">, StandardComponentProps {
   readonly loading?: boolean;
   readonly form: FormInstance<T>;

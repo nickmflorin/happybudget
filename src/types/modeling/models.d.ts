@@ -55,9 +55,12 @@ namespace Model {
   type ProductionTypeId = 0 | 1 | 2 | 3 | 4 | 5;
   type ProductionType = Choice<ProductionTypeId, ProductionTypeName>;
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type MarkupUnitId = 0 | 1;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type MarkupUnitName = "Percent" | "Flat";
-  type MarkupUnit = Choice<MarkupUnitId, MarkupUnitName>;
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type MarkupUnit = Choice<0, "Percent"> | Choice<1, "Flat">;
 
   type FringeUnitId = 0 | 1;
   type FringeUnitName = "Percent" | "Flat";
@@ -149,11 +152,21 @@ namespace Model {
     readonly description: string | null;
   }
 
-  interface Markup extends TrackedModel, SimpleMarkup {
-    readonly unit: MarkupUnit | null;
+  type UnknownMarkup = TrackedModel & SimpleMarkup & {
     readonly rate: number | null;
-    readonly children: number[];
+    readonly unit: MarkupUnit;
   }
+
+  type FlatMarkup = Omit<UnknownMarkup, "unit"> & {
+    readonly unit: Choice<1, "Flat">;
+  }
+
+  type PercentMarkup = Omit<UnknownMarkup, "unit"> & {
+    readonly children: number[];
+    readonly unit: Choice<0, "Percent">;
+  }
+
+  type Markup = FlatMarkup | PercentMarkup;
 
   interface BaseBudget extends TrackedModel {
     readonly name: string;
