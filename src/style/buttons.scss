@@ -156,6 +156,11 @@
   @include solid_color($white);
 }
 
+@mixin danger() {
+  @include bg_color_set($red, $red-darker, $red-darker);
+  @include solid_color($white);
+}
+
 @mixin default() {
   @include bg_color_set(#ececec, darken(#ececec, 10%), darken(#ececec, 10%));
   @include solid_color($text-secondary);
@@ -327,6 +332,11 @@
   &--primary {
     @extend .btn;
     @include primary();
+  }
+
+  &--danger {
+    @extend .btn;
+    @include danger();
   }
 
   &--icon-only {

@@ -2,6 +2,7 @@ import React, { useImperativeHandle, useState, useMemo } from "react";
 import { forEach, isNil, uniq, map, filter, intersection } from "lodash";
 
 import { tabling, util, hooks } from "lib";
+import { DeleteRowsModal } from "components/modals";
 import { AuthenticatedGrid } from "components/tabling/generic";
 
 import { AuthenticatedGridProps } from "../grids";
@@ -77,6 +78,7 @@ const AuthenticatedTable = <
 ): JSX.Element => {
   const grid = tabling.hooks.useDataGrid();
   const [selectedRows, setSelectedRows] = useState<Table.EditableRow<R>[]>([]);
+  const [deleteRows, setDeleteRows] = useState<Table.EditableRow<R>[] | undefined>(undefined);
 
   /**
    * Note: Ideally, we would be including the selector in the mechanics of the
@@ -207,11 +209,13 @@ const AuthenticatedTable = <
                 const rows = filter((apis?.grid.getSelectedRows() || []) as Table.BodyRow<R>[], (r: Table.BodyRow<R>) =>
                   tabling.typeguards.isEditableRow(r)
                 ) as Table.EditableRow<R>[];
-                if (rows.length !== 0) {
+                if (rows.length === 1) {
                   props.onChangeEvent({
                     payload: { rows: map(rows, (r: Table.EditableRow<R>) => r.id) },
                     type: "rowDelete"
                   });
+                } else if (rows.length !== 0) {
+                  setDeleteRows(rows);
                 }
               }
             }
@@ -361,6 +365,20 @@ const AuthenticatedTable = <
             }
           }}
         />
+        {!isNil(deleteRows) && (
+          <DeleteRowsModal
+            open={true}
+            onCancel={() => setDeleteRows(undefined)}
+            onSuccess={() => {
+              props.onChangeEvent({
+                payload: { rows: map(deleteRows, (r: Table.EditableRow<R>) => r.id) },
+                type: "rowDelete"
+              });
+              setDeleteRows(undefined);
+            }}
+            rows={deleteRows}
+          />
+        )}
       </React.Fragment>
     </TableWrapper>
   );
