@@ -45,7 +45,7 @@ const Profile = (): JSX.Element => {
 
   return (
     <Page className={"profile"} title={"Profile"}>
-      <FormContainer>
+      <FormContainer style={{ maxWidth: 500 }}>
         <UserProfileForm
           form={form}
           onValuesChange={onValuesChange}

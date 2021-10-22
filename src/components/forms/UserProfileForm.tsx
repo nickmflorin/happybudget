@@ -14,14 +14,14 @@ const UserProfileForm: React.FC<FormProps<Http.UserPayload>> = (props): JSX.Elem
         label={"First Name"}
         rules={[{ required: true, message: "Please provide your first name." }]}
       >
-        <Input placeholder={"First Name"} />
+        <Input />
       </Form.Item>
       <Form.Item
         name={"last_name"}
         label={"Last Name"}
         rules={[{ required: true, message: "Please provide your last name." }]}
       >
-        <Input placeholder={"Last Name"} />
+        <Input />
       </Form.Item>
       <Form.Item name={"company"} label={"Company"}>
         <Input />
