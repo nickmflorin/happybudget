@@ -8,13 +8,11 @@ import { redux } from "lib";
 
 import { WrapInApplicationSpinner } from "components";
 import { TemplateCard, EmptyCard } from "components/cards";
-import { EditTemplateModal, CreateTemplateModal } from "components/modals";
-
 import { NoBudgets } from "components/empty";
+import { EditTemplateModal, CreateTemplateModal } from "components/modals";
+import { TemplateEmptyIcon } from "components/svgs";
 
 import { actions } from "../../store";
-
-import { TemplateEmptyIcon } from "components/svgs";
 
 const selectTemplates = (state: Application.Authenticated.Store) => state.dashboard.templates.data;
 const selectLoadingTemplates = (state: Application.Authenticated.Store) => state.dashboard.templates.loading;

@@ -7,14 +7,13 @@ import * as api from "api";
 import { redux } from "lib";
 
 import { BudgetCard } from "components/cards";
+import { NoBudgets } from "components/empty";
 import { Page } from "components/layout";
 import { EditBudgetModal, CreateBudgetModal } from "components/modals";
-import { NoBudgets } from "components/empty";
+import { BudgetEmptyIcon } from "components/svgs";
 
 import { actions } from "../../store";
 import BudgetsSubTitle from "./BudgetsSubTitle";
-
-import { BudgetEmptyIcon } from "components/svgs";
 
 const selectBudgets = (state: Application.Authenticated.Store) => state.dashboard.budgets.data;
 const selectLoadingBudgets = (state: Application.Authenticated.Store) => state.dashboard.budgets.loading;
