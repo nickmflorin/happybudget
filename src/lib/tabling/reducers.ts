@@ -385,6 +385,7 @@ export const createTableChangeEventReducer = <
         )
       };
       applicationEvents.dispatchRowsAddedEvent({ tableId: config.tableId, numRows: newState.data.length });
+      return newState;
     } else if (typeguards.isRowDeleteEvent(e)) {
       return rowDeleteReducer(state, action as Redux.Action<Table.RowDeleteEvent>, config.columns);
     } else if (typeguards.isRowRemoveFromGroupEvent(e)) {
