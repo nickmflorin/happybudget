@@ -69,7 +69,7 @@ const CreateMarkupModal = <
         if (mutated.unit === model.models.MarkupUnitModels.PERCENT.id) {
           // The children should not be an empty list as the Form should have already validated
           // that.
-          mutated = { ...mutated, children };
+          mutated = { ...mutated, children: markupChildren };
           if (!isNaN(parseFloat(rate))) {
             mutated = {
               ...mutated,
