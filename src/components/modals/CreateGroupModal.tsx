@@ -19,8 +19,7 @@ const CreateGroupModal = <M extends Model.SimpleAccount | Model.SimpleSubAccount
   ...props
 }: CreateGroupModalProps): JSX.Element => {
   const form = ui.hooks.useForm<Http.GroupPayload>();
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  const [cancelToken, _] = api.useCancelToken();
+  const [cancelToken] = api.useCancelToken();
 
   const [availableChildren, setAvailableChildren] = useState<M[]>([]);
   const [availableChildrenLoading, setAvailableChildrenLoading] = useState(false);

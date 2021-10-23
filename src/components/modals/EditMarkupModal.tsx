@@ -29,8 +29,7 @@ const EditMarkupModal = <
   ...props
 }: EditMarkupModalProps<B, R>): JSX.Element => {
   const form = ui.hooks.useFormIfNotDefined<MarkupFormValues>({ isInModal: true });
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  const [cancelToken, cancel] = api.useCancelToken();
+  const [cancelToken] = api.useCancelToken();
   const markupRef = useRef<IMarkupForm>(null);
 
   const [availableChildren, setAvailableChildren] = useState<M[]>([]);

@@ -9,7 +9,7 @@ interface UseCancelTokenConfig {
   readonly preserve?: boolean;
 }
 
-export const useCancelToken = (config?: UseCancelTokenConfig): [() => CancelToken, Canceler] => {
+export const useCancelToken = (config?: UseCancelTokenConfig): [() => CancelToken] => {
   const axiosSource = useRef<CancelTokenSource | null>(null);
   const axiosCanceler = useRef<Canceler>(DefaultCanceler);
 
@@ -29,5 +29,5 @@ export const useCancelToken = (config?: UseCancelTokenConfig): [() => CancelToke
     return () => axiosCanceler.current?.();
   }, []);
 
-  return [newCancelToken, axiosCanceler.current];
+  return [newCancelToken];
 };

@@ -43,8 +43,8 @@ const CreateModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>,
   ...props
 }: PrivateCreateModelModalProps<M, P, V, R>): JSX.Element => {
   const Form = ui.hooks.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  const [cancelToken, cancel] = api.useCancelToken();
+  const [cancelToken] = api.useCancelToken();
+  const isMounted = ui.hooks.useIsMounted();
 
   const title = useMemo(() => {
     if (typeof props.title === "function") {
@@ -58,19 +58,25 @@ const CreateModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>,
     () => () => {
       Form.validateFields()
         .then((values: V) => {
-          const payload = !isNil(interceptPayload) ? interceptPayload(values) : values;
-          Form.setLoading(true);
-          create(payload as P, { cancelToken: cancelToken() })
-            .then((response: R) => {
-              Form.resetFields();
-              onSuccess(response);
-            })
-            .catch((e: Error) => {
-              Form.handleRequestError(e);
-            })
-            .finally(() => {
-              Form.setLoading(false);
-            });
+          if (isMounted.current) {
+            const payload = !isNil(interceptPayload) ? interceptPayload(values) : values;
+            Form.setLoading(true);
+            create(payload as P, { cancelToken: cancelToken() })
+              .then((response: R) => {
+                if (isMounted.current) {
+                  Form.resetFields();
+                  onSuccess(response);
+                }
+              })
+              .catch((e: Error) => {
+                Form.handleRequestError(e);
+              })
+              .finally(() => {
+                if (isMounted.current) {
+                  Form.setLoading(false);
+                }
+              });
+          }
         })
         .catch(() => {
           return;

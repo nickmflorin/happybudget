@@ -1,5 +1,4 @@
 const ActionType = {
-  WipeState: "share.WipeState",
   SetId: "share.SetId",
   Loading: "share.Loading",
   Response: "share.Response",

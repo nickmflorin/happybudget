@@ -260,11 +260,7 @@ const rootReducer: Redux.Reducer<Modules.Budget.Store> = (
   state: Modules.Budget.Store = initialState,
   action: Redux.Action
 ): Modules.Budget.Store => {
-  let newState = { ...state };
-  if (action.type === actions.wipeStateAction.toString()) {
-    newState = initialState;
-  }
-  return genericReducer(newState, action);
+  return genericReducer(state, action);
 };
 
 export default rootReducer;

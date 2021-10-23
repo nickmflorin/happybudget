@@ -74,7 +74,6 @@ export function* getTemplateTask(action: Redux.Action<null>): SagaIterator {
 }
 
 function* getData(action: Redux.Action<any>): SagaIterator {
-  // yield put(actions.wipeStateAction(null));
   yield all([call(getTemplateTask, action), call(FringesTasks.request, action)]);
 }
 
