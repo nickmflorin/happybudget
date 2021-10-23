@@ -16,9 +16,11 @@ export function* getBudgetsTask(action: Redux.Action): SagaIterator {
   });
   yield put(actions.loadingBudgetsAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleBudget> = yield call(api.getBudgets, query, {
-      cancelToken: source.token
-    });
+    const response: Http.ListResponse<Model.SimpleBudget> = yield call(
+      api.getBudgets,
+      { ...query, no_pagination: true },
+      { cancelToken: source.token }
+    );
     yield put(actions.responseBudgetsAction(response));
   } catch (e: unknown) {
     if (!(yield cancelled())) {
@@ -44,9 +46,11 @@ export function* getTemplatesTask(action: Redux.Action): SagaIterator {
   });
   yield put(actions.loadingTemplatesAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleTemplate> = yield call(api.getTemplates, query, {
-      cancelToken: source.token
-    });
+    const response: Http.ListResponse<Model.SimpleTemplate> = yield call(
+      api.getTemplates,
+      { ...query, no_pagination: true },
+      { cancelToken: source.token }
+    );
     yield put(actions.responseTemplatesAction(response));
   } catch (e: unknown) {
     if (!(yield cancelled())) {
@@ -72,9 +76,11 @@ export function* getCommunityTemplatesTask(action: Redux.Action): SagaIterator {
   });
   yield put(actions.loadingCommunityTemplatesAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleTemplate> = yield call(api.getCommunityTemplates, query, {
-      cancelToken: source.token
-    });
+    const response: Http.ListResponse<Model.SimpleTemplate> = yield call(
+      api.getCommunityTemplates,
+      { ...query, no_pagination: true },
+      { cancelToken: source.token }
+    );
     yield put(actions.responseCommunityTemplatesAction(response));
   } catch (e: unknown) {
     if (!(yield cancelled())) {
