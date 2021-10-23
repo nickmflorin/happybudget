@@ -65,17 +65,21 @@ const CreateMarkupModal = <
       interceptPayload={(p: MarkupFormValues) => {
         let { rate, children: markupChildren, ...payload } = p;
         let mutated = { ...payload } as Http.MarkupPayload;
-        if (!isNaN(parseFloat(rate))) {
-          mutated = {
-            ...mutated,
-            rate: parseFloat((parseFloat(rate) / 100.0).toFixed(2))
-          };
-        }
         // FLAT Markups do not have any children.
         if (mutated.unit === model.models.MarkupUnitModels.PERCENT.id) {
           // The children should not be an empty list as the Form should have already validated
           // that.
-          mutated = { ...mutated, children: markupChildren };
+          mutated = { ...mutated, children };
+          if (!isNaN(parseFloat(rate))) {
+            mutated = {
+              ...mutated,
+              rate: parseFloat((parseFloat(rate) / 100.0).toFixed(2))
+            };
+          }
+        } else {
+          if (!isNaN(parseFloat(rate))) {
+            mutated = { ...mutated, rate: parseFloat(parseFloat(rate).toFixed(2)) };
+          }
         }
         return mutated;
       }}

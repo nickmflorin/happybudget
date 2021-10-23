@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { isNil } from "lodash";
 
 import * as api from "api";
 import { ui, model } from "lib";
@@ -58,17 +59,21 @@ const EditMarkupModal = <
       interceptPayload={(p: MarkupFormValues) => {
         let { rate, children, ...payload } = p;
         let mutated = { ...payload } as Http.MarkupPayload;
-        if (!isNaN(parseFloat(rate))) {
-          mutated = {
-            ...mutated,
-            rate: parseFloat((parseFloat(rate) / 100.0).toFixed(2))
-          };
-        }
         // FLAT Markups do not have any children.
         if (mutated.unit === model.models.MarkupUnitModels.PERCENT.id) {
           // The children should not be an empty list as the Form should have already validated
           // that.
           mutated = { ...mutated, children };
+          if (!isNaN(parseFloat(rate))) {
+            mutated = {
+              ...mutated,
+              rate: parseFloat((parseFloat(rate) / 100.0).toFixed(2))
+            };
+          }
+        } else {
+          if (!isNaN(parseFloat(rate))) {
+            mutated = { ...mutated, rate: parseFloat(parseFloat(rate).toFixed(2)) };
+          }
         }
         return mutated;
       }}
@@ -78,11 +83,16 @@ const EditMarkupModal = <
         let fields: (FormField<Model.FlatMarkup> | FormField<Model.PercentMarkup>)[] = [
           { name: "identifier", value: markup.identifier },
           { name: "description", value: markup.description },
-          { name: "unit", value: markup.unit?.id === undefined ? null : markup.unit?.id },
-          { name: "rate", value: markup.rate }
+          { name: "unit", value: markup.unit?.id === undefined ? null : markup.unit.id }
         ];
         if (model.typeguards.isPercentMarkup(markup)) {
-          fields = [...fields, { name: "children", value: markup.children }];
+          fields = [
+            ...fields,
+            { name: "children", value: markup.children },
+            { name: "rate", value: !isNil(markup.rate) ? (100.0 * markup.rate).toFixed(2) : null }
+          ];
+        } else {
+          fields = [...fields, { name: "rate", value: markup.rate }];
         }
         form.setFields(fields);
       }}

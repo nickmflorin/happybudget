@@ -34,7 +34,7 @@
     "no-restricted-syntax": [
       "error",
       {
-        "selector": "CallExpression[callee.object.name='console'][callee.property.name!=/^(warn|error|info)$/]",
+        "selector": "CallExpression[callee.object.name='console'][callee.property.name!=/^(debug|warn|error|info)$/]",
         "message": "This property on console is not allowed."
       }
     ],
