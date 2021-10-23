@@ -72,7 +72,7 @@ export const createBudgetTableChangeEventReducer = <
       });
       // Insert the new MarkupRow(s) into the table and reorder the rows of the table so that the
       // MarkupRow(s) are in the appropriate location.
-      newState = {
+      return {
         ...newState,
         data: tabling.data.orderTableRows<R, M>([...newState.data, markupRow])
       };
@@ -144,7 +144,7 @@ export const createBudgetTableChangeEventReducer = <
           },
           newState
         );
-        newState = {
+        return {
           ...newState,
           data: util.replaceInArray<Table.BodyRow<R>>(
             newState.data,
@@ -167,7 +167,7 @@ export const createBudgetTableChangeEventReducer = <
 
       const mk = markupRowFromState<R, S>(action, newState, e.payload.markup);
       if (!isNil(mk)) {
-        newState = {
+        return {
           ...newState,
           data: tabling.data.orderTableRows<R, M>(
             util.replaceInArray<Table.BodyRow<R>>(

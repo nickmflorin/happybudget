@@ -99,7 +99,7 @@ const SubAccountsTable = ({
     table: table.current,
     onGroupUpdated: (group: Model.Group) =>
       dispatch(
-        actions.account.handleTableChangeEventAction({
+        actions.subAccount.handleTableChangeEventAction({
           type: "groupUpdated",
           payload: { id: group.id, data: group }
         })

@@ -70,7 +70,7 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
     table: table.current,
     onGroupUpdated: (group: Model.Group) =>
       dispatch(
-        actions.account.handleTableChangeEventAction({
+        actions.accounts.handleTableChangeEventAction({
           type: "groupUpdated",
           payload: { id: group.id, data: group }
         })

@@ -16,7 +16,7 @@ export const groupRowFromState = <R extends Table.RowData, S extends Redux.Table
   rowId?: Table.ModelRowId | Table.MarkupRowId,
   options: Redux.FindModelOptions = { name: "Group", warnIfMissing: true }
 ): Table.GroupRow<R> | null => {
-  let predicate = (g: Table.GroupRow<R>) => g.id === id;
+  let predicate: Redux.ModelLookup<Table.GroupRow<R>> = id;
   if (!isNil(rowId)) {
     predicate = (g: Table.GroupRow<R>) => g.id === id && includes(g.children, rowId);
   }
@@ -259,8 +259,6 @@ export const createTableChangeEventReducer = <
   options?: Pick<Redux.FindModelOptions, "name">
 ): Redux.Reducer<S, Redux.Action<Table.ChangeEvent<R, M>>> => {
   return (state: S = config.initialState, action: Redux.Action<Table.ChangeEvent<R, M>>): S => {
-    let newState: S = { ...state };
-
     const e: Table.ChangeEvent<R, M> = action.payload;
 
     if (typeguards.isDataChangeEvent<R>(e)) {
@@ -275,7 +273,7 @@ export const createTableChangeEventReducer = <
           /* eslint-disable no-loop-func */
           const r: Table.EditableRow<R> | null = redux.reducers.findModelInData<Table.EditableRow<R>>(
             action,
-            filter(newState.data, (ri: Table.BodyRow<R>) => typeguards.isEditableRow(ri)) as Table.EditableRow<R>[],
+            filter(state.data, (ri: Table.BodyRow<R>) => typeguards.isEditableRow(ri)) as Table.EditableRow<R>[],
             consolidated[i].id,
             options
           );
@@ -293,7 +291,7 @@ export const createTableChangeEventReducer = <
       }
       // For each Row that was changed, apply that change to the Row stored in state.
       let modifiedRows: Table.EditableRow<R>[] = [];
-      newState = reduce(
+      let newState = reduce(
         changesPerRow,
         (s: S, dt: { changes: Table.RowChange<R>[]; row: Table.EditableRow<R> }) => {
           let r: Table.EditableRow<R> = reduce(
@@ -310,7 +308,7 @@ export const createTableChangeEventReducer = <
             data: util.replaceInArray<Table.BodyRow<R>>(s.data, { id: r.id }, r)
           };
         },
-        newState
+        state
       );
       const groupsWithRowsThatChanged: Table.GroupRow<R>[] = filter(
         filter(newState.data, (r: Table.BodyRow<R>) => typeguards.isGroupRow(r)) as Table.GroupRow<R>[],
@@ -326,7 +324,7 @@ export const createTableChangeEventReducer = <
           );
         }
       );
-      newState = reduce(
+      return reduce(
         groupsWithRowsThatChanged,
         (s: S, groupRow: Table.GroupRow<R>) => {
           return {
@@ -346,14 +344,14 @@ export const createTableChangeEventReducer = <
     } else if (typeguards.isModelUpdatedEvent(e)) {
       const modelRow: Table.ModelRow<R> | null = redux.reducers.modelFromState<Table.ModelRow<R>>(
         action,
-        filter(newState.data, (ri: Table.BodyRow<R>) => typeguards.isModelRow(ri)) as Table.ModelRow<R>[],
+        filter(state.data, (ri: Table.BodyRow<R>) => typeguards.isModelRow(ri)) as Table.ModelRow<R>[],
         e.payload.id
       );
       if (!isNil(modelRow)) {
-        newState = {
-          ...newState,
+        return {
+          ...state,
           data: util.replaceInArray<Table.BodyRow<R>>(
-            newState.data,
+            state.data,
             { id: modelRow.id },
             rows.createModelRow<R, M>({
               originalIndex: modelRow.originalIndex,
@@ -366,8 +364,8 @@ export const createTableChangeEventReducer = <
       }
     } else if (typeguards.isRowAddEvent(e)) {
       const payload: Table.RowAdd<R>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
-      newState = {
-        ...newState,
+      let newState = {
+        ...state,
         data: data.orderTableRows<R, M>(
           reduce(
             payload,
@@ -382,21 +380,17 @@ export const createTableChangeEventReducer = <
                 })
               ];
             },
-            newState.data
+            state.data
           )
         )
       };
       applicationEvents.dispatchRowsAddedEvent({ tableId: config.tableId, numRows: newState.data.length });
     } else if (typeguards.isRowDeleteEvent(e)) {
-      newState = rowDeleteReducer(newState, action as Redux.Action<Table.RowDeleteEvent>, config.columns);
+      return rowDeleteReducer(state, action as Redux.Action<Table.RowDeleteEvent>, config.columns);
     } else if (typeguards.isRowRemoveFromGroupEvent(e)) {
-      newState = rowRemoveFromGroupReducer(
-        newState,
-        action as Redux.Action<Table.RowRemoveFromGroupEvent>,
-        config.columns
-      );
+      return rowRemoveFromGroupReducer(state, action as Redux.Action<Table.RowRemoveFromGroupEvent>, config.columns);
     } else if (typeguards.isRowAddToGroupEvent(e)) {
-      newState = rowAddToGroupReducer(newState, action as Redux.Action<Table.RowAddToGroupEvent>, config.columns);
+      return rowAddToGroupReducer(state, action as Redux.Action<Table.RowAddToGroupEvent>, config.columns);
     } else if (typeguards.isGroupAddedEvent(e)) {
       /*
       When a Group is added to the table, we must first convert that Group model to a
@@ -413,10 +407,10 @@ export const createTableChangeEventReducer = <
         model: e.payload
       });
       const groupsWithChild: Table.GroupRow<R>[] = filter(
-        newState.data,
+        state.data,
         (r: Table.Row<R>) => typeguards.isGroupRow(r) && intersection(r.children, newGroupRow.children).length !== 0
       ) as Table.GroupRow<R>[];
-      newState = reduce(
+      let newState = reduce(
         groupsWithChild,
         (st: S, group: Table.GroupRow<R>) => {
           return {
@@ -431,9 +425,9 @@ export const createTableChangeEventReducer = <
             )
           };
         },
-        newState
+        state
       );
-      newState = {
+      return {
         ...newState,
         data: data.orderTableRows<R, M>([...newState.data, newGroupRow])
       };
@@ -443,11 +437,7 @@ export const createTableChangeEventReducer = <
       Group.  In this case, the backend will automatically remove those children from the previous
       Group they belonged to - but we also need to apply that change in the reducer here.
       */
-      const groupRow: Table.GroupRow<R> | null = groupRowFromState<R, S>(
-        action,
-        newState,
-        rows.groupRowId(e.payload.id)
-      );
+      const groupRow: Table.GroupRow<R> | null = groupRowFromState<R, S>(action, state, rows.groupRowId(e.payload.id));
       if (!isNil(groupRow)) {
         const newGroupRow: Table.GroupRow<R> = rows.updateGroupRow<R, M>({
           model: e.payload.data,
@@ -455,10 +445,10 @@ export const createTableChangeEventReducer = <
           row: groupRow
         });
         const groupsWithChild: Table.GroupRow<R>[] = filter(
-          newState.data,
+          state.data,
           (r: Table.Row<R>) => typeguards.isGroupRow(r) && intersection(r.children, newGroupRow.children).length !== 0
         ) as Table.GroupRow<R>[];
-        newState = reduce(
+        let newState = reduce(
           groupsWithChild,
           (st: S, group: Table.GroupRow<R>) => {
             return {
@@ -473,9 +463,9 @@ export const createTableChangeEventReducer = <
               )
             };
           },
-          newState
+          state
         );
-        newState = {
+        return {
           ...newState,
           data: data.orderTableRows<R, M>(
             util.replaceInArray<Table.BodyRow<R>>(newState.data, { id: groupRow.id }, newGroupRow)
@@ -483,7 +473,7 @@ export const createTableChangeEventReducer = <
         };
       }
     }
-    return newState;
+    return state;
   };
 };
 
@@ -496,39 +486,35 @@ export const createTableReducer = <
   config: Table.ReducerConfig<R, M, S, A>
 ): Redux.Reducer<S> => {
   return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
-    let newState: S = { ...state };
-
     if (
       (!isNil(config.actions.request) && action.type === config.actions.request.toString()) ||
       action.type === config.actions.clear.toString()
     ) {
-      newState = { ...newState, data: [], models: [], groups: [] };
+      return { ...state, data: [], models: [], groups: [] };
     } else if (action.type === config.actions.response.toString()) {
       const response: Http.TableResponse<M> = action.payload;
       if (!isNil(config.createTableRows)) {
-        newState = {
-          ...newState,
+        return {
+          ...state,
           data: config.createTableRows({
             ...config,
             response
           })
         };
       } else {
-        newState = {
-          ...newState,
+        return {
+          ...state,
           data: data.createTableRows<R, M>({
             ...config,
             response
           })
         };
       }
-    } else if (action.type === config.actions.loading.toString()) {
-      newState = { ...newState, loading: action.payload };
     } else if (action.type === config.actions.setSearch.toString()) {
       const search: string = action.payload;
-      newState = { ...newState, search };
+      return { ...state, search };
     }
-    return newState;
+    return state;
   };
 };
 
@@ -555,16 +541,17 @@ export const createAuthenticatedTableReducer = <
 ): Redux.Reducer<S> => {
   const tableEventReducer = config.eventReducer || createTableChangeEventReducer<R, M, S, A>(config);
   const generic = createTableReducer<R, M, S, A>(config);
+
   return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
     let newState = generic(state, action);
-
+    console.log({ type: action.type, data: newState.data.length });
     if (action.type === config.actions.tableChanged.toString()) {
-      newState = tableEventReducer(newState, action);
+      return tableEventReducer(newState, action);
     } else if (action.type === config.actions.saving.toString()) {
-      newState = { ...newState, saving: action.payload };
+      return { ...newState, saving: action.payload };
     } else if (action.type === config.actions.addModelsToState.toString()) {
       const payload: Redux.AddModelsToTablePayload<M> = action.payload;
-      newState = reduce(
+      return reduce(
         payload.placeholderIds,
         (s: S, id: Table.PlaceholderRowId, index: number) => {
           const r: Table.PlaceholderRow<R> | null = redux.reducers.findModelInData<Table.PlaceholderRow<R>>(
@@ -597,7 +584,7 @@ export const createAuthenticatedTableReducer = <
       action.type === config.actions.updateModelsInState.toString()
     ) {
       const models: M[] = Array.isArray(action.payload) ? action.payload : [action.payload];
-      newState = reduce(
+      return reduce(
         models,
         (s: S, m: M) => {
           const r: Table.ModelRow<R> | null = redux.reducers.findModelInData(
