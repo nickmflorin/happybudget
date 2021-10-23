@@ -14,7 +14,7 @@ const configureSentry = () => {
         })
       ],
       environment: process.env.REACT_APP_SENTRY_ENV || "development",
-      tracesSampleRate: 0.1
+      tracesSampleRate: 1.0
     });
   } else {
     console.info("Skipping Sentry Configuration; No DSN defined.");
