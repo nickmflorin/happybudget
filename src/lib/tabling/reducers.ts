@@ -544,7 +544,6 @@ export const createAuthenticatedTableReducer = <
 
   return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
     let newState = generic(state, action);
-    console.log({ type: action.type, data: newState.data.length });
     if (action.type === config.actions.tableChanged.toString()) {
       return tableEventReducer(newState, action);
     } else if (action.type === config.actions.saving.toString()) {
