@@ -32,9 +32,9 @@
     "no-trailing-spaces": "warn",
     "no-console": "off",
     "no-restricted-syntax": [
-      "error",
+      "warn",
       {
-        "selector": "CallExpression[callee.object.name='console'][callee.property.name!=/^(debug|warn|error|info)$/]",
+        "selector": "CallExpression[callee.object.name='console'][callee.property.name!=/^(warn|error|info)$/]",
         "message": "This property on console is not allowed."
       }
     ],
