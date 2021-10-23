@@ -40,6 +40,7 @@ const EditGroupModal = <M extends Model.SimpleAccount | Model.SimpleSubAccount>(
   return (
     <EditModelModal<Model.Group, Http.GroupPayload>
       {...props}
+      form={form}
       title={"Group"}
       titleIcon={"folder"}
       request={api.getGroup}
