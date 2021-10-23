@@ -15,6 +15,8 @@ import { TemplateEmptyIcon } from "components/svgs";
 import { actions } from "../../store";
 
 const selectTemplates = (state: Application.Authenticated.Store) => state.dashboard.templates.data;
+const selectTemplatesResponseReceived = (state: Application.Authenticated.Store) =>
+  state.dashboard.templates.responseWasReceived;
 const selectLoadingTemplates = (state: Application.Authenticated.Store) => state.dashboard.templates.loading;
 
 interface MyTemplatesProps {
@@ -31,6 +33,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
   const dispatch: Redux.Dispatch = useDispatch();
   const templates = useSelector(selectTemplates);
   const loading = useSelector(selectLoadingTemplates);
+  const responseWasReceived = useSelector(selectTemplatesResponseReceived);
 
   const history = useHistory();
 
@@ -41,7 +44,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
   return (
     <div className={"my-templates"}>
       <WrapInApplicationSpinner loading={loading}>
-        {templates.length === 0 ? (
+        {templates.length === 0 && responseWasReceived ? (
           <NoBudgets
             title={"You don't have any templates yet!"}
             button={{

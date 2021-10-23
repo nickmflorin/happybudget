@@ -141,10 +141,12 @@ namespace Redux {
     readonly data: T[];
     readonly count: number;
     readonly loading: boolean;
+    readonly responseWasReceived: boolean;
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ListResponseActionMap<T> = {
+    readonly request: null;
     readonly loading: boolean;
     readonly response: Http.ListResponse<T>;
   };
@@ -165,14 +167,11 @@ namespace Redux {
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type ModelListResponseActionMap<M extends Model.HttpModel> = {
-    readonly loading: boolean;
-    readonly request: null;
+  type ModelListResponseActionMap<M extends Model.HttpModel> = ListResponseActionMap<M> & {
     readonly updating: Redux.ModelListActionPayload;
     readonly creating: boolean;
     readonly removeFromState: number;
     readonly deleting: Redux.ModelListActionPayload;
-    readonly response: Http.ListResponse<M>;
     readonly addToState: M;
     readonly updateInState: Redux.UpdateActionPayload<M>;
     readonly setSearch: string;
