@@ -41,7 +41,6 @@ const configureApplication = (history: History, initializeApp: () => void) => {
   // to log results (for example: reportWebVitals(console.log))
   // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
   if (process.env.NODE_ENV === "development" && Config.reportWebVitals === true) {
-    /* eslint-disable no-console */
     reportWebVitals(console.log);
   }
 
@@ -62,7 +61,7 @@ const configureApplication = (history: History, initializeApp: () => void) => {
   // because it must be done at the top of the src/index.tsx file before any other imports are
   // performed.
   if (process.env.NODE_ENV === "development" && Config.whyDidYouRender) {
-    console.log("Registering WYDR");
+    console.info("Registering WYDR");
     const whyDidYouRender = require("@welldone-software/why-did-you-render");
     whyDidYouRender(React, {
       trackAllPureComponents: true,

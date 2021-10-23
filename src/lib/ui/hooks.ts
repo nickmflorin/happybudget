@@ -158,15 +158,12 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
       setLoading,
       handleRequestError: (e: Error, opts?: FormNotifyOptions) => {
         if (!axios.isCancel(e)) {
+          api.handleRequestError(e);
           if (e instanceof api.ClientError) {
-            /* eslint-disable no-console */
-            console.warn(e);
             notify(e.errors, opts);
           } else if (e instanceof api.NetworkError) {
             notify("There was a problem communicating with the server.", opts);
           } else if (e instanceof api.ServerError) {
-            /* eslint-disable no-console */
-            console.warn(e);
             notify("There was a problem communicating with the server.", opts);
           } else {
             throw e;

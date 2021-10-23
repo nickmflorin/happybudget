@@ -198,7 +198,6 @@ const Uploader = (
                   });
                 })
                 .catch((e: Error) => {
-                  /* eslint-disable no-console */
                   console.error(e);
                   _onError("Uploaded file was corrupted.");
                 });

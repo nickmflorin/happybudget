@@ -33,7 +33,6 @@ const useClipboard = <R extends Table.RowData, M extends Model.HttpModel>(
         } else {
           // The value should never be undefined at this point.
           if (value === undefined) {
-            /* eslint-disable no-console */
             console.warn("Encountered undefined value when it was not expected!");
           }
           if (value === column.nullValue || value === undefined) {

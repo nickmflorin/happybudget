@@ -31,7 +31,6 @@ export const injectMarkupsAndGroups = <
   const modelGroup = (obj: A): C | null => {
     const groupsForModel: C[] | undefined = filter(config.groups, (g: C) => includes(g.children, obj.id));
     if (groupsForModel.length > 1) {
-      /* eslint-disable no-console */
       console.error(`Corrupted Data: Model ${obj.id} is associated with multiple groups!`);
     }
     return groupsForModel.length === 0 ? null : groupsForModel[0];

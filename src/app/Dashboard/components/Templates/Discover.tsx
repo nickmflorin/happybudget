@@ -49,7 +49,6 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
             // by design.  However, just in case we will also make sure that we are
             // not showing those templates to the user in the frontend.
             if (template.hidden === true && user.is_staff === false) {
-              /* eslint-disable no-console */
               console.error(
                 "The API is returning hidden community templates for non-staff users!  This is a security problem!"
               );

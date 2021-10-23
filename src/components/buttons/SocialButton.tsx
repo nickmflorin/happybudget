@@ -35,7 +35,6 @@ const SocialButton = ({ provider, text, onGoogleSuccess, onGoogleError }: Social
           // will just be { code: xxx } that can be used to obtain a refresh token
           // from the server.  This should be implemented at some point.
           if (isOfflineResponse(response)) {
-            /* eslint-disable no-console */
             console.error(`Received offline response with code ${response.code}.`);
           } else {
             onGoogleSuccess(response.tokenId);

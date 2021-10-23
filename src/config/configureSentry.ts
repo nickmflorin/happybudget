@@ -4,8 +4,7 @@ import { CaptureConsole } from "@sentry/integrations";
 
 const configureSentry = () => {
   if (process.env.REACT_APP_SENTRY_DSN) {
-    /* eslint-disable no-console */
-    console.log("Configuring Sentry");
+    console.info("Configuring Sentry");
     Sentry.init({
       dsn: process.env.REACT_APP_SENTRY_DSN,
       integrations: [
@@ -18,8 +17,7 @@ const configureSentry = () => {
       tracesSampleRate: 0.1
     });
   } else {
-    /* eslint-disable no-console */
-    console.log("Skipping Sentry Configuration; No DSN defined.");
+    console.info("Skipping Sentry Configuration; No DSN defined.");
   }
 };
 
