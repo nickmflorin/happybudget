@@ -76,6 +76,7 @@ const genericReducer = combineReducers({
   history: redux.reducers.createListResponseReducer<Model.HistoryEvent>({
     initialState: redux.initialState.initialModelListResponseState,
     actions: {
+      request: actions.accounts.requestHistoryAction,
       response: actions.accounts.responseHistoryAction,
       loading: actions.accounts.loadingHistoryAction
     }
@@ -145,6 +146,7 @@ const genericReducer = combineReducers({
       history: redux.reducers.createListResponseReducer<Model.HistoryEvent>({
         initialState: redux.initialState.initialModelListResponseState,
         actions: {
+          request: actions.account.requestHistoryAction,
           response: actions.account.responseHistoryAction,
           loading: actions.account.loadingHistoryAction
         }
@@ -213,6 +215,7 @@ const genericReducer = combineReducers({
       history: redux.reducers.createListResponseReducer<Model.HistoryEvent>({
         initialState: redux.initialState.initialModelListResponseState,
         actions: {
+          request: actions.subAccount.requestHistoryAction,
           response: actions.subAccount.responseHistoryAction,
           loading: actions.subAccount.loadingHistoryAction
         }

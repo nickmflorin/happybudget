@@ -1,7 +1,8 @@
 export const initialListResponseState: Redux.ListResponseStore<any> = {
   loading: false,
   data: [],
-  count: 0
+  count: 0,
+  responseWasReceived: false
 };
 
 export const initialModelListResponseState: Redux.ModelListResponseStore<any> = {

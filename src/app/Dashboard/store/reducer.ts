@@ -7,11 +7,12 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
     Model.SimpleTemplate,
     Omit<
       Redux.ModelListResponseActionMap<Model.SimpleTemplate>,
-      "restoreSearchCache" | "request" | "updating" | "deleting" | "creating"
+      "restoreSearchCache" | "updating" | "deleting" | "creating"
     >
   >({
     initialState: redux.initialState.initialModelListResponseState,
     actions: {
+      request: actions.requestTemplatesAction,
       response: actions.responseTemplatesAction,
       loading: actions.loadingTemplatesAction,
       setSearch: actions.setTemplatesSearchAction,
@@ -24,11 +25,12 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
     Model.SimpleTemplate,
     Omit<
       Redux.ModelListResponseActionMap<Model.SimpleTemplate>,
-      "restoreSearchCache" | "request" | "updating" | "deleting" | "creating"
+      "restoreSearchCache" | "updating" | "deleting" | "creating"
     >
   >({
     initialState: redux.initialState.initialModelListResponseState,
     actions: {
+      request: actions.requestCommunityTemplatesAction,
       response: actions.responseCommunityTemplatesAction,
       loading: actions.loadingCommunityTemplatesAction,
       setSearch: actions.setCommunityTemplatesSearchAction,
@@ -41,11 +43,12 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
     Model.SimpleBudget,
     Omit<
       Redux.ModelListResponseActionMap<Model.SimpleBudget>,
-      "restoreSearchCache" | "request" | "updating" | "deleting" | "creating"
+      "restoreSearchCache" | "updating" | "deleting" | "creating"
     >
   >({
     initialState: redux.initialState.initialModelListResponseState,
     actions: {
+      request: actions.requestBudgetsAction,
       response: actions.responseBudgetsAction,
       loading: actions.loadingBudgetsAction,
       setSearch: actions.setBudgetsSearchAction,

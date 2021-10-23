@@ -5,9 +5,14 @@ import { redux, util } from "lib";
 export const listResponseReducerTransformers = <M, S extends Redux.ListResponseStore<M> = Redux.ListResponseStore<M>>(
   initialState: S
 ): Redux.Transformers<S, Redux.ListResponseActionMap<M>> => ({
+  request: (st: S = initialState, action: Redux.Action<Http.ListResponse<M>>) => ({
+    ...st,
+    responseWasReceived: false
+  }),
   response: (st: S = initialState, action: Redux.Action<Http.ListResponse<M>>) => {
     return {
       ...st,
+      responseWasReceived: true,
       data: action.payload.data,
       count: action.payload.count
     };
@@ -44,6 +49,7 @@ export const modelListResponseReducerTransformers = <
       data: action.payload.data,
       count: action.payload.count,
       selected: [],
+      responseWasReceived: true,
       cache: {
         ...st.cache,
         [st.search]: {
@@ -60,7 +66,8 @@ export const modelListResponseReducerTransformers = <
     data: [],
     count: 0,
     selected: [],
-    cache: {}
+    cache: {},
+    responseWasReceived: false
   }),
   removeFromState: (st: S = initialState, action: Redux.Action<ID>) => {
     if (action.isAuthenticated === true) {

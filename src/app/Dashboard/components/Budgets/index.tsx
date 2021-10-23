@@ -16,6 +16,8 @@ import { actions } from "../../store";
 import BudgetsSubTitle from "./BudgetsSubTitle";
 
 const selectBudgets = (state: Application.Authenticated.Store) => state.dashboard.budgets.data;
+const selectBudgetsResponseReceived = (state: Application.Authenticated.Store) =>
+  state.dashboard.budgets.responseWasReceived;
 const selectLoadingBudgets = (state: Application.Authenticated.Store) => state.dashboard.budgets.loading;
 
 const Budgets = (): JSX.Element => {
@@ -30,6 +32,7 @@ const Budgets = (): JSX.Element => {
   const dispatch: Redux.Dispatch = useDispatch();
   const budgets = useSelector(selectBudgets);
   const loading = useSelector(selectLoadingBudgets);
+  const responseWasReceived = useSelector(selectBudgetsResponseReceived);
 
   useEffect(() => {
     dispatch(actions.requestBudgetsAction(null));
@@ -42,7 +45,7 @@ const Budgets = (): JSX.Element => {
       title={"My Budgets"}
       subTitle={<BudgetsSubTitle onNewBudget={() => setCreateBudgetModalOpen(true)} />}
     >
-      {budgets.length === 0 ? (
+      {budgets.length === 0 && responseWasReceived ? (
         <NoBudgets title={"You don't have any templates yet! Create a new budget."} subTitle>
           <BudgetEmptyIcon />
         </NoBudgets>
