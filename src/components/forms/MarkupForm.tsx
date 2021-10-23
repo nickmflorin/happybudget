@@ -107,15 +107,11 @@ const MarkupForm = (
               // If the unit is FLAT, we do not allow children - but we have to just filter those
               // out in the payload before the API request as doing that validation here will
               // prevent the form from submitting in the FLAT state.
-              if (value) {
-                const unit = getFieldValue("unit");
-                if (unit === model.models.MarkupUnitModels.PERCENT.id && value.length === 0) {
-                  return Promise.reject("At least one account must be selected.");
-                }
-                return Promise.resolve();
-              } else {
+              const unit = getFieldValue("unit");
+              if (unit === model.models.MarkupUnitModels.PERCENT.id && (value.length === 0 || isNil(value))) {
                 return Promise.reject("At least one account must be selected.");
               }
+              return Promise.resolve();
             }
           })
         ]}
