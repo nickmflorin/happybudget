@@ -9,7 +9,6 @@ export * as subAccount from "./subAccount";
 
 export { default as ActionType } from "./ActionType";
 
-export const wipeStateAction = createAction<null>(ActionType.WipeState);
 export const setBudgetIdAction = createAction<number | null>(ActionType.SetId);
 export const loadingBudgetAction = createAction<boolean>(ActionType.Loading);
 export const responseBudgetAction = createAction<Model.Budget | null>(ActionType.Response);

@@ -3,11 +3,12 @@ import { Store } from "redux";
 import { Provider } from "react-redux";
 import { Redirect } from "react-router-dom";
 import { ConnectedRouter } from "connected-react-router";
+import axios from "axios";
 import { isNil } from "lodash";
 
-import { NetworkError, ServerError, ClientError } from "api";
+import * as api from "api";
+import { ui } from "lib";
 import { ApplicationSpinner } from "components";
-import { validateToken } from "api/services";
 import { history, configureAuthenticatedStore } from "store/configureStore";
 
 interface WrapInAuthenticatedStoreProps {
@@ -20,28 +21,35 @@ const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): 
   const [reduxStore, setReduxStore] = useState<Store<Application.Authenticated.Store, Redux.Action> | undefined>(
     undefined
   );
+  const [newCancelToken] = api.useCancelToken();
+  const isMounted = ui.hooks.useIsMounted();
 
   useEffect(() => {
     setAuthenticating(true);
-    validateToken()
+    api
+      .validateToken({ cancelToken: newCancelToken() })
       .then((response: Model.User) => {
         const store = configureAuthenticatedStore(response);
         setReduxStore(store);
       })
       .catch((e: Error) => {
-        if (e instanceof ClientError && e.authenticationErrors.length !== 0) {
-          setRedirect(true);
-        } else {
-          if (e instanceof NetworkError || e instanceof ClientError || e instanceof ServerError) {
-            /* eslint-disable no-console */
-            console.error(e);
+        if (!axios.isCancel(e)) {
+          if (e instanceof api.ClientError && e.authenticationErrors.length !== 0) {
+            setRedirect(true);
           } else {
-            throw e;
+            if (e instanceof api.NetworkError || e instanceof api.ClientError || e instanceof api.ServerError) {
+              /* eslint-disable no-console */
+              console.error(e);
+            } else {
+              throw e;
+            }
           }
         }
       })
       .finally(() => {
-        setAuthenticating(false);
+        if (isMounted.current) {
+          setAuthenticating(false);
+        }
       });
   }, []);
 

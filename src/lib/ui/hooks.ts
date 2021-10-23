@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useMemo, useReducer } from "react";
+import { RefObject, useRef, useEffect, useState, useMemo, useReducer } from "react";
 import { forEach, isNil, debounce, find, reduce, filter, map } from "lodash";
 import * as JsSearch from "js-search";
 import axios from "axios";
@@ -324,4 +324,16 @@ export const useTrackFirstRender = (): boolean => {
     isFirstRender.current = false;
   }, []);
   return isFirstRender.current;
+};
+
+export const useIsMounted = (): RefObject<boolean> => {
+  const _isMounted = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      _isMounted.current = false;
+    };
+  }, []);
+
+  return _isMounted;
 };

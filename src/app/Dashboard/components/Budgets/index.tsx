@@ -43,6 +43,7 @@ const Budgets = (): JSX.Element => {
       className={"budgets"}
       loading={loading}
       title={"My Budgets"}
+      contentScrollable={true}
       subTitle={<BudgetsSubTitle onNewBudget={() => setCreateBudgetModalOpen(true)} />}
     >
       {budgets.length === 0 && responseWasReceived ? (
@@ -103,8 +104,8 @@ const Budgets = (): JSX.Element => {
           open={true}
           onCancel={() => setCreateBudgetModalOpen(false)}
           onSuccess={(budget: Model.Budget) => {
-            setCreateBudgetModalOpen(false);
             dispatch(actions.addBudgetToStateAction(budget));
+            setCreateBudgetModalOpen(false);
             history.push(`/budgets/${budget.id}/accounts`);
           }}
         />

@@ -122,11 +122,7 @@ const rootReducer: Redux.Reducer<Modules.Template.Store> = (
   state: Modules.Template.Store = initialState,
   action: Redux.Action
 ): Modules.Template.Store => {
-  let newState = { ...state };
-  if (action.type === actions.wipeStateAction.toString()) {
-    newState = initialState;
-  }
-  return genericReducer(newState, action);
+  return genericReducer(state, action);
 };
 
 export default rootReducer;

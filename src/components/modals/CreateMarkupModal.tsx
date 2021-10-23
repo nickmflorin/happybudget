@@ -30,8 +30,7 @@ const CreateMarkupModal = <
   ...props
 }: CreateMarkupModalProps<B, R>): JSX.Element => {
   const form = ui.hooks.useForm<MarkupFormValues>();
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  const [cancelToken, cancel] = api.useCancelToken();
+  const [cancelToken] = api.useCancelToken();
 
   const [availableChildren, setAvailableChildren] = useState<M[]>([]);
   const [availableChildrenLoading, setAvailableChildrenLoading] = useState(false);

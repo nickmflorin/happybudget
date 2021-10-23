@@ -1,5 +1,4 @@
 const ActionType = {
-  WipeState: "template.WipeState",
   SetId: "template.SetId",
   Loading: "template.Loading",
   Response: "template.Response",

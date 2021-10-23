@@ -52,7 +52,8 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
   ...props
 }: PrivateEditModelModalProps<M, P, V, R>): JSX.Element => {
   const Form = ui.hooks.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
-  const [getToken, cancel] = api.useCancelToken({ preserve: true, createOnInit: true });
+  const [getToken] = api.useCancelToken({ preserve: true, createOnInit: true });
+  const isMounted = ui.hooks.useIsMounted();
   const [instance, loading, error] = model.hooks.useModel(id, {
     request,
     onModelLoaded,
@@ -93,24 +94,30 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
   const onOk = useCallback(async () => {
     Form.validateFields()
       .then((values: V) => {
-        const payload = !isNil(interceptPayload) ? interceptPayload(values) : values;
-        Form.setLoading(true);
-        update(id, payload as P, { cancelToken: getToken() })
-          .then((response: R) => {
-            Form.resetFields();
-            onSuccess(response);
-          })
-          .catch((e: Error) => {
-            Form.handleRequestError(e);
-          })
-          .finally(() => {
-            Form.setLoading(false);
-          });
+        if (isMounted.current) {
+          const payload = !isNil(interceptPayload) ? interceptPayload(values) : values;
+          Form.setLoading(true);
+          update(id, payload as P, { cancelToken: getToken() })
+            .then((response: R) => {
+              if (isMounted.current) {
+                Form.resetFields();
+              }
+              onSuccess(response);
+            })
+            .catch((e: Error) => {
+              Form.handleRequestError(e);
+            })
+            .finally(() => {
+              if (isMounted.current) {
+                Form.setLoading(false);
+              }
+            });
+        }
       })
       .catch(() => {
         return;
       });
-  }, [Form, update, getToken, cancel, interceptPayload]);
+  }, [Form, update, getToken, interceptPayload]);
 
   return (
     <Modal

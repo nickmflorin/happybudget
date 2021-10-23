@@ -19,7 +19,7 @@ const Templates = (): JSX.Element => {
 
   return (
     <React.Fragment>
-      <Page className={"templates"} title={"New Project"} subTitle={<TemplatesMenu />}>
+      <Page className={"templates"} title={"New Project"} subTitle={<TemplatesMenu />} contentScrollable={true}>
         <Switch>
           <Route
             path={"/templates"}

@@ -1,5 +1,4 @@
 const ActionType = {
-  WipeState: "budget.WipeState",
   SetCommentsHistoryDrawerVisibility: "budget.SetCommentsHistoryDrawerVisibility",
   SetId: "budget.SetId",
   Loading: "budget.Loading",

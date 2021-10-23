@@ -1,6 +1,6 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, takeLatest, call, put, select, cancelled, all } from "redux-saga/effects";
-import axios from "axios";
+import axios, { CancelTokenSource } from "axios";
 import { isNil } from "lodash";
 
 import * as api from "api";
@@ -14,9 +14,6 @@ import accountsSaga from "./accounts";
 import actualsSaga from "./actuals";
 import subAccountSaga from "./subAccount";
 import pdfSaga from "./pdf";
-
-const CancelToken = axios.CancelToken;
-const source = CancelToken.source();
 
 const FringesActionMap = {
   requestAccount: actions.account.requestAccountAction,
@@ -54,7 +51,7 @@ const fringesTableSaga = tabling.sagas.createAuthenticatedTableSaga<Tables.Fring
   tasks: FringesTasks
 });
 
-function* getBudgetTask(action: Redux.Action<null>): SagaIterator {
+function* getBudgetTask(action: Redux.Action<null>, source: CancelTokenSource): SagaIterator {
   const budgetId = yield select((state: Application.Authenticated.Store) => state.budget.id);
   if (!isNil(budgetId)) {
     yield put(actions.loadingBudgetAction(true));
@@ -68,16 +65,20 @@ function* getBudgetTask(action: Redux.Action<null>): SagaIterator {
       }
     } finally {
       yield put(actions.loadingBudgetAction(false));
-      if (yield cancelled()) {
-        source.cancel();
-      }
     }
   }
 }
 
 function* getData(action: Redux.Action<any>): SagaIterator {
-  // yield put(actions.wipeStateAction(null));
-  yield all([call(getBudgetTask, action), call(FringesTasks.request, action)]);
+  const CancelToken = axios.CancelToken;
+  const source = CancelToken.source();
+  try {
+    yield all([call(getBudgetTask, action, source), call(FringesTasks.request, action)]);
+  } finally {
+    if (yield cancelled()) {
+      source.cancel("cancelled");
+    }
+  }
 }
 
 function* watchForBudgetIdChangedSaga(): SagaIterator {
