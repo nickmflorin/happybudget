@@ -5,7 +5,7 @@ import classNames from "classnames";
 export type SelectProps<T> = AntDSelectProps<T>;
 
 const Select = <T extends SelectValue>(props: SelectProps<T>): JSX.Element => (
-  <AntDSelect {...props} className={classNames("select", props.className)} />
+  <AntDSelect {...props} className={classNames("select", props.className, { disabled: props.disabled })} />
 );
 
 Select.Option = AntDSelect.Option;

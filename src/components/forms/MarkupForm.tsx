@@ -99,7 +99,6 @@ const MarkupForm = (
       <Form.Item
         name={"children"}
         label={"Include Accounts"}
-        style={unitState !== model.models.MarkupUnitModels.PERCENT.id ? { display: "none" } : {}}
         rules={[
           { required: false },
           ({ getFieldValue }: { getFieldValue: any }) => ({
@@ -120,8 +119,8 @@ const MarkupForm = (
           suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
           showArrow
           loading={availableChildrenLoading}
-          disabled={availableChildrenLoading}
           mode={"multiple"}
+          disabled={availableChildrenLoading || unitState !== model.models.MarkupUnitModels.PERCENT.id}
         >
           {map(availableChildren, (obj: Model.SimpleAccount | Model.SimpleSubAccount, index: number) => {
             return (
