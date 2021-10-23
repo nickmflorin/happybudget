@@ -42,7 +42,6 @@ const RichTextNode = ({ node, ...props }: RichTextNodeProps): JSX.Element => {
         );
       }
     } else {
-      /* eslint-disable no-console */
       console.warn(`Corrupted heading tag ${node.tag} found!`);
       return <></>;
     }

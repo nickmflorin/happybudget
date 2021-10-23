@@ -110,7 +110,6 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
             const models = yield call(requestSubAccounts, objId, action.payload.ids);
             yield put(actionHandler(models));
           } else {
-            /* eslint-disable no-console */
             console.warn(
               `Trying to submit a request to update specific IDs of the model
               but have not provided the action handler to update the models in

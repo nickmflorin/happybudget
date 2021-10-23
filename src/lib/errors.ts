@@ -1,45 +1,55 @@
-import { isNil } from "lodash";
 import { toast } from "react-toastify";
 import * as Sentry from "@sentry/react";
+import { isNil } from "lodash";
 
-interface SilentFailProps {
-  readonly error?: Error | string | object;
-  readonly message?: string;
+interface NotifyConfig {
+  readonly error?: Error;
   readonly dispatchToSentry?: boolean;
   readonly notifyUser?: boolean;
 }
 
-export const silentFail = (params: SilentFailProps) => {
-  const notifyUser = params.notifyUser === undefined ? true : params.notifyUser;
-  const dispatchToSentry = params.dispatchToSentry === undefined ? true : params.dispatchToSentry;
+export const errorToString = (e: Error | string | object) => {
+  return e instanceof Error ? String(e) : typeof e === "string" ? e : JSON.stringify(e);
+};
 
-  const errorToString = (e: Error | string | object) => {
-    return e instanceof Error ? String(e) : typeof e === "string" ? e : JSON.stringify(e);
-  };
-
-  const dispatch = (error: Error | string | object) => {
-    if (dispatchToSentry === true && process.env.NODE_ENV === "production") {
-      error instanceof Error ? Sentry.captureException(error) : Sentry.captureMessage(errorToString(error));
+export const warn = (e: Error | string | object, config?: NotifyConfig) => {
+  const notifyUser = config?.notifyUser === undefined ? false : config.notifyUser;
+  const dispatchToSentry = config?.dispatchToSentry === undefined ? true : config.dispatchToSentry;
+  // Issuing a warning will dispatch to Sentry, issuing info will not.
+  if (dispatchToSentry) {
+    if (isNil(config?.error)) {
+      console.warn(errorToString(e));
+    } else {
+      // If the actual error is included, dispatch that to Sentry and just note the
+      // string representation in the console.
+      console.info(errorToString(e));
+      Sentry.captureException(config?.error);
     }
-  };
+  } else {
+    console.info(errorToString(e));
+  }
+  if (notifyUser === true) {
+    toast.warn(errorToString(e));
+  }
+};
 
-  const notify = (message: string) => {
-    if (notifyUser === true) {
-      toast.error(message);
+export const error = (e: Error | string | object, config?: NotifyConfig) => {
+  const notifyUser = config?.notifyUser === undefined ? false : config.notifyUser;
+  const dispatchToSentry = config?.dispatchToSentry === undefined ? true : config.dispatchToSentry;
+  // Issuing a error will dispatch to Sentry, issuing info will not.
+  if (dispatchToSentry) {
+    if (isNil(config?.error)) {
+      console.error(errorToString(e));
+    } else {
+      // If the actual error is included, dispatch that to Sentry and just note the
+      // string representation in the console.
+      console.info(errorToString(e));
+      Sentry.captureException(config?.error);
     }
-  };
-
-  if (!isNil(params.error)) {
-    /* eslint-disable-next-line no-console */
-    console.warn(params.error);
-    if (typeof params.error === "string" || typeof params.message === "string") {
-      notify(typeof params.message === "string" ? params.message : errorToString(params.error));
-    }
-    dispatch(params.error);
-  } else if (!isNil(params.message)) {
-    /* eslint-disable-next-line no-console */
-    console.error(params.message);
-    notify(params.message);
-    dispatch(params.message);
+  } else {
+    console.info(errorToString(e));
+  }
+  if (notifyUser === true) {
+    toast.error(errorToString(e));
   }
 };

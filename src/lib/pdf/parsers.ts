@@ -112,12 +112,10 @@ export const structureNode = (node: Node): Pdf.HTMLNode[] => {
       return null;
     } else if (n.nodeType === Node.ELEMENT_NODE) {
       if (!isSupportedNode(n)) {
-        /* eslint-disable no-console */
         console.error(`Suspicious Behavior: Unsupported node ${n.nodeName} found!`);
         return null;
       } else {
         if (n.childNodes.length === 0) {
-          /* eslint-disable no-console */
           console.error(`Suspicious Behavior: Empty node ${n.nodeName} found!`);
           return null;
         }
@@ -125,7 +123,6 @@ export const structureNode = (node: Node): Pdf.HTMLNode[] => {
         if (n.childNodes.length === 1 && n.childNodes[0].nodeType === Node.TEXT_NODE) {
           const nodeValue = n.childNodes[0].nodeValue;
           if (isNil(nodeValue) || nodeValue === "") {
-            /* eslint-disable no-console */
             console.error(`Suspicious Behavior: Node ${n.childNodes[0].nodeName} has invalid value ${nodeValue}!`);
             return null;
           }
@@ -140,14 +137,12 @@ export const structureNode = (node: Node): Pdf.HTMLNode[] => {
           (ni: Pdf.HTMLNode | null) => !isNil(ni)
         ) as Pdf.HTMLNode[];
         if (children.length === 0) {
-          /* eslint-disable no-console */
           console.error(`Suspicious Behavior: Empty node ${n.nodeName} found!`);
           return null;
         }
         return { tag, type: structuredNodeType(n), data: children } as Pdf.HTMLNode;
       }
     } else {
-      /* eslint-disable no-console */
       console.error(`Suspicious Behavior: Unsupported node type ${n.nodeType} found!`);
       return null;
     }

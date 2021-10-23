@@ -24,7 +24,6 @@ const Login = (): JSX.Element => {
   const handleTokenError = useMemo(
     () => (e: Http.IApiError<"auth", Http.TokenErrorCode>, tokenType: Http.TokenType, userId?: number | undefined) => {
       if (e.code === "token_expired" && isNil(userId)) {
-        /* eslint-disable no-console */
         console.error(
           `The token of type ${location.state.tokenType} has expired, but we cannot
               resend the email because the response did not include the user's ID.`
@@ -66,7 +65,6 @@ const Login = (): JSX.Element => {
         }
       } else if (e.code === "email_not_verified") {
         if (isNil(userId)) {
-          /* eslint-disable no-console */
           console.error(
             `The user's email confirmation token has expired, but we cannot
               resend the verification email because the response did not include
@@ -145,7 +143,7 @@ const Login = (): JSX.Element => {
             .finally(() => setLoading(false));
         }}
         onGoogleError={(error: any) => {
-          errors.silentFail(error);
+          errors.error(error);
           form.notify("There was an error authenticating with Google.");
         }}
         onSubmit={(values: ILoginFormValues) => {

@@ -33,11 +33,8 @@ const PrivateRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
         if (!axios.isCancel(e)) {
           if (e instanceof api.ClientError && e.authenticationErrors.length !== 0) {
             setRedirect(true);
-          } else if (e instanceof api.NetworkError || e instanceof api.ClientError || e instanceof api.ServerError) {
-            /* eslint-disable no-console */
-            console.error(e);
           } else {
-            throw e;
+            api.handleRequestError(e);
           }
         }
       })

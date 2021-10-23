@@ -15,7 +15,6 @@ export const importFontModules = (): Promise<{ [key: string]: any }> => import("
 export const getPdfFont = (font: Style.Font, modules: { [key: string]: any }): Pdf.Font | null => {
   const moduleName = getFontSourceModuleName(font);
   if (isNil(modules[moduleName])) {
-    /* eslint-disable no-console */
     console.warn(`Module ${moduleName} is not on fonts path for ${fontToString(font)}.  It will not be registered.`);
     return null;
   } else if (font.italic === true) {
@@ -309,7 +308,6 @@ const Styles: Pdf.ExtensionStyles = { ...TextStyles, ...LayoutStyles, ...ExportS
 export const styleForClassName = (className: string): Pdf.Style => {
   let style: Pdf.ExtensionStyle = {};
   if (isNil(Styles[className.trim()])) {
-    /* eslint-disable no-console */
     console.warn(`Unrecognized class name ${className}`);
     return style;
   }

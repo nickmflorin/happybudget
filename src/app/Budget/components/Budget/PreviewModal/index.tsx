@@ -5,7 +5,7 @@ import { isNil, map, debounce, filter } from "lodash";
 
 import * as api from "api";
 import { registerFonts } from "style/pdf";
-import { util, redux, ui, tabling, pdf, errors } from "lib";
+import { util, redux, ui, tabling, pdf } from "lib";
 
 import { Modal } from "components";
 import { ExportPdfForm } from "components/forms";
@@ -123,14 +123,14 @@ const PreviewModal = ({
           .getBase64(blb)
           .then((result: ArrayBuffer | string) => setFile(result))
           .catch((e: Error) => {
-            errors.silentFail({ error: e, message: "There was an error generating the PDF." });
+            console.error("There was an error generating the PDF.");
           })
           .finally(() => {
             setGeneratingPdf(false);
           });
       })
       .catch((e: Error) => {
-        errors.silentFail({ error: e, message: "There was an error generating the PDF." });
+        console.error("There was an error generating the PDF.");
         setGeneratingPdf(false);
       });
   };

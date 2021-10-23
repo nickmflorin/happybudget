@@ -30,7 +30,14 @@
     "no-unused-expressions": "warn",
     "no-multi-spaces": "warn",
     "no-trailing-spaces": "warn",
-    "no-console": "warn",
+    "no-console": "off",
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "CallExpression[callee.object.name='console'][callee.property.name!=/^(debug|warn|error|info)$/]",
+        "message": "This property on console is not allowed."
+      }
+    ],
     "no-eval": "warn",
     "import/first": "warn",
     "object-curly-spacing": [1, "always"],

@@ -55,17 +55,17 @@ export const parseHttpErrors = (error: Http.IHttpClientError | Http.ErrorRespons
   filter(parseErrors(error), { error_type: "http" }) as Http.HttpError[];
 
 export const handleRequestError = (e: Error, message = "") => {
-  // TODO: Improve this - this most likely can be it's own saga (maybe even at the
-  // global application level) that dispatches error messages to a queue.
   if (e instanceof ClientError) {
-    errors.silentFail({
-      message: message === "" ? "There was a problem with your request." : message,
-      error: e
+    errors.warn(message || "There was a problem with your request.", {
+      error: e,
+      notifyUser: true,
+      dispatchToSentry: false
     });
   } else if (e instanceof NetworkError) {
-    errors.silentFail({
-      message: "There was a problem communicating with the server.",
-      error: e
+    errors.error(message || "There was a problem communicating with the server.", {
+      error: e,
+      notifyUser: true,
+      dispatchToSentry: true
     });
   } else {
     throw e;

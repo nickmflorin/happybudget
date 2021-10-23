@@ -1,49 +1,26 @@
 import { Suspense } from "react";
 import { Router, Switch, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import * as Sentry from "@sentry/react";
-import { Integrations } from "@sentry/tracing";
+import { History } from "history";
 import "style/index.scss";
 
 import { ApplicationSpinner } from "components";
 import { AuthenticatedReduxRoute, UnauthenticatedReduxRoute } from "components/routes";
 
 import * as config from "config";
-import { history } from "store";
 
 const Landing = config.lazyWithRetry(() => import("./Landing"));
 const Application = config.lazyWithRetry(() => import("./Application"));
 const EmailVerification = config.lazyWithRetry(() => import("./Landing/EmailVerification"));
 const PasswordRecovery = config.lazyWithRetry(() => import("./Landing/PasswordRecovery"));
 
-let prevPath: string | null = null;
-
-if (process.env.NODE_ENV === "production") {
-  Sentry.init({
-    dsn: "https://c27df092747b4aae964b2ff6f07c3497@o591585.ingest.sentry.io/5740401",
-    environment: process.env.NODE_ENV,
-    // By default Sentry SDKs normalize any context to a depth of 3, which in the case of sending
-    // Redux state you probably will want to increase that.
-    normalizeDepth: 10,
-    integrations: [
-      new Integrations.BrowserTracing({
-        routingInstrumentation: Sentry.reactRouterV5Instrumentation(history)
-      })
-    ],
-    tracesSampleRate: 1.0
-  });
-  // Listen and notify Segment of client-side page updates.
-  history.listen(location => {
-    if (location.pathname !== prevPath) {
-      prevPath = location.pathname;
-      window.analytics.page();
-    }
-  });
+interface AppProps {
+  readonly history: History;
 }
 
-function App(): JSX.Element {
+function App(props: AppProps): JSX.Element {
   return (
-    <Router history={history}>
+    <Router history={props.history}>
       <ToastContainer />
       <div className={"root"}>
         <div id={"application-spinner-container"}></div>

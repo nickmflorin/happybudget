@@ -63,7 +63,6 @@ export const mergeChangesWithRow = <R extends Table.RowData>(
       consolidated,
       (curr: R, change: Table.RowChange<R>) => {
         if (change.id !== id) {
-          /* eslint-disable no-console */
           console.error("Cannot apply table changes from one row to another row!");
           return curr;
         } else {

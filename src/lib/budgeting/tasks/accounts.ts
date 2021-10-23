@@ -84,7 +84,6 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
             const models = yield call(requestAccounts, objId, action.payload.ids);
             yield put(actionHandler(models));
           } else {
-            /* eslint-disable no-console */
             console.warn(
               `Trying to submit a request to update specific IDs of the model
               but have not provided the action handler to update the models in

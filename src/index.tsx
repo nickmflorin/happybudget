@@ -1,11 +1,10 @@
-import configureApplication from "./config";
-
 import ReactDOM from "react-dom";
 
 import "style/index.scss";
-import App from "./app";
 
-configureApplication();
+import App from "./app";
+import configureApplication from "./config";
+import { history } from "./store";
 
 /*
 Note:
@@ -28,4 +27,6 @@ have a chance to address these warnings.
 
 The most frequent package that causes the warnings is AntD.
 */
-ReactDOM.render(<App />, document.getElementById("root"));
+configureApplication(history, () => {
+  ReactDOM.render(<App history={history} />, document.getElementById("root"));
+});

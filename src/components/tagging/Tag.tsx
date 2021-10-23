@@ -60,7 +60,6 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
       if (!isNil(props.modelTextField)) {
         const modelTextFieldValue = util.getKeyValue<M, keyof M>(props.modelTextField)(m);
         if (!isNil(modelTextFieldValue) && typeof modelTextFieldValue !== "string") {
-          /* eslint-disable no-console */
           console.error(`The field ${props.modelTextField} did not return a string.`);
           return "";
         }
@@ -103,7 +102,6 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
       if (isNil(color)) {
         return Colors.DEFAULT_TAG_BACKGROUND;
       } else if (typeof color !== "string") {
-        /* eslint-disable no-console */
         console.error(`The field ${field} did not return a string color.`);
         return Colors.DEFAULT_TAG_BACKGROUND;
       }
@@ -111,7 +109,6 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
         color = `#${color}`;
       }
       if (color.length !== 7) {
-        /* eslint-disable no-console */
         console.error(`The field ${field} did not return a valid HEX string color.`);
         return Colors.DEFAULT_TAG_BACKGROUND;
       }

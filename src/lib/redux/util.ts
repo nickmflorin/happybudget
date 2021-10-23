@@ -6,7 +6,6 @@ interface WarningParams {
 }
 
 export const warnInconsistentState = ({ level = "warn", ...props }: WarningParams): void => {
-  /* eslint-disable no-console */
   const method = console[level || "warn"];
 
   let message = "Inconsistent State!";

@@ -22,7 +22,6 @@ const useColumnHelpers = <R extends Table.RowData, M extends Model.HttpModel>(
         if (!isNil(foundColumn)) {
           return foundColumn;
         } else {
-          /* eslint-disable no-console */
           console.error(`Could not find column for field ${field}!`);
           return null;
         }

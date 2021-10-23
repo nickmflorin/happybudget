@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import { Redirect } from "react-router-dom";
-import { logout } from "api/services";
+import * as api from "api";
 
 export const Logout = (): JSX.Element => {
   const [redirect, setRedirect] = useState(false);
 
   useEffect(() => {
-    logout()
+    api
+      .logout()
       .then(() => {
         setRedirect(true);
       })
       .catch(e => {
-        /* eslint-disable no-console */
-        console.error(`There was an error logging out: \n ${e}`);
+        api.handleRequestError(e, "There was an error logging out.");
       });
   }, []);
 

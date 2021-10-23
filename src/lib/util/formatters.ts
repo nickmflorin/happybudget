@@ -10,7 +10,6 @@ export const formatAsCurrency: Table.NativeFormatter<number | string> = (value: 
   }
   const numericValue = parseFloat(String(value));
   if (isNaN(numericValue)) {
-    /* eslint-disable no-console */
     console.error(`Could not parse value ${value} into currency!`);
     return "";
   }
@@ -23,7 +22,6 @@ export const formatPercentage: Table.NativeFormatter<number | string> = (value: 
   }
   const numericValue = parseFloat(String(value));
   if (isNaN(numericValue)) {
-    /* eslint-disable no-console */
     console.error(`Could not parse value ${value} into percentage!`);
     return "";
   }

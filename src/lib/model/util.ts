@@ -100,7 +100,6 @@ export const inferModelFromName = <M extends Model.Model>(
         if (strictUniqueness) {
           throw new Error(`Multiple models exist for field=${nameField} value=${value}.`);
         } else {
-          /* eslint-disable no-console */
           console.warn(`Multiple models exist for field=${nameField} value=${value}.`);
           return msCaseSensitive[0];
         }
@@ -152,7 +151,6 @@ export const getModelById = <M extends Model.Model>(
     if (options.throwOnMissing === true) {
       throw new Error(`Cannot find ${options.modelName || "model"} with ID ${id} in provided models!`);
     } else if (options.warnOnMissing === true) {
-      /* eslint-disable no-console */
       console.warn(`Cannot find ${options.modelName || "model"} with ID ${id} in provided models!`);
     }
     return null;
