@@ -8,7 +8,7 @@ import { Form as RootForm } from "antd";
 import { Breakpoints } from "style/constants";
 
 import * as api from "api";
-import { util, hooks } from "lib";
+import { util, hooks, notifications } from "lib";
 import * as typeguards from "./typeguards";
 
 export * from "./tsxHooks";
@@ -46,9 +46,9 @@ const formNotificationReducer = (
   action: FormNotifyAction | undefined
 ): FormNotification[] => {
   if (!isNil(action)) {
-    const notifications = Array.isArray(action.notifications) ? action.notifications : [];
+    const ns = Array.isArray(action.notifications) ? action.notifications : [];
     return reduce(
-      notifications,
+      ns,
       (curr: FormNotification[], n: FormNotification): FormNotification[] => {
         if (!typeguards.isRawFormNotification(n)) {
           return [
@@ -77,7 +77,7 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
   const _useAntdForm = RootForm.useForm();
   const antdForm = _useAntdForm[0];
 
-  const [notifications, dispatchNotification] = useReducer(formNotificationReducer, []);
+  const [ns, dispatchNotification] = useReducer(formNotificationReducer, []);
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
 
   const renderFieldErrors = useMemo(
@@ -144,7 +144,7 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
     return {
       ...antdForm,
       autoFocusField: form?.autoFocusField,
-      notifications,
+      notifications: ns,
       clearNotifications: () => dispatchNotification(undefined),
       submit: () => {
         dispatchNotification(undefined);
@@ -158,7 +158,7 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
       setLoading,
       handleRequestError: (e: Error, opts?: FormNotifyOptions) => {
         if (!axios.isCancel(e)) {
-          api.handleRequestError(e);
+          notifications.requestError(e, { notifyUser: false });
           if (e instanceof api.ClientError) {
             notify(e.errors, opts);
           } else if (e instanceof api.NetworkError) {
@@ -173,7 +173,7 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
       loading,
       ...form
     };
-  }, [form, antdForm, loading, notifications, notify]);
+  }, [form, antdForm, loading, ns, notify]);
 
   return wrapForm;
 };

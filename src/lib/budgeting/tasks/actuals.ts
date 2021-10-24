@@ -4,7 +4,7 @@ import { put, call, cancelled, fork, select, all } from "redux-saga/effects";
 import { map, isNil, filter } from "lodash";
 
 import * as api from "api";
-import * as tabling from "../../tabling";
+import { tabling, notifications } from "lib";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;
@@ -40,7 +40,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
         yield all([call(requestActuals, budgetId), call(requestActualTypes), call(requestOwnerTree, action)]);
       } catch (e: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(e as Error, "There was an error retrieving the table data.");
+          notifications.requestError(e as Error, "There was an error retrieving the table data.");
           yield put(config.actions.response({ models: [] }));
         }
       } finally {
@@ -101,7 +101,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
           yield put(config.actions.responseOwnerTree(response));
         } catch (e: unknown) {
           if (!(yield cancelled())) {
-            api.handleRequestError(e as Error, "There was an error retrieving the budget's items.");
+            notifications.requestError(e as Error, "There was an error retrieving the budget's items.");
             yield put(config.actions.responseOwnerTree({ count: 0, data: [] }));
           }
         } finally {
@@ -137,7 +137,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
       yield put(config.actions.addModelsToState({ placeholderIds: placeholderIds, models: response.children }));
     } catch (err: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(err as Error, errorMessage);
+        notifications.requestError(err as Error, errorMessage);
       }
     } finally {
       yield put(config.actions.saving(false));
@@ -159,7 +159,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
       yield call(api.bulkUpdateBudgetActuals, budgetId, requestPayload, { cancelToken: source.token });
     } catch (err: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(err as Error, errorMessage);
+        notifications.requestError(err as Error, errorMessage);
       }
     } finally {
       yield put(config.actions.saving(false));
@@ -176,7 +176,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
       yield call(api.bulkDeleteBudgetActuals, budgetId, ids, { cancelToken: source.token });
     } catch (err: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(err as Error, errorMessage);
+        notifications.requestError(err as Error, errorMessage);
       }
     } finally {
       yield put(config.actions.saving(false));

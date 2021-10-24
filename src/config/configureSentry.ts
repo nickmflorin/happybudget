@@ -14,7 +14,15 @@ const configureSentry = () => {
         })
       ],
       environment: process.env.REACT_APP_SENTRY_ENV || "development",
-      tracesSampleRate: 1.0
+      tracesSampleRate: 1.0,
+      beforeSend: (event: Sentry.Event) => {
+        // Allows us to disable Sentry for a single line of code.
+        if (event.extra?.ignore === true) {
+          return null;
+        }
+        return event;
+      },
+      ignoreErrors: ["e.dn is not a function"]
     });
   } else {
     console.info("Skipping Sentry Configuration; No DSN defined.");

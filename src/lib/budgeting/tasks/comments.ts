@@ -4,6 +4,7 @@ import { put, call, cancelled, select } from "redux-saga/effects";
 import { isNil } from "lodash";
 
 import * as api from "api";
+import { notifications } from "lib";
 
 export const createListResponseTaskSet = (
   config: Redux.TaskConfig<Redux.CommentsListResponseActionMap>
@@ -21,7 +22,7 @@ export const createListResponseTaskSet = (
         yield put(config.actions.response(response));
       } catch (e: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(e as Error, "There was an error retrieving the comments.");
+          notifications.requestError(e as Error, "There was an error retrieving the comments.");
           yield put(config.actions.response({ count: 0, data: [] }));
         }
       } finally {
@@ -52,7 +53,7 @@ export const createListResponseTaskSet = (
         yield put(config.actions.addToState({ data: response, parent }));
       } catch (e: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(e as Error, "There was an error submitting the comment.");
+          notifications.requestError(e as Error, "There was an error submitting the comment.");
         }
       } finally {
         if (!isNil(parent)) {
@@ -75,7 +76,7 @@ export const createListResponseTaskSet = (
         yield put(config.actions.removeFromState(action.payload));
       } catch (e: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(e as Error, "There was an error deleting the comment.");
+          notifications.requestError(e as Error, "There was an error deleting the comment.");
         }
       } finally {
         yield put(config.actions.deleting({ id: action.payload, value: false }));
@@ -99,7 +100,7 @@ export const createListResponseTaskSet = (
         yield put(config.actions.updateInState({ id, data: response }));
       } catch (e: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(e as Error, "There was an error updating the comment.");
+          notifications.requestError(e as Error, "There was an error updating the comment.");
         }
       } finally {
         yield put(config.actions.updating({ id, value: false }));

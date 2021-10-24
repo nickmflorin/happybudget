@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { map, isNil } from "lodash";
 
 import * as api from "api";
-import { redux } from "lib";
+import { redux, notifications } from "lib";
 
 import { WrapInApplicationSpinner } from "components";
 import { CommunityTemplateCard, EmptyCard } from "components/cards";
@@ -71,7 +71,7 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
                         dispatch(actions.updateCommunityTemplateInStateAction({ id: template.id, data: response }));
                         e.closeParentDropdown?.();
                       })
-                      .catch((err: Error) => api.handleRequestError(err))
+                      .catch((err: Error) => notifications.requestError(err))
                       .finally(() => setVisibilityToggled(template.id));
                   } else {
                     setTogglingVisibility(template.id);
@@ -81,7 +81,7 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
                         dispatch(actions.updateCommunityTemplateInStateAction({ id: template.id, data: response }));
                         e.closeParentDropdown?.();
                       })
-                      .catch((err: Error) => api.handleRequestError(err))
+                      .catch((err: Error) => notifications.requestError(err))
                       .finally(() => setVisibilityToggled(template.id));
                   }
                 }}
@@ -95,7 +95,7 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
                       e.closeParentDropdown?.();
                       dispatch(actions.removeCommunityTemplateFromStateAction(template.id));
                     })
-                    .catch((err: Error) => api.handleRequestError(err))
+                    .catch((err: Error) => notifications.requestError(err))
                     .finally(() => setDeleted(template.id));
                 }}
                 onClick={() => setTemplateToDerive(template.id)}
@@ -107,7 +107,7 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
                       e.closeParentDropdown?.();
                       dispatch(actions.addCommunityTemplateToStateAction(response));
                     })
-                    .catch((err: Error) => api.handleRequestError(err))
+                    .catch((err: Error) => notifications.requestError(err))
                     .finally(() => setDuplicated(template.id));
                 }}
               />

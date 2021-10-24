@@ -3,6 +3,7 @@ import { spawn, take, cancel, fork, call, put, cancelled } from "redux-saga/effe
 import axios from "axios";
 
 import * as api from "api";
+import { notifications } from "lib";
 
 import { ActionType } from "../actions";
 import * as actions from "../actions/pdf";
@@ -16,7 +17,7 @@ function* loadHeaderTemplateTask(id: number): SagaIterator {
     yield put(actions.displayHeaderTemplateAction(response));
   } catch (e: unknown) {
     if (!(yield cancelled())) {
-      api.handleRequestError(e as Error, "There was an error loading the header template.");
+      notifications.requestError(e as Error, "There was an error loading the header template.");
     }
   } finally {
     yield put(actions.setLoadingHeaderTemplateDetailAction(false));
@@ -50,7 +51,7 @@ function* getHeaderTemplatesTask(): SagaIterator {
     yield put(actions.responseHeaderTemplatesAction(response));
   } catch (e: unknown) {
     if (!(yield cancelled())) {
-      api.handleRequestError(e as Error, "There was an error retrieving the header templates.");
+      notifications.requestError(e as Error, "There was an error retrieving the header templates.");
       yield put(actions.responseHeaderTemplatesAction({ data: [], count: 0 }));
     }
   } finally {

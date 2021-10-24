@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import * as api from "api";
-import { ui, errors } from "lib";
+import { ui, notifications } from "lib";
 
 import SignupForm, { ISignupFormValues } from "components/forms/SignupForm";
 import { UnverifiedEmailNotification } from "./Notifications";
@@ -41,7 +41,7 @@ const Signup = (): JSX.Element => {
         }}
         onGoogleError={(error: any) => {
           // TODO: Try to do a better job parsing the error.
-          errors.error(error);
+          notifications.error(error);
           form.notify("There was an error authenticating with Google.");
         }}
         onSubmit={(values: ISignupFormValues) => {

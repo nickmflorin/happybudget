@@ -4,6 +4,7 @@
 /// <reference path="./redux.d.ts" />
 /// <reference path="./ui.d.ts" />
 /// <reference path="./files.d.ts" />
+/// <reference path="./notifications.d.ts" />
 
 interface Window {
   analytics: any;

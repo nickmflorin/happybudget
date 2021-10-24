@@ -4,7 +4,7 @@ import axios from "axios";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { budgeting, tabling } from "lib";
+import { budgeting, tabling, notifications } from "lib";
 import { FringesTable } from "components/tabling";
 
 import * as actions from "../actions";
@@ -61,7 +61,7 @@ export function* getTemplateTask(action: Redux.Action<null>): SagaIterator {
       yield put(actions.responseTemplateAction(response));
     } catch (e: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(e as Error, "There was an error retrieving the template.");
+        notifications.requestError(e as Error, "There was an error retrieving the template.");
         yield put(actions.responseTemplateAction(null));
       }
     } finally {

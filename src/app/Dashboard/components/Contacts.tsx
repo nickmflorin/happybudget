@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { isNil } from "lodash";
 
@@ -44,21 +44,23 @@ const Contacts = (): JSX.Element => {
   const dispatch = useDispatch();
 
   return (
-    <Page className={"contacts"} title={"My Contacts"}>
-      <ConnectedContactsTable
-        table={table}
-        tableId={"contacts-table"}
-        onRowExpand={(row: Table.ModelRow<R>) => setContactToEdit(row.id)}
-        exportFileName={"contacts"}
-      />
-      <CreateContactModal
-        open={newContactModalOpen}
-        onCancel={() => setNewContactModalOpen(false)}
-        onSuccess={(m: Model.Contact) => {
-          dispatch(globalActions.authenticated.addContactToStateAction(m));
-          setNewContactModalOpen(false);
-        }}
-      />
+    <React.Fragment>
+      <Page className={"contacts"} title={"My Contacts"}>
+        <ConnectedContactsTable
+          table={table}
+          tableId={"contacts-table"}
+          onRowExpand={(row: Table.ModelRow<R>) => setContactToEdit(row.id)}
+          exportFileName={"contacts"}
+        />
+        <CreateContactModal
+          open={newContactModalOpen}
+          onCancel={() => setNewContactModalOpen(false)}
+          onSuccess={(m: Model.Contact) => {
+            dispatch(globalActions.authenticated.addContactToStateAction(m));
+            setNewContactModalOpen(false);
+          }}
+        />
+      </Page>
       {!isNil(contactToEdit) && (
         <EditContactModal
           id={contactToEdit}
@@ -73,7 +75,7 @@ const Contacts = (): JSX.Element => {
           open={true}
         />
       )}
-    </Page>
+    </React.Fragment>
   );
 };
 

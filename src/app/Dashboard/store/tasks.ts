@@ -3,6 +3,7 @@ import { SagaIterator } from "redux-saga";
 import { call, put, select, cancelled } from "redux-saga/effects";
 
 import * as api from "api";
+import { notifications } from "lib";
 import * as actions from "./actions";
 
 // TODO: These need to be paginated!
@@ -24,7 +25,7 @@ export function* getBudgetsTask(action: Redux.Action): SagaIterator {
     yield put(actions.responseBudgetsAction(response));
   } catch (e: unknown) {
     if (!(yield cancelled())) {
-      api.handleRequestError(e as Error, "There was an error retrieving the budgets.");
+      notifications.requestError(e as Error, "There was an error retrieving the budgets.");
       yield put(actions.responseBudgetsAction({ count: 0, data: [] }));
     }
   } finally {
@@ -54,7 +55,7 @@ export function* getTemplatesTask(action: Redux.Action): SagaIterator {
     yield put(actions.responseTemplatesAction(response));
   } catch (e: unknown) {
     if (!(yield cancelled())) {
-      api.handleRequestError(e as Error, "There was an error retrieving the templates.");
+      notifications.requestError(e as Error, "There was an error retrieving the templates.");
       yield put(actions.responseTemplatesAction({ count: 0, data: [] }));
     }
   } finally {
@@ -84,7 +85,7 @@ export function* getCommunityTemplatesTask(action: Redux.Action): SagaIterator {
     yield put(actions.responseCommunityTemplatesAction(response));
   } catch (e: unknown) {
     if (!(yield cancelled())) {
-      api.handleRequestError(e as Error, "There was an error retrieving the community templates.");
+      notifications.requestError(e as Error, "There was an error retrieving the community templates.");
       yield put(actions.responseCommunityTemplatesAction({ count: 0, data: [] }));
     }
   } finally {

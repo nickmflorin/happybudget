@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { map, isNil } from "lodash";
 
 import * as api from "api";
-import { redux } from "lib";
+import { redux, notifications } from "lib";
 
 import { BudgetCard } from "components/cards";
 import { NoBudgets } from "components/empty";
@@ -39,55 +39,57 @@ const Budgets = (): JSX.Element => {
   }, []);
 
   return (
-    <Page
-      className={"budgets"}
-      loading={loading}
-      title={"My Budgets"}
-      contentScrollable={true}
-      subTitle={<BudgetsSubTitle onNewBudget={() => setCreateBudgetModalOpen(true)} />}
-    >
-      {budgets.length === 0 && responseWasReceived ? (
-        <NoBudgets title={"You don't have any templates yet! Create a new budget."} subTitle>
-          <BudgetEmptyIcon />
-        </NoBudgets>
-      ) : (
-        <div className={"dashboard-card-grid"}>
-          {map(budgets, (budget: Model.Budget, index: number) => {
-            return (
-              <BudgetCard
-                key={index}
-                budget={budget}
-                deleting={isDeleting(budget.id)}
-                duplicating={isDuplicating(budget.id)}
-                onClick={() => history.push(`/budgets/${budget.id}`)}
-                onEdit={() => setBudgetToEdit(budget.id)}
-                onDelete={(e: MenuItemClickEvent<MenuItemModel>) => {
-                  setDeleting(budget.id);
-                  api
-                    .deleteBudget(budget.id)
-                    .then(() => {
-                      e.closeParentDropdown?.();
-                      dispatch(actions.removeBudgetFromStateAction(budget.id));
-                    })
-                    .catch((err: Error) => api.handleRequestError(err))
-                    .finally(() => setDeleted(budget.id));
-                }}
-                onDuplicate={(e: MenuItemClickEvent<MenuItemModel>) => {
-                  setDuplicating(budget.id);
-                  api
-                    .duplicateBudget(budget.id)
-                    .then((response: Model.Budget) => {
-                      e.closeParentDropdown?.();
-                      dispatch(actions.addBudgetToStateAction(response));
-                    })
-                    .catch((err: Error) => api.handleRequestError(err))
-                    .finally(() => setDuplicated(budget.id));
-                }}
-              />
-            );
-          })}
-        </div>
-      )}
+    <React.Fragment>
+      <Page
+        className={"budgets"}
+        loading={loading}
+        title={"My Budgets"}
+        contentScrollable={true}
+        subTitle={<BudgetsSubTitle onNewBudget={() => setCreateBudgetModalOpen(true)} />}
+      >
+        {budgets.length === 0 && responseWasReceived ? (
+          <NoBudgets title={"You don't have any templates yet! Create a new budget."} subTitle>
+            <BudgetEmptyIcon />
+          </NoBudgets>
+        ) : (
+          <div className={"dashboard-card-grid"}>
+            {map(budgets, (budget: Model.Budget, index: number) => {
+              return (
+                <BudgetCard
+                  key={index}
+                  budget={budget}
+                  deleting={isDeleting(budget.id)}
+                  duplicating={isDuplicating(budget.id)}
+                  onClick={() => history.push(`/budgets/${budget.id}`)}
+                  onEdit={() => setBudgetToEdit(budget.id)}
+                  onDelete={(e: MenuItemClickEvent<MenuItemModel>) => {
+                    setDeleting(budget.id);
+                    api
+                      .deleteBudget(budget.id)
+                      .then(() => {
+                        e.closeParentDropdown?.();
+                        dispatch(actions.removeBudgetFromStateAction(budget.id));
+                      })
+                      .catch((err: Error) => notifications.requestError(err))
+                      .finally(() => setDeleted(budget.id));
+                  }}
+                  onDuplicate={(e: MenuItemClickEvent<MenuItemModel>) => {
+                    setDuplicating(budget.id);
+                    api
+                      .duplicateBudget(budget.id)
+                      .then((response: Model.Budget) => {
+                        e.closeParentDropdown?.();
+                        dispatch(actions.addBudgetToStateAction(response));
+                      })
+                      .catch((err: Error) => notifications.requestError(err))
+                      .finally(() => setDuplicated(budget.id));
+                  }}
+                />
+              );
+            })}
+          </div>
+        )}
+      </Page>
       {!isNil(budgetToEdit) && (
         <EditBudgetModal
           open={true}
@@ -110,7 +112,7 @@ const Budgets = (): JSX.Element => {
           }}
         />
       )}
-    </Page>
+    </React.Fragment>
   );
 };
 

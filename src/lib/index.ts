@@ -7,4 +7,4 @@ export * as pdf from "./pdf";
 export * as budgeting from "./budgeting";
 export * as ui from "./ui";
 export * as events from "./events";
-export * as errors from "./errors";
+export * as notifications from "./notifications";

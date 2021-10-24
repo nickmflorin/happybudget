@@ -5,7 +5,7 @@ import { call, put, select, cancelled, spawn } from "redux-saga/effects";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { redux, budgeting, tabling } from "lib";
+import { redux, budgeting, tabling, notifications } from "lib";
 
 import { AccountsTable } from "components/tabling";
 
@@ -27,7 +27,7 @@ export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
       yield put(actions.responseHistoryAction(response));
     } catch (e: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(e as Error, "There was an error retrieving the accounts history.");
+        notifications.requestError(e as Error, "There was an error retrieving the accounts history.");
       }
     } finally {
       yield put(actions.loadingHistoryAction(false));
