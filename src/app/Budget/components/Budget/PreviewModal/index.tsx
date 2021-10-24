@@ -167,7 +167,7 @@ const PreviewModal = ({
       getContainer={false}
       footer={null}
     >
-      <div className={"form-container"}>
+      <div className={"export-form-container"}>
         <ExportPdfForm
           form={form}
           initialValues={{
