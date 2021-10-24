@@ -81,8 +81,8 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         if (isAuthenticatedConfig(config)) {
           const actionHandler = config.actions.updateModelsInState;
           if (!isNil(actionHandler)) {
-            const models = yield call(requestAccounts, objId, action.payload.ids);
-            yield put(actionHandler(models));
+            const response: Http.ListResponse<Model.Account> = yield call(requestAccounts, objId, action.payload.ids);
+            yield put(actionHandler(response.data));
           } else {
             console.warn(
               `Trying to submit a request to update specific IDs of the model

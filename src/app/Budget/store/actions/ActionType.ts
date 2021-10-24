@@ -94,6 +94,7 @@ const ActionType = {
       Loading: "budget.subaccount.subaccounts.Loading",
       Response: "budget.subaccount.subaccounts.Response",
       AddToState: "budget.subaccount.subaccounts.AddToState",
+      UpdateInState: "budget.subaccount.subaccounts.UpdateInState",
       Clear: "budget.subaccount.subaccounts.Clear"
     },
     History: {
@@ -131,6 +132,7 @@ const ActionType = {
       Response: "budget.account.subaccounts.Response",
       SetSearch: "budget.account.subaccounts.SetSearch",
       AddToState: "budget.account.subaccounts.AddToState",
+      UpdateInState: "budget.account.subaccounts.UpdateInState",
       Clear: "budget.account.subaccounts.Clear"
     },
     History: {

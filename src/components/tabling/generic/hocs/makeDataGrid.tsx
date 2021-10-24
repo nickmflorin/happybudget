@@ -80,7 +80,7 @@ const DataGrid =
       const onFirstDataRendered: (e: FirstDataRenderedEvent) => void = hooks.useDynamicCallback(
         (e: FirstDataRenderedEvent): void => {
           props.onFirstDataRendered(e);
-          e.api.ensureIndexVisible(0);
+          e.api.ensureIndexVisible(1);
 
           const query = new URLSearchParams(location.search);
           const rowId = query.get("row");
@@ -221,7 +221,7 @@ const DataGrid =
         if (focused === false) {
           const firstEditableCol = getFirstEditableDisplayedColumn();
           if (!isNil(firstEditableCol)) {
-            props.apis?.grid.ensureIndexVisible(0);
+            props.apis?.grid.ensureIndexVisible(1);
             props.apis?.grid.ensureColumnVisible(firstEditableCol);
             setTimeout(() => props.apis?.grid.setFocusedCell(0, firstEditableCol), 0);
             // TODO: Investigate if there is a better way to do this - currently,

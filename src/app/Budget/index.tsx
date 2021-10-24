@@ -71,12 +71,20 @@ const RootBudget = (): JSX.Element => {
           icon: <Icon weight={"light"} icon={"file-spreadsheet"} />,
           activeIcon: <Icon weight={"solid"} icon={"file-spreadsheet"} />,
           onClick: () => {
+            // When coming from Actuals, we need to get the latest Budget in the case that
+            // Actual(s) were changed.  We only request the Budget when the Budget ID changes,
+            // which it will not have here, so we need to trigger the effect to manually request
+            // the data.
+            let state = {};
+            if (location.pathname.startsWith(`/budgets/${budgetId}/actuals`)) {
+              state = { requestData: true };
+            }
             if (!isNaN(parseInt(budgetId)) && !budgeting.urls.isBudgetRelatedUrl(location.pathname)) {
               const budgetLastVisited = budgeting.urls.getLastVisited("budgets", budgetId);
               if (!isNil(budgetLastVisited)) {
-                history.push(budgetLastVisited);
+                history.push(budgetLastVisited, state);
               } else {
-                history.push(`/budgets/${budgetId}`);
+                history.push(`/budgets/${budgetId}`, state);
               }
             }
           },

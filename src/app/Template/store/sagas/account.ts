@@ -47,6 +47,7 @@ const ActionMap = {
   response: actions.responseAction,
   saving: actions.savingTableAction,
   addModelsToState: actions.addModelsToStateAction,
+  updateModelsInState: actions.updateModelsInStateAction,
   loadingBudget: loadingTemplateAction,
   updateBudgetInState: updateTemplateInStateAction,
   setSearch: actions.setSearchAction,
@@ -93,6 +94,6 @@ function* getData(action: Redux.Action<any>): SagaIterator {
 export default function* rootSaga(): SagaIterator {
   yield takeLatest(actions.requestAccountAction.toString(), getAccount);
   yield takeLatest(actions.setAccountIdAction.toString(), getData);
-  yield takeLatest(actions.requestAction.toString(), getData);
+  yield takeLatest(actions.requestAction.toString(), Tasks.request);
   yield spawn(tableSaga);
 }
