@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { map, isNil } from "lodash";
 
 import * as api from "api";
-import { redux } from "lib";
+import { redux, notifications } from "lib";
 
 import { WrapInApplicationSpinner } from "components";
 import { TemplateCard, EmptyCard } from "components/cards";
@@ -74,7 +74,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
                         e.closeParentDropdown?.();
                         dispatch(actions.removeTemplateFromStateAction(template.id));
                       })
-                      .catch((err: Error) => api.handleRequestError(err))
+                      .catch((err: Error) => notifications.requestError(err))
                       .finally(() => setDeleted(template.id));
                   }}
                   onClick={() => setTemplateToDerive(template.id)}
@@ -87,7 +87,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
                         dispatch(actions.removeTemplateFromStateAction(template.id));
                         dispatch(actions.addCommunityTemplateToStateAction(response));
                       })
-                      .catch((err: Error) => api.handleRequestError(err))
+                      .catch((err: Error) => notifications.requestError(err))
                       .finally(() => setMoved(template.id));
                   }}
                   onDuplicate={(e: MenuItemClickEvent<MenuItemModel>) => {
@@ -98,7 +98,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
                         e.closeParentDropdown?.();
                         dispatch(actions.addTemplateToStateAction(response));
                       })
-                      .catch((err: Error) => api.handleRequestError(err))
+                      .catch((err: Error) => notifications.requestError(err))
                       .finally(() => setDuplicated(template.id));
                   }}
                 />

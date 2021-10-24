@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 import { map, isNil } from "lodash";
 
 import * as api from "api";
-import { redux } from "lib";
+import { redux, notifications } from "lib";
 
 import { BudgetCard } from "components/cards";
 import { NoBudgets } from "components/empty";
@@ -70,7 +70,7 @@ const Budgets = (): JSX.Element => {
                         e.closeParentDropdown?.();
                         dispatch(actions.removeBudgetFromStateAction(budget.id));
                       })
-                      .catch((err: Error) => api.handleRequestError(err))
+                      .catch((err: Error) => notifications.requestError(err))
                       .finally(() => setDeleted(budget.id));
                   }}
                   onDuplicate={(e: MenuItemClickEvent<MenuItemModel>) => {
@@ -81,7 +81,7 @@ const Budgets = (): JSX.Element => {
                         e.closeParentDropdown?.();
                         dispatch(actions.addBudgetToStateAction(response));
                       })
-                      .catch((err: Error) => api.handleRequestError(err))
+                      .catch((err: Error) => notifications.requestError(err))
                       .finally(() => setDuplicated(budget.id));
                   }}
                 />

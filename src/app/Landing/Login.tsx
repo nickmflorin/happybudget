@@ -3,7 +3,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import { isNil, includes } from "lodash";
 
 import * as api from "api";
-import { ui, errors } from "lib";
+import { ui, notifications } from "lib";
 
 import { LoginForm } from "components/forms";
 import { ILoginFormValues } from "components/forms/LoginForm";
@@ -143,7 +143,7 @@ const Login = (): JSX.Element => {
             .finally(() => setLoading(false));
         }}
         onGoogleError={(error: any) => {
-          errors.error(error);
+          notifications.error(error);
           form.notify("There was an error authenticating with Google.");
         }}
         onSubmit={(values: ILoginFormValues) => {

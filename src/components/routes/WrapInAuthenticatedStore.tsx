@@ -7,7 +7,7 @@ import axios from "axios";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { ui } from "lib";
+import { ui, notifications } from "lib";
 import { ApplicationSpinner } from "components";
 import { history, configureAuthenticatedStore } from "store/configureStore";
 
@@ -37,7 +37,7 @@ const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): 
           if (e instanceof api.ClientError && e.authenticationErrors.length !== 0) {
             setRedirect(true);
           } else {
-            api.handleRequestError(e);
+            notifications.requestError(e, { notifyUser: false });
           }
         }
       })

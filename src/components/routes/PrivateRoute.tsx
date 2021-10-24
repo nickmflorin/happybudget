@@ -4,7 +4,7 @@ import { Route, Redirect } from "react-router-dom";
 import axios from "axios";
 
 import * as api from "api";
-import { ui } from "lib";
+import { ui, notifications } from "lib";
 import { actions } from "store";
 import { WrapInApplicationSpinner } from "components";
 
@@ -34,7 +34,7 @@ const PrivateRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
           if (e instanceof api.ClientError && e.authenticationErrors.length !== 0) {
             setRedirect(true);
           } else {
-            api.handleRequestError(e);
+            notifications.requestError(e, { notifyUser: false });
           }
         }
       })

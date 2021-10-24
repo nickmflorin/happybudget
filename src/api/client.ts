@@ -3,7 +3,7 @@ import axiosRetry from "axios-retry";
 import Cookies from "universal-cookie";
 import { isNil } from "lodash";
 
-import { util, errors } from "lib";
+import { util, notifications } from "lib";
 
 import { ClientError, NetworkError, ServerError } from "./errors";
 
@@ -92,7 +92,7 @@ const throwClientError = (error: AxiosError<Http.ErrorResponse>) => {
           url
         });
       } else {
-        errors.warn(`
+        notifications.warn(`
           The response body from the backend does not conform to a standard convention for indicating
           a client error - the specific type of error cannot be determined.
       `);

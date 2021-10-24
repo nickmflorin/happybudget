@@ -5,7 +5,7 @@ import { isNil, map, debounce, filter } from "lodash";
 
 import * as api from "api";
 import { registerFonts } from "style/pdf";
-import { util, redux, ui, tabling, pdf } from "lib";
+import { util, redux, ui, tabling, pdf, notifications } from "lib";
 
 import { Modal } from "components";
 import { ExportPdfForm } from "components/forms";
@@ -107,7 +107,7 @@ const PreviewModal = ({
           })
           // TODO: We should probably display the error in the modal and not let the default toast
           // package display it in the top right of the window.
-          .catch((e: Error) => api.handleRequestError(e))
+          .catch((e: Error) => notifications.requestError(e))
           .finally(() => setLoadingData(false));
       });
     }

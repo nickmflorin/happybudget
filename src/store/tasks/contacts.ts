@@ -4,7 +4,7 @@ import { put, call, cancelled, fork } from "redux-saga/effects";
 import { map, isNil, filter } from "lodash";
 
 import * as api from "api";
-import { tabling } from "lib";
+import { tabling, notifications } from "lib";
 
 import * as actions from "../actions";
 
@@ -21,7 +21,7 @@ export function* request(action: Redux.Action): SagaIterator {
     yield put(actions.responseContactsAction(response));
   } catch (e: unknown) {
     if (!(yield cancelled())) {
-      api.handleRequestError(e as Error, "There was an error retrieving the contacts.");
+      notifications.requestError(e as Error, "There was an error retrieving the contacts.");
       yield put(actions.responseContactsAction({ count: 0, data: [] }));
     }
   } finally {
@@ -49,7 +49,7 @@ export const createTableTaskSet = (
       yield put(config.actions.response({ models: response.data }));
     } catch (e: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(e as Error, "There was an error retrieving the contacts.");
+        notifications.requestError(e as Error, "There was an error retrieving the contacts.");
         yield put(config.actions.response({ models: [] }));
       }
     } finally {
@@ -79,7 +79,7 @@ export const createTableTaskSet = (
       yield put(config.actions.addModelsToState({ placeholderIds: placeholderIds, models: response.data }));
     } catch (err: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(err as Error, errorMessage);
+        notifications.requestError(err as Error, errorMessage);
       }
     } finally {
       yield put(config.actions.saving(false));
@@ -99,7 +99,7 @@ export const createTableTaskSet = (
       yield call(api.bulkUpdateContacts, requestPayload, { cancelToken: source.token });
     } catch (err: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(err as Error, errorMessage);
+        notifications.requestError(err as Error, errorMessage);
       }
     } finally {
       yield put(config.actions.saving(false));
@@ -115,7 +115,7 @@ export const createTableTaskSet = (
       yield call(api.bulkDeleteContacts, ids, { cancelToken: source.token });
     } catch (err: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(err as Error, errorMessage);
+        notifications.requestError(err as Error, errorMessage);
       }
     } finally {
       yield put(config.actions.saving(false));

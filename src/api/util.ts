@@ -1,7 +1,6 @@
 import { isMatch, reduce, filter } from "lodash";
 
-import { errors } from "lib";
-import { ClientError, NetworkError } from "./errors";
+import { ClientError } from "./errors";
 
 export type ErrorFilter = ((error: Http.Error) => boolean) | { [key: string]: any };
 export type ErrorStandardizer<T> = (error: T) => T;
@@ -53,21 +52,3 @@ export const parseUnknownErrors = (
 
 export const parseHttpErrors = (error: Http.IHttpClientError | Http.ErrorResponse | Http.Error[]): Http.HttpError[] =>
   filter(parseErrors(error), { error_type: "http" }) as Http.HttpError[];
-
-export const handleRequestError = (e: Error, message = "") => {
-  if (e instanceof ClientError) {
-    errors.warn(message || "There was a problem with your request.", {
-      error: e,
-      notifyUser: true,
-      dispatchToSentry: false
-    });
-  } else if (e instanceof NetworkError) {
-    errors.error(message || "There was a problem communicating with the server.", {
-      error: e,
-      notifyUser: true,
-      dispatchToSentry: true
-    });
-  } else {
-    throw e;
-  }
-};

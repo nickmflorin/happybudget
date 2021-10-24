@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Redirect } from "react-router-dom";
 import * as api from "api";
+import { notifications } from "lib";
 
 export const Logout = (): JSX.Element => {
   const [redirect, setRedirect] = useState(false);
@@ -12,7 +13,7 @@ export const Logout = (): JSX.Element => {
         setRedirect(true);
       })
       .catch(e => {
-        api.handleRequestError(e, "There was an error logging out.");
+        notifications.requestError(e, { message: "There was an error logging out." });
       });
   }, []);
 

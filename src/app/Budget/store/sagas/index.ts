@@ -4,7 +4,7 @@ import axios, { CancelTokenSource } from "axios";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { budgeting, tabling } from "lib";
+import { budgeting, tabling, notifications } from "lib";
 import { FringesTable } from "components/tabling";
 
 import * as actions from "../actions";
@@ -60,7 +60,7 @@ function* getBudgetTask(action: Redux.Action<null>, source: CancelTokenSource): 
       yield put(actions.responseBudgetAction(response));
     } catch (e: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(e as Error, "There was an error retrieving the budget.");
+        notifications.requestError(e as Error, "There was an error retrieving the budget.");
         yield put(actions.responseBudgetAction(null));
       }
     } finally {

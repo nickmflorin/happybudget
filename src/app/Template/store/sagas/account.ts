@@ -4,7 +4,7 @@ import { call, put, select, cancelled, spawn, takeLatest, all } from "redux-saga
 import { isNil, filter, intersection } from "lodash";
 
 import * as api from "api";
-import { budgeting, tabling } from "lib";
+import { budgeting, tabling, notifications } from "lib";
 
 import { SubAccountsTable } from "components/tabling";
 
@@ -28,7 +28,7 @@ function* getAccount(action: Redux.Action<null>): SagaIterator {
       yield put(actions.responseAccountAction(response));
     } catch (e: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(e as Error, "There was an error retrieving the account.");
+        notifications.requestError(e as Error, "There was an error retrieving the account.");
         yield put(actions.responseAccountAction(null));
       }
     } finally {

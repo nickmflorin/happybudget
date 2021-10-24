@@ -4,7 +4,7 @@ import { StrictEffect, call, put, select, fork, cancelled, all } from "redux-sag
 import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
-import { tabling, redux } from "lib";
+import { tabling, redux, notifications } from "lib";
 
 type R = Tables.AccountRowData;
 type C = Model.Account;
@@ -116,7 +116,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
           }
         } catch (e: unknown) {
           if (!(yield cancelled())) {
-            api.handleRequestError(e as Error, "There was an error retrieving the table data.");
+            notifications.requestError(e as Error, "There was an error retrieving the table data.");
             yield put(config.actions.response({ models: [], groups: [], markups: [] }));
           }
         } finally {
@@ -170,7 +170,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         yield put(config.actions.addModelsToState({ placeholderIds: placeholderIds, models: response.children }));
       } catch (err: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(err as Error, errorMessage);
+          notifications.requestError(err as Error, errorMessage);
         }
       } finally {
         yield put(config.actions.saving(false));
@@ -200,7 +200,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
       } catch (err: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(err as Error, errorMessage);
+          notifications.requestError(err as Error, errorMessage);
         }
       } finally {
         yield put(config.actions.saving(false));
@@ -241,7 +241,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         yield all(validEffects);
       } catch (err: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(err as Error, "There was an error updating the table rows.");
+          notifications.requestError(err as Error, "There was an error updating the table rows.");
         }
       } finally {
         yield put(config.actions.saving(false));
@@ -297,7 +297,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         );
       } catch (err: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(err as Error, "There was an error updating the table rows.");
+          notifications.requestError(err as Error, "There was an error updating the table rows.");
         }
       } finally {
         yield put(config.actions.saving(false));
@@ -372,7 +372,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
             yield all([call(deleteGroups, groupRowIds), call(bulkDeleteRows, objId, modelRowIds, markupRowIds)]);
           } catch (err: unknown) {
             if (!(yield cancelled())) {
-              api.handleRequestError(err as Error, "There was an error removing the rows.");
+              notifications.requestError(err as Error, "There was an error removing the rows.");
             }
           } finally {
             yield put(config.actions.saving(false));
