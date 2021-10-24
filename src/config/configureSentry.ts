@@ -21,7 +21,8 @@ const configureSentry = () => {
           return null;
         }
         return event;
-      }
+      },
+      ignoreErrors: ["e.dn is not a function"]
     });
   } else {
     console.info("Skipping Sentry Configuration; No DSN defined.");
