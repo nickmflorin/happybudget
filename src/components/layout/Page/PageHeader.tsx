@@ -3,24 +3,16 @@ import { isNil, map } from "lodash";
 import classNames from "classnames";
 import { ShowHide, VerticalFlexCenter } from "components";
 
-export interface PageHeaderProps extends StandardComponentProps {
-  title?: string;
-  subTitle?: JSX.Element | JSX.Element[];
-  titleProps?: StandardComponentProps;
-  extra?: JSX.Element[];
+export interface PageHeaderProps extends StandardComponentWithChildrenProps {
+  readonly title?: string;
+  readonly titleProps?: StandardComponentProps;
+  readonly extra?: JSX.Element[];
 }
 
-const PageHeader: React.FC<PageHeaderProps> = ({
-  title,
-  subTitle,
-  className,
-  extra,
-  titleProps = {},
-  style = {}
-}): JSX.Element => {
+const PageHeader: React.FC<PageHeaderProps> = ({ title, extra, titleProps = {}, children, ...props }): JSX.Element => {
   return (
-    <div className={classNames("page-header", className)} style={style}>
-      <div className={classNames("page-header-title", { "with-subtitle": !isNil(subTitle) })}>
+    <div {...props} className={classNames("page-header", props.className)}>
+      <div className={classNames("page-header-title")}>
         <div className={"title-text-wrapper"}>
           <ShowHide show={!isNil(title)}>
             <div className={classNames("page-header-title-text", titleProps.className)} style={titleProps.style}>
@@ -36,7 +28,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
           </div>
         )}
       </div>
-      {!isNil(subTitle) && <div className={"page-header-subtitle"}>{subTitle}</div>}
+      {!isNil(children) && <div className={"page-header-subtitle"}>{children}</div>}
     </div>
   );
 };
