@@ -43,6 +43,7 @@ const ActionType = {
       Loading: "template.subaccount.subaccounts.Loading",
       Response: "template.subaccount.subaccounts.Response",
       AddToState: "template.subaccount.subaccounts.AddToState",
+      UpdateInState: "template.subaccount.subaccounts.AddToState",
       Clear: "template.subaccount.subaccounts.Clear"
     }
   },
@@ -60,6 +61,7 @@ const ActionType = {
       Saving: "template.account.subaccounts.Saving",
       SetSearch: "template.account.subaccounts.SetSearch",
       AddToState: "template.account.subaccounts.AddToState",
+      UpdateInState: "template.account.subaccounts.UpdateInState",
       Clear: "template.account.subaccounts.Clear"
     }
   }

@@ -39,6 +39,7 @@ const genericReducer = combineReducers({
           responseSubAccountUnits: actions.responseSubAccountUnitsAction,
           saving: actions.account.savingTableAction,
           addModelsToState: actions.account.addModelsToStateAction,
+          updateModelsInState: actions.account.updateModelsInStateAction,
           setSearch: actions.account.setSearchAction,
           clear: actions.account.clearAction
         },
@@ -87,6 +88,7 @@ const genericReducer = combineReducers({
           response: actions.subAccount.responseAction,
           saving: actions.subAccount.savingTableAction,
           addModelsToState: actions.subAccount.addModelsToStateAction,
+          updateModelsInState: actions.subAccount.updateModelsInStateAction,
           setSearch: actions.subAccount.setSearchAction,
           clear: actions.subAccount.clearAction
         },

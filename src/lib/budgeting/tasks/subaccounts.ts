@@ -102,13 +102,18 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
   function* request(action: Redux.Action<Redux.TableRequestPayload>): SagaIterator {
     const objId = yield select(config.selectObjId);
     const budgetId = yield select(config.selectBudgetId);
+
     if (!isNil(objId) && !isNil(budgetId)) {
       if (redux.typeguards.isListRequestIdsAction(action)) {
         if (isAuthenticatedConfig(config)) {
           const actionHandler = config.actions.updateModelsInState;
           if (!isNil(actionHandler)) {
-            const models = yield call(requestSubAccounts, objId, action.payload.ids);
-            yield put(actionHandler(models));
+            const response: Http.ListResponse<Model.SubAccount> = yield call(
+              requestSubAccounts,
+              objId,
+              action.payload.ids
+            );
+            yield put(actionHandler(response.data));
           } else {
             console.warn(
               `Trying to submit a request to update specific IDs of the model

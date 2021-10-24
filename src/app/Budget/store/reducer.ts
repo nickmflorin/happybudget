@@ -103,6 +103,7 @@ const genericReducer = combineReducers({
           responseSubAccountUnits: actions.responseSubAccountUnitsAction,
           saving: actions.account.savingTableAction,
           addModelsToState: actions.account.addModelsToStateAction,
+          updateModelsInState: actions.account.updateModelsInStateAction,
           setSearch: actions.account.setSearchAction
         },
         tableId: "account-subaccounts-table",
@@ -173,6 +174,7 @@ const genericReducer = combineReducers({
           response: actions.subAccount.responseAction,
           saving: actions.subAccount.savingTableAction,
           addModelsToState: actions.subAccount.addModelsToStateAction,
+          updateModelsInState: actions.subAccount.updateModelsInStateAction,
           setSearch: actions.subAccount.setSearchAction
         },
         columns: SubAccountColumns,

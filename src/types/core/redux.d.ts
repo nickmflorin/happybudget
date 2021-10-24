@@ -229,7 +229,7 @@ namespace Redux {
     readonly tableChanged: Table.ChangeEvent<R, M>;
     readonly saving: boolean;
     readonly addModelsToState: Redux.AddModelsToTablePayload<M>;
-    readonly updateModelsInState?: SingleOrArray<M>;
+    readonly updateModelsInState?: UpdateModelsInTablePayload<M>;
   };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -245,6 +245,9 @@ namespace Redux {
     readonly placeholderIds: Table.PlaceholderRowId[];
     readonly models: M[];
   };
+
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type UpdateModelsInTablePayload<M extends Model.HttpModel> = SingleOrArray<M>;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type BudgetTableStore<R extends Tables.BudgetRowData> = Redux.TableStore<R>;

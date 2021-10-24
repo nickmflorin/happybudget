@@ -22,6 +22,9 @@ export const responseAction = createAction<Http.TableResponse<Model.SubAccount>>
 export const addModelsToStateAction = createAction<Redux.AddModelsToTablePayload<Model.SubAccount>>(
   ActionType.SubAccount.SubAccounts.AddToState
 );
+export const updateModelsInStateAction = createAction<Redux.UpdateModelsInTablePayload<Model.SubAccount>>(
+  ActionType.SubAccount.SubAccounts.UpdateInState
+);
 export const setSearchAction = createAction<string>(ActionType.SubAccount.SubAccounts.SetSearch);
 
 export const requestCommentsAction = createAction<null>(ActionType.SubAccount.Comments.Request);
