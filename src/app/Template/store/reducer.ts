@@ -49,7 +49,6 @@ const genericReducer = combineReducers({
           (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
             intersection([c.field, c.colId], ["variance", "contact", "actual"]).length === 0
         ),
-        fringesTableChangedAction: actions.handleFringesTableChangeEventAction,
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
           tableId: "fringes-table",
           initialState: initialState.account.table.fringes,
@@ -98,7 +97,6 @@ const genericReducer = combineReducers({
             intersection([c.field, c.colId], ["variance", "contact", "actual"]).length === 0
         ),
         getModelRowChildren: (m: Model.SubAccount) => m.children,
-        fringesTableChangedAction: actions.handleFringesTableChangeEventAction,
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
           tableId: "fringes-table",
           initialState: initialState.subaccount.table.fringes,

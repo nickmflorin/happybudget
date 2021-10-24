@@ -1,4 +1,3 @@
-import { PayloadActionCreator } from "@reduxjs/toolkit";
 import { isNil, filter } from "lodash";
 
 import { tabling, redux, model } from "lib";
@@ -84,7 +83,6 @@ export type AuthenticatedSubAccountTableActionMap = Redux.AuthenticatedTableActi
 export const createAuthenticatedSubAccountsTableReducer = (
   config: BudgetTableReducerConfig<R, M, S, AuthenticatedSubAccountTableActionMap> & {
     readonly fringes: Redux.Reducer<Tables.FringeTableStore>;
-    readonly fringesTableChangedAction: PayloadActionCreator<Table.ChangeEvent<Tables.FringeRowData, Model.Fringe>>;
   }
 ): Redux.Reducer<S> => {
   const generic = createAuthenticatedBudgetTableReducer<R, M, S>({
