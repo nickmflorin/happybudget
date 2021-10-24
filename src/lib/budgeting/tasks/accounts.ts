@@ -259,16 +259,21 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
   function* bulkDeleteRows(objId: number, ids: number[], markupIds?: number[]): SagaIterator {
     // Note: We have do these operations sequentially, since they will both update the Budget in state
     // and we cannot risk running into race conditions.
-    if (isAuthenticatedConfig(config) && ids.length !== 0) {
-      let response: Http.BulkDeleteResponse<B> = yield call(config.services.bulkDelete, objId, ids, {
-        cancelToken: source.token
-      });
-      if (!isNil(markupIds) && markupIds.length !== 0 && !isNil(config.services.bulkDeleteMarkups)) {
-        response = yield call(config.services.bulkDeleteMarkups, objId, ids, {
+    if (isAuthenticatedConfig(config)) {
+      let response: Http.BulkDeleteResponse<B> | null = null;
+      if (ids.length !== 0) {
+        response = yield call(config.services.bulkDelete, objId, ids, {
           cancelToken: source.token
         });
       }
-      yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
+      if (!isNil(markupIds) && markupIds.length !== 0 && !isNil(config.services.bulkDeleteMarkups)) {
+        response = yield call(config.services.bulkDeleteMarkups, objId, markupIds, {
+          cancelToken: source.token
+        });
+      }
+      if (!isNil(response)) {
+        yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
+      }
     }
   }
 
