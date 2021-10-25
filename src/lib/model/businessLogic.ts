@@ -1,4 +1,4 @@
-import { isNil, reduce } from "lodash";
+import { isNil, reduce, filter } from "lodash";
 
 import { model, tabling } from "lib";
 
@@ -57,17 +57,13 @@ export const contributionFromMarkups = <R extends Table.RowData>(
   value: number,
   markups: (Model.Markup | Table.MarkupRow<R>)[]
 ): number => {
+  const unit = (m: Model.Markup | Table.MarkupRow<R>) => (tabling.typeguards.isRow(m) ? m.markupData.unit : m.unit);
   return reduce(
-    markups,
+    filter(markups, (m: Model.Markup | Table.MarkupRow<R>) => unit(m).id === model.models.MarkupUnitModels.PERCENT.id),
     (curr: number, markup: Model.Markup | Table.MarkupRow<R>): number => {
-      const unit = tabling.typeguards.isRow(markup) ? markup.markupData.unit : markup.unit;
       const rate = tabling.typeguards.isRow(markup) ? markup.markupData.rate : markup.rate;
-      if (!isNil(unit) && !isNil(rate)) {
-        if (unit.id === model.models.FringeUnitModels.FLAT.id) {
-          return curr + rate;
-        } else {
-          return curr + rate * value;
-        }
+      if (!isNil(rate)) {
+        return curr + rate * value;
       }
       return curr;
     },

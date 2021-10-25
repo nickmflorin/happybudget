@@ -9,8 +9,6 @@ export const estimatedValueGetter = <R extends Tables.BudgetRowData>(
   if (tabling.typeguards.isDataRow(row)) {
     return businessLogic.estimatedValue(row);
   } else {
-    // Note: We do not have to exclude row's by ID because the primary Row here
-    // is already a MarkupRow and we are only looking at the BodyRow(s).
     const childrenRows: Table.ModelRow<R>[] = filter(
       rows,
       (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) && includes(row.children, r.id)
@@ -22,7 +20,12 @@ export const estimatedValueGetter = <R extends Tables.BudgetRowData>(
       if (row.markupData.unit.id === model.models.MarkupUnitModels.FLAT.id) {
         return row.markupData.rate || 0.0;
       }
-      return reduce(childrenRows, (curr: number, r: Table.ModelRow<R>) => curr + r.data.markup_contribution, 0.0);
+      return reduce(
+        childrenRows,
+        (curr: number, r: Table.ModelRow<R>) =>
+          curr + model.businessLogic.contributionFromMarkups(businessLogic.estimatedValue(r), [row]),
+        0.0
+      );
     } else {
       return reduce(childrenRows, (curr: number, r: Table.ModelRow<R>) => curr + businessLogic.estimatedValue(r), 0.0);
     }
@@ -36,8 +39,6 @@ export const actualValueGetter = <R extends Tables.BudgetRowData>(
   if (tabling.typeguards.isDataRow(row) || tabling.typeguards.isMarkupRow(row)) {
     return row.data.actual;
   } else {
-    // Note: We do not have to exclude row's by ID because the primary Row here
-    // is already a MarkupRow and we are only looking at the BodyRow(s).
     const childrenRows: Table.ModelRow<R>[] = filter(
       rows,
       (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) && includes(row.children, r.id)
