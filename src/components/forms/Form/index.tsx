@@ -232,26 +232,28 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
             <React.Fragment key={index}>{element}</React.Fragment>
           )
         )}
-        <div className={"form-alert-wrapper"}>
-          {map(props.form.notifications, (n: FormNotification, index: number) => {
-            const type: AlertType | undefined = ui.typeguards.isRawFormNotification(n) ? undefined : n.type;
-            const notification = ui.typeguards.isRawFormNotification(n) ? n : n.notification;
-            if (!ui.typeguards.isFormFieldNotification(notification)) {
-              if (typeof notification === "string" || api.typeguards.isHttpError(notification)) {
-                return (
-                  <Notification key={index} type={type}>
-                    {notification}
-                  </Notification>
-                );
-              } else if (ui.typeguards.isAlert(notification)) {
-                return <Notification key={index} type={notification.type} alert={notification} />;
-              } else {
-                return <React.Fragment key={index}>{notification}</React.Fragment>;
+        {props.form.notifications.length !== 0 && (
+          <div className={"form-alert-wrapper"}>
+            {map(props.form.notifications, (n: FormNotification, index: number) => {
+              const type: AlertType | undefined = ui.typeguards.isRawFormNotification(n) ? undefined : n.type;
+              const notification = ui.typeguards.isRawFormNotification(n) ? n : n.notification;
+              if (!ui.typeguards.isFormFieldNotification(notification)) {
+                if (typeof notification === "string" || api.typeguards.isHttpError(notification)) {
+                  return (
+                    <Notification key={index} type={type}>
+                      {notification}
+                    </Notification>
+                  );
+                } else if (ui.typeguards.isAlert(notification)) {
+                  return <Notification key={index} type={notification.type} alert={notification} />;
+                } else {
+                  return <React.Fragment key={index}>{notification}</React.Fragment>;
+                }
               }
-            }
-            return <></>;
-          })}
-        </div>
+              return <></>;
+            })}
+          </div>
+        )}
         {!isNil(footer) && footer}
       </RenderWithSpinner>
     </RootForm>

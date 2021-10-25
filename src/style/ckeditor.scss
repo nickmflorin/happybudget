@@ -41,6 +41,9 @@
 .ck-content p {
   margin-top: var(--ck-spacing-small) !important;
   margin-bottom: 4px !important;
+  font-family: $avenir !important;
+  font-weight: 400;
+  font-size: 13px;
 }
 
 .ck.ck-editor__editable_inline {

@@ -20,12 +20,5 @@
         margin-top: 10px;
       }
     }
-    @include media("<=xl") {
-      flex-direction: column;
-      .export-header-side-item {
-        width: 100%;
-        margin-left: 0px !important;
-      }
-    }
   }
 }

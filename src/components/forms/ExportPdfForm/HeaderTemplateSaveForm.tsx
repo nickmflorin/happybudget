@@ -65,7 +65,7 @@ const HeaderTemplateSaveForm = (
   return (
     <div {...props} className={classNames("header-template-save-form", props.className)}>
       <Form.ItemStyle label={"Header Template"}>
-        <div style={{ display: "flex" }}>
+        <div className={"header-template-save-form-content"}>
           <HeaderTemplateSelect
             loading={loading}
             onLoad={onLoad}
@@ -83,66 +83,63 @@ const HeaderTemplateSaveForm = (
                 .finally(() => setDeleting(null));
             }}
           />
+          <Button
+            className={"btn btn--default btn--small"}
+            disabled={disabled || saving}
+            loading={saving}
+            style={{ marginRight: !isNil(existing) || requestNameInput ? 6 : 0 }}
+            onClick={() => {
+              if (requestNameInput === true) {
+                if (name.trim() !== "") {
+                  setError(null);
+                  onSave(name);
+                } else {
+                  setError("Template name is required.");
+                }
+              } else if (existing === false) {
+                setError(null);
+                setRequestNameInput(true);
+              } else {
+                setError(null);
+                onSave();
+              }
+            }}
+          >
+            {"Save"}
+          </Button>
 
-          <div style={{ display: "flex", width: "100%" }}>
+          <ShowHide show={existing && saveAsMode === false}>
             <Button
               className={"btn btn--default btn--small"}
-              disabled={disabled || saving}
-              loading={saving}
-              style={{ marginRight: !isNil(existing) || requestNameInput ? 6 : 0 }}
+              style={{ marginRight: requestNameInput ? 6 : 0 }}
+              disabled={disabled || saving || saveAsMode === true}
               onClick={() => {
-                if (requestNameInput === true) {
-                  if (name.trim() !== "") {
-                    setError(null);
-                    onSave(name);
-                  } else {
-                    setError("Template name is required.");
-                  }
-                } else if (existing === false) {
-                  setError(null);
-                  setRequestNameInput(true);
-                } else {
-                  setError(null);
-                  onSave();
-                }
+                setRequestNameInput(true);
+                setSaveAsMode(true);
               }}
             >
-              {"Save"}
+              {"Save As..."}
             </Button>
+          </ShowHide>
 
-            <ShowHide show={existing && saveAsMode === false}>
-              <Button
-                className={"btn btn--default btn--small"}
-                style={{ marginRight: requestNameInput ? 6 : 0 }}
-                disabled={disabled || saving || saveAsMode === true}
+          <ShowHide show={requestNameInput}>
+            <div style={{ display: "flex" }}>
+              <Input
+                placeholder={"Name"}
+                className={classNames("input input--small", {
+                  "with-error": !isNil(error)
+                })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+              />
+              <ClearButton
+                size={"small"}
                 onClick={() => {
-                  setRequestNameInput(true);
-                  setSaveAsMode(true);
+                  setError(null);
+                  setRequestNameInput(false);
                 }}
-              >
-                {"Save As..."}
-              </Button>
-            </ShowHide>
-
-            <ShowHide show={requestNameInput}>
-              <div style={{ display: "flex" }}>
-                <Input
-                  placeholder={"Name"}
-                  className={classNames("input input--small", {
-                    "with-error": !isNil(error)
-                  })}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
-                />
-                <ClearButton
-                  size={"small"}
-                  onClick={() => {
-                    setError(null);
-                    setRequestNameInput(false);
-                  }}
-                />
-              </div>
-            </ShowHide>
-          </div>
+              />
+            </div>
+          </ShowHide>
         </div>
       </Form.ItemStyle>
       <Form.FieldError>{error}</Form.FieldError>
