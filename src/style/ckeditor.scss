@@ -34,9 +34,12 @@
 .ck-content {
   background: $gray-light;
   border-radius: var(--ck-border-radius);
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
 }
 
 .ck-content p {
+  margin-top: var(--ck-spacing-small) !important;
   margin-bottom: 4px !important;
 }
 
