@@ -12,7 +12,7 @@ interface ContactCellProps<
   M extends Model.HttpModel = Model.HttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends Table.CellProps<R, M, S, number | null> {
-  readonly onEditContact: (id: number) => void;
+  readonly onEditContact: (params: { contact: number; id: Table.EditableRowId }) => void;
 }
 
 /* eslint-disable indent */
@@ -24,6 +24,7 @@ const ContactCell = <
   value,
   ...props
 }: ContactCellProps<R, M, S>): JSX.Element => {
+  const row: Table.EditableRow<R> = props.node.data;
   const contacts = useContacts();
   const model = useMemo(() => (!isNil(value) ? find(contacts, { id: value } as any) || null : null), [value, contacts]);
 
@@ -45,7 +46,7 @@ const ContactCell = <
             color={"#EFEFEF"}
             textColor={"#2182e4"}
             text={model.full_name}
-            onClick={() => props.onEditContact(model.id)}
+            onClick={() => props.onEditContact({ contact: model.id, id: row.id })}
             disabled={!isFocused}
           />
         ) : (

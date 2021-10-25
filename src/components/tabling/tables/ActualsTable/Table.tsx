@@ -16,7 +16,7 @@ export type Props = Omit<AuthenticatedModelTableProps<R, M>, "columns"> & {
   readonly actualTypes: Model.Tag[];
   readonly onOwnerTreeSearch: (value: string) => void;
   readonly onNewContact: (params: { name?: string; id: Table.ModelRowId }) => void;
-  readonly onEditContact: (id: number) => void;
+  readonly onEditContact: (params: { contact: number; id: Table.EditableRowId }) => void;
 };
 
 const ActualsTable = ({

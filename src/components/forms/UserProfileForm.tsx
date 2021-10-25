@@ -6,12 +6,7 @@ import { Button } from "components/buttons";
 import { Input } from "components/fields";
 import { TimezoneSelect } from "../fields";
 
-interface UserProfileFormProps extends FormProps<Http.UserPayload> {
-  originalImage?: SavedImage | null;
-  onImageChange?: (f: UploadedImage | null) => void;
-}
-
-const UserProfileForm: React.FC<UserProfileFormProps> = ({ originalImage, onImageChange, ...props }): JSX.Element => {
+const UserProfileForm: React.FC<FormProps<Http.UserPayload>> = (props): JSX.Element => {
   return (
     <Form.Form {...props} className={classNames("user-profile-form", props.className)} layout={"vertical"}>
       <Form.Item

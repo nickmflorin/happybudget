@@ -91,7 +91,6 @@ const UploaderContent = (props: UploaderContentProps): JSX.Element => {
 export interface UploaderProps extends Omit<UploaderContentProps, "data" | "error" | "loading" | "image" | "onClear"> {
   readonly contentStyle?: React.CSSProperties;
   readonly contentClassName?: string;
-  readonly initialValue?: SavedImage | null;
   readonly showLoadingIndicator?: boolean;
   readonly value?: SavedImage | UploadedImage | null;
   readonly showClear?: boolean;

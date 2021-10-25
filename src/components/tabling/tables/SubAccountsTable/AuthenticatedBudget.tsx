@@ -23,7 +23,7 @@ export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>,
   readonly onNewContact: (params: { name?: string; id: Table.ModelRowId }) => void;
   readonly onEditMarkup: (row: Table.MarkupRow<R>) => void;
   readonly onMarkupRows?: (rows?: Table.ModelRow<R>[]) => void;
-  readonly onEditContact: (id: number) => void;
+  readonly onEditContact: (params: { contact: number; id: Table.EditableRowId }) => void;
   readonly onAddFringes: () => void;
   readonly onEditFringes: () => void;
 };
@@ -97,10 +97,9 @@ const AuthenticatedBudgetSubAccountsTable = (
         cellRendererParams: { onEditContact: props.onEditContact },
         cellEditorParams: { onNewContact: props.onNewContact },
         onDataChange: (id: Table.ModelRowId, change: Table.CellChange<R>) => {
-          // If a Row is assigned a Contact when it didn't previously have one, and the Row
-          // does not have a populated value for `rate`, auto fill the `rate` field from the
-          // Contact.
-          if (change.oldValue === null && change.newValue !== null) {
+          // If the Row does not already have a populated value for `rate`, we populate
+          // the `rate` value based on the selected Contact (if non-null).
+          if (change.newValue !== null) {
             const row = table.current.getRow(id);
             if (!isNil(row) && tabling.typeguards.isModelRow(row) && row.data.rate === null) {
               const contact: Model.Contact | undefined = find(props.contacts, { id: change.newValue } as any);

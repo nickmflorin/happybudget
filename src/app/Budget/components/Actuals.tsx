@@ -76,7 +76,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
         onOwnerTreeSearch={(value: string) => dispatch(actions.actuals.setOwnerTreeSearchAction(value))}
         exportFileName={!isNil(budget) ? `${budget.name}_actuals` : "actuals"}
         onNewContact={() => setCreateContactModalVisible(true)}
-        onEditContact={(id: number) => setContactToEdit(id)}
+        onEditContact={(params: { contact: number; id: Table.EditableRowId }) => setContactToEdit(params.contact)}
       />
       {!isNil(contactToEdit) && (
         <EditContactModal

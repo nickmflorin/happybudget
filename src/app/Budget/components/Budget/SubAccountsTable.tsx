@@ -25,6 +25,7 @@ const SubAccountsTable = ({
   setPreviewModalVisible,
   ...props
 }: BudgetSubAccountsTableProps): JSX.Element => {
+  const [preContactEdit, setPreContactEdit] = useState<Table.EditableRowId | null>(null);
   const [preContactCreate, setPreContactCreate] = useState<{ name?: string; id: Table.EditableRowId } | null>(null);
   const [initialContactFormValues, setInitialContactFormValues] = useState<any>(null);
   const [contactToEdit, setContactToEdit] = useState<number | null>(null);
@@ -42,7 +43,10 @@ const SubAccountsTable = ({
         contacts={contacts}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
-        onEditContact={(contact: number) => setContactToEdit(contact)}
+        onEditContact={(params: { contact: number; id: Table.EditableRowId }) => {
+          setPreContactEdit(params.id);
+          setContactToEdit(params.contact);
+        }}
         onExportPdf={() => setPreviewModalVisible(true)}
         onNewContact={(params: { name?: string; id: Table.EditableRowId }) => {
           setPreContactCreate(params);
@@ -64,6 +68,19 @@ const SubAccountsTable = ({
           onSuccess={(m: Model.Contact) => {
             dispatch(actions.authenticated.updateContactInStateAction({ id: m.id, data: m }));
             setContactToEdit(null);
+            setPreContactEdit(null);
+            if (!isNil(preContactEdit)) {
+              const row: Table.BodyRow<R> | null = table.current.getRow(preContactEdit);
+              if (!isNil(row) && tabling.typeguards.isModelRow(row) && row.data.rate === null && m.rate !== null) {
+                table.current.applyTableChange({
+                  type: "dataChange",
+                  payload: {
+                    id: row.id,
+                    data: { rate: { oldValue: row.data.rate, newValue: m.rate } }
+                  }
+                });
+              }
+            }
           }}
           onCancel={() => setContactToEdit(null)}
         />
