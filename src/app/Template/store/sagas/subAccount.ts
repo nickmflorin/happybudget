@@ -1,6 +1,5 @@
-import axios from "axios";
 import { SagaIterator } from "redux-saga";
-import { call, put, select, cancelled, spawn, all, takeLatest } from "redux-saga/effects";
+import { call, put, select, spawn, all, takeLatest } from "redux-saga/effects";
 import { isNil, filter, intersection } from "lodash";
 
 import * as api from "api";
@@ -20,21 +19,12 @@ import {
 function* getSubAccount(action: Redux.Action<null>): SagaIterator {
   const subaccountId = yield select((state: Application.Authenticated.Store) => state.template.subaccount.id);
   if (!isNil(subaccountId)) {
-    const CancelToken = axios.CancelToken;
-    const source = CancelToken.source();
-
     try {
-      const response: Model.SubAccount = yield call(api.getSubAccount, subaccountId, { cancelToken: source.token });
+      const response: Model.SubAccount = yield api.request(api.getSubAccount, subaccountId);
       yield put(actions.responseSubAccountAction(response));
     } catch (e: unknown) {
-      if (!(yield cancelled())) {
-        notifications.requestError(e as Error, "There was an error retrieving the sub account.");
-        yield put(actions.responseSubAccountAction(null));
-      }
-    } finally {
-      if (yield cancelled()) {
-        source.cancel();
-      }
+      notifications.requestError(e as Error, "There was an error retrieving the sub account.");
+      yield put(actions.responseSubAccountAction(null));
     }
   }
 }

@@ -1,6 +1,5 @@
-import axios from "axios";
 import { SagaIterator } from "redux-saga";
-import { StrictEffect, call, put, select, fork, cancelled, all } from "redux-saga/effects";
+import { StrictEffect, call, put, select, fork, all } from "redux-saga/effects";
 import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
@@ -71,9 +70,6 @@ const isAuthenticatedConfig = <B extends Model.Template | Model.Budget>(
 export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
   config: AccountsTableTaskConfig | AuthenticatedAccountsTableTaskConfig<B>
 ): Redux.TaskMapObject<Redux.TableTaskMap<R>> => {
-  const CancelToken = axios.CancelToken;
-  const source = CancelToken.source();
-
   function* request(action: Redux.Action<Redux.TableRequestPayload>): SagaIterator {
     const objId = yield select(config.selectObjId);
     if (!isNil(objId)) {
@@ -81,7 +77,10 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         if (isAuthenticatedConfig(config)) {
           const actionHandler = config.actions.updateModelsInState;
           if (!isNil(actionHandler)) {
-            const response: Http.ListResponse<Model.Account> = yield call(requestAccounts, objId, action.payload.ids);
+            const response: Http.ListResponse<Model.Account> = yield api.request(config.services.request, objId, {
+              no_pagination: true,
+              ids: action.payload.ids
+            });
             yield put(actionHandler(response.data));
           } else {
             console.warn(
@@ -99,15 +98,16 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
             Http.ListResponse<C>,
             Http.ListResponse<Model.Group>,
             Http.ListResponse<Model.Markup>
-          ] = yield all([call(requestAccounts, objId), call(requestGroups, objId), call(requestMarkups, objId)]);
+          ] = yield all([
+            api.request(config.services.request, objId, { no_pagination: true }),
+            api.request(config.services.requestGroups, objId, { no_pagination: true }),
+            call(requestMarkups, objId)
+          ]);
           if (models.data.length === 0 && isAuthenticatedConfig(config)) {
             // If there is no table data, we want to default create two rows.
-            const response: Http.BulkResponse<B, C> = yield call(
-              config.services.bulkCreate,
-              objId,
-              { data: [{}, {}] },
-              { cancelToken: source.token }
-            );
+            const response: Http.BulkResponse<B, C> = yield api.request(config.services.bulkCreate, objId, {
+              data: [{}, {}]
+            });
             yield put(
               config.actions.response({ models: response.children, groups: groups.data, markups: markups.data })
             );
@@ -115,29 +115,18 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
             yield put(config.actions.response({ models: models.data, groups: groups.data, markups: markups.data }));
           }
         } catch (e: unknown) {
-          if (!(yield cancelled())) {
-            notifications.requestError(e as Error, "There was an error retrieving the table data.");
-            yield put(config.actions.response({ models: [], groups: [], markups: [] }));
-          }
+          notifications.requestError(e as Error, "There was an error retrieving the table data.");
+          yield put(config.actions.response({ models: [], groups: [], markups: [] }));
         } finally {
           yield put(config.actions.loading(false));
-          if (yield cancelled()) {
-            source.cancel();
-          }
         }
       }
     }
   }
 
-  const requestAccounts = (objId: number, ids?: number[]): Promise<Http.ListResponse<C>> =>
-    config.services.request(objId, { no_pagination: true, ids }, { cancelToken: source.token });
-
-  const requestGroups = (objId: number): Promise<Http.ListResponse<Model.Group>> =>
-    config.services.requestGroups(objId, { no_pagination: true }, { cancelToken: source.token });
-
   const requestMarkups = (objId: number): Promise<Http.ListResponse<Model.Markup>> => {
     if (!isNil(config.services.requestMarkups)) {
-      return config.services.requestMarkups(objId, { no_pagination: true }, { cancelToken: source.token });
+      return config.services.requestMarkups(objId, { no_pagination: true }, {});
     }
     return new Promise(resolve => resolve({ count: 0, data: [] }));
   };
@@ -151,9 +140,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       yield put(config.actions.saving(true));
       yield put(config.actions.loadingBudget(true));
       try {
-        const response: Http.BulkResponse<B, C> = yield call(config.services.bulkCreate, objId, requestPayload, {
-          cancelToken: source.token
-        });
+        const response: Http.BulkResponse<B, C> = yield api.request(config.services.bulkCreate, objId, requestPayload);
         /*
         Note: We also have access to the updated Account from the response (as response.data)
         so we could use this to update the overall Account in state.  However, the reducer handles
@@ -169,15 +156,10 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         );
         yield put(config.actions.addModelsToState({ placeholderIds: placeholderIds, models: response.children }));
       } catch (err: unknown) {
-        if (!(yield cancelled())) {
-          notifications.requestError(err as Error, errorMessage);
-        }
+        notifications.requestError(err as Error, errorMessage);
       } finally {
         yield put(config.actions.saving(false));
         yield put(config.actions.loadingBudget(false));
-        if (yield cancelled()) {
-          source.cancel();
-        }
       }
     }
   }
@@ -194,21 +176,14 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         yield put(config.actions.loadingBudget(true));
       }
       try {
-        const response: Http.BulkResponse<B, C> = yield call(config.services.bulkUpdate, objId, requestPayload, {
-          cancelToken: source.token
-        });
+        const response: Http.BulkResponse<B, C> = yield api.request(config.services.bulkUpdate, objId, requestPayload);
         yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
       } catch (err: unknown) {
-        if (!(yield cancelled())) {
-          notifications.requestError(err as Error, errorMessage);
-        }
+        notifications.requestError(err as Error, errorMessage);
       } finally {
         yield put(config.actions.saving(false));
         if (isGroupEvent !== true) {
           yield put(config.actions.loadingBudget(false));
-        }
-        if (yield cancelled()) {
-          source.cancel();
         }
       }
     }
@@ -219,9 +194,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       const effects: (StrictEffect | null)[] = map(changes, (ch: Table.RowChange<R, Table.MarkupRowId>) => {
         const payload = tabling.http.patchPayloadForChange<R, Http.MarkupPayload, C>(ch, config.columns);
         if (!isNil(payload)) {
-          return call(api.updateMarkup, tabling.rows.markupId(ch.id), payload, {
-            cancelToken: source.token
-          });
+          return api.request(api.updateMarkup, tabling.rows.markupId(ch.id), payload);
         }
         return null;
       });
@@ -240,20 +213,15 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         */
         yield all(validEffects);
       } catch (err: unknown) {
-        if (!(yield cancelled())) {
-          notifications.requestError(err as Error, "There was an error updating the table rows.");
-        }
+        notifications.requestError(err as Error, "There was an error updating the table rows.");
       } finally {
         yield put(config.actions.saving(false));
-        if (yield cancelled()) {
-          source.cancel();
-        }
       }
     }
   }
 
   function* deleteGroups(ids: number[]): SagaIterator {
-    yield all(map(ids, (id: number) => call(api.deleteGroup, id, { cancelToken: source.token })));
+    yield all(map(ids, (id: number) => api.request(api.deleteGroup, id)));
   }
 
   function* bulkDeleteRows(objId: number, ids: number[], markupIds?: number[]): SagaIterator {
@@ -262,14 +230,10 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
     if (isAuthenticatedConfig(config)) {
       let response: Http.BulkDeleteResponse<B> | null = null;
       if (ids.length !== 0) {
-        response = yield call(config.services.bulkDelete, objId, ids, {
-          cancelToken: source.token
-        });
+        response = yield api.request(config.services.bulkDelete, objId, ids);
       }
       if (!isNil(markupIds) && markupIds.length !== 0 && !isNil(config.services.bulkDeleteMarkups)) {
-        response = yield call(config.services.bulkDeleteMarkups, objId, markupIds, {
-          cancelToken: source.token
-        });
+        response = yield api.request(config.services.bulkDeleteMarkups, objId, markupIds);
       }
       if (!isNil(response)) {
         yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
@@ -283,21 +247,11 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
     if (isAuthenticatedConfig(config) && ids.length !== 0) {
       yield put(config.actions.saving(true));
       try {
-        yield call(
-          api.removeMarkupChildren,
-          tabling.rows.markupId(e.payload.markup),
-          { children: ids },
-          { cancelToken: source.token }
-        );
+        yield api.request(api.removeMarkupChildren, tabling.rows.markupId(e.payload.markup), { children: ids });
       } catch (err: unknown) {
-        if (!(yield cancelled())) {
-          notifications.requestError(err as Error, "There was an error updating the table rows.");
-        }
+        notifications.requestError(err as Error, "There was an error updating the table rows.");
       } finally {
         yield put(config.actions.saving(false));
-        if (yield cancelled()) {
-          source.cancel();
-        }
       }
     }
   }
@@ -365,15 +319,10 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
           try {
             yield all([call(deleteGroups, groupRowIds), call(bulkDeleteRows, objId, modelRowIds, markupRowIds)]);
           } catch (err: unknown) {
-            if (!(yield cancelled())) {
-              notifications.requestError(err as Error, "There was an error removing the rows.");
-            }
+            notifications.requestError(err as Error, "There was an error removing the rows.");
           } finally {
             yield put(config.actions.saving(false));
             yield put(config.actions.loadingBudget(false));
-            if (yield cancelled()) {
-              source.cancel();
-            }
           }
         }
       }

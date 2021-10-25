@@ -1,6 +1,5 @@
-import axios from "axios";
 import { SagaIterator } from "redux-saga";
-import { put, call, cancelled, fork } from "redux-saga/effects";
+import { put, fork } from "redux-saga/effects";
 import { map, isNil, filter } from "lodash";
 
 import * as api from "api";
@@ -13,50 +12,31 @@ type M = Model.Contact;
 type P = Http.ContactPayload;
 
 export function* request(action: Redux.Action): SagaIterator {
-  const CancelToken = axios.CancelToken;
-  const source = CancelToken.source();
   yield put(actions.loadingContactsAction(true));
   try {
-    const response: Http.ListResponse<M> = yield call(api.getContacts, {}, { cancelToken: source.token });
+    const response: Http.ListResponse<M> = yield api.request(api.getContacts, {});
     yield put(actions.responseContactsAction(response));
   } catch (e: unknown) {
-    if (!(yield cancelled())) {
-      notifications.requestError(e as Error, "There was an error retrieving the contacts.");
-      yield put(actions.responseContactsAction({ count: 0, data: [] }));
-    }
+    notifications.requestError(e as Error, "There was an error retrieving the contacts.");
+    yield put(actions.responseContactsAction({ count: 0, data: [] }));
   } finally {
     yield put(actions.loadingContactsAction(false));
-    if (yield cancelled()) {
-      source.cancel();
-    }
   }
 }
 
 export const createTableTaskSet = (
   config: Table.TaskConfig<R, M, Redux.AuthenticatedTableActionMap<R, M>>
 ): Redux.TaskMapObject<Redux.TableTaskMap<R>> => {
-  const CancelToken = axios.CancelToken;
-  const source = CancelToken.source();
-
   function* tableRequest(action: Redux.Action): SagaIterator {
     yield put(config.actions.loading(true));
     try {
-      const response: Http.ListResponse<M> = yield call(
-        api.getContacts,
-        { no_pagination: true },
-        { cancelToken: source.token }
-      );
+      const response: Http.ListResponse<M> = yield api.request(api.getContacts, { no_pagination: true });
       yield put(config.actions.response({ models: response.data }));
     } catch (e: unknown) {
-      if (!(yield cancelled())) {
-        notifications.requestError(e as Error, "There was an error retrieving the contacts.");
-        yield put(config.actions.response({ models: [] }));
-      }
+      notifications.requestError(e as Error, "There was an error retrieving the contacts.");
+      yield put(config.actions.response({ models: [] }));
     } finally {
       yield put(config.actions.loading(false));
-      if (yield cancelled()) {
-        source.cancel();
-      }
     }
   }
 
@@ -67,9 +47,7 @@ export const createTableTaskSet = (
     );
     yield put(config.actions.saving(true));
     try {
-      const response: Http.BulkModelResponse<M> = yield call(api.bulkCreateContacts, requestPayload, {
-        cancelToken: source.token
-      });
+      const response: Http.BulkModelResponse<M> = yield api.request(api.bulkCreateContacts, requestPayload);
       // Note: The logic in the reducer for activating the placeholder rows with real data relies on the
       // assumption that the models in the response are in the same order as the placeholder IDs.
       const placeholderIds: Table.PlaceholderRowId[] = map(
@@ -78,14 +56,9 @@ export const createTableTaskSet = (
       );
       yield put(config.actions.addModelsToState({ placeholderIds: placeholderIds, models: response.data }));
     } catch (err: unknown) {
-      if (!(yield cancelled())) {
-        notifications.requestError(err as Error, errorMessage);
-      }
+      notifications.requestError(err as Error, errorMessage);
     } finally {
       yield put(config.actions.saving(false));
-      if (yield cancelled()) {
-        source.cancel();
-      }
     }
   }
 
@@ -96,32 +69,22 @@ export const createTableTaskSet = (
   ): SagaIterator {
     yield put(config.actions.saving(true));
     try {
-      yield call(api.bulkUpdateContacts, requestPayload, { cancelToken: source.token });
+      yield api.request(api.bulkUpdateContacts, requestPayload);
     } catch (err: unknown) {
-      if (!(yield cancelled())) {
-        notifications.requestError(err as Error, errorMessage);
-      }
+      notifications.requestError(err as Error, errorMessage);
     } finally {
       yield put(config.actions.saving(false));
-      if (yield cancelled()) {
-        source.cancel();
-      }
     }
   }
 
   function* bulkDeleteTask(ids: number[], errorMessage: string): SagaIterator {
     yield put(config.actions.saving(true));
     try {
-      yield call(api.bulkDeleteContacts, ids, { cancelToken: source.token });
+      yield api.request(api.bulkDeleteContacts, ids);
     } catch (err: unknown) {
-      if (!(yield cancelled())) {
-        notifications.requestError(err as Error, errorMessage);
-      }
+      notifications.requestError(err as Error, errorMessage);
     } finally {
       yield put(config.actions.saving(false));
-      if (yield cancelled()) {
-        source.cancel();
-      }
     }
   }
 

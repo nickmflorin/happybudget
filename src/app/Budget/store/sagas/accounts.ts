@@ -1,7 +1,6 @@
-import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
-import { call, put, select, cancelled, spawn } from "redux-saga/effects";
+import { put, select, spawn } from "redux-saga/effects";
 import { isNil } from "lodash";
 
 import * as api from "api";
@@ -14,26 +13,14 @@ import { accounts as actions, loadingBudgetAction, updateBudgetInStateAction } f
 export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
   const budgetId = yield select((state: Application.Authenticated.Store) => state.budget.id);
   if (!isNil(budgetId)) {
-    const CancelToken = axios.CancelToken;
-    const source = CancelToken.source();
     yield put(actions.loadingHistoryAction(true));
     try {
-      const response: Http.ListResponse<Model.HistoryEvent> = yield call(
-        api.getAccountsHistory,
-        budgetId,
-        {},
-        { cancelToken: source.token }
-      );
+      const response: Http.ListResponse<Model.HistoryEvent> = yield api.request(api.getAccountsHistory, budgetId, {});
       yield put(actions.responseHistoryAction(response));
     } catch (e: unknown) {
-      if (!(yield cancelled())) {
-        notifications.requestError(e as Error, "There was an error retrieving the accounts history.");
-      }
+      notifications.requestError(e as Error, "There was an error retrieving the accounts history.");
     } finally {
       yield put(actions.loadingHistoryAction(false));
-      if (yield cancelled()) {
-        source.cancel();
-      }
     }
   }
 }

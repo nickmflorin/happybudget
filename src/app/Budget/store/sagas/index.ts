@@ -1,6 +1,5 @@
 import { SagaIterator } from "redux-saga";
-import { spawn, takeLatest, call, put, select, cancelled, all } from "redux-saga/effects";
-import axios, { CancelTokenSource } from "axios";
+import { spawn, takeLatest, call, put, select, all } from "redux-saga/effects";
 import { isNil } from "lodash";
 
 import * as api from "api";
@@ -51,18 +50,16 @@ const fringesTableSaga = tabling.sagas.createAuthenticatedTableSaga<Tables.Fring
   tasks: FringesTasks
 });
 
-function* getBudgetTask(action: Redux.Action<null>, source: CancelTokenSource): SagaIterator {
+function* getBudgetTask(action: Redux.Action<null>): SagaIterator {
   const budgetId = yield select((state: Application.Authenticated.Store) => state.budget.id);
   if (!isNil(budgetId)) {
     yield put(actions.loadingBudgetAction(true));
     try {
-      const response: Model.Budget = yield call(api.getBudget, budgetId, { cancelToken: source.token });
+      const response: Model.Budget = yield api.request(api.getBudget, budgetId);
       yield put(actions.responseBudgetAction(response));
     } catch (e: unknown) {
-      if (!(yield cancelled())) {
-        notifications.requestError(e as Error, "There was an error retrieving the budget.");
-        yield put(actions.responseBudgetAction(null));
-      }
+      notifications.requestError(e as Error, "There was an error retrieving the budget.");
+      yield put(actions.responseBudgetAction(null));
     } finally {
       yield put(actions.loadingBudgetAction(false));
     }
@@ -70,15 +67,7 @@ function* getBudgetTask(action: Redux.Action<null>, source: CancelTokenSource): 
 }
 
 function* getData(action: Redux.Action<any>): SagaIterator {
-  const CancelToken = axios.CancelToken;
-  const source = CancelToken.source();
-  try {
-    yield all([call(getBudgetTask, action, source), call(FringesTasks.request, action)]);
-  } finally {
-    if (yield cancelled()) {
-      source.cancel("cancelled");
-    }
-  }
+  yield all([call(getBudgetTask, action), call(FringesTasks.request, action)]);
 }
 
 function* watchForBudgetIdChangedSaga(): SagaIterator {

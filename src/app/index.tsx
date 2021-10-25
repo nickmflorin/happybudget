@@ -5,7 +5,7 @@ import { History } from "history";
 import "style/index.scss";
 
 import { ApplicationSpinner } from "components";
-import { AuthenticatedReduxRoute, UnauthenticatedReduxRoute } from "components/routes";
+import { NotFoundRoute, AuthenticatedReduxRoute, UnauthenticatedReduxRoute } from "components/routes";
 
 import * as config from "config";
 
@@ -33,6 +33,7 @@ function App(props: AppProps): JSX.Element {
               component={Landing}
             />
             <AuthenticatedReduxRoute path={["/"]} component={Application} />
+            <NotFoundRoute />
           </Switch>
         </Suspense>
       </div>

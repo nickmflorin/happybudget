@@ -1,6 +1,5 @@
-import axios from "axios";
 import { SagaIterator } from "redux-saga";
-import { put, call, cancelled, fork, select, all } from "redux-saga/effects";
+import { put, call, fork, select, all } from "redux-saga/effects";
 import { map, isNil, filter } from "lodash";
 
 import * as api from "api";
@@ -28,9 +27,6 @@ export type ActualsTableTaskMap = Redux.TableTaskMap<R> & {
 };
 
 export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMapObject<ActualsTableTaskMap> => {
-  const CancelToken = axios.CancelToken;
-  const source = CancelToken.source();
-
   function* request(action: Redux.Action): SagaIterator {
     const budgetId = yield select(config.selectObjId);
     if (!isNil(budgetId)) {
@@ -39,38 +35,27 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
       try {
         yield all([call(requestActuals, budgetId), call(requestActualTypes), call(requestOwnerTree, action)]);
       } catch (e: unknown) {
-        if (!(yield cancelled())) {
-          notifications.requestError(e as Error, "There was an error retrieving the table data.");
-          yield put(config.actions.response({ models: [] }));
-        }
+        notifications.requestError(e as Error, "There was an error retrieving the table data.");
+        yield put(config.actions.response({ models: [] }));
       } finally {
         yield put(config.actions.loading(false));
-        if (yield cancelled()) {
-          source.cancel();
-        }
       }
     }
   }
 
   function* requestActualTypes(): SagaIterator {
-    const response = yield call(api.getActualTypes, { cancelToken: source.token });
+    const response = yield api.request(api.getActualTypes);
     yield put(config.actions.responseActualTypes(response));
   }
 
   function* requestActuals(budgetId: number): SagaIterator {
-    const response: Http.ListResponse<M> = yield call(
-      api.getBudgetActuals,
-      budgetId,
-      { no_pagination: true },
-      { cancelToken: source.token }
-    );
+    const response: Http.ListResponse<M> = yield api.request(api.getBudgetActuals, budgetId, { no_pagination: true });
     if (response.data.length === 0) {
       // If there is no table data, we want to default create two rows.
-      const createResponse: Http.BulkResponse<Model.Budget, M> = yield call(
+      const createResponse: Http.BulkResponse<Model.Budget, M> = yield api.request(
         api.bulkCreateBudgetActuals,
         budgetId,
-        { data: [{}, {}] },
-        { cancelToken: source.token }
+        { data: [{}, {}] }
       );
       yield put(config.actions.response({ models: createResponse.children }));
     } else {
@@ -92,23 +77,13 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
         yield put(config.actions.loadingOwnerTree(true));
         try {
           // TODO: Eventually we will want to build in pagination for this.
-          const response = yield call(
-            api.getBudgetOwnerTree,
-            budgetId,
-            { no_pagination: true, search },
-            { cancelToken: source.token }
-          );
+          const response = yield api.request(api.getBudgetOwnerTree, budgetId, { no_pagination: true, search });
           yield put(config.actions.responseOwnerTree(response));
         } catch (e: unknown) {
-          if (!(yield cancelled())) {
-            notifications.requestError(e as Error, "There was an error retrieving the budget's items.");
-            yield put(config.actions.responseOwnerTree({ count: 0, data: [] }));
-          }
+          notifications.requestError(e as Error, "There was an error retrieving the budget's items.");
+          yield put(config.actions.responseOwnerTree({ count: 0, data: [] }));
         } finally {
           yield put(config.actions.loadingOwnerTree(false));
-          if (yield cancelled()) {
-            source.cancel();
-          }
         }
       }
     }
@@ -121,11 +96,10 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
     );
     yield put(config.actions.saving(true));
     try {
-      const response: Http.BulkResponse<Model.Budget, M> = yield call(
+      const response: Http.BulkResponse<Model.Budget, M> = yield api.request(
         api.bulkCreateBudgetActuals,
         budgetId,
-        requestPayload,
-        { cancelToken: source.token }
+        requestPayload
       );
       // Note: We also have access to the updated budget here, we should use that.
       // Note: The logic in the reducer for activating the placeholder rows with real data relies on the
@@ -136,14 +110,9 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
       );
       yield put(config.actions.addModelsToState({ placeholderIds: placeholderIds, models: response.children }));
     } catch (err: unknown) {
-      if (!(yield cancelled())) {
-        notifications.requestError(err as Error, errorMessage);
-      }
+      notifications.requestError(err as Error, errorMessage);
     } finally {
       yield put(config.actions.saving(false));
-      if (yield cancelled()) {
-        source.cancel();
-      }
     }
   }
 
@@ -156,16 +125,11 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
     yield put(config.actions.saving(true));
     try {
       // Note: We also have access to the updated budget here, we should use that.
-      yield call(api.bulkUpdateBudgetActuals, budgetId, requestPayload, { cancelToken: source.token });
+      yield api.request(api.bulkUpdateBudgetActuals, budgetId, requestPayload);
     } catch (err: unknown) {
-      if (!(yield cancelled())) {
-        notifications.requestError(err as Error, errorMessage);
-      }
+      notifications.requestError(err as Error, errorMessage);
     } finally {
       yield put(config.actions.saving(false));
-      if (yield cancelled()) {
-        source.cancel();
-      }
     }
   }
 
@@ -173,16 +137,11 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
     yield put(config.actions.saving(true));
     try {
       // Note: We also have access to the updated budget here, we should use that.
-      yield call(api.bulkDeleteBudgetActuals, budgetId, ids, { cancelToken: source.token });
+      yield api.request(api.bulkDeleteBudgetActuals, budgetId, ids);
     } catch (err: unknown) {
-      if (!(yield cancelled())) {
-        notifications.requestError(err as Error, errorMessage);
-      }
+      notifications.requestError(err as Error, errorMessage);
     } finally {
       yield put(config.actions.saving(false));
-      if (yield cancelled()) {
-        source.cancel();
-      }
     }
   }
 

@@ -1,8 +1,8 @@
 import React from "react";
-import { Redirect, Switch, Route } from "react-router-dom";
+import { Redirect, Route } from "react-router-dom";
 
 import { ConnectedApplicationSpinner } from "components";
-import { PrivateRoute } from "components/routes";
+import { NotFoundRedirectSwitch, NotFoundRoute, PrivateRoute } from "components/routes";
 
 import * as config from "config";
 
@@ -17,14 +17,15 @@ const Application = (): JSX.Element => {
   return (
     <React.Fragment>
       <ConnectedApplicationSpinner />
-      <Switch>
+      <NotFoundRedirectSwitch>
         <Redirect exact from={"/"} to={"/budgets"} />
         <PrivateRoute path={"/budgets/:budgetId"} component={Budget} />
         <PrivateRoute path={"/templates/:templateId"} component={Template} />
         <PrivateRoute path={["/budgets", "/contacts", "/templates", "/discover", "/new"]} component={Dashboard} />
         <PrivateRoute path={["/profile"]} component={Settings} />
         <Route exact path={"/logout"} component={Logout} />
-      </Switch>
+        <NotFoundRoute />
+      </NotFoundRedirectSwitch>
     </React.Fragment>
   );
 };

@@ -1,6 +1,5 @@
-import axios from "axios";
 import { SagaIterator } from "redux-saga";
-import { put, call, cancelled, fork, select, all } from "redux-saga/effects";
+import { put, call, fork, select, all } from "redux-saga/effects";
 import { map, isNil, filter, intersection } from "lodash";
 
 import * as api from "api";
@@ -61,9 +60,6 @@ export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Ta
 export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   config: FringesTableTaskConfig<B>
 ): Redux.TaskMapObject<Redux.TableTaskMap<R>> => {
-  const CancelToken = axios.CancelToken;
-  const source = CancelToken.source();
-
   function* request(action: Redux.Action<null>): SagaIterator {
     const objId = yield select(config.selectObjId);
     if (!isNil(objId)) {
@@ -72,34 +68,21 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       try {
         yield all([call(requestFringes, objId), call(requestFringeColors)]);
       } catch (e: unknown) {
-        if (!(yield cancelled())) {
-          notifications.requestError(e as Error, "There was an error retrieving the table data.");
-          yield put(config.actions.response({ models: [] }));
-        }
+        notifications.requestError(e as Error, "There was an error retrieving the table data.");
+        yield put(config.actions.response({ models: [] }));
       } finally {
         yield put(config.actions.loading(false));
-        if (yield cancelled()) {
-          source.cancel();
-        }
       }
     }
   }
 
   function* requestFringes(objId: number): SagaIterator {
-    const response: Http.ListResponse<M> = yield call(
-      config.services.request,
-      objId,
-      { no_pagination: true },
-      { cancelToken: source.token }
-    );
+    const response: Http.ListResponse<M> = yield api.request(config.services.request, objId, { no_pagination: true });
     if (response.data.length === 0) {
       // If there is no table data, we want to default create two rows.
-      const createResponse: Http.BulkResponse<B, M> = yield call(
-        config.services.bulkCreate,
-        objId,
-        { data: [{}, {}] },
-        { cancelToken: source.token }
-      );
+      const createResponse: Http.BulkResponse<B, M> = yield api.request(config.services.bulkCreate, objId, {
+        data: [{}, {}]
+      });
       yield put(config.actions.response({ models: createResponse.children }));
     } else {
       yield put(config.actions.response({ models: response.data }));
@@ -107,7 +90,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   }
 
   function* requestFringeColors(): SagaIterator {
-    const response = yield call(api.getFringeColors, { cancelToken: source.token });
+    const response = yield api.request(api.getFringeColors);
     yield put(config.actions.responseFringeColors(response));
   }
 
@@ -116,13 +99,10 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       e.payload,
       config.columns
     );
-
     yield put(config.actions.saving(true));
     yield put(config.actions.loadingBudget(true));
     try {
-      const response: Http.BulkResponse<B, M> = yield call(config.services.bulkCreate, objId, requestPayload, {
-        cancelToken: source.token
-      });
+      const response: Http.BulkResponse<B, M> = yield api.request(config.services.bulkCreate, objId, requestPayload);
       yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
       // Note: The logic in the reducer for activating the placeholder rows with real data relies on the
       // assumption that the models in the response are in the same order as the placeholder numbers.
@@ -132,15 +112,10 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       );
       yield put(config.actions.addModelsToState({ placeholderIds: placeholderIds, models: response.children }));
     } catch (err: unknown) {
-      if (!(yield cancelled())) {
-        notifications.requestError(err as Error, errorMessage);
-      }
+      notifications.requestError(err as Error, errorMessage);
     } finally {
       yield put(config.actions.saving(false));
       yield put(config.actions.loadingBudget(false));
-      if (yield cancelled()) {
-        source.cancel();
-      }
     }
   }
 
@@ -155,9 +130,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       yield put(config.actions.loadingBudget(true));
     }
     try {
-      const response: Http.BulkResponse<B, M> = yield call(config.services.bulkUpdate, objId, requestPayload, {
-        cancelToken: source.token
-      });
+      const response: Http.BulkResponse<B, M> = yield api.request(config.services.bulkUpdate, objId, requestPayload);
       yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
       const path = yield select((s: Application.Authenticated.Store) => s.router.location.pathname);
 
@@ -194,17 +167,12 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         yield put(config.actions.requestSubAccount(null));
       }
     } catch (err: unknown) {
-      if (!(yield cancelled())) {
-        notifications.requestError(err as Error, errorMessage);
-      }
+      notifications.requestError(err as Error, errorMessage);
     } finally {
       if (!tabling.typeguards.isGroupEvent(e)) {
         yield put(config.actions.loadingBudget(false));
       }
       yield put(config.actions.saving(false));
-      if (yield cancelled()) {
-        source.cancel();
-      }
     }
   }
 
@@ -212,20 +180,13 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     yield put(config.actions.saving(true));
     yield put(config.actions.loadingBudget(true));
     try {
-      const response: Http.BulkDeleteResponse<B> = yield call(config.services.bulkDelete, budgetId, ids, {
-        cancelToken: source.token
-      });
+      const response: Http.BulkDeleteResponse<B> = yield api.request(config.services.bulkDelete, budgetId, ids);
       yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
     } catch (err: unknown) {
-      if (!(yield cancelled())) {
-        notifications.requestError(err as Error, errorMessage);
-      }
+      notifications.requestError(err as Error, errorMessage);
     } finally {
       yield put(config.actions.saving(false));
       yield put(config.actions.loadingBudget(false));
-      if (yield cancelled()) {
-        source.cancel();
-      }
     }
   }
 

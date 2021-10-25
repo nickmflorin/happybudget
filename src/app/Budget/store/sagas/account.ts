@@ -1,6 +1,5 @@
-import axios from "axios";
 import { SagaIterator } from "redux-saga";
-import { call, put, select, cancelled, spawn, takeLatest, all } from "redux-saga/effects";
+import { call, put, select, spawn, takeLatest, all } from "redux-saga/effects";
 import { isNil } from "lodash";
 
 import * as api from "api";
@@ -20,21 +19,12 @@ import {
 function* getAccount(action: Redux.Action<null>): SagaIterator {
   const accountId = yield select((state: Application.Authenticated.Store) => state.budget.account.id);
   if (!isNil(accountId)) {
-    const CancelToken = axios.CancelToken;
-    const source = CancelToken.source();
-
     try {
-      const response: Model.Account = yield call(api.getAccount, accountId, { cancelToken: source.token });
+      const response: Model.Account = yield api.request(api.getAccount, accountId);
       yield put(actions.responseAccountAction(response));
     } catch (e: unknown) {
-      if (!(yield cancelled())) {
-        notifications.requestError(e as Error, { message: "There was an error retrieving the account." });
-        yield put(actions.responseAccountAction(null));
-      }
-    } finally {
-      if (yield cancelled()) {
-        source.cancel();
-      }
+      notifications.requestError(e as Error, { message: "There was an error retrieving the account." });
+      yield put(actions.responseAccountAction(null));
     }
   }
 }
@@ -42,28 +32,20 @@ function* getAccount(action: Redux.Action<null>): SagaIterator {
 function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
   const accountId = yield select((state: Application.Authenticated.Store) => state.budget.account.id);
   if (!isNil(accountId)) {
-    const CancelToken = axios.CancelToken;
-    const source = CancelToken.source();
     yield put(actions.loadingHistoryAction(true));
     try {
-      const response: Http.ListResponse<Model.HistoryEvent> = yield call(
+      const response: Http.ListResponse<Model.HistoryEvent> = yield api.request(
         api.getAccountSubAccountsHistory,
         accountId,
-        {},
-        { cancelToken: source.token }
+        {}
       );
       yield put(actions.responseHistoryAction(response));
     } catch (e: unknown) {
-      if (!(yield cancelled())) {
-        notifications.requestError(e as Error, {
-          message: "There was an error retrieving the account's sub accounts history."
-        });
-      }
+      notifications.requestError(e as Error, {
+        message: "There was an error retrieving the account's sub accounts history."
+      });
     } finally {
       yield put(actions.loadingHistoryAction(false));
-      if (yield cancelled()) {
-        source.cancel();
-      }
     }
   }
 }

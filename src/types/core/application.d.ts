@@ -19,6 +19,8 @@ namespace Application {
     readonly default?: boolean;
   }
 
+  type Redirect = string | null | true;
+
   namespace Authenticated {
     type ModuleLabel = "dashboard" | "budget" | "template";
     type AnyModuleStore = Modules.Budget.Store | Modules.Dashboard.Store | Modules.Template.Store;
@@ -36,6 +38,7 @@ namespace Application {
       readonly loading: boolean;
       readonly user: Model.User;
       readonly contacts: Redux.ModelListResponseStore<Model.Contact>;
+      readonly redirect404: Redirect;
     }
     /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
     type StaticReducers = Redux.ReducersMapObject<StaticStores>;
@@ -69,6 +72,7 @@ namespace Application {
       readonly drawerVisible: boolean;
       readonly loading: boolean;
       readonly contacts: Redux.ListResponseStore<Model.Contact>;
+      readonly redirect404: Redirect;
     }
 
     /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */

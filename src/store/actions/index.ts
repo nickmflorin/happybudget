@@ -5,6 +5,7 @@ export * as authenticated from "./authenticated";
 export { default as AuthenticatedActionTypes } from "./authenticated";
 
 export const GlobalActionTypes = {
+  Set404Redirect: "Set404Redirect",
   SetDrawerVisibility: "SetDrawerVisibility",
   SetApplicationLoading: "SetApplicationLoading",
   Contacts: {
@@ -14,6 +15,7 @@ export const GlobalActionTypes = {
   }
 };
 
+export const redirect404Action = createAction<string | true>(GlobalActionTypes.Set404Redirect);
 export const setDrawerVisibilityAction = createAction<boolean>(GlobalActionTypes.SetDrawerVisibility);
 export const setApplicationLoadingAction = createAction<boolean>(GlobalActionTypes.SetApplicationLoading);
 

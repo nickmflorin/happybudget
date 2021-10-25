@@ -1,6 +1,5 @@
 import { SagaIterator } from "redux-saga";
-import { spawn, take, cancel, fork, call, put, cancelled } from "redux-saga/effects";
-import axios from "axios";
+import { spawn, take, cancel, fork, put } from "redux-saga/effects";
 
 import * as api from "api";
 import { notifications } from "lib";
@@ -9,21 +8,14 @@ import { ActionType } from "../actions";
 import * as actions from "../actions/pdf";
 
 function* loadHeaderTemplateTask(id: number): SagaIterator {
-  const CancelToken = axios.CancelToken;
-  const source = CancelToken.source();
   yield put(actions.setLoadingHeaderTemplateDetailAction(true));
   try {
-    const response: Model.HeaderTemplate = yield call(api.getHeaderTemplate, id, { cancelToken: source.token });
+    const response: Model.HeaderTemplate = yield api.request(api.getHeaderTemplate, id);
     yield put(actions.displayHeaderTemplateAction(response));
   } catch (e: unknown) {
-    if (!(yield cancelled())) {
-      notifications.requestError(e as Error, "There was an error loading the header template.");
-    }
+    notifications.requestError(e as Error, "There was an error loading the header template.");
   } finally {
     yield put(actions.setLoadingHeaderTemplateDetailAction(false));
-    if (yield cancelled()) {
-      source.cancel();
-    }
   }
 }
 
@@ -39,26 +31,15 @@ function* watchForLoadHeaderTemplateTask(): SagaIterator {
 }
 
 function* getHeaderTemplatesTask(): SagaIterator {
-  const CancelToken = axios.CancelToken;
-  const source = CancelToken.source();
   yield put(actions.loadingHeaderTemplatesAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleHeaderTemplate> = yield call(
-      api.getHeaderTemplates,
-      {},
-      { cancelToken: source.token }
-    );
+    const response: Http.ListResponse<Model.SimpleHeaderTemplate> = yield api.request(api.getHeaderTemplates, {});
     yield put(actions.responseHeaderTemplatesAction(response));
   } catch (e: unknown) {
-    if (!(yield cancelled())) {
-      notifications.requestError(e as Error, "There was an error retrieving the header templates.");
-      yield put(actions.responseHeaderTemplatesAction({ data: [], count: 0 }));
-    }
+    notifications.requestError(e as Error, "There was an error retrieving the header templates.");
+    yield put(actions.responseHeaderTemplatesAction({ data: [], count: 0 }));
   } finally {
     yield put(actions.loadingHeaderTemplatesAction(false));
-    if (yield cancelled()) {
-      source.cancel();
-    }
   }
 }
 
