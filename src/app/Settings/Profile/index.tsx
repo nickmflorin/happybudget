@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { ui } from "lib";
+import { ui, model } from "lib";
 import { hooks, actions } from "store";
 
 import { FormContainer, UserProfileForm } from "components/forms";
@@ -15,11 +15,10 @@ import { Page } from "components/layout";
 import "./index.scss";
 
 const Profile = (): JSX.Element => {
-  const [file, setFile] = useState<UploadedImage | null>(null);
   const form = ui.hooks.useForm<Http.UserPayload>();
   const user = hooks.useLoggedInUser();
   const dispatch: Redux.Dispatch = useDispatch();
-  const [image, setImage] = useState<UploadedImage | null>(null);
+  const [image, setImage] = useState<UploadedImage | SavedImage | null>(null);
   /*
   Note: We have to use a ref here, instead of storing firstName and lastName in the state
   of this component, because if we were storing it in this component, when the firstName and
@@ -29,12 +28,8 @@ const Profile = (): JSX.Element => {
   const headerRef = useRef<IImageAndNameRef | null>(null);
 
   useEffect(() => {
-    return () => {
-      headerRef.current?.setFirstName(null);
-      headerRef.current?.setLastName(null);
-      setImage(null);
-    };
-  }, []);
+    setImage(user.profile_image);
+  }, [user]);
 
   const onValuesChange = useMemo(
     () => (changedValues: Partial<Http.ContactPayload>, values: Http.ContactPayload) => {
@@ -67,11 +62,14 @@ const Profile = (): JSX.Element => {
             last_name: user.last_name,
             timezone: user.timezone
           }}
-          onImageChange={(f: UploadedImage | null) => setFile(f)}
-          originalImage={user.profile_image}
           onFinish={(values: Partial<Http.UserPayload>) => {
             form.setLoading(true);
-            const payload = { ...values, profile_image: !isNil(file) ? file.data : null };
+            let payload = { ...values };
+            if (!isNil(image) && model.typeguards.isUploadedImage(image)) {
+              payload = { ...payload, profile_image: image.data };
+            } else if (isNil(image)) {
+              payload = { ...payload, profile_image: null };
+            }
             api
               .updateActiveUser(payload)
               .then((response: Model.User) => {
