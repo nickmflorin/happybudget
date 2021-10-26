@@ -23,6 +23,12 @@ const ColumnTypes: Table.ColumnType[] = [
     headerOverrides: { style: { textAlign: "center" } }
   },
   {
+    id: "file",
+    icon: "file",
+    style: { textAlign: "left" },
+    headerOverrides: { style: { textAlign: "center" } }
+  },
+  {
     id: "phone",
     icon: "phone",
     style: { textAlign: "left" },

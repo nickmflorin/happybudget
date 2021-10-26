@@ -13,7 +13,7 @@ namespace Tables {
 
   interface SubAccountRowData
     extends BudgetRowData,
-      Pick<Model.SubAccount, "quantity" | "unit" | "multiplier" | "rate" | "fringes" | "fringe_contribution"> {
+      Pick<Model.SubAccount, "quantity" | "unit" | "multiplier" | "rate" | "fringes" | "fringe_contribution" | "attachments"> {
     readonly contact?: number | null;
   }
 
@@ -34,7 +34,7 @@ namespace Tables {
 
   type ActualRowData = Pick<
     Model.Actual,
-    "description" | "purchase_order" | "date" | "actual_type" | "payment_id" | "value" | "contact" | "owner"
+    "description" | "purchase_order" | "date" | "actual_type" | "payment_id" | "value" | "contact" | "owner" | "attachments"
   >;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */

@@ -254,6 +254,26 @@ export const CalculatedColumn = <
   };
 };
 
+export const AttachmentsColumn = <
+  R extends Table.RowData,
+  M extends Model.HttpModel = Model.HttpModel,
+  PDFM extends Model.HttpModel = any
+>(
+  col: Partial<Table.Column<R, M, number, PDFM>>,
+  width?: number
+): Table.Column<R, M, number, PDFM> => {
+  return {
+    ...col,
+    editable: false,
+    cellRenderer: "AttachmentsCell",
+    tableColumnType: "body",
+    columnType: "file",
+    isRead: true,
+    isWrite: true,
+    width: !isNil(width) ? width : 140
+  };
+};
+
 export const BodyColumn = <
   R extends Table.RowData,
   M extends Model.HttpModel = Model.HttpModel,

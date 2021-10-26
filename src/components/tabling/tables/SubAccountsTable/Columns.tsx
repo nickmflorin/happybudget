@@ -58,6 +58,10 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
       return 1;
     }
   }),
+  tabling.columns.AttachmentsColumn({
+    field: "attachments",
+    headerName: "Att."
+  }),
   tabling.columns.SelectColumn({
     field: "contact",
     headerName: "Contact",
@@ -68,30 +72,6 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     width: 120,
     pdfWidth: 0.2,
     requiresAuthentication: true
-  }),
-  tabling.columns.BodyColumn<R, M, number, PDFM>({
-    field: "quantity",
-    headerName: "Qty",
-    pdfWidth: 0.1,
-    width: 60,
-    valueSetter: tabling.valueSetters.integerValueSetter<R>("quantity"),
-    columnType: "number",
-    // If the plurality of the quantity changes, we need to refresh the refresh
-    // the unit column to change the plurality of the tag in the cell.
-    refreshColumns: (change: Table.CellChange<number>) => {
-      if (isNil(change.newValue) && isNil(change.oldValue)) {
-        return [];
-      } else if (
-        isNil(change.newValue) ||
-        isNil(change.oldValue) ||
-        (change.newValue > 1 && !(change.oldValue > 1)) ||
-        (change.newValue <= 1 && !(change.oldValue <= 1))
-      ) {
-        return ["unit"];
-      } else {
-        return [];
-      }
-    }
   }),
   tabling.columns.TagSelectColumn({
     field: "unit",

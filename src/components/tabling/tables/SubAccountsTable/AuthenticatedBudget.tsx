@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { isNil, find, map, filter } from "lodash";
 
 import { model, tabling, hooks } from "lib";
+import { EditSubAccountAttachmentsModal } from "components/modals";
 import { framework } from "components/tabling/generic";
 
 import { AuthenticatedBudgetTable, AuthenticatedBudgetTableProps } from "../BudgetTable";
@@ -31,6 +32,7 @@ export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>,
 const AuthenticatedBudgetSubAccountsTable = (
   props: WithSubAccountsTableProps<AuthenticatedBudgetProps>
 ): JSX.Element => {
+  const [editSubAccountAttachments, setEditSubAccountAttachments] = useState<number | null>(null);
   const table = tabling.hooks.useTableIfNotDefined(props.table);
 
   const processUnitCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
@@ -83,6 +85,9 @@ const AuthenticatedBudgetSubAccountsTable = (
         headerName: props.identifierFieldHeader
       }),
       description: { headerName: `${props.categoryName} Description` },
+      attachments: {
+        onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditSubAccountAttachments(row.id)
+      },
       unit: {
         processCellFromClipboard: processUnitCellFromClipboard
       },
@@ -129,81 +134,91 @@ const AuthenticatedBudgetSubAccountsTable = (
   ]);
 
   return (
-    <AuthenticatedBudgetTable<R, M>
-      {...props}
-      table={table}
-      columns={columns}
-      onCellFocusChanged={(params: Table.CellFocusChangedParams<R, M>) => {
-        /*
+    <React.Fragment>
+      <AuthenticatedBudgetTable<R, M>
+        {...props}
+        table={table}
+        columns={columns}
+        onCellFocusChanged={(params: Table.CellFocusChangedParams<R, M>) => {
+          /*
         For the ContactCell, we want the contact tag in the cell to be clickable
         only when the cell is focused.  This means we have to rerender the cell when
         it becomes focused or unfocused so that the tag becomes clickable (in the focused
         case) or unclickable (in the unfocused case).
         */
-        const rowNodes: Table.RowNode[] = [];
-        if (params.cell.column.field === "contact") {
-          rowNodes.push(params.cell.rowNode);
-        }
-        if (!isNil(params.previousCell) && params.previousCell.column.field === "contact") {
-          rowNodes.push(params.previousCell.rowNode);
-        }
-        if (rowNodes.length !== 0) {
-          params.apis.grid.refreshCells({
-            force: true,
-            rowNodes,
-            columns: ["contact"]
-          });
-        }
-      }}
-      actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
-        {
-          icon: "folder",
-          label: "Group",
-          isWriteOnly: true,
-          onClick: () => {
-            let rows = filter(params.selectedRows, (r: Table.BodyRow<R>) =>
-              tabling.typeguards.isModelRow(r)
-            ) as Table.ModelRow<R>[];
-            if (rows.length === 0) {
-              const focusedRow = table.current.getFocusedRow();
-              if (!isNil(focusedRow) && tabling.typeguards.isModelRow(focusedRow)) {
-                rows = [focusedRow];
-              }
-            }
-            if (rows.length !== 0) {
-              props.onGroupRows?.(rows);
-            }
+          const rowNodes: Table.RowNode[] = [];
+          if (params.cell.column.field === "contact") {
+            rowNodes.push(params.cell.rowNode);
           }
-        },
-        {
-          icon: "badge-percent",
-          label: "Mark Up",
-          isWriteOnly: true,
-          onClick: () => {
-            const selectedRows = filter(params.selectedRows, (r: Table.BodyRow<R>) =>
-              tabling.typeguards.isModelRow(r)
-            ) as Table.ModelRow<R>[];
-            // If rows are explicitly selected for the Markup, we want to include them
-            // as the default children for the Markup in the modal, which will default the
-            // unit in the modal to PERCENT.
-            if (selectedRows.length !== 0) {
-              props.onMarkupRows?.(selectedRows);
-            } else {
-              const rows: Table.ModelRow<R>[] = filter(table.current.getRows(), (r: Table.BodyRow<R>) =>
+          if (!isNil(params.previousCell) && params.previousCell.column.field === "contact") {
+            rowNodes.push(params.previousCell.rowNode);
+          }
+          if (rowNodes.length !== 0) {
+            params.apis.grid.refreshCells({
+              force: true,
+              rowNodes,
+              columns: ["contact"]
+            });
+          }
+        }}
+        actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
+          {
+            icon: "folder",
+            label: "Group",
+            isWriteOnly: true,
+            onClick: () => {
+              let rows = filter(params.selectedRows, (r: Table.BodyRow<R>) =>
                 tabling.typeguards.isModelRow(r)
               ) as Table.ModelRow<R>[];
+              if (rows.length === 0) {
+                const focusedRow = table.current.getFocusedRow();
+                if (!isNil(focusedRow) && tabling.typeguards.isModelRow(focusedRow)) {
+                  rows = [focusedRow];
+                }
+              }
               if (rows.length !== 0) {
-                props.onMarkupRows?.();
+                props.onGroupRows?.(rows);
               }
             }
-          }
-        },
-        ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
-        framework.actions.ToggleColumnAction<R, M>(table.current, params),
-        framework.actions.ExportPdfAction(props.onExportPdf),
-        framework.actions.ExportCSVAction<R, M>(table.current, params, props.exportFileName)
-      ]}
-    />
+          },
+          {
+            icon: "badge-percent",
+            label: "Mark Up",
+            isWriteOnly: true,
+            onClick: () => {
+              const selectedRows = filter(params.selectedRows, (r: Table.BodyRow<R>) =>
+                tabling.typeguards.isModelRow(r)
+              ) as Table.ModelRow<R>[];
+              // If rows are explicitly selected for the Markup, we want to include them
+              // as the default children for the Markup in the modal, which will default the
+              // unit in the modal to PERCENT.
+              if (selectedRows.length !== 0) {
+                props.onMarkupRows?.(selectedRows);
+              } else {
+                const rows: Table.ModelRow<R>[] = filter(table.current.getRows(), (r: Table.BodyRow<R>) =>
+                  tabling.typeguards.isModelRow(r)
+                ) as Table.ModelRow<R>[];
+                if (rows.length !== 0) {
+                  props.onMarkupRows?.();
+                }
+              }
+            }
+          },
+          ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
+          framework.actions.ToggleColumnAction<R, M>(table.current, params),
+          framework.actions.ExportPdfAction(props.onExportPdf),
+          framework.actions.ExportCSVAction<R, M>(table.current, params, props.exportFileName)
+        ]}
+      />
+      {!isNil(editSubAccountAttachments) && (
+        <EditSubAccountAttachmentsModal
+          id={editSubAccountAttachments}
+          open={true}
+          onCancel={() => setEditSubAccountAttachments(null)}
+          onSuccess={() => {}}
+        />
+      )}
+    </React.Fragment>
   );
 };
 
