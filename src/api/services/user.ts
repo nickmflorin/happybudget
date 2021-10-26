@@ -30,6 +30,6 @@ export const tempUploadImage = async (
   data: FormData,
   options?: Http.RequestOptions
 ): Promise<AxiosResponse<Http.FileUploadResponse>> => {
-  const url = services.URL.v1("users", "temp_upload_user_image");
+  const url = services.URL.v1("io", "temp-upload-image");
   return client.upload<Http.FileUploadResponse>(url, data, options);
 };
