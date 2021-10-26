@@ -182,12 +182,20 @@
             // preferred spacing
             padding-left: 15px;
             margin-left: -15px;
+            padding-top: 15px;
+            margin-top: -15px;
 
             .page-content {
               width: 100%;
+
               // Required for non-table pages to get the content area to scroll.
+              // But this cuts off the budget card box shadow so we need this negative margin hack.
               &.scrollable {
                 overflow-y: scroll;
+                padding-left: 15px;
+                margin-left: -15px;
+                padding-top: 15px;
+                margin-top: -15px;
               }
             }
           }
