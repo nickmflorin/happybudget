@@ -134,6 +134,17 @@ namespace Model {
     readonly phone_number: number | null;
   }
 
+  interface SimpleAttachment extends HttpModel {
+    readonly name: string;
+    readonly extension: string;
+  }
+
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  interface Attachment extends SimpleAttachment {
+    readonly url: string;
+    readonly size: number;
+  }
+
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface Fringe extends TrackedModel {
     readonly type: "fringe";
@@ -291,6 +302,7 @@ namespace Model {
     readonly object_id: number;
     readonly parent_type: "account" | "subaccount";
     readonly fringes: number[];
+    readonly attachments: SimpleAttachment[];
     readonly siblings?: SimpleSubAccount[]; // Only included for detail endpoints.
     readonly ancestors?: [SimpleBudget | SimpleTemplate, SimpleAccount, ...Array<SimpleSubAccount>]; // Only included for detail endpoints.
   }
@@ -312,6 +324,7 @@ namespace Model {
     readonly payment_id: string | null;
     readonly value: number | null;
     readonly actual_type: Tag | null;
+    readonly attachments: SimpleAttachment[];
     readonly owner: SimpleSubAccount | SimpleMarkup | null;
   }
 

@@ -52,6 +52,17 @@ export const getSubAccountUnits = async (options: Http.RequestOptions = {}): Pro
   return client.list<Model.Tag>(url, { no_pagination: true }, options);
 };
 
+export const getSubAccountAttachments = services.detailListService<Model.Attachment>((id: number) => [
+  "subaccounts",
+  id,
+  "attachments"
+]);
+export const uploadSubAccountAttachment = services.detailPatchService<FormData, Model.SubAccount>((id: number) => [
+  "subaccounts",
+  id,
+  "upload-attachment"
+]);
+
 export const bulkUpdateSubAccountSubAccounts = async <B extends Model.Budget | Model.Template>(
   id: number,
   data: Http.BulkUpdatePayload<Http.SubAccountPayload>,
