@@ -57,10 +57,16 @@ export const getSubAccountAttachments = services.detailListService<Model.Attachm
   id,
   "attachments"
 ]);
-export const uploadSubAccountAttachment = services.detailPatchService<FormData, Model.SubAccount>((id: number) => [
+export const deleteSubAccountAttachment = services.detailDeleteService((id: number, objId: number) => [
   "subaccounts",
   id,
-  "upload-attachment"
+  "attachments",
+  objId
+]);
+export const uploadSubAccountAttachment = services.detailPostService<FormData, Model.Attachment>((id: number) => [
+  "subaccounts",
+  id,
+  "attachments"
 ]);
 
 export const bulkUpdateSubAccountSubAccounts = async <B extends Model.Budget | Model.Template>(

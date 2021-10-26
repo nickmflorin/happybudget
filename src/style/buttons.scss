@@ -453,6 +453,16 @@
     }
   }
 
+  &--trash {
+    @include bare_color_set(#d2d2d2, #a5a5a5);
+
+    &:hover {
+      .icon {
+        color: $red-hover !important;
+      }
+    }
+  }
+
   &--login,
   &--reset {
     @extend .btn--large;

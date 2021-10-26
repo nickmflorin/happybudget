@@ -12,10 +12,16 @@ export const getActualAttachments = services.detailListService<Model.Attachment>
   id,
   "attachments"
 ]);
-export const uploadActualAttachment = services.detailPatchService<FormData, Model.Actual>((id: number) => [
+export const deleteActualAttachment = services.detailDeleteService((id: number, objId: number) => [
   "actuals",
   id,
-  "upload-attachment"
+  "attachments",
+  objId
+]);
+export const uploadActualAttachment = services.detailPostService<FormData, Model.Attachment>((id: number) => [
+  "actuals",
+  id,
+  "attachments"
 ]);
 export const getActualTypes = async (options: Http.RequestOptions = {}): Promise<Http.ListResponse<Model.Tag>> => {
   const url = services.URL.v1("actuals", "types");

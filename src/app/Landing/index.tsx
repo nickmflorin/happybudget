@@ -1,6 +1,5 @@
-import { Route } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 
-import { NotFoundRedirectSwitch } from "components/routes";
 import { Logo } from "components/svgs";
 import * as config from "config";
 
@@ -18,12 +17,12 @@ const Landing = (): JSX.Element => {
         <div className={"logo-container"}>
           <Logo color={"green"} />
         </div>
-        <NotFoundRedirectSwitch>
+        <Switch>
           <Route exact path={"/login"} component={Login} />
           <Route exact path={"/signup"} component={Signup} />
           <Route exact path={"/reset-password"} component={ResetPassword} />
           <Route exact path={"/recover-password"} component={RecoverPassword} />
-        </NotFoundRedirectSwitch>
+        </Switch>
       </div>
       <div className={"landing-page-right"}>
         <div className={"logo-container"}>

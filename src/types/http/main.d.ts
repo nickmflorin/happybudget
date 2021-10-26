@@ -9,6 +9,7 @@ namespace Http {
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface RequestOptions {
+    readonly redirectOn404?: boolean;
     readonly retries?: number;
     readonly headers?: { [key: string]: string };
     readonly cancelToken?: import("axios").CancelToken | undefined | null;

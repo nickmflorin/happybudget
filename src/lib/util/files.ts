@@ -1,6 +1,6 @@
 import { isNil } from "lodash";
 
-export const fileSizeInMB = (file: File) => file.size / 1024 / 1024;
+export const fileSizeInMB = (file: File | number) => (typeof file === "number" ? file : file.size) / 1024 / 1024;
 
 export const getFileType = (filename: string): string | undefined => {
   if (!filename.includes(".")) {
@@ -8,6 +8,8 @@ export const getFileType = (filename: string): string | undefined => {
   }
   return filename.split(".").slice(-1)[0];
 };
+
+export const fileSizeString = (file: File | number) => `${fileSizeInMB(file).toFixed(2)} MB`;
 
 export const getBase64 = (file: File | Blob): Promise<string | ArrayBuffer> =>
   new Promise((resolve, reject) => {

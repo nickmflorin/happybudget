@@ -11,14 +11,6 @@ export enum HttpErrorTypes {
   AUTHENTICATION = "AUTHENTICATION"
 }
 
-export class NotFoundError extends Error {
-  constructor(message: string, name?: string) {
-    super("");
-    this.message = message;
-    this.name = name || "NotFoundError";
-  }
-}
-
 /**
  * Base class for all request errors.  Should not be used directly, but rather
  * one of ClientError or NetworkError or ServerError should be used.

@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 
 import { util, notifications } from "lib";
 
-import { NotFoundError, ClientError, NetworkError, ServerError } from "./errors";
+import { ClientError, NetworkError, ServerError } from "./errors";
 
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -35,6 +35,14 @@ export const getRequestHeaders = (): { [key: string]: string } => {
   return headers;
 };
 
+export const setRequestHeaders = (request: XMLHttpRequest) => {
+  const headers = getRequestHeaders();
+  const keys = Object.keys(headers);
+  for (let i = 0; i < keys.length; i++) {
+    request.setRequestHeader(keys[i], headers[keys[i]]);
+  }
+};
+
 instance.interceptors.request.use((config: AxiosRequestConfig): AxiosRequestConfig => {
   config = config || {};
   config.headers = { ...config.headers, ...getRequestHeaders() };
@@ -57,7 +65,7 @@ export const filterPayload = <T extends { [key: string]: any } = { [key: string]
  *
  * @param error The AxiosError that was raised.
  */
-const throwClientError = (error: AxiosError<Http.ErrorResponse>) => {
+const throwClientError = (error: AxiosError<Http.ErrorResponse>, options: Http.RequestOptions) => {
   if (isNil(error.response) || isNil(error.response.data)) {
     return;
   }
@@ -67,7 +75,26 @@ const throwClientError = (error: AxiosError<Http.ErrorResponse>) => {
     window.location.href = "/login";
   } else {
     if (error.response.status === 404) {
-      throw new NotFoundError("The requested resource could not be found.");
+      if (options.redirectOn404 === true) {
+        // This will trigger a redirect to the 404 page via the Sagas.
+        window.location.href = "/not_found";
+      } else {
+        // On 404's Django will sometimes bypass DRF exception handling and
+        // return a 404.html template response.  We should bypass this in the
+        // backend, but for the time being we can manually raise a ClientError.
+        throw new ClientError({
+          response,
+          errors: [
+            {
+              message: "The requested resource could not be found.",
+              code: "not_found",
+              error_type: "http"
+            }
+          ],
+          status: response.status,
+          url
+        });
+      }
     } else if (!isNil(response.data.errors)) {
       throw new ClientError({
         response,
@@ -97,7 +124,7 @@ instance.interceptors.response.use(
     if (!isNil(error.response)) {
       const response = error.response;
       if (response.status >= 400 && response.status < 500) {
-        throwClientError(error);
+        throwClientError(error, response.config);
       } else {
         const url = !isNil(error.request.config) ? error.request.config.url : undefined;
         throw new ServerError({ status: error.response.status, url });
@@ -178,8 +205,7 @@ export class ApiClient {
     };
     url = this._prepare_url(url, query, method);
     const response: AxiosResponse<T> = await lookup[method](url, filterPayload(payload), {
-      cancelToken: options.cancelToken,
-      headers: options.headers
+      cancelToken: options.cancelToken
     });
     return response.data;
   };

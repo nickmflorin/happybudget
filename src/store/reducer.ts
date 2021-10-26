@@ -26,16 +26,6 @@ const loadingReducer: Redux.Reducer<boolean> = (state: boolean = false, action: 
   return state;
 };
 
-const redirect404Reducer: Redux.Reducer<Application.Redirect> = (
-  state: Application.Redirect = null,
-  action: Redux.Action
-): Application.Redirect => {
-  if (!isNil(action.payload) && action.type === actions.redirect404Action.toString()) {
-    return action.payload;
-  }
-  return state;
-};
-
 function createModularApplicationReducer(
   config: Application.Authenticated.ModuleConfig[]
 ): Application.Authenticated.ModuleReducers;
@@ -96,8 +86,7 @@ export const createStaticAuthenticatedReducers = (
       actions: { set: actions.setDrawerVisibilityAction }
     }),
     loading: loadingReducer,
-    user: createUserReducer(user),
-    redirect404: redirect404Reducer
+    user: createUserReducer(user)
   };
 };
 
@@ -129,7 +118,6 @@ export const createStaticUnauthenticatedReducers = (
     drawerVisible: redux.reducers.createSimpleBooleanReducer({
       actions: { set: actions.setDrawerVisibilityAction }
     }),
-    loading: loadingReducer,
-    redirect404: redirect404Reducer
+    loading: loadingReducer
   };
 };

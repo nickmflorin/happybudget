@@ -8,6 +8,12 @@
   padding-bottom: 0px;
   top: auto !important;
   max-height: 90vh;
+
+  &.modal--no-footer {
+    .ant-modal-body {
+      padding-bottom: 36px !important;
+    }
+  }
 }
 
 .ant-modal-content {
