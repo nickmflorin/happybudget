@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { filter, map, includes, isNil } from "lodash";
+import { filter, map, isNil } from "lodash";
 
 import { tabling } from "lib";
 import Dropdown, { DropdownMenuItemsProps } from "./Dropdown";
@@ -8,7 +8,7 @@ type OmitDropdownProps = "menuMode" | "menuCheckbox" | "menuSelected" | "menuIte
 export interface ToggleColumnsDropdownProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
   extends Omit<DropdownMenuItemsProps, OmitDropdownProps> {
   readonly columns: Table.Column<R, M>[];
-  readonly hiddenColumns?: (keyof R | string)[];
+  readonly hiddenColumns?: Table.HiddenColumns;
 }
 
 /* eslint-disable indent */
@@ -28,10 +28,10 @@ const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.HttpMode
   const selected = useMemo<(keyof R | string)[]>(
     () =>
       map(
-        filter(
-          hideableColumns,
-          (col: Table.Column<R, M>) => !includes(props.hiddenColumns, tabling.columns.normalizedField(col))
-        ),
+        filter(hideableColumns, (col: Table.Column<R, M>) => {
+          const field = tabling.columns.normalizedField(col);
+          return !isNil(field) && (isNil(props.hiddenColumns) || props.hiddenColumns[field] !== true);
+        }),
         (col: Table.Column<R, M>) => tabling.columns.normalizedField(col)
       ) as (keyof R | string)[],
     [hideableColumns, props.hiddenColumns]

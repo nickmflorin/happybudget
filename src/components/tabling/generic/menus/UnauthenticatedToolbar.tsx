@@ -8,7 +8,7 @@ interface UnauthenticatedToolbarProps<R extends Table.RowData, M extends Model.H
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
   readonly actions: Table.UnauthenticatedMenuActions<R, M>;
-  readonly hiddenColumns: (keyof R | string)[];
+  readonly hiddenColumns?: Table.HiddenColumns;
 }
 
 /* eslint-disable indent */

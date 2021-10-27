@@ -69,9 +69,9 @@ namespace Redux {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type Dispatch = import("redux").Dispatch<Action>;
 
-  interface Action<P = any> {
+  interface Action<P = any, T extends string = string> {
     readonly payload: P;
-    readonly type: string;
+    readonly type: T;
     readonly isAuthenticated?: boolean | undefined;
   }
 

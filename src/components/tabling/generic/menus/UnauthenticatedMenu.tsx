@@ -23,7 +23,7 @@ type InternalUnauthenticatedMenuProps<
   M extends Model.HttpModel = Model.HttpModel
 > = UnauthenticatedMenuProps<R, M> & {
   readonly apis: Table.GridApis | null;
-  readonly hiddenColumns: (keyof R | string)[];
+  readonly hiddenColumns?: Table.HiddenColumns;
 };
 
 /* eslint-disable indent */

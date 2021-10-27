@@ -32,7 +32,7 @@ type InternalAuthenticatedMenuProps<
   M extends Model.HttpModel = Model.HttpModel
 > = AuthenticatedMenuProps<R, M> & {
   readonly apis: Table.GridApis | null;
-  readonly hiddenColumns: (keyof R | string)[];
+  readonly hiddenColumns?: Table.HiddenColumns;
   readonly selectedRows: Table.EditableRow<R>[];
   readonly rowHasCheckboxSelection?: (row: Table.EditableRow<R>) => boolean;
   readonly hasExpandColumn: boolean;

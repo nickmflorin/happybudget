@@ -38,7 +38,7 @@ export const DefaultFooterGridOptions: GridOptions = {
 type TableConfigurationProvidedProps<R extends Table.RowData> = {
   readonly id: string;
   readonly tableApis: Table.ITableApis;
-  readonly hiddenColumns: (keyof R | string)[];
+  readonly hiddenColumns?: Table.HiddenColumns;
   readonly tableGridOptions: Table.TableOptionsSet;
   readonly hasExpandColumn: boolean;
   readonly minimal?: boolean;
@@ -52,10 +52,7 @@ type TableConfigurationProvidedProps<R extends Table.RowData> = {
   readonly onFooterGridReady: (event: GridReadyEvent) => void;
   readonly onPageGridReady: (event: GridReadyEvent) => void;
   readonly onFirstDataRendered: (e: FirstDataRenderedEvent) => void;
-  readonly changeColumnVisibility: (
-    changes: SingleOrArray<Table.ColumnVisibilityChange<R>>,
-    sizeToFit?: boolean
-  ) => void;
+  readonly changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange>, sizeToFit?: boolean) => void;
 };
 
 export type TableConfigurationProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {

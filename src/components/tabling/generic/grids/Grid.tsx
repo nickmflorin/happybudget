@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { map, isNil, includes, cloneDeep, filter } from "lodash";
+import { map, isNil, cloneDeep, filter } from "lodash";
 import classNames from "classnames";
 
 import { AgGridReact } from "@ag-grid-community/react";
@@ -92,7 +92,7 @@ type UseAgProps<R extends Table.RowData> = ExtensionProps & {
 export interface GridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> extends UseAgProps<R> {
   readonly id: Table.GridId;
   readonly data?: Table.BodyRow<R>[];
-  readonly hiddenColumns: (keyof R | string)[];
+  readonly hiddenColumns?: Table.HiddenColumns;
   readonly gridOptions: Table.GridOptions;
   readonly indexColumn?: Partial<Table.Column<R, M>>;
   readonly columns: Table.Column<R, M>[];
@@ -125,23 +125,23 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
   ...props
 }: GridProps<R, M>): JSX.Element => {
   const localColumns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-    let cs: Table.Column<R, M>[] = map(
-      columns,
-      (col: Table.Column<R, M>, index: number): Table.Column<R, M> =>
-        ({
-          ...col,
-          headerComponentParams: { ...col.headerComponentParams, column: col },
-          cellRendererParams: { ...col.cellRendererParams, columns, customCol: col, gridId: id },
-          hide: includes(hiddenColumns, col.field),
-          resizable: index === columns.length - 1 ? false : !isNil(col.resizable) ? col.resizable : true,
-          cellStyle: !isNil(col.columnType)
-            ? { ...tabling.columns.getColumnTypeCSSStyle(col.columnType), ...col.cellStyle }
-            : col.cellStyle
-        } as Table.Column<R, M>)
-    );
+    let cs: Table.Column<R, M>[] = map(columns, (col: Table.Column<R, M>, index: number): Table.Column<R, M> => {
+      const field = tabling.columns.normalizedField(col);
+      const hidden = !isNil(field) && (isNil(hiddenColumns) || hiddenColumns[field] === true);
+      return {
+        ...col,
+        headerComponentParams: { ...col.headerComponentParams, column: col },
+        cellRendererParams: { ...col.cellRendererParams, columns, customCol: col, gridId: id },
+        hide: hidden,
+        resizable: index === columns.length - 1 ? false : !isNil(col.resizable) ? col.resizable : true,
+        cellStyle: !isNil(col.columnType)
+          ? { ...tabling.columns.getColumnTypeCSSStyle(col.columnType), ...col.cellStyle }
+          : col.cellStyle
+      } as Table.Column<R, M>;
+    });
     cs = !isNil(indexColumn) ? util.updateInArray<Table.Column<R, M>>(cs, { field: "index" }, indexColumn) : cs;
     return cs;
-  }, []);
+  }, [hiddenColumns]);
 
   const colDefs = useMemo(
     () =>

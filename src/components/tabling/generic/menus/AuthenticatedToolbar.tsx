@@ -8,7 +8,7 @@ interface AuthenticatedToolbarProps<R extends Table.RowData, M extends Model.Htt
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
   readonly actions: Table.AuthenticatedMenuActions<R, M>;
-  readonly hiddenColumns: (keyof R | string)[];
+  readonly hiddenColumns?: Table.HiddenColumns;
   readonly selectedRows: Table.EditableRow<R>[];
 }
 

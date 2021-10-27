@@ -223,6 +223,7 @@ export const FakeColumn = <
   col: Partial<Table.Column<R, M, any, PDFM>>
 ): Table.Column<R, M, any, PDFM> => ({
   ...col,
+  canBeHidden: false,
   tableColumnType: "fake"
 });
 

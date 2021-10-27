@@ -275,6 +275,9 @@ namespace Table {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type InferFactoryParams<T> = T extends FactoryFn<infer D> ? D : never;
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type HiddenColumns = { [key: string]: boolean };
+
   interface Column<
     R extends RowData,
     M extends Model.HttpModel = Model.HttpModel,
@@ -386,7 +389,7 @@ namespace Table {
   type MenuActionParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
     readonly apis: GridApis;
     readonly columns: Column<R, M>[];
-    readonly hiddenColumns: (keyof R | string)[];
+    readonly hiddenColumns?: Table.HiddenColumns;
   };
 
   type UnauthenticatedMenuActionParams<
@@ -443,8 +446,8 @@ namespace Table {
     AuthenticatedMenuActionParams<R, M>
   >;
 
-  interface ColumnVisibilityChange<R extends RowData> {
-    readonly field: keyof R | string;
+  interface ColumnVisibilityChange {
+    readonly field: string;
     readonly visible: boolean;
   }
 
