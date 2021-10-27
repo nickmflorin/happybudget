@@ -323,6 +323,8 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
         enterMovesDown={false}
         immutableData={true}
         getRowNodeId={getRowNodeId}
+        debounceVerticalScrollbar={true}
+        rowBuffer={50}
         {...props}
         rowHeight={props.rowHeight === undefined ? 36 : props.rowHeight}
         navigateToNextCell={navigateToNextCell}
