@@ -128,6 +128,16 @@ const SubAccountsTable = ({
             tabling.typeguards.isModelRow(f)
           ) as Tables.FringeRow[]
         }
+        onAttachmentRemoved={(row: Table.ModelRow<R>, id: number) =>
+          dispatch(
+            actions.account.updateRowsInStateAction({
+              id: row.id,
+              data: {
+                attachments: filter(row.data.attachments, (a: Model.SimpleAttachment) => a.id !== id)
+              }
+            })
+          )
+        }
         onAttachmentAdded={(row: Table.ModelRow<R>, attachment: Model.Attachment) =>
           dispatch(
             actions.account.updateRowsInStateAction({

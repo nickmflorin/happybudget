@@ -1,28 +1,36 @@
 import { SagaIterator } from "redux-saga";
-import { put, fork } from "redux-saga/effects";
+import { put, fork, select } from "redux-saga/effects";
 import { map, isNil, filter } from "lodash";
 
 import * as api from "api";
-import { tabling, notifications } from "lib";
-
 import * as actions from "../actions";
+import { tabling, notifications } from "lib";
 
 type R = Tables.ContactRowData;
 type M = Model.Contact;
 type P = Http.ContactPayload;
 
-export function* request(action: Redux.Action): SagaIterator {
-  yield put(actions.loadingContactsAction(true));
-  try {
-    const response: Http.ListResponse<M> = yield api.request(api.getContacts, {});
-    yield put(actions.responseContactsAction(response));
-  } catch (e: unknown) {
-    notifications.requestError(e as Error, "There was an error retrieving the contacts.");
-    yield put(actions.responseContactsAction({ count: 0, data: [] }));
-  } finally {
-    yield put(actions.loadingContactsAction(false));
+export const createTaskSet = (config: {
+  readonly authenticated: boolean;
+}): Redux.TaskMapObject<Redux.ModelListResponseTaskMap> => {
+  function* request(action: Redux.Action<null>): SagaIterator {
+    yield put(actions.loadingContactsAction(true));
+    let query: Http.ListQuery = {};
+    if (config.authenticated) {
+      query = yield select((state: Application.Authenticated.Store) => ({ search: state.contacts.search }));
+    }
+    try {
+      const response: Http.ListResponse<M> = yield api.request(api.getContacts, query);
+      yield put(actions.responseContactsAction(response));
+    } catch (e: unknown) {
+      notifications.requestError(e as Error, "There was an error retrieving the contacts.");
+      yield put(actions.responseContactsAction({ count: 0, data: [] }));
+    } finally {
+      yield put(actions.loadingContactsAction(false));
+    }
   }
-}
+  return { request };
+};
 
 export const createTableTaskSet = (
   config: Table.TaskConfig<R, M, Redux.AuthenticatedTableActionMap<R, M>>

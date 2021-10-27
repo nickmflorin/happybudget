@@ -28,10 +28,10 @@ const GenericModelMenuEditor = <
 ) => {
   return (
     <ModelTagsMenu<C>
+      clientSearching={true}
       {...props}
       menu={props.editor.menu}
       includeSearch={true}
-      clientSearching={true}
       focusSearchOnCharPress={true}
       className={classNames("table-menu", props.className)}
     />

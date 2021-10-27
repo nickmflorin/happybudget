@@ -4,7 +4,7 @@ export const initialSubAccountState: Modules.Budget.SubAccountStore = {
   id: null,
   detail: redux.initialState.initialDetailResponseState,
   comments: {
-    ...redux.initialState.initialModelListResponseState,
+    ...redux.initialState.initialAuthenticatedModelListResponseState,
     replying: []
   },
   history: redux.initialState.initialModelListResponseState,
@@ -22,7 +22,7 @@ export const initialAccountState: Modules.Budget.AccountStore = {
   id: null,
   detail: redux.initialState.initialDetailResponseState,
   comments: {
-    ...redux.initialState.initialModelListResponseState,
+    ...redux.initialState.initialAuthenticatedModelListResponseState,
     replying: []
   },
   history: redux.initialState.initialModelListResponseState,
@@ -37,7 +37,7 @@ export const initialAccountState: Modules.Budget.AccountStore = {
 };
 
 export const initialHeaderTemplatesState: Modules.Budget.HeaderTemplatesStore = {
-  ...redux.initialState.initialModelListResponseState,
+  ...redux.initialState.initialAuthenticatedModelListResponseState,
   displayedTemplate: null,
   loadingDetail: false
 };
@@ -46,7 +46,7 @@ const initialState: Modules.Budget.Store = {
   id: null,
   detail: redux.initialState.initialDetailResponseState,
   comments: {
-    ...redux.initialState.initialModelListResponseState,
+    ...redux.initialState.initialAuthenticatedModelListResponseState,
     replying: []
   },
   history: redux.initialState.initialModelListResponseState,
@@ -57,7 +57,7 @@ const initialState: Modules.Budget.Store = {
   actuals: {
     ...redux.initialState.initialTableState,
     actualTypes: [],
-    ownerTree: redux.initialState.initialModelListResponseState
+    ownerTree: redux.initialState.initialAuthenticatedModelListResponseState
   }
 };
 

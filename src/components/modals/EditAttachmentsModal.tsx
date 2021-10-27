@@ -15,6 +15,7 @@ interface EditAttachmentsModalProps extends RootModalProps {
   readonly id: number;
   readonly open: boolean;
   readonly path: string;
+  readonly onAttachmentRemoved?: (id: number) => void;
   readonly onAttachmentAdded?: (m: Model.Attachment) => void;
   readonly listAttachments: (
     id: number,
@@ -29,6 +30,7 @@ const EditAttachmentsModal = ({
   id,
   open,
   path,
+  onAttachmentRemoved,
   listAttachments,
   deleteAttachment,
   onAttachmentAdded,
@@ -53,7 +55,10 @@ const EditAttachmentsModal = ({
     () => (attachment: Model.Attachment) => {
       setDeleting(attachment.id);
       deleteAttachment(attachment.id, id, { cancelToken: cancelToken() })
-        .then(() => setAttachments(filter(attachments, (a: Model.Attachment) => a.id !== attachment.id)))
+        .then(() => {
+          onAttachmentRemoved?.(attachment.id);
+          setAttachments(filter(attachments, (a: Model.Attachment) => a.id !== attachment.id));
+        })
         .catch((e: Error) => notifications.requestError(e))
         .finally(() => setDeleted(attachment.id));
     },
@@ -92,7 +97,10 @@ const EditAttachmentsModal = ({
             const attachmentId = parseInt(uniqueFileId);
             if (!isNaN(attachmentId)) {
               deleteAttachment(attachmentId, id)
-                .then(() => load())
+                .then(() => {
+                  onAttachmentRemoved?.(attachmentId);
+                  load();
+                })
                 .catch((e: Error) => {
                   console.error(e.message);
                   error("There was a problem deleting the attachment.");

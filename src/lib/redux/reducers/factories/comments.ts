@@ -1,7 +1,7 @@
 import { isNil, find, filter, concat } from "lodash";
 import { util } from "lib";
 
-import { initialModelListResponseState } from "../../initialState";
+import { initialAuthenticatedModelListResponseState } from "../../initialState";
 import { createModelListActionReducer } from "../../reducers";
 import { warnInconsistentState } from "../../util";
 
@@ -9,7 +9,7 @@ import * as transformers from "./transformers";
 import { createObjectReducerFromTransformers } from "./util";
 
 export const initialCommentsListResponseState: Redux.CommentsListResponseStore = {
-  ...initialModelListResponseState,
+  ...initialAuthenticatedModelListResponseState,
   replying: []
 };
 
@@ -92,7 +92,7 @@ export const createCommentsListResponseReducer = (
     Redux.CommentsListResponseStore,
     Omit<Redux.CommentsListResponseActionMap, "submit" | "delete" | "replying" | "edit">
   > = {
-    ...transformers.modelListResponseReducerTransformers<Model.Comment, Redux.CommentsListResponseStore>(
+    ...transformers.authenticatedModelListResponseReducerTransformers<Model.Comment, Redux.CommentsListResponseStore>(
       initialCommentsListResponseState
     ),
     addToState: (

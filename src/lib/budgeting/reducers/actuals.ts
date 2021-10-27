@@ -1,4 +1,4 @@
-import * as tabling from "../../tabling";
+import { tabling } from "lib";
 
 type M = Model.Actual;
 type R = Tables.ActualRowData;
@@ -10,7 +10,7 @@ export type ActualTableActionMap = Redux.AuthenticatedTableActionMap<R, M> & {
 /* eslint-disable indent */
 export const createAuthenticatedActualsTableReducer = (
   config: Table.ReducerConfig<R, M, Tables.ActualTableStore, ActualTableActionMap> & {
-    readonly ownerTree: Redux.Reducer<Redux.ModelListResponseStore<Model.OwnerTreeNode>>;
+    readonly ownerTree: Redux.Reducer<Redux.AuthenticatedModelListResponseStore<Model.OwnerTreeNode>>;
   }
 ): Redux.Reducer<Tables.ActualTableStore> => {
   type S = Tables.ActualTableStore;

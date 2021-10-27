@@ -1,9 +1,9 @@
 import { redux } from "lib";
 
 const initialState: Modules.Dashboard.Store = {
-  budgets: redux.initialState.initialModelListResponseState,
-  templates: redux.initialState.initialModelListResponseState,
-  community: redux.initialState.initialModelListResponseState
+  budgets: redux.initialState.initialAuthenticatedModelListResponseState,
+  templates: redux.initialState.initialAuthenticatedModelListResponseState,
+  community: redux.initialState.initialAuthenticatedModelListResponseState
 };
 
 export default initialState;

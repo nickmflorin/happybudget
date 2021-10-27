@@ -10,7 +10,14 @@ import { SubAccountsTable as GenericSubAccountsTable } from "components/tabling"
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
 
-type OmitTableProps = "contacts" | "onEditContact" | "onNewContact" | "menuPortalId" | "columns" | "onExportPdf";
+type OmitTableProps =
+  | "contacts"
+  | "onEditContact"
+  | "onNewContact"
+  | "menuPortalId"
+  | "columns"
+  | "onExportPdf"
+  | "onSearchContact";
 
 export interface BudgetSubAccountsTableProps
   extends Omit<GenericSubAccountsTable.AuthenticatedBudgetProps, OmitTableProps> {
@@ -48,6 +55,7 @@ const SubAccountsTable = ({
           setContactToEdit(params.contact);
         }}
         onExportPdf={() => setPreviewModalVisible(true)}
+        onSearchContact={(v: string) => dispatch(actions.authenticated.setContactsSearchAction(v))}
         onNewContact={(params: { name?: string; id: Table.EditableRowId }) => {
           setPreContactCreate(params);
           setInitialContactFormValues(null);

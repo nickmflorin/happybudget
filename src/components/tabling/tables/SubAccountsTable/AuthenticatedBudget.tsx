@@ -19,9 +19,11 @@ export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>,
   readonly identifierFieldHeader: "Account" | "Line";
   readonly contacts: Model.Contact[];
   readonly exportFileName: string;
+  readonly onAttachmentRemoved: (row: Table.ModelRow<R>, id: number) => void;
   readonly onAttachmentAdded: (row: Table.ModelRow<R>, attachment: Model.Attachment) => void;
   readonly onGroupRows: (rows: Table.ModelRow<R>[]) => void;
   readonly onExportPdf: () => void;
+  readonly onSearchContact: (v: string) => void;
   readonly onNewContact: (params: { name?: string; id: Table.ModelRowId }) => void;
   readonly onEditMarkup: (row: Table.MarkupRow<R>) => void;
   readonly onMarkupRows?: (rows?: Table.ModelRow<R>[]) => void;
@@ -101,7 +103,7 @@ const AuthenticatedBudgetSubAccountsTable = (
       },
       contact: {
         cellRendererParams: { onEditContact: props.onEditContact },
-        cellEditorParams: { onNewContact: props.onNewContact },
+        cellEditorParams: { onNewContact: props.onNewContact, setSearch: props.onSearchContact },
         onDataChange: (id: Table.ModelRowId, change: Table.CellChange<R>) => {
           // If the Row does not already have a populated value for `rate`, we populate
           // the `rate` value based on the selected Contact (if non-null).
@@ -216,6 +218,24 @@ const AuthenticatedBudgetSubAccountsTable = (
           id={editSubAccountAttachments}
           open={true}
           onCancel={() => setEditSubAccountAttachments(null)}
+          onAttachmentRemoved={(id: number) => {
+            const row = table.current.getRow(editSubAccountAttachments);
+            if (!isNil(row)) {
+              if (tabling.typeguards.isModelRow(row)) {
+                props.onAttachmentRemoved(row, id);
+              } else {
+                console.warn(
+                  `Suspicous Behavior: After attachment was added, row with ID
+                  ${editSubAccountAttachments} did not refer to a model row.`
+                );
+              }
+            } else {
+              console.warn(
+                `Suspicous Behavior: After attachment was added, could not find row in
+                state for ID ${editSubAccountAttachments}.`
+              );
+            }
+          }}
           onAttachmentAdded={(m: Model.Attachment) => {
             const row = table.current.getRow(editSubAccountAttachments);
             if (!isNil(row)) {

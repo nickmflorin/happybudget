@@ -14,10 +14,10 @@ const headerTemplatesRootReducer: Redux.Reducer<Modules.Budget.HeaderTemplatesSt
   state: Modules.Budget.HeaderTemplatesStore = initialHeaderTemplatesState,
   action: Redux.Action
 ): Modules.Budget.HeaderTemplatesStore => {
-  const listResponseReducer = redux.reducers.createModelListResponseReducer<
+  const listResponseReducer = redux.reducers.createAuthenticatedModelListResponseReducer<
     Model.SimpleHeaderTemplate,
     Pick<
-      Redux.ModelListResponseActionMap<Model.SimpleHeaderTemplate>,
+      Redux.AuthenticatedModelListResponseActionMap<Model.SimpleHeaderTemplate>,
       "request" | "loading" | "response" | "addToState" | "removeFromState"
     >,
     Modules.Budget.HeaderTemplatesStore
@@ -240,14 +240,14 @@ const genericReducer = combineReducers({
       updateRowsInState: actions.actuals.updateRowsInStateAction
     },
     columns: ActualColumns,
-    ownerTree: redux.reducers.createModelListResponseReducer<
+    ownerTree: redux.reducers.createAuthenticatedModelListResponseReducer<
       Model.OwnerTreeNode,
       Pick<
-        Redux.ModelListResponseActionMap<Model.OwnerTreeNode>,
+        Redux.AuthenticatedModelListResponseActionMap<Model.OwnerTreeNode>,
         "loading" | "response" | "restoreSearchCache" | "setSearch"
       >
     >({
-      initialState: redux.initialState.initialModelListResponseState,
+      initialState: redux.initialState.initialAuthenticatedModelListResponseState,
       actions: {
         loading: actions.actuals.loadingOwnerTreeAction,
         response: actions.actuals.responseOwnerTreeAction,

@@ -8,6 +8,7 @@ interface EditActualAttachmentsModalProps extends RootModalProps {
   readonly id: number;
   readonly open: boolean;
   readonly onAttachmentAdded?: (m: Model.Attachment) => void;
+  readonly onAttachmentRemoved?: (id: number) => void;
 }
 
 const EditActualAttachmentsModal = (props: EditActualAttachmentsModalProps): JSX.Element => {

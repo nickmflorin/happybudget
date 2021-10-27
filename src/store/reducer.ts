@@ -65,11 +65,11 @@ export const createStaticAuthenticatedReducers = (
   return {
     ...moduleReducers,
     router: connectRouter(history),
-    contacts: redux.reducers.createModelListResponseReducer<
+    contacts: redux.reducers.createAuthenticatedModelListResponseReducer<
       Model.Contact,
-      Omit<Redux.ModelListResponseActionMap<Model.Contact>, "restoreSearchCache" | "setSearch">
+      Omit<Redux.AuthenticatedModelListResponseActionMap<Model.Contact>, "restoreSearchCache">
     >({
-      initialState: redux.initialState.initialModelListResponseState,
+      initialState: redux.initialState.initialAuthenticatedModelListResponseState,
       actions: {
         request: actions.requestContactsAction,
         response: actions.responseContactsAction,
@@ -77,9 +77,7 @@ export const createStaticAuthenticatedReducers = (
         updateInState: actions.authenticated.updateContactInStateAction,
         removeFromState: actions.authenticated.removeContactFromStateAction,
         addToState: actions.authenticated.addContactToStateAction,
-        creating: actions.authenticated.creatingContactAction,
-        updating: actions.authenticated.updatingContactAction,
-        deleting: actions.authenticated.deletingContactAction
+        setSearch: actions.authenticated.setContactsSearchAction
       }
     }),
     drawerVisible: redux.reducers.createSimpleBooleanReducer({

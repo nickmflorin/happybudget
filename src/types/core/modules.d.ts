@@ -33,12 +33,12 @@ namespace Modules {
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   namespace Budget {
-    interface HeaderTemplatesStore extends Redux.ModelListResponseStore<Model.HeaderTemplate> {
+    interface HeaderTemplatesStore extends Redux.AuthenticatedModelListResponseStore<Model.HeaderTemplate> {
       readonly displayedTemplate: Model.HeaderTemplate | null;
       readonly loadingDetail: boolean;
     }
 
-    interface CommentsStore extends Redux.ModelListResponseStore<Model.Comment> {
+    interface CommentsStore extends Redux.AuthenticatedModelListResponseStore<Model.Comment> {
       readonly replying: number[];
     }
 
@@ -77,9 +77,9 @@ namespace Modules {
     /* eslint-disable no-shadow */
     /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
     interface Store {
-      readonly budgets: Redux.ModelListResponseStore<Model.SimpleBudget>;
-      readonly templates: Redux.ModelListResponseStore<Model.SimpleTemplate>;
-      readonly community: Redux.ModelListResponseStore<Model.SimpleTemplate>;
+      readonly budgets: Redux.AuthenticatedModelListResponseStore<Model.SimpleBudget>;
+      readonly templates: Redux.AuthenticatedModelListResponseStore<Model.SimpleTemplate>;
+      readonly community: Redux.AuthenticatedModelListResponseStore<Model.SimpleTemplate>;
     }
   }
 

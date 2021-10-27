@@ -3,14 +3,14 @@ import { redux } from "lib";
 import * as actions from "./actions";
 
 const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
-  templates: redux.reducers.createModelListResponseReducer<
+  templates: redux.reducers.createAuthenticatedModelListResponseReducer<
     Model.SimpleTemplate,
     Omit<
-      Redux.ModelListResponseActionMap<Model.SimpleTemplate>,
+      Redux.AuthenticatedModelListResponseActionMap<Model.SimpleTemplate>,
       "restoreSearchCache" | "updating" | "deleting" | "creating"
     >
   >({
-    initialState: redux.initialState.initialModelListResponseState,
+    initialState: redux.initialState.initialAuthenticatedModelListResponseState,
     actions: {
       request: actions.requestTemplatesAction,
       response: actions.responseTemplatesAction,
@@ -21,14 +21,14 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
       updateInState: actions.updateTemplateInStateAction
     }
   }),
-  community: redux.reducers.createModelListResponseReducer<
+  community: redux.reducers.createAuthenticatedModelListResponseReducer<
     Model.SimpleTemplate,
     Omit<
-      Redux.ModelListResponseActionMap<Model.SimpleTemplate>,
+      Redux.AuthenticatedModelListResponseActionMap<Model.SimpleTemplate>,
       "restoreSearchCache" | "updating" | "deleting" | "creating"
     >
   >({
-    initialState: redux.initialState.initialModelListResponseState,
+    initialState: redux.initialState.initialAuthenticatedModelListResponseState,
     actions: {
       request: actions.requestCommunityTemplatesAction,
       response: actions.responseCommunityTemplatesAction,
@@ -39,14 +39,14 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
       updateInState: actions.updateCommunityTemplateInStateAction
     }
   }),
-  budgets: redux.reducers.createModelListResponseReducer<
+  budgets: redux.reducers.createAuthenticatedModelListResponseReducer<
     Model.SimpleBudget,
     Omit<
-      Redux.ModelListResponseActionMap<Model.SimpleBudget>,
+      Redux.AuthenticatedModelListResponseActionMap<Model.SimpleBudget>,
       "restoreSearchCache" | "updating" | "deleting" | "creating"
     >
   >({
-    initialState: redux.initialState.initialModelListResponseState,
+    initialState: redux.initialState.initialAuthenticatedModelListResponseState,
     actions: {
       request: actions.requestBudgetsAction,
       response: actions.responseBudgetsAction,

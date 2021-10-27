@@ -3,6 +3,7 @@ import { put, call, fork, select, all } from "redux-saga/effects";
 import { map, isNil, filter } from "lodash";
 
 import * as api from "api";
+import { createTaskSet } from "store/tasks/contacts";
 import { tabling, notifications } from "lib";
 
 type R = Tables.ActualRowData;
@@ -27,13 +28,20 @@ export type ActualsTableTaskMap = Redux.TableTaskMap<R> & {
 };
 
 export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMapObject<ActualsTableTaskMap> => {
+  const contactsTasks = createTaskSet({ authenticated: true });
+
   function* request(action: Redux.Action): SagaIterator {
     const budgetId = yield select(config.selectObjId);
     if (!isNil(budgetId)) {
       yield put(config.actions.loading(true));
       yield put(config.actions.clear(null));
       try {
-        yield all([call(requestActuals, budgetId), call(requestActualTypes), call(requestOwnerTree, action)]);
+        yield all([
+          call(requestActuals, budgetId),
+          call(requestActualTypes),
+          call(requestOwnerTree, action),
+          call(contactsTasks.request, action as Redux.Action<null>)
+        ]);
       } catch (e: unknown) {
         notifications.requestError(e as Error, "There was an error retrieving the table data.");
         yield put(config.actions.response({ models: [] }));

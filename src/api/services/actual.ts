@@ -14,9 +14,9 @@ export const getActualAttachments = services.detailListService<Model.Attachment>
 ]);
 export const deleteActualAttachment = services.detailDeleteService((id: number, objId: number) => [
   "actuals",
-  id,
+  objId,
   "attachments",
-  objId
+  id
 ]);
 export const uploadActualAttachment = services.detailPostService<FormData, Model.Attachment>((id: number) => [
   "actuals",

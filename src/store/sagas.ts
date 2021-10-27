@@ -7,12 +7,14 @@ import { redux } from "lib";
 import * as actions from "./actions";
 import * as tasks from "./tasks";
 
-const contactsRootSaga = redux.sagas.createListResponseSaga({
-  tasks: { request: tasks.contacts.request },
-  actions: { request: actions.requestContactsAction }
-});
-
 export const createUnauthenticatedRootSaga = (config: Application.AnyModuleConfig[]): Saga => {
+  const contactsTasks = tasks.contacts.createTaskSet({
+    authenticated: false
+  });
+  const contactsSaga = redux.sagas.createModelListResponseSaga({
+    tasks: contactsTasks,
+    actions: { request: actions.requestContactsAction }
+  });
   function* applicationSaga(): SagaIterator {
     const unauthenticatedConfig = filter(config, (c: Application.AnyModuleConfig) =>
       redux.typeguards.isUnauthenticatedModuleConfig(c)
@@ -23,12 +25,19 @@ export const createUnauthenticatedRootSaga = (config: Application.AnyModuleConfi
         yield spawn(moduleConfig.rootSaga);
       }
     }
-    yield spawn(contactsRootSaga);
+    yield spawn(contactsSaga);
   }
   return applicationSaga;
 };
 
 export const createAuthenticatedRootSaga = (config: Application.AnyModuleConfig[]): Saga => {
+  const contactsTasks = tasks.contacts.createTaskSet({
+    authenticated: true
+  });
+  const contactsSaga = redux.sagas.createAuthenticatedModelListResponseSaga({
+    tasks: contactsTasks,
+    actions: { request: actions.requestContactsAction, setSearch: actions.authenticated.setContactsSearchAction }
+  });
   function* applicationSaga(): SagaIterator {
     const authenticatedConfig = filter(
       config,
@@ -40,7 +49,7 @@ export const createAuthenticatedRootSaga = (config: Application.AnyModuleConfig[
         yield spawn(moduleConfig.rootSaga);
       }
     }
-    yield spawn(contactsRootSaga);
+    yield spawn(contactsSaga);
   }
   return applicationSaga;
 };

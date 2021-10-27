@@ -16,9 +16,11 @@ export type ActualsTableProps = Omit<AuthenticatedModelTableProps<R, M>, "column
   readonly exportFileName: string;
   readonly contacts: Model.Contact[];
   readonly actualTypes: Model.Tag[];
+  readonly onAttachmentRemoved: (row: Table.ModelRow<R>, id: number) => void;
   readonly onAttachmentAdded: (row: Table.ModelRow<R>, attachment: Model.Attachment) => void;
   readonly onOwnerTreeSearch: (value: string) => void;
   readonly onNewContact: (params: { name?: string; id: Table.ModelRowId }) => void;
+  readonly onSearchContact: (v: string) => void;
   readonly onEditContact: (params: { contact: number; id: Table.EditableRowId }) => void;
 };
 
@@ -28,6 +30,7 @@ const ActualsTable = ({
   onOwnerTreeSearch,
   onNewContact,
   onEditContact,
+  onSearchContact,
   ...props
 }: WithConnectedTableProps<ActualsTableProps, R, M>): JSX.Element => {
   const [editSubAccountAttachments, setEditSubAccountAttachments] = useState<number | null>(null);
@@ -113,7 +116,7 @@ const ActualsTable = ({
           },
           contact: {
             cellRendererParams: { onEditContact },
-            cellEditorParams: { onNewContact },
+            cellEditorParams: { onNewContact, setSearch: onSearchContact },
             processCellForClipboard: processContactCellForClipboard,
             processCellFromClipboard: processContactCellFromClipboard
           }
@@ -124,6 +127,24 @@ const ActualsTable = ({
           id={editSubAccountAttachments}
           open={true}
           onCancel={() => setEditSubAccountAttachments(null)}
+          onAttachmentRemoved={(id: number) => {
+            const row = table.current.getRow(editSubAccountAttachments);
+            if (!isNil(row)) {
+              if (tabling.typeguards.isModelRow(row)) {
+                props.onAttachmentRemoved(row, id);
+              } else {
+                console.warn(
+                  `Suspicous Behavior: After attachment was added, row with ID
+                  ${editSubAccountAttachments} did not refer to a model row.`
+                );
+              }
+            } else {
+              console.warn(
+                `Suspicous Behavior: After attachment was added, could not find row in
+                state for ID ${editSubAccountAttachments}.`
+              );
+            }
+          }}
           onAttachmentAdded={(m: Model.Attachment) => {
             const row = table.current.getRow(editSubAccountAttachments);
             if (!isNil(row)) {

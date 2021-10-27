@@ -6,7 +6,11 @@ export const initialListResponseState: Redux.ListResponseStore<any> = {
 };
 
 export const initialModelListResponseState: Redux.ModelListResponseStore<any> = {
-  ...initialListResponseState,
+  ...initialListResponseState
+};
+
+export const initialAuthenticatedModelListResponseState: Redux.AuthenticatedModelListResponseStore<any> = {
+  ...initialModelListResponseState,
   search: "",
   cache: {},
   selected: [],

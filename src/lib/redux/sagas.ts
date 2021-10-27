@@ -1,5 +1,5 @@
 import { SagaIterator } from "redux-saga";
-import { take, cancel, fork, call, spawn } from "redux-saga/effects";
+import { take, cancel, fork, call, spawn, debounce } from "redux-saga/effects";
 import { isNil } from "lodash";
 
 function* takeWithCancellableByIdSaga(actionType: string, task: any, getId: any): SagaIterator {
@@ -60,6 +60,36 @@ export const createModelListResponseSaga = <M extends Model.HttpModel>(
   }
   function* rootSaga(): SagaIterator {
     yield spawn(requestSaga);
+  }
+  return rootSaga;
+};
+
+export const createAuthenticatedModelListResponseSaga = <M extends Model.HttpModel>(
+  config: Redux.SagaConfig<
+    Redux.ModelListResponseTaskMap,
+    Pick<Redux.AuthenticatedModelListResponseActionMap<M>, "request" | "setSearch">
+  >
+) => {
+  function* requestSaga(): SagaIterator {
+    let lastTasks;
+    while (true) {
+      const action = yield take(config.actions.request.toString());
+      if (lastTasks) {
+        yield cancel(lastTasks);
+      }
+      lastTasks = yield call(config.tasks.request, action);
+    }
+  }
+
+  function* watchForSearchSaga(): SagaIterator {
+    if (!isNil(config.actions.setSearch)) {
+      yield debounce(250, config.actions.setSearch.toString(), config.tasks.request);
+    }
+  }
+
+  function* rootSaga(): SagaIterator {
+    yield spawn(requestSaga);
+    yield spawn(watchForSearchSaga);
   }
   return rootSaga;
 };

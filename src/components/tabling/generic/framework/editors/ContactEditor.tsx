@@ -2,7 +2,7 @@ import { forwardRef, ForwardedRef } from "react";
 import { filter, isNil } from "lodash";
 
 import { tabling } from "lib";
-import { useContacts } from "store/hooks";
+import { useContacts, useContactsLoading } from "store/hooks";
 import { Icon } from "components";
 import { framework } from "components/tabling/generic";
 
@@ -14,6 +14,7 @@ interface ContactEditorProps<
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends Table.EditorParams<R, M, S> {
   readonly onNewContact: (params: { name?: string; id: Table.ModelRowId }) => void;
+  readonly setSearch: (value: string) => void;
 }
 
 /* eslint-disable indent */
@@ -26,6 +27,7 @@ const ContactEditor = <
   ref: ForwardedRef<any>
 ) => {
   const contacts = useContacts();
+  const loading = useContactsLoading();
 
   const [editor] = framework.editors.useModelMenuEditor<Model.Contact, ID, R, M, S>({
     ...props,
@@ -36,7 +38,10 @@ const ContactEditor = <
       {...props}
       editor={editor}
       style={{ width: 160 }}
+      loading={loading}
+      clientSearching={false}
       selected={editor.value}
+      onSearch={(v: string) => props.setSearch(v)}
       models={filter(contacts, (m: Model.Contact) => m.full_name !== "")}
       onChange={(e: MenuChangeEvent<Model.Contact>) => editor.onChange(e.model.id, e.event)}
       searchIndices={["first_name", "last_name"]}

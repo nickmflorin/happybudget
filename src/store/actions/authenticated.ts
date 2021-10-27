@@ -8,20 +8,17 @@ const ActionTypes = {
     UpdateInState: "user.contacts.UpdateInState",
     RemoveFromState: "user.contacts.RemoveFromState",
     AddToState: "user.contacts.AddToState",
-    Deleting: "user.contacts.Deleting",
-    Updating: "user.contacts.Updating",
-    Creating: "user.contacts.Creating"
+    SetSearch: "user.contacts.SetSearch"
   }
 };
 
 export const updateLoggedInUserAction = createAction<Model.User>(ActionTypes.User.UpdateInState);
-export const deletingContactAction = createAction<Redux.ModelListActionPayload>(ActionTypes.Contacts.Deleting);
+
 export const removeContactFromStateAction = createAction<number>(ActionTypes.Contacts.RemoveFromState);
 export const updateContactInStateAction = createAction<Redux.UpdateActionPayload<Model.Contact>>(
   ActionTypes.Contacts.UpdateInState
 );
 export const addContactToStateAction = createAction<Model.Contact>(ActionTypes.Contacts.AddToState);
-export const updatingContactAction = createAction<Redux.ModelListActionPayload>(ActionTypes.Contacts.Updating);
-export const creatingContactAction = createAction<boolean>(ActionTypes.Contacts.Creating);
+export const setContactsSearchAction = createAction<string>(ActionTypes.Contacts.SetSearch);
 
 export default ActionTypes;

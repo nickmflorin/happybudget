@@ -46,3 +46,21 @@ export const createModelListResponseReducer = <
     subReducers
   );
 };
+
+export const createAuthenticatedModelListResponseReducer = <
+  M extends Model.HttpModel,
+  A extends Partial<
+    Redux.AuthenticatedModelListResponseActionMap<M>
+  > = Redux.AuthenticatedModelListResponseActionMap<M>,
+  S extends Redux.AuthenticatedModelListResponseStore<M> = Redux.AuthenticatedModelListResponseStore<M>
+>(
+  config: Redux.ReducerConfig<S, A>,
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  subReducers?: { [Property in keyof Partial<S>]: Redux.Reducer<any> } | null | {}
+): Redux.Reducer<S> => {
+  return createObjectReducerFromTransformers<S, A>(
+    config,
+    transformers.authenticatedModelListResponseReducerTransformers(config.initialState),
+    subReducers
+  );
+};

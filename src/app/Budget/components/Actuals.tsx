@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
-import { isNil, reduce } from "lodash";
+import { isNil, filter, reduce } from "lodash";
 
 import { redux } from "lib";
 import { actions as globalActions, selectors } from "store";
@@ -77,6 +77,17 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
         exportFileName={!isNil(budget) ? `${budget.name}_actuals` : "actuals"}
         onNewContact={() => setCreateContactModalVisible(true)}
         onEditContact={(params: { contact: number; id: Table.EditableRowId }) => setContactToEdit(params.contact)}
+        onSearchContact={(v: string) => dispatch(globalActions.authenticated.setContactsSearchAction(v))}
+        onAttachmentRemoved={(row: Table.ModelRow<R>, id: number) =>
+          dispatch(
+            actions.actuals.updateRowsInStateAction({
+              id: row.id,
+              data: {
+                attachments: filter(row.data.attachments, (a: Model.SimpleAttachment) => a.id !== id)
+              }
+            })
+          )
+        }
         onAttachmentAdded={(row: Table.ModelRow<R>, attachment: Model.Attachment) =>
           dispatch(
             actions.actuals.updateRowsInStateAction({

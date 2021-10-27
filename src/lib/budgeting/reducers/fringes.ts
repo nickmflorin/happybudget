@@ -1,4 +1,4 @@
-import * as tabling from "../../tabling";
+import { tabling } from "lib";
 
 export type FringeTableActionMap = Redux.TableActionMap<Model.Fringe> & {
   readonly responseFringeColors: Http.ListResponse<string>;

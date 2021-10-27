@@ -20,13 +20,22 @@ export const listResponseReducerTransformers = <M, S extends Redux.ListResponseS
   loading: (st: S = initialState, action: Redux.Action<boolean>) => ({ ...st, loading: action.payload })
 });
 
-/* eslint-disable indent */
 export const modelListResponseReducerTransformers = <
   M extends Model.HttpModel,
   S extends Redux.ModelListResponseStore<M> | Redux.ModelListResponseStore<M>
 >(
   initialState: S
 ): Redux.Transformers<S, Redux.ModelListResponseActionMap<M>> => ({
+  ...listResponseReducerTransformers<M, S>(initialState)
+});
+
+/* eslint-disable indent */
+export const authenticatedModelListResponseReducerTransformers = <
+  M extends Model.HttpModel,
+  S extends Redux.AuthenticatedModelListResponseStore<M> | Redux.AuthenticatedModelListResponseStore<M>
+>(
+  initialState: S
+): Redux.Transformers<S, Redux.AuthenticatedModelListResponseActionMap<M>> => ({
   ...listResponseReducerTransformers<M, S>(initialState),
   setSearch: (st: S = initialState, action: Redux.Action<string>) => ({
     ...st,

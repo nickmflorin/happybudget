@@ -18,13 +18,13 @@ namespace Redux {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type Transformers<S = any, A = any> = {
     /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-    [K in keyof A]: Redux.Reducer<S>;
+    [K in keyof A]-?: Reducer<S>;
   };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type Task<P = any> = (action: Redux.Action<P>) => import("@redux-saga/types").SagaIterator;
+  type Task<P = any> = (action: Action<P>) => import("@redux-saga/types").SagaIterator;
   type TaskMapObject<M = any> = {
-    [K in keyof M]-?: Redux.Task<M[K]>;
+    [K in keyof M]-?: Task<M[K]>;
   };
 
   type ActionMapObject<M = any> = {
@@ -34,17 +34,16 @@ namespace Redux {
   };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type Reducer<S, A = Redux.Action> = import("redux").Reducer<S, A>;
+  type Reducer<S, A = Action> = import("redux").Reducer<S, A>;
   type ReducersMapObject<S = any> = {
-    [K in keyof S]-?: Redux.Reducer<S[K]>;
+    [K in keyof S]-?: Reducer<S[K]>;
   };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type ReducersWithAsyncMapObject<S = any> = ReducersMapObject<S> &
-    {
-      /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-      [K in AsyncId]: Redux.Reducer<any>;
-    };
+  type ReducersWithAsyncMapObject<S = any> = ReducersMapObject<S> & {
+    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+    [K in AsyncId]: Reducer<any>;
+  };
 
   type SagaManager = {
     readonly injectSaga: (id: Table.AsyncId, saga: import("redux-saga").Saga) => void;
@@ -52,9 +51,9 @@ namespace Redux {
   };
 
   type ReducerManager<S extends Application.Store> = {
-    readonly getReducerMap: () => Redux.ReducersWithAsyncMapObject<S>;
-    readonly reduce: (state: S | undefined, action: Redux.Action) => S;
-    readonly injectReducer: (key: Table.AsyncId, reducer: Redux.Reducer<any>) => void;
+    readonly getReducerMap: () => ReducersWithAsyncMapObject<S>;
+    readonly reduce: (state: S | undefined, action: Action) => S;
+    readonly injectReducer: (key: Table.AsyncId, reducer: Reducer<any>) => void;
     readonly ejectReducer: (key: Table.AsyncId) => void;
   };
 
@@ -62,13 +61,13 @@ namespace Redux {
   type StoreObj = Record<string, any> | boolean | number;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type Store<S extends Application.Store> = import("redux").Store<S, Redux.Action> & {
+  type Store<S extends Application.Store> = import("redux").Store<S, Action> & {
     readonly reducerManager: ReducerManager<S>;
     readonly sagaManager: SagaManager;
   };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type Dispatch = import("redux").Dispatch<Redux.Action>;
+  type Dispatch = import("redux").Dispatch<Action>;
 
   interface Action<P = any> {
     readonly payload: P;
@@ -133,7 +132,7 @@ namespace Redux {
   interface ModelDetailResponseActionMap<M extends Model.HttpModel> {
     readonly loading: boolean;
     readonly response: M | null;
-    readonly updateInState: Redux.UpdateActionPayload<M>;
+    readonly updateInState: UpdateActionPayload<M>;
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -156,25 +155,29 @@ namespace Redux {
     readonly request: null;
   }
 
+  interface ModelListResponseStore<T extends Model.HttpModel> extends ListResponseStore<T> {}
+
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  interface ModelListResponseStore<T extends Model.HttpModel> extends Redux.ListResponseStore<T> {
+  interface AuthenticatedModelListResponseStore<T extends Model.HttpModel> extends ModelListResponseStore<T> {
     readonly cache: SearchCache<T>;
     readonly search: string;
-    readonly deleting: Redux.ModelListActionStore;
-    readonly updating: Redux.ModelListActionStore;
+    readonly deleting: ModelListActionStore;
+    readonly updating: ModelListActionStore;
     readonly creating: boolean;
     readonly selected: number[];
   }
 
+  type ModelListResponseActionMap<M extends Model.HttpModel> = ListResponseActionMap<M>;
+
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type ModelListResponseActionMap<M extends Model.HttpModel> = ListResponseActionMap<M> & {
-    readonly updating: Redux.ModelListActionPayload;
-    readonly creating: boolean;
+  type AuthenticatedModelListResponseActionMap<M extends Model.HttpModel> = ModelListResponseActionMap<M> & {
+    readonly updating?: ModelListActionPayload;
+    readonly creating?: boolean;
     readonly removeFromState: number;
-    readonly deleting: Redux.ModelListActionPayload;
+    readonly deleting?: ModelListActionPayload;
     readonly addToState: M;
-    readonly updateInState: Redux.UpdateActionPayload<M>;
-    readonly setSearch: string;
+    readonly updateInState: UpdateActionPayload<M>;
+    readonly setSearch?: string;
     readonly restoreSearchCache: null;
   };
 
@@ -185,21 +188,24 @@ namespace Redux {
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type CommentsListResponseActionMap = Omit<
-    Redux.ModelListResponseActionMap<Model.Comment>,
-    "addToState" | "setSearch" | "restoreSearchCache"
+    AuthenticatedModelListResponseActionMap<Model.Comment>,
+    "addToState" | "setSearch" | "restoreSearchCache" | "creating" | "deleting" | "updating"
   > & {
+    readonly updating: ModelListActionPayload; // Make required
+    readonly creating: boolean; // Make required
+    readonly deleting: ModelListActionPayload; // Make required
     readonly submit: { parent?: number; data: Http.CommentPayload };
     readonly delete: number;
-    readonly edit: Redux.UpdateActionPayload<Model.Comment>;
+    readonly edit: UpdateActionPayload<Model.Comment>;
     readonly addToState: { data: Model.Comment; parent?: number };
-    readonly replying: Redux.ModelListActionPayload;
+    readonly replying: ModelListActionPayload;
   };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type CommentsListResponseTaskMap = Redux.ModelListResponseTaskMap & {
+  type CommentsListResponseTaskMap = ModelListResponseTaskMap & {
     readonly submit: { parent?: number; data: Http.CommentPayload };
     readonly delete: number;
-    readonly edit: Redux.UpdateActionPayload<Model.Comment>;
+    readonly edit: UpdateActionPayload<Model.Comment>;
   };
 
   // Holds previously searched for results.  Note that this may not play well
@@ -216,7 +222,7 @@ namespace Redux {
   type TableActionMap<M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
     readonly loading: boolean;
     readonly response: Http.TableResponse<M>;
-    readonly request?: Redux.TableRequestPayload;
+    readonly request?: TableRequestPayload;
     readonly setSearch: string;
     readonly clear: null;
   };
@@ -253,16 +259,16 @@ namespace Redux {
   type UpdateRowPayload<R extends Table.RowData> = {
     readonly data: Partial<R>;
     readonly id: Table.ModelRowId;
-  }
+  };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type UpdateRowsInTablePayload<R extends Table.RowData> = SingleOrArray<UpdateRowPayload<R>>;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type BudgetTableStore<R extends Tables.BudgetRowData> = Redux.TableStore<R>;
+  type BudgetTableStore<R extends Tables.BudgetRowData> = TableStore<R>;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  interface CommentsListResponseStore extends Redux.ModelListResponseStore<Model.Comment> {
+  interface CommentsListResponseStore extends AuthenticatedModelListResponseStore<Model.Comment> {
     readonly replying: number[];
   }
 }
