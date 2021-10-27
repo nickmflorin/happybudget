@@ -3,18 +3,22 @@ frontend:
   phases:
     preBuild:
       commands:
+        - nvm use $VERSION_NODE_16
         - yarn install
     build:
       commands:
+        - nvm use $VERSION_NODE_16
         - yarn run build
         - REACT_APP_API_DOMAIN=$REACT_APP_API_DOMAIN
         - REACT_APP_AG_GRID_KEY=$REACT_APP_AG_GRID_KEY
         - REACT_APP_GOOGLE_CLIENT_KEY=$REACT_APP_GOOGLE_CLIENT_KEY
         - FONTAWESOME_NPM_AUTH_TOKEN=$FONTAWESOME_NPM_AUTH_TOKEN
+        - REACT_APP_SENTRY_DSN=$REACT_APP_SENTRY_DSN
+        - REACT_APP_SENTRY_ENV=$REACT_APP_SENTRY_ENV
   artifacts:
     baseDirectory: build
     files:
-      - '**/*'
+      - "**/*"
   cache:
     paths:
       - node_modules/**/*
