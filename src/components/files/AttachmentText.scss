@@ -1,19 +1,35 @@
 @import "style/_imports";
 
 .attachment-text {
-  font-size: 12px;
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: flex;
+  height: 16px;
 
-  .icon--attachment-text {
-    color: #b5b5b5;
+  .icon--attachment {
+    color: $text-primary;
+    height: 14px;
+    width: 14px;
+    line-height: 16px;
+    vertical-align: -0.125em !important;
   }
 
-  .file-name {
+  .content-text {
+    font-size: 12px;
     font-family: $avenir;
     font-weight: 400;
     color: $text-secondary;
+    line-height: 16px;
+  }
+
+  .additional-count {
+    margin-left: 4px;
+    font-size: 12px;
+    font-family: $avenir;
+    font-weight: 400;
+    color: $text-secondary;
+    line-height: 16px;
   }
 }

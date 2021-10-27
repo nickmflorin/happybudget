@@ -24,7 +24,7 @@ const ColumnTypes: Table.ColumnType[] = [
   },
   {
     id: "file",
-    icon: "file",
+    icon: "paperclip",
     style: { textAlign: "left" },
     headerOverrides: { style: { textAlign: "center" } }
   },

@@ -18,6 +18,8 @@ export { default as EmailCell } from "./EmailCell";
 export * from "./EmailCell";
 export { default as PhoneNumberCell } from "./PhoneNumberCell";
 export * from "./PhoneNumberCell";
+export { default as AttachmentsCell } from "./AttachmentsCell";
+export * from "./AttachmentsCell";
 export { default as excludeRowsOfType } from "./excludeRowsOfType";
 export { default as connectCellToStore } from "./connectCellToStore";
 export { default as renderOnRowType } from "./renderOnRowType";

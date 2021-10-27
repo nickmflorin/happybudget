@@ -47,7 +47,7 @@ const AuthenticatedTemplateSubAccountsTable = (
     <AuthenticatedBudgetTable<R, M>
       {...props}
       table={table}
-      excludeColumns={["actual", "contact", "variance"]}
+      excludeColumns={["actual", "contact", "variance", "attachment"]}
       columns={columns}
       generateNewRowData={(rows: Table.BodyRow<R>[]) => {
         const dataRows = filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[];

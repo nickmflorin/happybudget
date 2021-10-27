@@ -1,7 +1,9 @@
+import React, { useState } from "react";
 import { map, filter, find, isNil } from "lodash";
 
 import { model, tabling, hooks } from "lib";
 
+import { EditActualAttachmentsModal } from "components/modals";
 import { framework, WithConnectedTableProps } from "components/tabling/generic";
 import { AuthenticatedModelTable, AuthenticatedModelTableProps } from "../ModelTable";
 import Framework from "./framework";
@@ -27,6 +29,7 @@ const ActualsTable = ({
   onEditContact,
   ...props
 }: WithConnectedTableProps<Props, R, M>): JSX.Element => {
+  const [editSubAccountAttachments, setEditSubAccountAttachments] = useState<number | null>(null);
   const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
 
   const processActualTypeCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
@@ -77,40 +80,52 @@ const ActualsTable = ({
   });
 
   return (
-    <AuthenticatedModelTable<R, M>
-      {...props}
-      table={table}
-      showPageFooter={false}
-      menuPortalId={"supplementary-header"}
-      cookieNames={{ hiddenColumns: "actuals-table-hidden-columns" }}
-      getModelRowName={(r: Table.ModelRow<R>) => r.data.description}
-      getPlaceholderRowName={(r: Table.PlaceholderRow<R>) => r.data.description}
-      getModelRowLabel={"Sub Account"}
-      getPlaceholderRowLabel={"Sub Account"}
-      framework={Framework}
-      actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
-        framework.actions.ToggleColumnAction(table.current, params),
-        framework.actions.ExportCSVAction(table.current, params, exportFileName)
-      ]}
-      columns={tabling.columns.normalizeColumns<R, M>(Columns, {
-        owner: (col: Table.Column<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>) => ({
-          processCellFromClipboard: processOwnerCellFromClipboard,
-          cellEditorParams: {
-            ...col.cellEditorParams,
-            setSearch: (value: string) => onOwnerTreeSearch(value)
+    <React.Fragment>
+      <AuthenticatedModelTable<R, M>
+        {...props}
+        table={table}
+        showPageFooter={false}
+        menuPortalId={"supplementary-header"}
+        cookieNames={{ hiddenColumns: "actuals-table-hidden-columns" }}
+        getModelRowName={(r: Table.ModelRow<R>) => r.data.description}
+        getPlaceholderRowName={(r: Table.PlaceholderRow<R>) => r.data.description}
+        getModelRowLabel={"Sub Account"}
+        getPlaceholderRowLabel={"Sub Account"}
+        framework={Framework}
+        actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
+          framework.actions.ToggleColumnAction(table.current, params),
+          framework.actions.ExportCSVAction(table.current, params, exportFileName)
+        ]}
+        columns={tabling.columns.normalizeColumns<R, M>(Columns, {
+          owner: (col: Table.Column<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>) => ({
+            processCellFromClipboard: processOwnerCellFromClipboard,
+            cellEditorParams: {
+              ...col.cellEditorParams,
+              setSearch: (value: string) => onOwnerTreeSearch(value)
+            }
+          }),
+          attachments: {
+            onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditSubAccountAttachments(row.id)
+          },
+          actual_type: {
+            processCellFromClipboard: processActualTypeCellFromClipboard
+          },
+          contact: {
+            cellRendererParams: { onEditContact },
+            cellEditorParams: { onNewContact },
+            processCellForClipboard: processContactCellForClipboard,
+            processCellFromClipboard: processContactCellFromClipboard
           }
-        }),
-        actual_type: {
-          processCellFromClipboard: processActualTypeCellFromClipboard
-        },
-        contact: {
-          cellRendererParams: { onEditContact },
-          cellEditorParams: { onNewContact },
-          processCellForClipboard: processContactCellForClipboard,
-          processCellFromClipboard: processContactCellFromClipboard
-        }
-      })}
-    />
+        })}
+      />
+      {!isNil(editSubAccountAttachments) && (
+        <EditActualAttachmentsModal
+          id={editSubAccountAttachments}
+          open={true}
+          onCancel={() => setEditSubAccountAttachments(null)}
+        />
+      )}
+    </React.Fragment>
   );
 };
 

@@ -80,6 +80,9 @@ const Columns: Table.Column<R, M>[] = [
     flex: 1,
     columnType: "number"
   }),
+  tabling.columns.AttachmentsColumn({
+    field: "attachments"
+  }),
   tabling.columns.BodyColumn<R, M>({
     field: "value",
     headerName: "Amount",

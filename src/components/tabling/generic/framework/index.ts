@@ -25,6 +25,7 @@ export const Framework: Table.Framework = {
       PhoneNumberCell: cells.PhoneNumberCell,
       EmailCell: cells.EmailCell,
       LinkCell: cells.LinkCell,
+      AttachmentsCell: cells.AttachmentsCell,
       agColumnHeader: cells.HeaderCell
     },
     footer: {

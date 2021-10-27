@@ -215,7 +215,6 @@ const AuthenticatedBudgetSubAccountsTable = (
           id={editSubAccountAttachments}
           open={true}
           onCancel={() => setEditSubAccountAttachments(null)}
-          onSuccess={() => {}}
         />
       )}
     </React.Fragment>

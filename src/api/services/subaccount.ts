@@ -59,9 +59,9 @@ export const getSubAccountAttachments = services.detailListService<Model.Attachm
 ]);
 export const deleteSubAccountAttachment = services.detailDeleteService((id: number, objId: number) => [
   "subaccounts",
-  id,
+  objId,
   "attachments",
-  objId
+  id
 ]);
 export const uploadSubAccountAttachment = services.detailPostService<FormData, Model.Attachment>((id: number) => [
   "subaccounts",

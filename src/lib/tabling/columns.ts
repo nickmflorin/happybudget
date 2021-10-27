@@ -264,8 +264,10 @@ export const AttachmentsColumn = <
 ): Table.Column<R, M, number, PDFM> => {
   return {
     ...col,
+    headerName: "Attachment",
     editable: false,
-    cellRenderer: "AttachmentsCell",
+    requiresAuthentication: true,
+    cellRenderer: { data: "AttachmentsCell" },
     tableColumnType: "body",
     columnType: "file",
     isRead: true,

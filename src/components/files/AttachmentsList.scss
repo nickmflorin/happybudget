@@ -6,54 +6,38 @@
 
   .attachment-list-item {
     display: flex;
-    height: 22px;
+    height: 41px;
+    padding-top: 4px;
+    border-top: 1px solid #efefef;
+    margin-bottom: 6px;
 
-    .icon-wrapper {
-      height: 100%;
-      width: 22px;
-      margin-right: 12px;
-      color: $text-secondary;
+    &.disabled {
+      opacity: 0.4;
     }
 
-    .name-wrapper {
-      height: 100%;
-      line-height: 22px;
-      flex-grow: 100;
-      font-weight: 500;
-      color: $text-secondary;
-    }
-
-    .size-wrapper {
-      height: 100%;
+    .attachment-list-item-left {
       display: flex;
+      flex-direction: column;
+      height: 36px;
+      flex-grow: 100;
 
-      .icon-wrapper {
-        height: 100%;
-        width: 22px;
-        margin-right: 12px;
-        padding: 2px;
-
-        .icon {
-          height: 18px;
-          width: 18px;
-        }
-      }
-
-      .size-text {
-        font-size: 12px;
-        line-height: 22px;
-        font-family: $roboto;
-        margin-right: 4px;
-        font-weight: 500;
-        color: $text-secondary;
+      .attachment-size-text {
+        margin-top: 4px;
+        margin-left: 20px;
       }
     }
 
-    .btn--trash {
+    .btn-wrapper {
+      height: 36px;
+      width: 36px;
       margin-left: 12px;
-      height: 22px;
-      width: 22px;
-      padding: 2px;
+      padding: 7px;
+
+      .btn--trash {
+        height: 22px;
+        width: 22px;
+        padding: 2px;
+      }
     }
   }
 }

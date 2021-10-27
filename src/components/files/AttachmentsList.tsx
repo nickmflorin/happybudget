@@ -7,14 +7,23 @@ import "./AttachmentsList.scss";
 interface AttachmentsListProps extends StandardComponentProps {
   readonly attachments: Model.Attachment[];
   readonly showSize?: boolean;
+  readonly onDelete?: (m: Model.Attachment) => void;
+  readonly isDeleting?: (id: number) => void;
 }
 
-const AttachmentsList = ({ attachments, showSize, ...props }: AttachmentsListProps) => (
-  <div {...props} className={classNames("attachments-list", props.className)}>
-    {map(attachments, (attachment: Model.Attachment, index: number) => (
-      <AttachmentListItem key={index} attachment={attachment} showSize={showSize} />
-    ))}
-  </div>
-);
+const AttachmentsList = ({ attachments, showSize, onDelete, isDeleting, ...props }: AttachmentsListProps) => {
+  return (
+    <div {...props} className={classNames("attachments-list", props.className)}>
+      {map(attachments, (attachment: Model.Attachment, index: number) => (
+        <AttachmentListItem
+          key={index}
+          attachment={attachment}
+          onClick={() => onDelete?.(attachment)}
+          disabled={isDeleting?.(attachment.id) || false}
+        />
+      ))}
+    </div>
+  );
+};
 
 export default AttachmentsList;

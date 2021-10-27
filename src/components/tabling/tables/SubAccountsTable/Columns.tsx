@@ -58,10 +58,9 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
       return 1;
     }
   }),
-  // tabling.columns.AttachmentsColumn({
-  //   field: "attachments",
-  //   headerName: "Att."
-  // }),
+  tabling.columns.AttachmentsColumn({
+    field: "attachments"
+  }),
   tabling.columns.SelectColumn({
     field: "contact",
     headerName: "Contact",

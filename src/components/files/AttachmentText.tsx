@@ -1,25 +1,26 @@
 import React from "react";
 import classNames from "classnames";
-
-import { ShowHide } from "components";
+import { isNil } from "lodash";
 
 import FileIcon from "./FileIcon";
 import "./AttachmentText.scss";
 
 export interface AttachmentTextProps extends StandardComponentProps {
-  readonly children: Model.Attachment;
-  readonly showSize?: boolean;
+  readonly children: Model.Attachment | Model.SimpleAttachment;
+  readonly additionalCount?: number;
 }
 
-const AttachmentText: React.FC<AttachmentTextProps> = ({ children, showSize, ...props }) => {
+const AttachmentText: React.FC<AttachmentTextProps> = ({ children, additionalCount, ...props }) => {
   return (
-    <span {...props} className={classNames("attachment-text", props.className)}>
-      <FileIcon className={"icon--attachment-text"} name={children.name} ext={children.extension} />
-      <span className={"file-name"}>{children.name}</span>
-      <ShowHide show={showSize}>
-        <span className={"file-size"}>{children.name}</span>
-      </ShowHide>
-    </span>
+    <div {...props} className={classNames("attachment-text", props.className)}>
+      <div className={"icon-wrapper"} style={{ marginRight: 4 }}>
+        <FileIcon className={"icon--attachment"} name={children.name} ext={children.extension} />
+      </div>
+      <div className={"content-text"}>{children.name}</div>
+      {!isNil(additionalCount) && additionalCount !== 0 && (
+        <div className={"additional-count"}>{`(${additionalCount} more...)`}</div>
+      )}
+    </div>
   );
 };
 
