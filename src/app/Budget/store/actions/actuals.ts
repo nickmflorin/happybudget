@@ -11,6 +11,9 @@ export const loadingOwnerTreeAction = createAction<boolean>(ActionType.OwnerTree
 export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.ActualRowData, Model.Actual>>(
   ActionType.Actuals.TableChanged
 );
+export const updateRowsInStateAction = createAction<Redux.UpdateRowsInTablePayload<Tables.ActualRowData>>(
+  ActionType.Actuals.UpdateRowsInState
+);
 export const savingTableAction = createAction<boolean>(ActionType.Actuals.Saving);
 export const requestAction = createAction<Redux.TableRequestPayload>(ActionType.Actuals.Request);
 export const clearAction = createAction<null>(ActionType.Actuals.Clear);

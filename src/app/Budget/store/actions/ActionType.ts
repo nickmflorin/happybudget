@@ -95,6 +95,7 @@ const ActionType = {
       Response: "budget.subaccount.subaccounts.Response",
       AddToState: "budget.subaccount.subaccounts.AddToState",
       UpdateInState: "budget.subaccount.subaccounts.UpdateInState",
+      UpdateRowsInState: "budget.subaccount.subaccounts.UpdateRowsInState",
       Clear: "budget.subaccount.subaccounts.Clear"
     },
     History: {
@@ -133,7 +134,8 @@ const ActionType = {
       SetSearch: "budget.account.subaccounts.SetSearch",
       AddToState: "budget.account.subaccounts.AddToState",
       UpdateInState: "budget.account.subaccounts.UpdateInState",
-      Clear: "budget.account.subaccounts.Clear"
+      Clear: "budget.account.subaccounts.Clear",
+      UpdateRowsInState: "budget.account.subaccounts.UpdateRowsInState"
     },
     History: {
       Loading: "budget.account.history.Loading",
@@ -155,7 +157,8 @@ const ActionType = {
     Response: "budget.actuals.Response",
     Request: "budget.actuals.Request",
     AddToState: "budget.actuals.AddToState",
-    Clear: "budget.actuals.Clear"
+    Clear: "budget.actuals.Clear",
+    UpdateRowsInState: "budget.actuals.UpdateRowsInState"
   }
 };
 

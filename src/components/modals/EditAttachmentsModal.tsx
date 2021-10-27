@@ -126,8 +126,9 @@ const EditAttachmentsModal = ({
             };
             request.onload = function () {
               if (request.status >= 200 && request.status < 300) {
-                const data = JSON.parse(request.response);
-                load(data.id);
+                const data: Model.Attachment = JSON.parse(request.response);
+                load(String(data.id));
+                onAttachmentAdded?.(data);
               } else {
                 error("There was an error processing the attachment.");
               }

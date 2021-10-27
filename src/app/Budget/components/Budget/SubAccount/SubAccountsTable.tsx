@@ -130,6 +130,19 @@ const SubAccountsTable = ({
         }
         setPreviewModalVisible={setPreviewModalVisible}
         subAccountUnits={subAccountUnits}
+        onAttachmentAdded={(row: Table.ModelRow<R>, attachment: Model.Attachment) =>
+          dispatch(
+            actions.subAccount.updateRowsInStateAction({
+              id: row.id,
+              data: {
+                attachments: [
+                  ...row.data.attachments,
+                  { id: attachment.id, name: attachment.name, extension: attachment.extension }
+                ]
+              }
+            })
+          )
+        }
         onAddFringes={() => setFringesModalVisible(true)}
         onEditFringes={() => setFringesModalVisible(true)}
         // Right now, the SubAccount recursion only goes 1 layer deep.

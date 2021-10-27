@@ -612,6 +612,35 @@ export const createAuthenticatedTableReducer = <
         },
         newState
       );
+    } else if (
+      !isNil(config.actions.updateRowsInState) &&
+      action.type === config.actions.updateRowsInState.toString()
+    ) {
+      const updates: Redux.UpdateRowPayload<R>[] = Array.isArray(action.payload) ? action.payload : [action.payload];
+      return reduce(
+        updates,
+        (s: S, update: Redux.UpdateRowPayload<R>) => {
+          const r: Table.ModelRow<R> | null = redux.reducers.findModelInData(
+            action,
+            filter(newState.data, (ri: Table.BodyRow<R>) => typeguards.isModelRow(ri)),
+            update.id
+          );
+          if (!isNil(r)) {
+            return {
+              ...s,
+              data: data.orderTableRows<R, M>(
+                util.replaceInArray<Table.BodyRow<R>>(
+                  s.data,
+                  { id: r.id },
+                  { ...r, data: { ...r.data, ...update.data } }
+                )
+              )
+            };
+          }
+          return s;
+        },
+        newState
+      );
     }
     return newState;
   };

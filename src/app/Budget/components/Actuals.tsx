@@ -29,7 +29,7 @@ const selectActualTypes = redux.selectors.simpleDeepEqualSelector(
   (state: Application.Authenticated.Store) => state.budget.actuals.actualTypes
 );
 
-const ConnectedActualsTable = connectTableToStore<ActualsTable.Props, R, M, Tables.ActualTableStore>({
+const ConnectedActualsTable = connectTableToStore<ActualsTable.ActualsTableProps, R, M, Tables.ActualTableStore>({
   actions: ActionMap,
   selector: redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.actuals),
   footerRowSelectors: {
@@ -77,6 +77,19 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
         exportFileName={!isNil(budget) ? `${budget.name}_actuals` : "actuals"}
         onNewContact={() => setCreateContactModalVisible(true)}
         onEditContact={(params: { contact: number; id: Table.EditableRowId }) => setContactToEdit(params.contact)}
+        onAttachmentAdded={(row: Table.ModelRow<R>, attachment: Model.Attachment) =>
+          dispatch(
+            actions.actuals.updateRowsInStateAction({
+              id: row.id,
+              data: {
+                attachments: [
+                  ...row.data.attachments,
+                  { id: attachment.id, name: attachment.name, extension: attachment.extension }
+                ]
+              }
+            })
+          )
+        }
       />
       {!isNil(contactToEdit) && (
         <EditContactModal

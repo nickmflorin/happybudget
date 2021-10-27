@@ -128,6 +128,19 @@ const SubAccountsTable = ({
             tabling.typeguards.isModelRow(f)
           ) as Tables.FringeRow[]
         }
+        onAttachmentAdded={(row: Table.ModelRow<R>, attachment: Model.Attachment) =>
+          dispatch(
+            actions.account.updateRowsInStateAction({
+              id: row.id,
+              data: {
+                attachments: [
+                  ...row.data.attachments,
+                  { id: attachment.id, name: attachment.name, extension: attachment.extension }
+                ]
+              }
+            })
+          )
+        }
         subAccountUnits={subAccountUnits}
         setPreviewModalVisible={setPreviewModalVisible}
         onAddFringes={() => setFringesModalVisible(true)}

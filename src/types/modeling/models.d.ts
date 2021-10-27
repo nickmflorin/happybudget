@@ -6,6 +6,9 @@ namespace Model {
     readonly id: ID;
   }
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type PartialModel<M extends Model> = Partial<Omit<M, "id">> & Pick<M, "id">;
+
   type HttpModelType =
     | "markup"
     | "subaccount"

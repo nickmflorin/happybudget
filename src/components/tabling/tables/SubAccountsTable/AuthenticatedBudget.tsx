@@ -19,6 +19,7 @@ export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>,
   readonly identifierFieldHeader: "Account" | "Line";
   readonly contacts: Model.Contact[];
   readonly exportFileName: string;
+  readonly onAttachmentAdded: (row: Table.ModelRow<R>, attachment: Model.Attachment) => void;
   readonly onGroupRows: (rows: Table.ModelRow<R>[]) => void;
   readonly onExportPdf: () => void;
   readonly onNewContact: (params: { name?: string; id: Table.ModelRowId }) => void;
@@ -215,6 +216,24 @@ const AuthenticatedBudgetSubAccountsTable = (
           id={editSubAccountAttachments}
           open={true}
           onCancel={() => setEditSubAccountAttachments(null)}
+          onAttachmentAdded={(m: Model.Attachment) => {
+            const row = table.current.getRow(editSubAccountAttachments);
+            if (!isNil(row)) {
+              if (tabling.typeguards.isModelRow(row)) {
+                props.onAttachmentAdded(row, m);
+              } else {
+                console.warn(
+                  `Suspicous Behavior: After attachment was added, row with ID
+                  ${editSubAccountAttachments} did not refer to a model row.`
+                );
+              }
+            } else {
+              console.warn(
+                `Suspicous Behavior: After attachment was added, could not find row in
+                state for ID ${editSubAccountAttachments}.`
+              );
+            }
+          }}
         />
       )}
     </React.Fragment>

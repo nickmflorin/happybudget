@@ -12,10 +12,11 @@ import Columns from "./Columns";
 type R = Tables.ActualRowData;
 type M = Model.Actual;
 
-export type Props = Omit<AuthenticatedModelTableProps<R, M>, "columns"> & {
+export type ActualsTableProps = Omit<AuthenticatedModelTableProps<R, M>, "columns"> & {
   readonly exportFileName: string;
   readonly contacts: Model.Contact[];
   readonly actualTypes: Model.Tag[];
+  readonly onAttachmentAdded: (row: Table.ModelRow<R>, attachment: Model.Attachment) => void;
   readonly onOwnerTreeSearch: (value: string) => void;
   readonly onNewContact: (params: { name?: string; id: Table.ModelRowId }) => void;
   readonly onEditContact: (params: { contact: number; id: Table.EditableRowId }) => void;
@@ -28,7 +29,7 @@ const ActualsTable = ({
   onNewContact,
   onEditContact,
   ...props
-}: WithConnectedTableProps<Props, R, M>): JSX.Element => {
+}: WithConnectedTableProps<ActualsTableProps, R, M>): JSX.Element => {
   const [editSubAccountAttachments, setEditSubAccountAttachments] = useState<number | null>(null);
   const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
 
@@ -123,6 +124,24 @@ const ActualsTable = ({
           id={editSubAccountAttachments}
           open={true}
           onCancel={() => setEditSubAccountAttachments(null)}
+          onAttachmentAdded={(m: Model.Attachment) => {
+            const row = table.current.getRow(editSubAccountAttachments);
+            if (!isNil(row)) {
+              if (tabling.typeguards.isModelRow(row)) {
+                props.onAttachmentAdded(row, m);
+              } else {
+                console.warn(
+                  `Suspicous Behavior: After attachment was added, row with ID
+                  ${editSubAccountAttachments} did not refer to a model row.`
+                );
+              }
+            } else {
+              console.warn(
+                `Suspicous Behavior: After attachment was added, could not find row in
+                state for ID ${editSubAccountAttachments}.`
+              );
+            }
+          }}
         />
       )}
     </React.Fragment>

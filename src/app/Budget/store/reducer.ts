@@ -104,6 +104,7 @@ const genericReducer = combineReducers({
           saving: actions.account.savingTableAction,
           addModelsToState: actions.account.addModelsToStateAction,
           updateModelsInState: actions.account.updateModelsInStateAction,
+          updateRowsInState: actions.account.updateRowsInStateAction,
           setSearch: actions.account.setSearchAction
         },
         tableId: "account-subaccounts-table",
@@ -174,6 +175,7 @@ const genericReducer = combineReducers({
           saving: actions.subAccount.savingTableAction,
           addModelsToState: actions.subAccount.addModelsToStateAction,
           updateModelsInState: actions.subAccount.updateModelsInStateAction,
+          updateRowsInState: actions.subAccount.updateRowsInStateAction,
           setSearch: actions.subAccount.setSearchAction
         },
         columns: SubAccountColumns,
@@ -234,7 +236,8 @@ const genericReducer = combineReducers({
       saving: actions.actuals.savingTableAction,
       addModelsToState: actions.actuals.addModelsToStateAction,
       setSearch: actions.actuals.setSearchAction,
-      responseActualTypes: actions.actuals.responseActualTypesAction
+      responseActualTypes: actions.actuals.responseActualTypesAction,
+      updateRowsInState: actions.actuals.updateRowsInStateAction
     },
     columns: ActualColumns,
     ownerTree: redux.reducers.createModelListResponseReducer<

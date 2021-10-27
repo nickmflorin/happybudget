@@ -25,6 +25,9 @@ export const addModelsToStateAction = createAction<Redux.AddModelsToTablePayload
 export const updateModelsInStateAction = createAction<Redux.UpdateModelsInTablePayload<Model.SubAccount>>(
   ActionType.Account.SubAccounts.UpdateInState
 );
+export const updateRowsInStateAction = createAction<Redux.UpdateRowsInTablePayload<Tables.SubAccountRowData>>(
+  ActionType.Account.SubAccounts.UpdateRowsInState
+);
 export const setSearchAction = createAction<string>(ActionType.Account.SubAccounts.SetSearch);
 
 export const requestCommentsAction = createAction<null>(ActionType.Account.Comments.Request);
