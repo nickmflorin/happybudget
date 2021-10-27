@@ -260,7 +260,6 @@ export const createTableChangeEventReducer = <
 ): Redux.Reducer<S, Redux.Action<Table.ChangeEvent<R, M>>> => {
   return (state: S = config.initialState, action: Redux.Action<Table.ChangeEvent<R, M>>): S => {
     const e: Table.ChangeEvent<R, M> = action.payload;
-
     if (typeguards.isDataChangeEvent<R>(e)) {
       const consolidated = events.consolidateRowChanges(e.payload);
 

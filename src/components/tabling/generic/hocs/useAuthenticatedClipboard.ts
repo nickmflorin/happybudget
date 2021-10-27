@@ -155,71 +155,74 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.Http
           // to rows that should be added to the table - and then dispatch an event to add these
           // rows to the table with the data provided.
           const cols = getWritableColumnsAfter(params.apis.column, focusedCell.column);
-          params.onChangeEvent({
-            type: "rowAdd",
-            payload: reduce(
-              newRowData,
-              (curr: Table.RowAdd<R>[], rowData: any[]) => {
-                if (cols.length < rowData.length) {
-                  console.warn(
-                    `There are ${cols.length} writable displayed columns, but the data array
-                    has length ${rowData.length} - this most likely means there is an issue with the
-                    column configuration.`
-                  );
-                  return curr;
-                } else {
-                  return [
-                    ...curr,
-                    {
-                      id: tabling.rows.placeholderRowId(),
-                      data: reduce(
-                        cols,
-                        /* eslint-disable indent */
-                        (currD: Partial<R>, ci: Table.Column<R, M>, index: number): Partial<R> => {
-                          if (!isNil(ci.parseIntoFields)) {
-                            // Note: We must apply the logic to nullify certain values because the
-                            // values here do not pass through the valueGetter in authenticateDataGrid
-                            // (which would otherwise nullify things like "").
-                            const parsed = ci.parseIntoFields(rowData[index]);
+          const payload = reduce(
+            newRowData,
+            (curr: Table.RowAdd<R>[], rowData: any[]) => {
+              if (cols.length < rowData.length) {
+                console.warn(
+                  `There are ${cols.length} writable displayed columns, but the data array
+                  has length ${rowData.length} - this most likely means there is an issue with the
+                  column configuration.`
+                );
+                return curr;
+              } else {
+                return [
+                  ...curr,
+                  {
+                    id: tabling.rows.placeholderRowId(),
+                    data: reduce(
+                      cols,
+                      /* eslint-disable indent */
+                      (currD: Partial<R>, ci: Table.Column<R, M>, index: number): Partial<R> => {
+                        if (!isNil(ci.parseIntoFields)) {
+                          // Note: We must apply the logic to nullify certain values because the
+                          // values here do not pass through the valueGetter in authenticateDataGrid
+                          // (which would otherwise nullify things like "").
+                          const parsed = ci.parseIntoFields(rowData[index]);
+                          return {
+                            ...currD,
+                            ...reduce(
+                              parsed,
+                              (v: Partial<R>, parsedField: Table.ParsedColumnField<R>) => {
+                                if (parsedField.value === "") {
+                                  return {
+                                    ...v,
+                                    [parsedField.field]: ci.nullValue === undefined ? null : ci.nullValue
+                                  };
+                                }
+                                return { ...v, [parsedField.field]: parsedField.value };
+                              },
+                              {} as Partial<R>
+                            )
+                          };
+                        } else if (!isNil(ci.field)) {
+                          // Note: We do not use the colId for creating the RowData object - the colId
+                          // is used for cases where the Column is not associated with a field of the
+                          // Row Data.
+                          if (rowData[index] === "") {
                             return {
                               ...currD,
-                              ...reduce(
-                                parsed,
-                                (v: Partial<R>, parsedField: Table.ParsedColumnField<R>) => {
-                                  if (parsedField.value === "") {
-                                    return {
-                                      ...v,
-                                      [parsedField.field]: ci.nullValue === undefined ? null : ci.nullValue
-                                    };
-                                  }
-                                  return { ...v, [parsedField.field]: parsedField.value };
-                                },
-                                {} as Partial<R>
-                              )
+                              [ci.field]: ci.nullValue === undefined ? null : ci.nullValue
                             };
-                          } else if (!isNil(ci.field)) {
-                            // Note: We do not use the colId for creating the RowData object - the colId
-                            // is used for cases where the Column is not associated with a field of the
-                            // Row Data.
-                            if (rowData[index] === "") {
-                              return {
-                                ...currD,
-                                [ci.field]: ci.nullValue === undefined ? null : ci.nullValue
-                              };
-                            }
-                            return { ...currD, [ci.field]: rowData[index] };
                           }
-                          return currD;
-                        },
-                        {} as Partial<R>
-                      )
-                    }
-                  ];
-                }
-              },
-              []
-            )
-          });
+                          return { ...currD, [ci.field]: rowData[index] };
+                        }
+                        return currD;
+                      },
+                      {} as Partial<R>
+                    )
+                  }
+                ];
+              }
+            },
+            []
+          );
+          if (payload.length !== 0) {
+            params.onChangeEvent({
+              type: "rowAdd",
+              payload
+            });
+          }
           // All we need to do is return the data corresponding to updates to the existing rows
           // because the cell value change handlers will take care of the rest.
           return updateRowData;
