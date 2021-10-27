@@ -46,8 +46,9 @@
   font-size: 13px;
 }
 
+// we have to use !important here to prevent ckeditor from overriding padding to 0px
 .ck.ck-editor__editable_inline {
-  padding: var(--ck-spacing-standard) var(--ck-spacing-large);
+  padding: var(--ck-spacing-standard) var(--ck-spacing-large) !important;
 }
 
 .ck-content .ck-heading_heading1,
