@@ -3,11 +3,9 @@ frontend:
   phases:
     preBuild:
       commands:
-        - nvm use $VERSION_NODE_16
         - yarn install
     build:
       commands:
-        - nvm use $VERSION_NODE_16
         - yarn run build
         - REACT_APP_API_DOMAIN=$REACT_APP_API_DOMAIN
         - REACT_APP_AG_GRID_KEY=$REACT_APP_AG_GRID_KEY
