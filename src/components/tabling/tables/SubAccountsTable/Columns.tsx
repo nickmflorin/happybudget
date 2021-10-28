@@ -60,7 +60,8 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
   }),
   tabling.columns.AttachmentsColumn({
     field: "attachments",
-    defaultHidden: true
+    defaultHidden: true,
+    includeInPdf: false
   }),
   tabling.columns.SelectColumn({
     field: "contact",
