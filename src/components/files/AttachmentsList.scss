@@ -15,25 +15,35 @@
       opacity: 0.4;
     }
 
-    .attachment-list-item-left {
-      display: flex;
-      flex-direction: column;
-      height: 36px;
-      flex-grow: 100;
+    .text-wrapper {
+      font-size: 12px;
+      font-family: $avenir;
+      font-weight: 500;
+      color: $text-secondary;
+      line-height: 36px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
-      .attachment-size-text {
-        margin-top: 4px;
-        margin-left: 20px;
+      &.size {
+        text-align: right;
+        flex-grow: 100;
+        text-overflow: initial;
       }
     }
 
-    .btn-wrapper {
+    .action-wrapper {
       height: 36px;
-      width: 36px;
-      margin-left: 12px;
-      padding: 7px;
+      width: 28px;
+      padding: 7px 3px;
 
-      .btn--trash {
+      > .icon {
+        height: 22px;
+        width: 22px;
+        padding: 3px;
+      }
+
+      .btn {
         height: 22px;
         width: 22px;
         padding: 2px;

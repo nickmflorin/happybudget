@@ -1,26 +1,66 @@
+import { useState } from "react";
 import classNames from "classnames";
 
-import { TrashButton } from "components/buttons";
+import { util, notifications } from "lib";
 
-import AttachmentText from "./AttachmentText";
-import AttachmentSizeText from "./AttachmentSizeText";
+import { Icon } from "components";
+import { IconButton, TrashButton } from "components/buttons";
+
+import FileIcon from "./FileIcon";
 
 interface AttachmentListItemProps extends StandardComponentProps {
   readonly attachment: Model.Attachment;
-  readonly disabled?: boolean;
+  readonly deleting?: boolean;
   readonly onClick?: () => void;
 }
 
-const AttachmentListItem = ({ attachment, disabled, onClick, ...props }: AttachmentListItemProps) => (
-  <div {...props} className={classNames("attachment-list-item", props.className, { disabled })}>
-    <div className={"attachment-list-item-left"}>
-      <AttachmentText>{attachment}</AttachmentText>
-      <AttachmentSizeText>{attachment}</AttachmentSizeText>
+const AttachmentListItem = ({ attachment, deleting, onClick, ...props }: AttachmentListItemProps) => {
+  const [downloading, setDownloading] = useState(false);
+
+  return (
+    <div {...props} className={classNames("attachment-list-item", props.className, { disabled: deleting })}>
+      <div className={"action-wrapper"}>
+        <FileIcon className={"icon--attachment"} name={attachment.name} ext={attachment.extension} />
+      </div>
+      <div className={"text-wrapper"}>{attachment.name}</div>
+      <div style={{ display: "flex", flexGrow: 100, justifyContent: "right" }}>
+        <div className={"text-wrapper size"}>{util.files.fileSizeString(attachment.size)}</div>
+        <div className={"action-wrapper"}>
+          <Icon className={"icon--attachment"} icon={"server"} />
+        </div>
+        <div className={"action-wrapper"}>
+          <IconButton
+            disabled={downloading}
+            loading={downloading}
+            onClick={() => {
+              setDownloading(true);
+              util.files
+                .getDataFromURL(attachment.url)
+                .then((response: string | ArrayBuffer) => util.files.download(response, attachment.name))
+                .catch((e: Error) => {
+                  notifications.error(e, {
+                    notifyUser: true,
+                    message: "There was an error downloading your attachment.",
+                    dispatchToSentry: true
+                  });
+                })
+                .finally(() => setDownloading(false));
+            }}
+            icon={<Icon icon={"arrow-circle-down"} weight={"regular"} />}
+          />
+        </div>
+        <div className={"action-wrapper"}>
+          <IconButton
+            onClick={() => window.open(attachment.url)}
+            icon={<Icon icon={"external-link-square-alt"} weight={"regular"} />}
+          />
+        </div>
+        <div className={"action-wrapper"}>
+          <TrashButton loading={deleting} disabled={deleting} onClick={() => onClick?.()} />
+        </div>
+      </div>
     </div>
-    <div className={"btn-wrapper"}>
-      <TrashButton disabled={disabled} onClick={() => onClick?.()} />
-    </div>
-  </div>
-);
+  );
+};
 
 export default AttachmentListItem;

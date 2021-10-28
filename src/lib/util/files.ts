@@ -1,138 +1,130 @@
 import { isNil } from "lodash";
+import mime from "mime";
 
 export const fileSizeInMB = (file: File | number) => (typeof file === "number" ? file : file.size) / 1024 / 1024;
 
-export const getFileType = (filename: string): string | undefined => {
-  if (!filename.includes(".")) {
-    return undefined;
+class InvalidFileNameError extends Error {
+  constructor(filename: string) {
+    super(`The filename ${filename} is invalid.`);
   }
-  return filename.split(".").slice(-1)[0];
+}
+
+class InvalidFileExtensionError extends Error {
+  constructor(ext: string) {
+    super(`The file extension ${ext} is invalid.`);
+  }
+}
+
+export const parseFileNameAndExtension = (name: string, ext?: string): [string, string] => {
+  let extension: string;
+  let explicitExtension: string | null = null;
+  if (!isNil(ext)) {
+    if (ext.startsWith(".")) {
+      explicitExtension = ext.slice(1);
+    }
+  }
+  let extensionFromName = getFileType(name);
+  if (isNil(extensionFromName)) {
+    if (isNil(explicitExtension)) {
+      throw new InvalidFileNameError(name);
+    }
+    extension = explicitExtension;
+  } else {
+    if (!isNil(explicitExtension) && explicitExtension !== extensionFromName) {
+      throw new InvalidFileExtensionError(explicitExtension);
+    }
+    extension = extensionFromName;
+  }
+  return [name, extension];
 };
+
+export const getFileType = (filename: string): string | undefined => filename.split(".").pop();
 
 export const fileSizeString = (file: File | number) => `${fileSizeInMB(file).toFixed(2)} MB`;
 
-export const getBase64 = (file: File | Blob): Promise<string | ArrayBuffer> =>
+export const getDataFromBlob = (file: File | Blob): Promise<string | ArrayBuffer> =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = () =>
-      reader.result === null ? reject("Could not encode image with base64 encoding.") : resolve(reader.result);
+    reader.onload = () => (reader.result === null ? reject("Could not read data from blob.") : resolve(reader.result));
     reader.onerror = error => reject(error);
   });
 
-export const getBase64FromUrl = (url: string): Promise<string | ArrayBuffer> =>
+export const getDataFromURL = (url: string): Promise<string | ArrayBuffer> =>
   new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.onload = function () {
       const reader = new FileReader();
       reader.readAsDataURL(xhr.response);
-      reader.onload = () =>
-        reader.result === null ? reject("Could not determine base64 encoding from URL.") : resolve(reader.result);
+      reader.onload = () => (reader.result === null ? reject("Could not read data from URL.") : resolve(reader.result));
       reader.onerror = error => reject(error);
     };
-    // For AWS S3 Bucket - Not sure if it's needed though, this was mostly a test.
-    xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
     xhr.open("GET", url);
     xhr.responseType = "blob";
     xhr.send();
   });
-
-export const base64ToArrayBuffer = (base64: string): Uint8Array => {
-  const binaryString = window.atob(base64);
-  const binaryLen = binaryString.length;
-  const bytes = new Uint8Array(binaryLen);
-  for (let i = 0; i < binaryLen; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes;
-};
-
-export const stringIsBase64 = (value: string): boolean => {
-  if (value === "" || value.trim() === "") {
-    return false;
-  }
-  try {
-    return btoa(atob(value)) === value;
-  } catch (err: unknown) {
-    return false;
-  }
-};
 
 type DownloadOptions = {
   readonly ext?: string;
   readonly includeExtensionInName?: boolean;
 };
 
-export const removeBase64IndicatorsFromString = (value: string, ext: string): string => {
-  const indicators = [`data:application/${ext.toLowerCase()};`, "base64,", "base64"];
-  for (let i = 0; i < indicators.length; i++) {
-    value = value.replace(indicators[i], "");
+export const downloadData = async (data: string, name: string) => {
+  const link = document.createElement("a");
+  link.href = data;
+  link.setAttribute("download", name);
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
+  link.click();
+  if (!isNil(link.parentNode)) {
+    link.parentNode.removeChild(link);
   }
-  return value.trim();
+};
+
+export const downloadBlob = async (blob: Blob, name: string) => {
+  const blobUrl = URL.createObjectURL(blob);
+  if (!isNil(blobUrl)) {
+    downloadData(blobUrl, name);
+  } else {
+    throw new Error("Error downloading file.");
+  }
+};
+
+export const extensionIsImage = (ext: string) => {
+  let mimeType = mime.getType(ext);
+  if (isNil(mimeType)) {
+    throw new InvalidFileExtensionError(ext);
+  }
+  return mimeType.split("/")[0] === "image";
 };
 
 export const download = async (
   fileObj: string | ArrayBuffer | Blob,
-  name: string,
+  nm: string,
   options: DownloadOptions = { includeExtensionInName: true }
 ) => {
-  let extension: string;
-
-  let explicitExtension: string | null = null;
-  if (!isNil(options.ext)) {
-    if (options.ext.startsWith(".")) {
-      explicitExtension = options.ext.slice(1);
-    }
-  }
-  let extensionFromName = getFileType(name);
-  if (isNil(extensionFromName)) {
-    if (isNil(explicitExtension)) {
-      throw new Error(`Could not determine file type from file name ${name}.`);
-    }
-    extension = explicitExtension;
-  } else {
-    if (!isNil(explicitExtension) && explicitExtension !== extensionFromName) {
-      throw new Error(`Invalid extension ${explicitExtension} for file name ${name}.`);
-    }
-    extension = extensionFromName;
-  }
+  let [name, extension] = parseFileNameAndExtension(nm, options.ext);
   if (!name.endsWith(extension) && options.includeExtensionInName === true) {
     name = `${name}.${extension}`;
   } else if (name.endsWith(extension) && options.includeExtensionInName === false) {
     name = name.slice(0, name.indexOf(extension) - 1);
   }
+  let mimeType = mime.getType(extension);
+  if (isNil(mimeType)) {
+    throw new InvalidFileExtensionError(extension);
+  }
   let blob: Blob;
   if (!(fileObj instanceof Blob)) {
     if (fileObj instanceof ArrayBuffer) {
-      blob = new Blob([fileObj], { type: "application/" + extension });
+      blob = new Blob([fileObj], { type: mimeType });
+      downloadBlob(blob, name);
+      return;
     } else {
-      fileObj = removeBase64IndicatorsFromString(fileObj, extension);
-      if (stringIsBase64(fileObj)) {
-        const bytes = base64ToArrayBuffer(fileObj);
-        blob = new Blob([bytes], { type: "application/" + extension });
-      } else {
-        blob = new Blob([fileObj], {
-          type: "application/" + extension
-        });
-      }
+      downloadData(fileObj, name);
+      return;
     }
   } else {
-    blob = fileObj;
-  }
-
-  const blobUrl = URL.createObjectURL(blob);
-  if (!isNil(blobUrl)) {
-    const link = document.createElement("a");
-    link.href = blobUrl;
-    link.setAttribute("download", name);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    if (!isNil(link.parentNode)) {
-      link.parentNode.removeChild(link);
-    }
-  } else {
-    throw new Error("Could not create blob from file data.");
+    downloadBlob(fileObj, name);
   }
 };
 
@@ -164,18 +156,7 @@ export const downloadAsCsvFile = async (filename: string, data: CSVData) => {
   }
 
   const blob = new Blob([csvFile], { type: "text/csv;charset=utf-8;" });
-
-  const link = document.createElement("a");
-  if (link.download !== undefined) {
-    // Feature detection: Browsers that support HTML5 download attribute
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", filename);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
+  downloadBlob(blob, filename);
 };
 
 export const truncateFileName = (file: string, length: number) => {

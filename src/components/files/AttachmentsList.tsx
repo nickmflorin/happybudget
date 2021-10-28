@@ -19,7 +19,7 @@ const AttachmentsList = ({ attachments, showSize, onDelete, isDeleting, ...props
           key={index}
           attachment={attachment}
           onClick={() => onDelete?.(attachment)}
-          disabled={isDeleting?.(attachment.id) || false}
+          deleting={isDeleting?.(attachment.id) || false}
         />
       ))}
     </div>

@@ -120,7 +120,7 @@ const PreviewModal = ({
       .toBlob()
       .then((blb: Blob) => {
         util.files
-          .getBase64(blb)
+          .getDataFromBlob(blb)
           .then((result: ArrayBuffer | string) => setFile(result))
           .catch((e: Error) => {
             console.error("There was an error generating the PDF.");

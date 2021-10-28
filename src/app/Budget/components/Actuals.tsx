@@ -95,7 +95,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
               data: {
                 attachments: [
                   ...row.data.attachments,
-                  { id: attachment.id, name: attachment.name, extension: attachment.extension }
+                  { id: attachment.id, name: attachment.name, extension: attachment.extension, url: attachment.url }
                 ]
               }
             })

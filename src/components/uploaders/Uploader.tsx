@@ -9,7 +9,7 @@ import { UploadChangeParam } from "antd/lib/upload";
 import { UploadFile } from "antd/lib/upload/interface";
 
 import * as api from "api";
-import { fileSizeInMB, getBase64 } from "lib/util/files";
+import { util } from "lib";
 import { Icon, RenderWithSpinner, Image, ShowHide } from "components";
 import { ImageClearButton } from "components/buttons";
 
@@ -167,7 +167,7 @@ const Uploader = (
               `${file.type} is not an acceptable image type.  Must be one of ${ACCCEPTED_IMAGE_TYPES.join(", ")}.`
             );
             return false;
-          } else if (fileSizeInMB(file) > 2) {
+          } else if (util.files.fileSizeInMB(file) > 2) {
             _onError(`The image must be smaller than ${MAX_IMAGE_SIZE}MB.`);
             return false;
           }
@@ -185,7 +185,8 @@ const Uploader = (
             const response: Http.FileUploadResponse | undefined = info.file.response;
             const file: File | undefined = info.file.originFileObj;
             if (!isNil(file) && !isNil(response)) {
-              getBase64(file)
+              util.files
+                .getDataFromBlob(file)
                 .then((data: ArrayBuffer | string) => {
                   setImage({
                     url: response.fileUrl,

@@ -140,11 +140,11 @@ namespace Model {
   interface SimpleAttachment extends HttpModel {
     readonly name: string;
     readonly extension: string;
+    readonly url: string;
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface Attachment extends SimpleAttachment {
-    readonly url: string;
     readonly size: number;
   }
 
