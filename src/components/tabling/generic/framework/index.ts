@@ -11,7 +11,8 @@ export { default as connectCellToStore } from "./cells/connectCellToStore";
 export const Framework: Table.Framework = {
   editors: {
     ContactEditor: editors.ContactEditor,
-    DateEditor: editors.DateEditor
+    DateEditor: editors.DateEditor,
+    NullCellEditor: editors.NullCellEditor
   },
   cells: {
     data: {

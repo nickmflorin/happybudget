@@ -1,4 +1,4 @@
-import { isNil, filter, find, map, forEach } from "lodash";
+import { isNil, filter, find, map, forEach, reduce } from "lodash";
 import { util, tabling } from "lib";
 import { Colors } from "style/constants";
 
@@ -133,6 +133,21 @@ export const parseFirstAndLastName = (name: string): [string | null, string | nu
     return names[0].trim() === "" ? [null, null] : [names[0], null];
   }
   return [names[0].trim(), names[1].join(" ")];
+};
+
+export const parseIdsFromDeliminatedString = (value: string, delimiter = ","): number[] => {
+  const split: string[] = value.split(",");
+  return reduce(
+    split,
+    (curr: number[], id: string) => {
+      const trimmed = id.trim();
+      if (!isNaN(parseInt(trimmed))) {
+        return [...curr, parseInt(trimmed)];
+      }
+      return curr;
+    },
+    []
+  );
 };
 
 type GetModelsByIdOptions = {

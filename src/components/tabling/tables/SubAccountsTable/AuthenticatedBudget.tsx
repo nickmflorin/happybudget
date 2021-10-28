@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { isNil, find, map, filter } from "lodash";
+import { reduce, isNil, find, map, filter, uniq } from "lodash";
 
 import { model, tabling, hooks } from "lib";
 import { EditSubAccountAttachmentsModal } from "components/modals";
@@ -64,6 +64,26 @@ const AuthenticatedBudgetSubAccountsTable = (
     }
   });
 
+  const processAttachmentsCellForClipboard = hooks.useDynamicCallback((row: R) =>
+    map(row.attachments, (a: Model.SimpleAttachment) => a.id).join(", ")
+  );
+
+  const processAttachmentsCellFromClipboard = hooks.useDynamicCallback((value: string) => {
+    const modelRows = filter(table.current.getRows(), (r: Table.Row<R>) =>
+      tabling.typeguards.isModelRow(r)
+    ) as Table.ModelRow<R>[];
+    const attachments = reduce(
+      modelRows,
+      (curr: Model.SimpleAttachment[], r: Table.ModelRow<R>) => uniq([...curr, ...r.data.attachments]),
+      []
+    );
+    return model.util.getModelsByIds<Model.SimpleAttachment>(
+      attachments,
+      model.util.parseIdsFromDeliminatedString(value),
+      { warnOnMissing: false }
+    );
+  });
+
   const processFringesCellForClipboard = hooks.useDynamicCallback((row: R) => {
     const fringes = model.util.getModelsByIds<Tables.FringeRow>(props.fringes, row.fringes);
     return map(fringes, (fringe: Tables.FringeRow) => fringe.data.name).join(", ");
@@ -89,7 +109,9 @@ const AuthenticatedBudgetSubAccountsTable = (
       }),
       description: { headerName: `${props.categoryName} Description` },
       attachments: {
-        onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditSubAccountAttachments(row.id)
+        onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditSubAccountAttachments(row.id),
+        processCellFromClipboard: processAttachmentsCellFromClipboard,
+        processCellForClipboard: processAttachmentsCellForClipboard
       },
       unit: {
         processCellFromClipboard: processUnitCellFromClipboard

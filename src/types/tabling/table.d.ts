@@ -291,7 +291,7 @@ namespace Table {
     readonly columnType?: ColumnTypeId;
     readonly tableColumnType: TableColumnTypeId;
     readonly index?: number;
-    readonly nullValue?: R[keyof R] | null;
+    readonly nullValue?: any;
     readonly selectable?: boolean | ((params: CellCallbackParams<R, M>) => boolean) | undefined;
     readonly editable?: boolean | ((params: CellCallbackParams<R, M>) => boolean);
     readonly footer?: FooterColumn<R, M>;

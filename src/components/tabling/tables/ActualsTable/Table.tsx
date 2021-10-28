@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { map, filter, find, isNil } from "lodash";
+import { map, filter, find, isNil, reduce, uniq } from "lodash";
 
 import { model, tabling, hooks } from "lib";
 
@@ -35,6 +35,26 @@ const ActualsTable = ({
 }: WithConnectedTableProps<ActualsTableProps, R, M>): JSX.Element => {
   const [editSubAccountAttachments, setEditSubAccountAttachments] = useState<number | null>(null);
   const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
+
+  const processAttachmentsCellForClipboard = hooks.useDynamicCallback((row: R) =>
+    map(row.attachments, (a: Model.SimpleAttachment) => a.id).join(", ")
+  );
+
+  const processAttachmentsCellFromClipboard = hooks.useDynamicCallback((value: string) => {
+    const modelRows = filter(table.current.getRows(), (r: Table.Row<R>) =>
+      tabling.typeguards.isModelRow(r)
+    ) as Table.ModelRow<R>[];
+    const attachments = reduce(
+      modelRows,
+      (curr: Model.SimpleAttachment[], r: Table.ModelRow<R>) => uniq([...curr, ...r.data.attachments]),
+      []
+    );
+    return model.util.getModelsByIds<Model.SimpleAttachment>(
+      attachments,
+      model.util.parseIdsFromDeliminatedString(value),
+      { warnOnMissing: false }
+    );
+  });
 
   const processActualTypeCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
     model.util.inferModelFromName<Model.Tag>(props.actualTypes, name, { nameField: "title" })
@@ -109,7 +129,9 @@ const ActualsTable = ({
             }
           }),
           attachments: {
-            onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditSubAccountAttachments(row.id)
+            onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditSubAccountAttachments(row.id),
+            processCellForClipboard: processAttachmentsCellForClipboard,
+            processCellFromClipboard: processAttachmentsCellFromClipboard
           },
           actual_type: {
             processCellFromClipboard: processActualTypeCellFromClipboard

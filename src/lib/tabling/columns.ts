@@ -256,24 +256,26 @@ export const CalculatedColumn = <
 };
 
 export const AttachmentsColumn = <
-  R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  PDFM extends Model.HttpModel = any
+  R extends Tables.ActualRowData | Tables.SubAccountRowData,
+  M extends Model.HttpModel = Model.HttpModel
 >(
-  col: Partial<Table.Column<R, M, number, PDFM>>,
+  col: Partial<Table.Column<R, M, Model.SimpleAttachment[]>>,
   width?: number
-): Table.Column<R, M, number, PDFM> => {
+): Table.Column<R, M, Model.SimpleAttachment[]> => {
   return {
     ...col,
     headerName: "Attachment",
-    editable: false,
+    editable: true,
     requiresAuthentication: true,
     cellRenderer: { data: "AttachmentsCell" },
+    cellEditor: "NullCellEditor",
     tableColumnType: "body",
     columnType: "file",
     isRead: true,
     isWrite: true,
-    width: !isNil(width) ? width : 140
+    nullValue: [],
+    width: !isNil(width) ? width : 140,
+    getHttpValue: (value: Model.SimpleAttachment[]) => map(value, (m: Model.SimpleAttachment) => m.id)
   };
 };
 
