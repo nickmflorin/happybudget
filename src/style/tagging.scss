@@ -25,6 +25,15 @@
     width: 100%;
   }
 
+  &--account {
+    color: $text-secondary !important;
+    background-color: white !important;
+    font-weight: 500;
+    line-height: 17px;
+    border: 1px solid $text-secondary !important;
+    border-radius: 4px;
+  }
+
   &--contact {
     border-radius: 4px;
 
