@@ -1,6 +1,11 @@
 import { useSelector } from "react-redux";
 import { isNil } from "lodash";
-import { selectContacts, selectContactsLoading } from "./selectors";
+import {
+  selectContacts,
+  selectContactsLoading,
+  selectFilteredContacts,
+  selectFilteredContactsLoading
+} from "./selectors";
 
 export const useLoggedInUser = (): Model.User => {
   const value = useSelector((state: Application.Authenticated.Store) => {
@@ -15,6 +20,14 @@ export const useContacts = (): Model.Contact[] => {
 
 export const useContactsLoading = (): boolean => {
   return useSelector(selectContactsLoading);
+};
+
+export const useFilteredContacts = (): Model.Contact[] => {
+  return useSelector(selectFilteredContacts);
+};
+
+export const useFilteredContactsLoading = (): boolean => {
+  return useSelector(selectFilteredContactsLoading);
 };
 
 export const useTimezone = (options: { defaultTz?: string | undefined } = {}): string => {

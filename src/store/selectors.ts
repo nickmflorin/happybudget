@@ -9,3 +9,11 @@ export const selectContacts = redux.selectors.simpleDeepEqualSelector(
 export const selectContactsLoading = redux.selectors.simpleShallowEqualSelector(
   (state: Application.Store) => state.contacts.loading
 );
+
+export const selectFilteredContacts = redux.selectors.simpleDeepEqualSelector(
+  (state: Application.Authenticated.Store) => state.filteredContacts.data
+);
+
+export const selectFilteredContactsLoading = redux.selectors.simpleShallowEqualSelector(
+  (state: Application.Authenticated.Store) => state.filteredContacts.loading
+);

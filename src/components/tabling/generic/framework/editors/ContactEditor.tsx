@@ -2,7 +2,7 @@ import { forwardRef, ForwardedRef } from "react";
 import { filter, isNil } from "lodash";
 
 import { tabling } from "lib";
-import { useContacts, useContactsLoading } from "store/hooks";
+import { useFilteredContacts, useFilteredContactsLoading } from "store/hooks";
 import { Icon } from "components";
 import { framework } from "components/tabling/generic";
 
@@ -26,8 +26,8 @@ const ContactEditor = <
   props: ContactEditorProps<R, M, S>,
   ref: ForwardedRef<any>
 ) => {
-  const contacts = useContacts();
-  const loading = useContactsLoading();
+  const contacts = useFilteredContacts();
+  const loading = useFilteredContactsLoading();
 
   const [editor] = framework.editors.useModelMenuEditor<Model.Contact, ID, R, M, S>({
     ...props,

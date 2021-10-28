@@ -76,6 +76,20 @@ export const createStaticAuthenticatedReducers = (
         loading: actions.loadingContactsAction,
         updateInState: actions.authenticated.updateContactInStateAction,
         removeFromState: actions.authenticated.removeContactFromStateAction,
+        addToState: actions.authenticated.addContactToStateAction
+      }
+    }),
+    filteredContacts: redux.reducers.createAuthenticatedModelListResponseReducer<
+      Model.Contact,
+      Omit<Redux.AuthenticatedModelListResponseActionMap<Model.Contact>, "restoreSearchCache">
+    >({
+      initialState: redux.initialState.initialAuthenticatedModelListResponseState,
+      actions: {
+        request: actions.authenticated.requestFilteredContactsAction,
+        response: actions.authenticated.responseFilteredContactsAction,
+        loading: actions.authenticated.loadingFilteredContactsAction,
+        updateInState: actions.authenticated.updateContactInStateAction,
+        removeFromState: actions.authenticated.removeContactFromStateAction,
         addToState: actions.authenticated.addContactToStateAction,
         setSearch: actions.authenticated.setContactsSearchAction
       }

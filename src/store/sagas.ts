@@ -31,12 +31,18 @@ export const createUnauthenticatedRootSaga = (config: Application.AnyModuleConfi
 };
 
 export const createAuthenticatedRootSaga = (config: Application.AnyModuleConfig[]): Saga => {
-  const contactsTasks = tasks.contacts.createTaskSet({
-    authenticated: true
-  });
+  const contactsTasks = tasks.contacts.createTaskSet({ authenticated: true });
+  const filteredContactsTasks = tasks.contacts.createFilteredTaskSet();
   const contactsSaga = redux.sagas.createAuthenticatedModelListResponseSaga({
     tasks: contactsTasks,
-    actions: { request: actions.requestContactsAction, setSearch: actions.authenticated.setContactsSearchAction }
+    actions: { request: actions.requestContactsAction }
+  });
+  const filteredContactsSaga = redux.sagas.createAuthenticatedModelListResponseSaga({
+    tasks: filteredContactsTasks,
+    actions: {
+      request: actions.authenticated.requestFilteredContactsAction,
+      setSearch: actions.authenticated.setContactsSearchAction
+    }
   });
   function* applicationSaga(): SagaIterator {
     const authenticatedConfig = filter(
@@ -50,6 +56,7 @@ export const createAuthenticatedRootSaga = (config: Application.AnyModuleConfig[
       }
     }
     yield spawn(contactsSaga);
+    yield spawn(filteredContactsSaga);
   }
   return applicationSaga;
 };

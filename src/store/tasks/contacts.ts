@@ -15,18 +15,39 @@ export const createTaskSet = (config: {
 }): Redux.TaskMapObject<Redux.ModelListResponseTaskMap> => {
   function* request(action: Redux.Action<null>): SagaIterator {
     yield put(actions.loadingContactsAction(true));
-    let query: Http.ListQuery = {};
-    if (config.authenticated) {
-      query = yield select((state: Application.Authenticated.Store) => ({ search: state.contacts.search }));
-    }
     try {
-      const response: Http.ListResponse<M> = yield api.request(api.getContacts, query);
+      const response: Http.ListResponse<M> = yield api.request(api.getContacts);
       yield put(actions.responseContactsAction(response));
+      if (config.authenticated) {
+        yield put(actions.authenticated.responseFilteredContactsAction(response));
+      }
     } catch (e: unknown) {
       notifications.requestError(e as Error, "There was an error retrieving the contacts.");
       yield put(actions.responseContactsAction({ count: 0, data: [] }));
+      if (config.authenticated) {
+        yield put(actions.authenticated.responseFilteredContactsAction({ count: 0, data: [] }));
+      }
     } finally {
       yield put(actions.loadingContactsAction(false));
+    }
+  }
+  return { request };
+};
+
+export const createFilteredTaskSet = (): Redux.TaskMapObject<Redux.ModelListResponseTaskMap> => {
+  function* request(action: Redux.Action<null>): SagaIterator {
+    yield put(actions.authenticated.loadingFilteredContactsAction(true));
+    let query: Http.ListQuery = yield select((state: Application.Authenticated.Store) => ({
+      search: state.filteredContacts.search
+    }));
+    try {
+      const response: Http.ListResponse<M> = yield api.request(api.getContacts, query);
+      yield put(actions.authenticated.responseFilteredContactsAction(response));
+    } catch (e: unknown) {
+      notifications.requestError(e as Error, "There was an error retrieving the contacts.");
+      yield put(actions.authenticated.responseFilteredContactsAction({ count: 0, data: [] }));
+    } finally {
+      yield put(actions.authenticated.loadingFilteredContactsAction(false));
     }
   }
   return { request };

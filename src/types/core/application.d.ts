@@ -36,6 +36,7 @@ namespace Application {
       readonly loading: boolean;
       readonly user: Model.User;
       readonly contacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
+      readonly filteredContacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
     }
     /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
     type StaticReducers = Redux.ReducersMapObject<StaticStores>;
