@@ -73,7 +73,7 @@ const EditAttachmentsModal = ({
       destroyOnClose={true}
       getContainer={false}
       title={"Attachments"}
-      titleIcon={"file-alt"}
+      titleIcon={"paperclip"}
       loading={loadingAttachments}
       footer={null}
     >
