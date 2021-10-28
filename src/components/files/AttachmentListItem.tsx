@@ -22,7 +22,9 @@ const AttachmentListItem = ({ attachment, deleting, onClick, ...props }: Attachm
       <div className={"action-wrapper"}>
         <FileIcon className={"icon--attachment"} name={attachment.name} ext={attachment.extension} />
       </div>
-      <div className={"text-wrapper"}>{attachment.name}</div>
+      <div className={"text-wrapper"} style={{ marginRight: 4 }}>
+        {attachment.name}
+      </div>
       <div style={{ display: "flex", flexGrow: 100, justifyContent: "right" }}>
         <div className={"text-wrapper size"}>{util.files.fileSizeString(attachment.size)}</div>
         <div className={"action-wrapper"}>
