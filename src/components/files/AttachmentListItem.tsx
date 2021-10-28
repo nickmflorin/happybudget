@@ -26,9 +26,6 @@ const AttachmentListItem = ({ attachment, deleting, onClick, ...props }: Attachm
       <div style={{ display: "flex", flexGrow: 100, justifyContent: "right" }}>
         <div className={"text-wrapper size"}>{util.files.fileSizeString(attachment.size)}</div>
         <div className={"action-wrapper"}>
-          <Icon className={"icon--attachment"} icon={"server"} />
-        </div>
-        <div className={"action-wrapper"}>
           <IconButton
             disabled={downloading}
             loading={downloading}
