@@ -30,7 +30,7 @@ const Columns: Table.Column<R, M>[] = [
   }),
   tabling.columns.BodyColumn<R, M>({
     field: "name",
-    headerName: "Description",
+    headerName: "Name",
     minWidth: 200,
     flex: 3,
     columnType: "longText"
