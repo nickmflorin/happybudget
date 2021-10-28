@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { isNil } from "lodash";
 
 import { model } from "lib";
@@ -71,4 +71,4 @@ const UserImageOrInitials = ({
   }
 };
 
-export default UserImageOrInitials;
+export default React.memo(UserImageOrInitials);

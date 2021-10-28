@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 import { model } from "lib";
@@ -37,4 +37,4 @@ const UserImage = ({ user, src, ...props }: UserImageProps): JSX.Element => {
   );
 };
 
-export default UserImage;
+export default React.memo(UserImage);

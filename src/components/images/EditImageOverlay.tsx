@@ -41,4 +41,4 @@ const EditImageOverlay = ({ onClear, isImage, ...props }: EditImageOverlayProps)
   );
 };
 
-export default EditImageOverlay;
+export default React.memo(EditImageOverlay);

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
@@ -76,4 +76,4 @@ const UserInitials = ({
   );
 };
 
-export default UserInitials;
+export default React.memo(UserInitials);

@@ -81,4 +81,4 @@ const EntityText: React.FC<EntityTextProps> = ({ children, className, fillEmpty,
   );
 };
 
-export default EntityText;
+export default React.memo(EntityText);
