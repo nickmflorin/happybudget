@@ -121,9 +121,12 @@ const AccountTable = ({
                 let subRows: JSX.Element[] = reduce(
                   filter(
                     subTable,
-                    (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) || tabling.typeguards.isGroupRow(r)
+                    (r: Table.BodyRow<R>) =>
+                      tabling.typeguards.isModelRow(r) ||
+                      tabling.typeguards.isGroupRow(r) ||
+                      tabling.typeguards.isMarkupRow(r)
                   ) as (Table.ModelRow<R> | Table.GroupRow<R>)[],
-                  (subRws: JSX.Element[], detailRow: Table.ModelRow<R> | Table.GroupRow<R>) => {
+                  (subRws: JSX.Element[], detailRow: Table.ModelRow<R> | Table.GroupRow<R> | Table.MarkupRow<R>) => {
                     if (tabling.typeguards.isModelRow(detailRow) || tabling.typeguards.isMarkupRow(detailRow)) {
                       return [
                         ...subRws,
@@ -133,8 +136,6 @@ const AccountTable = ({
                           row={detailRow}
                           data={table}
                           cellProps={{
-                            cellContentsVisible: (params: Table.PdfCellCallbackParams<R, M>) =>
-                              params.column.field === "identifier" ? false : true,
                             textClassName: "detail-tr-td-text",
                             className: (params: Table.PdfCellCallbackParams<R, M>) => {
                               if (params.column.field === "description") {
@@ -170,9 +171,7 @@ const AccountTable = ({
                     <BodyRow
                       cellProps={{
                         className: "subaccount-td",
-                        textClassName: "subaccount-tr-td-text",
-                        cellContentsInvisible: (params: Table.PdfCellCallbackParams<R, M>) =>
-                          tabling.columns.normalizedField(params.column) !== "description"
+                        textClassName: "subaccount-tr-td-text"
                       }}
                       className={"subaccount-tr"}
                       columns={subAccountColumns}
