@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { isNil, filter, reduce, find, map } from "lodash";
+import { isNil, filter, reduce, find, map, includes } from "lodash";
 import classNames from "classnames";
 
 import { tabling, hooks, model } from "lib";
@@ -171,7 +171,9 @@ const AccountTable = ({
                     <BodyRow
                       cellProps={{
                         className: "subaccount-td",
-                        textClassName: "subaccount-tr-td-text"
+                        textClassName: "subaccount-tr-td-text",
+                        cellContentsInvisible: (params: Table.PdfCellCallbackParams<R, M>) =>
+                          !includes(["description", "identifier"], tabling.columns.normalizedField(params.column))
                       }}
                       className={"subaccount-tr"}
                       columns={subAccountColumns}
