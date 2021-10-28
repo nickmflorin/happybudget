@@ -34,6 +34,7 @@ const FringesEditor = (props: FringesEditorProps, ref: ForwardedRef<any>) => {
       mode={"multiple"}
       menu={editor.menu}
       includeSearch={true}
+      clientSearching={true}
       selected={editor.value}
       models={
         filter(
@@ -54,7 +55,7 @@ const FringesEditor = (props: FringesEditorProps, ref: ForwardedRef<any>) => {
         const ms = map(selectedStates, (s: IMenuItemState<Tables.FringeRow>) => s.model.id);
         editor.onChange(ms, e.event, false);
       }}
-      searchIndices={["data.name"]}
+      searchIndices={[["data", "name"]]}
       focusSearchOnCharPress={true}
       extra={[
         {
