@@ -321,7 +321,8 @@ namespace Model {
   interface Actual extends TrackedModel {
     readonly type: "actual";
     readonly contact: number | null;
-    readonly description: string | null;
+    readonly name: string | null;
+    readonly notes: string | null;
     readonly purchase_order: string | null;
     readonly date: string | null;
     readonly payment_id: string | null;

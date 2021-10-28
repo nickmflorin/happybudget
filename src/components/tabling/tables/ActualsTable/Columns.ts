@@ -29,7 +29,7 @@ const Columns: Table.Column<R, M>[] = [
     cellEditor: "OwnerTreeEditor"
   }),
   tabling.columns.BodyColumn<R, M>({
-    field: "description",
+    field: "name",
     headerName: "Description",
     minWidth: 200,
     flex: 3,

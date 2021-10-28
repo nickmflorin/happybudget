@@ -91,8 +91,8 @@ const ActualsTable = ({
         showPageFooter={false}
         menuPortalId={"supplementary-header"}
         cookieNames={{ hiddenColumns: "actuals-table-hidden-columns" }}
-        getModelRowName={(r: Table.ModelRow<R>) => r.data.description}
-        getPlaceholderRowName={(r: Table.PlaceholderRow<R>) => r.data.description}
+        getModelRowName={(r: Table.ModelRow<R>) => r.data.name}
+        getPlaceholderRowName={(r: Table.PlaceholderRow<R>) => r.data.name}
         getModelRowLabel={"Sub Account"}
         getPlaceholderRowLabel={"Sub Account"}
         framework={Framework}

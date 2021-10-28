@@ -34,7 +34,7 @@ namespace Tables {
 
   type ActualRowData = Pick<
     Model.Actual,
-    "description" | "purchase_order" | "date" | "actual_type" | "payment_id" | "value" | "contact" | "owner" | "attachments"
+    "name" | "notes" | "purchase_order" | "date" | "actual_type" | "payment_id" | "value" | "contact" | "owner" | "attachments"
   >;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
