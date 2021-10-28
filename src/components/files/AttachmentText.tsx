@@ -24,4 +24,4 @@ const AttachmentText: React.FC<AttachmentTextProps> = ({ children, additionalCou
   );
 };
 
-export default AttachmentText;
+export default React.memo(AttachmentText);

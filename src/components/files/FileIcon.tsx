@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { isNil, find, includes } from "lodash";
 
 import { util } from "lib";
@@ -74,4 +74,4 @@ const FileIcon = ({ name, ext, ...props }: FileIconProps) => {
   return <Icon {...props} icon={icon} />;
 };
 
-export default FileIcon;
+export default React.memo(FileIcon);

@@ -35,4 +35,4 @@ const Color = ({ color, selected, className, noValueColor, onClick, style = {} }
   );
 };
 
-export default Color;
+export default React.memo(Color);

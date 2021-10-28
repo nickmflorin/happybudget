@@ -4,7 +4,7 @@ import { filter } from "lodash";
 
 import { hooks, model, tabling } from "lib";
 
-import { Tag } from "components/tagging";
+import { MultipleTags } from "components/tagging";
 import { Cell } from "components/tabling/generic/framework/cells";
 
 export interface FringesCellProps
@@ -29,7 +29,7 @@ const FringesCell = ({ value, onAddFringes, ...props }: FringesCellProps): JSX.E
   return (
     <Cell<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore> {...props}>
       <div style={{ display: "flex", justifyContent: "left" }}>
-        <Tag.Multiple<Tables.FringeRow> models={applicableFringes} />
+        <MultipleTags<Tables.FringeRow> models={applicableFringes} />
       </div>
     </Cell>
   );

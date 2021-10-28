@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 import "./Separator.scss";
@@ -21,4 +22,4 @@ const Separator: React.FC<SeparatorProps> = ({ className, style, margin, color }
   return <div className={classNames("separator", className)} style={style}></div>;
 };
 
-export default Separator;
+export default React.memo(Separator);
