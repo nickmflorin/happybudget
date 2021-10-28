@@ -5,7 +5,8 @@ import { isNil } from "lodash";
 
 import { util, notifications } from "lib";
 
-import { ClientError, NetworkError, ServerError } from "./errors";
+import * as codes from "./codes";
+import * as errors from "./errors";
 
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -82,21 +83,21 @@ const throwClientError = (error: AxiosError<Http.ErrorResponse>, options: Http.R
         // On 404's Django will sometimes bypass DRF exception handling and
         // return a 404.html template response.  We should bypass this in the
         // backend, but for the time being we can manually raise a ClientError.
-        throw new ClientError({
+        throw new errors.ClientError({
           response,
           errors: [
             {
               message: "The requested resource could not be found.",
-              code: "not_found",
-              error_type: "http"
-            }
+              code: codes.ErrorCodes.NOT_FOUND,
+              error_type: errors.ApiErrorTypes.HTTP
+            } as Http.Error
           ],
           status: response.status,
           url
         });
       }
     } else if (!isNil(response.data.errors)) {
-      throw new ClientError({
+      throw new errors.ClientError({
         response,
         errors: response.data.errors,
         status: response.status,
@@ -108,9 +109,15 @@ const throwClientError = (error: AxiosError<Http.ErrorResponse>, options: Http.R
           The response body from the backend does not conform to a standard convention for indicating
           a client error - the specific type of error cannot be determined.
       `);
-      throw new ClientError({
+      throw new errors.ClientError({
         response,
-        errors: [{ message: "Unknown client error.", error_type: "unknown", code: "unknown" }],
+        errors: [
+          {
+            message: "Unknown client error.",
+            error_type: errors.ApiErrorTypes.UNKNOWN,
+            code: codes.ErrorCodes.UNKNOWN
+          } as Http.Error
+        ],
         status: response.status,
         url
       });
@@ -127,10 +134,10 @@ instance.interceptors.response.use(
         throwClientError(error, response.config);
       } else {
         const url = !isNil(error.request.config) ? error.request.config.url : undefined;
-        throw new ServerError({ status: error.response.status, url });
+        throw new errors.ServerError({ status: error.response.status, url });
       }
     } else if (!isNil(error.request)) {
-      throw new NetworkError({ url: !isNil(error.request.config) ? error.request.conf.url : undefined });
+      throw new errors.NetworkError({ url: !isNil(error.request.config) ? error.request.conf.url : undefined });
     } else {
       throw error;
     }

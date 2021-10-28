@@ -1,13 +1,19 @@
 namespace Http {
   type ErrorType = "unknown" | "http" | "field" | "global" | "auth";
 
+  type FileErrorCode = "invalid_file_name" | "invalid_file_extension";
+
+  type GlobalErrorCode = FileErrorCode | "pdf_error" | "rate_limited";
+
   type FieldErrorCode =
     | "unique"
     | "invalid"
     | "required"
     | "email_does_not_exist"
     | "invalid_credentials";
+
   type TokenErrorCode = "token_expired" | "token_not_valid";
+
   type AuthErrorCode =
     | TokenErrorCode
     | "email_not_verified"
@@ -15,8 +21,13 @@ namespace Http {
     | "account_not_authenticated"
     | "invalid_social_token"
     | "invalid_social_provider";
+
   type HttpErrorCode = "not_found";
+
   type UnknownErrorCode = "unknown";
+
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type ErrorCode = AuthErrorCode | HttpErrorCode | UnknownErrorCode | FieldErrorCode | GlobalErrorCode
 
   interface IApiError<T extends ErrorType = ErrorType, C extends string = string> {
     readonly code: C;
@@ -48,10 +59,10 @@ namespace Http {
     readonly response: import("axios").AxiosResponse<any>;
     readonly errors: Http.Error[];
     readonly userId?: number;
-    readonly globalErrors: GlobalError[];
-    readonly authenticationErrors: AuthError[];
-    readonly httpErrors: HttpError[];
-    readonly unknownErrors: UnknownError[];
+    readonly globalError: GlobalError | null;
+    readonly authenticationError: AuthError | null;
+    readonly httpError: HttpError | null;
+    readonly unknownError: UnknownError | null;
     readonly fieldErrors: FieldError[];
   }
 
@@ -59,7 +70,7 @@ namespace Http {
   type FieldError = IApiError<"field", FieldErrorCode> & {
     readonly field: string;
   };
-  type GlobalError = IApiError<"global">;
+  type GlobalError = IApiError<"global", GlobalErrorCode>;
   type HttpError = IApiError<"http", HttpErrorCode>;
   type AuthError = IApiError<"auth", AuthErrorCode>;
 

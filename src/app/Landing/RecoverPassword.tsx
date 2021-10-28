@@ -52,7 +52,7 @@ const RecoverPassword = (): JSX.Element => {
               // token here.  If however we do get that error, we just redirect back to the
               // login page and display the error for simplicity case (versus duplicating all the
               // error handling code here).
-              if (e instanceof api.ClientError && e.authenticationErrors.length !== 0) {
+              if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
                 setRedirect({ pathname: "/login", state: { error: e, tokenType: "password-recovery" } });
               } else {
                 form.handleRequestError(e);

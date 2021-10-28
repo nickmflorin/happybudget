@@ -1,5 +1,6 @@
 import { AxiosResponse } from "axios";
 import { isNil, map } from "lodash";
+import * as codes from "./codes";
 import * as util from "./util";
 
 /* eslint-disable no-shadow */
@@ -9,6 +10,14 @@ export enum HttpErrorTypes {
   NETWORK = "NETWORK",
   SERVER = "SERVER",
   AUTHENTICATION = "AUTHENTICATION"
+}
+
+export enum ApiErrorTypes {
+  AUTH = "auth",
+  UNKNOWN = "unknown",
+  HTTP = "http",
+  FIELD = "field",
+  GLOBAL = "global"
 }
 
 /**
@@ -76,7 +85,7 @@ export class ClientError extends HttpError implements Http.IHttpClientError {
   constructor(
     config: Omit<
       Http.IHttpClientError,
-      "message" | "name" | "authenticationErrors" | "httpErrors" | "fieldErrors" | "globalErrors" | "unknownErrors"
+      "message" | "name" | "authenticationError" | "httpError" | "fieldErrors" | "globalError" | "unknownError"
     >
   ) {
     super(
@@ -87,27 +96,27 @@ export class ClientError extends HttpError implements Http.IHttpClientError {
     this.url = config.url;
     this.response = config.response;
     this.status = config.status;
-    this.errors = map(config.errors, (e: Http.Error) => util.standardizeError(e));
+    this.errors = map(config.errors, (e: Http.Error) => codes.standardizeError(e));
   }
 
-  public get authenticationErrors(): Http.AuthError[] {
-    return util.parseAuthErrors(this);
+  public get authenticationError(): Http.AuthError | null {
+    return util.parseAuthError(this);
   }
 
-  public get httpErrors(): Http.HttpError[] {
-    return util.parseHttpErrors(this);
+  public get httpError(): Http.HttpError | null {
+    return util.parseHttpError(this);
   }
 
   public get fieldErrors(): Http.FieldError[] {
     return util.parseFieldErrors(this);
   }
 
-  public get globalErrors(): Http.GlobalError[] {
-    return util.parseGlobalErrors(this);
+  public get globalError(): Http.GlobalError | null {
+    return util.parseGlobalError(this);
   }
 
-  public get unknownErrors(): Http.UnknownError[] {
-    return util.parseUnknownErrors(this);
+  public get unknownError(): Http.UnknownError | null {
+    return util.parseUnknownError(this);
   }
 }
 

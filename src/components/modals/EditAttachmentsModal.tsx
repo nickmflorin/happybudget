@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { FilePond } from "react-filepond";
-import { filter } from "lodash";
+import { filter, isNil } from "lodash";
 import classNames from "classnames";
 import { ActualFileObject, FilePondFile, ProgressServerConfigFunction } from "filepond/types";
 import { ModalProps as RootModalProps } from "antd/lib/modal";
@@ -91,6 +91,9 @@ const EditAttachmentsModal = ({
         onupdatefiles={setFiles}
         allowMultiple={true}
         labelIdle={"Drag & Drop or Click to Browse"}
+        labelFileProcessingError={(error: any) => {
+          return error.body || "There was an error processing the attachment.";
+        }}
         name={"files"}
         server={{
           revert: (uniqueFileId: string, load: () => void, error: (text: string) => void) => {
@@ -138,7 +141,31 @@ const EditAttachmentsModal = ({
                 load(String(data.id));
                 onAttachmentAdded?.(data);
               } else {
-                error("There was an error processing the attachment.");
+                let errorData: Http.ErrorResponse | null = null;
+                try {
+                  errorData = JSON.parse(request.response);
+                } catch (e) {
+                  if (e instanceof SyntaxError) {
+                    console.warn("Could not parse error data from response while uploading attachment.");
+                    error("There was an error processing the attachment.");
+                  } else {
+                    throw e;
+                  }
+                }
+                if (!isNil(errorData)) {
+                  const fieldError = api.parseFieldError(errorData.errors, "file");
+                  const globalError = api.parseGlobalError(errorData.errors);
+                  if (!isNil(globalError)) {
+                    error(globalError.message);
+                  } else if (!isNil(fieldError)) {
+                    error(fieldError.message);
+                  } else {
+                    console.warn("Unexpected error returned when uploading attachment. \n" + JSON.stringify(errorData));
+                    error("There was an error processing the attachment.");
+                  }
+                } else {
+                  error("There was an error processing the attachment.");
+                }
               }
             };
             request.send(formData);

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Route, Redirect } from "react-router-dom";
+import { isNil } from "lodash";
 import axios from "axios";
 
 import * as api from "api";
@@ -31,7 +32,7 @@ const PrivateRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
       })
       .catch((e: Error) => {
         if (!axios.isCancel(e)) {
-          if (e instanceof api.ClientError && e.authenticationErrors.length !== 0) {
+          if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
             setRedirect(true);
           } else {
             notifications.requestError(e, { notifyUser: false });

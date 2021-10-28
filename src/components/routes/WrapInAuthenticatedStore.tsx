@@ -34,7 +34,7 @@ const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): 
       })
       .catch((e: Error) => {
         if (!axios.isCancel(e)) {
-          if (e instanceof api.ClientError && e.authenticationErrors.length !== 0) {
+          if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
             setRedirect(true);
           } else {
             notifications.requestError(e, { notifyUser: false });

@@ -23,13 +23,13 @@ const Login = (): JSX.Element => {
 
   const handleTokenError = useMemo(
     () => (e: Http.IApiError<"auth", Http.TokenErrorCode>, tokenType: Http.TokenType, userId?: number | undefined) => {
-      if (e.code === "token_expired" && isNil(userId)) {
+      if (e.code === api.ErrorCodes.TOKEN_EXPIRED && isNil(userId)) {
         console.error(
           `The token of type ${location.state.tokenType} has expired, but we cannot
               resend the email because the response did not include the user's ID.`
         );
       }
-      if (isNil(userId) || e.code === "token_not_valid") {
+      if (isNil(userId) || e.code === api.ErrorCodes.TOKEN_INVALID) {
         form.notify(<TokenNotification tokenType={tokenType} userId={userId} code={e.code} />);
       } else {
         form.notify(
@@ -58,12 +58,12 @@ const Login = (): JSX.Element => {
 
   const handleAuthError = useMemo(
     () => (e: Http.AuthError, userId?: number | undefined, tokenType?: Http.TokenType) => {
-      if (includes(["token_expired", "token_not_valid"], e.code)) {
+      if (includes([api.ErrorCodes.TOKEN_EXPIRED, api.ErrorCodes.TOKEN_INVALID], e.code)) {
         if (!isNil(tokenType)) {
           handleTokenError(e as Http.IApiError<"auth", Http.TokenErrorCode>, tokenType, userId);
           return true;
         }
-      } else if (e.code === "email_not_verified") {
+      } else if (e.code === api.ErrorCodes.EMAIL_NOT_VERIFIED) {
         if (isNil(userId)) {
           console.error(
             `The user's email confirmation token has expired, but we cannot
@@ -97,8 +97,8 @@ const Login = (): JSX.Element => {
 
   const handleError = useMemo(
     () => (e: Error) => {
-      if (e instanceof api.ClientError && e.authenticationErrors.length !== 0) {
-        const handled = handleAuthError(e.authenticationErrors[0], e.userId, location.state?.tokenType);
+      if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
+        const handled = handleAuthError(e.authenticationError, e.userId, location.state?.tokenType);
         if (!handled) {
           form.handleRequestError(e);
         }
