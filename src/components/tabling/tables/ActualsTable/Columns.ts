@@ -95,6 +95,14 @@ const Columns: Table.Column<R, M>[] = [
     valueSetter: tabling.valueSetters.floatValueSetter<R>("value"),
     cellRenderer: "BodyCell",
     columnType: "currency"
+  }),
+  tabling.columns.BodyColumn<R, M>({
+    field: "notes",
+    headerName: "Notes",
+    width: 100,
+    minWidth: 100,
+    flex: 1,
+    columnType: "longText"
   })
 ];
 
