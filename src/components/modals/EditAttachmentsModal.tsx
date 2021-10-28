@@ -139,6 +139,7 @@ const EditAttachmentsModal = ({
               if (request.status >= 200 && request.status < 300) {
                 const data: Model.Attachment = JSON.parse(request.response);
                 load(String(data.id));
+                setAttachments([...attachments, data]);
                 onAttachmentAdded?.(data);
               } else {
                 let errorData: Http.ErrorResponse | null = null;
