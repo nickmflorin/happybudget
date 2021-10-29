@@ -101,7 +101,7 @@ const AccountsTable = ({ budgetId, budget, setPreviewModalVisible }: AccountsTab
           rows === undefined ? onCreateMarkup() : onCreateMarkup(map(rows, (row: Table.ModelRow<R>) => row.id))
         }
         onEditGroup={(group: Table.GroupRow<R>) => onEditGroup(group)}
-        onEditMarkup={(row: Table.MarkupRow<R>) => onEditMarkup(tabling.rows.markupId(row.id))}
+        onEditMarkup={(row: Table.MarkupRow<R>) => onEditMarkup(tabling.managers.markupId(row.id))}
       />
       {groupModals}
       {markupModals}

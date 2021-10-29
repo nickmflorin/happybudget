@@ -13,7 +13,7 @@ const NewRowCell = (props: Table.CellProps<any, any, any, null>): JSX.Element =>
       onClick={() =>
         props.onChangeEvent?.({
           type: "rowAdd",
-          payload: { id: tabling.rows.placeholderRowId(), data: props.generateNewRowData?.(props.data) }
+          payload: { id: tabling.managers.placeholderRowId(), data: props.generateNewRowData?.(props.data) }
         })
       }
     />

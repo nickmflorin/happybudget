@@ -1,4 +1,4 @@
-import { tabling } from "lib";
+import { tabling, model } from "lib";
 
 export type FringeTableActionMap = Redux.TableActionMap<Model.Fringe> & {
   readonly responseFringeColors: Http.ListResponse<string>;
@@ -35,11 +35,9 @@ export type AuthenticatedFringeTableActionMap = Redux.AuthenticatedTableActionMa
 
 /* eslint-disable indent */
 export const createAuthenticatedFringesTableReducer = (
-  config: Table.ReducerConfig<
-    Tables.FringeRowData,
-    Model.Fringe,
-    Tables.FringeTableStore,
-    AuthenticatedFringeTableActionMap
+  config: Omit<
+    Table.ReducerConfig<Tables.FringeRowData, Model.Fringe, Tables.FringeTableStore, AuthenticatedFringeTableActionMap>,
+    "defaultData"
   >
 ): Redux.Reducer<Tables.FringeTableStore> => {
   type S = Tables.FringeTableStore;
@@ -48,7 +46,13 @@ export const createAuthenticatedFringesTableReducer = (
     Tables.FringeRowData,
     Model.Fringe,
     Tables.FringeTableStore
-  >(config);
+  >({
+    ...config,
+    defaultData: {
+      unit: model.models.FringeUnitModels.PERCENT,
+      rate: 0.0
+    }
+  });
 
   return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
     let newState = generic(state, action);

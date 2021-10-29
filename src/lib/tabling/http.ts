@@ -1,6 +1,6 @@
 import { isNil, filter, reduce } from "lodash";
 
-import * as rows from "./rows";
+import * as managers from "./managers";
 
 /* eslint-disable indent */
 export const patchPayloadForChange = <
@@ -44,7 +44,7 @@ export const bulkPatchPayloadForChange = <
 ): Http.ModelBulkUpdatePayload<P> | null => {
   const patchPayload = patchPayloadForChange<R, P, M, I>(change, columns);
   if (!isNil(patchPayload)) {
-    return { id: rows.editableId(change.id), ...patchPayload };
+    return { id: managers.editableId(change.id), ...patchPayload };
   }
   return null;
 };

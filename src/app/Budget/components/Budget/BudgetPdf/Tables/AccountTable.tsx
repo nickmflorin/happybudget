@@ -53,22 +53,26 @@ const AccountTable = ({
   }, [columns, subAccountColumns]);
 
   const accountSubHeaderRow: Tables.AccountRow = useMemo(() => {
-    return tabling.rows.createModelRow<Tables.AccountRowData, Model.PdfAccount>({
+    const accountRowManager = new tabling.managers.ModelRowManager<Tables.AccountRowData, Model.PdfAccount>({
+      columns
+    });
+    return accountRowManager.create({
       model: account,
-      columns,
-      originalIndex: 0 // Irrelevant for this row since we are not ordering it.
+      originalIndex: 0 // Irrelevant for PDF rows since they are not dynamic.
     });
   }, [account, columns]);
 
   const generateRows = hooks.useDynamicCallback((): JSX.Element[] => {
+    const subAccountRowManager = new tabling.managers.ModelRowManager<Tables.SubAccountRowData, Model.PdfSubAccount>({
+      columns: subAccountColumns
+    });
     const createSubAccountFooterRow = (subaccount: M): Table.ModelRow<R> => {
-      return tabling.rows.createModelRow<R, M>({
+      return subAccountRowManager.create({
         model: subaccount,
-        originalIndex: 0, // Irrelevant for this row since we are not ordering it.
-        columns: subAccountColumns,
+        originalIndex: 0, // Irrelevant for PDF rows since they are not dynamic.
         getRowValue: (m: Model.PdfSubAccount, c: Table.PdfColumn<R, M>) => {
-          if (!isNil(c.pdfChildFooter) && !isNil(c.pdfChildFooter(subaccount).value)) {
-            return c.pdfChildFooter(subaccount).value;
+          if (!isNil(c.pdfChildFooter) && !isNil(c.pdfChildFooter(m).value)) {
+            return c.pdfChildFooter(m).value;
           }
         }
       });

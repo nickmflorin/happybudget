@@ -177,3 +177,33 @@ export const consolidateDataChangeEvents = <
   );
   return { type: "dataChange", payload: consolidateRowChanges(rowChanges) };
 };
+
+export const mergeChangesWithRow = <R extends Table.RowData>(
+  id: Table.RowId,
+  row: Table.EditableRow<R>,
+  changes: Table.DataChangePayload<R>
+): Table.EditableRow<R> => {
+  const consolidated: Table.ConsolidatedChange<R> = consolidateRowChanges<R>(changes);
+  return {
+    ...row,
+    data: reduce(
+      consolidated,
+      (curr: R, change: Table.RowChange<R>) => {
+        if (change.id !== id) {
+          console.error("Cannot apply table changes from one row to another row!");
+          return curr;
+        } else {
+          let field: keyof R;
+          for (field in change.data) {
+            const cellChange = util.getKeyValue<Table.RowChangeData<R>, keyof R>(field)(
+              change.data
+            ) as Table.CellChange<R>;
+            curr = { ...curr, [field as string]: cellChange.newValue };
+          }
+          return curr;
+        }
+      },
+      { ...row.data }
+    )
+  };
+};

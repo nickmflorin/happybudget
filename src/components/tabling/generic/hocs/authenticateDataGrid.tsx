@@ -223,7 +223,7 @@ const authenticateDataGrid =
         onNewRowRequired: () =>
           props.onChangeEvent({
             type: "rowAdd",
-            payload: { id: tabling.rows.placeholderRowId(), data: props.generateNewRowData?.(props.data) }
+            payload: { id: tabling.managers.placeholderRowId(), data: props.generateNewRowData?.(props.data) }
           })
       });
 

@@ -26,7 +26,7 @@ export const injectMarkupsAndGroups = <
 ): (A | B | C)[] => {
   let modelsWithoutGroups: A[] = [];
 
-  const groupId = (obj: C) => (tabling.typeguards.isRow(obj) ? tabling.rows.groupId(obj.id) : obj.id);
+  const groupId = (obj: C) => (tabling.typeguards.isRow(obj) ? tabling.managers.groupId(obj.id) : obj.id);
 
   const modelGroup = (obj: A): C | null => {
     const groupsForModel: C[] | undefined = filter(config.groups, (g: C) => includes(g.children, obj.id));
@@ -101,40 +101,29 @@ export const orderTableRows = <R extends Table.RowData, M extends Model.TypedHtt
 export const createTableRows = <R extends Table.RowData, M extends Model.TypedHttpModel>(
   config: Table.CreateTableDataConfig<R, M>
 ): Table.BodyRow<R>[] => {
+  const modelRowManager = new tabling.managers.ModelRowManager<R, M>({
+    getRowChildren: config.getModelRowChildren,
+    columns: config.columns
+  });
+  const groupRowManager = new tabling.managers.GroupRowManager<R, M>({ columns: config.columns });
+  const markupRowManager = new tabling.managers.MarkupRowManager<R, M>({ columns: config.columns });
   return orderTableRows([
     ...reduce(
       config.response.models,
       (curr: Table.ModelRow<R>[], m: M, index: number) => [
         ...curr,
-        tabling.rows.createModelRow<R, M>({
-          originalIndex: index,
-          model: m,
-          columns: config.columns,
-          getRowChildren: config.getModelRowChildren
-        })
+        modelRowManager.create({ originalIndex: index, model: m })
       ],
       []
     ),
     ...reduce(
       config.response.groups === undefined ? [] : config.response.groups,
-      (curr: Table.GroupRow<R>[], g: Model.Group) => [
-        ...curr,
-        tabling.rows.createGroupRow<R, M>({
-          columns: config.columns,
-          model: g
-        })
-      ],
+      (curr: Table.GroupRow<R>[], g: Model.Group) => [...curr, groupRowManager.create({ model: g })],
       []
     ),
     ...reduce(
       config.response.markups === undefined ? [] : config.response.markups,
-      (curr: Table.MarkupRow<R>[], mk: Model.Markup) => [
-        ...curr,
-        tabling.rows.createMarkupRow<R, M>({
-          model: mk,
-          columns: config.columns
-        })
-      ],
+      (curr: Table.MarkupRow<R>[], mk: Model.Markup) => [...curr, markupRowManager.create({ model: mk })],
       []
     )
   ]);

@@ -169,7 +169,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.Http
                 return [
                   ...curr,
                   {
-                    id: tabling.rows.placeholderRowId(),
+                    id: tabling.managers.placeholderRowId(),
                     data: reduce(
                       cols,
                       /* eslint-disable indent */

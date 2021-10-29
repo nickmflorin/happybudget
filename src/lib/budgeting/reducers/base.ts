@@ -62,14 +62,14 @@ export const createBudgetTableChangeEventReducer = <
   return (state: S = config.initialState, action: Redux.Action<Table.ChangeEvent<R, M>>): S => {
     let newState: S = generic(state, action);
 
+    const markupRowManager = new tabling.managers.MarkupRowManager({ columns: config.columns });
+
     const e: Table.ChangeEvent<R, M> = action.payload;
     if (tabling.typeguards.isMarkupAddedEvent(e)) {
       const markup: Model.Markup = e.payload;
 
-      const markupRow = tabling.rows.createMarkupRow<R, M>({
-        columns: config.columns,
-        model: markup
-      });
+      const markupRow = markupRowManager.create({ model: markup });
+
       // Insert the new MarkupRow(s) into the table and reorder the rows of the table so that the
       // MarkupRow(s) are in the appropriate location.
       return {
@@ -86,7 +86,7 @@ export const createBudgetTableChangeEventReducer = <
       const markupRow: Table.MarkupRow<R> | null = markupRowFromState<R, S>(
         action,
         newState,
-        tabling.rows.markupRowId(e.payload.id)
+        tabling.managers.markupRowId(e.payload.id)
       );
       if (!isNil(markupRow)) {
         /*
@@ -96,11 +96,7 @@ export const createBudgetTableChangeEventReducer = <
         the MarkupRow to reflect these new values, and then finally update the
         MarkupRow again to reflect the new children.
         */
-        let updatedMarkupRow = tabling.rows.updateMarkupRow<R, M>({
-          row: markupRow,
-          columns: config.columns,
-          model: e.payload
-        });
+        let updatedMarkupRow = markupRowManager.create({ model: e.payload });
 
         const childrenRows = filter(
           newState.data,
@@ -108,7 +104,7 @@ export const createBudgetTableChangeEventReducer = <
         ) as Table.ModelRow<R>[];
 
         // Update the children rows of the MarkupRow to reflect the new MarkupRow data.
-        newState = reduce(
+        return reduce(
           childrenRows,
           (st: S, r: Table.ModelRow<R>) => {
             const otherMarkupRows = filter(
@@ -144,27 +140,9 @@ export const createBudgetTableChangeEventReducer = <
           },
           newState
         );
-        return {
-          ...newState,
-          data: util.replaceInArray<Table.BodyRow<R>>(
-            newState.data,
-            { id: updatedMarkupRow.id },
-            tabling.rows.updateMarkupRow<R, M>({
-              row: updatedMarkupRow,
-              columns: config.columns
-            })
-          )
-        };
       }
     } else if (tabling.typeguards.isRowRemoveFromMarkupEvent(e)) {
-      /*
-      When a Row is removed from a Group, we first have to update the Row(s) in state so that they
-      do not reference that Group, and also update the Group in state so it no longer references the
-      row.  Then, we must recalculate the Group metrics (if applicable) to reflect the new Row(s) it
-      contains.
-      */
       const ids: Table.ModelRowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
-
       const mk = markupRowFromState<R, S>(action, newState, e.payload.markup);
       if (!isNil(mk)) {
         return {
@@ -173,14 +151,7 @@ export const createBudgetTableChangeEventReducer = <
             util.replaceInArray<Table.BodyRow<R>>(
               newState.data,
               { id: mk.id },
-              {
-                ...mk,
-                children: filter(mk.children, (child: number) => !includes(ids, child)),
-                data: tabling.rows.updateMarkupRowData<R, M>({
-                  columns: config.columns,
-                  data: mk.data
-                })
-              }
+              markupRowManager.removeChildren(mk, ids)
             )
           )
         };

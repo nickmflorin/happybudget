@@ -37,7 +37,7 @@ const FooterGrid =
           {...props}
           id={config.id}
           columns={columns}
-          data={[tabling.rows.createFooterRow({ gridId: config.id })]}
+          data={[tabling.managers.createFooterRow({ gridId: config.id })]}
           headerHeight={0}
           rowHeight={config.rowHeight || 38}
           className={classNames("grid--footer", config.className)}

@@ -87,6 +87,8 @@ namespace Table {
   }
 
   type DataRowType = "placeholder" | "model";
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type EditableRowType = "model" | "markup";
   type BodyRowType = DataRowType | "group" | "markup";
   type RowType = BodyRowType | "footer";
 
@@ -127,6 +129,7 @@ namespace Table {
   };
   type PlaceholderRow<R extends RowData> = IBodyRow<PlaceholderRowId, "placeholder", R> & {
     readonly originalIndex: number;
+    readonly children: [];
   };
   type GroupRow<R extends RowData> = IBodyRow<GroupRowId, "group", R> & {
     readonly children: number[];
@@ -746,7 +749,9 @@ namespace Table {
     Omit<CFG, "gridId" | "response"> & {
       readonly initialState: S;
       readonly tableId: Id;
+      readonly defaultData?: Partial<R>;
       readonly createTableRows?: (config: CFG) => BodyRow<R>[];
+      readonly getModelRowChildren?: (m: M) => number[];
     };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */

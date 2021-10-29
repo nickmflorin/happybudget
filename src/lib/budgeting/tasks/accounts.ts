@@ -194,7 +194,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       const effects: (StrictEffect | null)[] = map(changes, (ch: Table.RowChange<R, Table.MarkupRowId>) => {
         const payload = tabling.http.patchPayloadForChange<R, Http.MarkupPayload, C>(ch, config.columns);
         if (!isNil(payload)) {
-          return api.request(api.updateMarkup, tabling.rows.markupId(ch.id), payload);
+          return api.request(api.updateMarkup, tabling.managers.markupId(ch.id), payload);
         }
         return null;
       });
@@ -246,7 +246,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
     if (isAuthenticatedConfig(config) && ids.length !== 0) {
       yield put(config.actions.saving(true));
       try {
-        yield api.request(api.removeMarkupChildren, tabling.rows.markupId(e.payload.markup), { children: ids });
+        yield api.request(api.removeMarkupChildren, tabling.managers.markupId(e.payload.markup), { children: ids });
       } catch (err: unknown) {
         notifications.requestError(err as Error, "There was an error updating the table rows.");
       } finally {
@@ -276,7 +276,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       const requestPayload: Http.BulkUpdatePayload<P> = {
         data: map(ids, (id: Table.ModelRowId) => ({
           id,
-          group: tabling.rows.groupId(e.payload.group)
+          group: tabling.managers.groupId(e.payload.group)
         }))
       };
       yield fork(bulkUpdateTask, objId, requestPayload, "There was an error adding the row to the group.", true);
@@ -303,12 +303,12 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
 
           const markupRowIds = map(
             filter(ids, (id: Table.RowId) => tabling.typeguards.isMarkupRowId(id)) as Table.MarkupRowId[],
-            (id: Table.MarkupRowId) => tabling.rows.markupId(id)
+            (id: Table.MarkupRowId) => tabling.managers.markupId(id)
           ) as number[];
 
           const groupRowIds = map(
             filter(ids, (id: Table.RowId) => tabling.typeguards.isGroupRowId(id)) as Table.GroupRowId[],
-            (id: Table.GroupRowId) => tabling.rows.groupId(id)
+            (id: Table.GroupRowId) => tabling.managers.groupId(id)
           );
 
           try {

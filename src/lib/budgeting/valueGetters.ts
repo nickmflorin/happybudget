@@ -11,7 +11,7 @@ export const estimatedValueGetter = <R extends Tables.BudgetRowData>(
   } else {
     const childrenRows: Table.ModelRow<R>[] = filter(
       rows,
-      (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) && includes(row.children, r.id)
+      (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r) && includes(row.children, r.id)
     ) as Table.ModelRow<R>[];
     if (tabling.typeguards.isMarkupRow(row)) {
       // Markup rows that are of unit FLAT only count towards the overall estimated value once,
@@ -41,7 +41,7 @@ export const actualValueGetter = <R extends Tables.BudgetRowData>(
   } else {
     const childrenRows: Table.ModelRow<R>[] = filter(
       rows,
-      (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) && includes(row.children, r.id)
+      (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r) && includes(row.children, r.id)
     ) as Table.ModelRow<R>[];
     return reduce(childrenRows, (curr: number, r: Table.ModelRow<R>) => curr + r.data.actual, 0.0);
   }

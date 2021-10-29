@@ -12,8 +12,14 @@ export const createUnauthenticatedAccountsTableReducer = (config: ReducerConfig)
 };
 
 export const createAuthenticatedAccountsTableReducer = (
-  config: ReducerConfig<Redux.AuthenticatedTableActionMap<R, M>>
+  config: Omit<ReducerConfig<Redux.AuthenticatedTableActionMap<R, M>>, "defaultData">
 ): Redux.Reducer<S> =>
   createAuthenticatedBudgetTableReducer<R, M, S>({
+    defaultData: {
+      markup_contribution: 0.0,
+      actual: 0.0,
+      accumulated_markup_contribution: 0.0,
+      accumulated_fringe_contribution: 0.0
+    },
     ...config
   });

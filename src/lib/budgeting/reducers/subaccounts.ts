@@ -81,12 +81,22 @@ export type AuthenticatedSubAccountTableActionMap = Redux.AuthenticatedTableActi
 };
 
 export const createAuthenticatedSubAccountsTableReducer = (
-  config: BudgetTableReducerConfig<R, M, S, AuthenticatedSubAccountTableActionMap> & {
-    readonly fringes: Redux.Reducer<Tables.FringeTableStore>;
-  }
+  config: Omit<
+    BudgetTableReducerConfig<R, M, S, AuthenticatedSubAccountTableActionMap> & {
+      readonly fringes: Redux.Reducer<Tables.FringeTableStore>;
+    },
+    "defaultData"
+  >
 ): Redux.Reducer<S> => {
   const generic = createAuthenticatedBudgetTableReducer<R, M, S>({
     ...config,
+    defaultData: {
+      markup_contribution: 0.0,
+      fringe_contribution: 0.0,
+      actual: 0.0,
+      accumulated_markup_contribution: 0.0,
+      accumulated_fringe_contribution: 0.0
+    },
     recalculateRow: recalculateSubAccountRow
   });
 
