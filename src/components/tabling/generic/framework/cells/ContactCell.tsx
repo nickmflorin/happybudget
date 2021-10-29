@@ -26,7 +26,18 @@ const ContactCell = <
 }: ContactCellProps<R, M, S>): JSX.Element => {
   const row: Table.EditableRow<R> = props.node.data;
   const contacts = useContacts();
-  const model = useMemo(() => (!isNil(value) ? find(contacts, { id: value } as any) || null : null), [value, contacts]);
+
+  const model = useMemo(() => {
+    if (!isNil(value)) {
+      const c: Model.Contact | undefined = find(contacts, { id: value } as any);
+      if (isNil(c)) {
+        console.error(`Could not find contact ${value} in store.`);
+        return null;
+      }
+      return c;
+    }
+    return null;
+  }, [value, contacts]);
 
   // TODO: This is a very, very render intensive piece of logic.  We should figure out if there
   // is a better way to do this that doesn't involve getting the focused cell on every render.
