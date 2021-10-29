@@ -90,10 +90,6 @@
         font-weight: 400;
         font-family: $roboto;
 
-        .ag-react-container {
-          width: 100%;
-        }
-
         .inner-cell--header {
           display: flex;
           width: 100%;
@@ -172,12 +168,6 @@
           white-space: nowrap !important;
         }
 
-        &--centered {
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-        }
-
         // In the case that the cell renders HTML (like a tag) it is much easier
         // to vertically center the content with flex than it is to pad each cell
         // to center the rendered HTML.  It is important that we do not apply this
@@ -187,12 +177,6 @@
           display: flex;
           flex-direction: column;
           justify-content: center;
-
-          .ag-react-container {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-          }
         }
 
         &.ag-cell-inline-editing {
@@ -328,6 +312,10 @@
       max-height: calc(100% - 40px);
     }
 
+    .ag-popup-editor {
+      margin-top: 36px;
+    }
+
     .grid--data {
       max-height: calc(100% - 40px);
 
@@ -355,10 +343,9 @@
             border: unset !important;
             text-align: center;
             padding: 2px;
-            .ag-react-container {
-              > * {
-                margin: 0 auto;
-              }
+
+            > * {
+              margin: 0 auto;
             }
           }
 

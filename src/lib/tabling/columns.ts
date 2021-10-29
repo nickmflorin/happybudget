@@ -210,7 +210,7 @@ export const ActionColumn = <R extends Table.RowData, M extends Model.HttpModel 
   editable: false,
   suppressSizeToFit: true,
   resizable: false,
-  cellClass: aggrid.mergeClassNamesFn("cell--centered", "cell--action", col.cellClass),
+  cellClass: aggrid.mergeClassNamesFn("cell--action", col.cellClass),
   canBeHidden: false,
   canBeExported: false
 });
@@ -334,7 +334,8 @@ export const SelectColumn = <
     columnType: "singleSelect",
     suppressSizeToFit: true,
     ...col,
-    editorIsPopup: true,
+    cellEditorPopup: true,
+    cellEditorPopupPosition: "below",
     cellClass: aggrid.mergeClassNamesFn("cell--renders-html", col?.cellClass),
     // Required to allow the dropdown to be selectable on Enter key.
     suppressKeyboardEvent: !isNil(col?.suppressKeyboardEvent)

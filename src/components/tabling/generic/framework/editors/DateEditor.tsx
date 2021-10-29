@@ -27,12 +27,6 @@ const DateEditor = (props: DateEditorProps, ref: any): JSX.Element => {
       },
       isCancelAfterEnd() {
         return false;
-      },
-      isPopup() {
-        return true;
-      },
-      getPopupPosition() {
-        return "under";
       }
     };
   });

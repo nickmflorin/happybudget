@@ -167,7 +167,6 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
             tableColumnType,
             nullValue,
             defaultHidden,
-            editorIsPopup,
             includeInPdf,
             pdfWidth,
             pdfHeaderName,
@@ -268,7 +267,7 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
         if (!isNil(props.tabToNextCell)) {
           return { ...props.tabToNextCell(params), rowPinned: null };
         }
-        return params.nextCellPosition;
+        return params.nextCellPosition === null ? params.previousCellPosition : params.nextCellPosition;
       },
     []
   );
@@ -323,9 +322,9 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
         enterMovesDown={false}
         immutableData={true}
         getRowNodeId={getRowNodeId}
-        debounceVerticalScrollbar={true}
         rowBuffer={50}
         {...props}
+        reactUi={false}
         rowHeight={props.rowHeight === undefined ? 36 : props.rowHeight}
         navigateToNextCell={navigateToNextCell}
         tabToNextCell={tabToNextCell}

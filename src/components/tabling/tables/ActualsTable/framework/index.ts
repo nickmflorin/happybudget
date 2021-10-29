@@ -1,3 +1,5 @@
+import React from "react";
+
 import * as cells from "./cells";
 import * as editors from "./editors";
 
@@ -8,8 +10,8 @@ const FrameworkComponents: Table.Framework = {
   },
   cells: {
     data: {
-      ActualTypeCell: cells.ActualTypeCell,
-      OwnerCell: cells.OwnerCell
+      ActualTypeCell: React.memo(cells.ActualTypeCell),
+      OwnerCell: React.memo(cells.OwnerCell)
     }
   }
 };

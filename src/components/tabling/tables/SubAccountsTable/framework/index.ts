@@ -1,3 +1,5 @@
+import React from "react";
+
 import { framework } from "components/tabling/generic";
 
 import * as cells from "./cells";
@@ -10,8 +12,8 @@ export const Framework: Table.Framework = {
   },
   cells: {
     data: {
-      SubAccountUnitCell: framework.excludeRowsOfType(["group"])(cells.SubAccountUnitCell),
-      FringesCell: framework.excludeRowsOfType(["group"])(cells.FringesCell)
+      SubAccountUnitCell: framework.excludeRowsOfType(["group"])(React.memo(cells.SubAccountUnitCell)),
+      FringesCell: framework.excludeRowsOfType(["group"])(React.memo(cells.FringesCell))
     }
   }
 };

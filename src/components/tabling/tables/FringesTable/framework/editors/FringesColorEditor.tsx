@@ -33,12 +33,6 @@ const FringesColorEditor = (props: FringesColorEditorProps, ref: any) => {
       },
       isCancelAfterEnd() {
         return false;
-      },
-      isPopup() {
-        return true;
-      },
-      getPopupPosition() {
-        return "under";
       }
     };
   });

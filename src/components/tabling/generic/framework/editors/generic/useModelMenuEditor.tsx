@@ -104,12 +104,6 @@ const useModelMenuEditor = <
       },
       isCancelAfterEnd() {
         return false;
-      },
-      isPopup() {
-        return true;
-      },
-      getPopupPosition() {
-        return "under";
       }
     };
   });

@@ -1,3 +1,5 @@
+import React from "react";
+
 import * as cells from "./cells";
 import * as editors from "./editors";
 
@@ -7,8 +9,8 @@ const FrameworkComponents: Table.Framework = {
   },
   cells: {
     data: {
-      ContactTypeCell: cells.ContactTypeCell,
-      ContactNameCell: cells.ContactNameCell
+      ContactTypeCell: React.memo(cells.ContactTypeCell),
+      ContactNameCell: React.memo(cells.ContactNameCell)
     }
   }
 };

@@ -111,7 +111,7 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.HttpModel = 
     (p: TabToNextCellParams): Table.CellPosition => {
       // TODO: We need to figure out how to add additional rows in the write case when we are
       // at the bottom right of the table.
-      if (!p.editing) {
+      if (!p.editing && p.nextCellPosition !== null) {
         if (includes(["index", "expand"], p.nextCellPosition.column.getColId())) {
           let nextCellPosition = { ...p.nextCellPosition };
           /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -133,7 +133,7 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.HttpModel = 
           }
         }
       }
-      return p.nextCellPosition;
+      return p.nextCellPosition === null ? p.previousCellPosition : p.nextCellPosition;
     }
   );
 

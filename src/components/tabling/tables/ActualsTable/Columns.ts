@@ -60,6 +60,8 @@ const Columns: Table.Column<R, M>[] = [
     minWidth: 100,
     flex: 1,
     cellEditor: "DateEditor",
+    cellEditorPopup: true,
+    cellEditorPopupPosition: "below",
     valueFormatter: tabling.formatters.dateValueFormatter,
     valueSetter: tabling.valueSetters.dateTimeValueSetter<R>("date"),
     columnType: "date"

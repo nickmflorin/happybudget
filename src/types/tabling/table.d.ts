@@ -182,9 +182,9 @@ namespace Table {
     readonly id: ColumnTypeId;
     readonly style?: React.CSSProperties;
     readonly icon?: IconOrElement;
-    readonly pdfOverrides?: Omit<Partial<ColumnType>, "id" | "editorIsPopup">;
+    readonly pdfOverrides?: Omit<Partial<ColumnType>, "id">;
     /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-    readonly headerOverrides?: Omit<Partial<ColumnType>, "id" | "editorIsPopup" | "icon" | "pdfOverrides">;
+    readonly headerOverrides?: Omit<Partial<ColumnType>, "id" | "icon" | "pdfOverrides">;
   }
 
   type CellCallbackParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
@@ -305,7 +305,6 @@ namespace Table {
     readonly canBeHidden?: boolean;
     readonly canBeExported?: boolean;
     readonly requiresAuthentication?: boolean;
-    readonly editorIsPopup?: boolean;
     readonly getRowValue?: (m: M) => R[keyof R];
     readonly getHttpValue?: (value: V) => any;
     readonly getCSVValue?: (row: BodyRow<R>) => string;

@@ -187,7 +187,7 @@ const authenticateDataGrid =
                     presses from triggering edit mode in the Cell Editor and clear the value at this level.
                     */
                   const row: Table.BodyRow<R> = params.node.data;
-                  if (tabling.typeguards.isEditableRow(row) && col.editorIsPopup === true) {
+                  if (tabling.typeguards.isEditableRow(row) && col.cellEditorPopup === true) {
                     clearCell(row, col);
                     return true;
                   }
