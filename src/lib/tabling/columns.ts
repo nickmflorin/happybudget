@@ -264,7 +264,7 @@ export const AttachmentsColumn = <
 ): Table.Column<R, M, Model.SimpleAttachment[]> => {
   return {
     ...col,
-    headerName: "Attachment",
+    headerName: "Attachments",
     editable: true,
     requiresAuthentication: true,
     cellRenderer: { data: "AttachmentsCell" },

@@ -77,7 +77,9 @@ const Columns: Table.Column<R, M>[] = [
     cellEditor: "OwnerTreeEditor"
   }),
   tabling.columns.AttachmentsColumn({
-    field: "attachments"
+    field: "attachments",
+    width: 140,
+    minWidth: 140
   }),
   tabling.columns.BodyColumn<R, M>({
     field: "purchase_order",
