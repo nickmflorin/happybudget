@@ -17,7 +17,9 @@ const Columns: Table.Column<R, M>[] = [
     cellRenderer: { data: "ColorCell" },
     cellEditor: "FringesColorEditor",
     width: 100,
-    columnType: "singleSelect"
+    columnType: "singleSelect",
+    cellEditorPopup: true,
+    cellEditorPopupPosition: "below"
   }),
   tabling.columns.BodyColumn<R, M>({
     field: "description",
