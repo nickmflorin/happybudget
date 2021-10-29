@@ -16,7 +16,7 @@ export const createTaskSet = (config: {
   function* request(action: Redux.Action<null>): SagaIterator {
     yield put(actions.loadingContactsAction(true));
     try {
-      const response: Http.ListResponse<M> = yield api.request(api.getContacts, {});
+      const response: Http.ListResponse<M> = yield api.request(api.getContacts, { no_pagination: true });
       yield put(actions.responseContactsAction(response));
       if (config.authenticated) {
         yield put(actions.authenticated.responseFilteredContactsAction(response));
