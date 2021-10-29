@@ -148,7 +148,8 @@ namespace Http {
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type BulkCreatePayload<T extends Payload> = { data: Partial<T>[] };
-  type ModelBulkUpdatePayload<T extends Payload> = (Partial<T> | {}) & { readonly id: number };
+  type ModelBulkUpdatePayload<T extends Payload> = Partial<T> & { readonly id: number };
+
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type BulkUpdatePayload<T extends Payload> = { data: ModelBulkUpdatePayload<T>[] };
 }

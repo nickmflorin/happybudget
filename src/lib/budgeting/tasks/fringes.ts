@@ -1,6 +1,6 @@
 import { SagaIterator } from "redux-saga";
 import { put, call, fork, select, all } from "redux-saga/effects";
-import { map, isNil, filter, intersection } from "lodash";
+import { map, isNil, filter, intersection, reduce } from "lodash";
 
 import * as api from "api";
 import { tabling, budgeting, notifications } from "lib";
@@ -134,37 +134,55 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
       const path = yield select((s: Application.Authenticated.Store) => s.router.location.pathname);
 
+      const FRINGE_QUANTITATIVE_FIELDS: (keyof Http.FringePayload)[] = ["cutoff", "rate", "unit"];
+
+      const payloadWarrantsRecalculation = (p: Http.ModelBulkUpdatePayload<Http.FringePayload>) => {
+        return (
+          filter(
+            map(FRINGE_QUANTITATIVE_FIELDS, (field: keyof Http.FringePayload) => p[field]),
+            (v: any) => v !== undefined
+          ).length !== 0
+        );
+      };
       // If the Fringe(s) that were changed are associated with any models in the active table
-      // (either the AccountTable or the SubAccountTable), we need to request those SubAccount(s)
-      // and update them in the table.  We also need to update the overall Account or SubAccount.
-      if (budgeting.urls.isAccountUrl(path)) {
-        const subaccounts = yield select(config.selectAccountTableData);
-        const fringeIds = map(response.children, (c: Model.Fringe) => c.id);
-        const subaccountsWithFringesChanged: Table.ModelRow<Tables.SubAccountRowData>[] = filter(
-          filter(subaccounts, (r: Tables.SubAccountRow) => tabling.typeguards.isModelRow(r)),
-          (r: Tables.SubAccountRow) => intersection(r.data.fringes, fringeIds).length !== 0
-        ) as Table.ModelRow<Tables.SubAccountRowData>[];
-        if (subaccountsWithFringesChanged.length !== 0) {
+      // (either the AccountTable or the SubAccountTable) that need to be recalculated due to the
+      // applied changes, we need to request those SubAccount(s) and update them in the table.
+      const fringeIds = reduce(
+        requestPayload.data,
+        (curr: number[], p: Http.ModelBulkUpdatePayload<Http.FringePayload>) =>
+          payloadWarrantsRecalculation(p) ? [...curr, p.id] : curr,
+        []
+      );
+      if (fringeIds.length !== 0) {
+        if (budgeting.urls.isAccountUrl(path)) {
+          const subaccounts = yield select(config.selectAccountTableData);
+          const subaccountsWithFringesChanged: Table.ModelRow<Tables.SubAccountRowData>[] = filter(
+            filter(subaccounts, (r: Tables.SubAccountRow) => tabling.typeguards.isModelRow(r)),
+            (r: Tables.SubAccountRow) => intersection(r.data.fringes, fringeIds).length !== 0
+          ) as Table.ModelRow<Tables.SubAccountRowData>[];
+          if (subaccountsWithFringesChanged.length !== 0) {
+            yield put(
+              config.actions.requestAccountTableData({
+                ids: map(subaccountsWithFringesChanged, (r: Table.ModelRow<Tables.SubAccountRowData>) => r.id)
+              })
+            );
+            // We also need to update the overall Account or SubAccount.
+            yield put(config.actions.requestAccount(null));
+          }
+        } else if (budgeting.urls.isSubAccountUrl(path)) {
+          const subaccounts = yield select(config.selectSubAccountTableData);
+          const subaccountsWithFringesChanged: Table.ModelRow<Tables.SubAccountRowData>[] = filter(
+            filter(subaccounts, (r: Tables.SubAccountRow) => tabling.typeguards.isModelRow(r)),
+            (r: Tables.SubAccountRow) => intersection(r.data.fringes, fringeIds).length !== 0
+          ) as Table.ModelRow<Tables.SubAccountRowData>[];
           yield put(
-            config.actions.requestAccountTableData({
+            config.actions.requestSubAccountTableData({
               ids: map(subaccountsWithFringesChanged, (r: Table.ModelRow<Tables.SubAccountRowData>) => r.id)
             })
           );
-          yield put(config.actions.requestAccount(null));
+          // We also need to update the overall Account or SubAccount.
+          yield put(config.actions.requestSubAccount(null));
         }
-      } else if (budgeting.urls.isSubAccountUrl(path)) {
-        const subaccounts = yield select(config.selectSubAccountTableData);
-        const fringeIds = map(response.children, (c: Model.Fringe) => c.id);
-        const subaccountsWithFringesChanged: Table.ModelRow<Tables.SubAccountRowData>[] = filter(
-          filter(subaccounts, (r: Tables.SubAccountRow) => tabling.typeguards.isModelRow(r)),
-          (r: Tables.SubAccountRow) => intersection(r.data.fringes, fringeIds).length !== 0
-        ) as Table.ModelRow<Tables.SubAccountRowData>[];
-        yield put(
-          config.actions.requestSubAccountTableData({
-            ids: map(subaccountsWithFringesChanged, (r: Table.ModelRow<Tables.SubAccountRowData>) => r.id)
-          })
-        );
-        yield put(config.actions.requestSubAccount(null));
       }
     } catch (err: unknown) {
       notifications.requestError(err as Error, errorMessage);
@@ -217,7 +235,9 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       const merged = tabling.events.consolidateRowChanges<R, Table.ModelRowId>(e.payload);
       if (merged.length !== 0) {
         const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns);
-        yield fork(bulkUpdateTask, objId, e, requestPayload, "There was an error updating the rows.");
+        if (requestPayload.data.length !== 0) {
+          yield fork(bulkUpdateTask, objId, e, requestPayload, "There was an error updating the rows.");
+        }
       }
     }
   }

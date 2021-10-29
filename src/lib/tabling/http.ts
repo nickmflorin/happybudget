@@ -42,7 +42,11 @@ export const bulkPatchPayloadForChange = <
   change: Table.RowChange<R, I>,
   columns: Table.Column<R, M>[]
 ): Http.ModelBulkUpdatePayload<P> | null => {
-  return { id: rows.editableId(change.id), ...patchPayloadForChange(change, columns) };
+  const patchPayload = patchPayloadForChange<R, P, M, I>(change, columns);
+  if (!isNil(patchPayload)) {
+    return { id: rows.editableId(change.id), ...patchPayload };
+  }
+  return null;
 };
 
 export const bulkPatchPayloads = <

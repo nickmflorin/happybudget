@@ -141,7 +141,9 @@ export const createTableTaskSet = (
       const merged = tabling.events.consolidateRowChanges(e.payload);
       if (merged.length !== 0) {
         const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns);
-        yield fork(bulkUpdateTask, e, requestPayload, "There was an error updating the rows.");
+        if (requestPayload.data.length !== 0) {
+          yield fork(bulkUpdateTask, e, requestPayload, "There was an error updating the rows.");
+        }
       }
     }
   }

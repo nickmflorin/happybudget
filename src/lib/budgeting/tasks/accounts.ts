@@ -346,7 +346,9 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         yield fork(updateMarkupTask, markupChanges);
         if (dataChanges.length !== 0) {
           const requestPayload = tabling.http.createBulkUpdatePayload<R, P, C>(dataChanges, config.columns);
-          yield fork(bulkUpdateTask, objId, requestPayload, "There was an error updating the rows.");
+          if (requestPayload.data.length !== 0) {
+            yield fork(bulkUpdateTask, objId, requestPayload, "There was an error updating the rows.");
+          }
         }
       }
     }
