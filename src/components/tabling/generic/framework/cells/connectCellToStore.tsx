@@ -34,7 +34,7 @@ const connectCellToStore = <
     }
     return <Component {...props} value={value} />;
   };
-  return hoistNonReactStatics(WithConnectedCell, Component);
+  return hoistNonReactStatics(WithConnectedCell, React.memo(Component));
 };
 
 export default connectCellToStore;

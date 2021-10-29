@@ -14,7 +14,7 @@ const excludeRowsOfType =
       }
       return <Component {...props} />;
     };
-    return hoistNonReactStatics(WithExcludeRowsOfType, Component);
+    return hoistNonReactStatics(WithExcludeRowsOfType, React.memo(Component));
   };
 
 export default excludeRowsOfType;
