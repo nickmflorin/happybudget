@@ -53,20 +53,18 @@ const ContactCell = <
   }
   return (
     <Cell {...props}>
-      <div style={{ display: "flex", justifyContent: "left" }}>
-        {!isNil(model) ? (
-          <Tag
-            className={classNames("tag--contact", { focused: isFocused })}
-            color={"#EFEFEF"}
-            textColor={"#2182e4"}
-            text={model.full_name}
-            onClick={() => props.onEditContact({ contact: model.id, id: row.id })}
-            disabled={!isFocused}
-          />
-        ) : (
-          <></>
-        )}
-      </div>
+      {!isNil(model) ? (
+        <Tag
+          className={classNames("tag--contact", { focused: isFocused })}
+          color={"#EFEFEF"}
+          textColor={"#2182e4"}
+          text={model.full_name}
+          onClick={() => props.onEditContact({ contact: model.id, id: row.id })}
+          disabled={!isFocused}
+        />
+      ) : (
+        <></>
+      )}
     </Cell>
   );
 };

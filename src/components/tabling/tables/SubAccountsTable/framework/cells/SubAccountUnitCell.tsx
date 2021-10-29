@@ -11,13 +11,7 @@ const SubAccountUnitCell = (
   >
 ): JSX.Element => {
   const row: Table.BodyRow<Tables.SubAccountRowData> = props.node.data;
-  return (
-    <ModelTagCell
-      {...props}
-      tagProps={{ isPlural: !isNil(row.data.quantity) && row.data.quantity > 1 }}
-      leftAlign={true}
-    />
-  );
+  return <ModelTagCell {...props} tagProps={{ isPlural: !isNil(row.data.quantity) && row.data.quantity > 1 }} />;
 };
 
 export default SubAccountUnitCell;

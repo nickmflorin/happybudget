@@ -28,9 +28,7 @@ const FringesCell = ({ value, onAddFringes, ...props }: FringesCellProps): JSX.E
 
   return (
     <Cell<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore> {...props}>
-      <div style={{ display: "flex", justifyContent: "left" }}>
-        <MultipleTags<Tables.FringeRow> models={applicableFringes} />
-      </div>
+      <MultipleTags<Tables.FringeRow> models={applicableFringes} />
     </Cell>
   );
 };

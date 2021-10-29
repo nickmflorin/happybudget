@@ -29,9 +29,7 @@ const AttachmentsCell = <
 
   return (
     <Cell {...props}>
-      <div style={{ display: "flex", justifyContent: "left" }}>
-        {!isNil(attachment) && <AttachmentText additionalCount={additionalCount}>{attachment}</AttachmentText>}
-      </div>
+      {!isNil(attachment) && <AttachmentText additionalCount={additionalCount}>{attachment}</AttachmentText>}
     </Cell>
   );
 };

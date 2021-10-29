@@ -8,5 +8,5 @@ const FringeUnitCell = (
     Tables.FringeTableStore,
     Model.FringeUnit
   >
-): JSX.Element => <ModelTagCell {...props} leftAlign={true} />;
+): JSX.Element => <ModelTagCell {...props} />;
 export default FringeUnitCell;

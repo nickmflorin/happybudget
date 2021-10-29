@@ -9,7 +9,6 @@ export interface ModelTagCellProps<
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   V extends Model.HttpModel = Model.HttpModel
 > extends Table.CellProps<R, M, S, V | null> {
-  readonly leftAlign?: boolean;
   readonly tagProps?: Omit<TagProps<V>, "model" | "text" | "children">;
 }
 
@@ -21,17 +20,10 @@ const ModelTagCell = <
   V extends Model.HttpModel = Model.HttpModel
 >({
   value,
-  leftAlign,
   tagProps,
   ...props
 }: ModelTagCellProps<R, M, S, V>): JSX.Element => {
-  return (
-    <Cell {...props}>
-      <div style={{ display: "flex", justifyContent: leftAlign === true ? "left" : "center" }}>
-        {!isNil(value) ? <Tag<V, any> model={value} {...tagProps} /> : <></>}
-      </div>
-    </Cell>
-  );
+  return <Cell {...props}>{!isNil(value) ? <Tag<V, any> model={value} {...tagProps} /> : <></>}</Cell>;
 };
 
 export default React.memo(ModelTagCell) as typeof ModelTagCell;

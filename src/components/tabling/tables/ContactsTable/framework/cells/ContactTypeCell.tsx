@@ -8,5 +8,5 @@ const ContactTypeCell = (
     Tables.ContactTableStore,
     Model.ContactType
   >
-): JSX.Element => <ModelTagCell {...props} leftAlign={true} />;
+): JSX.Element => <ModelTagCell {...props} />;
 export default ContactTypeCell;
