@@ -1,6 +1,8 @@
 import { Saga, SagaIterator } from "redux-saga";
-import { spawn, take, call, cancel, actionChannel } from "redux-saga/effects";
-import { isNil } from "lodash";
+import { spawn, take, call, cancel, actionChannel, delay, fork, flush } from "redux-saga/effects";
+import { isNil, map } from "lodash";
+
+import { tabling } from "lib";
 
 /* eslint-disable indent */
 export const createTableSaga = <
@@ -48,14 +50,49 @@ export const createAuthenticatedTableSaga = <
   config: Table.SagaConfig<R, M, A>
 ): Saga => {
   function* tableChangeEventSaga(): SagaIterator {
-    // TODO: We probably want a way to prevent duplicate events that can cause
-    // backend errors from occurring.  This would include things like trying to
-    // delete the same row twice.
     const changeChannel = yield actionChannel(config.actions.tableChanged.toString());
-    while (true) {
-      const action: Redux.Action<Table.ChangeEvent<R, M>> = yield take(changeChannel);
-      // Blocking call so that table changes happen sequentially.
-      yield call(config.tasks.handleChangeEvent, action);
+    try {
+      while (true) {
+        const action = yield take(changeChannel);
+        const e: Table.ChangeEvent<R, M> = action.payload;
+        if (!tabling.typeguards.isDataChangeEvent(e)) {
+          yield fork(config.tasks.handleChangeEvent, action);
+        } else {
+          // Buffer and flush data change events that occur every 500ms - this is particularly
+          // important for dragging cell values to update other cell values as it submits a
+          // separate DataChangeEvent for every new cell value.
+          yield delay(500);
+          const actions: Redux.Action<Table.DataChangeEvent<R>>[] = yield flush(changeChannel);
+          const events: Table.DataChangeEvent<R>[] = map(
+            [action as Redux.Action<Table.DataChangeEvent<R>>, ...actions],
+            /* eslint-disable-next-line no-loop-func */
+            (a: Redux.Action<Table.DataChangeEvent<R>>) => a.payload
+          );
+          const event = tabling.events.consolidateDataChangeEvents(events);
+          if (!Array.isArray(event.payload) || event.payload.length !== 0) {
+            yield fork(config.tasks.handleChangeEvent, {
+              type: config.actions.tableChanged.toString(),
+              payload: event
+            });
+          }
+        }
+      }
+    } finally {
+      const actions = yield flush(changeChannel);
+      if (actions.length !== 0) {
+        const events: Table.DataChangeEvent<R>[] = map(
+          actions,
+          /* eslint-disable-next-line no-loop-func */
+          (a: Redux.Action<Table.DataChangeEvent<R>>) => a.payload
+        );
+        const event = tabling.events.consolidateDataChangeEvents(events);
+        if (!Array.isArray(event.payload) || event.payload.length !== 0) {
+          yield fork(config.tasks.handleChangeEvent, {
+            type: config.actions.tableChanged.toString(),
+            payload: event
+          });
+        }
+      }
     }
   }
 

@@ -146,3 +146,20 @@ export const consolidateRowChanges = <R extends Table.RowData, I extends Table.E
     []
   );
 };
+
+export const consolidateDataChangeEvents = <
+  R extends Table.RowData,
+  I extends Table.EditableRowId = Table.EditableRowId
+>(
+  events: Table.DataChangeEvent<R, I>[]
+): Table.DataChangeEvent<R, I> => {
+  const rowChanges: Table.RowChange<R, I>[] = reduce(
+    events,
+    (curr: Table.RowChange<R, I>[], e: Table.DataChangeEvent<R, I>) => [
+      ...curr,
+      ...(Array.isArray(e.payload) ? e.payload : [e.payload])
+    ],
+    []
+  );
+  return { type: "dataChange", payload: consolidateRowChanges(rowChanges) };
+};
