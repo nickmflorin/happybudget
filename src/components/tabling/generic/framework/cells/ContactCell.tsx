@@ -3,7 +3,7 @@ import { find, isNil } from "lodash";
 import classNames from "classnames";
 
 import { Tag } from "components/tagging";
-import { useContacts } from "store/hooks";
+import { useContacts, useContactsLoaded } from "store/hooks";
 
 import { Cell } from "./generic";
 
@@ -26,18 +26,21 @@ const ContactCell = <
 }: ContactCellProps<R, M, S>): JSX.Element => {
   const row: Table.EditableRow<R> = props.node.data;
   const contacts = useContacts();
+  const loaded = useContactsLoaded();
 
   const model = useMemo(() => {
     if (!isNil(value)) {
       const c: Model.Contact | undefined = find(contacts, { id: value } as any);
       if (isNil(c)) {
-        console.error(`Could not find contact ${value} in store.`);
+        if (loaded === true) {
+          console.error(`Could not find contact ${value} in store.`);
+        }
         return null;
       }
       return c;
     }
     return null;
-  }, [value, contacts]);
+  }, [value, contacts, loaded]);
 
   // TODO: This is a very, very render intensive piece of logic.  We should figure out if there
   // is a better way to do this that doesn't involve getting the focused cell on every render.

@@ -4,7 +4,8 @@ import {
   selectContacts,
   selectContactsLoading,
   selectFilteredContacts,
-  selectFilteredContactsLoading
+  selectFilteredContactsLoading,
+  selectContactsLoaded
 } from "./selectors";
 
 export const useLoggedInUser = (): Model.User => {
@@ -16,6 +17,10 @@ export const useLoggedInUser = (): Model.User => {
 
 export const useContacts = (): Model.Contact[] => {
   return useSelector(selectContacts);
+};
+
+export const useContactsLoaded = (): boolean => {
+  return useSelector(selectContactsLoaded);
 };
 
 export const useContactsLoading = (): boolean => {
