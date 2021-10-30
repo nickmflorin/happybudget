@@ -9,10 +9,10 @@ export const estimatedValueGetter = <R extends Tables.BudgetRowData>(
   if (tabling.typeguards.isDataRow(row)) {
     return businessLogic.estimatedValue(row);
   } else {
-    const childrenRows: Table.ModelRow<R>[] = filter(
+    const childrenRows: Table.DataRow<R>[] = filter(
       rows,
       (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r) && includes(row.children, r.id)
-    ) as Table.ModelRow<R>[];
+    ) as Table.DataRow<R>[];
     if (tabling.typeguards.isMarkupRow(row)) {
       // Markup rows that are of unit FLAT only count towards the overall estimated value once,
       // not per Account/Sub Account that is tied to that Markup (which happens when the Markup
@@ -22,12 +22,12 @@ export const estimatedValueGetter = <R extends Tables.BudgetRowData>(
       }
       return reduce(
         childrenRows,
-        (curr: number, r: Table.ModelRow<R>) =>
+        (curr: number, r: Table.DataRow<R>) =>
           curr + model.businessLogic.contributionFromMarkups(businessLogic.estimatedValue(r), [row]),
         0.0
       );
     } else {
-      return reduce(childrenRows, (curr: number, r: Table.ModelRow<R>) => curr + businessLogic.estimatedValue(r), 0.0);
+      return reduce(childrenRows, (curr: number, r: Table.DataRow<R>) => curr + businessLogic.estimatedValue(r), 0.0);
     }
   }
 };
@@ -39,11 +39,11 @@ export const actualValueGetter = <R extends Tables.BudgetRowData>(
   if (tabling.typeguards.isDataRow(row) || tabling.typeguards.isMarkupRow(row)) {
     return row.data.actual;
   } else {
-    const childrenRows: Table.ModelRow<R>[] = filter(
+    const childrenRows: Table.DataRow<R>[] = filter(
       rows,
       (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r) && includes(row.children, r.id)
-    ) as Table.ModelRow<R>[];
-    return reduce(childrenRows, (curr: number, r: Table.ModelRow<R>) => curr + r.data.actual, 0.0);
+    ) as Table.DataRow<R>[];
+    return reduce(childrenRows, (curr: number, r: Table.DataRow<R>) => curr + r.data.actual, 0.0);
   }
 };
 
