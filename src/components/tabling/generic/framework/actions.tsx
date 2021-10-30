@@ -54,7 +54,7 @@ export const ToggleColumnAction = <R extends Table.RowData, M extends Model.Http
         columns={params.columns}
         onChange={(p: MenuChangeEvent<MenuItemModel>) =>
           table.changeColumnVisibility({
-            field: p.model.id as keyof R,
+            field: String(p.model.id),
             visible: p.selected
           })
         }

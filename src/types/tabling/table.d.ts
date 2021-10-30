@@ -369,7 +369,7 @@ namespace Table {
     readonly getRowsAboveAndIncludingFocusedRow: () => BodyRow<R>[];
     readonly applyTableChange: (event: SingleOrArray<ChangeEvent<R, M>>) => void;
     readonly applyGroupColorChange: (group: Model.Group) => void;
-    readonly changeColumnVisibility: (changes: SingleOrArray<ColumnVisibilityChange<R>>, sizeToFit?: boolean) => void;
+    readonly changeColumnVisibility: (changes: SingleOrArray<ColumnVisibilityChange>, sizeToFit?: boolean) => void;
   };
 
   type MenuActionObj = {
@@ -388,7 +388,7 @@ namespace Table {
   type MenuActionParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
     readonly apis: GridApis;
     readonly columns: Column<R, M>[];
-    readonly hiddenColumns?: Table.HiddenColumns;
+    readonly hiddenColumns?: HiddenColumns;
   };
 
   type UnauthenticatedMenuActionParams<
@@ -583,42 +583,20 @@ namespace Table {
     readonly payload: MarkupAddedPayload;
   };
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type ModelUpdatedPayload<M extends Model.HttpModel = Model.HttpModel> = Redux.UpdateActionPayload<M, number>;
   type ModelUpdatedEvent<M extends Model.HttpModel = Model.HttpModel> = {
     readonly type: "modelUpdated";
-    // We need the full model to recreate the <ModelRow>.
     readonly payload: M;
   };
 
-  type GroupUpdatedPayload = Redux.UpdateActionPayload<Model.Group, number>;
   type GroupUpdatedEvent = {
     readonly type: "groupUpdated";
-    readonly payload: GroupUpdatedPayload;
+    readonly payload: Model.Group;
   };
 
-  type MarkupUpdatedPayload = Redux.UpdateActionPayload<Model.Markup, number>;
   type MarkupUpdatedEvent = {
     readonly type: "markupUpdated";
-    readonly payload: MarkupUpdatedPayload;
+    readonly payload: Model.Markup;
   };
-
-  type ChangeEventTypeMap<R extends RowData> = {
-    dataChange: DataChangeEvent<R>;
-    rowAdd: RowAddEvent<R>;
-    rowDelete: RowDeleteEvent;
-    rowRemoveFromGroup: RowRemoveFromGroupEvent;
-    rowAddToGroup: RowAddToGroupEvent;
-    groupAdded: GroupAddedEvent;
-    groupUpdated: GroupUpdatedEvent;
-    markupAdded: MarkupAddedEvent;
-    markupUpdated: MarkupUpdatedEvent;
-    rowAddToMarkup: RowAddToMarkupEvent;
-    rowRemoveFromMarkup: RowRemoveFromMarkupEvent;
-  };
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type ChangeEventTaskMap<R extends RowData> = Redux.TaskMapObject<ChangeEventTypeMap<R>>;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type FullRowEvent = RowDeleteEvent | RowRemoveFromGroupEvent | RowAddToGroupEvent;
@@ -626,7 +604,7 @@ namespace Table {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type GroupEvent = RowRemoveFromGroupEvent | RowAddToGroupEvent | GroupUpdatedEvent | GroupAddedEvent;
 
-  type TableChangeEvent<R extends RowData> =
+  type ChangeEvent<R extends RowData, M extends Model.HttpModel = Model.HttpModel> =
     | DataChangeEvent<R>
     | RowAddEvent<R>
     | RowDeleteEvent
@@ -637,10 +615,7 @@ namespace Table {
     | RowRemoveFromMarkupEvent
     | RowAddToMarkupEvent
     | MarkupAddedEvent
-    | MarkupUpdatedEvent;
-
-  type ChangeEvent<R extends RowData, M extends Model.HttpModel = Model.HttpModel> =
-    | TableChangeEvent<R>
+    | MarkupUpdatedEvent
     | ModelUpdatedEvent<M>;
 
   type CellDoneEditingEvent = import("react").SyntheticEvent | KeyboardEvent;

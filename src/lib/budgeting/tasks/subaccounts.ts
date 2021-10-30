@@ -94,7 +94,7 @@ const isAuthenticatedConfig = <M extends Model.Account | Model.SubAccount, B ext
 /* eslint-disable indent */
 export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B extends Model.Budget | Model.Template>(
   config: SubAccountsTableTaskConfig | AuthenticatedSubAccountsTableTaskConfig<M, B>
-): Redux.TaskMapObject<Redux.TableTaskMap<R>> => {
+): Redux.TableTaskMap<R, C> => {
   const contactsTasks = createTaskSet({ authenticated: isAuthenticatedConfig(config) });
 
   function* request(action: Redux.Action<Redux.TableRequestPayload>): SagaIterator {
@@ -287,10 +287,9 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     }
   }
 
-  function* handleRemoveRowFromGroupEvent(action: Redux.Action<Table.RowRemoveFromGroupEvent>): SagaIterator {
+  function* handleRemoveRowFromGroupEvent(e: Table.RowRemoveFromGroupEvent): SagaIterator {
     const objId = yield select(config.selectObjId);
-    if (!isNil(action.payload) && !isNil(objId)) {
-      const e: Table.RowRemoveFromGroupEvent = action.payload;
+    if (!isNil(objId)) {
       const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
       const requestPayload: Http.BulkUpdatePayload<P> = {
         data: map(ids, (id: Table.ModelRowId) => ({
@@ -302,10 +301,9 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     }
   }
 
-  function* handleAddRowToGroupEvent(action: Redux.Action<Table.RowAddToGroupEvent>): SagaIterator {
+  function* handleAddRowToGroupEvent(e: Table.RowAddToGroupEvent): SagaIterator {
     const objId = yield select(config.selectObjId);
-    if (!isNil(action.payload) && !isNil(objId)) {
-      const e: Table.RowAddToGroupEvent = action.payload;
+    if (!isNil(objId)) {
       const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
       const requestPayload: Http.BulkUpdatePayload<P> = {
         data: map(ids, (id: Table.ModelRowId) => ({
@@ -317,19 +315,17 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     }
   }
 
-  function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R>>): SagaIterator {
+  function* handleRowAddEvent(e: Table.RowAddEvent<R>): SagaIterator {
     const objId = yield select(config.selectObjId);
-    if (!isNil(objId) && !isNil(action.payload)) {
-      const e: Table.RowAddEvent<R> = action.payload;
+    if (!isNil(objId)) {
       yield fork(bulkCreateTask, objId, e, "There was an error creating the rows.");
     }
   }
 
-  function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent>): SagaIterator {
+  function* handleRowDeleteEvent(e: Table.RowDeleteEvent): SagaIterator {
     if (isAuthenticatedConfig(config)) {
       const objId = yield select(config.selectObjId);
-      if (!isNil(action.payload) && !isNil(objId)) {
-        const e: Table.RowDeleteEvent = action.payload;
+      if (!isNil(objId)) {
         const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
         if (ids.length !== 0) {
           yield put(config.actions.loadingBudget(true));
@@ -360,11 +356,10 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     }
   }
 
-  function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R>>): SagaIterator {
+  function* handleDataChangeEvent(e: Table.DataChangeEvent<R>): SagaIterator {
     if (isAuthenticatedConfig(config)) {
       const objId = yield select(config.selectObjId);
-      if (!isNil(action.payload) && !isNil(objId)) {
-        const e: Table.DataChangeEvent<R> = action.payload;
+      if (!isNil(objId)) {
         const merged = tabling.events.consolidateRowChanges<R>(e.payload);
 
         const markupChanges: Table.RowChange<R, Table.MarkupRowId>[] = filter(merged, (value: Table.RowChange<R>) =>
@@ -374,12 +369,11 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         const dataChanges: Table.RowChange<R, Table.ModelRowId>[] = filter(merged, (value: Table.RowChange<R>) =>
           tabling.typeguards.isModelRowId(value.id)
         ) as Table.RowChange<R, Table.ModelRowId>[];
-
         yield fork(updateMarkupTask, markupChanges);
         if (dataChanges.length !== 0) {
           const requestPayload = tabling.http.createBulkUpdatePayload<R, P, C>(dataChanges, config.columns);
           if (requestPayload.data.length !== 0) {
-            yield fork(bulkUpdateTask, objId, requestPayload, "There was an error updating the rows.");
+            yield call(bulkUpdateTask, objId, requestPayload, "There was an error updating the rows.");
           }
         }
       }

@@ -95,7 +95,7 @@ const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableP
       dispatch(
         actions.account.handleTableChangeEventAction({
           type: "groupUpdated",
-          payload: { id: group.id, data: group }
+          payload: group
         })
       )
   });

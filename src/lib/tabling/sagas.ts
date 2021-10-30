@@ -1,6 +1,6 @@
 import { Saga, SagaIterator } from "redux-saga";
-import { spawn, take, call, cancel, actionChannel, delay, fork, flush, all } from "redux-saga/effects";
-import { isNil, map, filter } from "lodash";
+import { spawn, take, call, cancel, actionChannel, delay, fork, flush } from "redux-saga/effects";
+import { isNil, map } from "lodash";
 
 import { tabling } from "lib";
 
@@ -49,67 +49,79 @@ export const createAuthenticatedTableSaga = <
 >(
   config: Table.SagaConfig<R, M, A>
 ): Saga => {
+  /**
+   * Flushes events that are queued in the Action Channel by batching like,
+   * consecutive events together to perform bulk API updates instead of individual
+   * ones.
+   *
+   * The algorithm is written specifically to only batch together consecutive
+   * events, such that the original order the events occurred in is preserved
+   * (which is important).
+   *
+   * Events: [A, A, A, B, A, A, B, B, C, B, C, A, A, B]
+   * In Batches: [[A, A, A], [B], [A, A], [B, B], [C], [B], [C], [A, A], B]
+   */
   function* flushEvents(actions: Redux.Action<Table.ChangeEvent<R, M>>[]): SagaIterator {
-    /* eslint-disable-next-line no-loop-func */
-    let actionsWithDataChangeEvents = filter(actions, (a: Redux.Action<Table.ChangeEvent<R, M>>) =>
-      tabling.typeguards.isActionWithDataChangeEvent(a)
-    ) as Redux.Action<Table.DataChangeEvent<R>>[];
+    const events: Table.ChangeEvent<R, M>[] = map(actions, (a: Redux.Action<Table.ChangeEvent<R, M>>) => a.payload);
 
-    let actionsWithoutDataChangeEvents = filter(
-      actions,
-      /* eslint-disable-next-line no-loop-func */
-      (a: Redux.Action<Table.ChangeEvent<R, M>>) => !tabling.typeguards.isActionWithDataChangeEvent(a)
-    );
-
-    const events: Table.DataChangeEvent<R>[] = map(
-      actionsWithDataChangeEvents,
-      /* eslint-disable-next-line no-loop-func */
-      (a: Redux.Action<Table.DataChangeEvent<R>>) => a.payload
-    );
-    const event = tabling.events.consolidateDataChangeEvents(events);
-    if (!Array.isArray(event.payload) || event.payload.length !== 0) {
-      yield fork(config.tasks.handleChangeEvent, {
-        type: config.actions.tableChanged.toString(),
-        payload: event
-      });
+    function* flushDataBatch(batch: Table.DataChangeEvent<R>[]): SagaIterator {
+      if (batch.length !== 0) {
+        const event = tabling.events.consolidateDataChangeEvents(batch);
+        if (!Array.isArray(event.payload) || event.payload.length !== 0) {
+          yield call(config.tasks.handleChangeEvent, event);
+        }
+      }
     }
-    // Note: Since we are now applying the events in a segmented order, the order might
-    // not be the same as it was when the user submitted them.  This might cause bugs, as
-    // a certain entity might not longer exist if it was deleted and then updated, for
-    // example.  However, this will only happen if the user is abnormally fast (like really
-    // fast).
-    yield all(
-      /* eslint-disable-next-line no-loop-func */
-      map(actionsWithoutDataChangeEvents, (a: Redux.Action<Table.ChangeEvent<R, M>>) =>
-        call(config.tasks.handleChangeEvent, a)
-      )
-    );
+
+    function* flushRowAddBatch(batch: Table.RowAddEvent<R>[]): SagaIterator {
+      if (batch.length !== 0) {
+        const event = tabling.events.consolidateRowAddEvents(batch);
+        if (!Array.isArray(event.payload) || event.payload.length !== 0) {
+          yield call(config.tasks.handleChangeEvent, event);
+        }
+      }
+    }
+
+    let runningDataChangeBatch: Table.DataChangeEvent<R>[] = [];
+    let runningRowAddBatch: Table.RowAddEvent<R>[] = [];
+
+    for (let i = 0; i < events.length; i++) {
+      const e = events[i];
+      if (tabling.typeguards.isDataChangeEvent(e)) {
+        runningDataChangeBatch = [...runningDataChangeBatch, e];
+        yield call(flushRowAddBatch, runningRowAddBatch);
+        runningRowAddBatch = [];
+      } else if (tabling.typeguards.isRowAddEvent(e)) {
+        runningRowAddBatch = [...runningRowAddBatch, e];
+        yield call(flushDataBatch, runningDataChangeBatch);
+        runningDataChangeBatch = [];
+      } else {
+        yield call(flushDataBatch, runningDataChangeBatch);
+        runningDataChangeBatch = [];
+        yield call(flushRowAddBatch, runningRowAddBatch);
+        runningRowAddBatch = [];
+        yield call(config.tasks.handleChangeEvent, e);
+      }
+    }
+    // Cleanup leftover events at the end.
+    yield call(flushDataBatch, runningDataChangeBatch);
+    yield call(flushRowAddBatch, runningRowAddBatch);
   }
 
   function* tableChangeEventSaga(): SagaIterator {
     const changeChannel = yield actionChannel(config.actions.tableChanged.toString());
-    try {
-      while (true) {
-        const action = yield take(changeChannel);
-        yield call(config.tasks.handleChangeEvent, action);
-        // console.log({ action: action.type });
-        // const e: Table.ChangeEvent<R, M> = action.payload;
-        // if (!tabling.typeguards.isDataChangeEvent(e)) {
-        //   console.log("HANDLING DATA CHANGE");
-        //   yield fork(config.tasks.handleChangeEvent, action);
-        // } else {
-        //   // Buffer and flush data change events that occur every 500ms - this is particularly
-        //   // important for dragging cell values to update other cell values as it submits a
-        //   // separate DataChangeEvent for every new cell value.
-        //   yield delay(200);
-        //   const actions: Redux.Action<Table.ChangeEvent<R, M>>[] = yield flush(changeChannel);
-        //   yield fork(flushEvents, [...actions, action]);
-        // }
-      }
-    } finally {
-      const actions = yield flush(changeChannel);
-      if (actions.length !== 0) {
-        yield fork(flushEvents, actions);
+    while (true) {
+      const action = yield take(changeChannel);
+      const e: Table.ChangeEvent<R, M> = action.payload;
+      if (tabling.typeguards.isDataChangeEvent(e) || tabling.typeguards.isRowAddEvent(e)) {
+        // Buffer and flush data change events and new row events that occur every 500ms -
+        // this is particularly important for dragging cell values to update other cell
+        // values as it submits a separate DataChangeEvent for every new cell value.
+        yield delay(200);
+        const actions: Redux.Action<Table.ChangeEvent<R, M>>[] = yield flush(changeChannel);
+        yield call(flushEvents, [action, ...actions]);
+      } else {
+        yield fork(config.tasks.handleChangeEvent, e);
       }
     }
   }

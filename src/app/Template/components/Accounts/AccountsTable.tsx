@@ -72,7 +72,7 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
       dispatch(
         actions.accounts.handleTableChangeEventAction({
           type: "groupUpdated",
-          payload: { id: group.id, data: group }
+          payload: group
         })
       )
   });

@@ -147,6 +147,20 @@ export const consolidateRowChanges = <R extends Table.RowData, I extends Table.E
   );
 };
 
+export const consolidateRowAddEvents = <R extends Table.RowData>(
+  events: Table.RowAddEvent<R>[]
+): Table.RowAddEvent<R> => {
+  return {
+    type: "rowAdd",
+    payload: reduce(
+      events,
+      (curr: Table.RowAdd<R>[], e: Table.RowAddEvent<R>) =>
+        Array.isArray(e.payload) ? [...curr, ...e.payload] : [...curr, e.payload],
+      []
+    )
+  };
+};
+
 export const consolidateDataChangeEvents = <
   R extends Table.RowData,
   I extends Table.EditableRowId = Table.EditableRowId

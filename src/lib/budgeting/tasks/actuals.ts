@@ -24,10 +24,10 @@ export type ActualsTableTaskConfig = Table.TaskConfig<R, M, ActualsTableActionMa
 };
 
 export type ActualsTableTaskMap = Redux.TableTaskMap<R> & {
-  readonly requestOwnerTree: null;
+  readonly requestOwnerTree: Redux.Task<null>;
 };
 
-export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMapObject<ActualsTableTaskMap> => {
+export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTableTaskMap => {
   const contactsTasks = createTaskSet({ authenticated: true });
 
   function* request(action: Redux.Action): SagaIterator {
@@ -153,18 +153,16 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
     }
   }
 
-  function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R>>): SagaIterator {
+  function* handleRowAddEvent(e: Table.RowAddEvent<R>): SagaIterator {
     const budgetId = yield select(config.selectObjId);
-    if (!isNil(action.payload) && !isNil(budgetId)) {
-      const e: Table.RowAddEvent<R> = action.payload;
+    if (!isNil(budgetId)) {
       yield fork(bulkCreateTask, budgetId, e, "There was an error creating the rows.");
     }
   }
 
-  function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent>): SagaIterator {
+  function* handleRowDeleteEvent(e: Table.RowDeleteEvent): SagaIterator {
     const budgetId = yield select(config.selectObjId);
-    if (!isNil(action.payload) && !isNil(budgetId)) {
-      const e: Table.RowDeleteEvent = action.payload;
+    if (!isNil(budgetId)) {
       const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
       const modelRowIds = filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[];
       if (modelRowIds.length !== 0) {
@@ -173,10 +171,9 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
     }
   }
 
-  function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R>>): SagaIterator {
+  function* handleDataChangeEvent(e: Table.DataChangeEvent<R>): SagaIterator {
     const budgetId = yield select(config.selectObjId);
-    if (!isNil(action.payload) && !isNil(budgetId)) {
-      const e = action.payload as Table.DataChangeEvent<R, Table.ModelRowId>;
+    if (!isNil(budgetId)) {
       const merged = tabling.events.consolidateRowChanges(e.payload);
       if (merged.length !== 0) {
         const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns);

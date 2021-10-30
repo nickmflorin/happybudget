@@ -23,8 +23,30 @@ namespace Redux {
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type Task<P = any> = (action: Action<P>) => import("@redux-saga/types").SagaIterator;
-  type TaskMapObject<M = any> = {
-    [K in keyof M]-?: Task<M[K]>;
+
+  type TableEventTask<
+    E extends Table.ChangeEvent<R, M>,
+    R extends Table.RowData = any,
+    M extends Model.HttpModel = any
+  > = (event: E) => import("@redux-saga/types").SagaIterator;
+
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type TableEventTaskMapObject<
+    R extends Table.RowData = any,
+    M extends Model.HttpModel = any
+  > = {
+      dataChange: TableEventTask<DataChangeEvent<R>>;
+      rowAdd: TableEventTask<RowAddEvent<R>>;
+      rowDelete: TableEventTask<RowDeleteEvent>;
+      rowRemoveFromGroup: TableEventTask<RowRemoveFromGroupEvent>;
+      rowAddToGroup: TableEventTask<RowAddToGroupEvent>;
+      groupAdded: TableEventTask<GroupAddedEvent>;
+      groupUpdated: TableEventTask<GroupUpdatedEvent>;
+      modelUpdated: TableEventTask<ModelUpdatedEvent<M>>;
+      markupAdded: TableEventTask<MarkupAddedEvent>;
+      markupUpdated: TableEventTask<MarkupUpdatedEvent>;
+      rowAddToMarkup: TableEventTask<RowAddToMarkupEvent>;
+      rowRemoveFromMarkup: TableEventTask<RowRemoveFromMarkupEvent>;
   };
 
   type ActionMapObject<M = any> = {
@@ -152,7 +174,7 @@ namespace Redux {
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface ListResponseTaskMap {
-    readonly request: null;
+    readonly request: Action<null>;
   }
 
   interface ModelListResponseStore<T extends Model.HttpModel> extends ListResponseStore<T> {}
@@ -183,7 +205,7 @@ namespace Redux {
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface ModelListResponseTaskMap {
-    readonly request: null;
+    readonly request: Task<null>;
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -203,9 +225,9 @@ namespace Redux {
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type CommentsListResponseTaskMap = ModelListResponseTaskMap & {
-    readonly submit: { parent?: number; data: Http.CommentPayload };
-    readonly delete: number;
-    readonly edit: UpdateActionPayload<Model.Comment>;
+    readonly submit: Task<{ parent?: number; data: Http.CommentPayload }>;
+    readonly delete: Task<number>;
+    readonly edit: Task<UpdateActionPayload<Model.Comment>>;
   };
 
   // Holds previously searched for results.  Note that this may not play well
@@ -215,8 +237,8 @@ namespace Redux {
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type TableTaskMap<R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
-    readonly request: null;
-    readonly handleChangeEvent: Table.ChangeEvent<R, M>;
+    readonly request: Task<null>;
+    readonly handleChangeEvent: TableEventTask<Table.ChangeEvent<R, M>>;
   };
 
   type TableActionMap<M extends Model.TypedHttpModel = Model.TypedHttpModel> = {

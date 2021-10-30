@@ -7,8 +7,8 @@ import { notifications } from "lib";
 
 export const createListResponseTaskSet = (
   config: Redux.TaskConfig<Redux.CommentsListResponseActionMap>
-): Redux.TaskMapObject<Redux.CommentsListResponseTaskMap> => {
-  function* request(action: Redux.Action): SagaIterator {
+): Redux.CommentsListResponseTaskMap => {
+  function* request(action: Redux.Action<null>): SagaIterator {
     const budgetId = yield select((state: Application.Authenticated.Store) => state.budget.id);
     if (!isNil(budgetId)) {
       yield put(config.actions.loading(true));

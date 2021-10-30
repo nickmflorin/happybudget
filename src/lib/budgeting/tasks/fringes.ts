@@ -59,7 +59,7 @@ export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Ta
 
 export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   config: FringesTableTaskConfig<B>
-): Redux.TaskMapObject<Redux.TableTaskMap<R>> => {
+): Redux.TableTaskMap<R, M> => {
   function* request(action: Redux.Action<null>): SagaIterator {
     const objId = yield select(config.selectObjId);
     if (!isNil(objId)) {
@@ -208,18 +208,16 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     }
   }
 
-  function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R>>): SagaIterator {
+  function* handleRowAddEvent(e: Table.RowAddEvent<R>): SagaIterator {
     const objId = yield select(config.selectObjId);
-    if (!isNil(objId) && !isNil(action.payload)) {
-      const e: Table.RowAddEvent<R> = action.payload;
+    if (!isNil(objId)) {
       yield fork(bulkCreateTask, objId, e, "There was an error creating the fringes.");
     }
   }
 
-  function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent>): SagaIterator {
+  function* handleRowDeleteEvent(e: Table.RowDeleteEvent): SagaIterator {
     const budgetId: number | null = yield select(config.selectObjId);
-    if (!isNil(action.payload) && !isNil(budgetId)) {
-      const e: Table.RowDeleteEvent = action.payload;
+    if (!isNil(budgetId)) {
       const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
       const modelRowIds = filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[];
       if (modelRowIds.length !== 0) {
@@ -228,10 +226,9 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     }
   }
 
-  function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R>>): SagaIterator {
+  function* handleDataChangeEvent(e: Table.DataChangeEvent<R, Table.ModelRowId>): SagaIterator {
     const objId = yield select(config.selectObjId);
-    if (!isNil(objId) && !isNil(action.payload)) {
-      const e = action.payload as Table.DataChangeEvent<R, Table.ModelRowId>;
+    if (!isNil(objId)) {
       const merged = tabling.events.consolidateRowChanges<R, Table.ModelRowId>(e.payload);
       if (merged.length !== 0) {
         const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns);

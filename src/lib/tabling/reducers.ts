@@ -440,7 +440,7 @@ export const createTableChangeEventReducer = <
       const groupRow: Table.GroupRow<R> | null = groupRowFromState<R, S>(action, state, rows.groupRowId(e.payload.id));
       if (!isNil(groupRow)) {
         const newGroupRow: Table.GroupRow<R> = rows.updateGroupRow<R, M>({
-          model: e.payload.data,
+          model: e.payload,
           columns: config.columns,
           row: groupRow
         });

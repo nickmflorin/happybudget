@@ -99,7 +99,7 @@ export const createBudgetTableChangeEventReducer = <
         let updatedMarkupRow = tabling.rows.updateMarkupRow<R, M>({
           row: markupRow,
           columns: config.columns,
-          model: e.payload.data
+          model: e.payload
         });
 
         const childrenRows = filter(

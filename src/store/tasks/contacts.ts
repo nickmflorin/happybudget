@@ -1,6 +1,6 @@
 import { SagaIterator } from "redux-saga";
 import { put, fork, select } from "redux-saga/effects";
-import { map, isNil, filter } from "lodash";
+import { map, filter } from "lodash";
 
 import * as api from "api";
 import * as actions from "../actions";
@@ -10,9 +10,7 @@ type R = Tables.ContactRowData;
 type M = Model.Contact;
 type P = Http.ContactPayload;
 
-export const createTaskSet = (config: {
-  readonly authenticated: boolean;
-}): Redux.TaskMapObject<Redux.ModelListResponseTaskMap> => {
+export const createTaskSet = (config: { readonly authenticated: boolean }): Redux.ModelListResponseTaskMap => {
   function* request(action: Redux.Action<null>): SagaIterator {
     yield put(actions.loadingContactsAction(true));
     try {
@@ -34,7 +32,7 @@ export const createTaskSet = (config: {
   return { request };
 };
 
-export const createFilteredTaskSet = (): Redux.TaskMapObject<Redux.ModelListResponseTaskMap> => {
+export const createFilteredTaskSet = (): Redux.ModelListResponseTaskMap => {
   function* request(action: Redux.Action<null>): SagaIterator {
     yield put(actions.authenticated.loadingFilteredContactsAction(true));
     let query: Http.ListQuery = yield select((state: Application.Authenticated.Store) => ({
@@ -55,7 +53,7 @@ export const createFilteredTaskSet = (): Redux.TaskMapObject<Redux.ModelListResp
 
 export const createTableTaskSet = (
   config: Table.TaskConfig<R, M, Redux.AuthenticatedTableActionMap<R, M>>
-): Redux.TaskMapObject<Redux.TableTaskMap<R>> => {
+): Redux.TableTaskMap<R> => {
   function* tableRequest(action: Redux.Action): SagaIterator {
     yield put(config.actions.loading(true));
     try {
@@ -117,33 +115,24 @@ export const createTableTaskSet = (
     }
   }
 
-  function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R>>): SagaIterator {
-    if (!isNil(action.payload)) {
-      const e: Table.RowAddEvent<R> = action.payload;
-      yield fork(bulkCreateTask, e, "There was an error creating the rows.");
+  function* handleRowAddEvent(e: Table.RowAddEvent<R>): SagaIterator {
+    yield fork(bulkCreateTask, e, "There was an error creating the rows.");
+  }
+
+  function* handleRowDeleteEvent(e: Table.RowDeleteEvent): SagaIterator {
+    const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
+    const modelRowIds = filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[];
+    if (modelRowIds.length !== 0) {
+      yield fork(bulkDeleteTask, modelRowIds, "There was an error deleting the rows.");
     }
   }
 
-  function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent>): SagaIterator {
-    if (!isNil(action.payload)) {
-      const e: Table.RowDeleteEvent = action.payload;
-      const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
-      const modelRowIds = filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[];
-      if (modelRowIds.length !== 0) {
-        yield fork(bulkDeleteTask, modelRowIds, "There was an error deleting the rows.");
-      }
-    }
-  }
-
-  function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R>>): SagaIterator {
-    if (!isNil(action.payload)) {
-      const e = action.payload as Table.DataChangeEvent<R, Table.ModelRowId>;
-      const merged = tabling.events.consolidateRowChanges(e.payload);
-      if (merged.length !== 0) {
-        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns);
-        if (requestPayload.data.length !== 0) {
-          yield fork(bulkUpdateTask, e, requestPayload, "There was an error updating the rows.");
-        }
+  function* handleDataChangeEvent(e: Table.DataChangeEvent<R, Table.ModelRowId>): SagaIterator {
+    const merged = tabling.events.consolidateRowChanges(e.payload);
+    if (merged.length !== 0) {
+      const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns);
+      if (requestPayload.data.length !== 0) {
+        yield fork(bulkUpdateTask, e, requestPayload, "There was an error updating the rows.");
       }
     }
   }

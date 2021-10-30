@@ -67,7 +67,7 @@ const useMarkup = <
             props.onResponse(response);
             props.table.applyTableChange({
               type: "markupUpdated",
-              payload: { id: response.data.id, data: response.data }
+              payload: response.data
             });
           }}
         />
