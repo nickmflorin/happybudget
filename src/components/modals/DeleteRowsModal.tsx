@@ -22,12 +22,9 @@ function DeleteRowsModal({ open, onCancel, onSuccess, rows, ...props }: DeleteRo
       onCancel={() => onCancel()}
       onOk={onSuccess}
     >
-      <>
-        <p style={{ marginBottom: 20 }}>{`Are you sure you want to delete ${rows?.length} rows?`}</p>
-        <Notification type={"warning"}>
-          {"This action is not recoverable, the data will be permanently erased"}
-        </Notification>
-      </>
+      <Notification type={"warning"} title={`You are about to delete ${rows.length} rows.`}>
+        {"This action is not recoverable, the data will be permanently erased"}
+      </Notification>
     </Modal>
   );
 }
