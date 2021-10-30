@@ -68,6 +68,10 @@
   }
 }
 
+.ag-react-container {
+  width: 100%;
+}
+
 .table {
   display: flex;
   flex-direction: column;
@@ -110,6 +114,7 @@
             height: 18px;
             width: 18px;
             padding: 2px;
+            float: right;
 
             svg {
               height: 14px;

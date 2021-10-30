@@ -102,6 +102,16 @@ export const isDataChangeEvent = <
   return (e as Table.DataChangeEvent<R, I>).type === "dataChange";
 };
 
+export const isActionWithDataChangeEvent = <
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel = Model.TypedHttpModel,
+  I extends Table.EditableRowId = Table.EditableRowId
+>(
+  a: Redux.Action<Table.ChangeEvent<R, M>>
+): a is Redux.Action<Table.DataChangeEvent<R, I>> => {
+  return isDataChangeEvent(a.payload);
+};
+
 export const isModelUpdatedEvent = <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
   e: Table.ChangeEvent<R, M>
 ): e is Table.ModelUpdatedEvent<M> => {

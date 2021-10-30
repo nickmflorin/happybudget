@@ -38,6 +38,7 @@ export type AuthenticatedTableProps<
     readonly excludeColumns?:
       | SingleOrArray<keyof R | string | ((col: Table.Column<R, M>) => boolean)>
       | ((col: Table.Column<R, M>) => boolean);
+    readonly confirmRowDelete?: boolean;
     readonly children: RenderPropChild<AuthenticatedTableDataGridProps<R, M>>;
     readonly rowHasCheckboxSelection?: (row: Table.EditableRow<R>) => boolean;
   };
@@ -209,7 +210,7 @@ const AuthenticatedTable = <
                 const rows = filter((apis?.grid.getSelectedRows() || []) as Table.BodyRow<R>[], (r: Table.BodyRow<R>) =>
                   tabling.typeguards.isEditableRow(r)
                 ) as Table.EditableRow<R>[];
-                if (rows.length === 1) {
+                if (rows.length === 1 || props.confirmRowDelete === false) {
                   props.onChangeEvent({
                     payload: { rows: map(rows, (r: Table.EditableRow<R>) => r.id) },
                     type: "rowDelete"
