@@ -1,3 +1,5 @@
+import { isNil } from "lodash";
+
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 import { CaptureConsole } from "@sentry/integrations";
@@ -17,7 +19,7 @@ const configureSentry = () => {
       tracesSampleRate: 1.0,
       beforeSend: (event: Sentry.Event) => {
         // Allows us to disable Sentry for a single line of code.
-        if (event.extra?.ignore === true) {
+        if (event.extra?.ignore === true || (!isNil(event.message) && event.message.indexOf("e.dn") !== -1)) {
           return null;
         }
         return event;
