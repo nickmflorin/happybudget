@@ -1,5 +1,5 @@
 import { Saga, SagaIterator } from "redux-saga";
-import { spawn, take, call, cancel, actionChannel, delay, fork, flush } from "redux-saga/effects";
+import { spawn, take, call, cancel, actionChannel, delay, flush, fork } from "redux-saga/effects";
 import { isNil, map } from "lodash";
 
 import { tabling } from "lib";
@@ -89,23 +89,23 @@ export const createAuthenticatedTableSaga = <
       const e = events[i];
       if (tabling.typeguards.isDataChangeEvent(e)) {
         runningDataChangeBatch = [...runningDataChangeBatch, e];
-        yield call(flushRowAddBatch, runningRowAddBatch);
+        yield fork(flushRowAddBatch, runningRowAddBatch);
         runningRowAddBatch = [];
       } else if (tabling.typeguards.isRowAddEvent(e)) {
         runningRowAddBatch = [...runningRowAddBatch, e];
-        yield call(flushDataBatch, runningDataChangeBatch);
+        yield fork(flushDataBatch, runningDataChangeBatch);
         runningDataChangeBatch = [];
       } else {
-        yield call(flushDataBatch, runningDataChangeBatch);
+        yield fork(flushDataBatch, runningDataChangeBatch);
         runningDataChangeBatch = [];
-        yield call(flushRowAddBatch, runningRowAddBatch);
+        yield fork(flushRowAddBatch, runningRowAddBatch);
         runningRowAddBatch = [];
-        yield call(config.tasks.handleChangeEvent, e);
+        yield fork(config.tasks.handleChangeEvent, e);
       }
     }
     // Cleanup leftover events at the end.
-    yield call(flushDataBatch, runningDataChangeBatch);
-    yield call(flushRowAddBatch, runningRowAddBatch);
+    yield fork(flushDataBatch, runningDataChangeBatch);
+    yield fork(flushRowAddBatch, runningRowAddBatch);
   }
 
   function* tableChangeEventSaga(): SagaIterator {
@@ -121,7 +121,7 @@ export const createAuthenticatedTableSaga = <
         const actions: Redux.Action<Table.ChangeEvent<R, M>>[] = yield flush(changeChannel);
         yield call(flushEvents, [action, ...actions]);
       } else {
-        yield fork(config.tasks.handleChangeEvent, e);
+        yield call(config.tasks.handleChangeEvent, e);
       }
     }
   }
