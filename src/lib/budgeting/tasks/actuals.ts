@@ -57,7 +57,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
   }
 
   function* requestActuals(budgetId: number): SagaIterator {
-    const response: Http.ListResponse<M> = yield api.request(api.getBudgetActuals, budgetId, { no_pagination: true });
+    const response: Http.ListResponse<M> = yield api.request(api.getBudgetActuals, budgetId, {});
     if (response.data.length === 0) {
       // If there is no table data, we want to default create two rows.
       const createResponse: Http.BulkResponse<Model.Budget, M> = yield api.request(
@@ -85,7 +85,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
         yield put(config.actions.loadingOwnerTree(true));
         try {
           // TODO: Eventually we will want to build in pagination for this.
-          const response = yield api.request(api.getBudgetOwnerTree, budgetId, { no_pagination: true, search });
+          const response = yield api.request(api.getBudgetOwnerTree, budgetId, { search });
           yield put(config.actions.responseOwnerTree(response));
         } catch (e: unknown) {
           notifications.requestError(e as Error, "There was an error retrieving the budget's items.");

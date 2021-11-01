@@ -37,7 +37,6 @@ namespace Http {
     readonly ordering?: Ordering;
     readonly page?: number;
     readonly page_size?: number;
-    readonly no_pagination?: string | number | boolean;
     readonly simple?: boolean;
     readonly search?: string;
   }

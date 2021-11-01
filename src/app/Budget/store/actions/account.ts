@@ -29,34 +29,3 @@ export const updateRowsInStateAction = createAction<Redux.UpdateRowsInTablePaylo
   ActionType.Account.SubAccounts.UpdateRowsInState
 );
 export const setSearchAction = createAction<string>(ActionType.Account.SubAccounts.SetSearch);
-
-export const requestCommentsAction = createAction<null>(ActionType.Account.Comments.Request);
-export const responseCommentsAction = createAction<Http.ListResponse<Model.Comment>>(
-  ActionType.Account.Comments.Response
-);
-export const loadingCommentsAction = createAction<boolean>(ActionType.Account.Comments.Loading);
-export const createCommentAction = createAction<{
-  parent?: number;
-  data: Http.CommentPayload;
-}>(ActionType.Account.Comments.Create);
-export const creatingCommentAction = createAction<boolean>(ActionType.Account.Comments.Creating);
-export const deleteCommentAction = createAction<number>(ActionType.Account.Comments.Delete);
-export const updateCommentAction = createAction<Redux.UpdateActionPayload<Model.Comment>>(
-  ActionType.Account.Comments.Update
-);
-export const replyingToCommentAction = createAction<Redux.ModelListActionPayload>(ActionType.Account.Comments.Replying);
-export const deletingCommentAction = createAction<Redux.ModelListActionPayload>(ActionType.Account.Comments.Deleting);
-export const updatingCommentAction = createAction<Redux.ModelListActionPayload>(ActionType.Account.Comments.Updating);
-export const addCommentToStateAction = createAction<{ data: Model.Comment; parent?: number }>(
-  ActionType.Account.Comments.AddToState
-);
-export const removeCommentFromStateAction = createAction<number>(ActionType.Account.Comments.RemoveFromState);
-export const updateCommentInStateAction = createAction<Redux.UpdateActionPayload<Model.Comment>>(
-  ActionType.Account.Comments.UpdateInState
-);
-
-export const requestHistoryAction = createAction<null>(ActionType.Account.History.Request);
-export const loadingHistoryAction = createAction<boolean>(ActionType.Account.History.Loading);
-export const responseHistoryAction = createAction<Http.ListResponse<Model.HistoryEvent>>(
-  ActionType.Account.History.Response
-);

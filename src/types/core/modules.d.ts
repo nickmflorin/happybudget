@@ -38,15 +38,9 @@ namespace Modules {
       readonly loadingDetail: boolean;
     }
 
-    interface CommentsStore extends Redux.AuthenticatedModelListResponseStore<Model.Comment> {
-      readonly replying: number[];
-    }
-
     type AccountOrSubAccountStore<D extends Model.HttpModel> = {
       readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<D>;
-      readonly comments: CommentsStore;
-      readonly history: Redux.ListResponseStore<Model.IFieldAlterationEvent>;
     }
 
     type SubAccountStore = AccountOrSubAccountStore<Model.SubAccount> & {
@@ -62,13 +56,10 @@ namespace Modules {
     interface Store {
       readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<Model.Budget>;
-      readonly comments: CommentsStore;
-      readonly history: Redux.ListResponseStore<Model.IFieldAlterationEvent>;
       readonly subaccount: SubAccountStore;
       readonly account: AccountStore;
       readonly actuals: Tables.ActualTableStore;
       readonly headerTemplates: HeaderTemplatesStore;
-      readonly commentsHistoryDrawerOpen: boolean;
     }
   }
 

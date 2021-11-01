@@ -78,7 +78,6 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
           const actionHandler = config.actions.updateModelsInState;
           if (!isNil(actionHandler)) {
             const response: Http.ListResponse<Model.Account> = yield api.request(config.services.request, objId, {
-              no_pagination: true,
               ids: action.payload.ids
             });
             yield put(actionHandler(response.data));
@@ -99,8 +98,8 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
             Http.ListResponse<Model.Group>,
             Http.ListResponse<Model.Markup>
           ] = yield all([
-            api.request(config.services.request, objId, { no_pagination: true }),
-            api.request(config.services.requestGroups, objId, { no_pagination: true }),
+            api.request(config.services.request, objId),
+            api.request(config.services.requestGroups, objId),
             call(requestMarkups, objId)
           ]);
           if (models.data.length === 0 && isAuthenticatedConfig(config)) {
@@ -126,7 +125,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
 
   const requestMarkups = (objId: number): Promise<Http.ListResponse<Model.Markup>> => {
     if (!isNil(config.services.requestMarkups)) {
-      return config.services.requestMarkups(objId, { no_pagination: true }, {});
+      return config.services.requestMarkups(objId, {}, {});
     }
     return new Promise(resolve => resolve({ count: 0, data: [] }));
   };

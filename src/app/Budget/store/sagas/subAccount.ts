@@ -3,7 +3,7 @@ import { call, put, select, spawn, all, takeLatest } from "redux-saga/effects";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { redux, budgeting, tabling, notifications } from "lib";
+import { budgeting, tabling, notifications } from "lib";
 
 import { SubAccountsTable } from "components/tabling";
 
@@ -15,57 +15,6 @@ import {
   responseFringesAction,
   responseSubAccountUnitsAction
 } from "../actions";
-
-export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
-  const subaccountId = yield select((state: Application.Authenticated.Store) => state.budget.subaccount.id);
-  if (!isNil(subaccountId)) {
-    yield put(actions.loadingHistoryAction(true));
-    try {
-      const response: Http.ListResponse<Model.HistoryEvent> = yield api.request(
-        api.getSubAccountSubAccountsHistory,
-        subaccountId,
-        {}
-      );
-      yield put(actions.responseHistoryAction(response));
-    } catch (e: unknown) {
-      notifications.requestError(e as Error, "There was an error retrieving the sub account's sub accounts history.");
-    } finally {
-      yield put(actions.loadingHistoryAction(false));
-    }
-  }
-}
-
-/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-const historySaga = redux.sagas.createModelListResponseSaga<Model.HistoryEvent>({
-  tasks: { request: getHistoryTask },
-  actions: {
-    request: actions.requestHistoryAction
-  }
-});
-
-const CommentsActionMap = {
-  response: actions.responseCommentsAction,
-  submit: actions.createCommentAction,
-  edit: actions.updateCommentAction,
-  request: actions.requestCommentsAction,
-  delete: actions.deleteCommentAction,
-  loading: actions.loadingCommentsAction,
-  updating: actions.updatingCommentAction,
-  deleting: actions.deletingCommentAction,
-  creating: actions.creatingCommentAction,
-  replying: actions.replyingToCommentAction,
-  removeFromState: actions.removeCommentFromStateAction,
-  updateInState: actions.updateCommentInStateAction,
-  addToState: actions.addCommentToStateAction
-};
-
-/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-const commentsSaga = budgeting.sagas.createCommentsListResponseSaga({
-  tasks: budgeting.tasks.comments.createListResponseTaskSet({
-    actions: CommentsActionMap
-  }),
-  actions: CommentsActionMap
-});
 
 function* getSubAccount(action: Redux.Action<null>): SagaIterator {
   const subaccountId = yield select((state: Application.Authenticated.Store) => state.budget.subaccount.id);

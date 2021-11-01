@@ -7,5 +7,5 @@ export const updateGroup = services.detailPatchService<Http.GroupPayload, Model.
 
 export const getGroupColors = async (options: Http.RequestOptions = {}): Promise<Http.ListResponse<string>> => {
   const url = services.URL.v1("groups", "colors");
-  return client.list<string>(url, { no_pagination: true, ...options });
+  return client.list<string>(url, {}, options);
 };

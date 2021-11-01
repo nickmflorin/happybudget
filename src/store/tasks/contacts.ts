@@ -14,7 +14,7 @@ export const createTaskSet = (config: { readonly authenticated: boolean }): Redu
   function* request(action: Redux.Action<null>): SagaIterator {
     yield put(actions.loadingContactsAction(true));
     try {
-      const response: Http.ListResponse<M> = yield api.request(api.getContacts, { no_pagination: true });
+      const response: Http.ListResponse<M> = yield api.request(api.getContacts, {});
       yield put(actions.responseContactsAction(response));
       if (config.authenticated) {
         yield put(actions.authenticated.responseFilteredContactsAction(response));
@@ -57,7 +57,7 @@ export const createTableTaskSet = (
   function* tableRequest(action: Redux.Action): SagaIterator {
     yield put(config.actions.loading(true));
     try {
-      const response: Http.ListResponse<M> = yield api.request(api.getContacts, { no_pagination: true });
+      const response: Http.ListResponse<M> = yield api.request(api.getContacts, {});
       yield put(config.actions.response({ models: response.data }));
     } catch (e: unknown) {
       notifications.requestError(e as Error, "There was an error retrieving the contacts.");

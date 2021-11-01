@@ -130,8 +130,8 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
             Http.ListResponse<Model.Group>,
             Http.ListResponse<Model.Markup>
           ] = yield all([
-            api.request(config.services.request, objId, { no_pagination: true }),
-            api.request(config.services.requestGroups, objId, { no_pagination: true }),
+            api.request(config.services.request, objId, {}),
+            api.request(config.services.requestGroups, objId, {}),
             call(requestMarkups, objId)
           ]);
           if (models.data.length === 0 && isAuthenticatedConfig(config)) {
@@ -157,15 +157,13 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
 
   const requestMarkups = (objId: number): Promise<Http.ListResponse<Model.Markup>> => {
     if (!isNil(config.services.requestMarkups)) {
-      return config.services.requestMarkups(objId, { no_pagination: true }, {});
+      return config.services.requestMarkups(objId, {}, {});
     }
     return new Promise(resolve => resolve({ count: 0, data: [] }));
   };
 
   function* requestFringes(objId: number): SagaIterator {
-    const response: Http.ListResponse<Model.Fringe> = yield api.request(config.services.requestFringes, objId, {
-      no_pagination: true
-    });
+    const response: Http.ListResponse<Model.Fringe> = yield api.request(config.services.requestFringes, objId, {});
     yield put(config.actions.responseFringes({ models: response.data }));
   }
 

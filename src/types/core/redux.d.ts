@@ -208,28 +208,6 @@ namespace Redux {
     readonly request: Task<null>;
   }
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type CommentsListResponseActionMap = Omit<
-    AuthenticatedModelListResponseActionMap<Model.Comment>,
-    "addToState" | "setSearch" | "restoreSearchCache" | "creating" | "deleting" | "updating"
-  > & {
-    readonly updating: ModelListActionPayload; // Make required
-    readonly creating: boolean; // Make required
-    readonly deleting: ModelListActionPayload; // Make required
-    readonly submit: { parent?: number; data: Http.CommentPayload };
-    readonly delete: number;
-    readonly edit: UpdateActionPayload<Model.Comment>;
-    readonly addToState: { data: Model.Comment; parent?: number };
-    readonly replying: ModelListActionPayload;
-  };
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type CommentsListResponseTaskMap = ModelListResponseTaskMap & {
-    readonly submit: Task<{ parent?: number; data: Http.CommentPayload }>;
-    readonly delete: Task<number>;
-    readonly edit: Task<UpdateActionPayload<Model.Comment>>;
-  };
-
   // Holds previously searched for results.  Note that this may not play well
   // with pagination, in which case we will have to adjust (but we are currently
   // not using pagination anywhere that we are using this cache).
@@ -288,9 +266,4 @@ namespace Redux {
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type BudgetTableStore<R extends Tables.BudgetRowData> = TableStore<R>;
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  interface CommentsListResponseStore extends AuthenticatedModelListResponseStore<Model.Comment> {
-    readonly replying: number[];
-  }
 }

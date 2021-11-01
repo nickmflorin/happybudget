@@ -39,12 +39,6 @@ export const isTemplate = <M extends Model.Template | Model.SimpleTemplate = Mod
   m: Model.HttpModel
 ): m is M => (m as M).type === "template";
 
-export const isFieldAlterationEvent = (
-  event: Model.FieldAlterationEvent | Model.CreateEvent
-): event is Model.FieldAlterationEvent => {
-  return (event as Model.FieldAlterationEvent).field !== undefined;
-};
-
 export const isModelWithChildren = <M extends Model.Model>(model: M): model is M & { children: M[] } => {
   return (
     (model as M & { children: M[] }).children !== undefined && Array.isArray((model as M & { children: M[] }).children)

@@ -49,7 +49,7 @@ export const getSubAccountSubAccounts = async <M extends Model.SubAccount | Mode
 
 export const getSubAccountUnits = async (options: Http.RequestOptions = {}): Promise<Http.ListResponse<Model.Tag>> => {
   const url = services.URL.v1("subaccounts", "units");
-  return client.list<Model.Tag>(url, { no_pagination: true }, options);
+  return client.list<Model.Tag>(url, {}, options);
 };
 
 export const getSubAccountAttachments = services.detailListService<Model.Attachment>((id: number) => [

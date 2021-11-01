@@ -13,10 +13,7 @@ export function* getBudgetsTask(action: Redux.Action): SagaIterator {
   });
   yield put(actions.loadingBudgetsAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleBudget> = yield api.request(api.getBudgets, {
-      ...query,
-      no_pagination: true
-    });
+    const response: Http.ListResponse<Model.SimpleBudget> = yield api.request(api.getBudgets, query);
     yield put(actions.responseBudgetsAction(response));
   } catch (e: unknown) {
     notifications.requestError(e as Error, "There was an error retrieving the budgets.");
@@ -34,10 +31,7 @@ export function* getTemplatesTask(action: Redux.Action): SagaIterator {
   });
   yield put(actions.loadingTemplatesAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleTemplate> = yield api.request(api.getTemplates, {
-      ...query,
-      no_pagination: true
-    });
+    const response: Http.ListResponse<Model.SimpleTemplate> = yield api.request(api.getTemplates, query);
     yield put(actions.responseTemplatesAction(response));
   } catch (e: unknown) {
     notifications.requestError(e as Error, "There was an error retrieving the templates.");
@@ -55,10 +49,7 @@ export function* getCommunityTemplatesTask(action: Redux.Action): SagaIterator {
   });
   yield put(actions.loadingCommunityTemplatesAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleTemplate> = yield api.request(api.getCommunityTemplates, {
-      ...query,
-      no_pagination: true
-    });
+    const response: Http.ListResponse<Model.SimpleTemplate> = yield api.request(api.getCommunityTemplates, query);
     yield put(actions.responseCommunityTemplatesAction(response));
   } catch (e: unknown) {
     notifications.requestError(e as Error, "There was an error retrieving the community templates.");

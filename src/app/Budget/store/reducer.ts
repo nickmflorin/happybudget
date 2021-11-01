@@ -56,34 +56,6 @@ const genericReducer = combineReducers({
       updateInState: actions.updateBudgetInStateAction
     }
   }),
-  comments: redux.reducers.createCommentsListResponseReducer({
-    actions: {
-      request: actions.accounts.requestCommentsAction,
-      response: actions.accounts.responseCommentsAction,
-      loading: actions.accounts.loadingCommentsAction,
-      submit: actions.accounts.createCommentAction,
-      delete: actions.accounts.deleteCommentAction,
-      edit: actions.accounts.updateCommentAction,
-      updating: actions.accounts.updatingCommentAction,
-      deleting: actions.accounts.deletingCommentAction,
-      creating: actions.accounts.creatingCommentAction,
-      replying: actions.accounts.replyingToCommentAction,
-      removeFromState: actions.accounts.removeCommentFromStateAction,
-      updateInState: actions.accounts.updateCommentInStateAction,
-      addToState: actions.accounts.addCommentToStateAction
-    }
-  }),
-  history: redux.reducers.createListResponseReducer<Model.HistoryEvent>({
-    initialState: redux.initialState.initialModelListResponseState,
-    actions: {
-      request: actions.accounts.requestHistoryAction,
-      response: actions.accounts.responseHistoryAction,
-      loading: actions.accounts.loadingHistoryAction
-    }
-  }),
-  commentsHistoryDrawerOpen: redux.reducers.createSimpleBooleanReducer({
-    actions: { set: actions.setCommentsHistoryDrawerVisibilityAction }
-  }),
   account: budgeting.reducers.createAccountDetailReducer({
     initialState: initialState.account,
     actions: {
@@ -126,31 +98,6 @@ const genericReducer = combineReducers({
             setSearch: actions.setFringesSearchAction
           }
         })
-      }),
-      comments: redux.reducers.createCommentsListResponseReducer({
-        actions: {
-          request: actions.account.requestCommentsAction,
-          response: actions.account.responseCommentsAction,
-          loading: actions.account.loadingCommentsAction,
-          submit: actions.account.createCommentAction,
-          delete: actions.account.deleteCommentAction,
-          edit: actions.account.updateCommentAction,
-          updating: actions.account.updatingCommentAction,
-          deleting: actions.account.deletingCommentAction,
-          creating: actions.account.creatingCommentAction,
-          replying: actions.account.replyingToCommentAction,
-          removeFromState: actions.account.removeCommentFromStateAction,
-          updateInState: actions.account.updateCommentInStateAction,
-          addToState: actions.account.addCommentToStateAction
-        }
-      }),
-      history: redux.reducers.createListResponseReducer<Model.HistoryEvent>({
-        initialState: redux.initialState.initialModelListResponseState,
-        actions: {
-          request: actions.account.requestHistoryAction,
-          response: actions.account.responseHistoryAction,
-          loading: actions.account.loadingHistoryAction
-        }
       })
     }
   }),
@@ -196,31 +143,6 @@ const genericReducer = combineReducers({
             setSearch: actions.setFringesSearchAction
           }
         })
-      }),
-      comments: redux.reducers.createCommentsListResponseReducer({
-        actions: {
-          request: actions.subAccount.requestCommentsAction,
-          response: actions.subAccount.responseCommentsAction,
-          loading: actions.subAccount.loadingCommentsAction,
-          submit: actions.subAccount.createCommentAction,
-          delete: actions.subAccount.deleteCommentAction,
-          edit: actions.subAccount.updateCommentAction,
-          updating: actions.subAccount.updatingCommentAction,
-          deleting: actions.subAccount.deletingCommentAction,
-          creating: actions.subAccount.creatingCommentAction,
-          replying: actions.subAccount.replyingToCommentAction,
-          removeFromState: actions.subAccount.removeCommentFromStateAction,
-          updateInState: actions.subAccount.updateCommentInStateAction,
-          addToState: actions.subAccount.addCommentToStateAction
-        }
-      }),
-      history: redux.reducers.createListResponseReducer<Model.HistoryEvent>({
-        initialState: redux.initialState.initialModelListResponseState,
-        actions: {
-          request: actions.subAccount.requestHistoryAction,
-          response: actions.subAccount.responseHistoryAction,
-          loading: actions.subAccount.loadingHistoryAction
-        }
       })
     }
   }),

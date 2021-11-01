@@ -25,5 +25,5 @@ export const uploadActualAttachment = services.detailPostService<FormData, Model
 ]);
 export const getActualTypes = async (options: Http.RequestOptions = {}): Promise<Http.ListResponse<Model.Tag>> => {
   const url = services.URL.v1("actuals", "types");
-  return client.list<Model.Tag>(url, { no_pagination: true }, options);
+  return client.list<Model.Tag>(url, {}, options);
 };

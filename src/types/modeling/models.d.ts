@@ -332,16 +332,6 @@ namespace Model {
     readonly owner: SimpleSubAccount | SimpleMarkup | null;
   }
 
-  type Comment = TimestampTrackedModel & {
-    readonly likes: SimpleUser[];
-    readonly user: SimpleUser;
-    readonly text: string;
-    readonly object_id: number;
-    readonly content_object_type: "budget" | "account" | "subaccount" | "comment";
-    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-    readonly comments: Comment[];
-  }
-
   interface ContactNamesAndImage {
     readonly image: SavedImage | null;
     readonly first_name: string | null;
@@ -367,26 +357,6 @@ namespace Model {
     | (User & { profile_image: SavedImage })
     | (SimpleUser & { profile_image: SavedImage })
     | (Contact & { image: SavedImage });
-
-  type HistoryEventType = "field_alteration" | "create";
-
-  interface PolymorphicEvent extends HttpModel {
-    readonly created_at: string;
-    readonly user: SimpleUser;
-    readonly type: HistoryEventType;
-    readonly content_object: SimpleAccount | SimpleSubAccount;
-  }
-
-  interface FieldAlterationEvent extends PolymorphicEvent {
-    readonly new_value: string | number | null;
-    readonly old_value: string | number | null;
-    readonly field: string;
-  }
-
-  interface CreateEvent extends PolymorphicEvent {}
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type HistoryEvent = FieldAlterationEvent | CreateEvent;
 
   interface SimpleHeaderTemplate extends TimestampTrackedModel {
     readonly name: string;

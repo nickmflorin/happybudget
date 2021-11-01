@@ -42,7 +42,6 @@ const Account = ({ budgetId, budget, setPreviewModalVisible }: AccountProps): JS
         budgetId={budgetId}
         setPreviewModalVisible={setPreviewModalVisible}
       />
-      {/* <AccountCommentsHistory /> */}
     </AccountPage>
   );
 };

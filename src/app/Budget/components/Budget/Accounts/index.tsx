@@ -21,7 +21,6 @@ const Accounts = ({ budget, budgetId, setPreviewModalVisible }: AccountsProps): 
   return (
     <AccountsPage budget={budget}>
       <AccountsTable budget={budget} budgetId={budgetId} setPreviewModalVisible={setPreviewModalVisible} />
-      {/* <AccountsCommentsHistory /> */}
     </AccountsPage>
   );
 };

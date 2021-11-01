@@ -7,6 +7,3 @@ export const selectBudgetDetail = redux.selectors.simpleDeepEqualSelector(
 export const selectBudgetDetailLoading = redux.selectors.simpleShallowEqualSelector(
   (state: Application.Authenticated.Store) => state.budget.detail.loading
 );
-export const selectCommentsHistoryDrawerOpen = redux.selectors.simpleShallowEqualSelector(
-  (state: Application.Authenticated.Store) => state.budget.commentsHistoryDrawerOpen
-);

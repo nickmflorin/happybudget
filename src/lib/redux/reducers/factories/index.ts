@@ -1,7 +1,6 @@
 import { modelListActionReducer } from "lib/redux/reducers";
 
 export * from "./util";
-export * from "./comments";
 export * from "./detail";
 export * from "./list";
 

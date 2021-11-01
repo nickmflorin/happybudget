@@ -120,12 +120,6 @@ namespace Http {
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  interface CommentPayload {
-    readonly likes?: number[];
-    readonly text: string;
-  }
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface HeaderTemplatePayload extends ModelPayload<Model.HeaderTemplate> {
     readonly left_image?: string | ArrayBuffer | null;
     readonly right_image?: string | ArrayBuffer | null;

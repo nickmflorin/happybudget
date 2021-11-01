@@ -45,7 +45,7 @@ const EditAttachmentsModal = ({
 
   useEffect(() => {
     setLoadingAttachments(true);
-    listAttachments(id, { no_pagination: true }, { cancelToken: cancelToken() })
+    listAttachments(id, {}, { cancelToken: cancelToken() })
       .then((response: Http.ListResponse<Model.Attachment>) => setAttachments(response.data))
       .catch((e: Error) => notifications.requestError(e))
       .finally(() => setLoadingAttachments(false));

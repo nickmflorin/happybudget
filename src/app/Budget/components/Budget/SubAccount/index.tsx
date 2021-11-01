@@ -44,7 +44,6 @@ const SubAccount = ({ budgetId, budget, setPreviewModalVisible }: SubAccountProp
         subaccountId={parseInt(subaccountId)}
         setPreviewModalVisible={setPreviewModalVisible}
       />
-      {/* <SubAccountCommentsHistory /> */}
     </SubAccountPage>
   );
 };

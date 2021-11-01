@@ -77,7 +77,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   }
 
   function* requestFringes(objId: number): SagaIterator {
-    const response: Http.ListResponse<M> = yield api.request(config.services.request, objId, { no_pagination: true });
+    const response: Http.ListResponse<M> = yield api.request(config.services.request, objId, {});
     if (response.data.length === 0) {
       // If there is no table data, we want to default create two rows.
       const createResponse: Http.BulkResponse<B, M> = yield api.request(config.services.bulkCreate, objId, {

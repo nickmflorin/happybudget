@@ -12,9 +12,7 @@ export { default as ActionType } from "./ActionType";
 export const setBudgetIdAction = createAction<number | null>(ActionType.SetId);
 export const loadingBudgetAction = createAction<boolean>(ActionType.Loading);
 export const responseBudgetAction = createAction<Model.Budget | null>(ActionType.Response);
-export const setCommentsHistoryDrawerVisibilityAction = createAction<boolean>(
-  ActionType.SetCommentsHistoryDrawerVisibility
-);
+
 export const updateBudgetInStateAction = createAction<Redux.UpdateActionPayload<Model.Budget>>(
   ActionType.UpdateInState
 );
