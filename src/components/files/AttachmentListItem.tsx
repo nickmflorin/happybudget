@@ -5,6 +5,7 @@ import { util, notifications } from "lib";
 
 import { Icon } from "components";
 import { IconButton, TrashButton } from "components/buttons";
+import { Link } from "components/links";
 
 import FileIcon from "./FileIcon";
 
@@ -22,9 +23,9 @@ const AttachmentListItem = ({ attachment, deleting, onClick, ...props }: Attachm
       <div className={"action-wrapper"}>
         <FileIcon className={"icon--attachment"} name={attachment.name} ext={attachment.extension} />
       </div>
-      <div className={"text-wrapper"} style={{ marginRight: 4 }}>
+      <Link href={attachment.url} style={{ marginRight: 4 }}>
         {attachment.name}
-      </div>
+      </Link>
       <div style={{ display: "flex", flexGrow: 100, justifyContent: "right" }}>
         <div className={"text-wrapper size"}>{util.files.fileSizeString(attachment.size)}</div>
         <div className={"action-wrapper"}>
@@ -46,12 +47,6 @@ const AttachmentListItem = ({ attachment, deleting, onClick, ...props }: Attachm
                 .finally(() => setDownloading(false));
             }}
             icon={<Icon icon={"arrow-circle-down"} weight={"regular"} />}
-          />
-        </div>
-        <div className={"action-wrapper"}>
-          <IconButton
-            onClick={() => window.open(attachment.url)}
-            icon={<Icon icon={"external-link-square-alt"} weight={"regular"} />}
           />
         </div>
         <div className={"action-wrapper"}>

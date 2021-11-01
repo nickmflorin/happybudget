@@ -31,6 +31,13 @@
       }
     }
 
+    .link {
+      line-height: 36px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     .action-wrapper {
       height: 36px;
       width: 28px;
