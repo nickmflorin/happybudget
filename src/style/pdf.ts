@@ -53,7 +53,7 @@ const TextStyles: Pdf.ExtensionStyles = {
   italic: { fontStyle: "italic" },
   uppercase: { textTransform: "uppercase" },
   header: { ext: ["text"], fontFamily: "AvenirNext" },
-  paragraph: { ext: ["text"], fontFamily: "AvenirNext", fontSize: 11, lineHeight: "1.5pt" },
+  paragraph: { ext: ["text"], fontFamily: "AvenirNext", fontSize: 9, lineHeight: "1.5pt" },
   h1: {
     ext: ["header"],
     fontWeight: 700,
@@ -85,14 +85,14 @@ const TextStyles: Pdf.ExtensionStyles = {
   h5: {
     ext: ["header"],
     fontWeight: 500,
-    fontSize: 16,
+    fontSize: 14,
     lineHeight: "1.5pt",
     marginBottom: 2
   },
   h6: {
     ext: ["header"],
     fontWeight: 500,
-    fontSize: 14,
+    fontSize: 12,
     lineHeight: "1.5pt",
     marginBottom: 2
   },

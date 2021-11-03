@@ -32,8 +32,8 @@ const DEFAULT_OPTIONS: ExportFormOptions = {
     header: `<h2>Sample Budget ${new Date().getFullYear()}</h2><p>Cost Summary</p>`,
     left_image: null,
     right_image: null,
-    left_info: "<h4>Production Company</h4><p>Address:</p><p>Phone:</p>",
-    right_info: "<h4>Client / Agency</h4><p>Address:</p><p>Phone:</p>"
+    left_info: "<h6>Production Company</h6><p>Address:</p><p>Phone:</p>",
+    right_info: "<h6>Client / Agency</h6><p>Address:</p><p>Phone:</p>"
   },
   includeNotes: false,
   columns: filter(
