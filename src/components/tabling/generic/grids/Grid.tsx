@@ -322,6 +322,7 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
         enterMovesDown={false}
         immutableData={true}
         getRowNodeId={getRowNodeId}
+        valueCache={false}
         rowBuffer={50}
         {...props}
         reactUi={false}
