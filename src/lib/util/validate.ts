@@ -4,7 +4,7 @@ const getPasswordValidationState = (value: string): PasswordValidationState => {
   const lowercase = /[a-z]/.test(value);
   const uppercase = /[A-Z]/.test(value);
   const number = /[0-9]/.test(value);
-  const character = /[!@#$%&_=]/.test(value);
+  const character = /[\W|_/g]/.test(value);
   const minChar = value.length >= 8;
   return { lowercase, uppercase, number, character, minChar };
 };
