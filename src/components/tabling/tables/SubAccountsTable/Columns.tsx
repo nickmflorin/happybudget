@@ -79,7 +79,7 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     headerName: "Qty",
     pdfWidth: 0.1,
     width: 60,
-    valueSetter: tabling.valueSetters.integerValueSetter<R>("quantity"),
+    valueSetter: tabling.valueSetters.floatValueSetter<R>("quantity"),
     columnType: "number",
     // If the plurality of the quantity changes, we need to refresh the refresh
     // the unit column to change the plurality of the tag in the cell.
