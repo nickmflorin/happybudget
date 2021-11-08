@@ -3,6 +3,7 @@ import { find, isNil } from "lodash";
 import classNames from "classnames";
 
 import { Tag } from "components/tagging";
+import { model } from "lib";
 import { useContacts, useContactsLoaded } from "store/hooks";
 
 import { Cell } from "./generic";
@@ -28,7 +29,7 @@ const ContactCell = <
   const contacts = useContacts();
   const loaded = useContactsLoaded();
 
-  const model = useMemo(() => {
+  const m = useMemo(() => {
     if (!isNil(value)) {
       const c: Model.Contact | undefined = find(contacts, { id: value } as any);
       if (isNil(c)) {
@@ -53,13 +54,13 @@ const ContactCell = <
   }
   return (
     <Cell {...props}>
-      {!isNil(model) ? (
+      {!isNil(m) ? (
         <Tag
           className={classNames("tag--contact", { focused: isFocused })}
           color={"#EFEFEF"}
           textColor={"#2182e4"}
-          text={model.full_name}
-          onClick={() => props.onEditContact({ contact: model.id, id: row.id })}
+          text={!isNil(m) ? model.util.contactName(m) : ""}
+          onClick={() => props.onEditContact({ contact: m.id, id: row.id })}
           disabled={!isFocused}
         />
       ) : (

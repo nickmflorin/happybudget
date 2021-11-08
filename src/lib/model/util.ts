@@ -1,6 +1,10 @@
 import { isNil, filter, find, map, forEach, reduce } from "lodash";
 import { util, tabling } from "lib";
 import { Colors } from "style/constants";
+import * as models from "./models";
+
+export const contactName = (contact: Model.Contact): string | null =>
+  contact.contact_type?.id === models.ContactTypeModels.VENDOR.id ? contact.company : contact.full_name;
 
 export const getGroupColorDefinition = (
   group: Style.HexColor | Model.Group | Table.GroupRow<any>
@@ -22,17 +26,17 @@ export const getGroupColorDefinition = (
 };
 
 export const findChoiceForName = <M extends Model.Choice<number, string>>(
-  models: M[],
+  ms: M[],
   name: string,
   caseSensitive = true
 ): M | null => {
   return caseSensitive
-    ? find(models, { name } as any) || null
-    : find(models, (model: M) => model.name.toLowerCase() === name.toLowerCase()) || null;
+    ? find(ms, { name } as any) || null
+    : find(ms, (model: M) => model.name.toLowerCase() === name.toLowerCase()) || null;
 };
 
-export const findChoiceForId = <M extends Model.Choice<number, string>>(models: M[], id: ID): M | null => {
-  return find(models, { id } as any) || null;
+export const findChoiceForId = <M extends Model.Choice<number, string>>(ms: M[], id: ID): M | null => {
+  return find(ms, { id } as any) || null;
 };
 
 type InferModelFromNameParams<M extends Model.Model> = {
@@ -57,7 +61,7 @@ type InferModelFromNameParams<M extends Model.Model> = {
  * @param options   InferModelFromNameParams
  */
 export const inferModelFromName = <M extends Model.Model>(
-  models: M[],
+  ms: M[],
   value: string,
   options?: InferModelFromNameParams<M>
 ): M | null => {
@@ -67,7 +71,7 @@ export const inferModelFromName = <M extends Model.Model>(
   const strictUniqueness = !isNil(options.strictUniqueness) ? options.strictUniqueness : false;
 
   const performFilter = (caseSensitive: boolean): M[] => {
-    const ms: M[] = filter(models, (m: M) => {
+    return filter(ms, (m: M) => {
       const nameValue = util.getKeyValue<M, keyof M>(nameField)(m);
       if (!isNil(nameValue) && typeof nameValue === "string") {
         return caseSensitive === false
@@ -76,19 +80,18 @@ export const inferModelFromName = <M extends Model.Model>(
       }
       return false;
     });
-    return ms;
   };
 
   if (value.trim() === "" && ignoreBlank) {
     return null;
   } else {
-    const ms = performFilter(false);
-    if (ms.length === 0) {
+    const filtered = performFilter(false);
+    if (filtered.length === 0) {
       // If there are no matches when case is insensitive, there will also be no
       // matches when case is sensitive.
       return null;
-    } else if (ms.length === 1) {
-      return ms[0];
+    } else if (filtered.length === 1) {
+      return filtered[0];
     } else {
       // If there are multiple matches, we need to restrict base on case sensitivity.
       const msCaseSensitive = performFilter(true);
@@ -157,11 +160,11 @@ type GetModelsByIdOptions = {
 };
 
 export const getModelById = <M extends Model.Model>(
-  models: M[],
+  ms: M[],
   id: ID,
   options: GetModelsByIdOptions = { throwOnMissing: false, warnOnMissing: true }
 ): M | null => {
-  const model: M | undefined = find(models, { id } as any);
+  const model: M | undefined = find(ms, { id } as any);
   if (isNil(model)) {
     if (options.throwOnMissing === true) {
       throw new Error(`Cannot find ${options.modelName || "model"} with ID ${id} in provided models!`);
@@ -175,12 +178,12 @@ export const getModelById = <M extends Model.Model>(
 };
 
 export const getModelsByIds = <M extends Model.Model>(
-  models: M[],
+  ms: M[],
   ids: ID[],
   options: GetModelsByIdOptions = { throwOnMissing: false, warnOnMissing: true }
 ): M[] => {
   return filter(
-    map(ids, (id: ID) => getModelById(models, id, options)),
+    map(ids, (id: ID) => getModelById(ms, id, options)),
     (m: M | null) => !isNil(m)
   ) as M[];
 };
