@@ -12,7 +12,7 @@
   user-select: none;
   vertical-align: middle;
   justify-content: center;
-  border-color: $transparent !important;
+  border-color: $transparent;
 
   &:disabled,
   &.disabled,
@@ -20,7 +20,7 @@
   &:hover:not(:disabled):not(.disabled):not(.fake-disabled),
   &:focus:not(:disabled):not(.disabled):not(.fake-disabled),
   &.hovered:not(:disabled):not(.disabled):not(.fake-disabled) {
-    border-color: $transparent !important;
+    border-color: $transparent;
   }
 
   &.no-transform {
@@ -49,7 +49,6 @@
 
 .icon-wrapper {
   height: 100%;
-  aspect-ratio: 1;
   width: auto;
   position: relative;
   display: flex;
@@ -131,6 +130,7 @@
 
 @mixin bare_color_set($c, $h: lighten($c, 20%), $d: $disabled-color) {
   @include color_set($c, $h, $d);
+  border-color: $transparent !important;
 
   &:hover,
   &:disabled,
@@ -155,16 +155,19 @@
 @mixin primary() {
   @include bg_color_set($green, $green-darker, $green-darker);
   @include solid_color($white);
+  border-color: $transparent !important;
 }
 
 @mixin danger() {
   @include bg_color_set($red, $red-darker, $red-darker);
   @include solid_color($white);
+  border-color: $transparent !important;
 }
 
 @mixin default() {
   @include bg_color_set(#ececec, darken(#ececec, 10%), darken(#ececec, 10%));
   @include solid_color($text-secondary);
+  border-color: $transparent !important;
 }
 
 .link {
@@ -501,7 +504,6 @@
 
   &--google {
     @extend .btn--large;
-    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1) !important;
     border-radius: 4px !important;
     width: 230px !important;
     text-transform: unset !important;
@@ -512,27 +514,29 @@
     font-size: 14px;
     font-family: $avenir;
 
-    @include color_on_disabled(rgba(70, 70, 70, 0.6));
-    @include color_on_hover(rgba(70, 70, 70, 0.6));
+    @include bg_color_set($white, $white, $white);
+    @include solid_color($text-secondary);
+    border-color: #e5e5e5 !important;
 
     &:hover,
     &:focus,
     &:disabled,
     &.fake-disabled,
     &.disabled {
-      border-color: #d9d9d9 !important;
       box-shadow: none !important;
+      border-color: #e5e5e5 !important;
     }
 
     .content-wrapper {
       display: flex;
       margin: 0 auto;
+      position: relative;
+      height: 100%;
 
       .icon-wrapper {
-        padding: 13px;
+        margin-right: 8px;
 
         .icon {
-          top: 1px;
           position: relative;
           height: 18px;
           width: 18px;
@@ -540,7 +544,7 @@
       }
 
       .text-wrapper {
-        line-height: 49px;
+        line-height: 42px;
       }
     }
   }
