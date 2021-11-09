@@ -14,6 +14,7 @@
     "@ckeditor/ckeditor5-build-balloon": "^30.0.0",
     "@ckeditor/ckeditor5-build-classic": "^30.0.0",
     "@ckeditor/ckeditor5-react": "^3.0.3",
+    "@fancyapps/ui": "^4.0.9",
     "@fortawesome/fontawesome-pro": "^5.15.3",
     "@fortawesome/fontawesome-svg-core": "^1.2.34",
     "@fortawesome/pro-duotone-svg-icons": "^5.15.3",

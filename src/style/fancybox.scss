@@ -1,0 +1,8 @@
+.fancybox__slide {
+  &.has-pdf {
+    .fancybox__content {
+      width: 100% !important;
+      height: 100% !important;
+    }
+  }
+}

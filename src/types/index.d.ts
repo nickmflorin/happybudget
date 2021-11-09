@@ -26,3 +26,5 @@ declare module "@ckeditor/ckeditor5-react" {
   const CKEditor: React.FunctionComponent<CKEditorProps>;
   export { CKEditor, CKEditorProps, Event as CKEditorEvent, BalloonEditor as EditorInstance };
 }
+
+declare module "@fancyapps/ui/dist/fancybox.esm.js"

@@ -7,6 +7,7 @@ import { Icon } from "components";
 import { IconButton, TrashButton } from "components/buttons";
 import { Link } from "components/links";
 
+import Fancybox from "./Fancybox";
 import FileIcon from "./FileIcon";
 
 interface AttachmentListItemProps extends StandardComponentProps {
@@ -23,9 +24,11 @@ const AttachmentListItem = ({ attachment, deleting, onClick, ...props }: Attachm
       <div className={"action-wrapper"}>
         <FileIcon className={"icon--attachment"} name={attachment.name} ext={attachment.extension} />
       </div>
-      <Link href={attachment.url} style={{ marginRight: 4 }}>
-        {attachment.name}
-      </Link>
+      <Fancybox options={{ infinite: false }}>
+        <Link data-fancybox={"gallery"} data-src={attachment.url} style={{ marginRight: 4 }}>
+          {attachment.name}
+        </Link>
+      </Fancybox>
       <div style={{ display: "flex", flexGrow: 100, justifyContent: "right" }}>
         <div className={"text-wrapper size"}>{util.files.fileSizeString(attachment.size)}</div>
         <div className={"action-wrapper"}>

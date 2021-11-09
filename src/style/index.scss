@@ -17,10 +17,12 @@
 @import "./tabling/index";
 @import "./react-datepicker";
 @import "./pagination";
+@import "./fancybox";
 
 @import "~react-toastify/dist/ReactToastify.css";
 @import "~antd/dist/antd.css";
 @import "filepond/dist/filepond.min.css";
+@import "@fancyapps/ui/dist/fancybox.css";
 
 @mixin fface($family, $type: "Regular", $weight: 400, $style: normal) {
   $src: null;
