@@ -20,12 +20,7 @@ export const estimatedValueGetter = <R extends Tables.BudgetRowData>(
       if (row.markupData.unit.id === model.models.MarkupUnitModels.FLAT.id) {
         return row.markupData.rate || 0.0;
       }
-      return reduce(
-        childrenRows,
-        (curr: number, r: Table.DataRow<R>) =>
-          curr + model.businessLogic.contributionFromMarkups(businessLogic.estimatedValue(r), [row]),
-        0.0
-      );
+      return reduce(childrenRows, (curr: number, r: Table.DataRow<R>) => curr + r.data.markup_contribution, 0.0);
     } else {
       return reduce(childrenRows, (curr: number, r: Table.DataRow<R>) => curr + businessLogic.estimatedValue(r), 0.0);
     }

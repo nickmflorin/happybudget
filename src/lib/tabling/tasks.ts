@@ -11,10 +11,11 @@ export const createChangeEventHandler = <
 ): Redux.TableEventTask<Table.ChangeEvent<R, M>> => {
   function* handleChangeEvent(e: Table.ChangeEvent<R, M>): SagaIterator {
     const handler = handlers[e.type];
+    // Do not issue a warning/error if the event type does not have an associated
+    // handler because there are event types that correspond to reducer behavior
+    // only.
     if (!isNil(handler)) {
       yield call(handler, e);
-    } else {
-      console.error(`Received unexpected event type ${e.type}!`);
     }
   }
   return handleChangeEvent;
