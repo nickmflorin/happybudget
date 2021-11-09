@@ -1,5 +1,8 @@
 import { isNil } from "lodash";
 
+import { Image } from "components/pdf";
+import Logo from "components/images/logo_green.png";
+
 import { View, BasePage } from "./primitive";
 import { BasePageProps } from "./primitive/Page";
 import { Label } from "./text";
@@ -28,6 +31,7 @@ const Page = ({ header, footer, children, ...props }: PageProps): JSX.Element =>
         <></>
       )}
       <View className={"page-footer"} wrap={false}>
+        <Image className={"footer-logo"} src={Logo} />
         <Label
           fixed={true}
           className={"page-number"}

@@ -132,12 +132,14 @@ const LayoutStyles: Pdf.ExtensionStyles = {
     fontSize: 20
   },
   "page-footer": {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 15
   },
   "page-number": {
     fontSize: 10,
-    textAlign: "right",
-    width: "100%",
     marginTop: 4
   }
 };
@@ -289,6 +291,11 @@ const ExportStyles: Pdf.ExtensionStyles = {
     objectFit: "contain",
     marginRight: 15,
     borderRadius: 10
+  },
+  "footer-logo": {
+    width: 100,
+    height: 30,
+    objectFit: "contain"
   },
   "budget-page-sub-header-rich-text": {
     flexGrow: 100
