@@ -33,11 +33,11 @@ export const isPdfBudget = (m: Model.HttpModel): m is Model.PdfBudget => (m as M
 
 export const isBudget = <M extends Model.Budget | Model.SimpleBudget = Model.Budget | Model.SimpleBudget>(
   m: Model.HttpModel
-): m is M => (m as M).type === "budget";
+): m is M => (m as M).type === "budget" && (m as M).domain === "budget";
 
 export const isTemplate = <M extends Model.Template | Model.SimpleTemplate = Model.Template | Model.SimpleTemplate>(
   m: Model.HttpModel
-): m is M => (m as M).type === "template";
+): m is M => (m as M).type === "budget" && (m as M).domain === "template";
 
 export const isModelWithChildren = <M extends Model.Model>(model: M): model is M & { children: M[] } => {
   return (

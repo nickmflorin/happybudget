@@ -183,12 +183,13 @@ namespace Model {
   type Markup = FlatMarkup | PercentMarkup;
 
   interface BaseBudget extends TrackedModel {
+    readonly type: "budget";
     readonly name: string;
     readonly type: BudgetType;
   }
 
   interface SimpleTemplate extends BaseBudget {
-    readonly type: "template";
+    readonly domain: "template";
     readonly image: SavedImage | null;
     // The hidden attribute will not be present for non-community templates.
     readonly hidden?: boolean;
@@ -202,7 +203,7 @@ namespace Model {
   }
 
   interface SimpleBudget extends BaseBudget {
-    readonly type: "budget";
+    readonly domain: "budget";
     readonly image: SavedImage | null;
   }
 
