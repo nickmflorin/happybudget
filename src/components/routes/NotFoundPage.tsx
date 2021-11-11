@@ -1,16 +1,13 @@
-import { isNil } from "lodash";
+import { RouterLink } from "components/links";
+import { NotFoundPageIcon } from "components/svgs";
 
-interface NotFoundPageProps {
-  readonly redirect?: string | true;
-}
+import "./NotFoundPage.scss";
 
-const NotFoundPage = (props: NotFoundPageProps) => (
+const NotFoundPage = () => (
   <div className={"not-found-page"}>
-    <h1>
-      {!isNil(props.redirect) && typeof props.redirect === "string"
-        ? props.redirect
-        : "The requested resource could not be found."}
-    </h1>
+    <NotFoundPageIcon />
+    <h1>{"Oh no! The page you were looking for doesn't exist."}</h1>
+    <RouterLink to={"/"}>{"Click here to return home."}</RouterLink>
   </div>
 );
 

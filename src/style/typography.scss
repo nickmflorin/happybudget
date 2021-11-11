@@ -18,6 +18,8 @@ p {
 
 h1 {
   @extend .header-base;
+  font-weight: 700;
+
   &.ant-typography {
     font-size: 28px;
   }

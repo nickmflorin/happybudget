@@ -52,7 +52,7 @@
 }
 
 .ck-content .ck-heading_heading1,
-h1 {
+.ck-content h1 {
   @extend .header-base;
   font-weight: 700;
   font-size: 20px;
@@ -62,7 +62,7 @@ h1 {
 }
 
 .ck-content .ck-heading_heading2,
-h2 {
+.ck-content h2 {
   @extend .header-base;
   font-weight: 700;
   font-size: 18px;
@@ -72,7 +72,7 @@ h2 {
 }
 
 .ck-content .ck-heading_heading3,
-h3 {
+.ck-content h3 {
   @extend .header-base;
   font-weight: 600;
   font-size: 18px;
@@ -82,7 +82,7 @@ h3 {
 }
 
 .ck-content .ck-heading_heading4,
-h4 {
+.ck-content h4 {
   @extend .header-base;
   font-weight: 600;
   font-size: 16px;
@@ -92,7 +92,7 @@ h4 {
 }
 
 .ck-content .ck-heading_heading5,
-h5 {
+.ck-content h5 {
   @extend .header-base;
   font-weight: 500;
   font-size: 16px;
@@ -102,7 +102,7 @@ h5 {
 }
 
 .ck-content .ck-heading_heading6,
-h6 {
+.ck-content h6 {
   @extend .header-base;
   font-weight: 500;
   font-size: 14px;
