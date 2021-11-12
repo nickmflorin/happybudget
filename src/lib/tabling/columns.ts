@@ -238,14 +238,18 @@ export const CalculatedColumn = <
   return {
     ...col,
     cellStyle: { textAlign: "right", ...col?.cellStyle },
-    cellRenderer: "CalculatedCell",
+    // We do not want to use the cell renderers for the body cells because it
+    // slows rendering down dramatically.
+    cellRenderer: {
+      footer: "CalculatedCell",
+      page: "CalculatedCell"
+    },
     tableColumnType: "calculated",
     columnType: "sum",
     isRead: true,
     isWrite: false,
     suppressSizeToFit: true,
     width: !isNil(width) ? width : 100,
-    // maxWidth: !isNil(width) ? width : 100,
     cellClass: aggrid.mergeClassNamesFn("cell--calculated", col?.cellClass),
     valueFormatter: formatters.currencyValueFormatter,
     cellRendererParams: {

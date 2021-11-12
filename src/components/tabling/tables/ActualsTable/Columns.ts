@@ -51,7 +51,6 @@ const Columns: Table.Column<R, M>[] = [
     flex: 1,
     valueFormatter: tabling.formatters.currencyValueFormatter,
     valueSetter: tabling.valueSetters.floatValueSetter<R>("value"),
-    cellRenderer: "BodyCell",
     columnType: "currency"
   }),
   tabling.columns.SelectColumn<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>({

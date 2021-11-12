@@ -20,7 +20,6 @@ const Columns: Table.Column<R, M>[] = [
     minWidth: 200,
     flex: 100,
     columnType: "longText",
-    cellRenderer: "BodyCell",
     cellRendererParams: {
       icon: (row: Table.BodyRow<R>) =>
         tabling.typeguards.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined

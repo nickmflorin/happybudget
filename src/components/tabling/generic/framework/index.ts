@@ -22,7 +22,6 @@ export const Framework: Table.Framework = {
       EmptyCell: React.memo(cells.EmptyCell),
       NewRowCell: React.memo(cells.NewRowCell),
       BodyCell: React.memo(cells.BodyCell),
-      CalculatedCell: React.memo(cells.CalculatedCell),
       ColorCell: React.memo(cells.ColorCell),
       ContactCell: React.memo(cells.ContactCell),
       PhoneNumberCell: React.memo(cells.PhoneNumberCell),

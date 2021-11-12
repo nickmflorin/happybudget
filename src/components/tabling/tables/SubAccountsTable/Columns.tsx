@@ -22,7 +22,6 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     columnType: "longText",
     index: 1,
     suppressSizeToFit: false,
-    cellRenderer: "BodyCell",
     pdfHeaderName: "Category Description",
     pdfWidth: 0.6,
     pdfFooter: { value: "Grand Total" },
