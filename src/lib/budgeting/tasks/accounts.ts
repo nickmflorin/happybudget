@@ -98,8 +98,8 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
             Http.ListResponse<Model.Group>,
             Http.ListResponse<Model.Markup>
           ] = yield all([
-            api.request(config.services.request, objId),
-            api.request(config.services.requestGroups, objId),
+            api.request(config.services.request, objId, {}),
+            api.request(config.services.requestGroups, objId, {}),
             call(requestMarkups, objId)
           ]);
           if (models.data.length === 0 && isAuthenticatedConfig(config)) {
