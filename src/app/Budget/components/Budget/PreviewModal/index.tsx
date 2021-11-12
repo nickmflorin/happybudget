@@ -27,7 +27,7 @@ const SubAccountColumns = filter(
 ) as Table.PdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>[];
 
 const DEFAULT_OPTIONS: ExportFormOptions = {
-  excludeZeroTotals: true,
+  excludeZeroTotals: false,
   header: {
     header: `<h2>Sample Budget ${new Date().getFullYear()}</h2><p>Cost Summary</p>`,
     left_image: null,
