@@ -1,7 +1,7 @@
 import { isNil } from "lodash";
 
 import { Image } from "components/pdf";
-import Logo from "components/images/logo_green.png";
+import Logo from "components/images/GreenLogo.png";
 
 import { View, BasePage } from "./primitive";
 import { BasePageProps } from "./primitive/Page";
