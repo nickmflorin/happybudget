@@ -8,8 +8,7 @@ export const Framework: Table.Framework = {
   editors: {},
   cells: {
     data: {
-      ExpandCell: framework.excludeRowsOfType(["placeholder"])(React.memo(cells.ExpandCell)),
-      IdentifierCell: React.memo(cells.IdentifierCell)
+      ExpandCell: framework.excludeRowsOfType(["placeholder"])(React.memo(cells.ExpandCell))
     },
     footer: { IdentifierCell: React.memo(cells.IdentifierCell) },
     page: { IdentifierCell: React.memo(cells.IdentifierCell) }

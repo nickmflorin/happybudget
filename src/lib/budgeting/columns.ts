@@ -27,7 +27,9 @@ export const IdentifierColumn = <
       cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset", textAlign: "left" }
     },
     index: 0,
-    cellRenderer: { data: "IdentifierCell", footer: "IdentifierCell", page: "IdentifierCell" },
+    // We only want to use IdentifierCell's in the Footer cells because it slows rendering
+    // performance down dramatically.
+    cellRenderer: { footer: "IdentifierCell", page: "IdentifierCell" },
     width: 100,
     suppressSizeToFit: true,
     cellStyle: { textAlign: "left" },
