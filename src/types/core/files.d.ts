@@ -5,7 +5,7 @@ type CSVData = CSVRow[];
 
 // Image data that is received from the API.
 type SavedImage = {
-  readonly url: string;
+  readonly url: string; // URL will be string, unless something happened with S3.
   readonly size: number;
   readonly height: number;
   readonly width: number;

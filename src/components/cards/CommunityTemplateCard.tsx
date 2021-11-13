@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { isNil } from "lodash";
+
 import { Icon } from "components";
 import { useLoggedInUser } from "store/hooks";
 
@@ -31,6 +34,15 @@ const CommunityTemplateCard = ({
   onDelete
 }: CommunityTemplateCardProps): JSX.Element => {
   const user = useLoggedInUser();
+
+  useEffect(() => {
+    if (!isNil(template.image) && isNil(template.image.url)) {
+      console.warn(
+        `Template ${template.id} has an image with an undefined URL.
+        This most likely means something wonky is going on with S3.`
+      );
+    }
+  }, [template.image]);
 
   return (
     <Card

@@ -1,10 +1,11 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import { Icon } from "components";
 import { useLoggedInUser, useTimezone } from "store/hooks";
 import { util } from "lib";
 
 import Card from "./Card";
+import { isNil } from "lodash";
 
 interface BudgetCardProps {
   readonly budget: Model.Budget;
@@ -36,6 +37,15 @@ const BudgetCard = ({
     }
     return `Last edited by ${user.full_name} on ${util.dates.toAbbvDisplayDateTime(budget.updated_at, { tz })}`;
   }, [budget.updated_at, user.full_name]);
+
+  useEffect(() => {
+    if (!isNil(budget.image) && isNil(budget.image.url)) {
+      console.warn(
+        `Budget ${budget.id} has an image with an undefined URL.
+        This most likely means something wonky is going on with S3.`
+      );
+    }
+  }, [budget.image]);
 
   return (
     <Card
