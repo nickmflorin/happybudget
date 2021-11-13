@@ -3,12 +3,12 @@ import { useHistory } from "react-router-dom";
 
 import { Icon } from "components";
 import { AccountCircleLink } from "components/links";
-import { useLoggedInUser } from "store/hooks";
+import { users } from "lib";
 
 import DropdownMenu, { DropdownMenuProps } from "./DropdownMenu";
 
 const UserDropdownMenu = (props: Omit<DropdownMenuProps, "models" | "menuClassName" | "children">): JSX.Element => {
-  const user = useLoggedInUser();
+  const user = users.hooks.useLoggedInUser();
   const history = useHistory();
 
   return (

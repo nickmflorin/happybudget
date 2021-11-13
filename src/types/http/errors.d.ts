@@ -1,9 +1,11 @@
 declare namespace Http {
-  type ErrorType = "unknown" | "http" | "field" | "global" | "auth";
+  type ErrorType = "unknown" | "http" | "field" | "global" | "auth" | "billing";
 
   type FileErrorCode = "invalid_file_name" | "invalid_file_extension";
 
   type GlobalErrorCode = "pdf_error" | "rate_limited";
+
+  type BillingErrorCode = "stripe_request_error" | "checkout_error" | "checkout_session_inactive";
 
   type FieldErrorCode =
     | FileErrorCode
@@ -29,7 +31,13 @@ declare namespace Http {
 
   type UnknownErrorCode = "unknown";
 
-  type ErrorCode = AuthErrorCode | HttpErrorCode | UnknownErrorCode | FieldErrorCode | GlobalErrorCode;
+  type ErrorCode =
+    | AuthErrorCode
+    | HttpErrorCode
+    | UnknownErrorCode
+    | FieldErrorCode
+    | GlobalErrorCode
+    | BillingErrorCode;
 
   interface IApiError<T extends ErrorType = ErrorType, C extends string = string> {
     readonly code: C;
@@ -60,6 +68,7 @@ declare namespace Http {
     readonly userId?: number;
     readonly globalError: GlobalError | null;
     readonly authenticationError: AuthError | null;
+    readonly billingError: BillingError | null;
     readonly httpError: HttpError | null;
     readonly unknownError: UnknownError | null;
     readonly fieldErrors: FieldError[];
@@ -72,6 +81,7 @@ declare namespace Http {
   type GlobalError = IApiError<"global", GlobalErrorCode>;
   type HttpError = IApiError<"http", HttpErrorCode>;
   type AuthError = IApiError<"auth", AuthErrorCode>;
+  type BillingError = IApiError<"billing", BillingErrorCode>;
 
-  type Error = HttpError | UnknownError | FieldError | GlobalError | AuthError;
+  type Error = HttpError | UnknownError | FieldError | GlobalError | AuthError | BillingError;
 }

@@ -6,7 +6,7 @@ import { map, isNil } from "lodash";
 import { Pagination } from "antd";
 
 import * as api from "api";
-import { redux, notifications } from "lib";
+import { redux, notifications, users } from "lib";
 
 import { ShowHide, Icon } from "components";
 import { PrimaryButtonIconToggle, OrderingButtonIconToggle } from "components/buttons";
@@ -16,8 +16,6 @@ import { SearchInput } from "components/fields";
 import { Page } from "components/layout";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
 import { IsStaff } from "components/permissions";
-
-import { useLoggedInUser } from "store/hooks";
 
 import { actions } from "../../store";
 
@@ -38,7 +36,7 @@ interface DiscoverProps {
 const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTemplateToDerive }): JSX.Element => {
   const [templateToEdit, setTemplateToEdit] = useState<number | undefined>(undefined);
   const [createTemplateModalOpen, setCreateTempateModalOpen] = useState(false);
-  const user = useLoggedInUser();
+  const user = users.hooks.useLoggedInUser();
   const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
   const [isTogglingVisibility, setTogglingVisibility, setVisibilityToggled] = redux.hooks.useTrackModelActions([]);
   const [isDuplicating, setDuplicating, setDuplicated] = redux.hooks.useTrackModelActions([]);

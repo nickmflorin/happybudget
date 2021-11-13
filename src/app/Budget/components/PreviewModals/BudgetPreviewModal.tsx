@@ -4,8 +4,7 @@ import { isNil, map, filter } from "lodash";
 import classNames from "classnames";
 
 import * as api from "api";
-import { redux, ui, tabling, pdf } from "lib";
-import { selectors } from "store";
+import { redux, ui, tabling, pdf, contacts } from "lib";
 
 import { ExportBudgetPdfForm } from "components/forms";
 import { PreviewModal } from "components/modals";
@@ -80,7 +79,7 @@ const BudgetPreviewModal = ({
   const [loadingData, setLoadingData] = useState(false);
   const [getToken] = api.useCancelToken({ preserve: true, createOnInit: true });
 
-  const contacts = useSelector(selectors.selectContacts);
+  const cs = contacts.hooks.useContacts();
 
   const [budget, setBudget] = useState<Model.PdfBudget | null>(null);
   const [options, setOptions] = useState<ExportBudgetPdfFormOptions>(DEFAULT_OPTIONS);
@@ -128,7 +127,7 @@ const BudgetPreviewModal = ({
           setBudget(response);
           const pdfComponent = BudgetPdfFunc({
             budget: response,
-            contacts,
+            contacts: cs,
             options: convertOptions(options)
           });
           previewer.current?.render(pdfComponent);
@@ -143,7 +142,7 @@ const BudgetPreviewModal = ({
       if (!isNil(budget)) {
         return BudgetPdfFunc({
           budget,
-          contacts,
+          contacts: cs,
           options: convertOptions(options)
         });
       }

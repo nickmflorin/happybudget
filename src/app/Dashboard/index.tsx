@@ -1,9 +1,7 @@
-import { Switch, useHistory, useLocation } from "react-router-dom";
+import { Route, Switch, useHistory, useLocation } from "react-router-dom";
 
 import { Icon } from "components";
 import { ExpandedLayout } from "components/layout";
-import { PrivateRoute } from "components/routes";
-
 import { Contacts, Templates, Budgets } from "./components";
 
 import "./index.scss";
@@ -54,9 +52,9 @@ const Dashboard = (): JSX.Element => {
       showHeaderLogo={true}
     >
       <Switch>
-        <PrivateRoute exact path={"/contacts"} component={Contacts} />
-        <PrivateRoute exact path={"/budgets"} component={Budgets} />
-        <PrivateRoute path={["/templates", "/discover"]} component={Templates} />
+        <Route exact path={"/contacts"} component={Contacts} />
+        <Route exact path={"/budgets"} component={Budgets} />
+        <Route path={["/templates", "/discover"]} component={Templates} />
       </Switch>
     </ExpandedLayout>
   );

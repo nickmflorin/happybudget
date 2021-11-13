@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { isNil } from "lodash";
 
 import { Icon } from "components";
-import { useLoggedInUser } from "store/hooks";
+import { users } from "lib";
 
 import Card from "./Card";
 
@@ -33,7 +33,7 @@ const TemplateCard = ({
   onDelete,
   onMoveToCommunity
 }: TemplateCardProps): JSX.Element => {
-  const user = useLoggedInUser();
+  const user = users.hooks.useLoggedInUser();
 
   useEffect(() => {
     if (!isNil(template.image) && isNil(template.image.url)) {

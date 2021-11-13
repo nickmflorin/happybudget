@@ -20,14 +20,6 @@ export const isHttpModelWithType = (m: Model.Model): m is Model.GenericHttpModel
 export const isTag = (model: Model.Model | Model.Tag): model is Model.Tag =>
   (model as Model.Tag).title !== undefined && (model as Model.Tag).color !== undefined;
 
-export const isContact = (user: Model.User | Model.SimpleUser | Model.Contact): user is Model.Contact =>
-  (user as Model.Contact).image !== undefined;
-
-export const isUserWithImage = (user: Model.User | Model.SimpleUser | Model.Contact): user is Model.UserWithImage =>
-  isContact(user)
-    ? (user as Model.Contact).image !== null
-    : (user as Model.User | Model.SimpleUser).profile_image !== null;
-
 export const isUploadParamsWithImage = (params: UploadImageParams): params is UploadImageParamsWithImage =>
   (params as UploadImageParamsWithImage).image !== undefined;
 

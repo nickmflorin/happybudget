@@ -1,0 +1,44 @@
+@import 'style/_imports';
+
+.product {
+	display: flex;
+	height: 56px;
+	padding: 6px;
+	border-radius: 6px;
+	border: 1px solid $transparent;
+
+	> * {
+		margin-right: 8px;
+	}
+
+	&:not(:last-child) {
+		margin-bottom: 10px;
+	}
+
+	.product-detail {
+		flex-grow: 100;
+		display: flex;
+		flex-direction: column;
+
+		.product-description {
+			font-family: $avenir;
+			font-weight: 500;
+			font-size: 13px;
+			color: $text-secondary;
+		}
+	}
+
+	.product-extra {
+		margin-left: 20px;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		height: 100%;
+	}
+
+	&.highlight-on-hover {
+		&:hover {
+			background-color: #efefef;
+		}
+	}
+}

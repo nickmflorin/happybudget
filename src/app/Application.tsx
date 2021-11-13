@@ -19,7 +19,7 @@ const Application = (): JSX.Element => {
         <PrivateRoute path={"/budgets/:budgetId"} component={Budget} />
         <PrivateRoute path={"/templates/:budgetId"} component={Template} />
         <PrivateRoute path={["/budgets", "/contacts", "/templates", "/discover"]} component={Dashboard} />
-        <PrivateRoute path={["/profile", "/security"]} component={Settings} />
+        <PrivateRoute path={["/profile", "/security", "/billing"]} component={Settings} />
         <Route exact path={"/logout"} component={Logout} />
         <NotFoundRoute />
       </Switch>

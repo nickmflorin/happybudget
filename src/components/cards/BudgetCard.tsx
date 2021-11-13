@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 
 import { Icon } from "components";
-import { useLoggedInUser, useTimezone } from "store/hooks";
-import { util } from "lib";
+import { util, users } from "lib";
 
 import Card from "./Card";
 import { isNil } from "lodash";
@@ -28,8 +27,8 @@ const BudgetCard = ({
   onClick,
   onDuplicate
 }: BudgetCardProps): JSX.Element => {
-  const user = useLoggedInUser();
-  const tz = useTimezone();
+  const user = users.hooks.useLoggedInUser();
+  const tz = users.hooks.useTimezone();
 
   const subTitle = useMemo(() => {
     if (util.dates.isToday(budget.updated_at)) {

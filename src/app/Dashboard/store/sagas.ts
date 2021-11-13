@@ -1,8 +1,7 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, takeLatest, debounce } from "redux-saga/effects";
 
-import { contacts } from "store/tasks";
-import { tabling } from "lib";
+import { tabling, contacts } from "lib";
 
 import * as actions from "./actions";
 import * as tasks from "./tasks";
@@ -70,7 +69,7 @@ export const createContactsTableSaga = (table: Table.TableInstance<Tables.Contac
     Redux.AuthenticatedTableActionMap<Tables.ContactRowData, Model.Contact, Tables.ContactTableContext>
   >({
     actions: ActionMap,
-    tasks: contacts.createTableTaskSet({
+    tasks: contacts.tasks.createTableTaskSet({
       table,
       selectStore: (state: Application.AuthenticatedStore) => state.dashboard.contacts,
       actions: ActionMap

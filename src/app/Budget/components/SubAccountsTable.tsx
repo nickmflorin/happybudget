@@ -2,8 +2,8 @@ import React, { useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { isNil, filter } from "lodash";
 
-import { tabling } from "lib";
-import { actions, selectors } from "store";
+import { tabling, contacts } from "lib";
+import { actions } from "store";
 
 import { useContacts, CreateContactParams, EditContactParams } from "components/hooks";
 import { SubAccountsTable as GenericSubAccountsTable } from "tabling";
@@ -47,7 +47,7 @@ const SubAccountsTable = ({
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
 
   const dispatch = useDispatch();
-  const contacts = useSelector(selectors.selectContacts);
+  const cs = contacts.hooks.useContacts();
   const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
   const fringes = useSelector(selectFringes);
   const subaccountUnits = useSelector(selectSubAccountUnits);
@@ -114,7 +114,7 @@ const SubAccountsTable = ({
       <GenericSubAccountsTable.AuthenticatedBudget
         {...props}
         table={table}
-        contacts={contacts}
+        contacts={cs}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
         onEditContact={(params: { contact: number; rowId: Table.ModelRowId }) =>

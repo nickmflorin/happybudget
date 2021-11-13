@@ -16,9 +16,12 @@ export const logout = async (): Promise<null> => {
   return client.post<null>(url);
 };
 
-export const validateToken = async (options?: Http.RequestOptions): Promise<Model.User> => {
+export const validateAuthToken = async (
+  payload?: Http.AuthTokenValidationPayload,
+  options?: Http.RequestOptions
+): Promise<Model.User> => {
   const url = services.URL.v1("auth", "validate");
-  return client.post<Model.User>(url, {}, options);
+  return client.post<Model.User>(url, payload || {}, options);
 };
 
 export const validateEmailConfirmationToken = async (

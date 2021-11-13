@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { isNil } from "lodash";
 
-import { typeguards } from "lib";
+import { users } from "lib";
 import UserImage, { UserImageProps } from "./UserImage";
 import UserInitials, { UserInitialsProps } from "./UserInitials";
 
@@ -40,7 +40,7 @@ const UserImageOrInitials = ({
     if (errorWithImage === null) {
       if (!isNil(src)) {
         return { src };
-      } else if (!isNil(user) && typeguards.isUserWithImage(user)) {
+      } else if (!isNil(user) && users.typeguards.isUserWithImage(user)) {
         return { user };
       }
       return null;

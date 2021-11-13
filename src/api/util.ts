@@ -10,7 +10,7 @@ export const parseError = <T extends Http.Error>(
   error: Http.IHttpClientError | Http.ErrorResponse | Http.Error[],
   /* For field level errors, there will often be more than one error in the
      response. */
-  error_type: "http" | "unknown" | "global" | "auth"
+  error_type: "http" | "unknown" | "global" | "auth" | "billing"
 ): T | null => {
   const filtered = filter(parseErrors(error), { error_type }) as T[];
   return filtered.length === 0 ? null : filtered[0];
@@ -40,6 +40,10 @@ export const parseAuthError = (
 export const parseGlobalError = (
   error: Http.IHttpClientError | Http.ErrorResponse | Http.Error[]
 ): Http.GlobalError | null => parseError(error, errors.ApiErrorTypes.GLOBAL);
+
+export const parseBillingError = (
+  error: Http.IHttpClientError | Http.ErrorResponse | Http.Error[]
+): Http.BillingError | null => parseError(error, errors.ApiErrorTypes.BILLING);
 
 export const parseUnknownError = (
   error: Http.IHttpClientError | Http.ErrorResponse | Http.Error[]

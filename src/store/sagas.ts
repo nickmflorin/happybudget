@@ -2,13 +2,12 @@ import { SagaIterator, Saga } from "redux-saga";
 import { spawn } from "redux-saga/effects";
 import { isNil, filter } from "lodash";
 
-import { redux } from "lib";
+import { redux, contacts } from "lib";
 
 import * as actions from "./actions";
-import * as tasks from "./tasks";
 
 export const createUnauthenticatedRootSaga = (config: Application.AnyModuleConfig[]): Saga => {
-  const contactsTasks = tasks.contacts.createTaskSet({
+  const contactsTasks = contacts.tasks.createTaskSet({
     authenticated: false
   });
   const contactsSaga = redux.sagas.createModelListResponseSaga({
@@ -31,8 +30,8 @@ export const createUnauthenticatedRootSaga = (config: Application.AnyModuleConfi
 };
 
 export const createAuthenticatedRootSaga = (config: Application.AnyModuleConfig[]): Saga => {
-  const contactsTasks = tasks.contacts.createTaskSet({ authenticated: true });
-  const filteredContactsTasks = tasks.contacts.createFilteredTaskSet();
+  const contactsTasks = contacts.tasks.createTaskSet({ authenticated: true });
+  const filteredContactsTasks = contacts.tasks.createFilteredTaskSet();
   const contactsSaga = redux.sagas.createAuthenticatedModelListResponseSaga({
     tasks: contactsTasks,
     actions: { request: actions.requestContactsAction }

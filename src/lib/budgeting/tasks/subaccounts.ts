@@ -3,8 +3,7 @@ import { StrictEffect, call, put, fork, all } from "redux-saga/effects";
 import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
-import { createTaskSet } from "store/tasks/contacts";
-import { tabling, redux } from "lib";
+import { tabling, redux, contacts } from "lib";
 
 type R = Tables.SubAccountRowData;
 type C = Model.SubAccount;
@@ -101,7 +100,7 @@ const isAuthenticatedConfig = <M extends Model.Account | Model.SubAccount, B ext
 export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B extends Model.Budget | Model.Template>(
   config: SubAccountsTableTaskConfig | AuthenticatedSubAccountsTableTaskConfig<M, B>
 ): Redux.TableTaskMap<R, C, Tables.SubAccountTableContext> => {
-  const contactsTasks = createTaskSet({ authenticated: isAuthenticatedConfig(config) });
+  const contactsTasks = contacts.tasks.createTaskSet({ authenticated: isAuthenticatedConfig(config) });
 
   function* requestFringes(objId: number): SagaIterator {
     try {

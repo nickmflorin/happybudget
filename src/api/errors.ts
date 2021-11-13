@@ -6,8 +6,7 @@ import * as util from "./util";
 export enum HttpErrorTypes {
   CLIENT = "CLIENT",
   NETWORK = "NETWORK",
-  SERVER = "SERVER",
-  AUTHENTICATION = "AUTHENTICATION"
+  SERVER = "SERVER"
 }
 
 export enum ApiErrorTypes {
@@ -15,7 +14,8 @@ export enum ApiErrorTypes {
   UNKNOWN = "unknown",
   HTTP = "http",
   FIELD = "field",
-  GLOBAL = "global"
+  GLOBAL = "global",
+  BILLING = "billing"
 }
 
 /**
@@ -102,7 +102,14 @@ export class ClientError extends HttpError implements Http.IHttpClientError {
   constructor(
     config: Omit<
       Http.IHttpClientError,
-      "message" | "name" | "authenticationError" | "httpError" | "fieldErrors" | "globalError" | "unknownError"
+      | "message"
+      | "name"
+      | "authenticationError"
+      | "httpError"
+      | "fieldErrors"
+      | "globalError"
+      | "unknownError"
+      | "billingError"
     >
   ) {
     super(
@@ -122,6 +129,10 @@ export class ClientError extends HttpError implements Http.IHttpClientError {
 
   public get httpError(): Http.HttpError | null {
     return util.parseHttpError(this);
+  }
+
+  public get billingError(): Http.BillingError | null {
+    return util.parseBillingError(this);
   }
 
   public get fieldErrors(): Http.FieldError[] {

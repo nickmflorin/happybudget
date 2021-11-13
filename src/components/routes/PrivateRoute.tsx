@@ -9,7 +9,11 @@ import { ui, notifications } from "lib";
 import { actions } from "store";
 import { WrapInApplicationSpinner } from "components";
 
-const PrivateRoute = (props: RouteProps): JSX.Element => {
+interface PrivateRouteProps extends RouteProps {
+  readonly forceReloadFromStripe?: boolean;
+}
+
+const PrivateRoute = ({ forceReloadFromStripe, ...props }: PrivateRouteProps): JSX.Element => {
   const [redirect, setRedirect] = useState(false);
   const [authenticating, setAuthenticating] = useState(true);
   const dispatch: Redux.Dispatch = useDispatch();
@@ -19,7 +23,10 @@ const PrivateRoute = (props: RouteProps): JSX.Element => {
   useEffect(() => {
     setAuthenticating(true);
     api
-      .validateToken({ cancelToken: newCancelToken() })
+      .validateAuthToken(
+        { force_reload_from_stripe: forceReloadFromStripe || false },
+        { cancelToken: newCancelToken() }
+      )
       .then((response: Model.User) => {
         dispatch(actions.authenticated.updateLoggedInUserAction(response));
       })

@@ -3,7 +3,7 @@ import { isNil } from "lodash";
 
 import * as api from "api";
 import { TemplateForm } from "components/forms";
-import { useLoggedInUser } from "store/hooks";
+import { users } from "lib";
 
 import { CreateModelModal, CreateModelModalProps } from "./generic";
 
@@ -12,7 +12,7 @@ interface CreateTemplateModalProps extends CreateModelModalProps<Model.Template>
 }
 
 const CreateTemplateModal = ({ community = false, ...props }: CreateTemplateModalProps): JSX.Element => {
-  const user = useLoggedInUser();
+  const user = users.hooks.useLoggedInUser();
   const [file, setFile] = useState<UploadedImage | null>(null);
 
   return (

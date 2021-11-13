@@ -3,7 +3,7 @@ import { put, fork, select } from "redux-saga/effects";
 import { filter } from "lodash";
 
 import * as api from "api";
-import * as actions from "../actions";
+import * as actions from "store/actions";
 import { tabling, notifications } from "lib";
 
 type R = Tables.ContactRowData;

@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { isNil, filter, reduce } from "lodash";
 
-import { redux, tabling } from "lib";
-import { actions as globalActions, selectors } from "store";
+import { redux, tabling, contacts } from "lib";
+import { actions as globalActions } from "store";
 
 import { ActualsPage } from "app/Pages";
 
@@ -64,7 +64,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
 
   const dispatch = useDispatch();
-  const contacts = useSelector(selectors.selectContacts);
+  const cs = contacts.hooks.useContacts();
   const table = tabling.hooks.useTable<R, M>();
   const actualTypes = useSelector(selectActualTypes);
 
@@ -109,7 +109,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
           table={table}
           actionContext={{ budgetId }}
           tableId={"budget-actuals"}
-          contacts={contacts}
+          contacts={cs}
           actualTypes={actualTypes}
           onOwnersSearch={(value: string) => dispatch(actions.actuals.setActualOwnersSearchAction(value, { budgetId }))}
           exportFileName={!isNil(budget) ? `${budget.name}_actuals` : "actuals"}

@@ -14,6 +14,10 @@ declare namespace Http {
   type PayloadObj = { readonly data: _PayloadObj[] } | _PayloadObj;
   type Payload = FormData | PayloadObj;
 
+  type AuthTokenValidationPayload = {
+    readonly force_reload_from_stripe?: boolean;
+  };
+
   type SocialPayload = {
     readonly token_id: string;
     readonly provider: string;
@@ -154,4 +158,12 @@ declare namespace Http {
   type BulkCreatePayload<T extends PayloadObj> = { data: Partial<T>[] };
   type ModelBulkUpdatePayload<T extends PayloadObj> = Partial<T> & { readonly id: number };
   type BulkUpdatePayload<T extends PayloadObj> = { data: ModelBulkUpdatePayload<T>[] };
+
+  type CheckoutSessionPayload = {
+    readonly price_id: string;
+  };
+
+  type SyncCheckoutSessionPayload = {
+    readonly session_id: string;
+  };
 }

@@ -3,8 +3,8 @@ import { useDispatch } from "react-redux";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { ui, typeguards, notifications } from "lib";
-import { hooks, actions } from "store";
+import { ui, typeguards, notifications, users } from "lib";
+import { actions } from "store";
 
 import { UserProfileForm } from "components/forms";
 import { ImageAndName } from "components/fields";
@@ -16,7 +16,7 @@ import "./index.scss";
 
 const Profile = (): JSX.Element => {
   const form = ui.hooks.useForm<Http.UserPayload>();
-  const user = hooks.useLoggedInUser();
+  const user = users.hooks.useLoggedInUser();
   const dispatch: Redux.Dispatch = useDispatch();
   const [image, setImage] = useState<UploadedImage | SavedImage | null>(null);
   /*

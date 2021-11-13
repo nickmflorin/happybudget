@@ -1,12 +1,9 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import { useSelector } from "react-redux";
 import { isNil, map, filter } from "lodash";
 import classNames from "classnames";
 
 import * as api from "api";
-import { ui, tabling, pdf } from "lib";
-
-import { selectors } from "store";
+import { ui, tabling, pdf, contacts } from "lib";
 
 import { ExportActualsPdfForm } from "components/forms";
 import { PreviewModal } from "components/modals";
@@ -58,7 +55,7 @@ const ActualsPreviewModal = ({
   const previewer = useRef<Pdf.IPreviewerRef>(null);
   const [getToken] = api.useCancelToken({ preserve: true, createOnInit: true });
 
-  const contacts = useSelector(selectors.selectContacts);
+  const cs = contacts.hooks.useContacts();
 
   const [options, setOptions] = useState<ExportActualsPdfFormOptions>(DEFAULT_OPTIONS);
   const [actuals, setActuals] = useState<M[] | null>(null);
@@ -91,7 +88,7 @@ const ActualsPreviewModal = ({
           setActuals(response.data);
           const pdfComponent = ActualsPdfFunc({
             budget,
-            contacts,
+            contacts: cs,
             actuals: response.data,
             options: convertOptions(options)
           });
@@ -109,7 +106,7 @@ const ActualsPreviewModal = ({
       if (!isNil(actuals)) {
         return ActualsPdfFunc({
           budget,
-          contacts,
+          contacts: cs,
           actuals,
           options: convertOptions(options)
         });

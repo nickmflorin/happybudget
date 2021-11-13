@@ -3,8 +3,7 @@ import { find, isNil } from "lodash";
 import classNames from "classnames";
 
 import { Tag } from "components/tagging";
-import { models } from "lib";
-import { useContacts, useContactsLoaded } from "store/hooks";
+import { contacts } from "lib";
 
 import { Cell } from "./generic";
 
@@ -25,12 +24,12 @@ const ContactCell = <
   ...props
 }: ContactCellProps<R, M, S>): JSX.Element => {
   const row: Table.ModelRow<R> = props.node.data;
-  const contacts = useContacts();
-  const loaded = useContactsLoaded();
+  const cs = contacts.hooks.useContacts();
+  const loaded = contacts.hooks.useContactsLoaded();
 
   const m = useMemo(() => {
     if (!isNil(value)) {
-      const c: Model.Contact | undefined = find(contacts, { id: value });
+      const c: Model.Contact | undefined = find(cs, { id: value });
       if (isNil(c)) {
         if (loaded === true) {
           console.error(`Could not find contact ${value} in store.`);
@@ -40,7 +39,7 @@ const ContactCell = <
       return c;
     }
     return null;
-  }, [value, contacts, loaded]);
+  }, [value, cs, loaded]);
 
   /* TODO: This is a very, very render intensive piece of logic.  We should
      figure out if there is a better way to do this that doesn't involve
@@ -59,7 +58,7 @@ const ContactCell = <
           className={classNames("tag--contact", { focused: isFocused })}
           color={"#EFEFEF"}
           textColor={"#2182e4"}
-          text={!isNil(m) ? models.contactName(m) : ""}
+          text={!isNil(m) ? contacts.models.contactName(m) : ""}
           onClick={() => props.onEditContact({ contact: m.id, rowId: row.id })}
           disabled={!isFocused}
         />

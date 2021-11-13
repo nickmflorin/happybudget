@@ -27,7 +27,7 @@ const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): 
   useEffect(() => {
     setAuthenticating(true);
     api
-      .validateToken({ cancelToken: newCancelToken() })
+      .validateAuthToken({ force_reload_from_stripe: true }, { cancelToken: newCancelToken() })
       .then((response: Model.User) => {
         const store = configureAuthenticatedStore(response);
         setReduxStore(store);

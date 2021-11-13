@@ -3,23 +3,6 @@ import { find, filter, isNil, forEach, reduce, map } from "lodash";
 import { tabling } from "lib";
 import { isHttpModelWithType } from "./typeguards";
 
-export enum ContactTypeNames {
-  CONTRACTOR = "Contractor",
-  EMPLOYEE = "Employee",
-  VENDOR = "Vendor"
-}
-
-export const ContactTypeModels: { [key: string]: Model.ContactType } = {
-  CONTRACTOR: { id: 0, name: ContactTypeNames.CONTRACTOR },
-  EMPLOYEE: { id: 1, name: ContactTypeNames.EMPLOYEE },
-  VENDOR: { id: 2, name: ContactTypeNames.VENDOR }
-};
-
-export const ContactTypes = Object.values(ContactTypeModels);
-
-export const contactName = (contact: Model.Contact): string | null =>
-  contact.contact_type?.id === ContactTypeModels.VENDOR.id ? contact.company : contact.full_name;
-
 export const getRowGeneralReference = <R extends Table.RowData>(row: Table.Row<R>) => {
   if (tabling.typeguards.isModelRow(row)) {
     return `row (type = ${row.rowType}, modelType = ${row.modelType})`;

@@ -16,7 +16,7 @@ export { default as Config } from "./config";
 export * as flags from "./flags";
 export * as localization from "./localization";
 
-const RequiredEnvironmentVariables = ["REACT_APP_API_DOMAIN", "REACT_APP_PRODUCTION_ENV"];
+const RequiredEnvironmentVariables = ["REACT_APP_API_DOMAIN", "REACT_APP_PRODUCTION_ENV", "REACT_APP_DOMAIN"];
 
 const validateEnvironmentVariables = () => {
   for (let i = 0; i < RequiredEnvironmentVariables.length; i++) {

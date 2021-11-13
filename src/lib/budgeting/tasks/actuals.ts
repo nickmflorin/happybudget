@@ -3,8 +3,7 @@ import { put, call, fork, select, all } from "redux-saga/effects";
 import { filter } from "lodash";
 
 import * as api from "api";
-import { createTaskSet } from "store/tasks/contacts";
-import { tabling } from "lib";
+import { tabling, contacts } from "lib";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;
@@ -27,7 +26,7 @@ export type ActualsTableTaskMap = Redux.TableTaskMap<R, M, Tables.ActualTableCon
 };
 
 export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTableTaskMap => {
-  const contactsTasks = createTaskSet({ authenticated: true });
+  const contactsTasks = contacts.tasks.createTaskSet({ authenticated: true });
 
   function* requestActualTypes(): SagaIterator {
     const response = yield api.request(api.getActualTypes);

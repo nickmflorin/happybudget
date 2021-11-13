@@ -43,8 +43,8 @@ export const detailPatchService = <P extends Http.Payload, R>(
   };
 };
 
-export const deleteService = (path: Http.PathParams | ((id: number) => Http.PathParams)) => {
-  return async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
+export const deleteService = <Id extends ID = number>(path: Http.PathParams | ((id: Id) => Http.PathParams)) => {
+  return async (id: Id, options: Http.RequestOptions = {}): Promise<null> => {
     const pt = typeof path === "function" ? path(id) : path;
     const url = URL.v1(...pt);
     return client.delete<null>(url, options);
@@ -82,7 +82,7 @@ export const detailListService = <M extends Model.HttpModel>(
   };
 };
 
-export const listService = <M extends Model.HttpModel>(path: Http.PathParams) => {
+export const listService = <M extends Model.Model>(path: Http.PathParams) => {
   return async (query: Http.ListQuery = {}, options: Http.RequestOptions = {}): Promise<Http.ListResponse<M>> => {
     const url = URL.v1(...path);
     return client.list<M>(url, query, options);

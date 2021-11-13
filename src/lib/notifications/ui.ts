@@ -93,6 +93,12 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
         (n: UINotificationType) => typeguards.isUIFieldNotification(n) || api.typeguards.isHttpError(n)
       ) as (Http.FieldError | UIFieldNotification)[];
 
+      // Filter out the notifications that do not pertain to individual fields.
+      notices = filter(
+        notices,
+        (n: UINotificationType) => !(typeguards.isUIFieldNotification(n) || api.typeguards.isHttpError(n))
+      ) as UINonFieldNotificationType[];
+
       /* For the notification sources that pertain to field type errors, a
 				 callback can be provided that allows for more granular handling of
 				 each error pertinent to an individual field.  This is primarily used
@@ -105,12 +111,6 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
       const fieldHandler = config?.handleFieldErrors;
       if (!isNil(fieldHandler)) {
         fieldHandler(fieldRelatedErrors);
-        /* Filter out the notifications that do not pertain to individual fields
-				   of the form and dispatch them to the notifications store. */
-        notices = filter(
-          notices,
-          (n: UINotificationType) => !(typeguards.isUIFieldNotification(n) || api.typeguards.isHttpError(n))
-        ) as UINonFieldNotificationType[];
       } else if (fieldRelatedErrors.length !== 0) {
         /* If the fieldHandler is not defined, field related errors will still be
 				   in the set of notifications.  If field related errors are submitted in

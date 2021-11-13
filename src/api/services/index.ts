@@ -1,6 +1,7 @@
 export * from "./account";
 export * from "./actual";
 export * from "./auth";
+export * from "./billing";
 export * from "./budget";
 export * from "./contact";
 export * from "./fringe";
