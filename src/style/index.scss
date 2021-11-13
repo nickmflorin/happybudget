@@ -15,10 +15,11 @@
 @import "./image";
 @import "./filepond";
 @import "./tabling/index";
+@import "./react-datepicker";
+@import "./pagination";
 
 @import "~react-toastify/dist/ReactToastify.css";
 @import "~antd/dist/antd.css";
-@import "./react-datepicker";
 @import "filepond/dist/filepond.min.css";
 
 @mixin fface($family, $type: "Regular", $weight: 400, $style: normal) {
@@ -121,12 +122,6 @@ code {
 
 .ant-checkbox {
   top: 0rem !important;
-}
-
-form {
-  .ant-checkbox {
-    top: 0.3rem !important;
-  }
 }
 
 .ant-spin {

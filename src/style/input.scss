@@ -228,7 +228,8 @@ textarea {
   }
 }
 
-.select {
+.select,
+.ant-select {
   @extend .input-base;
   box-shadow: none !important;
   min-width: 200px;

@@ -1,0 +1,26 @@
+.ant-pagination {
+  .ant-pagination-item-active {
+    border-color: $green;
+
+    a {
+      color: $green;
+    }
+  }
+  .ant-pagination-item {
+    &:focus-visible,
+    &:hover,
+    &:focus {
+      border-color: $green;
+      a {
+        color: $green;
+      }
+    }
+  }
+  .ant-pagination-prev:focus-visible .ant-pagination-item-link,
+  .ant-pagination-next:focus-visible .ant-pagination-item-link,
+  .ant-pagination-prev:hover .ant-pagination-item-link,
+  .ant-pagination-next:hover .ant-pagination-item-link {
+    color: $green;
+    border-color: $green;
+  }
+}
