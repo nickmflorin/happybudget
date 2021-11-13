@@ -33,11 +33,11 @@ const Card = ({
   const [imageError, setImageError] = useState(false);
 
   const dropdownEllipsisClassName = useMemo(() => {
-    if (isNil(image) || !isNil(imageError)) {
+    if (isNil(image) || imageError === true) {
       return "dark";
     }
     return "";
-  }, [image]);
+  }, [image, imageError]);
 
   return (
     <div className={classNames("card", className, { hidden })} style={style}>
