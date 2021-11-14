@@ -179,28 +179,12 @@
             flex-direction: column;
             flex-grow: 100;
 
-            // The budget card box shadow is getting cut off by the sub-content parent.
-            // This negative margin hack is needed to display the box shadow nad keep our
-            // preferred spacing
-            padding-left: 15px;
-            margin-left: -15px;
-            padding-top: 15px;
-            margin-top: -15px;
-
             .page-content {
               width: 100%;
               flex-grow: 100;
 
-              // Required for non-table pages to get the content area to scroll.
-              // But this cuts off the budget card box shadow so we need this negative margin hack.
               &.scrollable {
                 overflow-y: scroll;
-                padding-left: 15px;
-                margin-left: -15px;
-                padding-top: 15px;
-                margin-top: -15px;
-                padding-right: 15px;
-                margin-right: -15px;
               }
             }
 
