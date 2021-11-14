@@ -7,6 +7,9 @@ import { CaptureConsole } from "@sentry/integrations";
 const configureSentry = () => {
   if (process.env.REACT_APP_SENTRY_DSN) {
     console.info("Configuring Sentry");
+    Sentry.configureScope((scope: Sentry.Scope) => {
+      scope.setTag("userAgent", window.navigator.userAgent);
+    });
     Sentry.init({
       dsn: process.env.REACT_APP_SENTRY_DSN,
       integrations: [
