@@ -7,7 +7,7 @@ import { NotFoundRoute, PrivateRoute } from "components/routes";
 import Budget from "./Budget";
 import Template from "./Template";
 import Dashboard from "./Dashboard";
-import Settings from "./Dashboard";
+import Settings from "./Settings";
 import Logout from "./Logout";
 
 const Application = (): JSX.Element => {
