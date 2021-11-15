@@ -15,6 +15,7 @@ interface CardProps extends StandardComponentProps {
   readonly subTitle?: string;
   readonly image: SavedImage | null;
   readonly loading?: boolean;
+  readonly disabled?: boolean;
   readonly onClick?: () => void;
   readonly hidden?: boolean;
 }
@@ -25,6 +26,7 @@ const Card = ({
   dropdown,
   onClick,
   loading,
+  disabled,
   image,
   hidden = false,
   style = {},
@@ -40,7 +42,7 @@ const Card = ({
   }, [image, imageError]);
 
   return (
-    <div className={classNames("card", className, { hidden })} style={style}>
+    <div className={classNames("card", className, { hidden, disabled })} style={style}>
       <RenderWithSpinner size={18} loading={loading} toggleOpacity={true}>
         <ShowHide show={hidden}>
           <Icon className={"icon--hidden"} icon={"eye-slash"} weight={"solid"} />
@@ -55,12 +57,15 @@ const Card = ({
         )}
         <BudgetCardImage
           image={image}
-          onClick={onClick}
+          onClick={disabled ? undefined : onClick}
           titleOnly={isNil(subTitle)}
           onError={() => setImageError(true)}
           onLoad={() => setImageError(false)}
         />
-        <div className={classNames("card-footer", { "title-only": isNil(subTitle) })} onClick={onClick}>
+        <div
+          className={classNames("card-footer", { "title-only": isNil(subTitle) })}
+          onClick={disabled ? undefined : onClick}
+        >
           <div className={"title"}>{title}</div>
           <ShowHide show={!isNil(subTitle)}>
             <div className={"sub-title truncate"}>{subTitle}</div>

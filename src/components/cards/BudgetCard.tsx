@@ -10,7 +10,7 @@ import { isNil } from "lodash";
 interface BudgetCardProps {
   readonly budget: Model.Budget;
   readonly loading?: boolean;
-  readonly deleting: boolean;
+  readonly disabled: boolean;
   readonly duplicating: boolean;
   readonly onEdit: () => void;
   readonly onClick: () => void;
@@ -21,7 +21,7 @@ interface BudgetCardProps {
 const BudgetCard = ({
   budget,
   loading,
-  deleting,
+  disabled,
   duplicating,
   onEdit,
   onDelete,
@@ -54,6 +54,7 @@ const BudgetCard = ({
       title={budget.name}
       subTitle={subTitle}
       loading={loading}
+      disabled={disabled}
       image={budget.image}
       dropdown={[
         {
@@ -76,9 +77,7 @@ const BudgetCard = ({
           label: "Delete",
           icon: <Icon icon={"trash"} weight={"light"} />,
           onClick: (e: MenuItemClickEvent<MenuItemModel>) => onDelete(e),
-          keepDropdownOpenOnClick: true,
-          loading: deleting,
-          disabled: deleting
+          keepDropdownOpenOnClick: false
         }
       ]}
     />

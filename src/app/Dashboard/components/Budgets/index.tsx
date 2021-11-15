@@ -6,6 +6,7 @@ import { Pagination } from "antd";
 
 import * as api from "api";
 import { redux, notifications } from "lib";
+import { DeleteBudgetModal } from "components/modals";
 
 import { BudgetCard } from "components/cards";
 import { NoBudgets } from "components/empty";
@@ -29,6 +30,7 @@ const Budgets = (): JSX.Element => {
   const [isDuplicating, setDuplicating, setDuplicated] = redux.hooks.useTrackModelActions([]);
 
   const [budgetToEdit, setBudgetToEdit] = useState<number | null>(null);
+  const [budgetToDelete, setBudgetToDelete] = useState<Model.Budget | null>(null);
   const [createBudgetModalOpen, setCreateBudgetModalOpen] = useState(false);
 
   const history = useHistory();
@@ -65,21 +67,11 @@ const Budgets = (): JSX.Element => {
                 <BudgetCard
                   key={index}
                   budget={budget}
-                  deleting={isDeleting(budget.id)}
+                  disabled={isDeleting(budget.id)}
                   duplicating={isDuplicating(budget.id)}
                   onClick={() => history.push(`/budgets/${budget.id}`)}
                   onEdit={() => setBudgetToEdit(budget.id)}
-                  onDelete={(e: MenuItemClickEvent<MenuItemModel>) => {
-                    setDeleting(budget.id);
-                    api
-                      .deleteBudget(budget.id)
-                      .then(() => {
-                        e.closeParentDropdown?.();
-                        dispatch(actions.removeBudgetFromStateAction(budget.id));
-                      })
-                      .catch((err: Error) => notifications.requestError(err))
-                      .finally(() => setDeleted(budget.id));
-                  }}
+                  onDelete={() => setBudgetToDelete(budget)}
                   onDuplicate={(e: MenuItemClickEvent<MenuItemModel>) => {
                     setDuplicating(budget.id);
                     api
@@ -131,6 +123,26 @@ const Budgets = (): JSX.Element => {
             setCreateBudgetModalOpen(false);
             history.push(`/budgets/${budget.id}/accounts`);
           }}
+        />
+      )}
+      {!isNil(budgetToDelete) && (
+        <DeleteBudgetModal
+          open={true}
+          onCancel={() => setBudgetToDelete(null)}
+          onOk={(e: React.MouseEvent<HTMLElement>) => {
+            setBudgetToDelete(null);
+            setDeleting(budgetToDelete.id);
+            api
+              .deleteBudget(budgetToDelete.id)
+              .then(() => {
+                dispatch(actions.removeBudgetFromStateAction(budgetToDelete.id));
+              })
+              .catch((err: Error) => notifications.requestError(err))
+              .finally(() => {
+                setDeleted(budgetToDelete.id);
+              });
+          }}
+          budget={budgetToDelete}
         />
       )}
     </React.Fragment>

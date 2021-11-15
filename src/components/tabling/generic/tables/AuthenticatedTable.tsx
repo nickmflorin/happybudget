@@ -370,7 +370,7 @@ const AuthenticatedTable = <
           <DeleteRowsModal
             open={true}
             onCancel={() => setDeleteRows(undefined)}
-            onSuccess={() => {
+            onOk={() => {
               props.onChangeEvent({
                 payload: { rows: map(deleteRows, (r: Table.EditableRow<R>) => r.id) },
                 type: "rowDelete"

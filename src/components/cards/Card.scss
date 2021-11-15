@@ -18,6 +18,10 @@
     opacity: 0.6;
   }
 
+  &.disabled {
+    opacity: 0.6;
+  }
+
   .icon--hidden {
     position: absolute;
     top: 15px;
