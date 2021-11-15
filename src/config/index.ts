@@ -33,7 +33,7 @@ export const Config: Application.Config = reduce(
 
 let prevPath: string | null = null;
 
-const configureApplication = (history: History, initializeApp: () => void) => {
+const configureApplication = async (history: History) => {
   configureAgGrid();
   configureFontAwesome();
 
@@ -69,8 +69,6 @@ const configureApplication = (history: History, initializeApp: () => void) => {
       trackExtraHooks: [[require("react-redux/lib"), "useSelector"]]
     });
   }
-
-  initializeApp();
 };
 
 export default configureApplication;

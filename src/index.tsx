@@ -27,6 +27,6 @@ have a chance to address these warnings.
 
 The most frequent package that causes the warnings is AntD.
 */
-configureApplication(history, () => {
-  ReactDOM.render(<App history={history} />, document.getElementById("root"));
-});
+configureApplication(history);
+
+ReactDOM.render(<App history={history} />, document.getElementById("root"));
