@@ -25,13 +25,27 @@
     }
   }
 
-  .switch-text {
+  .link-text-base {
     font-size: 12px;
     text-align: center;
     margin-top: 12px;
     font-family: $roboto;
     font-weight: 400;
     color: $text-secondary;
+  }
+
+  .alt-link-text {
+    @extend .link-text-base;
+
+    a {
+      color: $text-primary;
+      text-decoration: underline;
+      margin-left: 4px;
+    }
+  }
+
+  .switch-text {
+    @extend .link-text-base;
 
     a {
       margin-left: 6px;

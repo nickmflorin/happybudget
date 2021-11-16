@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { Form } from "components";
 import { PasswordInput, EmailInput, UserInput } from "components/fields";
 import { Button, SocialButton } from "components/buttons";
-import { RouterLink } from "components/links";
+import { RouterLink, Link } from "components/links";
 import { util } from "lib";
 
 import "./LandingForm.scss";
@@ -94,8 +94,12 @@ const SignupForm = ({ loading, onSubmit, onGoogleSuccess, onGoogleError, ...prop
           onGoogleSuccess={onGoogleSuccess}
           onGoogleError={onGoogleError}
         />
+        <div className={"alt-link-text"}>
+          {"By signing up, you agree to our"}
+          <Link href={`${process.env.REACT_APP_TERMS_AND_CONDITIONS_URL}`}>{"Terms and Conditions."}</Link>
+        </div>
         <div className={"switch-text"}>
-          {"Back to"}
+          {"Already have an account?"}
           <RouterLink to={"/login"}>{"Log In"}</RouterLink>
         </div>
       </Form.Footer>
