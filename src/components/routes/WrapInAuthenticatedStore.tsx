@@ -37,6 +37,28 @@ const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): 
         }
         const store = configureAuthenticatedStore(response);
         setReduxStore(store);
+
+        // When a user clicks the "Feedback" link in the profile image
+        // dropdown menu they will be redirected to and authenticated in
+        // Canny. This allows them to leave feedback without having to create
+        // a Canny account. Their feedback will be tied to their existing
+        // Greenbudget user account.
+
+        // We do not want to makes calls to Canny's API in local development by default.
+        if (!isNil(process.env.REACT_APP_CANNY_APP_ID)) {
+          window.Canny("identify", {
+            appID: process.env.REACT_APP_CANNY_APP_ID,
+            user: {
+              id: response.id,
+              email: response.email,
+              name: response.full_name,
+              avatarURL: response.profile_image?.url,
+              created: new Date(response.created_at).toISOString()
+            }
+          });
+        } else if (process.env.NODE_ENV === "production") {
+          console.warn("Could not identify Canny user as ENV variable `REACT_APP_CANNY_APP_ID` is not defined.");
+        }
       })
       .catch((e: Error) => {
         if (!axios.isCancel(e)) {

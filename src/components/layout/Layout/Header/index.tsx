@@ -93,6 +93,20 @@ const Header = ({
                 visible: user.is_staff === true
               },
               {
+                id: "feedback",
+                label: "Feedback",
+                onClick: () => {
+                  if (!isNil(process.env.REACT_APP_CANNY_FEEDBACK_URL)) {
+                    window.location.href = process.env.REACT_APP_CANNY_FEEDBACK_URL;
+                  } else {
+                    console.warn(
+                      "Could not identify Canny feedback URL as ENV variable `REACT_APP_CANNY_FEEDBACK_URL` is not defined."
+                    );
+                  }
+                },
+                icon: <Icon icon={"bullhorn"} weight={"light"} />
+              },
+              {
                 id: "logout",
                 label: "Logout",
                 onClick: () => history.push("/logout"),
