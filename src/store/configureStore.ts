@@ -1,5 +1,5 @@
 import { Middleware, createStore, applyMiddleware, compose } from "redux";
-import createSagaMiddleware, { Saga } from "redux-saga";
+import createSagaMiddleware, { Saga, SagaMiddlewareOptions } from "redux-saga";
 import { routerMiddleware } from "connected-react-router";
 import { createBrowserHistory } from "history";
 import * as Sentry from "@sentry/react";
@@ -28,8 +28,14 @@ const configureGenericStore = <S extends Application.Store>(
   rootSaga: Saga<any[]>
 ): Redux.Store<S> => {
   // Create the redux-saga middleware that allows the sagas to run as side-effects
-  // in the application.
-  const sagaMiddleware = createSagaMiddleware();
+  // in the application.  If in a production environment, instruct the middleware
+  // to funnel errors through to Sentry.
+  let sagaMiddlewareOptions: SagaMiddlewareOptions = {};
+  if (process.env.NODE_ENV === "production") {
+    sagaMiddlewareOptions = { ...sagaMiddlewareOptions, onError: (error: Error) => Sentry.captureException(error) };
+  }
+  const sagaMiddleware = createSagaMiddleware(sagaMiddlewareOptions);
+
   let baseMiddleware: Middleware<{}, Application.Store>[] = [sagaMiddleware, authenticatedActionMiddleware];
   baseMiddleware =
     process.env.NODE_ENV !== "production"
