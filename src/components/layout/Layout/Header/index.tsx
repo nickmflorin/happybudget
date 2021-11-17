@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useHistory, Link } from "react-router-dom";
 import classNames from "classnames";
 import { isNil } from "lodash";
@@ -13,7 +13,6 @@ import { useLoggedInUser } from "store/hooks";
 
 import "./index.scss";
 
-const APP_ID = process.env.REACT_APP_CANNY_APP_ID;
 export interface HeaderProps extends StandardComponentProps {
   readonly sidebarVisible: boolean;
   readonly collapsed?: boolean | undefined;
@@ -32,24 +31,6 @@ const Header = ({
 }: HeaderProps): JSX.Element => {
   const user = useLoggedInUser();
   const history = useHistory();
-
-  // https://developers.canny.io/install
-  // When a user clicks the "Feedback" link in the profile image
-  // dropdown menu they will be redirected to and authenticated in
-  // Canny. This allows them to leave feedback without having to sign up.
-  // Their feedback will be tied to their existing user account in your application.
-  useEffect(() => {
-    window.Canny("identify", {
-      appID: APP_ID,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.full_name,
-        avatarURL: user.profile_image?.url,
-        created: new Date(user.created_at).toISOString()
-      }
-    });
-  }, [user]);
 
   return (
     <Layout.Header
@@ -110,14 +91,6 @@ const Header = ({
                 },
                 icon: <Icon icon={"lock"} weight={"light"} />,
                 visible: user.is_staff === true
-              },
-              {
-                id: "feedback",
-                label: "Feedback",
-                onClick: () => {
-                  window.location.href = "https://saturation.canny.io/greenbudget";
-                },
-                icon: <Icon icon={"bullhorn"} weight={"light"} />
               },
               {
                 id: "logout",
