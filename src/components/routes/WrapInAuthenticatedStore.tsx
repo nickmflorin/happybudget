@@ -29,6 +29,12 @@ const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): 
     api
       .validateToken({ cancelToken: newCancelToken() })
       .then((response: Model.User) => {
+        if (process.env.NODE_ENV !== "development") {
+          window.analytics.identify(response.id, {
+            name: response.full_name,
+            email: response.email
+          });
+        }
         const store = configureAuthenticatedStore(response);
         setReduxStore(store);
       })

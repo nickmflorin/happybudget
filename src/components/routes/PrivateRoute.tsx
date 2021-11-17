@@ -22,13 +22,6 @@ const PrivateRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
       .validateToken({ cancelToken: newCancelToken() })
       .then((response: Model.User) => {
         dispatch(actions.authenticated.updateLoggedInUserAction(response));
-        // TODO: Figure out how to do this just on login.
-        if (process.env.NODE_ENV !== "development") {
-          window.analytics.identify(response.id, {
-            name: response.full_name,
-            email: response.email
-          });
-        }
       })
       .catch((e: Error) => {
         if (!axios.isCancel(e)) {
