@@ -1,5 +1,3 @@
-import { isNil } from "lodash";
-
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 import { CaptureConsole } from "@sentry/integrations";
@@ -22,12 +20,11 @@ const configureSentry = () => {
       tracesSampleRate: 1.0,
       beforeSend: (event: Sentry.Event) => {
         // Allows us to disable Sentry for a single line of code.
-        if (event.extra?.ignore === true || (!isNil(event.message) && event.message.indexOf("e.dn") !== -1)) {
+        if (event.extra?.ignore === true) {
           return null;
         }
         return event;
-      },
-      ignoreErrors: ["e.dn is not a function"]
+      }
     });
   } else {
     console.info("Skipping Sentry Configuration; No DSN defined.");
