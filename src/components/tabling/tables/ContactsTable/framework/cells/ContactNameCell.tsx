@@ -19,7 +19,7 @@ const ContactNameCell = ({ value, ...props }: ContactNameCellProps): JSX.Element
           firstName={row.data.first_name}
           lastName={row.data.last_name}
           initialsStyle={{ width: 28, height: 28, marginRight: 8 }}
-          imageProps={{ wrapperStyle: { width: 28, height: 28, marginRight: 8 } }}
+          imageProps={{ wrapperStyle: { minWidth: 28, width: 28, height: 28, marginRight: 8 } }}
           hideOnNoInitials={true}
         />
         {util.conditionalJoinString(row.data.first_name, row.data.last_name)}
