@@ -9,6 +9,23 @@ import * as formatters from "./formatters";
 import * as Models from "./models";
 
 /* eslint-disable indent */
+export const isEditable = <
+  R extends Table.RowData = any,
+  M extends Model.HttpModel = any,
+  V = any,
+  PDFM extends Model.HttpModel = any
+>(
+  column: Table.Column<R, M, V, PDFM>,
+  row: Table.BodyRow<R>
+): boolean => {
+  if (isNil(column.editable)) {
+    return false;
+  } else if (typeof column.editable === "boolean") {
+    return column.editable;
+  }
+  return column.editable({ column, row });
+};
+
 export const normalizedField = <
   R extends Table.RowData = any,
   M extends Model.HttpModel = any,

@@ -217,11 +217,7 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
             editable: (params: EditableCallbackParams) => {
               const row: Table.Row<R> = params.node.data;
               if (tabling.typeguards.isBodyRow(row)) {
-                return typeof col.editable === "function"
-                  ? col.editable({ row, column: col })
-                  : isNil(col.editable)
-                  ? false
-                  : col.editable;
+                return tabling.columns.isEditable(col, row);
               }
               return false;
             },

@@ -1,9 +1,8 @@
 import { useMemo, useRef, useState, useImperativeHandle } from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
-import { map, isNil, includes, find, filter, flatten, forEach, reduce, uniq } from "lodash";
+import { map, isNil, includes, find, filter, flatten, reduce, uniq, isEqual } from "lodash";
 
 import {
-  GridApi,
   CellKeyDownEvent,
   ProcessCellForExportParams,
   ValueSetterParams,
@@ -66,6 +65,143 @@ export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Mo
 
 export type WithAuthenticatedDataGridProps<R extends Table.RowData, T> = T & InjectedAuthenticatedDataGridProps<R>;
 
+const getCellChangeForClear = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  row: Table.EditableRow<R>,
+  col: Table.Column<R, M>
+): Table.SoloCellChange<R> | null => {
+  const clearValue = col.nullValue !== undefined ? col.nullValue : null;
+  if (!isNil(col.field) && (row.data[col.field] === undefined || !isEqual(row.data[col.field], clearValue))) {
+    return {
+      oldValue: row.data[col.field],
+      newValue: clearValue,
+      id: row.id,
+      field: col.field
+    };
+  } else {
+    return null;
+  }
+};
+
+const getTableChangesFromRangeClear = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  api: Table.GridApi,
+  columns: Table.Column<R, M>[],
+  range: CellRange
+): Table.SoloCellChange<R>[] => {
+  const changes: Table.SoloCellChange<R>[] = [];
+  if (!isNil(range.startRow) && !isNil(range.endRow)) {
+    let colIds: (keyof R)[] = map(range.columns, (col: Table.AgColumn) => col.getColId() as keyof R);
+    let startRowIndex = Math.min(range.startRow.rowIndex, range.endRow.rowIndex);
+    let endRowIndex = Math.max(range.startRow.rowIndex, range.endRow.rowIndex);
+    for (let i = startRowIndex; i <= endRowIndex; i++) {
+      const node: Table.RowNode | undefined = api.getDisplayedRowAtIndex(i);
+      if (!isNil(node)) {
+        const row: Table.BodyRow<R> = node.data;
+        if (tabling.typeguards.isEditableRow(row)) {
+          for (let j = 0; j < colIds.length; j++) {
+            /* eslint-disable-next-line no-loop-func */
+            const column = find(columns, (c: Table.Column<R, M>) => tabling.columns.normalizedField(c) === colIds[j]);
+            if (!isNil(column)) {
+              if (tabling.columns.isEditable(column, row)) {
+                const change = getCellChangeForClear(row, column);
+                if (!isNil(change)) {
+                  changes.push(change);
+                }
+              }
+            } else {
+              console.error(`Could not find column for field ${colIds[j]}!`);
+            }
+          }
+        }
+      }
+    }
+  }
+  return changes;
+};
+
+const getCellChangesFromEvent = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  columns: Table.Column<R, M>[],
+  event: CellEditingStoppedEvent | CellValueChangedEvent
+): Table.SoloCellChange<R>[] => {
+  const row: Table.BodyRow<R> = event.node.data;
+  if (tabling.typeguards.isEditableRow(row)) {
+    const field = event.column.getColId();
+    const column = find(columns, (c: Table.Column<R, M>) => tabling.columns.normalizedField(c) === field);
+    if (isNil(column)) {
+      console.error(`Could not find column for field ${field}!`);
+      return [];
+    }
+    /*
+    AG Grid treats cell values as undefined when they are cleared via edit,
+    so we need to translate that back into a null representation.
+
+    Note: Converting undefined values back to the column's corresponding null
+    values may now be handled by the valueSetter on the Table.Column object.
+    We may be able to remove - but leave now for safety.
+    */
+    const nullValue = column.nullValue === undefined ? null : column.nullValue;
+    const oldValue = event.oldValue === undefined ? nullValue : event.oldValue;
+    let newValue = event.newValue === undefined ? nullValue : event.newValue;
+
+    let changes: Table.SoloCellChange<R>[];
+    if (!isNil(column.parseIntoFields)) {
+      const oldParsed = column.parseIntoFields(oldValue);
+      const parsed = column.parseIntoFields(newValue);
+      // The fields for the parsed values of each value should be the same.
+      const fields: (keyof R)[] = uniq([
+        ...map(oldParsed, (p: Table.ParsedColumnField<R>) => p.field),
+        ...map(parsed, (p: Table.ParsedColumnField<R>) => p.field)
+      ]);
+      changes = reduce(
+        fields,
+        (chs: Table.SoloCellChange<R>[], fld: keyof R) => {
+          const oldParsedForField = find(oldParsed, { field: fld } as any);
+          const parsedForField = find(parsed, { field: fld } as any);
+          // Since the fields for each set of parsed field-value pairs will be the
+          // same, the null check here is mostly just a check to satisfy TS.
+          if (!isNil(oldParsedForField) && !isNil(parsedForField)) {
+            return [
+              ...chs,
+              {
+                id: row.id,
+                field: fld,
+                oldValue: oldParsedForField.value,
+                newValue: parsedForField.value
+              }
+            ];
+          }
+          return chs;
+        },
+        []
+      );
+    } else {
+      /*
+      The logic inside this conditional is 100% a HACK - and this type of
+      programming should not be encouraged.  However, in this case, it is
+      a HACK to get around AG Grid nonsense.  It appears to be a bug with
+      AG Grid, but if you have data stored for a cell that is an Array of
+      length 1, when you drag the cell contents to fill other cells, AG Grid
+      will pass the data to the onCellValueChanged handler as only the
+      first element (i.e. [4] becomes 4).  This is problematic for Fringes,
+      since the cell value corresponds to a list of Fringe IDs, so we need
+      to make that adjustment here.
+      */
+      if (field === "fringes" && !Array.isArray(newValue)) {
+        newValue = [newValue];
+      }
+      changes = [
+        {
+          oldValue,
+          newValue,
+          field: field as keyof R,
+          id: event.data.id
+        }
+      ];
+    }
+    return filter(changes, (ch: Table.SoloCellChange<R>) => !isEqual(ch.oldValue, ch.newValue));
+  }
+  return [];
+};
+
 /* eslint-disable indent */
 const authenticateDataGrid =
   <
@@ -92,12 +228,18 @@ const authenticateDataGrid =
         apis: props.apis,
         onChangeEvent: props.onChangeEvent
       });
-      const [getColumn, callWithColumn] = useColumnHelpers(props.columns);
+      /* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
+      const [_, callWithColumn] = useColumnHelpers(props.columns);
       const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
       const oldRow = useRef<Table.ModelRow<R> | null>(null); // TODO: Figure out a better way to do this.
       const lastSelectionFromRange = useRef<boolean>(false);
 
-      const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
+      /*
+      Note: The behavior of the column suppression in the subsequent column memorization
+      relies on the column transformations applied here - so they cannot be applied together
+      as it would lead to a recursion.
+      */
+      const unsuppressedColumns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
         /*
         When the cell editor finishes editing, the AG Grid callback (onCellDoneEditing)
         does not have any context about what e triggered the completion.  This is
@@ -117,7 +259,7 @@ const authenticateDataGrid =
             }
           }
         };
-        const cs = tabling.columns.normalizeColumns<R, M>(props.columns, {
+        return tabling.columns.normalizeColumns<R, M>(props.columns, {
           body: (col: Table.Column<R, M>) => ({
             cellRendererParams: { ...col.cellRendererParams, generateNewRowData: props.generateNewRowData },
             cellEditorParams: { ...col.cellEditorParams, onDoneEditing },
@@ -127,11 +269,7 @@ const authenticateDataGrid =
               } else if (!isNil(props.isCellEditable)) {
                 return props.isCellEditable(params);
               } else {
-                const colEditable = col.editable;
-                if (!isNil(colEditable)) {
-                  return typeof colEditable === "function" ? colEditable(params) : colEditable;
-                }
-                return true;
+                return col.editable === undefined ? true : tabling.columns.isEditable(col, params.row);
               }
             },
             valueSetter: (params: ValueSetterParams) => {
@@ -148,58 +286,6 @@ const authenticateDataGrid =
               // clone each row before feeding it into the AG Grid tables.
               params.data.data[params.column.getColId()] = params.newValue;
               return true;
-            },
-            suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
-              if (!isNil(col.suppressKeyboardEvent) && col.suppressKeyboardEvent(params) === true) {
-                return true;
-              } else if (params.editing && includes(["Tab"], params.event.code)) {
-                /*
-                  Our custom cell editors have built in functionality that when editing is terminated via
-                  a TAB key, we move one cell to the right without continuing in edit mode.  This however
-                  does not work for the bland text cells, where we do not have cell editors controlling the
-                  edit behavior.  So we need to suppress the TAB behavior when editing, and manually move
-                  the cell over.
-                  */
-                return true;
-              } else if (!params.editing && includes(["Backspace", "Delete"], params.event.code)) {
-                const clearCellsOverRange = (range: CellRange | CellRange[], api: GridApi) => {
-                  const changes: Table.SoloCellChange<R>[] = !Array.isArray(range)
-                    ? getTableChangesFromRangeClear(range, api)
-                    : flatten(map(range, (rng: CellRange) => getTableChangesFromRangeClear(rng, api)));
-                  props.onChangeEvent({
-                    type: "dataChange",
-                    payload: tabling.events.consolidateCellChanges(changes)
-                  });
-                };
-                // Suppress Backspace/Delete events when multiple cells are selected in a range.
-                const ranges = params.api.getCellRanges();
-                if (
-                  !isNil(ranges) &&
-                  ranges.length !== 0 &&
-                  (ranges.length !== 1 || !tabling.aggrid.rangeSelectionIsSingleCell(ranges[0]))
-                ) {
-                  clearCellsOverRange(ranges, params.api);
-                  return true;
-                } else {
-                  /*
-                    For custom Cell Editor(s) with a Pop-Up, we do not want Backspace/Delete to go into
-                    edit mode but instead want to clear the values of the cells - so we prevent those key
-                    presses from triggering edit mode in the Cell Editor and clear the value at this level.
-                    */
-                  const row: Table.BodyRow<R> = params.node.data;
-                  if (tabling.typeguards.isEditableRow(row) && col.cellEditorPopup === true) {
-                    clearCell(row, col);
-                    return true;
-                  }
-                  return false;
-                }
-              } else if (
-                (params.event.key === "ArrowDown" || params.event.key === "ArrowUp") &&
-                (params.event.ctrlKey || params.event.metaKey)
-              ) {
-                return true;
-              }
-              return false;
             }
           }),
           index: {
@@ -212,8 +298,71 @@ const authenticateDataGrid =
             }
           }
         });
-        return cs;
       }, [hooks.useDeepEqualMemo(props.columns)]);
+
+      const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
+        return tabling.columns.normalizeColumns<R, M>(unsuppressedColumns, {
+          body: (col: Table.Column<R, M>) => ({
+            suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
+              if (!isNil(col.suppressKeyboardEvent) && col.suppressKeyboardEvent(params) === true) {
+                return true;
+              } else if (params.editing && includes(["Tab"], params.event.code)) {
+                /*
+                Our custom cell editors have built in functionality that when editing is terminated via
+                a TAB key, we move one cell to the right without continuing in edit mode.  This however
+                does not work for the bland text cells, where we do not have cell editors controlling the
+                edit behavior.  So we need to suppress the TAB behavior when editing, and manually move
+                the cell over.
+                */
+                return true;
+              } else if (!params.editing && includes(["Backspace", "Delete"], params.event.code)) {
+                // Suppress Backspace/Delete events when multiple cells are selected in a range.
+                const ranges = params.api.getCellRanges();
+                if (
+                  !isNil(ranges) &&
+                  ranges.length !== 0 &&
+                  (ranges.length !== 1 || !tabling.aggrid.rangeSelectionIsSingleCell(ranges[0]))
+                ) {
+                  const changes: Table.SoloCellChange<R>[] = flatten(
+                    map(ranges, (rng: CellRange) => getTableChangesFromRangeClear(params.api, unsuppressedColumns, rng))
+                  );
+                  if (changes.length !== 0) {
+                    props.onChangeEvent({
+                      type: "dataChange",
+                      payload: tabling.events.consolidateCellChanges(changes)
+                    });
+                  }
+                  return true;
+                } else {
+                  /*
+                  For custom Cell Editor(s) with a Pop-Up, we do not want Backspace/Delete to go into
+                  edit mode but instead want to clear the values of the cells - so we prevent those key
+                  presses from triggering edit mode in the Cell Editor and clear the value at this level.
+                  */
+                  const row: Table.BodyRow<R> = params.node.data;
+                  if (tabling.typeguards.isEditableRow(row) && col.cellEditorPopup === true) {
+                    const change = getCellChangeForClear(row, col);
+                    if (!isNil(change)) {
+                      props.onChangeEvent({
+                        type: "dataChange",
+                        payload: tabling.events.cellChangeToRowChange(change)
+                      });
+                    }
+                    return true;
+                  }
+                  return false;
+                }
+              } else if (
+                (params.event.key === "ArrowDown" || params.event.key === "ArrowUp") &&
+                (params.event.ctrlKey || params.event.metaKey)
+              ) {
+                return true;
+              }
+              return false;
+            }
+          })
+        });
+      }, [hooks.useDeepEqualMemo(unsuppressedColumns)]);
 
       const [navigateToNextCell, tabToNextCell, moveToNextColumn, moveToNextRow] = useCellNavigation({
         apis: props.apis,
@@ -229,18 +378,21 @@ const authenticateDataGrid =
 
       const [getContextMenuItems] = useContextMenu<R, M>(props);
 
-      const onCellSpaceKey = (event: CellKeyDownEvent) => {
-        if (!isNil(event.rowIndex)) {
-          event.api.startEditingCell({
-            rowIndex: event.rowIndex,
-            colKey: event.column.getColId(),
-            charPress: " "
-          });
-        }
-      };
+      const onCellSpaceKey = useMemo(
+        () => (event: CellKeyDownEvent) => {
+          if (!isNil(event.rowIndex)) {
+            event.api.startEditingCell({
+              rowIndex: event.rowIndex,
+              colKey: event.column.getColId(),
+              charPress: " "
+            });
+          }
+        },
+        []
+      );
 
-      const onCellCut: (e: CellKeyDownEvent, local: GridApi) => void = hooks.useDynamicCallback(
-        (e: CellKeyDownEvent, local: GridApi) => {
+      const onCellCut: (e: CellKeyDownEvent, local: Table.GridApi) => void = hooks.useDynamicCallback(
+        (e: CellKeyDownEvent, local: Table.GridApi) => {
           const focusedCell = local.getFocusedCell();
           if (!isNil(focusedCell)) {
             const node = local.getDisplayedRowAtIndex(focusedCell.rowIndex);
@@ -286,164 +438,6 @@ const authenticateDataGrid =
         }
       });
 
-      const getCellChangeForClear: (
-        row: Table.EditableRow<R>,
-        col: Table.Column<R, M>
-      ) => Table.SoloCellChange<R> | null = hooks.useDynamicCallback(
-        (row: Table.EditableRow<R>, col: Table.Column<R, M>): Table.SoloCellChange<R> | null => {
-          const clearValue = col.nullValue !== undefined ? col.nullValue : null;
-          const colId = col.field;
-          if (
-            tabling.typeguards.isModelRow(row) &&
-            !isNil(colId) &&
-            (row.data[colId] === undefined || row.data[colId] !== clearValue)
-          ) {
-            const change: Table.SoloCellChange<R> = {
-              oldValue: row.data[colId],
-              newValue: clearValue,
-              id: row.id,
-              field: colId
-            };
-            return change;
-          } else {
-            return null;
-          }
-        }
-      );
-
-      const getTableChangesFromRangeClear: (range: CellRange, gridApi?: GridApi) => Table.SoloCellChange<R>[] =
-        hooks.useDynamicCallback((range: CellRange, gridApi?: GridApi): Table.SoloCellChange<R>[] => {
-          const changes: Table.SoloCellChange<R>[] = [];
-          if (!isNil(props.apis) && !isNil(range.startRow) && !isNil(range.endRow)) {
-            gridApi = isNil(gridApi) ? gridApi : props.apis.grid;
-            let colIds: (keyof R)[] = map(range.columns, (col: Table.AgColumn) => col.getColId() as keyof R);
-            let startRowIndex = Math.min(range.startRow.rowIndex, range.endRow.rowIndex);
-            let endRowIndex = Math.max(range.startRow.rowIndex, range.endRow.rowIndex);
-            for (let i = startRowIndex; i <= endRowIndex; i++) {
-              const node: Table.RowNode | undefined = props.apis.grid.getDisplayedRowAtIndex(i);
-              if (!isNil(node)) {
-                const row: Table.BodyRow<R> = node.data;
-                if (tabling.typeguards.isEditableRow(row)) {
-                  /* eslint-disable no-loop-func */
-                  forEach(colIds, (colId: keyof R) => {
-                    callWithColumn(colId, (c: Table.Column<R, M>) => {
-                      if (c.editable === true) {
-                        const change = getCellChangeForClear(row, c);
-                        if (!isNil(change)) {
-                          changes.push(change);
-                        }
-                      }
-                    });
-                  });
-                }
-              }
-            }
-          }
-          return changes;
-        });
-
-      const getCellChangesFromEvent: (
-        event: CellEditingStoppedEvent | CellValueChangedEvent
-      ) => Table.SoloCellChange<R>[] = (
-        event: CellEditingStoppedEvent | CellValueChangedEvent
-      ): Table.SoloCellChange<R>[] => {
-        const hasChanged = (ch: Table.SoloCellChange<R>): boolean => {
-          return ch.newValue !== ch.oldValue;
-        };
-
-        const row: Table.BodyRow<R> = event.node.data;
-        if (tabling.typeguards.isEditableRow(row)) {
-          // The field might not necessarily be a key of the RowData, if the colId was specified
-          // for the Column and the field was not.
-          const field = event.column.getColId() as keyof R | string;
-
-          const customCol: Table.Column<R, M> | null = getColumn(field);
-          if (!isNil(customCol)) {
-            /*
-            AG Grid treats cell values as undefined when they are cleared via edit,
-            so we need to translate that back into a null representation.
-
-            Note: Converting undefined values back to the column's corresponding null
-            values may now be handled by the valueSetter on the Table.Column object.
-            We may be able to remove - but leave now for safety.
-            */
-            const nullValue = customCol.nullValue === undefined ? null : customCol.nullValue;
-            const oldValue = event.oldValue === undefined ? nullValue : event.oldValue;
-            let newValue = event.newValue === undefined ? nullValue : event.newValue;
-
-            let changes: Table.SoloCellChange<R>[];
-            if (!isNil(customCol.parseIntoFields)) {
-              const oldParsed = customCol.parseIntoFields(oldValue);
-              const parsed = customCol.parseIntoFields(newValue);
-              // The fields for the parsed values of each value should be the same.
-              const fields: (keyof R)[] = uniq([
-                ...map(oldParsed, (p: Table.ParsedColumnField<R>) => p.field),
-                ...map(parsed, (p: Table.ParsedColumnField<R>) => p.field)
-              ]);
-              changes = reduce(
-                fields,
-                (chs: Table.SoloCellChange<R>[], fld: keyof R) => {
-                  const oldParsedForField = find(oldParsed, { field: fld } as any);
-                  const parsedForField = find(parsed, { field: fld } as any);
-                  // Since the fields for each set of parsed field-value pairs will be the
-                  // same, this is mostly just a check to satisfy TS.
-                  if (!isNil(oldParsedForField) && !isNil(parsedForField)) {
-                    return [
-                      ...chs,
-                      {
-                        id: row.id,
-                        field: fld,
-                        oldValue: oldParsedForField.value,
-                        newValue: parsedForField.value
-                      }
-                    ];
-                  }
-                  return chs;
-                },
-                []
-              );
-            } else {
-              /*
-              The logic inside this conditional is 100% a HACK - and this type of
-              programming should not be encouraged.  However, in this case, it is
-              a HACK to get around AG Grid nonsense.  It appears to be a bug with
-              AG Grid, but if you have data stored for a cell that is an Array of
-              length 1, when you drag the cell contents to fill other cells, AG Grid
-              will pass the data to the onCellValueChanged handler as only the
-              first element (i.e. [4] becomes 4).  This is problematic for Fringes,
-              since the cell value corresponds to a list of Fringe IDs, so we need
-              to make that adjustment here.
-              */
-              if (field === "fringes" && !Array.isArray(newValue)) {
-                newValue = [newValue];
-              }
-              changes = [
-                {
-                  oldValue,
-                  newValue,
-                  field: field as keyof R,
-                  id: event.data.id
-                }
-              ];
-            }
-            return filter(changes, (ch: Table.SoloCellChange<R>) => hasChanged(ch));
-          }
-        }
-        return [];
-      };
-
-      const clearCell: (row: Table.EditableRow<R>, def: Table.Column<R, M>) => void = hooks.useDynamicCallback(
-        (row: Table.EditableRow<R>, def: Table.Column<R, M>) => {
-          const change = getCellChangeForClear(row, def);
-          if (!isNil(change)) {
-            props.onChangeEvent({
-              type: "dataChange",
-              payload: tabling.events.cellChangeToRowChange(change)
-            });
-          }
-        }
-      );
-
       const onPasteStart: (event: PasteStartEvent) => void = hooks.useDynamicCallback((event: PasteStartEvent) => {
         setCellChangeEvents([]);
       });
@@ -451,7 +445,10 @@ const authenticateDataGrid =
       const onPasteEnd: (event: PasteEndEvent) => void = hooks.useDynamicCallback((event: PasteEndEvent) => {
         const changes: Table.SoloCellChange<R>[] = reduce(
           cellChangeEvents,
-          (curr: Table.SoloCellChange<R>[], e: CellValueChangedEvent) => [...curr, ...getCellChangesFromEvent(e)],
+          (curr: Table.SoloCellChange<R>[], e: CellValueChangedEvent) => [
+            ...curr,
+            ...getCellChangesFromEvent(columns, e)
+          ],
           []
         );
         if (changes.length !== 0) {
@@ -473,7 +470,7 @@ const authenticateDataGrid =
             if (e.source === "paste") {
               setCellChangeEvents([...cellChangeEvents, e]);
             } else {
-              const changes = getCellChangesFromEvent(e);
+              const changes = getCellChangesFromEvent(columns, e);
               if (changes.length !== 0) {
                 props.onChangeEvent({ type: "dataChange", payload: tabling.events.consolidateCellChanges(changes) });
                 if (tabling.typeguards.isModelRow(row) && !isNil(props.onRowExpand) && !isNil(props.rowCanExpand)) {
