@@ -20,6 +20,10 @@ const Columns: Table.Column<R, M>[] = [
     minWidth: 200,
     flex: 100,
     columnType: "longText",
+    // The custom cell renderer here is only needed to include the Markup icon,
+    // which is annoying because it is only needed for those rows and slows down
+    // rendering performance.
+    cellRenderer: "BodyCell",
     cellRendererParams: {
       icon: (row: Table.BodyRow<R>) =>
         tabling.typeguards.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined
