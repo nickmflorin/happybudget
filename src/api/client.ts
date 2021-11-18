@@ -214,7 +214,13 @@ export class ApiClient {
     const response: AxiosResponse<T> = await lookup[method](url, filterPayload(payload), {
       cancelToken: options.cancelToken
     });
-    return response.data;
+    // We are getting sporadic errors where the response is not defined.  I am
+    // not exactly sure why this is happening, but it could be related to request
+    // cancellation.  For now, we will just allow the return value to be undefined
+    // here and force coerce it, with the understanding that the value only seems
+    // to be undefined in cases where we would not be accessing the response
+    // data anyways (i.e. task cancellation).
+    return response?.data;
   };
 
   /**
