@@ -22,6 +22,10 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     columnType: "longText",
     index: 1,
     suppressSizeToFit: false,
+    // The custom cell renderer here is only needed to include the Markup icon,
+    // which is annoying because it is only needed for those rows and slows down
+    // rendering performance.
+    cellRenderer: "BodyCell",
     pdfHeaderName: "Category Description",
     pdfWidth: 0.6,
     pdfFooter: { value: "Grand Total" },
