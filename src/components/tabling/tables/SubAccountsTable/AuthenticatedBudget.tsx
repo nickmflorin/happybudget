@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from "react";
-import { reduce, isNil, find, map, filter, uniq } from "lodash";
+import React, { useMemo } from "react";
+import { isNil, find, map, filter } from "lodash";
 
+import * as api from "api";
 import { model, tabling, hooks } from "lib";
-import { EditSubAccountAttachmentsModal } from "components/modals";
 import { framework } from "components/tabling/generic";
 
+import { useAttachments } from "../hooks";
 import { AuthenticatedBudgetTable, AuthenticatedBudgetTableProps } from "../BudgetTable";
 import SubAccountsTable, { WithSubAccountsTableProps } from "./SubAccountsTable";
 import Columns from "./Columns";
@@ -35,8 +36,17 @@ export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>,
 const AuthenticatedBudgetSubAccountsTable = (
   props: WithSubAccountsTableProps<AuthenticatedBudgetProps>
 ): JSX.Element => {
-  const [editSubAccountAttachments, setEditSubAccountAttachments] = useState<number | null>(null);
   const table = tabling.hooks.useTableIfNotDefined(props.table);
+  const [processAttachmentsCellForClipboard, processAttachmentsCellFromClipboard, setEditAttachments, modal] =
+    useAttachments({
+      table: table.current,
+      onAttachmentRemoved: props.onAttachmentRemoved,
+      onAttachmentAdded: props.onAttachmentAdded,
+      listAttachments: api.getSubAccountAttachments,
+      uploadAttachment: api.uploadSubAccountAttachment,
+      deleteAttachment: api.deleteSubAccountAttachment,
+      path: (id: number) => `/v1/subaccounts/${id}/attachments/`
+    });
 
   const processUnitCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
     model.util.inferModelFromName<Model.Tag>(props.subAccountUnits, name, { nameField: "title" })
@@ -64,26 +74,6 @@ const AuthenticatedBudgetSubAccountsTable = (
     }
   });
 
-  const processAttachmentsCellForClipboard = hooks.useDynamicCallback((row: R) =>
-    map(row.attachments, (a: Model.SimpleAttachment) => a.id).join(", ")
-  );
-
-  const processAttachmentsCellFromClipboard = hooks.useDynamicCallback((value: string) => {
-    const modelRows = filter(table.current.getRows(), (r: Table.Row<R>) =>
-      tabling.typeguards.isModelRow(r)
-    ) as Table.ModelRow<R>[];
-    const attachments = reduce(
-      modelRows,
-      (curr: Model.SimpleAttachment[], r: Table.ModelRow<R>) => uniq([...curr, ...r.data.attachments]),
-      []
-    );
-    return model.util.getModelsByIds<Model.SimpleAttachment>(
-      attachments,
-      model.util.parseIdsFromDeliminatedString(value),
-      { warnOnMissing: false }
-    );
-  });
-
   const processFringesCellForClipboard = hooks.useDynamicCallback((row: R) => {
     const fringes = model.util.getModelsByIds<Tables.FringeRow>(props.fringes, row.fringes);
     return map(fringes, (fringe: Tables.FringeRow) => fringe.data.name).join(", ");
@@ -109,7 +99,7 @@ const AuthenticatedBudgetSubAccountsTable = (
       }),
       description: { headerName: `${props.categoryName} Description` },
       attachments: {
-        onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditSubAccountAttachments(row.id),
+        onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditAttachments(row.id),
         processCellFromClipboard: processAttachmentsCellFromClipboard,
         processCellForClipboard: processAttachmentsCellForClipboard
       },
@@ -235,49 +225,7 @@ const AuthenticatedBudgetSubAccountsTable = (
           framework.actions.ExportCSVAction<R, M>(table.current, params, props.exportFileName)
         ]}
       />
-      {!isNil(editSubAccountAttachments) && (
-        <EditSubAccountAttachmentsModal
-          id={editSubAccountAttachments}
-          open={true}
-          onCancel={() => setEditSubAccountAttachments(null)}
-          onAttachmentRemoved={(id: number) => {
-            const row = table.current.getRow(editSubAccountAttachments);
-            if (!isNil(row)) {
-              if (tabling.typeguards.isModelRow(row)) {
-                props.onAttachmentRemoved(row, id);
-              } else {
-                console.warn(
-                  `Suspicous Behavior: After attachment was added, row with ID
-                  ${editSubAccountAttachments} did not refer to a model row.`
-                );
-              }
-            } else {
-              console.warn(
-                `Suspicous Behavior: After attachment was added, could not find row in
-                state for ID ${editSubAccountAttachments}.`
-              );
-            }
-          }}
-          onAttachmentAdded={(m: Model.Attachment) => {
-            const row = table.current.getRow(editSubAccountAttachments);
-            if (!isNil(row)) {
-              if (tabling.typeguards.isModelRow(row)) {
-                props.onAttachmentAdded(row, m);
-              } else {
-                console.warn(
-                  `Suspicous Behavior: After attachment was added, row with ID
-                  ${editSubAccountAttachments} did not refer to a model row.`
-                );
-              }
-            } else {
-              console.warn(
-                `Suspicous Behavior: After attachment was added, could not find row in
-                state for ID ${editSubAccountAttachments}.`
-              );
-            }
-          }}
-        />
-      )}
+      {modal}
     </React.Fragment>
   );
 };

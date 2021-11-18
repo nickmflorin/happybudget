@@ -351,6 +351,7 @@ namespace Model {
     readonly phone_number: string | null;
     readonly created_at: string;
     readonly updated_at: string;
+    readonly attachments: SimpleAttachment[];
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */

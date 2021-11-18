@@ -138,6 +138,7 @@ namespace Http {
     readonly phone_number?: string | null;
     readonly rate?: number | null;
     readonly image?: ArrayBuffer | string | null;
+    readonly attachments?: number[];
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */

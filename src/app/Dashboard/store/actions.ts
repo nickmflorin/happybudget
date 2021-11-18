@@ -41,7 +41,8 @@ export const ActionType = {
     SetSearch: "dashboard.contacts.SetSearch",
     UpdateInState: "dashboard.contacts.UpdateInState",
     RemoveFromState: "dashboard.contacts.RemoveFromState",
-    AddToState: "dashboard.contacts.AddToState"
+    AddToState: "dashboard.contacts.AddToState",
+    UpdateRowsInState: "dashboard.contacts.UpdateRowsInState"
   }
 };
 
@@ -97,4 +98,7 @@ export const responseContactsAction = createAction<Http.TableResponse<Model.Cont
 export const removeContactFromStateAction = createAction<number>(ActionType.Contacts.RemoveFromState);
 export const updateContactInStateAction = createAction<Redux.UpdateActionPayload<Model.Contact>>(
   ActionType.Contacts.UpdateInState
+);
+export const updateContactRowsInStateAction = createAction<Redux.UpdateRowsInTablePayload<Tables.ContactRowData>>(
+  ActionType.Contacts.UpdateRowsInState
 );

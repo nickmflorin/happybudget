@@ -47,7 +47,7 @@ namespace Tables {
 
   type ContactRowData = Pick<
     Model.Contact,
-    "contact_type" | "company" | "position" | "rate" | "phone_number" | "email" | "first_name" | "last_name" | "image"
+    "contact_type" | "company" | "position" | "rate" | "phone_number" | "email" | "first_name" | "last_name" | "image" | "attachments"
   >;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */

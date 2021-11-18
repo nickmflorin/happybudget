@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { map, filter, find, isNil, reduce, uniq } from "lodash";
+import React from "react";
+import { map, filter, find, isNil } from "lodash";
 
+import * as api from "api";
 import { model, tabling, hooks } from "lib";
 
-import { EditActualAttachmentsModal } from "components/modals";
 import { framework, WithConnectedTableProps } from "components/tabling/generic";
 import { AuthenticatedModelTable, AuthenticatedModelTableProps } from "../ModelTable";
+import { useAttachments } from "../hooks";
 import Framework from "./framework";
 import Columns from "./Columns";
 
@@ -33,28 +34,18 @@ const ActualsTable = ({
   onSearchContact,
   ...props
 }: WithConnectedTableProps<ActualsTableProps, R, M>): JSX.Element => {
-  const [editSubAccountAttachments, setEditSubAccountAttachments] = useState<number | null>(null);
   const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
 
-  const processAttachmentsCellForClipboard = hooks.useDynamicCallback((row: R) =>
-    map(row.attachments, (a: Model.SimpleAttachment) => a.id).join(", ")
-  );
-
-  const processAttachmentsCellFromClipboard = hooks.useDynamicCallback((value: string) => {
-    const modelRows = filter(table.current.getRows(), (r: Table.Row<R>) =>
-      tabling.typeguards.isModelRow(r)
-    ) as Table.ModelRow<R>[];
-    const attachments = reduce(
-      modelRows,
-      (curr: Model.SimpleAttachment[], r: Table.ModelRow<R>) => uniq([...curr, ...r.data.attachments]),
-      []
-    );
-    return model.util.getModelsByIds<Model.SimpleAttachment>(
-      attachments,
-      model.util.parseIdsFromDeliminatedString(value),
-      { warnOnMissing: false }
-    );
-  });
+  const [processAttachmentsCellForClipboard, processAttachmentsCellFromClipboard, setEditAttachments, modal] =
+    useAttachments({
+      table: table.current,
+      onAttachmentRemoved: props.onAttachmentRemoved,
+      onAttachmentAdded: props.onAttachmentAdded,
+      listAttachments: api.getActualAttachments,
+      uploadAttachment: api.uploadActualAttachment,
+      deleteAttachment: api.deleteActualAttachment,
+      path: (id: number) => `/v1/actuals/${id}/attachments/`
+    });
 
   const processActualTypeCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
     model.util.inferModelFromName<Model.Tag>(props.actualTypes, name, { nameField: "title" })
@@ -129,7 +120,7 @@ const ActualsTable = ({
             }
           }),
           attachments: {
-            onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditSubAccountAttachments(row.id),
+            onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditAttachments(row.id),
             processCellForClipboard: processAttachmentsCellForClipboard,
             processCellFromClipboard: processAttachmentsCellFromClipboard
           },
@@ -144,49 +135,7 @@ const ActualsTable = ({
           }
         })}
       />
-      {!isNil(editSubAccountAttachments) && (
-        <EditActualAttachmentsModal
-          id={editSubAccountAttachments}
-          open={true}
-          onCancel={() => setEditSubAccountAttachments(null)}
-          onAttachmentRemoved={(id: number) => {
-            const row = table.current.getRow(editSubAccountAttachments);
-            if (!isNil(row)) {
-              if (tabling.typeguards.isModelRow(row)) {
-                props.onAttachmentRemoved(row, id);
-              } else {
-                console.warn(
-                  `Suspicous Behavior: After attachment was added, row with ID
-                  ${editSubAccountAttachments} did not refer to a model row.`
-                );
-              }
-            } else {
-              console.warn(
-                `Suspicous Behavior: After attachment was added, could not find row in
-                state for ID ${editSubAccountAttachments}.`
-              );
-            }
-          }}
-          onAttachmentAdded={(m: Model.Attachment) => {
-            const row = table.current.getRow(editSubAccountAttachments);
-            if (!isNil(row)) {
-              if (tabling.typeguards.isModelRow(row)) {
-                props.onAttachmentAdded(row, m);
-              } else {
-                console.warn(
-                  `Suspicous Behavior: After attachment was added, row with ID
-                  ${editSubAccountAttachments} did not refer to a model row.`
-                );
-              }
-            } else {
-              console.warn(
-                `Suspicous Behavior: After attachment was added, could not find row in
-                state for ID ${editSubAccountAttachments}.`
-              );
-            }
-          }}
-        />
-      )}
+      {modal}
     </React.Fragment>
   );
 };

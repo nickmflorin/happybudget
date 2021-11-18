@@ -260,7 +260,7 @@ export const CalculatedColumn = <
 };
 
 export const AttachmentsColumn = <
-  R extends Tables.ActualRowData | Tables.SubAccountRowData,
+  R extends Tables.ActualRowData | Tables.SubAccountRowData | Tables.ContactRowData,
   M extends Model.HttpModel = Model.HttpModel
 >(
   col: Partial<Table.Column<R, M, Model.SimpleAttachment[]>>,

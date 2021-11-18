@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { isNil } from "lodash";
+import { isNil, filter } from "lodash";
 
 import { actions as globalActions } from "store";
 import { tabling, redux } from "lib";
@@ -22,7 +22,8 @@ const ActionMap = {
   saving: actions.savingContactsTableAction,
   addModelsToState: actions.addContactModelsToStateAction,
   setSearch: actions.setContactsSearchAction,
-  clear: actions.clearContactsAction
+  clear: actions.clearContactsAction,
+  updateRowsInState: actions.updateContactRowsInStateAction
 };
 
 const ConnectedContactsTable = connectTableToStore<ContactsTable.Props, R, M, Tables.ContactTableStore>({
@@ -51,6 +52,29 @@ const Contacts = (): JSX.Element => {
           tableId={"contacts-table"}
           onRowExpand={(row: Table.ModelRow<R>) => setContactToEdit(row.id)}
           exportFileName={"contacts"}
+          onAttachmentRemoved={(row: Table.ModelRow<R>, id: number) =>
+            dispatch(
+              actions.updateContactRowsInStateAction({
+                id: row.id,
+                data: {
+                  attachments: filter(row.data.attachments, (a: Model.SimpleAttachment) => a.id !== id)
+                }
+              })
+            )
+          }
+          onAttachmentAdded={(row: Table.ModelRow<R>, attachment: Model.Attachment) =>
+            dispatch(
+              actions.updateContactRowsInStateAction({
+                id: row.id,
+                data: {
+                  attachments: [
+                    ...row.data.attachments,
+                    { id: attachment.id, name: attachment.name, extension: attachment.extension, url: attachment.url }
+                  ]
+                }
+              })
+            )
+          }
         />
         <CreateContactModal
           open={newContactModalOpen}

@@ -71,6 +71,11 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     cellRenderer: { data: "EmailCell" },
     valueSetter: tabling.valueSetters.emailValueSetter<R>("email")
   }),
+  tabling.columns.AttachmentsColumn({
+    field: "attachments",
+    width: 140,
+    minWidth: 140
+  }),
   tabling.columns.BodyColumn<R, M>({
     field: "rate",
     headerName: "Rate",
