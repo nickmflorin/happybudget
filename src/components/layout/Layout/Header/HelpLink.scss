@@ -1,0 +1,24 @@
+@import "style/_imports";
+
+.help-link {
+  display: flex;
+
+  @include media(">=large") {
+    margin-right: 10px;
+  }
+
+  &.link {
+    color: $text-primary;
+  }
+
+  .text-container {
+    display: none;
+    font-size: 14px;
+    font-weight: 500;
+    color: $text-primary;
+
+    @include media(">=large") {
+      display: block;
+    }
+  }
+}

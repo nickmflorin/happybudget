@@ -7,6 +7,10 @@
 
 .ant-dropdown {
   @extend .dropdown-base;
+
+  .menu-item {
+    cursor: pointer;
+  }
 }
 
 .ant-select-dropdown {

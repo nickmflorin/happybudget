@@ -11,6 +11,8 @@ import { SidebarLogo } from "components/svgs";
 import { AccountCircleLink } from "components/links";
 import { useLoggedInUser } from "store/hooks";
 
+import HelpLink from "./HelpLink";
+
 import "./index.scss";
 
 export interface HeaderProps extends StandardComponentProps {
@@ -78,6 +80,34 @@ const Header = ({
             trigger={["click"]}
             menuItems={[
               {
+                id: "feedback",
+                label: "Feedback/Feature Request",
+                onClick: () => {
+                  if (!isNil(process.env.REACT_APP_CANNY_FEEDBACK_URL)) {
+                    window.location.href = process.env.REACT_APP_CANNY_FEEDBACK_URL;
+                  } else {
+                    console.warn(
+                      "Could not identify Canny feedback URL as ENV variable `REACT_APP_CANNY_FEEDBACK_URL` is not defined."
+                    );
+                  }
+                },
+                icon: <Icon icon={"bullhorn"} weight={"light"} />
+              },
+              {
+                // TODO: implement custom Intercom Launcher
+                // https://www.intercom.com/help/en/articles/2894-customize-the-intercom-messenger-technical
+                id: "intercom-chat",
+                label: "Chat with Support",
+                icon: <Icon icon={"comment-dots"} weight={"light"} />
+              }
+            ]}
+          >
+            <HelpLink />
+          </Dropdown>
+          <Dropdown
+            trigger={["click"]}
+            menuItems={[
+              {
                 id: "profile",
                 label: "Profile",
                 onClick: () => history.push("/profile"),
@@ -91,20 +121,6 @@ const Header = ({
                 },
                 icon: <Icon icon={"lock"} weight={"light"} />,
                 visible: user.is_staff === true
-              },
-              {
-                id: "feedback",
-                label: "Feedback",
-                onClick: () => {
-                  if (!isNil(process.env.REACT_APP_CANNY_FEEDBACK_URL)) {
-                    window.location.href = process.env.REACT_APP_CANNY_FEEDBACK_URL;
-                  } else {
-                    console.warn(
-                      "Could not identify Canny feedback URL as ENV variable `REACT_APP_CANNY_FEEDBACK_URL` is not defined."
-                    );
-                  }
-                },
-                icon: <Icon icon={"bullhorn"} weight={"light"} />
               },
               {
                 id: "logout",
