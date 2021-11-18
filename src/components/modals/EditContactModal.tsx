@@ -10,11 +10,14 @@ import { IImageAndNameRef } from "components/fields/ImageAndName";
 import { EditModelModal, EditModelModalProps } from "./generic";
 import "./ContactModal.scss";
 
-interface EditContactModalProps extends EditModelModalProps<Model.Contact> {}
+interface EditContactModalProps extends EditModelModalProps<Model.Contact> {
+  readonly onAttachmentRemoved?: (id: number) => void;
+  readonly onAttachmentAdded?: (m: Model.Attachment) => void;
+}
 
 const MemoizedContactForm = React.memo(ContactForm);
 
-const EditContactModal = (props: EditContactModalProps): JSX.Element => {
+const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: EditContactModalProps): JSX.Element => {
   const [image, setImage] = useState<UploadedImage | null | undefined>(undefined);
   /*
   Note: We have to use a ref here, instead of storing firstName and lastName in the state
@@ -75,7 +78,25 @@ const EditContactModal = (props: EditContactModalProps): JSX.Element => {
       }
     >
       {(m: Model.Contact | null, form: FormInstance<Http.ContactPayload>) => (
-        <MemoizedContactForm form={form} onValuesChange={onValuesChange} />
+        <React.Fragment>
+          <MemoizedContactForm
+            form={form}
+            onValuesChange={onValuesChange}
+            attachmentsProps={
+              /* eslint-disable indent */
+              !isNil(m)
+                ? {
+                    onAttachmentRemoved: onAttachmentRemoved,
+                    onAttachmentAdded: onAttachmentAdded,
+                    listAttachments: api.getContactAttachments,
+                    deleteAttachment: api.deleteContactAttachment,
+                    path: `/v1/contacts/${m.id}/attachments/`,
+                    id: m.id
+                  }
+                : undefined
+            }
+          />
+        </React.Fragment>
       )}
     </EditModelModal>
   );

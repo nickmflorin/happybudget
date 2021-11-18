@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { isNil, filter } from "lodash";
 
@@ -44,6 +44,35 @@ const Contacts = (): JSX.Element => {
 
   const dispatch = useDispatch();
 
+  const onAttachmentRemoved = useMemo(
+    () => (row: Table.ModelRow<R>, id: number) =>
+      dispatch(
+        actions.updateContactRowsInStateAction({
+          id: row.id,
+          data: {
+            attachments: filter(row.data.attachments, (a: Model.SimpleAttachment) => a.id !== id)
+          }
+        })
+      ),
+    []
+  );
+
+  const onAttachmentAdded = useMemo(
+    () => (row: Table.ModelRow<R>, attachment: Model.Attachment) =>
+      dispatch(
+        actions.updateContactRowsInStateAction({
+          id: row.id,
+          data: {
+            attachments: [
+              ...row.data.attachments,
+              { id: attachment.id, name: attachment.name, extension: attachment.extension, url: attachment.url }
+            ]
+          }
+        })
+      ),
+    []
+  );
+
   return (
     <React.Fragment>
       <Page className={"contacts"} title={"My Contacts"}>
@@ -52,29 +81,8 @@ const Contacts = (): JSX.Element => {
           tableId={"contacts-table"}
           onRowExpand={(row: Table.ModelRow<R>) => setContactToEdit(row.id)}
           exportFileName={"contacts"}
-          onAttachmentRemoved={(row: Table.ModelRow<R>, id: number) =>
-            dispatch(
-              actions.updateContactRowsInStateAction({
-                id: row.id,
-                data: {
-                  attachments: filter(row.data.attachments, (a: Model.SimpleAttachment) => a.id !== id)
-                }
-              })
-            )
-          }
-          onAttachmentAdded={(row: Table.ModelRow<R>, attachment: Model.Attachment) =>
-            dispatch(
-              actions.updateContactRowsInStateAction({
-                id: row.id,
-                data: {
-                  attachments: [
-                    ...row.data.attachments,
-                    { id: attachment.id, name: attachment.name, extension: attachment.extension, url: attachment.url }
-                  ]
-                }
-              })
-            )
-          }
+          onAttachmentRemoved={onAttachmentRemoved}
+          onAttachmentAdded={onAttachmentAdded}
         />
         <CreateContactModal
           open={newContactModalOpen}
@@ -89,6 +97,42 @@ const Contacts = (): JSX.Element => {
         <EditContactModal
           id={contactToEdit}
           onCancel={() => setContactToEdit(undefined)}
+          onAttachmentRemoved={(id: number) => {
+            const row = table.current.getRow(contactToEdit);
+            if (!isNil(row)) {
+              if (tabling.typeguards.isModelRow(row)) {
+                onAttachmentRemoved(row, id);
+              } else {
+                console.warn(
+                  `Suspicous Behavior: After attachment was added, row with ID
+                  ${contactToEdit} did not refer to a model row.`
+                );
+              }
+            } else {
+              console.warn(
+                `Suspicous Behavior: After attachment was added, could not find row in
+                state for ID ${contactToEdit}.`
+              );
+            }
+          }}
+          onAttachmentAdded={(m: Model.Attachment) => {
+            const row = table.current.getRow(contactToEdit);
+            if (!isNil(row)) {
+              if (tabling.typeguards.isModelRow(row)) {
+                onAttachmentAdded(row, m);
+              } else {
+                console.warn(
+                  `Suspicous Behavior: After attachment was added, row with ID
+                  ${contactToEdit} did not refer to a model row.`
+                );
+              }
+            } else {
+              console.warn(
+                `Suspicous Behavior: After attachment was added, could not find row in
+                state for ID ${contactToEdit}.`
+              );
+            }
+          }}
           onSuccess={(m: Model.Contact) => {
             setContactToEdit(undefined);
             table.current.applyTableChange({

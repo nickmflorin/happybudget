@@ -15,7 +15,6 @@ import FormItemStyle from "./FormItemStyle";
 import FormItemSection from "./FormItemSection";
 import FormItemComp from "./FormItem";
 import FormLabel from "./FormLabel";
-import FormColumnItem from "./FormColumnItem";
 import FormTitle from "./FormTitle";
 
 interface PrivateFormProps<T = any> extends FormProps<T> {
@@ -267,7 +266,6 @@ const exportable = {
   FieldError: FieldError,
   Footer: Footer,
   Item: FormItemComp,
-  ColumnItem: FormColumnItem,
   ItemStyle: FormItemStyle,
   ItemSection: FormItemSection,
   Label: FormLabel

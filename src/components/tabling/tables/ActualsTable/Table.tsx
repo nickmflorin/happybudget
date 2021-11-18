@@ -42,7 +42,6 @@ const ActualsTable = ({
       onAttachmentRemoved: props.onAttachmentRemoved,
       onAttachmentAdded: props.onAttachmentAdded,
       listAttachments: api.getActualAttachments,
-      uploadAttachment: api.uploadActualAttachment,
       deleteAttachment: api.deleteActualAttachment,
       path: (id: number) => `/v1/actuals/${id}/attachments/`
     });

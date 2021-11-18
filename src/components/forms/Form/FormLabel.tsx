@@ -1,12 +1,19 @@
 import classNames from "classnames";
 
-const FormLabel = (props: StandardComponentWithChildrenProps & { section?: boolean }): JSX.Element => {
+import FormLabelContent from "./FormLabelContent";
+
+interface FormLabelProps extends StandardComponentWithChildrenProps {
+  readonly section?: boolean;
+  readonly columnType?: Table.ColumnTypeId;
+}
+
+const FormLabel = ({ section, columnType, ...props }: FormLabelProps): JSX.Element => {
   return (
-    <div className={"ant-col ant-form-item-label"}>
-      <label className={classNames({ "label--section": props.section }, props.className)} style={props.style}>
+    <label className={classNames({ "label--section": section }, props.className)} style={props.style}>
+      <FormLabelContent columnType={columnType} section={section}>
         {props.children}
-      </label>
-    </div>
+      </FormLabelContent>
+    </label>
   );
 };
 

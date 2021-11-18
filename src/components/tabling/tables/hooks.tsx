@@ -18,7 +18,6 @@ interface UseAttachmentsProps<
     options?: Http.RequestOptions
   ) => Promise<Http.ListResponse<Model.Attachment>>;
   readonly deleteAttachment: (id: number, objId: number, options?: Http.RequestOptions) => Promise<null>;
-  readonly uploadAttachment: (id: number, data: FormData, options?: Http.RequestOptions) => Promise<Model.Attachment>;
 }
 
 type UseAttachmentsReturnType<R extends Tables.ActualRowData | Tables.SubAccountRowData | Tables.ContactRowData> = [
@@ -66,7 +65,6 @@ export const useAttachments = <
         id={editAttachments}
         listAttachments={props.listAttachments}
         deleteAttachment={props.deleteAttachment}
-        uploadAttachment={props.uploadAttachment}
         path={props.path(editAttachments)}
         open={true}
         onCancel={() => setEditAttachments(null)}

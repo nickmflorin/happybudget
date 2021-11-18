@@ -11,6 +11,7 @@ export interface FormItemStyleProps extends StandardComponentProps {
   readonly labelStyle?: React.CSSProperties;
   readonly labelClassName?: string;
   readonly section?: boolean;
+  readonly columnType?: Table.ColumnTypeId;
 }
 
 /**
@@ -27,9 +28,16 @@ const FormItemStyle = (props: FormItemStyleProps): JSX.Element => {
   return (
     <div className={classNames("form-item", props.className)} style={props.style}>
       <ShowHide show={!isNil(props.label)}>
-        <FormLabel className={props.labelClassName} style={props.labelStyle} section={props.section}>
-          {props.label}
-        </FormLabel>
+        <div className={"ant-col ant-form-item-label"}>
+          <FormLabel
+            className={props.labelClassName}
+            style={props.labelStyle}
+            section={props.section}
+            columnType={props.columnType}
+          >
+            {props.label}
+          </FormLabel>
+        </div>
       </ShowHide>
       {props.children}
     </div>

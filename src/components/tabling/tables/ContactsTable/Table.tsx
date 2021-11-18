@@ -27,7 +27,6 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
       onAttachmentRemoved: props.onAttachmentRemoved,
       onAttachmentAdded: props.onAttachmentAdded,
       listAttachments: api.getContactAttachments,
-      uploadAttachment: api.uploadContactAttachment,
       deleteAttachment: api.deleteContactAttachment,
       path: (id: number) => `/v1/contacts/${id}/attachments/`
     });

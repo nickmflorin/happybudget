@@ -43,7 +43,6 @@ const AuthenticatedBudgetSubAccountsTable = (
       onAttachmentRemoved: props.onAttachmentRemoved,
       onAttachmentAdded: props.onAttachmentAdded,
       listAttachments: api.getSubAccountAttachments,
-      uploadAttachment: api.uploadSubAccountAttachment,
       deleteAttachment: api.deleteSubAccountAttachment,
       path: (id: number) => `/v1/subaccounts/${id}/attachments/`
     });
