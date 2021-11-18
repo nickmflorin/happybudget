@@ -48,7 +48,7 @@ const AuthenticatedBudgetSubAccountsTable = (
     });
 
   const processUnitCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
-    model.util.inferModelFromName<Model.Tag>(props.subAccountUnits, name, { nameField: "title" })
+    model.util.inferModelFromName<Model.Tag>(props.subAccountUnits, name, { getName: (m: Model.Tag) => m.title })
   );
 
   const processContactCellForClipboard = hooks.useDynamicCallback((row: R) => {
@@ -75,20 +75,17 @@ const AuthenticatedBudgetSubAccountsTable = (
 
   const processFringesCellForClipboard = hooks.useDynamicCallback((row: R) => {
     const fringes = model.util.getModelsByIds<Tables.FringeRow>(props.fringes, row.fringes);
-    return map(fringes, (fringe: Tables.FringeRow) => fringe.data.name).join(", ");
+    return map(fringes, (fringe: Tables.FringeRow) => fringe.id).join(", ");
   });
 
   const processFringesCellFromClipboard = hooks.useDynamicCallback((value: string) => {
-    // NOTE: When pasting from the clipboard, the values will be a comma-separated
-    // list of Fringe Names (assuming a rational user).  Currently, Fringe Names are
-    // enforced to be unique, so we can map the Name back to the ID.  However, this might
-    // not always be the case, in which case this logic breaks down.
-    const names = value.split(",");
-    const fs: Tables.FringeRow[] = filter(
-      map(names, (name: string) => model.util.inferModelFromName<Tables.FringeRow>(props.fringes, name)),
-      (f: Tables.FringeRow | null) => f !== null
-    ) as Tables.FringeRow[];
-    return map(fs, (f: Tables.FringeRow) => f.id);
+    // Here, we convert from IDs to Rows then back to IDs to ensure that the IDs are valid.
+    return map(
+      model.util.getModelsByIds<Tables.FringeRow>(props.fringes, model.util.parseIdsFromDeliminatedString(value), {
+        warnOnMissing: false
+      }),
+      (m: Tables.FringeRow) => m.id
+    );
   });
 
   const columns = useMemo(() => {

@@ -40,9 +40,8 @@ export const findChoiceForId = <M extends Model.Choice<number, string>>(ms: M[],
 };
 
 type InferModelFromNameParams<M extends Model.Model> = {
-  readonly nameField?: keyof M;
-  readonly strictUniqueness?: boolean;
-  readonly ignoreBlank?: boolean;
+  readonly getName?: (m: M) => string | null | undefined;
+  readonly reference?: string;
 };
 
 /**
@@ -66,13 +65,12 @@ export const inferModelFromName = <M extends Model.Model>(
   options?: InferModelFromNameParams<M>
 ): M | null => {
   options = !isNil(options) ? options : {};
-  const ignoreBlank = !isNil(options.ignoreBlank) ? options.ignoreBlank : true;
-  const nameField = !isNil(options.nameField) ? options.nameField : ("name" as keyof M);
-  const strictUniqueness = !isNil(options.strictUniqueness) ? options.strictUniqueness : false;
+  const getName = options?.getName || ((m: M) => (m as M & { readonly name: string | null | undefined }).name);
+  const reference = options?.reference || "model";
 
   const performFilter = (caseSensitive: boolean): M[] => {
     return filter(ms, (m: M) => {
-      const nameValue = util.getKeyValue<M, keyof M>(nameField)(m);
+      const nameValue = getName(m);
       if (!isNil(nameValue) && typeof nameValue === "string") {
         return caseSensitive === false
           ? String(nameValue).trim().toLocaleLowerCase() === String(value).trim().toLocaleLowerCase()
@@ -82,31 +80,23 @@ export const inferModelFromName = <M extends Model.Model>(
     });
   };
 
-  if (value.trim() === "" && ignoreBlank) {
+  const filtered = performFilter(false);
+  if (filtered.length === 0) {
+    // If there are no matches when case is insensitive, there will also be no
+    // matches when case is sensitive.
     return null;
+  } else if (filtered.length === 1) {
+    return filtered[0];
   } else {
-    const filtered = performFilter(false);
-    if (filtered.length === 0) {
-      // If there are no matches when case is insensitive, there will also be no
-      // matches when case is sensitive.
+    // If there are multiple matches, we need to restrict base on case sensitivity.
+    const msCaseSensitive = performFilter(true);
+    if (msCaseSensitive.length === 0) {
       return null;
-    } else if (filtered.length === 1) {
-      return filtered[0];
+    } else if (msCaseSensitive.length === 1) {
+      return msCaseSensitive[0];
     } else {
-      // If there are multiple matches, we need to restrict base on case sensitivity.
-      const msCaseSensitive = performFilter(true);
-      if (msCaseSensitive.length === 0) {
-        return null;
-      } else if (msCaseSensitive.length === 1) {
-        return msCaseSensitive[0];
-      } else {
-        if (strictUniqueness) {
-          throw new Error(`Multiple models exist for field=${nameField} value=${value}.`);
-        } else {
-          console.warn(`Multiple models exist for field=${nameField} value=${value}.`);
-          return msCaseSensitive[0];
-        }
-      }
+      console.warn(`Multiple ${reference}s exist for name value=${value} - assuming the first.`);
+      return msCaseSensitive[0];
     }
   }
 };

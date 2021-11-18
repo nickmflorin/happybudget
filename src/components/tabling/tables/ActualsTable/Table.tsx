@@ -47,7 +47,7 @@ const ActualsTable = ({
     });
 
   const processActualTypeCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
-    model.util.inferModelFromName<Model.Tag>(props.actualTypes, name, { nameField: "title" })
+    model.util.inferModelFromName<Model.Tag>(props.actualTypes, name, { getName: (m: Model.Tag) => m.title })
   );
 
   const processContactCellForClipboard = hooks.useDynamicCallback((row: R) => {
@@ -88,7 +88,7 @@ const ActualsTable = ({
     const subaccount = model.util.inferModelFromName<Model.SimpleSubAccount | Model.SimpleMarkup>(
       availableOwners,
       name,
-      { nameField: "identifier" }
+      { getName: (m: Model.SimpleSubAccount | Model.SimpleMarkup) => m.identifier }
     );
     return subaccount;
   });

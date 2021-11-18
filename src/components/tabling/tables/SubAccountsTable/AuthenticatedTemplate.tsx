@@ -28,7 +28,7 @@ const AuthenticatedTemplateSubAccountsTable = (
   const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
 
   const processUnitCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
-    model.util.inferModelFromName<Model.Tag>(props.subAccountUnits, name, { nameField: "title" })
+    model.util.inferModelFromName<Model.Tag>(props.subAccountUnits, name, { getName: (m: Model.Tag) => m.title })
   );
 
   const columns = useMemo(
