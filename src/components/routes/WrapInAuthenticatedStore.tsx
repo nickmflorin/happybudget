@@ -35,14 +35,9 @@ const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): 
             email: response.email
           });
         }
+
         const store = configureAuthenticatedStore(response);
         setReduxStore(store);
-
-        // When a user clicks the "Feedback" link in the profile image
-        // dropdown menu they will be redirected to and authenticated in
-        // Canny. This allows them to leave feedback without having to create
-        // a Canny account. Their feedback will be tied to their existing
-        // Greenbudget user account.
 
         // We do not want to makes calls to Canny's API in local development by default.
         if (!isNil(process.env.REACT_APP_CANNY_APP_ID)) {
