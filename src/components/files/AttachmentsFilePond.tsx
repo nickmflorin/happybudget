@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { FilePond } from "react-filepond";
-import { isNil } from "lodash";
 import { ActualFileObject, FilePondFile, ProgressServerConfigFunction } from "filepond/types";
 
 import * as api from "api";
@@ -55,52 +54,14 @@ const AttachmentsFilePond = (props: AttachmentsFilePondProps): JSX.Element => {
           progress: ProgressServerConfigFunction,
           abort: () => void
         ) => {
-          const url = `${process.env.REACT_APP_API_DOMAIN}${props.path}`;
-          const formData = new FormData();
-          formData.append("file", file, file.name);
-
-          const request = new XMLHttpRequest();
-          request.withCredentials = true;
-
-          request.open("POST", url);
-          api.setRequestHeaders(request);
-
-          request.upload.onprogress = e => {
-            progress(e.lengthComputable, e.loaded, e.total);
-          };
-          request.onload = function () {
-            if (request.status >= 200 && request.status < 300) {
-              const data: Model.Attachment = JSON.parse(request.response);
-              load(String(data.id));
-              props.onAttachmentAdded?.(data);
-            } else {
-              let errorData: Http.ErrorResponse | null = null;
-              try {
-                errorData = JSON.parse(request.response);
-              } catch (e) {
-                if (e instanceof SyntaxError) {
-                  console.warn("Could not parse error data from response while uploading attachment.");
-                  error("There was an error processing the attachment.");
-                } else {
-                  throw e;
-                }
-              }
-              if (!isNil(errorData)) {
-                const fieldError = api.parseFieldError(errorData.errors, "file");
-                const globalError = api.parseGlobalError(errorData.errors);
-                if (!isNil(globalError)) {
-                  error(globalError.message);
-                } else if (!isNil(fieldError)) {
-                  error(fieldError.message);
-                } else {
-                  console.warn("Unexpected error returned when uploading attachment. \n" + JSON.stringify(errorData));
-                  error("There was an error processing the attachment.");
-                }
-              } else {
-                error("There was an error processing the attachment.");
-              }
+          const [request, formData] = api.xhr.uploadAttachmentFile(file, props.path, {
+            error,
+            progress,
+            success: (m: Model.Attachment) => {
+              load(String(m.id));
+              props.onAttachmentAdded?.(m);
             }
-          };
+          });
           request.send(formData);
           return {
             abort: () => {

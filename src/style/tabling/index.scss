@@ -184,6 +184,24 @@
           justify-content: center;
         }
 
+        &--full-size {
+          padding: 0px !important;
+
+          .ag-react-container {
+            height: 100%;
+
+            .inner-cell {
+              height: 100%;
+              width: 100%;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              padding-left: 6px;
+              padding-right: 6px;
+            }
+          }
+        }
+
         &.ag-cell-inline-editing {
           border-radius: 0px !important;
 
@@ -199,12 +217,9 @@
         // This will vertically center the text nicely while also not adjusting the
         // vertical location of the text when the cell is selected.
         .ag-react-container {
-          // max-height: 100%;
-          // height: 100%;
           display: flex;
           flex-direction: column;
           justify-content: center;
-          // white-space: nowrap;
         }
 
         .ag-selection-checkbox {

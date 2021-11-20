@@ -94,11 +94,16 @@ const AuthenticatedBudgetSubAccountsTable = (
         headerName: props.identifierFieldHeader
       }),
       description: { headerName: `${props.categoryName} Description` },
-      attachments: {
+      attachments: (col: Table.Column<R, M>) => ({
         onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditAttachments(row.id),
         processCellFromClipboard: processAttachmentsCellFromClipboard,
-        processCellForClipboard: processAttachmentsCellForClipboard
-      },
+        processCellForClipboard: processAttachmentsCellForClipboard,
+        cellRendererParams: {
+          ...col.cellRendererParams,
+          onAttachmentAdded: props.onAttachmentAdded,
+          uploadAttachmentsPath: (id: number) => `/v1/subaccounts/${id}/attachments/`
+        }
+      }),
       unit: {
         processCellFromClipboard: processUnitCellFromClipboard
       },

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { forwardRef, useMemo, RefObject, ForwardedRef } from "react";
 import { isNil } from "lodash";
 
 import { ui } from "lib";
@@ -11,7 +11,8 @@ const Cell = <
   M extends Model.HttpModel = Model.HttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
-  props: Table.CellWithChildrenProps<R, M, S>
+  props: Table.CellWithChildrenProps<R, M, S>,
+  ref: ForwardedRef<HTMLDivElement>
 ): JSX.Element => {
   const row: Table.BodyRow<R> = props.node.data;
 
@@ -26,9 +27,11 @@ const Cell = <
   }, [props.icon]);
 
   return (
-    <span
+    <div
       id={props.id}
+      className={"inner-cell"}
       style={props.style}
+      ref={ref}
       onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => !isNil(props.onKeyDown) && props.onKeyDown(event)}
     >
       {props.children}
@@ -39,8 +42,18 @@ const Cell = <
       ) : (
         <></>
       )}
-    </span>
+    </div>
   );
 };
 
-export default React.memo(Cell) as typeof Cell;
+type CellComponent = {
+  <
+    R extends Table.RowData,
+    M extends Model.HttpModel = Model.HttpModel,
+    S extends Redux.TableStore<R> = Redux.TableStore<R>
+  >(
+    props: Table.CellWithChildrenProps<R, M, S> & { readonly ref?: RefObject<HTMLDivElement> }
+  ): JSX.Element;
+};
+
+export default React.memo(forwardRef(Cell)) as CellComponent;

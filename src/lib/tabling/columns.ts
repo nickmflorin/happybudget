@@ -292,6 +292,9 @@ export const AttachmentsColumn = <
     cellEditor: "NullCellEditor",
     tableColumnType: "body",
     columnType: "file",
+    // We want to make the attachments cell full size for purposes of dragging
+    // and dropping media - and we add the padding inside of the cell itself.
+    cellClass: "cell--full-size",
     isRead: true,
     isWrite: true,
     nullValue: [],

@@ -118,11 +118,16 @@ const ActualsTable = ({
               setSearch: (value: string) => onOwnerTreeSearch(value)
             }
           }),
-          attachments: {
+          attachments: (col: Table.Column<R, M>) => ({
             onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditAttachments(row.id),
+            processCellFromClipboard: processAttachmentsCellFromClipboard,
             processCellForClipboard: processAttachmentsCellForClipboard,
-            processCellFromClipboard: processAttachmentsCellFromClipboard
-          },
+            cellRendererParams: {
+              ...col.cellRendererParams,
+              onAttachmentAdded: props.onAttachmentAdded,
+              uploadAttachmentsPath: (id: number) => `/v1/actuals/${id}/attachments/`
+            }
+          }),
           actual_type: {
             processCellFromClipboard: processActualTypeCellFromClipboard
           },

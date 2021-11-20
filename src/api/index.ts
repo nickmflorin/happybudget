@@ -6,3 +6,4 @@ export * from "./hooks";
 export * from "./tasks";
 export * from "./codes";
 export * as typeguards from "./typeguards";
+export * as xhr from "./xhr";

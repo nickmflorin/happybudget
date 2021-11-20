@@ -55,11 +55,16 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
           framework.actions.ExportCSVAction<R, M>(table.current, params, exportFileName)
         ]}
         columns={tabling.columns.normalizeColumns<R, M>(Columns, {
-          attachments: {
+          attachments: (col: Table.Column<R, M>) => ({
             onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditAttachments(row.id),
+            processCellFromClipboard: processAttachmentsCellFromClipboard,
             processCellForClipboard: processAttachmentsCellForClipboard,
-            processCellFromClipboard: processAttachmentsCellFromClipboard
-          }
+            cellRendererParams: {
+              ...col.cellRendererParams,
+              onAttachmentAdded: props.onAttachmentAdded,
+              uploadAttachmentsPath: (id: number) => `/v1/contacts/${id}/attachments/`
+            }
+          })
         })}
       />
       {modal}
