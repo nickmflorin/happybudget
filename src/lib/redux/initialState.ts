@@ -14,7 +14,6 @@ export const initialAuthenticatedModelListResponseState: Redux.AuthenticatedMode
   search: "",
   page: 1,
   pageSize: 10,
-  cache: {},
   selected: [],
   creating: false,
   deleting: [],

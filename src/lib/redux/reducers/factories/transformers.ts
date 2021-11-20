@@ -41,33 +41,13 @@ export const authenticatedModelListResponseReducerTransformers = <
     ...st,
     search: action.payload
   }),
-  restoreSearchCache: (st: S = initialState, action: Redux.Action<null>) => {
-    const cachedResponse: Http.ListResponse<M> = st.cache[st.search];
-    if (!isNil(cachedResponse)) {
-      return {
-        ...st,
-        data: cachedResponse.data,
-        count: cachedResponse.count
-      };
-    }
-    return st;
-  },
   response: (st: S = initialState, action: Redux.Action<Http.ListResponse<M>>) => {
     return {
       ...st,
       data: action.payload.data,
       count: action.payload.count,
       selected: [],
-      responseWasReceived: true,
-      cache: {
-        ...st.cache,
-        [st.search]: {
-          data: action.payload.data,
-          count: action.payload.count,
-          next: action.payload.next,
-          previous: action.payload.previous
-        }
-      }
+      responseWasReceived: true
     };
   },
   request: (st: S = initialState, action: Redux.Action<null>) => ({
@@ -75,7 +55,6 @@ export const authenticatedModelListResponseReducerTransformers = <
     data: [],
     count: 0,
     selected: [],
-    cache: {},
     responseWasReceived: false
   }),
   removeFromState: (st: S = initialState, action: Redux.Action<ID>) => {

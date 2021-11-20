@@ -4,7 +4,6 @@ import ActionType from "./ActionType";
 export const responseOwnerTreeAction = createAction<Http.ListResponse<Model.OwnerTreeNode>>(
   ActionType.OwnerTree.Response
 );
-export const restoreOwnerTreeSearchCacheAction = createAction<null>(ActionType.OwnerTree.RestoreSearchCache);
 export const setOwnerTreeSearchAction = createAction<string>(ActionType.OwnerTree.SetSearch);
 export const loadingOwnerTreeAction = createAction<boolean>(ActionType.OwnerTree.Loading);
 

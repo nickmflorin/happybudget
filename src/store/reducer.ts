@@ -67,7 +67,7 @@ export const createStaticAuthenticatedReducers = (
     router: connectRouter(history),
     contacts: redux.reducers.createAuthenticatedModelListResponseReducer<
       Model.Contact,
-      Omit<Redux.AuthenticatedModelListResponseActionMap<Model.Contact>, "restoreSearchCache" | "setPagination">
+      Omit<Redux.AuthenticatedModelListResponseActionMap<Model.Contact>, "setPagination">
     >({
       initialState: redux.initialState.initialAuthenticatedModelListResponseState,
       actions: {
@@ -81,7 +81,7 @@ export const createStaticAuthenticatedReducers = (
     }),
     filteredContacts: redux.reducers.createAuthenticatedModelListResponseReducer<
       Model.Contact,
-      Omit<Redux.AuthenticatedModelListResponseActionMap<Model.Contact>, "restoreSearchCache" | "setPagination">
+      Omit<Redux.AuthenticatedModelListResponseActionMap<Model.Contact>, "setPagination">
     >({
       initialState: redux.initialState.initialAuthenticatedModelListResponseState,
       actions: {

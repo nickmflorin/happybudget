@@ -5,10 +5,7 @@ import * as actions from "./actions";
 const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
   templates: redux.reducers.createAuthenticatedModelListResponseReducer<
     Model.SimpleTemplate,
-    Omit<
-      Redux.AuthenticatedModelListResponseActionMap<Model.SimpleTemplate>,
-      "restoreSearchCache" | "updating" | "deleting" | "creating"
-    >
+    Omit<Redux.AuthenticatedModelListResponseActionMap<Model.SimpleTemplate>, "updating" | "deleting" | "creating">
   >({
     initialState: redux.initialState.initialAuthenticatedModelListResponseState,
     actions: {
@@ -24,10 +21,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
   }),
   community: redux.reducers.createAuthenticatedModelListResponseReducer<
     Model.SimpleTemplate,
-    Omit<
-      Redux.AuthenticatedModelListResponseActionMap<Model.SimpleTemplate>,
-      "restoreSearchCache" | "updating" | "deleting" | "creating"
-    >
+    Omit<Redux.AuthenticatedModelListResponseActionMap<Model.SimpleTemplate>, "updating" | "deleting" | "creating">
   >({
     initialState: redux.initialState.initialAuthenticatedModelListResponseState,
     actions: {
@@ -43,10 +37,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
   }),
   budgets: redux.reducers.createAuthenticatedModelListResponseReducer<
     Model.SimpleBudget,
-    Omit<
-      Redux.AuthenticatedModelListResponseActionMap<Model.SimpleBudget>,
-      "restoreSearchCache" | "updating" | "deleting" | "creating"
-    >
+    Omit<Redux.AuthenticatedModelListResponseActionMap<Model.SimpleBudget>, "updating" | "deleting" | "creating">
   >({
     initialState: redux.initialState.initialAuthenticatedModelListResponseState,
     actions: {

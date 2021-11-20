@@ -12,7 +12,6 @@ type P = Http.ActualPayload;
 
 export type ActualsTableActionMap = Redux.AuthenticatedTableActionMap<R, M> & {
   readonly loadingOwnerTree: boolean;
-  readonly restoreOwnerTreeSearchCache: null;
   readonly responseOwnerTree: Http.ListResponse<Model.OwnerTreeNode>;
   readonly responseActualTypes: Http.ListResponse<Model.Tag>;
 };
@@ -20,7 +19,6 @@ export type ActualsTableActionMap = Redux.AuthenticatedTableActionMap<R, M> & {
 export type ActualsTableTaskConfig = Table.TaskConfig<R, M, ActualsTableActionMap> & {
   readonly selectObjId: (state: Application.Authenticated.Store) => number | null;
   readonly selectTreeSearch: (state: Application.Authenticated.Store) => string;
-  readonly selectTreeCache: (state: Application.Authenticated.Store) => Redux.SearchCache<Model.OwnerTreeNode>;
 };
 
 export type ActualsTableTaskMap = Redux.TableTaskMap<R> & {
@@ -78,21 +76,16 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     const budgetId = yield select((state: Application.Authenticated.Store) => state.budget.id);
     if (!isNil(budgetId)) {
       const search = yield select(config.selectTreeSearch);
-      const cache = yield select(config.selectTreeCache);
-      if (!isNil(cache[search])) {
-        yield put(config.actions.restoreOwnerTreeSearchCache(null));
-      } else {
-        yield put(config.actions.loadingOwnerTree(true));
-        try {
-          // TODO: Eventually we will want to build in pagination for this.
-          const response = yield api.request(api.getBudgetOwnerTree, budgetId, { search });
-          yield put(config.actions.responseOwnerTree(response));
-        } catch (e: unknown) {
-          notifications.requestError(e as Error, "There was an error retrieving the budget's items.");
-          yield put(config.actions.responseOwnerTree({ count: 0, data: [] }));
-        } finally {
-          yield put(config.actions.loadingOwnerTree(false));
-        }
+      yield put(config.actions.loadingOwnerTree(true));
+      try {
+        // TODO: Eventually we will want to build in pagination for this.
+        const response = yield api.request(api.getBudgetOwnerTree, budgetId, { search });
+        yield put(config.actions.responseOwnerTree(response));
+      } catch (e: unknown) {
+        notifications.requestError(e as Error, "There was an error retrieving the budget's items.");
+        yield put(config.actions.responseOwnerTree({ count: 0, data: [] }));
+      } finally {
+        yield put(config.actions.loadingOwnerTree(false));
       }
     }
   }

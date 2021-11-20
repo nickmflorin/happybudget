@@ -164,16 +164,12 @@ const genericReducer = combineReducers({
     columns: ActualColumns,
     ownerTree: redux.reducers.createAuthenticatedModelListResponseReducer<
       Model.OwnerTreeNode,
-      Pick<
-        Redux.AuthenticatedModelListResponseActionMap<Model.OwnerTreeNode>,
-        "loading" | "response" | "restoreSearchCache" | "setSearch"
-      >
+      Pick<Redux.AuthenticatedModelListResponseActionMap<Model.OwnerTreeNode>, "loading" | "response" | "setSearch">
     >({
       initialState: redux.initialState.initialAuthenticatedModelListResponseState,
       actions: {
         loading: actions.actuals.loadingOwnerTreeAction,
         response: actions.actuals.responseOwnerTreeAction,
-        restoreSearchCache: actions.actuals.restoreOwnerTreeSearchCacheAction,
         setSearch: actions.actuals.setOwnerTreeSearchAction
       }
     })

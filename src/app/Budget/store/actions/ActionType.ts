@@ -84,8 +84,7 @@ const ActionType = {
   OwnerTree: {
     Response: "budget.ownertree.Response",
     Loading: "budget.ownertree.Loading",
-    SetSearch: "budget.ownertree.SetSearch",
-    RestoreSearchCache: "budget.ownertree.RestoreSearchCache"
+    SetSearch: "budget.ownertree.SetSearch"
   },
   Actuals: {
     TableChanged: "budget.actuals.TableChanged",

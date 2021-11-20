@@ -16,7 +16,6 @@ const ActionMap: Redux.ActionMapObject<budgeting.tasks.actuals.ActualsTableActio
   addModelsToState: actions.addModelsToStateAction,
   setSearch: actions.setSearchAction,
   responseOwnerTree: actions.responseOwnerTreeAction,
-  restoreOwnerTreeSearchCache: actions.restoreOwnerTreeSearchCacheAction,
   loadingOwnerTree: actions.loadingOwnerTreeAction,
   responseActualTypes: actions.responseActualTypesAction
 };
@@ -24,7 +23,6 @@ const ActionMap: Redux.ActionMapObject<budgeting.tasks.actuals.ActualsTableActio
 const tasks = budgeting.tasks.actuals.createTableTaskSet({
   columns: ActualsTable.Columns,
   selectObjId: (state: Application.Authenticated.Store) => state.budget.id,
-  selectTreeCache: (state: Application.Authenticated.Store) => state.budget.actuals.ownerTree.cache,
   selectTreeSearch: (state: Application.Authenticated.Store) => state.budget.actuals.ownerTree.search,
   actions: ActionMap
 });

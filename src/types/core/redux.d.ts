@@ -181,7 +181,6 @@ namespace Redux {
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface AuthenticatedModelListResponseStore<T extends Model.HttpModel> extends ModelListResponseStore<T> {
-    readonly cache: SearchCache<T>;
     readonly search: string;
     readonly page: number;
     readonly pageSize: number;
@@ -203,18 +202,12 @@ namespace Redux {
     readonly updateInState: UpdateActionPayload<M>;
     readonly setSearch?: string;
     readonly setPagination: Pagination;
-    readonly restoreSearchCache: null;
   };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface ModelListResponseTaskMap {
     readonly request: Task<null>;
   }
-
-  // Holds previously searched for results.  Note that this may not play well
-  // with pagination, in which case we will have to adjust (but we are currently
-  // not using pagination anywhere that we are using this cache).
-  type SearchCache<T extends Model.HttpModel> = { [key: string]: Http.ListResponse<T> };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type TableTaskMap<R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
