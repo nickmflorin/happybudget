@@ -53,6 +53,8 @@ export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Mo
   readonly columns: Table.Column<R, M>[];
   readonly data: Table.BodyRow<R>[];
   readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
+  readonly pinFirstColumn?: boolean;
+  readonly pinActionColumns?: boolean;
   readonly generateNewRowData?: (rows: Table.BodyRow<R>[]) => Partial<R>;
   readonly rowHasCheckboxSelection: ((row: Table.EditableRow<R>) => boolean) | undefined;
   readonly onRowSelectionChanged: (rows: Table.EditableRow<R>[]) => void;
@@ -259,45 +261,48 @@ const authenticateDataGrid =
             }
           }
         };
-        return tabling.columns.normalizeColumns<R, M>(props.columns, {
-          body: (col: Table.Column<R, M>) => ({
-            cellRendererParams: { ...col.cellRendererParams, generateNewRowData: props.generateNewRowData },
-            cellEditorParams: { ...col.cellEditorParams, onDoneEditing },
-            editable: (params: Table.CellCallbackParams<R, M>) => {
-              if (!tabling.typeguards.isEditableRow(params.row)) {
+        return [
+          tabling.columns.DragColumn({ pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined }),
+          ...tabling.columns.normalizeColumns<R, M>(props.columns, {
+            body: (col: Table.Column<R, M>) => ({
+              cellRendererParams: { ...col.cellRendererParams, generateNewRowData: props.generateNewRowData },
+              cellEditorParams: { ...col.cellEditorParams, onDoneEditing },
+              editable: (params: Table.CellCallbackParams<R, M>) => {
+                if (!tabling.typeguards.isEditableRow(params.row)) {
+                  return false;
+                } else if (!isNil(props.isCellEditable)) {
+                  return props.isCellEditable(params);
+                } else {
+                  return col.editable === undefined ? true : tabling.columns.isEditable(col, params.row);
+                }
+              },
+              valueSetter: (params: ValueSetterParams) => {
+                // By default, AG Grid treats Backspace clearing the cell as setting the
+                // value to undefined - but we have to set it to the null value associated
+                // with the column.
+                if (params.newValue === undefined || params.newValue === "") {
+                  params.newValue = col.nullValue === undefined ? null : col.nullValue;
+                }
+                if (!isNil(col.valueSetter) && typeof col.valueSetter === "function") {
+                  return col.valueSetter(params);
+                }
+                // We can apply this mutation to the immutable data from the store because we deep
+                // clone each row before feeding it into the AG Grid tables.
+                params.data.data[params.column.getColId()] = params.newValue;
+                return true;
+              }
+            }),
+            index: {
+              checkboxSelection: (params: CheckboxSelectionCallbackParams) => {
+                const row: Table.BodyRow<R> = params.data;
+                if (tabling.typeguards.isEditableRow(row)) {
+                  return isNil(props.rowHasCheckboxSelection) || props.rowHasCheckboxSelection(row);
+                }
                 return false;
-              } else if (!isNil(props.isCellEditable)) {
-                return props.isCellEditable(params);
-              } else {
-                return col.editable === undefined ? true : tabling.columns.isEditable(col, params.row);
               }
-            },
-            valueSetter: (params: ValueSetterParams) => {
-              // By default, AG Grid treats Backspace clearing the cell as setting the
-              // value to undefined - but we have to set it to the null value associated
-              // with the column.
-              if (params.newValue === undefined || params.newValue === "") {
-                params.newValue = col.nullValue === undefined ? null : col.nullValue;
-              }
-              if (!isNil(col.valueSetter) && typeof col.valueSetter === "function") {
-                return col.valueSetter(params);
-              }
-              // We can apply this mutation to the immutable data from the store because we deep
-              // clone each row before feeding it into the AG Grid tables.
-              params.data.data[params.column.getColId()] = params.newValue;
-              return true;
             }
-          }),
-          index: {
-            checkboxSelection: (params: CheckboxSelectionCallbackParams) => {
-              const row: Table.BodyRow<R> = params.data;
-              if (tabling.typeguards.isEditableRow(row)) {
-                return isNil(props.rowHasCheckboxSelection) || props.rowHasCheckboxSelection(row);
-              }
-              return false;
-            }
-          }
-        });
+          })
+        ];
       }, [hooks.useDeepEqualMemo(props.columns)]);
 
       const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
@@ -363,7 +368,7 @@ const authenticateDataGrid =
           })
         });
       }, [hooks.useDeepEqualMemo(unsuppressedColumns)]);
-
+      console.log({ columns });
       const [navigateToNextCell, tabToNextCell, moveToNextColumn, moveToNextRow] = useCellNavigation({
         apis: props.apis,
         tableId: props.tableId,

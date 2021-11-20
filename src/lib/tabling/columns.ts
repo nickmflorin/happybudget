@@ -1,8 +1,8 @@
 import React from "react";
 import { find, isNil, reduce, filter, orderBy, map } from "lodash";
-import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
+import { SuppressKeyboardEventParams, RowDragCallbackParams } from "@ag-grid-community/core";
 
-import { util } from "lib";
+import { tabling, util } from "lib";
 
 import * as aggrid from "./aggrid";
 import * as formatters from "./formatters";
@@ -316,6 +316,23 @@ export const BodyColumn = <
     tableColumnType: "body"
   };
 };
+
+export const DragColumn = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+  col: Partial<Table.Column<R, M>>,
+  width?: number
+): Table.Column<R, M> =>
+  ActionColumn({
+    /* eslint-disable indent */
+    // cellRenderer: "EmptyCell",
+    ...col,
+    rowDrag: (params: RowDragCallbackParams) => {
+      const r: Table.BodyRow<R> = params.node.data;
+      return !tabling.typeguards.isGroupRow(r) && !tabling.typeguards.isMarkupRow(r);
+    },
+    field: "index" as keyof R,
+    width: !isNil(width) ? width : 25,
+    maxWidth: !isNil(width) ? width : 25
+  }) as Table.Column<R, M>;
 
 export const ExpandColumn = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
   col: Partial<Table.Column<R, M, any>>,
