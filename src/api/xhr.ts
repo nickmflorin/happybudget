@@ -47,15 +47,19 @@ export const uploadAttachmentFile = (
         }
       }
       if (!isNil(errorData)) {
-        const fieldError = parseFieldError(errorData.errors, "file");
-        const globalError = parseGlobalError(errorData.errors);
-        if (!isNil(globalError)) {
-          options?.error?.(globalError.message);
-        } else if (!isNil(fieldError)) {
-          options?.error?.(fieldError.message);
+        if (errorData.force_logout === true) {
+          window.location.href = "/login";
         } else {
-          console.warn("Unexpected error returned when uploading attachment. \n" + JSON.stringify(errorData));
-          options?.error?.("There was an error processing the attachment.");
+          const fieldError = parseFieldError(errorData.errors, "file");
+          const globalError = parseGlobalError(errorData.errors);
+          if (!isNil(globalError)) {
+            options?.error?.(globalError.message);
+          } else if (!isNil(fieldError)) {
+            options?.error?.(fieldError.message);
+          } else {
+            console.warn("Unexpected error returned when uploading attachment. \n" + JSON.stringify(errorData));
+            options?.error?.("There was an error processing the attachment.");
+          }
         }
       } else {
         options?.error?.("There was an error processing the attachment.");

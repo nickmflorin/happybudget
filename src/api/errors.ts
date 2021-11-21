@@ -21,6 +21,25 @@ export enum ApiErrorTypes {
 }
 
 /**
+ * When an exception returned by the backend indicates that we need to force
+ * logout the user, the Axios interceptors will redirect to the login URL.
+ * However, the mechanics making the API request are still expecting a response
+ * or an Error to be raised, so we raise this Error to indicate that the caller
+ * should fail silently and allow the redirect to occur.
+ *
+ * Note: This is less of a user-facing problem and more of a problem with misleading
+ * errors flooding Sentry due to responses not being fully defined when they are
+ * expected to be.
+ */
+export class ForceLogout extends Error {
+  constructor(message: string, name?: string) {
+    super("");
+    this.message = message;
+    this.name = name || "ForceLogout";
+  }
+}
+
+/**
  * Base class for all request errors.  Should not be used directly, but rather
  * one of ClientError or NetworkError or ServerError should be used.
  */

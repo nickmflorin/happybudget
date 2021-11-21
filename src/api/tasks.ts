@@ -2,12 +2,11 @@ import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { call, cancelled } from "redux-saga/effects";
 
+import * as api from "api";
+
 type Service<T = any> = (...args: any[]) => T;
 
 type ProvidedRequestOptions =
-  | {
-      readonly redirectOn404: boolean;
-    }
   | {
       readonly retries: number;
     }
@@ -17,8 +16,7 @@ type ProvidedRequestOptions =
 
 export const isProvidedRequestConfig = (arg: any): arg is ProvidedRequestOptions =>
   typeof arg === "object" &&
-  ((arg as { readonly redirectOn404: boolean }).redirectOn404 !== undefined ||
-    (arg as { readonly retries: number }).retries !== undefined ||
+  ((arg as { readonly retries: number }).retries !== undefined ||
     (arg as { readonly headers: { [key: string]: string } }).headers !== undefined);
 
 export const request = <T = any>(service: Service<T>, ...args: any[]) =>
@@ -33,10 +31,13 @@ export const request = <T = any>(service: Service<T>, ...args: any[]) =>
     try {
       return yield call(service, ...args, config);
     } catch (e: unknown) {
-      if (!(yield cancelled())) {
-        throw e;
-      } else {
-        console.info("Service was cancelled.");
+      const err = e as Error;
+      if (!(err instanceof api.ForceLogout)) {
+        if (!(yield cancelled())) {
+          throw e;
+        } else {
+          console.info("Service was cancelled.");
+        }
       }
     } finally {
       if (yield cancelled()) {

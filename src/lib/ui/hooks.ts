@@ -157,7 +157,7 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
       notify,
       setLoading,
       handleRequestError: (e: Error, opts?: FormNotifyOptions) => {
-        if (!axios.isCancel(e)) {
+        if (!axios.isCancel(e) && !(e instanceof api.ForceLogout)) {
           notifications.requestError(e, { notifyUser: false });
           if (e instanceof api.ClientError) {
             notify(e.errors, opts);

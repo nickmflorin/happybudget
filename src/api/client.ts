@@ -74,27 +74,28 @@ const throwClientError = (error: AxiosError<Http.ErrorResponse>, options: Http.R
   const url = !isNil(error.response.config.url) ? error.response.config.url : "";
   if (!isNil(response.data.force_logout)) {
     window.location.href = "/login";
+    // We throw an error because the mechanics making the API request are expecting
+    // a defined response or an Error to be thrown.  If we to return nothing, we
+    // may get misleading errors dispatched to Sentry that occur between the time
+    // this method returns and the time the redirect actually takes place.
+    throw new errors.ForceLogout("User is not authenticated.");
   } else {
     if (error.response.status === 404) {
-      if (options.redirectOn404 === true) {
-        window.location.href = "/not_found";
-      } else {
-        // On 404's Django will sometimes bypass DRF exception handling and
-        // return a 404.html template response.  We should bypass this in the
-        // backend, but for the time being we can manually raise a ClientError.
-        throw new errors.ClientError({
-          response,
-          errors: [
-            {
-              message: "The requested resource could not be found.",
-              code: codes.ErrorCodes.NOT_FOUND,
-              error_type: errors.ApiErrorTypes.HTTP
-            } as Http.Error
-          ],
-          status: response.status,
-          url
-        });
-      }
+      // On 404's Django will sometimes bypass DRF exception handling and
+      // return a 404.html template response.  We should bypass this in the
+      // backend, but for the time being we can manually raise a ClientError.
+      throw new errors.ClientError({
+        response,
+        errors: [
+          {
+            message: "The requested resource could not be found.",
+            code: codes.ErrorCodes.NOT_FOUND,
+            error_type: errors.ApiErrorTypes.HTTP
+          } as Http.Error
+        ],
+        status: response.status,
+        url
+      });
     } else if (!isNil(response.data.errors)) {
       throw new errors.ClientError({
         response,
@@ -219,7 +220,7 @@ export class ApiClient {
     // here and force coerce it, with the understanding that the value only seems
     // to be undefined in cases where we would not be accessing the response
     // data anyways (i.e. task cancellation).
-    return response?.data;
+    return response.data;
   };
 
   /**
