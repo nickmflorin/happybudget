@@ -77,7 +77,6 @@ const throwClientError = (error: AxiosError<Http.ErrorResponse>, options: Http.R
   } else {
     if (error.response.status === 404) {
       if (options.redirectOn404 === true) {
-        // This will trigger a redirect to the 404 page via the Sagas.
         window.location.href = "/not_found";
       } else {
         // On 404's Django will sometimes bypass DRF exception handling and
