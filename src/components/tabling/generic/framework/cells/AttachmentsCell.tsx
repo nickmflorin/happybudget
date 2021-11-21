@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useReducer } from "react";
+import React, { useEffect, useMemo, useRef, useReducer } from "react";
 import { toast } from "react-toastify";
 import { isNil } from "lodash";
 
@@ -125,4 +125,4 @@ const AttachmentsCell = <
   );
 };
 
-export default AttachmentsCell;
+export default React.memo(AttachmentsCell);

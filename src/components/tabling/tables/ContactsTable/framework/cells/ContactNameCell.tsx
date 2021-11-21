@@ -1,3 +1,4 @@
+import React from "react";
 import { isNil } from "lodash";
 
 import { util } from "lib";
@@ -28,4 +29,4 @@ const ContactNameCell = ({ value, ...props }: ContactNameCellProps): JSX.Element
   );
 };
 
-export default ContactNameCell;
+export default React.memo(ContactNameCell);

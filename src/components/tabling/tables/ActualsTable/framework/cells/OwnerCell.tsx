@@ -1,3 +1,4 @@
+import React from "react";
 import { isNil } from "lodash";
 
 import { Cell } from "components/tabling/generic/framework/cells";
@@ -18,4 +19,4 @@ const OwnerCell = ({ value, ...props }: OwnerCellProps): JSX.Element => {
   );
 };
 
-export default OwnerCell;
+export default React.memo(OwnerCell);

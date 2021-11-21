@@ -1,3 +1,4 @@
+import React from "react";
 import { isNil } from "lodash";
 
 import { tabling } from "lib";
@@ -21,4 +22,4 @@ const PhoneNumberCell = <
   );
 };
 
-export default PhoneNumberCell;
+export default React.memo(PhoneNumberCell);

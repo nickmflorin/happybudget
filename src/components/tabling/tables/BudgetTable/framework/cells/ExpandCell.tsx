@@ -1,3 +1,4 @@
+import React from "react";
 import { isNil } from "lodash";
 
 import { tabling } from "lib";
@@ -22,4 +23,4 @@ const ExpandCell = <
   );
 };
 
-export default ExpandCell;
+export default React.memo(ExpandCell) as typeof ExpandCell;

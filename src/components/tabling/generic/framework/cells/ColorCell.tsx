@@ -1,3 +1,5 @@
+import React from "react";
+
 import { Color } from "components/tagging";
 import { Cell } from "./generic";
 
@@ -23,4 +25,4 @@ const ColorCell = <
   );
 };
 
-export default ColorCell;
+export default React.memo(ColorCell);

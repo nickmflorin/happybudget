@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { find, isNil } from "lodash";
 import classNames from "classnames";
 
@@ -70,4 +70,4 @@ const ContactCell = <
   );
 };
 
-export default ContactCell;
+export default React.memo(ContactCell) as typeof ContactCell;

@@ -1,3 +1,5 @@
+import React from "react";
+
 import { framework } from "components/tabling/generic";
 import { ModelTagCell } from "components/tabling/generic/framework/cells";
 
@@ -7,4 +9,4 @@ const ActualTypeCell = (
   return <ModelTagCell {...props} />;
 };
 
-export default ActualTypeCell;
+export default React.memo(ActualTypeCell);

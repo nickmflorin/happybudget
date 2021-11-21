@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { isNil, find } from "lodash";
 import classNames from "classnames";
 
@@ -74,4 +74,4 @@ const HeaderCell = <R extends Table.RowData, M extends Model.HttpModel = Model.H
   );
 };
 
-export default HeaderCell;
+export default React.memo(HeaderCell);

@@ -1,3 +1,5 @@
+import React from "react";
+
 import { ValueCell } from "./generic";
 import useFormattedValue from "./useFormattedValue";
 import connectCellToStore from "./connectCellToStore";
@@ -15,4 +17,4 @@ const BodyCell = <
   return <ValueCell<R, M, S> {...props} value={formattedValue} />;
 };
 
-export default connectCellToStore(BodyCell) as typeof BodyCell;
+export default connectCellToStore(React.memo(BodyCell)) as typeof BodyCell;

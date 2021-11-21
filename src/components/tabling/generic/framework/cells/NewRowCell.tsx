@@ -1,3 +1,4 @@
+import React from "react";
 import { tabling } from "lib";
 
 import { Icon } from "components";
@@ -20,4 +21,4 @@ const NewRowCell = (props: Table.CellProps<any, any, any, null>): JSX.Element =>
   );
 };
 
-export default NewRowCell;
+export default React.memo(NewRowCell);

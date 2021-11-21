@@ -1,3 +1,4 @@
+import React from "react";
 import { isNil } from "lodash";
 import LinkCell, { LinkCellProps } from "./LinkCell";
 
@@ -18,4 +19,4 @@ const EmailCell = <
   );
 };
 
-export default EmailCell;
+export default React.memo(EmailCell);

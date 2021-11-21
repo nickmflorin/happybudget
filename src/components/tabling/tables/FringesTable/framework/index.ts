@@ -1,5 +1,3 @@
-import React from "react";
-
 import * as cells from "./cells";
 import * as editors from "./editors";
 
@@ -10,7 +8,7 @@ const FrameworkComponents: Table.Framework = {
   },
   cells: {
     data: {
-      FringeUnitCell: React.memo(cells.FringeUnitCell)
+      FringeUnitCell: cells.FringeUnitCell
     }
   }
 };

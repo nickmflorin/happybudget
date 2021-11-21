@@ -1,5 +1,3 @@
-import React from "react";
-
 import * as cells from "./cells";
 import * as editors from "./editors";
 
@@ -18,28 +16,28 @@ export const Framework: Table.Framework = {
   },
   cells: {
     data: {
-      ExpandCell: React.memo(cells.excludeRowsOfType(["placeholder"])(cells.ExpandCell)),
-      EmptyCell: React.memo(cells.EmptyCell),
-      NewRowCell: React.memo(cells.NewRowCell),
-      BodyCell: React.memo(cells.BodyCell),
-      ColorCell: React.memo(cells.ColorCell),
-      ContactCell: React.memo(cells.ContactCell),
-      PhoneNumberCell: React.memo(cells.PhoneNumberCell),
-      EmailCell: React.memo(cells.EmailCell),
-      LinkCell: React.memo(cells.LinkCell),
-      AttachmentsCell: React.memo(cells.AttachmentsCell),
-      agColumnHeader: React.memo(cells.HeaderCell)
+      ExpandCell: cells.excludeRowsOfType(["placeholder"])(cells.ExpandCell),
+      EmptyCell: cells.EmptyCell,
+      NewRowCell: cells.NewRowCell,
+      BodyCell: cells.BodyCell,
+      ColorCell: cells.ColorCell,
+      ContactCell: cells.ContactCell,
+      PhoneNumberCell: cells.PhoneNumberCell,
+      EmailCell: cells.EmailCell,
+      LinkCell: cells.LinkCell,
+      AttachmentsCell: cells.AttachmentsCell,
+      agColumnHeader: cells.HeaderCell
     },
     footer: {
-      CalculatedCell: React.memo(cells.CalculatedCell),
-      BodyCell: React.memo(cells.BodyCell),
-      EmptyCell: React.memo(cells.EmptyCell),
-      NewRowCell: React.memo(cells.NewRowCell)
+      CalculatedCell: cells.CalculatedCell,
+      BodyCell: cells.BodyCell,
+      EmptyCell: cells.EmptyCell,
+      NewRowCell: cells.NewRowCell
     },
     page: {
-      CalculatedCell: React.memo(cells.CalculatedCell),
-      BodyCell: React.memo(cells.BodyCell),
-      EmptyCell: React.memo(cells.EmptyCell)
+      CalculatedCell: cells.CalculatedCell,
+      BodyCell: cells.BodyCell,
+      EmptyCell: cells.EmptyCell
     }
   }
 };

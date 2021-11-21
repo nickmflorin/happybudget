@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { filter } from "lodash";
 
@@ -33,4 +33,4 @@ const FringesCell = ({ value, onAddFringes, ...props }: FringesCellProps): JSX.E
   );
 };
 
-export default FringesCell;
+export default React.memo(FringesCell);

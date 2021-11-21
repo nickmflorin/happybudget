@@ -1,3 +1,5 @@
+import React from "react";
+
 import { framework } from "components/tabling/generic";
 import { ValueCell } from "components/tabling/generic/framework/cells";
 
@@ -21,4 +23,4 @@ const IdentifierCell = <
   return <ValueCell<R, M> {...props} />;
 };
 
-export default framework.connectCellToStore<any, any>(IdentifierCell) as typeof IdentifierCell;
+export default framework.connectCellToStore<any, any>(React.memo(IdentifierCell)) as typeof IdentifierCell;

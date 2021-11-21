@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
@@ -40,4 +40,4 @@ const CalculatedCell = <
   return <BodyCell<R, M, S> className={classNames({ "color--red": renderRed })} {...props} />;
 };
 
-export default connectCellToStore(CalculatedCell) as typeof CalculatedCell;
+export default connectCellToStore(React.memo(CalculatedCell)) as typeof CalculatedCell;

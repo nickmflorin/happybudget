@@ -1,3 +1,4 @@
+import React from "react";
 import { isNil } from "lodash";
 import { framework } from "components/tabling/generic";
 import { ModelTagCell } from "components/tabling/generic/framework/cells";
@@ -14,4 +15,4 @@ const SubAccountUnitCell = (
   return <ModelTagCell {...props} tagProps={{ isPlural: !isNil(row.data.quantity) && row.data.quantity > 1 }} />;
 };
 
-export default SubAccountUnitCell;
+export default React.memo(SubAccountUnitCell);

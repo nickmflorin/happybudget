@@ -1,3 +1,4 @@
+import React from "react";
 import { isNil } from "lodash";
 
 import { Link } from "components/links";
@@ -39,4 +40,4 @@ const LinkCell = <
   );
 };
 
-export default LinkCell;
+export default React.memo(LinkCell) as typeof LinkCell;

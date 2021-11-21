@@ -1,3 +1,5 @@
+import React from "react";
+
 import { framework } from "components/tabling/generic";
 import { ModelTagCell } from "components/tabling/generic/framework/cells";
 
@@ -9,4 +11,4 @@ const FringeUnitCell = (
     Model.FringeUnit
   >
 ): JSX.Element => <ModelTagCell {...props} />;
-export default FringeUnitCell;
+export default React.memo(FringeUnitCell);

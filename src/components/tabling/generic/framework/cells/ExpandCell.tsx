@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
@@ -130,4 +130,4 @@ const ExpandCell = <
   }
 };
 
-export default ExpandCell;
+export default React.memo(ExpandCell) as typeof ExpandCell;
