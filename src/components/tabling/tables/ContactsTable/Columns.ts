@@ -17,6 +17,8 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     cellRenderer: { data: "ContactNameCell" },
     editable: true,
     cellClass: "cell--renders-html",
+    width: 120,
+    minWidth: 120,
     getCSVValue: (row: Table.BodyRow<Tables.ContactRowData>) => {
       return util.conditionalJoinString(row.data.first_name, row.data.last_name);
     },
@@ -51,25 +53,33 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
   tabling.columns.BodyColumn<R, M>({
     field: "company",
     headerName: "Company",
-    columnType: "text"
+    columnType: "text",
+    width: 100,
+    minWidth: 100
   }),
   tabling.columns.BodyColumn<R, M>({
     field: "position",
     headerName: "Position",
-    columnType: "text"
+    columnType: "text",
+    width: 100,
+    minWidth: 100
   }),
   tabling.columns.BodyColumn<R, M>({
     field: "phone_number",
     headerName: "Phone Number",
     columnType: "phone",
-    cellRenderer: { data: "PhoneNumberCell" }
+    cellRenderer: { data: "PhoneNumberCell" },
+    width: 100,
+    minWidth: 100
   }),
   tabling.columns.BodyColumn<R, M>({
     field: "email",
     headerName: "Email",
     columnType: "email",
     cellRenderer: { data: "EmailCell" },
-    valueSetter: tabling.valueSetters.emailValueSetter<R>("email")
+    valueSetter: tabling.valueSetters.emailValueSetter<R>("email"),
+    width: 120,
+    minWidth: 120
   }),
   tabling.columns.AttachmentsColumn({
     field: "attachments",
@@ -81,7 +91,9 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     headerName: "Rate",
     columnType: "currency",
     valueFormatter: tabling.formatters.currencyValueFormatter,
-    valueSetter: tabling.valueSetters.floatValueSetter<R>("rate")
+    valueSetter: tabling.valueSetters.floatValueSetter<R>("rate"),
+    width: 75,
+    minWidth: 75
   }),
   tabling.columns.ChoiceSelectColumn<R, M, Model.ContactType>({
     field: "contact_type",
@@ -90,7 +102,9 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     cellRenderer: { data: "ContactTypeCell" },
     cellEditor: "ContactTypeEditor",
     processCellFromClipboard: (name: string) =>
-      model.util.findChoiceForName<Model.ContactType>(model.models.ContactTypes, name)
+      model.util.findChoiceForName<Model.ContactType>(model.models.ContactTypes, name),
+    width: 100,
+    minWidth: 100
   })
 ];
 
