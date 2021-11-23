@@ -308,6 +308,33 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     }
   }
 
+  function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent): SagaIterator {
+    if (isAuthenticatedConfig(config)) {
+      yield put(config.actions.saving(true));
+      try {
+        const response: C = yield api.request(api.updateSubAccount, e.payload.id, {
+          order: e.payload.order,
+          group: isNil(e.payload.newGroup) ? null : tabling.managers.groupId(e.payload.newGroup)
+        });
+        // The Group is not attributed to the Model in a detail response, so if the group
+        // did change we have to use the value from the event payload.
+        yield put(
+          config.actions.tableChanged({
+            type: "modelUpdated",
+            payload: {
+              model: response,
+              group: !isNil(e.payload.newGroup) ? tabling.managers.groupId(e.payload.newGroup) : null
+            }
+          })
+        );
+      } catch (err: unknown) {
+        notifications.requestError(err as Error, "There was an error moving the row.");
+      } finally {
+        yield put(config.actions.saving(false));
+      }
+    }
+  }
+
   function* handleRowAddEvent(e: Table.RowAddEvent<R>): SagaIterator {
     const objId = yield select(config.selectObjId);
     if (!isNil(objId)) {
@@ -380,7 +407,8 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       rowAddToGroup: handleAddRowToGroupEvent,
       rowAdd: handleRowAddEvent,
       rowDelete: handleRowDeleteEvent,
-      dataChange: handleDataChangeEvent
+      dataChange: handleDataChangeEvent,
+      rowPositionChanged: handleRowPositionChangedEvent
     })
   };
 };

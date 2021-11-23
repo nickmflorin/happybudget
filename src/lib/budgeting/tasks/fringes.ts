@@ -208,6 +208,25 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     }
   }
 
+  function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent): SagaIterator {
+    yield put(config.actions.saving(true));
+    try {
+      const response: M = yield api.request(api.updateFringe, e.payload.id, {
+        order: e.payload.order
+      });
+      yield put(
+        config.actions.tableChanged({
+          type: "modelUpdated",
+          payload: { model: response }
+        })
+      );
+    } catch (err: unknown) {
+      notifications.requestError(err as Error, "There was an error moving the row.");
+    } finally {
+      yield put(config.actions.saving(false));
+    }
+  }
+
   function* handleRowAddEvent(e: Table.RowAddEvent<R>): SagaIterator {
     const objId = yield select(config.selectObjId);
     if (!isNil(objId)) {
@@ -244,6 +263,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     handleChangeEvent: tabling.tasks.createChangeEventHandler({
       rowAdd: handleRowAddEvent,
       rowDelete: handleRowDeleteEvent,
+      rowPositionChanged: handleRowPositionChangedEvent,
       // It is safe to assume that the ID of the row for which data is being changed
       // will always be a ModelRowId - but we have to force coerce that here.
       dataChange: handleDataChangeEvent as Redux.TableEventTask<Table.DataChangeEvent<R>>

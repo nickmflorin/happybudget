@@ -146,6 +146,25 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     }
   }
 
+  function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent): SagaIterator {
+    yield put(config.actions.saving(true));
+    try {
+      const response: M = yield api.request(api.updateFringe, e.payload.id, {
+        order: e.payload.order
+      });
+      yield put(
+        config.actions.tableChanged({
+          type: "modelUpdated",
+          payload: { model: response }
+        })
+      );
+    } catch (err: unknown) {
+      notifications.requestError(err as Error, "There was an error moving the row.");
+    } finally {
+      yield put(config.actions.saving(false));
+    }
+  }
+
   function* handleRowAddEvent(e: Table.RowAddEvent<R>): SagaIterator {
     const budgetId = yield select(config.selectObjId);
     if (!isNil(budgetId)) {
@@ -183,7 +202,8 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     handleChangeEvent: tabling.tasks.createChangeEventHandler({
       rowAdd: handleRowAddEvent,
       rowDelete: handleRowDeleteEvent,
-      dataChange: handleDataChangeEvent
+      dataChange: handleDataChangeEvent,
+      rowPositionChanged: handleRowPositionChangedEvent
     })
   };
 };

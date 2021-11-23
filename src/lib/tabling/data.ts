@@ -62,7 +62,6 @@ export const injectMarkupsAndGroups = <R extends Table.RowData>(
     },
     []
   );
-
   return [
     ...reduce(
       // We want to order the groups by the model in it's set that occurs earliest in

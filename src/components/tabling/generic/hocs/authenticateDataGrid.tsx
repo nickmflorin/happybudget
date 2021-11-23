@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, useImperativeHandle } from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
-import { map, isNil, includes, find, filter, flatten, reduce, uniq, isEqual, indexOf, sortBy } from "lodash";
+import { map, isNil, includes, find, filter, flatten, reduce, uniq, isEqual } from "lodash";
 
 import {
   CellKeyDownEvent,
@@ -45,7 +45,6 @@ interface InjectedAuthenticatedDataGridProps<R extends Table.RowData> {
   readonly tabToNextCell: (params: TabToNextCellParams) => Table.CellPosition;
   readonly onRangeSelectionChanged: (e: RangeSelectionChangedEvent) => void;
   readonly onRowDragEnd: (event: RowDragEvent) => void;
-  readonly onRowDragEnter: (event: RowDragEvent) => void;
 }
 
 export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
@@ -58,6 +57,7 @@ export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Mo
   readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
   readonly pinFirstColumn?: boolean;
   readonly pinActionColumns?: boolean;
+  readonly suppressRowReordering?: boolean;
   readonly generateNewRowData?: (rows: Table.BodyRow<R>[]) => Partial<R>;
   readonly rowHasCheckboxSelection: ((row: Table.EditableRow<R>) => boolean) | undefined;
   readonly onRowSelectionChanged: (rows: Table.EditableRow<R>[]) => void;
@@ -265,48 +265,52 @@ const authenticateDataGrid =
             }
           }
         };
-        return [
-          tabling.columns.DragColumn({ pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined }),
-          ...tabling.columns.normalizeColumns<R, M>(props.columns, {
-            body: (col: Table.Column<R, M>) => ({
-              cellRendererParams: { ...col.cellRendererParams, generateNewRowData: props.generateNewRowData },
-              cellEditorParams: { ...col.cellEditorParams, onDoneEditing },
-              editable: (params: Table.CellCallbackParams<R, M>) => {
-                if (!tabling.typeguards.isEditableRow(params.row)) {
-                  return false;
-                } else if (!isNil(props.isCellEditable)) {
-                  return props.isCellEditable(params);
-                } else {
-                  return col.editable === undefined ? true : tabling.columns.isEditable(col, params.row);
-                }
-              },
-              valueSetter: (params: ValueSetterParams) => {
-                // By default, AG Grid treats Backspace clearing the cell as setting the
-                // value to undefined - but we have to set it to the null value associated
-                // with the column.
-                if (params.newValue === undefined || params.newValue === "") {
-                  params.newValue = col.nullValue === undefined ? null : col.nullValue;
-                }
-                if (!isNil(col.valueSetter) && typeof col.valueSetter === "function") {
-                  return col.valueSetter(params);
-                }
-                // We can apply this mutation to the immutable data from the store because we deep
-                // clone each row before feeding it into the AG Grid tables.
-                params.data.data[params.column.getColId()] = params.newValue;
-                return true;
-              }
-            }),
-            index: {
-              checkboxSelection: (params: CheckboxSelectionCallbackParams) => {
-                const row: Table.BodyRow<R> = params.data;
-                if (tabling.typeguards.isEditableRow(row)) {
-                  return isNil(props.rowHasCheckboxSelection) || props.rowHasCheckboxSelection(row);
-                }
+        let cs = tabling.columns.normalizeColumns<R, M>(props.columns, {
+          body: (col: Table.Column<R, M>) => ({
+            cellRendererParams: { ...col.cellRendererParams, generateNewRowData: props.generateNewRowData },
+            cellEditorParams: { ...col.cellEditorParams, onDoneEditing },
+            editable: (params: Table.CellCallbackParams<R, M>) => {
+              if (!tabling.typeguards.isEditableRow(params.row)) {
                 return false;
+              } else if (!isNil(props.isCellEditable)) {
+                return props.isCellEditable(params);
+              } else {
+                return col.editable === undefined ? true : tabling.columns.isEditable(col, params.row);
               }
+            },
+            valueSetter: (params: ValueSetterParams) => {
+              // By default, AG Grid treats Backspace clearing the cell as setting the
+              // value to undefined - but we have to set it to the null value associated
+              // with the column.
+              if (params.newValue === undefined || params.newValue === "") {
+                params.newValue = col.nullValue === undefined ? null : col.nullValue;
+              }
+              if (!isNil(col.valueSetter) && typeof col.valueSetter === "function") {
+                return col.valueSetter(params);
+              }
+              // We can apply this mutation to the immutable data from the store because we deep
+              // clone each row before feeding it into the AG Grid tables.
+              params.data.data[params.column.getColId()] = params.newValue;
+              return true;
             }
-          })
-        ];
+          }),
+          index: {
+            checkboxSelection: (params: CheckboxSelectionCallbackParams) => {
+              const row: Table.BodyRow<R> = params.data;
+              if (tabling.typeguards.isEditableRow(row)) {
+                return isNil(props.rowHasCheckboxSelection) || props.rowHasCheckboxSelection(row);
+              }
+              return false;
+            }
+          }
+        });
+        if (props.suppressRowReordering !== false) {
+          return [
+            tabling.columns.DragColumn({ pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined }),
+            ...cs
+          ];
+        }
+        return cs;
       }, [hooks.useDeepEqualMemo(props.columns)]);
 
       const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
@@ -543,38 +547,39 @@ const authenticateDataGrid =
         }
       });
 
-      const onRowDragStart = hooks.useDynamicCallback((e: RowDragEvent) => {
-        console.log("DRAG START");
-        const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api);
-        setRowsBeforeReorder(rows);
-      });
-
       const onRowDragEnd = hooks.useDynamicCallback((e: RowDragEvent) => {
         const row: Table.ModelRow<R> = e.node.data;
         const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api);
-
-        const testRows = (rws: any) => map(rws, (r: any) => r.data.identifier);
-        const testIndexes = (rws: any) => map(rws, (r: any) => r.originalIndex);
-        console.log({ rowsBeforeReorder });
+        // The order of the Row in the table when GroupRow(s) are also included
+        // in the ordering.
         const naiveOrder = e.node.rowIndex;
-        if (!isNil(naiveOrder) && !isNil(rowsBeforeReorder)) {
-          let grouplessOrder = naiveOrder;
-
-          let subset: Table.ModelRow<R>[] = [];
+        if (!isNil(naiveOrder)) {
           let groupRow: Table.GroupRow<R> | null = null;
           let foundMovedRow = false;
 
           let grouplessIndex = -1;
           let naiveIndexToGrouplessIndex: { [key: number]: number } = {};
-          let grouplessIndexToOriginalIndex: { [key: number]: number } = {};
 
-          // TODO: In the case that the direction is reversed, we will likely have to do this
-          // in reverse.
-          for (let i = 0; i < rowsBeforeReorder.length; i++) {
-            const iteratedRow: Table.BodyRow<R> = rowsBeforeReorder[i];
+          // We need to traverse the BodyRow(s) in order to determine both what the new order of
+          // the ModelRow is, without GroupRow(s) included in the ordering, and what the new
+          // (if any) GroupRow the ModelRow corresponds to.
+          for (let i = 0; i < rows.length; i++) {
+            const iteratedRow: Table.BodyRow<R> = rows[i];
             if (tabling.typeguards.isModelRow(iteratedRow)) {
               grouplessIndex = grouplessIndex + 1;
               naiveIndexToGrouplessIndex[i] = grouplessIndex;
+              if (iteratedRow.id === row.id) {
+                foundMovedRow = true;
+              }
+            } else if (tabling.typeguards.isGroupRow(iteratedRow)) {
+              // If we previously found the ModelRow that was moved, and we hit
+              // a GroupRow, then that means that the GroupRow is the first GroupRow
+              // underneath that ModelRow - which means that the ModelRow should now
+              // belong to that GroupRow.
+              if (foundMovedRow) {
+                groupRow = iteratedRow;
+                break;
+              }
             }
           }
           grouplessIndex = naiveIndexToGrouplessIndex[naiveOrder];
@@ -584,113 +589,12 @@ const authenticateDataGrid =
             console.error(`Invalid index for non-groups rows ${grouplessIndex} computed!`);
             return;
           }
-          for (let i = 0; i < rows.length; i++) {
-            const iteratedRow: Table.BodyRow<R> = rows[i];
-            if (tabling.typeguards.isModelRow(iteratedRow)) {
-              if (iteratedRow.id === row.id) {
-                foundMovedRow = true;
-              }
-            } else if (tabling.typeguards.isGroupRow(iteratedRow)) {
-              if (foundMovedRow) {
-                groupRow = iteratedRow;
-                break;
-              }
-            }
-          }
           props.onChangeEvent({
             type: "rowPositionChanged",
             payload: { order: grouplessIndex, id: row.id, newGroup: !isNil(groupRow) ? groupRow.id : null }
           });
-          console.log({ group: !isNil(groupRow) ? groupRow.groupData.name : null, grouplessIndex });
           setRowsBeforeReorder(null);
-          // for (let i = 0; i < rows.length; i++) {
-          //   const iteratedRow: Table.BodyRow<R> = rows[i];
-          //   if (tabling.typeguards.isModelRow(iteratedRow)) {
-          //     if (iteratedRow.id === row.id) {
-          //       foundMovedRow = true;
-          //     } else {
-          //       subset = [...subset, iteratedRow];
-          //       grouplessIndexToOriginalIndex[grouplessIndex] = iteratedRow.originalIndex;
-          //     }
-          //     grouplessIndex = grouplessIndex + 1;
-          // } else if (tabling.typeguards.isGroupRow(iteratedRow)) {
-          //   grouplessOrder = grouplessOrder - 1;
-          //   if (foundMovedRow) {
-          //     groupRow = iteratedRow;
-          //     break;
-          //   } else {
-          //     subset = [];
-          //   }
-          // }
-          // }
-          // console.log({
-          //   subsetIndexesOriginal: testIndexes(subset),
-          //   subset: testRows(subset),
-          //   groupRow: groupRow?.groupData.name,
-          //   foundMovedRow,
-          //   grouplessIndexToOriginalIndex
-          // });
-          // const newOrder = grouplessIndexToOriginalIndex[grouplessOrder];
-          // console.log({ newOrder });
-          // props.onChangeEvent({
-          //   type: "rowPositionChanged",
-          //   payload: { order: grouplessIndex, id: row.id, newGroup: !isNil(groupRow) ? groupRow.id : null }
-          // });
         }
-
-        // const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api);
-        // const modelRows: Table.ModelRow<R>[] = filter(rows, (r: Table.BodyRow<R>) =>
-        //   tabling.typeguards.isModelRow(r)
-        // ) as Table.ModelRow<R>[];
-        // /* @ts-ignore */
-        // console.log(map(modelRows, (r: Table.ModelRow<R>) => r.data.identifier));
-
-        // const order = indexOf(
-        //   map(
-        //     sortBy(modelRows, (r: Table.ModelRow<R>) => r.originalIndex),
-        //     (r: Table.ModelRow<R>) => r.id
-        //   ),
-        //   row.id
-        // );
-        // console.log({ order });
-        // if (!isNil(order)) {
-        // props.onChangeEvent({
-        //   type: "rowPositionChanged",
-        //   payload: { order, id: row.id }
-        // });
-
-        //   const currentIndex = indexOf(
-        //     map(rows, (r: Table.BodyRow<R>) => r.id),
-        //     row.id
-        //   );
-
-        //   let groupRow: Table.GroupRow<R> | null = null;
-        //   for (let i = currentIndex + 1; i < rows.length; i++) {
-        //     const r: Table.BodyRow<R> = rows[i];
-        //     if (tabling.typeguards.isGroupRow(r)) {
-        //       groupRow = r;
-        //     }
-        //   }
-        //   if (!isNil(groupRow)) {
-        //     if (!includes(groupRow.children, row.id)) {
-        //       props.onChangeEvent({
-        //         type: "rowAddToGroup",
-        //         payload: { rows: row.id, group: groupRow.id }
-        //       });
-        //     }
-        //   } else {
-        //     const groupRows: Table.GroupRow<R>[] = filter(rows, (r: Table.BodyRow<R>) =>
-        //       tabling.typeguards.isGroupRow(r)
-        //     ) as Table.GroupRow<R>[];
-        //     groupRow = find(groupRows, (r: Table.GroupRow<R>) => includes(r.children, row.id)) || null;
-        //     if (!isNil(groupRow)) {
-        //       props.onChangeEvent({
-        //         type: "rowRemoveFromGroup",
-        //         payload: { rows: row.id, group: groupRow.id }
-        //       });
-        //     }
-        //   }
-        // }
       });
 
       useImperativeHandle(props.grid, () => ({
@@ -732,7 +636,6 @@ const authenticateDataGrid =
           fillOperation={fillOperation}
           getContextMenuItems={getContextMenuItems}
           onRowDragEnd={onRowDragEnd}
-          onRowDragEnter={onRowDragStart}
         />
       );
     }
