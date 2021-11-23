@@ -102,6 +102,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
             api.request(config.services.requestGroups, objId, {}),
             call(requestMarkups, objId)
           ]);
+          console.log({ models });
           if (models.data.length === 0 && isAuthenticatedConfig(config)) {
             // If there is no table data, we want to default create two rows.
             const response: Http.BulkResponse<B, C> = yield api.request(config.services.bulkCreate, objId, {
@@ -323,6 +324,23 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
     }
   }
 
+  function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent): SagaIterator {
+    if (isAuthenticatedConfig(config)) {
+      yield put(config.actions.saving(true));
+      try {
+        const response: Http.ReorderResponse = yield api.request(api.reorderAccount, e.payload.id, {
+          order: e.payload.order,
+          group: isNil(e.payload.newGroup) ? null : tabling.managers.groupId(e.payload.newGroup)
+        });
+        yield put(config.actions.tableChanged({ type: "tableOrderChanged", payload: response.data }));
+      } catch (err: unknown) {
+        notifications.requestError(err as Error, "There was an error moving the row.");
+      } finally {
+        yield put(config.actions.saving(false));
+      }
+    }
+  }
+
   function* handleDataChangeEvent(e: Table.DataChangeEvent<R>): SagaIterator {
     if (isAuthenticatedConfig(config)) {
       const objId = yield select(config.selectObjId);
@@ -355,6 +373,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       rowAdd: handleRowAddEvent,
       rowDelete: handleRowDeleteEvent,
       dataChange: handleDataChangeEvent,
+      rowPositionChanged: handleRowPositionChangedEvent,
       rowRemoveFromMarkup: handleRowRemoveFromMarkup
     })
   };

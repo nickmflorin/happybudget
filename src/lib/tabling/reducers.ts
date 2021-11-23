@@ -13,7 +13,7 @@ export const groupRowFromState = <R extends Table.RowData, S extends Redux.Table
   action: Redux.Action,
   st: S,
   id: Table.GroupRowId,
-  rowId?: Table.ModelRowId | Table.MarkupRowId,
+  rowId?: Table.ModelRowId,
   options: Redux.FindModelOptions = { name: "Group", warnIfMissing: true }
 ): Table.GroupRow<R> | null => {
   let predicate: Redux.ModelLookup<Table.GroupRow<R>> = id;
@@ -31,7 +31,7 @@ export const groupRowFromState = <R extends Table.RowData, S extends Redux.Table
 export const rowGroupRowFromState = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
   action: Redux.Action,
   st: S,
-  rowId: Table.ModelRowId | Table.MarkupRowId,
+  rowId: Table.ModelRowId,
   options: Redux.FindModelOptions = { warnIfMissing: true }
 ): Table.GroupRow<R> | null => {
   const predicate = (g: Table.GroupRow<R>) => includes(g.children, rowId);
@@ -90,7 +90,7 @@ const removeRowsFromTheirGroupsIfTheyExist = <
     },
     {}
   );
-  st = reduce(
+  return reduce(
     alteredGroupsWithChildren,
     (s: S, alteration: Alteration) => {
       return {
@@ -107,7 +107,56 @@ const removeRowsFromTheirGroupsIfTheyExist = <
     },
     st
   );
+};
+
+const updateRowGroup = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
+  st: S,
+  action: Redux.Action,
+  rowIds: SingleOrArray<Table.ModelRowId>,
+  group: Table.GroupRowId
+): S => {
+  const ids: Table.ModelRowId[] = Array.isArray(rowIds) ? rowIds : [rowIds];
+
+  const g: Table.GroupRow<R> | null = groupRowFromState<R, S>(action, st, group);
+  if (!isNil(g)) {
+    // If any of the ModelRow(s) already belong to Group(s), they must be disassociated from
+    // those Group(s) since a ModelRow can only belong to one and only one Group.
+    let newState = removeRowsFromTheirGroupsIfTheyExist(st, action, ids);
+    // Find the rows associated with this Group including the rows that are being added to the
+    // group.  Note that this is intentionally redundant (as we simply set the children propery
+    // to these IDs afterwards anyways) - but is done so to make sure that the IDs are valid and
+    // associated with ModelRow(s) in state.
+    const rws = redux.reducers.findModelsInData<Table.ModelRow<R>>(
+      action,
+      filter(newState.data, (r: Table.BodyRow<R>) => typeguards.isModelRow(r)) as Table.ModelRow<R>[],
+      uniq([...ids, ...g.children])
+    );
+    return {
+      ...newState,
+      data: util.replaceInArray<Table.BodyRow<R>>(
+        newState.data,
+        { id: g.id },
+        {
+          ...g,
+          children: map(rws, (r: Table.ModelRow<R>) => r.id)
+        }
+      )
+    };
+  }
   return st;
+};
+
+const reorderRows = <
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel = Model.TypedHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
+>(
+  st: S
+): S => {
+  return {
+    ...st,
+    data: data.orderTableRows<R, M>(st.data)
+  };
 };
 
 export const createTableChangeEventReducer = <
@@ -204,29 +253,28 @@ export const createTableChangeEventReducer = <
           )
         };
       }
+      return state;
     } else if (typeguards.isRowAddEvent(e)) {
       const payload: Table.RowAdd<R>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
       let newState = {
         ...state,
-        data: data.orderTableRows<R, M>(
-          reduce(
-            payload,
-            (d: Table.BodyRow<R>[], addition: Table.RowAdd<R>) => {
-              return [
-                ...d,
-                placeholderRowManager.create({
-                  id: addition.id,
-                  data: addition.data,
-                  originalIndex: filter(d, (r: Table.BodyRow<R>) => typeguards.isDataRow(r)).length
-                })
-              ];
-            },
-            state.data
-          )
+        data: reduce(
+          payload,
+          (d: Table.BodyRow<R>[], addition: Table.RowAdd<R>) => {
+            return [
+              ...d,
+              placeholderRowManager.create({
+                id: addition.id,
+                data: addition.data,
+                originalIndex: filter(d, (r: Table.BodyRow<R>) => typeguards.isDataRow(r)).length
+              })
+            ];
+          },
+          state.data
         )
       };
       applicationEvents.dispatchRowsAddedEvent({ tableId: config.tableId, numRows: newState.data.length });
-      return newState;
+      return reorderRows(newState);
     } else if (typeguards.isRowDeleteEvent(e)) {
       /*
       When a Row is deleted, we first have to create a dichotomy of the rows we are deleting.
@@ -251,45 +299,85 @@ export const createTableChangeEventReducer = <
         filter(ids, (id: Table.ModelRowId | Table.MarkupRowId) => typeguards.isModelRowId(id)) as Table.ModelRowId[]
       );
       let newState = removeRowsFromTheirGroupsIfTheyExist(state, action, modelRows);
-      return {
+      return reorderRows({
         ...newState,
-        data: data.orderTableRows<R, M>(filter(newState.data, (ri: Table.BodyRow<R>) => !includes(ids, ri.id)))
-      };
+        data: filter(newState.data, (ri: Table.BodyRow<R>) => !includes(ids, ri.id))
+      });
     } else if (typeguards.isRowRemoveFromGroupEvent(e)) {
-      const ids: Table.ModelRowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
-      const g: Table.GroupRow<R> | null = groupRowFromState<R, S>(action, state, e.payload.group);
-      if (!isNil(g)) {
-        return {
-          ...state,
-          data: data.orderTableRows<R, M>(
-            util.replaceInArray<Table.BodyRow<R>>(state.data, { id: g.id }, groupRowManager.removeChildren(g, ids))
-          )
-        };
-      }
-    } else if (typeguards.isRowAddToGroupEvent(e)) {
       const ids: Table.ModelRowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
 
       const g: Table.GroupRow<R> | null = groupRowFromState<R, S>(action, state, e.payload.group);
       if (!isNil(g)) {
-        const rws = redux.reducers.findModelsInData<Table.ModelRow<R>>(
-          action,
-          filter(state.data, (r: Table.BodyRow<R>) => typeguards.isModelRow(r)) as Table.ModelRow<R>[],
-          uniq([...ids, ...g.children])
-        );
-        return {
+        return reorderRows({
           ...state,
-          data: data.orderTableRows<R, M>(
-            util.replaceInArray<Table.BodyRow<R>>(
-              state.data,
-              { id: g.id },
-              {
-                ...g,
-                children: map(rws, (r: Table.ModelRow<R>) => r.id)
-              }
-            )
-          )
-        };
+          data: util.replaceInArray<Table.BodyRow<R>>(state.data, { id: g.id }, groupRowManager.removeChildren(g, ids))
+        });
       }
+    } else if (typeguards.isRowAddToGroupEvent(e)) {
+      return reorderRows(updateRowGroup(state, action, e.payload.rows, e.payload.group));
+    } else if (typeguards.isRowPositionChangedEvent(e)) {
+      const modelRow: Table.ModelRow<R> | null = redux.reducers.modelFromState<Table.ModelRow<R>>(
+        action,
+        filter(state.data, (ri: Table.BodyRow<R>) => typeguards.isModelRow(ri)) as Table.ModelRow<R>[],
+        e.payload.id
+      );
+      let newState = { ...state };
+      if (!isNil(modelRow)) {
+        // If the repositioning involved moving the ModelRow out of a GroupRow and/or moving the
+        // ModelRow into a GroupRow, we need to update the state to reflect the new
+        // GroupRow/ModelRow relationship.
+        let previousGroupRow = rowGroupRowFromState<R, S>(action, state, e.payload.id, { warnIfMissing: false });
+        if (!isNil(previousGroupRow) && isNil(e.payload.newGroup) && e.payload.newGroup !== previousGroupRow.id) {
+          console.log("REORDERING");
+          return reorderRows({
+            ...state,
+            data: util.replaceInArray<Table.BodyRow<R>>(
+              state.data,
+              { id: previousGroupRow.id },
+              groupRowManager.removeChildren(previousGroupRow, [modelRow.id])
+            )
+          });
+        } else if (!isNil(e.payload.newGroup)) {
+          console.log("REORDERING");
+          return reorderRows(updateRowGroup(state, action, [modelRow.id], e.payload.newGroup));
+        }
+      }
+      return state;
+    } else if (typeguards.isTableOrderChangedEvent(e)) {
+      /*
+      This event is not responsible for actually reordering the rows in the store.
+      In fact, we actually do not want to do that - we want to let AG Grid handle
+      the ordering when the rows are moved.
+
+      This event is responsible for simply updating the `originalIndex` of the ModelRow(s)
+      after the API response is received from a request to reorder the ModelRow.  The
+      `originalIndex` does not actually factor in until the rows are reordered after
+      another event occurs - so it is necessary to update the `originalIndex` of the ModelRow(s)
+      so that subsequent reordering (either due to a Group removal, Row removal from Group, etc.)
+      is accurate.
+      */
+      const newOrdering: number[] = e.payload;
+      let newState = reduce(
+        newOrdering,
+        (st: S, id: number, index: number) => {
+          const modelRow: Table.ModelRow<R> | null = redux.reducers.modelFromState<Table.ModelRow<R>>(
+            action,
+            filter(state.data, (ri: Table.BodyRow<R>) => typeguards.isModelRow(ri)) as Table.ModelRow<R>[],
+            id
+          );
+          if (!isNil(modelRow)) {
+            return {
+              ...st,
+              data: util.replaceInArray<Table.BodyRow<R>>(st.data, { id }, { ...modelRow, originalIndex: index })
+            };
+          }
+          return st;
+        },
+        state
+      );
+      /* @ts-ignore */
+      console.log(map(newState.data, (r: Table.Row<R>) => r.data.identifier));
+      return reorderRows(newState);
     } else if (typeguards.isGroupAddedEvent(e)) {
       /*
       When a Group is added to the table, we must first convert that Group model to a
@@ -323,10 +411,10 @@ export const createTableChangeEventReducer = <
         },
         state
       );
-      return {
+      return reorderRows({
         ...newState,
-        data: data.orderTableRows<R, M>([...newState.data, newGroupRow])
-      };
+        data: [...newState.data, newGroupRow]
+      });
     } else if (typeguards.isGroupUpdateEvent(e)) {
       /*
       When a Group is updated, it may be updated with children that already belong to another
@@ -361,12 +449,10 @@ export const createTableChangeEventReducer = <
           },
           state
         );
-        return {
+        return reorderRows({
           ...newState,
-          data: data.orderTableRows<R, M>(
-            util.replaceInArray<Table.BodyRow<R>>(newState.data, { id: groupRow.id }, newGroupRow)
-          )
-        };
+          data: util.replaceInArray<Table.BodyRow<R>>(newState.data, { id: groupRow.id }, newGroupRow)
+        });
       }
     }
     return state;
@@ -490,19 +576,17 @@ export const createAuthenticatedTableReducer = <
             m.id
           );
           if (!isNil(r)) {
-            return {
+            return reorderRows({
               ...s,
-              data: data.orderTableRows<R, M>(
-                util.replaceInArray<Table.BodyRow<R>>(
-                  s.data,
-                  { id: r.id },
-                  modelRowManager.create({
-                    model: m,
-                    originalIndex: r.originalIndex
-                  })
-                )
+              data: util.replaceInArray<Table.BodyRow<R>>(
+                s.data,
+                { id: r.id },
+                modelRowManager.create({
+                  model: m,
+                  originalIndex: r.originalIndex
+                })
               )
-            };
+            });
           }
           return s;
         },
@@ -522,16 +606,14 @@ export const createAuthenticatedTableReducer = <
             update.id
           );
           if (!isNil(r)) {
-            return {
+            return reorderRows({
               ...s,
-              data: data.orderTableRows<R, M>(
-                util.replaceInArray<Table.BodyRow<R>>(
-                  s.data,
-                  { id: r.id },
-                  { ...r, data: { ...r.data, ...update.data } }
-                )
+              data: util.replaceInArray<Table.BodyRow<R>>(
+                s.data,
+                { id: r.id },
+                { ...r, data: { ...r.data, ...update.data } }
               )
-            };
+            });
           }
           return s;
         },

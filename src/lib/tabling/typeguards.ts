@@ -130,6 +130,24 @@ export const isRowDeleteEvent = <R extends Table.RowData, M extends Model.TypedH
   return (e as Table.RowDeleteEvent).type === "rowDelete";
 };
 
+export const isRowPositionChangedEvent = <
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel = Model.TypedHttpModel
+>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.RowPositionChangedEvent => {
+  return (e as Table.RowPositionChangedEvent).type === "rowPositionChanged";
+};
+
+export const isTableOrderChangedEvent = <
+  R extends Table.RowData,
+  M extends Model.TypedHttpModel = Model.TypedHttpModel
+>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.TableOrderChangedEvent => {
+  return (e as Table.TableOrderChangedEvent).type === "tableOrderChanged";
+};
+
 export const isRowRemoveFromGroupEvent = <
   R extends Table.RowData,
   M extends Model.TypedHttpModel = Model.TypedHttpModel

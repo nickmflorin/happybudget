@@ -142,7 +142,9 @@ export const createTableTaskSet = (
     handleChangeEvent: tabling.tasks.createChangeEventHandler({
       rowAdd: handleRowAddEvent,
       rowDelete: handleRowDeleteEvent,
-      dataChange: handleDataChangeEvent
+      // It is safe to assume that the ID of the row for which data is being changed
+      // will always be a ModelRowId - but we have to force coerce that here.
+      dataChange: handleDataChangeEvent as Redux.TableEventTask<Table.DataChangeEvent<R>>
     })
   };
 };

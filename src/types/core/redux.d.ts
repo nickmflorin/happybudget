@@ -31,22 +31,23 @@ namespace Redux {
   > = (event: E) => import("@redux-saga/types").SagaIterator;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type TableEventTaskMapObject<
+  interface TableEventTaskMapObject<
     R extends Table.RowData = any,
     M extends Model.HttpModel = any
-  > = {
-      dataChange: TableEventTask<DataChangeEvent<R>>;
-      rowAdd: TableEventTask<RowAddEvent<R>>;
-      rowDelete: TableEventTask<RowDeleteEvent>;
-      rowRemoveFromGroup: TableEventTask<RowRemoveFromGroupEvent>;
-      rowAddToGroup: TableEventTask<RowAddToGroupEvent>;
-      groupAdded: TableEventTask<GroupAddedEvent>;
-      groupUpdated: TableEventTask<GroupUpdatedEvent>;
-      modelUpdated: TableEventTask<ModelUpdatedEvent<M>>;
-      markupAdded: TableEventTask<MarkupAddedEvent>;
-      markupUpdated: TableEventTask<MarkupUpdatedEvent>;
-      rowAddToMarkup: TableEventTask<RowAddToMarkupEvent>;
-      rowRemoveFromMarkup: TableEventTask<RowRemoveFromMarkupEvent>;
+  > {
+      readonly dataChange: TableEventTask<Table.DataChangeEvent<R>, R, M>;
+      readonly rowAdd: TableEventTask<Table.RowAddEvent<R>, R, M>;
+      readonly rowPositionChanged: TableEventTask<Table.RowPositionChangedEvent, R, M>;
+      readonly rowDelete: TableEventTask<Table.RowDeleteEvent, R, M>;
+      readonly rowRemoveFromGroup: TableEventTask<Table.RowRemoveFromGroupEvent, R, M>;
+      readonly rowAddToGroup: TableEventTask<Table.RowAddToGroupEvent, R, M>;
+      readonly groupAdded: TableEventTask<Table.GroupAddedEvent, R, M>;
+      readonly groupUpdated: TableEventTask<Table.GroupUpdatedEvent, R, M>;
+      readonly modelUpdated: TableEventTask<Table.ModelUpdatedEvent<M>, R, M>;
+      readonly markupAdded: TableEventTask<Table.MarkupAddedEvent, R, M>;
+      readonly markupUpdated: TableEventTask<Table.MarkupUpdatedEvent, R, M>;
+      readonly rowAddToMarkup: TableEventTask<Table.RowAddToMarkupEvent, R, M>;
+      readonly rowRemoveFromMarkup: TableEventTask<Table.RowRemoveFromMarkupEvent, R, M>;
   };
 
   type ActionMapObject<M = any> = {

@@ -275,7 +275,9 @@ namespace Model {
   type OwnerTreeNode = SubAccountOwnerTreeNode | MarkupOwnerTreeNode;
 
   // Abstract -- not meant for external reference.
-  interface AbstractAccount extends SimpleAccount, LineMetrics {}
+  interface AbstractAccount extends SimpleAccount, LineMetrics {
+    readonly order: string;
+  }
 
   interface Account extends AbstractAccount, TrackedModel {
     readonly access: number[];
@@ -299,6 +301,7 @@ namespace Model {
     readonly multiplier: number | null;
     readonly unit: Tag | null;
     readonly contact?: number | null; // Will be undefined for Template SubAccount(s).
+    readonly order: string;
   }
 
   interface SubAccount extends AbstractSubAccount, TrackedModel {
@@ -331,6 +334,7 @@ namespace Model {
     readonly actual_type: Tag | null;
     readonly attachments: SimpleAttachment[];
     readonly owner: SimpleSubAccount | SimpleMarkup | null;
+    readonly order: string;
   }
 
   interface ContactNamesAndImage {
@@ -352,6 +356,7 @@ namespace Model {
     readonly created_at: string;
     readonly updated_at: string;
     readonly attachments: SimpleAttachment[];
+    readonly order: string;
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */

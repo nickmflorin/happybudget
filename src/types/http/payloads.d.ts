@@ -58,6 +58,7 @@ namespace Http {
     readonly rate: number;
     readonly unit?: Model.FringeUnit;
     readonly color?: string | null;
+    readonly order?: number;
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -101,6 +102,17 @@ namespace Http {
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  interface ReorderPayload {
+    readonly order: number;
+  }
+
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  interface ReorderWithGroupPayload {
+    readonly order: number;
+    readonly group: number | null;
+  }
+
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface AccountPayload extends ModelPayload<Model.Account> {
     readonly group?: number | null;
   }
@@ -139,6 +151,7 @@ namespace Http {
     readonly rate?: number | null;
     readonly image?: ArrayBuffer | string | null;
     readonly attachments?: number[];
+    readonly order?: number;
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */

@@ -45,7 +45,7 @@ export const injectMarkupsAndGroups = <
         );
 
   type ModelsAndGroup = { models: A[]; group: C };
-
+  console.log(config.current);
   const grouped = reduce(
     config.current,
     (curr: ModelsAndGroup[], m: A): ModelsAndGroup[] => {
@@ -107,6 +107,10 @@ export const createTableRows = <R extends Table.RowData, M extends Model.TypedHt
   });
   const groupRowManager = new tabling.managers.GroupRowManager<R, M>({ columns: config.columns });
   const markupRowManager = new tabling.managers.MarkupRowManager<R, M>({ columns: config.columns });
+
+  /* @ts-ignore */
+  console.log(map(config.response.models, (m: M) => m.identifier));
+  console.log(config.response.groups);
 
   return orderTableRows([
     ...reduce(

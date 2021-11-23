@@ -475,6 +475,8 @@ namespace Table {
     | "dataChange"
     | "modelUpdated"
     | "rowAdd"
+    | "rowPositionChanged"
+    | "tableOrderChanged"
     | "rowDelete"
     | "rowRemoveFromGroup"
     | "rowAddToGroup"
@@ -528,6 +530,22 @@ namespace Table {
   type RowAddEvent<R extends RowData> = {
     readonly type: "rowAdd";
     readonly payload: RowAddPayload<R>;
+  };
+
+  type RowPositionChangedPayload = {
+    readonly order: number;
+    readonly newGroup: GroupRowId | null;
+    readonly id: ModelRowId;
+  }
+
+  type RowPositionChangedEvent = {
+    readonly type: "rowPositionChanged";
+    readonly payload: RowPositionChangedPayload;
+  };
+
+  type TableOrderChangedEvent = {
+    readonly type: "tableOrderChanged";
+    readonly payload: number[];
   };
 
   type RowDeletePayload = {
@@ -611,6 +629,8 @@ namespace Table {
     | DataChangeEvent<R>
     | RowAddEvent<R>
     | RowDeleteEvent
+    | RowPositionChangedEvent
+    | TableOrderChangedEvent
     | RowRemoveFromGroupEvent
     | RowAddToGroupEvent
     | GroupAddedEvent

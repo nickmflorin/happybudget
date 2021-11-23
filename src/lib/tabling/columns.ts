@@ -327,7 +327,7 @@ export const DragColumn = <R extends Table.RowData, M extends Model.HttpModel = 
     ...col,
     rowDrag: (params: RowDragCallbackParams) => {
       const r: Table.BodyRow<R> = params.node.data;
-      return !tabling.typeguards.isGroupRow(r) && !tabling.typeguards.isMarkupRow(r);
+      return tabling.typeguards.isModelRow(r);
     },
     field: "index" as keyof R,
     width: !isNil(width) ? width : 25,

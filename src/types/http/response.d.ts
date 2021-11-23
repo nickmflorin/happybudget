@@ -37,6 +37,9 @@ namespace Http {
     | BudgetParentContextDetailResponse<Model.Markup, Model.Account, B>
     | BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, B>;
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type ReorderResponse = { data: number[] };
+
   type BudgetContextDetailResponse<
     M extends Model.HttpModel,
     B extends Model.Budget | Model.Template = Model.Budget

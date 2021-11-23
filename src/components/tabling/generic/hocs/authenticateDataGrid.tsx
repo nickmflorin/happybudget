@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, useImperativeHandle } from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
-import { map, isNil, includes, find, filter, flatten, reduce, uniq, isEqual } from "lodash";
+import { map, isNil, includes, find, filter, flatten, reduce, uniq, isEqual, indexOf, sortBy } from "lodash";
 
 import {
   CellKeyDownEvent,
@@ -18,7 +18,8 @@ import {
   NavigateToNextCellParams,
   TabToNextCellParams,
   RangeSelectionChangedEvent,
-  CheckboxSelectionCallbackParams
+  CheckboxSelectionCallbackParams,
+  RowDragEvent
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
@@ -43,6 +44,8 @@ interface InjectedAuthenticatedDataGridProps<R extends Table.RowData> {
   readonly navigateToNextCell: (params: NavigateToNextCellParams) => Table.CellPosition;
   readonly tabToNextCell: (params: TabToNextCellParams) => Table.CellPosition;
   readonly onRangeSelectionChanged: (e: RangeSelectionChangedEvent) => void;
+  readonly onRowDragEnd: (event: RowDragEvent) => void;
+  readonly onRowDragEnter: (event: RowDragEvent) => void;
 }
 
 export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
@@ -235,6 +238,7 @@ const authenticateDataGrid =
       const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
       const oldRow = useRef<Table.ModelRow<R> | null>(null); // TODO: Figure out a better way to do this.
       const lastSelectionFromRange = useRef<boolean>(false);
+      const [rowsBeforeReorder, setRowsBeforeReorder] = useState<Table.BodyRow<R>[] | null>(null);
 
       /*
       Note: The behavior of the column suppression in the subsequent column memorization
@@ -368,7 +372,7 @@ const authenticateDataGrid =
           })
         });
       }, [hooks.useDeepEqualMemo(unsuppressedColumns)]);
-      console.log({ columns });
+
       const [navigateToNextCell, tabToNextCell, moveToNextColumn, moveToNextRow] = useCellNavigation({
         apis: props.apis,
         tableId: props.tableId,
@@ -539,6 +543,156 @@ const authenticateDataGrid =
         }
       });
 
+      const onRowDragStart = hooks.useDynamicCallback((e: RowDragEvent) => {
+        console.log("DRAG START");
+        const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api);
+        setRowsBeforeReorder(rows);
+      });
+
+      const onRowDragEnd = hooks.useDynamicCallback((e: RowDragEvent) => {
+        const row: Table.ModelRow<R> = e.node.data;
+        const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api);
+
+        const testRows = (rws: any) => map(rws, (r: any) => r.data.identifier);
+        const testIndexes = (rws: any) => map(rws, (r: any) => r.originalIndex);
+        console.log({ rowsBeforeReorder });
+        const naiveOrder = e.node.rowIndex;
+        if (!isNil(naiveOrder) && !isNil(rowsBeforeReorder)) {
+          let grouplessOrder = naiveOrder;
+
+          let subset: Table.ModelRow<R>[] = [];
+          let groupRow: Table.GroupRow<R> | null = null;
+          let foundMovedRow = false;
+
+          let grouplessIndex = -1;
+          let naiveIndexToGrouplessIndex: { [key: number]: number } = {};
+          let grouplessIndexToOriginalIndex: { [key: number]: number } = {};
+
+          // TODO: In the case that the direction is reversed, we will likely have to do this
+          // in reverse.
+          for (let i = 0; i < rowsBeforeReorder.length; i++) {
+            const iteratedRow: Table.BodyRow<R> = rowsBeforeReorder[i];
+            if (tabling.typeguards.isModelRow(iteratedRow)) {
+              grouplessIndex = grouplessIndex + 1;
+              naiveIndexToGrouplessIndex[i] = grouplessIndex;
+            }
+          }
+          grouplessIndex = naiveIndexToGrouplessIndex[naiveOrder];
+          // The grouplessIndex will only be -1 if there are no ModelRow(s), in which case the
+          // dragging shouldn't be allowed to begin with.
+          if (grouplessIndex === -1 || grouplessIndex === undefined) {
+            console.error(`Invalid index for non-groups rows ${grouplessIndex} computed!`);
+            return;
+          }
+          for (let i = 0; i < rows.length; i++) {
+            const iteratedRow: Table.BodyRow<R> = rows[i];
+            if (tabling.typeguards.isModelRow(iteratedRow)) {
+              if (iteratedRow.id === row.id) {
+                foundMovedRow = true;
+              }
+            } else if (tabling.typeguards.isGroupRow(iteratedRow)) {
+              if (foundMovedRow) {
+                groupRow = iteratedRow;
+                break;
+              }
+            }
+          }
+          props.onChangeEvent({
+            type: "rowPositionChanged",
+            payload: { order: grouplessIndex, id: row.id, newGroup: !isNil(groupRow) ? groupRow.id : null }
+          });
+          console.log({ group: !isNil(groupRow) ? groupRow.groupData.name : null, grouplessIndex });
+          setRowsBeforeReorder(null);
+          // for (let i = 0; i < rows.length; i++) {
+          //   const iteratedRow: Table.BodyRow<R> = rows[i];
+          //   if (tabling.typeguards.isModelRow(iteratedRow)) {
+          //     if (iteratedRow.id === row.id) {
+          //       foundMovedRow = true;
+          //     } else {
+          //       subset = [...subset, iteratedRow];
+          //       grouplessIndexToOriginalIndex[grouplessIndex] = iteratedRow.originalIndex;
+          //     }
+          //     grouplessIndex = grouplessIndex + 1;
+          // } else if (tabling.typeguards.isGroupRow(iteratedRow)) {
+          //   grouplessOrder = grouplessOrder - 1;
+          //   if (foundMovedRow) {
+          //     groupRow = iteratedRow;
+          //     break;
+          //   } else {
+          //     subset = [];
+          //   }
+          // }
+          // }
+          // console.log({
+          //   subsetIndexesOriginal: testIndexes(subset),
+          //   subset: testRows(subset),
+          //   groupRow: groupRow?.groupData.name,
+          //   foundMovedRow,
+          //   grouplessIndexToOriginalIndex
+          // });
+          // const newOrder = grouplessIndexToOriginalIndex[grouplessOrder];
+          // console.log({ newOrder });
+          // props.onChangeEvent({
+          //   type: "rowPositionChanged",
+          //   payload: { order: grouplessIndex, id: row.id, newGroup: !isNil(groupRow) ? groupRow.id : null }
+          // });
+        }
+
+        // const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api);
+        // const modelRows: Table.ModelRow<R>[] = filter(rows, (r: Table.BodyRow<R>) =>
+        //   tabling.typeguards.isModelRow(r)
+        // ) as Table.ModelRow<R>[];
+        // /* @ts-ignore */
+        // console.log(map(modelRows, (r: Table.ModelRow<R>) => r.data.identifier));
+
+        // const order = indexOf(
+        //   map(
+        //     sortBy(modelRows, (r: Table.ModelRow<R>) => r.originalIndex),
+        //     (r: Table.ModelRow<R>) => r.id
+        //   ),
+        //   row.id
+        // );
+        // console.log({ order });
+        // if (!isNil(order)) {
+        // props.onChangeEvent({
+        //   type: "rowPositionChanged",
+        //   payload: { order, id: row.id }
+        // });
+
+        //   const currentIndex = indexOf(
+        //     map(rows, (r: Table.BodyRow<R>) => r.id),
+        //     row.id
+        //   );
+
+        //   let groupRow: Table.GroupRow<R> | null = null;
+        //   for (let i = currentIndex + 1; i < rows.length; i++) {
+        //     const r: Table.BodyRow<R> = rows[i];
+        //     if (tabling.typeguards.isGroupRow(r)) {
+        //       groupRow = r;
+        //     }
+        //   }
+        //   if (!isNil(groupRow)) {
+        //     if (!includes(groupRow.children, row.id)) {
+        //       props.onChangeEvent({
+        //         type: "rowAddToGroup",
+        //         payload: { rows: row.id, group: groupRow.id }
+        //       });
+        //     }
+        //   } else {
+        //     const groupRows: Table.GroupRow<R>[] = filter(rows, (r: Table.BodyRow<R>) =>
+        //       tabling.typeguards.isGroupRow(r)
+        //     ) as Table.GroupRow<R>[];
+        //     groupRow = find(groupRows, (r: Table.GroupRow<R>) => includes(r.children, row.id)) || null;
+        //     if (!isNil(groupRow)) {
+        //       props.onChangeEvent({
+        //         type: "rowRemoveFromGroup",
+        //         payload: { rows: row.id, group: groupRow.id }
+        //       });
+        //     }
+        //   }
+        // }
+      });
+
       useImperativeHandle(props.grid, () => ({
         getCSVData
       }));
@@ -577,6 +731,8 @@ const authenticateDataGrid =
           onRangeSelectionChanged={onRangeSelectionChanged}
           fillOperation={fillOperation}
           getContextMenuItems={getContextMenuItems}
+          onRowDragEnd={onRowDragEnd}
+          onRowDragEnter={onRowDragStart}
         />
       );
     }
