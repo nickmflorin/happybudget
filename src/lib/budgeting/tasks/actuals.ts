@@ -149,7 +149,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
   function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent): SagaIterator {
     yield put(config.actions.saving(true));
     try {
-      const response: M = yield api.request(api.updateFringe, e.payload.id, {
+      const response: M = yield api.request(api.updateActual, e.payload.id, {
         order: e.payload.order
       });
       yield put(
