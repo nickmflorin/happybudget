@@ -15,9 +15,6 @@ export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Table
 export const addModelsToStateAction = createAction<Redux.AddModelsToTablePayload<Model.SubAccount>>(
   ActionType.Account.SubAccounts.AddToState
 );
-export const updateModelsInStateAction = createAction<Redux.UpdateModelsInTablePayload<Model.SubAccount>>(
-  ActionType.Account.SubAccounts.UpdateInState
-);
 export const savingTableAction = createAction<boolean>(ActionType.Account.SubAccounts.Saving);
 export const clearAction = createAction<null>(ActionType.Account.SubAccounts.Clear);
 export const loadingAction = createAction<boolean>(ActionType.Account.SubAccounts.Loading);

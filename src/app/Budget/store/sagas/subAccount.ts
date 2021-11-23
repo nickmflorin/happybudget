@@ -37,7 +37,6 @@ const ActionMap = {
   response: actions.responseAction,
   saving: actions.savingTableAction,
   addModelsToState: actions.addModelsToStateAction,
-  updateModelsInState: actions.updateModelsInStateAction,
   loadingBudget: loadingBudgetAction,
   updateBudgetInState: updateBudgetInStateAction,
   setSearch: actions.setSearchAction,

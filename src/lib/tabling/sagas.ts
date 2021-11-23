@@ -7,7 +7,7 @@ import { tabling } from "lib";
 /* eslint-disable indent */
 export const createTableSaga = <
   R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
   config: Table.SagaConfig<R, M, A>
@@ -33,7 +33,7 @@ export const createTableSaga = <
 
 export const createUnauthenticatedTableSaga = <
   R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
   config: Table.SagaConfig<R, M, A>
@@ -44,7 +44,7 @@ export const createUnauthenticatedTableSaga = <
 /* eslint-disable indent */
 export const createAuthenticatedTableSaga = <
   R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
   config: Table.SagaConfig<R, M, A>

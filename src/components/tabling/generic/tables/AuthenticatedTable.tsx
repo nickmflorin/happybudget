@@ -22,12 +22,12 @@ import TableWrapper from "./TableWrapper";
 
 export type AuthenticatedTableDataGridProps<
   R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel
 > = AuthenticateDataGridProps<R, M> & DataGridProps<R, M> & Omit<AuthenticatedGridProps<R, M>, "id">;
 
 export type AuthenticatedTableProps<
   R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel
 > = TableConfigurationProps<R, M> &
   Omit<
     AuthenticateDataGridProps<R, M>,
@@ -49,7 +49,7 @@ const TableFooterGrid = FooterGrid<any, any, AuthenticatedGridProps<any, any>>({
   rowClass: "row--table-footer",
   getFooterColumn: (col: Table.Column<any>) => col.footer || null
 })(AuthenticatedGrid) as {
-  <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
+  <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
     props: Omit<AuthenticatedGridProps<R, M>, "id">
   ): JSX.Element;
 };
@@ -61,7 +61,7 @@ const PageFooterGrid = FooterGrid<any, any, AuthenticatedGridProps<any, any>>({
   rowHeight: 28,
   getFooterColumn: (col: Table.Column<any>) => col.page || null
 })(AuthenticatedGrid) as {
-  <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
+  <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
     props: Omit<AuthenticatedGridProps<R, M>, "id">
   ): JSX.Element;
 };
@@ -69,7 +69,7 @@ const PageFooterGrid = FooterGrid<any, any, AuthenticatedGridProps<any, any>>({
 /* eslint-disable indent */
 const AuthenticatedTable = <
   R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   props: WithAuthenticatedDataGridProps<
@@ -391,7 +391,7 @@ type Props = WithAuthenticatedDataGridProps<
 >;
 
 export default configureTable<any, any, Props>(AuthenticatedTable) as {
-  <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
+  <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
     props: AuthenticatedTableProps<R, M>
   ): JSX.Element;
 };

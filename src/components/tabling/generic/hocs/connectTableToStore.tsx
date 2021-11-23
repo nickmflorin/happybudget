@@ -32,7 +32,7 @@ const connectTableToStore =
   <
     T,
     R extends Table.RowData,
-    M extends Model.TypedHttpModel = Model.TypedHttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>
   >(
     config: Table.StoreConfig<R, M, S>

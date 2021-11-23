@@ -61,7 +61,6 @@ export type AuthenticatedSubAccountsTableActionMap<
   M extends Model.Account | Model.SubAccount,
   B extends Model.Template | Model.Budget
 > = Redux.AuthenticatedTableActionMap<R, C> & {
-  readonly updateModelsInState?: SingleOrArray<C>;
   readonly loadingBudget: boolean;
   readonly tableChanged: Table.ChangeEvent<R, M>;
   readonly updateBudgetInState: Redux.UpdateActionPayload<B>;
@@ -104,19 +103,15 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     if (!isNil(objId) && !isNil(budgetId)) {
       if (redux.typeguards.isListRequestIdsAction(action)) {
         if (isAuthenticatedConfig(config)) {
-          const actionHandler = config.actions.updateModelsInState;
-          if (!isNil(actionHandler)) {
-            const response: Http.ListResponse<Model.SubAccount> = yield api.request(config.services.request, objId, {
-              ids: action.payload.ids
-            });
-            yield put(actionHandler(response.data));
-          } else {
-            console.warn(
-              `Trying to submit a request to update specific IDs of the model
-              but have not provided the action handler to update the models in
-              the table.`
-            );
-          }
+          const response: Http.ListResponse<Model.SubAccount> = yield api.request(config.services.request, objId, {
+            ids: action.payload.ids
+          });
+          yield put(
+            config.actions.tableChanged({
+              type: "modelUpdated",
+              payload: map(response.data, (m: Model.SubAccount) => ({ model: m }))
+            })
+          );
         }
       } else {
         yield put(config.actions.loading(true));

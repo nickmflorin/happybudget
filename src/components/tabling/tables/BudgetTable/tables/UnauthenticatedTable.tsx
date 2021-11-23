@@ -8,13 +8,13 @@ import { UnauthenticatedBudgetDataGrid } from "../grids";
 
 export type UnauthenticatedBudgetTableProps<
   R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel
 > = Omit<UnauthenticatedTableProps<R, M>, "children"> & {
   readonly onBack?: () => void;
 };
 
 /* eslint-disable indent */
-const UnauthenticatedBudgetTable = <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
+const UnauthenticatedBudgetTable = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: UnauthenticatedBudgetTableProps<R, M>
 ): JSX.Element => {
   return (

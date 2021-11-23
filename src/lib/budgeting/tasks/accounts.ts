@@ -75,19 +75,15 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
     if (!isNil(objId)) {
       if (redux.typeguards.isListRequestIdsAction(action)) {
         if (isAuthenticatedConfig(config)) {
-          const actionHandler = config.actions.updateModelsInState;
-          if (!isNil(actionHandler)) {
-            const response: Http.ListResponse<Model.Account> = yield api.request(config.services.request, objId, {
-              ids: action.payload.ids
-            });
-            yield put(actionHandler(response.data));
-          } else {
-            console.warn(
-              `Trying to submit a request to update specific IDs of the model
-              but have not provided the action handler to update the models in
-              the table.`
-            );
-          }
+          const response: Http.ListResponse<Model.Account> = yield api.request(config.services.request, objId, {
+            ids: action.payload.ids
+          });
+          yield put(
+            config.actions.tableChanged({
+              type: "modelUpdated",
+              payload: map(response.data, (m: Model.Account) => ({ model: m }))
+            })
+          );
         }
       } else {
         yield put(config.actions.loading(true));
@@ -102,7 +98,6 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
             api.request(config.services.requestGroups, objId, {}),
             call(requestMarkups, objId)
           ]);
-          console.log({ models });
           if (models.data.length === 0 && isAuthenticatedConfig(config)) {
             // If there is no table data, we want to default create two rows.
             const response: Http.BulkResponse<B, C> = yield api.request(config.services.bulkCreate, objId, {
@@ -328,11 +323,21 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
     if (isAuthenticatedConfig(config)) {
       yield put(config.actions.saving(true));
       try {
-        const response: Http.ReorderResponse = yield api.request(api.reorderAccount, e.payload.id, {
+        const response: C = yield api.request(api.updateAccount, e.payload.id, {
           order: e.payload.order,
           group: isNil(e.payload.newGroup) ? null : tabling.managers.groupId(e.payload.newGroup)
         });
-        yield put(config.actions.tableChanged({ type: "tableOrderChanged", payload: response.data }));
+        // The Group is not attributed to the Model in a detail response, so if the group
+        // did change we have to use the value from the event payload.
+        yield put(
+          config.actions.tableChanged({
+            type: "modelUpdated",
+            payload: {
+              model: response,
+              group: !isNil(e.payload.newGroup) ? tabling.managers.groupId(e.payload.newGroup) : null
+            }
+          })
+        );
       } catch (err: unknown) {
         notifications.requestError(err as Error, "There was an error moving the row.");
       } finally {

@@ -117,7 +117,7 @@ type CreatePlaceholderRowConfig<R extends Table.RowData> = {
   readonly data?: Partial<R>;
 };
 
-type PlaceholderRowConfig<R extends Table.RowData, M extends Model.TypedHttpModel> = Omit<
+type PlaceholderRowConfig<R extends Table.RowData, M extends Model.RowHttpModel> = Omit<
   BodyRowManagerConfig<"placeholder", R, M>,
   "rowType"
 > & {
@@ -126,7 +126,7 @@ type PlaceholderRowConfig<R extends Table.RowData, M extends Model.TypedHttpMode
 
 export class PlaceholderRowManager<
   R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel
 > extends BodyRowManager<Table.PlaceholderRowId, "placeholder", R, M> {
   public getRowChildren: ((m: M) => number[]) | undefined;
   public defaultData?: Partial<R>;
@@ -146,20 +146,18 @@ export class PlaceholderRowManager<
 
   create(config: CreatePlaceholderRowConfig<R>): Table.PlaceholderRow<R> {
     return {
-      originalIndex: config.originalIndex,
       children: [],
       ...this.createBasic({ id: config.id }, config.data)
     };
   }
 }
 
-type GetRowValue<R extends Table.RowData, M extends Model.TypedHttpModel> = (
+type GetRowValue<R extends Table.RowData, M extends Model.RowHttpModel> = (
   m: M,
   col: Table.Column<R, M>
 ) => R[keyof R] | undefined;
 
-type CreateModelRowFromModelConfig<R extends Table.RowData, M extends Model.TypedHttpModel> = {
-  readonly originalIndex: number;
+type CreateModelRowFromModelConfig<R extends Table.RowData, M extends Model.RowHttpModel> = {
   readonly model: M;
   // Used solely for PDF purposes.
   readonly getRowValue?: GetRowValue<R, M> | undefined;
@@ -168,26 +166,26 @@ type CreateModelRowFromModelConfig<R extends Table.RowData, M extends Model.Type
 type CreateModelRowFromDataConfig<R extends Table.RowData> = {
   readonly id: Table.ModelRowId;
   readonly data: R;
-  readonly originalIndex: number;
+  readonly order: string;
   readonly children: number[];
 };
 
-type CreateModelRowConfig<R extends Table.RowData, M extends Model.TypedHttpModel> =
+type CreateModelRowConfig<R extends Table.RowData, M extends Model.RowHttpModel> =
   | CreateModelRowFromModelConfig<R, M>
   | CreateModelRowFromDataConfig<R>;
 
-const isModelRowConfigWithModel = <R extends Table.RowData, M extends Model.TypedHttpModel>(
+const isModelRowConfigWithModel = <R extends Table.RowData, M extends Model.RowHttpModel>(
   config: CreateModelRowConfig<R, M>
 ): config is CreateModelRowFromModelConfig<R, M> => (config as CreateModelRowFromModelConfig<R, M>).model !== undefined;
 
-type ModelRowManagerConfig<R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
+type ModelRowManagerConfig<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
   readonly columns: Table.Column<R, M>[];
   readonly getRowChildren?: (m: M) => number[];
 };
 
 export class ModelRowManager<
   R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel
 > extends BodyRowManager<Table.ModelRowId, "model", R, M> {
   public getRowChildren: ((m: M) => number[]) | undefined;
 
@@ -212,7 +210,7 @@ export class ModelRowManager<
   create(config: CreateModelRowConfig<R, M>): Table.ModelRow<R> {
     if (isModelRowConfigWithModel(config)) {
       return {
-        originalIndex: config.originalIndex,
+        order: config.model.order,
         children: this.getRowChildren?.(config.model) || [],
         ...this.createBasic(
           {
@@ -225,7 +223,7 @@ export class ModelRowManager<
       };
     }
     return {
-      originalIndex: config.originalIndex,
+      order: config.order,
       children: config.children,
       ...this.createBasic({
         ...config,
@@ -255,13 +253,13 @@ const isMarkupRowConfigWithModel = <R extends Table.RowData>(
   config: CreateMarkupRowConfig<R>
 ): config is CreateMarkupRowFromModelConfig => (config as CreateMarkupRowFromModelConfig).model !== undefined;
 
-type MarkupRowManagerConfig<R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
+type MarkupRowManagerConfig<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
   readonly columns: Table.Column<R, M>[];
 };
 
 export class MarkupRowManager<
   R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel
 > extends BodyRowManager<Table.MarkupRowId, "markup", R, M> {
   constructor(config: MarkupRowManagerConfig<R, M>) {
     super({ ...config, rowType: "markup" });
@@ -335,13 +333,13 @@ const isGroupRowConfigWithModel = <R extends Table.RowData>(
   config: CreateGroupRowConfig<R>
 ): config is CreateGroupRowFromModelConfig => (config as CreateGroupRowFromModelConfig).model !== undefined;
 
-type GroupRowManagerConfig<R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
+type GroupRowManagerConfig<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
   readonly columns: Table.Column<R, M>[];
 };
 
 export class GroupRowManager<
   R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel
 > extends BodyRowManager<Table.GroupRowId, "group", R, M> {
   constructor(config: GroupRowManagerConfig<R, M>) {
     super({ ...config, rowType: "group" });

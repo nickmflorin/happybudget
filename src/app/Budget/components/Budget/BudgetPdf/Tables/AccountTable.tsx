@@ -58,7 +58,7 @@ const AccountTable = ({
     });
     return accountRowManager.create({
       model: account,
-      originalIndex: 0 // Irrelevant for PDF rows since they are not dynamic.
+      order: "0" // Irrelevant for PDF rows since they are not dynamic.
     });
   }, [account, columns]);
 
@@ -69,7 +69,7 @@ const AccountTable = ({
     const createSubAccountFooterRow = (subaccount: M): Table.ModelRow<R> => {
       return subAccountRowManager.create({
         model: subaccount,
-        originalIndex: 0, // Irrelevant for PDF rows since they are not dynamic.
+        order: "0", // Irrelevant for PDF rows since they are not dynamic.
         getRowValue: (m: Model.PdfSubAccount, c: Table.PdfColumn<R, M>) => {
           if (!isNil(c.pdfChildFooter) && !isNil(c.pdfChildFooter(m).value)) {
             return c.pdfChildFooter(m).value;

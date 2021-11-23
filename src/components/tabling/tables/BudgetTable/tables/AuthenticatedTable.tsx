@@ -13,7 +13,7 @@ import { Framework } from "../framework";
 
 export type AuthenticatedBudgetTableProps<
   R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel
 > = Omit<AuthenticatedTableProps<R, M>, "children"> & {
   readonly onBack?: () => void;
   // Markup is currently not applicable for Templates.
@@ -22,10 +22,7 @@ export type AuthenticatedBudgetTableProps<
 };
 
 /* eslint-disable indent */
-const AuthenticatedBudgetTable = <
-  R extends Tables.BudgetRowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel
->({
+const AuthenticatedBudgetTable = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
   onEditMarkup,
   onEditGroup,
   ...props

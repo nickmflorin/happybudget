@@ -122,13 +122,10 @@ namespace Table {
 
   type FooterRow<Grid extends FooterGridId = FooterGridId> = IRow<FooterRowId, "footer", Grid>;
   type ModelRow<R extends RowData> = IBodyRow<ModelRowId, "model", R> & {
-    // The index (location) of the model in the original set of models returned from the backend,
-    // before grouping is applied.
-    readonly originalIndex: number;
     readonly children: number[];
+    readonly order: string;
   };
   type PlaceholderRow<R extends RowData> = IBodyRow<PlaceholderRowId, "placeholder", R> & {
-    readonly originalIndex: number;
     readonly children: [];
   };
   type GroupRow<R extends RowData> = IBodyRow<GroupRowId, "group", R> & {
@@ -157,7 +154,7 @@ namespace Table {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type RowWithIdentifier<D extends RowData = RowData> = BodyRow<D & { identifier: string | null }>;
 
-  type CreateTableDataConfig<R extends RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
+  type CreateTableDataConfig<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly response: Http.TableResponse<M>;
     readonly columns: Column<R, M>[];
     readonly getModelRowChildren?: (m: M) => number[];
@@ -476,7 +473,6 @@ namespace Table {
     | "modelUpdated"
     | "rowAdd"
     | "rowPositionChanged"
-    | "tableOrderChanged"
     | "rowDelete"
     | "rowRemoveFromGroup"
     | "rowAddToGroup"
@@ -543,11 +539,6 @@ namespace Table {
     readonly payload: RowPositionChangedPayload;
   };
 
-  type TableOrderChangedEvent = {
-    readonly type: "tableOrderChanged";
-    readonly payload: number[];
-  };
-
   type RowDeletePayload = {
     readonly rows: SingleOrArray<ModelRowId | MarkupRowId | GroupRowId | PlaceholderRowId>;
   };
@@ -604,9 +595,14 @@ namespace Table {
     readonly payload: MarkupAddedPayload;
   };
 
+  type ModelUpdatedPayload<M extends Model.HttpModel = Model.HttpModel> = {
+    readonly model: M;
+    readonly group?: number | null;
+  }
+
   type ModelUpdatedEvent<M extends Model.HttpModel = Model.HttpModel> = {
     readonly type: "modelUpdated";
-    readonly payload: M;
+    readonly payload: SingleOrArray<ModelUpdatedPayload<M>>;
   };
 
   type GroupUpdatedEvent = {
@@ -630,7 +626,6 @@ namespace Table {
     | RowAddEvent<R>
     | RowDeleteEvent
     | RowPositionChangedEvent
-    | TableOrderChangedEvent
     | RowRemoveFromGroupEvent
     | RowAddToGroupEvent
     | GroupAddedEvent
@@ -752,7 +747,7 @@ namespace Table {
 
   type TaskConfig<
     R extends RowData,
-    M extends Model.TypedHttpModel = Model.TypedHttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
   > = Redux.TaskConfig<A> & {
     readonly columns: Column<R, M>[];
@@ -761,7 +756,7 @@ namespace Table {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ReducerConfig<
     R extends RowData,
-    M extends Model.TypedHttpModel = Model.TypedHttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>,
     CFG extends CreateTableDataConfig<R, M> = CreateTableDataConfig<R, M>
@@ -777,14 +772,14 @@ namespace Table {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type SagaConfig<
     R extends RowData,
-    M extends Model.TypedHttpModel = Model.TypedHttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
   > = Redux.SagaConfig<Redux.TableTaskMap<R>, A>;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type StoreConfig<
     R extends RowData,
-    M extends Model.TypedHttpModel = Model.TypedHttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
   > = {

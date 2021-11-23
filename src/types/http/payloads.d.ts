@@ -102,17 +102,6 @@ namespace Http {
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  interface ReorderPayload {
-    readonly order: number;
-  }
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  interface ReorderWithGroupPayload {
-    readonly order: number;
-    readonly group: number | null;
-  }
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface AccountPayload extends ModelPayload<Model.Account> {
     readonly group?: number | null;
   }

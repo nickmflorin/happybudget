@@ -27,8 +27,9 @@ namespace Model {
     readonly id: number;
   }
 
-  interface TypedHttpModel<T extends HttpModelType = HttpModelType> extends HttpModel {
+  interface RowHttpModel<T extends HttpModelType = HttpModelType> extends HttpModel {
     readonly type: T;
+    readonly order: string;
   }
 
   interface TimestampTrackedModel extends HttpModel {
@@ -157,6 +158,7 @@ namespace Model {
     readonly cutoff: number | null;
     readonly rate: number | null;
     readonly unit: FringeUnit | null;
+    readonly order: string;
   }
 
   interface SimpleMarkup {
@@ -222,7 +224,7 @@ namespace Model {
     readonly accumulated_markup_contribution: number;
   }
 
-  interface PdfBudget extends TypedHttpModel<"pdf-budget"> {
+  interface PdfBudget extends RowHttpModel<"pdf-budget"> {
     readonly name: string;
     readonly nominal_value: number;
     readonly actual: number;

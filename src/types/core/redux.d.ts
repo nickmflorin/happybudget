@@ -211,12 +211,12 @@ namespace Redux {
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type TableTaskMap<R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
+  type TableTaskMap<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly request: Task<null>;
     readonly handleChangeEvent: TableEventTask<Table.ChangeEvent<R, M>>;
   };
 
-  type TableActionMap<M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
+  type TableActionMap<M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly loading: boolean;
     readonly response: Http.TableResponse<M>;
     readonly request?: TableRequestPayload;
@@ -227,12 +227,11 @@ namespace Redux {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type AuthenticatedTableActionMap<
     R extends Table.RowData = object,
-    M extends Model.TypedHttpModel = Model.TypedHttpModel
+    M extends Model.RowHttpModel = Model.RowHttpModel
   > = TableActionMap<M> & {
     readonly tableChanged: Table.ChangeEvent<R, M>;
     readonly saving: boolean;
     readonly addModelsToState: AddModelsToTablePayload<M>;
-    readonly updateModelsInState?: UpdateModelsInTablePayload<M>;
     readonly updateRowsInState?: UpdateRowsInTablePayload<R>;
   };
 
@@ -249,9 +248,6 @@ namespace Redux {
     readonly placeholderIds: Table.PlaceholderRowId[];
     readonly models: M[];
   };
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type UpdateModelsInTablePayload<M extends Model.HttpModel> = SingleOrArray<M>;
 
   type UpdateRowPayload<R extends Table.RowData> = {
     readonly data: Partial<R>;

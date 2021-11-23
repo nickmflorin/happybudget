@@ -22,9 +22,6 @@ export const responseAction = createAction<Http.TableResponse<Model.SubAccount>>
 export const addModelsToStateAction = createAction<Redux.AddModelsToTablePayload<Model.SubAccount>>(
   ActionType.SubAccount.SubAccounts.AddToState
 );
-export const updateModelsInStateAction = createAction<Redux.UpdateModelsInTablePayload<Model.SubAccount>>(
-  ActionType.SubAccount.SubAccounts.UpdateInState
-);
 export const updateRowsInStateAction = createAction<Redux.UpdateRowsInTablePayload<Tables.SubAccountRowData>>(
   ActionType.SubAccount.SubAccounts.UpdateRowsInState
 );

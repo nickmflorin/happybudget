@@ -18,9 +18,6 @@ export const updateAccount = services.detailPatchService<Http.AccountPayload, Mo
   "accounts",
   id
 ]);
-export const reorderAccount = services.detailPatchService<Http.ReorderWithGroupPayload, Http.ReorderResponse>(
-  (id: number) => ["accounts", id, "reorder"]
-);
 export const createAccountSubAccount = services.detailPostService<Http.SubAccountPayload, Model.SubAccount>(
   (id: number) => ["accounts", id, "subaccounts"]
 );

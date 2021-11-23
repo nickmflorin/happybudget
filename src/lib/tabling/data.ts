@@ -1,68 +1,62 @@
-import { includes, reduce, filter, map, isNil, findIndex, orderBy } from "lodash";
+import { includes, reduce, filter, isNil, findIndex, orderBy } from "lodash";
 
 import { tabling } from "lib";
 
-type InjectMarkupsAndGroupsConfig<
-  R extends Table.RowData,
-  M extends Model.TypedHttpModel,
-  A extends Table.DataRow<R> | M = M,
-  B extends Model.Markup | Table.MarkupRow<R> = Model.Markup,
-  C extends Model.Group | Table.GroupRow<R> = Model.Group
-> = {
-  readonly current: A[];
-  readonly markups?: B[];
-  readonly groups?: C[];
+type InjectMarkupsAndGroupsConfig<R extends Table.RowData> = {
+  readonly current: Table.DataRow<R>[];
+  readonly markups?: Table.MarkupRow<R>[];
+  readonly groups?: Table.GroupRow<R>[];
 };
 
 /* eslint-disable indent */
-export const injectMarkupsAndGroups = <
-  R extends Table.RowData,
-  M extends Model.TypedHttpModel,
-  A extends Table.DataRow<R> | M = M,
-  B extends Model.Markup | Table.MarkupRow<R> = Model.Markup,
-  C extends Model.Group | Table.GroupRow<R> = Model.Group
->(
-  config: InjectMarkupsAndGroupsConfig<R, M, A, B, C>
-): (A | B | C)[] => {
-  let modelsWithoutGroups: A[] = [];
+export const injectMarkupsAndGroups = <R extends Table.RowData>(
+  config: InjectMarkupsAndGroupsConfig<R>
+): (Table.DataRow<R> | Table.MarkupRow<R> | Table.GroupRow<R>)[] => {
+  let modelsWithoutGroups: Table.ModelRow<R>[] = [];
 
-  const groupId = (obj: C) => (tabling.typeguards.isRow(obj) ? tabling.managers.groupId(obj.id) : obj.id);
-
-  const modelGroup = (obj: A): C | null => {
-    const groupsForModel: C[] | undefined = filter(config.groups, (g: C) => includes(g.children, obj.id));
+  const modelGroup = (obj: Table.ModelRow<R>): Table.GroupRow<R> | null => {
+    const groupsForModel: Table.GroupRow<R>[] | undefined = filter(config.groups, (g: Table.GroupRow<R>) =>
+      includes(g.children, obj.id)
+    );
     if (groupsForModel.length > 1) {
       console.error(`Corrupted Data: Model ${obj.id} is associated with multiple groups!`);
     }
     return groupsForModel.length === 0 ? null : groupsForModel[0];
   };
 
-  const modelIndex = (obj: A): number =>
-    tabling.typeguards.isRow(obj)
-      ? obj.originalIndex
-      : Math.max(
-          findIndex(config.current, (mi: A) => mi.id === obj.id),
-          0
-        );
+  type ModelsAndGroup = { models: Table.ModelRow<R>[]; group: Table.GroupRow<R> };
 
-  type ModelsAndGroup = { models: A[]; group: C };
-  console.log(config.current);
+  // Placeholders do not have an inherent ordering from the backend, yet...
+  // They will not have this ordering until the response is received from the
+  // backend, so we need to collect them during the ordering process and put
+  // them at the end of the orders rows.
+  let placeholders: Table.PlaceholderRow<R>[] = [];
+
   const grouped = reduce(
     config.current,
-    (curr: ModelsAndGroup[], m: A): ModelsAndGroup[] => {
-      const group = modelGroup(m);
-      if (!isNil(group)) {
-        const index = findIndex(curr, (mg: ModelsAndGroup) => groupId(mg.group) === groupId(group));
-        if (index === -1) {
-          return [...curr, { models: [m], group }];
+    (curr: ModelsAndGroup[], m: Table.DataRow<R>): ModelsAndGroup[] => {
+      if (tabling.typeguards.isModelRow(m)) {
+        const group = modelGroup(m);
+        if (!isNil(group)) {
+          const index = findIndex(
+            curr,
+            (mg: ModelsAndGroup) => tabling.managers.groupId(mg.group.id) === tabling.managers.groupId(group.id)
+          );
+          if (index === -1) {
+            return [...curr, { models: [m], group }];
+          } else {
+            return [
+              ...curr.slice(0, index),
+              { ...curr[index], models: orderBy([...curr[index].models, m], "order") },
+              ...curr.slice(index + 1)
+            ];
+          }
         } else {
-          return [
-            ...curr.slice(0, index),
-            { ...curr[index], models: orderBy([...curr[index].models, m], modelIndex) },
-            ...curr.slice(index + 1)
-          ];
+          modelsWithoutGroups = [...modelsWithoutGroups, m];
+          return curr;
         }
       } else {
-        modelsWithoutGroups = [...modelsWithoutGroups, m];
+        placeholders = [...placeholders, m];
         return curr;
       }
     },
@@ -73,32 +67,31 @@ export const injectMarkupsAndGroups = <
     ...reduce(
       // We want to order the groups by the model in it's set that occurs earliest in
       // the original data.
-      orderBy(grouped, (mg: ModelsAndGroup) => Math.min(...map(mg.models, (m: A) => modelIndex(m)))),
-      (curr: (A | C)[], mg: ModelsAndGroup) => {
+      orderBy(grouped, (mg: ModelsAndGroup) => mg.models[0].order),
+      (curr: (Table.ModelRow<R> | Table.GroupRow<R>)[], mg: ModelsAndGroup) => {
         return [...curr, ...mg.models, mg.group];
       },
       []
     ),
-    ...orderBy(modelsWithoutGroups, modelIndex),
+    ...orderBy(modelsWithoutGroups, "order"),
+    ...placeholders,
     ...(config.markups || [])
   ];
 };
 
-export const orderTableRows = <R extends Table.RowData, M extends Model.TypedHttpModel>(
-  data: Table.BodyRow<R>[]
-): Table.BodyRow<R>[] => {
+export const orderTableRows = <R extends Table.RowData>(data: Table.BodyRow<R>[]): Table.BodyRow<R>[] => {
   // The order of the actual data rows of the table dictate the order of everything else.
   const dataRows = filter(data, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[];
   const markupRows = filter(data, (r: Table.BodyRow<R>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[];
   const groupRows = filter(data, (r: Table.BodyRow<R>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[];
-  return injectMarkupsAndGroups<R, M, Table.DataRow<R>, Table.MarkupRow<R>, Table.GroupRow<R>>({
+  return injectMarkupsAndGroups<R>({
     groups: groupRows,
     current: dataRows,
     markups: markupRows
   });
 };
 
-export const createTableRows = <R extends Table.RowData, M extends Model.TypedHttpModel>(
+export const createTableRows = <R extends Table.RowData, M extends Model.RowHttpModel>(
   config: Table.CreateTableDataConfig<R, M>
 ): Table.BodyRow<R>[] => {
   const modelRowManager = new tabling.managers.ModelRowManager<R, M>({
@@ -108,17 +101,10 @@ export const createTableRows = <R extends Table.RowData, M extends Model.TypedHt
   const groupRowManager = new tabling.managers.GroupRowManager<R, M>({ columns: config.columns });
   const markupRowManager = new tabling.managers.MarkupRowManager<R, M>({ columns: config.columns });
 
-  /* @ts-ignore */
-  console.log(map(config.response.models, (m: M) => m.identifier));
-  console.log(config.response.groups);
-
   return orderTableRows([
     ...reduce(
       config.response.models,
-      (curr: Table.ModelRow<R>[], m: M, index: number) => [
-        ...curr,
-        modelRowManager.create({ originalIndex: index, model: m })
-      ],
+      (curr: Table.ModelRow<R>[], m: M, index: number) => [...curr, modelRowManager.create({ model: m })],
       []
     ),
     ...reduce(

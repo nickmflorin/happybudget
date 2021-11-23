@@ -20,7 +20,7 @@ namespace Http {
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type TableResponse<M extends Model.TypedHttpModel = Model.TypedHttpModel> = {
+  type TableResponse<M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly models: M[];
     readonly groups?: Model.Group[];
     readonly markups?: Model.Markup[];

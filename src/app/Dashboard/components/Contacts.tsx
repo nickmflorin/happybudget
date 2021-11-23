@@ -137,7 +137,7 @@ const Contacts = (): JSX.Element => {
             setContactToEdit(undefined);
             table.current.applyTableChange({
               type: "modelUpdated",
-              payload: m
+              payload: { model: m }
             });
           }}
           open={true}

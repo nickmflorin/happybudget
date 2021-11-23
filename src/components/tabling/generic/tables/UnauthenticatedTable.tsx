@@ -19,12 +19,12 @@ import TableWrapper from "./TableWrapper";
 
 export type UnauthenticatedTableDataGridProps<
   R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel
 > = UnauthenticateDataGridProps<R, M> & DataGridProps<R, M> & Omit<UnauthenticatedGridProps<R, M>, "id">;
 
 export type UnauthenticatedTableProps<
   R extends Table.RowData,
-  M extends Model.TypedHttpModel = Model.TypedHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel
 > = TableConfigurationProps<R, M> & {
   readonly table?: NonNullRef<Table.TableInstance<R, M>>;
   readonly actions?: Table.UnauthenticatedMenuActions<R, M>;
@@ -40,7 +40,7 @@ const TableFooterGrid = FooterGrid<any, any, UnauthenticatedGridProps<any>>({
   rowClass: "row--table-footer",
   getFooterColumn: (col: Table.Column<any, any, any>) => col.footer || null
 })(UnauthenticatedGrid) as {
-  <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
+  <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
     props: Omit<UnauthenticatedGridProps<R, M>, "id">
   ): JSX.Element;
 };
@@ -52,13 +52,13 @@ const PageFooterGrid = FooterGrid<any, any, UnauthenticatedGridProps<any>>({
   rowHeight: 28,
   getFooterColumn: (col: Table.Column<any, any, any>) => col.page || null
 })(UnauthenticatedGrid) as {
-  <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
+  <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
     props: Omit<UnauthenticatedGridProps<R, M>, "id" | "grid">
   ): JSX.Element;
 };
 
 /* eslint-disable indent */
-const UnauthenticatedTable = <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
+const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: WithUnauthenticatedDataGridProps<
     R,
     WithConnectedTableProps<WithConfiguredTableProps<UnauthenticatedTableProps<R, M>, R>, R>
@@ -226,7 +226,7 @@ type Props = WithUnauthenticatedDataGridProps<
 >;
 
 export default configureTable<any, any, Props>(UnauthenticatedTable) as {
-  <R extends Table.RowData, M extends Model.TypedHttpModel = Model.TypedHttpModel>(
+  <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
     props: UnauthenticatedTableProps<R, M>
   ): JSX.Element;
 };

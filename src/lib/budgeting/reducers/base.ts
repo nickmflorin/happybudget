@@ -74,7 +74,7 @@ export const createBudgetTableChangeEventReducer = <
       // MarkupRow(s) are in the appropriate location.
       return {
         ...newState,
-        data: tabling.data.orderTableRows<R, M>([...newState.data, markupRow])
+        data: tabling.data.orderTableRows<R>([...newState.data, markupRow])
       };
     } else if (tabling.typeguards.isMarkupUpdatedEvent(e)) {
       /*
@@ -147,7 +147,7 @@ export const createBudgetTableChangeEventReducer = <
       if (!isNil(mk)) {
         return {
           ...newState,
-          data: tabling.data.orderTableRows<R, M>(
+          data: tabling.data.orderTableRows<R>(
             util.replaceInArray<Table.BodyRow<R>>(
               newState.data,
               { id: mk.id },
