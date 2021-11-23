@@ -230,76 +230,76 @@ export const createTableChangeEventReducer = <
       );
     } else if (typeguards.isModelUpdatedEvent(e)) {
       const payloads: Table.ModelUpdatedPayload<M>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
-      return reduce(
-        payloads,
-        (st: S, payload: Table.ModelUpdatedPayload<M>) => {
-          const modelRow: Table.ModelRow<R> | null = redux.reducers.modelFromState<Table.ModelRow<R>>(
-            action,
-            filter(st.data, (ri: Table.BodyRow<R>) => typeguards.isModelRow(ri)) as Table.ModelRow<R>[],
-            payload.model.id
-          );
-          if (!isNil(modelRow)) {
-            /*
-            We do not want to reorder the rows unless we absolutely need to.  The `ordering` param
-            is solely required for future events that require reordering the table (like group
-            related events).  If just the ordering was updated for the model, or another non-group
-            field was updated on the model, then we do not need to reorder the rows - as the ordering
-            will already be consistent with the backend ordering.
+      /*
+      Note: Even though the rows are already reordered via AG Grid, if we do not apply the
+      reordering redundantly to the state, the rows will revert back to their previous
+      ordering when the model is updated in the state.
 
-            However, if the group changed, due to ordering or not due to ordering, then we do need to
-            reorder the rows.  If we reorder the rows, then the rows need to have the updated values
-            of the `order` attribute that might be included as a part of the updated model in this event
-            payload - so, updating the ModelRow needs to be done before any manipulations of row order.
-            */
-            st = {
-              ...st,
-              data: util.replaceInArray<Table.BodyRow<R>>(
-                st.data,
-                { id: modelRow.id },
-                modelRowManager.create({
-                  model: payload.model
-                })
-              )
-            };
-            // If the `group` on the event payload is undefined, it means there was no change to the
-            // model's group.  A `null` group means that the group was removed.
-            if (payload.group !== undefined) {
-              let previousGroupRow: Table.GroupRow<R> | null = rowGroupRowFromState<R, S>(
-                action,
-                st,
-                payload.model.id,
-                { warnIfMissing: false }
-              );
-              let newGroupRow: Table.GroupRow<R> | null = null;
-              if (payload.group !== null) {
-                newGroupRow = groupRowFromState<R, S>(action, st, managers.groupRowId(payload.group));
-              }
-              let previousGroupRowId = !isNil(previousGroupRow) ? previousGroupRow.id : null;
-              let newGroupRowId = !isNil(newGroupRow) ? newGroupRow.id : null;
-              // Make sure the Group actually changed before proceeding.
-              if (previousGroupRowId !== newGroupRowId) {
-                // In this case, the ModelRow's associated GroupRow was removed.
-                if (!isNil(previousGroupRow) && isNil(newGroupRow)) {
-                  // Apply the reordering here, since the model already has it's `order` parameter
-                  // updated.
-                  st = reorderRows({
-                    ...st,
-                    data: util.replaceInArray<Table.BodyRow<R>>(
-                      st.data,
-                      { id: previousGroupRow.id },
-                      groupRowManager.removeChildren(previousGroupRow, [modelRow.id])
-                    )
-                  });
-                  // In this case, the ModelRow's associated GroupRow was either added or changed.
-                } else if (!isNil(newGroupRow)) {
-                  st = reorderRows(updateRowGroup(st, action, [modelRow.id], newGroupRow.id));
+      The ordering is applied in AG Grid and subsequently, after the API request succeeds,
+      here, because it provides a much smoother experience to do it immediately via AG Grid
+      and then do it in the background here.  However, even though it is in the background
+      here, we need to keep the state ordering consistent.
+      */
+      return reorderRows(
+        reduce(
+          payloads,
+          (st: S, payload: Table.ModelUpdatedPayload<M>) => {
+            const modelRow: Table.ModelRow<R> | null = redux.reducers.modelFromState<Table.ModelRow<R>>(
+              action,
+              filter(st.data, (ri: Table.BodyRow<R>) => typeguards.isModelRow(ri)) as Table.ModelRow<R>[],
+              payload.model.id
+            );
+            if (!isNil(modelRow)) {
+              st = {
+                ...st,
+                data: util.replaceInArray<Table.BodyRow<R>>(
+                  st.data,
+                  { id: modelRow.id },
+                  modelRowManager.create({
+                    model: payload.model
+                  })
+                )
+              };
+              // If the `group` on the event payload is undefined, it means there was no change to the
+              // model's group.  A `null` group means that the group was removed.
+              if (payload.group !== undefined) {
+                let previousGroupRow: Table.GroupRow<R> | null = rowGroupRowFromState<R, S>(
+                  action,
+                  st,
+                  payload.model.id,
+                  { warnIfMissing: false }
+                );
+                let newGroupRow: Table.GroupRow<R> | null = null;
+                if (payload.group !== null) {
+                  newGroupRow = groupRowFromState<R, S>(action, st, managers.groupRowId(payload.group));
+                }
+                let previousGroupRowId = !isNil(previousGroupRow) ? previousGroupRow.id : null;
+                let newGroupRowId = !isNil(newGroupRow) ? newGroupRow.id : null;
+                // Make sure the Group actually changed before proceeding.
+                if (previousGroupRowId !== newGroupRowId) {
+                  // In this case, the ModelRow's associated GroupRow was removed.
+                  if (!isNil(previousGroupRow) && isNil(newGroupRow)) {
+                    // Apply the reordering here, since the model already has it's `order` parameter
+                    // updated.
+                    st = reorderRows({
+                      ...st,
+                      data: util.replaceInArray<Table.BodyRow<R>>(
+                        st.data,
+                        { id: previousGroupRow.id },
+                        groupRowManager.removeChildren(previousGroupRow, [modelRow.id])
+                      )
+                    });
+                    // In this case, the ModelRow's associated GroupRow was either added or changed.
+                  } else if (!isNil(newGroupRow)) {
+                    st = reorderRows(updateRowGroup(st, action, [modelRow.id], newGroupRow.id));
+                  }
                 }
               }
             }
-          }
-          return st;
-        },
-        state
+            return st;
+          },
+          state
+        )
       );
     } else if (typeguards.isRowAddEvent(e)) {
       const payload: Table.RowAdd<R>[] = Array.isArray(e.payload) ? e.payload : [e.payload];

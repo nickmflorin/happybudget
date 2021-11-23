@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, useImperativeHandle } from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
-import { map, isNil, includes, find, filter, flatten, reduce, uniq, isEqual } from "lodash";
+import { map, isNil, includes, find, filter, flatten, reduce, uniq, isEqual, indexOf } from "lodash";
 
 import {
   CellKeyDownEvent,
@@ -45,6 +45,7 @@ interface InjectedAuthenticatedDataGridProps<R extends Table.RowData> {
   readonly tabToNextCell: (params: TabToNextCellParams) => Table.CellPosition;
   readonly onRangeSelectionChanged: (e: RangeSelectionChangedEvent) => void;
   readonly onRowDragEnd: (event: RowDragEvent) => void;
+  readonly onRowDragMove: (event: RowDragEvent) => void;
 }
 
 export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
@@ -597,6 +598,31 @@ const authenticateDataGrid =
         }
       });
 
+      const onRowDragMove = hooks.useDynamicCallback((e: RowDragEvent) => {
+        const rowIndex = (arr: Table.BodyRow<R>[], row: Table.BodyRow<R>) => {
+          return indexOf(
+            map(arr, (r: Table.BodyRow<R>) => r.id),
+            row.id
+          );
+        };
+
+        const moveInArray = (arr: Table.BodyRow<R>[], row: Table.ModelRow<R>, index: number) => {
+          const removed = filter(arr.slice(), (r: Table.BodyRow<R>) => r.id !== row.id);
+          return [...removed.slice(0, index), row, ...removed.slice(index)];
+        };
+        const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api);
+        if (!isNil(e.overNode)) {
+          const overRow: Table.BodyRow<R> = e.overNode.data;
+          const movingRow: Table.ModelRow<R> = e.node.data;
+          if (tabling.typeguards.isModelRow(overRow) || tabling.typeguards.isGroupRow(overRow)) {
+            const toIndex = rowIndex(rows, overRow);
+            const store: Table.BodyRow<R>[] = moveInArray(rows, movingRow, toIndex);
+            e.api.setRowData(store);
+            e.api.clearFocusedCell();
+          }
+        }
+      });
+
       useImperativeHandle(props.grid, () => ({
         getCSVData
       }));
@@ -636,6 +662,7 @@ const authenticateDataGrid =
           fillOperation={fillOperation}
           getContextMenuItems={getContextMenuItems}
           onRowDragEnd={onRowDragEnd}
+          onRowDragMove={onRowDragMove}
         />
       );
     }
