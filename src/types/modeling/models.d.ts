@@ -224,17 +224,6 @@ namespace Model {
     readonly description: string | null;
   }
 
-  interface SubAccountOwnerTreeNode extends SimpleSubAccount {
-    readonly children: OwnerTreeNode[];
-    readonly in_search_path: boolean;
-  }
-
-  interface MarkupOwnerTreeNode extends SimpleMarkup {
-    readonly in_search_path: boolean;
-  }
-
-  type OwnerTreeNode = SubAccountOwnerTreeNode | MarkupOwnerTreeNode;
-
   // Abstract -- not meant for external reference.
   interface AbstractAccount extends Omit<SimpleAccount, "type">, LineMetrics {}
 
@@ -278,6 +267,9 @@ namespace Model {
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type ActualOwner = SimpleMarkup | SimpleSubAccount;
+
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface Actual extends RowHttpModel<"actual"> {
     readonly contact: number | null;
     readonly name: string | null;
@@ -288,7 +280,7 @@ namespace Model {
     readonly value: number | null;
     readonly actual_type: Tag | null;
     readonly attachments: SimpleAttachment[];
-    readonly owner: SimpleSubAccount | SimpleMarkup | null;
+    readonly owner: ActualOwner | null;
   }
 
   interface ContactNamesAndImage {

@@ -96,10 +96,7 @@ const PrivateMenuItem = <M extends MenuItemModel>(props: IMenuItem<M> & { readon
       isExtra={false}
       style={{
         ...props.style,
-        ...(!isNil(props.levelIndent) && !isNil(props.level)
-          ? { paddingLeft: 10 + props.levelIndent * props.level }
-          : { paddingLeft: 10 }),
-        borderTop: props.level === 0 && props.bordersForLevels === true ? "1px solid #EFEFEF" : "none",
+        ...(!isNil(props.level) ? { paddingLeft: 10 + 6 * props.level } : { paddingLeft: 10 }),
         paddingTop: props.level === 0 ? 4 : 2,
         paddingBottom: props.level === 0 ? 4 : 2,
         height: props.level === 0 ? "32px" : "28px"

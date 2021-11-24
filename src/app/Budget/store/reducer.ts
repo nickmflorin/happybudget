@@ -160,15 +160,15 @@ const genericReducer = combineReducers({
       updateRowsInState: actions.actuals.updateRowsInStateAction
     },
     columns: ActualColumns,
-    ownerTree: redux.reducers.createAuthenticatedModelListResponseReducer<
-      Model.OwnerTreeNode,
-      Pick<Redux.AuthenticatedModelListResponseActionMap<Model.OwnerTreeNode>, "loading" | "response" | "setSearch">
+    owners: redux.reducers.createAuthenticatedModelListResponseReducer<
+      Model.ActualOwner,
+      Pick<Redux.AuthenticatedModelListResponseActionMap<Model.ActualOwner>, "loading" | "response" | "setSearch">
     >({
       initialState: redux.initialState.initialAuthenticatedModelListResponseState,
       actions: {
-        loading: actions.actuals.loadingOwnerTreeAction,
-        response: actions.actuals.responseOwnerTreeAction,
-        setSearch: actions.actuals.setOwnerTreeSearchAction
+        loading: actions.actuals.loadingActualOwnersAction,
+        response: actions.actuals.responseActualOwnersAction,
+        setSearch: actions.actuals.setActualOwnersSearchAction
       }
     })
   }),

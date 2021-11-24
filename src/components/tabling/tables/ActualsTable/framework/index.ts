@@ -4,12 +4,12 @@ import * as editors from "./editors";
 const FrameworkComponents: Table.Framework = {
   editors: {
     ActualTypeEditor: editors.ActualTypeEditor,
-    OwnerTreeEditor: editors.OwnerTreeEditor
+    ActualOwnerEditor: editors.ActualOwnerEditor
   },
   cells: {
     data: {
       ActualTypeCell: cells.ActualTypeCell,
-      OwnerCell: cells.OwnerCell
+      ActualOwnerCell: cells.ActualOwnerCell
     }
   }
 };

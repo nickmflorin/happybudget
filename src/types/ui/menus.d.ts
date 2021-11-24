@@ -53,8 +53,6 @@ interface IMenuItem<M extends MenuItemModel> extends StandardComponentProps, ICo
   readonly level: number;
   readonly selected: boolean;
   readonly checkbox?: boolean;
-  readonly levelIndent?: number;
-  readonly bordersForLevels?: boolean;
   readonly getLabel?: (m: M) => string;
   readonly renderContent?: (model: M, context: { level: number }) => JSX.Element;
 }
@@ -68,7 +66,6 @@ type IMenu<M extends MenuItemModel> = StandardComponentProps & {
   readonly mode?: MenuMode;
   readonly defaultSelected?: ID[] | ID;
   readonly itemProps?: StandardComponentProps;
-  readonly levelIndent?: number;
   readonly loading?: boolean;
   readonly search?: string;
   readonly includeSearch?: boolean;
@@ -78,13 +75,11 @@ type IMenu<M extends MenuItemModel> = StandardComponentProps & {
   readonly buttons?: IMenuButton<M>[];
   readonly searchIndices?: SearchIndicies | undefined;
   readonly extra?: ExtraMenuItemModel[];
-  readonly bordersForLevels?: boolean;
   readonly keepDropdownOpenOnClick?: boolean;
   readonly getModelIdentifier?: (m: M) => ID;
   readonly getLabel?: (m: M) => string;
   readonly onChange?: (params: MenuChangeEvent<M>) => void;
   readonly onSearch?: (value: string) => void;
-  readonly getFirstSearchResult?: (models: M[]) => ID | null;
   readonly onFocusCallback?: (focused: boolean) => void;
   readonly renderItemContent?: (model: M, context: { level: number }) => JSX.Element;
   readonly closeParentDropdown?: () => void;

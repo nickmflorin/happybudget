@@ -4,14 +4,14 @@ import { isNil } from "lodash";
 import { Cell } from "components/tabling/generic/framework/cells";
 import { Tag } from "components/tagging";
 
-type OwnerCellProps = Table.CellProps<
+type ActualOwnerCellProps = Table.CellProps<
   Tables.ActualRowData,
   Model.Actual,
   Tables.ActualTableStore,
   Model.SimpleAccount | Model.SimpleSubAccount | null
 >;
 
-const OwnerCell = ({ value, ...props }: OwnerCellProps): JSX.Element => {
+const ActualOwnerCell = ({ value, ...props }: ActualOwnerCellProps): JSX.Element => {
   return (
     <Cell {...props}>
       {!isNil(value) && <Tag className={"tag--account"} text={value.description || value.identifier} />}
@@ -19,4 +19,4 @@ const OwnerCell = ({ value, ...props }: OwnerCellProps): JSX.Element => {
   );
 };
 
-export default React.memo(OwnerCell);
+export default React.memo(ActualOwnerCell);

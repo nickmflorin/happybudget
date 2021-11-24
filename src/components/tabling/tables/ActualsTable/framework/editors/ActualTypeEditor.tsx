@@ -11,7 +11,7 @@ const ActualTypeEditor = (
   >,
   ref: any
 ) => {
-  const types = useSelector((state: Application.Store) => props.selector(state).actualTypes);
+  const types = useSelector((state: Application.Store) => props.selector(state).types);
   return (
     <ModelSelectEditor<Model.Tag, Tables.ActualRowData, Model.Actual, Tables.ActualTableStore>
       style={{ maxHeight: 300 }}

@@ -15,15 +15,15 @@ const ActionMap: Redux.ActionMapObject<budgeting.tasks.actuals.ActualsTableActio
   saving: actions.savingTableAction,
   addModelsToState: actions.addModelsToStateAction,
   setSearch: actions.setSearchAction,
-  responseOwnerTree: actions.responseOwnerTreeAction,
-  loadingOwnerTree: actions.loadingOwnerTreeAction,
+  responseActualOwners: actions.responseActualOwnersAction,
+  loadingActualOwners: actions.loadingActualOwnersAction,
   responseActualTypes: actions.responseActualTypesAction
 };
 
 const tasks = budgeting.tasks.actuals.createTableTaskSet({
   columns: ActualsTable.Columns,
   selectObjId: (state: Application.Authenticated.Store) => state.budget.id,
-  selectTreeSearch: (state: Application.Authenticated.Store) => state.budget.actuals.ownerTree.search,
+  selectOwnersSearch: (state: Application.Authenticated.Store) => state.budget.actuals.owners.search,
   actions: ActionMap
 });
 
@@ -38,5 +38,5 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
 
 export default function* rootSaga(): SagaIterator {
   yield spawn(tableSaga);
-  yield debounce(250, actions.setOwnerTreeSearchAction.toString(), tasks.requestOwnerTree);
+  yield debounce(250, actions.setActualOwnersSearchAction.toString(), tasks.requestActualOwners);
 }

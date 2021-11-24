@@ -57,8 +57,8 @@ namespace Tables {
   type ActualRow = Table.ModelRow<ActualRowData>;
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ActualTableStore = Redux.TableStore<ActualRowData> & {
-    readonly ownerTree: Redux.AuthenticatedModelListResponseStore<Model.OwnerTreeNode>;
-    readonly actualTypes: Model.Tag[];
+    readonly owners: Redux.AuthenticatedModelListResponseStore<Model.ActualOwner>;
+    readonly types: Model.Tag[];
   };
 
   type ContactRowData = Pick<

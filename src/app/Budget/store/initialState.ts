@@ -40,8 +40,8 @@ const initialState: Modules.Budget.Store = {
   headerTemplates: initialHeaderTemplatesState,
   actuals: {
     ...redux.initialState.initialTableState,
-    actualTypes: [],
-    ownerTree: redux.initialState.initialAuthenticatedModelListResponseState
+    types: [],
+    owners: redux.initialState.initialAuthenticatedModelListResponseState
   }
 };
 

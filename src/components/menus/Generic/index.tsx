@@ -277,38 +277,13 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
         }
         if (setIndexFromSelectedState === false) {
           let setIndexFromSearch = false;
-          // If we cannot set the index based on a selected value, check to see if
-          // there is a prop that returns the first model that we should select
-          // in the presence of a search.
-          if (!isNil(props.getFirstSearchResult)) {
-            const firstId = props.getFirstSearchResult(models);
-            if (!isNil(firstId)) {
-              const index = findIndex(
-                menuState.availableItems,
-                (mi: GenericItem<M>) => isModelItem(mi) && getModelIdentifier(mi.model) === firstId
-              );
-              if (index !== -1) {
-                setIndexFromSearch = true;
-                dispatchMenuState({ type: "SET", payload: index });
-              }
-            }
-          }
           if (setIndexFromSearch === false && search !== "") {
             dispatchMenuState({ type: "SET", payload: 0 });
           }
         }
       }
     }
-  }, [
-    noData,
-    noSearchResults,
-    focused,
-    search,
-    selected,
-    props.extra,
-    menuState.availableItems,
-    props.getFirstSearchResult
-  ]);
+  }, [noData, noSearchResults, focused, search, selected, props.extra, menuState.availableItems]);
 
   useEffect(() => {
     const scrollIndexIntoView = (index: number) => {
@@ -523,9 +498,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
                 level={0}
                 selected={selected}
                 keepDropdownOpenOnClick={props.keepDropdownOpenOnClick}
-                levelIndent={props.levelIndent}
                 itemProps={props.itemProps}
-                bordersForLevels={props.bordersForLevels}
                 onClick={(event: MenuItemClickEvent<M>) => onMenuItemClick(event.model, event.event)}
                 renderContent={props.renderItemContent}
                 closeParentDropdown={props.closeParentDropdown}

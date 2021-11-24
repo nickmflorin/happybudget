@@ -20,8 +20,6 @@ const MenuItems = <M extends Model.Model>(props: IMenuItems<M>): JSX.Element => 
             focused={props.isFocused(m)}
             selected={includes(props.selected, m.id)}
             checkbox={props.checkbox}
-            levelIndent={props.levelIndent}
-            bordersForLevels={props.bordersForLevels}
             closeParentDropdown={props.closeParentDropdown}
             keepDropdownOpenOnClick={props.keepDropdownOpenOnClick}
             getLabel={props.getLabel}

@@ -19,7 +19,7 @@ export type ActualsTableProps = Omit<AuthenticatedModelTableProps<R, M>, "column
   readonly actualTypes: Model.Tag[];
   readonly onAttachmentRemoved: (row: Table.ModelRow<R>, id: number) => void;
   readonly onAttachmentAdded: (row: Table.ModelRow<R>, attachment: Model.Attachment) => void;
-  readonly onOwnerTreeSearch: (value: string) => void;
+  readonly onOwnersSearch: (value: string) => void;
   readonly onNewContact: (params: { name?: string; id: Table.ModelRowId }) => void;
   readonly onSearchContact: (v: string) => void;
   readonly onEditContact: (params: { contact: number; id: Table.EditableRowId }) => void;
@@ -28,7 +28,7 @@ export type ActualsTableProps = Omit<AuthenticatedModelTableProps<R, M>, "column
 const ActualsTable = ({
   exportFileName,
   contacts,
-  onOwnerTreeSearch,
+  onOwnersSearch,
   onNewContact,
   onEditContact,
   onSearchContact,
@@ -116,7 +116,7 @@ const ActualsTable = ({
             processCellFromClipboard: processOwnerCellFromClipboard,
             cellEditorParams: {
               ...col.cellEditorParams,
-              setSearch: (value: string) => onOwnerTreeSearch(value)
+              setSearch: (value: string) => onOwnersSearch(value)
             }
           }),
           attachments: (col: Table.Column<R, M>) => ({

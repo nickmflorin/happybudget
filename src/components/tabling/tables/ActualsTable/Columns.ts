@@ -81,8 +81,8 @@ const Columns: Table.Column<R, M>[] = [
       }
       return "";
     },
-    cellRenderer: { data: "OwnerCell" },
-    cellEditor: "OwnerTreeEditor"
+    cellRenderer: { data: "ActualOwnerCell" },
+    cellEditor: "ActualOwnerEditor"
   }),
   tabling.columns.AttachmentsColumn({
     field: "attachments",

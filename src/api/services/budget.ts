@@ -5,11 +5,6 @@ export const getBudget = services.retrieveService<Model.Budget>((id: number) => 
 export const getBudgetPdf = services.retrieveService<Model.PdfBudget>((id: number) => ["budgets", id, "pdf"]);
 export const getBudgets = services.listService<Model.SimpleBudget>(["budgets"]);
 export const getBudgetAccounts = services.detailListService<Model.Account>((id: number) => ["budgets", id, "accounts"]);
-export const getBudgetSubAccounts = services.detailListService<Model.SimpleSubAccount>((id: number) => [
-  "budgets",
-  id,
-  "subaccounts"
-]);
 export const getBudgetAccountMarkups = services.detailListService<Model.Markup>((id: number) => [
   "budgets",
   id,
@@ -20,11 +15,10 @@ export const getBudgetAccountGroups = services.detailListService<Model.Group>((i
   id,
   "groups"
 ]);
-export const getBudgetOwnerTree = services.detailListService<Model.OwnerTreeNode>((id: number) => [
+export const getBudgetActualOwners = services.detailListService<Model.ActualOwner>((id: number) => [
   "budgets",
   id,
-  "subaccounts",
-  "owner-tree"
+  "actual-owners"
 ]);
 export const getBudgetFringes = services.detailListService<Model.Fringe>((id: number) => ["budgets", id, "fringes"]);
 export const getBudgetActuals = services.detailListService<Model.Actual>((id: number) => ["budgets", id, "actuals"]);

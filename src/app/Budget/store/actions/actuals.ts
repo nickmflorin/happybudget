@@ -1,11 +1,11 @@
 import { createAction } from "@reduxjs/toolkit";
 import ActionType from "./ActionType";
 
-export const responseOwnerTreeAction = createAction<Http.ListResponse<Model.OwnerTreeNode>>(
-  ActionType.OwnerTree.Response
+export const responseActualOwnersAction = createAction<Http.ListResponse<Model.ActualOwner>>(
+  ActionType.ActualOwners.Response
 );
-export const setOwnerTreeSearchAction = createAction<string>(ActionType.OwnerTree.SetSearch);
-export const loadingOwnerTreeAction = createAction<boolean>(ActionType.OwnerTree.Loading);
+export const setActualOwnersSearchAction = createAction<string>(ActionType.ActualOwners.SetSearch);
+export const loadingActualOwnersAction = createAction<boolean>(ActionType.ActualOwners.Loading);
 
 export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.ActualRowData, Model.Actual>>(
   ActionType.Actuals.TableChanged

@@ -2,18 +2,18 @@ import { forwardRef, ForwardedRef } from "react";
 import { useSelector } from "react-redux";
 import { isNil } from "lodash";
 
-import { OwnerTreeMenu } from "components/menus";
+import { ActualOwnersMenu } from "components/menus";
 import { framework } from "components/tabling/generic";
 
-interface OwnerTreeEditorProps
+interface ActualOwnerEditorProps
   extends Table.EditorParams<Tables.ActualRowData, Model.Actual, Tables.ActualTableStore, Model.SimpleSubAccount> {
   readonly setSearch: (value: string) => void;
 }
 
-const OwnerTreeEditor = ({ setSearch, ...props }: OwnerTreeEditorProps, ref: ForwardedRef<any>) => {
-  const tree = useSelector((state: Application.Authenticated.Store) => props.selector(state).ownerTree.data);
-  const search = useSelector((state: Application.Authenticated.Store) => props.selector(state).ownerTree.search);
-  const loading = useSelector((state: Application.Authenticated.Store) => props.selector(state).ownerTree.loading);
+const ActualOwnerEditor = ({ setSearch, ...props }: ActualOwnerEditorProps, ref: ForwardedRef<any>) => {
+  const owners = useSelector((state: Application.Authenticated.Store) => props.selector(state).owners.data);
+  const search = useSelector((state: Application.Authenticated.Store) => props.selector(state).owners.search);
+  const loading = useSelector((state: Application.Authenticated.Store) => props.selector(state).owners.loading);
 
   const [editor] = framework.editors.useModelMenuEditor<
     Model.SimpleSubAccount | Model.SimpleMarkup,
@@ -27,21 +27,21 @@ const OwnerTreeEditor = ({ setSearch, ...props }: OwnerTreeEditorProps, ref: For
   });
 
   return (
-    <OwnerTreeMenu
+    <ActualOwnersMenu
       style={{ minWidth: 200, maxWidth: 300 }}
       loading={loading}
       onSearch={(v: string) => setSearch(v)}
       search={search}
       selected={!isNil(editor.value) ? `${editor.value.type}-${editor.value.id}` : null}
-      nodes={tree}
+      models={owners}
       includeSearch={true}
       onChange={(m: Model.SimpleSubAccount | Model.SimpleMarkup, e: Table.CellDoneEditingEvent) => {
         editor.onChange(m, e);
       }}
-      menu={editor.menu as NonNullRef<IMenuRef<Model.OwnerTreeNode>>}
+      menu={editor.menu as NonNullRef<IMenuRef<Model.ActualOwner>>}
       focusSearchOnCharPress={true}
     />
   );
 };
 
-export default forwardRef(OwnerTreeEditor);
+export default forwardRef(ActualOwnerEditor);

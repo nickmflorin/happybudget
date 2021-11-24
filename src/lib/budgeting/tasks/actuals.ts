@@ -11,18 +11,18 @@ type M = Model.Actual;
 type P = Http.ActualPayload;
 
 export type ActualsTableActionMap = Redux.AuthenticatedTableActionMap<R, M> & {
-  readonly loadingOwnerTree: boolean;
-  readonly responseOwnerTree: Http.ListResponse<Model.OwnerTreeNode>;
+  readonly loadingActualOwners: boolean;
+  readonly responseActualOwners: Http.ListResponse<Model.ActualOwner>;
   readonly responseActualTypes: Http.ListResponse<Model.Tag>;
 };
 
 export type ActualsTableTaskConfig = Table.TaskConfig<R, M, ActualsTableActionMap> & {
   readonly selectObjId: (state: Application.Authenticated.Store) => number | null;
-  readonly selectTreeSearch: (state: Application.Authenticated.Store) => string;
+  readonly selectOwnersSearch: (state: Application.Authenticated.Store) => string;
 };
 
 export type ActualsTableTaskMap = Redux.TableTaskMap<R> & {
-  readonly requestOwnerTree: Redux.Task<null>;
+  readonly requestActualOwners: Redux.Task<null>;
 };
 
 export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTableTaskMap => {
@@ -37,7 +37,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
         yield all([
           call(requestActuals, budgetId),
           call(requestActualTypes),
-          call(requestOwnerTree, action),
+          call(requestActualOwners, action),
           call(contactsTasks.request, action as Redux.Action<null>)
         ]);
       } catch (e: unknown) {
@@ -69,23 +69,22 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     }
   }
 
-  function* requestOwnerTree(action: Redux.Action<null>): SagaIterator {
+  function* requestActualOwners(action: Redux.Action<null>): SagaIterator {
     // We have to perform the select() inside of this task, instead of providing budgetId as a param,
     // because there is a saga that listens for an search action to be dispatched and then calls this
     // task.
     const budgetId = yield select((state: Application.Authenticated.Store) => state.budget.id);
     if (!isNil(budgetId)) {
-      const search = yield select(config.selectTreeSearch);
-      yield put(config.actions.loadingOwnerTree(true));
+      const search = yield select(config.selectOwnersSearch);
+      yield put(config.actions.loadingActualOwners(true));
       try {
-        // TODO: Eventually we will want to build in pagination for this.
-        const response = yield api.request(api.getBudgetOwnerTree, budgetId, { search });
-        yield put(config.actions.responseOwnerTree(response));
+        const response = yield api.request(api.getBudgetActualOwners, budgetId, { search, page_size: 10 });
+        yield put(config.actions.responseActualOwners(response));
       } catch (e: unknown) {
         notifications.requestError(e as Error, "There was an error retrieving the budget's items.");
-        yield put(config.actions.responseOwnerTree({ count: 0, data: [] }));
+        yield put(config.actions.responseActualOwners({ count: 0, data: [] }));
       } finally {
-        yield put(config.actions.loadingOwnerTree(false));
+        yield put(config.actions.loadingActualOwners(false));
       }
     }
   }
@@ -198,7 +197,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
 
   return {
     request,
-    requestOwnerTree,
+    requestActualOwners,
     handleChangeEvent: tabling.tasks.createChangeEventHandler({
       rowAdd: handleRowAddEvent,
       rowDelete: handleRowDeleteEvent,

@@ -79,10 +79,10 @@ const ActionType = {
       UpdateRowsInState: "budget.account.subaccounts.UpdateRowsInState"
     }
   },
-  OwnerTree: {
-    Response: "budget.ownertree.Response",
-    Loading: "budget.ownertree.Loading",
-    SetSearch: "budget.ownertree.SetSearch"
+  ActualOwners: {
+    Response: "budget.actualowners.Response",
+    Loading: "budget.actualowners.Loading",
+    SetSearch: "budget.actualowners.SetSearch"
   },
   Actuals: {
     TableChanged: "budget.actuals.TableChanged",
