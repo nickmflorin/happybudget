@@ -3,7 +3,7 @@
 
 /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
 namespace Http {
-  type NonModelPayloadFields = "created_at" | "updated_at" | "created_by" | "updated_by" | "id" | "type";
+  type NonModelPayloadFields = "created_by" | "id" | "type";
 
   type Payload = { [key: string]: any };
 
@@ -79,7 +79,6 @@ namespace Http {
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface BudgetPayload {
-    readonly production_type?: Model.ProductionTypeId;
     readonly name: string;
     readonly template?: number;
     readonly image?: string | ArrayBuffer | null;

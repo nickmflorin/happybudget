@@ -32,32 +32,16 @@ namespace Model {
     readonly order: string;
   }
 
-  interface TimestampTrackedModel extends HttpModel {
-    readonly created_at: string;
-    readonly updated_at: string;
-  }
-
-  interface UserTrackedModel extends HttpModel {
-    readonly created_by: number;
-    readonly updated_by: number;
-  }
-
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type GenericHttpModel<T extends HttpModelType> = {
     readonly type: T;
     readonly id: number;
-  }
-
-  interface TrackedModel extends UserTrackedModel, TimestampTrackedModel {}
+  };
 
   interface Choice<I extends number, N extends string> {
     id: I;
     name: N;
   }
-
-  type ProductionTypeName = "Film" | "Episodic" | "Music Video" | "Commercial" | "Documentary" | "Custom";
-  type ProductionTypeId = 0 | 1 | 2 | 3 | 4 | 5;
-  type ProductionType = Choice<ProductionTypeId, ProductionTypeName>;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type MarkupUnitId = 0 | 1;
@@ -74,27 +58,12 @@ namespace Model {
   type ContactTypeId = 0 | 1 | 2;
   type ContactType = Choice<ContactTypeId, ContactTypeName>;
 
-  type LineType = "account" | "subaccount";
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type ParentType = LineType | "budget";
-
-  type SimpleLineItem = SimpleAccount | SimpleSubAccount;
-  type LineItem = Account | SubAccount;
-  type PdfLineItem = PdfAccount | PdfSubAccount;
-
-  type BudgetType = "budget" | "template";
+  type ParentType = "account" | "subaccount" | "budget";
+  type BudgetDomain = "budget" | "template";
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type EntityType = BudgetType | LineType;
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type Entity = LineItem | Budget | Template | Markup;
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type SimpleEntity = SimpleLineItem | SimpleBudget | SimpleTemplate | SimpleMarkup;
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type PdfEntity = PdfLineItem | PdfBudget;
+  type Entity = Account | SubAccount | Budget | Template | Markup;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ModelWithColor = HttpModel & { color: Style.HexColor | null };
@@ -108,7 +77,7 @@ namespace Model {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ModelWithIdentifier = HttpModel & { identifier: string | null };
 
-  interface Tag extends TimestampTrackedModel {
+  interface Tag extends HttpModel {
     readonly title: string;
     readonly plural_title: string | null;
     readonly order: number;
@@ -123,7 +92,7 @@ namespace Model {
     readonly profile_image: SavedImage | null;
   }
 
-  interface User extends SimpleUser, TimestampTrackedModel {
+  interface User extends SimpleUser {
     readonly last_login: null | string;
     readonly date_joined: string;
     readonly timezone: string;
@@ -150,15 +119,13 @@ namespace Model {
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  interface Fringe extends TrackedModel {
-    readonly type: "fringe";
+  interface Fringe extends RowHttpModel<"fringe"> {
     readonly color: Style.HexColor | null;
     readonly name: string | null;
     readonly description: string | null;
     readonly cutoff: number | null;
     readonly rate: number | null;
     readonly unit: FringeUnit | null;
-    readonly order: string;
   }
 
   interface SimpleMarkup {
@@ -168,26 +135,26 @@ namespace Model {
     readonly description: string | null;
   }
 
-  type UnknownMarkup = TrackedModel & SimpleMarkup & {
+  type UnknownMarkup = SimpleMarkup & {
     readonly rate: number | null;
     readonly unit: MarkupUnit;
-  }
+  };
 
   type FlatMarkup = Omit<UnknownMarkup, "unit"> & {
     readonly unit: Choice<1, "Flat">;
-  }
+  };
 
   type PercentMarkup = Omit<UnknownMarkup, "unit"> & {
     readonly children: number[];
     readonly unit: Choice<0, "Percent">;
-  }
+  };
 
   type Markup = FlatMarkup | PercentMarkup;
 
-  interface BaseBudget extends TrackedModel {
+  interface BaseBudget extends HttpModel {
     readonly type: "budget";
     readonly name: string;
-    readonly type: BudgetType;
+    readonly domain: BudgetDomain;
   }
 
   interface SimpleTemplate extends BaseBudget {
@@ -195,6 +162,7 @@ namespace Model {
     readonly image: SavedImage | null;
     // The hidden attribute will not be present for non-community templates.
     readonly hidden?: boolean;
+    readonly updated_at: string;
   }
 
   interface Template extends SimpleTemplate {
@@ -207,23 +175,17 @@ namespace Model {
   interface SimpleBudget extends BaseBudget {
     readonly domain: "budget";
     readonly image: SavedImage | null;
+    readonly updated_at: string;
   }
 
   interface Budget extends SimpleBudget {
-    readonly project_number: number;
-    readonly production_type: ProductionType;
-    readonly shoot_date: string;
-    readonly delivery_date: string;
-    readonly build_days: number;
-    readonly prelight_days: number;
-    readonly studio_shoot_days: number;
-    readonly location_days: number;
     readonly nominal_value: number;
     readonly actual: number;
     readonly accumulated_fringe_contribution: number;
     readonly accumulated_markup_contribution: number;
   }
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface PdfBudget extends RowHttpModel<"pdf-budget"> {
     readonly name: string;
     readonly nominal_value: number;
@@ -235,18 +197,11 @@ namespace Model {
     readonly children_markups: Markup[];
   }
 
-  interface Group extends TrackedModel {
+  interface Group extends HttpModel {
     readonly type: "group";
     readonly name: string;
     readonly color: Style.HexColor | null;
     readonly children: number[];
-  }
-
-  // Represents a simple form of an Account, SubAccount or Detail (Nested SubAccount).
-  interface Line extends HttpModel {
-    readonly identifier: string | null;
-    readonly type: LineType;
-    readonly description: string | null;
   }
 
   interface LineMetrics {
@@ -257,12 +212,16 @@ namespace Model {
     readonly accumulated_markup_contribution: number;
   }
 
-  interface SimpleAccount extends Line {
+  interface SimpleAccount extends HttpModel {
+    readonly identifier: string | null;
     readonly type: "account";
+    readonly description: string | null;
   }
 
-  interface SimpleSubAccount extends Line {
+  interface SimpleSubAccount extends HttpModel {
+    readonly identifier: string | null;
     readonly type: "subaccount";
+    readonly description: string | null;
   }
 
   interface SubAccountOwnerTreeNode extends SimpleSubAccount {
@@ -277,36 +236,32 @@ namespace Model {
   type OwnerTreeNode = SubAccountOwnerTreeNode | MarkupOwnerTreeNode;
 
   // Abstract -- not meant for external reference.
-  interface AbstractAccount extends SimpleAccount, LineMetrics {
-    readonly order: string;
-  }
+  interface AbstractAccount extends Omit<SimpleAccount, "type">, LineMetrics {}
 
-  interface Account extends AbstractAccount, TrackedModel {
+  interface Account extends AbstractAccount, RowHttpModel<"account"> {
     readonly access: number[];
     readonly children: number[];
     readonly siblings?: SimpleAccount[]; // Only included for detail endpoints.
     readonly ancestors?: [SimpleBudget | SimpleTemplate]; // Only included for detail endpoints.
   }
 
-  interface PdfAccount extends AbstractAccount {
-    readonly type: "pdf-account";
+  interface PdfAccount extends AbstractAccount, RowHttpModel<"pdf-account"> {
     readonly children: PdfSubAccount[];
     readonly groups: Group[];
     readonly children_markups: Markup[];
   }
 
   // Abstract -- not meant for external reference.
-  interface AbstractSubAccount extends SimpleSubAccount, LineMetrics {
+  interface AbstractSubAccount extends Omit<SimpleSubAccount, "type">, LineMetrics {
     readonly fringe_contribution: number;
     readonly quantity: number | null;
     readonly rate: number | null;
     readonly multiplier: number | null;
     readonly unit: Tag | null;
     readonly contact?: number | null; // Will be undefined for Template SubAccount(s).
-    readonly order: string;
   }
 
-  interface SubAccount extends AbstractSubAccount, TrackedModel {
+  interface SubAccount extends AbstractSubAccount, RowHttpModel<"subaccount"> {
     readonly children: number[];
     readonly object_id: number;
     readonly parent_type: "account" | "subaccount";
@@ -316,16 +271,14 @@ namespace Model {
     readonly ancestors?: [SimpleBudget | SimpleTemplate, SimpleAccount, ...Array<SimpleSubAccount>]; // Only included for detail endpoints.
   }
 
-  interface PdfSubAccount extends AbstractSubAccount {
-    readonly type: "pdf-subaccount";
+  interface PdfSubAccount extends AbstractSubAccount, RowHttpModel<"pdf-subaccount"> {
     readonly children: PdfSubAccount[];
     readonly groups: Group[];
     readonly children_markups: Markup[];
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  interface Actual extends TrackedModel {
-    readonly type: "actual";
+  interface Actual extends RowHttpModel<"actual"> {
     readonly contact: number | null;
     readonly name: string | null;
     readonly notes: string | null;
@@ -336,7 +289,6 @@ namespace Model {
     readonly actual_type: Tag | null;
     readonly attachments: SimpleAttachment[];
     readonly owner: SimpleSubAccount | SimpleMarkup | null;
-    readonly order: string;
   }
 
   interface ContactNamesAndImage {
@@ -345,8 +297,7 @@ namespace Model {
     readonly last_name: string | null;
   }
 
-  interface Contact extends TimestampTrackedModel, ContactNamesAndImage {
-    readonly type: "contact";
+  interface Contact extends ContactNamesAndImage, RowHttpModel<"contact"> {
     readonly contact_type: ContactType | null;
     readonly full_name: string;
     readonly company: string | null;
@@ -355,10 +306,7 @@ namespace Model {
     readonly city: string | null;
     readonly email: string | null;
     readonly phone_number: string | null;
-    readonly created_at: string;
-    readonly updated_at: string;
     readonly attachments: SimpleAttachment[];
-    readonly order: string;
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -367,7 +315,7 @@ namespace Model {
     | (SimpleUser & { profile_image: SavedImage })
     | (Contact & { image: SavedImage });
 
-  interface SimpleHeaderTemplate extends TimestampTrackedModel {
+  interface SimpleHeaderTemplate extends HttpModel {
     readonly name: string;
   }
 
