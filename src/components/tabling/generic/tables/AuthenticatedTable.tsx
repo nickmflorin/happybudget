@@ -15,8 +15,7 @@ import {
   WithConnectedTableProps,
   AuthenticateDataGridProps,
   DataGridProps,
-  configureTable,
-  useColumnHelpers
+  configureTable
 } from "../hocs";
 import TableWrapper from "./TableWrapper";
 
@@ -120,9 +119,6 @@ const AuthenticatedTable = <
     );
   }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns]);
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  const [getColumn, callWithColumn] = useColumnHelpers(columns);
-
   /**
    * Modified version of the onChangeEvent callback passed into the Grid.  The
    * modified version of the callback will first fire the original callback,
@@ -150,7 +146,7 @@ const AuthenticatedTable = <
               const change = util.getKeyValue<Table.RowChangeData<R>, keyof R>(field)(
                 rowChange.data
               ) as Table.CellChange<R>;
-              const col: Table.Column<R, M> | null = getColumn(field);
+              const col: Table.Column<R, M> | null = tabling.columns.getColumn(props.columns, field);
 
               if (!isNil(col)) {
                 // Check if the cellChange is associated with a Column that has it's own change
@@ -192,7 +188,7 @@ const AuthenticatedTable = <
       // previous state of a given row because it will already have been changed.
       props.onChangeEvent(event);
     },
-    [props.onChangeEvent, getColumn]
+    [props.onChangeEvent, hooks.useDeepEqualMemo(props.columns)]
   );
 
   const actions = useMemo<Table.AuthenticatedMenuActions<R, M>>(

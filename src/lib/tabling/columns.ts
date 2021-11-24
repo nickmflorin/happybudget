@@ -8,6 +8,28 @@ import * as aggrid from "./aggrid";
 import * as formatters from "./formatters";
 import * as Models from "./models";
 
+export const getColumn = <R extends Table.RowData = any, M extends Model.HttpModel = any>(
+  columns: Table.Column<R, M>[],
+  field: keyof R | string
+): Table.Column<R, M> | null => {
+  const foundColumn = find(columns, (c: Table.Column<R, M>) => c.field === field || c.colId === field);
+  if (!isNil(foundColumn)) {
+    return foundColumn;
+  } else {
+    console.error(`Could not find column for field ${field}!`);
+    return null;
+  }
+};
+
+export const callWithColumn = <R extends Table.RowData = any, M extends Model.HttpModel = any, RT = any>(
+  columns: Table.Column<R, M>[],
+  field: keyof R | string,
+  callback: (col: Table.Column<R, M>) => RT | null
+) => {
+  const foundColumn = getColumn(columns, field);
+  return !isNil(foundColumn) ? callback(foundColumn) : null;
+};
+
 /* eslint-disable indent */
 export const isEditable = <
   R extends Table.RowData = any,

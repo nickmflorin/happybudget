@@ -10,4 +10,3 @@ export { default as connectTableToStore } from "./connectTableToStore";
 export * from "./connectTableToStore";
 export { default as configureTable } from "./configureTable";
 export * from "./configureTable";
-export { default as useColumnHelpers } from "./useColumnHelpers";

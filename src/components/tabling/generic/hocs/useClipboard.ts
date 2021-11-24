@@ -1,11 +1,8 @@
-import { useMemo } from "react";
 import { isNil, filter, map, includes, reduce } from "lodash";
 
 import { ProcessCellForExportParams } from "@ag-grid-community/core";
 
 import { hooks, tabling } from "lib";
-
-import useColumnHelpers from "./useColumnHelpers";
 
 export type UseClipboardReturnType<R extends Table.RowData> = [
   (params: ProcessCellForExportParams) => string,
@@ -18,38 +15,35 @@ export type UseClipboardParams<R extends Table.RowData, M extends Model.HttpMode
   readonly setCellCutChange?: (ch: Table.SoloCellChange<R> | null) => void;
 };
 
+const processCellValueForClipboard = <R extends Table.RowData, M extends Model.HttpModel>(
+  column: Table.Column<R, M>,
+  row: Table.BodyRow<R>,
+  value: any
+): string => {
+  const processor = column.processCellForClipboard;
+  if (!isNil(processor)) {
+    return String(processor(row.data));
+  } else {
+    // The value should never be undefined at this point.
+    if (value === undefined) {
+      console.warn("Encountered undefined value when it was not expected!");
+    }
+    if (value === column.nullValue || value === undefined) {
+      return "";
+    } else if (typeof value === "string" || typeof value === "number") {
+      return String(value);
+    }
+    return "";
+  }
+};
+
 const useClipboard = <R extends Table.RowData, M extends Model.HttpModel>(
   params: UseClipboardParams<R, M>
 ): UseClipboardReturnType<R> => {
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  const [getColumn, callWithColumn] = useColumnHelpers(params.columns);
-
-  const processCellValueForClipboard = useMemo(
-    () =>
-      (column: Table.Column<R, M>, row: Table.BodyRow<R>, value: any): string => {
-        const processor = column.processCellForClipboard;
-        if (!isNil(processor)) {
-          return String(processor(row.data));
-        } else {
-          // The value should never be undefined at this point.
-          if (value === undefined) {
-            console.warn("Encountered undefined value when it was not expected!");
-          }
-          if (value === column.nullValue || value === undefined) {
-            return "";
-          } else if (typeof value === "string" || typeof value === "number") {
-            return String(value);
-          }
-          return "";
-        }
-      },
-    []
-  );
-
   const processCellForClipboard: (p: ProcessCellForExportParams) => string = hooks.useDynamicCallback(
     (p: ProcessCellForExportParams): string => {
       if (!isNil(p.node)) {
-        const c: Table.Column<R, M> | null = getColumn(p.column.getColId());
+        const c: Table.Column<R, M> | null = tabling.columns.getColumn(params.columns, p.column.getColId());
         if (!isNil(c)) {
           params.setCellCutChange?.(null);
           const row: Table.BodyRow<R> = p.node.data;

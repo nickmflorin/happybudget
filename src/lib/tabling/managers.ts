@@ -113,7 +113,6 @@ abstract class BodyRowManager<
 
 type CreatePlaceholderRowConfig<R extends Table.RowData> = {
   readonly id: Table.PlaceholderRowId;
-  readonly originalIndex: number;
   readonly data?: Partial<R>;
 };
 

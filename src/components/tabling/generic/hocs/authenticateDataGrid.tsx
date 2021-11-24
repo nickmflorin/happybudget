@@ -27,7 +27,6 @@ import { tabling, hooks } from "lib";
 import useCellNavigation from "./useCellNavigation";
 import useContextMenu, { UseContextMenuParams } from "./useContextMenu";
 import useAuthenticatedClipboard from "./useAuthenticatedClipboard";
-import useColumnHelpers from "./useColumnHelpers";
 
 interface InjectedAuthenticatedDataGridProps<R extends Table.RowData> {
   readonly getCSVData: (fields?: (keyof R | string)[]) => CSVData;
@@ -234,8 +233,6 @@ const authenticateDataGrid =
         apis: props.apis,
         onChangeEvent: props.onChangeEvent
       });
-      /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-      const [_, callWithColumn] = useColumnHelpers(props.columns);
       const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
       const oldRow = useRef<Table.ModelRow<R> | null>(null); // TODO: Figure out a better way to do this.
       const lastSelectionFromRange = useRef<boolean>(false);
@@ -412,7 +409,7 @@ const authenticateDataGrid =
             if (!isNil(node)) {
               const row: Table.BodyRow<R> = node.data;
               if (tabling.typeguards.isEditableRow(row)) {
-                callWithColumn(focusedCell.column.getColId(), (c: Table.Column<R, M>) => {
+                tabling.columns.callWithColumn(columns, focusedCell.column.getColId(), (c: Table.Column<R, M>) => {
                   if (tabling.typeguards.isEditableRow(row)) {
                     const change = getCellChangeForClear(row, c);
                     local.flashCells({ columns: [focusedCell.column], rowNodes: [node] });
@@ -513,7 +510,7 @@ const authenticateDataGrid =
       const onCellDoubleClicked = hooks.useDynamicCallback((e: CellDoubleClickedEvent) => {
         const row: Table.BodyRow<R> = e.data;
         if (tabling.typeguards.isModelRow(row)) {
-          callWithColumn(e.column.getColId(), (c: Table.Column<R, M>) => {
+          tabling.columns.callWithColumn(columns, e.column.getColId(), (c: Table.Column<R, M>) => {
             c.onCellDoubleClicked?.(row);
           });
         }

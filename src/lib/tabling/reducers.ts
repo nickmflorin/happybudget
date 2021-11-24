@@ -312,8 +312,7 @@ export const createTableChangeEventReducer = <
               ...d,
               placeholderRowManager.create({
                 id: addition.id,
-                data: addition.data,
-                originalIndex: filter(d, (r: Table.BodyRow<R>) => typeguards.isDataRow(r)).length
+                data: addition.data
               })
             ];
           },
