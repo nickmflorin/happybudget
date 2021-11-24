@@ -2,7 +2,11 @@
 
 /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
 namespace Tables {
-  interface BudgetRowData extends Model.LineMetrics, Pick<Model.Line, "identifier" | "description"> {}
+  interface BudgetRowData extends Model.LineMetrics {
+    readonly identifier: string | null;
+    readonly description: string | null;
+    readonly type: "subaccount" | "account";
+  }
 
   interface AccountRowData extends BudgetRowData {}
 
@@ -13,7 +17,10 @@ namespace Tables {
 
   interface SubAccountRowData
     extends BudgetRowData,
-      Pick<Model.SubAccount, "quantity" | "unit" | "multiplier" | "rate" | "fringes" | "fringe_contribution" | "attachments"> {
+      Pick<
+        Model.SubAccount,
+        "quantity" | "unit" | "multiplier" | "rate" | "fringes" | "fringe_contribution" | "attachments"
+      > {
     readonly contact?: number | null;
   }
 
@@ -34,7 +41,16 @@ namespace Tables {
 
   type ActualRowData = Pick<
     Model.Actual,
-    "name" | "notes" | "purchase_order" | "date" | "actual_type" | "payment_id" | "value" | "contact" | "owner" | "attachments"
+    | "name"
+    | "notes"
+    | "purchase_order"
+    | "date"
+    | "actual_type"
+    | "payment_id"
+    | "value"
+    | "contact"
+    | "owner"
+    | "attachments"
   >;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -47,7 +63,16 @@ namespace Tables {
 
   type ContactRowData = Pick<
     Model.Contact,
-    "contact_type" | "company" | "position" | "rate" | "phone_number" | "email" | "first_name" | "last_name" | "image" | "attachments"
+    | "contact_type"
+    | "company"
+    | "position"
+    | "rate"
+    | "phone_number"
+    | "email"
+    | "first_name"
+    | "last_name"
+    | "image"
+    | "attachments"
   >;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */

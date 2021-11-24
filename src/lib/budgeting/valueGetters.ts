@@ -20,7 +20,23 @@ export const estimatedValueGetter = <R extends Tables.BudgetRowData>(
       if (row.markupData.unit.id === model.models.MarkupUnitModels.FLAT.id) {
         return row.markupData.rate || 0.0;
       }
-      return reduce(childrenRows, (curr: number, r: Table.DataRow<R>) => curr + r.data.markup_contribution, 0.0);
+      // The Markup's estimated value is the sum of the contributions of each child Row
+      // to that Markup.  Note that this is not simply the `markup_contribution` of each
+      // Row, as that is the contribution of that Row to the overall Markup, not solely
+      // this Markup.
+      return reduce(
+        childrenRows,
+        (curr: number, r: Table.DataRow<R>) =>
+          curr +
+          businessLogic.contributionFromMarkups(
+            businessLogic.nominalValue(r) +
+              businessLogic.accumulatedMarkupContribution(r) +
+              businessLogic.accumulatedFringeContribution(r) +
+              businessLogic.fringeContribution(r),
+            [row]
+          ),
+        0.0
+      );
     } else {
       return reduce(childrenRows, (curr: number, r: Table.DataRow<R>) => curr + businessLogic.estimatedValue(r), 0.0);
     }

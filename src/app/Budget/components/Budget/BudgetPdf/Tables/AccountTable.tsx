@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { isNil, filter, reduce, find, map, includes } from "lodash";
 import classNames from "classnames";
 
-import { tabling, hooks, model } from "lib";
+import { tabling, hooks, budgeting } from "lib";
 
 import Table from "./Table";
 import { BodyRow, HeaderRow, FooterRow, GroupRow } from "../Rows";
@@ -80,7 +80,8 @@ const AccountTable = ({
 
     const subaccounts = filter(
       account.children,
-      (subaccount: M) => !(options.excludeZeroTotals === true) || model.businessLogic.estimatedValue(subaccount) !== 0
+      (subaccount: M) =>
+        !(options.excludeZeroTotals === true) || budgeting.businessLogic.estimatedValue(subaccount) !== 0
     );
     const table: Table.BodyRow<R>[] = tabling.data.createTableRows<R, M>({
       response: { models: subaccounts, groups: account.groups, markups: account.children_markups },

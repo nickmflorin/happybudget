@@ -1,6 +1,6 @@
 import { isNil, includes, filter, reduce } from "lodash";
 
-import { redux, tabling, util, model } from "lib";
+import { redux, tabling, util, budgeting } from "lib";
 
 /**
  * Returns (if present) the MarkupRow in state with a provided ID.  If the rowId is also
@@ -122,7 +122,7 @@ export const createBudgetTableChangeEventReducer = <
                   data: {
                     ...r.data,
                     // Markup contributions get applied to the value after fringes are applied.
-                    markup_contribution: model.businessLogic.contributionFromMarkups(
+                    markup_contribution: budgeting.businessLogic.contributionFromMarkups(
                       isSubAccountRowData(r.data)
                         ? r.data.nominal_value +
                             r.data.accumulated_fringe_contribution +

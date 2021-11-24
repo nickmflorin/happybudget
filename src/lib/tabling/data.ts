@@ -99,7 +99,6 @@ export const createTableRows = <R extends Table.RowData, M extends Model.RowHttp
   });
   const groupRowManager = new tabling.managers.GroupRowManager<R, M>({ columns: config.columns });
   const markupRowManager = new tabling.managers.MarkupRowManager<R, M>({ columns: config.columns });
-
   return orderTableRows([
     ...reduce(
       config.response.models,

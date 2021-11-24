@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
 import { isNil, map, filter } from "lodash";
 
-import { redux, tabling, model } from "lib";
+import { redux, tabling, budgeting } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
 import { SubAccountsTable as GenericSubAccountsTable, connectTableToStore } from "components/tabling";
 
@@ -53,7 +53,7 @@ const ConnectedTable = connectTableToStore<
       [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.template.detail.data)],
       (budget: Model.Template | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
-        estimated: !isNil(budget) ? model.businessLogic.estimatedValue(budget) : 0.0
+        estimated: !isNil(budget) ? budgeting.businessLogic.estimatedValue(budget) : 0.0
       })
     ),
     footer: createSelector(
@@ -64,7 +64,7 @@ const ConnectedTable = connectTableToStore<
       ],
       (detail: Model.Account | null) => ({
         identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
-        estimated: !isNil(detail) ? model.businessLogic.estimatedValue(detail) : 0.0
+        estimated: !isNil(detail) ? budgeting.businessLogic.estimatedValue(detail) : 0.0
       })
     )
   }

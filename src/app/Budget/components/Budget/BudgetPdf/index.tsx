@@ -4,7 +4,7 @@ import { isNil, map, filter, find, includes } from "lodash";
 import { ShowHide } from "components";
 import { Document, View, Page, Tag, Text, NoDataPage } from "components/pdf";
 import { AccountsTable as GenericAccountsTable, SubAccountsTable as GenericSubAccountsTable } from "components/tabling";
-import { tabling, model } from "lib";
+import { tabling, budgeting } from "lib";
 
 import PageHeader from "./PageHeader";
 import Notes from "./Notes";
@@ -30,7 +30,7 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
   const accountColumns = useMemo<Table.PdfColumn<Tables.AccountRowData, Model.PdfAccount>[]>(() => {
     let columns = tabling.columns.normalizeColumns(AccountColumns, {
       estimated: {
-        pdfFooterValueGetter: model.businessLogic.estimatedValue(budget)
+        pdfFooterValueGetter: budgeting.businessLogic.estimatedValue(budget)
       }
     });
     columns = tabling.columns.normalizePdfColumnWidths(columns);
@@ -83,9 +83,9 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
             params.rawValue !== null ? <Tag model={params.rawValue} /> : <Text></Text>
         },
         estimated: {
-          pdfFooterValueGetter: model.businessLogic.estimatedValue(account),
+          pdfFooterValueGetter: budgeting.businessLogic.estimatedValue(account),
           pdfChildFooter: (m: M) => {
-            return { value: model.businessLogic.estimatedValue(m) };
+            return { value: budgeting.businessLogic.estimatedValue(m) };
           }
         }
       });
@@ -102,12 +102,12 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
     return filter(
       budget.children,
       (account: Model.PdfAccount) =>
-        (!(options.excludeZeroTotals === true) || model.businessLogic.estimatedValue(account) !== 0) &&
+        (!(options.excludeZeroTotals === true) || budgeting.businessLogic.estimatedValue(account) !== 0) &&
         (isNil(options.tables) || includes(options.tables, account.id)) &&
         filter(
           account.children,
           (subaccount: Model.PdfSubAccount) =>
-            !(options.excludeZeroTotals === true) || model.businessLogic.estimatedValue(subaccount) !== 0
+            !(options.excludeZeroTotals === true) || budgeting.businessLogic.estimatedValue(subaccount) !== 0
         ).length !== 0
     );
   }, [budget, options]);
@@ -135,7 +135,7 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
             data={filter(
               budget.children,
               (account: Model.PdfAccount) =>
-                !(options.excludeZeroTotals === true) || model.businessLogic.estimatedValue(account) !== 0
+                !(options.excludeZeroTotals === true) || budgeting.businessLogic.estimatedValue(account) !== 0
             )}
             markups={budget.children_markups}
             groups={budget.groups}

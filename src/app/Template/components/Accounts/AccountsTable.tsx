@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { createSelector } from "reselect";
 import { isNil, map, filter, intersection } from "lodash";
 
-import { tabling, budgeting, redux, model } from "lib";
+import { tabling, budgeting, redux } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
 import { AccountsTable as GenericAccountsTable, connectTableToStore } from "components/tabling";
 
@@ -37,7 +37,7 @@ const ConnectedTable = connectTableToStore<
       [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.template.detail.data)],
       (budget: Model.Template | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
-        estimated: !isNil(budget) ? model.businessLogic.estimatedValue(budget) : 0.0
+        estimated: !isNil(budget) ? budgeting.businessLogic.estimatedValue(budget) : 0.0
       })
     )
   },

@@ -1,6 +1,6 @@
 import { isNil, filter } from "lodash";
 
-import { tabling, redux, model } from "lib";
+import { tabling, redux, budgeting } from "lib";
 import { createBudgetTableReducer, createAuthenticatedBudgetTableReducer, BudgetTableReducerConfig } from "./base";
 
 type R = Tables.SubAccountRowData;
@@ -33,7 +33,7 @@ const recalculateSubAccountRow = (
       const multiplier = row.data.multiplier || 1.0;
       return {
         nominal_value: row.data.quantity * row.data.rate * multiplier,
-        fringe_contribution: model.businessLogic.contributionFromFringes(
+        fringe_contribution: budgeting.businessLogic.contributionFromFringes(
           row.data.quantity * row.data.rate * multiplier,
           fringes
         )
@@ -41,7 +41,7 @@ const recalculateSubAccountRow = (
     } else {
       return {
         nominal_value: 0.0,
-        fringe_contribution: model.businessLogic.contributionFromFringes(0.0, fringes)
+        fringe_contribution: budgeting.businessLogic.contributionFromFringes(0.0, fringes)
       };
     }
   }
