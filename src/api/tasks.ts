@@ -1,6 +1,7 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { call, cancelled } from "redux-saga/effects";
+import * as Sentry from "@sentry/react";
 
 import * as api from "api";
 
@@ -37,7 +38,17 @@ export const request = <T = any>(service: Service<T>, ...args: any[]) =>
           throw e;
         } else {
           console.info("Service was cancelled.");
+          // We do not want to return undefined for the response because that
+          // will lead to errors in Sentry since the callees always expect
+          // an error to be thrown or the response to be defined.  However, we
+          // also don't want to dispatch the error to Sentry.
+          Sentry.withScope((scope: Sentry.Scope) => {
+            scope.setExtra("ignore", true);
+            throw e;
+          });
         }
+      } else {
+        source.cancel("User is being force logged out.");
       }
     } finally {
       if (yield cancelled()) {
