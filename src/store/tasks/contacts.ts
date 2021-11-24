@@ -118,7 +118,7 @@ export const createTableTaskSet = (
   function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent): SagaIterator {
     yield put(config.actions.saving(true));
     try {
-      const response: M = yield api.request(api.updateFringe, e.payload.id, {
+      const response: M = yield api.request(api.updateContact, e.payload.id, {
         order: e.payload.order
       });
       yield put(
