@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef, useImperativeHandle, useReducer } from "react";
 import classNames from "classnames";
-import { map, isNil, includes, filter, find, uniqueId, forEach, findIndex } from "lodash";
+import { map, isNil, includes, filter, find, uniqueId, forEach } from "lodash";
 
 import { Input as AntDInput } from "antd";
 
