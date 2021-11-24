@@ -7,15 +7,21 @@
     margin-right: 10px;
   }
 
-  &.link {
-    color: $text-primary;
+  .icon {
+    color: $text-tertiary;
+    height: 16px;
+    width: 16px;
+    margin-right: 6px;
   }
 
   .text-container {
     display: none;
-    font-size: 14px;
+    font-family: $roboto;
+    font-size: 12px;
     font-weight: 500;
-    color: $text-primary;
+    color: $text-tertiary;
+    line-height: 36px;
+    text-transform: uppercase;
 
     @include media(">=large") {
       display: block;
