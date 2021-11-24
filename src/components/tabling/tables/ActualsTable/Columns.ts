@@ -51,7 +51,10 @@ const Columns: Table.Column<R, M>[] = [
     flex: 1,
     valueFormatter: tabling.formatters.currencyValueFormatter,
     valueSetter: tabling.valueSetters.floatValueSetter<R>("value"),
-    columnType: "currency"
+    columnType: "currency",
+    // We only want to use BodyCell's in the Footer cells because it slows rendering
+    // performance down dramatically.
+    cellRenderer: { footer: "BodyCell" }
   }),
   tabling.columns.SelectColumn<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>({
     field: "owner",
