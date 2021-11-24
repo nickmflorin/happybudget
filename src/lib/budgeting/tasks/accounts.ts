@@ -88,26 +88,29 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       } else {
         yield put(config.actions.loading(true));
         yield put(config.actions.clear(null));
+        let effects = [
+          api.request(config.services.request, objId, {}),
+          api.request(config.services.requestGroups, objId, {})
+        ];
+        if (!isNil(config.services.requestMarkups)) {
+          effects = [...effects, api.request(config.services.requestMarkups, objId, {})];
+        }
         try {
           const [models, groups, markups]: [
             Http.ListResponse<C>,
             Http.ListResponse<Model.Group>,
-            Http.ListResponse<Model.Markup>
-          ] = yield all([
-            api.request(config.services.request, objId, {}),
-            api.request(config.services.requestGroups, objId, {}),
-            call(requestMarkups, objId)
-          ]);
+            Http.ListResponse<Model.Markup> | undefined
+          ] = yield all(effects);
           if (models.data.length === 0 && isAuthenticatedConfig(config)) {
             // If there is no table data, we want to default create two rows.
             const response: Http.BulkResponse<B, C> = yield api.request(config.services.bulkCreate, objId, {
               data: [{}, {}]
             });
             yield put(
-              config.actions.response({ models: response.children, groups: groups.data, markups: markups.data })
+              config.actions.response({ models: response.children, groups: groups.data, markups: markups?.data })
             );
           } else {
-            yield put(config.actions.response({ models: models.data, groups: groups.data, markups: markups.data }));
+            yield put(config.actions.response({ models: models.data, groups: groups.data, markups: markups?.data }));
           }
         } catch (e: unknown) {
           notifications.requestError(e as Error, "There was an error retrieving the table data.");
@@ -118,13 +121,6 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       }
     }
   }
-
-  const requestMarkups = (objId: number): Promise<Http.ListResponse<Model.Markup>> => {
-    if (!isNil(config.services.requestMarkups)) {
-      return config.services.requestMarkups(objId, {}, {});
-    }
-    return new Promise(resolve => resolve({ count: 0, data: [] }));
-  };
 
   function* bulkCreateTask(objId: number, e: Table.RowAddEvent<R>, errorMessage: string): SagaIterator {
     if (isAuthenticatedConfig(config)) {

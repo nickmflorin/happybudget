@@ -114,7 +114,7 @@ export const requestError = (e: Error, c?: string | Omit<AppNotificationContext,
       ...context,
       dispatchToSentry: true
     });
-  } else {
+  } else if (!(e instanceof api.ForceLogout)) {
     throw e;
   }
 };

@@ -29,26 +29,34 @@ export const request = <T = any>(service: Service<T>, ...args: any[]) =>
     if (args.length !== 0 && isProvidedRequestConfig(args[args.length - 1])) {
       config = { ...args[args.length - 1], ...config };
     }
+
+    const handleCancel = (e: Error) => {
+      // We do not want to return undefined for the response because that
+      // will lead to errors in Sentry since the callees always expect
+      // an error to be thrown or the response to be defined.  However, we
+      // also don't want to dispatch the error to Sentry.
+      Sentry.withScope((scope: Sentry.Scope) => {
+        scope.setExtra("ignore", true);
+        throw e;
+      });
+    };
+
     try {
       return yield call(service, ...args, config);
     } catch (e: unknown) {
       const err = e as Error;
       if (!(err instanceof api.ForceLogout)) {
         if (!(yield cancelled())) {
-          throw e;
+          if (!axios.isCancel(err)) {
+            throw e;
+          }
+          handleCancel(err);
         } else {
           console.info("Service was cancelled.");
-          // We do not want to return undefined for the response because that
-          // will lead to errors in Sentry since the callees always expect
-          // an error to be thrown or the response to be defined.  However, we
-          // also don't want to dispatch the error to Sentry.
-          Sentry.withScope((scope: Sentry.Scope) => {
-            scope.setExtra("ignore", true);
-            throw e;
-          });
+          handleCancel(err);
         }
       } else {
-        source.cancel("User is being force logged out.");
+        handleCancel(err);
       }
     } finally {
       if (yield cancelled()) {
