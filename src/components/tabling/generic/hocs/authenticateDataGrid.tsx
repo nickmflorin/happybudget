@@ -234,12 +234,11 @@ const authenticateDataGrid =
         apis: props.apis,
         onChangeEvent: props.onChangeEvent
       });
-      /* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
+      /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
       const [_, callWithColumn] = useColumnHelpers(props.columns);
       const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
       const oldRow = useRef<Table.ModelRow<R> | null>(null); // TODO: Figure out a better way to do this.
       const lastSelectionFromRange = useRef<boolean>(false);
-      const [rowsBeforeReorder, setRowsBeforeReorder] = useState<Table.BodyRow<R>[] | null>(null);
 
       /*
       Note: The behavior of the column suppression in the subsequent column memorization
@@ -594,7 +593,6 @@ const authenticateDataGrid =
             type: "rowPositionChanged",
             payload: { order: grouplessIndex, id: row.id, newGroup: !isNil(groupRow) ? groupRow.id : null }
           });
-          setRowsBeforeReorder(null);
         }
       });
 
