@@ -100,6 +100,7 @@ const ActualsTable = ({
         table={table}
         showPageFooter={false}
         menuPortalId={"supplementary-header"}
+        savingChangesPortalId={"saving-changes"}
         cookieNames={{ hiddenColumns: "actuals-table-hidden-columns" }}
         getModelRowName={(r: Table.ModelRow<R>) => r.data.name}
         getPlaceholderRowName={(r: Table.PlaceholderRow<R>) => r.data.name}
