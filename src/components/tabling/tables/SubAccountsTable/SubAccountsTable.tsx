@@ -30,6 +30,7 @@ function SubAccountsTable<T extends SubAccountsTableProps>(
         getMarkupRowLabel={"Markup"}
         getModelRowLabel={"Line"}
         getPlaceholderRowLabel={"Line"}
+        suppressRowReordering={true}
       />
     );
   };
