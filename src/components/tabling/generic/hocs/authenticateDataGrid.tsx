@@ -301,7 +301,7 @@ const authenticateDataGrid =
             }
           }
         });
-        if (props.suppressRowReordering !== false) {
+        if (props.suppressRowReordering !== true) {
           return [
             tabling.columns.DragColumn({ pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined }),
             ...cs
