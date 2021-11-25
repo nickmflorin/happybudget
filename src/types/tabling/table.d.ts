@@ -529,7 +529,7 @@ namespace Table {
   };
 
   type RowPositionChangedPayload = {
-    readonly order: number;
+    readonly previous: number | null;
     readonly newGroup: GroupRowId | null;
     readonly id: ModelRowId;
   }

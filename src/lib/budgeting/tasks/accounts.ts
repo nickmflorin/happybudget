@@ -320,7 +320,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       yield put(config.actions.saving(true));
       try {
         const response: C = yield api.request(api.updateAccount, e.payload.id, {
-          order: e.payload.order,
+          previous: e.payload.previous,
           group: isNil(e.payload.newGroup) ? null : tabling.managers.groupId(e.payload.newGroup)
         });
         // The Group is not attributed to the Model in a detail response, so if the group

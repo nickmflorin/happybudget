@@ -119,7 +119,7 @@ export const createTableTaskSet = (
     yield put(config.actions.saving(true));
     try {
       const response: M = yield api.request(api.updateContact, e.payload.id, {
-        order: e.payload.order
+        previous: e.payload.previous
       });
       yield put(
         config.actions.tableChanged({

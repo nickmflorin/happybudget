@@ -149,7 +149,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     yield put(config.actions.saving(true));
     try {
       const response: M = yield api.request(api.updateActual, e.payload.id, {
-        order: e.payload.order
+        previous: e.payload.previous
       });
       yield put(
         config.actions.tableChanged({

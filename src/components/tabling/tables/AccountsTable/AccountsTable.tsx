@@ -23,7 +23,6 @@ const AccountsTable = <T extends AccountsTableProps>(
         getMarkupRowLabel={"Markup"}
         getModelRowLabel={"Account"}
         getPlaceholderRowLabel={"Account"}
-        suppressRowReordering={true}
       />
     );
   };

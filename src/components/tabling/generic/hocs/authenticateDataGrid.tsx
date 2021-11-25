@@ -547,50 +547,38 @@ const authenticateDataGrid =
       const onRowDragEnd = hooks.useDynamicCallback((e: RowDragEvent) => {
         const row: Table.ModelRow<R> = e.node.data;
         const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api);
-        // The order of the Row in the table when GroupRow(s) are also included
-        // in the ordering.
-        const naiveOrder = e.node.rowIndex;
-        if (!isNil(naiveOrder)) {
-          let groupRow: Table.GroupRow<R> | null = null;
-          let foundMovedRow = false;
 
-          let grouplessIndex = -1;
-          let naiveIndexToGrouplessIndex: { [key: number]: number } = {};
+        let groupRow: Table.GroupRow<R> | null = null;
+        let foundMovedRow = false;
+        let previous: Table.ModelRow<R> | null = null;
 
-          // We need to traverse the BodyRow(s) in order to determine both what the new order of
-          // the ModelRow is, without GroupRow(s) included in the ordering, and what the new
-          // (if any) GroupRow the ModelRow corresponds to.
-          for (let i = 0; i < rows.length; i++) {
-            const iteratedRow: Table.BodyRow<R> = rows[i];
-            if (tabling.typeguards.isModelRow(iteratedRow)) {
-              grouplessIndex = grouplessIndex + 1;
-              naiveIndexToGrouplessIndex[i] = grouplessIndex;
-              if (iteratedRow.id === row.id) {
-                foundMovedRow = true;
-              }
-            } else if (tabling.typeguards.isGroupRow(iteratedRow)) {
-              // If we previously found the ModelRow that was moved, and we hit
-              // a GroupRow, then that means that the GroupRow is the first GroupRow
-              // underneath that ModelRow - which means that the ModelRow should now
-              // belong to that GroupRow.
-              if (foundMovedRow) {
-                groupRow = iteratedRow;
-                break;
-              }
+        for (let i = 0; i < rows.length; i++) {
+          const iteratedRow: Table.BodyRow<R> = rows[i];
+          if (tabling.typeguards.isModelRow(iteratedRow)) {
+            if (iteratedRow.id === row.id) {
+              foundMovedRow = true;
+            } else if (foundMovedRow === false) {
+              previous = iteratedRow;
+            }
+          } else if (tabling.typeguards.isGroupRow(iteratedRow)) {
+            // If we previously found the ModelRow that was moved, and we hit
+            // a GroupRow, then that means that the GroupRow is the first GroupRow
+            // underneath that ModelRow - which means that the ModelRow should now
+            // belong to that GroupRow.
+            if (foundMovedRow) {
+              groupRow = iteratedRow;
+              break;
             }
           }
-          grouplessIndex = naiveIndexToGrouplessIndex[naiveOrder];
-          // The grouplessIndex will only be -1 if there are no ModelRow(s), in which case the
-          // dragging shouldn't be allowed to begin with.
-          if (grouplessIndex === -1 || grouplessIndex === undefined) {
-            console.error(`Invalid index for non-groups rows ${grouplessIndex} computed!`);
-            return;
-          }
-          props.onChangeEvent({
-            type: "rowPositionChanged",
-            payload: { order: grouplessIndex, id: row.id, newGroup: !isNil(groupRow) ? groupRow.id : null }
-          });
         }
+        props.onChangeEvent({
+          type: "rowPositionChanged",
+          payload: {
+            previous: !isNil(previous) ? previous.id : null,
+            id: row.id,
+            newGroup: !isNil(groupRow) ? groupRow.id : null
+          }
+        });
       });
 
       const onRowDragMove = hooks.useDynamicCallback((e: RowDragEvent) => {

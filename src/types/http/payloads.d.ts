@@ -58,7 +58,7 @@ namespace Http {
     readonly rate: number;
     readonly unit?: Model.FringeUnit;
     readonly color?: string | null;
-    readonly order?: number;
+    readonly previous?: number | null;
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -101,22 +101,25 @@ namespace Http {
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  interface AccountPayload extends ModelPayload<Model.Account> {
+  interface AccountPayload extends Omit<ModelPayload<Model.Account>, "order"> {
     readonly group?: number | null;
+    readonly previous?: number | null;
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type SubAccountPayload = Omit<ModelPayload<Model.SubAccount>, "unit" | "attachments"> & {
+  type SubAccountPayload = Omit<ModelPayload<Model.SubAccount>, "unit" | "attachments" | "order"> & {
     readonly unit?: number | null;
     readonly group?: number | null;
     readonly attachments?: number[];
+    readonly previous?: number | null;
   };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  interface ActualPayload extends Omit<ModelPayload<Model.Actual>, "owner" | "actual_type" | "attachments"> {
+  interface ActualPayload extends Omit<ModelPayload<Model.Actual>, "owner" | "actual_type" | "attachments" | "order"> {
     readonly actual_type?: number | null;
     readonly attachments?: number[];
     readonly owner?: Model.GenericHttpModel<"subaccount"> | Model.GenericHttpModel<"markup"> | null;
+    readonly previous?: number | null;
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -139,7 +142,7 @@ namespace Http {
     readonly rate?: number | null;
     readonly image?: ArrayBuffer | string | null;
     readonly attachments?: number[];
-    readonly order?: number;
+    readonly previous?: number | null;
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */

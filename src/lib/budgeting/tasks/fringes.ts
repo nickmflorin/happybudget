@@ -212,7 +212,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     yield put(config.actions.saving(true));
     try {
       const response: M = yield api.request(api.updateFringe, e.payload.id, {
-        order: e.payload.order
+        previous: e.payload.previous
       });
       yield put(
         config.actions.tableChanged({
