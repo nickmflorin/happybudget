@@ -47,7 +47,8 @@ const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): 
               id: response.id,
               email: response.email,
               name: response.full_name,
-              avatarURL: response.profile_image?.url
+              avatarURL: response.profile_image?.url,
+              created: new Date(response.date_joined).toISOString()
             }
           });
         } else if (process.env.NODE_ENV === "production") {
