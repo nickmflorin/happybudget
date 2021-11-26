@@ -42,6 +42,12 @@ $ nvm current
 $ v10.12.0
 ```
 
+Next, we need to install `yarn`:
+
+```bash
+npm install --global yarn
+```
+
 ##### Dependencies
 
 Now we need to setup the dependencies. We use [`yarn`](https://yarnpkg.com/)
