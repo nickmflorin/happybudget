@@ -32,6 +32,7 @@ const Cell = <
       id={props.id}
       className={classNames(
         "inner-cell",
+        props.className,
         !isNil(props.innerCellClassName) && typeof props.innerCellClassName === "function"
           ? props.innerCellClassName(row)
           : props.innerCellClassName

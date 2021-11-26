@@ -1,11 +1,17 @@
 import React, { useEffect, useMemo, useRef, useReducer } from "react";
 import { toast } from "react-toastify";
 import { isNil, map } from "lodash";
+import { Progress } from "antd";
 
 import * as api from "api";
+import { ui } from "lib";
+
+import { Icon } from "components";
 import { AttachmentText } from "components/files";
 
 import { Cell } from "./generic";
+
+import "./AttachmentsCell.scss";
 
 type DragCountAction = { type: "INCREMENT_COUNT" | "DECREMENT_COUNT" | "SET_DRAG" | "CLEAR"; payload?: boolean };
 type DragState = { count: number; drag: boolean };
@@ -50,6 +56,11 @@ const AttachmentsCell = <
   ...props
 }: AttachmentsCellProps<R, M, S>): JSX.Element => {
   const divRef = useRef<HTMLDivElement>(null);
+  const [progressValue, progressActive, progressUpdate, progressCancel] = ui.progress.useDampenedProgress({
+    dampenedRate: 0.1,
+    perMilliseconds: 80
+  });
+
   const [dragState, dispatchDragState] = useReducer(DragCountReducer, InitialDragState);
   const row: Table.ModelRow<R> = props.node.data;
 
@@ -82,19 +93,19 @@ const AttachmentsCell = <
     };
 
     const handleDrop = (e: DragEvent) => {
-      const progress = (computable: boolean, percent: number, total: number) => {
-        console.info({ computable, percent, total });
+      const error = (message: string) => {
+        toast.error(message);
+        progressCancel();
       };
-      const error = (message: string) => toast.error(message);
 
       e.preventDefault();
       e.stopPropagation();
       dispatchDragState({ type: "SET_DRAG", payload: false });
       if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
         for (let i = 0; i < e.dataTransfer.files.length; i++) {
-          api.xhr.uploadAttachmentFile(e.dataTransfer.files[i], props.uploadAttachmentsPath(row.id), {
+          api.xhr.uploadAttachmentFile(e.dataTransfer.files, props.uploadAttachmentsPath(row.id), {
             error,
-            progress,
+            progress: (computable: boolean, percent: number, total: number) => progressUpdate(percent, total),
             /* eslint-disable-next-line no-loop-func */
             success: (ms: Model.Attachment[]) => map(ms, (m: Model.Attachment) => props.onAttachmentAdded(row, m))
           });
@@ -116,11 +127,35 @@ const AttachmentsCell = <
       divRef.current?.removeEventListener("dragover", handleDrag);
       divRef.current?.removeEventListener("drop", handleDrop);
     };
-  }, [divRef.current]);
+  });
+
+  const content = useMemo(() => {
+    if (progressActive) {
+      return <Progress className={"progress-bar"} percent={Math.floor(progressValue * 100.0)} />;
+    } else {
+      if (dragState.drag) {
+        return (
+          <div className={"drag"}>
+            <Icon weight={"regular"} icon={"arrow-circle-down"} />
+            {"Drop files here"}
+          </div>
+        );
+      } else if (!isNil(attachment)) {
+        return <AttachmentText additionalCount={additionalCount}>{attachment}</AttachmentText>;
+      } else {
+        return (
+          <div className={"selected"}>
+            <Icon weight={"regular"} icon={"arrow-circle-down"} />
+            {"Double click or drop files here"}
+          </div>
+        );
+      }
+    }
+  }, [attachment, progressActive, dragState.drag, progressValue]);
 
   return (
-    <Cell {...props} ref={divRef} style={dragState.drag ? { backgroundColor: "#e6f7ff" } : {}}>
-      {!isNil(attachment) && <AttachmentText additionalCount={additionalCount}>{attachment}</AttachmentText>}
+    <Cell {...props} ref={divRef} className={"cell--attachments"}>
+      {content}
     </Cell>
   );
 };

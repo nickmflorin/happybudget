@@ -1,0 +1,51 @@
+@import "style/_imports";
+
+.cell--attachments {
+
+	.selected {
+    display: none;
+    color: $text-secondary;
+
+    .icon {
+      color: $text-secondary;
+      margin-right: 5px;
+    }
+
+    .table .grid .row > .cell.ag-cell-focus & {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+
+  .drag {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px dashed $text-secondary;
+    color: $text-secondary;
+    z-index: 3;
+
+    .icon {
+      color: $text-secondary;
+      margin-right: 5px;
+    }
+  }
+
+  .progress-bar {
+    width: 100%;
+
+    &.ant-progress-show-info .ant-progress-outer {
+      padding-right: calc(2em + 0px);
+    }
+
+    .ant-progress-text {
+      text-align: right;
+    }
+  }
+}

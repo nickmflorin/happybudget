@@ -11,20 +11,31 @@ type UploadAttachmentFileOptions = {
   readonly send?: boolean;
 };
 
+type F = File | ActualFileObject;
+type UploadableFileProp = F | FileList | F[];
+
+const isFile = (f: UploadableFileProp): f is F => {
+  return typeof f === "object" && (f as F).name !== undefined;
+};
+
+const isFiles = (f: UploadableFileProp): f is F[] => Array.isArray(f);
+
 export const uploadAttachmentFile = (
-  file: File | ActualFileObject | (File | ActualFileObject)[],
+  file: File | ActualFileObject | (File | ActualFileObject)[] | FileList,
   path: string,
   options?: UploadAttachmentFileOptions
 ): XMLHttpRequest => {
   const url = `${process.env.REACT_APP_API_DOMAIN}${path}`;
   const formData = new FormData();
 
-  if (Array.isArray(file)) {
+  if (isFile(file)) {
+    formData.append("file", file, file.name);
+  } else if (isFiles(file)) {
     for (let i = 0; i < file.length; i++) {
       formData.append("files", file[i], file[i].name);
     }
   } else {
-    formData.append("file", file, file.name);
+    Object.entries(file).forEach((v: [string, File]) => formData.append("file", v[1], v[1].name));
   }
 
   const request = new XMLHttpRequest();
