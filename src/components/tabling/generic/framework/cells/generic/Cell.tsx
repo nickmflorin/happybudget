@@ -1,5 +1,6 @@
 import React, { forwardRef, useMemo, RefObject, ForwardedRef } from "react";
 import { isNil } from "lodash";
+import classNames from "classnames";
 
 import { ui } from "lib";
 
@@ -29,8 +30,18 @@ const Cell = <
   return (
     <div
       id={props.id}
-      className={"inner-cell"}
-      style={props.style}
+      className={classNames(
+        "inner-cell",
+        !isNil(props.innerCellClassName) && typeof props.innerCellClassName === "function"
+          ? props.innerCellClassName(row)
+          : props.innerCellClassName
+      )}
+      style={{
+        ...props.style,
+        ...(!isNil(props.innerCellStyle) && typeof props.innerCellStyle === "function"
+          ? props.innerCellStyle(row)
+          : props.innerCellStyle)
+      }}
       ref={ref}
       onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => !isNil(props.onKeyDown) && props.onKeyDown(event)}
     >

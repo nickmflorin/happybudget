@@ -36,6 +36,9 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
       return r.data.description || "";
     },
     cellRendererParams: {
+      // For the MarkupRow, we need to remove the flex styling so we can justify
+      // the Icon at the right end of the cell.
+      innerCellStyle: (row: Table.BodyRow<R>) => (tabling.typeguards.isMarkupRow(row) ? { display: "block" } : {}),
       icon: (row: Table.BodyRow<R>) =>
         tabling.typeguards.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined
     },

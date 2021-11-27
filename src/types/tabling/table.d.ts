@@ -691,6 +691,8 @@ namespace Table {
     readonly value: V;
     readonly gridId: GridId;
     readonly icon?: IconOrElement | ((row: BodyRow<R>) => IconOrElement | undefined | null);
+    readonly innerCellClassName?: string | undefined | ((r: Table.Row<R>) => string | undefined);
+    readonly innerCellStyle?: React.CSSProperties | undefined | ((r: Table.Row<R>) => React.CSSProperties | undefined);
     readonly generateNewRowData?: (rows: BodyRow<R>[]) => Partial<R>;
     // Note: This is only applied for the data grid rows/cells - so we have to be careful.  We need
     // a better way of establishing which props are available to cells based on which grid they lie
