@@ -310,12 +310,6 @@ const AuthenticatedTable = <
           columns={columns}
           framework={props.framework}
           hiddenColumns={props.hiddenColumns}
-          checkboxColumn={{
-            // If we want to leftAlign the New Row Button, we do not want to have the cell span 2 columns
-            // because then the New Row Button will be centered horizontally between two cells and not
-            // aligned with the Index cells in the grid--data.
-            colSpan: (params: Table.ColSpanParams<R, M>) => (props.hasExpandColumn ? 2 : 1)
-          }}
         />
       }
     >
@@ -351,10 +345,6 @@ const AuthenticatedTable = <
           footerRowSelectors={props.footerRowSelectors}
           checkboxColumn={{
             cellRenderer: "NewRowCell",
-            // If we want to leftAlign the New Row Button, we do not want to have the cell span 2 columns
-            // because then the New Row Button will be centered horizontally between two cells and not
-            // aligned with the Index cells in the grid--data.
-            colSpan: (params: Table.ColSpanParams<R, M>) => (props.hasExpandColumn ? 2 : 1),
             // The onChangeEvent callback is needed to dispatch the action to create a new row.
             cellRendererParams: {
               onChangeEvent: _onChangeEvent
