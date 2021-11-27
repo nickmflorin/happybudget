@@ -4,7 +4,7 @@ import { map, isNil, includes, find, filter } from "lodash";
 
 import { tabling, hooks, util } from "lib";
 
-export type UseContextMenuParams<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {
+export type UseContextMenuParams<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
   readonly apis: Table.GridApis | null;
   readonly data: Table.BodyRow<R>[];
   readonly getModelRowLabel?: Table.RowStringGetter<Table.ModelRow<R>>;
@@ -30,7 +30,7 @@ const evaluateRowStringGetter = <R extends Table.BodyRow>(
 ): Table.RowNameLabelType | undefined => (typeof value === "function" ? value(row) : value);
 
 /* eslint-disable indent */
-const useContextMenu = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   params: UseContextMenuParams<R, M>
 ): [(row: Table.BodyRow<R>, node: Table.RowNode) => Table.MenuItemDef[]] => {
   const getRowName = useMemo(

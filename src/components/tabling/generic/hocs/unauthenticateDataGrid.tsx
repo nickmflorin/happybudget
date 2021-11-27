@@ -22,7 +22,10 @@ type InjectedUnauthenticatedDataGridProps<R extends Table.RowData> = {
   readonly tabToNextCell: (params: TabToNextCellParams) => Table.CellPosition;
 };
 
-export interface UnauthenticateDataGridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
+export interface UnauthenticateDataGridProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel
+> {
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
   readonly grid: NonNullRef<Table.DataGridInstance<R>>;
@@ -34,7 +37,7 @@ export type WithUnauthenticatedDataGridProps<R extends Table.RowData, T> = T & I
 const unauthenticatedDataGrid =
   <
     R extends Table.RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     T extends UnauthenticateDataGridProps<R, M> = UnauthenticateDataGridProps<R, M>
   >(
     config?: Table.UnauthenticatedDataGridConfig<R>

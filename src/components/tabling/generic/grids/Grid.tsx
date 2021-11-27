@@ -89,12 +89,13 @@ type UseAgProps<R extends Table.RowData> = ExtensionProps & {
   readonly getContextMenuItems?: (row: Table.BodyRow<R>, node: Table.RowNode) => Table.MenuItemDef[];
 };
 
-export interface GridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> extends UseAgProps<R> {
+export interface GridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
+  extends UseAgProps<R> {
   readonly id: Table.GridId;
   readonly data?: Table.BodyRow<R>[];
   readonly hiddenColumns?: Table.HiddenColumns;
   readonly gridOptions: Table.GridOptions;
-  readonly indexColumn?: Partial<Table.Column<R, M>>;
+  readonly checkboxColumn?: Partial<Table.Column<R, M>>;
   readonly columns: Table.Column<R, M>[];
   readonly className?: Table.GeneralClassName;
   readonly style?: React.CSSProperties;
@@ -113,14 +114,14 @@ export interface GridProps<R extends Table.RowData, M extends Model.HttpModel = 
 }
 
 /* eslint-disable indent */
-const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>({
+const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
   id,
   columns,
   data,
   className,
   hiddenColumns,
   rowClass,
-  indexColumn,
+  checkboxColumn,
   style,
   ...props
 }: GridProps<R, M>): JSX.Element => {
@@ -139,7 +140,9 @@ const Grid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpMod
           : col.cellStyle
       } as Table.Column<R, M>;
     });
-    cs = !isNil(indexColumn) ? util.updateInArray<Table.Column<R, M>>(cs, { field: "index" }, indexColumn) : cs;
+    cs = !isNil(checkboxColumn)
+      ? util.updateInArray<Table.Column<R, M>>(cs, { field: "checkbox" }, checkboxColumn)
+      : cs;
     return cs;
   }, [hiddenColumns]);
 

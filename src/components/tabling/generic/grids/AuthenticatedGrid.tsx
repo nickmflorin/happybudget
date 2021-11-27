@@ -7,7 +7,7 @@ import { tabling, hooks } from "lib";
 import { framework as generic } from "components/tabling/generic";
 import Grid, { GridProps } from "./Grid";
 
-export interface AuthenticatedGridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
+export interface AuthenticatedGridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
   extends GridProps<R, M> {
   readonly apis: Table.GridApis | null;
   readonly framework?: Table.Framework;
@@ -17,7 +17,7 @@ export interface AuthenticatedGridProps<R extends Table.RowData, M extends Model
 }
 
 /* eslint-disable indent */
-const AuthenticatedGrid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>({
+const AuthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
   framework,
   footerRowSelectors,
   ...props

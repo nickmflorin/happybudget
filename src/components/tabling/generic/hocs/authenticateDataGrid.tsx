@@ -47,7 +47,7 @@ interface InjectedAuthenticatedDataGridProps<R extends Table.RowData> {
   readonly onRowDragMove: (event: RowDragEvent) => void;
 }
 
-export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
+export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
   extends UseContextMenuParams<R, M> {
   readonly apis: Table.GridApis | null;
   readonly tableId: Table.Id;
@@ -70,7 +70,7 @@ export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Mo
 
 export type WithAuthenticatedDataGridProps<R extends Table.RowData, T> = T & InjectedAuthenticatedDataGridProps<R>;
 
-const getCellChangeForClear = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+const getCellChangeForClear = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   row: Table.EditableRow<R>,
   col: Table.Column<R, M>
 ): Table.SoloCellChange<R> | null => {
@@ -87,7 +87,7 @@ const getCellChangeForClear = <R extends Table.RowData, M extends Model.HttpMode
   }
 };
 
-const getTableChangesFromRangeClear = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+const getTableChangesFromRangeClear = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   api: Table.GridApi,
   columns: Table.Column<R, M>[],
   range: CellRange
@@ -123,7 +123,7 @@ const getTableChangesFromRangeClear = <R extends Table.RowData, M extends Model.
   return changes;
 };
 
-const getCellChangesFromEvent = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+const getCellChangesFromEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   columns: Table.Column<R, M>[],
   event: CellEditingStoppedEvent | CellValueChangedEvent
 ): Table.SoloCellChange<R>[] => {
@@ -211,7 +211,7 @@ const getCellChangesFromEvent = <R extends Table.RowData, M extends Model.HttpMo
 const authenticateDataGrid =
   <
     R extends Table.RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     T extends AuthenticateDataGridProps<R, M> = AuthenticateDataGridProps<R, M>
   >(
     config?: Table.AuthenticatedDataGridConfig<R>
@@ -291,7 +291,7 @@ const authenticateDataGrid =
               return true;
             }
           }),
-          index: {
+          checkbox: {
             checkboxSelection: (params: CheckboxSelectionCallbackParams) => {
               const row: Table.BodyRow<R> = params.data;
               if (tabling.typeguards.isEditableRow(row)) {

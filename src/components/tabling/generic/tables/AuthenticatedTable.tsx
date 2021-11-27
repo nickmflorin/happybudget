@@ -310,7 +310,7 @@ const AuthenticatedTable = <
           columns={columns}
           framework={props.framework}
           hiddenColumns={props.hiddenColumns}
-          indexColumn={{
+          checkboxColumn={{
             // If we want to leftAlign the New Row Button, we do not want to have the cell span 2 columns
             // because then the New Row Button will be centered horizontally between two cells and not
             // aligned with the Index cells in the grid--data.
@@ -349,7 +349,7 @@ const AuthenticatedTable = <
           onChangeEvent={_onChangeEvent}
           framework={props.framework}
           footerRowSelectors={props.footerRowSelectors}
-          indexColumn={{
+          checkboxColumn={{
             cellRenderer: "NewRowCell",
             // If we want to leftAlign the New Row Button, we do not want to have the cell span 2 columns
             // because then the New Row Button will be centered horizontally between two cells and not

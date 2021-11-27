@@ -4,7 +4,7 @@ import { map, isNil } from "lodash";
 import { tabling } from "lib";
 import TableMenuAction from "./MenuAction";
 
-interface AuthenticatedToolbarProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
+interface AuthenticatedToolbarProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
   readonly actions: Table.AuthenticatedMenuActions<R, M>;
@@ -13,7 +13,7 @@ interface AuthenticatedToolbarProps<R extends Table.RowData, M extends Model.Htt
 }
 
 /* eslint-disable indent */
-const AuthenticatedToolbar = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+const AuthenticatedToolbar = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: AuthenticatedToolbarProps<R, M>
 ): JSX.Element => {
   return (

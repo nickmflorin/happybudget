@@ -14,7 +14,7 @@ type UseAuthenticatedClipboardReturnType<R extends Table.RowData> = [
   (p: Table.SoloCellChange<R> | null) => void
 ];
 
-type UseAuthenticatedClipboardParams<R extends Table.RowData, M extends Model.HttpModel> = Omit<
+type UseAuthenticatedClipboardParams<R extends Table.RowData, M extends Model.RowHttpModel> = Omit<
   UseClipboardParams<R, M>,
   "setCellCutChange"
 > & {
@@ -22,7 +22,7 @@ type UseAuthenticatedClipboardParams<R extends Table.RowData, M extends Model.Ht
   readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
 };
 
-const columnIsWritable = <R extends Table.RowData, M extends Model.HttpModel>(
+const columnIsWritable = <R extends Table.RowData, M extends Model.RowHttpModel>(
   columns: Table.Column<R, M>[],
   col: Table.AgColumn
 ): [Table.Column<R, M>, true] | [null, false] | [Table.Column<R, M>, false] => {
@@ -34,7 +34,7 @@ const columnIsWritable = <R extends Table.RowData, M extends Model.HttpModel>(
   return [null, false];
 };
 
-const getWritableColumnsAfter = <R extends Table.RowData, M extends Model.HttpModel>(
+const getWritableColumnsAfter = <R extends Table.RowData, M extends Model.RowHttpModel>(
   api: Table.ColumnApi,
   columns: Table.Column<R, M>[],
   col: Table.AgColumn
@@ -53,7 +53,7 @@ const getWritableColumnsAfter = <R extends Table.RowData, M extends Model.HttpMo
   return cols;
 };
 
-const processValueFromClipboard = <R extends Table.RowData, M extends Model.HttpModel>(
+const processValueFromClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
   value: string,
   c: Table.Column<R, M>,
   row?: Table.BodyRow<R> // Will not be defined when adding rows.
@@ -78,7 +78,7 @@ const processValueFromClipboard = <R extends Table.RowData, M extends Model.Http
   }
 };
 
-const processArrayFromClipboard = <R extends Table.RowData, M extends Model.HttpModel>(
+const processArrayFromClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
   api: Table.ColumnApi,
   cols: Table.Column<R, M>[],
   col: Table.AgColumn,
@@ -107,7 +107,7 @@ const processArrayFromClipboard = <R extends Table.RowData, M extends Model.Http
   );
 };
 
-const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.HttpModel>(
+const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
   params: UseAuthenticatedClipboardParams<R, M>
 ): UseAuthenticatedClipboardReturnType<R> => {
   const [cutCellChange, setCellCutChange] = useState<Table.SoloCellChange<R> | null>(null);

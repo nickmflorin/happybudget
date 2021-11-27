@@ -6,8 +6,8 @@ import { tabling, budgeting } from "lib";
 /* eslint-disable indent */
 export const IdentifierColumn = <
   R extends Tables.BudgetRowData,
-  M extends Model.HttpModel,
-  PDFM extends Model.HttpModel = any
+  M extends Model.RowHttpModel,
+  PDFM extends Model.RowHttpModel = any
 >(
   props: Partial<Table.Column<R, M, string | null, PDFM>>
 ): Table.Column<R, M, string | null, PDFM> => {
@@ -74,8 +74,8 @@ export const IdentifierColumn = <
 
 export const EstimatedColumn = <
   R extends Tables.BudgetRowData,
-  M extends Model.HttpModel,
-  PDFM extends Model.HttpModel = any
+  M extends Model.RowHttpModel,
+  PDFM extends Model.RowHttpModel = any
 >(
   props: Partial<Table.Column<R, M, number, PDFM>>
 ): Table.Column<R, M, number, PDFM> => {
@@ -97,8 +97,8 @@ export const EstimatedColumn = <
 
 export const ActualColumn = <
   R extends Tables.BudgetRowData,
-  M extends Model.HttpModel,
-  PDFM extends Model.HttpModel = any
+  M extends Model.RowHttpModel,
+  PDFM extends Model.RowHttpModel = any
 >(
   props: Partial<Table.Column<R, M, number, PDFM>>
 ): Table.Column<R, M, number, PDFM> => {
@@ -120,8 +120,8 @@ export const ActualColumn = <
 
 export const VarianceColumn = <
   R extends Tables.BudgetRowData,
-  M extends Model.HttpModel,
-  PDFM extends Model.HttpModel = any
+  M extends Model.RowHttpModel,
+  PDFM extends Model.RowHttpModel = any
 >(
   props: Partial<Table.Column<R, M, number, PDFM>>
 ): Table.Column<R, M, number, PDFM> => {

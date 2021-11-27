@@ -8,11 +8,11 @@ import * as aggrid from "./aggrid";
 import * as formatters from "./formatters";
 import * as Models from "./models";
 
-export const getColumn = <R extends Table.RowData = any, M extends Model.HttpModel = any>(
+export const getColumn = <R extends Table.RowData = any, M extends Model.RowHttpModel = any>(
   columns: Table.Column<R, M>[],
   field: keyof R | string
 ): Table.Column<R, M> | null => {
-  const foundColumn = find(columns, (c: Table.Column<R, M>) => c.field === field || c.colId === field);
+  const foundColumn = find(columns, (c: Table.Column<R, M>) => normalizedField(c) === field);
   if (!isNil(foundColumn)) {
     return foundColumn;
   } else {
@@ -21,7 +21,7 @@ export const getColumn = <R extends Table.RowData = any, M extends Model.HttpMod
   }
 };
 
-export const callWithColumn = <R extends Table.RowData = any, M extends Model.HttpModel = any, RT = any>(
+export const callWithColumn = <R extends Table.RowData = any, M extends Model.RowHttpModel = any, RT = any>(
   columns: Table.Column<R, M>[],
   field: keyof R | string,
   callback: (col: Table.Column<R, M>) => RT | null
@@ -33,9 +33,9 @@ export const callWithColumn = <R extends Table.RowData = any, M extends Model.Ht
 /* eslint-disable indent */
 export const isEditable = <
   R extends Table.RowData = any,
-  M extends Model.HttpModel = any,
+  M extends Model.RowHttpModel = any,
   V = any,
-  PDFM extends Model.HttpModel = any
+  PDFM extends Model.RowHttpModel = any
 >(
   column: Table.Column<R, M, V, PDFM>,
   row: Table.BodyRow<R>
@@ -50,9 +50,9 @@ export const isEditable = <
 
 export const normalizedField = <
   R extends Table.RowData = any,
-  M extends Model.HttpModel = any,
+  M extends Model.RowHttpModel = any,
   V = any,
-  PDFM extends Model.HttpModel = any,
+  PDFM extends Model.RowHttpModel = any,
   P extends { readonly field?: keyof R; readonly colId?: string } = Table.Column<R, M, V, PDFM>
 >(
   col: P
@@ -65,9 +65,9 @@ type ColumnTypeVariantOptions = {
 
 export const normalizePdfColumnWidths = <
   R extends Table.RowData = any,
-  M extends Model.HttpModel = any,
+  M extends Model.RowHttpModel = any,
   V = any,
-  PDFM extends Model.HttpModel = any
+  PDFM extends Model.RowHttpModel = any
 >(
   cs: Table.Column<R, M, V, PDFM>[],
   flt?: (c: Table.Column<R, M, V, PDFM>) => boolean
@@ -146,14 +146,14 @@ export const getColumnTypeCSSStyle = (
 
 type ColumnUpdate<
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  PDFM extends Model.HttpModel = any
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  PDFM extends Model.RowHttpModel = any
 > = Partial<Table.Column<R, M>> | ((p: Table.Column<R, M, any, PDFM>) => Partial<Table.Column<R, M>>);
 
 export const normalizeColumns = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  PDFM extends Model.HttpModel = any
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  PDFM extends Model.RowHttpModel = any
 >(
   // TODO: Assuming any here for D can cause bugs - where the update might have fields in it that
   // are not allowed.  We should come up with a cleaner solution.
@@ -196,8 +196,8 @@ export const normalizeColumns = <
 
 export const orderColumns = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  PDFM extends Model.HttpModel = any
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  PDFM extends Model.RowHttpModel = any
 >(
   columns: Table.Column<R, M, any, PDFM>[]
 ): Table.Column<R, M, any, PDFM>[] => {
@@ -237,7 +237,7 @@ export const orderColumns = <
 };
 
 /* eslint-disable indent */
-export const ActionColumn = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+export const ActionColumn = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   col: Partial<Table.Column<R, M, any>>
 ): Table.Column<R, M, any> => ({
   ...col,
@@ -256,8 +256,8 @@ export const ActionColumn = <R extends Table.RowData, M extends Model.HttpModel 
 
 export const FakeColumn = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  PDFM extends Model.HttpModel = any
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  PDFM extends Model.RowHttpModel = any
 >(
   col: Partial<Table.Column<R, M, any, PDFM>>
 ): Table.Column<R, M, any, PDFM> => ({
@@ -268,8 +268,8 @@ export const FakeColumn = <
 
 export const CalculatedColumn = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  PDFM extends Model.HttpModel = any
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  PDFM extends Model.RowHttpModel = any
 >(
   col: Partial<Table.Column<R, M, number, PDFM>>,
   width?: number
@@ -300,7 +300,7 @@ export const CalculatedColumn = <
 
 export const AttachmentsColumn = <
   R extends Tables.ActualRowData | Tables.SubAccountRowData | Tables.ContactRowData,
-  M extends Model.HttpModel = Model.HttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel
 >(
   col: Partial<Table.Column<R, M, Model.SimpleAttachment[]>>,
   width?: number
@@ -327,9 +327,9 @@ export const AttachmentsColumn = <
 
 export const BodyColumn = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   V = any,
-  PDFM extends Model.HttpModel = any
+  PDFM extends Model.RowHttpModel = any
 >(
   col?: Partial<Table.Column<R, M, V, PDFM>>
 ): Table.Column<R, M, V, PDFM> => {
@@ -339,7 +339,7 @@ export const BodyColumn = <
   };
 };
 
-export const DragColumn = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+export const DragColumn = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   col: Partial<Table.Column<R, M>>,
   width?: number
 ): Table.Column<R, M> =>
@@ -351,12 +351,12 @@ export const DragColumn = <R extends Table.RowData, M extends Model.HttpModel = 
       const r: Table.BodyRow<R> = params.node.data;
       return tabling.typeguards.isModelRow(r);
     },
-    field: "index" as keyof R,
+    colId: "drag",
     width: !isNil(width) ? width : 25,
     maxWidth: !isNil(width) ? width : 25
   }) as Table.Column<R, M>;
 
-export const ExpandColumn = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+export const ExpandColumn = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   col: Partial<Table.Column<R, M, any>>,
   width?: number
 ): Table.Column<R, M, any> =>
@@ -366,10 +366,10 @@ export const ExpandColumn = <R extends Table.RowData, M extends Model.HttpModel 
     ...col,
     width: !isNil(width) ? width : 30,
     maxWidth: !isNil(width) ? width : 30,
-    field: "expand" as keyof R & string
+    colId: "expand"
   });
 
-export const IndexColumn = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+export const CheckboxColumn = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   col: Partial<Table.Column<R, M>>,
   hasExpandColumn: boolean,
   width?: number
@@ -378,7 +378,7 @@ export const IndexColumn = <R extends Table.RowData, M extends Model.HttpModel =
     /* eslint-disable indent */
     cellRenderer: "EmptyCell",
     ...col,
-    field: "index" as keyof R,
+    colId: "checkbox",
     width: !isNil(width) ? width : hasExpandColumn === false ? 40 : 25,
     maxWidth: !isNil(width) ? width : hasExpandColumn === false ? 40 : 25
   }) as Table.Column<R, M>;
@@ -387,9 +387,9 @@ export const IndexColumn = <R extends Table.RowData, M extends Model.HttpModel =
 // the clipboard processing props are provided.
 export const SelectColumn = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   V = any,
-  PDFM extends Model.HttpModel = any
+  PDFM extends Model.RowHttpModel = any
 >(
   col: Partial<Table.Column<R, M, V, PDFM>>
 ): Table.Column<R, M, V, PDFM> => {
@@ -414,8 +414,8 @@ export const SelectColumn = <
 
 export const TagSelectColumn = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
-  PDFM extends Model.HttpModel = any
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  PDFM extends Model.RowHttpModel = any
 >(
   col: Partial<Table.Column<R, M, Model.Tag, PDFM>>
 ): Table.Column<R, M, Model.Tag, PDFM> => {
@@ -434,9 +434,9 @@ export const TagSelectColumn = <
 };
 export const ChoiceSelectColumn = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Model.Choice<any, any> = Model.Choice<any, any>,
-  PDFM extends Model.HttpModel = any
+  PDFM extends Model.RowHttpModel = any
 >(
   col: Partial<Table.Column<R, M, C, PDFM>>
 ): Table.Column<R, M, C, PDFM> => {

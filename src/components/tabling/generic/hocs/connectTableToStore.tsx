@@ -7,7 +7,7 @@ import { redux, tabling } from "lib";
 
 type ProvidedProps<
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = {
   readonly search: string;
@@ -23,7 +23,7 @@ type ProvidedProps<
 export type WithConnectedTableProps<
   T,
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = T & ProvidedProps<R, M, S>;
 

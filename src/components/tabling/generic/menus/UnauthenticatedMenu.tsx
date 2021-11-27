@@ -10,7 +10,7 @@ import UnauthenticatedToolbar from "./UnauthenticatedToolbar";
 
 import "./index.scss";
 
-export interface UnauthenticatedMenuProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
+export interface UnauthenticatedMenuProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
   readonly columns: Table.Column<R, M>[];
   readonly search?: string;
   readonly menuPortalId?: string;
@@ -20,14 +20,14 @@ export interface UnauthenticatedMenuProps<R extends Table.RowData, M extends Mod
 
 type InternalUnauthenticatedMenuProps<
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel
 > = UnauthenticatedMenuProps<R, M> & {
   readonly apis: Table.GridApis | null;
   readonly hiddenColumns?: Table.HiddenColumns;
 };
 
 /* eslint-disable indent */
-const UnauthenticatedMenu = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+const UnauthenticatedMenu = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: Omit<InternalUnauthenticatedMenuProps<R, M>, "menuPortalId"> & { readonly detached: boolean }
 ) => (
   /* eslint-disable indent */
@@ -56,7 +56,7 @@ const UnauthenticatedMenu = <R extends Table.RowData, M extends Model.HttpModel 
   </div>
 );
 
-const Menu = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>({
+const Menu = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
   menuPortalId,
   ...props
 }: InternalUnauthenticatedMenuProps<R, M>) =>

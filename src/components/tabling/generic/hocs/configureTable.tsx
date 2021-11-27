@@ -55,11 +55,11 @@ type TableConfigurationProvidedProps<R extends Table.RowData> = {
   readonly changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange>, sizeToFit?: boolean) => void;
 };
 
-export type TableConfigurationProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {
+export type TableConfigurationProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
   readonly cookieNames?: Table.CookieNames;
   readonly calculatedColumnWidth?: number;
-  readonly indexColumn?: Partial<Table.Column<R, M>>;
-  readonly indexColumnWidth?: number;
+  readonly checkboxColumn?: Partial<Table.Column<R, M>>;
+  readonly checkboxColumnWidth?: number;
   readonly expandColumn?: Partial<Table.Column<R, M>>;
   readonly expandColumnWidth?: number;
   readonly expandCellTooltip?: string;
@@ -105,7 +105,7 @@ const apisReducer = (state: tabling.TableApis = InitialAPIs, action: SetApiActio
 /* eslint-disable indent */
 const configureTable = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   T extends TableConfigurationProps<R, M> = TableConfigurationProps<R, M>
 >(
   Component:
@@ -184,10 +184,10 @@ const configureTable = <
 
       if (hasExpandColumn === true) {
         return [
-          tabling.columns.IndexColumn<R, M>(
-            { ...props.indexColumn, pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined },
+          tabling.columns.CheckboxColumn<R, M>(
+            { ...props.checkboxColumn, pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined },
             hasExpandColumn,
-            props.indexColumnWidth
+            props.checkboxColumnWidth
           ),
           tabling.columns.ExpandColumn<R, M>(
             {
@@ -210,10 +210,10 @@ const configureTable = <
         ];
       }
       return [
-        tabling.columns.IndexColumn<R, M>(
-          { ...props.indexColumn, pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined },
+        tabling.columns.CheckboxColumn<R, M>(
+          { ...props.checkboxColumn, pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined },
           hasExpandColumn || false,
-          props.indexColumnWidth
+          props.checkboxColumnWidth
         ),
         ...(props.pinFirstColumn ? pinFirstColumn(orderedColumns) : orderedColumns)
       ];

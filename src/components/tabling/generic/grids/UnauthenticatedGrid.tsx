@@ -5,14 +5,14 @@ import { tabling, hooks } from "lib";
 import { framework as generic } from "components/tabling/generic";
 import Grid, { GridProps } from "./Grid";
 
-export interface UnauthenticatedGridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
+export interface UnauthenticatedGridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
   extends GridProps<R, M> {
   readonly framework?: Table.Framework;
   readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
 }
 
 /* eslint-disable indent */
-const UnauthenticatedGrid = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>({
+const UnauthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
   framework,
   footerRowSelectors,
   ...props
@@ -25,7 +25,6 @@ const UnauthenticatedGrid = <R extends Table.RowData, M extends Model.HttpModel 
         (prev: Table.FrameworkGroup, cell: React.ComponentType<any>, name: string) => ({
           ...prev,
           [name]: cell
-          // [name]: generic.connectCellToStore({ gridId: props.id, footerRowSelectors })(cell)
         }),
         {}
       )

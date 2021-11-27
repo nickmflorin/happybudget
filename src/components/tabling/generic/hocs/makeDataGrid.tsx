@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import classNames from "classnames";
-import { map, isNil, includes, find } from "lodash";
+import { map, isNil, includes, find, filter } from "lodash";
 import hoistNonReactStatics from "hoist-non-react-statics";
 
 import { FirstDataRenderedEvent, CellMouseOverEvent, CellFocusedEvent } from "@ag-grid-community/core";
@@ -14,7 +14,7 @@ interface InjectedDataGridProps {
   readonly onCellFocused?: (e: CellFocusedEvent) => void;
 }
 
-export interface DataGridProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
+export interface DataGridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
   readonly apis: Table.GridApis | null;
   readonly className?: Table.GeneralClassName;
   readonly rowClass?: Table.RowClassName;
@@ -35,7 +35,7 @@ export type WithDataGridProps<T> = T & InjectedDataGridProps;
 const DataGrid =
   <
     R extends Table.RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     T extends DataGridProps<R, M> = DataGridProps<R, M>
   >(
     config?: Table.DataGridConfig<R>
@@ -80,24 +80,29 @@ const DataGrid =
       const onFirstDataRendered: (e: FirstDataRenderedEvent) => void = hooks.useDynamicCallback(
         (e: FirstDataRenderedEvent): void => {
           props.onFirstDataRendered(e);
-          e.api.ensureIndexVisible(1);
+          const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api);
+          if (rows.length !== 0) {
+            e.api.ensureIndexVisible(0);
 
-          const query = new URLSearchParams(location.search);
-          const rowId = query.get("row");
-          const cols = e.columnApi.getAllColumns();
+            const query = new URLSearchParams(location.search);
+            const rowId = query.get("row");
+            const cols = e.columnApi.getAllColumns();
 
-          if (!isNil(cols) && cols.length >= 3) {
-            let identifierCol = cols[2];
-            let focusedOnQuery = false;
-            if (!isNil(rowId) && !isNaN(parseInt(rowId))) {
-              const node = e.api.getRowNode(String(rowId));
-              if (!isNil(node) && !isNil(node.rowIndex) && !isNil(identifierCol)) {
-                e.api.setFocusedCell(node.rowIndex, identifierCol);
-                focusedOnQuery = true;
+            const actionColumns = filter(props.columns, (c: Table.Column<R, M>) => c.tableColumnType === "action");
+
+            if (!isNil(cols) && cols.length > actionColumns.length) {
+              let firstColumn = cols[actionColumns.length];
+              let focusedOnQuery = false;
+              if (!isNil(rowId) && !isNaN(parseInt(rowId))) {
+                const node = e.api.getRowNode(String(rowId));
+                if (!isNil(node) && !isNil(node.rowIndex) && !isNil(firstColumn)) {
+                  e.api.setFocusedCell(node.rowIndex, firstColumn);
+                  focusedOnQuery = true;
+                }
               }
-            }
-            if (focusedOnQuery === false) {
-              e.api.setFocusedCell(0, identifierCol);
+              if (focusedOnQuery === false) {
+                e.api.setFocusedCell(0, firstColumn);
+              }
             }
           }
         }

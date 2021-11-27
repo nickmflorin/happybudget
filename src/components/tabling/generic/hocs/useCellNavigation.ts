@@ -1,10 +1,10 @@
-import { isNil, includes, filter } from "lodash";
+import { isNil, includes, filter, map } from "lodash";
 
 import { NavigateToNextCellParams, TabToNextCellParams } from "@ag-grid-community/core";
 
 import { hooks, tabling, events } from "lib";
 
-export interface UseCellNavigationParams<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> {
+export interface UseCellNavigationParams<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
   readonly tableId?: Table.Id;
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
@@ -20,7 +20,7 @@ type UseCellNavigationReturnType = [
 ];
 
 /* eslint-disable indent */
-const useCellNavigation = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   params: UseCellNavigationParams<R, M>
 ): UseCellNavigationReturnType => {
   const scrollToBottom = hooks.useDynamicCallback((numRows: number) => {
@@ -80,27 +80,31 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.HttpModel = 
   const navigateToNextCell: (p: NavigateToNextCellParams) => Table.CellPosition = hooks.useDynamicCallback(
     (p: NavigateToNextCellParams): Table.CellPosition => {
       if (!isNil(p.nextCellPosition)) {
-        const verticalAscend = p.previousCellPosition.rowIndex < p.nextCellPosition.rowIndex;
-        const verticalDescend = p.previousCellPosition.rowIndex > p.nextCellPosition.rowIndex;
+        const field = p.nextCellPosition.column.getColId();
+        const column = tabling.columns.getColumn(params.columns, field);
+        if (!isNil(column)) {
+          const verticalAscend = p.previousCellPosition.rowIndex < p.nextCellPosition.rowIndex;
+          const verticalDescend = p.previousCellPosition.rowIndex > p.nextCellPosition.rowIndex;
 
-        if (verticalAscend === true || verticalDescend === true) {
-          const direction: "asc" | "desc" = verticalAscend === true ? "asc" : "desc";
-          /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-          const [rowNode, _, additionalIndex] = findNextNavigatableRow(p.nextCellPosition.rowIndex, direction);
-          if (!isNil(rowNode)) {
-            return {
-              ...p.nextCellPosition,
-              rowIndex:
-                verticalAscend === true
-                  ? p.nextCellPosition.rowIndex + additionalIndex
-                  : p.nextCellPosition.rowIndex - additionalIndex
-            };
+          if (verticalAscend === true || verticalDescend === true) {
+            const direction: "asc" | "desc" = verticalAscend === true ? "asc" : "desc";
+            /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+            const [rowNode, _, additionalIndex] = findNextNavigatableRow(p.nextCellPosition.rowIndex, direction);
+            if (!isNil(rowNode)) {
+              return {
+                ...p.nextCellPosition,
+                rowIndex:
+                  verticalAscend === true
+                    ? p.nextCellPosition.rowIndex + additionalIndex
+                    : p.nextCellPosition.rowIndex - additionalIndex
+              };
+            }
+            return p.nextCellPosition;
+          } else if (column.tableColumnType === "action") {
+            return p.previousCellPosition;
+          } else {
+            return p.nextCellPosition;
           }
-          return p.nextCellPosition;
-        } else if (includes(["expand", "index"], p.nextCellPosition.column.getColId())) {
-          return p.previousCellPosition;
-        } else {
-          return p.nextCellPosition;
         }
       }
       return p.previousCellPosition;
@@ -112,23 +116,35 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.HttpModel = 
       // TODO: We need to figure out how to add additional rows in the write case when we are
       // at the bottom right of the table.
       if (!p.editing && p.nextCellPosition !== null) {
-        if (includes(["index", "expand"], p.nextCellPosition.column.getColId())) {
-          let nextCellPosition = { ...p.nextCellPosition };
-          /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-          const [rowNode, _, additionalIndex] = findNextNavigatableRow(p.nextCellPosition.rowIndex);
-          if (!isNil(rowNode)) {
-            nextCellPosition = {
-              ...p.nextCellPosition,
-              rowIndex: p.nextCellPosition.rowIndex + additionalIndex
-            };
-          }
-          const agColumns = params.apis?.column.getAllColumns();
-          if (!isNil(agColumns)) {
-            const baseColumns = filter(agColumns, (c: Table.AgColumn) => includes(["index", "expand"], c.getColId()));
-            if (p.backwards === false && params.columns.length > baseColumns.length) {
-              return { ...nextCellPosition, column: agColumns[baseColumns.length] };
-            } else {
-              return { ...nextCellPosition, column: agColumns[agColumns.length - 1] };
+        const field = p.nextCellPosition.column.getColId();
+        const column = tabling.columns.getColumn(params.columns, field);
+        if (!isNil(column)) {
+          if (column.tableColumnType === "action") {
+            let nextCellPosition = { ...p.nextCellPosition };
+            /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+            const [rowNode, _, additionalIndex] = findNextNavigatableRow(p.nextCellPosition.rowIndex);
+            if (!isNil(rowNode)) {
+              nextCellPosition = {
+                ...p.nextCellPosition,
+                rowIndex: p.nextCellPosition.rowIndex + additionalIndex
+              };
+            }
+            const agColumns = params.apis?.column.getAllColumns();
+            if (!isNil(agColumns)) {
+              const baseColumns = filter(agColumns, (c: Table.AgColumn) =>
+                includes(
+                  map(
+                    filter(params.columns, (ci: Table.Column<R, M>) => ci.tableColumnType === "action"),
+                    (ci: Table.Column<R, M>) => tabling.columns.normalizedField(ci)
+                  ),
+                  c.getColId()
+                )
+              );
+              if (p.backwards === false && params.columns.length > baseColumns.length) {
+                return { ...nextCellPosition, column: agColumns[baseColumns.length] };
+              } else {
+                return { ...nextCellPosition, column: agColumns[agColumns.length - 1] };
+              }
             }
           }
         }

@@ -11,7 +11,11 @@ type WithFooterGridProps<T> = T & { readonly id: "page" | "footer" };
 
 /* eslint-disable indent */
 const FooterGrid =
-  <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, T extends GridProps<R, M> = GridProps<R, M>>(
+  <
+    R extends Table.RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+    T extends GridProps<R, M> = GridProps<R, M>
+  >(
     config: Table.FooterGridConfig<R, M>
   ) =>
   (

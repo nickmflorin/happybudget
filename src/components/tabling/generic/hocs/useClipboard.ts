@@ -9,13 +9,13 @@ export type UseClipboardReturnType<R extends Table.RowData> = [
   (fields?: (keyof R | string)[]) => CSVData
 ];
 
-export type UseClipboardParams<R extends Table.RowData, M extends Model.HttpModel> = {
+export type UseClipboardParams<R extends Table.RowData, M extends Model.RowHttpModel> = {
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
   readonly setCellCutChange?: (ch: Table.SoloCellChange<R> | null) => void;
 };
 
-const processCellValueForClipboard = <R extends Table.RowData, M extends Model.HttpModel>(
+const processCellValueForClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
   column: Table.Column<R, M>,
   row: Table.BodyRow<R>,
   value: any
@@ -37,7 +37,7 @@ const processCellValueForClipboard = <R extends Table.RowData, M extends Model.H
   }
 };
 
-const useClipboard = <R extends Table.RowData, M extends Model.HttpModel>(
+const useClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
   params: UseClipboardParams<R, M>
 ): UseClipboardReturnType<R> => {
   const processCellForClipboard: (p: ProcessCellForExportParams) => string = hooks.useDynamicCallback(
