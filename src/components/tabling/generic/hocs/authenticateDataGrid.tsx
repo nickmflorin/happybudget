@@ -51,7 +51,7 @@ export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Mo
   extends UseContextMenuParams<R, M> {
   readonly apis: Table.GridApis | null;
   readonly tableId: Table.Id;
-  readonly grid: NonNullRef<Table.DataGridInstance<R>>;
+  readonly grid: NonNullRef<Table.DataGridInstance>;
   readonly columns: Table.Column<R, M>[];
   readonly data: Table.BodyRow<R>[];
   readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);

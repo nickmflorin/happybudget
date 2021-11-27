@@ -28,7 +28,7 @@ export interface UnauthenticateDataGridProps<
 > {
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
-  readonly grid: NonNullRef<Table.DataGridInstance<R>>;
+  readonly grid: NonNullRef<Table.DataGridInstance>;
 }
 
 export type WithUnauthenticatedDataGridProps<R extends Table.RowData, T> = T & InjectedUnauthenticatedDataGridProps<R>;

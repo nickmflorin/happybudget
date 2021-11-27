@@ -1,6 +1,6 @@
 import React from "react";
 import { find, isNil, reduce, filter, orderBy, map } from "lodash";
-import { SuppressKeyboardEventParams, RowDragCallbackParams } from "@ag-grid-community/core";
+import { SuppressKeyboardEventParams, RowDragCallbackParams, CellClassParams } from "@ag-grid-community/core";
 
 import { tabling, util } from "lib";
 
@@ -289,7 +289,12 @@ export const CalculatedColumn = <
     isWrite: false,
     suppressSizeToFit: true,
     width: !isNil(width) ? width : 100,
-    cellClass: aggrid.mergeClassNamesFn("cell--calculated", col?.cellClass),
+    cellClass: (params: CellClassParams) => {
+      if (!isNaN(parseFloat(params.value)) && parseFloat(params.value) < 0.0) {
+        return aggrid.mergeClassNamesFn("cell--calculated", "negative", col?.cellClass)(params);
+      }
+      return aggrid.mergeClassNamesFn("cell--calculated", col?.cellClass)(params);
+    },
     valueFormatter: formatters.currencyValueFormatter,
     cellRendererParams: {
       ...col?.cellRendererParams,

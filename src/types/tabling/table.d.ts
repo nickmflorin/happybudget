@@ -193,7 +193,7 @@ namespace Table {
   };
 
   type RawClassName = string | string[] | undefined | { [key: string]: boolean };
-  type ClassNameParamCallback<T> = (params: T) => RawClassName;
+  type ClassNameParamCallback<T> = (params: T) => ClassName<T>;
   interface _CellClassNameArray<P> {
     [n: number]: RawClassName | ClassNameParamCallback<P>;
   }
@@ -357,12 +357,12 @@ namespace Table {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ExpandActionBehavior = "expand" | "edit";
 
-  type DataGridInstance<R extends RowData = RowData> = {
+  type DataGridInstance = {
     readonly getCSVData: (fields?: string[]) => CSVData;
   };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type TableInstance<R extends RowData = RowData, M extends Model.HttpModel = Model.HttpModel> = DataGridInstance<R> & {
+  type TableInstance<R extends RowData = RowData, M extends Model.HttpModel = Model.HttpModel> = DataGridInstance & {
     readonly getFocusedRow: () => BodyRow<R> | null;
     readonly getRow: (id: BodyRowId) => BodyRow<R> | null;
     readonly getRows: () => BodyRow<R>[];

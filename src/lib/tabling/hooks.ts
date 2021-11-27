@@ -120,12 +120,12 @@ export const useHiddenColumns = <R extends Table.RowData, M extends Model.HttpMo
   return [hiddenColumns, changeColumnVisibility];
 };
 
-export const InitialGridRef: Table.DataGridInstance<any> = {
+export const InitialGridRef: Table.DataGridInstance = {
   getCSVData: (fields?: string[]) => []
 };
 
-export const useDataGrid = <R extends Table.RowData = object>(): NonNullRef<Table.DataGridInstance<R>> => {
-  return useRef<Table.DataGridInstance<R>>(InitialGridRef);
+export const useDataGrid = (): NonNullRef<Table.DataGridInstance> => {
+  return useRef<Table.DataGridInstance>(InitialGridRef);
 };
 
 export const InitialTableRef: Table.TableInstance<any, any> = {
