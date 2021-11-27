@@ -29,7 +29,7 @@ const Columns: Table.Column<R, M>[] = [
         tabling.typeguards.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined
     },
     pdfHeaderName: "Category Description",
-    pdfWidth: 0.75,
+    pdfWidth: 0.45,
     pdfFooter: { value: "Grand Total" },
     pdfValueGetter: (r: Table.BodyRow<Tables.AccountRowData>) => {
       if (tabling.typeguards.isGroupRow(r)) {
@@ -40,13 +40,22 @@ const Columns: Table.Column<R, M>[] = [
   }),
   budgeting.columns.EstimatedColumn<R, M, PDFM>({
     colId: "estimated",
-    pdfHeaderName: "Estimated",
     pdfFormatter: tabling.formatters.currencyValueFormatter,
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.estimatedValueGetter
   }),
-  budgeting.columns.ActualColumn<R, M, PDFM>({ includeInPdf: false, field: "actual" }),
-  budgeting.columns.VarianceColumn<R, M, PDFM>({ includeInPdf: false, colId: "variance" }),
+  budgeting.columns.ActualColumn<R, M, PDFM>({
+    field: "actual",
+    pdfFormatter: tabling.formatters.currencyValueFormatter,
+    pdfWidth: 0.15,
+    pdfValueGetter: budgeting.valueGetters.actualValueGetter
+  }),
+  budgeting.columns.VarianceColumn<R, M, PDFM>({
+    colId: "variance",
+    pdfFormatter: tabling.formatters.currencyValueFormatter,
+    pdfWidth: 0.15,
+    pdfValueGetter: budgeting.valueGetters.varianceValueGetter
+  }),
   tabling.columns.FakeColumn<R, M, PDFM>({ field: "nominal_value" }),
   tabling.columns.FakeColumn<R, M, PDFM>({ field: "markup_contribution" }),
   tabling.columns.FakeColumn<R, M, PDFM>({ field: "accumulated_fringe_contribution" }),
