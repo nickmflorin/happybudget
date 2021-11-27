@@ -42,12 +42,10 @@ type TableConfigurationProvidedProps<R extends Table.RowData> = {
   readonly tableGridOptions: Table.TableOptionsSet;
   readonly hasExpandColumn: boolean;
   readonly minimal?: boolean;
-  readonly leftAlignNewRowButton?: boolean;
   readonly rowHeight?: number;
   readonly menuPortalId?: string;
   readonly showPageFooter?: boolean;
   readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
-  // readonly getCSVData: () => CSVData;
   readonly onDataGridReady: (event: GridReadyEvent) => void;
   readonly onFooterGridReady: (event: GridReadyEvent) => void;
   readonly onPageGridReady: (event: GridReadyEvent) => void;
@@ -65,7 +63,6 @@ export type TableConfigurationProps<R extends Table.RowData, M extends Model.Row
   readonly expandCellTooltip?: string;
   readonly showPageFooter?: boolean;
   readonly minimal?: boolean;
-  readonly leftAlignNewRowButton?: boolean;
   readonly rowHeight?: number;
   readonly menuPortalId?: string;
   readonly pinFirstColumn?: boolean;
@@ -231,7 +228,6 @@ const configureTable = <
         {...props}
         id={tableId}
         minimal={props.minimal}
-        leftAlignNewRowButton={props.leftAlignNewRowButton}
         rowHeight={props.rowHeight}
         menuPortalId={props.menuPortalId}
         savingChangesPortalId={props.savingChangesPortalId}

@@ -39,7 +39,6 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
         showPageFooter={false}
         minimal={true}
         cookieNames={{ hiddenColumns: "contacts-table-hidden-columns" }}
-        leftAlignNewRowButton={true}
         rowHeight={40}
         expandCellTooltip={"Edit"}
         getModelRowName={(r: Table.ModelRow<R>) => util.conditionalJoinString(r.data.first_name, r.data.last_name)}
