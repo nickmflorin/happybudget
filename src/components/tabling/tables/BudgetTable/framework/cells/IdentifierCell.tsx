@@ -5,7 +5,7 @@ import { ValueCell } from "components/tabling/generic/framework/cells";
 
 interface IdentifierCellProps<
   R extends Tables.BudgetRowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
 > extends Table.ValueCellProps<R, M, S> {
   readonly onGroupEdit?: (group: Table.GroupRow<R>) => void;
@@ -14,7 +14,7 @@ interface IdentifierCellProps<
 /* eslint-disable indent */
 const IdentifierCell = <
   R extends Tables.BudgetRowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
 >({
   onGroupEdit,

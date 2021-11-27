@@ -7,7 +7,12 @@ import { ShowHide } from "components";
 import { View, Text } from "components/pdf";
 import { tabling } from "lib";
 
-const isCallback = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = R[keyof R], RV = any>(
+const isCallback = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  V = R[keyof R],
+  RV = any
+>(
   /* eslint-disable indent */
   prop: Table.PdfOptionalCellCallback<R, M, V, RV>
 ): prop is Table.PdfCellCallback<R, M, V, RV> => {
@@ -16,7 +21,7 @@ const isCallback = <R extends Table.RowData, M extends Model.HttpModel = Model.H
 
 const evaluateOptionalCallbackProp = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   V = R[keyof R],
   RV = any
 >(
@@ -30,7 +35,7 @@ const evaluateOptionalCallbackProp = <
   return prop;
 };
 
-const evaluateClassName = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = R[keyof R]>(
+const evaluateClassName = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = R[keyof R]>(
   className: Table.PdfCellClassName<R, M, V>,
   params: Table.PdfCellCallbackParams<R, M, V>
 ): (string | undefined)[] => {
@@ -46,7 +51,7 @@ const evaluateClassName = <R extends Table.RowData, M extends Model.HttpModel = 
   }
 };
 
-const evaluateCellStyle = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = R[keyof R]>(
+const evaluateCellStyle = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = R[keyof R]>(
   styleObj: Table.PdfCellStyle<R, M, V>,
   params: Table.PdfCellCallbackParams<R, M, V>
 ): Style | undefined => {
@@ -66,7 +71,7 @@ const evaluateCellStyle = <R extends Table.RowData, M extends Model.HttpModel = 
 
 export interface RowExplicitCellProps<
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   V = R[keyof R]
 > {
   readonly style?: Table.PdfCellStyle<R, M, V>;
@@ -77,7 +82,7 @@ export interface RowExplicitCellProps<
   readonly cellContentsInvisible?: Table.PdfOptionalCellCallback<R, M, any, boolean>;
 }
 
-export interface CellProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = R[keyof R]>
+export interface CellProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = R[keyof R]>
   extends RowExplicitCellProps<R, M, V> {
   readonly column: Table.PdfColumn<R, M, V>;
   readonly colIndex: number;
@@ -86,13 +91,16 @@ export interface CellProps<R extends Table.RowData, M extends Model.HttpModel = 
   readonly indented?: boolean;
 }
 
-export interface PrivateCellProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = R[keyof R]>
-  extends CellProps<R, M, V> {
+export interface PrivateCellProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  V = R[keyof R]
+> extends CellProps<R, M, V> {
   readonly rawValue: V | null;
   readonly value: string;
 }
 
-const Cell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = R[keyof R]>(
+const Cell = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = R[keyof R]>(
   props: PrivateCellProps<R, M, V>
 ): JSX.Element => {
   const callbackParams = useMemo<Table.PdfCellCallbackParams<R, M, V>>(() => {

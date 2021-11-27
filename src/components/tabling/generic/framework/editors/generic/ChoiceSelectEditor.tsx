@@ -7,7 +7,7 @@ import GenericModelMenuEditor, { GenericModelMenuEditorProps } from "./GenericMo
 export interface ChoiceSelectEditorProps<
   C extends Model.Choice<number, string>,
   R extends Table.RowData = Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends GenericModelMenuEditorProps<C, C, R, M, S>,
     UseModelMenuEditorParams<C, R, M, S>,
@@ -20,7 +20,7 @@ export interface ChoiceSelectEditorProps<
 const ChoiceSelectEditor = <
   C extends Model.Choice<number, string>,
   R extends Table.RowData = Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   { models, ...props }: ChoiceSelectEditorProps<C, R, M, S>,
@@ -44,7 +44,7 @@ export default forwardRef(ChoiceSelectEditor) as {
   <
     C extends Model.Choice<number, string>,
     R extends Table.RowData = Table.RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>
   >(
     props: ChoiceSelectEditorProps<C, R, M, S> & { ref: ForwardedRef<any> }

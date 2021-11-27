@@ -3,26 +3,29 @@ import { isNil } from "lodash";
 
 import Cell, { PrivateCellProps, RowExplicitCellProps, CellProps } from "./Cell";
 
-type ValueGetter<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = R[keyof R]> = (
+type ValueGetter<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = R[keyof R]> = (
   c: Table.PdfColumn<R, M, V>,
   rows: Table.BodyRow<R>[]
 ) => V | null | undefined;
 
 export interface RowExplicitBodyCellProps<
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   V = R[keyof R]
 > extends RowExplicitCellProps<R, M, V> {
   readonly valueGetter?: ValueGetter<R, M, V>;
 }
 
-export interface BodyCellProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel, V = R[keyof R]>
-  extends RowExplicitBodyCellProps<R, M, V>,
+export interface BodyCellProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  V = R[keyof R]
+> extends RowExplicitBodyCellProps<R, M, V>,
     CellProps<R, M, V> {}
 
 interface PrivateBodyCellProps<
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   RW extends Table.BodyRow<R> = Table.BodyRow<R>,
   V = R[keyof R]
 > extends Omit<PrivateCellProps<R, M, V>, "value" | "rawValue">,
@@ -34,7 +37,7 @@ interface PrivateBodyCellProps<
 /* eslint-disable indent */
 const BodyCell = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   RW extends Table.BodyRow<R> = Table.BodyRow<R>,
   V = R[keyof R]
 >({

@@ -4,11 +4,12 @@ import { RowExplicitCellProps } from "../Cells/Cell";
 import HeaderCell from "../Cells/HeaderCell";
 import Row, { RowProps } from "./Row";
 
-interface HeaderRowProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> extends RowProps<R, M> {
+interface HeaderRowProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
+  extends RowProps<R, M> {
   readonly cellProps?: RowExplicitCellProps<R, M>;
 }
 
-const HeaderRow = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>({
+const HeaderRow = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
   cellProps,
   ...props
 }: HeaderRowProps<R, M>): JSX.Element => {

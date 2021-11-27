@@ -21,7 +21,7 @@ interface IHeaderCompParams {
   api: any;
 }
 
-export interface HeaderCellProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
+export interface HeaderCellProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
   extends Omit<IHeaderCompParams, "column">,
     StandardComponentProps {
   onEdit?: (field: keyof R, column: Table.Column<R, M>) => void;
@@ -29,7 +29,7 @@ export interface HeaderCellProps<R extends Table.RowData, M extends Model.HttpMo
 }
 
 /* eslint-disable indent */
-const HeaderCell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>({
+const HeaderCell = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
   column,
   displayName,
   className,

@@ -5,14 +5,14 @@ import { View } from "components/pdf";
 
 export type RowProps<
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel
 > = StandardPdfComponentProps & {
   readonly columns: Table.PdfColumn<R, M>[];
   readonly columnIndent?: number;
 };
 
 /* eslint-disable indent */
-const Row = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+const Row = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: RowProps<R, M> & {
     readonly renderCell: (params: {
       column: Table.PdfColumn<R, M>;

@@ -103,8 +103,11 @@ const getTableChangesFromRangeClear = <R extends Table.RowData, M extends Model.
         const row: Table.BodyRow<R> = node.data;
         if (tabling.typeguards.isEditableRow(row)) {
           for (let j = 0; j < colIds.length; j++) {
-            /* eslint-disable-next-line no-loop-func */
-            const column = find(columns, (c: Table.Column<R, M>) => tabling.columns.normalizedField(c) === colIds[j]);
+            const column = find(
+              columns,
+              /* eslint-disable-next-line no-loop-func */
+              (c: Table.Column<R, M>) => tabling.columns.normalizedField<R, M>(c) === colIds[j]
+            );
             if (!isNil(column)) {
               if (tabling.columns.isEditable(column, row)) {
                 const change = getCellChangeForClear(row, column);
@@ -130,7 +133,7 @@ const getCellChangesFromEvent = <R extends Table.RowData, M extends Model.RowHtt
   const row: Table.BodyRow<R> = event.node.data;
   if (tabling.typeguards.isEditableRow(row)) {
     const field = event.column.getColId();
-    const column = find(columns, (c: Table.Column<R, M>) => tabling.columns.normalizedField(c) === field);
+    const column = find(columns, (c: Table.Column<R, M>) => tabling.columns.normalizedField<R, M>(c) === field);
     if (isNil(column)) {
       console.error(`Could not find column for field ${field}!`);
       return [];

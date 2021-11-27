@@ -10,7 +10,7 @@ import { GenericModelMenuEditor } from "./generic";
 
 interface ContactEditorProps<
   R extends Table.RowData & { readonly contact: number | null },
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends Table.EditorParams<R, M, S> {
   readonly onNewContact: (params: { name?: string; id: Table.ModelRowId }) => void;
@@ -20,7 +20,7 @@ interface ContactEditorProps<
 /* eslint-disable indent */
 const ContactEditor = <
   R extends Table.RowData & { readonly contact: number | null },
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   props: ContactEditorProps<R, M, S>,

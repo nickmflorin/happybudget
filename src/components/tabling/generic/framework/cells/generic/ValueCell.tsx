@@ -4,7 +4,7 @@ import Cell from "./Cell";
 /* eslint-disable indent */
 const ValueCell = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >({
   value,

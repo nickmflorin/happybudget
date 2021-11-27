@@ -9,7 +9,7 @@ export const orderActions = (actions: Table.MenuActionObj[]): Table.MenuActionOb
 /* eslint-disable indent */
 export const evaluateActions = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   T extends Table.MenuActionParams<R, M> = Table.MenuActionParams<R, M>
 >(
   actions: Table.MenuActions<R, M, T>,
@@ -29,7 +29,7 @@ export const evaluateActions = <
 export const combineMenuActions = <
   P extends Table.MenuActionParams<R, M>,
   R extends Table.RowData,
-  M extends Model.HttpModel
+  M extends Model.RowHttpModel
 >(
   ...args: Table.MenuActions<R, M, P>[]
 ): Table.MenuActions<R, M, P> => {

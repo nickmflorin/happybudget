@@ -127,7 +127,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
 }: GridProps<R, M>): JSX.Element => {
   const localColumns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
     let cs: Table.Column<R, M>[] = map(columns, (col: Table.Column<R, M>, index: number): Table.Column<R, M> => {
-      const field = tabling.columns.normalizedField(col);
+      const field = tabling.columns.normalizedField<R, M>(col);
       const hidden = !isNil(field) && (isNil(hiddenColumns) || hiddenColumns[field] === true);
       return {
         ...col,

@@ -7,12 +7,12 @@ import { model } from "lib";
 import { RowExplicitCellProps } from "../Cells/Cell";
 import BodyRow, { BodyRowProps } from "./BodyRow";
 
-interface GroupRowProps<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>
+interface GroupRowProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
   extends BodyRowProps<R, M, Table.GroupRow<R>> {
   readonly cellProps?: RowExplicitCellProps<R, M>;
 }
 
-const GroupRow = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+const GroupRow = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: GroupRowProps<R, M>
 ): JSX.Element => {
   const cellStyle = useMemo(() => {

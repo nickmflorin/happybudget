@@ -31,6 +31,12 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
     let columns = tabling.columns.normalizeColumns(AccountColumns, {
       estimated: {
         pdfFooterValueGetter: budgeting.businessLogic.estimatedValue(budget)
+      },
+      variance: {
+        pdfFooterValueGetter: budgeting.businessLogic.varianceValue(budget)
+      },
+      actual: {
+        pdfFooterValueGetter: budgeting.businessLogic.actualValue(budget)
       }
     });
     columns = tabling.columns.normalizePdfColumnWidths(columns);
@@ -87,10 +93,22 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
           pdfChildFooter: (m: M) => {
             return { value: budgeting.businessLogic.estimatedValue(m) };
           }
+        },
+        variance: {
+          pdfFooterValueGetter: budgeting.businessLogic.varianceValue(account),
+          pdfChildFooter: (m: M) => {
+            return { value: budgeting.businessLogic.varianceValue(m) };
+          }
+        },
+        actual: {
+          pdfFooterValueGetter: budgeting.businessLogic.actualValue(account),
+          pdfChildFooter: (m: M) => {
+            return { value: budgeting.businessLogic.actualValue(m) };
+          }
         }
       });
       columns = tabling.columns.normalizePdfColumnWidths(columns, (c: C) =>
-        includes(options.columns, tabling.columns.normalizedField(c))
+        includes(options.columns, tabling.columns.normalizedField<R, M>(c))
       );
       return tabling.columns.orderColumns<R, M>(columns);
     };

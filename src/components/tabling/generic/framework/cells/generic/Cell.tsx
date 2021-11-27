@@ -8,7 +8,7 @@ import { Icon } from "components";
 /* eslint-disable indent */
 const Cell = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   props: Table.CellWithChildrenProps<R, M, S>,
@@ -49,7 +49,7 @@ const Cell = <
 type CellComponent = {
   <
     R extends Table.RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>
   >(
     props: Table.CellWithChildrenProps<R, M, S> & { readonly ref?: RefObject<HTMLDivElement> }

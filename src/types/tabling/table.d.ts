@@ -187,7 +187,7 @@ namespace Table {
     readonly headerOverrides?: Omit<Partial<ColumnType>, "id" | "icon" | "pdfOverrides">;
   }
 
-  type CellCallbackParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
+  type CellCallbackParams<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly column: Column<R, M>;
     readonly row: BodyRow<R>;
   };
@@ -204,12 +204,12 @@ namespace Table {
 
   type ColSpanParams<
     R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel
+    M extends Model.RowHttpModel = Model.RowHttpModel
   > = import("@ag-grid-community/core").ColSpanParams & {
     readonly columns: Column<R, M>[];
   };
 
-  type PdfCellCallbackParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> = {
+  type PdfCellCallbackParams<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = any> = {
     readonly colIndex: number;
     readonly column: Column<R, M, V>;
     readonly isHeader: boolean;
@@ -218,30 +218,32 @@ namespace Table {
     readonly indented: boolean;
   };
 
-  type PdfCellCallback<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any, RV = any> = (
+  type PdfCellCallback<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = any, RV = any> = (
     params: PdfCellCallbackParams<R, M, V>
   ) => RV;
 
-  type PdfOptionalCellCallback<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any, RV = any> =
-    | RV
-    | PdfCellCallback<R, M, V>
-    | undefined;
+  type PdfOptionalCellCallback<
+    R extends RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+    V = any,
+    RV = any
+  > = RV | PdfCellCallback<R, M, V> | undefined;
 
-  interface _PdfCellClassName<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> {
+  interface _PdfCellClassName<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = any> {
     [n: number]: PdfOptionalCellCallback<R, M, V, string> | _PdfCellClassName<R, M, V>;
   }
-  type PdfCellClassName<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> =
+  type PdfCellClassName<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = any> =
     | PdfOptionalCellCallback<R, M, V, string>
     | _PdfCellClassName<R, M, V>;
 
-  interface _PdfCellStyle<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> {
+  interface _PdfCellStyle<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = any> {
     [n: number]: PdfOptionalCellCallback<R, M, V, import("@react-pdf/types").Style> | _PdfCellStyle<R, M, V>;
   }
-  type PdfCellStyle<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> =
+  type PdfCellStyle<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = any> =
     | PdfOptionalCellCallback<R, M, V, import("@react-pdf/types").Style>
     | _PdfCellStyle<R, M, V>;
 
-  type PdfCellStandardProps<R extends RowData, M extends Model.HttpModel = Model.HttpModel, V = any> = {
+  type PdfCellStandardProps<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = any> = {
     readonly style?: PdfCellStyle<R, M, V>;
     readonly className?: PdfCellClassName<R, M, V>;
     readonly textStyle?: PdfCellStyle<R, M, V>;
@@ -280,9 +282,9 @@ namespace Table {
 
   interface Column<
     R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     V = any,
-    PDFM extends Model.HttpModel = any
+    PDFM extends Model.RowHttpModel = any
   > extends Omit<ColDef, OmitColDefParams> {
     readonly field?: keyof R;
     readonly colId?: string;
@@ -339,12 +341,12 @@ namespace Table {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type PdfColumn<
     R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     V = any,
-    MM extends Model.HttpModel = any
+    MM extends Model.RowHttpModel = any
   > = Column<R, MM, V, M>;
 
-  interface FooterColumn<R extends RowData, M extends Model.HttpModel = Model.HttpModel>
+  interface FooterColumn<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
     extends Pick<Column<R, M>, "colSpan"> {
     readonly cellStyle?: React.CSSProperties;
   }
@@ -362,7 +364,10 @@ namespace Table {
   };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type TableInstance<R extends RowData = RowData, M extends Model.HttpModel = Model.HttpModel> = DataGridInstance & {
+  type TableInstance<
+    R extends RowData = RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel
+  > = DataGridInstance & {
     readonly getFocusedRow: () => BodyRow<R> | null;
     readonly getRow: (id: BodyRowId) => BodyRow<R> | null;
     readonly getRows: () => BodyRow<R>[];
@@ -385,7 +390,7 @@ namespace Table {
     readonly render?: RenderFunc;
   };
 
-  type MenuActionParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
+  type MenuActionParams<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly apis: GridApis;
     readonly columns: Column<R, M>[];
     readonly hiddenColumns?: HiddenColumns;
@@ -393,53 +398,53 @@ namespace Table {
 
   type UnauthenticatedMenuActionParams<
     R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel
+    M extends Model.RowHttpModel = Model.RowHttpModel
   > = MenuActionParams<R, M>;
 
-  type AuthenticatedMenuActionParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = MenuActionParams<
-    R,
-    M
-  > & {
+  type AuthenticatedMenuActionParams<
+    R extends RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel
+  > = MenuActionParams<R, M> & {
     readonly selectedRows: EditableRow<R>[];
   };
 
   type MenuActionCallback<
     V,
     R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     T extends MenuActionParams<R, M> = MenuActionParams<R, M>
   > = (params: T) => V;
   type MenuAction<
     R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     T extends MenuActionParams<R, M> = MenuActionParams<R, M>
   > = MenuActionObj | MenuActionCallback<MenuActionObj, R, M, T>;
   type MenuActions<
     R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     T extends MenuActionParams<R, M> = MenuActionParams<R, M>
   > = Array<MenuAction<R, M, T>> | MenuActionCallback<MenuAction<R, M, T>[], R, M, T>;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type UnauthenticatedMenuAction<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = MenuAction<
+  type UnauthenticatedMenuAction<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = MenuAction<
     R,
     M,
     UnauthenticatedMenuActionParams<R, M>
   >;
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type AuthenticatedMenuAction<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = MenuAction<
+  type AuthenticatedMenuAction<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = MenuAction<
     R,
     M,
     AuthenticatedMenuActionParams<R, M>
   >;
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type UnauthenticatedMenuActions<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = MenuActions<
+  type UnauthenticatedMenuActions<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = MenuActions<
     R,
     M,
     UnauthenticatedMenuActionParams<R, M>
   >;
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type AuthenticatedMenuActions<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = MenuActions<
+  type AuthenticatedMenuActions<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = MenuActions<
     R,
     M,
     AuthenticatedMenuActionParams<R, M>
@@ -450,19 +455,19 @@ namespace Table {
     readonly visible: boolean;
   }
 
-  type Cell<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
+  type Cell<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly row: BodyRow<R>;
     readonly column: Column<R, M>;
     readonly rowNode: import("@ag-grid-community/core").RowNode;
   };
 
-  type CellFocusedParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
+  type CellFocusedParams<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly cell: Cell<R, M>;
     readonly apis: GridApis;
   };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type CellFocusChangedParams<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
+  type CellFocusChangedParams<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly cell: Cell<R, M>;
     readonly previousCell: Cell<R, M> | null;
     readonly apis: GridApis;
@@ -532,7 +537,7 @@ namespace Table {
     readonly previous: number | null;
     readonly newGroup: GroupRowId | null;
     readonly id: ModelRowId;
-  }
+  };
 
   type RowPositionChangedEvent = {
     readonly type: "rowPositionChanged";
@@ -595,12 +600,12 @@ namespace Table {
     readonly payload: MarkupAddedPayload;
   };
 
-  type ModelUpdatedPayload<M extends Model.HttpModel = Model.HttpModel> = {
+  type ModelUpdatedPayload<M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly model: M;
     readonly group?: number | null;
-  }
+  };
 
-  type ModelUpdatedEvent<M extends Model.HttpModel = Model.HttpModel> = {
+  type ModelUpdatedEvent<M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly type: "modelUpdated";
     readonly payload: SingleOrArray<ModelUpdatedPayload<M>>;
   };
@@ -621,7 +626,7 @@ namespace Table {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type GroupEvent = RowRemoveFromGroupEvent | RowAddToGroupEvent | GroupUpdatedEvent | GroupAddedEvent;
 
-  type ChangeEvent<R extends RowData, M extends Model.HttpModel = Model.HttpModel> =
+  type ChangeEvent<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> =
     | DataChangeEvent<R>
     | RowAddEvent<R>
     | RowDeleteEvent
@@ -643,7 +648,7 @@ namespace Table {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface EditorParams<
     R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     V = any
   > {
@@ -675,7 +680,7 @@ namespace Table {
 
   interface CellProps<
     R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     V = any
   > extends Omit<import("@ag-grid-community/core").ICellRendererParams, "value">,
@@ -701,7 +706,7 @@ namespace Table {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type CellWithChildrenProps<
     R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>
   > = Omit<CellProps<R, M, S>, "value"> & {
     readonly children: import("react").ReactNode;
@@ -710,7 +715,7 @@ namespace Table {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ValueCellProps<
     R extends RowData,
-    M extends Model.HttpModel = Model.HttpModel,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>
   > = CellProps<R, M, S, string | number | null> & {
     // This is used for extending cells.  Normally, the value formatter will be included on the ColDef
@@ -737,7 +742,7 @@ namespace Table {
   };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type FooterGridConfig<R extends RowData, M extends Model.HttpModel = Model.HttpModel> = {
+  type FooterGridConfig<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly id: "page" | "footer";
     readonly rowClass: RowClassName;
     readonly className: GeneralClassName;

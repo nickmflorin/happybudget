@@ -38,7 +38,7 @@ const DEFAULT_OPTIONS: ExportFormOptions = {
   includeNotes: false,
   columns: filter(
     map(SubAccountColumns, (column: Table.PdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>) =>
-      tabling.columns.normalizedField(column)
+      tabling.columns.normalizedField<Tables.SubAccountRowData, Model.PdfSubAccount>(column)
     ),
     (field: string | undefined) => !isNil(field)
   ) as string[]

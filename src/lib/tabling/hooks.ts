@@ -8,7 +8,7 @@ import TableApis from "./apis";
 import * as cookies from "./cookies";
 import * as columns from "./columns";
 
-type UseHiddenColumnsParams<R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel> = {
+type UseHiddenColumnsParams<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
   readonly cookie?: string;
   readonly columns: Table.Column<R, M>[];
   readonly apis: TableApis;
@@ -50,7 +50,7 @@ const hiddenColumnsReducer = (state: Table.HiddenColumns = {}, action: HiddenCol
   }
 };
 
-export const useHiddenColumns = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+export const useHiddenColumns = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   params: UseHiddenColumnsParams<R, M>
 ): UseHiddenColumnsReturnType => {
   const [hiddenColumns, dispatch] = useReducer(hiddenColumnsReducer, {});
@@ -73,7 +73,7 @@ export const useHiddenColumns = <R extends Table.RowData, M extends Model.HttpMo
       params.columns,
       (curr: Table.HiddenColumns, c: Table.Column<R, M>) => {
         if (c.canBeHidden !== false) {
-          const field = columns.normalizedField(c);
+          const field = columns.normalizedField<R, M>(c);
           if (!isNil(field)) {
             const defaultHidden = c.defaultHidden === undefined ? false : c.defaultHidden;
             const cookiesVisibility = hiddenColumnsInCookies[field];
@@ -139,13 +139,17 @@ export const InitialTableRef: Table.TableInstance<any, any> = {
   applyGroupColorChange: (group: Model.Group) => {}
 };
 
-export const useTable = <R extends Table.RowData = object, M extends Model.HttpModel = Model.HttpModel>(): NonNullRef<
-  Table.TableInstance<R, M>
-> => {
+export const useTable = <
+  R extends Table.RowData = object,
+  M extends Model.RowHttpModel = Model.RowHttpModel
+>(): NonNullRef<Table.TableInstance<R, M>> => {
   return useRef<Table.TableInstance<R, M>>(InitialTableRef);
 };
 
 /* eslint-disable indent */
-export const useTableIfNotDefined = <R extends Table.RowData = object, M extends Model.HttpModel = Model.HttpModel>(
+export const useTableIfNotDefined = <
+  R extends Table.RowData = object,
+  M extends Model.RowHttpModel = Model.RowHttpModel
+>(
   table?: NonNullRef<Table.TableInstance<R, M>>
 ): NonNullRef<Table.TableInstance<R, M>> => hooks.useRefIfNotDefined<Table.TableInstance<R, M>>(useTable, table);

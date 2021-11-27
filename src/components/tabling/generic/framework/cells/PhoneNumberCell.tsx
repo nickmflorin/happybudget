@@ -7,7 +7,7 @@ import LinkCell, { LinkCellProps } from "./LinkCell";
 /* eslint-disable indent */
 const PhoneNumberCell = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   props: LinkCellProps<R, M, S>

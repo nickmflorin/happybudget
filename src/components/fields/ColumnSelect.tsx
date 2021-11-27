@@ -16,12 +16,12 @@ type CustomTagProps = {
   readonly closable: boolean;
 };
 
-export interface ColumnSelectProps<R extends Table.RowData, M extends Model.HttpModel> extends SelectProps<string> {
+export interface ColumnSelectProps<R extends Table.RowData, M extends Model.RowHttpModel> extends SelectProps<string> {
   readonly columns: Table.Column<R, M>[];
   readonly getLabel: (c: Table.Column<R, M>) => string;
 }
 
-const ColumnSelect = <R extends Table.RowData, M extends Model.HttpModel>({
+const ColumnSelect = <R extends Table.RowData, M extends Model.RowHttpModel>({
   columns,
   getLabel,
   ...props
@@ -34,7 +34,10 @@ const ColumnSelect = <R extends Table.RowData, M extends Model.HttpModel>({
       mode={"multiple"}
       showArrow
       tagRender={(params: CustomTagProps) => {
-        const column = find(columns, (c: Table.Column<R, M>) => tabling.columns.normalizedField(c) === params.value);
+        const column = find(
+          columns,
+          (c: Table.Column<R, M>) => tabling.columns.normalizedField<R, M>(c) === params.value
+        );
         if (!isNil(column)) {
           const colType: Table.ColumnType | undefined = !isNil(column.columnType)
             ? find(tabling.models.ColumnTypes, { id: column.columnType })

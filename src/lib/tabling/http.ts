@@ -6,7 +6,7 @@ import * as managers from "./managers";
 export const patchPayloadForChange = <
   R extends Table.RowData,
   P,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   I extends Table.EditableRowId = Table.EditableRowId
 >(
   change: Table.RowChange<R, I>,
@@ -36,7 +36,7 @@ export const patchPayloadForChange = <
 export const bulkPatchPayloadForChange = <
   R extends Table.RowData,
   P,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   I extends Table.EditableRowId = Table.EditableRowId
 >(
   change: Table.RowChange<R, I>,
@@ -52,7 +52,7 @@ export const bulkPatchPayloadForChange = <
 export const bulkPatchPayloads = <
   R extends Table.RowData,
   P,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   I extends Table.EditableRowId = Table.EditableRowId
 >(
   p: Table.DataChangePayload<R, I> | Table.DataChangeEvent<R, I>,
@@ -77,7 +77,7 @@ export const bulkPatchPayloads = <
   );
 };
 
-export const postPayloadForAddition = <R extends Table.RowData, P, M extends Model.HttpModel = Model.HttpModel>(
+export const postPayloadForAddition = <R extends Table.RowData, P, M extends Model.RowHttpModel = Model.RowHttpModel>(
   addition: Table.RowAdd<R>,
   columns: Table.Column<R, M>[]
 ): P => {
@@ -100,7 +100,7 @@ export const postPayloadForAddition = <R extends Table.RowData, P, M extends Mod
   );
 };
 
-export const postPayloads = <R extends Table.RowData, P, M extends Model.HttpModel = Model.HttpModel>(
+export const postPayloads = <R extends Table.RowData, P, M extends Model.RowHttpModel = Model.RowHttpModel>(
   p: Table.RowAddPayload<R> | Table.RowAddEvent<R>,
   columns: Table.Column<R, M>[]
 ): P[] => {
@@ -122,7 +122,7 @@ export const postPayloads = <R extends Table.RowData, P, M extends Model.HttpMod
 export const createBulkUpdatePayload = <
   R extends Table.RowData,
   P,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   I extends Table.EditableRowId = Table.EditableRowId
 >(
   /* eslint-disable indent */
@@ -130,7 +130,7 @@ export const createBulkUpdatePayload = <
   columns: Table.Column<R, M>[]
 ): Http.BulkUpdatePayload<P> => ({ data: bulkPatchPayloads(p, columns) });
 
-export const createBulkCreatePayload = <R extends Table.RowData, P, M extends Model.HttpModel = Model.HttpModel>(
+export const createBulkCreatePayload = <R extends Table.RowData, P, M extends Model.RowHttpModel = Model.RowHttpModel>(
   /* eslint-disable indent */
   p: Table.RowAddPayload<R>,
   columns: Table.Column<R, M>[]

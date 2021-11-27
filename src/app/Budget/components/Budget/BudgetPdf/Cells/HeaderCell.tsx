@@ -2,7 +2,7 @@ import classNames from "classnames";
 
 import Cell, { CellProps } from "./Cell";
 
-const HeaderCell = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+const HeaderCell = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: Omit<CellProps<R, M>, "rawValue" | "value">
 ): JSX.Element => {
   return (

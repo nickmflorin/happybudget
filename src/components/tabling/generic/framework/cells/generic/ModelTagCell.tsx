@@ -5,7 +5,7 @@ import Cell from "./Cell";
 
 export interface ModelTagCellProps<
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   V extends Model.HttpModel = Model.HttpModel
 > extends Table.CellProps<R, M, S, V | null> {
@@ -15,7 +15,7 @@ export interface ModelTagCellProps<
 /* eslint-disable indent */
 const ModelTagCell = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   V extends Model.HttpModel = Model.HttpModel
 >({

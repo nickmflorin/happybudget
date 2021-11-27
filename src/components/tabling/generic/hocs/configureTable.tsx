@@ -172,7 +172,7 @@ const configureTable = <
           return util.replaceInArray<Table.Column<R, M>>(
             cs,
             (c: Table.Column<R, M>) =>
-              tabling.columns.normalizedField(c) === tabling.columns.normalizedField(displayedCols[0]),
+              tabling.columns.normalizedField<R, M>(c) === tabling.columns.normalizedField<R, M>(displayedCols[0]),
             { ...displayedCols[0], pinned: "left" }
           );
         }

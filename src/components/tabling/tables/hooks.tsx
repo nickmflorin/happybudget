@@ -6,7 +6,7 @@ import { EditAttachmentsModal } from "components/modals";
 
 interface UseAttachmentsProps<
   R extends Tables.ActualRowData | Tables.SubAccountRowData | Tables.ContactRowData,
-  M extends Model.HttpModel = Model.HttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel
 > {
   readonly table: Table.TableInstance<R, M>;
   readonly path: (id: number) => string;
@@ -30,7 +30,7 @@ type UseAttachmentsReturnType<R extends Tables.ActualRowData | Tables.SubAccount
 /* eslint-disable indent */
 export const useAttachments = <
   R extends Tables.ActualRowData | Tables.SubAccountRowData | Tables.ContactRowData,
-  M extends Model.HttpModel = Model.HttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel
 >(
   props: UseAttachmentsProps<R, M>
 ): UseAttachmentsReturnType<R> => {

@@ -7,7 +7,7 @@ import connectCellToStore from "./connectCellToStore";
 /* eslint-disable indent */
 const BodyCell = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >({
   value,

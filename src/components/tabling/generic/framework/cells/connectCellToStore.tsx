@@ -7,7 +7,7 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 /* eslint-disable indent */
 const connectCellToStore = <
   R extends Table.RowData = object,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   T extends Table.CellProps<R, M, S> = Table.CellProps<R, M, S>
 >(

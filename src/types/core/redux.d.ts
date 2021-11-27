@@ -1,3 +1,4 @@
+/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
 namespace Redux {
   type GenericSelectorFunc<S, T = any> = (state: S) => T;
   type AuthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Application.Authenticated.Store, T>;
@@ -27,13 +28,13 @@ namespace Redux {
   type TableEventTask<
     E extends Table.ChangeEvent<R, M>,
     R extends Table.RowData = any,
-    M extends Model.HttpModel = any
+    M extends Model.RowHttpModel = any
   > = (event: E) => import("@redux-saga/types").SagaIterator;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface TableEventTaskMapObject<
     R extends Table.RowData = any,
-    M extends Model.HttpModel = any
+    M extends Model.RowHttpModel = any
   > {
       readonly dataChange: TableEventTask<Table.DataChangeEvent<R>, R, M>;
       readonly rowAdd: TableEventTask<Table.RowAddEvent<R>, R, M>;
@@ -244,7 +245,7 @@ namespace Redux {
   };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type AddModelsToTablePayload<M extends Model.HttpModel> = {
+  type AddModelsToTablePayload<M extends Model.RowHttpModel> = {
     readonly placeholderIds: Table.PlaceholderRowId[];
     readonly models: M[];
   };

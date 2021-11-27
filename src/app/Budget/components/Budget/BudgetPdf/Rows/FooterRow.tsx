@@ -3,7 +3,7 @@ import classNames from "classnames";
 
 import BodyRow, { BodyRowProps } from "./BodyRow";
 
-const FooterRow = <R extends Table.RowData, M extends Model.HttpModel = Model.HttpModel>(
+const FooterRow = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: BodyRowProps<R, M>
 ): JSX.Element => {
   return (

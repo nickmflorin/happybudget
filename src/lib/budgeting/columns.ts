@@ -58,7 +58,7 @@ export const IdentifierColumn = <
         if (!isNil(agColumns)) {
           const originalCalculatedColumns = map(
             filter(params.columns, (c: Table.Column<R, M>) => c.tableColumnType === "calculated"),
-            (c: Table.Column<R, M>) => tabling.columns.normalizedField(c)
+            (c: Table.Column<R, M>) => tabling.columns.normalizedField<R, M>(c)
           );
           const indexOfIdentifierColumn = findIndex(agColumns, (c: Table.AgColumn) => c.getColId() === "identifier");
           const indexOfFirstCalculatedColumn = findIndex(agColumns, (c: Table.AgColumn) =>

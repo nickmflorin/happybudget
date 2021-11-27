@@ -33,7 +33,7 @@ const DragCountReducer = (state: DragState = InitialDragState, action: DragCount
 
 interface AttachmentsCellProps<
   R extends Tables.ActualRowData | Tables.SubAccountRowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends Table.CellProps<R, M, S, Model.SimpleAttachment[]> {
   readonly uploadAttachmentsPath: (id: number) => string;
@@ -43,7 +43,7 @@ interface AttachmentsCellProps<
 /* eslint-disable indent */
 const AttachmentsCell = <
   R extends Tables.ActualRowData | Tables.SubAccountRowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >({
   value,

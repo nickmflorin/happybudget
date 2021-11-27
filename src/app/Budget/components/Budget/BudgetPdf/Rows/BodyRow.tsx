@@ -6,7 +6,7 @@ import Row, { RowProps } from "./Row";
 
 export interface BodyRowProps<
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   RW extends Table.BodyRow<R> = Table.BodyRow<R>
 > extends RowProps<R, M> {
   readonly fillBlank?: (c: Table.PdfColumn<R, M>) => boolean;
@@ -18,7 +18,7 @@ export interface BodyRowProps<
 /* eslint-disable indent */
 const BodyRow = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   RW extends Table.BodyRow<R> = Table.BodyRow<R>
 >({
   cellProps,

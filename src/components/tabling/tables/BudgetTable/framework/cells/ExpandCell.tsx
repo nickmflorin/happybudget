@@ -8,7 +8,7 @@ import { ExpandCell as GenericExpandCell, ExpandCellProps } from "components/tab
 /* eslint-disable indent */
 const ExpandCell = <
   R extends Tables.BudgetRowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
 >(
   props: ExpandCellProps<R, M, S>

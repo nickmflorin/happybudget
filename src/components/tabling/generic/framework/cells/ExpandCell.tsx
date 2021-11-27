@@ -9,7 +9,7 @@ import { IconButton } from "components/buttons";
 
 export interface ExpandCellProps<
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends Table.CellProps<R, M, S, null> {
   readonly onEditRow?: (row: Table.BodyRow<R>) => void;
@@ -62,7 +62,7 @@ const ExpandAction = <R extends Table.RowData>(props: {
 /* eslint-disable indent */
 const ExpandCell = <
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >({
   rowCanExpand,

@@ -135,7 +135,7 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
                 includes(
                   map(
                     filter(params.columns, (ci: Table.Column<R, M>) => ci.tableColumnType === "action"),
-                    (ci: Table.Column<R, M>) => tabling.columns.normalizedField(ci)
+                    (ci: Table.Column<R, M>) => tabling.columns.normalizedField<R, M>(ci)
                   ),
                   c.getColId()
                 )

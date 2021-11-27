@@ -37,10 +37,11 @@ export const estimatedValue = <R extends Tables.BudgetRowData>(m: WithEstimation
   return nominalValue(m) + accumulatedMarkupContribution(m) + accumulatedFringeContribution(m) + fringeContribution(m);
 };
 
-export const varianceValue = <R extends Tables.BudgetRowData>(m: WithActual<R>): number => {
-  const actualValue = (obj: WithEstimation<R>) => (tabling.typeguards.isRow(obj) ? obj.data.actual : obj.actual);
-  return estimatedValue(m) - actualValue(m);
-};
+export const actualValue = <R extends Tables.BudgetRowData>(obj: WithActual<R>): number =>
+  tabling.typeguards.isRow(obj) ? obj.data.actual : obj.actual;
+
+export const varianceValue = <R extends Tables.BudgetRowData>(m: WithActual<R>): number =>
+  estimatedValue(m) - actualValue(m);
 
 export const contributionFromMarkups = <R extends Table.RowData>(
   value: number,

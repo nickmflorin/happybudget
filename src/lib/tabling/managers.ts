@@ -65,7 +65,7 @@ type CreateBodyRowConfig<RId extends Table.BodyRowId, R extends Table.RowData> =
 type BodyRowManagerConfig<
   TP extends Table.BodyRowType,
   R extends Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel
 > = Omit<RowManagerConfig<TP, "data">, "gridId"> & {
   readonly columns: Table.Column<R, M>[];
 };
@@ -74,7 +74,7 @@ abstract class BodyRowManager<
   RId extends Table.BodyRowId,
   TP extends Table.BodyRowType,
   R extends Table.RowData,
-  M extends Model.HttpModel
+  M extends Model.RowHttpModel
 > extends RowManager<RId, TP, "data"> {
   public columns: Table.Column<R, M>[];
 

@@ -57,8 +57,7 @@ const AccountTable = ({
       columns
     });
     return accountRowManager.create({
-      model: account,
-      order: "0" // Irrelevant for PDF rows since they are not dynamic.
+      model: account
     });
   }, [account, columns]);
 
@@ -69,7 +68,6 @@ const AccountTable = ({
     const createSubAccountFooterRow = (subaccount: M): Table.ModelRow<R> => {
       return subAccountRowManager.create({
         model: subaccount,
-        order: "0", // Irrelevant for PDF rows since they are not dynamic.
         getRowValue: (m: Model.PdfSubAccount, c: Table.PdfColumn<R, M>) => {
           if (!isNil(c.pdfChildFooter) && !isNil(c.pdfChildFooter(m).value)) {
             return c.pdfChildFooter(m).value;
@@ -178,7 +176,7 @@ const AccountTable = ({
                         className: "subaccount-td",
                         textClassName: "subaccount-tr-td-text",
                         cellContentsInvisible: (params: Table.PdfCellCallbackParams<R, M>) =>
-                          !includes(["description", "identifier"], tabling.columns.normalizedField(params.column))
+                          !includes(["description", "identifier"], tabling.columns.normalizedField<R, M>(params.column))
                       }}
                       className={"subaccount-tr"}
                       columns={subAccountColumns}

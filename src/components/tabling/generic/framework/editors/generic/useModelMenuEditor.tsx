@@ -9,7 +9,7 @@ const KEY_DELETE = 46;
 export type UseModelMenuEditorParams<
   V = ID,
   R extends Table.RowData = Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = Table.EditorParams<R, M, S, V>;
 
@@ -17,7 +17,7 @@ export type IEditor<
   V = ID,
   C extends Model.Model = Model.Model,
   R extends Table.RowData = Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = Omit<UseModelMenuEditorParams<V, R, M, S>, "forwardedRef"> & {
   readonly onChange: (value: V | null, e: Table.CellDoneEditingEvent, stopEditing?: boolean) => void;
@@ -32,7 +32,7 @@ const useModelMenuEditor = <
   C extends Model.Model,
   V = C,
   R extends Table.RowData = Table.RowData,
-  M extends Model.HttpModel = Model.HttpModel,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   params: UseModelMenuEditorParams<V, R, M, S> & { readonly forwardedRef: ForwardedRef<any> }
