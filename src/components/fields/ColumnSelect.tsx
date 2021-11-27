@@ -59,7 +59,11 @@ const ColumnSelect = <R extends Table.RowData, M extends Model.RowHttpModel>({
       {map(columns, (column: Table.Column<R, M>, index: number) => {
         const colType = find(tabling.models.ColumnTypes, { id: column.columnType });
         return (
-          <Select.Option className={"column-select-option"} key={index + 1} value={column.field as string}>
+          <Select.Option
+            className={"column-select-option"}
+            key={index + 1}
+            value={tabling.columns.normalizedField<R, M>(column) as string}
+          >
             {!isNil(colType) && !isNil(colType.icon) && (
               <div className={"icon-wrapper"}>
                 {ui.typeguards.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}
