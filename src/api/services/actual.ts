@@ -18,11 +18,9 @@ export const deleteActualAttachment = services.detailDeleteService((id: number, 
   "attachments",
   id
 ]);
-export const uploadActualAttachment = services.detailPostService<FormData, Model.Attachment>((id: number) => [
-  "actuals",
-  id,
-  "attachments"
-]);
+export const uploadActualAttachment = services.detailPostService<FormData, { data: Model.Attachment[] }>(
+  (id: number) => ["actuals", id, "attachments"]
+);
 export const getActualTypes = async (options: Http.RequestOptions = {}): Promise<Http.ListResponse<Model.Tag>> => {
   const url = services.URL.v1("actuals", "types");
   return client.list<Model.Tag>(url, {}, options);

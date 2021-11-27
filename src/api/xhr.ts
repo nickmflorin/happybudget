@@ -7,7 +7,7 @@ import { parseFieldError, parseGlobalError } from "./util";
 type UploadAttachmentFileOptions = {
   readonly progress?: (computable: boolean, percent: number, total: number) => void;
   readonly error?: (message: string) => void;
-  readonly success?: (m: Model.Attachment) => void;
+  readonly success?: (m: Model.Attachment[]) => void;
   readonly send?: boolean;
 };
 
@@ -18,6 +18,7 @@ export const uploadAttachmentFile = (
 ): [XMLHttpRequest, FormData] => {
   const url = `${process.env.REACT_APP_API_DOMAIN}${path}`;
   const formData = new FormData();
+
   formData.append("file", file, file.name);
 
   const request = new XMLHttpRequest();
@@ -32,8 +33,8 @@ export const uploadAttachmentFile = (
 
   request.onload = function () {
     if (request.status >= 200 && request.status < 300) {
-      const data: Model.Attachment = JSON.parse(request.response);
-      options?.success?.(data);
+      const responseData: { data: Model.Attachment[] } = JSON.parse(request.response);
+      options?.success?.(responseData.data);
     } else {
       let errorData: Http.ErrorResponse | null = null;
       try {

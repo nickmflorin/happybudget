@@ -28,11 +28,9 @@ export const deleteContactAttachment = services.detailDeleteService((id: number,
   "attachments",
   id
 ]);
-export const uploadContactAttachment = services.detailPostService<FormData, Model.Attachment>((id: number) => [
-  "contacts",
-  id,
-  "attachments"
-]);
+export const uploadContactAttachment = services.detailPostService<FormData, { data: Model.Attachment[] }>(
+  (id: number) => ["contacts", id, "attachments"]
+);
 
 export const bulkUpdateContacts = async (
   data: Http.BulkUpdatePayload<Http.ContactPayload>,

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useReducer } from "react";
 import { toast } from "react-toastify";
-import { isNil } from "lodash";
+import { isNil, map } from "lodash";
 
 import * as api from "api";
 import { AttachmentText } from "components/files";
@@ -96,7 +96,7 @@ const AttachmentsCell = <
             error,
             progress,
             /* eslint-disable-next-line no-loop-func */
-            success: (m: Model.Attachment) => props.onAttachmentAdded(row, m)
+            success: (ms: Model.Attachment[]) => map(ms, (m: Model.Attachment) => props.onAttachmentAdded(row, m))
           });
         }
         e.dataTransfer.clearData();

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FilePond } from "react-filepond";
 import { ActualFileObject, FilePondFile, ProgressServerConfigFunction } from "filepond/types";
+import { map } from "lodash";
 
 import * as api from "api";
 
@@ -57,10 +58,11 @@ const AttachmentsFilePond = (props: AttachmentsFilePondProps): JSX.Element => {
           const [request, formData] = api.xhr.uploadAttachmentFile(file, props.path, {
             error,
             progress,
-            success: (m: Model.Attachment) => {
-              load(String(m.id));
-              props.onAttachmentAdded?.(m);
-            }
+            success: (ms: Model.Attachment[]) =>
+              map(ms, (m: Model.Attachment) => {
+                load(String(m.id));
+                props.onAttachmentAdded?.(m);
+              })
           });
           request.send(formData);
           return {
