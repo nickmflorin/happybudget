@@ -23,3 +23,4 @@ export * from "./AttachmentsCell";
 export { default as excludeRowsOfType } from "./excludeRowsOfType";
 export { default as connectCellToStore } from "./connectCellToStore";
 export { default as renderOnRowType } from "./renderOnRowType";
+export { default as DragCell } from "./DragCell";

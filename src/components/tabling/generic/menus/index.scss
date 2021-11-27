@@ -14,6 +14,10 @@
 
   &.has-expand-column {
     padding-left: 4px;
+
+    &.has-drag-column {
+      padding-left: 12px;
+    }
   }
 
   .ant-checkbox-wrapper {

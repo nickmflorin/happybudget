@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, forwardRef, ForwardedRef } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
@@ -8,30 +8,33 @@ import { IconPrefix } from "@fortawesome/fontawesome-svg-core";
 /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
 const PrefixMap: { [key in IconWeight]: IconPrefix } = { light: "fal", regular: "far", solid: "fas" };
 
-const Icon: React.FC<IIcon> = ({ icon, green, prefix, weight, light, regular, solid, ...props }) => {
-  const derivedPrefix = useMemo(() => {
-    if (!isNil(prefix)) {
-      return prefix;
-    } else if (!isNil(weight)) {
-      return PrefixMap[weight];
-    } else if (light === true) {
-      return "fal";
-    } else if (solid === true) {
-      return "fas";
-    }
-    return "far";
-  }, [weight, light, regular, solid]);
+const Icon = forwardRef(
+  ({ icon, green, prefix, weight, light, regular, solid, ...props }: IIcon, ref: ForwardedRef<any>) => {
+    const derivedPrefix = useMemo(() => {
+      if (!isNil(prefix)) {
+        return prefix;
+      } else if (!isNil(weight)) {
+        return PrefixMap[weight];
+      } else if (light === true) {
+        return "fal";
+      } else if (solid === true) {
+        return "fas";
+      }
+      return "far";
+    }, [weight, light, regular, solid]);
 
-  if (!isNil(icon)) {
-    return (
-      <FontAwesomeIcon
-        {...props}
-        className={classNames("icon", { "icon--green": green }, props.className)}
-        icon={typeof icon === "string" ? [derivedPrefix, icon] : icon}
-      />
-    );
+    if (!isNil(icon)) {
+      return (
+        <FontAwesomeIcon
+          {...props}
+          forwardedRef={ref}
+          className={classNames("icon", { "icon--green": green }, props.className)}
+          icon={typeof icon === "string" ? [derivedPrefix, icon] : icon}
+        />
+      );
+    }
+    return <></>;
   }
-  return <></>;
-};
+);
 
 export default React.memo(Icon);

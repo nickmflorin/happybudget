@@ -168,6 +168,14 @@
         flex-direction: column;
         justify-content: center;
 
+        .inner-cell {
+          height: 100%;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+
         &--action {
           // white-space break-spaces messes with the checkbox selection cells.
           white-space: nowrap !important;
@@ -191,11 +199,6 @@
             height: 100%;
 
             .inner-cell {
-              height: 100%;
-              width: 100%;
-              display: flex;
-              flex-direction: column;
-              justify-content: center;
               padding-left: 6px;
               padding-right: 6px;
             }
@@ -296,6 +299,16 @@
             .icon {
               height: 16px;
               width: 16px;
+            }
+          }
+
+          &--drag {
+            .inner-cell {
+              .icon {
+                &:hover {
+                  cursor: pointer;
+                }
+              }
             }
           }
 
