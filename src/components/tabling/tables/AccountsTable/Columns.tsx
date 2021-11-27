@@ -1,3 +1,4 @@
+import { isNil } from "lodash";
 import { tabling, budgeting } from "lib";
 
 import { Icon } from "components";
@@ -40,19 +41,22 @@ const Columns: Table.Column<R, M>[] = [
   }),
   budgeting.columns.EstimatedColumn<R, M, PDFM>({
     colId: "estimated",
-    pdfFormatter: tabling.formatters.currencyValueFormatter,
+    pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
+      isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.estimatedValueGetter
   }),
   budgeting.columns.ActualColumn<R, M, PDFM>({
     field: "actual",
-    pdfFormatter: tabling.formatters.currencyValueFormatter,
+    pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
+      isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.actualValueGetter
   }),
   budgeting.columns.VarianceColumn<R, M, PDFM>({
     colId: "variance",
-    pdfFormatter: tabling.formatters.currencyValueFormatter,
+    pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
+      isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.varianceValueGetter
   }),

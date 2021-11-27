@@ -21,6 +21,7 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
   $pdf-canvas-height: calc(1 / 0.70749 * #{$canvas-width});
 
   width: $modal-width !important;
+  max-width: 1200px;
   $modal-height: calc(#{$pdf-canvas-height} + 6px + 36px + 10px + 70px + #{$modal-header-height});
   height: $modal-height !important;
 
@@ -81,6 +82,7 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
   $pdf-canvas-height: calc(1 / 0.70749 * 100%);
 
   width: $modal-width !important;
+  max-width: 1200px;
   $modal-height: 90vh;
   height: $modal-height !important;
 

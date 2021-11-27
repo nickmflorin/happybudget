@@ -73,49 +73,37 @@ export const normalizePdfColumnWidths = <
   flt?: (c: Table.Column<R, M, V, PDFM>) => boolean
 ) => {
   let columns = [...cs];
+  columns = isNil(flt) ? columns : filter(columns, flt);
+
+  const baseFilter = (c: Table.Column<R, M, V, PDFM>) => c.tableColumnType !== "fake" && c.includeInPdf !== false;
+
   // Determine the total width of all the columns that have a specified width.
   const totalSpecifiedWidth = reduce(
     columns,
-    (prev: number, column: Table.Column<R, M, V, PDFM>) =>
-      column.tableColumnType !== "fake" ? prev + (column.pdfWidth || 0.0) : prev,
+    (prev: number, c: Table.Column<R, M, V, PDFM>) => (baseFilter(c) ? prev + (c.pdfWidth || 0.0) : 0.0),
     0.0
   );
-  // Determine what the default width should be for columns that do not specify it.
+  // Determine what the default width should be for columns that do not specify it
+  // based on the leftover width available after the columns that specify a width
+  // are inserted.
   let defaultWidth = 0;
   if (totalSpecifiedWidth < 1.0) {
     defaultWidth =
       (1.0 - totalSpecifiedWidth) /
-      filter(columns, (c: Table.Column<R, M, V, PDFM>) => c.tableColumnType !== "fake" && !isNil(c.pdfWidth)).length;
+      filter(columns, (c: Table.Column<R, M, V, PDFM>) => baseFilter(c) && isNil(c.pdfWidth)).length;
   }
-  // Calculate Total Column Width Before Filtering Out Unused Columns
+  // Calculate total width of all the columns.
   const totalWidth = reduce(
     columns,
-    (prev: number, column: Table.Column<R, M, V, PDFM>) =>
-      column.tableColumnType !== "fake" ? prev + (column.pdfWidth || defaultWidth) : prev,
+    (prev: number, c: Table.Column<R, M, V, PDFM>) => (baseFilter(c) ? prev + (c.pdfWidth || defaultWidth) : prev),
     0.0
   );
   if (totalWidth !== 0.0) {
-    // Normalize Column Widths Before Filtering Out Unused Columns
+    // Normalize the width of each column such that the sum of all column widths is 1.0
     columns = map(columns, (c: Table.Column<R, M, V, PDFM>) => ({
       ...c,
-      width: c.tableColumnType !== "fake" ? (c.pdfWidth || defaultWidth) / totalWidth : 0.0
+      pdfWidth: baseFilter(c) ? (c.pdfWidth || defaultWidth) / totalWidth : c.pdfWidth
     }));
-    // Filter Out Unused Columns
-    columns = isNil(flt) ? columns : filter(columns, flt);
-    // Calculate Total Column Width After Filtering Out Unused Columns
-    const totalWidthWithFilter = reduce(
-      columns,
-      (prev: number, c: Table.Column<R, M, V, PDFM>) =>
-        c.tableColumnType !== "fake" ? prev + (c.pdfWidth || defaultWidth) : 0.0,
-      0.0
-    );
-    if (totalWidthWithFilter !== 0.0) {
-      // Normalize Column Widths After Filtering Out Unused Columns
-      columns = map(columns, (c: Table.Column<R, M, V, PDFM>) => ({
-        ...c,
-        width: c.tableColumnType !== "fake" ? (c.pdfWidth || defaultWidth) / totalWidthWithFilter : 0.0
-      }));
-    }
   }
   return columns;
 };

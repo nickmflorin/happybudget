@@ -39,7 +39,11 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
         pdfFooterValueGetter: budgeting.businessLogic.actualValue(budget)
       }
     });
-    columns = tabling.columns.normalizePdfColumnWidths(columns);
+    columns = tabling.columns.normalizePdfColumnWidths(
+      columns,
+      (c: Table.PdfColumn<Tables.AccountRowData, Model.PdfAccount>) =>
+        includes(options.columns, tabling.columns.normalizedField<Tables.AccountRowData, Model.PdfAccount>(c))
+    );
     return tabling.columns.orderColumns(columns);
   }, []);
 
