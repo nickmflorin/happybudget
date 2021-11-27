@@ -12,14 +12,20 @@ type UploadAttachmentFileOptions = {
 };
 
 export const uploadAttachmentFile = (
-  file: File | ActualFileObject,
+  file: File | ActualFileObject | (File | ActualFileObject)[],
   path: string,
   options?: UploadAttachmentFileOptions
 ): [XMLHttpRequest, FormData] => {
   const url = `${process.env.REACT_APP_API_DOMAIN}${path}`;
   const formData = new FormData();
 
-  formData.append("file", file, file.name);
+  if (Array.isArray(file)) {
+    for (let i = 0; i < file.length; i++) {
+      formData.append("files", file[i], file[i].name);
+    }
+  } else {
+    formData.append("file", file, file.name);
+  }
 
   const request = new XMLHttpRequest();
   request.withCredentials = true;
