@@ -396,14 +396,6 @@
       padding: 6px;
     }
 
-    &.green {
-      @include color_set($green, $green-darker);
-    }
-
-    &.green-hover {
-      @include green_on_hover();
-    }
-
     &.ag-grid-action-button {
       height: 26px;
       width: 26px;
@@ -432,6 +424,18 @@
           background-color: transparent !important;
         }
       }
+    }
+
+    &.budget-table-menu {
+      @include bare_color_set($text-secondary);
+    }
+
+    &.green {
+      @include color_set($green, $green-darker);
+    }
+
+    &.green-hover {
+      @include green_on_hover();
     }
   }
 
@@ -556,23 +560,18 @@
     padding: 10px 12px;
     line-height: 16px;
     @include bare_color_set($text-secondary);
+
+    &.budget-table-menu {
+      padding: 7px 6px;
+      line-height: 16px;
+      height: 30px;
+      @include bare_color_set($text-secondary, $green);
+    }
   }
 
   &--entity-text {
     padding-left: 0px !important;
     padding-right: 0px !important;
-  }
-
-  &--budget-table-menu {
-    padding: 6px 8px;
-    line-height: 18px;
-    height: 30px;
-
-    @include bare_color_set($text-secondary, $green);
-
-    .icon {
-      height: 1.2rem !important;
-    }
   }
 
   &--circle-icon {

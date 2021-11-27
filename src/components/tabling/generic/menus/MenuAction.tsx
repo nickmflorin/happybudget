@@ -24,7 +24,7 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
         // If the button is being wrapped in a dropdown, we need to allow the onClick prop that AntD sets
         // on the Button when it is nested in a Dropdown to persist.
         onClick={isNil(action.wrapInDropdown) ? () => !isNil(action.onClick) && action.onClick() : props.onClick}
-        className={classNames("btn--bare btn--budget-table-menu", props.className)}
+        className={classNames("btn--bare budget-table-menu", props.className)}
         disabled={action.disabled}
         icon={ui.typeguards.iconIsJSX(action.icon) ? action.icon : <Icon icon={action.icon} />}
         tooltip={
@@ -50,7 +50,7 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
   } else {
     return (
       <IconButton
-        className={"green-hover"}
+        className={"green-hover budget-table-menu"}
         onClick={() => !isNil(action.onClick) && action.onClick()}
         disabled={action.disabled}
         icon={ui.typeguards.iconIsJSX(action.icon) ? action.icon : <Icon icon={action.icon} />}
