@@ -320,7 +320,7 @@ const AuthenticatedTable = <
           actions={actions}
           selectedRows={selectedRows}
           hasExpandColumn={props.hasExpandColumn}
-          hasDragColumn={props.suppressRowDragging !== true}
+          hasDragColumn={props.hasDragColumn === undefined ? true : props.hasDragColumn}
         />
         {props.children({
           ...props,

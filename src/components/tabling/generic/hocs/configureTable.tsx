@@ -56,6 +56,7 @@ type TableConfigurationProvidedProps<R extends Table.RowData> = {
 export type TableConfigurationProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
   readonly cookieNames?: Table.CookieNames;
   readonly calculatedColumnWidth?: number;
+  readonly hasDragColumn?: boolean;
   readonly checkboxColumn?: Partial<Table.Column<R, M>>;
   readonly checkboxColumnWidth?: number;
   readonly expandColumn?: Partial<Table.Column<R, M>>;
@@ -164,8 +165,6 @@ const configureTable = <
     );
 
     const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-      let orderedColumns = tabling.columns.orderColumns<R, M>(props.columns);
-
       const pinFirstColumn = (cs: Table.Column<R, M>[]) => {
         const displayedCols = filter(cs, (c: Table.Column<R, M>) => c.tableColumnType !== "fake");
         if (displayedCols.length !== 0) {
@@ -179,13 +178,11 @@ const configureTable = <
         return cs;
       };
 
+      let cols = tabling.columns.orderColumns<R, M>(props.columns);
+      cols = props.pinFirstColumn ? pinFirstColumn(cols) : cols;
+
       if (hasExpandColumn === true) {
-        return [
-          tabling.columns.CheckboxColumn<R, M>(
-            { ...props.checkboxColumn, pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined },
-            hasExpandColumn,
-            props.checkboxColumnWidth
-          ),
+        cols = [
           tabling.columns.ExpandColumn<R, M>(
             {
               pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined,
@@ -203,24 +200,32 @@ const configureTable = <
             },
             props.expandColumnWidth
           ),
-          ...(props.pinFirstColumn ? pinFirstColumn(orderedColumns) : orderedColumns)
+          ...cols
         ];
       }
-      return [
+      cols = [
         tabling.columns.CheckboxColumn<R, M>(
           { ...props.checkboxColumn, pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined },
           hasExpandColumn || false,
           props.checkboxColumnWidth
         ),
-        ...(props.pinFirstColumn ? pinFirstColumn(orderedColumns) : orderedColumns)
+        ...cols
       ];
+      if (props.hasDragColumn !== false) {
+        cols = [
+          tabling.columns.DragColumn({ pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined }),
+          ...cols
+        ];
+      }
+      return cols;
     }, [
       hooks.useDeepEqualMemo(props.columns),
       props.pinFirstColumn,
       hasExpandColumn,
       props.expandActionBehavior,
       props.onRowExpand,
-      props.onEditRow
+      props.onEditRow,
+      props.hasDragColumn
     ]);
 
     return (

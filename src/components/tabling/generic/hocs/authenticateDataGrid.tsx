@@ -57,7 +57,6 @@ export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Mo
   readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
   readonly pinFirstColumn?: boolean;
   readonly pinActionColumns?: boolean;
-  readonly suppressRowDragging?: boolean;
   readonly generateNewRowData?: (rows: Table.BodyRow<R>[]) => Partial<R>;
   readonly rowHasCheckboxSelection: ((row: Table.EditableRow<R>) => boolean) | undefined;
   readonly onRowSelectionChanged: (rows: Table.EditableRow<R>[]) => void;
@@ -265,7 +264,7 @@ const authenticateDataGrid =
             }
           }
         };
-        let cs = tabling.columns.normalizeColumns<R, M>(props.columns, {
+        return tabling.columns.normalizeColumns<R, M>(props.columns, {
           body: (col: Table.Column<R, M>) => ({
             cellRendererParams: { ...col.cellRendererParams, generateNewRowData: props.generateNewRowData },
             cellEditorParams: { ...col.cellEditorParams, onDoneEditing },
@@ -304,13 +303,6 @@ const authenticateDataGrid =
             }
           }
         });
-        if (props.suppressRowDragging !== true) {
-          return [
-            tabling.columns.DragColumn({ pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined }),
-            ...cs
-          ];
-        }
-        return cs;
       }, [hooks.useDeepEqualMemo(props.columns)]);
 
       const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {

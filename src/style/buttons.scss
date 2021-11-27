@@ -439,6 +439,18 @@
     }
   }
 
+  &--new-row {
+    @include color_set($green, $green-darker);
+    padding: 0px !important;
+    height: 18px !important;
+    width: 18px !important;
+
+    .icon {
+      height: 18px !important;
+      width: 18px !important;
+    }
+  }
+
   // The color of the button is set dynamically based on the group color.
   &--edit-group {
     &:hover {

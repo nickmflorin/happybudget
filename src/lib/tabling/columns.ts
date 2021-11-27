@@ -364,7 +364,19 @@ export const CheckboxColumn = <R extends Table.RowData, M extends Model.RowHttpM
     ...col,
     colId: "checkbox",
     width: !isNil(width) ? width : hasExpandColumn === false ? 40 : 25,
-    maxWidth: !isNil(width) ? width : hasExpandColumn === false ? 40 : 25
+    maxWidth: !isNil(width) ? width : hasExpandColumn === false ? 40 : 25,
+    footer: {
+      // We always want the entire new row icon in the footer cell to be present,
+      // but the column itself isn't always wide enough.
+      cellStyle: {
+        zIndex: 1000,
+        overflow: "visible",
+        whiteSpace: "unset",
+        textAlign: "left",
+        paddingLeft: 0,
+        paddingRight: 0
+      }
+    }
   }) as Table.Column<R, M>;
 
 // Abstract - not meant to be used by individual columns.  It just enforces that

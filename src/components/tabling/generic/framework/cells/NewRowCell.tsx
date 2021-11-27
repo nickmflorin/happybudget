@@ -7,7 +7,7 @@ import { IconButton } from "components/buttons";
 const NewRowCell = (props: Table.CellProps<any, any, any, null>): JSX.Element => {
   return (
     <IconButton
-      className={"green"}
+      className={"btn--new-row"}
       size={"medium"}
       icon={<Icon icon={"plus-circle"} weight={"solid"} />}
       style={{ margin: "0 auto" }}
