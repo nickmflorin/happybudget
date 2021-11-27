@@ -141,7 +141,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
       } as Table.Column<R, M>;
     });
     cs = !isNil(checkboxColumn)
-      ? util.updateInArray<Table.Column<R, M>>(cs, { field: "checkbox" }, checkboxColumn)
+      ? util.updateInArray<Table.Column<R, M>>(cs, { colId: "checkbox" }, checkboxColumn)
       : cs;
     return cs;
   }, [hiddenColumns]);
