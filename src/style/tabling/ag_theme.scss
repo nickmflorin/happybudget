@@ -114,9 +114,16 @@
   }
 
   .ag-root-wrapper-body .ag-checkbox-input-wrapper {
+    .ag-checkbox-input {
+      box-shadow: none !important;
+    }
     &::after {
       -webkit-text-stroke: 1px white;
       color: $disabled-color;
+    }
+
+    &:focus-within {
+      box-shadow: none !important;
     }
 
     &.ag-checked::after {

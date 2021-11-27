@@ -45,6 +45,10 @@ input:focus-visible {
   outline: none !important;
 }
 
+.ant-checkbox-checked::after {
+  border: none !important;
+}
+
 .checkbox-wrapper {
   padding: 10px;
   .ant-checkbox-wrapper {
