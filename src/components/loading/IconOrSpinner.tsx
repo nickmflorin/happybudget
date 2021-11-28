@@ -39,4 +39,4 @@ const IconOrSpinner = ({ loading, icon, className, size = 14, style = {} }: Icon
   }
 };
 
-export default IconOrSpinner;
+export default React.memo(IconOrSpinner);

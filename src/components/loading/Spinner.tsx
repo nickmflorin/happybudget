@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import classNames from "classnames";
 import { Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -68,4 +68,4 @@ const Spinner = ({
   );
 };
 
-export default Spinner;
+export default React.memo(Spinner);

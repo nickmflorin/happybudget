@@ -65,132 +65,145 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
     [params.getModelRowLabel, params.getMarkupRowLabel, params.getPlaceholderRowLabel, params.getGroupRowLabel]
   );
 
-  const findGroupableRowsAbove = hooks.useDynamicCallback((node: Table.RowNode): Table.ModelRow<R>[] => {
-    const firstRow: Table.BodyRow<R> = node.data;
-    if (tabling.typeguards.isModelRow(firstRow)) {
-      const rows: Table.ModelRow<R>[] = [firstRow];
-      if (!isNil(params.apis)) {
-        let currentNode: Table.RowNode | undefined = node;
-        while (!isNil(currentNode) && !isNil(currentNode.rowIndex) && currentNode.rowIndex >= 1) {
-          currentNode = params.apis.grid.getDisplayedRowAtIndex(currentNode.rowIndex - 1);
-          if (!isNil(currentNode)) {
-            const row: Table.BodyRow<R> = currentNode.data;
-            if (tabling.typeguards.isGroupRow(row)) {
-              break;
-            } else if (tabling.typeguards.isModelRow(row)) {
-              rows.push(row);
-            }
-          }
-        }
-      }
-      return rows;
-    }
-    return [];
-  });
-
-  const findMarkupableRowsAbove = hooks.useDynamicCallback((node: Table.RowNode): Table.ModelRow<R>[] => {
-    const firstRow: Table.BodyRow<R> = node.data;
-    if (tabling.typeguards.isModelRow(firstRow)) {
-      const rows: Table.ModelRow<R>[] = [firstRow];
-      if (!isNil(params.apis)) {
-        let currentNode: Table.RowNode | undefined = node;
-        while (!isNil(currentNode) && !isNil(currentNode.rowIndex) && currentNode.rowIndex >= 1) {
-          currentNode = params.apis.grid.getDisplayedRowAtIndex(currentNode.rowIndex - 1);
-          if (!isNil(currentNode)) {
-            const row: Table.BodyRow<R> = currentNode.data;
-            if (tabling.typeguards.isModelRow(row)) {
-              rows.push(row);
-            }
-          }
-        }
-      }
-      return rows;
-    }
-    return [];
-  });
-
-  const getModelRowGroupContextMenuItems: (row: Table.ModelRow<R>, node: Table.RowNode) => Table.MenuItemDef[] =
-    hooks.useDynamicCallback((row: Table.ModelRow<R>, node: Table.RowNode): Table.MenuItemDef[] => {
-      let contextMenuItems: Table.MenuItemDef[] = [];
-
-      const onGroupRows = params.onGroupRows;
-      if (!isNil(onGroupRows)) {
-        const groupRows: Table.GroupRow<R>[] = filter(params.data, (r: Table.BodyRow<R>) =>
-          tabling.typeguards.isGroupRow(r)
-        ) as Table.GroupRow<R>[];
-
-        // The GroupRow that the ModelRow already potentially belongs to.
-        const groupRow: Table.GroupRow<R> | undefined = find(groupRows, (r: Table.GroupRow<R>) =>
-          includes(r.children, row.id)
-        );
-        if (!isNil(groupRow)) {
-          contextMenuItems = [
-            ...contextMenuItems,
-            {
-              name: `Remove ${getRowLabel(row) || "Row"} from Group ${getRowName(groupRow) || groupRow.groupData.name}`,
-              icon: '<i class="far fa-folder-minus context-icon"></i>',
-              action: () =>
-                params.onChangeEvent({
-                  type: "rowRemoveFromGroup",
-                  payload: { rows: [row.id], group: groupRow.id }
-                })
-            }
-          ];
-        } else {
-          const groupableRowsAbove = findGroupableRowsAbove(node);
-          if (groupableRowsAbove.length !== 0) {
-            let label: string;
-            if (groupableRowsAbove.length === 1) {
-              label = `Group Line`;
-            } else {
-              label = `Group ${getRowLabel(row) || "Row"}s Above`;
-              const lastRow: Table.ModelRow<R> | Table.MarkupRow<R> | undefined =
-                groupableRowsAbove[groupableRowsAbove.length - 1];
-              if (!isNil(lastRow)) {
-                const endpoints = [getRowName(row), getRowName(lastRow)];
-                if (!(endpoints[0] === undefined && endpoints[1] === undefined)) {
-                  label = `Group ${getRowLabel(row) || "Row"}s ${util.conditionalJoinString(
-                    endpoints[1] || null,
-                    endpoints[0] || null,
-                    {
-                      delimeter: " to ",
-                      replaceMissing: "-"
-                    }
-                  )}`;
+  const findGroupableRowsAbove = useMemo(
+    () =>
+      (node: Table.RowNode): Table.ModelRow<R>[] => {
+        const firstRow: Table.BodyRow<R> = node.data;
+        if (tabling.typeguards.isModelRow(firstRow)) {
+          const rows: Table.ModelRow<R>[] = [firstRow];
+          if (!isNil(params.apis)) {
+            let currentNode: Table.RowNode | undefined = node;
+            while (!isNil(currentNode) && !isNil(currentNode.rowIndex) && currentNode.rowIndex >= 1) {
+              currentNode = params.apis.grid.getDisplayedRowAtIndex(currentNode.rowIndex - 1);
+              if (!isNil(currentNode)) {
+                const row: Table.BodyRow<R> = currentNode.data;
+                if (tabling.typeguards.isGroupRow(row)) {
+                  break;
+                } else if (tabling.typeguards.isModelRow(row)) {
+                  rows.push(row);
                 }
               }
             }
-            contextMenuItems = [
-              ...contextMenuItems,
-              {
-                name: label,
-                icon: '<i class="far fa-folder context-icon"></i>',
-                action: () => onGroupRows(groupableRowsAbove)
-              }
-            ];
           }
-          if (groupRows.length !== 0) {
+          return rows;
+        }
+        return [];
+      },
+    [params.apis?.grid]
+  );
+
+  const findMarkupableRowsAbove = useMemo(
+    () =>
+      (node: Table.RowNode): Table.ModelRow<R>[] => {
+        const firstRow: Table.BodyRow<R> = node.data;
+        if (tabling.typeguards.isModelRow(firstRow)) {
+          const rows: Table.ModelRow<R>[] = [firstRow];
+          if (!isNil(params.apis)) {
+            let currentNode: Table.RowNode | undefined = node;
+            while (!isNil(currentNode) && !isNil(currentNode.rowIndex) && currentNode.rowIndex >= 1) {
+              currentNode = params.apis.grid.getDisplayedRowAtIndex(currentNode.rowIndex - 1);
+              if (!isNil(currentNode)) {
+                const row: Table.BodyRow<R> = currentNode.data;
+                if (tabling.typeguards.isModelRow(row)) {
+                  rows.push(row);
+                }
+              }
+            }
+          }
+          return rows;
+        }
+        return [];
+      },
+    [params.apis?.grid]
+  );
+
+  const getModelRowGroupContextMenuItems = useMemo(
+    () =>
+      (row: Table.ModelRow<R>, node: Table.RowNode): Table.MenuItemDef[] => {
+        let contextMenuItems: Table.MenuItemDef[] = [];
+
+        const onGroupRows = params.onGroupRows;
+        if (!isNil(onGroupRows)) {
+          const groupRows: Table.GroupRow<R>[] = filter(params.data, (r: Table.BodyRow<R>) =>
+            tabling.typeguards.isGroupRow(r)
+          ) as Table.GroupRow<R>[];
+
+          // The GroupRow that the ModelRow already potentially belongs to.
+          const groupRow: Table.GroupRow<R> | undefined = find(groupRows, (r: Table.GroupRow<R>) =>
+            includes(r.children, row.id)
+          );
+          if (!isNil(groupRow)) {
             contextMenuItems = [
               ...contextMenuItems,
               {
-                name: "Add to Group",
-                icon: '<i class="far fa-folder-plus context-icon"></i>',
-                subMenu: map(groupRows, (gr: Table.GroupRow<R>) => ({
-                  name: `${getRowName(gr) || gr.groupData.name}`,
-                  icon: '<i class="far fa-folders context-icon"></i>',
-                  action: () =>
-                    params.onChangeEvent({
-                      type: "rowAddToGroup",
-                      payload: { rows: [row.id], group: gr.id }
-                    })
-                }))
+                name: `Remove ${getRowLabel(row) || "Row"} from Group ${
+                  getRowName(groupRow) || groupRow.groupData.name
+                }`,
+                icon: '<i class="far fa-folder-minus context-icon"></i>',
+                action: () =>
+                  params.onChangeEvent({
+                    type: "rowRemoveFromGroup",
+                    payload: { rows: [row.id], group: groupRow.id }
+                  })
               }
             ];
+          } else {
+            const groupableRowsAbove = findGroupableRowsAbove(node);
+            if (groupableRowsAbove.length !== 0) {
+              let label: string;
+              if (groupableRowsAbove.length === 1) {
+                label = `Group Line`;
+              } else {
+                label = `Group ${getRowLabel(row) || "Row"}s Above`;
+                const lastRow: Table.ModelRow<R> | Table.MarkupRow<R> | undefined =
+                  groupableRowsAbove[groupableRowsAbove.length - 1];
+                if (!isNil(lastRow)) {
+                  const endpoints = [getRowName(row), getRowName(lastRow)];
+                  if (!(endpoints[0] === undefined && endpoints[1] === undefined)) {
+                    label = `Group ${getRowLabel(row) || "Row"}s ${util.conditionalJoinString(
+                      endpoints[1] || null,
+                      endpoints[0] || null,
+                      {
+                        delimeter: " to ",
+                        replaceMissing: "-"
+                      }
+                    )}`;
+                  }
+                }
+              }
+              contextMenuItems = [
+                ...contextMenuItems,
+                {
+                  name: label,
+                  icon: '<i class="far fa-folder context-icon"></i>',
+                  action: () => onGroupRows(groupableRowsAbove)
+                }
+              ];
+            }
+            if (groupRows.length !== 0) {
+              contextMenuItems = [
+                ...contextMenuItems,
+                {
+                  name: "Add to Group",
+                  icon: '<i class="far fa-folder-plus context-icon"></i>',
+                  subMenu: map(groupRows, (gr: Table.GroupRow<R>) => ({
+                    name: `${getRowName(gr) || gr.groupData.name}`,
+                    icon: '<i class="far fa-folders context-icon"></i>',
+                    action: () =>
+                      params.onChangeEvent({
+                        type: "rowAddToGroup",
+                        payload: { rows: [row.id], group: gr.id }
+                      })
+                  }))
+                }
+              ];
+            }
           }
         }
-      }
-      return contextMenuItems;
-    });
+        return contextMenuItems;
+      },
+    [params.onGroupRows, params.onChangeEvent, findGroupableRowsAbove, getRowLabel, getRowName, params.data]
+  );
 
   const getModelRowMarkupContextMenuItems: (row: Table.ModelRow<R>, node: Table.RowNode) => Table.MenuItemDef[] =
     hooks.useDynamicCallback((row: Table.ModelRow<R>, node: Table.RowNode): Table.MenuItemDef[] => {

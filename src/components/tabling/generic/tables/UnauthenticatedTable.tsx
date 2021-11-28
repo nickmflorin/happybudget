@@ -218,7 +218,9 @@ type Props = WithUnauthenticatedDataGridProps<
   WithConnectedTableProps<WithConfiguredTableProps<UnauthenticatedTableProps<any>, any>, any>
 >;
 
-export default configureTable<any, any, Props>(UnauthenticatedTable) as {
+const Memoized = React.memo(UnauthenticatedTable) as typeof UnauthenticatedTable;
+
+export default configureTable<any, any, Props>(Memoized) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
     props: UnauthenticatedTableProps<R, M>
   ): JSX.Element;

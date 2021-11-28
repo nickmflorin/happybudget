@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { filter, map, isNil } from "lodash";
 
 import { tabling } from "lib";
@@ -57,4 +57,4 @@ const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.RowHttpM
   );
 };
 
-export default ToggleColumnsDropdown;
+export default React.memo(ToggleColumnsDropdown) as typeof ToggleColumnsDropdown;

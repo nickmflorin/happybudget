@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 
 export interface ImageOverlayProps extends StandardComponentWithChildrenProps {
@@ -15,4 +16,4 @@ const ImageOverlay = (props: ImageOverlayProps): JSX.Element => {
   );
 };
 
-export default ImageOverlay;
+export default React.memo(ImageOverlay);

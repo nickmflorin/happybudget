@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 
 import { Icon } from "components";
 import { useLoggedInUser, useTimezone } from "store/hooks";
@@ -84,4 +84,4 @@ const BudgetCard = ({
   );
 };
 
-export default BudgetCard;
+export default React.memo(BudgetCard);

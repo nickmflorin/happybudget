@@ -1,3 +1,4 @@
+import React from "react";
 import { Link } from "react-router-dom";
 import classNames from "classnames";
 
@@ -21,4 +22,4 @@ const AccountCircleLink = ({
   );
 };
 
-export default AccountCircleLink;
+export default React.memo(AccountCircleLink);

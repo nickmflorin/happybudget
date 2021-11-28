@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { filter, map, isNil } from "lodash";
 
 import { tabling } from "lib";
@@ -76,4 +76,4 @@ const ExportCSVDropdown = <R extends Table.RowData, M extends Model.RowHttpModel
   );
 };
 
-export default ExportCSVDropdown;
+export default React.memo(ExportCSVDropdown) as typeof ExportCSVDropdown;

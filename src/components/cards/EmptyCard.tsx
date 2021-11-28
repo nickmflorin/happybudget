@@ -1,3 +1,4 @@
+import React from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
@@ -24,4 +25,4 @@ const EmptyCard = ({ title, icon, onClick, className, style = {} }: EmptyCardPro
   );
 };
 
-export default EmptyCard;
+export default React.memo(EmptyCard);

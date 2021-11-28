@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { isNil } from "lodash";
 
 import { Icon } from "components";
@@ -96,4 +96,4 @@ const CommunityTemplateCard = ({
   );
 };
 
-export default CommunityTemplateCard;
+export default React.memo(CommunityTemplateCard);

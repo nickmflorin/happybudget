@@ -1,3 +1,4 @@
+import React from "react";
 import { Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 
@@ -32,4 +33,4 @@ const SavingChanges = ({ saving }: SavingChangesProps): JSX.Element => {
   );
 };
 
-export default SavingChanges;
+export default React.memo(SavingChanges);

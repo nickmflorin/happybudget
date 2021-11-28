@@ -1,3 +1,4 @@
+import React from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
@@ -35,4 +36,4 @@ const NoBudgets = ({ title, subTitle, button, children, ...props }: NoBudgetsPro
   );
 };
 
-export default NoBudgets;
+export default React.memo(NoBudgets);

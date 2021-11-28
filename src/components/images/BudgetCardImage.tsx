@@ -35,4 +35,4 @@ const BudgetCardImage: React.FC<BudgetCardImageProps> = ({ image, titleOnly, ...
   />
 );
 
-export default BudgetCardImage;
+export default React.memo(BudgetCardImage);

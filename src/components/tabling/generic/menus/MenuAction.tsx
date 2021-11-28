@@ -82,4 +82,4 @@ const TableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.Elemen
   return <InnerTableMenuAction action={action} {...props} />;
 };
 
-export default TableMenuAction;
+export default React.memo(TableMenuAction);

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import { isNil } from "lodash";
 import classNames from "classnames";
@@ -76,4 +76,4 @@ const Card = ({
   );
 };
 
-export default Card;
+export default React.memo(Card);

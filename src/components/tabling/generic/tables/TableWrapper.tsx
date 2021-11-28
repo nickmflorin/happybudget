@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
@@ -38,4 +39,4 @@ const TableWrapper = (props: TableWrapperProps) => {
   );
 };
 
-export default TableWrapper;
+export default React.memo(TableWrapper);

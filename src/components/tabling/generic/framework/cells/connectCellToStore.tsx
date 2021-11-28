@@ -2,7 +2,6 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { isNil } from "lodash";
-import hoistNonReactStatics from "hoist-non-react-statics";
 
 /* eslint-disable indent */
 const connectCellToStore = <
@@ -12,10 +11,10 @@ const connectCellToStore = <
   T extends Table.CellProps<R, M, S> = Table.CellProps<R, M, S>
 >(
   Component: React.ComponentClass<T, {}> | React.FunctionComponent<T>
-): React.FunctionComponent<T> => {
+) => {
   const WithConnectedCell = (
     props: T & { readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>> }
-  ) => {
+  ): JSX.Element => {
     let selectorFn: Table.RowDataSelector<R> | ((state: Application.Store) => null) = (state: Application.Store) =>
       null;
     if (props.gridId !== "data" && !isNil(props.footerRowSelectors)) {
@@ -34,7 +33,7 @@ const connectCellToStore = <
     }
     return <Component {...props} value={value} />;
   };
-  return hoistNonReactStatics(WithConnectedCell, React.memo(Component));
+  return React.memo(WithConnectedCell);
 };
 
 export default connectCellToStore;

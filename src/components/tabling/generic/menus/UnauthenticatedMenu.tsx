@@ -68,4 +68,4 @@ const Menu = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
     <UnauthenticatedMenu<R, M> {...props} detached={true} />
   );
 
-export default Menu;
+export default React.memo(Menu) as typeof Menu;

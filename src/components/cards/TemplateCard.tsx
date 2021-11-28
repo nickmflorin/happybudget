@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { isNil } from "lodash";
 
 import { Icon } from "components";
@@ -97,4 +97,4 @@ const TemplateCard = ({
   );
 };
 
-export default TemplateCard;
+export default React.memo(TemplateCard);

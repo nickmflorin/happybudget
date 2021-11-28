@@ -375,7 +375,9 @@ type Props = WithAuthenticatedDataGridProps<
   WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<any>, any>, any>
 >;
 
-export default configureTable<any, any, Props>(AuthenticatedTable) as {
+const Memoized = React.memo(AuthenticatedTable) as typeof AuthenticatedTable;
+
+export default configureTable<any, any, Props>(Memoized) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
     props: AuthenticatedTableProps<R, M>
   ): JSX.Element;

@@ -107,8 +107,8 @@ const configureTable = <
   T extends TableConfigurationProps<R, M> = TableConfigurationProps<R, M>
 >(
   Component:
-    | React.ComponentClass<WithConfiguredTableProps<T, R>, {}>
     | React.FunctionComponent<WithConfiguredTableProps<T, R>>
+    | React.MemoExoticComponent<React.FunctionComponent>
 ): React.FunctionComponent<T> => {
   function WithConfigureTable(props: T) {
     const tableId = useMemo(() => uniqueId("table-"), []);

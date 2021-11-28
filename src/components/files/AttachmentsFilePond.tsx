@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { FilePond } from "react-filepond";
 import { ActualFileObject, FilePondFile, ProgressServerConfigFunction } from "filepond/types";
 import { map } from "lodash";
@@ -77,4 +77,4 @@ const AttachmentsFilePond = (props: AttachmentsFilePondProps): JSX.Element => {
   );
 };
 
-export default AttachmentsFilePond;
+export default React.memo(AttachmentsFilePond);

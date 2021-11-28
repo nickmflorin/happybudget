@@ -21,7 +21,7 @@ const renderOnRowType = <T extends { node: Table.RowNode } = any, R extends Tabl
     }
     return <span></span>;
   };
-  return WithRowsOfType;
+  return React.memo(WithRowsOfType);
 };
 
 export default renderOnRowType;

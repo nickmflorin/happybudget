@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { filter } from "lodash";
 
 import * as api from "api";
@@ -86,4 +86,4 @@ const EditAttachments = (props: EditAttachmentsProps): JSX.Element => {
   );
 };
 
-export default EditAttachments;
+export default React.memo(EditAttachments);

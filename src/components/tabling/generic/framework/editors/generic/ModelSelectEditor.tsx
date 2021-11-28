@@ -1,4 +1,4 @@
-import { ForwardedRef, forwardRef } from "react";
+import React, { ForwardedRef, forwardRef } from "react";
 import { isNil } from "lodash";
 
 import useModelMenuEditor, { UseModelMenuEditorParams } from "./useModelMenuEditor";
@@ -40,7 +40,7 @@ const ModelSelectEditor = <
   );
 };
 
-export default forwardRef(ModelSelectEditor) as {
+export default forwardRef(React.memo(ModelSelectEditor)) as {
   <
     C extends Model.HttpModel,
     R extends Table.RowData = Table.RowData,

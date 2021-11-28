@@ -1,3 +1,4 @@
+import React from "react";
 import { Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 
@@ -19,4 +20,4 @@ const ApplicationSpinner = ({ visible }: ApplicationSpinnerProps): JSX.Element =
   );
 };
 
-export default ApplicationSpinner;
+export default React.memo(ApplicationSpinner);

@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 import { map } from "lodash";
 
@@ -30,4 +31,4 @@ const AttachmentsList = ({ attachments, loading, onDelete, isDeleting, ...props 
   );
 };
 
-export default AttachmentsList;
+export default React.memo(AttachmentsList);

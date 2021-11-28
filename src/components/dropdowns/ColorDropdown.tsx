@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 
 import { Color } from "components/tagging";
@@ -35,4 +36,4 @@ const ColorDropdown = ({
   );
 };
 
-export default ColorDropdown;
+export default React.memo(ColorDropdown);

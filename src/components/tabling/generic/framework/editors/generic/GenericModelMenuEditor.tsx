@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 import { ModelTagsMenu, ModelTagsMenuProps } from "components/menus";
 import { IEditor } from "./useModelMenuEditor";
@@ -38,4 +39,4 @@ const GenericModelMenuEditor = <
   );
 };
 
-export default GenericModelMenuEditor;
+export default React.memo(GenericModelMenuEditor) as typeof GenericModelMenuEditor;
