@@ -97,12 +97,15 @@ export const createBudgetTableChangeEventReducer = <
         MarkupRow again to reflect the new children.
         */
         let updatedMarkupRow = markupRowManager.create({ model: e.payload });
-
         const childrenRows = filter(
           newState.data,
           (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) && includes(updatedMarkupRow.children, r.id)
         ) as Table.ModelRow<R>[];
-
+        // Update the Markup Row itself in state.
+        newState = {
+          ...state,
+          data: util.replaceInArray<Table.BodyRow<R>>(state.data, { id: updatedMarkupRow.id }, updatedMarkupRow)
+        };
         // Update the children rows of the MarkupRow to reflect the new MarkupRow data.
         return reduce(
           childrenRows,
