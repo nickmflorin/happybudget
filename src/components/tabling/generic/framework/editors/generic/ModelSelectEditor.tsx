@@ -40,7 +40,7 @@ const ModelSelectEditor = <
   );
 };
 
-export default forwardRef(React.memo(ModelSelectEditor)) as {
+export default forwardRef(ModelSelectEditor) as {
   <
     C extends Model.HttpModel,
     R extends Table.RowData = Table.RowData,
