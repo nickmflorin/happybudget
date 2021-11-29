@@ -41,7 +41,7 @@ const CreateGroupModal = <M extends Model.SimpleAccount | Model.SimpleSubAccount
   return (
     <CreateModelModal<Model.Group, Http.GroupPayload>
       {...props}
-      title={"Group"}
+      title={"Subtotal"}
       titleIcon={"folder"}
       form={form}
       create={(payload: Http.GroupPayload, options?: Http.RequestOptions) =>

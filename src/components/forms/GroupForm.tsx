@@ -40,7 +40,7 @@ const GroupForm = <M extends Model.SimpleAccount | Model.SimpleSubAccount>({
       </Form.Item>
       <Form.Item
         name={"children"}
-        label={"Group Accounts"}
+        label={"Subtotal Accounts"}
         rules={[
           { required: false },
           ({ getFieldValue }: { getFieldValue: any }) => ({

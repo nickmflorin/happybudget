@@ -27,7 +27,7 @@ const AuthenticatedTemplateAccountsTable = (props: AuthenticatedTemplateProps): 
       actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
         {
           icon: "folder",
-          label: "Group",
+          label: "Subtotal",
           isWriteOnly: true,
           onClick: () => {
             const rows: Table.BodyRow<R>[] = table.current.getRowsAboveAndIncludingFocusedRow();

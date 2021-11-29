@@ -180,7 +180,7 @@ const AuthenticatedBudgetSubAccountsTable = (
         actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
           {
             icon: "folder",
-            label: "Group",
+            label: "Subtotal",
             isWriteOnly: true,
             onClick: () => {
               let rows = filter(params.selectedRows, (r: Table.BodyRow<R>) =>

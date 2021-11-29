@@ -136,9 +136,9 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
             contextMenuItems = [
               ...contextMenuItems,
               {
-                name: `Remove ${getRowLabel(row) || "Row"} from Group ${
+                name: `Remove ${getRowLabel(row) || "Row"} from ${
                   getRowName(groupRow) || groupRow.groupData.name
-                }`,
+                } Subtotal`,
                 icon: '<i class="far fa-folder-minus context-icon"></i>',
                 action: () =>
                   params.onChangeEvent({
@@ -152,15 +152,15 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
             if (groupableRowsAbove.length !== 0) {
               let label: string;
               if (groupableRowsAbove.length === 1) {
-                label = `Group Line`;
+                label = `Create a Subtotal`;
               } else {
-                label = `Group ${getRowLabel(row) || "Row"}s Above`;
+                label = `Subtotal ${getRowLabel(row) || "Row"}s Above`;
                 const lastRow: Table.ModelRow<R> | Table.MarkupRow<R> | undefined =
                   groupableRowsAbove[groupableRowsAbove.length - 1];
                 if (!isNil(lastRow)) {
                   const endpoints = [getRowName(row), getRowName(lastRow)];
                   if (!(endpoints[0] === undefined && endpoints[1] === undefined)) {
-                    label = `Group ${getRowLabel(row) || "Row"}s ${util.conditionalJoinString(
+                    label = `Subtotal ${getRowLabel(row) || "Row"}s ${util.conditionalJoinString(
                       endpoints[1] || null,
                       endpoints[0] || null,
                       {
@@ -184,7 +184,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
               contextMenuItems = [
                 ...contextMenuItems,
                 {
-                  name: "Add to Group",
+                  name: "Add to Subtotal",
                   icon: '<i class="far fa-folder-plus context-icon"></i>',
                   subMenu: map(groupRows, (gr: Table.GroupRow<R>) => ({
                     name: `${getRowName(gr) || gr.groupData.name}`,
