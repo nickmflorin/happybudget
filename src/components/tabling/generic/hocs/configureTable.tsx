@@ -160,8 +160,8 @@ const configureTable = <
     }, []);
 
     const hasExpandColumn = useMemo(
-      () => !isNil(props.onRowExpand) || !isNil(props.onEditRow),
-      [props.onRowExpand, props.onEditRow]
+      () => props.rowCanExpand !== false && (!isNil(props.onRowExpand) || !isNil(props.onEditRow)),
+      [props.rowCanExpand, props.onRowExpand, props.onEditRow]
     );
 
     const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
@@ -211,7 +211,7 @@ const configureTable = <
         ),
         ...cols
       ];
-      if (props.hasDragColumn !== false) {
+      if (props.hasDragColumn !== false && Config.tableRowOrdering) {
         cols = [
           tabling.columns.DragColumn({ pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined }),
           ...cols

@@ -10,6 +10,7 @@ namespace Application {
     readonly reportWebVitals: boolean;
     readonly tableDebug: boolean;
     readonly whyDidYouRender: boolean;
+    readonly tableRowOrdering: boolean;
   };
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -17,6 +18,7 @@ namespace Application {
     readonly devOnly?: boolean;
     readonly name: keyof Config;
     readonly default?: boolean;
+    readonly hardOverride?: boolean;
   }
 
   namespace Authenticated {

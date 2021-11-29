@@ -2,6 +2,7 @@ import React, { useImperativeHandle, useState, useMemo } from "react";
 import { forEach, isNil, uniq, map, filter, intersection } from "lodash";
 
 import { tabling, util, hooks } from "lib";
+import { Config } from "config";
 import { DeleteRowsModal } from "components/modals";
 import { AuthenticatedGrid } from "components/tabling/generic";
 
@@ -320,7 +321,11 @@ const AuthenticatedTable = <
           actions={actions}
           selectedRows={selectedRows}
           hasExpandColumn={props.hasExpandColumn}
-          hasDragColumn={props.hasDragColumn === undefined ? true : props.hasDragColumn}
+          hasDragColumn={
+            props.hasDragColumn === undefined
+              ? Config.tableRowOrdering
+              : props.hasDragColumn && Config.tableRowOrdering === true
+          }
         />
         {props.children({
           ...props,

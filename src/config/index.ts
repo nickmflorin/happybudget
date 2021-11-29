@@ -18,6 +18,7 @@ export * as localization from "./localization";
 
 export const ConfigOptions: Application.ConfigOption[] = [
   { name: "tableDebug", default: false, devOnly: true },
+  { name: "tableRowOrdering", default: true, hardOverride: false },
   { name: "reportWebVitals", default: false },
   { name: "whyDidYouRender", default: false, devOnly: true }
 ];
@@ -26,7 +27,7 @@ export const Config: Application.Config = reduce(
   ConfigOptions,
   (curr: Application.Config, option: Application.ConfigOption) => ({
     ...curr,
-    [option.name]: flags.evaluateFlagFromEnvOrMemory(option)
+    [option.name]: option.hardOverride === undefined ? flags.evaluateFlagFromEnvOrMemory(option) : option.hardOverride
   }),
   {} as Application.Config
 );

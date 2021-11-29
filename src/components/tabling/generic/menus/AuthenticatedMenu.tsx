@@ -8,6 +8,7 @@ import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { RowNode } from "@ag-grid-community/core";
 
 import { tabling } from "lib";
+import { Config } from "config";
 
 import { ShowHide, SavingChanges } from "components";
 import { SearchInput } from "components/fields";
@@ -49,7 +50,7 @@ const AuthenticatedMenu = <R extends Table.RowData, M extends Model.RowHttpModel
       "table-action-menu",
       { detached: props.detached },
       { "has-expand-column": props.hasExpandColumn },
-      { "has-drag-column": props.hasDragColumn }
+      { "has-drag-column": props.hasDragColumn && Config.tableRowOrdering }
     )}
   >
     <Portal id={props.savingChangesPortalId}>
