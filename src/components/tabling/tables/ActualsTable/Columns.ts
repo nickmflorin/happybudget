@@ -8,7 +8,7 @@ type M = Model.Actual;
 const Columns: Table.Column<R, M>[] = [
   tabling.columns.BodyColumn<R, M>({
     field: "name",
-    headerName: "Name",
+    headerName: "Description",
     minWidth: 200,
     flex: 2,
     columnType: "longText"
