@@ -90,7 +90,18 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
         },
         unit: {
           pdfCellRenderer: (params: Table.PdfCellCallbackParams<R, M>) =>
-            params.rawValue !== null ? <Tag model={params.rawValue} /> : <Text></Text>
+            params.rawValue !== null ? (
+              <Tag
+                model={params.rawValue}
+                isPlural={
+                  !isNil(params.row) &&
+                  tabling.typeguards.isModelRow(params.row) &&
+                  (params.row?.data.quantity ?? 0) > 1
+                }
+              />
+            ) : (
+              <Text></Text>
+            )
         },
         estimated: {
           pdfFooterValueGetter: budgeting.businessLogic.estimatedValue(account),

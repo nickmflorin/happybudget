@@ -96,6 +96,7 @@ export interface PrivateCellProps<
   M extends Model.RowHttpModel = Model.RowHttpModel,
   V = R[keyof R]
 > extends CellProps<R, M, V> {
+  readonly row?: Table.Row<R>;
   readonly rawValue: V | null;
   readonly value: string;
 }
@@ -107,12 +108,13 @@ const Cell = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
     return {
       colIndex: props.colIndex,
       column: props.column,
+      row: props.row,
       isHeader: props.isHeader || false,
       indented: props.indented === true,
       rawValue: props.rawValue,
       value: props.value
     };
-  }, [props.colIndex, props.column, props.isHeader, props.rawValue, props.value]);
+  }, [props.row, props.colIndex, props.column, props.isHeader, props.rawValue, props.value]);
 
   const cellStyle = useMemo(() => {
     return {

@@ -210,6 +210,7 @@ namespace Table {
   };
 
   type PdfCellCallbackParams<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = any> = {
+    readonly row?: Row<R>;
     readonly colIndex: number;
     readonly column: Column<R, M, V>;
     readonly isHeader: boolean;
