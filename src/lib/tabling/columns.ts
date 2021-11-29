@@ -265,6 +265,7 @@ export const CalculatedColumn = <
       footer: "CalculatedCell",
       page: "CalculatedCell"
     },
+    nullValue: 0.0,
     tableColumnType: "calculated",
     columnType: "sum",
     isRead: true,

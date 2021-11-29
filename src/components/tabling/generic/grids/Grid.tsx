@@ -183,7 +183,6 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
             pdfCellRenderer,
             pdfFormatter,
             onDataChange,
-            getCSVValue,
             parseIntoFields,
             refreshColumns,
             onCellDoubleClicked,
@@ -198,17 +197,20 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
             field: col.field as string,
             cellStyle: !isNil(col.cellStyle) ? (col.cellStyle as { [key: string]: any }) : undefined,
             suppressMenu: true,
-            valueGetter: isNil(agColumn.valueGetter)
-              ? (params: ValueGetterParams) => {
-                  if (!isNil(params.node)) {
-                    const row: Table.BodyRow<R> | undefined = params.node.data;
-                    if (!isNil(row) && !isNil(row.data)) {
-                      return row.data[params.column.getColId() as keyof R];
-                    }
+            valueGetter: (params: ValueGetterParams) => {
+              if (!isNil(params.node)) {
+                const row: Table.Row<R> = params.node.data;
+                if (tabling.typeguards.isBodyRow(row)) {
+                  if (isNil(col.valueGetter)) {
+                    return row.data[params.column.getColId() as keyof R];
+                  } else {
+                    const rows = tabling.aggrid.getRows<R, Table.BodyRow<R>>(params.api);
+                    return col.valueGetter(row, rows);
                   }
-                  return col.nullValue !== undefined ? col.nullValue : null;
                 }
-              : agColumn.valueGetter,
+              }
+              return col.nullValue !== undefined ? col.nullValue : null;
+            },
             cellRenderer:
               /* eslint-disable indent */
               typeof col.cellRenderer === "string"

@@ -55,7 +55,8 @@ const useClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
   );
 
   const getCSVData = hooks.useDynamicCallback((fields?: (keyof R)[]) => {
-    if (!isNil(params.apis)) {
+    const gridApi = params.apis?.grid;
+    if (!isNil(gridApi)) {
       const cs: Table.Column<R, M>[] = filter(
         params.columns,
         (column: Table.Column<R, M>) =>
@@ -63,21 +64,25 @@ const useClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
           (isNil(fields) || includes(fields as string[], tabling.columns.normalizedField<R, M>(column)))
       );
       const csvData: CSVData = [map(cs, (col: Table.Column<R, M>) => col.headerName || "")];
-      params.apis.grid.forEachNode((node: Table.RowNode, index: number) => {
+      gridApi.forEachNode((node: Table.RowNode, index: number) => {
         const row: Table.BodyRow<R> = node.data;
+        const rows = tabling.aggrid.getRows(gridApi);
         if (tabling.typeguards.isDataRow(row)) {
           csvData.push(
             reduce(
               cs,
-              (current: CSVRow, column: Table.Column<R, M>) => [
-                ...current,
-                /* eslint-disable indent */
-                !isNil(column.getCSVValue)
-                  ? column.getCSVValue(row)
-                  : !isNil(column.field)
-                  ? processCellValueForClipboard(column, row, row.data[column.field])
-                  : ""
-              ],
+              (current: CSVRow, column: Table.Column<R, M>) => {
+                let value: any = null;
+                if (!isNil(column.valueGetter)) {
+                  value = column.valueGetter(
+                    row,
+                    filter(rows, (r: Table.Row<R>) => tabling.typeguards.isBodyRow(r)) as Table.BodyRow<R>[]
+                  );
+                } else if (!isNil(column.field)) {
+                  value = row.data[column.field];
+                }
+                return [...current, processCellValueForClipboard(column, row, value)];
+              },
               []
             )
           );

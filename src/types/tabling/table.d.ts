@@ -268,6 +268,7 @@ namespace Table {
     | "colSpan"
     | "cellStyle"
     | "editable"
+    | "valueGetter"
     | "onCellDoubleClicked";
 
   type ParsedColumnField<R extends RowData, V = any> = { field: keyof R; value: V };
@@ -307,9 +308,9 @@ namespace Table {
     readonly canBeHidden?: boolean;
     readonly canBeExported?: boolean;
     readonly requiresAuthentication?: boolean;
+    readonly valueGetter?: (row: Table.BodyRow<R>, rows: Table.BodyRow<R>[]) => any;
     readonly getRowValue?: (m: M) => R[keyof R];
     readonly getHttpValue?: (value: V) => any;
-    readonly getCSVValue?: (row: BodyRow<R>) => string;
     readonly onDataChange?: (id: ModelRowId, event: CellChange<R>) => void;
     readonly colSpan?: (params: ColSpanParams<R, M>) => number;
     readonly onCellFocus?: (params: CellFocusedParams<R, M>) => void;

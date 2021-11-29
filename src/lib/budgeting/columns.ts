@@ -1,5 +1,4 @@
 import { isNil, filter, map, findIndex, includes } from "lodash";
-import { ValueGetterParams } from "@ag-grid-community/core";
 
 import { tabling, budgeting } from "lib";
 
@@ -33,18 +32,11 @@ export const IdentifierColumn = <
     width: 100,
     suppressSizeToFit: true,
     cellStyle: { textAlign: "left" },
-    valueGetter: (params: ValueGetterParams) => {
-      if (!isNil(params.node)) {
-        const row: Table.Row<R> = params.node.data;
-        // If the row is a FooterRow, the value will be provided via footerRowSelectors.
-        if (tabling.typeguards.isBodyRow(row)) {
-          if (tabling.typeguards.isGroupRow(row)) {
-            return row.groupData.name;
-          }
-          return row.data.identifier;
-        }
+    valueGetter: (row: Table.BodyRow<R>) => {
+      if (tabling.typeguards.isGroupRow(row)) {
+        return row.groupData.name;
       }
-      return 0.0;
+      return row.data.identifier;
     },
     colSpan: (params: Table.ColSpanParams<R, M>) => {
       const row: Table.BodyRow<R> = params.data;
@@ -82,16 +74,7 @@ export const EstimatedColumn = <
   return tabling.columns.CalculatedColumn<R, M, PDFM>({
     ...props,
     headerName: "Estimated",
-    valueGetter: (params: ValueGetterParams) => {
-      if (!isNil(params.node)) {
-        const row: Table.Row<R> = params.node.data;
-        if (tabling.typeguards.isBodyRow(row)) {
-          const rows = tabling.aggrid.getRows<R, Table.BodyRow<R>>(params.api);
-          return budgeting.valueGetters.estimatedValueGetter(row, rows);
-        }
-      }
-      return 0.0;
-    }
+    valueGetter: budgeting.valueGetters.estimatedValueGetter
   });
 };
 
@@ -105,16 +88,7 @@ export const ActualColumn = <
   return tabling.columns.CalculatedColumn<R, M, PDFM>({
     ...props,
     headerName: "Actual",
-    valueGetter: (params: ValueGetterParams) => {
-      if (!isNil(params.node)) {
-        const row: Table.Row<R> = params.node.data;
-        if (tabling.typeguards.isBodyRow(row)) {
-          const rows = tabling.aggrid.getRows<R, Table.BodyRow<R>>(params.api);
-          return budgeting.valueGetters.actualValueGetter(row, rows);
-        }
-      }
-      return 0.0;
-    }
+    valueGetter: budgeting.valueGetters.actualValueGetter
   });
 };
 
@@ -128,15 +102,6 @@ export const VarianceColumn = <
   return tabling.columns.CalculatedColumn<R, M, PDFM>({
     ...props,
     headerName: "Variance",
-    valueGetter: (params: ValueGetterParams) => {
-      if (!isNil(params.node)) {
-        const row: Table.Row<R> = params.node.data;
-        if (tabling.typeguards.isBodyRow(row)) {
-          const rows = tabling.aggrid.getRows<R, Table.BodyRow<R>>(params.api);
-          return budgeting.valueGetters.varianceValueGetter(row, rows);
-        }
-      }
-      return 0.0;
-    }
+    valueGetter: budgeting.valueGetters.varianceValueGetter
   });
 };

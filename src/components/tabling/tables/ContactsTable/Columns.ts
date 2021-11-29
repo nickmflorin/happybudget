@@ -1,5 +1,5 @@
 import { isNil } from "lodash";
-import { ValueGetterParams, ValueSetterParams } from "@ag-grid-community/core";
+import { ValueSetterParams } from "@ag-grid-community/core";
 
 import { model, tabling, util } from "lib";
 
@@ -19,9 +19,6 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     cellClass: "cell--renders-html",
     width: 120,
     minWidth: 120,
-    getCSVValue: (row: Table.BodyRow<Tables.ContactRowData>) => {
-      return util.conditionalJoinString(row.data.first_name, row.data.last_name);
-    },
     parseIntoFields: (value: string | null) => {
       const parsed = !isNil(value) ? model.util.parseFirstAndLastName(value) : null;
       return [
@@ -40,15 +37,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
       }
       return true;
     },
-    valueGetter: (params: ValueGetterParams) => {
-      if (!isNil(params.node)) {
-        const row: Table.Row<Tables.ContactRowData> = params.node.data;
-        if (tabling.typeguards.isBodyRow(row)) {
-          return util.conditionalJoinString(row.data.first_name, row.data.last_name);
-        }
-      }
-      return null;
-    }
+    valueGetter: (row: Table.BodyRow<R>) => util.conditionalJoinString(row.data.first_name, row.data.last_name)
   }),
   tabling.columns.BodyColumn<R, M>({
     field: "company",
