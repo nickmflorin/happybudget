@@ -62,7 +62,7 @@ export const authenticatedModelListResponseReducerTransformers = <
       const existing = find(st.data, { id: action.payload });
       if (isNil(existing)) {
         redux.util.warnInconsistentState({
-          action: action.type,
+          action: action,
           reason: "Instance does not exist in state when it is expected to."
         });
         return st;
@@ -88,7 +88,7 @@ export const authenticatedModelListResponseReducerTransformers = <
       // we auto add it?
       if (isNil(existing)) {
         redux.util.warnInconsistentState({
-          action: action.type,
+          action: action,
           reason: "Instance does not exist in state when it is expected to."
         });
         return st;
@@ -122,7 +122,7 @@ export const authenticatedModelListResponseReducerTransformers = <
       const existing = find(st.data, { id: action.payload.id });
       if (!isNil(existing)) {
         redux.util.warnInconsistentState({
-          action: action.type,
+          action: action,
           reason: "Instance already exists in state when it is not expected to."
         });
         return st;

@@ -14,15 +14,17 @@ export const findModelInData = <M extends Model.Model, A extends Array<any> = M[
   } else {
     if (options.warnIfMissing !== false) {
       let warningData: any = {
-        action: action.type,
+        action: action,
         reason: `${options.name || "Model"} does not exist in state when it is expected to.`,
-        ids: JSON.stringify(map(data, (mi: M) => mi.id))
+        ids: JSON.stringify(map(data, (mi: M) => mi.id)),
+        model: options.name
       };
       if (typeof id === "function") {
         redux.util.warnInconsistentState({
           ...warningData,
           id: "provided as callback",
-          evaluatedCallback: JSON.stringify(map(data, (mi: M) => id(mi)))
+          evaluatedCallback: JSON.stringify(map(data, (mi: M) => id(mi))),
+          model: options.name
         });
       } else {
         redux.util.warnInconsistentState({ ...warningData, id });
