@@ -54,8 +54,8 @@ const EditBudgetModal = (props: EditBudgetModalProps): JSX.Element => {
         }
         return p;
       }}
-      setFormData={(contact: Model.Budget, form: FormInstance<Http.BudgetPayload>) =>
-        form.setFields([{ name: "name", value: contact.type }])
+      setFormData={(budget: Model.Budget, form: FormInstance<Http.BudgetPayload>) =>
+        form.setFields([{ name: "name", value: budget.name }])
       }
     >
       {(m: Model.Budget | null, form: FormInstance<Http.BudgetPayload>) => (
