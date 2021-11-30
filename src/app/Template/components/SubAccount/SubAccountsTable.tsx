@@ -1,15 +1,15 @@
-import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
-import { isNil, map, filter } from "lodash";
+import { isNil, map } from "lodash";
 
 import { redux, tabling, budgeting } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
-import { SubAccountsTable as GenericSubAccountsTable, connectTableToStore } from "components/tabling";
+import { connectTableToStore } from "components/tabling";
 
-import { actions } from "../../store";
-import FringesModal from "./FringesModal";
+import { actions, selectors } from "../../store";
+import TemplateSubAccountsTable, { TemplateSubAccountsTableProps } from "../SubAccountsTable";
 
 type M = Model.SubAccount;
 type R = Tables.SubAccountRowData;
@@ -18,22 +18,7 @@ const selectSubAccountDetail = redux.selectors.simpleDeepEqualSelector(
   (state: Application.Authenticated.Store) => state.template.subaccount.detail.data
 );
 
-const selectFringes = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.template.subaccount.table.fringes.data
-);
-
-const selectSubAccountUnits = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.template.subaccount.table.subaccountUnits
-);
-
-const ConnectedTable = connectTableToStore<
-  GenericSubAccountsTable.AuthenticatedTemplateProps,
-  R,
-  M,
-  Tables.SubAccountTableStore
->({
-  // We cannot autoRequest because we have to also request the new data when the dropdown breadcrumbs change.
-  autoRequest: false,
+const ConnectedTable = connectTableToStore<TemplateSubAccountsTableProps, R, M, Tables.SubAccountTableStore>({
   actions: {
     tableChanged: actions.subAccount.handleTableChangeEventAction,
     loading: actions.subAccount.loadingAction,
@@ -43,46 +28,39 @@ const ConnectedTable = connectTableToStore<
     setSearch: actions.subAccount.setSearchAction,
     clear: actions.subAccount.clearAction
   },
-  selector: redux.selectors.simpleDeepEqualSelector(
-    (state: Application.Authenticated.Store) => state.template.subaccount.table
-  ),
+  // We cannot autoRequest because we have to also request the new data when the dropdown breadcrumbs change.
+  autoRequest: false,
+  selector: selectors.selectSubAccountsTableStore,
   footerRowSelectors: {
     page: createSelector(
-      [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.template.detail.data)],
-      (budget: Model.Template | null) => ({
-        identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
-        estimated: !isNil(budget) ? budgeting.businessLogic.estimatedValue(budget) : 0.0
+      redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.template.detail.data),
+      (template: Model.Template | null) => ({
+        identifier: !isNil(template) && !isNil(template.name) ? `${template.name} Total` : "Budget Total",
+        estimated: !isNil(template) ? budgeting.businessLogic.estimatedValue(template) : 0.0
       })
     ),
     footer: createSelector(
-      [
-        redux.selectors.simpleDeepEqualSelector(
-          (state: Application.Authenticated.Store) => state.template.subaccount.detail.data
-        )
-      ],
+      redux.selectors.simpleDeepEqualSelector(
+        (state: Application.Authenticated.Store) => state.template.subaccount.detail.data
+      ),
       (detail: Model.SubAccount | null) => ({
         identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
         estimated: !isNil(detail) ? budgeting.businessLogic.estimatedValue(detail) : 0.0
       })
     )
   }
-})(GenericSubAccountsTable.AuthenticatedTemplate);
+})(TemplateSubAccountsTable);
 
 interface SubAccountsTableProps {
   readonly subaccountId: number;
   readonly templateId: number;
-  readonly template: Model.Template | null; // Not currently used, but including it is consistent.
+  readonly template: Model.Template | null;
 }
 
-const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTableProps): JSX.Element => {
-  const [fringesModalVisible, setFringesModalVisible] = useState(false);
-  const history = useHistory();
+const SubAccountsTable = ({ templateId, template, subaccountId }: SubAccountsTableProps): JSX.Element => {
   const dispatch = useDispatch();
-
+  const history = useHistory();
   const subaccountDetail = useSelector(selectSubAccountDetail);
-  const subAccountUnits = useSelector(selectSubAccountUnits);
-  const fringes = useSelector(selectFringes);
-
   const table = tabling.hooks.useTable<R>();
 
   const [groupModals, onEditGroup, onCreateGroup] = useGrouping({
@@ -110,24 +88,16 @@ const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTab
     <React.Fragment>
       <ConnectedTable
         tableId={"subaccount-subaccounts-table"}
+        template={template}
+        templateId={templateId}
         table={table}
-        fringes={
-          filter(fringes, (f: Table.BodyRow<Tables.FringeRowData>) =>
-            tabling.typeguards.isModelRow(f)
-          ) as Tables.FringeRow[]
-        }
-        subAccountUnits={subAccountUnits}
-        menuPortalId={"supplementary-header"}
-        savingChangesPortalId={"saving-changes"}
-        onAddFringes={() => setFringesModalVisible(true)}
-        onEditFringes={() => setFringesModalVisible(true)}
         // Right now, the SubAccount recursion only goes 1 layer deep.
         // Account -> SubAccount -> Detail (Recrusive SubAccount).
         rowCanExpand={false}
         exportFileName={!isNil(subaccountDetail) ? `subaccount_${subaccountDetail.identifier}` : ""}
         categoryName={"Detail"}
         identifierFieldHeader={"Line"}
-        onBack={() => {
+        onBack={(row?: Tables.FringeRowData) => {
           if (
             !isNil(subaccountDetail) &&
             !isNil(subaccountDetail.ancestors) &&
@@ -150,7 +120,6 @@ const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTab
       />
       {groupModals}
       {markupModals}
-      <FringesModal template={template} open={fringesModalVisible} onCancel={() => setFringesModalVisible(false)} />
     </React.Fragment>
   );
 };
