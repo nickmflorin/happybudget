@@ -187,6 +187,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
             refreshColumns,
             onCellDoubleClicked,
             processCellForClipboard,
+            processCellForCSV,
             processCellFromClipboard,
             getHttpValue,
             getRowValue,

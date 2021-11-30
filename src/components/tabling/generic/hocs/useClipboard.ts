@@ -81,6 +81,9 @@ const useClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
                 } else if (!isNil(column.field)) {
                   value = row.data[column.field];
                 }
+                if (!isNil(column.processCellForCSV)) {
+                  return [...current, column.processCellForCSV(row.data)];
+                }
                 return [...current, processCellValueForClipboard(column, row, value)];
               },
               []

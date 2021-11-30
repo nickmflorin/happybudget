@@ -318,6 +318,7 @@ namespace Table {
     readonly refreshColumns?: (change: CellChange<V>) => keyof R | (keyof R)[] | null;
     readonly parseIntoFields?: (value: V) => ParsedColumnField<R, V>[];
     // readonly getCellChanges?: (id: EditableRowId, oldValue: any, newValue: any) => SoloCellChange<R>[];
+    readonly processCellForCSV?: (row: R) => string | number;
     readonly processCellForClipboard?: (row: R) => string | number;
     readonly processCellFromClipboard?: (value: string) => V | null;
     readonly onCellDoubleClicked?: (row: ModelRow<R>) => void;

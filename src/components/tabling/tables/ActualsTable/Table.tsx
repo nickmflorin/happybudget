@@ -72,25 +72,60 @@ const ActualsTable = ({
     }
   });
 
-  const processOwnerCellFromClipboard = hooks.useDynamicCallback((name: string) => {
-    if (name.trim() === "") {
+  const processOwnerCellFromClipboard = hooks.useDynamicCallback((value: string) => {
+    if (value.trim() === "") {
       return null;
     }
-    const availableOwners: (Model.SimpleSubAccount | Model.SimpleMarkup)[] = filter(
+    let availableOwners: (Model.SimpleSubAccount | Model.SimpleMarkup)[] = filter(
       map(
         filter(props.data, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)),
         (row: Table.BodyRow<R>) => row.data.owner
       ),
-      (owner: Model.SimpleSubAccount | Model.SimpleMarkup | null) => owner !== null && owner.identifier !== null
-    ) as Model.SimpleSubAccount[];
-    // NOTE: If there are multiple owners with the same identifier, this will
-    // return the first and issue a warning.
-    const subaccount = model.util.inferModelFromName<Model.SimpleSubAccount | Model.SimpleMarkup>(
-      availableOwners,
-      name,
-      { getName: (m: Model.SimpleSubAccount | Model.SimpleMarkup) => m.identifier }
-    );
-    return subaccount;
+      (owner: Model.SimpleSubAccount | Model.SimpleMarkup | null) => owner !== null
+    ) as (Model.SimpleSubAccount | Model.SimpleMarkup)[];
+    // If the user pastes the value after directly copying from an internal table,
+    // the value will be structured as internal-<type>-<id> - which allows us to identify
+    // which owner model the copy was performed on exactly, since `type` and `id` combine
+    // to point to a unique model.
+    if (value.startsWith("internal-")) {
+      const splitValue = value.split("internal-")[1];
+      if (splitValue.trim() === "") {
+        return null;
+      } else if (splitValue.split("-").length !== 2) {
+        return null;
+      } else {
+        const type = splitValue.split("-")[0];
+        const id = parseInt(splitValue.split("-")[1]);
+        if (isNaN(id) || type.trim() === "") {
+          return null;
+        }
+        const owner = filter(
+          availableOwners,
+          (o: Model.SimpleSubAccount | Model.SimpleMarkup) => o.id === id && o.type === type
+        );
+        if (owner.length === 0) {
+          console.warn(`Could not parse Actual owner from clipboard value ${value}!`);
+          return null;
+        } else if (owner.length !== 1) {
+          console.warn(`Parsed multiple Actual owners from clipboard value ${value}... returning first.`);
+          return owner[0];
+        }
+        return owner[0];
+      }
+    } else {
+      // If the user pastes the value in the cell from an external source, it will likely be just
+      // the identifier - in which case we need to try to determine which owner that value for the
+      // identifier refers to.
+      availableOwners = filter(
+        availableOwners,
+        (o: Model.SimpleSubAccount | Model.SimpleMarkup) => o.identifier !== null
+      );
+      // NOTE: If there are multiple owners with the same identifier, this will
+      // return the first and issue a warning.
+      return model.util.inferModelFromName<Model.SimpleSubAccount | Model.SimpleMarkup>(availableOwners, value, {
+        getName: (m: Model.SimpleSubAccount | Model.SimpleMarkup) => m.identifier
+      });
+    }
   });
 
   return (

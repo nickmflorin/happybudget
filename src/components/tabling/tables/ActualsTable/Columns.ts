@@ -1,6 +1,6 @@
 import { isNil } from "lodash";
 
-import { tabling } from "lib";
+import { tabling, util } from "lib";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;
@@ -75,12 +75,9 @@ const Columns: Table.Column<R, M>[] = [
       }
       return value;
     },
-    processCellForClipboard: (row: R) => {
-      if (!isNil(row.owner)) {
-        return row.owner.identifier || "";
-      }
-      return "";
-    },
+    processCellForCSV: (row: R) =>
+      !isNil(row.owner) ? util.conditionalJoinString(row.owner.identifier, row.owner.description) : "",
+    processCellForClipboard: (row: R) => (!isNil(row.owner) ? `internal-${row.owner.type}-${row.owner.id}` : ""),
     cellRenderer: { data: "ActualOwnerCell" },
     cellEditor: "ActualOwnerEditor"
   }),
