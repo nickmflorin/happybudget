@@ -159,15 +159,6 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
         }
       }
       return null;
-    },
-    applyGroupColorChange: (group: Model.Group) => {
-      const apis = props.tableApis.get("data");
-      if (!isNil(apis)) {
-        const node: Table.RowNode | undefined = apis.grid.getRowNode(`group-${group.id}`);
-        if (!isNil(node)) {
-          apis.grid.redrawRows({ rowNodes: [node] });
-        }
-      }
     }
   }));
 

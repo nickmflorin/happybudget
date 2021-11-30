@@ -98,12 +98,10 @@ const SubAccountsTable = ({
     parentType: "account",
     table: table.current,
     onGroupUpdated: (group: Model.Group) =>
-      dispatch(
-        actions.account.handleTableChangeEventAction({
-          type: "groupUpdated",
-          payload: group
-        })
-      )
+      table.current.applyTableChange({
+        type: "groupUpdated",
+        payload: group
+      })
   });
 
   const [markupModals, onEditMarkup, onCreateMarkup] = useMarkup({

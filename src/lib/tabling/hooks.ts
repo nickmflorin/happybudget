@@ -135,8 +135,7 @@ export const InitialTableRef: Table.TableInstance<any, any> = {
   getRows: () => [],
   getRowsAboveAndIncludingFocusedRow: () => [],
   changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange>) => {},
-  applyTableChange: (event: SingleOrArray<Table.ChangeEvent<any>>) => {},
-  applyGroupColorChange: (group: Model.Group) => {}
+  applyTableChange: (event: SingleOrArray<Table.ChangeEvent<any>>) => {}
 };
 
 export const useTable = <

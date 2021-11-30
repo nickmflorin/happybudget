@@ -57,9 +57,6 @@ const useGrouping = <R extends Tables.BudgetRowData, M extends Model.RowHttpMode
           onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
             props.onGroupUpdated(group);
-            if (group.color !== groupToEdit.groupData.color) {
-              props.table.applyGroupColorChange(group);
-            }
           }}
         />
       );

@@ -69,12 +69,10 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
     parentType: "template",
     table: table.current,
     onGroupUpdated: (group: Model.Group) =>
-      dispatch(
-        actions.accounts.handleTableChangeEventAction({
-          type: "groupUpdated",
-          payload: group
-        })
-      )
+      table.current.applyTableChange({
+        type: "groupUpdated",
+        payload: group
+      })
   });
 
   const [markupModals, onEditMarkup, onCreateMarkup] = useMarkup({

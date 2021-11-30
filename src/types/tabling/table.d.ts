@@ -375,7 +375,6 @@ namespace Table {
     readonly getRows: () => BodyRow<R>[];
     readonly getRowsAboveAndIncludingFocusedRow: () => BodyRow<R>[];
     readonly applyTableChange: (event: SingleOrArray<ChangeEvent<R, M>>) => void;
-    readonly applyGroupColorChange: (group: Model.Group) => void;
     readonly changeColumnVisibility: (changes: SingleOrArray<ColumnVisibilityChange>, sizeToFit?: boolean) => void;
   };
 

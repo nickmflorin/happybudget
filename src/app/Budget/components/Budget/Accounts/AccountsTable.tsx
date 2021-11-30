@@ -69,12 +69,10 @@ const AccountsTable = ({ budgetId, budget, setPreviewModalVisible }: AccountsTab
     parentType: "budget",
     table: table.current,
     onGroupUpdated: (group: Model.Group) =>
-      dispatch(
-        actions.accounts.handleTableChangeEventAction({
-          type: "groupUpdated",
-          payload: group
-        })
-      )
+      table.current.applyTableChange({
+        type: "groupUpdated",
+        payload: group
+      })
   });
 
   const [markupModals, onEditMarkup, onCreateMarkup] = useMarkup({
