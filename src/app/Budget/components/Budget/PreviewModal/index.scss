@@ -249,6 +249,13 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
       .previewer {
         display: flex;
         flex-direction: column;
+        position: relative;
+
+        .btn--over {
+          position: absolute;
+          top: 5px;
+          right: 5px;
+        }
 
         .preview-content {
           position: relative;

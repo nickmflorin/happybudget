@@ -158,6 +158,12 @@
   border-color: $transparent !important;
 }
 
+@mixin over() {
+  @include bg_color_set(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2));
+  @include solid_color($white);
+  border-color: $transparent !important;
+}
+
 @mixin danger() {
   @include bg_color_set($red, $red-darker, $red-darker);
   @include solid_color($white);
@@ -336,6 +342,16 @@
   &--primary {
     @extend .btn;
     @include primary();
+  }
+
+  &--over {
+    @extend .btn;
+    @include over();
+    padding: 4px 10px;
+    height: 28px;
+    line-height: 20px;
+    min-width: 0px;
+    z-index: 10000;
   }
 
   &--danger {

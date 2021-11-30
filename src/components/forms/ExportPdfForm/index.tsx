@@ -351,7 +351,7 @@ const ExportForm = (
           <CKEditor
             ref={headerEditor}
             initialValue={props.initialValues?.header?.header || ""}
-            onBlur={(html: string) => setHeader(html)}
+            onChange={(html: string) => setHeader(html)}
           />
         </Form.ItemStyle>
 
@@ -365,7 +365,7 @@ const ExportForm = (
             <CKEditor
               ref={leftInfoEditor}
               initialValue={props.initialValues?.header?.left_info || ""}
-              onBlur={(html: string) => setLeftInfo(html)}
+              onChange={(html: string) => setLeftInfo(html)}
             />
           </Form.ItemStyle>
 
@@ -377,7 +377,7 @@ const ExportForm = (
             <CKEditor
               ref={rightInfoEditor}
               initialValue={props.initialValues?.header?.right_info || ""}
-              onBlur={(html: string) => setRightInfo(html)}
+              onChange={(html: string) => setRightInfo(html)}
             />
           </Form.ItemStyle>
         </div>
@@ -485,7 +485,7 @@ const ExportForm = (
             <CKEditor
               style={{ height: 140 }}
               initialValue={props.initialValues?.header?.notes || ""}
-              onBlur={(html: string) => {
+              onChange={(html: string) => {
                 setNotesHtml(html);
                 const values: ExportFormOptions = props.form.getFieldsValue();
                 props.onValuesChange?.({ notes: html }, { ...formData(values), notes: html });

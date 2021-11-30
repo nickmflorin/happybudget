@@ -1,11 +1,10 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { pdf as PDF } from "@react-pdf/renderer";
-import { isNil, map, debounce, filter } from "lodash";
+import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
 import { registerFonts } from "style/pdf";
-import { util, redux, ui, tabling, pdf, notifications } from "lib";
+import { redux, ui, tabling, notifications } from "lib";
 
 import { Modal } from "components";
 import { ExportPdfForm } from "components/forms";
@@ -13,13 +12,8 @@ import { SubAccountsTable } from "components/tabling";
 
 import { actions } from "../../../store";
 
-import BudgetPdf from "../BudgetPdf";
-import Previewer from "./Previewer";
+import Previewer, { IPreviewerRef } from "./Previewer";
 import "./index.scss";
-
-const BudgetPdfFunc = (budget: Model.PdfBudget, contacts: Model.Contact[], options: PdfBudgetTable.Options) => (
-  <BudgetPdf budget={budget} contacts={contacts} options={options} />
-);
 
 const SubAccountColumns = filter(
   SubAccountsTable.Columns,
@@ -74,15 +68,14 @@ const PreviewModal = ({
   onSuccess,
   onCancel
 }: PreviewModalProps): JSX.Element => {
+  const previewer = useRef<IPreviewerRef>(null);
   const [loadingData, setLoadingData] = useState(false);
-  const [generatingPdf, setGeneratingPdf] = useState(false);
-  const [options, setOptions] = useState<ExportFormOptions>(DEFAULT_OPTIONS);
 
   // TODO: Should we just use the useContacts hook?
   const [contactsResponse, setContactsResponse] = useState<Http.ListResponse<Model.Contact> | null>(null);
   const [budgetResponse, setBudgetResponse] = useState<Model.PdfBudget | null>(null);
+  const [options, setOptions] = useState<ExportFormOptions>(DEFAULT_OPTIONS);
 
-  const [file, setFile] = useState<string | ArrayBuffer | null>(null);
   const form = ui.hooks.useForm<ExportFormOptions>({ isInModal: true });
   const dispatch = useDispatch();
 
@@ -104,6 +97,7 @@ const PreviewModal = ({
           .then(([b, cs]: [Model.PdfBudget, Http.ListResponse<Model.Contact>]) => {
             setContactsResponse(cs);
             setBudgetResponse(b);
+            previewer.current?.render(b, cs.data, options);
           })
           // TODO: We should probably display the error in the modal and not let the default toast
           // package display it in the top right of the window.
@@ -112,51 +106,6 @@ const PreviewModal = ({
       });
     }
   }, [visible]);
-
-  const renderPdf = (budget: Model.PdfBudget, contacts: Model.Contact[], opts: PdfBudgetTable.Options) => {
-    setGeneratingPdf(true);
-    const pdfComponent = BudgetPdfFunc(budget, contacts, opts);
-    PDF(pdfComponent)
-      .toBlob()
-      .then((blb: Blob) => {
-        util.files
-          .getDataFromBlob(blb)
-          .then((result: ArrayBuffer | string) => setFile(result))
-          .catch((e: Error) => {
-            console.error("There was an error generating the PDF.");
-          })
-          .finally(() => {
-            setGeneratingPdf(false);
-          });
-      })
-      .catch((e: Error) => {
-        console.error("There was an error generating the PDF.");
-        setGeneratingPdf(false);
-      });
-  };
-
-  const debouncedSetOptions = useMemo(() => debounce(setOptions, 100), []);
-
-  useEffect(() => {
-    return () => {
-      debouncedSetOptions.cancel();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isNil(contactsResponse) && !isNil(budgetResponse)) {
-      renderPdf(budgetResponse, contactsResponse.data, {
-        ...options,
-        notes: pdf.parsers.convertHtmlIntoNodes(options.notes || "") || [],
-        header: {
-          ...options.header,
-          header: pdf.parsers.convertHtmlIntoNodes(options.header.header || "") || [],
-          left_info: pdf.parsers.convertHtmlIntoNodes(options.header.left_info || "") || [],
-          right_info: pdf.parsers.convertHtmlIntoNodes(options.header.right_info || "") || []
-        }
-      });
-    }
-  }, [contactsResponse, budgetResponse, options]);
 
   return (
     <Modal
@@ -184,9 +133,10 @@ const PreviewModal = ({
           accounts={!isNil(budgetResponse) ? budgetResponse.children : []}
           disabled={isNil(budgetResponse) || isNil(contactsResponse)}
           columns={SubAccountColumns}
-          onValuesChange={(changedValues: Partial<ExportFormOptions>, values: ExportFormOptions) =>
-            debouncedSetOptions(values)
-          }
+          onValuesChange={(changedValues: Partial<ExportFormOptions>, values: ExportFormOptions) => {
+            setOptions(values);
+            previewer.current?.refreshRequired();
+          }}
           displayedHeaderTemplate={displayedHeaderTemplate}
           onClearHeaderTemplate={() => dispatch(actions.pdf.clearHeaderTemplateAction(null))}
           onLoadHeaderTemplate={(id: number) => dispatch(actions.pdf.loadHeaderTemplateAction(id))}
@@ -203,17 +153,12 @@ const PreviewModal = ({
         />
       </div>
       <Previewer
-        file={file}
-        generatingPdf={generatingPdf}
+        ref={previewer}
         loadingData={loadingData}
-        onExport={() => {
-          // TODO: Since we are debouncing the Options setState, should we rerender the
-          // PDF with the most recent options just in case?
-          if (!isNil(file)) {
-            util.files.download(file, !filename.endsWith(".pdf") ? `${filename}.pdf` : filename, {
-              includeExtensionInName: false
-            });
-            onSuccess?.();
+        onExport={() => previewer.current?.export(filename, onSuccess)}
+        onRefresh={() => {
+          if (!isNil(budgetResponse) && !isNil(contactsResponse)) {
+            previewer.current?.render(budgetResponse, contactsResponse.data, options);
           }
         }}
       />

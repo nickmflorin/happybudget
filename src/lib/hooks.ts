@@ -9,6 +9,13 @@ type EffectCallback = UseEffectParams[0];
 type DependencyList = UseEffectParams[1];
 type UseEffectReturn = ReturnType<typeof useEffect>;
 
+export const useIsFirstRender = () => {
+  const ref = useRef(true);
+  const firstRender = ref.current;
+  ref.current = false;
+  return firstRender;
+};
+
 export const useRefIfNotDefined = <T extends { [key: string]: any }>(
   hook: () => { current: T },
   prop?: { current: T }

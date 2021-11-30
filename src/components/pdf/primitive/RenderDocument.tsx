@@ -1,3 +1,4 @@
+import React from "react";
 import { pdfjs, Document as ReactPdfDoc } from "react-pdf/dist/esm/entry.webpack";
 import { isNil } from "lodash";
 
@@ -21,4 +22,4 @@ const RenderDocument = ({ loading, onLoadStarted, ...props }: Pdf.RenderDocument
   );
 };
 
-export default RenderDocument;
+export default React.memo(RenderDocument);

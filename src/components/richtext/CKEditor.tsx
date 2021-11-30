@@ -19,6 +19,7 @@ const Editor = (
   ref: ForwardedRef<IEditor>
 ): JSX.Element => {
   const editor = useRef<EditorInstance | null>(null);
+  const isInitialChange = useRef(true);
 
   useEffect(() => {
     if (!isNil(initialValue) && !isNil(editor.current)) {
@@ -66,8 +67,12 @@ const Editor = (
           onBlur?.(html);
         }}
         onChange={(event: CKEditorEvent, e: EditorInstance) => {
-          const html = e.getData();
-          onChange?.(html);
+          if (isInitialChange.current === false) {
+            const html = e.getData();
+            onChange?.(html);
+          } else {
+            isInitialChange.current = false;
+          }
         }}
       />
     </div>
