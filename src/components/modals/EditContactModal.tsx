@@ -65,7 +65,7 @@ const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: 
       }}
       setFormData={(contact: Model.Contact, form: FormInstance<Http.ContactPayload>) =>
         form.setFields([
-          { name: "type", value: contact.type },
+          { name: "contact_type", value: contact.contact_type !== null ? contact.contact_type.id : null },
           { name: "first_name", value: contact.first_name },
           { name: "last_name", value: contact.last_name },
           { name: "company", value: contact.company },

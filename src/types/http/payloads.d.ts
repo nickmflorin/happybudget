@@ -131,7 +131,7 @@ namespace Http {
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface ContactPayload {
-    readonly type?: Model.ContactTypeId | null;
+    readonly contact_type?: Model.ContactTypeId | null;
     readonly first_name?: string | null;
     readonly last_name?: string | null;
     readonly company?: string | null;
