@@ -26,16 +26,6 @@ const selectSubAccountUnits = redux.selectors.simpleDeepEqualSelector(
   (state: Application.Authenticated.Store) => state.template.account.table.subaccountUnits
 );
 
-const ActionMap = {
-  tableChanged: actions.account.handleTableChangeEventAction,
-  loading: actions.account.loadingAction,
-  response: actions.account.responseAction,
-  saving: actions.account.savingTableAction,
-  addModelsToState: actions.account.addModelsToStateAction,
-  setSearch: actions.account.setSearchAction,
-  clear: actions.account.clearAction
-};
-
 const ConnectedTable = connectTableToStore<
   GenericSubAccountsTable.AuthenticatedTemplateProps,
   R,
@@ -44,7 +34,15 @@ const ConnectedTable = connectTableToStore<
 >({
   // We cannot autoRequest because we have to also request the new data when the dropdown breadcrumbs change.
   autoRequest: false,
-  actions: ActionMap,
+  actions: {
+    tableChanged: actions.account.handleTableChangeEventAction,
+    loading: actions.account.loadingAction,
+    response: actions.account.responseAction,
+    saving: actions.account.savingTableAction,
+    addModelsToState: actions.account.addModelsToStateAction,
+    setSearch: actions.account.setSearchAction,
+    clear: actions.account.clearAction
+  },
   selector: redux.selectors.simpleDeepEqualSelector(
     (state: Application.Authenticated.Store) => state.template.account.table
   ),

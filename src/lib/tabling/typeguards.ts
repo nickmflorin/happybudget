@@ -75,6 +75,8 @@ export const isNonPlaceholderBodyRow = <R extends Table.RowData = object>(
   row: Table.Row<R>
 ): row is Table.NonPlaceholderBodyRow<R> => isEditableRow(row) || isGroupRow(row);
 
+export type ActionMapFromObject<T> = T extends Redux.ActionMapObject<infer A> ? A : never;
+
 /* eslint-disable indent */
 export const isAuthenticatedActionMap = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   a: Redux.ActionMapObject<Redux.TableActionMap<M>> | Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<R, M>>
