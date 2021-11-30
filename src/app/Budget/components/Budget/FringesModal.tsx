@@ -1,22 +1,9 @@
 import { isNil } from "lodash";
 
-import { redux } from "lib";
-
 import { FringesTable, connectTableToStore } from "components/tabling";
 import GenericFringesModal, { GenericFringesModalProps } from "components/modals/FringesModal";
 
-import { actions, initialState } from "../../../store";
-
-const ActionMap = {
-  tableChanged: actions.handleFringesTableChangeEventAction,
-  request: actions.requestFringesAction,
-  loading: actions.loadingFringesAction,
-  response: actions.responseFringesAction,
-  saving: actions.savingFringesTableAction,
-  addModelsToState: actions.addFringeModelsToStateAction,
-  setSearch: actions.setFringesSearchAction,
-  clear: actions.clearFringesAction
-};
+import { actions, selectors } from "../../store";
 
 const ConnectedFringesTable = connectTableToStore<
   FringesTable.Props,
@@ -24,12 +11,18 @@ const ConnectedFringesTable = connectTableToStore<
   Model.Fringe,
   Tables.FringeTableStore
 >({
-  actions: ActionMap,
   autoRequest: false,
-  selector: (state: Application.Store) =>
-    redux.typeguards.isAuthenticatedStore(state)
-      ? state.budget.subaccount.table.fringes
-      : initialState.subaccount.table.fringes
+  actions: {
+    tableChanged: actions.handleFringesTableChangeEventAction,
+    request: actions.requestFringesAction,
+    loading: actions.loadingFringesAction,
+    response: actions.responseFringesAction,
+    saving: actions.savingFringesTableAction,
+    addModelsToState: actions.addFringeModelsToStateAction,
+    setSearch: actions.setFringesSearchAction,
+    clear: actions.clearFringesAction
+  },
+  selector: selectors.selectFringesStore
 })(FringesTable.Table);
 
 interface FringesModalProps extends Pick<GenericFringesModalProps, "open" | "onCancel"> {

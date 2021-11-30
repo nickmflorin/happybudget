@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { isNil } from "lodash";
+import { isNil, filter } from "lodash";
 
 import { model, tabling } from "lib";
+
 import { actions, selectors } from "store";
 import { EditContactModal, CreateContactModal } from "components/modals";
 import { SubAccountsTable as GenericSubAccountsTable } from "components/tabling";
+import { selectFringes, selectSubAccountUnits } from "../../store/selectors";
+import FringesModal from "./FringesModal";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
@@ -16,6 +19,10 @@ type OmitTableProps =
   | "onNewContact"
   | "menuPortalId"
   | "columns"
+  | "fringes"
+  | "subAccountUnits"
+  | "onEditFringes"
+  | "onAddFringes"
   | "onExportPdf"
   | "onSearchContact";
 
@@ -37,10 +44,13 @@ const SubAccountsTable = ({
   const [initialContactFormValues, setInitialContactFormValues] = useState<any>(null);
   const [contactToEdit, setContactToEdit] = useState<number | null>(null);
   const [createContactModalVisible, setCreateContactModalVisible] = useState(false);
+  const [fringesModalVisible, setFringesModalVisible] = useState(false);
 
   const dispatch = useDispatch();
   const contacts = useSelector(selectors.selectContacts);
   const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
+  const fringes = useSelector(selectFringes);
+  const subaccountUnits = useSelector(selectSubAccountUnits);
 
   return (
     <React.Fragment>
@@ -55,6 +65,14 @@ const SubAccountsTable = ({
           setContactToEdit(params.contact);
         }}
         onExportPdf={() => setPreviewModalVisible(true)}
+        subAccountUnits={subaccountUnits}
+        onAddFringes={() => setFringesModalVisible(true)}
+        onEditFringes={() => setFringesModalVisible(true)}
+        fringes={
+          filter(fringes, (f: Table.BodyRow<Tables.FringeRowData>) =>
+            tabling.typeguards.isModelRow(f)
+          ) as Tables.FringeRow[]
+        }
         onSearchContact={(v: string) => dispatch(actions.authenticated.setContactsSearchAction(v))}
         onNewContact={(params: { name?: string; id: Table.EditableRowId }) => {
           setPreContactCreate(params);
@@ -130,6 +148,7 @@ const SubAccountsTable = ({
           onCancel={() => setCreateContactModalVisible(false)}
         />
       )}
+      <FringesModal budget={budget} open={fringesModalVisible} onCancel={() => setFringesModalVisible(false)} />
     </React.Fragment>
   );
 };

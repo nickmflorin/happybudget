@@ -14,27 +14,25 @@ import { actions } from "../store";
 type R = Tables.ActualRowData;
 type M = Model.Actual;
 
-const ActionMap = {
-  tableChanged: actions.actuals.handleTableChangeEventAction,
-  request: actions.actuals.requestAction,
-  loading: actions.actuals.loadingAction,
-  response: actions.actuals.responseAction,
-  saving: actions.actuals.savingTableAction,
-  addModelsToState: actions.actuals.addModelsToStateAction,
-  setSearch: actions.actuals.setSearchAction,
-  clear: actions.actuals.clearAction
-};
-
 const selectActualTypes = redux.selectors.simpleDeepEqualSelector(
   (state: Application.Authenticated.Store) => state.budget.actuals.types
 );
 
 const ConnectedActualsTable = connectTableToStore<ActualsTable.ActualsTableProps, R, M, Tables.ActualTableStore>({
-  actions: ActionMap,
+  actions: {
+    tableChanged: actions.actuals.handleTableChangeEventAction,
+    request: actions.actuals.requestAction,
+    loading: actions.actuals.loadingAction,
+    response: actions.actuals.responseAction,
+    saving: actions.actuals.savingTableAction,
+    addModelsToState: actions.actuals.addModelsToStateAction,
+    setSearch: actions.actuals.setSearchAction,
+    clear: actions.actuals.clearAction
+  },
   selector: redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.actuals),
   footerRowSelectors: {
     footer: createSelector(
-      [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.actuals.data)],
+      redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.actuals.data),
       (rows: Table.BodyRow<Tables.ActualRowData>[]) => {
         return {
           value: reduce(rows, (sum: number, s: Table.BodyRow<Tables.ActualRowData>) => sum + (s.data.value || 0), 0)

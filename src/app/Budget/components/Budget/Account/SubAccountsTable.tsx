@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil, map, filter } from "lodash";
@@ -8,23 +8,14 @@ import { redux, tabling, budgeting } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
 import { connectTableToStore } from "components/tabling";
 
-import { actions } from "../../../store";
+import { actions, selectors } from "../../../store";
 import BudgetSubAccountsTable, { BudgetSubAccountsTableProps } from "../SubAccountsTable";
-import FringesModal from "./FringesModal";
 
 type M = Model.SubAccount;
 type R = Tables.SubAccountRowData;
 
 const selectAccountDetail = redux.selectors.simpleDeepEqualSelector(
   (state: Application.Authenticated.Store) => state.budget.account.detail.data
-);
-
-const selectFringes = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.budget.account.table.fringes.data
-);
-
-const selectSubAccountUnits = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.budget.account.table.subaccountUnits
 );
 
 const ConnectedTable = connectTableToStore<BudgetSubAccountsTableProps, R, M, Tables.SubAccountTableStore>({
@@ -39,12 +30,10 @@ const ConnectedTable = connectTableToStore<BudgetSubAccountsTableProps, R, M, Ta
   },
   // We cannot autoRequest because we have to also request the new data when the dropdown breadcrumbs change.
   autoRequest: false,
-  selector: redux.selectors.simpleDeepEqualSelector(
-    (state: Application.Authenticated.Store) => state.budget.account.table
-  ),
+  selector: selectors.selectSubAccountsTableStore,
   footerRowSelectors: {
     page: createSelector(
-      [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.detail.data)],
+      redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.detail.data),
       (budget: Model.Budget | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
         estimated: !isNil(budget) ? budgeting.businessLogic.estimatedValue(budget) : 0.0,
@@ -53,11 +42,9 @@ const ConnectedTable = connectTableToStore<BudgetSubAccountsTableProps, R, M, Ta
       })
     ),
     footer: createSelector(
-      [
-        redux.selectors.simpleDeepEqualSelector(
-          (state: Application.Authenticated.Store) => state.budget.account.detail.data
-        )
-      ],
+      redux.selectors.simpleDeepEqualSelector(
+        (state: Application.Authenticated.Store) => state.budget.account.detail.data
+      ),
       (detail: Model.Account | null) => ({
         identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
         estimated: !isNil(detail) ? budgeting.businessLogic.estimatedValue(detail) : 0.0,
@@ -81,14 +68,10 @@ const SubAccountsTable = ({
   accountId,
   setPreviewModalVisible
 }: SubAccountsTableProps): JSX.Element => {
-  const [fringesModalVisible, setFringesModalVisible] = useState(false);
-
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const fringes = useSelector(selectFringes);
   const accountDetail = useSelector(selectAccountDetail);
-  const subAccountUnits = useSelector(selectSubAccountUnits);
   const table = tabling.hooks.useTable<R>();
 
   const [groupModals, onEditGroup, onCreateGroup] = useGrouping({
@@ -119,11 +102,6 @@ const SubAccountsTable = ({
         budget={budget}
         budgetId={budgetId}
         table={table}
-        fringes={
-          filter(fringes, (f: Table.BodyRow<Tables.FringeRowData>) =>
-            tabling.typeguards.isModelRow(f)
-          ) as Tables.FringeRow[]
-        }
         onAttachmentRemoved={(row: Table.ModelRow<R>, id: number) =>
           dispatch(
             actions.account.updateRowsInStateAction({
@@ -147,10 +125,7 @@ const SubAccountsTable = ({
             })
           )
         }
-        subAccountUnits={subAccountUnits}
         setPreviewModalVisible={setPreviewModalVisible}
-        onAddFringes={() => setFringesModalVisible(true)}
-        onEditFringes={() => setFringesModalVisible(true)}
         exportFileName={!isNil(accountDetail) ? `account_${accountDetail.identifier}` : ""}
         categoryName={"Sub Account"}
         identifierFieldHeader={"Account"}
@@ -165,7 +140,6 @@ const SubAccountsTable = ({
       />
       {groupModals}
       {markupModals}
-      <FringesModal budget={budget} open={fringesModalVisible} onCancel={() => setFringesModalVisible(false)} />
     </React.Fragment>
   );
 };
