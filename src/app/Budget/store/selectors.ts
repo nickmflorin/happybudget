@@ -18,11 +18,6 @@ export const selectSubAccountsTableStore = redux.selectors.simpleDeepEqualSelect
       return store.budget.account.table;
     } else if (budgeting.urls.isSubAccountUrl(path)) {
       return store.budget.subaccount.table;
-    } else {
-      console.warn(
-        `SubAccountsTableStore encountered path ${path} which is not pertinent to an
-          account or a subaccount.`
-      );
     }
   }
   return initialSubAccountsTableState;
