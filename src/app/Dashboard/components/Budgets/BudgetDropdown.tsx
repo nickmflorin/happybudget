@@ -34,4 +34,4 @@ const BudgetDropdown: React.FC<BudgetDropdownProps> = ({ children, onNewBudget }
   );
 };
 
-export default BudgetDropdown;
+export default React.memo(BudgetDropdown);

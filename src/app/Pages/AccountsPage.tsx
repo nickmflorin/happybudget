@@ -37,4 +37,4 @@ const AccountsPage = <B extends Model.Budget | Model.Template>({
   );
 };
 
-export default AccountsPage;
+export default React.memo(AccountsPage);

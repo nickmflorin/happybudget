@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { isNil, filter, reduce } from "lodash";
@@ -7,7 +7,7 @@ import { redux } from "lib";
 import { actions as globalActions, selectors } from "store";
 
 import { Portal, BreadCrumbs } from "components/layout";
-import { EditContactModal, CreateContactModal } from "components/modals";
+import { useContacts } from "components/hooks";
 import { ActualsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../store";
@@ -49,12 +49,15 @@ interface ActualsProps {
 }
 
 const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
-  const [contactToEdit, setContactToEdit] = useState<number | null>(null);
-  const [createContactModalVisible, setCreateContactModalVisible] = useState(false);
-
   const dispatch = useDispatch();
   const contacts = useSelector(selectors.selectContacts);
   const actualTypes = useSelector(selectActualTypes);
+
+  const [createContactModal, editContactModal, editContact, createContact] = useContacts({
+    onCreated: (m: Model.Contact) => dispatch(globalActions.authenticated.addContactToStateAction(m)),
+    onUpdated: (m: Model.Contact) =>
+      dispatch(globalActions.authenticated.updateContactInStateAction({ id: m.id, data: m }))
+  });
 
   return (
     <React.Fragment>
@@ -76,8 +79,8 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
         actualTypes={actualTypes}
         onOwnersSearch={(value: string) => dispatch(actions.actuals.setActualOwnersSearchAction(value))}
         exportFileName={!isNil(budget) ? `${budget.name}_actuals` : "actuals"}
-        onNewContact={() => setCreateContactModalVisible(true)}
-        onEditContact={(params: { contact: number; id: Table.EditableRowId }) => setContactToEdit(params.contact)}
+        onNewContact={() => createContact()}
+        onEditContact={(params: { contact: number; id: Table.EditableRowId }) => editContact(params.contact)}
         onSearchContact={(v: string) => dispatch(globalActions.authenticated.setContactsSearchAction(v))}
         onAttachmentRemoved={(row: Table.ModelRow<R>, id: number) =>
           dispatch(
@@ -103,25 +106,8 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
           )
         }
       />
-      {!isNil(contactToEdit) && (
-        <EditContactModal
-          open={true}
-          id={contactToEdit}
-          onSuccess={(m: Model.Contact) => {
-            dispatch(globalActions.authenticated.updateContactInStateAction({ id: m.id, data: m }));
-            setContactToEdit(null);
-          }}
-          onCancel={() => setContactToEdit(null)}
-        />
-      )}
-      <CreateContactModal
-        open={createContactModalVisible}
-        onSuccess={(m: Model.Contact) => {
-          dispatch(globalActions.authenticated.addContactToStateAction(m));
-          setCreateContactModalVisible(false);
-        }}
-        onCancel={() => setCreateContactModalVisible(false)}
-      />
+      {editContactModal}
+      {createContactModal}
     </React.Fragment>
   );
 };

@@ -1,3 +1,4 @@
+import React from "react";
 import { map } from "lodash";
 
 import { budgeting } from "lib";
@@ -66,4 +67,4 @@ const AccountPage = <B extends Model.Budget | Model.Template>({
   );
 };
 
-export default AccountPage;
+export default React.memo(AccountPage);

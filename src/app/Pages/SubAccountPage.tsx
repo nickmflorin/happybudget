@@ -1,3 +1,4 @@
+import React from "react";
 import { map } from "lodash";
 
 import { budgeting } from "lib";
@@ -78,4 +79,4 @@ const SubAccountPage = <B extends Model.Budget | Model.Template>({
   );
 };
 
-export default SubAccountPage;
+export default React.memo(SubAccountPage);

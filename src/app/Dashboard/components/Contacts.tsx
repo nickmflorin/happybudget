@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { isNil, filter } from "lodash";
 
@@ -6,7 +6,7 @@ import { actions as globalActions } from "store";
 import { tabling, redux } from "lib";
 
 import { Page } from "components/layout";
-import { CreateContactModal, EditContactModal } from "components/modals";
+import { useContacts } from "components/hooks";
 import { ContactsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../store";
@@ -39,8 +39,6 @@ const ConnectedContactsTable = connectTableToStore<ContactsTable.Props, R, M, Ta
 
 const Contacts = (): JSX.Element => {
   const table = tabling.hooks.useTable<R, M>();
-  const [contactToEdit, setContactToEdit] = useState<number | undefined>(undefined);
-  const [newContactModalOpen, setNewContactModalOpen] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -73,76 +71,65 @@ const Contacts = (): JSX.Element => {
     []
   );
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  const [__, editContactModal, editContact, _] = useContacts({
+    onCreated: (m: Model.Contact) => dispatch(globalActions.authenticated.addContactToStateAction(m)),
+    onUpdated: (m: Model.Contact) =>
+      table.current.applyTableChange({
+        type: "modelUpdated",
+        payload: { model: m }
+      }),
+    onAttachmentRemoved: (id: number, attachmentId: number) => {
+      const row = table.current.getRow(id);
+      if (!isNil(row)) {
+        if (tabling.typeguards.isModelRow(row)) {
+          onAttachmentRemoved(row, attachmentId);
+        } else {
+          console.warn(
+            `Suspicous Behavior: After attachment was added, row with ID
+            ${id} did not refer to a model row.`
+          );
+        }
+      } else {
+        console.warn(
+          `Suspicous Behavior: After attachment was added, could not find row in
+          state for ID ${id}.`
+        );
+      }
+    },
+    onAttachmentAdded: (id: number, m: Model.Attachment) => {
+      const row = table.current.getRow(id);
+      if (!isNil(row)) {
+        if (tabling.typeguards.isModelRow(row)) {
+          onAttachmentAdded(row, m);
+        } else {
+          console.warn(
+            `Suspicous Behavior: After attachment was added, row with ID
+            ${id} did not refer to a model row.`
+          );
+        }
+      } else {
+        console.warn(
+          `Suspicous Behavior: After attachment was added, could not find row in
+          state for ID ${id}.`
+        );
+      }
+    }
+  });
+
   return (
     <React.Fragment>
       <Page className={"contacts"} title={"My Contacts"}>
         <ConnectedContactsTable
           table={table}
           tableId={"contacts-table"}
-          onRowExpand={(row: Table.ModelRow<R>) => setContactToEdit(row.id)}
+          onRowExpand={(row: Table.ModelRow<R>) => editContact(row.id)}
           exportFileName={"contacts"}
           onAttachmentRemoved={onAttachmentRemoved}
           onAttachmentAdded={onAttachmentAdded}
         />
-        <CreateContactModal
-          open={newContactModalOpen}
-          onCancel={() => setNewContactModalOpen(false)}
-          onSuccess={(m: Model.Contact) => {
-            dispatch(globalActions.authenticated.addContactToStateAction(m));
-            setNewContactModalOpen(false);
-          }}
-        />
       </Page>
-      {!isNil(contactToEdit) && (
-        <EditContactModal
-          id={contactToEdit}
-          onCancel={() => setContactToEdit(undefined)}
-          onAttachmentRemoved={(id: number) => {
-            const row = table.current.getRow(contactToEdit);
-            if (!isNil(row)) {
-              if (tabling.typeguards.isModelRow(row)) {
-                onAttachmentRemoved(row, id);
-              } else {
-                console.warn(
-                  `Suspicous Behavior: After attachment was added, row with ID
-                  ${contactToEdit} did not refer to a model row.`
-                );
-              }
-            } else {
-              console.warn(
-                `Suspicous Behavior: After attachment was added, could not find row in
-                state for ID ${contactToEdit}.`
-              );
-            }
-          }}
-          onAttachmentAdded={(m: Model.Attachment) => {
-            const row = table.current.getRow(contactToEdit);
-            if (!isNil(row)) {
-              if (tabling.typeguards.isModelRow(row)) {
-                onAttachmentAdded(row, m);
-              } else {
-                console.warn(
-                  `Suspicous Behavior: After attachment was added, row with ID
-                  ${contactToEdit} did not refer to a model row.`
-                );
-              }
-            } else {
-              console.warn(
-                `Suspicous Behavior: After attachment was added, could not find row in
-                state for ID ${contactToEdit}.`
-              );
-            }
-          }}
-          onSuccess={(m: Model.Contact) => {
-            setContactToEdit(undefined);
-            table.current.applyTableChange({
-              type: "modelUpdated",
-              payload: { model: m }
-            });
-          }}
-          open={true}
-        />
-      )}
+      {editContactModal}
     </React.Fragment>
   );
 };
