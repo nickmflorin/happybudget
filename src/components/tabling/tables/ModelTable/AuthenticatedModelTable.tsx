@@ -1,3 +1,4 @@
+import React from "react";
 import {
   AuthenticatedTable,
   AuthenticatedTableProps,
@@ -21,4 +22,4 @@ const AuthenticatedModelTable = <R extends Table.RowData, M extends Model.RowHtt
   );
 };
 
-export default AuthenticatedModelTable;
+export default React.memo(AuthenticatedModelTable) as typeof AuthenticatedModelTable;

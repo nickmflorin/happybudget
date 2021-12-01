@@ -155,6 +155,6 @@ type ActualsTableType = {
   (props: WithConnectedTableProps<ActualsTableProps, R, M>): JSX.Element;
 };
 
-export default withContacts<R, M, WithConnectedTableProps<ActualsTableProps, R, M>>(Columns)(
-  ActualsTable
+export default React.memo(
+  withContacts<R, M, WithConnectedTableProps<ActualsTableProps, R, M>>(Columns)(ActualsTable)
 ) as ActualsTableType;

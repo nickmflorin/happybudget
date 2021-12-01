@@ -45,4 +45,4 @@ const UnauthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpMod
   return <Grid {...props} columns={columns} frameworkComponents={frameworkComponents} />;
 };
 
-export default UnauthenticatedGrid;
+export default React.memo(UnauthenticatedGrid) as typeof UnauthenticatedGrid;

@@ -1,3 +1,4 @@
+import React from "react";
 import { isNil, filter } from "lodash";
 
 import { tabling } from "lib";
@@ -73,4 +74,4 @@ const AuthenticatedBudgetAccountsTable = (props: AuthenticatedBudgetProps): JSX.
   );
 };
 
-export default AccountsTable<AuthenticatedBudgetProps>(AuthenticatedBudgetAccountsTable);
+export default React.memo(AccountsTable<AuthenticatedBudgetProps>(AuthenticatedBudgetAccountsTable));

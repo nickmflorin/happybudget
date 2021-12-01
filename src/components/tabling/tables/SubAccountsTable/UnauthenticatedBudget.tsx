@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { isNil, map } from "lodash";
 
 import { model, tabling, hooks } from "lib";
@@ -59,4 +59,4 @@ const UnauthenticatedBudgetSubAccountsTable = (
   );
 };
 
-export default SubAccountsTable<UnauthenticatedBudgetProps>(UnauthenticatedBudgetSubAccountsTable);
+export default React.memo(SubAccountsTable<UnauthenticatedBudgetProps>(UnauthenticatedBudgetSubAccountsTable));

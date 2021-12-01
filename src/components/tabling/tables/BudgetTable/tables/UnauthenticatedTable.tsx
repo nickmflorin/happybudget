@@ -1,3 +1,4 @@
+import React from "react";
 import {
   UnauthenticatedTable,
   UnauthenticatedTableProps,
@@ -31,4 +32,4 @@ const UnauthenticatedBudgetTable = <R extends Table.RowData, M extends Model.Row
   );
 };
 
-export default UnauthenticatedBudgetTable;
+export default React.memo(UnauthenticatedBudgetTable) as typeof UnauthenticatedBudgetTable;

@@ -1,3 +1,4 @@
+import React from "react";
 import { isNil, filter } from "lodash";
 
 import { tabling } from "lib";
@@ -72,4 +73,4 @@ const AuthenticatedTemplateAccountsTable = (props: AuthenticatedTemplateProps): 
   );
 };
 
-export default AccountsTable<AuthenticatedTemplateProps>(AuthenticatedTemplateAccountsTable);
+export default React.memo(AccountsTable<AuthenticatedTemplateProps>(AuthenticatedTemplateAccountsTable));

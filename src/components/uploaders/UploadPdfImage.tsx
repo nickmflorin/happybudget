@@ -61,4 +61,4 @@ const UploadPdfImage = (props: UploaderProps): JSX.Element => {
   );
 };
 
-export default UploadPdfImage;
+export default React.memo(UploadPdfImage);

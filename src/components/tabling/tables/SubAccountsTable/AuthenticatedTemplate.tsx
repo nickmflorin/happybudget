@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { isNil, filter, map } from "lodash";
 
 import { tabling, hooks, model } from "lib";
@@ -103,4 +103,4 @@ const AuthenticatedTemplateSubAccountsTable = (
   );
 };
 
-export default SubAccountsTable<AuthenticatedTemplateProps>(AuthenticatedTemplateSubAccountsTable);
+export default React.memo(SubAccountsTable<AuthenticatedTemplateProps>(AuthenticatedTemplateSubAccountsTable));

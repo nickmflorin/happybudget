@@ -1,10 +1,10 @@
-import { useState, forwardRef, useImperativeHandle, ForwardedRef } from "react";
+import { useEffect, useState, forwardRef, useImperativeHandle, ForwardedRef } from "react";
 import classNames from "classnames";
 import { AxiosResponse } from "axios";
 import { isNil, includes } from "lodash";
 import { UploadRequestOption } from "rc-upload/lib/interface";
-import { Upload } from "antd";
 
+import { Upload } from "antd";
 import { UploadChangeParam } from "antd/lib/upload";
 import { UploadFile } from "antd/lib/upload/interface";
 
@@ -14,7 +14,6 @@ import { Icon, RenderWithSpinner, Image, ShowHide } from "components";
 import { ImageClearButton } from "components/buttons";
 
 import "./Uploader.scss";
-import { useEffect } from "react";
 
 const ACCCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png"];
 const MAX_IMAGE_SIZE = 2; // In MB

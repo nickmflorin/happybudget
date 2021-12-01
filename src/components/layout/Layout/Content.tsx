@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import classNames from "classnames";
 
 interface ContentProps extends StandardComponentProps {
@@ -14,4 +14,4 @@ const Content = ({ children, className, style = {} }: ContentProps): JSX.Element
   );
 };
 
-export default Content;
+export default React.memo(Content);

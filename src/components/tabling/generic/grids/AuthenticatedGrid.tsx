@@ -75,4 +75,4 @@ const AuthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpModel
   );
 };
 
-export default AuthenticatedGrid;
+export default React.memo(AuthenticatedGrid) as typeof AuthenticatedGrid;

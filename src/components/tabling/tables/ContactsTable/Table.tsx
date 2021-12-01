@@ -70,4 +70,4 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
   );
 };
 
-export default ContactsTable;
+export default React.memo(ContactsTable);

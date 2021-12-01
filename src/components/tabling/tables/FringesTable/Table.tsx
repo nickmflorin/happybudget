@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 
 import { tabling } from "lib";
@@ -35,4 +36,4 @@ const FringesTable: React.FC<WithConnectedTableProps<Props, R, M, S>> = ({ expor
   );
 };
 
-export default FringesTable;
+export default React.memo(FringesTable);

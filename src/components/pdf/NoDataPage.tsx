@@ -1,3 +1,4 @@
+import React from "react";
 import { PageSize } from "@react-pdf/types";
 
 import { BasePage, View } from "./primitive";
@@ -18,4 +19,4 @@ const NoDataPage = (props: PageProps): JSX.Element => {
   );
 };
 
-export default NoDataPage;
+export default React.memo(NoDataPage);

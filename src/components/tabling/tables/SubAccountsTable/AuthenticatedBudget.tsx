@@ -181,4 +181,4 @@ const AuthenticatedBudgetSubAccountsTable = (
 
 const AsSubAccountsTable = SubAccountsTable(AuthenticatedBudgetSubAccountsTable);
 
-export default withContacts<R, M, AuthenticatedBudgetProps>(Columns)(AsSubAccountsTable);
+export default React.memo(withContacts<R, M, AuthenticatedBudgetProps>(Columns)(AsSubAccountsTable));

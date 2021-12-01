@@ -1,3 +1,4 @@
+import React from "react";
 import { isNil, filter } from "lodash";
 
 import {
@@ -61,4 +62,4 @@ const AuthenticatedBudgetTable = <R extends Tables.BudgetRowData, M extends Mode
   );
 };
 
-export default AuthenticatedBudgetTable;
+export default React.memo(AuthenticatedBudgetTable) as typeof AuthenticatedBudgetTable;

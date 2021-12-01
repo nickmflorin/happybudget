@@ -1,3 +1,4 @@
+import React from "react";
 import { isNil } from "lodash";
 
 import { tabling } from "lib";
@@ -36,4 +37,4 @@ const UnauthenticatedBudgetAccountsTable = (props: UnauthenticatedBudgetProps): 
   );
 };
 
-export default AccountsTable<UnauthenticatedBudgetProps>(UnauthenticatedBudgetAccountsTable);
+export default React.memo(AccountsTable<UnauthenticatedBudgetProps>(UnauthenticatedBudgetAccountsTable));

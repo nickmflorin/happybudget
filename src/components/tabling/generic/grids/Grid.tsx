@@ -346,4 +346,4 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
   );
 };
 
-export default Grid;
+export default React.memo(Grid) as typeof Grid;
