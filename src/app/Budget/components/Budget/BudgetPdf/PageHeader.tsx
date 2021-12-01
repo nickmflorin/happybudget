@@ -1,4 +1,6 @@
+import { useMemo } from "react";
 import { isNil } from "lodash";
+import { SourceObject } from "@react-pdf/types";
 
 import { View, RichText, Image } from "components/pdf";
 
@@ -62,6 +64,26 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
     }
   }
 
+  const getImageSrc = useMemo(
+    () =>
+      (image: string): SourceObject => {
+        let headers = {};
+        if (process.env.NODE_ENV === "production") {
+          // We need to include Cache-Control headers in the passed in src object because
+          // there is a bug with React PDF as it relates to AWS.  However, if we include
+          // these locally, we get a CORS error.
+          headers = { ...headers, "Cache-Control": "no-cache", "Access-Control-Allow-Origin": "*" };
+        }
+        return {
+          uri: image,
+          method: "GET",
+          body: "",
+          headers
+        };
+      },
+    []
+  );
+
   return (
     <View className={"budget-page-header"}>
       {!isNil(props.header.header) && (
@@ -74,17 +96,7 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
           {!isNil(subHeaderLeft) && (
             <View className={"budget-page-sub-header-left"}>
               {subHeaderItemHasImage(subHeaderLeft) && (
-                // We need to include Cache-Control headers in the passed in src object because
-                // there is a bug with React PDF as it relates to AWS.
-                <Image
-                  className={"budget-page-sub-header-image"}
-                  src={{
-                    uri: subHeaderLeft.image,
-                    method: "GET",
-                    body: "",
-                    headers: { "Cache-Control": "no-cache", "Access-Control-Allow-Origin": "*" }
-                  }}
-                />
+                <Image className={"budget-page-sub-header-image"} src={getImageSrc(subHeaderLeft.image)} />
               )}
               {subHeaderItemHasInfo(subHeaderLeft) && (
                 <RichText className={"budget-page-sub-header-rich-text"} nodes={subHeaderLeft.info} />
@@ -94,17 +106,7 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
           {!isNil(subHeaderRight) && (
             <View className={"budget-page-sub-header-right"}>
               {subHeaderItemHasImage(subHeaderRight) && (
-                // We need to include Cache-Control headers in the passed in src object because
-                // there is a bug with React PDF as it relates to AWS.
-                <Image
-                  className={"budget-page-sub-header-image"}
-                  src={{
-                    uri: subHeaderRight.image,
-                    method: "GET",
-                    body: "",
-                    headers: { "Cache-Control": "no-cache", "Access-Control-Allow-Origin": "*" }
-                  }}
-                />
+                <Image className={"budget-page-sub-header-image"} src={getImageSrc(subHeaderRight.image)} />
               )}
               {subHeaderItemHasInfo(subHeaderRight) && (
                 <RichText className={"budget-page-sub-header-rich-text"} nodes={subHeaderRight.info} />
