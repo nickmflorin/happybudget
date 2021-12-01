@@ -6,7 +6,7 @@ import { map, isNil } from "lodash";
 import * as api from "api";
 import { redux, notifications } from "lib";
 
-import { WrapInApplicationSpinner } from "components";
+import { WrapInApplicationSpinner, ShowHide } from "components";
 import { TemplateCard, EmptyCard } from "components/cards";
 import { NoBudgets } from "components/empty";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
@@ -104,7 +104,10 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
                 />
               );
             })}
-            <EmptyCard title={"New Template"} icon={"plus"} onClick={() => setCreateTempateModalOpen(true)} />
+
+            <ShowHide show={templates.length !== 0}>
+              <EmptyCard title={"New Template"} icon={"plus"} onClick={() => setCreateTempateModalOpen(true)} />
+            </ShowHide>
           </div>
         )}
       </WrapInApplicationSpinner>

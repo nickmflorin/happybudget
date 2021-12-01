@@ -6,7 +6,7 @@ import { map, isNil } from "lodash";
 import * as api from "api";
 import { redux, notifications } from "lib";
 
-import { WrapInApplicationSpinner } from "components";
+import { WrapInApplicationSpinner, ShowHide } from "components";
 import { CommunityTemplateCard, EmptyCard } from "components/cards";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
 import { IsStaff } from "components/permissions";
@@ -16,6 +16,8 @@ import { useLoggedInUser } from "store/hooks";
 import { actions } from "../../store";
 
 const selectTemplates = (state: Application.Authenticated.Store) => state.dashboard.community.data;
+const selectTemplatesResponseReceived = (state: Application.Authenticated.Store) =>
+  state.dashboard.community.responseWasReceived;
 const selectLoadingTemplates = (state: Application.Authenticated.Store) => state.dashboard.community.loading;
 
 interface DiscoverProps {
@@ -33,6 +35,7 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
   const dispatch: Redux.Dispatch = useDispatch();
   const templates = useSelector(selectTemplates);
   const loading = useSelector(selectLoadingTemplates);
+  const responseWasReceived = useSelector(selectTemplatesResponseReceived);
 
   const history = useHistory();
 
@@ -118,7 +121,13 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
             return <React.Fragment key={index}>{card}</React.Fragment>;
           })}
           <IsStaff>
-            <EmptyCard title={"New Community Template"} icon={"plus"} onClick={() => setCreateTempateModalOpen(true)} />
+            <ShowHide show={responseWasReceived}>
+              <EmptyCard
+                title={"New Community Template"}
+                icon={"plus"}
+                onClick={() => setCreateTempateModalOpen(true)}
+              />
+            </ShowHide>
           </IsStaff>
         </div>
       </WrapInApplicationSpinner>
