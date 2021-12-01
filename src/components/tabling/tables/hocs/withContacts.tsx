@@ -59,18 +59,28 @@ const withContacts =
         return m?.full_name || "";
       });
 
+      const processCellForCSV = hooks.useDynamicCallback((row: R) => {
+        if (!isNil(row.contact)) {
+          const m: Model.Contact | null = model.util.getModelById(props.contacts, row.contact);
+          return (!isNil(m) && model.util.contactName(m)) || "";
+        }
+        return "";
+      });
+
       const cols = useMemo(() => {
         return tabling.columns.normalizeColumns(columns, {
           contact: {
             cellRendererParams: { onEditContact: props.onEditContact },
             cellEditorParams: { onNewContact: props.onNewContact, setSearch: props.onSearchContact },
             processCellForClipboard,
-            processCellFromClipboard
+            processCellFromClipboard,
+            processCellForCSV
           }
         });
       }, [
         processCellForClipboard,
         processCellFromClipboard,
+        processCellForCSV,
         props.onEditContact,
         props.onNewContact,
         props.onSearchContact,

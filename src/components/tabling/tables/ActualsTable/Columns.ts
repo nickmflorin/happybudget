@@ -33,7 +33,10 @@ const Columns: Table.Column<R, M>[] = [
     cellEditorPopupPosition: "below",
     valueFormatter: tabling.formatters.dateValueFormatter,
     valueSetter: tabling.valueSetters.dateTimeValueSetter<R>("date"),
-    columnType: "date"
+    columnType: "date",
+    processCellForCSV: (row: R) => {
+      return (!isNil(row.date) && util.dates.toDate(row.date)) || "";
+    }
   }),
   tabling.columns.TagSelectColumn({
     field: "actual_type",
@@ -84,7 +87,8 @@ const Columns: Table.Column<R, M>[] = [
   tabling.columns.AttachmentsColumn({
     field: "attachments",
     width: 140,
-    minWidth: 140
+    minWidth: 140,
+    canBeExported: false
   }),
   tabling.columns.BodyColumn<R, M>({
     field: "purchase_order",
