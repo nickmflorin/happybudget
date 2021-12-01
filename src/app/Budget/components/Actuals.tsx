@@ -9,6 +9,7 @@ import { actions as globalActions, selectors } from "store";
 import { Portal, BreadCrumbs } from "components/layout";
 import { EditContactModal, CreateContactModal } from "components/modals";
 import { ActualsTable, connectTableToStore } from "components/tabling";
+
 import { actions } from "../store";
 
 type R = Tables.ActualRowData;
