@@ -232,20 +232,6 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
     }
   }
 
-  function* handleRowRemoveFromMarkup(e: Table.RowRemoveFromMarkupEvent): SagaIterator {
-    const ids: Table.ModelRowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
-    if (isAuthenticatedConfig(config) && ids.length !== 0) {
-      yield put(config.actions.saving(true));
-      try {
-        yield api.request(api.removeMarkupChildren, tabling.managers.markupId(e.payload.markup), { children: ids });
-      } catch (err: unknown) {
-        notifications.requestError(err as Error, "There was an error updating the table rows.");
-      } finally {
-        yield put(config.actions.saving(false));
-      }
-    }
-  }
-
   function* handleRowRemoveFromGroupEvent(e: Table.RowRemoveFromGroupEvent): SagaIterator {
     const objId = yield select(config.selectObjId);
     if (!isNil(objId)) {
@@ -374,8 +360,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       rowAdd: handleRowAddEvent,
       rowDelete: handleRowDeleteEvent,
       dataChange: handleDataChangeEvent,
-      rowPositionChanged: handleRowPositionChangedEvent,
-      rowRemoveFromMarkup: handleRowRemoveFromMarkup
+      rowPositionChanged: handleRowPositionChangedEvent
     })
   };
 };

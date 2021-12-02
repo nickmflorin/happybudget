@@ -182,15 +182,3 @@ export const isMarkupUpdatedEvent = <R extends Table.RowData, M extends Model.Ro
 ): e is Table.MarkupUpdatedEvent => {
   return (e as Table.MarkupUpdatedEvent).type === "markupUpdated";
 };
-
-export const isRowRemoveFromMarkupEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ChangeEvent<R, M>
-): e is Table.RowRemoveFromMarkupEvent => {
-  return (e as Table.RowRemoveFromMarkupEvent).type === "rowRemoveFromMarkup";
-};
-
-export const isRowAddToMarkupEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ChangeEvent<R, M>
-): e is Table.RowAddToMarkupEvent => {
-  return (e as Table.RowAddToMarkupEvent).type === "rowAddToMarkup";
-};

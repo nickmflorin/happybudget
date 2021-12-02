@@ -144,21 +144,6 @@ export const createBudgetTableChangeEventReducer = <
           newState
         );
       }
-    } else if (tabling.typeguards.isRowRemoveFromMarkupEvent(e)) {
-      const ids: Table.ModelRowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
-      const mk = markupRowFromState<R, S>(action, newState, e.payload.markup);
-      if (!isNil(mk)) {
-        return {
-          ...newState,
-          data: tabling.data.orderTableRows<R>(
-            util.replaceInArray<Table.BodyRow<R>>(
-              newState.data,
-              { id: mk.id },
-              markupRowManager.removeChildren(mk, ids)
-            )
-          )
-        };
-      }
     }
     return newState;
   };

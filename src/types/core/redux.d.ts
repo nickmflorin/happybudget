@@ -47,8 +47,7 @@ namespace Redux {
       readonly modelUpdated: TableEventTask<Table.ModelUpdatedEvent<M>, R, M>;
       readonly markupAdded: TableEventTask<Table.MarkupAddedEvent, R, M>;
       readonly markupUpdated: TableEventTask<Table.MarkupUpdatedEvent, R, M>;
-      readonly rowAddToMarkup: TableEventTask<Table.RowAddToMarkupEvent, R, M>;
-      readonly rowRemoveFromMarkup: TableEventTask<Table.RowRemoveFromMarkupEvent, R, M>;
+
   };
 
   type ActionMapObject<M = any> = {

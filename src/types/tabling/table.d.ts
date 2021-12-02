@@ -485,8 +485,6 @@ namespace Table {
     | "rowAddToGroup"
     | "groupUpdated"
     | "groupAdded"
-    | "rowRemoveFromMarkup"
-    | "rowAddToMarkup"
     | "markupAdded"
     | "markupUpdated";
 
@@ -563,15 +561,6 @@ namespace Table {
     readonly payload: RowRemoveFromGroupPayload;
   };
 
-  type RowRemoveFromMarkupPayload = {
-    readonly rows: SingleOrArray<ModelRowId>;
-    readonly markup: MarkupRowId;
-  };
-  type RowRemoveFromMarkupEvent = {
-    readonly type: "rowRemoveFromMarkup";
-    readonly payload: RowRemoveFromMarkupPayload;
-  };
-
   type RowAddToGroupPayload = {
     readonly group: GroupRowId;
     readonly rows: SingleOrArray<ModelRowId>;
@@ -579,15 +568,6 @@ namespace Table {
   type RowAddToGroupEvent = {
     readonly type: "rowAddToGroup";
     readonly payload: RowAddToGroupPayload;
-  };
-
-  type RowAddToMarkupPayload = {
-    readonly markup: MarkupRowId;
-    readonly rows: SingleOrArray<ModelRowId>;
-  };
-  type RowAddToMarkupEvent = {
-    readonly type: "rowAddToMarkup";
-    readonly payload: RowAddToMarkupPayload;
   };
 
   type GroupAddedPayload = Model.Group;
@@ -637,8 +617,6 @@ namespace Table {
     | RowAddToGroupEvent
     | GroupAddedEvent
     | GroupUpdatedEvent
-    | RowRemoveFromMarkupEvent
-    | RowAddToMarkupEvent
     | MarkupAddedEvent
     | MarkupUpdatedEvent
     | ModelUpdatedEvent<M>;
