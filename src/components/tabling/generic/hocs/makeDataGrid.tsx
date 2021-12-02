@@ -22,9 +22,8 @@ export interface DataGridProps<R extends Table.RowData, M extends Model.RowHttpM
   readonly columns: Table.Column<R, M>[];
   readonly search?: string;
   readonly cookieNames?: Table.CookieNames;
-  readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
-  readonly isCellSelectable?: (params: Table.CellCallbackParams<R, M>) => boolean;
   readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
+  readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
   readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
   readonly onFirstDataRendered: (e: FirstDataRenderedEvent) => void;
 }
@@ -72,8 +71,7 @@ const DataGrid =
       const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
         return map(props.columns, (col: Table.Column<R, M>) => ({
           ...col,
-          cellRendererParams: { ...col.cellRendererParams, getRowColorDef },
-          selectable: col.selectable || props.isCellSelectable
+          cellRendererParams: { ...col.cellRendererParams, getRowColorDef }
         }));
       }, [hooks.useDeepEqualMemo(props.columns)]);
 

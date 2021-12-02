@@ -79,7 +79,6 @@ export type TableConfigurationProps<R extends Table.RowData, M extends Model.Row
   readonly onEditRow?: (g: Table.NonPlaceholderBodyRow<R>) => void;
   readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
-  readonly isCellSelectable?: (params: Table.CellCallbackParams<R, M>) => boolean;
 };
 
 export type WithConfiguredTableProps<T, R extends Table.RowData> = T & TableConfigurationProvidedProps<R>;
