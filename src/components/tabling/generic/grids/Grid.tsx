@@ -341,6 +341,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
         modules={AllModules}
         overlayNoRowsTemplate={"<span></span>"}
         overlayLoadingTemplate={"<span></span>"}
+        popupParent={document.querySelector("body") || undefined}
       />
     </div>
   );
