@@ -5,16 +5,35 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 
 import { hooks, tabling } from "lib";
 
-import { GridProps } from "../grids";
+import { GridProps, AuthenticatedGridProps, UnauthenticatedGridProps } from "../grids";
 
 type WithFooterGridProps<T> = T & { readonly id: "page" | "footer" };
+
+export interface FooterGridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
+  extends GridProps<R, M> {
+  readonly constrainHorizontally?: boolean;
+}
+
+export interface AuthenticatedFooterGridProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel
+> extends AuthenticatedGridProps<R, M> {
+  readonly constrainHorizontally?: boolean;
+}
+
+export interface UnauthenticatedFooterGridProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel
+> extends UnauthenticatedGridProps<R, M> {
+  readonly constrainHorizontally?: boolean;
+}
 
 /* eslint-disable indent */
 const FooterGrid =
   <
     R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    T extends GridProps<R, M> = GridProps<R, M>
+    T extends FooterGridProps<R, M> = FooterGridProps<R, M>
   >(
     config: Table.FooterGridConfig<R, M>
   ) =>
@@ -44,7 +63,9 @@ const FooterGrid =
           data={[tabling.managers.createFooterRow({ gridId: config.id })]}
           headerHeight={0}
           rowHeight={config.rowHeight || 38}
-          className={classNames("grid--footer", config.className)}
+          className={classNames("grid--footer", config.className, {
+            "constrain-horizontally": props.constrainHorizontally
+          })}
           rowClass={classNames("row--footer", config.rowClass)}
         />
       );

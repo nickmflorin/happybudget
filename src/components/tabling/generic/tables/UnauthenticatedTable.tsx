@@ -7,6 +7,7 @@ import { UnauthenticatedGrid, UnauthenticatedGridProps } from "../grids";
 import { UnauthenticatedMenu } from "../menus";
 import {
   FooterGrid,
+  UnauthenticatedFooterGridProps,
   TableConfigurationProps,
   WithConfiguredTableProps,
   WithConnectedTableProps,
@@ -28,24 +29,26 @@ export type UnauthenticatedTableProps<
 > = TableConfigurationProps<R, M> & {
   readonly table?: NonNullRef<Table.TableInstance<R, M>>;
   readonly actions?: Table.UnauthenticatedMenuActions<R, M>;
+  readonly constrainTableFooterHorizontally?: boolean;
+  readonly constrainPageFooterHorizontally?: boolean;
   readonly excludeColumns?:
     | SingleOrArray<keyof R | string | ((col: Table.Column<R, M>) => boolean)>
     | ((col: Table.Column<R, M>) => boolean);
   readonly children: RenderPropChild<UnauthenticatedTableDataGridProps<R, M>>;
 };
 
-const TableFooterGrid = FooterGrid<any, any, UnauthenticatedGridProps<any>>({
+const TableFooterGrid = FooterGrid<any, any, UnauthenticatedFooterGridProps<any>>({
   id: "footer",
   className: "grid--table-footer",
   rowClass: "row--table-footer",
   getFooterColumn: (col: Table.Column<any, any, any>) => col.footer || null
 })(UnauthenticatedGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-    props: Omit<UnauthenticatedGridProps<R, M>, "id">
+    props: Omit<UnauthenticatedFooterGridProps<R, M>, "id">
   ): JSX.Element;
 };
 
-const PageFooterGrid = FooterGrid<any, any, UnauthenticatedGridProps<any>>({
+const PageFooterGrid = FooterGrid<any, any, UnauthenticatedFooterGridProps<any>>({
   id: "page",
   className: "grid--page-footer",
   rowClass: "row--page-footer",
@@ -53,7 +56,7 @@ const PageFooterGrid = FooterGrid<any, any, UnauthenticatedGridProps<any>>({
   getFooterColumn: (col: Table.Column<any, any, any>) => col.page || null
 })(UnauthenticatedGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-    props: Omit<UnauthenticatedGridProps<R, M>, "id" | "grid">
+    props: Omit<UnauthenticatedFooterGridProps<R, M>, "id" | "grid">
   ): JSX.Element;
 };
 
@@ -178,6 +181,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
           columns={columns}
           hiddenColumns={props.hiddenColumns}
           framework={props.framework}
+          constrainHorizontally={props.constrainPageFooterHorizontally}
         />
       }
     >
@@ -198,6 +202,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
           columns={columns}
           hiddenColumns={props.hiddenColumns}
           framework={props.framework}
+          constrainHorizontally={props.constrainTableFooterHorizontally}
         />
       </React.Fragment>
     </TableWrapper>

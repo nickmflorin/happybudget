@@ -10,6 +10,7 @@ import { AuthenticatedGridProps } from "../grids";
 import { AuthenticatedMenu } from "../menus";
 import {
   FooterGrid,
+  AuthenticatedFooterGridProps,
   TableConfigurationProps,
   WithConfiguredTableProps,
   WithAuthenticatedDataGridProps,
@@ -35,6 +36,8 @@ export type AuthenticatedTableProps<
   > & {
     readonly table?: NonNullRef<Table.TableInstance<R, M>>;
     readonly actions?: Table.AuthenticatedMenuActions<R, M>;
+    readonly constrainTableFooterHorizontally?: boolean;
+    readonly constrainPageFooterHorizontally?: boolean;
     readonly excludeColumns?:
       | SingleOrArray<keyof R | string | ((col: Table.Column<R, M>) => boolean)>
       | ((col: Table.Column<R, M>) => boolean);
@@ -43,18 +46,18 @@ export type AuthenticatedTableProps<
     readonly rowHasCheckboxSelection?: (row: Table.EditableRow<R>) => boolean;
   };
 
-const TableFooterGrid = FooterGrid<any, any, AuthenticatedGridProps<any, any>>({
+const TableFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, any>>({
   id: "footer",
   className: "grid--table-footer",
   rowClass: "row--table-footer",
   getFooterColumn: (col: Table.Column<any>) => col.footer || null
 })(AuthenticatedGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-    props: Omit<AuthenticatedGridProps<R, M>, "id">
+    props: Omit<AuthenticatedFooterGridProps<R, M>, "id">
   ): JSX.Element;
 };
 
-const PageFooterGrid = FooterGrid<any, any, AuthenticatedGridProps<any, any>>({
+const PageFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, any>>({
   id: "page",
   className: "grid--page-footer",
   rowClass: "row--page-footer",
@@ -62,7 +65,7 @@ const PageFooterGrid = FooterGrid<any, any, AuthenticatedGridProps<any, any>>({
   getFooterColumn: (col: Table.Column<any>) => col.page || null
 })(AuthenticatedGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-    props: Omit<AuthenticatedGridProps<R, M>, "id">
+    props: Omit<AuthenticatedFooterGridProps<R, M>, "id">
   ): JSX.Element;
 };
 
@@ -302,6 +305,7 @@ const AuthenticatedTable = <
           columns={columns}
           framework={props.framework}
           hiddenColumns={props.hiddenColumns}
+          constrainHorizontally={props.constrainPageFooterHorizontally}
         />
       }
     >
@@ -339,6 +343,7 @@ const AuthenticatedTable = <
           onChangeEvent={_onChangeEvent}
           framework={props.framework}
           footerRowSelectors={props.footerRowSelectors}
+          constrainHorizontally={props.constrainTableFooterHorizontally}
           checkboxColumn={{
             cellRenderer: "NewRowCell",
             // The onChangeEvent callback is needed to dispatch the action to create a new row.

@@ -404,11 +404,20 @@
     .grid--table-footer {
       flex: none;
       height: 40px;
-      // margin-top: -1px;
 
       .ag-body-viewport {
         border-bottom-left-radius: 8px;
         border-bottom-right-radius: 8px;
+      }
+
+      &.constrain-horizontally {
+        .ag-center-cols-viewport {
+          max-width: 100%;
+          overflow-x: hidden;
+          .ag-center-cols-container {
+            max-width: 100%;
+          }
+        }
       }
 
       @include footer_grid_background($table-border-color);
@@ -442,6 +451,16 @@
 
       .ag-body-viewport {
         border-radius: 8px;
+      }
+
+      &.constrain-horizontally {
+        .ag-center-cols-viewport {
+          max-width: 100%;
+          overflow-x: hidden;
+          .ag-center-cols-container {
+            max-width: 100%;
+          }
+        }
       }
 
       @include footer_grid_background(#d3d3d3);
