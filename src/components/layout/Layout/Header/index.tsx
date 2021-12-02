@@ -84,7 +84,7 @@ const Header = ({
                 label: "Feedback/Feature Request",
                 onClick: () => {
                   if (!isNil(process.env.REACT_APP_CANNY_FEEDBACK_URL)) {
-                    window.location.href = process.env.REACT_APP_CANNY_FEEDBACK_URL;
+                    window.open(process.env.REACT_APP_CANNY_FEEDBACK_URL, "_blank");
                   } else {
                     console.warn(
                       "Could not identify Canny feedback URL as ENV variable `REACT_APP_CANNY_FEEDBACK_URL` is not defined."
