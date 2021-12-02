@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import classNames from "classnames";
 import { isNil, map } from "lodash";
 import hoistNonReactStatics from "hoist-non-react-statics";
@@ -70,7 +70,7 @@ const FooterGrid =
         />
       );
     }
-    return hoistNonReactStatics(WithFooterGrid, Component) as React.FunctionComponent<Omit<T, "id">>;
+    return hoistNonReactStatics(WithFooterGrid, React.memo(Component)) as React.FunctionComponent<Omit<T, "id">>;
   };
 
 export default FooterGrid;

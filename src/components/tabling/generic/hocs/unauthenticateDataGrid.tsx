@@ -1,4 +1,4 @@
-import { useMemo, useImperativeHandle } from "react";
+import React, { useMemo, useImperativeHandle } from "react";
 import { isNil, map } from "lodash";
 import hoistNonReactStatics from "hoist-non-react-statics";
 
@@ -91,7 +91,7 @@ const unauthenticatedDataGrid =
         />
       );
     }
-    return hoistNonReactStatics(WithUnauthenticatedDataGrid, Component);
+    return hoistNonReactStatics(WithUnauthenticatedDataGrid, React.memo(Component));
   };
 
 export default unauthenticatedDataGrid;

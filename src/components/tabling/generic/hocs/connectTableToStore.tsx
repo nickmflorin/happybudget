@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useStore, useSelector, useDispatch } from "react-redux";
 import hoistNonReactStatics from "hoist-non-react-statics";
 
@@ -97,7 +97,7 @@ const connectTableToStore =
         />
       );
     };
-    return hoistNonReactStatics(WithStoreConfigured, Component);
+    return hoistNonReactStatics(WithStoreConfigured, React.memo(Component));
   };
 
 export default connectTableToStore;

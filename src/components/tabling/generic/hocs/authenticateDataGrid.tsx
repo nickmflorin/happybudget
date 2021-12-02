@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, useImperativeHandle } from "react";
+import React, { useMemo, useRef, useState, useImperativeHandle } from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
 import { map, isNil, includes, find, filter, flatten, reduce, uniq, isEqual } from "lodash";
 
@@ -676,7 +676,7 @@ const authenticateDataGrid =
         />
       );
     }
-    return hoistNonReactStatics(WithAuthenticatedDataGrid, Component);
+    return hoistNonReactStatics(WithAuthenticatedDataGrid, React.memo(Component));
   };
 
 export default authenticateDataGrid;

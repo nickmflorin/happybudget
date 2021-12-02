@@ -257,7 +257,7 @@ const DataGrid =
         />
       );
     }
-    return hoistNonReactStatics(WithDataGrid, Component);
+    return hoistNonReactStatics(WithDataGrid, React.memo(Component));
   };
 
 export default DataGrid;

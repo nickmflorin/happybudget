@@ -1,4 +1,4 @@
-import { useMemo, useReducer } from "react";
+import React, { useMemo, useReducer } from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
 import { map, isNil, filter, reduce, uniqueId } from "lodash";
 import { GridReadyEvent, GridOptions, FirstDataRenderedEvent } from "@ag-grid-community/core";
@@ -250,7 +250,7 @@ const configureTable = <
       />
     );
   }
-  return hoistNonReactStatics(WithConfigureTable, Component);
+  return hoistNonReactStatics(WithConfigureTable, React.memo(Component));
 };
 
 export default configureTable;
