@@ -5,6 +5,19 @@ export const initialFringesState: Tables.FringeTableStore = {
   fringeColors: []
 };
 
+export const initialAnalysisState: Modules.Budget.AnalysisStore = {
+  loading: false,
+  responseWasReceived: false,
+  accounts: {
+    data: [],
+    count: 0
+  },
+  groups: {
+    data: [],
+    count: 0
+  }
+};
+
 export const initialSubAccountsTableState: Tables.SubAccountTableStore = {
   ...redux.initialState.initialTableState,
   fringes: initialFringesState,
@@ -35,6 +48,7 @@ const initialState: Modules.Budget.Store = {
   account: initialAccountState,
   subaccount: initialSubAccountState,
   headerTemplates: initialHeaderTemplatesState,
+  analysis: initialAnalysisState,
   actuals: {
     ...redux.initialState.initialTableState,
     types: [],

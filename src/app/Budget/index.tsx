@@ -113,7 +113,10 @@ const RootBudget = (): JSX.Element => {
             path={"/budgets/:budgetId/actuals"}
             render={() => <Actuals budgetId={parseInt(budgetId)} budget={budget} />}
           />
-          <Route path={"/budgets/:budgetId/analysis"} component={Analysis} />
+          <Route
+            path={"/budgets/:budgetId/analysis"}
+            render={() => <Analysis budgetId={parseInt(budgetId)} budget={budget} />}
+          />
           <Route
             path={[
               "/budgets/:budgetId/accounts/:accountId",

@@ -13,6 +13,7 @@ import accountsSaga from "./accounts";
 import actualsSaga from "./actuals";
 import subAccountSaga from "./subAccount";
 import pdfSaga from "./pdf";
+import analysisSaga from "./analysis";
 
 const FringesActionMap = {
   requestAccount: actions.account.requestAccountAction,
@@ -82,4 +83,5 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(actualsSaga);
   yield spawn(subAccountSaga);
   yield spawn(pdfSaga);
+  yield spawn(analysisSaga);
 }

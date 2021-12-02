@@ -43,6 +43,27 @@ const headerTemplatesRootReducer: Redux.Reducer<Modules.Budget.HeaderTemplatesSt
   return newState;
 };
 
+const analysisReducer: Redux.Reducer<Modules.Budget.AnalysisStore> = (
+  state: Modules.Budget.AnalysisStore = initialState.analysis,
+  action: Redux.Action<any>
+): Modules.Budget.AnalysisStore => {
+  if (action.type === actions.analysis.loadingAction.toString()) {
+    return { ...state, loading: action.payload };
+  } else if (action.type === actions.analysis.requestAction.toString()) {
+    return { ...state, responseWasReceived: false };
+  } else if (action.type === actions.analysis.responseAction.toString()) {
+    const response: { groups: Http.ListResponse<Model.Group>; accounts: Http.ListResponse<Model.Account> } =
+      action.payload;
+    return {
+      ...state,
+      responseWasReceived: true,
+      accounts: response.accounts,
+      groups: response.groups
+    };
+  }
+  return state;
+};
+
 const genericReducer = combineReducers({
   id: redux.reducers.createSimplePayloadReducer<number | null>({
     initialState: null,
@@ -56,6 +77,7 @@ const genericReducer = combineReducers({
       updateInState: actions.updateBudgetInStateAction
     }
   }),
+  analysis: analysisReducer,
   account: budgeting.reducers.createAccountDetailReducer({
     initialState: initialState.account,
     actions: {

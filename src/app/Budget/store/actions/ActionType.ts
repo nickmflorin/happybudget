@@ -14,6 +14,11 @@ const ActionType = {
     Display: "budget.headertemplates.Display",
     Clear: "budget.headertemplates.Clear"
   },
+  Analysis: {
+    Request: "budget.analysis.Request",
+    Response: "budget.analysis.Response",
+    Loading: "budget.analysis.Loading"
+  },
   Fringes: {
     TableChanged: "budget.fringes.TableChanged",
     Saving: "budget.fringes.Saving",

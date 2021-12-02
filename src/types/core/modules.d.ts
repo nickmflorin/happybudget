@@ -51,6 +51,13 @@ namespace Modules {
       readonly table: Tables.SubAccountTableStore;
     }
 
+    type AnalysisStore = {
+      readonly accounts: Omit<Redux.ModelListResponseStore<Model.Account>, "loading" | "responseWasReceived">;
+      readonly groups: Omit<Redux.ModelListResponseStore<Model.Group>, "loading" | "responseWasReceived">;
+      readonly loading: boolean;
+      readonly responseWasReceived: boolean;
+    }
+
     /* eslint-disable no-shadow */
     /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
     interface Store {
@@ -60,6 +67,7 @@ namespace Modules {
       readonly account: AccountStore;
       readonly actuals: Tables.ActualTableStore;
       readonly headerTemplates: HeaderTemplatesStore;
+      readonly analysis: AnalysisStore;
     }
   }
 
