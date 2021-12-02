@@ -39,11 +39,8 @@ export const isTemplate = <M extends Model.Template | Model.SimpleTemplate = Mod
   m: Model.HttpModel
 ): m is M => (m as M).type === "budget" && (m as M).domain === "template";
 
-export const isModelWithChildren = <M extends Model.Model>(model: M): model is M & { children: M[] } => {
-  return (
-    (model as M & { children: M[] }).children !== undefined && Array.isArray((model as M & { children: M[] }).children)
-  );
-};
+export const isModelWithChildren = <M extends Model.Model>(model: M): model is M & { children: M[] } =>
+  (model as M & { children: M[] }).children !== undefined && Array.isArray((model as M & { children: M[] }).children);
 
 /* eslint-disable indent */
 export const isModelWithGroup = <M extends Model.Model>(
@@ -51,29 +48,22 @@ export const isModelWithGroup = <M extends Model.Model>(
 ): m is M & { readonly group: Model.Group | null } =>
   (m as M & { readonly group: Model.Group | null }).group !== undefined;
 
-export const isModelWithColor = (model: Model.Model | Model.ModelWithColor): model is Model.ModelWithColor => {
-  return (model as Model.ModelWithColor).color !== undefined;
-};
+export const isModelWithColor = (model: Model.Model | Model.ModelWithColor): model is Model.ModelWithColor =>
+  (model as Model.ModelWithColor).color !== undefined;
 
-export const isModelWithName = (model: Model.Model | Model.ModelWithName): model is Model.ModelWithName => {
-  return (model as Model.ModelWithName).name !== undefined;
-};
+export const isModelWithName = (model: Model.Model | Model.ModelWithName): model is Model.ModelWithName =>
+  (model as Model.ModelWithName).name !== undefined;
 
 export const isModelWithDescription = (
   model: Model.Model | Model.ModelWithDescription
-): model is Model.ModelWithDescription => {
-  return (model as Model.ModelWithDescription).description !== undefined;
-};
+): model is Model.ModelWithDescription => (model as Model.ModelWithDescription).description !== undefined;
 
 export const isModelWithIdentifier = (
   model: Model.Model | Model.ModelWithIdentifier
-): model is Model.ModelWithIdentifier => {
-  return (model as Model.ModelWithIdentifier).identifier !== undefined;
-};
+): model is Model.ModelWithIdentifier => (model as Model.ModelWithIdentifier).identifier !== undefined;
 
-export const isTag = (model: Model.Model | Model.Tag): model is Model.Tag => {
-  return (model as Model.Tag).title !== undefined && (model as Model.Tag).color !== undefined;
-};
+export const isTag = (model: Model.Model | Model.Tag): model is Model.Tag =>
+  (model as Model.Tag).title !== undefined && (model as Model.Tag).color !== undefined;
 
 export const isContact = (user: Model.User | Model.SimpleUser | Model.Contact): user is Model.Contact =>
   (user as Model.Contact).image !== undefined;
@@ -83,10 +73,8 @@ export const isUserWithImage = (user: Model.User | Model.SimpleUser | Model.Cont
     ? (user as Model.Contact).image !== null
     : (user as Model.User | Model.SimpleUser).profile_image !== null;
 
-export const isUploadParamsWithImage = (params: UploadImageParams): params is UploadImageParamsWithImage => {
-  return (params as UploadImageParamsWithImage).image !== undefined;
-};
+export const isUploadParamsWithImage = (params: UploadImageParams): params is UploadImageParamsWithImage =>
+  (params as UploadImageParamsWithImage).image !== undefined;
 
-export const isUploadedImage = (params: UploadedImage | SavedImage): params is UploadedImage => {
-  return (params as UploadedImage).file !== undefined;
-};
+export const isUploadedImage = (params: UploadedImage | SavedImage): params is UploadedImage =>
+  (params as UploadedImage).file !== undefined;
