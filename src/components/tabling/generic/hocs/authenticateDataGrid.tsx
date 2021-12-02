@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, useImperativeHandle } from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
-import { map, isNil, includes, find, filter, flatten, reduce, uniq, isEqual, indexOf } from "lodash";
+import { map, isNil, includes, find, filter, flatten, reduce, uniq, isEqual } from "lodash";
 
 import {
   CellKeyDownEvent,
@@ -542,7 +542,6 @@ const authenticateDataGrid =
       const onRowDragEnd = hooks.useDynamicCallback((e: RowDragEvent) => {
         const row: Table.ModelRow<R> = e.node.data;
         const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api);
-
         let groupRow: Table.GroupRow<R> | null = null;
         let foundMovedRow = false;
         let previous: Table.ModelRow<R> | null = null;
@@ -577,26 +576,36 @@ const authenticateDataGrid =
       });
 
       const onRowDragMove = hooks.useDynamicCallback((e: RowDragEvent) => {
-        const rowIndex = (arr: Table.BodyRow<R>[], row: Table.BodyRow<R>) => {
-          return indexOf(
-            map(arr, (r: Table.BodyRow<R>) => r.id),
-            row.id
-          );
-        };
-
         const moveInArray = (arr: Table.BodyRow<R>[], row: Table.ModelRow<R>, index: number) => {
           const removed = filter(arr.slice(), (r: Table.BodyRow<R>) => r.id !== row.id);
           return [...removed.slice(0, index), row, ...removed.slice(index)];
         };
+
         const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api);
-        if (!isNil(e.overNode)) {
-          const overRow: Table.BodyRow<R> = e.overNode.data;
-          const movingRow: Table.ModelRow<R> = e.node.data;
-          if (tabling.typeguards.isModelRow(overRow) || tabling.typeguards.isGroupRow(overRow)) {
-            const toIndex = rowIndex(rows, overRow);
-            const store: Table.BodyRow<R>[] = moveInArray(rows, movingRow, toIndex);
-            e.api.setRowData(store);
-            e.api.clearFocusedCell();
+        const movingRow: Table.ModelRow<R> = e.node.data;
+
+        // Accessing the `overNode` property on RowDragEvent does not give the
+        // "true" `overNode` because it does not take into consideration where
+        // you might have scrolled to in the table.  The `overIndex` also does
+        // not take into account scrolling.  In order to determine where we are
+        // in the table, we need to calculate how many rows are off the viewport
+        // by calculating the scroll position of the viewport and the height of
+        // the rows in the viewport.
+        const viewports = document.getElementsByClassName("ag-body-viewport");
+        if (viewports.length !== 0) {
+          const rowElements = document.getElementsByClassName("ag-row row row--data");
+          if (rowElements.length !== 0) {
+            const numHiddenRows = Math.floor(viewports[0].scrollTop / rowElements[0].clientHeight);
+            const overRow: Table.BodyRow<R> = rows[e.overIndex + numHiddenRows];
+            if (
+              !isNil(overRow) &&
+              overRow.id !== movingRow.id &&
+              (tabling.typeguards.isModelRow(overRow) || tabling.typeguards.isGroupRow(overRow))
+            ) {
+              const store: Table.BodyRow<R>[] = moveInArray(rows, movingRow, e.overIndex + numHiddenRows);
+              e.api.setRowData(store);
+              e.api.clearFocusedCell();
+            }
           }
         }
       });

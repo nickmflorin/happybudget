@@ -18,7 +18,7 @@ export * as localization from "./localization";
 
 export const ConfigOptions: Application.ConfigOption[] = [
   { name: "tableDebug", default: false, devOnly: true },
-  { name: "tableRowOrdering", default: true, hardOverride: false },
+  { name: "tableRowOrdering", default: true },
   { name: "reportWebVitals", default: false },
   { name: "whyDidYouRender", default: false, devOnly: true }
 ];
