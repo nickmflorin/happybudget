@@ -17,8 +17,8 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     cellRenderer: { data: "ContactNameCell" },
     editable: true,
     cellClass: "cell--renders-html",
-    width: 120,
-    minWidth: 120,
+    width: 140,
+    minWidth: 140,
     parseIntoFields: (value: string | null) => {
       const parsed = !isNil(value) ? model.util.parseFirstAndLastName(value) : null;
       return [
@@ -58,8 +58,8 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     headerName: "Phone Number",
     columnType: "phone",
     cellRenderer: { data: "PhoneNumberCell" },
-    width: 100,
-    minWidth: 100
+    width: 120,
+    minWidth: 120
   }),
   tabling.columns.BodyColumn<R, M>({
     field: "email",
@@ -67,13 +67,13 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     columnType: "email",
     cellRenderer: { data: "EmailCell" },
     valueSetter: tabling.valueSetters.emailValueSetter<R>("email"),
-    width: 120,
-    minWidth: 120
+    width: 100,
+    minWidth: 100
   }),
   tabling.columns.AttachmentsColumn({
     field: "attachments",
-    width: 140,
-    minWidth: 140
+    width: 120,
+    minWidth: 120
   }),
   tabling.columns.BodyColumn<R, M>({
     field: "rate",

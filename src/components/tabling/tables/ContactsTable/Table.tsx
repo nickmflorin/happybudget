@@ -40,6 +40,7 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
         minimal={true}
         cookieNames={{ hiddenColumns: "contacts-table-hidden-columns" }}
         rowHeight={40}
+        sizeToFit={true}
         expandCellTooltip={"Edit"}
         getModelRowName={(r: Table.ModelRow<R>) => util.conditionalJoinString(r.data.first_name, r.data.last_name)}
         getPlaceholderRowName={(r: Table.PlaceholderRow<R>) =>

@@ -182,6 +182,7 @@
             .page-content {
               width: 100%;
               flex-grow: 100;
+              overflow-x: hidden;
 
               &.scrollable {
                 overflow-y: scroll;
