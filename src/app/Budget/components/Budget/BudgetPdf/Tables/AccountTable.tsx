@@ -151,7 +151,7 @@ const AccountTable = ({
                       ];
                     } else {
                       return [
-                        ...rws,
+                        ...subRws,
                         <GroupRow
                           className={"detail-group-tr"}
                           row={detailRow}
