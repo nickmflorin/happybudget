@@ -23,7 +23,7 @@ import {
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
-import { tabling, hooks } from "lib";
+import { tabling, hooks, util } from "lib";
 import useCellNavigation from "./useCellNavigation";
 import useContextMenu, { UseContextMenuParams } from "./useContextMenu";
 import useAuthenticatedClipboard from "./useAuthenticatedClipboard";
@@ -595,16 +595,39 @@ const authenticateDataGrid =
         if (viewports.length !== 0) {
           const rowElements = document.getElementsByClassName("ag-row row row--data");
           if (rowElements.length !== 0) {
-            const numHiddenRows = Math.floor(viewports[0].scrollTop / rowElements[0].clientHeight);
-            const overRow: Table.BodyRow<R> = rows[e.overIndex + numHiddenRows];
-            if (
-              !isNil(overRow) &&
-              overRow.id !== movingRow.id &&
-              (tabling.typeguards.isModelRow(overRow) || tabling.typeguards.isGroupRow(overRow))
-            ) {
-              const store: Table.BodyRow<R>[] = moveInArray(rows, movingRow, e.overIndex + numHiddenRows);
-              e.api.setRowData(store);
-              e.api.clearFocusedCell();
+            // At this point, I do not fully understand why clientHeight seems to be
+            // returning 0 in some cases (particularly for the Contacts table).  So,
+            // in the case that it does we have to try a fallback option to get the
+            // row height.
+            let rowHeight: number | null = null;
+            if (rowElements[0].clientHeight !== 0) {
+              rowHeight = rowElements[0].clientHeight;
+            } else {
+              const style: string | null = rowElements[0].getAttribute("style");
+              if (!isNil(style)) {
+                const styleObj = util.html.parseStyleString(style);
+                if (!isNil(styleObj.height) && String(styleObj.height).endsWith("px")) {
+                  const height = parseInt(String(styleObj.height).split("px")[0]);
+                  if (!isNaN(height)) {
+                    rowHeight = height;
+                  }
+                }
+              }
+            }
+            if (!isNil(rowHeight)) {
+              const numHiddenRows = Math.floor(viewports[0].scrollTop / rowHeight);
+              const overRow: Table.BodyRow<R> = rows[e.overIndex + numHiddenRows];
+              if (
+                !isNil(overRow) &&
+                overRow.id !== movingRow.id &&
+                (tabling.typeguards.isModelRow(overRow) || tabling.typeguards.isGroupRow(overRow))
+              ) {
+                const store: Table.BodyRow<R>[] = moveInArray(rows, movingRow, e.overIndex + numHiddenRows);
+                e.api.setRowData(store);
+                e.api.clearFocusedCell();
+              }
+            } else {
+              console.warn("Could not determine row height from DOM, reordering rows will not function properly.");
             }
           }
         }

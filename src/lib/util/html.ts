@@ -8,3 +8,16 @@ export const isNodeDescendantOf = (parent: HTMLElement | Element, child: HTMLEle
   }
   return false;
 };
+
+export const parseStyleString = (style: string): { [key: string]: string } => {
+  const regex = /([\w-]*)\s*:\s*([^;]*)/g;
+
+  const properties: { [key: string]: string } = {};
+
+  let match = regex.exec(style);
+  while (match) {
+    properties[match[1]] = match[2].trim();
+    match = regex.exec(style);
+  }
+  return properties;
+};
