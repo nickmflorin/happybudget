@@ -52,14 +52,11 @@ export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Mo
   readonly tableId: Table.Id;
   readonly grid: NonNullRef<Table.DataGridInstance>;
   readonly columns: Table.Column<R, M>[];
-  readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
   readonly pinFirstColumn?: boolean;
   readonly pinActionColumns?: boolean;
   readonly generateNewRowData?: (rows: Table.BodyRow<R>[]) => Partial<R>;
   readonly rowHasCheckboxSelection: ((row: Table.EditableRow<R>) => boolean) | undefined;
   readonly onRowSelectionChanged: (rows: Table.EditableRow<R>[]) => void;
-  readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
-  readonly onEditGroup?: (g: Table.GroupRow<R>) => void;
 }
 
 export type WithAuthenticatedDataGridProps<R extends Table.RowData, T> = T & InjectedAuthenticatedDataGridProps<R>;
@@ -470,14 +467,12 @@ const authenticateDataGrid =
               const changes = getCellChangesFromEvent(columns, e);
               if (changes.length !== 0) {
                 props.onChangeEvent({ type: "dataChange", payload: tabling.events.consolidateCellChanges(changes) });
-                if (tabling.typeguards.isModelRow(row) && !isNil(props.onRowExpand) && !isNil(props.rowCanExpand)) {
-                  const col = props.apis?.column.getColumn("expand");
-                  if (
-                    !isNil(col) &&
-                    (isNil(oldRow.current) ||
-                      (typeof props.rowCanExpand === "function" &&
-                        props.rowCanExpand(oldRow.current) !== props.rowCanExpand(row)))
-                  ) {
+                const expandConfig = !isNil(props.editColumnConfig)
+                  ? tabling.columns.getEditColumnRowConfig(props.editColumnConfig, row, "expand")
+                  : null;
+                if (!isNil(expandConfig)) {
+                  const col = props.apis?.column.getColumn("edit");
+                  if (!isNil(col) && isNil(oldRow.current)) {
                     props.apis?.grid.refreshCells({ force: true, rowNodes: [e.node], columns: [col] });
                   }
                 }

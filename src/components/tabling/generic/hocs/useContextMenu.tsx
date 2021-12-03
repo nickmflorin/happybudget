@@ -22,7 +22,7 @@ export type UseContextMenuParams<R extends Table.RowData, M extends Model.RowHtt
   readonly rowCanDelete?: (row: Table.ModelRow<R> | Table.MarkupRow<R>) => boolean;
   readonly onGroupRows?: (rows: Table.ModelRow<R>[]) => void;
   readonly onMarkupRows?: (rows?: Table.ModelRow<R>[]) => void;
-  readonly onEditMarkup?: (row: Table.MarkupRow<R>) => void;
+  readonly editColumnConfig?: Table.EditColumnRowConfig<R>[];
 };
 
 const evaluateRowStringGetter = <R extends Table.BodyRow>(
@@ -231,13 +231,16 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
       let contextMenuItems: Table.MenuItemDef[] = !isNil(params.getMarkupRowContextMenuItems)
         ? params.getMarkupRowContextMenuItems(row, node)
         : [];
-      if (!isNil(params.onEditMarkup)) {
+      const editMarkupConfig = !isNil(params.editColumnConfig)
+        ? tabling.columns.getEditColumnRowConfig(params.editColumnConfig, row, "edit")
+        : null;
+      if (!isNil(editMarkupConfig)) {
         contextMenuItems = [
           ...contextMenuItems,
           {
             name: `Edit ${getRowLabel(row)}`,
-            icon: '<i class="far fa-edit-alt context-icon"></i>',
-            action: () => params.onEditMarkup?.(row)
+            icon: '<i class="far fa-pencil context-icon"></i>',
+            action: () => editMarkupConfig.action(row, false)
           }
         ];
       }
@@ -279,7 +282,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
 
   const getGroupRowContextMenuItems: (row: Table.GroupRow<R>, node: Table.RowNode) => Table.MenuItemDef[] =
     hooks.useDynamicCallback((row: Table.GroupRow<R>, node: Table.RowNode): Table.MenuItemDef[] => {
-      return [
+      let contextMenuItems = [
         ...(!isNil(params.getGroupRowContextMenuItems) ? params.getGroupRowContextMenuItems(row, node) : []),
         {
           name: `Ungroup ${getRowName(row) || row.groupData.name}`,
@@ -291,6 +294,20 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
             })
         }
       ];
+      const editGroupConfig = !isNil(params.editColumnConfig)
+        ? tabling.columns.getEditColumnRowConfig(params.editColumnConfig, row, "edit")
+        : null;
+      if (!isNil(editGroupConfig)) {
+        contextMenuItems = [
+          {
+            name: `Edit ${getRowName(row) || row.groupData.name}`,
+            icon: '<i class="far fa-pencil context-icon"></i>',
+            action: () => editGroupConfig.action(row, false)
+          },
+          ...contextMenuItems
+        ];
+      }
+      return contextMenuItems;
     });
 
   const getContextMenuItems: (row: Table.BodyRow<R>, node: Table.RowNode) => Table.MenuItemDef[] =

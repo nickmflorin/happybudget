@@ -36,7 +36,7 @@ type InternalAuthenticatedMenuProps<
   readonly hiddenColumns?: Table.HiddenColumns;
   readonly selectedRows: Table.EditableRow<R>[];
   readonly rowHasCheckboxSelection?: (row: Table.EditableRow<R>) => boolean;
-  readonly hasExpandColumn: boolean;
+  readonly hasEditColumn: boolean;
   readonly hasDragColumn: boolean;
 };
 
@@ -49,7 +49,7 @@ const AuthenticatedMenu = <R extends Table.RowData, M extends Model.RowHttpModel
     className={classNames(
       "table-action-menu",
       { detached: props.detached },
-      { "has-expand-column": props.hasExpandColumn },
+      { "has-expand-column": props.hasEditColumn },
       { "has-drag-column": props.hasDragColumn && Config.tableRowOrdering }
     )}
   >

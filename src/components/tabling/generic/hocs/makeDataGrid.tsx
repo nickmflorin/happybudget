@@ -18,13 +18,11 @@ export interface DataGridProps<R extends Table.RowData, M extends Model.RowHttpM
   readonly apis: Table.GridApis | null;
   readonly className?: Table.GeneralClassName;
   readonly rowClass?: Table.RowClassName;
-  readonly hasExpandColumn: boolean;
+  readonly hasEditColumn: boolean;
   readonly columns: Table.Column<R, M>[];
   readonly search?: string;
   readonly cookieNames?: Table.CookieNames;
-  readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
-  readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
   readonly onFirstDataRendered: (e: FirstDataRenderedEvent) => void;
 }
 
@@ -181,7 +179,7 @@ const DataGrid =
           is hovered.  We should figure out if there is a way to optimize
           this to only refresh under certain circumstances.
           */
-          if (props.hasExpandColumn) {
+          if (props.hasEditColumn) {
             if (
               includes(
                 map(columns, (col: Table.Column<R, M>) => col.field),
@@ -202,7 +200,7 @@ const DataGrid =
                   }
                 }
               });
-              e.api.refreshCells({ force: true, rowNodes: nodes, columns: ["expand"] });
+              e.api.refreshCells({ force: true, rowNodes: nodes, columns: ["edit"] });
             }
           }
         },

@@ -71,7 +71,6 @@ const PreviewModal = ({
   const previewer = useRef<IPreviewerRef>(null);
   const [loadingData, setLoadingData] = useState(false);
 
-  // TODO: Should we just use the useContacts hook?
   const [contactsResponse, setContactsResponse] = useState<Http.ListResponse<Model.Contact> | null>(null);
   const [budgetResponse, setBudgetResponse] = useState<Model.PdfBudget | null>(null);
   const [options, setOptions] = useState<ExportFormOptions>(DEFAULT_OPTIONS);

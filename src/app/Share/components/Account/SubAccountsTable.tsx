@@ -1,5 +1,4 @@
 import { useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
 import { isNil, filter } from "lodash";
 
@@ -76,8 +75,6 @@ interface SubAccountsTableProps {
 }
 
 const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps): JSX.Element => {
-  const history = useHistory();
-
   const fringes = useSelector(selectFringes);
   const accountDetail = useSelector(selectAccountDetail);
   const subAccountUnits = useSelector(selectSubAccountUnits);
@@ -93,8 +90,6 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
       exportFileName={!isNil(accountDetail) ? `account_${accountDetail.identifier}` : ""}
       categoryName={"Sub Account"}
       identifierFieldHeader={"Account"}
-      onRowExpand={(row: Table.ModelRow<R>) => history.push(`/budgets/${budgetId}/subaccounts/${row.id}`)}
-      onBack={() => history.push(`/budgets/${budgetId}/accounts?row=${accountId}`)}
     />
   );
 };

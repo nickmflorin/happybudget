@@ -315,7 +315,7 @@ const AuthenticatedTable = <
           apis={props.tableApis.get("data")}
           actions={actions}
           selectedRows={selectedRows}
-          hasExpandColumn={props.hasExpandColumn}
+          hasEditColumn={props.hasEditColumn}
           hasDragColumn={
             props.hasDragColumn === undefined
               ? Config.tableRowOrdering

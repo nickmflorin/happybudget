@@ -123,7 +123,14 @@ const Contacts = (): JSX.Element => {
         <ConnectedContactsTable
           table={table}
           tableId={"contacts-table"}
-          onRowExpand={(row: Table.ModelRow<R>) => editContact(row.id)}
+          editColumnConfig={[
+            {
+              conditional: (r: Table.NonPlaceholderBodyRow<R>) => tabling.typeguards.isModelRow(r),
+              action: (r: Table.ModelRow<R>) => editContact(r.id),
+              behavior: "expand",
+              tooltip: "Edit"
+            }
+          ]}
           exportFileName={"contacts"}
           onAttachmentRemoved={onAttachmentRemoved}
           onAttachmentAdded={onAttachmentAdded}

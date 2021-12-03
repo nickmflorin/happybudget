@@ -1,4 +1,3 @@
-import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
@@ -52,14 +51,7 @@ interface AccountsTableProps {
 }
 
 const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element => {
-  const history = useHistory();
-
-  return (
-    <ConnectedTable
-      budget={budget}
-      onRowExpand={(row: Table.ModelRow<R>) => history.push(`/budgets/${budgetId}/accounts/${row.id}`)}
-    />
-  );
+  return <ConnectedTable budget={budget} />;
 };
 
 export default AccountsTable;

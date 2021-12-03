@@ -282,6 +282,16 @@ namespace Table {
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type HiddenColumns = { [key: string]: boolean };
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type EditColumnRowConfig<R extends RowData, RW extends Table.NonPlaceholderBodyRow<R> = Table.NonPlaceholderBodyRow<R>> = {
+    readonly conditional: (row: RW) => boolean;
+    readonly hidden?: (row: RW, hovered: boolean) => boolean;
+    readonly behavior: EditRowActionBehavior;
+    readonly action: (row: any, hovered: boolean) => void;
+    readonly tooltip?: string | ((row: RW, params: { hovered: boolean; disabled: boolean}) => string);
+    readonly disabled?: boolean | ((row: RW, hovered: boolean) => boolean);
+  }
+
   interface Column<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
@@ -360,7 +370,7 @@ namespace Table {
   }
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type ExpandActionBehavior = "expand" | "edit";
+  type EditRowActionBehavior = "expand" | "edit";
 
   type DataGridInstance = {
     readonly getCSVData: (fields?: string[]) => CSVData;

@@ -40,7 +40,7 @@ type TableConfigurationProvidedProps<R extends Table.RowData> = {
   readonly tableApis: Table.ITableApis;
   readonly hiddenColumns?: Table.HiddenColumns;
   readonly tableGridOptions: Table.TableOptionsSet;
-  readonly hasExpandColumn: boolean;
+  readonly hasEditColumn: boolean;
   readonly minimal?: boolean;
   readonly rowHeight?: number;
   readonly menuPortalId?: string;
@@ -59,9 +59,10 @@ export type TableConfigurationProps<R extends Table.RowData, M extends Model.Row
   readonly hasDragColumn?: boolean;
   readonly checkboxColumn?: Partial<Table.Column<R, M>>;
   readonly checkboxColumnWidth?: number;
-  readonly expandColumn?: Partial<Table.Column<R, M>>;
-  readonly expandColumnWidth?: number;
-  readonly expandCellTooltip?: string;
+  readonly hideEditColumn?: boolean;
+  readonly editColumn?: Partial<Table.Column<R, M>>;
+  readonly editColumnWidth?: number;
+  readonly editColumnConfig?: Table.EditColumnRowConfig<R>[];
   readonly showPageFooter?: boolean;
   readonly minimal?: boolean;
   readonly rowHeight?: number;
@@ -74,10 +75,6 @@ export type TableConfigurationProps<R extends Table.RowData, M extends Model.Row
   readonly framework?: Table.Framework;
   readonly className?: Table.GeneralClassName;
   readonly columns: Table.Column<R, M>[];
-  readonly expandActionBehavior?: Table.ExpandActionBehavior | ((r: Table.BodyRow<R>) => Table.ExpandActionBehavior);
-  readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
-  readonly onEditRow?: (g: Table.NonPlaceholderBodyRow<R>) => void;
-  readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
 };
 
@@ -158,9 +155,9 @@ const configureTable = <
       return { data, footer, page };
     }, []);
 
-    const hasExpandColumn = useMemo(
-      () => props.rowCanExpand !== false && (!isNil(props.onRowExpand) || !isNil(props.onEditRow)),
-      [props.rowCanExpand, props.onRowExpand, props.onEditRow]
+    const hasEditColumn = useMemo(
+      () => (props.hideEditColumn === true ? false : !isNil(props.editColumnConfig)),
+      [props.editColumnConfig, props.hideEditColumn]
     );
 
     const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
@@ -180,24 +177,19 @@ const configureTable = <
       let cols = tabling.columns.orderColumns<R, M>(props.columns);
       cols = props.pinFirstColumn ? pinFirstColumn(cols) : cols;
 
-      if (hasExpandColumn === true) {
+      if (hasEditColumn === true) {
         cols = [
-          tabling.columns.ExpandColumn<R, M>(
+          tabling.columns.EditColumn<R, M>(
             {
               pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined,
               // These are only applicable for the non-footer grids, but it is easier to define them
               // at the top Table level than at the Grid level.
               cellRendererParams: {
-                ...props.expandColumn?.cellRendererParams,
-                expandActionBehavior: props.expandActionBehavior,
-                onEditRow: (row: Table.BodyRow<R>) =>
-                  tabling.typeguards.isNonPlaceholderBodyRow(row) && props.onEditRow?.(row),
-                onExpand: (row: Table.ModelRow<R>) => tabling.typeguards.isDataRow(row) && props.onRowExpand?.(row),
-                rowCanExpand: props.rowCanExpand,
-                tooltip: props.expandCellTooltip
+                ...props.editColumn?.cellRendererParams,
+                editColumnConfig: props.editColumnConfig
               }
             },
-            props.expandColumnWidth
+            props.editColumnWidth
           ),
           ...cols
         ];
@@ -205,7 +197,7 @@ const configureTable = <
       cols = [
         tabling.columns.CheckboxColumn<R, M>(
           { ...props.checkboxColumn, pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined },
-          hasExpandColumn || false,
+          hasEditColumn || false,
           props.checkboxColumnWidth
         ),
         ...cols
@@ -220,10 +212,8 @@ const configureTable = <
     }, [
       hooks.useDeepEqualMemo(props.columns),
       props.pinFirstColumn,
-      hasExpandColumn,
-      props.expandActionBehavior,
-      props.onRowExpand,
-      props.onEditRow,
+      hasEditColumn,
+      props.editColumnConfig,
       props.hasDragColumn
     ]);
 
@@ -238,10 +228,9 @@ const configureTable = <
         showPageFooter={props.showPageFooter}
         columns={columns}
         tableApis={_apis}
-        hasExpandColumn={hasExpandColumn}
+        hasEditColumn={hasEditColumn}
         tableGridOptions={tableGridOptions}
         hiddenColumns={hiddenColumns}
-        rowCanExpand={props.rowCanExpand}
         onDataGridReady={onDataGridReady}
         onFooterGridReady={onFooterGridReady}
         onPageGridReady={onPageGridReady}

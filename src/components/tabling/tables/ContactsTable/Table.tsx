@@ -42,7 +42,6 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
         rowHeight={40}
         sizeToFit={true}
         constrainTableFooterHorizontally={true}
-        expandCellTooltip={"Edit"}
         getModelRowName={(r: Table.ModelRow<R>) => util.conditionalJoinString(r.data.first_name, r.data.last_name)}
         getPlaceholderRowName={(r: Table.PlaceholderRow<R>) =>
           util.conditionalJoinString(r.data.first_name, r.data.last_name)

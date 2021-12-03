@@ -8,6 +8,22 @@ import * as aggrid from "./aggrid";
 import * as formatters from "./formatters";
 import * as Models from "./models";
 
+/* eslint-disable indent */
+export const getEditColumnRowConfig = <
+  R extends Table.RowData,
+  RW extends Table.NonPlaceholderBodyRow<R> = Table.NonPlaceholderBodyRow<R>
+>(
+  config: Table.EditColumnRowConfig<R, RW>[],
+  row: RW,
+  behavior?: Table.EditRowActionBehavior
+): Table.EditColumnRowConfig<R, RW> | null => {
+  const filt = !isNil(behavior)
+    ? (c: Table.EditColumnRowConfig<R, RW>) => c.conditional(row) && c.behavior === behavior
+    : (c: Table.EditColumnRowConfig<R, RW>) => c.conditional(row);
+  const filtered = filter(config, filt);
+  return filtered.length !== 0 ? filtered[0] : null;
+};
+
 export const getColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
   columns: Table.Column<R, M>[],
   field: keyof R | string
@@ -341,22 +357,22 @@ export const DragColumn = <R extends Table.RowData, M extends Model.RowHttpModel
     maxWidth: !isNil(width) ? width : 10
   }) as Table.Column<R, M>;
 
-export const ExpandColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+export const EditColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
   col: Partial<Table.Column<R, M, any>>,
   width?: number
 ): Table.Column<R, M, any> =>
   ActionColumn({
     /* eslint-disable indent */
-    cellRenderer: { data: "ExpandCell" },
+    cellRenderer: { data: "EditCell" },
     ...col,
     width: !isNil(width) ? width : 30,
     maxWidth: !isNil(width) ? width : 30,
-    colId: "expand"
+    colId: "edit"
   });
 
 export const CheckboxColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
   col: Partial<Table.Column<R, M>>,
-  hasExpandColumn: boolean,
+  hasEditColumn: boolean,
   width?: number
 ): Table.Column<R, M> =>
   ActionColumn({
@@ -364,8 +380,8 @@ export const CheckboxColumn = <R extends Table.RowData, M extends Model.RowHttpM
     cellRenderer: "EmptyCell",
     ...col,
     colId: "checkbox",
-    width: !isNil(width) ? width : hasExpandColumn === false ? 40 : 25,
-    maxWidth: !isNil(width) ? width : hasExpandColumn === false ? 40 : 25,
+    width: !isNil(width) ? width : hasEditColumn === false ? 40 : 25,
+    maxWidth: !isNil(width) ? width : hasEditColumn === false ? 40 : 25,
     footer: {
       // We always want the entire new row icon in the footer cell to be present,
       // but the column itself isn't always wide enough.

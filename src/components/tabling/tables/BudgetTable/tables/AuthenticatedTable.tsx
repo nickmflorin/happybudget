@@ -20,12 +20,14 @@ export type AuthenticatedBudgetTableProps<
   // Markup is currently not applicable for Templates.
   readonly onEditMarkup?: (row: Table.MarkupRow<R>) => void;
   readonly onEditGroup?: (row: Table.GroupRow<R>) => void;
+  readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
 };
 
 /* eslint-disable indent */
 const AuthenticatedBudgetTable = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
   onEditMarkup,
   onEditGroup,
+  onRowExpand,
   ...props
 }: AuthenticatedBudgetTableProps<R, M>): JSX.Element => {
   return (
@@ -41,22 +43,27 @@ const AuthenticatedBudgetTable = <R extends Tables.BudgetRowData, M extends Mode
         }
         return {};
       }}
-      onEditRow={(g: Table.NonPlaceholderBodyRow<R>) =>
-        (tabling.typeguards.isMarkupRow(g) && onEditMarkup?.(g)) ||
-        (tabling.typeguards.isGroupRow(g) && onEditGroup?.(g))
-      }
-      expandActionBehavior={(r: Table.BodyRow<R>) =>
-        tabling.typeguards.isMarkupRow(r) || tabling.typeguards.isGroupRow(r) ? "edit" : "expand"
-      }
+      editColumnConfig={[
+        {
+          conditional: (r: Table.NonPlaceholderBodyRow<R>) => tabling.typeguards.isMarkupRow(r),
+          action: (r: Table.MarkupRow<R>) => onEditMarkup?.(r),
+          behavior: "edit"
+        },
+        {
+          conditional: (r: Table.NonPlaceholderBodyRow<R>) => tabling.typeguards.isGroupRow(r),
+          action: (r: Table.GroupRow<R>) => onEditGroup?.(r),
+          behavior: "edit"
+        },
+        {
+          conditional: (r: Table.NonPlaceholderBodyRow<R>) => tabling.typeguards.isModelRow(r),
+          action: (r: Table.ModelRow<R>) => onRowExpand?.(r),
+          behavior: "expand"
+        }
+      ]}
       framework={tabling.aggrid.combineFrameworks(Framework, props.framework)}
     >
       {(params: AuthenticatedTableDataGridProps<R, M>) => (
-        <AuthenticatedBudgetDataGrid<R, M>
-          {...params}
-          onBack={props.onBack}
-          rowCanExpand={props.rowCanExpand}
-          onRowExpand={props.onRowExpand}
-        />
+        <AuthenticatedBudgetDataGrid<R, M> {...params} onBack={props.onBack} />
       )}
     </AuthenticatedTable>
   );
