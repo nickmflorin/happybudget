@@ -112,18 +112,18 @@ export const structureNode = (node: Node): Pdf.HTMLNode[] => {
       return null;
     } else if (n.nodeType === Node.ELEMENT_NODE) {
       if (!isSupportedNode(n)) {
-        console.error(`Suspicious Behavior: Unsupported node ${n.nodeName} found!`);
+        console.warn(`Suspicious Behavior: Unsupported node ${n.nodeName} found!`);
         return null;
       } else {
         if (n.childNodes.length === 0) {
-          console.error(`Suspicious Behavior: Empty node ${n.nodeName} found!`);
+          console.warn(`Suspicious Behavior: Empty node ${n.nodeName} found!`);
           return null;
         }
         const tag = n.nodeName.toLocaleLowerCase() as Pdf.SupportedHTMLTag;
         if (n.childNodes.length === 1 && n.childNodes[0].nodeType === Node.TEXT_NODE) {
           const nodeValue = n.childNodes[0].nodeValue;
           if (isNil(nodeValue) || nodeValue === "") {
-            console.error(`Suspicious Behavior: Node ${n.childNodes[0].nodeName} has invalid value ${nodeValue}!`);
+            console.warn(`Suspicious Behavior: Node ${n.childNodes[0].nodeName} has invalid value ${nodeValue}!`);
             return null;
           }
           return {
@@ -137,13 +137,13 @@ export const structureNode = (node: Node): Pdf.HTMLNode[] => {
           (ni: Pdf.HTMLNode | null) => !isNil(ni)
         ) as Pdf.HTMLNode[];
         if (children.length === 0) {
-          console.error(`Suspicious Behavior: Empty node ${n.nodeName} found!`);
+          console.warn(`Suspicious Behavior: Empty node ${n.nodeName} found!`);
           return null;
         }
         return { tag, type: structuredNodeType(n), data: children } as Pdf.HTMLNode;
       }
     } else {
-      console.error(`Suspicious Behavior: Unsupported node type ${n.nodeType} found!`);
+      console.warn(`Suspicious Behavior: Unsupported node type ${n.nodeType} found!`);
       return null;
     }
   };
