@@ -15,17 +15,19 @@ type WithActual<R extends Tables.BudgetRowData> =
 
 type WithEstimation<R extends Tables.BudgetRowData> = WithActual<R> | Model.Template;
 
-export const nominalValue = <R extends Tables.BudgetRowData>(obj: WithEstimation<R>) =>
+export const nominalValue = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(obj: WithEstimation<R>) =>
   tabling.typeguards.isRow(obj) ? obj.data.nominal_value : obj.nominal_value;
 
-export const accumulatedMarkupContribution = <R extends Tables.BudgetRowData>(obj: WithEstimation<R>) =>
-  tabling.typeguards.isRow(obj) ? obj.data.accumulated_markup_contribution : obj.accumulated_markup_contribution;
+export const accumulatedMarkupContribution = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(
+  obj: WithEstimation<R>
+) => (tabling.typeguards.isRow(obj) ? obj.data.accumulated_markup_contribution : obj.accumulated_markup_contribution);
 
-export const accumulatedFringeContribution = <R extends Tables.BudgetRowData>(obj: WithEstimation<R>) =>
-  tabling.typeguards.isRow(obj) ? obj.data.accumulated_fringe_contribution : obj.accumulated_fringe_contribution;
+export const accumulatedFringeContribution = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(
+  obj: WithEstimation<R>
+) => (tabling.typeguards.isRow(obj) ? obj.data.accumulated_fringe_contribution : obj.accumulated_fringe_contribution);
 
 /* eslint-disable indent */
-export const fringeContribution = <R extends Tables.BudgetRowData>(obj: WithEstimation<R>) =>
+export const fringeContribution = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(obj: WithEstimation<R>) =>
   // Only SubAccount(s) have a Fringe Contribution.
   tabling.typeguards.isRow(obj) && typeguards.isSubAccountRow(obj)
     ? obj.data.fringe_contribution
@@ -33,17 +35,17 @@ export const fringeContribution = <R extends Tables.BudgetRowData>(obj: WithEsti
     ? obj.fringe_contribution
     : 0.0;
 
-export const estimatedValue = <R extends Tables.BudgetRowData>(m: WithEstimation<R>): number => {
+export const estimatedValue = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(m: WithEstimation<R>): number => {
   return nominalValue(m) + accumulatedMarkupContribution(m) + accumulatedFringeContribution(m) + fringeContribution(m);
 };
 
-export const actualValue = <R extends Tables.BudgetRowData>(obj: WithActual<R>): number =>
+export const actualValue = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(obj: WithActual<R>): number =>
   tabling.typeguards.isRow(obj) ? obj.data.actual : obj.actual;
 
-export const varianceValue = <R extends Tables.BudgetRowData>(m: WithActual<R>): number =>
+export const varianceValue = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(m: WithActual<R>): number =>
   estimatedValue(m) - actualValue(m);
 
-export const contributionFromMarkups = <R extends Table.RowData>(
+export const contributionFromMarkups = <R extends Table.RowData = Tables.BudgetRowData>(
   value: number,
   markups: (Model.Markup | Table.MarkupRow<R>)[]
 ): number => {
