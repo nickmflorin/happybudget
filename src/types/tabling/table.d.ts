@@ -292,6 +292,9 @@ namespace Table {
     readonly disabled?: boolean | ((row: RW, hovered: boolean) => boolean);
   }
 
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type PreviousValues<T> = [T, T] | [T];
+
   interface Column<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
@@ -319,6 +322,8 @@ namespace Table {
     readonly canBeHidden?: boolean;
     readonly canBeExported?: boolean;
     readonly requiresAuthentication?: boolean;
+    readonly smartInference?: boolean;
+    readonly defaultNewRowValue?: boolean;
     readonly valueGetter?: (row: Table.BodyRow<R>, rows: Table.BodyRow<R>[]) => any;
     readonly getRowValue?: (m: M) => R[keyof R];
     readonly getHttpValue?: (value: V) => any;
@@ -683,7 +688,6 @@ namespace Table {
     readonly icon?: IconOrElement | ((row: BodyRow<R>) => IconOrElement | undefined | null);
     readonly innerCellClassName?: string | undefined | ((r: Table.Row<R>) => string | undefined);
     readonly innerCellStyle?: React.CSSProperties | undefined | ((r: Table.Row<R>) => React.CSSProperties | undefined);
-    readonly generateNewRowData?: (rows: BodyRow<R>[]) => Partial<R>;
     // Note: This is only applied for the data grid rows/cells - so we have to be careful.  We need
     // a better way of establishing which props are available to cells based on which grid they lie
     // in,

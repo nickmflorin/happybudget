@@ -54,7 +54,6 @@ export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Mo
   readonly columns: Table.Column<R, M>[];
   readonly pinFirstColumn?: boolean;
   readonly pinActionColumns?: boolean;
-  readonly generateNewRowData?: (rows: Table.BodyRow<R>[]) => Partial<R>;
   readonly rowHasCheckboxSelection: ((row: Table.EditableRow<R>) => boolean) | undefined;
   readonly onRowSelectionChanged: (rows: Table.EditableRow<R>[]) => void;
 }
@@ -259,7 +258,7 @@ const authenticateDataGrid =
         */
         return tabling.columns.normalizeColumns<R, M>(props.columns, {
           body: (col: Table.Column<R, M>) => ({
-            cellRendererParams: { ...col.cellRendererParams, generateNewRowData: props.generateNewRowData },
+            cellRendererParams: { ...col.cellRendererParams },
             cellEditorParams: { ...col.cellEditorParams, onDoneEditing },
             editable: (params: Table.CellCallbackParams<R, M>) => {
               if (!tabling.typeguards.isEditableRow(params.row)) {
@@ -364,11 +363,18 @@ const authenticateDataGrid =
         tableId: props.tableId,
         columns,
         includeRowInNavigation: config?.includeRowInNavigation,
-        onNewRowRequired: () =>
-          props.onChangeEvent({
-            type: "rowAdd",
-            payload: { id: tabling.managers.placeholderRowId(), data: props.generateNewRowData?.(props.data) }
-          })
+        onNewRowRequired: (newRowIndex: number) => {
+          const gridApi: Table.GridApi | undefined = props.apis?.grid;
+          if (!isNil(gridApi)) {
+            props.onChangeEvent({
+              type: "rowAdd",
+              payload: {
+                id: tabling.managers.placeholderRowId(),
+                data: tabling.patterns.generateNewRowData(gridApi, columns, newRowIndex)
+              }
+            });
+          }
+        }
       });
 
       const [getContextMenuItems] = useContextMenu<R, M>(props);

@@ -1,5 +1,4 @@
 import React from "react";
-import { isNil, filter } from "lodash";
 
 import {
   AuthenticatedTable,
@@ -33,16 +32,6 @@ const AuthenticatedBudgetTable = <R extends Tables.BudgetRowData, M extends Mode
   return (
     <AuthenticatedTable<R, M>
       {...props}
-      generateNewRowData={(rows: Table.BodyRow<R>[]) => {
-        const dataRows = filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[];
-        if (dataRows.length !== 0) {
-          const lastRow: Table.DataRow<R> = dataRows[dataRows.length - 1];
-          if (!isNil(lastRow.data.identifier) && !isNaN(parseInt(lastRow.data.identifier))) {
-            return { identifier: String(parseInt(lastRow.data.identifier) + 1) } as Partial<R>;
-          }
-        }
-        return {};
-      }}
       editColumnConfig={[
         {
           conditional: (r: Table.NonPlaceholderBodyRow<R>) => tabling.typeguards.isMarkupRow(r),

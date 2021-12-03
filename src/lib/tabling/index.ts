@@ -15,3 +15,4 @@ export * as events from "./events";
 export * as menu from "./menu";
 export * as managers from "./managers";
 export * as tasks from "./tasks";
+export * as patterns from "./patterns";

@@ -12,6 +12,7 @@ export const IdentifierColumn = <
 ): Table.Column<R, M, string | null, PDFM> => {
   return tabling.columns.BodyColumn<R, M, string | null, PDFM>({
     columnType: "number",
+    smartInference: true,
     ...props,
     footer: {
       // We always want the text in the identifier cell to be present, but the column

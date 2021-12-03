@@ -169,6 +169,8 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
             columnType,
             tableColumnType,
             nullValue,
+            smartInference,
+            defaultNewRowValue,
             defaultHidden,
             includeInPdf,
             pdfWidth,

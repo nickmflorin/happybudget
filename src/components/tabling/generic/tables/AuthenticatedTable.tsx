@@ -286,6 +286,19 @@ const AuthenticatedTable = <
     }
   }));
 
+  const addNewRow = hooks.useDynamicCallback(() => {
+    const dataGridApi = props.tableApis.get("data");
+    if (!isNil(dataGridApi)) {
+      _onChangeEvent({
+        type: "rowAdd",
+        payload: {
+          id: tabling.managers.placeholderRowId(),
+          data: tabling.patterns.generateNewRowData(dataGridApi.grid, columns)
+        }
+      });
+    }
+  });
+
   return (
     <TableWrapper
       id={props.id}
@@ -346,9 +359,8 @@ const AuthenticatedTable = <
           constrainHorizontally={props.constrainTableFooterHorizontally}
           checkboxColumn={{
             cellRenderer: "NewRowCell",
-            // The onChangeEvent callback is needed to dispatch the action to create a new row.
             cellRendererParams: {
-              onChangeEvent: _onChangeEvent
+              onNewRow: addNewRow
             }
           }}
         />

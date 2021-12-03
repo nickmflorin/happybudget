@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { isNil, filter, map } from "lodash";
+import { isNil, filter } from "lodash";
 
 import { tabling, hooks, model } from "lib";
 import { framework } from "components/tabling/generic";
@@ -49,14 +49,6 @@ const AuthenticatedTemplateSubAccountsTable = (
       table={table}
       excludeColumns={["actual", "contact", "variance", "attachment"]}
       columns={columns}
-      generateNewRowData={(rows: Table.BodyRow<R>[]) => {
-        const dataRows = filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[];
-        const numericIdentifiers: number[] = map(
-          filter(dataRows, (r: Table.DataRow<R>) => !isNil(r.data.identifier) && !isNaN(parseInt(r.data.identifier))),
-          (r: Table.DataRow<R>) => parseInt(r.data.identifier as string)
-        );
-        return { identifier: String(Math.max(...numericIdentifiers) + 1) };
-      }}
       actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
         {
           icon: "folder",

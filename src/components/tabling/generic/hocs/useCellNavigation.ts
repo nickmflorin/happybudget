@@ -9,7 +9,7 @@ export interface UseCellNavigationParams<R extends Table.RowData, M extends Mode
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
   readonly includeRowInNavigation?: (row: Table.EditableRow<R>) => boolean;
-  readonly onNewRowRequired?: () => void;
+  readonly onNewRowRequired?: (newRowIndex: number) => void;
 }
 
 type UseCellNavigationReturnType = [
@@ -177,7 +177,7 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
     const [node, rowIndex, _] = findNextNavigatableRow(loc.rowIndex + 1);
     if (node === null) {
       if (!isNil(params.onNewRowRequired)) {
-        params.onNewRowRequired();
+        params.onNewRowRequired(loc.rowIndex + 1);
         moveToLocation({ rowIndex, column: loc.column });
       }
     } else {
