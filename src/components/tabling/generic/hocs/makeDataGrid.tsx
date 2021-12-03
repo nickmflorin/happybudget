@@ -30,6 +30,27 @@ export interface DataGridProps<R extends Table.RowData, M extends Model.RowHttpM
 
 export type WithDataGridProps<T> = T & InjectedDataGridProps;
 
+const getRowColorDef = <R extends Table.RowData>(row: Table.BodyRow<R>): Table.RowColorDef => {
+  if (tabling.typeguards.isGroupRow(row)) {
+    const colorDef = model.util.getGroupColorDefinition(row);
+    if (!isNil(colorDef?.color) && !isNil(colorDef?.backgroundColor)) {
+      return {
+        color: colorDef?.color,
+        backgroundColor: colorDef?.backgroundColor
+      };
+    } else if (!isNil(colorDef?.backgroundColor)) {
+      return {
+        backgroundColor: colorDef?.backgroundColor
+      };
+    } else if (!isNil(colorDef?.color)) {
+      return {
+        color: colorDef?.color
+      };
+    }
+  }
+  return {};
+};
+
 /* eslint-disable indent */
 const DataGrid =
   <
@@ -46,27 +67,6 @@ const DataGrid =
       const [focused, setFocused] = useState(false);
       const oldFocusedEvent = useRef<CellFocusedEvent | null>(null);
       const location = useLocation();
-
-      const getRowColorDef = hooks.useDynamicCallback((row: Table.BodyRow<R>): Table.RowColorDef => {
-        if (tabling.typeguards.isGroupRow(row)) {
-          const colorDef = model.util.getGroupColorDefinition(row);
-          if (!isNil(colorDef?.color) && !isNil(colorDef?.backgroundColor)) {
-            return {
-              color: colorDef?.color,
-              backgroundColor: colorDef?.backgroundColor
-            };
-          } else if (!isNil(colorDef?.backgroundColor)) {
-            return {
-              backgroundColor: colorDef?.backgroundColor
-            };
-          } else if (!isNil(colorDef?.color)) {
-            return {
-              color: colorDef?.color
-            };
-          }
-        }
-        return {};
-      });
 
       const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
         return map(props.columns, (col: Table.Column<R, M>) => ({
@@ -106,19 +106,24 @@ const DataGrid =
         }
       );
 
-      const getRowClass: Table.GetRowClassName = hooks.useDynamicCallback((params: Table.RowClassParams) => {
-        const row: Table.BodyRow<R> = params.node.data;
-        if (tabling.typeguards.isGroupRow(row)) {
-          return classNames("row--data", "row--group", props.rowClass);
-        }
-        return classNames("row--data", props.rowClass);
-      });
-
-      const getRowStyle: Table.GetRowStyle = hooks.useDynamicCallback(
-        (params: Table.RowClassParams): { [key: string]: any } => {
+      const getRowClass: Table.GetRowClassName = useMemo(
+        () => (params: Table.RowClassParams) => {
           const row: Table.BodyRow<R> = params.node.data;
-          return getRowColorDef(row);
-        }
+          if (tabling.typeguards.isGroupRow(row)) {
+            return classNames("row--data", "row--group", props.rowClass);
+          }
+          return classNames("row--data", props.rowClass);
+        },
+        [props.rowClass]
+      );
+
+      const getRowStyle: Table.GetRowStyle = useMemo(
+        () =>
+          (params: Table.RowClassParams): { [key: string]: any } => {
+            const row: Table.BodyRow<R> = params.node.data;
+            return getRowColorDef(row);
+          },
+        []
       );
 
       const onCellFocused: (e: CellFocusedEvent) => void = hooks.useDynamicCallback((e: CellFocusedEvent) => {
