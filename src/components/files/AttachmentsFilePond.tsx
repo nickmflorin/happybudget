@@ -55,7 +55,7 @@ const AttachmentsFilePond = (props: AttachmentsFilePondProps): JSX.Element => {
           progress: ProgressServerConfigFunction,
           abort: () => void
         ) => {
-          const [request, formData] = api.xhr.uploadAttachmentFile(file, props.path, {
+          const request = api.xhr.uploadAttachmentFile(file, props.path, {
             error,
             progress,
             success: (ms: Model.Attachment[]) =>
@@ -64,7 +64,6 @@ const AttachmentsFilePond = (props: AttachmentsFilePondProps): JSX.Element => {
                 props.onAttachmentAdded?.(m);
               })
           });
-          request.send(formData);
           return {
             abort: () => {
               request.abort();

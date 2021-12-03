@@ -15,7 +15,7 @@ export const uploadAttachmentFile = (
   file: File | ActualFileObject | (File | ActualFileObject)[],
   path: string,
   options?: UploadAttachmentFileOptions
-): [XMLHttpRequest, FormData] => {
+): XMLHttpRequest => {
   const url = `${process.env.REACT_APP_API_DOMAIN}${path}`;
   const formData = new FormData();
 
@@ -28,9 +28,9 @@ export const uploadAttachmentFile = (
   }
 
   const request = new XMLHttpRequest();
-  request.withCredentials = true;
+  request.open("POST", url, true);
 
-  request.open("POST", url);
+  request.withCredentials = true;
   setRequestHeaders(request);
 
   request.upload.onprogress = evt => {
@@ -76,5 +76,5 @@ export const uploadAttachmentFile = (
   if (options?.send !== false) {
     request.send(formData);
   }
-  return [request, formData];
+  return request;
 };

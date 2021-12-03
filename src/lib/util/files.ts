@@ -53,13 +53,13 @@ export const getDataFromBlob = (file: File | Blob): Promise<string | ArrayBuffer
 export const getDataFromURL = (url: string): Promise<string | ArrayBuffer> =>
   new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
+    xhr.open("GET", url);
     xhr.onload = function () {
       const reader = new FileReader();
       reader.readAsDataURL(xhr.response);
       reader.onload = () => (reader.result === null ? reject("Could not read data from URL.") : resolve(reader.result));
       reader.onerror = error => reject(error);
     };
-    xhr.open("GET", url);
     xhr.responseType = "blob";
     xhr.send();
   });
