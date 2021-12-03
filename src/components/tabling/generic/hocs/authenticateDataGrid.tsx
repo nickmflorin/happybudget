@@ -49,11 +49,9 @@ interface InjectedAuthenticatedDataGridProps<R extends Table.RowData> {
 
 export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
   extends UseContextMenuParams<R, M> {
-  readonly apis: Table.GridApis | null;
   readonly tableId: Table.Id;
   readonly grid: NonNullRef<Table.DataGridInstance>;
   readonly columns: Table.Column<R, M>[];
-  readonly data: Table.BodyRow<R>[];
   readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
   readonly pinFirstColumn?: boolean;
   readonly pinActionColumns?: boolean;
@@ -61,10 +59,7 @@ export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Mo
   readonly rowHasCheckboxSelection: ((row: Table.EditableRow<R>) => boolean) | undefined;
   readonly onRowSelectionChanged: (rows: Table.EditableRow<R>[]) => void;
   readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
-  readonly isCellEditable?: (params: Table.CellCallbackParams<R, M>) => boolean;
-  readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
   readonly onEditGroup?: (g: Table.GroupRow<R>) => void;
-  readonly onEditMarkup?: (g: Table.MarkupRow<R>) => void;
 }
 
 export type WithAuthenticatedDataGridProps<R extends Table.RowData, T> = T & InjectedAuthenticatedDataGridProps<R>;
@@ -271,11 +266,8 @@ const authenticateDataGrid =
             editable: (params: Table.CellCallbackParams<R, M>) => {
               if (!tabling.typeguards.isEditableRow(params.row)) {
                 return false;
-              } else if (!isNil(props.isCellEditable)) {
-                return props.isCellEditable(params);
-              } else {
-                return col.editable === undefined ? true : tabling.columns.isEditable(col, params.row);
               }
+              return col.editable === undefined ? true : tabling.columns.isEditable(col, params.row);
             },
             valueSetter: (params: ValueSetterParams) => {
               // By default, AG Grid treats Backspace clearing the cell as setting the

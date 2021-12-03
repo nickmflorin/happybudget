@@ -22,6 +22,7 @@ export type UseContextMenuParams<R extends Table.RowData, M extends Model.RowHtt
   readonly rowCanDelete?: (row: Table.ModelRow<R> | Table.MarkupRow<R>) => boolean;
   readonly onGroupRows?: (rows: Table.ModelRow<R>[]) => void;
   readonly onMarkupRows?: (rows?: Table.ModelRow<R>[]) => void;
+  readonly onEditMarkup?: (row: Table.MarkupRow<R>) => void;
 };
 
 const evaluateRowStringGetter = <R extends Table.BodyRow>(
@@ -230,6 +231,16 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
       let contextMenuItems: Table.MenuItemDef[] = !isNil(params.getMarkupRowContextMenuItems)
         ? params.getMarkupRowContextMenuItems(row, node)
         : [];
+      if (!isNil(params.onEditMarkup)) {
+        contextMenuItems = [
+          ...contextMenuItems,
+          {
+            name: `Edit ${getRowLabel(row)}`,
+            icon: '<i class="far fa-edit-alt context-icon"></i>',
+            action: () => params.onEditMarkup?.(row)
+          }
+        ];
+      }
       if (isNil(params.rowCanDelete) || params.rowCanDelete(row) === true) {
         contextMenuItems = [
           ...contextMenuItems,

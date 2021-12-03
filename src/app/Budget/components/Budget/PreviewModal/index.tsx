@@ -85,6 +85,16 @@ const PreviewModal = ({
   const headerTemplateLoading = useSelector(selectHeaderTemplateLoading);
 
   useEffect(() => {
+    setOptions({
+      ...DEFAULT_OPTIONS,
+      header: {
+        ...DEFAULT_OPTIONS.header,
+        header: `<h2>${budgetName}</h2><p>Cost Summary</p>`
+      }
+    });
+  }, [budgetName]);
+
+  useEffect(() => {
     if (visible === true) {
       dispatch(actions.pdf.requestHeaderTemplatesAction(null));
       registerFonts().then(() => {
