@@ -231,6 +231,19 @@ const authenticateDataGrid =
       const oldRow = useRef<Table.ModelRow<R> | null>(null); // TODO: Figure out a better way to do this.
       const lastSelectionFromRange = useRef<boolean>(false);
 
+      const onDoneEditing = hooks.useDynamicCallback((e: Table.CellDoneEditingEvent) => {
+        if (tabling.typeguards.isKeyboardEvent(e)) {
+          const focusedCell = props.apis?.grid.getFocusedCell();
+          if (!isNil(focusedCell) && !isNil(focusedCell.rowIndex)) {
+            if (e.code === "Enter") {
+              moveToNextRow({ rowIndex: focusedCell.rowIndex, column: focusedCell.column });
+            } else if (e.code === "Tab") {
+              moveToNextColumn({ rowIndex: focusedCell.rowIndex, column: focusedCell.column });
+            }
+          }
+        }
+      });
+
       /*
       Note: The behavior of the column suppression in the subsequent column memorization
       relies on the column transformations applied here - so they cannot be applied together
@@ -244,18 +257,6 @@ const authenticateDataGrid =
         or the cell below (on Enter completion).  To accomplish this, we use a custom hook
         to the Editor(s) that is manually called inside the Editor.
         */
-        const onDoneEditing = (e: Table.CellDoneEditingEvent) => {
-          if (tabling.typeguards.isKeyboardEvent(e)) {
-            const focusedCell = props.apis?.grid.getFocusedCell();
-            if (!isNil(focusedCell) && !isNil(focusedCell.rowIndex)) {
-              if (e.code === "Enter") {
-                moveToNextRow({ rowIndex: focusedCell.rowIndex, column: focusedCell.column });
-              } else if (e.code === "Tab") {
-                moveToNextColumn({ rowIndex: focusedCell.rowIndex, column: focusedCell.column });
-              }
-            }
-          }
-        };
         return tabling.columns.normalizeColumns<R, M>(props.columns, {
           body: (col: Table.Column<R, M>) => ({
             cellRendererParams: { ...col.cellRendererParams, generateNewRowData: props.generateNewRowData },
@@ -292,7 +293,7 @@ const authenticateDataGrid =
             }
           }
         });
-      }, [hooks.useDeepEqualMemo(props.columns)]);
+      }, [hooks.useDeepEqualMemo(props.columns), props.apis]);
 
       const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
         return tabling.columns.normalizeColumns<R, M>(unsuppressedColumns, {
