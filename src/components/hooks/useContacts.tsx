@@ -23,7 +23,10 @@ const useContacts = (props: UseContactsProps): UseContactsReturnType => {
         open={newContactModalOpen}
         initialValues={props.initialCreateValues}
         onCancel={() => setNewContactModalOpen(false)}
-        onSuccess={(m: Model.Contact) => props.onCreated(m)}
+        onSuccess={(m: Model.Contact) => {
+          setNewContactModalOpen(false);
+          props.onCreated(m);
+        }}
       />
     ),
     [props.initialCreateValues, newContactModalOpen, props.onCreated]
