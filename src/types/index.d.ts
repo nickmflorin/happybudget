@@ -5,6 +5,7 @@ declare module "@editorjs/header";
 declare module "@editorjs/table";
 declare module "@editorjs/link";
 declare module "@editorjs/list";
+declare module "@fancyapps/ui/dist/fancybox.esm.js"
 declare module "@ckeditor/ckeditor5-react" {
   import BalloonEditor from "@ckeditor/ckeditor5-build-balloon";
   import Event from "@ckeditor/ckeditor5-utils/src/eventinfo";
@@ -26,5 +27,3 @@ declare module "@ckeditor/ckeditor5-react" {
   const CKEditor: React.FunctionComponent<CKEditorProps>;
   export { CKEditor, CKEditorProps, Event as CKEditorEvent, BalloonEditor as EditorInstance };
 }
-
-declare module "@fancyapps/ui/dist/fancybox.esm.js"
