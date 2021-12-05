@@ -629,17 +629,16 @@ const authenticateDataGrid =
         getCSVData
       }));
 
-      const fillOperation = useMemo(
-        () => (params: FillOperationParams) => {
-          if (params.initialValues.length === 1) {
-            return false;
-          }
-          return params.initialValues[
-            (params.values.length - params.initialValues.length) % params.initialValues.length
-          ];
-        },
-        []
-      );
+      const fillOperation = hooks.useDynamicCallback((params: FillOperationParams) => {
+        const inferredValue = tabling.patterns.inferFillCellValue(params, columns);
+        if (!isNil(inferredValue)) {
+          return inferredValue;
+        }
+        if (params.initialValues.length === 1) {
+          return false;
+        }
+        return params.initialValues[(params.values.length - params.initialValues.length) % params.initialValues.length];
+      });
 
       return (
         <Component

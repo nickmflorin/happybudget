@@ -1,4 +1,7 @@
 import { filter, isNil, map, findLastIndex, reduce } from "lodash";
+import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
+
+import * as columnFns from "./columns";
 import * as typeguards from "./typeguards";
 import * as aggrid from "./aggrid";
 
@@ -147,6 +150,50 @@ const mapPreviousValues = <T, R>(values: Table.PreviousValues<T>, fn: (v: T) => 
   return values.length === 1 ? [fn(values[0])] : [fn(values[0]), fn(values[1])];
 };
 
+const detectPatternFromPreviousRows = <R extends Table.RowData>(
+  previousRows: Table.PreviousValues<Table.ModelRow<R>>,
+  field: keyof R
+): PatternValue | null => {
+  const previousValues = mapPreviousValues<Table.ModelRow<R>, R[keyof R]>(
+    previousRows,
+    (ri: Table.ModelRow<R>) => ri.data[field]
+  );
+  const patternValues: PatternValue[] = [];
+  for (let i = 0; i < previousValues.length; i++) {
+    const v = previousValues[i];
+    if (isPatternValue(v)) {
+      patternValues.push(v);
+    } else {
+      console.warn(
+        `Smart inference is being used on column ${field} that has a
+        data type (${typeof v}) that does not support smart inference.`
+      );
+    }
+  }
+  if (patternValues.length === previousValues.length) {
+    return detectNextInPattern(patternValues as Table.PreviousValues<PatternValue>, false);
+  }
+  return null;
+};
+
+export const inferFillCellValue = <R extends Table.RowData, M extends Model.RowHttpModel>(
+  params: FillOperationParams,
+  columns: Table.Column<R, M>[]
+): any => {
+  if (params.direction === "down") {
+    const c: Table.Column<R, M> | null = columnFns.getColumn(columns, params.column.getColId());
+    // The column will be by default not-fake and readable (`isRead !== false`) since it is
+    // already in the table.
+    if (!isNil(c) && c.smartInference === true && !isNil(params.rowNode.rowIndex)) {
+      const previousRows = findPreviousModelRows<R>(params.api, params.rowNode.rowIndex);
+      if (!isNil(previousRows)) {
+        return detectPatternFromPreviousRows(previousRows, params.column.getColId() as keyof R);
+      }
+    }
+  }
+  return null;
+};
+
 /* eslint-disable indent */
 export const generateNewRowData = <R extends Table.RowData, M extends Model.RowHttpModel>(
   api: Table.GridApi,
@@ -162,27 +209,9 @@ export const generateNewRowData = <R extends Table.RowData, M extends Model.RowH
           const newRowIndex = newIndex === undefined ? aggrid.getRows(api).length : newIndex;
           const previousRows = findPreviousModelRows<R>(api, newRowIndex);
           if (!isNil(previousRows)) {
-            const previousValues = mapPreviousValues<Table.ModelRow<R>, R[keyof R]>(
-              previousRows,
-              (r: Table.ModelRow<R>) => r.data[field]
-            );
-            const patternValues: PatternValue[] = [];
-            for (let i = 0; i < previousValues.length; i++) {
-              const v = previousValues[i];
-              if (isPatternValue(v)) {
-                patternValues.push(v);
-              } else {
-                console.warn(
-                  `Smart inference is being used on column ${field} that has a
-                data type (${typeof v}) that does not support smart inference.`
-                );
-              }
-            }
-            if (patternValues.length === previousValues.length) {
-              const inferred = detectNextInPattern(patternValues as Table.PreviousValues<PatternValue>, false);
-              if (!isNil(inferred)) {
-                return { ...curr, [field]: inferred };
-              }
+            const inferred = detectPatternFromPreviousRows(previousRows, field);
+            if (!isNil(inferred)) {
+              return { ...curr, [field]: inferred };
             }
           }
         } else if (c.defaultNewRowValue !== undefined) {
