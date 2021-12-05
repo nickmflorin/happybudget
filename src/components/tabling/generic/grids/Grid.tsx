@@ -180,6 +180,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
             pdfCellContentsVisible,
             pdfHeaderCellProps,
             pdfCellProps,
+            pdfFlexGrow,
             pdfValueGetter,
             pdfChildFooter,
             pdfCellRenderer,

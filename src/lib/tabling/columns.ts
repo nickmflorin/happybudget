@@ -83,35 +83,86 @@ export const normalizePdfColumnWidths = <
   cs: Table.Column<R, M, V, PDFM>[],
   flt?: (c: Table.Column<R, M, V, PDFM>) => boolean
 ) => {
-  let columns = [...cs];
-  columns = isNil(flt) ? columns : filter(columns, flt);
+  type C = Table.Column<R, M, V, PDFM>;
 
-  const baseFilter = (c: Table.Column<R, M, V, PDFM>) => c.tableColumnType !== "fake" && c.includeInPdf !== false;
+  let columns = [...cs];
+
+  const baseFilter = (c: C) => {
+    if (isNil(flt)) {
+      return c.tableColumnType !== "fake" && c.includeInPdf !== false;
+    }
+    return c.tableColumnType !== "fake" && c.includeInPdf !== false && flt(c);
+  };
 
   // Determine the total width of all the columns that have a specified width.
   const totalSpecifiedWidth = reduce(
     columns,
-    (prev: number, c: Table.Column<R, M, V, PDFM>) => (baseFilter(c) ? prev + (c.pdfWidth || 0.0) : 0.0),
+    (prev: number, c: C) => (baseFilter(c) ? prev + (c.pdfWidth || 0.0) : 0.0),
     0.0
   );
+
+  // Determine if there is a column that should flex grow to fill remaining space
+  // in the case that the total width of the visible columns is less than 1.0.
+  const flexColumns = filter(columns, (c: C) => baseFilter(c) && !isNil(c.pdfFlexGrow));
+  if (flexColumns.length !== 0 && totalSpecifiedWidth < 1.0) {
+    const flexColumn = flexColumns[0];
+    const normalizedFlexField = normalizedField<R, M, V, PDFM>(flexColumn);
+
+    // If there are multiple columns with 'pdfFlexGrow' specified, we cannot apply
+    // the flex to all of the columns because we would have to split the leftover space up
+    // between the columns with 'pdfFlexGrow' which can get hairy/complicated - and is not
+    // needed at this point.
+    if (flexColumns.length !== 1) {
+      const flexColumnFields: (string | undefined)[] = map(flexColumns, (c: C) => normalizedField<R, M, V, PDFM>(c));
+      console.warn(
+        `Found multiple columns, ${flexColumnFields.join(", ")}, with 'pdfFlexGrow' specified.
+        Since only one column can flex grow in the PDF, only the column ${flexColumnFields[0]}
+        will have 'pdfFlexGrow' applied.`
+      );
+    }
+    // If the remaining non-flex columns do not specify a width, then we cannot
+    // apply 'pdfFlexGrow' to the remaining column because we do not know how
+    // much space should be available.
+    const columnsWithoutSpecifiedWidth = filter(
+      columns,
+      (c: C) => baseFilter(c) && isNil(c.pdfWidth) && normalizedFlexField !== normalizedField<R, M, V, PDFM>(c)
+    );
+    if (columnsWithoutSpecifiedWidth.length !== 0) {
+      const missingWidthFields: (string | undefined)[] = map(columnsWithoutSpecifiedWidth, (c: C) =>
+        normalizedField<R, M, V, PDFM>(c)
+      );
+      console.warn(
+        `Cannot apply 'pdfFlexGrow' to column ${normalizedFlexField} because
+        columns ${missingWidthFields.join(", ")} do not specify a 'pdfWidth'.`
+      );
+    } else {
+      // Return the columns as they were but only changing the width of the column
+      // with 'pdfFlexGrow' applied to take up the remaining space in the table.
+      return map(columns, (c: C) => {
+        if (normalizedField<R, M, V, PDFM>(c) === normalizedFlexField) {
+          return { ...c, pdfWidth: 1.0 - totalSpecifiedWidth };
+        }
+        return c;
+      });
+    }
+  }
+
   // Determine what the default width should be for columns that do not specify it
   // based on the leftover width available after the columns that specify a width
   // are inserted.
   let defaultWidth = 0;
   if (totalSpecifiedWidth < 1.0) {
-    defaultWidth =
-      (1.0 - totalSpecifiedWidth) /
-      filter(columns, (c: Table.Column<R, M, V, PDFM>) => baseFilter(c) && isNil(c.pdfWidth)).length;
+    defaultWidth = (1.0 - totalSpecifiedWidth) / filter(columns, (c: C) => baseFilter(c) && isNil(c.pdfWidth)).length;
   }
   // Calculate total width of all the columns.
   const totalWidth = reduce(
     columns,
-    (prev: number, c: Table.Column<R, M, V, PDFM>) => (baseFilter(c) ? prev + (c.pdfWidth || defaultWidth) : prev),
+    (prev: number, c: C) => (baseFilter(c) ? prev + (c.pdfWidth || defaultWidth) : prev),
     0.0
   );
   if (totalWidth !== 0.0) {
     // Normalize the width of each column such that the sum of all column widths is 1.0
-    columns = map(columns, (c: Table.Column<R, M, V, PDFM>) => ({
+    columns = map(columns, (c: C) => ({
       ...c,
       pdfWidth: baseFilter(c) ? (c.pdfWidth || defaultWidth) / totalWidth : c.pdfWidth
     }));

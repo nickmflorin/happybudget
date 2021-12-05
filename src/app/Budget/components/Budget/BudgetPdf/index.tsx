@@ -173,6 +173,7 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
             markups={budget.children_markups}
             groups={budget.groups}
             columns={accountColumns}
+            options={options}
           />
         </Page>
       </ShowHide>

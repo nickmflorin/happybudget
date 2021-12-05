@@ -333,7 +333,6 @@ namespace Table {
     readonly onCellUnfocus?: (params: CellFocusedParams<R, M>) => void;
     readonly refreshColumns?: (change: CellChange<V>) => keyof R | (keyof R)[] | null;
     readonly parseIntoFields?: (value: V) => ParsedColumnField<R, V>[];
-    // readonly getCellChanges?: (id: EditableRowId, oldValue: any, newValue: any) => SoloCellChange<R>[];
     readonly processCellForCSV?: (row: R) => string | number;
     readonly processCellForClipboard?: (row: R) => string | number;
     readonly processCellFromClipboard?: (value: string) => V | null;
@@ -343,6 +342,7 @@ namespace Table {
     // of the column width to the overall table width assuming that all columns are present.  When
     // columns are hidden/shown, this ratio is adjusted.
     readonly pdfWidth?: number;
+    readonly pdfFlexGrow?: true;
     readonly pdfCellProps?: PdfCellStandardProps<R, PDFM, V>;
     readonly pdfHeaderCellProps?: PdfCellStandardProps<R, PDFM, V>;
     readonly pdfFooter?: PdfFooterColumn<V>;

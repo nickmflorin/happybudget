@@ -61,6 +61,18 @@ const AccountTable = ({
     });
   }, [account, columns]);
 
+  const accountColumnIsVisible = useMemo(
+    () => (c: Table.PdfColumn<Tables.AccountRowData, Model.PdfAccount>) =>
+      includes(options.columns, tabling.columns.normalizedField<Tables.AccountRowData, Model.PdfAccount>(c)),
+    [options.columns]
+  );
+
+  const subAccountColumnIsVisible = useMemo(
+    () => (c: Table.PdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>) =>
+      includes(options.columns, tabling.columns.normalizedField<Tables.SubAccountRowData, Model.PdfSubAccount>(c)),
+    [options.columns]
+  );
+
   const generateRows = hooks.useDynamicCallback((): JSX.Element[] => {
     const subAccountRowManager = new tabling.managers.ModelRowManager<Tables.SubAccountRowData, Model.PdfSubAccount>({
       columns: subAccountColumns
@@ -112,6 +124,7 @@ const AccountTable = ({
                     cellProps={{ className: "subaccount-td", textClassName: "subaccount-tr-td-text" }}
                     className={"subaccount-tr"}
                     columns={subAccountColumns}
+                    columnIsVisible={subAccountColumnIsVisible}
                     data={table}
                     row={subAccountRow}
                   />
@@ -135,6 +148,7 @@ const AccountTable = ({
                         ...subRws,
                         <BodyRow<R, M>
                           columns={subAccountColumns}
+                          columnIsVisible={subAccountColumnIsVisible}
                           className={"detail-tr"}
                           row={detailRow}
                           data={table}
@@ -157,6 +171,7 @@ const AccountTable = ({
                           row={detailRow}
                           data={table}
                           columns={subAccountColumns}
+                          columnIsVisible={subAccountColumnIsVisible}
                           columnIndent={1}
                           cellProps={{
                             textClassName: (params: Table.PdfCellCallbackParams<R, M>) => {
@@ -182,6 +197,7 @@ const AccountTable = ({
                       columns={subAccountColumns}
                       data={table}
                       row={subAccountRow}
+                      columnIsVisible={subAccountColumnIsVisible}
                     />
                   ]
                 );
@@ -192,6 +208,7 @@ const AccountTable = ({
                     className={"subaccount-footer-tr"}
                     cellProps={{ className: "subaccount-footer-td", textClassName: "subaccount-footer-tr-td-text" }}
                     columns={subAccountColumns}
+                    columnIsVisible={subAccountColumnIsVisible}
                     data={table}
                     row={footerRow}
                     style={{ borderBottomWidth: 1 }}
@@ -208,26 +225,40 @@ const AccountTable = ({
                 cellProps={{ className: "subaccount-td", textClassName: "subaccount-tr-td-text" }}
                 className={"subaccount-tr"}
                 columns={subAccountColumns}
+                columnIsVisible={subAccountColumnIsVisible}
                 data={table}
                 row={subAccountRow}
               />
             ];
           } else {
-            return [...rws, <GroupRow row={subAccountRow} columns={subAccountColumns} data={table} />];
+            return [
+              ...rws,
+              <GroupRow
+                row={subAccountRow}
+                columnIsVisible={subAccountColumnIsVisible}
+                columns={subAccountColumns}
+                data={table}
+              />
+            ];
           }
         },
         [
-          <HeaderRow className={"account-header-tr"} columns={subAccountColumns} />,
+          <HeaderRow
+            className={"account-header-tr"}
+            columns={subAccountColumns}
+            columnIsVisible={subAccountColumnIsVisible}
+          />,
           <BodyRow<Tables.AccountRowData, Model.PdfAccount>
             className={"account-sub-header-tr"}
             cellProps={{ textClassName: "account-sub-header-tr-td-text" }}
             columns={accountSubAccountColumns}
+            columnIsVisible={accountColumnIsVisible}
             data={table}
             row={accountSubHeaderRow}
           />
         ]
       ),
-      <FooterRow columns={subAccountColumns} data={table} />
+      <FooterRow columns={subAccountColumns} columnIsVisible={subAccountColumnIsVisible} data={table} />
     ];
   });
 

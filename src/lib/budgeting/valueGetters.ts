@@ -61,6 +61,4 @@ export const actualValueGetter = <R extends Tables.BudgetRowData>(
 export const varianceValueGetter = <R extends Tables.BudgetRowData>(
   row: Table.BodyRow<R>,
   rows: Table.BodyRow<R>[]
-): number => {
-  return estimatedValueGetter(row, rows) - actualValueGetter(row, rows);
-};
+): number => estimatedValueGetter(row, rows) - actualValueGetter(row, rows);
