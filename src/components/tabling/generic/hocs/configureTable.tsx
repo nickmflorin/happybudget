@@ -6,7 +6,7 @@ import { GridOptions } from "@ag-grid-community/core";
 import { Config } from "config";
 import { tabling, hooks, util } from "lib";
 
-import { generic } from "components/tabling";
+import * as genericColumns from "../columns";
 import { useHiddenColumns } from "../hooks";
 
 export const DefaultDataGridOptions: GridOptions = {
@@ -182,7 +182,7 @@ const configureTable = <
 
       if (hasEditColumn === true) {
         cols = [
-          generic.columns.EditColumn<R, M>(
+          genericColumns.EditColumn<R, M>(
             {
               pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined,
               // These are only applicable for the non-footer grids, but it is easier to define them
@@ -198,7 +198,7 @@ const configureTable = <
         ];
       }
       cols = [
-        generic.columns.CheckboxColumn<R, M>(
+        genericColumns.CheckboxColumn<R, M>(
           { ...props.checkboxColumn, pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined },
           hasEditColumn || false,
           props.checkboxColumnWidth
@@ -207,7 +207,7 @@ const configureTable = <
       ];
       if (props.hasDragColumn !== false && Config.tableRowOrdering) {
         cols = [
-          generic.columns.DragColumn({ pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined }),
+          genericColumns.DragColumn({ pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined }),
           ...cols
         ];
       }

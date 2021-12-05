@@ -1,17 +1,17 @@
 import { model, tabling } from "lib";
-import { generic } from "components/tabling";
+import { columns } from "../../generic";
 
 type R = Tables.FringeRowData;
 type M = Model.Fringe;
 
 const Columns: Table.Column<R, M>[] = [
-  generic.columns.BodyColumn<R, M>({
+  columns.BodyColumn<R, M>({
     field: "name",
     columnType: "text",
     headerName: "Name",
     width: 120
   }),
-  generic.columns.BodyColumn<R, M>({
+  columns.BodyColumn<R, M>({
     field: "color",
     headerName: "Color",
     cellClass: "cell--renders-html",
@@ -22,13 +22,13 @@ const Columns: Table.Column<R, M>[] = [
     cellEditorPopup: true,
     cellEditorPopupPosition: "below"
   }),
-  generic.columns.BodyColumn<R, M>({
+  columns.BodyColumn<R, M>({
     field: "description",
     headerName: "Description",
     columnType: "longText",
     flex: 100
   }),
-  generic.columns.BodyColumn<R, M>({
+  columns.BodyColumn<R, M>({
     field: "rate",
     headerName: "Rate",
     valueFormatter: tabling.formatters.percentageValueFormatter,
@@ -36,7 +36,7 @@ const Columns: Table.Column<R, M>[] = [
     columnType: "percentage",
     width: 100
   }),
-  generic.columns.ChoiceSelectColumn<R, M, Model.FringeUnit>({
+  columns.ChoiceSelectColumn<R, M, Model.FringeUnit>({
     field: "unit",
     headerName: "Unit",
     cellRenderer: { data: "FringeUnitCell" },
@@ -44,7 +44,7 @@ const Columns: Table.Column<R, M>[] = [
     processCellFromClipboard: (name: string) =>
       model.util.findChoiceForName<Model.FringeUnit>(model.models.FringeUnits, name)
   }),
-  generic.columns.BodyColumn<R, M>({
+  columns.BodyColumn<R, M>({
     field: "cutoff",
     headerName: "Cutoff",
     columnType: "number",

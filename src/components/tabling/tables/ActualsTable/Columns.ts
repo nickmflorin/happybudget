@@ -1,20 +1,20 @@
 import { isNil } from "lodash";
 
 import { tabling, util } from "lib";
-import { generic } from "components/tabling";
+import { columns } from "../../generic";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;
 
 const Columns: Table.Column<R, M>[] = [
-  generic.columns.BodyColumn<R, M>({
+  columns.BodyColumn<R, M>({
     field: "name",
     headerName: "Description",
     minWidth: 200,
     flex: 2,
     columnType: "longText"
   }),
-  generic.columns.SelectColumn({
+  columns.SelectColumn({
     field: "contact",
     headerName: "Contact",
     width: 120,
@@ -23,7 +23,7 @@ const Columns: Table.Column<R, M>[] = [
     cellEditor: "ContactEditor",
     columnType: "contact"
   }),
-  generic.columns.BodyColumn<R, M>({
+  columns.BodyColumn<R, M>({
     field: "date",
     headerName: "Date",
     width: 100,
@@ -39,7 +39,7 @@ const Columns: Table.Column<R, M>[] = [
       return (!isNil(row.date) && util.dates.toDate(row.date)) || "";
     }
   }),
-  generic.columns.TagSelectColumn({
+  columns.TagSelectColumn({
     field: "actual_type",
     headerName: "Type",
     cellRenderer: { data: "ActualTypeCell" },
@@ -47,7 +47,7 @@ const Columns: Table.Column<R, M>[] = [
     width: 140,
     minWidth: 140
   }),
-  generic.columns.BodyColumn<R, M>({
+  columns.BodyColumn<R, M>({
     field: "value",
     headerName: "Amount",
     width: 100,
@@ -66,7 +66,7 @@ const Columns: Table.Column<R, M>[] = [
     // performance down dramatically.
     cellRenderer: { footer: "BodyCell" }
   }),
-  generic.columns.SelectColumn<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>({
+  columns.SelectColumn<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>({
     field: "owner",
     headerName: "Sub-Account",
     minWidth: 200,
@@ -85,13 +85,13 @@ const Columns: Table.Column<R, M>[] = [
     cellRenderer: { data: "ActualOwnerCell" },
     cellEditor: "ActualOwnerEditor"
   }),
-  generic.columns.AttachmentsColumn({
+  columns.AttachmentsColumn({
     field: "attachments",
     width: 140,
     minWidth: 140,
     canBeExported: false
   }),
-  generic.columns.BodyColumn<R, M>({
+  columns.BodyColumn<R, M>({
     field: "purchase_order",
     headerName: "PO",
     width: 100,
@@ -100,7 +100,7 @@ const Columns: Table.Column<R, M>[] = [
     columnType: "number",
     tableColumnType: "body"
   }),
-  generic.columns.BodyColumn<R, M>({
+  columns.BodyColumn<R, M>({
     field: "payment_id",
     headerName: "Pay ID",
     width: 80,
@@ -108,7 +108,7 @@ const Columns: Table.Column<R, M>[] = [
     flex: 1,
     columnType: "number"
   }),
-  generic.columns.BodyColumn<R, M>({
+  columns.BodyColumn<R, M>({
     field: "notes",
     headerName: "Notes",
     width: 100,
