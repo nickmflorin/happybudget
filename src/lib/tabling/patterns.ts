@@ -256,6 +256,8 @@ export const findPreviousModelRows = <R extends Table.RowData>(
         if (modelRowsOrData.length === 2) {
           break;
         }
+      } else {
+        break;
       }
     } else {
       break;
