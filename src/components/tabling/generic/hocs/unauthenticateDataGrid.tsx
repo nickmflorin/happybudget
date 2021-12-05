@@ -11,8 +11,7 @@ import {
 
 import { hooks } from "lib";
 
-import useCellNavigation from "./useCellNavigation";
-import useClipboard from "./useClipboard";
+import { useClipboard, useCellNavigation } from "../hooks";
 
 type InjectedUnauthenticatedDataGridProps<R extends Table.RowData> = {
   readonly getCSVData: (fields?: (keyof R | string)[]) => CSVData;

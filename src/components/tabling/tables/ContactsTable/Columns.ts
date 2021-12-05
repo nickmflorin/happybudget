@@ -2,15 +2,16 @@ import { isNil } from "lodash";
 import { ValueSetterParams } from "@ag-grid-community/core";
 
 import { model, tabling, util } from "lib";
+import { generic } from "components/tabling";
 
 type R = Tables.ContactRowData;
 type M = Model.Contact;
 
 const Columns: Table.Column<Tables.ContactRowData, M>[] = [
-  tabling.columns.FakeColumn({ field: "first_name" }),
-  tabling.columns.FakeColumn({ field: "last_name" }),
-  tabling.columns.FakeColumn({ field: "image" }),
-  tabling.columns.BodyColumn<R, M, string | null>({
+  generic.columns.FakeColumn({ field: "first_name" }),
+  generic.columns.FakeColumn({ field: "last_name" }),
+  generic.columns.FakeColumn({ field: "image" }),
+  generic.columns.BodyColumn<R, M, string | null>({
     colId: "names_and_image",
     headerName: "Name",
     columnType: "text",
@@ -39,21 +40,21 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     },
     valueGetter: (row: Table.BodyRow<R>) => util.conditionalJoinString(row.data.first_name, row.data.last_name)
   }),
-  tabling.columns.BodyColumn<R, M>({
+  generic.columns.BodyColumn<R, M>({
     field: "company",
     headerName: "Company",
     columnType: "text",
     width: 100,
     minWidth: 100
   }),
-  tabling.columns.BodyColumn<R, M>({
+  generic.columns.BodyColumn<R, M>({
     field: "position",
     headerName: "Position",
     columnType: "text",
     width: 100,
     minWidth: 100
   }),
-  tabling.columns.BodyColumn<R, M>({
+  generic.columns.BodyColumn<R, M>({
     field: "phone_number",
     headerName: "Phone Number",
     columnType: "phone",
@@ -61,7 +62,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     width: 120,
     minWidth: 120
   }),
-  tabling.columns.BodyColumn<R, M>({
+  generic.columns.BodyColumn<R, M>({
     field: "email",
     headerName: "Email",
     columnType: "email",
@@ -70,12 +71,12 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     width: 100,
     minWidth: 100
   }),
-  tabling.columns.AttachmentsColumn({
+  generic.columns.AttachmentsColumn({
     field: "attachments",
     width: 120,
     minWidth: 120
   }),
-  tabling.columns.BodyColumn<R, M>({
+  generic.columns.BodyColumn<R, M>({
     field: "rate",
     headerName: "Rate",
     columnType: "currency",
@@ -84,7 +85,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     width: 75,
     minWidth: 75
   }),
-  tabling.columns.ChoiceSelectColumn<R, M, Model.ContactType>({
+  generic.columns.ChoiceSelectColumn<R, M, Model.ContactType>({
     field: "contact_type",
     headerName: "Type",
     defaultHidden: true,

@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { map, isNil, includes, find, filter } from "lodash";
 import hoistNonReactStatics from "hoist-non-react-statics";
 
-import { FirstDataRenderedEvent, CellMouseOverEvent, CellFocusedEvent } from "@ag-grid-community/core";
+import { CellMouseOverEvent, CellFocusedEvent } from "@ag-grid-community/core";
 
 import { tabling, hooks, model } from "lib";
 
@@ -23,7 +23,7 @@ export interface DataGridProps<R extends Table.RowData, M extends Model.RowHttpM
   readonly search?: string;
   readonly cookieNames?: Table.CookieNames;
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
-  readonly onFirstDataRendered: (e: FirstDataRenderedEvent) => void;
+  readonly onFirstDataRendered: (e: Table.FirstDataRenderedEvent) => void;
 }
 
 export type WithDataGridProps<T> = T & InjectedDataGridProps;
@@ -73,8 +73,8 @@ const DataGrid =
         }));
       }, [hooks.useDeepEqualMemo(props.columns)]);
 
-      const onFirstDataRendered: (e: FirstDataRenderedEvent) => void = hooks.useDynamicCallback(
-        (e: FirstDataRenderedEvent): void => {
+      const onFirstDataRendered: (e: Table.FirstDataRenderedEvent) => void = hooks.useDynamicCallback(
+        (e: Table.FirstDataRenderedEvent): void => {
           props.onFirstDataRendered(e);
           const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api);
           if (rows.length !== 0) {

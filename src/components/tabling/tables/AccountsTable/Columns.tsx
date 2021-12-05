@@ -2,20 +2,21 @@ import { isNil } from "lodash";
 import { tabling, budgeting } from "lib";
 
 import { Icon } from "components";
+import { generic } from "components/tabling";
 
 type R = Tables.AccountRowData;
 type M = Model.Account;
 type PDFM = Model.PdfAccount;
 
 const Columns: Table.Column<R, M>[] = [
-  budgeting.columns.IdentifierColumn<R, M, PDFM>({
+  generic.columns.IdentifierColumn<R, M, PDFM>({
     field: "identifier",
     headerName: "Account",
     pdfHeaderName: "Acct #",
     pdfWidth: 0.1,
     pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
   }),
-  tabling.columns.BodyColumn<R, M, string | null, PDFM>({
+  generic.columns.BodyColumn<R, M, string | null, PDFM>({
     field: "description",
     headerName: "Account Description",
     minWidth: 200,
@@ -42,31 +43,31 @@ const Columns: Table.Column<R, M>[] = [
       return r.data.description || "";
     }
   }),
-  budgeting.columns.EstimatedColumn<R, M, PDFM>({
+  generic.columns.EstimatedColumn<R, M, PDFM>({
     colId: "estimated",
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.estimatedValueGetter
   }),
-  budgeting.columns.ActualColumn<R, M, PDFM>({
+  generic.columns.ActualColumn<R, M, PDFM>({
     field: "actual",
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.actualValueGetter
   }),
-  budgeting.columns.VarianceColumn<R, M, PDFM>({
+  generic.columns.VarianceColumn<R, M, PDFM>({
     colId: "variance",
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.varianceValueGetter
   }),
-  tabling.columns.FakeColumn<R, M, PDFM>({ field: "nominal_value" }),
-  tabling.columns.FakeColumn<R, M, PDFM>({ field: "markup_contribution" }),
-  tabling.columns.FakeColumn<R, M, PDFM>({ field: "accumulated_fringe_contribution" }),
-  tabling.columns.FakeColumn<R, M, PDFM>({ field: "accumulated_markup_contribution" })
+  generic.columns.FakeColumn<R, M, PDFM>({ field: "nominal_value" }),
+  generic.columns.FakeColumn<R, M, PDFM>({ field: "markup_contribution" }),
+  generic.columns.FakeColumn<R, M, PDFM>({ field: "accumulated_fringe_contribution" }),
+  generic.columns.FakeColumn<R, M, PDFM>({ field: "accumulated_markup_contribution" })
 ];
 
 export default Columns;

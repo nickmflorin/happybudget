@@ -24,9 +24,7 @@ import {
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
 import { tabling, hooks, util } from "lib";
-import useCellNavigation from "./useCellNavigation";
-import useContextMenu, { UseContextMenuParams } from "./useContextMenu";
-import useAuthenticatedClipboard from "./useAuthenticatedClipboard";
+import { useCellNavigation, useAuthenticatedClipboard, useContextMenu, UseContextMenuParams } from "../hooks";
 
 interface InjectedAuthenticatedDataGridProps<R extends Table.RowData> {
   readonly getCSVData: (fields?: (keyof R | string)[]) => CSVData;

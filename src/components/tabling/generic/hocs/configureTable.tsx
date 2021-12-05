@@ -1,10 +1,13 @@
 import React, { useMemo, useReducer } from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
 import { map, isNil, filter, reduce, uniqueId } from "lodash";
-import { GridReadyEvent, GridOptions, FirstDataRenderedEvent } from "@ag-grid-community/core";
+import { GridOptions } from "@ag-grid-community/core";
 
 import { Config } from "config";
 import { tabling, hooks, util } from "lib";
+
+import { generic } from "components/tabling";
+import { useHiddenColumns } from "../hooks";
 
 export const DefaultDataGridOptions: GridOptions = {
   defaultColDef: {
@@ -46,10 +49,10 @@ type TableConfigurationProvidedProps<R extends Table.RowData> = {
   readonly menuPortalId?: string;
   readonly showPageFooter?: boolean;
   readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
-  readonly onDataGridReady: (event: GridReadyEvent) => void;
-  readonly onFooterGridReady: (event: GridReadyEvent) => void;
-  readonly onPageGridReady: (event: GridReadyEvent) => void;
-  readonly onFirstDataRendered: (e: FirstDataRenderedEvent) => void;
+  readonly onDataGridReady: (event: Table.GridReadyEvent) => void;
+  readonly onFooterGridReady: (event: Table.GridReadyEvent) => void;
+  readonly onPageGridReady: (event: Table.GridReadyEvent) => void;
+  readonly onFirstDataRendered: (e: Table.FirstDataRenderedEvent) => void;
   readonly changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange>, sizeToFit?: boolean) => void;
 };
 
@@ -110,18 +113,18 @@ const configureTable = <
     const tableId = useMemo(() => uniqueId("table-"), []);
     const [_apis, dispatchApis] = useReducer(apisReducer, InitialAPIs);
 
-    const [hiddenColumns, changeColumnVisibility] = tabling.hooks.useHiddenColumns<R, M>({
+    const [hiddenColumns, changeColumnVisibility] = useHiddenColumns<R, M>({
       cookie: props.cookieNames?.hiddenColumns,
       columns: map(filter(props.columns, (col: Table.Column<R, M>) => col.canBeHidden !== false)),
       apis: _apis
     });
 
-    const onDataGridReady = useMemo(() => (e: GridReadyEvent) => onGridReady(e, "data"), []);
-    const onFooterGridReady = useMemo(() => (e: GridReadyEvent) => onGridReady(e, "footer"), []);
-    const onPageGridReady = useMemo(() => (e: GridReadyEvent) => onGridReady(e, "page"), []);
+    const onDataGridReady = useMemo(() => (e: Table.GridReadyEvent) => onGridReady(e, "data"), []);
+    const onFooterGridReady = useMemo(() => (e: Table.GridReadyEvent) => onGridReady(e, "footer"), []);
+    const onPageGridReady = useMemo(() => (e: Table.GridReadyEvent) => onGridReady(e, "page"), []);
 
     const onGridReady = useMemo(
-      () => (e: GridReadyEvent, gridId: Table.GridId) => {
+      () => (e: Table.GridReadyEvent, gridId: Table.GridId) => {
         dispatchApis({ gridId, payload: { api: e.api, columnApi: e.columnApi } });
       },
       []
@@ -129,7 +132,7 @@ const configureTable = <
 
     const onFirstDataRendered = useMemo(
       () =>
-        (event: FirstDataRenderedEvent): void => {
+        (event: Table.FirstDataRenderedEvent): void => {
           const grid = document.querySelector(`#${tableId}`);
           const cols = event.columnApi.getAllDisplayedColumns();
           const width = reduce(
@@ -179,7 +182,7 @@ const configureTable = <
 
       if (hasEditColumn === true) {
         cols = [
-          tabling.columns.EditColumn<R, M>(
+          generic.columns.EditColumn<R, M>(
             {
               pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined,
               // These are only applicable for the non-footer grids, but it is easier to define them
@@ -195,7 +198,7 @@ const configureTable = <
         ];
       }
       cols = [
-        tabling.columns.CheckboxColumn<R, M>(
+        generic.columns.CheckboxColumn<R, M>(
           { ...props.checkboxColumn, pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined },
           hasEditColumn || false,
           props.checkboxColumnWidth
@@ -204,7 +207,7 @@ const configureTable = <
       ];
       if (props.hasDragColumn !== false && Config.tableRowOrdering) {
         cols = [
-          tabling.columns.DragColumn({ pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined }),
+          generic.columns.DragColumn({ pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined }),
           ...cols
         ];
       }
