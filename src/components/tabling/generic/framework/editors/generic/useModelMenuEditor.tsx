@@ -87,6 +87,8 @@ const useModelMenuEditor = <
       changedEvent,
       focusSearch: menu.current.focusSearch,
       onChange: (model: V | null, e: Table.CellDoneEditingEvent, stopEditing = true) => {
+        e.stopPropagation();
+        e.preventDefault();
         setStopEditingOnChangeEvent(stopEditing);
         setValue(model);
         setChangedEvent(e);
