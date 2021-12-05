@@ -1,6 +1,6 @@
 import { SagaIterator } from "redux-saga";
 import { put, fork, select } from "redux-saga/effects";
-import { map, filter } from "lodash";
+import { filter } from "lodash";
 
 import * as api from "api";
 import * as actions from "../actions";
@@ -52,7 +52,9 @@ export const createFilteredTaskSet = (): Redux.ModelListResponseTaskMap => {
 };
 
 export const createTableTaskSet = (
-  config: Table.TaskConfig<R, M, Redux.AuthenticatedTableActionMap<R, M>>
+  config: Table.TaskConfig<R, M, Redux.AuthenticatedTableActionMap<R, M>> & {
+    readonly selectStore: (state: Application.Authenticated.Store) => Tables.ContactTableStore;
+  }
 ): Redux.TableTaskMap<R> => {
   function* tableRequest(action: Redux.Action): SagaIterator {
     yield put(config.actions.loading(true));
@@ -67,27 +69,21 @@ export const createTableTaskSet = (
     }
   }
 
-  function* bulkCreateTask(e: Table.RowAddEvent<R>, errorMessage: string): SagaIterator {
-    const requestPayload: Http.BulkCreatePayload<P> = tabling.http.createBulkCreatePayload<R, P, M>(
-      e.payload,
-      config.columns
-    );
-    yield put(config.actions.saving(true));
-    try {
-      const response: Http.BulkModelResponse<M> = yield api.request(api.bulkCreateContacts, requestPayload);
-      // Note: The logic in the reducer for activating the placeholder rows with real data relies on the
-      // assumption that the models in the response are in the same order as the placeholder IDs.
-      const placeholderIds: Table.PlaceholderRowId[] = map(
-        Array.isArray(e.payload) ? e.payload : [e.payload],
-        (rowAdd: Table.RowAdd<R>) => rowAdd.id
-      );
-      yield put(config.actions.addModelsToState({ placeholderIds: placeholderIds, models: response.data }));
-    } catch (err: unknown) {
-      notifications.requestError(err as Error, errorMessage);
-    } finally {
-      yield put(config.actions.saving(false));
-    }
-  }
+  const bulkCreateTask: Redux.TableBulkCreateTask<R, []> = tabling.tasks.createBulkTask<
+    R,
+    M,
+    Tables.ContactTableStore,
+    P,
+    Http.BulkModelResponse<M>
+  >({
+    columns: config.columns,
+    selectStore: config.selectStore,
+    loadingActions: [config.actions.saving],
+    responseActions: (r: Http.BulkModelResponse<M>, e: Table.RowAddEvent<R>) => [
+      config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.data })
+    ],
+    bulkCreate: () => [api.bulkCreateContacts]
+  });
 
   function* bulkUpdateTask(
     e: Table.ChangeEvent<R, M>,

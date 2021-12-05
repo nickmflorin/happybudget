@@ -39,4 +39,8 @@ namespace Http {
     readonly simple?: boolean;
     readonly search?: string;
   }
+
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type Service<T = any> = (...args: any[]) => T;
 }
+

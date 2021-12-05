@@ -8,21 +8,10 @@ import { budgeting, redux, tabling } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
 import { AccountsTable as GenericAccountsTable, connectTableToStore } from "components/tabling";
 
-import { actions } from "../../../store";
+import { actions, selectors } from "../../../store";
 
 type R = Tables.AccountRowData;
 type M = Model.Account;
-
-const ActionMap = {
-  tableChanged: actions.accounts.handleTableChangeEventAction,
-  request: actions.accounts.requestAction,
-  loading: actions.accounts.loadingAction,
-  response: actions.accounts.responseAction,
-  saving: actions.accounts.savingTableAction,
-  addModelsToState: actions.accounts.addModelsToStateAction,
-  setSearch: actions.accounts.setSearchAction,
-  clear: actions.accounts.clearAction
-};
 
 const ConnectedTable = connectTableToStore<
   GenericAccountsTable.AuthenticatedBudgetProps,
@@ -30,8 +19,17 @@ const ConnectedTable = connectTableToStore<
   M,
   Tables.AccountTableStore
 >({
-  asyncId: "async-accounts-table",
-  actions: ActionMap,
+  actions: {
+    tableChanged: actions.accounts.handleTableChangeEventAction,
+    request: actions.accounts.requestAction,
+    loading: actions.accounts.loadingAction,
+    response: actions.accounts.responseAction,
+    saving: actions.accounts.savingTableAction,
+    addModelsToState: actions.accounts.addModelsToStateAction,
+    setSearch: actions.accounts.setSearchAction,
+    clear: actions.accounts.clearAction
+  },
+  selector: selectors.selectAccountsTableStore,
   footerRowSelectors: {
     footer: createSelector(
       redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.detail.data),
@@ -42,14 +40,7 @@ const ConnectedTable = connectTableToStore<
         actual: budget?.actual || 0.0
       })
     )
-  },
-  reducer: budgeting.reducers.createAuthenticatedAccountsTableReducer({
-    tableId: "accounts-table",
-    columns: GenericAccountsTable.Columns,
-    actions: ActionMap,
-    getModelRowChildren: (m: Model.Account) => m.children,
-    initialState: redux.initialState.initialTableState
-  })
+  }
 })(GenericAccountsTable.AuthenticatedBudget);
 
 interface AccountsTableProps {

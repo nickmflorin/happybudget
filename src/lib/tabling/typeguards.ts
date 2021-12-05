@@ -1,7 +1,8 @@
 import { SyntheticEvent } from "react";
+import { isNil } from "lodash";
 
-export const isRow = <R extends Table.RowData, M extends Model.Model>(obj: Table.Row<R> | M): obj is Table.Row<R> =>
-  (obj as Table.Row<R>).rowType !== undefined;
+export const isRow = <R extends Table.RowData, M>(obj: Table.Row<R> | M): obj is Table.Row<R> =>
+  typeof obj === "object" && (obj as Table.Row<R>).rowType !== undefined;
 
 export const isRowWithColor = <R extends Table.RowData>(
   r: Table.Row<R> | Table.RowWithColor<R>
@@ -120,6 +121,23 @@ export const isModelUpdatedEvent = <R extends Table.RowData, M extends Model.Row
 export const isRowAddEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   e: Table.ChangeEvent<R, M>
 ): e is Table.RowAddEvent<R> => (e as Table.RowAddEvent<R>).type === "rowAdd";
+
+export const isRowAddIndexPayload = <R extends Table.RowData>(
+  p: Table.RowAddPayload<R>
+): p is Table.RowAddIndexPayload => typeof p === "object" && (p as Table.RowAddIndexPayload).newIndex !== undefined;
+
+export const isRowAddCountPayload = <R extends Table.RowData>(
+  p: Table.RowAddPayload<R>
+): p is Table.RowAddCountPayload =>
+  !isRowAddIndexPayload(p) && typeof p === "object" && (p as Table.RowAddCountPayload).count !== undefined;
+
+export const isRowAddDataPayload = <R extends Table.RowData>(
+  p: Table.RowAddPayload<R>
+): p is Table.RowAddDataPayload<R> => !isRowAddIndexPayload(p) && !isRowAddCountPayload(p);
+
+export const isRowAddDataEvent = <R extends Table.RowData>(
+  e: Table.RowAddEvent<R>
+): e is Table.RowAddEvent<R, Table.RowAddDataPayload<R>> => !isNil(e.payload) && isRowAddDataPayload(e.payload);
 
 export const isRowDeleteEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   e: Table.ChangeEvent<R, M>

@@ -32,8 +32,8 @@ const FringesActionMap = {
 const FringesTasks = budgeting.tasks.fringes.createTableTaskSet<Model.Template>({
   columns: FringesTable.Columns,
   selectObjId: (state: Application.Authenticated.Store) => state.template.id,
-  selectAccountTableData: (state: Application.Authenticated.Store) => state.template.account.table.data,
-  selectSubAccountTableData: (state: Application.Authenticated.Store) => state.template.subaccount.table.data,
+  selectAccountTableStore: (state: Application.Authenticated.Store) => state.template.account.table,
+  selectSubAccountTableStore: (state: Application.Authenticated.Store) => state.template.subaccount.table,
   actions: FringesActionMap,
   services: {
     request: api.getTemplateFringes,

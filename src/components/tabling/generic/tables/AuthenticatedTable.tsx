@@ -291,10 +291,8 @@ const AuthenticatedTable = <
     if (!isNil(dataGridApi)) {
       _onChangeEvent({
         type: "rowAdd",
-        payload: {
-          id: tabling.managers.placeholderRowId(),
-          data: tabling.patterns.generateNewRowData(dataGridApi.grid, columns)
-        }
+        payload: { count: 1 },
+        placeholderIds: [tabling.managers.placeholderRowId()]
       });
     }
   });

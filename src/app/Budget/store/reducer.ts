@@ -1,13 +1,14 @@
 import { combineReducers } from "redux";
 
 import { redux, budgeting } from "lib";
-import { SubAccountsTable, FringesTable, ActualsTable } from "components/tabling";
+import { SubAccountsTable, FringesTable, ActualsTable, AccountsTable } from "components/tabling";
 
 import * as actions from "./actions";
 import initialState, { initialHeaderTemplatesState } from "./initialState";
 
 const SubAccountColumns = SubAccountsTable.Columns;
 const ActualColumns = ActualsTable.Columns;
+const AccountColumns = AccountsTable.Columns;
 const FringesColumns = FringesTable.Columns;
 
 const headerTemplatesRootReducer: Redux.Reducer<Modules.Budget.HeaderTemplatesStore> = (
@@ -121,6 +122,22 @@ const genericReducer = combineReducers({
         })
       })
     }
+  }),
+  accounts: budgeting.reducers.createAuthenticatedAccountsTableReducer({
+    tableId: "accounts-table",
+    initialState: initialState.account.table,
+    actions: {
+      tableChanged: actions.accounts.handleTableChangeEventAction,
+      request: actions.accounts.requestAction,
+      loading: actions.accounts.loadingAction,
+      response: actions.accounts.responseAction,
+      saving: actions.accounts.savingTableAction,
+      addModelsToState: actions.accounts.addModelsToStateAction,
+      setSearch: actions.accounts.setSearchAction,
+      clear: actions.accounts.clearAction
+    },
+    columns: AccountColumns,
+    getModelRowChildren: (m: Model.Account) => m.children
   }),
   subaccount: budgeting.reducers.createSubAccountDetailReducer({
     initialState: initialState.subaccount,

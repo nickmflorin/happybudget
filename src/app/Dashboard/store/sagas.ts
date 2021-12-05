@@ -60,6 +60,7 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   actions: ActionMap,
   tasks: contacts.createTableTaskSet({
     columns: ContactsTable.Columns,
+    selectStore: (state: Application.Authenticated.Store) => state.dashboard.contacts,
     actions: ActionMap
   })
 });

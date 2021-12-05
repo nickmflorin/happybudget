@@ -1,4 +1,4 @@
-import { isNil, reduce, uniq, map, filter } from "lodash";
+import { isNil, reduce, uniq, map, filter, flatten } from "lodash";
 
 import * as util from "../util";
 
@@ -148,16 +148,12 @@ export const consolidateRowChanges = <R extends Table.RowData, I extends Table.E
 };
 
 export const consolidateRowAddEvents = <R extends Table.RowData>(
-  events: Table.RowAddEvent<R>[]
-): Table.RowAddEvent<R> => {
+  events: Table.RowAddDataEvent<R>[]
+): Table.RowAddDataEvent<R> => {
   return {
     type: "rowAdd",
-    payload: reduce(
-      events,
-      (curr: Table.RowAdd<R>[], e: Table.RowAddEvent<R>) =>
-        Array.isArray(e.payload) ? [...curr, ...e.payload] : [...curr, e.payload],
-      []
-    )
+    placeholderIds: flatten(map(events, (e: Table.RowAddDataEvent<R>) => e.placeholderIds)),
+    payload: reduce(events, (curr: Partial<R>[], e: Table.RowAddDataEvent<R>) => [...curr, ...e.payload], [])
   };
 };
 

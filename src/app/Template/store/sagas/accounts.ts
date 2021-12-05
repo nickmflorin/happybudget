@@ -39,6 +39,7 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
         intersection([c.field, c.colId], ["variance", "actual"]).length === 0
     ),
     selectObjId: (state: Application.Authenticated.Store) => state.template.id,
+    selectStore: (state: Application.Authenticated.Store) => state.template.accounts,
     actions: ActionMap,
     services: {
       request: api.getTemplateAccounts,

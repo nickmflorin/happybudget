@@ -527,11 +527,6 @@ namespace Table {
     readonly data: RowChangeData<R>;
   };
 
-  type RowAdd<R extends RowData> = {
-    readonly id: PlaceholderRowId;
-    readonly data?: Partial<R>;
-  };
-
   type DataChangePayload<R extends RowData, I extends EditableRowId = EditableRowId> = SingleOrArray<RowChange<R, I>>;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -542,11 +537,20 @@ namespace Table {
     readonly payload: DataChangePayload<R, I>;
   };
 
-  type RowAddPayload<R extends RowData> = RowAdd<R> | RowAdd<R>[];
-  type RowAddEvent<R extends RowData> = {
+  type RowAddCountPayload = { readonly count: number; };
+  type RowAddIndexPayload = { readonly newIndex: number; readonly count?: number; };
+  type RowAddDataPayload<R extends RowData> = Partial<R>[];
+  type RowAddPayload<R extends RowData> = RowAddCountPayload | RowAddIndexPayload | RowAddDataPayload<R>;
+
+  type RowAddEvent<R extends RowData, P extends RowAddPayload<R> = RowAddPayload<R>> = {
     readonly type: "rowAdd";
-    readonly payload: RowAddPayload<R>;
+    readonly payload: P;
+    // Placeholder IDs must be provided ahead of time so that the IDs are consistent between the
+    // sagas and the reducer.
+    readonly placeholderIds: PlaceholderRowId[];
   };
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  type RowAddDataEvent<R extends RowData> = RowAddEvent<R, RowAddDataPayload<R>>;
 
   type RowPositionChangedPayload = {
     readonly previous: number | null;
@@ -775,7 +779,7 @@ namespace Table {
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
-  > = Redux.SagaConfig<Redux.TableTaskMap<R>, A>;
+  > = Redux.SagaConfig<Redux.TableTaskMap<R, M>, A>;
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type StoreConfig<

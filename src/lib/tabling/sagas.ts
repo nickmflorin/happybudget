@@ -73,7 +73,7 @@ export const createAuthenticatedTableSaga = <
       }
     }
 
-    function* flushRowAddBatch(batch: Table.RowAddEvent<R>[]): SagaIterator {
+    function* flushRowAddBatch(batch: Table.RowAddDataEvent<R>[]): SagaIterator {
       if (batch.length !== 0) {
         const event = tabling.events.consolidateRowAddEvents(batch);
         if (!Array.isArray(event.payload) || event.payload.length !== 0) {
@@ -83,7 +83,7 @@ export const createAuthenticatedTableSaga = <
     }
 
     let runningDataChangeBatch: Table.DataChangeEvent<R>[] = [];
-    let runningRowAddBatch: Table.RowAddEvent<R>[] = [];
+    let runningRowAddBatch: Table.RowAddDataEvent<R>[] = [];
 
     for (let i = 0; i < events.length; i++) {
       const e = events[i];
@@ -91,7 +91,7 @@ export const createAuthenticatedTableSaga = <
         runningDataChangeBatch = [...runningDataChangeBatch, e];
         yield fork(flushRowAddBatch, runningRowAddBatch);
         runningRowAddBatch = [];
-      } else if (tabling.typeguards.isRowAddEvent(e)) {
+      } else if (tabling.typeguards.isRowAddEvent(e) && tabling.typeguards.isRowAddDataEvent(e)) {
         runningRowAddBatch = [...runningRowAddBatch, e];
         yield fork(flushDataBatch, runningDataChangeBatch);
         runningDataChangeBatch = [];
@@ -113,7 +113,12 @@ export const createAuthenticatedTableSaga = <
     while (true) {
       const action = yield take(changeChannel);
       const e: Table.ChangeEvent<R, M> = action.payload;
-      if (tabling.typeguards.isDataChangeEvent(e) || tabling.typeguards.isRowAddEvent(e)) {
+      if (
+        tabling.typeguards.isDataChangeEvent(e) ||
+        // We do not want to buffer RowAdd events if the row is being added either
+        // by the `count` param or an empty payload (which means `count = 1`).
+        (tabling.typeguards.isRowAddEvent(e) && tabling.typeguards.isRowAddDataEvent(e))
+      ) {
         // Buffer and flush data change events and new row events that occur every 500ms -
         // this is particularly important for dragging cell values to update other cell
         // values as it submits a separate DataChangeEvent for every new cell value.

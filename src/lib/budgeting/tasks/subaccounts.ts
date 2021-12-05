@@ -82,6 +82,7 @@ export type AuthenticatedSubAccountsTableTaskConfig<
   readonly services: AuthenticatedSubAccountsTableServiceSet<M, B>;
   readonly selectBudgetId: (state: Application.Authenticated.Store) => number | null;
   readonly selectObjId: (state: Application.Authenticated.Store) => number | null;
+  readonly selectStore: (state: Application.Authenticated.Store) => Tables.SubAccountTableStore;
 };
 
 const isAuthenticatedConfig = <M extends Model.Account | Model.SubAccount, B extends Model.Template | Model.Budget>(
@@ -176,37 +177,26 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     }
   }
 
-  function* bulkCreateTask(objId: number, e: Table.RowAddEvent<R>, errorMessage: string): SagaIterator {
-    if (isAuthenticatedConfig(config)) {
-      const requestPayload: Http.BulkCreatePayload<P> = tabling.http.createBulkCreatePayload<R, P, C>(
-        e.payload,
-        config.columns
-      );
-      yield put(config.actions.saving(true));
-      yield put(config.actions.loadingBudget(true));
-      try {
-        const response: Http.BudgetBulkResponse<B, M, C> = yield api.request(
-          config.services.bulkCreate,
-          objId,
-          requestPayload
-        );
-        yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
-        yield put(config.actions.updateParentInState({ id: response.data.id, data: response.data }));
-        // Note: The logic in the reducer for activating the placeholder rows with real data relies on the
-        // assumption that the models in the response are in the same order as the placeholder numbers.
-        const placeholderIds: Table.PlaceholderRowId[] = map(
-          Array.isArray(e.payload) ? e.payload : [e.payload],
-          (rowAdd: Table.RowAdd<R>) => rowAdd.id
-        );
-        yield put(config.actions.addModelsToState({ placeholderIds: placeholderIds, models: response.children }));
-      } catch (err: unknown) {
-        notifications.requestError(err as Error, errorMessage);
-      } finally {
-        yield put(config.actions.saving(false));
-        yield put(config.actions.loadingBudget(false));
-      }
-    }
-  }
+  const bulkCreateTask: Redux.TableBulkCreateTask<R, [number]> | null = !isAuthenticatedConfig(config)
+    ? null
+    : tabling.tasks.createBulkTask<
+        R,
+        C,
+        Tables.SubAccountTableStore,
+        Http.SubAccountPayload,
+        Http.BudgetBulkResponse<B, M, C>,
+        [number]
+      >({
+        columns: config.columns,
+        selectStore: config.selectStore,
+        loadingActions: [config.actions.saving, config.actions.loadingBudget],
+        responseActions: (r: Http.BudgetBulkResponse<B, M, C>, e: Table.RowAddEvent<R>) => [
+          config.actions.updateBudgetInState({ id: r.budget.id, data: r.budget }),
+          config.actions.updateParentInState({ id: r.data.id, data: r.data }),
+          config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children })
+        ],
+        bulkCreate: (objId: number) => [config.services.bulkCreate, objId]
+      });
 
   function* bulkUpdateTask(
     objId: number,
@@ -346,8 +336,8 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
 
   function* handleRowAddEvent(e: Table.RowAddEvent<R>): SagaIterator {
     const objId = yield select(config.selectObjId);
-    if (!isNil(objId)) {
-      yield fork(bulkCreateTask, objId, e, "There was an error creating the rows.");
+    if (!isNil(objId) && !isNil(bulkCreateTask)) {
+      yield fork(bulkCreateTask, e, "There was an error creating the rows.", objId);
     }
   }
 

@@ -1,6 +1,6 @@
 import { SagaIterator } from "redux-saga";
 import { put, call, fork, select, all } from "redux-saga/effects";
-import { map, isNil, filter } from "lodash";
+import { isNil, filter } from "lodash";
 
 import * as api from "api";
 import { createTaskSet } from "store/tasks/contacts";
@@ -18,6 +18,7 @@ export type ActualsTableActionMap = Redux.AuthenticatedTableActionMap<R, M> & {
 
 export type ActualsTableTaskConfig = Table.TaskConfig<R, M, ActualsTableActionMap> & {
   readonly selectObjId: (state: Application.Authenticated.Store) => number | null;
+  readonly selectStore: (state: Application.Authenticated.Store) => Tables.ActualTableStore;
   readonly selectOwnersSearch: (state: Application.Authenticated.Store) => string;
 };
 
@@ -89,32 +90,23 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     }
   }
 
-  function* bulkCreateTask(budgetId: number, e: Table.RowAddEvent<R>, errorMessage: string): SagaIterator {
-    const requestPayload: Http.BulkCreatePayload<P> = tabling.http.createBulkCreatePayload<R, P, M>(
-      e.payload,
-      config.columns
-    );
-    yield put(config.actions.saving(true));
-    try {
-      const response: Http.BulkResponse<Model.Budget, M> = yield api.request(
-        api.bulkCreateBudgetActuals,
-        budgetId,
-        requestPayload
-      );
+  const bulkCreateTask: Redux.TableBulkCreateTask<R, [number]> = tabling.tasks.createBulkTask<
+    R,
+    M,
+    Tables.ActualTableStore,
+    P,
+    Http.BulkResponse<Model.Budget, M>,
+    [number]
+  >({
+    columns: config.columns,
+    selectStore: config.selectStore,
+    loadingActions: [config.actions.saving],
+    responseActions: (r: Http.BulkResponse<Model.Budget, M>, e: Table.RowAddEvent<R>) => [
       // Note: We also have access to the updated budget here, we should use that.
-      // Note: The logic in the reducer for activating the placeholder rows with real data relies on the
-      // assumption that the models in the response are in the same order as the placeholder numbers.
-      const placeholderIds: Table.PlaceholderRowId[] = map(
-        Array.isArray(e.payload) ? e.payload : [e.payload],
-        (rowAdd: Table.RowAdd<R>) => rowAdd.id
-      );
-      yield put(config.actions.addModelsToState({ placeholderIds: placeholderIds, models: response.children }));
-    } catch (err: unknown) {
-      notifications.requestError(err as Error, errorMessage);
-    } finally {
-      yield put(config.actions.saving(false));
-    }
-  }
+      config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children })
+    ],
+    bulkCreate: (objId: number) => [api.bulkCreateBudgetActuals, objId]
+  });
 
   function* bulkUpdateTask(
     budgetId: number,
@@ -167,7 +159,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
   function* handleRowAddEvent(e: Table.RowAddEvent<R>): SagaIterator {
     const budgetId = yield select(config.selectObjId);
     if (!isNil(budgetId)) {
-      yield fork(bulkCreateTask, budgetId, e, "There was an error creating the rows.");
+      yield fork(bulkCreateTask, e, "There was an error creating the rows.", budgetId);
     }
   }
 

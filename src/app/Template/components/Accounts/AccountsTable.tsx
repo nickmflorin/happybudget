@@ -2,27 +2,16 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { createSelector } from "reselect";
-import { isNil, map, filter, intersection } from "lodash";
+import { isNil, map } from "lodash";
 
 import { tabling, budgeting, redux } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
 import { AccountsTable as GenericAccountsTable, connectTableToStore } from "components/tabling";
 
-import { actions } from "../../store";
+import { actions, selectors } from "../../store";
 
 type R = Tables.AccountRowData;
 type M = Model.Account;
-
-const ActionMap = {
-  tableChanged: actions.accounts.handleTableChangeEventAction,
-  request: actions.accounts.requestAction,
-  loading: actions.accounts.loadingAction,
-  response: actions.accounts.responseAction,
-  saving: actions.accounts.savingTableAction,
-  addModelsToState: actions.accounts.addModelsToStateAction,
-  setSearch: actions.accounts.setSearchAction,
-  clear: actions.accounts.clearAction
-};
 
 const ConnectedTable = connectTableToStore<
   GenericAccountsTable.AuthenticatedTemplateProps,
@@ -30,8 +19,17 @@ const ConnectedTable = connectTableToStore<
   M,
   Tables.AccountTableStore
 >({
-  asyncId: "async-accounts-table",
-  actions: ActionMap,
+  actions: {
+    tableChanged: actions.accounts.handleTableChangeEventAction,
+    request: actions.accounts.requestAction,
+    loading: actions.accounts.loadingAction,
+    response: actions.accounts.responseAction,
+    saving: actions.accounts.savingTableAction,
+    addModelsToState: actions.accounts.addModelsToStateAction,
+    setSearch: actions.accounts.setSearchAction,
+    clear: actions.accounts.clearAction
+  },
+  selector: selectors.selectAccountsTableStore,
   footerRowSelectors: {
     footer: createSelector(
       redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.template.detail.data),
@@ -40,17 +38,7 @@ const ConnectedTable = connectTableToStore<
         estimated: !isNil(budget) ? budgeting.businessLogic.estimatedValue(budget) : 0.0
       })
     )
-  },
-  reducer: budgeting.reducers.createAuthenticatedAccountsTableReducer({
-    tableId: "accounts-table",
-    columns: filter(
-      GenericAccountsTable.Columns,
-      (c: Table.Column<R, M>) => intersection([c.field, c.colId], ["variance", "actual"]).length === 0
-    ),
-    actions: ActionMap,
-    getModelRowChildren: (m: Model.Account) => m.children,
-    initialState: redux.initialState.initialTableState
-  })
+  }
 })(GenericAccountsTable.AuthenticatedTemplate);
 
 interface AccountsTableProps {

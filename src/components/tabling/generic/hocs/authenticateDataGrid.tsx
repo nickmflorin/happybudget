@@ -366,10 +366,8 @@ const authenticateDataGrid =
           if (!isNil(gridApi)) {
             props.onChangeEvent({
               type: "rowAdd",
-              payload: {
-                id: tabling.managers.placeholderRowId(),
-                data: tabling.patterns.generateNewRowData(gridApi, columns, newRowIndex)
-              }
+              placeholderIds: [tabling.managers.placeholderRowId()],
+              payload: { newIndex: newRowIndex }
             });
           }
         }

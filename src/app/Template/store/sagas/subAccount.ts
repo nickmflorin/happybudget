@@ -52,6 +52,7 @@ const Tasks = budgeting.tasks.subaccounts.createTableTaskSet<Model.SubAccount, M
       intersection([c.field, c.colId], ["variance", "contact", "actual"]).length === 0
   ),
   selectBudgetId: (state: Application.Authenticated.Store) => state.template.id,
+  selectStore: (state: Application.Authenticated.Store) => state.template.subaccount.table,
   selectObjId: (state: Application.Authenticated.Store) => state.template.subaccount.id,
   actions: ActionMap,
   services: {

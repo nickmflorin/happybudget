@@ -27,7 +27,8 @@ const initialState: Modules.Template.Store = {
   id: null,
   detail: redux.initialState.initialDetailResponseState,
   account: initialAccountState,
-  subaccount: initialSubAccountState
+  subaccount: initialSubAccountState,
+  accounts: redux.initialState.initialTableState
 };
 
 export default initialState;

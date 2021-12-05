@@ -22,6 +22,7 @@ const ActionMap: Redux.ActionMapObject<budgeting.tasks.actuals.ActualsTableActio
 
 const tasks = budgeting.tasks.actuals.createTableTaskSet({
   columns: ActualsTable.Columns,
+  selectStore: (state: Application.Authenticated.Store) => state.budget.actuals,
   selectObjId: (state: Application.Authenticated.Store) => state.budget.id,
   selectOwnersSearch: (state: Application.Authenticated.Store) => state.budget.actuals.owners.search,
   actions: ActionMap

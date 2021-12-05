@@ -34,6 +34,7 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   tasks: budgeting.tasks.accounts.createTableTaskSet<Model.Budget>({
     columns: AccountsTable.Columns,
     selectObjId: (state: Application.Authenticated.Store) => state.budget.id,
+    selectStore: (state: Application.Authenticated.Store) => state.budget.accounts,
     actions: ActionMap,
     services: {
       request: api.getBudgetAccounts,

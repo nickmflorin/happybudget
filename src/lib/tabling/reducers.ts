@@ -7,6 +7,7 @@ import * as data from "./data";
 import * as events from "./events";
 import * as typeguards from "./typeguards";
 import * as managers from "./managers";
+import * as patterns from "./patterns";
 
 /* eslint-disable indent */
 export const groupRowFromState = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
@@ -302,17 +303,29 @@ export const createTableChangeEventReducer = <
         )
       );
     } else if (typeguards.isRowAddEvent(e)) {
-      const payload: Table.RowAdd<R>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
+      const p: Partial<R>[] | Table.RowAddIndexPayload | Table.RowAddCountPayload = e.payload;
+      let d: Partial<R>[];
+      if (typeguards.isRowAddCountPayload(p) || typeguards.isRowAddIndexPayload(p)) {
+        d = patterns.generateNewRowData({ store: state.data, ...p }, config.columns);
+      } else {
+        d = p;
+      }
+      if (e.placeholderIds.length !== d.length) {
+        throw new Error(
+          `Only ${e.placeholderIds.length} placeholder IDs were provided, but ${d.length}
+            new rows are being created.`
+        );
+      }
       let newState = {
         ...state,
         data: reduce(
-          payload,
-          (d: Table.BodyRow<R>[], addition: Table.RowAdd<R>) => {
+          d,
+          (current: Table.BodyRow<R>[], di: Partial<R>, index: number) => {
             return [
-              ...d,
+              ...current,
               placeholderRowManager.create({
-                id: addition.id,
-                data: addition.data
+                id: e.placeholderIds[index],
+                data: di
               })
             ];
           },

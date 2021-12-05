@@ -1,9 +1,11 @@
 import { SagaIterator } from "redux-saga";
 import { put, call, fork, select, all } from "redux-saga/effects";
 import { map, isNil, filter, intersection, reduce } from "lodash";
+import { createSelector } from "reselect";
 
 import * as api from "api";
 import { tabling, budgeting, notifications } from "lib";
+import { initialFringesState, initialSubAccountsTableState } from "app/Budget/store/initialState";
 
 type R = Tables.FringeRowData;
 type M = Model.Fringe;
@@ -37,11 +39,6 @@ export type FringeTableServiceSet<B extends Model.Template | Model.Budget> = Fri
   ) => Promise<Http.BulkResponse<B, Model.Fringe>>;
 };
 
-export type FringesTaskConfig = Redux.TaskConfig<{ loading: boolean; response: Http.ListResponse<Model.Fringe> }> & {
-  readonly services: FringeServiceSet;
-  readonly selectObjId: (state: Application.Authenticated.Store) => number | null;
-};
-
 export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Table.TaskConfig<
   R,
   M,
@@ -49,17 +46,47 @@ export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Ta
 > & {
   readonly services: FringeTableServiceSet<B>;
   readonly selectObjId: (state: Application.Authenticated.Store) => number | null;
-  readonly selectAccountTableData: (
-    state: Application.Authenticated.Store
-  ) => Table.BodyRow<Tables.SubAccountRowData>[];
-  readonly selectSubAccountTableData: (
-    state: Application.Authenticated.Store
-  ) => Table.BodyRow<Tables.SubAccountRowData>[];
+  readonly selectAccountTableStore: (state: Application.Authenticated.Store) => Tables.SubAccountTableStore;
+  readonly selectSubAccountTableStore: (state: Application.Authenticated.Store) => Tables.SubAccountTableStore;
 };
 
 export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   config: FringesTableTaskConfig<B>
 ): Redux.TableTaskMap<R, M> => {
+  const selectPath = (s: Application.Authenticated.Store) => s.router.location.pathname;
+
+  const selectTableStore = createSelector(
+    [selectPath, config.selectAccountTableStore, config.selectSubAccountTableStore],
+    (
+      path: string,
+      acountTableStore: Tables.SubAccountTableStore,
+      subaccountTableStore: Tables.SubAccountTableStore
+    ) => {
+      if (budgeting.urls.isAccountUrl(path)) {
+        return acountTableStore.fringes;
+      } else if (budgeting.urls.isSubAccountUrl(path)) {
+        return subaccountTableStore.fringes;
+      }
+      return initialFringesState;
+    }
+  );
+
+  const selectSubAccountsStore = createSelector(
+    [selectPath, config.selectAccountTableStore, config.selectSubAccountTableStore],
+    (
+      path: string,
+      acountTableStore: Tables.SubAccountTableStore,
+      subaccountTableStore: Tables.SubAccountTableStore
+    ) => {
+      if (budgeting.urls.isAccountUrl(path)) {
+        return acountTableStore;
+      } else if (budgeting.urls.isSubAccountUrl(path)) {
+        return subaccountTableStore;
+      }
+      return initialSubAccountsTableState;
+    }
+  );
+
   function* request(action: Redux.Action<null>): SagaIterator {
     const objId = yield select(config.selectObjId);
     if (!isNil(objId)) {
@@ -94,30 +121,23 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     yield put(config.actions.responseFringeColors(response));
   }
 
-  function* bulkCreateTask(objId: number, e: Table.RowAddEvent<R>, errorMessage: string): SagaIterator {
-    const requestPayload: Http.BulkCreatePayload<P> = tabling.http.createBulkCreatePayload<R, P, M>(
-      e.payload,
-      config.columns
-    );
-    yield put(config.actions.saving(true));
-    yield put(config.actions.loadingBudget(true));
-    try {
-      const response: Http.BulkResponse<B, M> = yield api.request(config.services.bulkCreate, objId, requestPayload);
-      yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
-      // Note: The logic in the reducer for activating the placeholder rows with real data relies on the
-      // assumption that the models in the response are in the same order as the placeholder numbers.
-      const placeholderIds: Table.PlaceholderRowId[] = map(
-        Array.isArray(e.payload) ? e.payload : [e.payload],
-        (rowAdd: Table.RowAdd<R>) => rowAdd.id
-      );
-      yield put(config.actions.addModelsToState({ placeholderIds: placeholderIds, models: response.children }));
-    } catch (err: unknown) {
-      notifications.requestError(err as Error, errorMessage);
-    } finally {
-      yield put(config.actions.saving(false));
-      yield put(config.actions.loadingBudget(false));
-    }
-  }
+  const bulkCreateTask: Redux.TableBulkCreateTask<R, [number]> = tabling.tasks.createBulkTask<
+    R,
+    M,
+    Tables.FringeTableStore,
+    Http.FringePayload,
+    Http.BulkResponse<B, M>,
+    [number]
+  >({
+    columns: config.columns,
+    selectStore: selectTableStore,
+    loadingActions: [config.actions.saving, config.actions.loadingBudget],
+    responseActions: (r: Http.BulkResponse<B, M>, e: Table.RowAddEvent<R>) => [
+      config.actions.updateBudgetInState({ id: r.data.id, data: r.data }),
+      config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children })
+    ],
+    bulkCreate: (objId: number) => [config.services.bulkCreate, objId]
+  });
 
   function* bulkUpdateTask(
     objId: number,
@@ -154,13 +174,13 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         []
       );
       if (fringeIds.length !== 0) {
-        if (budgeting.urls.isAccountUrl(path)) {
-          const subaccounts = yield select(config.selectAccountTableData);
-          const subaccountsWithFringesChanged: Table.ModelRow<Tables.SubAccountRowData>[] = filter(
-            filter(subaccounts, (r: Tables.SubAccountRow) => tabling.typeguards.isModelRow(r)),
-            (r: Tables.SubAccountRow) => intersection(r.data.fringes, fringeIds).length !== 0
-          ) as Table.ModelRow<Tables.SubAccountRowData>[];
-          if (subaccountsWithFringesChanged.length !== 0) {
+        const subaccounts = yield select(selectSubAccountsStore);
+        const subaccountsWithFringesChanged: Table.ModelRow<Tables.SubAccountRowData>[] = filter(
+          filter(subaccounts, (r: Tables.SubAccountRow) => tabling.typeguards.isModelRow(r)),
+          (r: Tables.SubAccountRow) => intersection(r.data.fringes, fringeIds).length !== 0
+        ) as Table.ModelRow<Tables.SubAccountRowData>[];
+        if (subaccountsWithFringesChanged.length !== 0) {
+          if (budgeting.urls.isAccountUrl(path)) {
             yield put(
               config.actions.requestAccountTableData({
                 ids: map(subaccountsWithFringesChanged, (r: Table.ModelRow<Tables.SubAccountRowData>) => r.id)
@@ -168,20 +188,15 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
             );
             // We also need to update the overall Account or SubAccount.
             yield put(config.actions.requestAccount(null));
+          } else if (budgeting.urls.isSubAccountUrl(path)) {
+            yield put(
+              config.actions.requestSubAccountTableData({
+                ids: map(subaccountsWithFringesChanged, (r: Table.ModelRow<Tables.SubAccountRowData>) => r.id)
+              })
+            );
+            // We also need to update the overall Account or SubAccount.
+            yield put(config.actions.requestSubAccount(null));
           }
-        } else if (budgeting.urls.isSubAccountUrl(path)) {
-          const subaccounts = yield select(config.selectSubAccountTableData);
-          const subaccountsWithFringesChanged: Table.ModelRow<Tables.SubAccountRowData>[] = filter(
-            filter(subaccounts, (r: Tables.SubAccountRow) => tabling.typeguards.isModelRow(r)),
-            (r: Tables.SubAccountRow) => intersection(r.data.fringes, fringeIds).length !== 0
-          ) as Table.ModelRow<Tables.SubAccountRowData>[];
-          yield put(
-            config.actions.requestSubAccountTableData({
-              ids: map(subaccountsWithFringesChanged, (r: Table.ModelRow<Tables.SubAccountRowData>) => r.id)
-            })
-          );
-          // We also need to update the overall Account or SubAccount.
-          yield put(config.actions.requestSubAccount(null));
         }
       }
     } catch (err: unknown) {
@@ -230,7 +245,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   function* handleRowAddEvent(e: Table.RowAddEvent<R>): SagaIterator {
     const objId = yield select(config.selectObjId);
     if (!isNil(objId)) {
-      yield fork(bulkCreateTask, objId, e, "There was an error creating the fringes.");
+      yield fork(bulkCreateTask, e, "There was an error creating the fringes.", objId);
     }
   }
 

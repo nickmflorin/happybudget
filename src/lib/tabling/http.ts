@@ -78,15 +78,15 @@ export const bulkPatchPayloads = <
 };
 
 export const postPayloadForAddition = <R extends Table.RowData, P, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  addition: Table.RowAdd<R>,
+  data: Partial<R>,
   columns: Table.Column<R, M>[]
 ): P => {
   const cols = filter(columns, (c: Table.Column<R, M>) => c.isWrite !== false);
   return reduce(
     cols,
     (p: P, col: Table.Column<R, M>) => {
-      if (!isNil(col.field) && !isNil(addition.data)) {
-        let value: R[keyof R] | undefined = addition.data[col.field];
+      if (!isNil(col.field)) {
+        let value: R[keyof R] | undefined = data[col.field];
         if (!isNil(value)) {
           if (!isNil(col.getHttpValue)) {
             value = col.getHttpValue(value);
@@ -101,18 +101,16 @@ export const postPayloadForAddition = <R extends Table.RowData, P, M extends Mod
 };
 
 export const postPayloads = <R extends Table.RowData, P, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  p: Table.RowAddPayload<R> | Table.RowAddEvent<R>,
+  p: Table.RowAddDataPayload<R> | Table.RowAddDataEvent<R>,
   columns: Table.Column<R, M>[]
 ): P[] => {
-  const isEvent = (obj: Table.RowAddPayload<R> | Table.RowAddEvent<R>): obj is Table.RowAddEvent<R> =>
-    (obj as Table.RowAddEvent<R>).type === "rowAdd";
+  const isEvent = (obj: Table.RowAddDataPayload<R> | Table.RowAddDataEvent<R>): obj is Table.RowAddDataEvent<R> =>
+    (obj as Table.RowAddDataEvent<R>).type === "rowAdd";
 
-  const payload: Table.RowAddPayload<R> = isEvent(p) ? p.payload : p;
-  const additions: Table.RowAdd<R>[] = Array.isArray(payload) ? payload : [payload];
-
+  const payload: Table.RowAddDataPayload<R> = isEvent(p) ? p.payload : p;
   return reduce(
-    additions,
-    (prev: P[], addition: Table.RowAdd<R>) => {
+    payload,
+    (prev: P[], addition: Partial<R>) => {
       return [...prev, postPayloadForAddition<R, P, M>(addition, columns)];
     },
     [] as P[]
@@ -132,7 +130,7 @@ export const createBulkUpdatePayload = <
 
 export const createBulkCreatePayload = <R extends Table.RowData, P, M extends Model.RowHttpModel = Model.RowHttpModel>(
   /* eslint-disable indent */
-  p: Table.RowAddPayload<R>,
+  p: Partial<R>[],
   columns: Table.Column<R, M>[]
 ): Http.BulkCreatePayload<P> => {
   return { data: postPayloads(p, columns) };

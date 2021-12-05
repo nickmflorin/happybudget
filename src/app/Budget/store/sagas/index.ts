@@ -35,8 +35,8 @@ const FringesActionMap = {
 const FringesTasks = budgeting.tasks.fringes.createTableTaskSet<Model.Budget>({
   columns: FringesTable.Columns,
   selectObjId: (state: Application.Authenticated.Store) => state.budget.id,
-  selectAccountTableData: (state: Application.Authenticated.Store) => state.budget.account.table.data,
-  selectSubAccountTableData: (state: Application.Authenticated.Store) => state.budget.subaccount.table.data,
+  selectAccountTableStore: (state: Application.Authenticated.Store) => state.budget.account.table,
+  selectSubAccountTableStore: (state: Application.Authenticated.Store) => state.budget.subaccount.table,
   actions: FringesActionMap,
   services: {
     request: api.getBudgetFringes,

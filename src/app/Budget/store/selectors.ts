@@ -11,6 +11,13 @@ export const selectBudgetDetailLoading = redux.selectors.simpleShallowEqualSelec
   (state: Application.Authenticated.Store) => state.budget.detail.loading
 );
 
+export const selectAccountsTableStore = redux.selectors.simpleDeepEqualSelector((store: Application.Store) => {
+  if (redux.typeguards.isAuthenticatedStore(store)) {
+    return store.budget.accounts;
+  }
+  return redux.initialState.initialTableState;
+});
+
 export const selectSubAccountsTableStore = redux.selectors.simpleDeepEqualSelector((store: Application.Store) => {
   if (redux.typeguards.isAuthenticatedStore(store)) {
     const path = store.router.location.pathname;

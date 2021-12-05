@@ -1,8 +1,30 @@
 import { combineReducers } from "redux";
-import { redux } from "lib";
+import { redux, tabling } from "lib";
+import { ContactsTable } from "components/tabling";
+
 import * as actions from "./actions";
 
 const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
+  contacts: tabling.reducers.createAuthenticatedTableReducer<
+    Tables.ContactRowData,
+    Model.Contact,
+    Tables.ContactTableStore
+  >({
+    tableId: "contacts-table",
+    columns: ContactsTable.Columns,
+    actions: {
+      tableChanged: actions.handleContactsTableChangeEventAction,
+      request: actions.requestContactsAction,
+      loading: actions.loadingContactsAction,
+      response: actions.responseContactsAction,
+      saving: actions.savingContactsTableAction,
+      addModelsToState: actions.addContactModelsToStateAction,
+      setSearch: actions.setContactsSearchAction,
+      clear: actions.clearContactsAction,
+      updateRowsInState: actions.updateContactRowsInStateAction
+    },
+    initialState: redux.initialState.initialTableState
+  }),
   templates: redux.reducers.createAuthenticatedModelListResponseReducer<
     Model.SimpleTemplate,
     Omit<Redux.AuthenticatedModelListResponseActionMap<Model.SimpleTemplate>, "updating" | "deleting" | "creating">

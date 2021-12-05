@@ -2,7 +2,7 @@ import { combineReducers } from "redux";
 import { filter, intersection } from "lodash";
 
 import { redux, budgeting } from "lib";
-import { SubAccountsTable, FringesTable } from "components/tabling";
+import { AccountsTable, SubAccountsTable, FringesTable } from "components/tabling";
 
 import * as actions from "./actions";
 import initialState from "./initialState";
@@ -19,6 +19,26 @@ const genericReducer = combineReducers({
       response: actions.responseTemplateAction,
       updateInState: actions.updateTemplateInStateAction
     }
+  }),
+  accounts: budgeting.reducers.createAuthenticatedAccountsTableReducer({
+    tableId: "accounts-table",
+    initialState: initialState.account.table,
+    actions: {
+      tableChanged: actions.accounts.handleTableChangeEventAction,
+      request: actions.accounts.requestAction,
+      loading: actions.accounts.loadingAction,
+      response: actions.accounts.responseAction,
+      saving: actions.accounts.savingTableAction,
+      addModelsToState: actions.accounts.addModelsToStateAction,
+      setSearch: actions.accounts.setSearchAction,
+      clear: actions.accounts.clearAction
+    },
+    columns: filter(
+      AccountsTable.Columns,
+      (c: Table.Column<Tables.AccountRowData, Model.Account>) =>
+        intersection([c.field, c.colId], ["variance", "actual"]).length === 0
+    ),
+    getModelRowChildren: (m: Model.Account) => m.children
   }),
   account: budgeting.reducers.createAccountDetailReducer({
     initialState: initialState.account,

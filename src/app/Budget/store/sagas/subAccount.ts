@@ -47,6 +47,7 @@ const ActionMap = {
 
 const Tasks = budgeting.tasks.subaccounts.createTableTaskSet<Model.SubAccount, Model.Budget>({
   columns: SubAccountsTable.Columns,
+  selectStore: (state: Application.Authenticated.Store) => state.budget.subaccount.table,
   selectBudgetId: (state: Application.Authenticated.Store) => state.budget.id,
   selectObjId: (state: Application.Authenticated.Store) => state.budget.subaccount.id,
   actions: ActionMap,

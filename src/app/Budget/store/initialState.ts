@@ -46,6 +46,7 @@ const initialState: Modules.Budget.Store = {
   id: null,
   detail: redux.initialState.initialDetailResponseState,
   account: initialAccountState,
+  accounts: redux.initialState.initialTableState,
   subaccount: initialSubAccountState,
   headerTemplates: initialHeaderTemplatesState,
   analysis: initialAnalysisState,

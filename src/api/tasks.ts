@@ -5,8 +5,6 @@ import * as Sentry from "@sentry/react";
 
 import * as api from "api";
 
-type Service<T = any> = (...args: any[]) => T;
-
 type ProvidedRequestOptions =
   | {
       readonly retries: number;
@@ -20,7 +18,7 @@ export const isProvidedRequestConfig = (arg: any): arg is ProvidedRequestOptions
   ((arg as { readonly retries: number }).retries !== undefined ||
     (arg as { readonly headers: { [key: string]: string } }).headers !== undefined);
 
-export const request = <T = any>(service: Service<T>, ...args: any[]) =>
+export const request = <T = any>(service: Http.Service<T>, ...args: any[]) =>
   call(function* (): SagaIterator {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();

@@ -28,6 +28,7 @@ namespace Modules {
       readonly detail: Redux.ModelDetailResponseStore<Model.Template>;
       readonly subaccount: SubAccountStore;
       readonly account: AccountStore;
+      readonly accounts: Tables.AccountTableStore;
     }
   }
 
@@ -65,6 +66,7 @@ namespace Modules {
       readonly detail: Redux.ModelDetailResponseStore<Model.Budget>;
       readonly subaccount: SubAccountStore;
       readonly account: AccountStore;
+      readonly accounts: Tables.AccountTableStore;
       readonly actuals: Tables.ActualTableStore;
       readonly headerTemplates: HeaderTemplatesStore;
       readonly analysis: AnalysisStore;
@@ -73,12 +75,12 @@ namespace Modules {
 
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   namespace Dashboard {
-    /* eslint-disable no-shadow */
     /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
     interface Store {
       readonly budgets: Redux.AuthenticatedModelListResponseStore<Model.SimpleBudget>;
       readonly templates: Redux.AuthenticatedModelListResponseStore<Model.SimpleTemplate>;
       readonly community: Redux.AuthenticatedModelListResponseStore<Model.SimpleTemplate>;
+      readonly contacts: Tables.ContactTableStore;
     }
   }
 

@@ -14,27 +14,24 @@ import { actions } from "../store";
 type M = Model.Contact;
 type R = Tables.ContactRowData;
 
-const ActionMap = {
-  tableChanged: actions.handleContactsTableChangeEventAction,
-  request: actions.requestContactsAction,
-  loading: actions.loadingContactsAction,
-  response: actions.responseContactsAction,
-  saving: actions.savingContactsTableAction,
-  addModelsToState: actions.addContactModelsToStateAction,
-  setSearch: actions.setContactsSearchAction,
-  clear: actions.clearContactsAction,
-  updateRowsInState: actions.updateContactRowsInStateAction
-};
-
 const ConnectedContactsTable = connectTableToStore<ContactsTable.Props, R, M, Tables.ContactTableStore>({
-  asyncId: "async-contacts-table",
-  actions: ActionMap,
-  reducer: tabling.reducers.createAuthenticatedTableReducer<R, M, Tables.ContactTableStore>({
-    tableId: "contacts-table",
-    columns: ContactsTable.Columns,
-    actions: ActionMap,
-    initialState: redux.initialState.initialTableState
-  })
+  selector: (state: Application.Store) => {
+    if (redux.typeguards.isAuthenticatedStore(state)) {
+      return state.dashboard.contacts;
+    }
+    return redux.initialState.initialTableState;
+  },
+  actions: {
+    tableChanged: actions.handleContactsTableChangeEventAction,
+    request: actions.requestContactsAction,
+    loading: actions.loadingContactsAction,
+    response: actions.responseContactsAction,
+    saving: actions.savingContactsTableAction,
+    addModelsToState: actions.addContactModelsToStateAction,
+    setSearch: actions.setContactsSearchAction,
+    clear: actions.clearContactsAction,
+    updateRowsInState: actions.updateContactRowsInStateAction
+  }
 })(ContactsTable.Table);
 
 const Contacts = (): JSX.Element => {

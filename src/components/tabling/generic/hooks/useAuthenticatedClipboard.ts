@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { isNil, reduce } from "lodash";
+import { isNil, map, reduce } from "lodash";
 
 import { ProcessCellForExportParams, ProcessDataFromClipboardParams } from "@ag-grid-community/core";
 
@@ -218,55 +218,52 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
           const cols = getWritableColumnsAfter(apis.column, params.columns, focusedCell.column);
           const payload = reduce(
             newRowData,
-            (curr: Table.RowAdd<R>[], rowData: R[keyof R][], i: number) => {
+            (curr: Partial<R>[], rowData: R[keyof R][], i: number) => {
               // TODO: Allow the default new row data to be defined and included in the new row
               // data here - similiarly to how it is defined for the reducers.
               return [
                 ...curr,
-                {
-                  id: tabling.managers.placeholderRowId(),
-                  data: reduce(
-                    cols,
-                    /* eslint-disable indent */
-                    (currD: Partial<R>, ci: Table.Column<R, M>, index: number): Partial<R> => {
-                      if (!isNil(ci.parseIntoFields)) {
-                        // Note: We must apply the logic to nullify certain values because the
-                        // values here do not pass through the valueGetter in authenticateDataGrid
-                        // (which would otherwise nullify things like "").
-                        const parsed = ci.parseIntoFields(rowData[index]);
+                reduce(
+                  cols,
+                  /* eslint-disable indent */
+                  (currD: Partial<R>, ci: Table.Column<R, M>, index: number): Partial<R> => {
+                    if (!isNil(ci.parseIntoFields)) {
+                      // Note: We must apply the logic to nullify certain values because the
+                      // values here do not pass through the valueGetter in authenticateDataGrid
+                      // (which would otherwise nullify things like "").
+                      const parsed = ci.parseIntoFields(rowData[index]);
+                      return {
+                        ...currD,
+                        ...reduce(
+                          parsed,
+                          (v: Partial<R>, parsedField: Table.ParsedColumnField<R>) => {
+                            if (parsedField.value === "") {
+                              return {
+                                ...v,
+                                [parsedField.field]: ci.nullValue === undefined ? null : ci.nullValue
+                              };
+                            }
+                            return { ...v, [parsedField.field]: parsedField.value };
+                          },
+                          {} as Partial<R>
+                        )
+                      };
+                    } else if (!isNil(ci.field)) {
+                      // Note: We do not use the colId for creating the RowData object - the colId
+                      // is used for cases where the Column is not associated with a field of the
+                      // Row Data.
+                      if (rowData[index] === ("" as unknown as R[keyof R])) {
                         return {
                           ...currD,
-                          ...reduce(
-                            parsed,
-                            (v: Partial<R>, parsedField: Table.ParsedColumnField<R>) => {
-                              if (parsedField.value === "") {
-                                return {
-                                  ...v,
-                                  [parsedField.field]: ci.nullValue === undefined ? null : ci.nullValue
-                                };
-                              }
-                              return { ...v, [parsedField.field]: parsedField.value };
-                            },
-                            {} as Partial<R>
-                          )
+                          [ci.field]: ci.nullValue === undefined ? null : ci.nullValue
                         };
-                      } else if (!isNil(ci.field)) {
-                        // Note: We do not use the colId for creating the RowData object - the colId
-                        // is used for cases where the Column is not associated with a field of the
-                        // Row Data.
-                        if (rowData[index] === ("" as unknown as R[keyof R])) {
-                          return {
-                            ...currD,
-                            [ci.field]: ci.nullValue === undefined ? null : ci.nullValue
-                          };
-                        }
-                        return { ...currD, [ci.field]: rowData[index] };
                       }
-                      return currD;
-                    },
-                    {} as Partial<R>
-                  )
-                }
+                      return { ...currD, [ci.field]: rowData[index] };
+                    }
+                    return currD;
+                  },
+                  {} as Partial<R>
+                )
               ];
             },
             []
@@ -274,7 +271,8 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
           if (payload.length !== 0) {
             params.onChangeEvent({
               type: "rowAdd",
-              payload
+              payload,
+              placeholderIds: map(payload, (py: Partial<R>) => tabling.managers.placeholderRowId())
             });
           }
           // All we need to do is return the data corresponding to updates to the existing rows
