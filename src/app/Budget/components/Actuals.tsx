@@ -80,7 +80,9 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
         onOwnersSearch={(value: string) => dispatch(actions.actuals.setActualOwnersSearchAction(value))}
         exportFileName={!isNil(budget) ? `${budget.name}_actuals` : "actuals"}
         onNewContact={() => createContact()}
-        onEditContact={(params: { contact: number; id: Table.EditableRowId }) => editContact(params.contact)}
+        onEditContact={(params: { contact: number; rowId: Table.ModelRowId }) =>
+          editContact({ id: params.contact, rowId: params.rowId })
+        }
         onSearchContact={(v: string) => dispatch(globalActions.authenticated.setContactsSearchAction(v))}
         onAttachmentRemoved={(row: Table.ModelRow<R>, id: number) =>
           dispatch(

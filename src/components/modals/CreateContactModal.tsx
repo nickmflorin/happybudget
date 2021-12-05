@@ -29,12 +29,20 @@ const CreateContactModal = ({ initialValues, ...props }: CreateContactModalProps
   const headerRef = useRef<IImageAndNameRef | null>(null);
 
   useEffect(() => {
+    const firstName = initialValues?.first_name;
+    if (!isNil(firstName)) {
+      headerRef.current?.setFirstName(firstName);
+    }
+    const lastName = initialValues?.last_name;
+    if (!isNil(lastName)) {
+      headerRef.current?.setLastName(lastName);
+    }
     return () => {
       headerRef.current?.setFirstName(null);
       headerRef.current?.setLastName(null);
       setImage(null);
     };
-  }, []);
+  }, [initialValues, headerRef.current]);
 
   const onValuesChange = useMemo(
     () => (changedValues: Partial<Http.ContactPayload>, values: Http.ContactPayload) => {

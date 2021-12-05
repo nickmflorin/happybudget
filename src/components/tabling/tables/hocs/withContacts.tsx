@@ -11,9 +11,9 @@ interface InjectedContactsProps<R extends Table.RowData, M extends Model.RowHttp
 
 export interface WithContactsProps {
   readonly contacts: Model.Contact[];
-  readonly onEditContact: (params: { contact: number; id: Table.EditableRowId }) => void;
+  readonly onEditContact: (params: { contact: number; rowId: Table.ModelRowId }) => void;
   readonly onSearchContact: (v: string) => void;
-  readonly onNewContact: (params: { name?: string; id: Table.ModelRowId }) => void;
+  readonly onNewContact: (params: { name?: string; rowId: Table.ModelRowId }) => void;
 }
 
 export type WithWithContactsProps<

@@ -1,57 +1,82 @@
 import { useMemo, useState } from "react";
 import { isNil } from "lodash";
 
+import { model } from "lib";
 import { CreateContactModal, EditContactModal } from "components/modals";
 
 interface UseContactsProps {
   readonly onAttachmentRemoved?: (id: number, attachmentId: number) => void;
   readonly onAttachmentAdded?: (id: number, m: Model.Attachment) => void;
-  readonly onCreated: (m: Model.Contact) => void;
-  readonly onUpdated: (m: Model.Contact) => void;
-  readonly initialCreateValues?: Partial<Http.ContactPayload>;
+  readonly onCreated?: (m: Model.Contact, params?: CreateContactParams) => void;
+  readonly onUpdated: (m: Model.Contact, params: EditContactParams) => void;
 }
 
-type UseContactsReturnType = [JSX.Element, JSX.Element, (id: number) => void, () => void];
+type UseContactsReturnType = [
+  JSX.Element | null,
+  JSX.Element | null,
+  (params: EditContactParams) => void,
+  (params?: CreateContactParams) => void
+];
+
+export type CreateContactParams = {
+  readonly name?: string;
+  readonly rowId?: Table.ModelRowId;
+};
+
+export type EditContactParams = {
+  readonly id: number;
+  readonly rowId?: Table.ModelRowId;
+};
 
 const useContacts = (props: UseContactsProps): UseContactsReturnType => {
-  const [contactToEdit, setContactToEdit] = useState<number | undefined>(undefined);
-  const [newContactModalOpen, setNewContactModalOpen] = useState(false);
+  const [newContactModal, setNewContactModal] = useState<JSX.Element | null>(null);
+  const [editContactModal, setEditContactModal] = useState<JSX.Element | null>(null);
 
-  const createModal = useMemo(
-    () => (
-      <CreateContactModal
-        open={newContactModalOpen}
-        initialValues={props.initialCreateValues}
-        onCancel={() => setNewContactModalOpen(false)}
-        onSuccess={(m: Model.Contact) => {
-          setNewContactModalOpen(false);
-          props.onCreated(m);
-        }}
-      />
-    ),
-    [props.initialCreateValues, newContactModalOpen, props.onCreated]
+  const createContact = useMemo(
+    () => (params?: CreateContactParams) => {
+      let initialValues: Partial<Http.ContactPayload> = {};
+      const name = params?.name;
+      if (!isNil(name)) {
+        const [firstName, lastName] = model.util.parseFirstAndLastName(name);
+        initialValues = { first_name: firstName, last_name: lastName };
+      }
+      const modal = (
+        <CreateContactModal
+          open={true}
+          initialValues={initialValues}
+          onCancel={() => setNewContactModal(null)}
+          onSuccess={(m: Model.Contact) => {
+            setNewContactModal(null);
+            props.onCreated?.(m, params);
+          }}
+        />
+      );
+      setNewContactModal(modal);
+    },
+    [props.onCreated]
   );
 
-  const editModal = useMemo(() => {
-    if (!isNil(contactToEdit)) {
-      return (
+  const editContact = useMemo(
+    () => (params: EditContactParams) => {
+      const modal = (
         <EditContactModal
-          id={contactToEdit}
-          onCancel={() => setContactToEdit(undefined)}
-          onAttachmentRemoved={(id: number) => props.onAttachmentRemoved?.(contactToEdit, id)}
-          onAttachmentAdded={(m: Model.Attachment) => props.onAttachmentAdded?.(contactToEdit, m)}
+          id={params.id}
+          onCancel={() => setEditContactModal(null)}
+          onAttachmentRemoved={(id: number) => props.onAttachmentRemoved?.(params.id, id)}
+          onAttachmentAdded={(m: Model.Attachment) => props.onAttachmentAdded?.(params.id, m)}
           onSuccess={(m: Model.Contact) => {
-            setContactToEdit(undefined);
-            props.onUpdated(m);
+            setEditContactModal(null);
+            props.onUpdated(m, params);
           }}
           open={true}
         />
       );
-    }
-    return <></>;
-  }, [contactToEdit, props.onAttachmentRemoved, props.onAttachmentAdded, props.onUpdated]);
+      setEditContactModal(modal);
+    },
+    [props.onUpdated, props.onAttachmentAdded, props.onAttachmentRemoved]
+  );
 
-  return [createModal, editModal, setContactToEdit, () => setNewContactModalOpen(true)];
+  return [newContactModal, editContactModal, editContact, createContact];
 };
 
 export default useContacts;

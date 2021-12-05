@@ -13,7 +13,7 @@ interface ContactEditorProps<
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends Table.EditorParams<R, M, S> {
-  readonly onNewContact: (params: { name?: string; id: Table.ModelRowId }) => void;
+  readonly onNewContact: (params: { name?: string; rowId: Table.ModelRowId }) => void;
   readonly setSearch: (value: string) => void;
 }
 
@@ -57,10 +57,10 @@ const ContactEditor = <
               if (searchValue !== "") {
                 props.onNewContact({
                   name: searchValue,
-                  id: row.id
+                  rowId: row.id
                 });
               } else {
-                props.onNewContact({ id: row.id });
+                props.onNewContact({ rowId: row.id });
               }
             }
           },

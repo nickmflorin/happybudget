@@ -123,7 +123,7 @@ const Contacts = (): JSX.Element => {
           editColumnConfig={[
             {
               conditional: (r: Table.NonPlaceholderBodyRow<R>) => tabling.typeguards.isModelRow(r),
-              action: (r: Table.ModelRow<R>) => editContact(r.id),
+              action: (r: Table.ModelRow<R>) => editContact({ id: r.id, rowId: r.id }),
               behavior: "expand",
               tooltip: "Edit"
             }

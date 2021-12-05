@@ -2,10 +2,10 @@ import React, { useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { isNil, filter } from "lodash";
 
-import { model, tabling } from "lib";
+import { tabling } from "lib";
 
 import { actions, selectors } from "store";
-import { useContacts } from "components/hooks";
+import { useContacts, CreateContactParams, EditContactParams } from "components/hooks";
 import { SubAccountsTable as GenericSubAccountsTable } from "components/tabling";
 import { selectFringes, selectSubAccountUnits } from "../../store/selectors";
 import FringesModal from "./FringesModal";
@@ -39,9 +39,6 @@ const SubAccountsTable = ({
   setPreviewModalVisible,
   ...props
 }: BudgetSubAccountsTableProps): JSX.Element => {
-  const [preContactEdit, setPreContactEdit] = useState<Table.EditableRowId | null>(null);
-  const [preContactCreate, setPreContactCreate] = useState<{ name?: string; id: Table.EditableRowId } | null>(null);
-  const [initialContactFormValues, setInitialContactFormValues] = useState<any>(null);
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
 
   const dispatch = useDispatch();
@@ -51,15 +48,14 @@ const SubAccountsTable = ({
   const subaccountUnits = useSelector(selectSubAccountUnits);
 
   const onContactCreated = useMemo(
-    () => (m: Model.Contact) => {
+    () => (m: Model.Contact, params?: CreateContactParams) => {
       dispatch(actions.authenticated.addContactToStateAction(m));
-      setPreContactCreate(null);
-      setInitialContactFormValues(null);
       // If we have enough information from before the contact was created in the specific
       // cell, combine that information with the new value to perform a table update, showing
       // the created contact in the new cell.
-      if (!isNil(preContactCreate)) {
-        const row: Table.BodyRow<R> | null = table.current.getRow(preContactCreate.id);
+      const rowId = params?.rowId;
+      if (!isNil(rowId)) {
+        const row: Table.BodyRow<R> | null = table.current.getRow(rowId);
         if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
           let rowChange: Table.RowChange<R> = {
             id: row.id,
@@ -80,15 +76,15 @@ const SubAccountsTable = ({
         }
       }
     },
-    [preContactCreate, table.current]
+    [table.current]
   );
 
   const onContactUpdated = useMemo(
-    () => (m: Model.Contact) => {
+    () => (m: Model.Contact, params: EditContactParams) => {
       dispatch(actions.authenticated.updateContactInStateAction({ id: m.id, data: m }));
-      setPreContactEdit(null);
-      if (!isNil(preContactEdit)) {
-        const row: Table.BodyRow<R> | null = table.current.getRow(preContactEdit);
+      const rowId = params.rowId;
+      if (!isNil(rowId)) {
+        const row: Table.BodyRow<R> | null = table.current.getRow(rowId);
         if (!isNil(row) && tabling.typeguards.isModelRow(row) && row.data.rate === null && m.rate !== null) {
           table.current.applyTableChange({
             type: "dataChange",
@@ -100,11 +96,10 @@ const SubAccountsTable = ({
         }
       }
     },
-    [preContactEdit, table.current]
+    [table.current]
   );
 
   const [createContactModal, editContactModal, editContact, createContact] = useContacts({
-    initialCreateValues: initialContactFormValues,
     onCreated: onContactCreated,
     onUpdated: onContactUpdated
   });
@@ -117,10 +112,9 @@ const SubAccountsTable = ({
         contacts={contacts}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
-        onEditContact={(params: { contact: number; id: Table.EditableRowId }) => {
-          setPreContactEdit(params.id);
-          editContact(params.contact);
-        }}
+        onEditContact={(params: { contact: number; rowId: Table.ModelRowId }) =>
+          editContact({ id: params.contact, rowId: params.rowId })
+        }
         onExportPdf={() => setPreviewModalVisible(true)}
         subAccountUnits={subaccountUnits}
         onAddFringes={() => setFringesModalVisible(true)}
@@ -131,18 +125,7 @@ const SubAccountsTable = ({
           ) as Tables.FringeRow[]
         }
         onSearchContact={(v: string) => dispatch(actions.authenticated.setContactsSearchAction(v))}
-        onNewContact={(params: { name?: string; id: Table.EditableRowId }) => {
-          setPreContactCreate(params);
-          setInitialContactFormValues(null);
-          if (!isNil(params.name)) {
-            const [firstName, lastName] = model.util.parseFirstAndLastName(params.name);
-            setInitialContactFormValues({
-              first_name: firstName,
-              last_name: lastName
-            });
-          }
-          createContact();
-        }}
+        onNewContact={(params: { name?: string; rowId: Table.ModelRowId }) => createContact(params)}
       />
       {createContactModal}
       {editContactModal}
