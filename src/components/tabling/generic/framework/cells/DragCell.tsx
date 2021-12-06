@@ -6,6 +6,8 @@ import { Icon } from "components";
 
 import { Cell } from "./generic";
 
+import "./DragCell.scss";
+
 /* eslint-disable indent */
 const DragCell = <
   R extends Table.RowData,
@@ -26,7 +28,7 @@ const DragCell = <
   if (tabling.typeguards.isModelRow(row)) {
     return (
       <Cell {...props}>
-        <Icon ref={iconRef} weight={"solid"} icon={"grip-vertical"} />
+        <Icon ref={iconRef} className={"icon--row-drag"} weight={"solid"} icon={"grip-dots-vertical"} />
       </Cell>
     );
   }
