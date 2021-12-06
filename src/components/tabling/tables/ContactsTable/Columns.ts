@@ -49,7 +49,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
   }),
   columns.BodyColumn<R, M>({
     field: "position",
-    headerName: "Position",
+    headerName: "Job Title",
     columnType: "text",
     width: 100,
     minWidth: 100
