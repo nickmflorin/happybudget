@@ -208,15 +208,18 @@ const getSourceIndex = <R extends Table.RowData>(source: AGSource | Omit<ReduxSo
  *                null if there are no ModelRow(s) before the index.
  */
 export const findPreviousModelRows = <R extends Table.RowData>(
-  source: AGSource | Omit<ReduxSource<R>, "count">
-): Table.PreviousValues<Table.ModelRow<R> | Partial<R>> | null => {
+  source: AGSource | Omit<ReduxSource<R>, "count">,
+  filling?: boolean
+): Table.PreviousValues<Table.ModelRow<R> | Partial<R> | Table.PlaceholderRow<R>> | null => {
   // If finding the previous ModelRow<R>(s) from AG Grid, we can specify the index
   // we are starting at, otherwise we start at the end of the table (in AG Grid
   // context) or the end ot the store (in Reducer context).
   let runningIndex = getSourceIndex(source);
 
-  const isModelRowOrData = (r: Table.BodyRow<R> | Partial<R>): r is Table.ModelRow<R> | Partial<R> =>
-    typeguards.isRow(r) ? typeguards.isModelRow(r) : true;
+  const isModelRowOrData = (
+    r: Table.BodyRow<R> | Partial<R>
+  ): r is Table.ModelRow<R> | Table.PlaceholderRow<R> | Partial<R> =>
+    typeguards.isRow(r) ? typeguards.isModelRow(r) || typeguards.isPlaceholderRow(r) : true;
 
   if (
     runningIndex === 0 ||
@@ -245,29 +248,32 @@ export const findPreviousModelRows = <R extends Table.RowData>(
     }
   };
 
-  let modelRowsOrData: (Table.ModelRow<R> | Partial<R>)[] = [];
+  let modelRowsOrData: (Table.ModelRow<R> | Table.PlaceholderRow<R> | Partial<R>)[] = [];
 
-  while (runningIndex > 0) {
+  // Because of how the timing of when the values are actually placed inside of
+  // the AGGrid table, when we are filling cells from a drag handle, we need to
+  // start one less than the index because the value is already assumed to be
+  // in the table.
+  if (filling) {
     runningIndex = runningIndex - 1;
-    const row: Table.BodyRow<R> | Partial<R> | null = getRowAtIndex(runningIndex);
-    if (!isNil(row)) {
-      if (isModelRowOrData(row)) {
-        modelRowsOrData.push(row);
-        if (modelRowsOrData.length === 2) {
-          break;
-        }
-      } else {
+  }
+
+  let row: Table.BodyRow<R> | Partial<R> | null = getRowAtIndex(runningIndex);
+  while (runningIndex > 0 && !isNil(row)) {
+    if (isModelRowOrData(row)) {
+      modelRowsOrData.push(row);
+      if (modelRowsOrData.length === 2) {
         break;
       }
-    } else {
-      break;
     }
+    runningIndex = runningIndex - 1;
+    row = getRowAtIndex(runningIndex);
   }
   if (modelRowsOrData.length === 0) {
     return null;
   }
   modelRowsOrData.reverse();
-  return modelRowsOrData as Table.PreviousValues<Table.ModelRow<R> | Partial<R>>;
+  return modelRowsOrData as Table.PreviousValues<Table.ModelRow<R> | Table.PlaceholderRow<R> | Partial<R>>;
 };
 
 const mapPreviousValues = <T, R>(values: Table.PreviousValues<T>, fn: (v: T) => R): Table.PreviousValues<R> => {
@@ -280,25 +286,26 @@ const detectPatternFromPreviousRows = <R extends Table.RowData>(
   created RowData because in the sagas, the full rows will not have been created
   yet, only the data that is used to create the new rows via the API.
   */
-  previousRows: Table.PreviousValues<Table.ModelRow<R> | Partial<R>>,
+  previousRows: Table.PreviousValues<Table.ModelRow<R> | Partial<R> | Table.PlaceholderRow<R>>,
   field: keyof R
 ): PatternValue | null => {
   let columnSupportsSmartInference = true;
 
-  const previousValues = mapPreviousValues<Table.ModelRow<R> | Partial<R>, R[keyof R] | undefined>(
-    previousRows,
-    (ri: Table.ModelRow<R> | Partial<R>) => {
-      /*
+  const previousValues = mapPreviousValues<
+    Table.ModelRow<R> | Partial<R> | Table.PlaceholderRow<R>,
+    R[keyof R] | undefined
+  >(previousRows, (ri: Table.ModelRow<R> | Partial<R> | Table.PlaceholderRow<R>) => {
+    /*
       If the object is a Row, then we know the value will not be undefined
       because we do not allow undefined values for Row(s).  In the worst case
       scenario, if it happened to slip in and avoid TS type checks, the below
       block of code would recognize that `undefined` is not a PatternValue and
       previous smart inference based on this column.
       */
-      if (typeguards.isRow(ri)) {
-        return ri.data[field];
-      } else {
-        /*
+    if (typeguards.isRow(ri)) {
+      return ri.data[field];
+    } else {
+      /*
         If the object is not a Row, and is a partially created RowData object,
         then the value will be undefined if the field does not exist in the
         Partial - which can happen if there is an inconsistency with generating
@@ -308,11 +315,9 @@ const detectPatternFromPreviousRows = <R extends Table.RowData>(
         `undefined` so that the next block of code will recognize the `undefined`
         value as not being a PatternValue and not perform the inference.
         */
-        return ri[field];
-      }
+      return ri[field];
     }
-  );
-
+  });
   const patternValues: PatternValue[] = [];
   for (let i = 0; i < previousValues.length; i++) {
     const v = previousValues[i];
@@ -350,7 +355,7 @@ export const inferFillCellValue = <R extends Table.RowData, M extends Model.RowH
     // The column will be by default not-fake and readable (`isRead !== false`) since it is
     // already in the table.
     if (!isNil(c) && c.smartInference === true && !isNil(params.rowNode.rowIndex)) {
-      const previousRows = findPreviousModelRows<R>({ api: params.api, newIndex: params.rowNode.rowIndex });
+      const previousRows = findPreviousModelRows<R>({ api: params.api, newIndex: params.rowNode.rowIndex }, true);
       if (!isNil(previousRows)) {
         return detectPatternFromPreviousRows(previousRows, params.column.getColId() as keyof R);
       }
