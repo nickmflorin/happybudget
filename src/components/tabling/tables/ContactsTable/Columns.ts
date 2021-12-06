@@ -71,11 +71,6 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     width: 100,
     minWidth: 100
   }),
-  columns.AttachmentsColumn({
-    field: "attachments",
-    width: 120,
-    minWidth: 120
-  }),
   columns.BodyColumn<R, M>({
     field: "rate",
     headerName: "Rate",
@@ -95,6 +90,11 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
       model.util.findChoiceForName<Model.ContactType>(model.models.ContactTypes, name),
     width: 100,
     minWidth: 100
+  }),
+  columns.AttachmentsColumn({
+    field: "attachments",
+    width: 120,
+    minWidth: 120
   })
 ];
 
