@@ -26,7 +26,7 @@ const DragCell = <
   if (tabling.typeguards.isModelRow(row)) {
     return (
       <Cell {...props}>
-        <Icon ref={iconRef} icon={"ellipsis-v"} />
+        <Icon ref={iconRef} weight={"solid"} icon={"grip-vertical"} />
       </Cell>
     );
   }

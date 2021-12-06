@@ -1,6 +1,5 @@
 import { isNil, reduce, map, filter, includes, intersection, uniq } from "lodash";
 
-import * as applicationEvents from "../events";
 import * as redux from "../redux";
 import * as util from "../util";
 import * as data from "./data";
@@ -316,7 +315,7 @@ export const createTableChangeEventReducer = <
             new rows are being created.`
         );
       }
-      let newState = {
+      return reorderRows({
         ...state,
         data: reduce(
           d,
@@ -331,9 +330,7 @@ export const createTableChangeEventReducer = <
           },
           state.data
         )
-      };
-      applicationEvents.dispatchRowsAddedEvent({ tableId: config.tableId, numRows: newState.data.length });
-      return reorderRows(newState);
+      });
     } else if (typeguards.isRowDeleteEvent(e)) {
       /*
       When a Row is deleted, we first have to create a dichotomy of the rows we are deleting.

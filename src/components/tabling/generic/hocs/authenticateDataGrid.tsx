@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState, useImperativeHandle } from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
-import { map, isNil, includes, find, filter, flatten, reduce, uniq, isEqual } from "lodash";
+import { map, isNil, includes, find, filter, flatten, reduce, uniq, isEqual, difference, findIndex } from "lodash";
 
 import {
   CellKeyDownEvent,
@@ -19,7 +19,8 @@ import {
   TabToNextCellParams,
   RangeSelectionChangedEvent,
   CheckboxSelectionCallbackParams,
-  RowDragEvent
+  RowDragEvent,
+  RowDataUpdatedEvent
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
@@ -43,6 +44,7 @@ interface InjectedAuthenticatedDataGridProps<R extends Table.RowData> {
   readonly onRangeSelectionChanged: (e: RangeSelectionChangedEvent) => void;
   readonly onRowDragEnd: (event: RowDragEvent) => void;
   readonly onRowDragMove: (event: RowDragEvent) => void;
+  readonly onRowDataUpdated: (event: RowDataUpdatedEvent) => void;
 }
 
 export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
@@ -52,6 +54,9 @@ export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Mo
   readonly columns: Table.Column<R, M>[];
   readonly pinFirstColumn?: boolean;
   readonly pinActionColumns?: boolean;
+  readonly onGroupRowsAdded?: (ids: Table.GroupRowId[], rows: Table.BodyRow<R>[]) => void;
+  readonly onMarkupRowsAdded?: (ids: Table.MarkupRowId[], rows: Table.BodyRow<R>[]) => void;
+  readonly onModelRowsAdded?: (ids: Table.ModelRowId[], rows: Table.BodyRow<R>[]) => void;
   readonly rowHasCheckboxSelection: ((row: Table.EditableRow<R>) => boolean) | undefined;
   readonly onRowSelectionChanged: (rows: Table.EditableRow<R>[]) => void;
 }
@@ -198,6 +203,24 @@ const getCellChangesFromEvent = <R extends Table.RowData, M extends Model.RowHtt
   return [];
 };
 
+type RowState = {
+  readonly markupRow: Table.MarkupRowId[];
+  readonly groupRow: Table.GroupRowId[];
+  readonly modelRow: Table.ModelRowId[];
+};
+
+type RowStateCallback<
+  R extends Table.RowData,
+  ID extends Table.NonPlaceholderBodyRowId = Table.NonPlaceholderBodyRowId
+> = (api: Table.GridApi, diff: ID[], rows: Table.BodyRow<R>[]) => void;
+
+type RowMap<R extends Table.RowData, ID extends Table.NonPlaceholderBodyRowId = Table.NonPlaceholderBodyRowId> = {
+  id: keyof RowState;
+  callback: RowStateCallback<R, ID>;
+};
+
+type InferRowMapId<MP> = MP extends RowMap<infer ID> ? ID : never;
+
 /* eslint-disable indent */
 const authenticateDataGrid =
   <
@@ -227,6 +250,11 @@ const authenticateDataGrid =
       const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
       const oldRow = useRef<Table.ModelRow<R> | null>(null); // TODO: Figure out a better way to do this.
       const lastSelectionFromRange = useRef<boolean>(false);
+      const rowState = useRef<RowState>({
+        markupRow: [],
+        groupRow: [],
+        modelRow: []
+      });
 
       const onDoneEditing = hooks.useDynamicCallback((e: Table.CellDoneEditingEvent) => {
         if (tabling.typeguards.isKeyboardEvent(e)) {
@@ -638,10 +666,133 @@ const authenticateDataGrid =
         return params.initialValues[(params.values.length - params.initialValues.length) % params.initialValues.length];
       });
 
+      const onMarkupRowsAdded = useMemo(
+        () => (api: Table.GridApi, diff: Table.MarkupRowId[], rows: Table.BodyRow<R>[]) => {
+          props.onMarkupRowsAdded?.(diff, rows);
+        },
+        [props.onMarkupRowsAdded]
+      );
+
+      const onGroupRowsAdded = useMemo(
+        () => (api: Table.GridApi, diff: Table.GroupRowId[], rows: Table.BodyRow<R>[]) => {
+          props.onGroupRowsAdded?.(diff, rows);
+        },
+        [props.onGroupRowsAdded]
+      );
+
+      const onModelRowsAdded = useMemo(
+        () => (api: Table.GridApi, diff: Table.ModelRowId[], rows: Table.BodyRow<R>[]) => {
+          // Scroll the table to the bottom in the case that rows have been added.
+          api.ensureIndexVisible(rows.length - 1, "bottom");
+
+          /*
+					The diff will always be one, even if adding new rows one-by-one at an
+					extremely quick rate, unless we are bulk pasting information
+					into the table and the bulk paste operation requires the addition of
+					several rows.  In the case that multiple rows are being added from a
+					paste operation, we do not want to refocus the index of the table to
+					the row at the bottom.
+					*/
+          if (diff.length === 1) {
+            // Find the row index of the newly added ModelRow in the set of all
+            // rows in the table.
+            const modelRowIndex = findIndex(
+              rows,
+              (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) && r.id === diff[0]
+            );
+            if (modelRowIndex !== -1) {
+              const focusedCell = api.getFocusedCell();
+              // Only refocus the row to the newly created row if there is already
+              // a focused cell in the table.
+              if (!isNil(focusedCell) && !isNil(focusedCell.rowIndex) && rows[focusedCell.rowIndex + 1] !== undefined) {
+                /*
+								The intended logic here is to refocus the cell to the newly added
+								ModelRow if we were previously on the last ModelRow in the table
+								(i.e. at the bottom of the table, before the MarkupRow(s)). This
+								logic has to account for the timing with the fact that the
+								`focusedCell` `rowIndex` is relative to the table rows before the
+								ModelRow was added, whereas the `modelRowIndex` is relative to the
+								table rows after the ModelRow was added.
+
+								When we are on the last ModelRow in the table, before any potential
+								MarkupRow(s), the `modelRowIndex` is greater than the `rowIndex`
+								of the `focusedCell`.  If the `rowIndex` of the `focusedCell`
+								is greater than or equal to the `modelRowIndex`, this means we
+								are in a MarkupRow underneath the newly added ModelRow - and we
+								do not want to change the row we are focused on.
+
+								In order to not change the row we are focused on, we actually need
+								to move the focused cell down 1 row, as this index will account
+								for the fact that the `focusedCell`'s `rowIndex` is relative to
+								the new row not being in the table yet.
+								*/
+                if (modelRowIndex > focusedCell.rowIndex) {
+                  api.setFocusedCell(modelRowIndex, focusedCell.column);
+                  api.clearRangeSelection();
+                } else {
+                  api.setFocusedCell(focusedCell.rowIndex + 1, focusedCell.column);
+                  api.clearRangeSelection();
+                }
+              }
+            } else {
+              console.warn(
+                `Model row ${diff[0]} was added to the table, but it does not
+								appear to be in the set of rows returned from the Grid Api.`
+              );
+            }
+          }
+          props.onModelRowsAdded?.(diff, rows);
+        },
+        [props.onModelRowsAdded]
+      );
+
+      const onRowDataUpdated = hooks.useDynamicCallback((e: RowDataUpdatedEvent) => {
+        const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api) as Table.BodyRow<R>[];
+        /*
+				Note: Before a ModelRow is first added, a PlaceholderRow is added - this
+				PlaceholderRow is turned into a ModelRow when the API request to create the
+				model returns a response.  The addition of a PlaceholderRow will not trigger
+				the `onModelRowsAdded` callback, but when the PlaceholderRow is turned into
+				a ModelRow the `onModelRowsAdded` callback will be triggered.
+				*/
+        const newRowState: RowState = {
+          groupRow: map(
+            filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[],
+            (g: Table.GroupRow<R>) => g.id
+          ),
+          modelRow: map(
+            filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R>[],
+            (g: Table.ModelRow<R>) => g.id
+          ),
+          markupRow: map(
+            filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[],
+            (g: Table.MarkupRow<R>) => g.id
+          )
+        };
+
+        const Mapping: [RowMap<R, Table.GroupRowId>, RowMap<R, Table.ModelRowId>, RowMap<R, Table.MarkupRowId>] = [
+          { id: "groupRow", callback: onGroupRowsAdded },
+          { id: "modelRow", callback: onModelRowsAdded },
+          { id: "markupRow", callback: onMarkupRowsAdded }
+        ];
+
+        for (let i = 0; i < Mapping.length; i++) {
+          const mp = Mapping[i];
+          type IDType = InferRowMapId<typeof mp>;
+          const cb = mp.callback as RowStateCallback<R, IDType>;
+          if (newRowState[mp.id].length > rowState.current[mp.id].length) {
+            const diff = difference(newRowState[mp.id] as IDType[], rowState.current[mp.id] as IDType[]);
+            cb(e.api, diff, rows);
+          }
+        }
+        rowState.current = newRowState;
+      });
+
       return (
         <Component
           {...props}
           columns={columns}
+          onRowDataUpdated={onRowDataUpdated}
           getCSVData={getCSVData}
           onCellKeyDown={onCellKeyDown}
           onCellCut={onCellCut}

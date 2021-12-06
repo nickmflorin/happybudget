@@ -99,7 +99,8 @@ declare namespace Table {
 
   type DataRowId = ModelRowId | PlaceholderRowId;
   type EditableRowId = ModelRowId | MarkupRowId;
-  type BodyRowId = ModelRowId | PlaceholderRowId | GroupRowId | MarkupRowId;
+	type NonPlaceholderBodyRowId = EditableRowId | GroupRowId;
+	type BodyRowId = NonPlaceholderBodyRowId | PlaceholderRowId;
 
   type RowId = BodyRowId | FooterRowId;
 

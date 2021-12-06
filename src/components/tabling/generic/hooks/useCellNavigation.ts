@@ -2,7 +2,7 @@ import { isNil, includes, filter, map } from "lodash";
 
 import { NavigateToNextCellParams, TabToNextCellParams } from "@ag-grid-community/core";
 
-import { hooks, tabling, events } from "lib";
+import { hooks, tabling } from "lib";
 
 export interface UseCellNavigationParams<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
   readonly tableId?: Table.Id;
@@ -80,22 +80,6 @@ const findNextNavigatableRow = <R extends Table.RowData>(
 const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   params: UseCellNavigationParams<R, M>
 ): UseCellNavigationReturnType => {
-  const scrollToBottom = hooks.useDynamicCallback((numRows: number) => {
-    params.apis?.grid.ensureIndexVisible(numRows - 1, "bottom");
-  });
-
-  events.useEvent<Events.RowsAddedParams>(
-    "rowsAdded",
-    (p: Events.RowsAddedParams) => {
-      if (!isNil(params.tableId) && p.tableId === params.tableId) {
-        setTimeout(() => {
-          scrollToBottom(p.numRows);
-        }, 100);
-      }
-    },
-    []
-  );
-
   const navigateToNextCell: (p: NavigateToNextCellParams) => Table.CellPosition = hooks.useDynamicCallback(
     (p: NavigateToNextCellParams): Table.CellPosition => {
       if (!isNil(p.nextCellPosition)) {
@@ -207,43 +191,19 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
         includeRowInNavigation: params.includeRowInNavigation,
         direction: "asc"
       });
-      let movedLocation = false;
+      let doNotMoveLocation = false;
       if (node === null) {
         if (!isNil(params.onNewRowRequired)) {
+          // In the case that we are adding a new row to the bottom of the table,
+          // the row state callbacks of the authenticated grid HOC handle the
+          // refocusing of the cell.
           params.onNewRowRequired(loc.rowIndex);
-          /*
-          This is slightly confusing - but when we are at the end of the table
-          and double click Enter on the last *ModelRow*, a new ModelRow is inserted
-          before the MarkupRow(s) at the end of the table.  This occurs when
-          the `boundaryRows` are [ModelRow, MarkupRow].  In this case, we do
-          not want the table to focus the MarkupRow (2nd element of `boundaryRows`)
-          after the new row is added, but instead focus the new row, inserted
-          between the two `boundaryRows`.
-
-          In the case that the `boundaryRows` are [MarkupRow, MarkupRow], this
-          means that the new row was triggered from double clicking Enter on
-          the last row of the table, which happens to be a MarkupRow.  We still
-          want to insert the ModelRow before the MarkupRow(s) in the table, but
-          we do not want to focus the newly created row.
-          */
-          const boundaryNodes: [Table.RowNode | undefined, Table.RowNode | undefined] = [
-            params.apis.grid.getDisplayedRowAtIndex(loc.rowIndex),
-            params.apis.grid.getDisplayedRowAtIndex(loc.rowIndex + 1)
-          ];
-          if (!isNil(boundaryNodes[0]) && !isNil(boundaryNodes[1])) {
-            const boundaryRows: [Table.BodyRow<R>, Table.BodyRow<R>] = [boundaryNodes[0].data, boundaryNodes[1].data];
-            if (
-              tabling.typeguards.isMarkupRow(boundaryRows[1]) &&
-              tabling.typeguards.isModelRow(boundaryRows[0]) &&
-              rowIndex > 0
-            ) {
-              moveToLocation({ rowIndex: rowIndex - 1, column: loc.column });
-              movedLocation = true;
-            }
-          }
+          // We do not want to refocus the cell if a new row is being added, as
+          // that is handled in the HOC.
+          doNotMoveLocation = true;
         }
       }
-      if (!movedLocation) {
+      if (!doNotMoveLocation) {
         moveToLocation({ rowIndex, column: loc.column });
       }
     }
