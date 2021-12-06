@@ -1,17 +1,14 @@
 /// <reference path="./payloads.d.ts" />
 /// <reference path="./errors.d.ts" />
 
-/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-namespace Http {
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+declare namespace Http {
+
   type ErrorResponse = {
-    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-    readonly errors: Http.Error[];
+    readonly errors: Error[];
     readonly user_id?: number;
     readonly force_logout?: true;
   };
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface ListResponse<T> {
     readonly count: number;
     readonly data: T[];
@@ -19,25 +16,21 @@ namespace Http {
     readonly previous?: string | null;
   }
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type TableResponse<M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly models: M[];
     readonly groups?: Model.Group[];
     readonly markups?: Model.Markup[];
   };
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface FileUploadResponse {
     readonly fileUrl: string;
   }
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type MarkupResponseTypes<B extends Model.Budget | Model.Template> =
     | BudgetContextDetailResponse<Model.Markup, B>
     | BudgetParentContextDetailResponse<Model.Markup, Model.Account, B>
     | BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, B>;
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ReorderResponse = { data: number[] };
 
   type BudgetContextDetailResponse<
@@ -62,7 +55,6 @@ namespace Http {
     readonly data: M;
   };
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type BulkModelResponse<M extends Model.HttpModel> = {
     readonly data: M[];
   };
@@ -72,7 +64,6 @@ namespace Http {
     readonly children: C[];
   };
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type BudgetBulkDeleteResponse<
     B extends Model.Budget | Model.Template,
     M extends Model.HttpModel
@@ -80,7 +71,6 @@ namespace Http {
     readonly budget: B;
   };
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type BudgetBulkResponse<
     B extends Model.Budget | Model.Template,
     M extends Model.HttpModel,

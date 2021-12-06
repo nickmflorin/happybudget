@@ -1,16 +1,16 @@
-interface ILazyBreadCrumbItem {
+declare interface ILazyBreadCrumbItem {
   readonly requiredParams: string[];
   readonly func: (params: any) => IBreadCrumbItem | IBreadCrumbItem[];
 }
 
-interface IBreadCrumbItem extends Omit<MenuItemModel, "render"> {
+declare interface IBreadCrumbItem extends Omit<MenuItemModel, "render"> {
   readonly tooltip?: Tooltip;
   readonly options?: MenuItemModel[];
   readonly primary?: boolean;
   readonly render?: () => React.ReactChild;
 }
 
-interface ISidebarItem {
+declare interface ISidebarItem {
   readonly icon?: IconOrElement | null | undefined;
   readonly activeIcon?: IconOrElement | null | undefined;
   readonly label?: string;
@@ -26,7 +26,7 @@ interface ISidebarItem {
   readonly onActivated?: () => void;
 }
 
-type LayoutClassNameParams = {
+declare type LayoutClassNameParams = {
   "expanded-layout": boolean | undefined,
   "collapsed-layout": boolean | undefined,
   "sidebar-visible": boolean | undefined,

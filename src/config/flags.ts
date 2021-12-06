@@ -16,9 +16,19 @@ export const evaluateMemoryFlag = (envVarName: string): boolean | undefined => {
 };
 
 export const evaluateFlagFromEnvOrMemory = (option: Application.ConfigOption): boolean => {
-  if (option.devOnly === true && process.env.NODE_ENV !== "development") {
-    return false;
+  if (option.env !== undefined) {
+    const envs = Array.isArray(option.env) ? option.env : [option.env];
+    if (!includes(envs, process.env.NODE_ENV)) {
+      return false;
+    }
   }
+  if (option.prodEnv !== undefined) {
+    const prodEnvs = Array.isArray(option.prodEnv) ? option.prodEnv : [option.prodEnv];
+    if (!includes(prodEnvs, process.env.REACT_APP_PRODUCTION_ENV)) {
+      return false;
+    }
+  }
+
   const valueFromEnv = evaluateEnvFlag(option.name);
   if (valueFromEnv !== undefined) {
     return valueFromEnv;

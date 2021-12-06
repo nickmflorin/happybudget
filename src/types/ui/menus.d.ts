@@ -1,26 +1,26 @@
-type MenuMode = "single" | "multiple";
+declare type MenuMode = "single" | "multiple";
 
-type IMenuItemState<M extends MenuItemModel> = {
+declare type IMenuItemState<M extends MenuItemModel> = {
   readonly model: M;
   readonly selected: boolean;
 };
 
-type MenuItemClickEvent<M extends MenuItemModel> = {
+declare type MenuItemClickEvent<M extends MenuItemModel> = {
   readonly model: M;
   readonly event: Table.CellDoneEditingEvent;
   readonly closeParentDropdown: (() => void) | undefined;
 };
 
-type MenuChangeEvent<M extends MenuItemModel> = MenuItemClickEvent<M> & {
+declare type MenuChangeEvent<M extends MenuItemModel> = MenuItemClickEvent<M> & {
   readonly selected: boolean;
   readonly state: IMenuItemState<M>[];
 };
 
-type MenuButtonClickEvent<M extends MenuItemModel> = {
+declare type MenuButtonClickEvent<M extends MenuItemModel> = {
   readonly state: IMenuItemState<M>[];
 };
 
-type MenuItemModel = Model.Model & {
+declare type MenuItemModel = Model.Model & {
   readonly label?: string | number | null;
   readonly icon?: IconOrElement;
   readonly loading?: boolean;
@@ -32,7 +32,7 @@ type MenuItemModel = Model.Model & {
   readonly render?: () => import("react").ReactNode;
 };
 
-type ExtraMenuItemModel = MenuItemModel & {
+declare type ExtraMenuItemModel = MenuItemModel & {
   readonly showOnNoSearchResults?: boolean;
   readonly focusOnNoSearchResults?: boolean;
   readonly leaveAtBottom?: boolean;
@@ -40,7 +40,7 @@ type ExtraMenuItemModel = MenuItemModel & {
   readonly focusOnNoData?: boolean;
 };
 
-interface ICommonMenuItem<M extends MenuItemModel> extends Omit<StandardComponentProps, "id"> {
+declare interface ICommonMenuItem<M extends MenuItemModel> extends Omit<StandardComponentProps, "id"> {
   readonly model: M;
   readonly menuId: string;
   readonly focused: boolean;
@@ -49,7 +49,7 @@ interface ICommonMenuItem<M extends MenuItemModel> extends Omit<StandardComponen
   readonly closeParentDropdown?: () => void;
 }
 
-interface IMenuItem<M extends MenuItemModel> extends StandardComponentProps, ICommonMenuItem<M> {
+declare interface IMenuItem<M extends MenuItemModel> extends StandardComponentProps, ICommonMenuItem<M> {
   readonly level: number;
   readonly selected: boolean;
   readonly checkbox?: boolean;
@@ -57,9 +57,9 @@ interface IMenuItem<M extends MenuItemModel> extends StandardComponentProps, ICo
   readonly renderContent?: (model: M, context: { level: number }) => JSX.Element;
 }
 
-type IExtraMenuItem = Omit<StandardComponentProps, "id"> & ICommonMenuItem<ExtraMenuItemModel>;
+declare type IExtraMenuItem = Omit<StandardComponentProps, "id"> & ICommonMenuItem<ExtraMenuItemModel>;
 
-type IMenu<M extends MenuItemModel> = StandardComponentProps & {
+declare type IMenu<M extends MenuItemModel> = StandardComponentProps & {
   readonly models: M[];
   readonly checkbox?: boolean;
   readonly selected?: ID[] | null | undefined | ID;
@@ -85,7 +85,7 @@ type IMenu<M extends MenuItemModel> = StandardComponentProps & {
   readonly closeParentDropdown?: () => void;
 };
 
-interface IMenuItems<M extends MenuItemModel> extends Omit<IMenuItem<M>, "selected" | "focused" | "model"> {
+declare interface IMenuItems<M extends MenuItemModel> extends Omit<IMenuItem<M>, "selected" | "focused" | "model"> {
   readonly models: M[];
   readonly selected?: ID[];
   readonly checkbox?: boolean;
@@ -96,7 +96,7 @@ interface IMenuItems<M extends MenuItemModel> extends Omit<IMenuItem<M>, "select
   readonly closeParentDropdown?: () => void;
 }
 
-type IMenuRef<M extends MenuItemModel> = {
+declare type IMenuRef<M extends MenuItemModel> = {
   readonly getState: () => IMenuItemState<M>[];
   readonly getSearchValue: () => string;
   readonly incrementFocusedIndex: () => void;
@@ -107,7 +107,7 @@ type IMenuRef<M extends MenuItemModel> = {
   readonly focusSearch: (value: boolean, search?: string) => void;
 };
 
-interface IMenuButton<M extends MenuItemModel> {
+declare interface IMenuButton<M extends MenuItemModel> {
   readonly label: string;
   readonly className?: string;
   readonly style?: React.CSSProperties;

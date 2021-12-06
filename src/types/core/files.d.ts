@@ -1,10 +1,8 @@
-/// <reference path="../modeling/http.d.ts" />
-
-type CSVRow = (string | number | null | undefined)[];
-type CSVData = CSVRow[];
+declare type CSVRow = (string | number | null | undefined)[];
+declare type CSVData = CSVRow[];
 
 // Image data that is received from the API.
-type SavedImage = {
+declare type SavedImage = {
   readonly url: string; // URL will be string, unless something happened with S3.
   readonly size: number;
   readonly height: number;
@@ -13,7 +11,7 @@ type SavedImage = {
 }
 
 // Image data that is received from an upload, but not saved to the API.
-type UploadedImage = {
+declare type UploadedImage = {
   readonly file: File | Blob;
   readonly size?: number;
   readonly name: string;
@@ -22,13 +20,13 @@ type UploadedImage = {
   readonly data: string | ArrayBuffer;
 }
 
-type UploadError = Error | string;
-type UploadFile = import("antd/lib/upload/interface").UploadFile<Http.FileUploadResponse>;
+declare type UploadError = Error | string;
+declare type UploadFile = import("antd/lib/upload/interface").UploadFile<Http.FileUploadResponse>;
 
-type UploadImageParamsNoImage = { loading: boolean, onClear: () => void, error?: UploadError | null };
-type UploadImageParamsWithImage = UploadImageParamsNoImage & { image: UploadedImage | SavedImage }
-type UploadImageParams = UploadImageParamsWithImage | UploadImageParamsNoImage;
+declare type UploadImageParamsNoImage = { loading: boolean, onClear: () => void, error?: UploadError | null };
+declare type UploadImageParamsWithImage = UploadImageParamsNoImage & { image: UploadedImage | SavedImage }
+declare type UploadImageParams = UploadImageParamsWithImage | UploadImageParamsNoImage;
 
-type IUploaderRef = {
+declare type IUploaderRef = {
   readonly clear: () => void;
 }

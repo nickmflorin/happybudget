@@ -1,6 +1,6 @@
-type AlertType = "error" | "info" | "warning" | "success";
+declare type AlertType = "error" | "info" | "warning" | "success";
 
-type IAlert = {
+declare type IAlert = {
   readonly type: AlertType;
   readonly title?: string;
   readonly message?: string | Http.Error;

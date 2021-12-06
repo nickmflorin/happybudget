@@ -17,11 +17,21 @@ export * as flags from "./flags";
 export * as localization from "./localization";
 
 export const ConfigOptions: Application.ConfigOption[] = [
-  { name: "tableDebug", default: false, devOnly: true },
-  { name: "tableRowOrdering", default: true, devOnly: true },
-  { name: "reportWebVitals", default: false },
-  { name: "whyDidYouRender", default: false, devOnly: true }
+  { name: "tableDebug", default: false, prodEnv: "local" },
+  { name: "tableRowOrdering", default: true, prodEnv: ["local", "dev"] },
+  { name: "reportWebVitals", default: false, prodEnv: "local" },
+  { name: "whyDidYouRender", default: false, prodEnv: "local" }
 ];
+
+const RequiredEnvironmentVariables = ["REACT_APP_API_DOMAIN", "REACT_APP_PRODUCTION_ENV"];
+
+const validateEnvironmentVariables = () => {
+  for (let i = 0; i < RequiredEnvironmentVariables.length; i++) {
+    if (process.env[RequiredEnvironmentVariables[i]] === undefined) {
+      throw new Error(`Environment variable ${RequiredEnvironmentVariables[i]} is not defined!`);
+    }
+  }
+};
 
 export const Config: Application.Config = reduce(
   ConfigOptions,
@@ -35,6 +45,7 @@ export const Config: Application.Config = reduce(
 let prevPath: string | null = null;
 
 const configureApplication = async (history: History) => {
+  validateEnvironmentVariables();
   configureAgGrid();
   configureFontAwesome();
 

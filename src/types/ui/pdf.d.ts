@@ -1,13 +1,11 @@
-/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-namespace Pdf {
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+declare namespace Pdf {
+
   type Style = import("@react-pdf/types").Style;
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+
   type Styles = import("@react-pdf/renderer").default.Styles;
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ExtensionStyle = ReactPdfStyle & { ext?: SingleOrArray<string>, fontFamily?: FontFamily };
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+
   type ExtensionStyles = {[key: string]: ExtensionStyle};
 
   type HTMLNodeType = "paragraph" | "header" | "text" | "fontStyle";
@@ -49,9 +47,8 @@ namespace Pdf {
 
   type HTMLNode = HTMLTextNode | HTMLParagraphNode | HTMLHeadingNode | HTMLFontStyleNode;
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type SupportedFontStyle = { name: FontStyleName, tag: SupportedFontStyleTag };
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+
   type Font = {
     readonly src: any;
     readonly fontWeight: FontWeight;
@@ -62,15 +59,12 @@ namespace Pdf {
     readonly numPages: number;
   }
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type DocumentProps = import("@react-pdf/renderer").default.DocumentProps & {children: JSX.Element | JSX.Element[]};
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type PageRenderParams = {
     readonly pageNumber: number;
   }
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type RenderDocumentProps = {
     readonly title?: string;
     readonly file?: string | ArrayBuffer | null;

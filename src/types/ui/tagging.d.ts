@@ -6,19 +6,19 @@
  *
  * <MultipleTags tags={[{ text: "foo", color: "red" }]} />
  */
- interface ITag {
+declare interface ITag {
   readonly color?: Style.HexColor | undefined | null;
   readonly textColor?: Style.HexColor | undefined | null;
   readonly uppercase?: boolean;
   readonly text: string;
 }
 
-type PluralityWithModel<M extends Model.Model = Model.Model> = {
+declare type PluralityWithModel<M extends Model.Model = Model.Model> = {
   readonly isPlural?: boolean;
   readonly model: M;
 }
 
-interface ITagRenderParams<S extends object = React.CSSProperties> {
+declare interface ITagRenderParams<S extends object = React.CSSProperties> {
   readonly className: string | undefined;
   readonly textClassName: string | undefined;
   readonly style: S | undefined;
@@ -33,7 +33,7 @@ interface ITagRenderParams<S extends object = React.CSSProperties> {
   readonly disabled?: boolean;
 }
 
-type TagProps<M extends Model.Model = Model.Model, S extends object = React.CSSProperties> = {
+declare type TagProps<M extends Model.Model = Model.Model, S extends object = React.CSSProperties> = {
   readonly className?: string;
   readonly textClassName?: string;
   readonly style?: S;
@@ -61,7 +61,7 @@ type TagProps<M extends Model.Model = Model.Model, S extends object = React.CSSP
   readonly disabled?: boolean;
 }
 
-type MultipleTagsProps<M extends Model.Model = Model.Model> = StandardComponentProps & {
+declare type MultipleTagsProps<M extends Model.Model = Model.Model> = StandardComponentProps & {
   // <Tag> components should be generated based on a set of provided models M.
   readonly models?: (M | PluralityWithModel<M>)[];
   // <Tag> components are provided as children to the component:
@@ -77,13 +77,13 @@ type MultipleTagsProps<M extends Model.Model = Model.Model> = StandardComponentP
   readonly onMissing?: JSX.Element | EmptyTagProps;
 }
 
-interface VisibleEmptyTagProps extends StandardComponentProps {
+declare interface VisibleEmptyTagProps extends StandardComponentProps {
   readonly visible?: true;
   readonly text: string;
 }
 
-interface InvisibleEmptyTagProps extends StandardComponentProps {
+declare interface InvisibleEmptyTagProps extends StandardComponentProps {
   readonly visible: false;
 }
 
-type EmptyTagProps = VisibleEmptyTagProps | InvisibleEmptyTagProps;
+declare type EmptyTagProps = VisibleEmptyTagProps | InvisibleEmptyTagProps;

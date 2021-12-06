@@ -1,7 +1,4 @@
-/// <reference path="../tabling/table.d.ts" />
-
-/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-namespace Tables {
+declare namespace Tables {
   interface BudgetRowData extends Model.LineMetrics {
     readonly identifier: string | null;
     readonly description: string | null;
@@ -10,9 +7,8 @@ namespace Tables {
 
   interface AccountRowData extends BudgetRowData {}
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type AccountRow = Table.ModelRow<AccountRowData>;
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+
   type AccountTableStore = Redux.BudgetTableStore<AccountRowData>;
 
   interface SubAccountRowData
@@ -24,16 +20,15 @@ namespace Tables {
     readonly contact?: number | null;
   }
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type SubAccountRow = Table.ModelRow<SubAccountRowData>;
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+
   type SubAccountTableStore = Redux.BudgetTableStore<SubAccountRowData> & {
     readonly fringes: FringeTableStore;
     readonly subaccountUnits: Model.Tag[];
   };
 
   type FringeRowData = Pick<Model.Fringe, "color" | "name" | "description" | "cutoff" | "rate" | "unit">;
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+
   type FringeRow = Table.ModelRow<FringeRowData>;
   type FringeTableStore = Redux.TableStore<FringeRowData> & {
     readonly fringeColors: string[];
@@ -53,9 +48,8 @@ namespace Tables {
     | "attachments"
   >;
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ActualRow = Table.ModelRow<ActualRowData>;
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+
   type ActualTableStore = Redux.TableStore<ActualRowData> & {
     readonly owners: Redux.AuthenticatedModelListResponseStore<Model.ActualOwner>;
     readonly types: Model.Tag[];
@@ -75,8 +69,7 @@ namespace Tables {
     | "attachments"
   >;
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ContactRow = Table.ModelRow<ContactRowData>;
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+
   type ContactTableStore = Redux.TableStore<ContactRowData>;
 }

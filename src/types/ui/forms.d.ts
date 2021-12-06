@@ -1,35 +1,35 @@
-type RootFormInstance<T> = import("antd/lib/form").FormInstance<T>;
-type RootFormProps = import("antd/lib/form").FormProps;
+declare type RootFormInstance<T> = import("antd/lib/form").FormInstance<T>;
+declare type RootFormProps = import("antd/lib/form").FormProps;
 
-type FormFieldNotification = {
+declare type FormFieldNotification = {
   readonly field: string;
   readonly message: string;
 };
 
-type FormNotificationWithMeta<S> = {
-  readonly type?: AlertType;
+declare type FormNotificationWithMeta<S> = {
+  readonly declare type?: AlertType;
   readonly closable?: boolean;
   readonly notification: S;
 };
 
-type RawFormNotification =
+declare type RawFormNotification =
   | JSX.Element
   | FormFieldNotification
   | IAlert
   | string
   | Http.Error;
 
-type FormNotification =
+declare type FormNotification =
   | RawFormNotification
   | FormNotificationWithMeta<Http.Error | string>;
 
-type FormNotifyOptions = {
-  readonly type?: AlertType;
+declare type FormNotifyOptions = {
+  readonly declare type?: AlertType;
   readonly append?: boolean;
   readonly closable?: boolean;
 };
 
-interface FormInstance<T> extends RootFormInstance<T> {
+declare interface FormInstance<T> extends RootFormInstance<T> {
   readonly notify: (notifications: SingleOrArray<FormNotification>, opts?: FormNotifyOptions) => void;
   readonly clearNotifications: () => void;
   readonly setLoading: (value: boolean) => void;
@@ -43,10 +43,10 @@ interface FormInstance<T> extends RootFormInstance<T> {
   readonly autoFocusField?: boolean | number;
 }
 
-// The type of iterable passed to AntD's form.setFields([...])
-type FormField<M> = { readonly name: keyof M; readonly value: M[keyof M] };
+// The declare type of iterable passed to AntD's form.setFields([...])
+declare type FormField<M> = { readonly name: keyof M; readonly value: M[keyof M] };
 
-interface FormProps<T> extends Omit<RootFormProps, "style" | "id" | "className">, StandardComponentProps {
+declare interface FormProps<T> extends Omit<RootFormProps, "style" | "id" | "className">, StandardComponentProps {
   readonly loading?: boolean;
   readonly form: FormInstance<T>;
   // If it is a boolean, it will automatically focus the first field based on

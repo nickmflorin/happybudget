@@ -1,3 +1,6 @@
+/// <reference types="@welldone-software/why-did-you-render" />
+/// <reference types="node" />
+
 declare module "*.ttf";
 declare module "classnames";
 declare module "@editorjs/paragraph";
@@ -27,3 +30,28 @@ declare module "@ckeditor/ckeditor5-react" {
   const CKEditor: React.FunctionComponent<CKEditorProps>;
   export { CKEditor, CKEditorProps, Event as CKEditorEvent, BalloonEditor as EditorInstance };
 }
+
+type ID = string | number;
+
+type FnWithTypedArgs<T, ARGS extends any[]> = (...args: ARGS) => T;
+
+type NonNullable<T> = Exclude<T, null | undefined>;
+
+type Writeable<T extends { [x: string]: any }, K extends string> = {
+  [P in K]: T[P];
+}
+
+type SingleOrArray<T> = T | T[];
+
+type FlattenIfArray<T> = T extends (infer R)[] ? R : T
+type ArrayIfSingle<T> = T extends Array<any> ? T : T[];
+
+type NonNullRef<T> = {
+  readonly current: T;
+}
+
+type SetUndefined<T, W extends keyof T> = Omit<T, W> & Record<W, undefined>;
+type SetOptional<T, W extends keyof T> = Omit<T, W> & Partial<Pick<T, W>>;
+type SetRequired<T, W extends keyof T> = Omit<T, W> & Required<Pick<T, W>>;
+
+type RenderPropChild<PARAMS = any> = (p: PARAMS) => import("react").ReactElement<any, any>;

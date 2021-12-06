@@ -1,9 +1,9 @@
-type AppNotification = Error | string | object;
+declare type AppNotification = Error | string | object;
 
-type AppNotificationConsoleLevel = "info" | "error" | "warning";
-type AppNotificationLevel = AppNotificationConsoleLevel | "success";
+declare type AppNotificationConsoleLevel = "info" | "error" | "warning";
+declare type AppNotificationLevel = AppNotificationConsoleLevel | "success";
 
-interface AppNotificationContext<L extends AppNotificationLevel = AppNotificationLevel> {
+declare interface AppNotificationContext<L extends AppNotificationLevel = AppNotificationLevel> {
   readonly message?: string;
   readonly dispatchToSentry?: boolean;
   readonly notifyUser?: boolean;

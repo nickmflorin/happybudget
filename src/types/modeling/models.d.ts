@@ -1,12 +1,10 @@
-/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-namespace Model {
+
+declare namespace Model {
   /* eslint-disable no-shadow */
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface Model {
     readonly id: ID;
   }
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type PartialModel<M extends Model> = Partial<Omit<M, "id">> & Pick<M, "id">;
 
   type HttpModelType =
@@ -32,7 +30,6 @@ namespace Model {
     readonly order: string;
   }
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type GenericHttpModel<T extends HttpModelType> = {
     readonly type: T;
     readonly id: number;
@@ -43,11 +40,10 @@ namespace Model {
     name: N;
   }
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type MarkupUnitId = 0 | 1;
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+
   type MarkupUnitName = "Percent" | "Flat";
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+
   type MarkupUnit = Choice<0, "Percent"> | Choice<1, "Flat">;
 
   type FringeUnitId = 0 | 1;
@@ -58,23 +54,17 @@ namespace Model {
   type ContactTypeId = 0 | 1 | 2;
   type ContactType = Choice<ContactTypeId, ContactTypeName>;
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ParentType = "account" | "subaccount" | "budget";
   type BudgetDomain = "budget" | "template";
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type Entity = Account | SubAccount | Budget | Template | Markup;
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ModelWithColor = HttpModel & { color: Style.HexColor | null };
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ModelWithName = HttpModel & { name: string | null };
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ModelWithDescription = HttpModel & { description: string | null };
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ModelWithIdentifier = HttpModel & { identifier: string | null };
 
   interface Tag extends HttpModel {
@@ -113,12 +103,10 @@ namespace Model {
     readonly url: string;
   }
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface Attachment extends SimpleAttachment {
     readonly size: number;
   }
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface Fringe extends RowHttpModel<"fringe"> {
     readonly color: Style.HexColor | null;
     readonly name: string | null;
@@ -185,7 +173,6 @@ namespace Model {
     readonly accumulated_markup_contribution: number;
   }
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface PdfBudget extends RowHttpModel<"pdf-budget"> {
     readonly name: string;
     readonly nominal_value: number;
@@ -266,10 +253,8 @@ namespace Model {
     readonly children_markups: Markup[];
   }
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type ActualOwner = SimpleMarkup | SimpleSubAccount;
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface Actual extends RowHttpModel<"actual"> {
     readonly contact: number | null;
     readonly name: string | null;
@@ -301,7 +286,6 @@ namespace Model {
     readonly attachments: SimpleAttachment[];
   }
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type UserWithImage =
     | (User & { profile_image: SavedImage })
     | (SimpleUser & { profile_image: SavedImage })
@@ -311,7 +295,6 @@ namespace Model {
     readonly name: string;
   }
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   interface HeaderTemplate extends SimpleHeaderTemplate {
     readonly header: string | null;
     readonly left_image: SavedImage | null;
