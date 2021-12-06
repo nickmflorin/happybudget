@@ -116,13 +116,13 @@ export const createAuthenticatedTableSaga = <
       if (
         tabling.typeguards.isDataChangeEvent(e) ||
         // We do not want to buffer RowAdd events if the row is being added either
-        // by the `count` param or an empty payload (which means `count = 1`).
+        // by the RowAddIndexPayload or the RowAddCountPayload.
         (tabling.typeguards.isRowAddEvent(e) && tabling.typeguards.isRowAddDataEvent(e))
       ) {
         // Buffer and flush data change events and new row events that occur every 500ms -
         // this is particularly important for dragging cell values to update other cell
         // values as it submits a separate DataChangeEvent for every new cell value.
-        yield delay(200);
+        yield delay(500);
         const actions: Redux.Action<Table.ChangeEvent<R, M>>[] = yield flush(changeChannel);
         yield call(flushEvents, [action, ...actions]);
       } else {
