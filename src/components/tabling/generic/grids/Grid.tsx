@@ -240,13 +240,11 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
                   ? col.selectable({ row, column: col })
                   : col.selectable;
                 return tabling.aggrid.mergeClassNames<CellClassParams>(params, "cell", col.cellClass, {
-                  "cell--not-selectable": isSelectable === false,
-                  "cell--not-editable": !(col.editable === true)
+                  "cell--not-selectable": isSelectable === false
                 });
               }
               return tabling.aggrid.mergeClassNames<CellClassParams>(params, "cell", col.cellClass, {
-                "cell--not-selectable": true,
-                "cell--not-editable": true
+                "cell--not-selectable": true
               });
             }
           };

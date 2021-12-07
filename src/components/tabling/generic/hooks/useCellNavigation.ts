@@ -133,35 +133,33 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
       if (!p.editing && p.nextCellPosition !== null) {
         const field = p.nextCellPosition.column.getColId();
         const column = tabling.columns.getColumn(params.columns, field);
-        if (!isNil(column)) {
-          if (column.tableColumnType === "action") {
-            let nextCellPosition = { ...p.nextCellPosition };
-            /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-            const [rowNodes, _, additionalIndex] = findNextNavigatableNodes(p.api, p.nextCellPosition.rowIndex, {
-              includeRowInNavigation: params.includeRowInNavigation
-            });
-            if (rowNodes.length !== 0) {
-              nextCellPosition = {
-                ...p.nextCellPosition,
-                rowIndex: p.nextCellPosition.rowIndex + additionalIndex
-              };
-            }
-            const agColumns = params.apis?.column.getAllColumns();
-            if (!isNil(agColumns)) {
-              const baseColumns = filter(agColumns, (c: Table.AgColumn) =>
-                includes(
-                  map(
-                    filter(params.columns, (ci: Table.Column<R, M>) => ci.tableColumnType === "action"),
-                    (ci: Table.Column<R, M>) => tabling.columns.normalizedField<R, M>(ci)
-                  ),
-                  c.getColId()
-                )
-              );
-              if (p.backwards === false && params.columns.length > baseColumns.length) {
-                return { ...nextCellPosition, column: agColumns[baseColumns.length] };
-              } else {
-                return { ...nextCellPosition, column: agColumns[agColumns.length - 1] };
-              }
+        if (!isNil(column) && column.tableColumnType === "action") {
+          let nextCellPosition = { ...p.nextCellPosition };
+          /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+          const [rowNodes, _, additionalIndex] = findNextNavigatableNodes(p.api, p.nextCellPosition.rowIndex, {
+            includeRowInNavigation: params.includeRowInNavigation
+          });
+          if (rowNodes.length !== 0) {
+            nextCellPosition = {
+              ...p.nextCellPosition,
+              rowIndex: p.nextCellPosition.rowIndex + additionalIndex
+            };
+          }
+          const agColumns = params.apis?.column.getAllColumns();
+          if (!isNil(agColumns)) {
+            const baseColumns = filter(agColumns, (c: Table.AgColumn) =>
+              includes(
+                map(
+                  filter(params.columns, (ci: Table.Column<R, M>) => ci.tableColumnType === "action"),
+                  (ci: Table.Column<R, M>) => tabling.columns.normalizedField<R, M>(ci)
+                ),
+                c.getColId()
+              )
+            );
+            if (p.backwards === false && params.columns.length > baseColumns.length) {
+              return { ...nextCellPosition, column: agColumns[baseColumns.length] };
+            } else {
+              return { ...nextCellPosition, column: agColumns[agColumns.length - 1] };
             }
           }
         }
