@@ -9,36 +9,31 @@
     display: flex;
     flex-direction: column;
 
-    > * {
-      margin-bottom: 20px;
-      &:last-child {
-        margin-bottom: 0px;
-      }
-    }
-
     .page-header-title {
-      flex-grow: 100;
+			color: $text-primary !important;
+			font-weight: 700;
+			font-family: $avenir;
+			font-size: 28px;
+			line-height: 36px;
 
-      .title-text-wrapper {
-        .page-header-title-text {
-          margin-right: 0px;
-          margin-bottom: 0;
-          color: $text-primary !important;
-          font-weight: 700;
-          font-family: $avenir;
-          font-size: 28px;
-          line-height: 36px;
-        }
-      }
+			&.with-sub-menu {
+				margin-bottom: 14px;
+			}
+		}
 
-      .extra-wrapper {
-        display: flex;
-      }
-    }
+		.sub-menu {
+			display: flex;
 
-    .page-header-subtitle {
-      display: flex;
-    }
+			> * {
+				&:not(:last-child) {
+					margin-right: 10px;
+				}
+			}
+
+			> .input {
+				max-width: 300px;
+			}
+		}
   }
 
   .page-content {

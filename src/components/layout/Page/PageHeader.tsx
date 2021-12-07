@@ -1,36 +1,33 @@
 import React from "react";
 import { isNil, map } from "lodash";
 import classNames from "classnames";
-import { ShowHide, VerticalFlexCenter } from "components";
 
-export interface PageHeaderProps extends StandardComponentWithChildrenProps {
-  readonly title?: string;
+export interface PageHeaderProps extends StandardComponentProps {
+  readonly title: string;
   readonly titleProps?: StandardComponentProps;
-  readonly extra?: JSX.Element[];
+  readonly subMenu?: JSX.Element[];
 }
 
-const PageHeader: React.FC<PageHeaderProps> = ({ title, extra, titleProps = {}, children, ...props }): JSX.Element => {
+const PageHeader = ({ title, titleProps = {}, subMenu, ...props }: PageHeaderProps): JSX.Element => {
   return (
     <div {...props} className={classNames("page-header", props.className)}>
-      <div className={classNames("page-header-title")}>
-        <div className={"title-text-wrapper"}>
-          <ShowHide show={!isNil(title)}>
-            <div className={classNames("page-header-title-text", titleProps.className)} style={titleProps.style}>
-              {title}
-            </div>
-          </ShowHide>
-        </div>
-        {!isNil(extra) && (
-          <div className={"extra-wrapper"}>
-            {map(extra, (item: JSX.Element, index: number) => {
-              return <VerticalFlexCenter key={index}>{item}</VerticalFlexCenter>;
-            })}
-          </div>
-        )}
+      <div
+        className={classNames("page-header-title", titleProps?.className, {
+          "with-sub-menu": !isNil(subMenu) && subMenu.length !== 0
+        })}
+        style={titleProps?.style}
+      >
+        {title}
       </div>
-      {!isNil(children) && <div className={"page-header-subtitle"}>{children}</div>}
+      {!isNil(subMenu) && (
+        <div className={"sub-menu"}>
+          {map(subMenu, (element: JSX.Element, index: number) => (
+            <React.Fragment key={index}>{element}</React.Fragment>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
-export default PageHeader;
+export default React.memo(PageHeader);

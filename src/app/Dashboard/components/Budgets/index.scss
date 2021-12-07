@@ -1,18 +1,7 @@
 @import "style/_imports";
 
-.budget-sub-title {
-  display: flex;
-  flex-grow: 100;
-
-  .input {
-    margin-right: 10px;
-
-    @include media(">=xl") {
-      max-width: 300px;
-    }
-  }
-
-  .btn-non-circle {
+.budgets-page {
+	.btn-non-circle {
     display: none;
 
     @include media(">=xl") {

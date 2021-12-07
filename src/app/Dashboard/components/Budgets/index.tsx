@@ -6,16 +6,19 @@ import { Pagination } from "antd";
 
 import * as api from "api";
 import { redux, notifications } from "lib";
-import { DeleteBudgetModal } from "components/modals";
 
+import { Icon } from "components";
+import { Button, CircleIconButton } from "components/buttons";
 import { BudgetCard } from "components/cards";
 import { NoBudgets } from "components/empty";
+import { Input } from "components/fields";
 import { Page } from "components/layout";
-import { EditBudgetModal, CreateBudgetModal } from "components/modals";
+import { EditBudgetModal, DeleteBudgetModal, CreateBudgetModal } from "components/modals";
 import { BudgetEmptyIcon } from "components/svgs";
 
 import { actions } from "../../store";
-import BudgetsSubTitle from "./BudgetsSubTitle";
+import BudgetDropdown from "./BudgetDropdown";
+import "./index.scss";
 
 const selectBudgets = (state: Application.Authenticated.Store) => state.dashboard.budgets.data;
 const selectBudgetsResponseReceived = (state: Application.Authenticated.Store) =>
@@ -24,6 +27,7 @@ const selectLoadingBudgets = (state: Application.Authenticated.Store) => state.d
 const selectBudgetPage = (state: Application.Authenticated.Store) => state.dashboard.budgets.page;
 const selectBudgetPageSize = (state: Application.Authenticated.Store) => state.dashboard.budgets.pageSize;
 const selectBudgetsCount = (state: Application.Authenticated.Store) => state.dashboard.budgets.count;
+const selectBudgetsSearch = (state: Application.Authenticated.Store) => state.dashboard.budgets.search;
 
 const Budgets = (): JSX.Element => {
   const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
@@ -32,6 +36,7 @@ const Budgets = (): JSX.Element => {
   const [budgetToEdit, setBudgetToEdit] = useState<number | null>(null);
   const [budgetToDelete, setBudgetToDelete] = useState<Model.Budget | null>(null);
   const [createBudgetModalOpen, setCreateBudgetModalOpen] = useState(false);
+  const search = useSelector(selectBudgetsSearch);
 
   const history = useHistory();
 
@@ -50,11 +55,30 @@ const Budgets = (): JSX.Element => {
   return (
     <React.Fragment>
       <Page
+        pageProps={{ className: "budgets-page" }}
         className={"budgets"}
         loading={loading}
         title={"My Budgets"}
         contentScrollable={true}
-        subTitle={<BudgetsSubTitle onNewBudget={() => setCreateBudgetModalOpen(true)} />}
+        subMenu={[
+          <Input
+            placeholder={"Search Projects..."}
+            value={search}
+            allowClear={true}
+            prefix={<Icon icon={"search"} weight={"light"} />}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              dispatch(actions.setBudgetsSearchAction(event.target.value))
+            }
+          />,
+          <BudgetDropdown onNewBudget={() => setCreateBudgetModalOpen(true)}>
+            <CircleIconButton className={"btn--primary"} icon={<Icon icon={"plus"} weight={"light"} />} />
+          </BudgetDropdown>,
+          <BudgetDropdown onNewBudget={() => setCreateBudgetModalOpen(true)}>
+            <Button className={"btn--primary btn-non-circle"} icon={<Icon icon={"plus"} weight={"light"} />}>
+              {"Create Budget"}
+            </Button>
+          </BudgetDropdown>
+        ]}
       >
         {budgets.length === 0 && responseWasReceived ? (
           <NoBudgets title={"You don't have any templates yet! Create a new budget."} subTitle>

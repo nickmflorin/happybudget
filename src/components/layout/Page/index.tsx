@@ -9,17 +9,15 @@ import PageFooter from "./PageFooter";
 import "./index.scss";
 
 interface PageProps extends StandardComponentProps {
-  readonly className?: string;
   // Required for pages that do not have a full page table in them to get the
   // content area scrollable.
   readonly contentScrollable?: boolean;
   readonly children?: SingleOrArray<ReactNode>;
   readonly loading?: boolean;
-  readonly style?: React.CSSProperties;
-  readonly title?: string;
-  readonly subTitle?: JSX.Element;
+  readonly pageProps?: StandardComponentProps;
+  readonly title: string;
   readonly footer?: JSX.Element;
-  readonly extra?: JSX.Element[];
+  readonly subMenu?: JSX.Element[];
 }
 
 const Page = (props: PageProps): JSX.Element => {
@@ -38,15 +36,14 @@ const Page = (props: PageProps): JSX.Element => {
   }, [props.children]);
 
   return (
-    <div className={"page"} style={props.style}>
-      {!isNil(props.title) && (
-        <PageHeader title={props.title} extra={props.extra}>
-          {props.subTitle}
-        </PageHeader>
-      )}
+    <div className={classNames("page", props.pageProps?.className)} style={props.pageProps?.style}>
+      <PageHeader title={props.title} subMenu={props.subMenu} />
       <WrapInApplicationSpinner loading={props.loading}>
         {childrenArray.length !== 0 && (
-          <div className={classNames("page-content", props.className, { scrollable: props.contentScrollable })}>
+          <div
+            className={classNames("page-content", props.className, { scrollable: props.contentScrollable })}
+            style={props.style}
+          >
             {map(childrenArray, (element: JSX.Element, index: number) => (
               <React.Fragment key={index}>{element}</React.Fragment>
             ))}
