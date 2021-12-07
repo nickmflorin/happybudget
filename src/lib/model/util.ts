@@ -20,8 +20,8 @@ export const getGroupColorDefinition = (
     }
   }
   return {
-    backgroundColor: Colors.DEFAULT_GROUP_ROW_BACKGROUND,
-    color: util.colors.contrastedForegroundColor(Colors.DEFAULT_GROUP_ROW_BACKGROUND)
+    backgroundColor: Colors.COLOR_NO_COLOR,
+    color: util.colors.contrastedForegroundColor(Colors.COLOR_NO_COLOR)
   };
 };
 

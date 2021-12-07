@@ -86,17 +86,17 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
   const tagColor = useMemo((): Style.HexColor => {
     const validateAndReturnColor = (color: Style.HexColor | null | undefined, field: string): Style.HexColor => {
       if (isNil(color)) {
-        return Colors.DEFAULT_TAG_BACKGROUND;
+        return Colors.COLOR_NO_COLOR;
       } else if (typeof color !== "string") {
         console.error(`The field ${field} did not return a string color.`);
-        return Colors.DEFAULT_TAG_BACKGROUND;
+        return Colors.COLOR_NO_COLOR;
       }
       if (!color.startsWith("#")) {
         color = `#${color}`;
       }
       if (color.length !== 7) {
         console.error(`The field ${field} did not return a valid HEX string color.`);
-        return Colors.DEFAULT_TAG_BACKGROUND;
+        return Colors.COLOR_NO_COLOR;
       }
       return color;
     };
@@ -119,7 +119,7 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
       } else if (typeof m.id === "number" && !isNil(colorScheme[m.id])) {
         return colorScheme[m.id];
       }
-      return Colors.DEFAULT_TAG_BACKGROUND;
+      return Colors.COLOR_NO_COLOR;
     };
     if (!isNil(props.color)) {
       return validateAndReturnColor(props.color, "color");
@@ -131,7 +131,7 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
       if (!isNil(colorScheme[props.colorIndex])) {
         return colorScheme[props.colorIndex];
       }
-      return Colors.DEFAULT_TAG_BACKGROUND;
+      return Colors.COLOR_NO_COLOR;
     }
     return util.selectConsistent(colorScheme, tagText as string);
   }, [props]);

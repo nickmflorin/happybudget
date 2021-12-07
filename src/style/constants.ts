@@ -30,9 +30,7 @@ export const Colors: { [key: string]: Style.HexColor } = {
   TEXT_PRIMARY: "#404152",
   TEXT_SECONDARY: "#424242",
   TABLE_BORDER: "#F7F7F7",
-  DEFAULT_TAG_BACKGROUND: "#EFEFEF",
-  DEFAULT_GROUP_ROW_BACKGROUND: "#EFEFEF",
-  COLOR_NO_COLOR: "#585858"
+  COLOR_NO_COLOR: "#EFEFEF"
 };
 
 export const TABLE_BORDER_RADIUS = 8;

@@ -1,7 +1,7 @@
 import { forwardRef, useImperativeHandle, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
-import { ColorSelect } from "components/fields";
+import { ColorGrid } from "components/tagging";
 import { ui } from "lib";
 
 const KEY_BACKSPACE = 8;
@@ -37,7 +37,7 @@ const FringesColorEditor = (props: FringesColorEditorProps, ref: any) => {
     };
   });
 
-  return <ColorSelect colors={colors} value={value} onChange={(v: string) => setValue(v)} />;
+  return <ColorGrid colors={colors} value={value} onChange={(v: string) => setValue(v)} />;
 };
 
 export default forwardRef(FringesColorEditor);
