@@ -1,13 +1,13 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { isNil, filter, reduce } from "lodash";
 
-import { redux } from "lib";
+import { redux, tabling } from "lib";
 import { actions as globalActions, selectors } from "store";
 
 import { Portal, BreadCrumbs } from "components/layout";
-import { useContacts } from "components/hooks";
+import { useContacts, CreateContactParams } from "components/hooks";
 import { ActualsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../store";
@@ -50,10 +50,35 @@ interface ActualsProps {
 const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
   const dispatch = useDispatch();
   const contacts = useSelector(selectors.selectContacts);
+  const table = tabling.hooks.useTable<R>();
   const actualTypes = useSelector(selectActualTypes);
 
+  const onContactCreated = useMemo(
+    () => (m: Model.Contact, params?: CreateContactParams) => {
+      dispatch(globalActions.authenticated.addContactToStateAction(m));
+      // If we have enough information from before the contact was created in the specific
+      // cell, combine that information with the new value to perform a table update, showing
+      // the created contact in the new cell.
+      const rowId = params?.rowId;
+      if (!isNil(rowId)) {
+        const row: Table.BodyRow<R> | null = table.current.getRow(rowId);
+        if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
+          let rowChange: Table.RowChange<R> = {
+            id: row.id,
+            data: { contact: { oldValue: row.data.contact || null, newValue: m.id } }
+          };
+          table.current.applyTableChange({
+            type: "dataChange",
+            payload: rowChange
+          });
+        }
+      }
+    },
+    [table.current]
+  );
+
   const [createContactModal, editContactModal, editContact, createContact] = useContacts({
-    onCreated: (m: Model.Contact) => dispatch(globalActions.authenticated.addContactToStateAction(m)),
+    onCreated: onContactCreated,
     onUpdated: (m: Model.Contact) =>
       dispatch(globalActions.authenticated.updateContactInStateAction({ id: m.id, data: m }))
   });
@@ -73,11 +98,12 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
         />
       </Portal>
       <ConnectedActualsTable
+        table={table}
         contacts={contacts}
         actualTypes={actualTypes}
         onOwnersSearch={(value: string) => dispatch(actions.actuals.setActualOwnersSearchAction(value))}
         exportFileName={!isNil(budget) ? `${budget.name}_actuals` : "actuals"}
-        onNewContact={() => createContact()}
+        onNewContact={(params: { name?: string; rowId: Table.ModelRowId }) => createContact(params)}
         onEditContact={(params: { contact: number; rowId: Table.ModelRowId }) =>
           editContact({ id: params.contact, rowId: params.rowId })
         }
