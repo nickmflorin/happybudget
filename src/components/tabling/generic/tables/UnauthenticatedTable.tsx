@@ -175,6 +175,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
       showPageFooter={props.showPageFooter}
       footer={
         <PageFooterGrid
+          tableId={props.id}
           onGridReady={props.onPageGridReady}
           onFirstDataRendered={props.onFirstDataRendered}
           gridOptions={props.tableGridOptions.page}
@@ -189,6 +190,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
         <UnauthenticatedMenu<R, M> {...props} apis={props.tableApis.get("data")} />
         {props.children({
           ...props,
+          tableId: props.id,
           apis: props.tableApis.get("data"),
           columns: columns,
           grid,
@@ -196,6 +198,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
           onGridReady: props.onDataGridReady
         })}
         <TableFooterGrid
+          tableId={props.id}
           onGridReady={props.onFooterGridReady}
           onFirstDataRendered={props.onFirstDataRendered}
           gridOptions={props.tableGridOptions.footer}

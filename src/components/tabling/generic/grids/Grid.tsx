@@ -92,6 +92,7 @@ type UseAgProps<R extends Table.RowData> = ExtensionProps & {
 export interface GridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
   extends UseAgProps<R> {
   readonly id: Table.GridId;
+  readonly tableId: string;
   readonly data?: Table.BodyRow<R>[];
   readonly hiddenColumns?: Table.HiddenColumns;
   readonly gridOptions: Table.GridOptions;
@@ -116,6 +117,7 @@ export interface GridProps<R extends Table.RowData, M extends Model.RowHttpModel
 /* eslint-disable indent */
 const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
   id,
+  tableId,
   columns,
   data,
   className,
@@ -342,7 +344,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
         modules={AllModules}
         overlayNoRowsTemplate={"<span></span>"}
         overlayLoadingTemplate={"<span></span>"}
-        popupParent={document.querySelector("body") || undefined}
+        popupParent={document.getElementById(tableId) || undefined}
       />
     </div>
   );

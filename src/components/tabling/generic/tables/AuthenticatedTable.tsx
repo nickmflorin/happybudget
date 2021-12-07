@@ -307,6 +307,7 @@ const AuthenticatedTable = <
       showPageFooter={props.showPageFooter}
       footer={
         <PageFooterGrid
+          tableId={props.id}
           apis={props.tableApis.get("page")}
           onGridReady={props.onPageGridReady}
           onFirstDataRendered={props.onFirstDataRendered}
@@ -335,6 +336,7 @@ const AuthenticatedTable = <
         />
         {props.children({
           ...props,
+          tableId: props.id,
           apis: props.tableApis.get("data"),
           columns: columns,
           gridOptions: props.tableGridOptions.data,
@@ -345,6 +347,7 @@ const AuthenticatedTable = <
           rowHasCheckboxSelection: props.rowHasCheckboxSelection
         })}
         <TableFooterGrid
+          tableId={props.id}
           apis={props.tableApis.get("footer")}
           onGridReady={props.onFooterGridReady}
           onFirstDataRendered={props.onFirstDataRendered}
