@@ -7,7 +7,7 @@ import axios from "axios";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { ui, notifications } from "lib";
+import { ui, notifications, plugins } from "lib";
 import { ApplicationSpinner } from "components";
 import { history, configureAuthenticatedStore } from "store/configureStore";
 
@@ -39,21 +39,7 @@ const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): 
         const store = configureAuthenticatedStore(response);
         setReduxStore(store);
 
-        // We do not want to makes calls to Canny's API in local development by default.
-        if (!isNil(process.env.REACT_APP_CANNY_APP_ID)) {
-          window.Canny("identify", {
-            appID: process.env.REACT_APP_CANNY_APP_ID,
-            user: {
-              id: response.id,
-              email: response.email,
-              name: response.full_name,
-              avatarURL: response.profile_image?.url,
-              created: new Date(response.date_joined).toISOString()
-            }
-          });
-        } else if (process.env.NODE_ENV === "production") {
-          console.warn("Could not identify Canny user as ENV variable `REACT_APP_CANNY_APP_ID` is not defined.");
-        }
+        plugins.identifyCanny(response);
       })
       .catch((e: Error) => {
         if (!axios.isCancel(e)) {

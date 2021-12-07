@@ -38,18 +38,18 @@
             ];
             analytics.factory = function (e) {
               return function () {
-                var t = Array.prototype.slice.call(arguments);
+                const t = Array.prototype.slice.call(arguments);
                 t.unshift(e);
                 analytics.push(t);
                 return analytics;
               };
             };
-            for (var e = 0; e < analytics.methods.length; e++) {
-              var key = analytics.methods[e];
+            for (let e = 0; e < analytics.methods.length; e++) {
+              const key = analytics.methods[e];
               analytics[key] = analytics.factory(key);
             }
             analytics.load = function (key, e) {
-              var t = document.createElement("script");
+              const t = document.createElement("script");
               t.type = "text/javascript";
               t.async = !0;
               t.defer = !0;
@@ -67,27 +67,27 @@
     </script>
     <script>
       !(function (w, d, i, s) {
-        function l() {
+        function loadCannySdk() {
           if (!d.getElementById(i)) {
-            var f = d.getElementsByTagName(s)[0],
-              e = d.createElement(s);
-            (e.type = "text/javascript"),
-              (e.async = !0),
-              (e.src = "https://canny.io/sdk.js"),
-              f.parentNode.insertBefore(e, f);
+            const f = d.getElementsByTagName(s)[0];
+            const e = d.createElement(s);
+						e.type = "text/javascript";
+						e.async != 0;
+						e.src = "https://canny.io/sdk.js";
+						f.parentNode.insertBefore(e, f);
           }
         }
         if ("function" != typeof w.Canny) {
-          var c = function () {
+          const c = function () {
             c.q.push(arguments);
           };
           (c.q = []),
             (w.Canny = c),
             "complete" === d.readyState
-              ? l()
+              ? loadCannySdk()
               : w.attachEvent
-              ? w.attachEvent("onload", l)
-              : w.addEventListener("load", l, !1);
+              ? w.attachEvent("onload", loadCannySdk)
+              : w.addEventListener("load", loadCannySdk, !1);
         }
       })(window, document, "canny-jssdk", "script");
     </script>

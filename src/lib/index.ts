@@ -6,4 +6,5 @@ export * as model from "./model";
 export * as pdf from "./pdf";
 export * as budgeting from "./budgeting";
 export * as ui from "./ui";
+export * as plugins from "./plugins";
 export * as notifications from "./notifications";
