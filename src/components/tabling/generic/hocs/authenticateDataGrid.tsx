@@ -49,7 +49,6 @@ interface InjectedAuthenticatedDataGridProps<R extends Table.RowData> {
 
 export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
   extends UseContextMenuParams<R, M> {
-  readonly tableId: Table.Id;
   readonly grid: NonNullRef<Table.DataGridInstance>;
   readonly columns: Table.Column<R, M>[];
   readonly pinFirstColumn?: boolean;
@@ -386,7 +385,6 @@ const authenticateDataGrid =
 
       const [navigateToNextCell, tabToNextCell, moveToNextColumn, moveToNextRow] = useCellNavigation({
         apis: props.apis,
-        tableId: props.tableId,
         columns,
         includeRowInNavigation: config?.includeRowInNavigation,
         onNewRowRequired: (newRowIndex: number) => {

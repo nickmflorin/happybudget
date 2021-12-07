@@ -101,11 +101,9 @@ const genericReducer = combineReducers({
           updateRowsInState: actions.account.updateRowsInStateAction,
           setSearch: actions.account.setSearchAction
         },
-        tableId: "account-subaccounts-table",
         columns: SubAccountColumns,
         getModelRowChildren: (m: Model.SubAccount) => m.children,
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
-          tableId: "fringes-table",
           initialState: initialState.account.table.fringes,
           columns: FringesColumns,
           actions: {
@@ -124,7 +122,6 @@ const genericReducer = combineReducers({
     }
   }),
   accounts: budgeting.reducers.createAuthenticatedAccountsTableReducer({
-    tableId: "accounts-table",
     initialState: initialState.account.table,
     actions: {
       tableChanged: actions.accounts.handleTableChangeEventAction,
@@ -149,7 +146,6 @@ const genericReducer = combineReducers({
     },
     reducers: {
       table: budgeting.reducers.createAuthenticatedSubAccountsTableReducer({
-        tableId: "subaccount-subaccounts-table",
         initialState: initialState.subaccount.table,
         actions: {
           clear: actions.subAccount.clearAction,
@@ -165,7 +161,6 @@ const genericReducer = combineReducers({
         columns: SubAccountColumns,
         getModelRowChildren: (m: Model.SubAccount) => m.children,
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
-          tableId: "fringes-table",
           initialState: initialState.subaccount.table.fringes,
           columns: FringesColumns,
           actions: {
@@ -184,7 +179,6 @@ const genericReducer = combineReducers({
     }
   }),
   actuals: budgeting.reducers.createAuthenticatedActualsTableReducer({
-    tableId: "actuals-table",
     initialState: initialState.actuals,
     actions: {
       clear: actions.actuals.clearAction,

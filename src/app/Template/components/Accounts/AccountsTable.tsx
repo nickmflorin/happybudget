@@ -75,7 +75,6 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
   return (
     <React.Fragment>
       <ConnectedTable
-        tableId={"accounts-table"}
         table={table}
         budget={template}
         menuPortalId={"supplementary-header"}

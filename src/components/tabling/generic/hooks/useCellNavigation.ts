@@ -5,7 +5,6 @@ import { NavigateToNextCellParams, TabToNextCellParams } from "@ag-grid-communit
 import { hooks, tabling } from "lib";
 
 export interface UseCellNavigationParams<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
-  readonly tableId?: Table.Id;
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
   readonly includeRowInNavigation?: (row: Table.EditableRow<R>) => boolean;

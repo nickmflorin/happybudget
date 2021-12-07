@@ -10,7 +10,6 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
     Model.Contact,
     Tables.ContactTableStore
   >({
-    tableId: "contacts-table",
     columns: ContactsTable.Columns,
     actions: {
       tableChanged: actions.handleContactsTableChangeEventAction,

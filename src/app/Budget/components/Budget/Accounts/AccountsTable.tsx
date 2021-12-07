@@ -78,7 +78,6 @@ const AccountsTable = ({ budgetId, budget, setPreviewModalVisible }: AccountsTab
   return (
     <React.Fragment>
       <ConnectedTable
-        tableId={"accounts-table"}
         budget={budget}
         table={table}
         menuPortalId={"supplementary-header"}

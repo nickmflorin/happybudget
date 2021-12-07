@@ -2,8 +2,7 @@
 
 declare namespace Table {
   type Name = "account-subaccounts" | "accounts" | "subaccount-subaccounts" | "fringes" | "actuals" | "contacts";
-  type Id = `${Name}-table`;
-  type AsyncId = `async-${Id}`;
+  type AsyncId = `async-${Name}-table`;
 
   type AgGridProps = import("@ag-grid-community/react/lib/interfaces").AgGridReactProps;
 
@@ -748,7 +747,6 @@ declare namespace Table {
   > = TaskConfig<R, M, A> &
     Omit<CFG, "gridId" | "response"> & {
       readonly initialState: S;
-      readonly tableId: Id;
       readonly defaultData?: Partial<R>;
       readonly createTableRows?: (config: CFG) => BodyRow<R>[];
       readonly getModelRowChildren?: (m: M) => number[];

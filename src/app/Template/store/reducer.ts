@@ -21,7 +21,6 @@ const genericReducer = combineReducers({
     }
   }),
   accounts: budgeting.reducers.createAuthenticatedAccountsTableReducer({
-    tableId: "accounts-table",
     initialState: initialState.account.table,
     actions: {
       tableChanged: actions.accounts.handleTableChangeEventAction,
@@ -50,7 +49,6 @@ const genericReducer = combineReducers({
     },
     reducers: {
       table: budgeting.reducers.createAuthenticatedSubAccountsTableReducer({
-        tableId: "account-subaccounts-table",
         initialState: initialState.account.table,
         actions: {
           tableChanged: actions.account.handleTableChangeEventAction,
@@ -69,7 +67,6 @@ const genericReducer = combineReducers({
             intersection([c.field, c.colId], ["variance", "contact", "actual"]).length === 0
         ),
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
-          tableId: "fringes-table",
           initialState: initialState.account.table.fringes,
           columns: FringesTable.Columns,
           actions: {
@@ -97,7 +94,6 @@ const genericReducer = combineReducers({
     },
     reducers: {
       table: budgeting.reducers.createAuthenticatedSubAccountsTableReducer({
-        tableId: "subaccount-subaccounts-table",
         initialState: initialState.subaccount.table,
         actions: {
           tableChanged: actions.subAccount.handleTableChangeEventAction,
@@ -116,7 +112,6 @@ const genericReducer = combineReducers({
         ),
         getModelRowChildren: (m: Model.SubAccount) => m.children,
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
-          tableId: "fringes-table",
           initialState: initialState.subaccount.table.fringes,
           columns: FringesTable.Columns,
           actions: {

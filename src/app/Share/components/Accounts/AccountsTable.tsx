@@ -37,7 +37,6 @@ const ConnectedTable = connectTableToStore<
     )
   },
   reducer: budgeting.reducers.createUnauthenticatedAccountsTableReducer({
-    tableId: "accounts-table",
     columns: GenericAccountsTable.Columns,
     actions: ActionMap,
     getModelRowChildren: (m: Model.Account) => m.children,

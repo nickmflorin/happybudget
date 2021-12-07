@@ -119,7 +119,6 @@ const Contacts = (): JSX.Element => {
       <Page className={"contacts"} title={"My Contacts"}>
         <ConnectedContactsTable
           table={table}
-          tableId={"contacts-table"}
           editColumnConfig={[
             {
               conditional: (r: Table.NonPlaceholderBodyRow<R>) => tabling.typeguards.isModelRow(r),

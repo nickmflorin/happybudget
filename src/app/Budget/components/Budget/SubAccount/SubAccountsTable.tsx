@@ -97,7 +97,6 @@ const SubAccountsTable = ({
   return (
     <React.Fragment>
       <ConnectedTable
-        tableId={"subaccount-subaccounts-table"}
         budget={budget}
         budgetId={budgetId}
         table={table}

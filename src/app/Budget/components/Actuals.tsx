@@ -74,7 +74,6 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
         />
       </Portal>
       <ConnectedActualsTable
-        tableId={"actuals-table"}
         contacts={contacts}
         actualTypes={actualTypes}
         onOwnersSearch={(value: string) => dispatch(actions.actuals.setActualOwnersSearchAction(value))}
