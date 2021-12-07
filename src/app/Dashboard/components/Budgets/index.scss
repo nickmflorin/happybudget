@@ -1,21 +1,30 @@
-@import "style/_imports";
+@import 'style/_imports';
 
 .budgets-page {
-	.btn-non-circle {
-    display: none;
+	.sub-menu {
+		.btn-non-circle {
+			display: none;
+			margin-right: 0px;
 
-    @include media(">=xl") {
-      display: inherit;
-    }
-  }
+			@include media('>=xl') {
+				display: inherit;
+			}
+		}
 
-  .btn--circle-icon {
-    @include media(">=xl") {
-      display: none;
-    }
+		.btn--circle-icon {
+			margin-right: 0px;
+			@include media('>=xl') {
+				display: none;
+			}
+			.icon {
+				margin-right: 0px;
+			}
+		}
+	}
 
-    .icon {
-      margin-right: 0;
-    }
-  }
+	@include media("<xl") {
+		.input {
+			max-width: unset !important;
+		}
+	}
 }
