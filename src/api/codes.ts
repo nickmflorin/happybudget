@@ -5,8 +5,10 @@ export const AuthErrorCodes: { [key: string]: Http.AuthErrorCode } = {
   TOKEN_INVALID: "token_not_valid",
   INVALID_SOCIAL_TOKEN: "invalid_social_token",
   INVALID_SOCIAL_PROVIDER: "invalid_social_provider",
-  EMAIL_NOT_VERIFIED: "email_not_verified",
+  ACCOUNT_NOT_VERIFIED: "account_not_verified",
   ACCOUNT_DISABLED: "account_disabled",
+  ACCOUNT_NOT_APPROVED: "account_not_approved",
+  ACCOUNT_NOT_ON_WAITLIST: "account_not_on_waitlist",
   NOT_AUTHENTICATED: "account_not_authenticated"
 };
 
@@ -15,12 +17,12 @@ export const FieldErrorCodes: { [key: string]: Http.FieldErrorCode } = {
   INVALID_CREDENTIALS: "invalid_credentials",
   UNIQUE: "unique",
   INVALID: "invalid",
-  REQUIRED: "required"
+  REQUIRED: "required",
+  INVALID_FILE_NAME: "invalid_file_name",
+  INVALID_FILE_EXTENSION: "invalid_file_extension"
 };
 
 export const GlobalErrorCodes: { [key: string]: Http.GlobalErrorCode } = {
-  INVALID_FILE_NAME: "invalid_file_name",
-  INVALID_FILE_EXTENSION: "invalid_file_extension",
   PDF_ERROR: "pdf_error",
   RATE_LIMITED: "rate_limited"
 };

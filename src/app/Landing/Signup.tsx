@@ -1,17 +1,43 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useHistory } from "react-router-dom";
+import { isNil } from "lodash";
 
 import * as api from "api";
 import { ui, notifications } from "lib";
 
 import SignupForm, { ISignupFormValues } from "components/forms/SignupForm";
-import { UnverifiedEmailNotification } from "./Notifications";
+import { UnverifiedEmailNotification, UserNotOnWaitlistNotification } from "./Notifications";
 import LandingFormContainer from "./LandingFormContainer";
 
 const Signup = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const form = ui.hooks.useForm<ISignupFormValues>();
   const history = useHistory();
+
+  const handleAuthError = useMemo(
+    () => (e: Http.AuthError) => {
+      if (e.code === api.ErrorCodes.ACCOUNT_NOT_ON_WAITLIST) {
+        form.notify(<UserNotOnWaitlistNotification />);
+        return true;
+      }
+      return false;
+    },
+    [form.handleRequestError, form.notify]
+  );
+
+  const handleError = useMemo(
+    () => (e: Error) => {
+      if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
+        const handled = handleAuthError(e.authenticationError);
+        if (!handled) {
+          form.handleRequestError(e);
+        }
+      } else {
+        form.handleRequestError(e);
+      }
+    },
+    [form.handleRequestError, handleAuthError]
+  );
 
   return (
     <LandingFormContainer title={"Register"} subTitle={"Cloud based budgeting at your fingertips."}>
@@ -32,12 +58,8 @@ const Signup = (): JSX.Element => {
                 history.push("/");
               }
             })
-            .catch((e: Error) => {
-              form.handleRequestError(e);
-            })
-            .finally(() => {
-              setLoading(false);
-            });
+            .catch((e: Error) => handleError(e))
+            .finally(() => setLoading(false));
         }}
         onGoogleError={(error: any) => {
           // TODO: Try to do a better job parsing the error.
@@ -70,12 +92,8 @@ const Signup = (): JSX.Element => {
                 />
               );
             })
-            .catch((e: Error) => {
-              form.handleRequestError(e);
-            })
-            .finally(() => {
-              setLoading(false);
-            });
+            .catch((e: Error) => handleError(e))
+            .finally(() => setLoading(false));
         }}
       />
     </LandingFormContainer>

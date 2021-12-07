@@ -8,7 +8,7 @@ import { ui, notifications } from "lib";
 import { LoginForm } from "components/forms";
 import { ILoginFormValues } from "components/forms/LoginForm";
 
-import { TokenNotification, UnverifiedEmailNotification } from "./Notifications";
+import { TokenNotification, UnverifiedEmailNotification, UnapprovedUserNotification } from "./Notifications";
 import LandingFormContainer from "./LandingFormContainer";
 
 const Login = (): JSX.Element => {
@@ -63,7 +63,10 @@ const Login = (): JSX.Element => {
           handleTokenError(e as Http.IApiError<"auth", Http.TokenErrorCode>, tokenType, userId);
           return true;
         }
-      } else if (e.code === api.ErrorCodes.EMAIL_NOT_VERIFIED) {
+      } else if (e.code === api.ErrorCodes.ACCOUNT_NOT_APPROVED) {
+        form.notify(<UnapprovedUserNotification />);
+        return true;
+      } else if (e.code === api.ErrorCodes.ACCOUNT_NOT_VERIFIED) {
         if (isNil(userId)) {
           console.error(
             `The user's email confirmation token has expired, but we cannot

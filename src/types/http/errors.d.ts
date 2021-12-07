@@ -3,15 +3,23 @@ declare namespace Http {
 
   type FileErrorCode = "invalid_file_name" | "invalid_file_extension";
 
-  type GlobalErrorCode = FileErrorCode | "pdf_error" | "rate_limited";
+  type GlobalErrorCode = "pdf_error" | "rate_limited";
 
-  type FieldErrorCode = "unique" | "invalid" | "required" | "email_does_not_exist" | "invalid_credentials";
+  type FieldErrorCode =
+    | FileErrorCode
+    | "unique"
+    | "invalid"
+    | "required"
+    | "email_does_not_exist"
+    | "invalid_credentials";
 
   type TokenErrorCode = "token_expired" | "token_not_valid";
 
   type AuthErrorCode =
     | TokenErrorCode
-    | "email_not_verified"
+    | "account_not_on_waitlist"
+    | "account_not_verified"
+    | "account_not_approved"
     | "account_disabled"
     | "account_not_authenticated"
     | "invalid_social_token"

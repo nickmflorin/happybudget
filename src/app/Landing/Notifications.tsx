@@ -120,3 +120,33 @@ export const UnverifiedEmailNotification = (props: UnverifiedEmailNotificationPr
     </Notification>
   );
 };
+
+interface UserNotOnWaitlistNotificationProps {
+  readonly title?: string;
+  readonly type?: AlertType;
+}
+
+export const UserNotOnWaitlistNotification = (props: UserNotOnWaitlistNotificationProps): JSX.Element => {
+  return (
+    <Notification type={props.type || "warning"} title={props.title || "Your email is not on the waitlist."}>
+      {`Currently, this software is open to those who are on the waitlist.  Please
+			contact support if you would like more information.`}
+    </Notification>
+  );
+};
+
+interface UnapprovedUserNotificationProps {
+  readonly title?: string;
+  readonly type?: AlertType;
+}
+
+export const UnapprovedUserNotification = (props: UnapprovedUserNotificationProps): JSX.Element => {
+  return (
+    <Notification
+      type={props.type || "warning"}
+      title={props.title || "Your account has not been approved for access."}
+    >
+      {"Your account has been successfully verified, but has not yet been approved. Please contact support."}
+    </Notification>
+  );
+};

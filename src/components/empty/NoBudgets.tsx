@@ -16,19 +16,21 @@ interface NoBudgetsProps extends StandardComponentWithChildrenProps {
 const NoBudgets = ({ title, subTitle, button, children, ...props }: NoBudgetsProps): JSX.Element => {
   return (
     <div {...props} className={classNames("no-budgets", props.className)}>
-      {children}
-      <h1>{title}</h1>
-      {!isNil(subTitle) && <p>{subTitle}</p>}
-      {!isNil(button) && (
-        <Button
-          style={{ marginTop: 20 }}
-          className={"btn btn--primary"}
-          icon={<Icon icon={"plus"} weight={"light"} />}
-          onClick={() => button.onClick?.()}
-        >
-          {button.text}
-        </Button>
-      )}
+      <div className={"no-budgets-content"}>
+        {children}
+        <h1>{title}</h1>
+        {!isNil(subTitle) && <p>{subTitle}</p>}
+        {!isNil(button) && (
+          <Button
+            style={{ marginTop: 20 }}
+            className={"btn btn--primary"}
+            icon={<Icon icon={"plus"} weight={"light"} />}
+            onClick={() => button.onClick?.()}
+          >
+            {button.text}
+          </Button>
+        )}
+      </div>
     </div>
   );
 };
