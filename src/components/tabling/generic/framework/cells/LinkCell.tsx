@@ -12,6 +12,7 @@ export type LinkCellProps<
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = Table.ValueCellProps<R, M, S> & {
   readonly href?: string | ((value: string | number | null) => string | undefined) | undefined;
+  readonly target?: string | undefined;
   readonly rel?: string | undefined;
 };
 
@@ -23,6 +24,7 @@ const LinkCell = <
 >({
   value,
   href,
+  target,
   rel,
   ...props
 }: LinkCellProps<R, M, S>): JSX.Element => {
@@ -32,6 +34,7 @@ const LinkCell = <
       <Link
         className={"link--table"}
         href={!isNil(href) ? (typeof href === "string" ? href : href(formattedValue)) : undefined}
+        target={target}
         rel={rel}
       >
         {formattedValue}

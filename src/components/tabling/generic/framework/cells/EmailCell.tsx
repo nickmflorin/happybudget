@@ -13,7 +13,8 @@ const EmailCell = <
   return (
     <LinkCell<R, M, S>
       href={(v: string | number | null) => (!isNil(v) ? `mailto:${v}` : undefined)}
-      rel={"noreferrer"}
+      target={"_blank"}
+      rel={"noreferrer noopener"}
       {...props}
     />
   );
