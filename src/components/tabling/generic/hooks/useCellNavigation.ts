@@ -21,15 +21,14 @@ type UseCellNavigationReturnType = [
 
 type FindNavigatableRowOptions<R extends Table.RowData> = {
   readonly direction?: "asc" | "desc";
-  readonly flt?: (r: Table.EditableRow<R>) => boolean;
   readonly includeRowInNavigation?: (row: Table.EditableRow<R>) => boolean;
 };
 
-const findNextNavigatableRow = <R extends Table.RowData>(
+const findNextNavigatableNodes = <R extends Table.RowData>(
   api: Table.GridApi,
   startingIndex: number,
   opts?: FindNavigatableRowOptions<R>
-): [Table.RowNode | null, number, number] => {
+): [Table.RowNode[], number, number] => {
   const d = opts?.direction !== undefined ? opts.direction : "asc";
   const indexIsValid = (index: number) => {
     if (d === "desc" && index < 0) {
@@ -43,36 +42,47 @@ const findNextNavigatableRow = <R extends Table.RowData>(
 
   const isNavigatableNode = (node: Table.RowNode) => {
     const row: Table.BodyRow<R> = node.data;
-    const flt = opts?.flt;
     const includeRowInNavigation = opts?.includeRowInNavigation;
-    if (!isNil(flt)) {
-      if (tabling.typeguards.isEditableRow(row)) {
-        return (isNil(includeRowInNavigation) || includeRowInNavigation(row) !== false) && flt(row);
-      }
-      return false;
-    }
     return (
       tabling.typeguards.isEditableRow(row) && (isNil(includeRowInNavigation) || includeRowInNavigation(row) !== false)
     );
   };
 
+  let nodesAfterNavigatable: Table.RowNode[] = [];
+
   if (indexIsValid(startingIndex)) {
     let runningIndex = 0;
-    let nextRowNode: Table.RowNode | undefined = api.getDisplayedRowAtIndex(startingIndex);
+    let runningAllNodeIndex = 0;
 
-    while (!isNil(nextRowNode) && !isNavigatableNode(nextRowNode)) {
-      runningIndex = runningIndex + 1;
-      if (!indexIsValid(nextIndex(runningIndex))) {
+    let nextRowNode: Table.RowNode | undefined = api.getDisplayedRowAtIndex(startingIndex);
+    if (!isNil(nextRowNode)) {
+      nodesAfterNavigatable = [nextRowNode];
+    }
+    while (!isNil(nextRowNode)) {
+      // The `runningIndex` is used to track the first index at which the node
+      // is navigatable, so if we already encountered a navigatable row we need
+      // to stop incrementing `runningIndex`.
+      if (nodesAfterNavigatable.length === 0) {
+        runningIndex = runningIndex + 1;
+      }
+      runningAllNodeIndex = runningAllNodeIndex + 1;
+      if (!indexIsValid(nextIndex(runningAllNodeIndex))) {
         break;
       }
-      nextRowNode = api.getDisplayedRowAtIndex(nextIndex(runningIndex));
-      if (!isNil(nextRowNode) && isNavigatableNode(nextRowNode)) {
-        break;
+      nextRowNode = api.getDisplayedRowAtIndex(nextIndex(runningAllNodeIndex));
+      if (!isNil(nextRowNode)) {
+        if (nodesAfterNavigatable.length === 0 && isNavigatableNode(nextRowNode)) {
+          nodesAfterNavigatable = [nextRowNode];
+        } else if (nodesAfterNavigatable.length !== 0) {
+          // If we already encountered a navigatable RowNode, start adding the
+          // RowNode(s) after it to the array.
+          nodesAfterNavigatable = [...nodesAfterNavigatable, nextRowNode];
+        }
       }
     }
-    return [nextRowNode === undefined ? null : nextRowNode, startingIndex + runningIndex, runningIndex];
+    return [nodesAfterNavigatable, startingIndex + runningIndex, runningIndex];
   } else {
-    return [null, startingIndex, 0];
+    return [[], startingIndex, 0];
   }
 };
 
@@ -92,11 +102,11 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
           if (verticalAscend === true || verticalDescend === true) {
             const direction: "asc" | "desc" = verticalAscend === true ? "asc" : "desc";
             /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-            const [rowNode, _, additionalIndex] = findNextNavigatableRow(p.api, p.nextCellPosition.rowIndex, {
+            const [rowNodes, _, additionalIndex] = findNextNavigatableNodes(p.api, p.nextCellPosition.rowIndex, {
               direction,
               includeRowInNavigation: params.includeRowInNavigation
             });
-            if (!isNil(rowNode)) {
+            if (rowNodes.length !== 0) {
               return {
                 ...p.nextCellPosition,
                 rowIndex:
@@ -128,10 +138,10 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
           if (column.tableColumnType === "action") {
             let nextCellPosition = { ...p.nextCellPosition };
             /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-            const [rowNode, _, additionalIndex] = findNextNavigatableRow(p.api, p.nextCellPosition.rowIndex, {
+            const [rowNodes, _, additionalIndex] = findNextNavigatableNodes(p.api, p.nextCellPosition.rowIndex, {
               includeRowInNavigation: params.includeRowInNavigation
             });
-            if (!isNil(rowNode)) {
+            if (rowNodes.length !== 0) {
               nextCellPosition = {
                 ...p.nextCellPosition,
                 rowIndex: p.nextCellPosition.rowIndex + additionalIndex
@@ -182,29 +192,41 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
 
   const moveToNextRow: (loc: Table.CellPosition) => void = hooks.useDynamicCallback((loc: Table.CellPosition) => {
     if (!isNil(params.apis)) {
-      /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-      const [node, rowIndex, _] = findNextNavigatableRow(params.apis.grid, loc.rowIndex + 1, {
-        // We want to add a new row when we are at the end of the ModelRow(s),
-        // because the MarkupRow(s) will be at the end of the table but new rows
-        // get inserted before them.
-        flt: (r: Table.EditableRow<R>) => tabling.typeguards.isModelRow(r),
-        includeRowInNavigation: params.includeRowInNavigation,
-        direction: "asc"
-      });
-      let doNotMoveLocation = false;
-      if (node === null) {
-        if (!isNil(params.onNewRowRequired)) {
-          // In the case that we are adding a new row to the bottom of the table,
-          // the row state callbacks of the authenticated grid HOC handle the
-          // refocusing of the cell.
-          params.onNewRowRequired(loc.rowIndex);
-          // We do not want to refocus the cell if a new row is being added, as
-          // that is handled in the HOC.
-          doNotMoveLocation = true;
+      const node: Table.RowNode | undefined = params.apis.grid.getDisplayedRowAtIndex(loc.rowIndex);
+      if (!isNil(node)) {
+        const row: Table.BodyRow<R> = node.data;
+        /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+        const [nodes, rowIndex, _] = findNextNavigatableNodes(params.apis.grid, loc.rowIndex + 1, {
+          includeRowInNavigation: params.includeRowInNavigation,
+          direction: "asc"
+        });
+
+        const rows: Table.BodyRow<R>[] = map(nodes, (n: Table.RowNode) => n.data);
+
+        // We only want to add a new row if we are either at the last BodyRow of the
+        // entire table or at the last ModelRow of the entire table (in which case
+        // the only BodyRow(s) after it should be MarkupRow(s)).
+        const newRowRequired = (r: Table.BodyRow<R>, rws: Table.BodyRow<R>[]) => {
+          if (rows.length === 0) {
+            return true;
+          } else if (
+            tabling.typeguards.isModelRow(r) &&
+            filter(rows, (ri: Table.BodyRow<R>) => tabling.typeguards.isModelRow(ri)).length === 0
+          ) {
+            return true;
+          }
+          return false;
+        };
+
+        if (!isNil(node)) {
+          if (newRowRequired(row, rows)) {
+            if (!isNil(params.onNewRowRequired)) {
+              params.onNewRowRequired(loc.rowIndex);
+            }
+          } else {
+            moveToLocation({ rowIndex, column: loc.column });
+          }
         }
-      }
-      if (!doNotMoveLocation) {
-        moveToLocation({ rowIndex, column: loc.column });
       }
     }
   });
