@@ -47,6 +47,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
         {templates.length === 0 && responseWasReceived ? (
           <NoBudgets
             title={"You don't have any templates yet!"}
+            subTitle={"Create your own templates or choose one we curated in Discover."}
             button={{
               onClick: () => setCreateTempateModalOpen(true),
               text: "Create a Template"

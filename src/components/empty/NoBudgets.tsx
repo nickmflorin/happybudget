@@ -9,7 +9,7 @@ import "./NoBudgets.scss";
 
 interface NoBudgetsProps extends StandardComponentWithChildrenProps {
   readonly title: string;
-  readonly subTitle?: boolean;
+  readonly subTitle?: string;
   readonly button?: { readonly onClick?: () => void; readonly text: string };
 }
 
@@ -18,10 +18,7 @@ const NoBudgets = ({ title, subTitle, button, children, ...props }: NoBudgetsPro
     <div {...props} className={classNames("no-budgets", props.className)}>
       {children}
       <h1>{title}</h1>
-      {!isNil(subTitle) && (
-        // eslint-disable-next-line quotes
-        <p>{'Tip: Click the "Create Budget" button above and create an empty budget or start one from a template.'}</p>
-      )}
+      {!isNil(subTitle) && <p>{subTitle}</p>}
       {!isNil(button) && (
         <Button
           style={{ marginTop: 20 }}
