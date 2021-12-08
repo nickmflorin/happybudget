@@ -93,7 +93,7 @@
           width: auto;
         }
 
-        @include media(">=xl") {
+        @include media(">=medium") {
           display: none;
         }
       }
