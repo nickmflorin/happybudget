@@ -43,13 +43,11 @@ function* watchForSearchCommunityTemplatesSaga(): SagaIterator {
 
 const ActionMap = {
   tableChanged: actions.handleContactsTableChangeEventAction,
-  request: actions.requestContactsAction,
   loading: actions.loadingContactsAction,
   response: actions.responseContactsAction,
   saving: actions.savingContactsTableAction,
   addModelsToState: actions.addContactModelsToStateAction,
-  setSearch: actions.setContactsSearchAction,
-  clear: actions.clearContactsAction
+  setSearch: actions.setContactsSearchAction
 };
 
 const tableSaga = tabling.sagas.createAuthenticatedTableSaga<

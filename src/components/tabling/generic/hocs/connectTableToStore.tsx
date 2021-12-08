@@ -35,7 +35,13 @@ const connectTableToStore =
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>
   >(
-    config: Table.StoreConfig<R, M, S, Redux.TableActionMap<M> | Redux.AuthenticatedTableActionMap<R, M>>
+    config: Table.StoreConfig<
+      R,
+      M,
+      S,
+      | (Redux.TableActionMap<M> & { readonly request?: Redux.TableRequestPayload })
+      | (Redux.AuthenticatedTableActionMap<R, M> & { readonly request?: Redux.TableRequestPayload })
+    >
   ) =>
   (
     Component:

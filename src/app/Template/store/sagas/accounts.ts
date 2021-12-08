@@ -11,12 +11,12 @@ import { AccountsTable } from "components/tabling";
 import { accounts as actions, loadingTemplateAction, updateTemplateInStateAction } from "../actions";
 
 const ActionMap: Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account>> & {
+  readonly request: ActionCreatorWithPayload<Redux.TableRequestPayload>;
   readonly loadingBudget: ActionCreatorWithPayload<boolean>;
   readonly updateBudgetInState: ActionCreatorWithPayload<Redux.UpdateActionPayload<Model.Template>>;
 } = {
   tableChanged: actions.handleTableChangeEventAction,
   request: actions.requestAction,
-  clear: actions.clearAction,
   loading: actions.loadingAction,
   response: actions.responseAction,
   saving: actions.savingTableAction,
@@ -29,7 +29,9 @@ const ActionMap: Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<Tables.
 const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   Tables.AccountRowData,
   Model.Account,
-  Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account>
+  Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account> & {
+    readonly request: Redux.TableRequestPayload;
+  }
 >({
   actions: ActionMap,
   tasks: budgeting.tasks.accounts.createTableTaskSet<Model.Template>({

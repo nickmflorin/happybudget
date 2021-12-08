@@ -10,8 +10,7 @@ const ActionType = {
     Loading: "template.accounts.Loading",
     Response: "template.accounts.Response",
     Request: "template.accounts.Request",
-    AddToState: "template.accounts.AddToState",
-    Clear: "template.accounts.Clear"
+    AddToState: "template.accounts.AddToState"
   },
   Fringes: {
     TableChanged: "template.fringes.TableChanged",
@@ -20,8 +19,7 @@ const ActionType = {
     Response: "template.fringes.Response",
     Request: "template.fringes.Request",
     AddToState: "template.fringes.AddToState",
-    SetSearch: "template.fringes.SetSearch",
-    Clear: "template.fringes.Clear"
+    SetSearch: "template.fringes.SetSearch"
   },
   SubAccountUnits: {
     Response: "template.subaccountunits.Response"
@@ -42,8 +40,7 @@ const ActionType = {
       SetSearch: "template.subaccount.subaccounts.SetSearch",
       Loading: "template.subaccount.subaccounts.Loading",
       Response: "template.subaccount.subaccounts.Response",
-      AddToState: "template.subaccount.subaccounts.AddToState",
-      Clear: "template.subaccount.subaccounts.Clear"
+      AddToState: "template.subaccount.subaccounts.AddToState"
     }
   },
   Account: {
@@ -59,8 +56,7 @@ const ActionType = {
       Response: "template.account.subaccounts.Response",
       Saving: "template.account.subaccounts.Saving",
       SetSearch: "template.account.subaccounts.SetSearch",
-      AddToState: "template.account.subaccounts.AddToState",
-      Clear: "template.account.subaccounts.Clear"
+      AddToState: "template.account.subaccounts.AddToState"
     }
   }
 };

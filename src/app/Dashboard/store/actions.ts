@@ -35,7 +35,6 @@ export const ActionType = {
     TableChanged: "dashboard.contacts.TableChanged",
     Saving: "dashboard.contacts.Saving",
     Request: "dashboard.contacts.Request",
-    Clear: "dashboard.contacts.Clear",
     Loading: "dashboard.contacts.Loading",
     Response: "dashboard.contacts.Response",
     SetSearch: "dashboard.contacts.SetSearch",
@@ -89,7 +88,6 @@ export const handleContactsTableChangeEventAction = createAction<
 export const savingContactsTableAction = createAction<boolean>(ActionType.Contacts.Saving);
 export const setContactsSearchAction = createAction<string>(ActionType.Contacts.SetSearch);
 export const requestContactsAction = createAction<Redux.TableRequestPayload>(ActionType.Contacts.Request);
-export const clearContactsAction = createAction<null>(ActionType.Contacts.Clear);
 export const addContactModelsToStateAction = createAction<Redux.AddModelsToTablePayload<Model.Contact>>(
   ActionType.Contacts.AddToState
 );

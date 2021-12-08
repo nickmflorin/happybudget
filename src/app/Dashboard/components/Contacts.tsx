@@ -29,7 +29,6 @@ const ConnectedContactsTable = connectTableToStore<ContactsTable.Props, R, M, Ta
     saving: actions.savingContactsTableAction,
     addModelsToState: actions.addContactModelsToStateAction,
     setSearch: actions.setContactsSearchAction,
-    clear: actions.clearContactsAction,
     updateRowsInState: actions.updateContactRowsInStateAction
   }
 })(ContactsTable.Table);

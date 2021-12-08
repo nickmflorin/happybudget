@@ -30,7 +30,6 @@ function* getAccount(action: Redux.Action<null>): SagaIterator {
 }
 
 const ActionMap = {
-  request: actions.requestAction,
   updateParentInState: actions.updateInStateAction,
   tableChanged: actions.handleTableChangeEventAction,
   loading: actions.loadingAction,
@@ -42,8 +41,7 @@ const ActionMap = {
   setSearch: actions.setSearchAction,
   responseFringes: responseFringesAction,
   responseSubAccountUnits: responseSubAccountUnitsAction,
-  responseFringeColors: responseFringeColorsAction,
-  clear: actions.clearAction
+  responseFringeColors: responseFringeColorsAction
 };
 
 const Tasks = budgeting.tasks.subaccounts.createTableTaskSet<Model.Account, Model.Template>({

@@ -27,8 +27,7 @@ const ConnectedActualsTable = connectTableToStore<ActualsTable.ActualsTableProps
     response: actions.actuals.responseAction,
     saving: actions.actuals.savingTableAction,
     addModelsToState: actions.actuals.addModelsToStateAction,
-    setSearch: actions.actuals.setSearchAction,
-    clear: actions.actuals.clearAction
+    setSearch: actions.actuals.setSearchAction
   },
   selector: redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.actuals),
   footerRowSelectors: {

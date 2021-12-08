@@ -32,7 +32,6 @@ function* getSubAccount(action: Redux.Action<null>): SagaIterator {
 const ActionMap = {
   updateParentInState: actions.updateInStateAction,
   tableChanged: actions.handleTableChangeEventAction,
-  clear: actions.clearAction,
   loading: actions.loadingAction,
   response: actions.responseAction,
   saving: actions.savingTableAction,

@@ -32,9 +32,8 @@ const genericReducer = combineReducers({
     reducers: {
       table: budgeting.reducers.createUnauthenticatedSubAccountsTableReducer({
         initialState: initialState.account.table,
+        clearOn: [actions.account.requestAction, actions.account.setAccountIdAction],
         actions: {
-          clear: actions.account.clearAction,
-          request: actions.account.requestAction,
           loading: actions.account.loadingAction,
           response: actions.account.responseAction,
           responseSubAccountUnits: actions.responseSubAccountUnitsAction,
@@ -48,10 +47,9 @@ const genericReducer = combineReducers({
         fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
           initialState: initialState.account.table.fringes,
           columns: FringesTable.Columns,
+          clearOn: [actions.requestFringesAction],
           actions: {
-            clear: actions.clearFringesAction,
             responseFringeColors: actions.responseFringeColorsAction,
-            request: actions.requestFringesAction,
             loading: actions.loadingFringesAction,
             response: actions.responseFringesAction,
             setSearch: actions.setFringesSearchAction
@@ -70,12 +68,11 @@ const genericReducer = combineReducers({
     reducers: {
       table: budgeting.reducers.createUnauthenticatedSubAccountsTableReducer({
         initialState: initialState.account.table,
+        clearOn: [actions.subAccount.requestAction, actions.subAccount.setSubAccountIdAction],
         actions: {
-          request: actions.subAccount.requestAction,
           loading: actions.subAccount.loadingAction,
           response: actions.subAccount.responseAction,
           responseSubAccountUnits: actions.responseSubAccountUnitsAction,
-          clear: actions.subAccount.clearAction,
           setSearch: actions.subAccount.setSearchAction
         },
         getModelRowChildren: (m: Model.SubAccount) => m.children,
@@ -86,10 +83,9 @@ const genericReducer = combineReducers({
         fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
           initialState: initialState.subaccount.table.fringes,
           columns: FringesTable.Columns,
+          clearOn: [actions.requestFringesAction],
           actions: {
             responseFringeColors: actions.responseFringeColorsAction,
-            request: actions.requestFringesAction,
-            clear: actions.clearFringesAction,
             loading: actions.loadingFringesAction,
             response: actions.responseFringesAction,
             setSearch: actions.setFringesSearchAction

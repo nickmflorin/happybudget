@@ -19,7 +19,6 @@ export const updateBudgetInStateAction = createAction<Redux.UpdateActionPayload<
 );
 export const loadingFringesAction = createAction<boolean>(ActionType.Fringes.Loading);
 export const requestFringesAction = createAction<Redux.TableRequestPayload>(ActionType.Fringes.Request);
-export const clearFringesAction = createAction<null>(ActionType.Fringes.Clear);
 export const responseFringesAction = createAction<Http.TableResponse<Model.Fringe>>(ActionType.Fringes.Response);
 export const handleFringesTableChangeEventAction = createAction<Table.ChangeEvent<Tables.FringeRowData, Model.Fringe>>(
   ActionType.Fringes.TableChanged

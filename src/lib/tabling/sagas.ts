@@ -8,7 +8,9 @@ import { tabling } from "lib";
 export const createTableSaga = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
+  A extends Redux.TableActionMap<M> & { readonly request?: any } = Redux.TableActionMap<M> & {
+    readonly request?: any;
+  }
 >(
   config: Table.SagaConfig<R, M, A>
 ): Saga => {
@@ -34,7 +36,9 @@ export const createTableSaga = <
 export const createUnauthenticatedTableSaga = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
+  A extends Redux.TableActionMap<M> & { readonly request?: any } = Redux.TableActionMap<M> & {
+    readonly request?: any;
+  }
 >(
   config: Table.SagaConfig<R, M, A>
 ): Saga => {
@@ -45,7 +49,10 @@ export const createUnauthenticatedTableSaga = <
 export const createAuthenticatedTableSaga = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
+  A extends Redux.AuthenticatedTableActionMap<R, M> & { readonly request?: any } = Redux.AuthenticatedTableActionMap<
+    R,
+    M
+  > & { readonly request?: any }
 >(
   config: Table.SagaConfig<R, M, A>
 ): Saga => {

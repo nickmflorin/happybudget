@@ -26,8 +26,7 @@ const ActionType = {
     Request: "budget.fringes.Request",
     Response: "budget.fringes.Response",
     AddToState: "budget.fringes.AddToState",
-    SetSearch: "budget.fringes.SetSearch",
-    Clear: "budget.fringes.Clear"
+    SetSearch: "budget.fringes.SetSearch"
   },
   FringeColors: {
     Response: "budget.fringecolors.Response"
@@ -45,8 +44,7 @@ const ActionType = {
     Loading: "budget.accounts.Loading",
     Response: "budget.accounts.Response",
     Request: "budget.accounts.Request",
-    AddToState: "budget.accounts.AddToState",
-    Clear: "budget.accounts.Clear"
+    AddToState: "budget.accounts.AddToState"
   },
   SubAccount: {
     Request: "budget.subaccount.Request",
@@ -62,8 +60,7 @@ const ActionType = {
       Loading: "budget.subaccount.subaccounts.Loading",
       Response: "budget.subaccount.subaccounts.Response",
       AddToState: "budget.subaccount.subaccounts.AddToState",
-      UpdateRowsInState: "budget.subaccount.subaccounts.UpdateRowsInState",
-      Clear: "budget.subaccount.subaccounts.Clear"
+      UpdateRowsInState: "budget.subaccount.subaccounts.UpdateRowsInState"
     }
   },
   Account: {
@@ -80,7 +77,6 @@ const ActionType = {
       Response: "budget.account.subaccounts.Response",
       SetSearch: "budget.account.subaccounts.SetSearch",
       AddToState: "budget.account.subaccounts.AddToState",
-      Clear: "budget.account.subaccounts.Clear",
       UpdateRowsInState: "budget.account.subaccounts.UpdateRowsInState"
     }
   },
@@ -97,7 +93,6 @@ const ActionType = {
     Response: "budget.actuals.Response",
     Request: "budget.actuals.Request",
     AddToState: "budget.actuals.AddToState",
-    Clear: "budget.actuals.Clear",
     UpdateRowsInState: "budget.actuals.UpdateRowsInState"
   }
 };

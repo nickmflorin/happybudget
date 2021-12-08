@@ -1,4 +1,5 @@
 import { isNil, reduce, map, filter, includes, intersection, uniq } from "lodash";
+import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 
 import * as redux from "../redux";
 import * as util from "../util";
@@ -461,16 +462,20 @@ export const createTableReducer = <
   config: Table.ReducerConfig<R, M, S, A>
 ): Redux.Reducer<S> => {
   return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
-    if (
-      (!isNil(config.actions.request) && action.type === config.actions.request.toString()) ||
-      action.type === config.actions.clear.toString()
-    ) {
-      return { ...state, data: [], models: [], groups: [] };
-    } else if (action.type === config.actions.response.toString()) {
+    let newState = { ...state };
+
+    const clearOnActionTypes: string[] = map(config.clearOn, (obj: ActionCreatorWithPayload<any, string>) =>
+      obj.toString()
+    );
+    if (includes(clearOnActionTypes, action.type)) {
+      newState = { ...state, data: [] };
+    }
+
+    if (action.type === config.actions.response.toString()) {
       const response: Http.TableResponse<M> = action.payload;
       if (!isNil(config.createTableRows)) {
         return {
-          ...state,
+          ...newState,
           data: config.createTableRows({
             ...config,
             response
@@ -478,7 +483,7 @@ export const createTableReducer = <
         };
       } else {
         return {
-          ...state,
+          ...newState,
           data: data.createTableRows<R, M>({
             ...config,
             response
@@ -487,9 +492,9 @@ export const createTableReducer = <
       }
     } else if (action.type === config.actions.setSearch.toString()) {
       const search: string = action.payload;
-      return { ...state, search };
+      return { ...newState, search };
     }
-    return state;
+    return newState;
   };
 };
 

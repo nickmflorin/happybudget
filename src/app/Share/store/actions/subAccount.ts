@@ -7,7 +7,6 @@ export const loadingSubAccountAction = createAction<boolean>(ActionType.SubAccou
 export const responseSubAccountAction = createAction<Model.SubAccount | null>(ActionType.SubAccount.Response);
 
 export const requestAction = createAction<Redux.TableRequestPayload>(ActionType.SubAccount.SubAccounts.Request);
-export const clearAction = createAction<null>(ActionType.SubAccount.SubAccounts.Clear);
 export const loadingAction = createAction<boolean>(ActionType.SubAccount.SubAccounts.Loading);
 export const responseAction = createAction<Http.TableResponse<Model.SubAccount>>(
   ActionType.SubAccount.SubAccounts.Response

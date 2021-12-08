@@ -21,7 +21,6 @@ const FringesActionMap = {
   loading: actions.loadingFringesAction,
   response: actions.responseFringesAction,
   saving: actions.savingFringesTableAction,
-  clear: actions.clearFringesAction,
   addModelsToState: actions.addFringeModelsToStateAction,
   loadingBudget: actions.loadingTemplateAction,
   updateBudgetInState: actions.updateTemplateInStateAction,

@@ -1,16 +1,18 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, debounce } from "redux-saga/effects";
+import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 
 import { tabling, budgeting } from "lib";
 import { ActualsTable } from "components/tabling";
 
 import { actuals as actions } from "../actions";
 
-const ActionMap: Redux.ActionMapObject<budgeting.tasks.actuals.ActualsTableActionMap> = {
+const ActionMap: Redux.ActionMapObject<budgeting.tasks.actuals.ActualsTableActionMap> & {
+  readonly request: ActionCreatorWithPayload<Redux.TableRequestPayload>;
+} = {
   tableChanged: actions.handleTableChangeEventAction,
-  request: actions.requestAction,
-  clear: actions.clearAction,
   loading: actions.loadingAction,
+  request: actions.requestAction,
   response: actions.responseAction,
   saving: actions.savingTableAction,
   addModelsToState: actions.addModelsToStateAction,

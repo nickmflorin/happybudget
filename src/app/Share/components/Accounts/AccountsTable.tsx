@@ -10,11 +10,9 @@ type R = Tables.AccountRowData;
 type M = Model.Account;
 
 const ActionMap = {
-  request: actions.accounts.requestAction,
   loading: actions.accounts.loadingAction,
   response: actions.accounts.responseAction,
-  setSearch: actions.accounts.setSearchAction,
-  clear: actions.accounts.clearAction
+  setSearch: actions.accounts.setSearchAction
 };
 
 const ConnectedTable = connectTableToStore<
@@ -39,6 +37,7 @@ const ConnectedTable = connectTableToStore<
   reducer: budgeting.reducers.createUnauthenticatedAccountsTableReducer({
     columns: GenericAccountsTable.Columns,
     actions: ActionMap,
+    clearOn: [actions.accounts.requestAction, actions.setBudgetIdAction],
     getModelRowChildren: (m: Model.Account) => m.children,
     initialState: redux.initialState.initialTableState
   })

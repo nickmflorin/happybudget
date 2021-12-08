@@ -88,7 +88,6 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         }
       } else {
         yield put(config.actions.loading(true));
-        yield put(config.actions.clear(null));
         let effects = [
           api.request(config.services.request, objId, {}),
           api.request(config.services.requestGroups, objId, {})

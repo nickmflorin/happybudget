@@ -6,15 +6,13 @@ const ActionType = {
     Loading: "share.fringes.Loading",
     Response: "share.fringes.Response",
     Request: "share.fringes.Request",
-    SetSearch: "share.fringes.SetSearch",
-    Clear: "shares.fringes.Clear"
+    SetSearch: "share.fringes.SetSearch"
   },
   Accounts: {
     SetSearch: "share.accounts.SetSearch",
     Loading: "share.accounts.Loading",
     Response: "share.accounts.Response",
-    Request: "share.accounts.Request",
-    Clear: "share.accounts.Clear"
+    Request: "share.accounts.Request"
   },
   FringeColors: {
     Response: "share.fringecolors.Response"
@@ -31,8 +29,7 @@ const ActionType = {
       SetSearch: "share.subaccount.subaccounts.SetSearch",
       Loading: "share.subaccount.subaccounts.Loading",
       Response: "share.subaccount.subaccounts.Response",
-      Request: "share.subaccount.subaccounts.Request",
-      Clear: "share.subaccount.subaccounts.Clear"
+      Request: "share.subaccount.subaccounts.Request"
     }
   },
   Account: {
@@ -44,8 +41,7 @@ const ActionType = {
       Loading: "share.account.subaccounts.Loading",
       Response: "share.account.subaccounts.Response",
       Request: "share.account.subaccounts.Request",
-      SetSearch: "share.account.subaccounts.SetSearch",
-      Clear: "share.account.subaccounts.Clear"
+      SetSearch: "share.account.subaccounts.SetSearch"
     }
   }
 };

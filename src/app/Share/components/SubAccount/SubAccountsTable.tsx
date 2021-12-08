@@ -32,11 +32,9 @@ const ConnectedTable = connectTableToStore<
   // We cannot autoRequest because we have to also request the new data when the dropdown breadcrumbs change.
   autoRequest: false,
   actions: {
-    request: actions.subAccount.requestAction,
     loading: actions.subAccount.loadingAction,
     response: actions.subAccount.responseAction,
-    setSearch: actions.subAccount.setSearchAction,
-    clear: actions.subAccount.clearAction
+    setSearch: actions.subAccount.setSearchAction
   },
   selector: redux.selectors.simpleDeepEqualSelector(
     (state: Application.Unauthenticated.Store) => state.share.subaccount.table

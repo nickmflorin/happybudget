@@ -22,15 +22,14 @@ const genericReducer = combineReducers({
   }),
   accounts: budgeting.reducers.createAuthenticatedAccountsTableReducer({
     initialState: initialState.account.table,
+    clearOn: [actions.accounts.requestAction, actions.setTemplateIdAction],
     actions: {
       tableChanged: actions.accounts.handleTableChangeEventAction,
-      request: actions.accounts.requestAction,
       loading: actions.accounts.loadingAction,
       response: actions.accounts.responseAction,
       saving: actions.accounts.savingTableAction,
       addModelsToState: actions.accounts.addModelsToStateAction,
-      setSearch: actions.accounts.setSearchAction,
-      clear: actions.accounts.clearAction
+      setSearch: actions.accounts.setSearchAction
     },
     columns: filter(
       AccountsTable.Columns,
@@ -50,6 +49,7 @@ const genericReducer = combineReducers({
     reducers: {
       table: budgeting.reducers.createAuthenticatedSubAccountsTableReducer({
         initialState: initialState.account.table,
+        clearOn: [actions.account.requestAction, actions.account.setAccountIdAction],
         actions: {
           tableChanged: actions.account.handleTableChangeEventAction,
           loading: actions.account.loadingAction,
@@ -57,8 +57,7 @@ const genericReducer = combineReducers({
           responseSubAccountUnits: actions.responseSubAccountUnitsAction,
           saving: actions.account.savingTableAction,
           addModelsToState: actions.account.addModelsToStateAction,
-          setSearch: actions.account.setSearchAction,
-          clear: actions.account.clearAction
+          setSearch: actions.account.setSearchAction
         },
         getModelRowChildren: (m: Model.SubAccount) => m.children,
         columns: filter(
@@ -69,16 +68,15 @@ const genericReducer = combineReducers({
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
           initialState: initialState.account.table.fringes,
           columns: FringesTable.Columns,
+          clearOn: [actions.requestFringesAction],
           actions: {
             responseFringeColors: actions.responseFringeColorsAction,
             tableChanged: actions.handleFringesTableChangeEventAction,
-            request: actions.requestFringesAction,
             loading: actions.loadingFringesAction,
             response: actions.responseFringesAction,
             saving: actions.savingFringesTableAction,
             addModelsToState: actions.addFringeModelsToStateAction,
-            setSearch: actions.setFringesSearchAction,
-            clear: actions.clearFringesAction
+            setSearch: actions.setFringesSearchAction
           }
         })
       })
@@ -95,6 +93,7 @@ const genericReducer = combineReducers({
     reducers: {
       table: budgeting.reducers.createAuthenticatedSubAccountsTableReducer({
         initialState: initialState.subaccount.table,
+        clearOn: [actions.subAccount.requestAction, actions.subAccount.setSubAccountIdAction],
         actions: {
           tableChanged: actions.subAccount.handleTableChangeEventAction,
           responseSubAccountUnits: actions.responseSubAccountUnitsAction,
@@ -102,8 +101,7 @@ const genericReducer = combineReducers({
           response: actions.subAccount.responseAction,
           saving: actions.subAccount.savingTableAction,
           addModelsToState: actions.subAccount.addModelsToStateAction,
-          setSearch: actions.subAccount.setSearchAction,
-          clear: actions.subAccount.clearAction
+          setSearch: actions.subAccount.setSearchAction
         },
         columns: filter(
           SubAccountsTable.Columns as Table.Column<Tables.SubAccountRowData, Model.SubAccount>[],
@@ -114,16 +112,15 @@ const genericReducer = combineReducers({
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
           initialState: initialState.subaccount.table.fringes,
           columns: FringesTable.Columns,
+          clearOn: [actions.requestFringesAction],
           actions: {
             responseFringeColors: actions.responseFringeColorsAction,
             tableChanged: actions.handleFringesTableChangeEventAction,
-            request: actions.requestFringesAction,
             loading: actions.loadingFringesAction,
             response: actions.responseFringesAction,
             saving: actions.savingFringesTableAction,
             addModelsToState: actions.addFringeModelsToStateAction,
-            setSearch: actions.setFringesSearchAction,
-            clear: actions.clearFringesAction
+            setSearch: actions.setFringesSearchAction
           }
         })
       })

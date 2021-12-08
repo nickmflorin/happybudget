@@ -14,13 +14,11 @@ const ConnectedFringesTable = connectTableToStore<
   autoRequest: false,
   actions: {
     tableChanged: actions.handleFringesTableChangeEventAction,
-    request: actions.requestFringesAction,
     loading: actions.loadingFringesAction,
     response: actions.responseFringesAction,
     saving: actions.savingFringesTableAction,
     addModelsToState: actions.addFringeModelsToStateAction,
-    setSearch: actions.setFringesSearchAction,
-    clear: actions.clearFringesAction
+    setSearch: actions.setFringesSearchAction
   },
   selector: selectors.selectFringesStore
 })(FringesTable.Table);

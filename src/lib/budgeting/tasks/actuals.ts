@@ -33,7 +33,6 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     const budgetId = yield select(config.selectObjId);
     if (!isNil(budgetId)) {
       yield put(config.actions.loading(true));
-      yield put(config.actions.clear(null));
       try {
         yield all([
           call(requestActuals, budgetId),

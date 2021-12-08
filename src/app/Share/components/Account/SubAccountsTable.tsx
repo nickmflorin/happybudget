@@ -35,11 +35,9 @@ const ConnectedTable = connectTableToStore<
   // We cannot autoRequest because we have to also request the new data when the dropdown breadcrumbs change.
   autoRequest: false,
   actions: {
-    request: actions.account.requestAction,
     loading: actions.account.loadingAction,
     response: actions.account.responseAction,
-    setSearch: actions.account.setSearchAction,
-    clear: actions.account.clearAction
+    setSearch: actions.account.setSearchAction
   },
   selector: SubAccountsTableStoreSelector,
   footerRowSelectors: {

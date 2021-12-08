@@ -25,8 +25,7 @@ const ConnectedTable = connectTableToStore<BudgetSubAccountsTableProps, R, M, Ta
     response: actions.account.responseAction,
     saving: actions.account.savingTableAction,
     addModelsToState: actions.account.addModelsToStateAction,
-    setSearch: actions.account.setSearchAction,
-    clear: actions.account.clearAction
+    setSearch: actions.account.setSearchAction
   },
   // We cannot autoRequest because we have to also request the new data when the dropdown breadcrumbs change.
   autoRequest: false,

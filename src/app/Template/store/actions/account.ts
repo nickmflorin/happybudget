@@ -16,7 +16,6 @@ export const addModelsToStateAction = createAction<Redux.AddModelsToTablePayload
   ActionType.Account.SubAccounts.AddToState
 );
 export const savingTableAction = createAction<boolean>(ActionType.Account.SubAccounts.Saving);
-export const clearAction = createAction<null>(ActionType.Account.SubAccounts.Clear);
 export const loadingAction = createAction<boolean>(ActionType.Account.SubAccounts.Loading);
 export const responseAction = createAction<Http.TableResponse<Model.SubAccount>>(
   ActionType.Account.SubAccounts.Response

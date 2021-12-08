@@ -11,15 +11,14 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
     Tables.ContactTableStore
   >({
     columns: ContactsTable.Columns,
+    clearOn: [actions.requestContactsAction],
     actions: {
       tableChanged: actions.handleContactsTableChangeEventAction,
-      request: actions.requestContactsAction,
       loading: actions.loadingContactsAction,
       response: actions.responseContactsAction,
       saving: actions.savingContactsTableAction,
       addModelsToState: actions.addContactModelsToStateAction,
       setSearch: actions.setContactsSearchAction,
-      clear: actions.clearContactsAction,
       updateRowsInState: actions.updateContactRowsInStateAction
     },
     initialState: redux.initialState.initialTableState

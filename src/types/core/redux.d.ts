@@ -192,9 +192,7 @@ declare namespace Redux {
 	type TableActionMap<M extends Model.RowHttpModel = Model.RowHttpModel> = {
 		readonly loading: boolean;
 		readonly response: Http.TableResponse<M>;
-		readonly request?: TableRequestPayload;
 		readonly setSearch: string;
-		readonly clear: null;
 	};
 
 	type AuthenticatedTableActionMap<

@@ -15,7 +15,6 @@ export const updateRowsInStateAction = createAction<Redux.UpdateRowsInTablePaylo
 );
 export const savingTableAction = createAction<boolean>(ActionType.Actuals.Saving);
 export const requestAction = createAction<Redux.TableRequestPayload>(ActionType.Actuals.Request);
-export const clearAction = createAction<null>(ActionType.Actuals.Clear);
 export const loadingAction = createAction<boolean>(ActionType.Actuals.Loading);
 export const responseAction = createAction<Http.TableResponse<Model.Actual>>(ActionType.Actuals.Response);
 export const setSearchAction = createAction<string>(ActionType.Actuals.SetSearch);

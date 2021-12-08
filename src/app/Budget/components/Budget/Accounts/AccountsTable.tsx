@@ -26,8 +26,7 @@ const ConnectedTable = connectTableToStore<
     response: actions.accounts.responseAction,
     saving: actions.accounts.savingTableAction,
     addModelsToState: actions.accounts.addModelsToStateAction,
-    setSearch: actions.accounts.setSearchAction,
-    clear: actions.accounts.clearAction
+    setSearch: actions.accounts.setSearchAction
   },
   selector: selectors.selectAccountsTableStore,
   footerRowSelectors: {

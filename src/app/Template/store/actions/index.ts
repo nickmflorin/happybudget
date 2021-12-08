@@ -28,5 +28,4 @@ export const addFringeModelsToStateAction = createAction<Redux.AddModelsToTableP
 export const responseSubAccountUnitsAction = createAction<Http.ListResponse<Model.Tag>>(
   ActionType.SubAccountUnits.Response
 );
-export const clearFringesAction = createAction<null>(ActionType.Fringes.Clear);
 export const responseFringeColorsAction = createAction<Http.ListResponse<string>>(ActionType.FringeColors.Response);

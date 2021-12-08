@@ -23,10 +23,10 @@ declare namespace Table {
   type FooterGridId = "footer" | "page";
   type GridId = "data" | FooterGridId;
 
-	/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type GridSet<T> = { [key in GridId]: T };
 
-	/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type FooterGridSet<T> = { [key in FooterGridId]: T };
 
   type TableApiSet = GridSet<GridApis | null>;
@@ -98,8 +98,8 @@ declare namespace Table {
 
   type DataRowId = ModelRowId | PlaceholderRowId;
   type EditableRowId = ModelRowId | MarkupRowId;
-	type NonPlaceholderBodyRowId = EditableRowId | GroupRowId;
-	type BodyRowId = NonPlaceholderBodyRowId | PlaceholderRowId;
+  type NonPlaceholderBodyRowId = EditableRowId | GroupRowId;
+  type BodyRowId = NonPlaceholderBodyRowId | PlaceholderRowId;
 
   type RowId = BodyRowId | FooterRowId;
 
@@ -507,7 +507,7 @@ declare namespace Table {
     readonly id: I;
   };
 
-	/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   type RowChangeData<R extends RowData> = { [Property in keyof R]?: CellChange };
 
   type RowChange<R extends RowData, I extends EditableRowId = EditableRowId> = {
@@ -750,6 +750,7 @@ declare namespace Table {
       readonly defaultData?: Partial<R>;
       readonly createTableRows?: (config: CFG) => BodyRow<R>[];
       readonly getModelRowChildren?: (m: M) => number[];
+      readonly clearOn: import("@reduxjs/toolkit").PayloadActionCreator<any>[];
     };
 
   type SagaConfig<
@@ -762,7 +763,9 @@ declare namespace Table {
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
-    A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
+    A extends Redux.TableActionMap<M> & { readonly request?: Redux.TableRequestPayload } = Redux.TableActionMap<M> & {
+      readonly request?: Redux.TableRequestPayload;
+    }
   > = {
     readonly autoRequest?: boolean;
     readonly asyncId?: AsyncId;
