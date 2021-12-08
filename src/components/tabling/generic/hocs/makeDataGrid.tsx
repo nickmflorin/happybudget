@@ -73,35 +73,58 @@ const DataGrid =
         }));
       }, [hooks.useDeepEqualMemo(props.columns)]);
 
-      const onFirstDataRendered: (e: Table.FirstDataRenderedEvent) => void = hooks.useDynamicCallback(
-        (e: Table.FirstDataRenderedEvent): void => {
-          props.onFirstDataRendered(e);
-          const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api);
-          if (rows.length !== 0) {
-            e.api.ensureIndexVisible(0);
+      const onFirstDataRendered: (e: Table.FirstDataRenderedEvent) => void = useMemo(
+        () =>
+          (e: Table.FirstDataRenderedEvent): void => {
+            props.onFirstDataRendered(e);
 
-            const query = new URLSearchParams(location.search);
-            const rowId = query.get("row");
-            const cols = e.columnApi.getAllColumns();
+            const handleQuery = (rows: Table.BodyRow<R>[]) => {
+              if (rows.length !== 0) {
+                e.api.ensureIndexVisible(0);
 
-            const actionColumns = filter(props.columns, (c: Table.Column<R, M>) => c.tableColumnType === "action");
+                const query = new URLSearchParams(location.search);
+                const rowId = query.get("row");
+                const cols = e.columnApi.getAllColumns();
 
-            if (!isNil(cols) && cols.length > actionColumns.length) {
-              let firstColumn = cols[actionColumns.length];
-              let focusedOnQuery = false;
-              if (!isNil(rowId) && !isNaN(parseInt(rowId))) {
-                const node = e.api.getRowNode(String(rowId));
-                if (!isNil(node) && !isNil(node.rowIndex) && !isNil(firstColumn)) {
-                  e.api.setFocusedCell(node.rowIndex, firstColumn);
-                  focusedOnQuery = true;
+                const actionColumns = filter(props.columns, (c: Table.Column<R, M>) => c.tableColumnType === "action");
+
+                if (!isNil(cols) && cols.length > actionColumns.length) {
+                  let firstColumn = cols[actionColumns.length];
+                  let focusedOnQuery = false;
+                  if (!isNil(rowId) && !isNaN(parseInt(rowId))) {
+                    const node = e.api.getRowNode(String(rowId));
+                    if (!isNil(node) && !isNil(node.rowIndex) && !isNil(firstColumn)) {
+                      e.api.setFocusedCell(node.rowIndex, firstColumn);
+                      focusedOnQuery = true;
+                    }
+                  }
+                  if (focusedOnQuery === false) {
+                    e.api.setFocusedCell(0, firstColumn);
+                  }
                 }
               }
-              if (focusedOnQuery === false) {
-                e.api.setFocusedCell(0, firstColumn);
-              }
+            };
+            /*
+						At the time of this writing, we are not exactly sure why this is
+						happening - but for whatever reason (most like an AG Grid internal
+						discrepancy) when migrating to the previous table with CMD + ArrowUp,
+						the table initially triggers onFirstDataRendered when there are no
+						nodes in the table yet - which is strange.  In order to avoid this
+						situation, if we notice that there are no rows in the table when
+						this is triggered, we will attempt to handle the query 100ms later -
+						so that the nodes are populated in the table.
+						*/
+            let rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api);
+            if (rows.length === 0) {
+              setTimeout(() => {
+                rows = tabling.aggrid.getRows(e.api);
+                handleQuery(rows);
+              }, 100);
+            } else {
+              handleQuery(rows);
             }
-          }
-        }
+          },
+        [hooks.useDeepEqualMemo(props.columns), props.onFirstDataRendered]
       );
 
       const getRowClass: Table.GetRowClassName = useMemo(

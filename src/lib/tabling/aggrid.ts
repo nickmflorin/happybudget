@@ -15,6 +15,26 @@ export const rangeSelectionIsSingleCell = (range: CellRange) => {
   return false;
 };
 
+export const getFocusedNode = (api: Table.GridApi): Table.RowNode | null => {
+  const focusedCell = api.getFocusedCell();
+  if (!isNil(focusedCell)) {
+    const node = api.getDisplayedRowAtIndex(focusedCell.rowIndex);
+    return node || null;
+  }
+  return null;
+};
+
+export const getFocusedRow = <R extends Table.RowData, RW extends Table.BodyRow<R> = Table.BodyRow<R>>(
+  api: Table.GridApi
+): RW | null => {
+  const node = getFocusedNode(api);
+  if (!isNil(node)) {
+    const row: RW = node.data;
+    return row;
+  }
+  return null;
+};
+
 export const collapseRangeSelectionVertically = (ranges: CellRange[]): [number | null, number | null] => {
   let verticalRange: [number | null, number | null] = [null, null];
   map(ranges, (range: CellRange) => {

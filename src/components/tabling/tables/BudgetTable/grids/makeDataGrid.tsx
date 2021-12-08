@@ -14,9 +14,8 @@ interface InjectedBudgetDataGridProps {
 export interface BudgetDataGridProps<R extends Table.RowData> {
   readonly apis: Table.GridApis | null;
   readonly framework?: Table.Framework;
+  readonly editColumnConfig?: Table.EditColumnRowConfig<R>[];
   readonly onBack?: () => void;
-  readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
-  readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
 }
 
 export type WithBudgetDataGridProps<T> = T & InjectedBudgetDataGridProps;
@@ -29,20 +28,11 @@ const BudgetDataGrid = <R extends Tables.BudgetRowData, T extends BudgetDataGrid
     const moveDownKeyListener = hooks.useDynamicCallback((localApi: GridApi, e: KeyboardEvent) => {
       const ctrlCmdPressed = e.ctrlKey || e.metaKey;
       if (e.key === "ArrowDown" && ctrlCmdPressed) {
-        const focusedCell = localApi.getFocusedCell();
-        if (!isNil(focusedCell)) {
-          const node = localApi.getDisplayedRowAtIndex(focusedCell.rowIndex);
-          if (!isNil(node)) {
-            const row: Table.BodyRow<R> = node.data;
-            if (
-              tabling.typeguards.isModelRow(row) &&
-              !isNil(props.onRowExpand) &&
-              (isNil(props.rowCanExpand) ||
-                (typeof props.rowCanExpand === "boolean" && props.rowCanExpand !== false) ||
-                (typeof props.rowCanExpand === "function" && props.rowCanExpand(row)))
-            ) {
-              props.onRowExpand(row);
-            }
+        const focusedRow = tabling.aggrid.getFocusedRow<R>(localApi);
+        if (!isNil(focusedRow) && !isNil(props.editColumnConfig) && !tabling.typeguards.isPlaceholderRow(focusedRow)) {
+          const expandConfig = tabling.columns.getEditColumnRowConfig<R>(props.editColumnConfig, focusedRow, "expand");
+          if (!isNil(expandConfig)) {
+            expandConfig.action(focusedRow, false);
           }
         }
       }
