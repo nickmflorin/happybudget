@@ -7,9 +7,6 @@ import { Checkbox } from "antd";
 
 import { IconOrSpinner, VerticalFlexCenter, Spinner } from "components";
 
-import { model } from "lib";
-import MenuItems from "./MenuItems";
-
 const PrivateCommonMenuItem = <M extends MenuItemModel>(
   props: ICommonMenuItem<M> & { readonly isExtra: boolean; readonly children: JSX.Element }
 ): JSX.Element => {
@@ -91,17 +88,7 @@ const PrivateMenuItem = <M extends MenuItemModel>(props: IMenuItem<M> & { readon
   }
 
   return (
-    <CommonMenuItem
-      {...props}
-      isExtra={false}
-      style={{
-        ...props.style,
-        ...(!isNil(props.level) ? { paddingLeft: 10 + 6 * props.level } : { paddingLeft: 10 }),
-        paddingTop: props.level === 0 ? 4 : 2,
-        paddingBottom: props.level === 0 ? 4 : 2,
-        height: props.level === 0 ? "32px" : "28px"
-      }}
-    >
+    <CommonMenuItem {...props} isExtra={false}>
       <React.Fragment>
         {props.checkbox && <Checkbox checked={props.selected} />}
         {!isNil(m.icon) && (
@@ -116,7 +103,7 @@ const PrivateMenuItem = <M extends MenuItemModel>(props: IMenuItem<M> & { readon
         )}
         <VerticalFlexCenter>
           {!isNil(props.renderContent) ? (
-            props.renderContent(m, { level: props.level })
+            props.renderContent(m)
           ) : !isNil(m.render) ? (
             m.render()
           ) : (
@@ -129,30 +116,3 @@ const PrivateMenuItem = <M extends MenuItemModel>(props: IMenuItem<M> & { readon
 };
 
 export const MenuItem = React.memo(PrivateMenuItem) as typeof PrivateMenuItem;
-
-const PrivateRecursiveMenuItem = <M extends MenuItemModel>(
-  props: IMenuItem<M> & {
-    readonly recursion?: IMenuItems<M>;
-    readonly label?: string;
-    readonly getLabel?: (m: M) => string;
-  }
-): JSX.Element => {
-  return (
-    <React.Fragment>
-      <MenuItem {...props} id={`menu-${props.menuId}-item-${props.model.id}`} />
-      {model.typeguards.isModelWithChildren(props.model) &&
-        /* eslint-disable indent */
-        props.model.children.length !== 0 &&
-        !isNil(props.recursion) && (
-          <MenuItems<M>
-            {...props.recursion}
-            getLabel={props.getLabel}
-            models={props.model.children}
-            level={props.level + 1}
-          />
-        )}
-    </React.Fragment>
-  );
-};
-
-export const RecursiveMenuItem = React.memo(PrivateRecursiveMenuItem) as typeof PrivateRecursiveMenuItem;

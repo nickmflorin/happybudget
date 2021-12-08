@@ -4,7 +4,7 @@ import GenericMenu from "./Generic";
 export type ModelMenuProps<M extends Model.Model> = Omit<IMenu<M>, "renderItemContent"> & {
   readonly menu?: NonNullRef<IMenuRef<M>>;
 } & {
-  readonly renderItemContent: (model: M, context: { level: number }) => JSX.Element;
+  readonly renderItemContent: (model: M) => JSX.Element;
 };
 
 const ModelMenu = <M extends Model.Model>(props: ModelMenuProps<M>): JSX.Element => (

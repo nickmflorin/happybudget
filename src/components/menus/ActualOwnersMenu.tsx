@@ -1,6 +1,5 @@
 import classNames from "classnames";
 
-import { Icon } from "components";
 import { EntityText } from "components/typography";
 
 import ModelMenu from "./ModelMenu";
@@ -31,20 +30,7 @@ const ActualOwnersMenu = ({ childrenDefaultVisible = true, ...props }: ActualOwn
           showOnNoData: true
         }
       ]}
-      renderItemContent={(model: Model.ActualOwner, context: { level: number }) => {
-        if (context.level !== 0) {
-          return (
-            <div className={"with-neuter-wrapper"}>
-              <div className={"icon-wrapper"}>
-                <Icon icon={"long-arrow-alt-right"} weight={"light"} />
-              </div>
-              <EntityText fillEmpty={"---------"}>{model}</EntityText>
-            </div>
-          );
-        } else {
-          return <EntityText fillEmpty={"---------"}>{model}</EntityText>;
-        }
-      }}
+      renderItemContent={(model: Model.ActualOwner) => <EntityText fillEmpty={"---------"}>{model}</EntityText>}
     />
   );
 };
