@@ -421,13 +421,11 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
       if (value === true) {
         setTimeout(() => {
           ref.current?.focus();
-          // innerRef.current?.focus();
           searchRef.current?.focus();
         });
       } else {
         setTimeout(() => {
           ref.current?.blur();
-          // innerRef.current?.blur();
           searchRef.current?.blur();
         });
       }
@@ -479,8 +477,6 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
             value={search}
             ref={searchRef}
             style={{ maxWidth: 300, minWidth: 100 }}
-            // onFocus={(e: React.FocusEvent<HTMLInputElement>) => setSearchFocused(true)}
-            // onBlur={(e: React.FocusEvent<HTMLInputElement>) => setSearchFocused(false)}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setSearch(event.target.value);
             }}
