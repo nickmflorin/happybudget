@@ -55,7 +55,7 @@ export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Mo
   readonly pinActionColumns?: boolean;
   readonly onGroupRowsAdded?: (ids: Table.GroupRowId[], rows: Table.BodyRow<R>[]) => void;
   readonly onMarkupRowsAdded?: (ids: Table.MarkupRowId[], rows: Table.BodyRow<R>[]) => void;
-  readonly onModelRowsAdded?: (ids: Table.ModelRowId[], rows: Table.BodyRow<R>[]) => void;
+  readonly onModelRowsAdded?: (ids: (Table.ModelRowId | Table.PlaceholderRowId)[], rows: Table.BodyRow<R>[]) => void;
   readonly rowHasCheckboxSelection: ((row: Table.EditableRow<R>) => boolean) | undefined;
   readonly onRowSelectionChanged: (rows: Table.EditableRow<R>[]) => void;
 }
@@ -205,15 +205,16 @@ const getCellChangesFromEvent = <R extends Table.RowData, M extends Model.RowHtt
 type RowState = {
   readonly markupRow: Table.MarkupRowId[];
   readonly groupRow: Table.GroupRowId[];
-  readonly modelRow: Table.ModelRowId[];
+  readonly modelRow: (Table.ModelRowId | Table.PlaceholderRowId)[];
 };
 
-type RowStateCallback<
-  R extends Table.RowData,
-  ID extends Table.NonPlaceholderBodyRowId = Table.NonPlaceholderBodyRowId
-> = (api: Table.GridApi, diff: ID[], rows: Table.BodyRow<R>[]) => void;
+type RowStateCallback<R extends Table.RowData, ID extends Table.BodyRowId = Table.BodyRowId> = (
+  api: Table.GridApi,
+  diff: ID[],
+  rows: Table.BodyRow<R>[]
+) => void;
 
-type RowMap<R extends Table.RowData, ID extends Table.NonPlaceholderBodyRowId = Table.NonPlaceholderBodyRowId> = {
+type RowMap<R extends Table.RowData, ID extends Table.BodyRowId = Table.BodyRowId> = {
   id: keyof RowState;
   callback: RowStateCallback<R, ID>;
 };
@@ -679,7 +680,7 @@ const authenticateDataGrid =
       );
 
       const onModelRowsAdded = useMemo(
-        () => (api: Table.GridApi, diff: Table.ModelRowId[], rows: Table.BodyRow<R>[]) => {
+        () => (api: Table.GridApi, diff: (Table.ModelRowId | Table.PlaceholderRowId)[], rows: Table.BodyRow<R>[]) => {
           // Scroll the table to the bottom in the case that rows have been added.
           api.ensureIndexVisible(rows.length - 1, "bottom");
 
@@ -696,7 +697,8 @@ const authenticateDataGrid =
             // rows in the table.
             const modelRowIndex = findIndex(
               rows,
-              (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) && r.id === diff[0]
+              (r: Table.BodyRow<R>) =>
+                (tabling.typeguards.isModelRow(r) || tabling.typeguards.isPlaceholderRow(r)) && r.id === diff[0]
             );
             if (modelRowIndex !== -1) {
               const focusedCell = api.getFocusedCell();
@@ -759,8 +761,11 @@ const authenticateDataGrid =
             (g: Table.GroupRow<R>) => g.id
           ),
           modelRow: map(
-            filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R>[],
-            (g: Table.ModelRow<R>) => g.id
+            filter(
+              rows,
+              (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) || tabling.typeguards.isPlaceholderRow(r)
+            ) as (Table.ModelRow<R> | Table.PlaceholderRow<R>)[],
+            (g: Table.ModelRow<R> | Table.PlaceholderRow<R>) => g.id
           ),
           markupRow: map(
             filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[],
@@ -768,7 +773,11 @@ const authenticateDataGrid =
           )
         };
 
-        const Mapping: [RowMap<R, Table.GroupRowId>, RowMap<R, Table.ModelRowId>, RowMap<R, Table.MarkupRowId>] = [
+        const Mapping: [
+          RowMap<R, Table.GroupRowId>,
+          RowMap<R, Table.ModelRowId | Table.PlaceholderRowId>,
+          RowMap<R, Table.MarkupRowId>
+        ] = [
           { id: "groupRow", callback: onGroupRowsAdded },
           { id: "modelRow", callback: onModelRowsAdded },
           { id: "markupRow", callback: onMarkupRowsAdded }
