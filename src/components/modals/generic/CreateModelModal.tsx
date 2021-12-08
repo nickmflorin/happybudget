@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { isNil } from "lodash";
+import { isNil, includes, reduce } from "lodash";
 
 import * as api from "api";
 import { ui } from "lib";
@@ -30,6 +30,7 @@ interface PrivateCreateModelModalProps<M extends Model.Model, P extends Http.Mod
   readonly create: (payload: P, options: Http.RequestOptions) => Promise<R>;
   readonly children: (form: FormInstance<V>) => JSX.Element;
   readonly interceptPayload?: (p: V) => P;
+  readonly convertEmptyStringsToNull?: (keyof P)[] | boolean;
 }
 
 const CreateModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V = P, R = M>({
@@ -40,6 +41,7 @@ const CreateModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>,
   onSuccess,
   children,
   interceptPayload,
+  convertEmptyStringsToNull,
   ...props
 }: PrivateCreateModelModalProps<M, P, V, R>): JSX.Element => {
   const Form = ui.hooks.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
@@ -59,9 +61,19 @@ const CreateModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>,
       Form.validateFields()
         .then((values: V) => {
           if (isMounted.current) {
-            const payload = !isNil(interceptPayload) ? interceptPayload(values) : values;
+            let payload = (!isNil(interceptPayload) ? interceptPayload(values) : values) as P;
+            payload = reduce(
+              payload,
+              (curr: P, value: P[keyof P], k: string) =>
+                ((Array.isArray(convertEmptyStringsToNull) && includes(convertEmptyStringsToNull, k as keyof P)) ||
+                  (!Array.isArray(convertEmptyStringsToNull) && convertEmptyStringsToNull !== false)) &&
+                value === ""
+                  ? { ...curr, [k]: null }
+                  : curr,
+              payload
+            );
             Form.setLoading(true);
-            create(payload as P, { cancelToken: cancelToken() })
+            create(payload, { cancelToken: cancelToken() })
               .then((response: R) => {
                 if (isMounted.current) {
                   Form.resetFields();

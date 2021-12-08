@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useCallback } from "react";
-import { isNil } from "lodash";
+import { isNil, includes, reduce } from "lodash";
 
 import { model, ui } from "lib";
 import * as api from "api";
@@ -34,6 +34,7 @@ interface PrivateEditModelModalProps<M extends Model.Model, P extends Http.Model
   readonly update: (id: number, payload: P, options: Http.RequestOptions) => Promise<R>;
   readonly children: (m: M | null, form: FormInstance<V>) => JSX.Element;
   readonly interceptPayload?: (p: V) => P;
+  readonly convertEmptyStringsToNull?: (keyof P)[] | boolean;
 }
 
 const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V = P, R = M>({
@@ -49,6 +50,7 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
   children,
   interceptPayload,
   setFormData,
+  convertEmptyStringsToNull,
   ...props
 }: PrivateEditModelModalProps<M, P, V, R>): JSX.Element => {
   const Form = ui.hooks.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
@@ -95,9 +97,20 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
     Form.validateFields()
       .then((values: V) => {
         if (isMounted.current) {
-          const payload = !isNil(interceptPayload) ? interceptPayload(values) : values;
+          let payload = (!isNil(interceptPayload) ? interceptPayload(values) : values) as P;
+          payload = reduce(
+            payload,
+            (curr: P, value: P[keyof P], k: string) =>
+              ((Array.isArray(convertEmptyStringsToNull) && includes(convertEmptyStringsToNull, k as keyof P)) ||
+                (!Array.isArray(convertEmptyStringsToNull) && convertEmptyStringsToNull !== false)) &&
+              value === ""
+                ? { ...curr, [k]: null }
+                : curr,
+            payload
+          );
+
           Form.setLoading(true);
-          update(id, payload as P, { cancelToken: getToken() })
+          update(id, payload, { cancelToken: getToken() })
             .then((response: R) => {
               if (isMounted.current) {
                 Form.resetFields();
