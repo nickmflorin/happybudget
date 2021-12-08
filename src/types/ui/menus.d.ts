@@ -50,11 +50,10 @@ declare interface ICommonMenuItem<M extends MenuItemModel> extends Omit<Standard
 }
 
 declare interface IMenuItem<M extends MenuItemModel> extends StandardComponentProps, ICommonMenuItem<M> {
-  readonly level: number;
   readonly selected: boolean;
   readonly checkbox?: boolean;
   readonly getLabel?: (m: M) => string;
-  readonly renderContent?: (model: M, context: { level: number }) => JSX.Element;
+  readonly renderContent?: (model: M) => JSX.Element;
 }
 
 declare type IExtraMenuItem = Omit<StandardComponentProps, "id"> & ICommonMenuItem<ExtraMenuItemModel>;
@@ -76,12 +75,13 @@ declare type IMenu<M extends MenuItemModel> = StandardComponentProps & {
   readonly searchIndices?: SearchIndicies | undefined;
   readonly extra?: ExtraMenuItemModel[];
   readonly keepDropdownOpenOnClick?: boolean;
+	readonly menu?: NonNullRef<IMenuRef<M>>;
   readonly getModelIdentifier?: (m: M) => ID;
   readonly getLabel?: (m: M) => string;
   readonly onChange?: (params: MenuChangeEvent<M>) => void;
   readonly onSearch?: (value: string) => void;
   readonly onFocusCallback?: (focused: boolean) => void;
-  readonly renderItemContent?: (model: M, context: { level: number }) => JSX.Element;
+  readonly renderItemContent?: (model: M) => JSX.Element;
   readonly closeParentDropdown?: () => void;
 };
 

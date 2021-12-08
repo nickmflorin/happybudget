@@ -4,13 +4,12 @@ import { map, isNil, includes, filter, find, uniqueId, forEach } from "lodash";
 
 import { Input as AntDInput } from "antd";
 
-import { hooks, model, ui, util } from "lib";
+import { hooks, ui, util } from "lib";
 import { RenderWithSpinner, ShowHide } from "components";
 import { Button } from "components/buttons";
 import { SearchInput } from "components/fields";
 
-import MenuItems from "./MenuItems";
-import { ExtraMenuItem } from "./MenuItem";
+import { ExtraMenuItem, MenuItem } from "./MenuItem";
 
 type GenericExtraItem = { extra: ExtraMenuItemModel };
 type GenericModelItem<M extends MenuItemModel> = { model: M };
@@ -108,6 +107,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
       ? props.defaultSelected
       : [props.defaultSelected]
   );
+
   const selected = useMemo(
     () => (!isNil(props.selected) ? (Array.isArray(props.selected) ? props.selected : [props.selected]) : _selected),
     [props.selected, _selected]
@@ -130,30 +130,13 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
     [props.onSearch]
   );
 
-  const _flattenedModels = useMemo<M[]>(() => {
-    const flattened: M[] = [];
-
-    const addModel = (m: M) => {
-      if (model.typeguards.isModelWithChildren(m)) {
-        flattened.push(m);
-        for (let i = 0; i < m.children.length; i++) {
-          addModel(m.children[i]);
-        }
-      } else {
-        flattened.push(m);
-      }
-    };
-    map(props.models, (m: M) => addModel(m));
-    return flattened;
-  }, [hooks.useDeepEqualMemo(props.models)]);
-
   const getModelIdentifier = useMemo(
     () => (m: M) => !isNil(props.getModelIdentifier) ? props.getModelIdentifier(m) : m.id,
     [props.getModelIdentifier]
   );
 
   // This will only perform searching if clientSearching is not false.
-  const models = ui.hooks.useDebouncedJSSearch<M>(search, _flattenedModels, {
+  const models = ui.hooks.useDebouncedJSSearch<M>(search, props.models, {
     indices: props.searchIndices || ["id"],
     disabled: props.includeSearch !== true || props.clientSearching !== true
   });
@@ -202,13 +185,6 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   const availableExtraItems = useMemo<GenericExtraItem[]>(() => {
     return filter(menuState.availableItems, (item: GenericExtraItem) => !isModelItem(item)) as GenericExtraItem[];
   }, [menuState.availableItems]);
-
-  const topLevelModelItems = useMemo<GenericModelItem<M>[]>(() => {
-    const topLevelIds: (number | string)[] = map(props.models, (m: M) => getModelIdentifier(m));
-    return filter(availableModelItems, (item: GenericModelItem<M>) =>
-      includes(topLevelIds, getModelIdentifier(item.model))
-    );
-  }, [hooks.useDeepEqualMemo(props.models), hooks.useDeepEqualMemo(models), availableModelItems, getModelIdentifier]);
 
   const getIndexFromSelectedState = useMemo(
     () =>
@@ -487,20 +463,23 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
         <RenderWithSpinner loading={props.loading} size={22}>
           <ul>
             <React.Fragment>
-              <MenuItems<M>
-                models={map(topLevelModelItems, (item: GenericModelItem<M>) => item.model)}
-                menuId={!isNil(props.id) ? props.id : menuId}
-                checkbox={props.checkbox}
-                level={0}
-                selected={selected}
-                keepDropdownOpenOnClick={props.keepDropdownOpenOnClick}
-                itemProps={props.itemProps}
-                onClick={(event: MenuItemClickEvent<M>) => onMenuItemClick(event.model, event.event)}
-                renderContent={props.renderItemContent}
-                closeParentDropdown={props.closeParentDropdown}
-                isFocused={(m: M) => menuState.focusedIndex === indexMap[getModelIdentifier(m)]}
-                getLabel={props.getLabel}
-              />
+              {map(availableModelItems, (item: GenericModelItem<M>, index: number) => (
+                <MenuItem<M>
+                  key={`${props.id}-${item.model.id}-${index}`}
+                  style={props.itemProps?.style}
+                  className={props.itemProps?.className}
+                  model={item.model}
+                  menuId={props.id}
+                  renderContent={props.renderItemContent}
+                  focused={menuState.focusedIndex === indexMap[getModelIdentifier(item.model)]}
+                  selected={includes(selected, item.model.id)}
+                  checkbox={props.checkbox}
+                  closeParentDropdown={props.closeParentDropdown}
+                  keepDropdownOpenOnClick={props.keepDropdownOpenOnClick}
+                  getLabel={props.getLabel}
+                  onClick={(event: MenuItemClickEvent<M>) => onMenuItemClick(event.model, event.event)}
+                />
+              ))}
               {map(availableExtraItems, (item: GenericExtraItem, index: number) => {
                 return (
                   <ExtraMenuItem

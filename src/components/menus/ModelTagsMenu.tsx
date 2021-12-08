@@ -1,6 +1,7 @@
+import React from "react";
 import { Tag } from "components/tagging";
 
-import ModelMenu from "./ModelMenu";
+import TableModelMenu from "./TableModelMenu";
 
 export type ModelTagsMenuProps<M extends MenuItemModel> = IMenu<M> & { readonly menu?: NonNullRef<IMenuRef<M>> } & {
   readonly tagProps?: Omit<TagProps<M>, "children" | "model" | "text">;
@@ -14,7 +15,7 @@ export type ModelTagsMenuProps<M extends MenuItemModel> = IMenu<M> & { readonly 
 };
 
 const ModelTagsMenu = <M extends Model.Model>(props: Omit<ModelTagsMenuProps<M>, "renderItemContent">): JSX.Element => {
-  return <ModelMenu<M> {...props} renderItemContent={(model: M) => <Tag model={model} {...props.tagProps} />} />;
+  return <TableModelMenu<M> {...props} renderItemContent={(model: M) => <Tag model={model} {...props.tagProps} />} />;
 };
 
-export default ModelTagsMenu;
+export default React.memo(ModelTagsMenu) as typeof ModelTagsMenu;

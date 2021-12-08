@@ -1,5 +1,4 @@
 import React from "react";
-import classNames from "classnames";
 import { ModelTagsMenu, ModelTagsMenuProps } from "components/menus";
 import { IEditor } from "./useModelMenuEditor";
 
@@ -34,7 +33,6 @@ const GenericModelMenuEditor = <
       menu={props.editor.menu}
       includeSearch={true}
       focusSearchOnCharPress={true}
-      className={classNames("table-menu", props.className)}
     />
   );
 };
