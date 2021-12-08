@@ -1,15 +1,16 @@
 import React, { useState, useMemo, useEffect, useRef, useImperativeHandle, useReducer } from "react";
 import classNames from "classnames";
-import { map, isNil, includes, filter, find, uniqueId, forEach, reduce } from "lodash";
+import { map, isNil, includes, filter, find, uniqueId, forEach } from "lodash";
 
 import { Input as AntDInput } from "antd";
 
-import { hooks, ui, util } from "lib";
+import { hooks, model, ui, util } from "lib";
 import { RenderWithSpinner, ShowHide } from "components";
 import { Button } from "components/buttons";
 import { SearchInput } from "components/fields";
 
-import { MenuItem, ExtraMenuItem } from "./MenuItem";
+import MenuItems from "./MenuItems";
+import { ExtraMenuItem } from "./MenuItem";
 
 type GenericExtraItem = { extra: ExtraMenuItemModel };
 type GenericModelItem<M extends MenuItemModel> = { model: M };
@@ -129,26 +130,41 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
     [props.onSearch]
   );
 
+  const _flattenedModels = useMemo<M[]>(() => {
+    const flattened: M[] = [];
+
+    const addModel = (m: M) => {
+      if (model.typeguards.isModelWithChildren(m)) {
+        flattened.push(m);
+        for (let i = 0; i < m.children.length; i++) {
+          addModel(m.children[i]);
+        }
+      } else {
+        flattened.push(m);
+      }
+    };
+    map(props.models, (m: M) => addModel(m));
+    return flattened;
+  }, [hooks.useDeepEqualMemo(props.models)]);
+
   const getModelIdentifier = useMemo(
     () => (m: M) => !isNil(props.getModelIdentifier) ? props.getModelIdentifier(m) : m.id,
     [props.getModelIdentifier]
   );
 
   // This will only perform searching if clientSearching is not false.
-  const models = ui.hooks.useDebouncedJSSearch<M>(search, props.models, {
+  const models = ui.hooks.useDebouncedJSSearch<M>(search, _flattenedModels, {
     indices: props.searchIndices || ["id"],
     disabled: props.includeSearch !== true || props.clientSearching !== true
   });
 
-  const indexMap = useMemo<{ [key: string]: number }>(
-    () =>
-      reduce(
-        models,
-        (curr: { [key: string]: number }, m: M, index: number) => ({ ...curr, [getModelIdentifier(m)]: index }),
-        {}
-      ),
-    []
-  );
+  const indexMap = useMemo<{ [key: string]: number }>(() => {
+    const mapping: { [key: string]: number } = {};
+    map(models, (m: M, index: number) => {
+      mapping[String(getModelIdentifier(m))] = index;
+    });
+    return mapping;
+  }, [hooks.useDeepEqualMemo(models), getModelIdentifier]);
 
   const noData = useMemo(() => {
     return props.models.length === 0;
@@ -186,6 +202,13 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   const availableExtraItems = useMemo<GenericExtraItem[]>(() => {
     return filter(menuState.availableItems, (item: GenericExtraItem) => !isModelItem(item)) as GenericExtraItem[];
   }, [menuState.availableItems]);
+
+  const topLevelModelItems = useMemo<GenericModelItem<M>[]>(() => {
+    const topLevelIds: (number | string)[] = map(props.models, (m: M) => getModelIdentifier(m));
+    return filter(availableModelItems, (item: GenericModelItem<M>) =>
+      includes(topLevelIds, getModelIdentifier(item.model))
+    );
+  }, [hooks.useDeepEqualMemo(props.models), hooks.useDeepEqualMemo(models), availableModelItems, getModelIdentifier]);
 
   const getIndexFromSelectedState = useMemo(
     () =>
@@ -398,11 +421,13 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
       if (value === true) {
         setTimeout(() => {
           ref.current?.focus();
+          // innerRef.current?.focus();
           searchRef.current?.focus();
         });
       } else {
         setTimeout(() => {
           ref.current?.blur();
+          // innerRef.current?.blur();
           searchRef.current?.blur();
         });
       }
@@ -454,6 +479,8 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
             value={search}
             ref={searchRef}
             style={{ maxWidth: 300, minWidth: 100 }}
+            // onFocus={(e: React.FocusEvent<HTMLInputElement>) => setSearchFocused(true)}
+            // onBlur={(e: React.FocusEvent<HTMLInputElement>) => setSearchFocused(false)}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setSearch(event.target.value);
             }}
@@ -464,25 +491,20 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
         <RenderWithSpinner loading={props.loading} size={22}>
           <ul>
             <React.Fragment>
-              {map(props.models, (m: M, index: number) => {
-                return (
-                  <MenuItem<M>
-                    key={`${!isNil(props.id) ? props.id : menuId}-${m.id}-${index}`}
-                    style={props.itemProps?.style}
-                    className={props.itemProps?.className}
-                    model={m}
-                    menuId={props.id}
-                    renderContent={props.renderItemContent}
-                    focused={menuState.focusedIndex === indexMap[getModelIdentifier(m)]}
-                    selected={includes(selected, m.id)}
-                    checkbox={props.checkbox}
-                    closeParentDropdown={props.closeParentDropdown}
-                    keepDropdownOpenOnClick={props.keepDropdownOpenOnClick}
-                    getLabel={props.getLabel}
-                    onClick={(event: MenuItemClickEvent<M>) => onMenuItemClick(event.model, event.event)}
-                  />
-                );
-              })}
+              <MenuItems<M>
+                models={map(topLevelModelItems, (item: GenericModelItem<M>) => item.model)}
+                menuId={!isNil(props.id) ? props.id : menuId}
+                checkbox={props.checkbox}
+                level={0}
+                selected={selected}
+                keepDropdownOpenOnClick={props.keepDropdownOpenOnClick}
+                itemProps={props.itemProps}
+                onClick={(event: MenuItemClickEvent<M>) => onMenuItemClick(event.model, event.event)}
+                renderContent={props.renderItemContent}
+                closeParentDropdown={props.closeParentDropdown}
+                isFocused={(m: M) => menuState.focusedIndex === indexMap[getModelIdentifier(m)]}
+                getLabel={props.getLabel}
+              />
               {map(availableExtraItems, (item: GenericExtraItem, index: number) => {
                 return (
                   <ExtraMenuItem
