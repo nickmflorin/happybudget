@@ -24,14 +24,18 @@ const Formatters = [
   }
 ];
 
-const addParam = (message: string, params: WarningParams, paramName: string) => {
+const addParamValue = (message: string, params: WarningParams, paramName: string, value: any) => {
   const formatter: Formatter<any> | undefined = find(Formatters, { key: paramName });
+  if (!isNil(formatter)) {
+    value = formatter.formatter(value, params);
+  }
+  return message + `\n\t${toTitleCase(paramName)}: ${value}`;
+};
+
+const addParam = (message: string, params: WarningParams, paramName: string) => {
   let value = params[paramName];
   if (value !== undefined) {
-    if (!isNil(formatter)) {
-      value = formatter.formatter(value, params);
-    }
-    return message + `\n\t${toTitleCase(paramName)}: ${value}`;
+    return addParamValue(message, params, paramName, value);
   }
   return message;
 };
@@ -42,5 +46,8 @@ export const warnInconsistentState = ({ level = "warn", ...props }: WarningParam
   Object.keys(props).forEach((key: string) => {
     message = addParam(message, props, key);
   });
+  if (props.action !== undefined && typeof props.action !== "string" && props.payload === undefined) {
+    message = addParamValue(message, props, "payload", props.action.payload);
+  }
   method(message);
 };
