@@ -1,7 +1,6 @@
 import { isNil } from "lodash";
 
 import { Image } from "components/pdf";
-import Logo from "components/images/GreenLogo.png";
 
 import { View, BasePage } from "./primitive";
 import { BasePageProps } from "./primitive/Page";
@@ -31,7 +30,7 @@ const Page = ({ header, footer, children, ...props }: PageProps): JSX.Element =>
         <></>
       )}
       <View className={"page-footer"} wrap={false}>
-        <Image className={"footer-logo"} src={Logo} />
+        <Image className={"footer-logo"} src={process.env.PUBLIC_URL + "/GreenLogo.png"} />
         <Label
           fixed={true}
           className={"page-number"}
