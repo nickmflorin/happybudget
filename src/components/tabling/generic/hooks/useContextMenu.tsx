@@ -271,7 +271,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
             ...contextMenuItems,
             {
               name: `Insert ${getRowLabel(row)} Above`,
-              icon: '<i class="far fa-hand-point-up-alt context-icon"></i>',
+              icon: '<i class="far fa-hand-point-up context-icon"></i>',
               action: () =>
                 params.onChangeEvent({
                   payload: {
@@ -288,7 +288,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
           ...contextMenuItems,
           {
             name: `Insert ${getRowLabel(row)} Below`,
-            icon: '<i class="far fa-hand-point-down-alt context-icon"></i>',
+            icon: '<i class="far fa-hand-point-down context-icon"></i>',
             action: () =>
               params.onChangeEvent({
                 payload: {
