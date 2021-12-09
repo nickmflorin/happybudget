@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { isNil, map, reduce } from "lodash";
+import { isNil, map, reduce, filter } from "lodash";
 
 import { ProcessCellForExportParams, ProcessDataFromClipboardParams } from "@ag-grid-community/core";
 
@@ -144,13 +144,17 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
       const apis: Table.GridApis | null = params.apis;
       if (!isNil(apis)) {
         const rows = tabling.aggrid.getRows(apis.grid);
-        const lastIndex = apis.grid.getDisplayedRowCount();
+        const lastIndex =
+          apis.grid.getDisplayedRowCount() -
+          filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isMarkupRow(r)).length;
         const focusedCell = apis.grid.getFocusedCell();
 
-        if (!isNil(focusedCell) && tabling.typeguards.isEditableRow(rows[focusedCell.rowIndex])) {
-          // If the first column from the focused cell is not writable, that means we are
-          // trying to copy and paste with the focused cell being associated with a column
-          // like the index column.
+        // We enforce that bulk paste operations cannot happen inside of the
+        // MarkupRow(s) at the bottom of the table.
+        if (!isNil(focusedCell) && tabling.typeguards.isModelRow(rows[focusedCell.rowIndex])) {
+          // If the first column from the focused cell is not writable, that
+          // means we are trying to copy and paste with the focused cell being
+          // associated with a column like the index column.
           /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
           const [c, writable] = columnIsWritable(params.columns, focusedCell.column);
           if (writable === false) {
@@ -179,12 +183,14 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
                   // data at the current iteration.
                   if (tabling.typeguards.isGroupRow(row)) {
                     return [...curr, [""], arr];
-                  } else if (tabling.typeguards.isModelRow(row) || tabling.typeguards.isMarkupRow(row)) {
+                  } else if (tabling.typeguards.isModelRow(row)) {
                     return [...curr, arr];
                   } else {
                     // If we are trying to paste into a placeholder row, we need to disallow it
                     // because we cannot update the row until we get an ID from the original
-                    // API response to create that row.
+                    // API response to create that row.  If we are trying to paste into a MarkupRow,
+                    // we do not allow it - because they are at the bottom of the table and new
+                    // rows occur before the MarkupRow(s).
                     return curr;
                   }
                 } else {
