@@ -18,7 +18,7 @@ export * as localization from "./localization";
 
 export const ConfigOptions: Application.ConfigOption[] = [
   { name: "tableDebug", default: false, prodEnv: "local" },
-  { name: "tableRowOrdering", default: true, prodEnv: ["local", "dev"] },
+  { name: "tableRowOrdering", default: true },
   { name: "reportWebVitals", default: false, prodEnv: "local" },
   { name: "whyDidYouRender", default: false, prodEnv: "local" }
 ];
