@@ -42,6 +42,7 @@ function* watchForSearchCommunityTemplatesSaga(): SagaIterator {
 }
 
 const ActionMap = {
+  request: actions.requestContactsAction,
   tableChanged: actions.handleContactsTableChangeEventAction,
   loading: actions.loadingContactsAction,
   response: actions.responseContactsAction,
