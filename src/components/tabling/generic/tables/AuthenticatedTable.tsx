@@ -86,13 +86,14 @@ const AuthenticatedTable = <
 
   /**
    * Note: Ideally, we would be including the selector in the mechanics of the
-   * connectTableToStore HOC.  However, that HOC is usually applied to tables after
-   * the columns have already been provided - meaning that the HOC would not have
-   * a chance to provide the altered columns to this component (or the configureTable HOC).
+   * connectTableToStore HOC.  However, that HOC is usually applied to tables
+   * after the columns have already been provided - meaning that the HOC would
+   * not have a chance to provide the altered columns to this component (or the
+   * configureTable HOC).
    *
-   * We should improve the tabling API such that we can apply connectTableToStore and
-   * configureTable in any order, and the selector will still be included in the editor
-   * and renderer params for each column.
+   * We should improve the tabling API such that we can apply connectTableToStore
+   * and configureTable in any order, and the selector will still be included in
+   * the editor and renderer params for each column.
    */
   const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
     const evaluateColumnExclusionProp = (c: Table.Column<R, M>): boolean => {
@@ -153,14 +154,14 @@ const AuthenticatedTable = <
               const col: Table.Column<R, M> | null = tabling.columns.getColumn(props.columns, field);
 
               if (!isNil(col)) {
-                // Check if the cellChange is associated with a Column that has it's own change
-                // event handler.
+                /* Check if the cellChange is associated with a Column that has
+									 it's own change event handler. */
                 if (tabling.typeguards.isModelRowId(rowChange.id)) {
                   col.onDataChange?.(rowChange.id, change);
                 }
 
-                // Check if the cellChange is associated with a Column that when changed,
-                // should refresh other columns.
+                /* Check if the cellChange is associated with a Column that when
+									 changed, should refresh other columns. */
                 if (!isNil(col.refreshColumns)) {
                   const fieldsToRefresh = col.refreshColumns(change);
                   if (!isNil(fieldsToRefresh) && (!Array.isArray(fieldsToRefresh) || fieldsToRefresh.length !== 0)) {
@@ -187,9 +188,10 @@ const AuthenticatedTable = <
         }
       }
 
-      // Wait until the end to trigger the onChangeEvent.  The onChangeEvent handler is
-      // synchronous, and if we execute before hand the callbacks will not be able to access the
-      // previous state of a given row because it will already have been changed.
+      /* Wait until the end to trigger the onChangeEvent.  The onChangeEvent
+				 handler is synchronous, and if we execute before hand the callbacks
+				 will not be able to access the previous state of a given row because it
+				 will already have been changed. */
       props.onChangeEvent(event);
     },
     [props.onChangeEvent, hooks.useDeepEqualMemo(props.columns)]

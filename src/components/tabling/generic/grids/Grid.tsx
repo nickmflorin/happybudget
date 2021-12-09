@@ -154,10 +154,9 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
         filter(localColumns, (c: Table.Column<R, M>) => c.tableColumnType !== "fake"),
         (col: Table.Column<R, M>): ColDef => {
           /*
-        While AG Grid will not break if we include extra properties on the ColDef(s)
-        (properties from our own custom Table.Column model) - they will complain a lot.
-        So we need to try to remove them.
-        */
+        	While AG Grid will not break if we include extra properties on the
+					ColDef(s) (properties from our own custom Table.Column model) - they
+					will complain a lot. So we need to try to remove them. */
           const {
             footer,
             page,
@@ -286,11 +285,11 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
   );
 
   /*
-  We have to deep clone the row data because it is being pulled directly from the store
-  and as such, is immutable.  If we did not do this, than AG Grid would be applying the
-  updates to the elements of the data in the store, i.e. mutating the store.  This only
-  becomes a problem since we are nestling the actual underlying row data in a `data` property
-  of the <Row> model.
+  We have to deep clone the row data because it is being pulled directly from
+	the store and as such, is immutable.  If we did not do this, than AG Grid would
+	be applying the updates to the elements of the data in the store, i.e. mutating
+	the store.  This only becomes a problem since we are nestling the actual
+	underlying row data in a `data` property of the <Row> model.
   */
   const rowData = useMemo(() => map(data, (r: Table.BodyRow<R>) => cloneDeep(r)), [hooks.useDeepEqualMemo(data)]);
 

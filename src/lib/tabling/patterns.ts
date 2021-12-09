@@ -22,9 +22,10 @@ const isPatternValue = (value: any): value is PatternValue =>
  * a table cell based on the previous value and the previous previous value
  * if one or either exist.
  *
- * The function is intelligent enough to recognize that when there is a "Separator"
- * in the value, if the prefixes before the "Separator" are consistent, the value
- * can be inferred based on the partial value after the "Separator".
+ * The function is intelligent enough to recognize that when there is a
+ * "Separator" in the value, if the prefixes before the "Separator" are
+ * consistent, the value can be inferred based on the partial value after the
+ * "Separator".
  *
  * For instance, if we have values ["Account 100", "Account 200"], the "Separator"
  * is " " - the function will recognize that the prefix "Account" is the same
@@ -110,17 +111,17 @@ export const detectNextInPattern = (values: Table.PreviousValues<PatternValue>):
         const diff = previousNumericValue - numericValue;
         return typeof value === "string" ? String(numericValue - diff) : numericValue - diff;
       } else {
-        // The numeric values are the same, but if we are not considering an
-        // equality part of a pattern then we should return null to indicate that
-        // we could not infer a pattern.
+        /* The numeric values are the same, but if we are not considering an
+           equality part of a pattern then we should return null to indicate that
+           we could not infer a pattern. */
         return null;
       }
     } else {
       return typeof value === "string" ? String(numericValue + 1) : numericValue + 1;
     }
   } else if (typeof value === "string") {
-    // If the value itself is not numeric, then maybe there is a prefix before
-    // a numeric value that we can infer from.
+    /* If the value itself is not numeric, then maybe there is a prefix before
+       a numeric value that we can infer from. */
     const separated = separate(value);
     if (!isNil(separated)) {
       if (!isNil(previousValue) && typeof previousValue === "string") {
@@ -144,9 +145,9 @@ export const detectNextInPattern = (values: Table.PreviousValues<PatternValue>):
 Information required to detect patterns when in the context of AGGrid.  When
 using AGSource, the rows will be pulled directly from the GridApi.
 
-Note that if using an AGGrid source, the rows are pulled from the AGGrid table itself,
-not the store.  In the case that the rows are pulled from the AGGrid table,
-we cannot generate data for multiple rows because after the first generated
+Note that if using an AGGrid source, the rows are pulled from the AGGrid table
+itself, not the store.  In the case that the rows are pulled from the AGGrid
+table, we cannot generate data for multiple rows because after the first generated
 RowData, generating each subsequent RowData object requires the previously
 created RowNode in AGGrid (because it needs them to detect a pattern) - and
 these RowNode(s) will not exist until after this function returns.
@@ -211,9 +212,9 @@ export const findPreviousModelRows = <R extends Table.RowData>(
   source: AGSource | Omit<ReduxSource<R>, "count">,
   filling?: boolean
 ): Table.PreviousValues<Table.ModelRow<R> | Partial<R> | Table.PlaceholderRow<R>> | null => {
-  // If finding the previous ModelRow<R>(s) from AG Grid, we can specify the index
-  // we are starting at, otherwise we start at the end of the table (in AG Grid
-  // context) or the end ot the store (in Reducer context).
+  /* If finding the previous ModelRow<R>(s) from AG Grid, we can specify the index
+     we are starting at, otherwise we start at the end of the table (in AG Grid
+     context) or the end ot the store (in Reducer context). */
   let runningIndex = getSourceIndex(source);
 
   const isModelRowOrData = (
@@ -231,9 +232,9 @@ export const findPreviousModelRows = <R extends Table.RowData>(
 
   const getRowAtIndex = (index: number): Table.BodyRow<R> | Partial<R> | null => {
     if (isAgSource(source)) {
-      // The node should exist at the index because we check the validity of the
-      // index compared to the number of rows in the table in `getSourceIndex` -
-      // but this is mostly to make TS happy and to protect against edge cases.
+      /* The node should exist at the index because we check the validity of the
+         index compared to the number of rows in the table in `getSourceIndex` -
+         but this is mostly to make TS happy and to protect against edge cases. */
       const node = source.api.getDisplayedRowAtIndex(index);
       if (!isNil(node)) {
         const row: Table.BodyRow<R> = node.data;
@@ -241,19 +242,19 @@ export const findPreviousModelRows = <R extends Table.RowData>(
       }
       return null;
     } else {
-      // The index should be in the store because we check the validity of the
-      // index compared to the length of the store in `getSourceIndex` - so this
-      // is primarily to make TS happy.
+      /* The index should be in the store because we check the validity of the
+         index compared to the length of the store in `getSourceIndex` - so this
+         is primarily to make TS happy. */
       return source.store[index] || null;
     }
   };
 
   let modelRowsOrData: (Table.ModelRow<R> | Table.PlaceholderRow<R> | Partial<R>)[] = [];
 
-  // Because of how the timing of when the values are actually placed inside of
-  // the AGGrid table, when we are filling cells from a drag handle, we need to
-  // start one less than the index because the value is already assumed to be
-  // in the table.
+  /* Because of how the timing of when the values are actually placed inside of
+     the AGGrid table, when we are filling cells from a drag handle, we need to
+     start one less than the index because the value is already assumed to be
+     in the table. */
   if (filling) {
     runningIndex = runningIndex - 1;
   }
@@ -352,8 +353,8 @@ export const inferFillCellValue = <R extends Table.RowData, M extends Model.RowH
 ): any => {
   if (params.direction === "down") {
     const c: Table.Column<R, M> | null = columnFns.getColumn(columns, params.column.getColId());
-    // The column will be by default not-fake and readable (`isRead !== false`) since it is
-    // already in the table.
+    /* The column will be by default not-fake and readable (`isRead !== false`)
+			 since it is already in the table. */
     if (!isNil(c) && c.smartInference === true && !isNil(params.rowNode.rowIndex)) {
       const previousRows = findPreviousModelRows<R>({ api: params.api, newIndex: params.rowNode.rowIndex }, true);
       if (!isNil(previousRows)) {
@@ -374,9 +375,10 @@ export const generateNewRowData = <R extends Table.RowData, M extends Model.RowH
     if (source.count === 0) {
       return [];
     } else {
-      // We need to keep track of the RowData objects that are created as we go,
-      // because in the case we are generating multiple RowData objects, the previously
-      // created RowData object needs to factor into the pattern recognition.
+      /* We need to keep track of the RowData objects that are created as we go,
+         because in the case we are generating multiple RowData objects, the
+				 previously created RowData object needs to factor into the pattern
+				 recognition. */
       let runningRows: Partial<R>[] = [];
       for (let i = 0; i < source.count; i++) {
         let runningSource = { ...source, count: 1, store: [...source.store, ...runningRows] };

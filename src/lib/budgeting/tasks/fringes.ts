@@ -26,13 +26,14 @@ export type FringesTableActionMap<B extends Model.Template | Model.Budget> = Red
 };
 
 export type FringeTableServiceSet<B extends Model.Template | Model.Budget> = FringeServiceSet & {
-  bulkDelete: (id: number, ids: number[], options: Http.RequestOptions) => Promise<Http.BulkDeleteResponse<B>>;
-  bulkUpdate: (
+  readonly create: (id: number, payload: P, options?: Http.RequestOptions) => Promise<M>;
+  readonly bulkDelete: (id: number, ids: number[], options: Http.RequestOptions) => Promise<Http.BulkDeleteResponse<B>>;
+  readonly bulkUpdate: (
     id: number,
     data: Http.BulkUpdatePayload<Http.FringePayload>,
     options: Http.RequestOptions
   ) => Promise<Http.BulkResponse<B, Model.Fringe>>;
-  bulkCreate: (
+  readonly bulkCreate: (
     id: number,
     p: Http.BulkCreatePayload<P>,
     options: Http.RequestOptions
@@ -163,9 +164,10 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
           ).length !== 0
         );
       };
-      // If the Fringe(s) that were changed are associated with any models in the active table
-      // (either the AccountTable or the SubAccountTable) that need to be recalculated due to the
-      // applied changes, we need to request those SubAccount(s) and update them in the table.
+      /* If the Fringe(s) that were changed are associated with any models in
+			   the active table (either the AccountTable or the SubAccountTable) that
+				 need to be recalculated due to the applied changes, we need to request
+				 those SubAccount(s) and update them in the table. */
       const fringeIds = reduce(
         requestPayload.data,
         (curr: number[], p: Http.ModelBulkUpdatePayload<Http.FringePayload>) =>
@@ -219,6 +221,29 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     } finally {
       yield put(config.actions.saving(false));
       yield put(config.actions.loadingBudget(false));
+    }
+  }
+
+  function* handleRowInsertEvent(e: Table.RowInsertEvent<R>): SagaIterator {
+    const objId = yield select(config.selectObjId);
+    if (!isNil(objId)) {
+      yield put(config.actions.saving(true));
+      try {
+        const response: M = yield api.request(config.services.create, objId, {
+          previous: e.payload.previous,
+          ...tabling.http.postPayload(e.payload.data, config.columns)
+        });
+        yield put(
+          config.actions.tableChanged({
+            type: "modelAdded",
+            payload: { model: response }
+          })
+        );
+      } catch (err: unknown) {
+        notifications.requestError(err as Error, "There was an error adding the row.");
+      } finally {
+        yield put(config.actions.saving(false));
+      }
     }
   }
 
@@ -277,9 +302,11 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     handleChangeEvent: tabling.tasks.createChangeEventHandler({
       rowAdd: handleRowAddEvent,
       rowDelete: handleRowDeleteEvent,
+      rowInsert: handleRowInsertEvent,
       rowPositionChanged: handleRowPositionChangedEvent,
-      // It is safe to assume that the ID of the row for which data is being changed
-      // will always be a ModelRowId - but we have to force coerce that here.
+      /* It is safe to assume that the ID of the row for which data is being
+				 changed will always be a ModelRowId - but we have to force coerce that
+				 here. */
       dataChange: handleDataChangeEvent as Redux.TableEventTask<Table.DataChangeEvent<R>>
     })
   };

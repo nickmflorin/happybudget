@@ -2,8 +2,8 @@ import { createObjectReducerFromTransformers } from "./util";
 
 /**
  * A reducer factory that creates a generic reducer to handle the read only state
- * of a detail response, where a detail response might be the response received from
- * submitting an API request to /entity/<pk>.
+ * of a detail response, where a detail response might be the response received
+ * from submitting an API request to /entity/<pk>.
  *
  * The reducer has default behavior that is mapped to the action types via
  * the mappings parameter.

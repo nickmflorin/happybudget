@@ -1,8 +1,4 @@
-/// <reference path="./payloads.d.ts" />
-/// <reference path="./errors.d.ts" />
-
 declare namespace Http {
-
   type ErrorResponse = {
     readonly errors: Error[];
     readonly user_id?: number;

@@ -253,11 +253,11 @@ const DataGrid =
             props.apis?.grid.ensureIndexVisible(1);
             props.apis?.grid.ensureColumnVisible(firstEditableCol);
             setTimeout(() => props.apis?.grid.setFocusedCell(0, firstEditableCol), 0);
-            // TODO: Investigate if there is a better way to do this - currently,
-            // this hook is getting triggered numerous times when it shouldn't be.
-            // It is because the of the `columns` in the dependency array, which
-            // are necessary to get a situation when `firstEditCol` is not null,
-            // but also shouldn't be triggering this hook so many times.
+            /* TODO: Investigate if there is a better way to do this - currently,
+               this hook is getting triggered numerous times when it shouldn't be.
+               It is because the of the `columns` in the dependency array, which
+               are necessary to get a situation when `firstEditCol` is not null,
+               but also shouldn't be triggering this hook so many times. */
             setFocused(true);
           }
         }

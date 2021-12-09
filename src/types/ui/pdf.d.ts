@@ -1,12 +1,11 @@
 declare namespace Pdf {
-
   type Style = import("@react-pdf/types").Style;
 
   type Styles = import("@react-pdf/renderer").default.Styles;
 
-  type ExtensionStyle = ReactPdfStyle & { ext?: SingleOrArray<string>, fontFamily?: FontFamily };
+  type ExtensionStyle = ReactPdfStyle & { ext?: SingleOrArray<string>; fontFamily?: FontFamily };
 
-  type ExtensionStyles = {[key: string]: ExtensionStyle};
+  type ExtensionStyles = { [key: string]: ExtensionStyle };
 
   type HTMLNodeType = "paragraph" | "header" | "text" | "fontStyle";
   type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
@@ -18,36 +17,20 @@ declare namespace Pdf {
 
   type FontStyleName = "italic" | "bold";
 
-  interface IHTMLNode<
-    T extends HTMLNodeType,
-    D,
-    Tag extends SupportedHTMLTag | null
-  > {
+  interface IHTMLNode<T extends HTMLNodeType, D, Tag extends SupportedHTMLTag | null> {
     readonly type: T;
     readonly data: D;
     readonly tag: Tag;
   }
 
   type HTMLTextNode = IHTMLNode<"text", string, null>;
-  type HTMLFontStyleNode = IHTMLNode<
-    "fontStyle",
-    string | Array<HTMLNode>,
-    SupportedFontStyleTag
-  >;
-  type HTMLParagraphNode = IHTMLNode<
-    "paragraph",
-    string | Array<HTMLNode>,
-    SupportedParagraphTag
-  >;
-  type HTMLHeadingNode = IHTMLNode<
-    "header",
-    string | Array<HTMLNode>,
-    SupportedHeaderTag
-  >;
+  type HTMLFontStyleNode = IHTMLNode<"fontStyle", string | Array<HTMLNode>, SupportedFontStyleTag>;
+  type HTMLParagraphNode = IHTMLNode<"paragraph", string | Array<HTMLNode>, SupportedParagraphTag>;
+  type HTMLHeadingNode = IHTMLNode<"header", string | Array<HTMLNode>, SupportedHeaderTag>;
 
   type HTMLNode = HTMLTextNode | HTMLParagraphNode | HTMLHeadingNode | HTMLFontStyleNode;
 
-  type SupportedFontStyle = { name: FontStyleName, tag: SupportedFontStyleTag };
+  type SupportedFontStyle = { name: FontStyleName; tag: SupportedFontStyleTag };
 
   type Font = {
     readonly src: any;
@@ -57,13 +40,13 @@ declare namespace Pdf {
 
   type DocumentLoadedParams = {
     readonly numPages: number;
-  }
+  };
 
-  type DocumentProps = import("@react-pdf/renderer").default.DocumentProps & {children: JSX.Element | JSX.Element[]};
+  type DocumentProps = import("@react-pdf/renderer").default.DocumentProps & { children: JSX.Element | JSX.Element[] };
 
   type PageRenderParams = {
     readonly pageNumber: number;
-  }
+  };
 
   type RenderDocumentProps = {
     readonly title?: string;
@@ -74,5 +57,5 @@ declare namespace Pdf {
     readonly onLoadStarted?: () => void;
     readonly children: JSX.Element;
     readonly loadingOnNoFile?: boolean;
-  }
+  };
 }

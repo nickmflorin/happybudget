@@ -44,8 +44,8 @@ const getWritableColumnsAfter = <R extends Table.RowData, M extends Model.RowHtt
   while (!isNil(current)) {
     const [c, writable] = columnIsWritable<R, M>(columns, current);
     if (writable) {
-      // If the column is writable, the first value of the array will be non-null so this
-      // type coercion is safe.
+      /* If the column is writable, the first value of the array will be
+         non-null so this type coercion is safe. */
       cols.push(c as Table.Column<R, M>);
     }
     current = api.getDisplayedColAfter(current);
@@ -58,8 +58,8 @@ const processValueFromClipboard = <R extends Table.RowData, M extends Model.RowH
   c: Table.Column<R, M>,
   row?: Table.BodyRow<R> // Will not be defined when adding rows.
 ) => {
-  // If the value is undefined, it is something wonky with AG Grid.  We should return
-  // the current value as to not cause data loss.
+  /* If the value is undefined, it is something wonky with AG Grid.  We should
+		 return the current value as to not cause data loss. */
   if (value === undefined) {
     if (!isNil(c.field) && !isNil(row)) {
       return util.getKeyValue<R, keyof R>(c.field as keyof R)(row.data);
@@ -92,9 +92,9 @@ const processArrayFromClipboard = <R extends Table.RowData, M extends Model.RowH
       has length ${arr.length} - this most likely means there is an issue with the
       column configuration.`
     );
-    // Because, due to an error, we cannot determine what column each element of
-    // the array is associated with - we cannot process the clipboard values for
-    // each element of the array.
+    /* Because, due to an error, we cannot determine what column each element of
+       the array is associated with - we cannot process the clipboard values for
+       each element of the array. */
     return undefined;
   }
   return reduce(
@@ -149,13 +149,13 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
           filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isMarkupRow(r)).length;
         const focusedCell = apis.grid.getFocusedCell();
 
-        // We enforce that bulk paste operations cannot happen inside of the
-        // MarkupRow(s) at the bottom of the table.
+        /* We enforce that bulk paste operations cannot happen inside of the
+           MarkupRow(s) at the bottom of the table. */
         if (!isNil(focusedCell) && tabling.typeguards.isModelRow(rows[focusedCell.rowIndex])) {
-          // If the first column from the focused cell is not writable, that
-          // means we are trying to copy and paste with the focused cell being
-          // associated with a column like the index column.
-          /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+          /* If the first column from the focused cell is not writable, that
+             means we are trying to copy and paste with the focused cell being
+             associated with a column like the index column. */
+          // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
           const [c, writable] = columnIsWritable(params.columns, focusedCell.column);
           if (writable === false) {
             return [];
@@ -163,9 +163,10 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
 
           let newRowData: any[] = [];
 
-          // First, we need to separate out the data that corresponds to rows that should
-          // be added vs. rows that should be updated, and stagger the data corresponding to
-          // rows being updated such the paste operation will skip Group Rows.
+          /* First, we need to separate out the data that corresponds to rows
+						 that should be added vs. rows that should be updated, and stagger
+						 the data corresponding to rows being updated such the paste
+						 operation will skip Group Rows. */
           const updateRowData: any[] = reduce(
             p.data,
             (curr: (R[keyof R] | string)[][], arr: string[], i: number) => {
@@ -177,20 +178,22 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
                 const node = apis.grid.getDisplayedRowAtIndex(rowIndex);
                 if (!isNil(node)) {
                   const row: Table.BodyRow<R> = node.data;
-                  // If the row corresponds to a Group Row, we want to paste the contents into the
-                  // cell below the Group Row.  To do this, we simply add an empty data set for the
-                  // Group Row data (since it will not trigger a change anyways) and also append the
-                  // data at the current iteration.
+                  /* If the row corresponds to a Group Row, we want to paste the
+										 contents into the cell below the Group Row.  To do this, we
+										 simply add an empty data set for the Group Row data (since
+										 it will not trigger a change anyways) and also append the
+                     data at the current iteration. */
                   if (tabling.typeguards.isGroupRow(row)) {
                     return [...curr, [""], arr];
                   } else if (tabling.typeguards.isModelRow(row)) {
                     return [...curr, arr];
                   } else {
-                    // If we are trying to paste into a placeholder row, we need to disallow it
-                    // because we cannot update the row until we get an ID from the original
-                    // API response to create that row.  If we are trying to paste into a MarkupRow,
-                    // we do not allow it - because they are at the bottom of the table and new
-                    // rows occur before the MarkupRow(s).
+                    /* If we are trying to paste into a placeholder row, we need
+											 to disallow it because we cannot update the row until we
+											 get an ID from the original API response to create that
+											 row.  If we are trying to paste into a MarkupRow,
+                       we do not allow it - because they are at the bottom of
+											 the table and new rows occur before the MarkupRow(s). */
                     return curr;
                   }
                 } else {
@@ -201,11 +204,12 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
             },
             []
           );
-          // Since we return the data to update existing rows at the end of this function, not
-          // the data to create new rows, the values to update the rows will automatically go
-          // through AG Grid's valueSetters and clipboard processing callbacks.  However, since
-          // we are concerned with data for new rows here, we have to manually apply some of
-          // that logic.
+          /* Since we return the data to update existing rows at the end of this
+						 function, not the data to create new rows, the values to update the
+						 rows will automatically go through AG Grid's valueSetters and
+						 clipboard processing callbacks.  However, since we are concerned
+						 with data for new rows here, we have to manually apply some of
+             that logic. */
           newRowData = reduce(
             newRowData,
             (curr: R[keyof R][][], rowData: string[], i: number) => {
@@ -218,15 +222,17 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
             []
           );
 
-          // Next, we need to determine what the row data should be for the pasted data corresponding
-          // to rows that should be added to the table - and then dispatch an event to add these
-          // rows to the table with the data provided.
+          /* Next, we need to determine what the row data should be for the
+						 pasted data corresponding to rows that should be added to the
+						 table - and then dispatch an event to add these rows to the table
+						 with the data provided. */
           const cols = getWritableColumnsAfter(apis.column, params.columns, focusedCell.column);
           const payload = reduce(
             newRowData,
             (curr: Partial<R>[], rowData: R[keyof R][], i: number) => {
-              // TODO: Allow the default new row data to be defined and included in the new row
-              // data here - similiarly to how it is defined for the reducers.
+              /* TODO: Allow the default new row data to be defined and included
+								 in the new row data here - similiarly to how it is defined for
+								 the reducers. */
               return [
                 ...curr,
                 reduce(
@@ -234,9 +240,10 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
                   /* eslint-disable indent */
                   (currD: Partial<R>, ci: Table.Column<R, M>, index: number): Partial<R> => {
                     if (!isNil(ci.parseIntoFields)) {
-                      // Note: We must apply the logic to nullify certain values because the
-                      // values here do not pass through the valueGetter in authenticateDataGrid
-                      // (which would otherwise nullify things like "").
+                      /* Note: We must apply the logic to nullify certain values
+												 because the values here do not pass through the
+												 valueGetter in authenticateDataGrid
+                         (which would otherwise nullify things like ""). */
                       const parsed = ci.parseIntoFields(rowData[index]);
                       return {
                         ...currD,
@@ -255,9 +262,9 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
                         )
                       };
                     } else if (!isNil(ci.field)) {
-                      // Note: We do not use the colId for creating the RowData object - the colId
-                      // is used for cases where the Column is not associated with a field of the
-                      // Row Data.
+                      /* Note: We do not use the colId for creating the RowData
+											   object - the colId is used for cases where the Column
+												 is not associated with a field of the Row Data. */
                       if (rowData[index] === ("" as unknown as R[keyof R])) {
                         return {
                           ...currD,
@@ -281,8 +288,9 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
               placeholderIds: map(payload, (py: Partial<R>) => tabling.managers.placeholderRowId())
             });
           }
-          // All we need to do is return the data corresponding to updates to the existing rows
-          // because the cell value change handlers will take care of the rest.
+          /* All we need to do is return the data corresponding to updates to
+						 the existing rows because the cell value change handlers will take
+						 care of the rest. */
           return updateRowData;
         }
       }

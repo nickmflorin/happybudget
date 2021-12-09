@@ -40,7 +40,8 @@ export const identifyCanny = (user: Model.User) => {
   const userId = parseLastIdentifiedUser();
   const delta = parseDurationSinceLastIdentify(user);
   if (!isNil(userId) && !isNil(delta) && delta > 6) {
-    // We do not want to makes calls to Canny's API in local development by default.
+    /* We do not want to makes calls to Canny's API in local development by
+       default. */
     if (!isNil(process.env.REACT_APP_CANNY_APP_ID)) {
       window.Canny("identify", {
         appID: process.env.REACT_APP_CANNY_APP_ID,

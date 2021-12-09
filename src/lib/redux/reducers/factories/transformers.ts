@@ -84,8 +84,8 @@ export const authenticatedModelListResponseReducerTransformers = <
   updateInState: (st: S = initialState, action: Redux.Action<Redux.UpdateActionPayload<M>>) => {
     if (action.isAuthenticated === true) {
       const existing: M | undefined = find(st.data, { id: action.payload.id } as any);
-      // TODO: If the entity does not exist in the state when updating, should
-      // we auto add it?
+      /* TODO: If the entity does not exist in the state when updating, should
+         we auto add it? */
       if (isNil(existing)) {
         redux.util.warnInconsistentState({
           action: action,

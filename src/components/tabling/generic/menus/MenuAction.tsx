@@ -9,8 +9,9 @@ import { Button, IconButton } from "components/buttons";
 
 interface TableMenuActionProps extends StandardComponentProps {
   readonly action: Table.MenuActionObj;
-  // For the buttons to properly work when included in a Dropdown, we need to expose
-  // the onClick prop such that AntD can automatically set this prop on the action.
+  /* For the buttons to properly work when included in a Dropdown, we need to
+		 expose the onClick prop such that AntD can automatically set this prop on
+		 the action. */
   readonly onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
@@ -21,8 +22,9 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
     return (
       <Button
         {...props}
-        // If the button is being wrapped in a dropdown, we need to allow the onClick prop that AntD sets
-        // on the Button when it is nested in a Dropdown to persist.
+        /* If the button is being wrapped in a dropdown, we need to allow the
+					 onClick prop that AntD sets on the Button when it is nested in a
+					 Dropdown to persist. */
         onClick={isNil(action.wrapInDropdown) ? () => !isNil(action.onClick) && action.onClick() : props.onClick}
         className={classNames("btn--bare budget-table-menu", props.className)}
         disabled={action.disabled}

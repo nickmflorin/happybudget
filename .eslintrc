@@ -4,7 +4,11 @@
     "es6": true,
     "node": true
   },
-  "extends": ["react-app", "eslint:recommended", "plugin:prettier/recommended"],
+  "extends": [
+    "react-app",
+    "eslint:recommended",
+    "plugin:prettier/recommended"
+  ],
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly",
@@ -23,9 +27,18 @@
     "no-redeclare": "off", // Messes with function overloading.
     "no-shadow": 2,
     "no-restricted-globals": 2,
-    "quotes": [1, "double"],
-    "semi": [1, "always"],
-    "indent": [1, 2],
+    "quotes": [
+      1,
+      "double"
+    ],
+    "semi": [
+      1,
+      "always"
+    ],
+    "indent": [
+      1,
+      2
+    ],
     "no-unused-vars": "warn",
     "no-unused-expressions": "warn",
     "no-multi-spaces": "warn",
@@ -40,7 +53,26 @@
     ],
     "no-eval": "warn",
     "import/first": "warn",
-    "object-curly-spacing": [1, "always"],
+    "object-curly-spacing": [
+      1,
+      "always"
+    ],
+    // This needs to be an error.
+    "multiline-comment-style": [
+      "warn",
+      "bare-block"
+    ],
+    // This needs to eventually be an error.
+    "max-len": [
+      "warn",
+      {
+        "code": 120,
+        "tabWidth": 2,
+        "comments": 82,
+        "ignoreRegExpLiterals": true,
+        "ignorePattern": "^.*(eslint-disable).*"
+      }
+    ],
     "react/no-unused-prop-types": "warn",
     "react/no-unused-state": "warn",
     "react/jsx-uses-react": "warn",
@@ -48,7 +80,9 @@
     "react/jsx-no-undef": "error",
     "react/jsx-no-comment-textnodes": "off",
     "react-hooks/exhaustive-deps": "off",
-    "@typescript-eslint/explicit-function-return-type": ["off"],
+    "@typescript-eslint/explicit-function-return-type": [
+      "off"
+    ],
     "react/jsx-curly-brace-presence": [
       "warn",
       {
@@ -66,6 +100,8 @@
     // rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
     "no-use-before-define": "off",
     "no-undef": "off",
-    "@typescript-eslint/no-use-before-define": ["error"]
+    "@typescript-eslint/no-use-before-define": [
+      "error"
+    ]
   }
 }

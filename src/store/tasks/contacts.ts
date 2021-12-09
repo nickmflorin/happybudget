@@ -111,6 +111,26 @@ export const createTableTaskSet = (
     }
   }
 
+  function* handleRowInsertEvent(e: Table.RowInsertEvent<R>): SagaIterator {
+    yield put(config.actions.saving(true));
+    try {
+      const response: M = yield api.request(api.createContact, {
+        previous: e.payload.previous,
+        ...tabling.http.postPayload(e.payload.data, config.columns)
+      });
+      yield put(
+        config.actions.tableChanged({
+          type: "modelAdded",
+          payload: { model: response }
+        })
+      );
+    } catch (err: unknown) {
+      notifications.requestError(err as Error, "There was an error adding the row.");
+    } finally {
+      yield put(config.actions.saving(false));
+    }
+  }
+
   function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent): SagaIterator {
     yield put(config.actions.saving(true));
     try {
@@ -156,6 +176,7 @@ export const createTableTaskSet = (
     request: tableRequest,
     handleChangeEvent: tabling.tasks.createChangeEventHandler({
       rowAdd: handleRowAddEvent,
+      rowInsert: handleRowInsertEvent,
       rowDelete: handleRowDeleteEvent,
       rowPositionChanged: handleRowPositionChangedEvent,
       // It is safe to assume that the ID of the row for which data is being changed

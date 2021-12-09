@@ -51,6 +51,7 @@ const Tasks = budgeting.tasks.subaccounts.createTableTaskSet<Model.Account, Mode
   selectObjId: (state: Application.Authenticated.Store) => state.budget.account.id,
   actions: ActionMap,
   services: {
+    create: api.createAccountSubAccount,
     request: api.getAccountSubAccounts,
     requestGroups: api.getAccountSubAccountGroups,
     requestMarkups: api.getAccountSubAccountMarkups,

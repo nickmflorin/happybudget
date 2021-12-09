@@ -33,12 +33,17 @@ export const createSimpleBooleanReducer = (
  *                  the reducer should listen for.
  * @param options   Additional options supplied to the reducer factory.
  */
-/* prettier-ignore */
 export const createModelListActionReducer =
-  (config: Omit<Redux.ReducerConfig<Redux.ModelListActionStore, { change: Redux.ModelListActionPayload }>, "initialState">) =>
-    (st: Redux.ModelListActionStore = [], action: Redux.Action<Redux.ModelListActionPayload>) => {
-      if (config.actions.change.toString() === action.type) {
-        return modelListActionReducer(st, action);
-      }
-      return st;
-    };
+  (
+    config: Omit<
+      Redux.ReducerConfig<Redux.ModelListActionStore, { change: Redux.ModelListActionPayload }>,
+      "initialState"
+    >
+  ) =>
+  /* eslint-disable indent */
+  (st: Redux.ModelListActionStore = [], action: Redux.Action<Redux.ModelListActionPayload>) => {
+    if (config.actions.change.toString() === action.type) {
+      return modelListActionReducer(st, action);
+    }
+    return st;
+  };

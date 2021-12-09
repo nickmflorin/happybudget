@@ -7,8 +7,8 @@ import urljoin from "url-join";
  * contain a trailing slash.
  */
 export const getDomain = (): string => {
-  // If we don't check process.env.REACT_APP_DOMAIN for null/undefined, we can get
-  // misleading errors.
+  /* If we don't check process.env.REACT_APP_DOMAIN for null/undefined, we can get
+     misleading errors. */
   const domain = process.env.REACT_APP_DOMAIN;
   if (isNil(domain)) {
     throw new Error("The REACT_APP_DOMAIN environment variable is missing from the .env file.");
@@ -31,8 +31,9 @@ export const getDomain = (): string => {
  */
 export const relativizeUrlPath = (...parts: string[]): string => {
   let path: string = urljoin(...parts);
-  // The first part in the array of PATH components should really start with
-  // a leading slash, but just in case it doesn't we will safeguard against that.
+  /* The first part in the array of PATH components should really start with
+     a leading slash, but just in case it doesn't we will safeguard against
+		 that. */
   if (!path.startsWith("/")) {
     path = `/${path}`;
   }

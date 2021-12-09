@@ -55,7 +55,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
   }
 
   function* requestActuals(budgetId: number): SagaIterator {
-    const response: Http.ListResponse<M> = yield api.request(api.getBudgetActuals, budgetId, {});
+    const response: Http.ListResponse<M> = yield api.request(api.getActuals, budgetId, {});
     if (response.data.length === 0) {
       // If there is no table data, we want to default create two rows.
       const createResponse: Http.BulkResponse<Model.Budget, M> = yield api.request(
@@ -70,9 +70,9 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
   }
 
   function* requestActualOwners(action: Redux.Action<null>): SagaIterator {
-    // We have to perform the select() inside of this task, instead of providing budgetId as a param,
-    // because there is a saga that listens for an search action to be dispatched and then calls this
-    // task.
+    /* We have to perform the select() inside of this task, instead of providing
+		   budgetId as a param, because there is a saga that listens for an search
+			 action to be dispatched and then calls this task. */
     const budgetId = yield select((state: Application.Authenticated.Store) => state.budget.id);
     if (!isNil(budgetId)) {
       const search = yield select(config.selectOwnersSearch);
@@ -155,6 +155,29 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     }
   }
 
+  function* handleRowInsertEvent(e: Table.RowInsertEvent<R>): SagaIterator {
+    const objId = yield select(config.selectObjId);
+    if (!isNil(objId)) {
+      yield put(config.actions.saving(true));
+      try {
+        const response: M = yield api.request(api.createActual, objId, {
+          previous: e.payload.previous,
+          ...tabling.http.postPayload(e.payload.data, config.columns)
+        });
+        yield put(
+          config.actions.tableChanged({
+            type: "modelAdded",
+            payload: { model: response }
+          })
+        );
+      } catch (err: unknown) {
+        notifications.requestError(err as Error, "There was an error adding the row.");
+      } finally {
+        yield put(config.actions.saving(false));
+      }
+    }
+  }
+
   function* handleRowAddEvent(e: Table.RowAddEvent<R>): SagaIterator {
     const budgetId = yield select(config.selectObjId);
     if (!isNil(budgetId)) {
@@ -191,6 +214,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     requestActualOwners,
     handleChangeEvent: tabling.tasks.createChangeEventHandler({
       rowAdd: handleRowAddEvent,
+      rowInsert: handleRowInsertEvent,
       rowDelete: handleRowDeleteEvent,
       dataChange: handleDataChangeEvent,
       rowPositionChanged: handleRowPositionChangedEvent

@@ -1,12 +1,3 @@
-/// <reference path="./menus.d.ts" />
-/// <reference path="./layout.d.ts" />
-/// <reference path="./tagging.d.ts" />
-/// <reference path="./style.d.ts" />
-/// <reference path="./forms.d.ts" />
-/// <reference path="./pdf.d.ts" />
-/// <reference path="./richtext.d.ts" />
-/// <reference path="./feedback.d.ts" />
-
 declare type Order = 1 | -1 | 0;
 declare type DefinitiveOrder = 1 | -1;
 declare type Ordering<T = string> = { [key: T]: Order };
@@ -36,7 +27,9 @@ declare interface StandardPdfComponentProps {
   readonly wrap?: boolean;
 }
 
-declare type IconProp = import("@fortawesome/fontawesome-svg-core").IconName | [import("@fortawesome/fontawesome-svg-core").IconPrefix, import("@fortawesome/fontawesome-svg-core").IconName];
+declare type IconProp =
+  | import("@fortawesome/fontawesome-svg-core").IconName
+  | [import("@fortawesome/fontawesome-svg-core").IconPrefix, import("@fortawesome/fontawesome-svg-core").IconName];
 declare type IconWeight = "light" | "regular" | "solid";
 declare type IconOrElement = IconProp | JSX.Element;
 
@@ -54,12 +47,14 @@ declare type PropsOf<T> = T extends React.ComponentType<infer Props> ? Props : n
 
 declare type RenderFunc = () => JSX.Element;
 
-declare type Tooltip = Omit<Partial<import("antd/lib/tooltip").TooltipPropsWithTitle>, "title"> & { readonly title: string } | string;
+declare type Tooltip =
+  | (Omit<Partial<import("antd/lib/tooltip").TooltipPropsWithTitle>, "title"> & { readonly title: string })
+  | string;
 
 declare type ClickableIconCallbackParams = {
   readonly isHovered: boolean;
-}
-declare type ClickableIconCallback = (params: ClickableIconCallbackParams) => IconOrElement
+};
+declare type ClickableIconCallback = (params: ClickableIconCallbackParams) => IconOrElement;
 declare type ClickableIconOrElement = IconOrElement | ClickableIconCallback;
 
 declare interface ClickableProps extends StandardComponentProps {
@@ -93,4 +88,4 @@ declare type PasswordValidationState = { [key in ValidationId]: boolean };
 declare type Pagination = {
   readonly page: number;
   readonly pageSize?: number;
-}
+};

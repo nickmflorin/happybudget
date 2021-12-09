@@ -14,16 +14,16 @@ export const estimatedValueGetter = <R extends Tables.BudgetRowData>(
       (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r) && includes(row.children, r.id)
     ) as Table.DataRow<R>[];
     if (tabling.typeguards.isMarkupRow(row)) {
-      // Markup rows that are of unit FLAT only count towards the overall estimated value once,
-      // not per Account/Sub Account that is tied to that Markup (which happens when the Markup
-      // is of unit PERCENT).
+      /* Markup rows that are of unit FLAT only count towards the overall
+			   estimated value once, not per Account/Sub Account that is tied to that
+				 Markup (which happens when the Markup is of unit PERCENT). */
       if (row.markupData.unit.id === model.models.MarkupUnitModels.FLAT.id) {
         return row.markupData.rate || 0.0;
       }
-      // The Markup's estimated value is the sum of the contributions of each child Row
-      // to that Markup.  Note that this is not simply the `markup_contribution` of each
-      // Row, as that is the contribution of that Row to the overall Markup, not solely
-      // this Markup.
+      /* The Markup's estimated value is the sum of the contributions of each
+			   child Row to that Markup.  Note that this is not simply the
+				 `markup_contribution` of each Row, as that is the contribution of that
+				 Row to the overall Markup, not solely this Markup. */
       return reduce(
         childrenRows,
         (curr: number, r: Table.DataRow<R>) =>

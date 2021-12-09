@@ -18,8 +18,8 @@ export const DefaultDataGridOptions: GridOptions = {
   },
   suppressHorizontalScroll: true,
   suppressContextMenu: Config.tableDebug,
-  // If for whatever reason, we have a table that cannot support bulk-updating,
-  // these two parameters need to be set to true.
+  /* If for whatever reason, we have a table that cannot support bulk-updating,
+     these two parameters need to be set to true. */
   suppressCopyRowsToClipboard: false,
   suppressClipboardPaste: false,
   enableFillHandle: true,
@@ -185,8 +185,9 @@ const configureTable = <
           genericColumns.EditColumn<R, M>(
             {
               pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined,
-              // These are only applicable for the non-footer grids, but it is easier to define them
-              // at the top Table level than at the Grid level.
+              /* These are only applicable for the non-footer grids, but it is
+								 easier to define them at the top Table level than at the Grid
+								 level. */
               cellRendererParams: {
                 ...props.editColumn?.cellRendererParams,
                 editColumnConfig: props.editColumnConfig

@@ -101,17 +101,17 @@ export const normalizePdfColumnWidths = <
     0.0
   );
 
-  // Determine if there is a column that should flex grow to fill remaining space
-  // in the case that the total width of the visible columns is less than 1.0.
+  /* Determine if there is a column that should flex grow to fill remaining space
+     in the case that the total width of the visible columns is less than 1.0. */
   const flexColumns = filter(columns, (c: C) => baseFilter(c) && !isNil(c.pdfFlexGrow));
   if (flexColumns.length !== 0 && totalSpecifiedWidth < 1.0) {
     const flexColumn = flexColumns[0];
     const normalizedFlexField = normalizedField<R, M, V, PDFM>(flexColumn);
 
-    // If there are multiple columns with 'pdfFlexGrow' specified, we cannot apply
-    // the flex to all of the columns because we would have to split the leftover space up
-    // between the columns with 'pdfFlexGrow' which can get hairy/complicated - and is not
-    // needed at this point.
+    /* If there are multiple columns with 'pdfFlexGrow' specified, we cannot apply
+       the flex to all of the columns because we would have to split the leftover
+			 space up between the columns with 'pdfFlexGrow' which can get
+			 hairy/complicated - and is not needed at this point. */
     if (flexColumns.length !== 1) {
       const flexColumnFields: (string | undefined)[] = map(flexColumns, (c: C) => normalizedField<R, M, V, PDFM>(c));
       console.warn(
@@ -120,9 +120,9 @@ export const normalizePdfColumnWidths = <
         will have 'pdfFlexGrow' applied.`
       );
     }
-    // If the remaining non-flex columns do not specify a width, then we cannot
-    // apply 'pdfFlexGrow' to the remaining column because we do not know how
-    // much space should be available.
+    /* If the remaining non-flex columns do not specify a width, then we cannot
+       apply 'pdfFlexGrow' to the remaining column because we do not know how
+       much space should be available. */
     const columnsWithoutSpecifiedWidth = filter(
       columns,
       (c: C) => baseFilter(c) && isNil(c.pdfWidth) && normalizedFlexField !== normalizedField<R, M, V, PDFM>(c)
@@ -136,8 +136,9 @@ export const normalizePdfColumnWidths = <
         columns ${missingWidthFields.join(", ")} do not specify a 'pdfWidth'.`
       );
     } else {
-      // Return the columns as they were but only changing the width of the column
-      // with 'pdfFlexGrow' applied to take up the remaining space in the table.
+      /* Return the columns as they were but only changing the width of the column
+         with 'pdfFlexGrow' applied to take up the remaining space in the
+				 table. */
       return map(columns, (c: C) => {
         if (normalizedField<R, M, V, PDFM>(c) === normalizedFlexField) {
           return { ...c, pdfWidth: 1.0 - totalSpecifiedWidth };
@@ -147,9 +148,9 @@ export const normalizePdfColumnWidths = <
     }
   }
 
-  // Determine what the default width should be for columns that do not specify it
-  // based on the leftover width available after the columns that specify a width
-  // are inserted.
+  /* Determine what the default width should be for columns that do not specify it
+     based on the leftover width available after the columns that specify a width
+     are inserted. */
   let defaultWidth = 0;
   if (totalSpecifiedWidth < 1.0) {
     defaultWidth = (1.0 - totalSpecifiedWidth) / filter(columns, (c: C) => baseFilter(c) && isNil(c.pdfWidth)).length;
@@ -161,7 +162,8 @@ export const normalizePdfColumnWidths = <
     0.0
   );
   if (totalWidth !== 0.0) {
-    // Normalize the width of each column such that the sum of all column widths is 1.0
+    /* Normalize the width of each column such that the sum of all column widths
+       is 1.0 */
     columns = map(columns, (c: C) => ({
       ...c,
       pdfWidth: baseFilter(c) ? (c.pdfWidth || defaultWidth) / totalWidth : c.pdfWidth
@@ -203,8 +205,9 @@ export const normalizeColumns = <
   M extends Model.RowHttpModel,
   PDFM extends Model.RowHttpModel = any
 >(
-  // TODO: Assuming any here for D can cause bugs - where the update might have fields in it that
-  // are not allowed.  We should come up with a cleaner solution.
+  /* TODO: Assuming any here for D can cause bugs - where the update might have
+		 fields in it that are not allowed.  We should come up with a cleaner
+		 solution. */
   columns: Table.Column<R, M, any, PDFM>[],
   updates?: {
     [key: string]: ColumnUpdate<R, M, PDFM>;
@@ -219,8 +222,8 @@ export const normalizeColumns = <
     if (!isNil(updates)) {
       const id = normalizedField<R, M>(c);
       const data: ColumnUpdate<R, M, PDFM> = updates[id as string] || {};
-      // Data pertaining to a specific column ID should be given precedence to
-      // data defined more generally for the TableColumnType.
+      /* Data pertaining to a specific column ID should be given precedence to
+         data defined more generally for the TableColumnType. */
       return { ...normalizeUpdate(updates[c.tableColumnType], c), ...normalizeUpdate(data, c) };
     }
     return {};
@@ -255,8 +258,8 @@ export const orderColumns = <
     (col: Table.Column<R, M, any, PDFM>) => col.tableColumnType === "calculated"
   );
   const bodyColumns = filter(columns, (col: Table.Column<R, M, any, PDFM>) => col.tableColumnType === "body");
-  // It doesn't matter where the fake columns go in the ordering because they are not
-  // displayed - all we care about is that they are present.
+  /* It doesn't matter where the fake columns go in the ordering because they
+		 are not displayed - all we care about is that they are present. */
   const fakeColumns = filter(columns, (col: Table.Column<R, M, any, PDFM>) => col.tableColumnType === "fake");
 
   const actionColumnsWithIndex = filter(actionColumns, (col: Table.Column<R, M, any, PDFM>) => !isNil(col.index));

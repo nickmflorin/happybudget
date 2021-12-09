@@ -83,7 +83,8 @@ const AuthenticatedMenu = <R extends Table.RowData, M extends Model.RowHttpModel
       )}
     </div>
     <div className={"table-menu-right"}>
-      {/* Reserved for cases where the table is not a full page table and thus the Saving Changes in the page header is not visible. */}
+      {/* Reserved for cases where the table is not a full page table and thus
+				  the Saving Changes in the page header is not visible. */}
       {!isNil(props.saving) && isNil(props.savingChangesPortalId) && <SavingChanges saving={props.saving} />}
       <ShowHide show={!isNil(props.search)}>
         <SearchInput

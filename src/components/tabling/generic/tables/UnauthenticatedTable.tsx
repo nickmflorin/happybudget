@@ -70,13 +70,14 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
   const grid = tabling.hooks.useDataGrid();
   /**
    * Note: Ideally, we would be including the selector in the mechanics of the
-   * connectTableToStore HOC.  However, that HOC is usually applied to tables after
-   * the columns have already been provided - meaning that the HOC would not have
-   * a chance to provide the altered columns to this component (or the configureTable HOC).
+   * connectTableToStore HOC.  However, that HOC is usually applied to tables
+   * after the columns have already been provided - meaning that the HOC would
+   * not have a chance to provide the altered columns to this component (or the
+   * configureTable HOC).
    *
-   * We should improve the tabling API such that we can apply connectTableToStore and
-   * configureTable in any order, and the selector will still be included in the editor
-   * and renderer params for each column.
+   * We should improve the tabling API such that we can apply connectTableToStore
+   * and configureTable in any order, and the selector will still be included in
+   * the editor and renderer params for each column.
    */
   const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
     const evaluateColumnExclusionProp = (c: Table.Column<R, M>): boolean => {

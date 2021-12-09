@@ -5,4 +5,4 @@ declare type IAlert = {
   readonly title?: string;
   readonly message?: string | Http.Error;
   readonly closable?: boolean;
-}
+};

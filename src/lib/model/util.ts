@@ -45,15 +45,17 @@ type InferModelFromNameParams<M extends Model.Model> = {
 };
 
 /**
- * Given a set of models (M[]), tries to infer the model that corresponds to a given
- * string field value (referred to as Name in this case).  This method should be used
- * for inference only, when values may be fuzzy and/or corrupted (i.e. pasting
- * into a table). - it accounts for case insensitivity in the case that uniqueness is still
+ * Given a set of models (M[]), tries to infer the model that corresponds to a
+ * given string field value (referred to as Name in this case).  This method
+ * should be used for inference only, when values may be fuzzy and/or corrupted
+ * (i.e. pasting into a table). - it accounts for case insensitivity in the case
+ * that uniqueness is still
  *
- * The method accounts for case insensitivity by first determining if a unique result
- * can be determined from the case insensitive filter.  In the case that it cannot,
- * it tries the case sensitive filter.  If this still does not produce a single result,
- * it will either raise an Error or issue a warning and assume the first value.
+ * The method accounts for case insensitivity by first determining if a unique
+ * result can be determined from the case insensitive filter.  In the case that
+ * it cannot, it tries the case sensitive filter.  If this still does not produce
+ * a single result, it will either raise an Error or issue a warning and assume
+ * the first value.
  *
  * @param models    M[]  List of models that should be filtered.
  * @param value          The value of the name field that we are searching for.
@@ -82,13 +84,14 @@ export const inferModelFromName = <M extends Model.Model>(
 
   const filtered = performFilter(false);
   if (filtered.length === 0) {
-    // If there are no matches when case is insensitive, there will also be no
-    // matches when case is sensitive.
+    /* If there are no matches when case is insensitive, there will also be no
+       matches when case is sensitive. */
     return null;
   } else if (filtered.length === 1) {
     return filtered[0];
   } else {
-    // If there are multiple matches, we need to restrict base on case sensitivity.
+    /* If there are multiple matches, we need to restrict base on case
+       sensitivity. */
     const msCaseSensitive = performFilter(true);
     if (msCaseSensitive.length === 0) {
       return null;

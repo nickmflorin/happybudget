@@ -55,6 +55,7 @@ const Tasks = budgeting.tasks.subaccounts.createTableTaskSet<Model.Account, Mode
       intersection([c.field, c.colId], ["variance", "contact", "actual"]).length === 0
   ),
   services: {
+    create: api.createAccountSubAccount,
     request: api.getAccountSubAccounts,
     requestGroups: api.getAccountSubAccountGroups,
     requestFringes: api.getTemplateFringes,

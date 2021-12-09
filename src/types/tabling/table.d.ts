@@ -323,7 +323,7 @@ declare namespace Table {
     readonly valueGetter?: (row: Table.BodyRow<R>, rows: Table.BodyRow<R>[]) => any;
     readonly getRowValue?: (m: M) => R[keyof R];
     readonly getHttpValue?: (value: V) => any;
-    readonly onDataChange?: (id: ModelRowId, event: CellChange<R>) => void;
+    readonly onDataChange?: (id: ModelRowId, event: Table.CellChange<R>) => void;
     readonly colSpan?: (params: ColSpanParams<R, M>) => number;
     readonly onCellFocus?: (params: CellFocusedParams<R, M>) => void;
     readonly onCellUnfocus?: (params: CellFocusedParams<R, M>) => void;
@@ -334,9 +334,10 @@ declare namespace Table {
     readonly processCellFromClipboard?: (value: string) => V | null;
     readonly onCellDoubleClicked?: (row: ModelRow<R>) => void;
     readonly includeInPdf?: boolean;
-    // In the PDF case, since we cannot dynamically resize columns, the width refers to a ratio
-    // of the column width to the overall table width assuming that all columns are present.  When
-    // columns are hidden/shown, this ratio is adjusted.
+    /* In the PDF case, since we cannot dynamically resize columns, the width
+			 refers to a ratio of the column width to the overall table width assuming
+			 that all columns are present.  When columns are hidden/shown, this ratio
+			 is adjusted. */
     readonly pdfWidth?: number;
     readonly pdfFlexGrow?: true;
     readonly pdfCellProps?: PdfCellStandardProps<R, PDFM, V>;
@@ -347,8 +348,8 @@ declare namespace Table {
     readonly pdfValueGetter?: PdfValueGetter<R, V>;
     readonly pdfFooterValueGetter?: V | null | PdfFooterValueGetter<R, V>;
     readonly pdfCellRenderer?: (params: PdfCellCallbackParams<R, PDFM, V>) => JSX.Element;
-    // NOTE: This only applies for the individual Account tables, not the the overall
-    // Accounts
+    /* NOTE: This only applies for the individual Account tables, not the the
+			 overall Accounts */
     readonly pdfChildFooter?: (s: PDFM) => PdfFooterColumn<V>;
   }
 
@@ -382,7 +383,7 @@ declare namespace Table {
     readonly getRow: (id: BodyRowId) => BodyRow<R> | null;
     readonly getRows: () => BodyRow<R>[];
     readonly getRowsAboveAndIncludingFocusedRow: () => BodyRow<R>[];
-    readonly applyTableChange: (event: SingleOrArray<ChangeEvent<R, M>>) => void;
+    readonly applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R, M>>) => void;
     readonly changeColumnVisibility: (changes: SingleOrArray<ColumnVisibilityChange>, sizeToFit?: boolean) => void;
   };
 
@@ -480,156 +481,8 @@ declare namespace Table {
     readonly apis: GridApis;
   };
 
-  type ChangeEventId =
-    | "dataChange"
-    | "modelUpdated"
-    | "rowAdd"
-    | "rowPositionChanged"
-    | "rowDelete"
-    | "rowRemoveFromGroup"
-    | "rowAddToGroup"
-    | "groupUpdated"
-    | "groupAdded"
-    | "markupAdded"
-    | "markupUpdated";
-
-  type BaseChangeEvent = {
-    readonly type: ChangeEventId;
-  };
-
-  type CellChange<V = any> = {
-    readonly oldValue: V | null;
-    readonly newValue: V | null;
-  };
-
-  type SoloCellChange<R extends RowData, I extends EditableRowId = EditableRowId, V = any> = CellChange<V> & {
-    readonly field: keyof R;
-    readonly id: I;
-  };
-
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  type RowChangeData<R extends RowData> = { [Property in keyof R]?: CellChange };
-
-  type RowChange<R extends RowData, I extends EditableRowId = EditableRowId> = {
-    readonly id: I;
-    readonly data: RowChangeData<R>;
-  };
-
-  type DataChangePayload<R extends RowData, I extends EditableRowId = EditableRowId> = SingleOrArray<RowChange<R, I>>;
-
-  type ConsolidatedChange<R extends RowData, I extends EditableRowId = EditableRowId> = RowChange<R, I>[];
-
-  type DataChangeEvent<R extends RowData, I extends EditableRowId = EditableRowId> = {
-    readonly type: "dataChange";
-    readonly payload: DataChangePayload<R, I>;
-  };
-
-  type RowAddCountPayload = { readonly count: number };
-  type RowAddIndexPayload = { readonly newIndex: number; readonly count?: number };
-  type RowAddDataPayload<R extends RowData> = Partial<R>[];
-  type RowAddPayload<R extends RowData> = RowAddCountPayload | RowAddIndexPayload | RowAddDataPayload<R>;
-
-  type RowAddEvent<R extends RowData, P extends RowAddPayload<R> = RowAddPayload<R>> = {
-    readonly type: "rowAdd";
-    readonly payload: P;
-    // Placeholder IDs must be provided ahead of time so that the IDs are consistent between the
-    // sagas and the reducer.
-    readonly placeholderIds: PlaceholderRowId[];
-  };
-
-  type RowAddDataEvent<R extends RowData> = RowAddEvent<R, RowAddDataPayload<R>>;
-
-  type RowPositionChangedPayload = {
-    readonly previous: number | null;
-    readonly newGroup: GroupRowId | null;
-    readonly id: ModelRowId;
-  };
-
-  type RowPositionChangedEvent = {
-    readonly type: "rowPositionChanged";
-    readonly payload: RowPositionChangedPayload;
-  };
-
-  type RowDeletePayload = {
-    readonly rows: SingleOrArray<ModelRowId | MarkupRowId | GroupRowId | PlaceholderRowId>;
-  };
-  type RowDeleteEvent = {
-    readonly type: "rowDelete";
-    readonly payload: RowDeletePayload;
-  };
-
-  type RowRemoveFromGroupPayload = {
-    readonly rows: SingleOrArray<ModelRowId>;
-    readonly group: GroupRowId;
-  };
-  type RowRemoveFromGroupEvent = {
-    readonly type: "rowRemoveFromGroup";
-    readonly payload: RowRemoveFromGroupPayload;
-  };
-
-  type RowAddToGroupPayload = {
-    readonly group: GroupRowId;
-    readonly rows: SingleOrArray<ModelRowId>;
-  };
-  type RowAddToGroupEvent = {
-    readonly type: "rowAddToGroup";
-    readonly payload: RowAddToGroupPayload;
-  };
-
-  type GroupAddedPayload = Model.Group;
-  type GroupAddedEvent = {
-    readonly type: "groupAdded";
-    readonly payload: GroupAddedPayload;
-  };
-
-  type MarkupAddedPayload = Model.Markup;
-  type MarkupAddedEvent = {
-    readonly type: "markupAdded";
-    readonly payload: MarkupAddedPayload;
-  };
-
-  type ModelUpdatedPayload<M extends Model.RowHttpModel = Model.RowHttpModel> = {
-    readonly model: M;
-    readonly group?: number | null;
-  };
-
-  type ModelUpdatedEvent<M extends Model.RowHttpModel = Model.RowHttpModel> = {
-    readonly type: "modelUpdated";
-    readonly payload: SingleOrArray<ModelUpdatedPayload<M>>;
-  };
-
-  type GroupUpdatedEvent = {
-    readonly type: "groupUpdated";
-    readonly payload: Model.Group;
-  };
-
-  type MarkupUpdatedEvent = {
-    readonly type: "markupUpdated";
-    readonly payload: Model.Markup;
-  };
-
-  type FullRowEvent = RowDeleteEvent | RowRemoveFromGroupEvent | RowAddToGroupEvent;
-
-  type GroupEvent = RowRemoveFromGroupEvent | RowAddToGroupEvent | GroupUpdatedEvent | GroupAddedEvent;
-
-  type ChangeEvent<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> =
-    | DataChangeEvent<R>
-    | RowAddEvent<R>
-    | RowDeleteEvent
-    | RowPositionChangedEvent
-    | RowRemoveFromGroupEvent
-    | RowAddToGroupEvent
-    | GroupAddedEvent
-    | GroupUpdatedEvent
-    | MarkupAddedEvent
-    | MarkupUpdatedEvent
-    | ModelUpdatedEvent<M>;
-
-  type CellDoneEditingEvent = import("react").SyntheticEvent | KeyboardEvent;
-
-  // I really don't know why, but extending import("@ag-grid-community/core").IEditorParams
-  // does not work here.
-
+  /* I really don't know why, but extending
+		 import("@ag-grid-community/core").IEditorParams does not work here. */
   interface EditorParams<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
@@ -655,11 +508,11 @@ declare namespace Table {
     readonly stopEditing: (suppressNavigateAfterEdit?: boolean) => void;
     readonly parseValue: (value: any) => any;
     readonly formatValue: (value: any) => any;
-    // When the cell editor finishes editing, the AG Grid callback (onCellDoneEditing)
-    // does not have any context about what event triggered the completion, so we have
-    // to handle that ourselves so we can trigger different behaviors depending on
-    // how the selection was performed.
-    readonly onDoneEditing: (e: CellDoneEditingEvent) => void;
+    /* When the cell editor finishes editing, the AG Grid callback
+			 (onCellDoneEditing) does not have any context about what event triggered
+			 the completion, so we have to handle that ourselves so we can trigger
+			 different behaviors depending on how the selection was performed. */
+    readonly onDoneEditing: (e: Table.CellDoneEditingEvent) => void;
   }
 
   interface CellProps<
@@ -677,15 +530,15 @@ declare namespace Table {
     readonly icon?: IconOrElement | ((row: BodyRow<R>) => IconOrElement | undefined | null);
     readonly innerCellClassName?: string | undefined | ((r: Table.Row<R>) => string | undefined);
     readonly innerCellStyle?: React.CSSProperties | undefined | ((r: Table.Row<R>) => React.CSSProperties | undefined);
-    // Note: This is only applied for the data grid rows/cells - so we have to be careful.  We need
-    // a better way of establishing which props are available to cells based on which grid they lie
-    // in,
+    /* Note: This is only applied for the data grid rows/cells - so we have to
+			 be careful.  We need a better way of establishing which props are
+			 available to cells based on which grid they lie in. */
     readonly getRowColorDef: (row: BodyRow<R>) => RowColorDef;
     readonly selector: (state: Application.Store) => S;
     readonly onClear?: (row: BodyRow<R>, column: Column<R, M>) => void;
     readonly showClear?: (row: BodyRow<R>, column: Column<R, M>) => boolean;
     readonly onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
-    readonly onChangeEvent?: (event: ChangeEvent<R, M>) => void;
+    readonly onChangeEvent?: (event: Table.ChangeEvent<R, M>) => void;
   }
 
   type CellWithChildrenProps<
@@ -701,9 +554,9 @@ declare namespace Table {
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>
   > = CellProps<R, M, S, string | number | null> & {
-    // This is used for extending cells.  Normally, the value formatter will be included on the ColDef
-    // of the associated column.  But when extending a Cell, we sometimes want to provide a formatter
-    // for that specific cell.
+    /* This is used for extending cells.  Normally, the value formatter will be
+			 included on the ColDef of the associated column.  But when extending a
+			 Cell, we sometimes want to provide a formatter for that specific cell. */
     readonly valueFormatter?: AGFormatter;
   };
 

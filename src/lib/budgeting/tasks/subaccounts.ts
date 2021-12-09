@@ -11,18 +11,18 @@ type C = Model.SubAccount;
 type P = Http.SubAccountPayload;
 
 export type SubAccountsTableServiceSet = {
-  request: (id: number, query: Http.ListQuery, options: Http.RequestOptions) => Promise<Http.ListResponse<C>>;
-  requestGroups: (
+  readonly request: (id: number, query: Http.ListQuery, options: Http.RequestOptions) => Promise<Http.ListResponse<C>>;
+  readonly requestGroups: (
     id: number,
     query: Http.ListQuery,
     options: Http.RequestOptions
   ) => Promise<Http.ListResponse<Model.Group>>;
-  requestFringes: (
+  readonly requestFringes: (
     id: number,
     query: Http.ListQuery,
     options: Http.RequestOptions
   ) => Promise<Http.ListResponse<Model.Fringe>>;
-  requestMarkups?: (
+  readonly requestMarkups?: (
     id: number,
     query: Http.ListQuery,
     options: Http.RequestOptions
@@ -33,18 +33,23 @@ export type AuthenticatedSubAccountsTableServiceSet<
   M extends Model.Account | Model.SubAccount,
   B extends Model.Template | Model.Budget
 > = SubAccountsTableServiceSet & {
-  bulkDelete: (id: number, ids: number[], options: Http.RequestOptions) => Promise<Http.BudgetBulkDeleteResponse<B, M>>;
-  bulkDeleteMarkups?: (
+  readonly create: (id: number, payload: P, options?: Http.RequestOptions) => Promise<C>;
+  readonly bulkDelete: (
     id: number,
     ids: number[],
     options: Http.RequestOptions
   ) => Promise<Http.BudgetBulkDeleteResponse<B, M>>;
-  bulkUpdate: (
+  readonly bulkDeleteMarkups?: (
+    id: number,
+    ids: number[],
+    options: Http.RequestOptions
+  ) => Promise<Http.BudgetBulkDeleteResponse<B, M>>;
+  readonly bulkUpdate: (
     id: number,
     data: Http.BulkUpdatePayload<P>,
     options: Http.RequestOptions
   ) => Promise<Http.BudgetBulkResponse<B, M, C>>;
-  bulkCreate: (
+  readonly bulkCreate: (
     id: number,
     p: Http.BulkCreatePayload<P>,
     options: Http.RequestOptions
@@ -227,7 +232,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
   function* updateMarkupTask(changes: Table.RowChange<R, Table.MarkupRowId>[]): SagaIterator {
     if (isAuthenticatedConfig(config) && changes.length !== 0) {
       const effects: (StrictEffect | null)[] = map(changes, (ch: Table.RowChange<R, Table.MarkupRowId>) => {
-        const payload = tabling.http.patchPayloadForChange<R, Http.MarkupPayload, C>(ch, config.columns);
+        const payload = tabling.http.patchPayload<R, Http.MarkupPayload, C>(ch, config.columns);
         if (!isNil(payload)) {
           return api.request(api.updateMarkup, tabling.managers.markupId(ch.id), payload);
         }
@@ -241,9 +246,10 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       yield put(config.actions.saving(true));
       try {
         /*
-        Note: We will have access to the updated parent and budget for each request made to update
-        a specific markup - however, the budget or parent will only change when the unit/rate fields
-        are updated for the Markup via the Modal (not the table) - so we do not have to be concerned
+        Note: We will have access to the updated parent and budget for each
+				request made to update a specific markup - however, the budget or parent
+				will only change when the unit/rate fields are updated for the Markup
+				via the Modal (not the table) - so we do not have to be concerned
         with updating the budget or parent in state here.
         */
         yield all(validEffects);
@@ -260,8 +266,9 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
   }
 
   function* bulkDeleteRows(objId: number, ids: number[], markupIds?: number[]): SagaIterator {
-    // Note: We have do these operations sequentially, since they will both update the Budget in state
-    // and we cannot risk running into race conditions.
+    /* Note: We have do these operations sequentially, since they will both
+			 update the Budget in state and we cannot risk running into race
+			 conditions. */
     if (isAuthenticatedConfig(config)) {
       let response: Http.BudgetBulkDeleteResponse<B, M> | null = null;
       if (ids.length !== 0) {
@@ -305,6 +312,38 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     }
   }
 
+  function* handleRowInsertEvent(e: Table.RowInsertEvent<R>): SagaIterator {
+    if (isAuthenticatedConfig(config)) {
+      const objId = yield select(config.selectObjId);
+      if (!isNil(objId)) {
+        yield put(config.actions.saving(true));
+        try {
+          const response: C = yield api.request(config.services.create, objId, {
+            previous: e.payload.previous,
+            group: isNil(e.payload.group) ? null : tabling.managers.groupId(e.payload.group),
+            ...tabling.http.postPayload(e.payload.data, config.columns)
+          });
+          /* The Group is not attributed to the Model in a detail response, so
+						 if the group did change we have to use the value from the event
+						 payload. */
+          yield put(
+            config.actions.tableChanged({
+              type: "modelAdded",
+              payload: {
+                model: response,
+                group: !isNil(e.payload.group) ? tabling.managers.groupId(e.payload.group) : null
+              }
+            })
+          );
+        } catch (err: unknown) {
+          notifications.requestError(err as Error, "There was an error adding the row.");
+        } finally {
+          yield put(config.actions.saving(false));
+        }
+      }
+    }
+  }
+
   function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent): SagaIterator {
     if (isAuthenticatedConfig(config)) {
       yield put(config.actions.saving(true));
@@ -313,8 +352,9 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
           previous: e.payload.previous,
           group: isNil(e.payload.newGroup) ? null : tabling.managers.groupId(e.payload.newGroup)
         });
-        // The Group is not attributed to the Model in a detail response, so if the group
-        // did change we have to use the value from the event payload.
+        /* The Group is not attributed to the Model in a detail response, so if
+					 the group did change we have to use the value from the event
+					 payload. */
         yield put(
           config.actions.tableChanged({
             type: "modelUpdated",
@@ -401,6 +441,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     request,
     handleChangeEvent: tabling.tasks.createChangeEventHandler({
       rowRemoveFromGroup: handleRemoveRowFromGroupEvent,
+      rowInsert: handleRowInsertEvent,
       rowAddToGroup: handleAddRowToGroupEvent,
       rowAdd: handleRowAddEvent,
       rowDelete: handleRowDeleteEvent,

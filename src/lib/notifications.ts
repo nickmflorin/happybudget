@@ -48,29 +48,30 @@ export const notifyUser = (e: AppNotification, context: AppNotificationContext) 
 export const isContextForSentry = (context: AppNotificationContext) => includes(["error", "warning"], context.level);
 
 export const notify = (e: AppNotification, context: AppNotificationContext) => {
-  // Note: Issuing a console.warn or console.error will automatically dispatch to Sentry.
+  /* Note: Issuing a console.warn or console.error will automatically dispatch
+     to Sentry. */
   const defaultDispatchToSentry = isContextForSentry(context) ? true : false;
   const dispatchToSentry = context.dispatchToSentry === undefined ? defaultDispatchToSentry : context.dispatchToSentry;
 
   let consoler: Console["warn" | "error" | "info"] | null = null;
   if (isConsoleNotification(context)) {
     consoler = consoleMethod(context.level);
-    // If this is a warning or error, it will be automatically dispatched to Sentry - unless
-    // we disable it temporarily.
+    /* If this is a warning or error, it will be automatically dispatched to
+       Sentry - unless we disable it temporarily. */
     if (dispatchToSentry === false && isContextForSentry(context)) {
-      // If this is an error or warning and we do not want to send to Sentry, we must temporarily
-      // disable it.
+      /* If this is an error or warning and we do not want to send to Sentry,
+         we must temporarily disable it. */
       Sentry.withScope((scope: Sentry.Scope) => {
         scope.setExtra("ignore", true);
         consoler?.(e);
       });
     } else if (dispatchToSentry === true && e instanceof Error) {
-      // If this is an error or warning but we have the actual Error object, we want to send
-      // that to Sentry - not via the console because we will lose the error trace in the
-      // console.
+      /* If this is an error or warning but we have the actual Error object, we\
+         want to send that to Sentry - not via the console because we will lose
+         the error trace in the console. */
       Sentry.captureException(e);
-      // Perform the console action as before, not propogating it to Sentry since we
-      // already did that via the captureException method.
+      /* Perform the console action as before, not propogating it to Sentry
+         since we already did that via the captureException method. */
       Sentry.withScope((scope: Sentry.Scope) => {
         scope.setExtra("ignore", true);
         consoler?.(e);

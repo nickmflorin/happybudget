@@ -26,10 +26,10 @@ export const injectMarkupsAndGroups = <R extends Table.RowData>(
 
   type ModelsAndGroup = { models: Table.ModelRow<R>[]; group: Table.GroupRow<R> };
 
-  // Placeholders do not have an inherent ordering from the backend, yet...
-  // They will not have this ordering until the response is received from the
-  // backend, so we need to collect them during the ordering process and put
-  // them at the end of the orders rows.
+  /* Placeholders do not have an inherent ordering from the backend, yet...
+     They will not have this ordering until the response is received from the
+     backend, so we need to collect them during the ordering process and put
+     them at the end of the orders rows. */
   let placeholders: Table.PlaceholderRow<R>[] = [];
 
   const grouped = reduce(
@@ -64,8 +64,8 @@ export const injectMarkupsAndGroups = <R extends Table.RowData>(
   );
   return [
     ...reduce(
-      // We want to order the groups by the model in it's set that occurs earliest in
-      // the original data.
+      /* We want to order the groups by the model in it's set that occurs
+				 earliest in the original data. */
       orderBy(grouped, (mg: ModelsAndGroup) => mg.models[0].order),
       (curr: (Table.ModelRow<R> | Table.GroupRow<R>)[], mg: ModelsAndGroup) => {
         return [...curr, ...mg.models, mg.group];
@@ -79,7 +79,8 @@ export const injectMarkupsAndGroups = <R extends Table.RowData>(
 };
 
 export const orderTableRows = <R extends Table.RowData>(data: Table.BodyRow<R>[]): Table.BodyRow<R>[] => {
-  // The order of the actual data rows of the table dictate the order of everything else.
+  /* The order of the actual data rows of the table dictate the order of
+     everything else. */
   const dataRows = filter(data, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[];
   const markupRows = filter(data, (r: Table.BodyRow<R>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[];
   const groupRows = filter(data, (r: Table.BodyRow<R>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[];

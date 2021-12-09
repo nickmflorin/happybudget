@@ -52,9 +52,9 @@ const removeRowsFromTheirGroupsIfTheyExist = <
   action: Redux.Action,
   rowIds: (Table.ModelRowId | Table.ModelRow<R>)[]
 ): S => {
-  // Keep track of which groups were altered and what their most recent children were after all
-  // alterations, because it will be faster to recalculate the groups in the state after so we can
-  // only recalculate each group once.
+  /* Keep track of which groups were altered and what their most recent children
+		 were after all alterations, because it will be faster to recalculate the
+		 groups in the state after so we can only recalculate each group once. */
   type Alteration = {
     groupRow: Table.GroupRow<R>;
     children: number[];
@@ -77,9 +77,10 @@ const removeRowsFromTheirGroupsIfTheyExist = <
       if (!isNil(r)) {
         let groupRow = rowGroupRowFromState<R, S>(action, st, r.id, { warnIfMissing: false });
         if (!isNil(groupRow)) {
-          // This will be overwrittten if a group belongs to multiple rows associated with the provided
-          // IDS - but that is what we want, because we want the final values to have the most up to
-          // date children for each group after all alterations.
+          /* This will be overwrittten if a group belongs to multiple rows
+						 associated with the provided IDS - but that is what we want, because
+						 we want the final values to have the most up to date children for
+						 each group after all alterations. */
           const modelId = r.id;
           return {
             ...alterations,
@@ -120,13 +121,15 @@ const updateRowGroup = <R extends Table.RowData, S extends Redux.TableStore<R> =
 
   const g: Table.GroupRow<R> | null = groupRowFromState<R, S>(action, st, group);
   if (!isNil(g)) {
-    // If any of the ModelRow(s) already belong to Group(s), they must be disassociated from
-    // those Group(s) since a ModelRow can only belong to one and only one Group.
+    /* If any of the ModelRow(s) already belong to Group(s), they must be
+			 disassociated from those Group(s) since a ModelRow can only belong to one
+			 and only one Group. */
     let newState = removeRowsFromTheirGroupsIfTheyExist(st, action, ids);
-    // Find the rows associated with this Group including the rows that are being added to the
-    // group.  Note that this is intentionally redundant (as we simply set the children propery
-    // to these IDs afterwards anyways) - but is done so to make sure that the IDs are valid and
-    // associated with ModelRow(s) in state.
+    /* Find the rows associated with this Group including the rows that are
+			 being added to the group.  Note that this is intentionally redundant (as
+			 we simply set the children propery to these IDs afterwards anyways) - but
+			 is done so to make sure that the IDs are valid and associated with
+			 ModelRow(s) in state. */
     const rws = redux.reducers.findModelsInData<Table.ModelRow<R>>(
       action,
       filter(newState.data, (r: Table.BodyRow<R>) => typeguards.isModelRow(r)) as Table.ModelRow<R>[],
@@ -208,7 +211,8 @@ export const createTableChangeEventReducer = <
           };
         }
       }
-      // For each Row that was changed, apply that change to the Row stored in state.
+      /* For each Row that was changed, apply that change to the Row stored in
+         state. */
       let modifiedRows: Table.EditableRow<R>[] = [];
       return reduce(
         changesPerRow,
@@ -229,18 +233,45 @@ export const createTableChangeEventReducer = <
         },
         state
       );
+    } else if (typeguards.isModelAddedEvent(e)) {
+      const payloads: Table.ModelAddedPayload<M>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
+      return reorderRows(
+        reduce(
+          payloads,
+          (st: S, payload: Table.ModelAddedPayload<M>) => {
+            const modelRow: Table.ModelRow<R> = modelRowManager.create({ model: payload.model });
+            st = { ...st, data: [...st.data, modelRow] };
+            /*
+						The payload's group will only be defined and non-null if the newly
+						created row belongs to a group.  If the newly created row does not
+						belong to a group, the group will not be included in the payload.
+
+						Unlike the modelUpdatedEvent, we do not need to be concerned with
+						null values for group, since null values here are not used to indicate
+						that the group was removed - as the group cannot "change" for a
+						newly created model.
+						*/
+            if (!isNil(payload.group)) {
+              st = updateRowGroup(st, action, [modelRow.id], managers.groupRowId(payload.group));
+            }
+            return st;
+          },
+          state
+        )
+      );
     } else if (typeguards.isModelUpdatedEvent(e)) {
       const payloads: Table.ModelUpdatedPayload<M>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
       /*
-      Note: Even though the rows are already reordered via AG Grid, if we do not apply the
-      reordering redundantly to the state, the rows will revert back to their previous
-      ordering when the model is updated in the state.
+			Note: Even though the rows are already reordered via AG Grid, if we do not
+			apply the reordering redundantly to the state, the rows will revert back
+			to their previous ordering when the model is updated in the state.
 
-      The ordering is applied in AG Grid and subsequently, after the API request succeeds,
-      here, because it provides a much smoother experience to do it immediately via AG Grid
-      and then do it in the background here.  However, even though it is in the background
-      here, we need to keep the state ordering consistent.
-      */
+			The ordering is applied in AG Grid and subsequently, after the API request
+			succeeds, here, because it provides a much smoother experience to do it
+			immediately via AG Grid	and then do it in the background here.  However,
+			even though it is in the background here, we need to keep the state
+			ordering consistent.
+			*/
       return reorderRows(
         reduce(
           payloads,
@@ -256,43 +287,41 @@ export const createTableChangeEventReducer = <
                 data: util.replaceInArray<Table.BodyRow<R>>(
                   st.data,
                   { id: modelRow.id },
-                  modelRowManager.create({
-                    model: payload.model
-                  })
+                  modelRowManager.create({ model: payload.model })
                 )
               };
-              // If the `group` on the event payload is undefined, it means there was no change to the
-              // model's group.  A `null` group means that the group was removed.
+              /* If the `group` on the event payload is undefined, it means
+								 there was no change to the
+                 model's group.  A `null` group means that the group was
+								 removed. */
               if (payload.group !== undefined) {
-                let previousGroupRow: Table.GroupRow<R> | null = rowGroupRowFromState<R, S>(
+                const groupRowId = payload.group !== null ? managers.groupRowId(payload.group) : null;
+                const previousGroupRow: Table.GroupRow<R> | null = rowGroupRowFromState<R, S>(
                   action,
                   st,
                   payload.model.id,
                   { warnIfMissing: false }
                 );
-                let newGroupRow: Table.GroupRow<R> | null = null;
-                if (payload.group !== null) {
-                  newGroupRow = groupRowFromState<R, S>(action, st, managers.groupRowId(payload.group));
-                }
                 let previousGroupRowId = !isNil(previousGroupRow) ? previousGroupRow.id : null;
-                let newGroupRowId = !isNil(newGroupRow) ? newGroupRow.id : null;
                 // Make sure the Group actually changed before proceeding.
-                if (previousGroupRowId !== newGroupRowId) {
-                  // In this case, the ModelRow's associated GroupRow was removed.
-                  if (!isNil(previousGroupRow) && isNil(newGroupRow)) {
-                    // Apply the reordering here, since the model already has it's `order` parameter
-                    // updated.
-                    st = reorderRows({
+                if (previousGroupRowId !== groupRowId) {
+                  if (groupRowId !== null) {
+                    /* If the Group ID of the Model is non-null, this means that
+											 the GroupRow associated with the ModelRow was either added
+											 or changed. */
+                    st = updateRowGroup(st, action, [modelRow.id], groupRowId);
+                  } else if (previousGroupRow !== null) {
+                    /* If the previous GroupRow associated with the ModelRow is
+											 not null but the new Group ID of the Model is null, this
+											 means that the GroupRow was removed from the ModelRow. */
+                    st = {
                       ...st,
                       data: util.replaceInArray<Table.BodyRow<R>>(
                         st.data,
                         { id: previousGroupRow.id },
                         groupRowManager.removeChildren(previousGroupRow, [modelRow.id])
                       )
-                    });
-                    // In this case, the ModelRow's associated GroupRow was either added or changed.
-                  } else if (!isNil(newGroupRow)) {
-                    st = reorderRows(updateRowGroup(st, action, [modelRow.id], newGroupRow.id));
+                    };
                   }
                 }
               }
@@ -334,20 +363,22 @@ export const createTableChangeEventReducer = <
       });
     } else if (typeguards.isRowDeleteEvent(e)) {
       /*
-      When a Row is deleted, we first have to create a dichotomy of the rows we are deleting.
+			When a Row is deleted, we first have to create a dichotomy of the rows we
+			are deleting.
 
-      (1) Group Rows
-      (2) Markup Rows
-      (3) Model Rows
-      (4) Placeholder Rows
+			(1) Group Rows
+			(2) Markup Rows
+			(3) Model Rows
+			(4) Placeholder Rows
 
-      For Markup and Model Rows, we first have to remove the rows that we are going to delete
-      from their respective groups (if they exist).  When this is done, the row data for the
-      groups will also be calculated based on the new set of rows belonging to each group.
+			For Markup and Model Rows, we first have to remove the rows that we are
+			going to delete from their respective groups (if they exist).  When this
+			is done, the row data for the	groups will also be calculated based on the
+			new set of rows belonging to each group.
 
-      Then, we need to actually remove the rows, whether they are group rows or non-group rows from
-      the state.
-      */
+			Then, we need to actually remove the rows, whether they are group rows or
+			non-group rows from the state.
+			*/
       const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
 
       const modelRows: Table.ModelRow<R>[] = redux.reducers.findModelsInData<Table.ModelRow<R>>(
@@ -374,15 +405,16 @@ export const createTableChangeEventReducer = <
       return reorderRows(updateRowGroup(state, action, e.payload.rows, e.payload.group));
     } else if (typeguards.isGroupAddedEvent(e)) {
       /*
-      When a Group is added to the table, we must first convert that Group model to a
-      GroupRow - then, we need to insert the GroupRow into the set of table data and reapply
-      the ordering scheme on the overall set of table data so the GroupRow aappears in the
-      correct location.
+			When a Group is added to the table, we must first convert that Group model
+			to a GroupRow - then, we need to insert the GroupRow into the set of table
+			data and reapply the ordering scheme on the overall set of table data so
+			the GroupRow aappears in the correct location.
 
-      When a Group is created, it may be created with children that already belong to another
-      Group.  In this case, the backend will automatically remove those children from the previous
-      Group they belonged to - but we also need to apply that change in the reducer here.
-      */
+			When a Group is created, it may be created with children that already
+			belong to another Group.  In this case, the backend will automatically
+			remove those children from the previous Group they belonged to - but we
+			also need to apply that change in the reducer here.
+			*/
       const newGroupRow: Table.GroupRow<R> = groupRowManager.create({ model: e.payload });
       const groupsWithChild: Table.GroupRow<R>[] = filter(
         state.data,
@@ -411,10 +443,11 @@ export const createTableChangeEventReducer = <
       });
     } else if (typeguards.isGroupUpdateEvent(e)) {
       /*
-      When a Group is updated, it may be updated with children that already belong to another
-      Group.  In this case, the backend will automatically remove those children from the previous
-      Group they belonged to - but we also need to apply that change in the reducer here.
-      */
+			When a Group is updated, it may be updated with children that already
+			belong to another Group.  In this case, the backend will automatically
+			remove those children from the previous Group they belonged to - but we
+			also need to apply that change in the reducer here.
+			*/
       const groupRow: Table.GroupRow<R> | null = groupRowFromState<R, S>(
         action,
         state,

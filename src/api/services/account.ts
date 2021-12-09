@@ -12,7 +12,6 @@ export const getAccountSubAccountGroups = services.detailListService<Model.Group
   id,
   "groups"
 ]);
-export const getAccountActuals = services.detailListService<Model.Actual>((id: number) => ["accounts", id, "actuals"]);
 export const deleteAccount = services.deleteService((id: number) => ["accounts", id]);
 export const updateAccount = services.detailPatchService<Http.AccountPayload, Model.Account>((id: number) => [
   "accounts",
@@ -29,11 +28,6 @@ export const createAccountSubAccountGroup = services.detailPostService<Http.Grou
   "accounts",
   id,
   "groups"
-]);
-export const createAccountActual = services.detailPostService<Http.ActualPayload, Model.Actual>((id: number) => [
-  "accounts",
-  id,
-  "actuals"
 ]);
 
 export const getAccountSubAccounts = async <M extends Model.SubAccount | Model.SimpleSubAccount = Model.SubAccount>(

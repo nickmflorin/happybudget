@@ -21,7 +21,12 @@ export const getBudgetActualOwners = services.detailListService<Model.ActualOwne
   "actual-owners"
 ]);
 export const getBudgetFringes = services.detailListService<Model.Fringe>((id: number) => ["budgets", id, "fringes"]);
-export const getBudgetActuals = services.detailListService<Model.Actual>((id: number) => ["budgets", id, "actuals"]);
+export const createActual = services.detailPostService<Http.ActualPayload, Model.Actual>((id: number) => [
+  "budgets",
+  id,
+  "actuals"
+]);
+export const getActuals = services.detailListService<Model.Actual>((id: number) => ["budgets", id, "actuals"]);
 export const deleteBudget = services.deleteService((id: number) => ["budgets", id]);
 export const updateBudget = services.detailPatchService<Http.BudgetPayload, Model.Budget>((id: number) => [
   "budgets",

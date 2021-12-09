@@ -125,6 +125,16 @@ export const isModelUpdatedEvent = <R extends Table.RowData, M extends Model.Row
   return (e as Table.ModelUpdatedEvent<M>).type === "modelUpdated";
 };
 
+export const isModelAddedEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.ModelAddedEvent<M> => {
+  return (e as Table.ModelAddedEvent<M>).type === "modelAdded";
+};
+
+export const isRowInsertEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.RowInsertEvent<R> => (e as Table.RowInsertEvent<R>).type === "rowInsert";
+
 export const isRowAddEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   e: Table.ChangeEvent<R, M>
 ): e is Table.RowAddEvent<R> => (e as Table.RowAddEvent<R>).type === "rowAdd";

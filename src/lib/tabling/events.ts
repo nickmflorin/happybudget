@@ -34,9 +34,9 @@ export const addCellChangeToRowChange = <R extends Table.RowData, I extends Tabl
       }
     };
   } else {
-    // If the Table.SoloCellChange field is already in the Table.RowChange data, that means
-    // it was changed multiple times.  We want to maintain the original `oldValue` but just
-    // alter the `newValue`.
+    /* If the Table.SoloCellChange field is already in the Table.RowChange data,
+			 that means it was changed multiple times.  We want to maintain the
+			 original `oldValue` but just alter the `newValue`. */
     return {
       ...rowChange,
       data: {
@@ -109,8 +109,9 @@ export const consolidateCellChanges = <R extends Table.RowData, I extends Table.
   changes: Table.SoloCellChange<R, I>[] | Table.SoloCellChange<R, I>
 ): Table.RowChange<R, I>[] => {
   const cellChanges: Table.SoloCellChange<R, I>[] = Array.isArray(changes) ? changes : [changes];
-  // Note: It is difficult to use a groupBy operation here because the operation
-  // will convert integer IDs to string IDs so they can index the output object.
+  /* Note: It is difficult to use a groupBy operation here because the operation
+     will convert integer IDs to string IDs so they can index the output
+		 object. */
   const ids: Table.EditableRowId[] = uniq(map(cellChanges, (ch: Table.SoloCellChange<R, I>) => ch.id));
   return reduce(
     ids,
@@ -130,8 +131,9 @@ export const consolidateRowChanges = <R extends Table.RowData, I extends Table.E
   changes: Table.RowChange<R, I>[] | Table.RowChange<R, I>
 ): Table.ConsolidatedChange<R, I> => {
   const rowChanges: Table.RowChange<R, I>[] = Array.isArray(changes) ? changes : [changes];
-  // Note: It is difficult to use a groupBy operation here because the operation
-  // will convert integer IDs to string IDs so they can index the output object.
+  /* Note: It is difficult to use a groupBy operation here because the operation
+     will convert integer IDs to string IDs so they can index the output
+		 object. */
   const ids: Table.EditableRowId[] = uniq(map(rowChanges, (ch: Table.RowChange<R, I>) => ch.id));
   return reduce(
     ids,

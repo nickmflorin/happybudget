@@ -27,8 +27,8 @@ declare interface ISidebarItem {
 }
 
 declare type LayoutClassNameParams = {
-  "expanded-layout": boolean | undefined,
-  "collapsed-layout": boolean | undefined,
-  "sidebar-visible": boolean | undefined,
-  "sidebar-hidden": boolean | undefined
-}
+  "expanded-layout": boolean | undefined;
+  "collapsed-layout": boolean | undefined;
+  "sidebar-visible": boolean | undefined;
+  "sidebar-hidden": boolean | undefined;
+};

@@ -1,6 +1,3 @@
-/// <reference path="./payloads.d.ts" />
-/// <reference path="./errors.d.ts" />
-
 declare namespace Http {
   type NonModelPayloadFields = "created_by" | "id" | "type";
 
@@ -11,7 +8,7 @@ declare namespace Http {
     [key in keyof Omit<M, NonModelPayloadFields>]?: any;
   };
 
- 	interface SocialPayload {
+  interface SocialPayload {
     readonly token_id: string;
     readonly provider: string;
   }
@@ -31,7 +28,7 @@ declare namespace Http {
   interface ChangePasswordPayload {
     readonly password: string;
     readonly new_password: string;
-	}
+  }
 
   interface UserPayload {
     readonly profile_image?: string | ArrayBuffer | null;
@@ -66,7 +63,7 @@ declare namespace Http {
   interface ModifyMarkupPayload {
     readonly children?: number[];
     readonly groups?: number[];
-	}
+  }
 
   interface BudgetPayload {
     readonly name: string;
@@ -103,7 +100,7 @@ declare namespace Http {
   interface ActualPayload extends Omit<ModelPayload<Model.Actual>, "owner" | "actual_type" | "attachments" | "order"> {
     readonly actual_type?: number | null;
     readonly attachments?: number[];
-    readonly owner?: Model.GenericHttpModel<"subaccount"> | Model.GenericHttpModel<"markup"> | null;
+    readonly owner: Model.GenericHttpModel<"subaccount"> | Model.GenericHttpModel<"markup"> | null;
     readonly previous?: number | null;
   }
 

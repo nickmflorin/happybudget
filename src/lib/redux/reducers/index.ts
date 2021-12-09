@@ -4,8 +4,10 @@ import { util, redux } from "lib";
 export * from "./factories";
 export * from "./util";
 
-/* prettier-ignore */
-export const modelListActionReducer: Redux.Reducer<Redux.ModelListActionStore, Redux.Action<Redux.ModelListActionPayload>> = (
+export const modelListActionReducer: Redux.Reducer<
+  Redux.ModelListActionStore,
+  Redux.Action<Redux.ModelListActionPayload>
+> = (
   st: Redux.ModelListActionStore = [],
   action: Redux.Action<Redux.ModelListActionPayload>
 ): Redux.ModelListActionStore => {

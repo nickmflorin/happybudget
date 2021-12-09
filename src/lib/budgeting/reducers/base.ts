@@ -3,9 +3,9 @@ import { isNil, includes, filter, reduce } from "lodash";
 import { redux, tabling, util, budgeting } from "lib";
 
 /**
- * Returns (if present) the MarkupRow in state with a provided ID.  If the rowId is also
- * provided, it will only return the MarkupRow if that MarkupRow also pertains to the
- * specific rowId.
+ * Returns (if present) the MarkupRow in state with a provided ID.  If the rowId
+ * is also provided, it will only return the MarkupRow if that MarkupRow also
+ * pertains to the specific rowId.
  */
 /* eslint-disable indent */
 export const markupRowFromState = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
@@ -70,8 +70,8 @@ export const createBudgetTableChangeEventReducer = <
 
       const markupRow = markupRowManager.create({ model: markup });
 
-      // Insert the new MarkupRow(s) into the table and reorder the rows of the table so that the
-      // MarkupRow(s) are in the appropriate location.
+      /* Insert the new MarkupRow(s) into the table and reorder the rows of the
+				 table so that the MarkupRow(s) are in the appropriate location. */
       return {
         ...newState,
         data: tabling.data.orderTableRows<R>([...newState.data, markupRow])
@@ -106,7 +106,8 @@ export const createBudgetTableChangeEventReducer = <
           ...state,
           data: util.replaceInArray<Table.BodyRow<R>>(state.data, { id: updatedMarkupRow.id }, updatedMarkupRow)
         };
-        // Update the children rows of the MarkupRow to reflect the new MarkupRow data.
+        /* Update the children rows of the MarkupRow to reflect the new MarkupRow
+           data. */
         return reduce(
           childrenRows,
           (st: S, r: Table.ModelRow<R>) => {
@@ -124,7 +125,8 @@ export const createBudgetTableChangeEventReducer = <
                   ...r,
                   data: {
                     ...r.data,
-                    // Markup contributions get applied to the value after fringes are applied.
+                    /* Markup contributions get applied to the value after fringes
+                       are applied. */
                     markup_contribution: budgeting.businessLogic.contributionFromMarkups(
                       isSubAccountRowData(r.data)
                         ? r.data.nominal_value +

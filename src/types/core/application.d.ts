@@ -1,10 +1,4 @@
-
-/// <reference path="redux/index.d.ts" />
-/// <reference path="redux-sagas/index.d.ts" />
-/// <reference path="./redux.d.ts" />
-
 declare namespace Application {
-
   type Config = {
     readonly reportWebVitals: boolean;
     readonly tableDebug: boolean;
@@ -16,9 +10,9 @@ declare namespace Application {
     readonly name: keyof Config;
     readonly default?: boolean;
     readonly hardOverride?: boolean;
-		readonly env?: SingleOrArray<NodeJS.ProcessEnv["NODE_ENV"]>;
-		readonly prodEnv?: SingleOrArray<NodeJS.ProcessEnv["PRODUCTION_ENV"]>;
-  }
+    readonly env?: SingleOrArray<NodeJS.ProcessEnv["NODE_ENV"]>;
+    readonly prodEnv?: SingleOrArray<NodeJS.ProcessEnv["PRODUCTION_ENV"]>;
+  };
 
   declare namespace Authenticated {
     type ModuleLabel = "dashboard" | "budget" | "template";
@@ -27,8 +21,8 @@ declare namespace Application {
       readonly dashboard: Modules.Dashboard.Store;
       readonly budget: Modules.Budget.Store;
       readonly template: Modules.Template.Store;
-    }
-		type ModuleReducers = Redux.ReducersMapObject<ModuleStores>;
+    };
+    type ModuleReducers = Redux.ReducersMapObject<ModuleStores>;
 
     type StaticStores = ModuleStores & {
       readonly router: import("connected-react-router").RouterState<import("history").LocationState>;
@@ -37,7 +31,7 @@ declare namespace Application {
       readonly user: Model.User;
       readonly contacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
       readonly filteredContacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
-    }
+    };
 
     type StaticReducers = Redux.ReducersMapObject<StaticStores>;
 
@@ -58,7 +52,7 @@ declare namespace Application {
     type AnycModuleStore = Modules.Share.Store;
     type ModuleStores = {
       readonly share: Modules.Share.Store;
-    }
+    };
 
     type ModuleReducers = Redux.ReducersMapObject<ModuleStores>;
 
@@ -66,7 +60,7 @@ declare namespace Application {
       readonly drawerVisible: boolean;
       readonly loading: boolean;
       readonly contacts: Redux.ListResponseStore<Model.Contact>;
-    }
+    };
 
     type StaticReducers = Redux.ReducersMapObject<StaticStores>;
 

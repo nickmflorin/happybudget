@@ -38,6 +38,7 @@ const FringesTasks = budgeting.tasks.fringes.createTableTaskSet<Model.Budget>({
   selectSubAccountTableStore: (state: Application.Authenticated.Store) => state.budget.subaccount.table,
   actions: FringesActionMap,
   services: {
+    create: api.createBudgetFringe,
     request: api.getBudgetFringes,
     bulkCreate: api.bulkCreateBudgetFringes,
     bulkDelete: api.bulkDeleteBudgetFringes,

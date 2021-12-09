@@ -1,5 +1,4 @@
 declare namespace Style {
-
   type HexColor = `#${number | string}`;
 
   type FontFamily = "AvenirNext" | "Roboto";
@@ -7,9 +6,9 @@ declare namespace Style {
   type FontWeight = 300 | 400 | 500 | 600 | 700;
   type FontWeightName = "Bold" | "Regular" | "Light" | "SemiBold" | "Medium";
 
-  type FontVariant = FontWeightName | { weight: FontWeightName, hasItalic?: boolean };
+  type FontVariant = FontWeightName | { weight: FontWeightName; hasItalic?: boolean };
 
-  type Font = { family: FontFamily, weight: FontWeightName, italic?: boolean };
+  type Font = { family: FontFamily; weight: FontWeightName; italic?: boolean };
 
   type FontFace = { family: FontFamily; variants: FontVariant[] };
 

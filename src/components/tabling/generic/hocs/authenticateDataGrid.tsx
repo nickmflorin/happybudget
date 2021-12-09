@@ -156,8 +156,8 @@ const getCellChangesFromEvent = <R extends Table.RowData, M extends Model.RowHtt
         (chs: Table.SoloCellChange<R>[], fld: keyof R) => {
           const oldParsedForField = find(oldParsed, { field: fld } as any);
           const parsedForField = find(parsed, { field: fld } as any);
-          // Since the fields for each set of parsed field-value pairs will be the
-          // same, the null check here is mostly just a check to satisfy TS.
+          /* Since the fields for each set of parsed field-value pairs will be the
+             same, the null check here is mostly just a check to satisfy TS. */
           if (!isNil(oldParsedForField) && !isNil(parsedForField)) {
             return [
               ...chs,
@@ -270,17 +270,18 @@ const authenticateDataGrid =
       });
 
       /*
-      Note: The behavior of the column suppression in the subsequent column memorization
-      relies on the column transformations applied here - so they cannot be applied together
-      as it would lead to a recursion.
+      Note: The behavior of the column suppression in the subsequent column
+			memorization relies on the column transformations applied here - so they
+			cannot be applied together as it would lead to a recursion.
       */
       const unsuppressedColumns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
         /*
-        When the cell editor finishes editing, the AG Grid callback (onCellDoneEditing)
-        does not have any context about what e triggered the completion.  This is
-        problematic because we need to focus either the cell to the right (on Tab completion)
-        or the cell below (on Enter completion).  To accomplish this, we use a custom hook
-        to the Editor(s) that is manually called inside the Editor.
+        When the cell editor finishes editing, the AG Grid callback
+				(onCellDoneEditing) does not have any context about what event triggered
+				the completion.  This is problematic because we need to focus either the
+				cell to the right (on Tab completion) or the cell below (on Enter
+				completion).  To accomplish this, we use a custom hook to the Editor(s)
+				that is manually called inside the Editor.
         */
         return tabling.columns.normalizeColumns<R, M>(props.columns, {
           body: (col: Table.Column<R, M>) => ({
@@ -293,17 +294,18 @@ const authenticateDataGrid =
               return col.editable === undefined ? true : tabling.columns.isEditable(col, params.row);
             },
             valueSetter: (params: ValueSetterParams) => {
-              // By default, AG Grid treats Backspace clearing the cell as setting the
-              // value to undefined - but we have to set it to the null value associated
-              // with the column.
+              /* By default, AG Grid treats Backspace clearing the cell as
+								 setting the value to undefined - but we have to set it to the
+								 null value associated with the column. */
               if (params.newValue === undefined || params.newValue === "") {
                 params.newValue = col.nullValue === undefined ? null : col.nullValue;
               }
               if (!isNil(col.valueSetter) && typeof col.valueSetter === "function") {
                 return col.valueSetter(params);
               }
-              // We can apply this mutation to the immutable data from the store because we deep
-              // clone each row before feeding it into the AG Grid tables.
+              /* We can apply this mutation to the immutable data from the store
+							   because we deep clone each row before feeding it into the AG
+								 Grid tables. */
               params.data.data[params.column.getColId()] = params.newValue;
               return true;
             }
@@ -328,15 +330,17 @@ const authenticateDataGrid =
                 return true;
               } else if (params.editing && includes(["Tab"], params.event.code)) {
                 /*
-                Our custom cell editors have built in functionality that when editing is terminated via
-                a TAB key, we move one cell to the right without continuing in edit mode.  This however
-                does not work for the bland text cells, where we do not have cell editors controlling the
-                edit behavior.  So we need to suppress the TAB behavior when editing, and manually move
-                the cell over.
+                Our custom cell editors have built in functionality that when
+								editing is terminated via a TAB key, we move one cell to the
+								right without continuing in edit mode.  This however does not
+								work for the bland text cells, where we do not have cell editors
+								controlling the edit behavior.  So we need to suppress the TAB
+								behavior when editing, and manually move the cell over.
                 */
                 return true;
               } else if (!params.editing && includes(["Backspace", "Delete"], params.event.code)) {
-                // Suppress Backspace/Delete events when multiple cells are selected in a range.
+                /* Suppress Backspace/Delete events when multiple cells are
+                   selected in a range. */
                 const ranges = params.api.getCellRanges();
                 if (
                   !isNil(ranges) &&
@@ -355,9 +359,11 @@ const authenticateDataGrid =
                   return true;
                 } else {
                   /*
-                  For custom Cell Editor(s) with a Pop-Up, we do not want Backspace/Delete to go into
-                  edit mode but instead want to clear the values of the cells - so we prevent those key
-                  presses from triggering edit mode in the Cell Editor and clear the value at this level.
+                  For custom Cell Editor(s) with a Pop-Up, we do not want
+									Backspace/Delete to go into edit mode but instead want to clear
+									the values of the cells - so we prevent those key presses from
+									triggering edit mode in the Cell Editor and clear the value at
+									this level.
                   */
                   const row: Table.BodyRow<R> = params.node.data;
                   if (tabling.typeguards.isEditableRow(row) && col.cellEditorPopup === true) {
@@ -440,9 +446,9 @@ const authenticateDataGrid =
 
       const onCellKeyDown: (event: CellKeyDownEvent) => void = hooks.useDynamicCallback((event: CellKeyDownEvent) => {
         if (!isNil(event.event)) {
+          /* AG Grid only enters Edit mode in a cell when a character is pressed,
+						 not the Space key - so we have to do that manually here. */
           /* @ts-ignore  AG Grid's Event Object is Wrong */
-          // AG Grid only enters Edit mode in a cell when a character is pressed, not the Space
-          // key - so we have to do that manually here.
           if (event.event.code === "Space") {
             onCellSpaceKey(event);
             /* @ts-ignore  AG Grid's Event Object is Wrong */
@@ -450,7 +456,8 @@ const authenticateDataGrid =
             onCellCut(event, event.api);
             /* @ts-ignore  AG Grid's Event Object is Wrong */
           } else if (event.event.code === "Enter" && !isNil(event.rowIndex)) {
-            // If Enter is clicked inside the cell popout, this doesn't get triggered.
+            /* If Enter is clicked inside the cell popout, this doesn't get
+               triggered. */
             const editing = event.api.getEditingCells();
             if (editing.length === 0) {
               moveToNextRow({ rowIndex: event.rowIndex, column: event.column });
@@ -486,10 +493,11 @@ const authenticateDataGrid =
       const onCellValueChanged: (e: CellValueChangedEvent) => void = hooks.useDynamicCallback(
         (e: CellValueChangedEvent) => {
           const row: Table.BodyRow<R> = e.node.data;
-          // Note: If this is a placeholder row, the data will not persist.  This is because the row
-          // is not yet persisted in the backend database.  While this is an EDGE case, because the
-          // placeholder rows only exist for a very short period of time, these scenarios need to be
-          // more concretely established.
+          /* Note: If this is a placeholder row, the data will not persist.
+						 This is because the row is not yet persisted in the backend
+						 database.  While this is an EDGE case, because the placeholder rows
+						 only exist for a very short period of time, these scenarios need to
+						 be more concretely established. */
           if (tabling.typeguards.isEditableRow(row)) {
             if (e.source === "paste") {
               setCellChangeEvents([...cellChangeEvents, e]);
@@ -572,10 +580,10 @@ const authenticateDataGrid =
               previous = iteratedRow;
             }
           } else if (tabling.typeguards.isGroupRow(iteratedRow)) {
-            // If we previously found the ModelRow that was moved, and we hit
-            // a GroupRow, then that means that the GroupRow is the first GroupRow
-            // underneath that ModelRow - which means that the ModelRow should now
-            // belong to that GroupRow.
+            /* If we previously found the ModelRow that was moved, and we hit
+               a GroupRow, then that means that the GroupRow is the first GroupRow
+               underneath that ModelRow - which means that the ModelRow should now
+               belong to that GroupRow. */
             if (foundMovedRow) {
               groupRow = iteratedRow;
               break;
@@ -601,21 +609,21 @@ const authenticateDataGrid =
         const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api);
         const movingRow: Table.ModelRow<R> = e.node.data;
 
-        // Accessing the `overNode` property on RowDragEvent does not give the
-        // "true" `overNode` because it does not take into consideration where
-        // you might have scrolled to in the table.  The `overIndex` also does
-        // not take into account scrolling.  In order to determine where we are
-        // in the table, we need to calculate how many rows are off the viewport
-        // by calculating the scroll position of the viewport and the height of
-        // the rows in the viewport.
+        /* Accessing the `overNode` property on RowDragEvent does not give the
+           "true" `overNode` because it does not take into consideration where
+           you might have scrolled to in the table.  The `overIndex` also does
+           not take into account scrolling.  In order to determine where we are
+           in the table, we need to calculate how many rows are off the viewport
+           by calculating the scroll position of the viewport and the height of
+           the rows in the viewport. */
         const viewports = document.getElementsByClassName("ag-body-viewport");
         if (viewports.length !== 0) {
           const rowElements = document.getElementsByClassName("ag-row row row--data");
           if (rowElements.length !== 0) {
-            // At this point, I do not fully understand why clientHeight seems to be
-            // returning 0 in some cases (particularly for the Contacts table).  So,
-            // in the case that it does we have to try a fallback option to get the
-            // row height.
+            /* At this point, I do not fully understand why clientHeight seems
+						   to be returning 0 in some cases (particularly for the Contacts
+							 table).  So, in the case that it does we have to try a fallback
+							 option to get the row height. */
             let rowHeight: number | null = null;
             if (rowElements[0].clientHeight !== 0) {
               rowHeight = rowElements[0].clientHeight;
@@ -693,8 +701,8 @@ const authenticateDataGrid =
 					the row at the bottom.
 					*/
           if (diff.length === 1) {
-            // Find the row index of the newly added ModelRow in the set of all
-            // rows in the table.
+            /* Find the row index of the newly added ModelRow in the set of all
+               rows in the table. */
             const modelRowIndex = findIndex(
               rows,
               (r: Table.BodyRow<R>) =>
@@ -702,8 +710,8 @@ const authenticateDataGrid =
             );
             if (modelRowIndex !== -1) {
               const focusedCell = api.getFocusedCell();
-              // Only refocus the row to the newly created row if there is already
-              // a focused cell in the table.
+              /* Only refocus the row to the newly created row if there is already
+                 a focused cell in the table. */
               if (!isNil(focusedCell) && !isNil(focusedCell.rowIndex) && rows[focusedCell.rowIndex + 1] !== undefined) {
                 /*
 								The intended logic here is to refocus the cell to the newly added
@@ -714,12 +722,14 @@ const authenticateDataGrid =
 								ModelRow was added, whereas the `modelRowIndex` is relative to the
 								table rows after the ModelRow was added.
 
-								When we are on the last ModelRow in the table, before any potential
-								MarkupRow(s), the `modelRowIndex` is greater than the `rowIndex`
-								of the `focusedCell`.  If the `rowIndex` of the `focusedCell`
-								is greater than or equal to the `modelRowIndex`, this means we
-								are in a MarkupRow underneath the newly added ModelRow - and we
-								do not want to change the row we are focused on.
+								When we are on the last ModelRow in the table, before any
+								potential MarkupRow(s), the `modelRowIndex` is greater than the
+								`rowIndex` of the `focusedCell`.
+
+								If the `rowIndex` of the `focusedCell` is greater than or equal
+								to the `modelRowIndex`, this means we are in a MarkupRow
+								underneath the newly added ModelRow - and we do not want to
+								change the row we are focused on.
 
 								In order to not change the row we are focused on, we actually need
 								to move the focused cell down 1 row, as this index will account
@@ -748,13 +758,6 @@ const authenticateDataGrid =
 
       const onRowDataUpdated = hooks.useDynamicCallback((e: RowDataUpdatedEvent) => {
         const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api) as Table.BodyRow<R>[];
-        /*
-				Note: Before a ModelRow is first added, a PlaceholderRow is added - this
-				PlaceholderRow is turned into a ModelRow when the API request to create the
-				model returns a response.  The addition of a PlaceholderRow will not trigger
-				the `onModelRowsAdded` callback, but when the PlaceholderRow is turned into
-				a ModelRow the `onModelRowsAdded` callback will be triggered.
-				*/
         const newRowState: RowState = {
           groupRow: map(
             filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[],

@@ -3,7 +3,7 @@ import { isNil, filter, reduce } from "lodash";
 import * as managers from "./managers";
 
 /* eslint-disable indent */
-export const patchPayloadForChange = <
+export const patchPayload = <
   R extends Table.RowData,
   P,
   M extends Model.RowHttpModel = Model.RowHttpModel,
@@ -33,7 +33,7 @@ export const patchPayloadForChange = <
   );
 };
 
-export const bulkPatchPayloadForChange = <
+export const bulkPatchPayload = <
   R extends Table.RowData,
   P,
   M extends Model.RowHttpModel = Model.RowHttpModel,
@@ -42,9 +42,9 @@ export const bulkPatchPayloadForChange = <
   change: Table.RowChange<R, I>,
   columns: Table.Column<R, M>[]
 ): Http.ModelBulkUpdatePayload<P> | null => {
-  const patchPayload = patchPayloadForChange<R, P, M, I>(change, columns);
-  if (!isNil(patchPayload)) {
-    return { id: managers.editableId(change.id), ...patchPayload };
+  const patch = patchPayload<R, P, M, I>(change, columns);
+  if (!isNil(patch)) {
+    return { id: managers.editableId(change.id), ...patch };
   }
   return null;
 };
@@ -67,9 +67,9 @@ export const bulkPatchPayloads = <
   return reduce(
     changes,
     (prev: Http.ModelBulkUpdatePayload<P>[], change: Table.RowChange<R, I>) => {
-      const patchPayload = bulkPatchPayloadForChange<R, P, M>(change, columns);
-      if (!isNil(patchPayload)) {
-        return [...prev, patchPayload];
+      const patch = bulkPatchPayload<R, P, M>(change, columns);
+      if (!isNil(patch)) {
+        return [...prev, patch];
       }
       return prev;
     },
@@ -77,7 +77,7 @@ export const bulkPatchPayloads = <
   );
 };
 
-export const postPayloadForAddition = <R extends Table.RowData, P, M extends Model.RowHttpModel = Model.RowHttpModel>(
+export const postPayload = <R extends Table.RowData, P, M extends Model.RowHttpModel = Model.RowHttpModel>(
   data: Partial<R>,
   columns: Table.Column<R, M>[]
 ): P => {
@@ -111,7 +111,7 @@ export const postPayloads = <R extends Table.RowData, P, M extends Model.RowHttp
   return reduce(
     payload,
     (prev: P[], addition: Partial<R>) => {
-      return [...prev, postPayloadForAddition<R, P, M>(addition, columns)];
+      return [...prev, postPayload<R, P, M>(addition, columns)];
     },
     [] as P[]
   );

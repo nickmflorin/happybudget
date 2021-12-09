@@ -58,9 +58,9 @@ const findNextNavigatableNodes = <R extends Table.RowData>(
       nodesAfterNavigatable = [nextRowNode];
     }
     while (!isNil(nextRowNode)) {
-      // The `runningIndex` is used to track the first index at which the node
-      // is navigatable, so if we already encountered a navigatable row we need
-      // to stop incrementing `runningIndex`.
+      /* The `runningIndex` is used to track the first index at which the node
+         is navigatable, so if we already encountered a navigatable row we need
+         to stop incrementing `runningIndex`. */
       if (nodesAfterNavigatable.length === 0) {
         runningIndex = runningIndex + 1;
       }
@@ -73,8 +73,8 @@ const findNextNavigatableNodes = <R extends Table.RowData>(
         if (nodesAfterNavigatable.length === 0 && isNavigatableNode(nextRowNode)) {
           nodesAfterNavigatable = [nextRowNode];
         } else if (nodesAfterNavigatable.length !== 0) {
-          // If we already encountered a navigatable RowNode, start adding the
-          // RowNode(s) after it to the array.
+          /* If we already encountered a navigatable RowNode, start adding the
+             RowNode(s) after it to the array. */
           nodesAfterNavigatable = [...nodesAfterNavigatable, nextRowNode];
         }
       }
@@ -128,8 +128,8 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
 
   const tabToNextCell: (p: TabToNextCellParams) => Table.CellPosition = hooks.useDynamicCallback(
     (p: TabToNextCellParams): Table.CellPosition => {
-      // TODO: We need to figure out how to add additional rows in the write case when we are
-      // at the bottom right of the table.
+      /* TODO: We need to figure out how to add additional rows in the write
+				 case when we are at the bottom right of the table. */
       if (!p.editing && p.nextCellPosition !== null) {
         const field = p.nextCellPosition.column.getColId();
         const column = tabling.columns.getColumn(params.columns, field);
@@ -200,9 +200,9 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
 
         const rows: Table.BodyRow<R>[] = map(nodes, (n: Table.RowNode) => n.data);
 
-        // We only want to add a new row if we are either at the last BodyRow of the
-        // entire table or at the last ModelRow of the entire table (in which case
-        // the only BodyRow(s) after it should be MarkupRow(s)).
+        /* We only want to add a new row if we are either at the last BodyRow of
+					 the entire table or at the last ModelRow of the entire table (in which
+					 case the only BodyRow(s) after it should be MarkupRow(s)). */
         const newRowRequired = (r: Table.BodyRow<R>, rws: Table.BodyRow<R>[]) => {
           if (rows.length === 0) {
             return true;

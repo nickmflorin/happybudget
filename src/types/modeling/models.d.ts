@@ -1,4 +1,3 @@
-
 declare namespace Model {
   /* eslint-disable no-shadow */
   interface Model {
@@ -244,6 +243,7 @@ declare namespace Model {
     readonly fringes: number[];
     readonly attachments: SimpleAttachment[];
     readonly siblings?: SimpleSubAccount[]; // Only included for detail endpoints.
+    /* eslint-disable-next-line max-len */
     readonly ancestors?: [SimpleBudget | SimpleTemplate, SimpleAccount, ...Array<SimpleSubAccount>]; // Only included for detail endpoints.
   }
 

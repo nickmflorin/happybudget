@@ -83,10 +83,10 @@ export const findWithDistributedTypes = <M, A extends Array<any> = Array<M>>(
   return null;
 };
 
-// TODO: It would be nice if we could figure out a pure TS solution for this.
-// The problem is that sometimes, when we call replaceInArray with a union,
-// we don't want it to be distributed.
-// replaceInArray<Cat | Dog> => (Cat | Dog) != Cat[] | Dog[]
+/* TODO: It would be nice if we could figure out a pure TS solution for this.
+   The problem is that sometimes, when we call replaceInArray with a union,
+   we don't want it to be distributed.
+   replaceInArray<Cat | Dog> => (Cat | Dog) != Cat[] | Dog[] */
 export const replaceInArrayDistributedTypes = <M, A extends Array<any> = Array<M>>(
   array: A,
   predicate: ((i: M) => boolean) | { [key: string]: any },

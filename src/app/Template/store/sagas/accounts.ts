@@ -44,6 +44,7 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
     selectStore: (state: Application.Authenticated.Store) => state.template.accounts,
     actions: ActionMap,
     services: {
+      create: api.createTemplateAccount,
       request: api.getTemplateAccounts,
       requestMarkups: api.getTemplateAccountMarkups,
       requestGroups: api.getTemplateAccountGroups,

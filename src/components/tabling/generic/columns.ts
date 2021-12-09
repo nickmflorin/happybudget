@@ -40,8 +40,8 @@ export const CalculatedColumn = <
   return {
     ...col,
     cellStyle: { textAlign: "right", ...col?.cellStyle },
-    // We do not want to use the cell renderers for the body cells because it
-    // slows rendering down dramatically.
+    /* We do not want to use the cell renderers for the body cells because it
+       slows rendering down dramatically. */
     cellRenderer: {
       footer: "CalculatedCell",
       page: "CalculatedCell"
@@ -83,8 +83,8 @@ export const AttachmentsColumn = <
     cellEditor: "NullCellEditor",
     tableColumnType: "body",
     columnType: "file",
-    // We want to make the attachments cell full size for purposes of dragging
-    // and dropping media - and we add the padding inside of the cell itself.
+    /* We want to make the attachments cell full size for purposes of dragging
+       and dropping media - and we add the padding inside of the cell itself. */
     cellClass: "cell--full-size",
     isRead: true,
     isWrite: true,
@@ -148,8 +148,8 @@ export const CheckboxColumn = <R extends Table.RowData, M extends Model.RowHttpM
     width: !isNil(width) ? width : hasEditColumn === false ? 40 : 25,
     maxWidth: !isNil(width) ? width : hasEditColumn === false ? 40 : 25,
     footer: {
-      // We always want the entire new row icon in the footer cell to be present,
-      // but the column itself isn't always wide enough.
+      /* We always want the entire new row icon in the footer cell to be present,
+         but the column itself isn't always wide enough. */
       cellStyle: {
         zIndex: 1000,
         overflow: "visible",
@@ -161,8 +161,8 @@ export const CheckboxColumn = <R extends Table.RowData, M extends Model.RowHttpM
     }
   }) as Table.Column<R, M>;
 
-// Abstract - not meant to be used by individual columns.  It just enforces that
-// the clipboard processing props are provided.
+/* Abstract - not meant to be used by individual columns.  It just enforces that
+   the clipboard processing props are provided. */
 export const SelectColumn = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
@@ -245,20 +245,22 @@ export const IdentifierColumn = <
     smartInference: true,
     ...props,
     footer: {
-      // We always want the text in the identifier cell to be present, but the column
-      // itself isn't always wide enough.  However, applying a colSpan conflicts with the
-      // colSpan of the main data grid, causing weird behavior.
+      /* We always want the text in the identifier cell to be present, but the
+			   column itself isn't always wide enough.  However, applying a colSpan
+				 conflicts with the colSpan of the main data grid, causing weird
+				 behavior. */
       cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset", textAlign: "left" }
     },
     page: {
-      // We always want the text in the identifier cell to be present, but the column
-      // itself isn't always wide enough.  However, applying a colSpan conflicts with the
-      // colSpan of the main data grid, causing weird behavior.
+      /* We always want the text in the identifier cell to be present, but the
+			   column itself isn't always wide enough.  However, applying a colSpan
+				 conflicts with the colSpan of the main data grid, causing weird
+				 behavior. */
       cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset", textAlign: "left" }
     },
     index: 0,
-    // We only want to use IdentifierCell's in the Footer cells because it slows rendering
-    // performance down dramatically.
+    /* We only want to use IdentifierCell's in the Footer cells because it slows
+		   rendering performance down dramatically. */
     cellRenderer: { footer: "IdentifierCell", page: "IdentifierCell" },
     width: 100,
     suppressSizeToFit: true,
@@ -273,9 +275,9 @@ export const IdentifierColumn = <
       const row: Table.BodyRow<R> = params.data;
       if (tabling.typeguards.isGroupRow(row)) {
         /*
-        Note: We have to look at all of the visible columns that are present up until
-        the calculated columns.  This means we have to use the AG Grid ColumnApi (not our
-        own columns).
+        Note: We have to look at all of the visible columns that are present up
+				until the calculated columns.  This means we have to use the AG Grid
+				ColumnApi (not our own columns).
         */
         const agColumns: Table.AgColumn[] | undefined = params.columnApi?.getAllDisplayedColumns();
         if (!isNil(agColumns)) {

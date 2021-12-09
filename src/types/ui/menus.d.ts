@@ -75,7 +75,7 @@ declare type IMenu<M extends MenuItemModel> = StandardComponentProps & {
   readonly searchIndices?: SearchIndicies | undefined;
   readonly extra?: ExtraMenuItemModel[];
   readonly keepDropdownOpenOnClick?: boolean;
-	readonly menu?: NonNullRef<IMenuRef<M>>;
+  readonly menu?: NonNullRef<IMenuRef<M>>;
   readonly getModelIdentifier?: (m: M) => ID;
   readonly getLabel?: (m: M) => string;
   readonly onChange?: (params: MenuChangeEvent<M>) => void;

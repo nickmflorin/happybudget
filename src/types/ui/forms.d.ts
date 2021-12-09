@@ -7,24 +7,17 @@ declare type FormFieldNotification = {
 };
 
 declare type FormNotificationWithMeta<S> = {
-  readonly declare type?: AlertType;
+  readonly type?: AlertType;
   readonly closable?: boolean;
   readonly notification: S;
 };
 
-declare type RawFormNotification =
-  | JSX.Element
-  | FormFieldNotification
-  | IAlert
-  | string
-  | Http.Error;
+declare type RawFormNotification = JSX.Element | FormFieldNotification | IAlert | string | Http.Error;
 
-declare type FormNotification =
-  | RawFormNotification
-  | FormNotificationWithMeta<Http.Error | string>;
+declare type FormNotification = RawFormNotification | FormNotificationWithMeta<Http.Error | string>;
 
 declare type FormNotifyOptions = {
-  readonly declare type?: AlertType;
+  readonly type?: AlertType;
   readonly append?: boolean;
   readonly closable?: boolean;
 };
@@ -37,9 +30,9 @@ declare interface FormInstance<T> extends RootFormInstance<T> {
   readonly notifications: FormNotification[];
   readonly loading: boolean | undefined;
   readonly isInModal?: boolean;
-  // If it is a boolean, it will automatically focus the first field based on
-  // whether or not the boolean is true.  If it is a number, it will automatically
-  // focus the field at that index.
+  /* If it is a boolean, it will automatically focus the first field based on
+     whether or not the boolean is true.  If it is a number, it will automatically
+     focus the field at that index. */
   readonly autoFocusField?: boolean | number;
 }
 
@@ -49,9 +42,9 @@ declare type FormField<M> = { readonly name: keyof M; readonly value: M[keyof M]
 declare interface FormProps<T> extends Omit<RootFormProps, "style" | "id" | "className">, StandardComponentProps {
   readonly loading?: boolean;
   readonly form: FormInstance<T>;
-  // If it is a boolean, it will automatically focus the first field based on
-  // whether or not the boolean is true.  If it is a number, it will automatically
-  // focus the field at that index.
+  /* If it is a boolean, it will automatically focus the first field based on
+     whether or not the boolean is true.  If it is a number, it will automatically
+     focus the field at that index. */
   readonly autoFocusField?: boolean | number;
   readonly titleIcon?: IconOrElement;
   readonly title?: string | JSX.Element;

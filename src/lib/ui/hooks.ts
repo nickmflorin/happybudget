@@ -115,8 +115,8 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
         }
         return typeguards.isFormFieldNotification(e.notification);
       };
-      // For the notification sources that pertain to field type errors, render those
-      // next to the individual fields of the form.
+      /* For the notification sources that pertain to field type errors, render
+				 those next to the individual fields of the form. */
       renderFieldErrors(
         map(
           filter(notices, (n: FormNotification) => isFieldNotice(n)) as (
@@ -128,8 +128,8 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
             typeguards.isRawFormNotification(f) ? f : f.notification
         ) as (Http.FieldError | FormFieldNotification)[]
       );
-      // Filter out the notifications that do not pertain to individual fields of the form
-      // and dispatch them to the notifications store.
+      /* Filter out the notifications that do not pertain to individual fields
+				 of the form and dispatch them to the notifications store. */
       dispatchNotification({
         notifications: filter(notices, (n: FormNotification) => !isFieldNotice(n)) as FormNotification[],
         type: opts?.type,
@@ -242,7 +242,9 @@ export const usePortalReference = (id: string | number) => {
    *   since this will run every single render (that's a lot).
    * - We want the ref to consistently point to the same DOM element and only
    *   ever run once.
-   * @link https://reactjs.org/docs/hooks-faq.html#how-to-create-expensive-objects-lazily
+   * @link
+   * 	https://reactjs.org/docs/hooks-faq.html#how-to-create-expensive-objects
+   * 		-lazily
    */
   const getRootElem = () => {
     if (!rootElemRef.current) {

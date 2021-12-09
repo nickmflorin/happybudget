@@ -14,10 +14,11 @@ const recalculateSubAccountRow = (
   row: Table.DataRow<R>
 ): Pick<R, "nominal_value" | "fringe_contribution"> => {
   /*
-  In the case that the SubAccount has SubAccount(s) itself, the estimated value is determined
-  from the accumulation of the estimated values for those children SubAccount(s).  In this
-  case,  we do not need to update the SubAccount estimated value in state because it only
-  changes when the estimated values of it's SubAccount(s) on another page are altered.
+  In the case that the SubAccount has SubAccount(s) itself, the estimated value
+	is determined from the accumulation of the estimated values for those children
+	SubAccount(s).  In this case,  we do not need to update the SubAccount estimated
+	value in state because it only changes when the estimated values of it's
+	SubAccount(s) on another page are altered.
   */
   const isValidToRecalculate =
     tabling.typeguards.isPlaceholderRow<R>(row) || (!isNil(row.children) && row.children.length === 0);

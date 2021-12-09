@@ -35,6 +35,7 @@ const FringesTasks = budgeting.tasks.fringes.createTableTaskSet<Model.Template>(
   selectSubAccountTableStore: (state: Application.Authenticated.Store) => state.template.subaccount.table,
   actions: FringesActionMap,
   services: {
+    create: api.createTemplateFringe,
     request: api.getTemplateFringes,
     bulkCreate: api.bulkCreateTemplateFringes,
     bulkDelete: api.bulkDeleteTemplateFringes,

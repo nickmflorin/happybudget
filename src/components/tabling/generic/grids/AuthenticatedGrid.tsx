@@ -30,7 +30,6 @@ const AuthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpModel
         (prev: Table.FrameworkGroup, cell: React.ComponentType<any>, name: string) => ({
           ...prev,
           [name]: cell
-          // [name]: generic.connectCellToStore({ gridId: props.id, footerRowSelectors })(cell)
         }),
         {}
       ),

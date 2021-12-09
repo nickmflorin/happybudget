@@ -49,9 +49,9 @@ const configureApplication = async (history: History) => {
   configureAgGrid();
   configureFontAwesome();
 
-  // If you want to start measuring performance in your app, pass a function
-  // to log results (for example: reportWebVitals(console.log))
-  // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+  /* If you want to start measuring performance in your app, pass a function
+     to log results (for example: reportWebVitals(console.log))
+     or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals */
   if (process.env.NODE_ENV === "development" && Config.reportWebVitals === true) {
     reportWebVitals(console.log);
   }
@@ -68,10 +68,10 @@ const configureApplication = async (history: History) => {
     });
   }
 
-  // WYDR is extremely useful in development, but slows down production bundles.
-  // It is important that this is done outside of the scope of the configuration method,
-  // because it must be done at the top of the src/index.tsx file before any other imports are
-  // performed.
+  /* WYDR is extremely useful in development, but slows down production bundles.
+     It is important that this is done outside of the scope of the configuration
+		 method, because it must be done at the top of the src/index.tsx file before
+		 any other imports are performed. */
   if (process.env.NODE_ENV === "development" && Config.whyDidYouRender) {
     console.info("Registering WYDR");
     const whyDidYouRender = require("@welldone-software/why-did-you-render");

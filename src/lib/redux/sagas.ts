@@ -11,8 +11,8 @@ function* takeWithCancellableByIdSaga(actionType: string, task: any, getId: any)
       if (isNil(lastTasks[actionId])) {
         lastTasks[actionId] = [];
       }
-      // If there were any previously submitted tasks to delete the same group,
-      // cancel them.
+      /* If there were any previously submitted tasks to delete the same group,
+         cancel them. */
       if (lastTasks[actionId].length !== 0) {
         const cancellable = lastTasks[actionId];
         lastTasks = { ...lastTasks, [actionId]: [] };

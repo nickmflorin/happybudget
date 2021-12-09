@@ -42,7 +42,8 @@ export const collapseRangeSelectionVertically = (ranges: CellRange[]): [number |
     const startRowIndex = range.startRow?.rowIndex;
     if (!isNil(endRowIndex) && !isNil(startRowIndex)) {
       if (endRowIndex > startRowIndex) {
-        // In this case, the range was selected starting at the top of the table dragging downwards.
+        /* In this case, the range was selected starting at the top of the table
+           dragging downwards. */
         if (verticalRange[0] === null || startRowIndex < verticalRange[0]) {
           verticalRange[0] = startRowIndex;
         }
@@ -50,7 +51,8 @@ export const collapseRangeSelectionVertically = (ranges: CellRange[]): [number |
           verticalRange[1] = endRowIndex;
         }
       } else if (startRowIndex > endRowIndex) {
-        // In this case, the range was selected starting at the bottom of the table dragging upwards.
+        /* In this case, the range was selected starting at the bottom of the
+           table dragging upwards. */
         if (verticalRange[0] === null || endRowIndex < verticalRange[0]) {
           verticalRange[0] = endRowIndex;
         }

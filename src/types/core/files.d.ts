@@ -8,7 +8,7 @@ declare type SavedImage = {
   readonly height: number;
   readonly width: number;
   readonly extension: string;
-}
+};
 
 // Image data that is received from an upload, but not saved to the API.
 declare type UploadedImage = {
@@ -18,15 +18,15 @@ declare type UploadedImage = {
   readonly fileName?: string;
   readonly url: string;
   readonly data: string | ArrayBuffer;
-}
+};
 
 declare type UploadError = Error | string;
 declare type UploadFile = import("antd/lib/upload/interface").UploadFile<Http.FileUploadResponse>;
 
-declare type UploadImageParamsNoImage = { loading: boolean, onClear: () => void, error?: UploadError | null };
-declare type UploadImageParamsWithImage = UploadImageParamsNoImage & { image: UploadedImage | SavedImage }
+declare type UploadImageParamsNoImage = { loading: boolean; onClear: () => void; error?: UploadError | null };
+declare type UploadImageParamsWithImage = UploadImageParamsNoImage & { image: UploadedImage | SavedImage };
 declare type UploadImageParams = UploadImageParamsWithImage | UploadImageParamsNoImage;
 
 declare type IUploaderRef = {
   readonly clear: () => void;
-}
+};
