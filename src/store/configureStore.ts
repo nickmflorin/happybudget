@@ -1,4 +1,4 @@
-import { Middleware, createStore, applyMiddleware, compose } from "redux";
+import { Middleware, createStore, applyMiddleware, compose, PreloadedState } from "redux";
 import createSagaMiddleware, { Saga, SagaMiddlewareOptions } from "redux-saga";
 import { routerMiddleware } from "connected-react-router";
 import { createBrowserHistory } from "history";
@@ -27,9 +27,9 @@ const configureGenericStore = <S extends Application.Store>(
   staticReducers: Redux.ReducersMapObject<S>,
   rootSaga: Saga<any[]>
 ): Redux.Store<S> => {
-  // Create the redux-saga middleware that allows the sagas to run as side-effects
-  // in the application.  If in a production environment, instruct the middleware
-  // to funnel errors through to Sentry.
+  /* Create the redux-saga middleware that allows the sagas to run as side-effects
+     in the application.  If in a production environment, instruct the middleware
+     to funnel errors through to Sentry. */
   let sagaMiddlewareOptions: SagaMiddlewareOptions = {};
   if (process.env.NODE_ENV === "production") {
     sagaMiddlewareOptions = { ...sagaMiddlewareOptions, onError: (error: Error) => Sentry.captureException(error) };
@@ -53,7 +53,7 @@ const configureGenericStore = <S extends Application.Store>(
 
   const store: Redux.Store<S> = {
     reducerManager,
-    ...createStore<S, Redux.Action, any, any>(reducerManager.reduce, initialState, enhancers)
+    ...createStore<S, Redux.Action, any, any>(reducerManager.reduce, initialState as PreloadedState<S>, enhancers)
   };
 
   // Start the application saga.
