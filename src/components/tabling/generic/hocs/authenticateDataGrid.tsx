@@ -689,9 +689,18 @@ const authenticateDataGrid =
 
       const onModelRowsAdded = useMemo(
         () => (api: Table.GridApi, diff: (Table.ModelRowId | Table.PlaceholderRowId)[], rows: Table.BodyRow<R>[]) => {
-          // Scroll the table to the bottom in the case that rows have been added.
-          api.ensureIndexVisible(rows.length - 1, "bottom");
+          /* Find the row index of the newly added ModelRow in the set of
+						 only the existing ModelRow(s) and PlaceholderRow(s) in the table. */
+          const modelAndPlaceholderRows: Table.DataRow<R>[] = filter(rows, (r: Table.BodyRow<R>) =>
+            tabling.typeguards.isDataRow(r)
+          ) as Table.DataRow<R>[];
+          const modelRowModelIndex = findIndex(modelAndPlaceholderRows, (r: Table.DataRow<R>) => r.id === diff[0]);
 
+          /* Scroll the table to the bottom in the case that rows have been
+             added to the end of the table. */
+          if (modelRowModelIndex === modelAndPlaceholderRows.length - 1) {
+            api.ensureIndexVisible(modelAndPlaceholderRows.length - 1, "bottom");
+          }
           /*
 					The diff will always be one, even if adding new rows one-by-one at an
 					extremely quick rate, unless we are bulk pasting information
@@ -705,8 +714,7 @@ const authenticateDataGrid =
                rows in the table. */
             const modelRowIndex = findIndex(
               rows,
-              (r: Table.BodyRow<R>) =>
-                (tabling.typeguards.isModelRow(r) || tabling.typeguards.isPlaceholderRow(r)) && r.id === diff[0]
+              (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r) && r.id === diff[0]
             );
             if (modelRowIndex !== -1) {
               const focusedCell = api.getFocusedCell();

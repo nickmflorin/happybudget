@@ -262,6 +262,46 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
       let contextMenuItems: Table.MenuItemDef[] = !isNil(params.getModelRowContextMenuItems)
         ? params.getModelRowContextMenuItems(row, node)
         : [];
+
+      if (!isNil(params.apis) && !isNil(node.rowIndex)) {
+        const groupRow = tabling.aggrid.getNodeGroupRow(params.apis.grid, node);
+        const previous: Table.ModelRow<R> | null = tabling.aggrid.getNodePreviousModelRow(params.apis.grid, node);
+        if (!isNil(previous)) {
+          contextMenuItems = [
+            ...contextMenuItems,
+            {
+              name: `Insert ${getRowLabel(row)} Above`,
+              icon: '<i class="far fa-trash-alt context-icon"></i>',
+              action: () =>
+                params.onChangeEvent({
+                  payload: {
+                    previous: previous.id,
+                    data: {},
+                    group: !isNil(groupRow) ? groupRow.id : null
+                  },
+                  type: "rowInsert"
+                })
+            }
+          ];
+        }
+        contextMenuItems = [
+          ...contextMenuItems,
+          {
+            name: `Insert ${getRowLabel(row)} Below`,
+            icon: '<i class="far fa-trash-alt context-icon"></i>',
+            action: () =>
+              params.onChangeEvent({
+                payload: {
+                  previous: row.id,
+                  data: {},
+                  group: !isNil(groupRow) ? groupRow.id : null
+                },
+                type: "rowInsert"
+              })
+          }
+        ];
+      }
+
       if (isNil(params.rowCanDelete) || params.rowCanDelete(row) === true) {
         contextMenuItems = [
           ...contextMenuItems,
