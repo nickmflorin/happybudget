@@ -44,10 +44,10 @@ const Header = ({
     >
       <div className={"primary-header"}>
         <div className={"primary-header-left"}>
-          {/* In the case that we are not using a collapsed layout, we always show the
-          sidebar toggle button - the only exception is cases where the screen is very
-          large and we do not allow the sidebar to be toggled, but in those cases this
-          button is hidden with media queries. */}
+          {/* In the case that we are not using a collapsed layout, we always
+					show the sidebar toggle button - the only exception is cases where the
+					screen is very large and we do not allow the sidebar to be toggled,
+					but in those cases this button is hidden with media queries. */}
           <ShowHide show={!sidebarVisible || collapsed === false}>
             <IconButton
               className={"btn--sidebar-toggle"}
@@ -87,15 +87,17 @@ const Header = ({
                     window.open(process.env.REACT_APP_CANNY_FEEDBACK_URL, "_blank");
                   } else {
                     console.warn(
-                      "Could not identify Canny feedback URL as ENV variable `REACT_APP_CANNY_FEEDBACK_URL` is not defined."
+                      `Could not identify Canny feedback URL as ENV variable
+											'REACT_APP_CANNY_FEEDBACK_URL; is not defined.`
                     );
                   }
                 },
                 icon: <Icon icon={"bullhorn"} weight={"light"} />
               },
               {
-                // TODO: implement custom Intercom Launcher
-                // https://www.intercom.com/help/en/articles/2894-customize-the-intercom-messenger-technical
+                /* TODO: implement custom Intercom Launcher
+                   https://www.intercom.com/help/en/articles/
+									 2894-customize-the-intercom-messenger-technical */
                 id: "intercom-chat",
                 label: "Chat with Support",
                 icon: <Icon icon={"comment-dots"} weight={"light"} />

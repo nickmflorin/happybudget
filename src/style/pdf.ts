@@ -146,8 +146,8 @@ const LayoutStyles: Pdf.ExtensionStyles = {
 
 const TableStyles: Pdf.ExtensionStyles = {
   table: {
-    // Note: react-pdf does not "support" display: table, even though it works fine,
-    // their TS bindings disallow it.
+    /* Note: react-pdf does not "support" display: table, even though it works
+			 fine, their TS bindings disallow it. */
     /* @ts-ignore */
     display: "table",
     width: "auto",
@@ -203,9 +203,9 @@ const TableStyles: Pdf.ExtensionStyles = {
   td: {
     paddingLeft: 4,
     paddingRight: 4,
-    // The default border is none, since we set the border for each side to 0
-    // here.  However, on an individual cell basis, we turn on specific borders
-    // by overriding the specific side width.
+    /* The default border is none, since we set the border for each side to 0
+       here.  However, on an individual cell basis, we turn on specific borders
+       by overriding the specific side width. */
     borderStyle: "solid",
     borderWidth: 1,
     borderLeftWidth: 0,
@@ -228,11 +228,13 @@ const TableStyles: Pdf.ExtensionStyles = {
   },
   indented: {
     backgroundColor: "white",
-    // This here is an absolute hack.  The problem is that because we are applying
-    // a background color to the entire GroupRow, but overriding the indented cells
-    // with a background color "white", we still see remnants of the GroupRow backgroundColor
-    // as a thin line at the top of the indented cell.  To fix this, we essentially
-    // "cover" it here, by giving it a white top border and moving the cell up slightly.
+    /* This here is an absolute hack.  The problem is that because we are applying
+       a background color to the entire GroupRow, but overriding the indented
+			 cells with a background color "white", we still see remnants of the
+			 GroupRow backgroundColor as a thin line at the top of the indented cell.
+
+			 To fix this, we essentially "cover" it here, by giving it a white top
+			 border and moving the cell up slightly. */
     borderTopWidth: 3,
     borderTopColor: "white",
     marginTop: -2

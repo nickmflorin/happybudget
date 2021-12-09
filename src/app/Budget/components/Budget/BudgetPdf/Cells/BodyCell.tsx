@@ -58,8 +58,8 @@ const BodyCell = <
         if (value === null) {
           return null;
         } else if (typeof value !== "string" && typeof value !== "number") {
-          // If there is a custom cell renderer, the value can be anything since it will not be
-          // directly rendered in the DOM.
+          /* If there is a custom cell renderer, the value can be anything since
+             it will not be directly rendered in the DOM. */
           if (isNil(props.column.cellRenderer)) {
             return null;
           }

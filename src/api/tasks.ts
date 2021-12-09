@@ -29,10 +29,10 @@ export const request = <T = any>(service: Http.Service<T>, ...args: any[]) =>
     }
 
     const handleCancel = (e: Error) => {
-      // We do not want to return undefined for the response because that
-      // will lead to errors in Sentry since the callees always expect
-      // an error to be thrown or the response to be defined.  However, we
-      // also don't want to dispatch the error to Sentry.
+      /* We do not want to return undefined for the response because that
+         will lead to errors in Sentry since the callees always expect
+         an error to be thrown or the response to be defined.  However, we
+         also don't want to dispatch the error to Sentry. */
       Sentry.withScope((scope: Sentry.Scope) => {
         scope.setExtra("ignore", true);
         throw e;

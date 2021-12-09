@@ -20,10 +20,11 @@ const MemoizedContactForm = React.memo(ContactForm);
 const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: EditContactModalProps): JSX.Element => {
   const [image, setImage] = useState<UploadedImage | null | undefined>(undefined);
   /*
-  Note: We have to use a ref here, instead of storing firstName and lastName in the state
-  of this component, because if we were storing it in this component, when the firstName and
-  lastName change it causes the entire component to rerender, and AntD rerenders all form fields
-  when the form rerenders, which causes the auto focus to be lost on the first and last name fields.
+  Note: We have to use a ref here, instead of storing firstName and lastName in
+	the state of this component, because if we were storing it in this component,
+	when the firstName and lastName change it causes the entire component to
+	rerender, and AntD rerenders all form fields when the form rerenders, which
+	causes the auto focus to be lost on the first and last name fields.
   */
   const headerRef = useRef<IImageAndNameRef | null>(null);
 
@@ -56,8 +57,8 @@ const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: 
         />
       )}
       interceptPayload={(p: Http.ContactPayload) => {
-        // We have to account for allowing the image to be null, which is the case
-        // when we are deleting the image for the contact.
+        /* We have to account for allowing the image to be null, which is the case
+           when we are deleting the image for the contact. */
         if (image !== undefined) {
           return { ...p, image: !isNil(image) ? image.data : null };
         }

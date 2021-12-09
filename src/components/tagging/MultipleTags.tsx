@@ -23,10 +23,12 @@ const isPluralityWithModel = <M extends Model.Model = Model.Model>(
  * This component can be created in 3 different ways:
  *
  * (1) Explicitly Provided ITag Objects:
- *     <MultipleTags tags={[{ text: "foo", color: "red" }, { text: "bar", color: "blue" }]} />
+ *     <MultipleTags tags={[
+ * 				{ text: "foo", color: "red" }, { text: "bar", color: "blue" }]} />
  *
  * (2) Provided Model (M) Objects:
- *     <MultipleTags models={[ {...}, {...} ]} modelColorField={"color"} modelTextField={"name"}]} />
+ *     <MultipleTags models={
+ * 				[ {...}, {...} ]} modelColorField={"color"} modelTextField={"name"}]} />
  *
  * (3) Children <Tag> Components:
  *     <MultipleTags><Tag /><Tag /></MultipleTags>
@@ -53,11 +55,13 @@ export const MultipleTags = <M extends Model.Model = Model.Model>(props: Multipl
       ) : !isNil(props.tags) ? (
         props.tags.length !== 0 || isNil(props.onMissing) ? (
           map(props.tags, (tag: ITag, index: number) => {
-            // For each object, ITag, in the series, the ITag object can explicitly set the color,
-            // textColor and uppercase setting for that created <Tag>.  However, these fields are
-            // optional for each specific ITag, and if not set on any given individual ITag object,
-            // can be applied to all created <Tag> components based on the textColor, color and
-            // uppercase setting supplied globally as props to this MultipleTags component.
+            /* For each object, ITag, in the series, the ITag object can
+							 explicitly set the color, textColor and uppercase setting for
+							 that created <Tag>.  However, these fields are optional for each
+							 specific ITag, and if not set on any given individual ITag object,
+               can be applied to all created <Tag> components based on the
+							 textColor, color and uppercase setting supplied globally as props
+							 to this MultipleTags component. */
             return (
               <Tag
                 key={index}

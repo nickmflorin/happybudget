@@ -21,6 +21,7 @@
       "jsx": true
     }
   },
+  "ignorePatterns": ["*.svg"],
   "rules": {
     "prettier/prettier": "error",
     "no-global-assign": 2,
@@ -70,7 +71,7 @@
         "tabWidth": 2,
         "comments": 82,
         "ignoreRegExpLiterals": true,
-        "ignorePattern": "^.*(eslint-disable).*"
+        "ignorePattern": "^.*(eslint-disable|@ts-ignore).*"
       }
     ],
     "react/no-unused-prop-types": "warn",

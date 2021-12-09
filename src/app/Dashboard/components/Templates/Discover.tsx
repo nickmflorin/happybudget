@@ -48,9 +48,10 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
       <WrapInApplicationSpinner loading={loading}>
         <div className={"dashboard-card-grid"}>
           {map(templates, (template: Model.Template, index: number) => {
-            // The API will exclude hidden community templates for non-staff users
-            // by design.  However, just in case we will also make sure that we are
-            // not showing those templates to the user in the frontend.
+            /* The API will exclude hidden community templates for non-staff
+							 users by design.  However, just in case we will also make sure
+							 that we are not showing those templates to the user in the
+							 frontend. */
             if (template.hidden === true && user.is_staff === false) {
               console.error(
                 "The API is returning hidden community templates for non-staff users!  This is a security problem!"

@@ -8,7 +8,8 @@ import { tabling, ui } from "lib";
 import { Icon, VerticalFlexCenter } from "components";
 import { IconButton } from "components/buttons";
 
-// This is defined in AG Grid's documentation but does not seem to be importable from anywhere.
+/* This is defined in AG Grid's documentation but does not seem to be importable
+   from anywhere. */
 interface IHeaderCompParams {
   column: Column;
   displayName: string;

@@ -93,10 +93,11 @@ const withContacts =
           columns={cols}
           onCellFocusChanged={(params: Table.CellFocusChangedParams<R, M>) => {
             /*
-            For the ContactCell, we want the contact tag in the cell to be clickable
-            only when the cell is focused.  This means we have to rerender the cell when
-            it becomes focused or unfocused so that the tag becomes clickable (in the focused
-            case) or unclickable (in the unfocused case).
+            For the ContactCell, we want the contact tag in the cell to be
+						clickable only when the cell is focused.  This means we have to
+						rerender the cell when it becomes focused or unfocused so that the
+						tag becomes clickable (in the focused case) or unclickable (in the
+						unfocused case).
             */
             const rowNodes: Table.RowNode[] = [];
             if (params.cell.column.field === "contact") {

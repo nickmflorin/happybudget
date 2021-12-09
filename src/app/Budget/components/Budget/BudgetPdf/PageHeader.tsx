@@ -32,8 +32,8 @@ interface PageHeaderProps {
 }
 
 const PageHeader = (props: PageHeaderProps): JSX.Element => {
-  // Note: We cannot use hooks with @react-pdf components, in particular because of the
-  // render callbacks.
+  /* Note: We cannot use hooks with @react-pdf components, in particular because
+     of the render callbacks. */
   let subHeaderLeft: SubHeaderItem | null = null;
   const leftInfoMissing = isNil(props.header.left_info) || props.header.left_info.length === 0;
   if (!(leftInfoMissing && isNil(props.header.left_image))) {
@@ -48,8 +48,8 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
     }
   }
 
-  // Note: We cannot use hooks with @react-pdf components, in particular because of the
-  // render callbacks.
+  /* Note: We cannot use hooks with @react-pdf components, in particular because
+		 of the render callbacks. */
   let subHeaderRight: SubHeaderItem | null = null;
   const rightInfoMissing = isNil(props.header.right_info) || props.header.right_info.length === 0;
   if (!(rightInfoMissing && isNil(props.header.right_image))) {
@@ -69,9 +69,9 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
       (image: string): SourceObject => {
         let headers = {};
         if (process.env.NODE_ENV === "production") {
-          // We need to include Cache-Control headers in the passed in src object because
-          // there is a bug with React PDF as it relates to AWS.  However, if we include
-          // these locally, we get a CORS error.
+          /* We need to include Cache-Control headers in the passed in src object
+					   because there is a bug with React PDF as it relates to AWS.
+						 However, if we include these locally, we get a CORS error. */
           headers = { ...headers, "Cache-Control": "no-cache", "Access-Control-Allow-Origin": "*" };
         }
         return {

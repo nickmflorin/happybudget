@@ -32,7 +32,8 @@ const ConnectedTable = connectTableToStore<
   M,
   Tables.SubAccountTableStore
 >({
-  // We cannot autoRequest because we have to also request the new data when the dropdown breadcrumbs change.
+  /* We cannot autoRequest because we have to also request the new data when
+     the dropdown breadcrumbs change. */
   autoRequest: false,
   actions: {
     loading: actions.account.loadingAction,

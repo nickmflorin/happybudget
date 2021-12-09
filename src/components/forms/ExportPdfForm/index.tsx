@@ -233,16 +233,16 @@ const ExportForm = (
         })
         .catch((e: Error) => {
           props.form.handleRequestError(e);
-          // Since the save form is not actually a Form, we have to manually set
-          // the error.  There is only 1 field, `name`, so we want to manually set
-          // field errors for that field attribute.  If the error does not pertain
-          // to that field attribute, we will let the global form error handler
-          // take effect.
+          /* Since the save form is not actually a Form, we have to manually set
+             the error.  There is only 1 field, `name`, so we want to manually set
+             field errors for that field attribute.  If the error does not pertain
+             to that field attribute, we will let the global form error handler
+             take effect. */
           let manuallySetFieldError = false;
           if (e instanceof api.ClientError && !isNil(saveFormRef.current)) {
             if (e.fieldErrors.length !== 0) {
-              // There is a small chance there are multiple errors for the `name` field,
-              // but we can only display 1.
+              /* There is a small chance there are multiple errors for the
+								 `name` field, but we can only display 1. */
               const nameError: Http.FieldError | undefined = find(e.fieldErrors, { field: "name" });
               if (!isNil(nameError)) {
                 manuallySetFieldError = true;
@@ -273,8 +273,8 @@ const ExportForm = (
         header: data.header,
         right_info: data.right_info
       };
-      // We only want to include the images in the payload if they were changed - this means they
-      // are either null or of the UploadedImage form.
+      /* We only want to include the images in the payload if they were changed
+				 - this means they are either null or of the UploadedImage form. */
       if (!isNil(data.left_image) && model.typeguards.isUploadedImage(data.left_image)) {
         requestPayload = { ...requestPayload, left_image: data.left_image.data };
       } else if (isNil(data.left_image)) {
@@ -340,9 +340,10 @@ const ExportForm = (
         changedValues: Partial<Omit<ExportFormOptions, NonFormFields>>,
         values: Omit<ExportFormOptions, NonFormFields>
       ) => {
-        // Note: Since the images are not included as a part of the underlying Form mechanics,
-        // they will not trigger this hook.  This means that we have to manually call the
-        // onValuesChange() hook when the images change.
+        /* Note: Since the images are not included as a part of the underlying
+					 Form mechanics, they will not trigger this hook.  This means that we
+					 have to manually call the onValuesChange() hook when the images
+					 change. */
         props.onValuesChange?.(changedValues, formData(values));
       }}
     >

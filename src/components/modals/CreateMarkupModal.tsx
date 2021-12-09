@@ -41,8 +41,8 @@ const CreateMarkupModal = <
       .getTableChildren<M>(id, parentType, { simple: true }, { cancelToken: cancelToken() })
       .then((response: Http.ListResponse<M>) => {
         setAvailableChildren(response.data);
-        // Wait until the available children are set in the Form so the select doesn't
-        // render selected children with missing labels.
+        /* Wait until the available children are set in the Form so the select
+					 doesn't render selected children with missing labels. */
         if (!isNil(children)) {
           form.setFields([{ name: "children", value: children }]);
         }
@@ -67,8 +67,8 @@ const CreateMarkupModal = <
         let mutated = { ...payload } as Http.MarkupPayload;
         // FLAT Markups do not have any children.
         if (mutated.unit === model.models.MarkupUnitModels.PERCENT.id) {
-          // The children should not be an empty list as the Form should have already validated
-          // that.
+          /* The children should not be an empty list as the Form should have
+						 already validated that. */
           mutated = { ...mutated, children: markupChildren };
           if (!isNaN(parseFloat(rate))) {
             mutated = {

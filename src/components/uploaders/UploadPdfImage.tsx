@@ -11,9 +11,9 @@ import Uploader, { UploaderProps } from "./Uploader";
 import "./UploadPdfImage.scss";
 
 const UploadPdfImage = (props: UploaderProps): JSX.Element => {
-  // NOTE: We could show a loading indicator when the upload is loading, but it
-  // usually happens too fast and looks weird because the indicator just flashes
-  // on screen.
+  /* NOTE: We could show a loading indicator when the upload is loading, but it
+     usually happens too fast and looks weird because the indicator just flashes
+     on screen. */
   return (
     <Uploader
       {...props}

@@ -20,10 +20,11 @@ const Profile = (): JSX.Element => {
   const dispatch: Redux.Dispatch = useDispatch();
   const [image, setImage] = useState<UploadedImage | SavedImage | null>(null);
   /*
-  Note: We have to use a ref here, instead of storing firstName and lastName in the state
-  of this component, because if we were storing it in this component, when the firstName and
-  lastName change it causes the entire component to rerender, and AntD rerenders all form fields
-  when the form rerenders, which causes the auto focus to be lost on the first and last name fields.
+  Note: We have to use a ref here, instead of storing firstName and lastName in
+	the state of this component, because if we were storing it in this component,
+	when the firstName and lastName change it causes the entire component to
+	rerender, and AntD rerenders all form fields when the form rerenders, which
+	causes the auto focus to be lost on the first and last name fields.
   */
   const headerRef = useRef<IImageAndNameRef | null>(null);
 

@@ -191,18 +191,18 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
       (selectedState: (number | string)[]): number | null => {
         if (selectedState.length !== 0) {
           let validSelectedModel: GenericModelItem<M> | null = null;
-          // TODO: In the case that there are multiple selected models (i.e. the Menu
-          // is operating as multiple = true) we should see if there is a way to recover
-          // the last active selection instead of defaulting to the first selected model
-          // in the array.
+          /* TODO: In the case that there are multiple selected models (i.e.
+						 the Menu is operating as multiple = true) we should see if there is
+						 a way to recover the last active selection instead of defaulting to
+						 the first selected model in the array. */
           forEach(selectedState, (id: ID | string) => {
             const m: GenericModelItem<M> | undefined = find(
               availableModelItems,
               (item: GenericModelItem<M>) => getModelIdentifier(item.model) === id
             );
-            // It might be the case that the selected model does not exist in the
-            // models, beacuse the models are filtered based on the search and the
-            // search might exclude the selection.
+            /* It might be the case that the selected model does not exist in the
+               models, beacuse the models are filtered based on the search and the
+               search might exclude the selection. */
             if (!isNil(m)) {
               validSelectedModel = m;
               return null;

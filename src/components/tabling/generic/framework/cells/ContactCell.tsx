@@ -43,8 +43,9 @@ const ContactCell = <
     return null;
   }, [value, contacts, loaded]);
 
-  // TODO: This is a very, very render intensive piece of logic.  We should figure out if there
-  // is a better way to do this that doesn't involve getting the focused cell on every render.
+  /* TODO: This is a very, very render intensive piece of logic.  We should
+     figure out if there is a better way to do this that doesn't involve
+     getting the focused cell on every render. */
   let isFocused = false;
   const focusedCell = props.api.getFocusedCell();
   if (!isNil(focusedCell)) {

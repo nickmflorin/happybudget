@@ -53,15 +53,15 @@ const HorizontalMenu = <I extends string = string>({
   const isItemSelected = useCallback(
     (item: IHorizontalMenuItem) => {
       if (!isNil(selected)) {
-        // In this case, the component is "controlled" (i.e. the selected state is determined from
-        // the passed in selected prop).
+        /* In this case, the component is "controlled" (i.e. the selected state
+					 is determined from the passed in selected prop). */
         if (Array.isArray(selected)) {
           return includes(selected, item.id);
         }
         return selected === item.id;
       } else {
-        // In this case, the component is "uncontrolled" (i.e. the selected state is determined
-        // from internal state).
+        /* In this case, the component is "uncontrolled" (i.e. the selected
+					 state is determined from internal state). */
         if (Array.isArray(_selected)) {
           return includes(_selected, item.id);
         }

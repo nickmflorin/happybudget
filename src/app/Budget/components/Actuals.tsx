@@ -56,9 +56,9 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
   const onContactCreated = useMemo(
     () => (m: Model.Contact, params?: CreateContactParams) => {
       dispatch(globalActions.authenticated.addContactToStateAction(m));
-      // If we have enough information from before the contact was created in the specific
-      // cell, combine that information with the new value to perform a table update, showing
-      // the created contact in the new cell.
+      /* If we have enough information from before the contact was created in
+				 the specific cell, combine that information with the new value to
+				 perform a table update, showing the created contact in the new cell. */
       const rowId = params?.rowId;
       if (!isNil(rowId)) {
         const row: Table.BodyRow<R> | null = table.current.getRow(rowId);

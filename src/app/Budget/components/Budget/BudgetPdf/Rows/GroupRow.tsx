@@ -46,9 +46,9 @@ const GroupRow = <R extends Table.RowData, M extends Model.RowHttpModel = Model.
         className: [
           props.cellProps?.className,
           (params: Table.PdfCellCallbackParams<R, M>) => {
-            // We have to add a borderLeft to the first indented column for the Group Row
-            // because the Row itself will not have a borderLeft attribute on it and the
-            // Row starts one column to the right.
+            /* We have to add a borderLeft to the first indented column for the
+						   Group Row because the Row itself will not have a borderLeft
+							 attribute on it and the Row starts one column to the right. */
             /* eslint-disable indent */
             return params.indented === false ? "group-tr-td" : params.colIndex === 0 ? "td-border-left" : "";
           }

@@ -60,10 +60,10 @@ const ActualsTable = ({
       ),
       (owner: Model.SimpleSubAccount | Model.SimpleMarkup | null) => owner !== null
     ) as (Model.SimpleSubAccount | Model.SimpleMarkup)[];
-    // If the user pastes the value after directly copying from an internal table,
-    // the value will be structured as internal-<type>-<id> - which allows us to identify
-    // which owner model the copy was performed on exactly, since `type` and `id` combine
-    // to point to a unique model.
+    /* If the user pastes the value after directly copying from an internal
+			 table, the value will be structured as internal-<type>-<id> - which allows
+			 us to identify which owner model the copy was performed on exactly,
+			 since `type` and `id` combine to point to a unique model. */
     if (value.startsWith("internal-")) {
       const splitValue = value.split("internal-")[1];
       if (splitValue.trim() === "") {
@@ -90,15 +90,15 @@ const ActualsTable = ({
         return owner[0];
       }
     } else {
-      // If the user pastes the value in the cell from an external source, it will likely be just
-      // the identifier - in which case we need to try to determine which owner that value for the
-      // identifier refers to.
+      /* If the user pastes the value in the cell from an external source, it
+			   will likely be just the identifier - in which case we need to try to
+				 determine which owner that value for the identifier refers to. */
       availableOwners = filter(
         availableOwners,
         (o: Model.SimpleSubAccount | Model.SimpleMarkup) => o.identifier !== null
       );
-      // NOTE: If there are multiple owners with the same identifier, this will
-      // return the first and issue a warning.
+      /* NOTE: If there are multiple owners with the same identifier, this will
+         return the first and issue a warning. */
       return model.util.inferModelFromName<Model.SimpleSubAccount | Model.SimpleMarkup>(availableOwners, value, {
         getName: (m: Model.SimpleSubAccount | Model.SimpleMarkup) => m.identifier
       });

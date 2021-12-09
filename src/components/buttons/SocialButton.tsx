@@ -31,9 +31,10 @@ const SocialButton = ({ provider, text, onGoogleSuccess, onGoogleError }: Social
           <GoogleAuthButton text={text} onClick={props.onClick} disabled={props.disabled} />
         )}
         onSuccess={(response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
-          // In the case that the response is GoogleLoginResponseOffline, the response
-          // will just be { code: xxx } that can be used to obtain a refresh token
-          // from the server.  This should be implemented at some point.
+          /* In the case that the response is GoogleLoginResponseOffline, the
+						 response will just be { code: xxx } that can be used to obtain a
+						 refresh token from the server.  This should be implemented at some
+						 point. */
           if (isOfflineResponse(response)) {
             console.error(`Received offline response with code ${response.code}.`);
           } else {

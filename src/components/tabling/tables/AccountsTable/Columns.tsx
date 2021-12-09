@@ -23,13 +23,13 @@ const Columns: Table.Column<R, M>[] = [
     minWidth: 200,
     flex: 100,
     columnType: "longText",
-    // The custom cell renderer here is only needed to include the Markup icon,
-    // which is annoying because it is only needed for those rows and slows down
-    // rendering performance.
+    /* The custom cell renderer here is only needed to include the Markup icon,
+       which is annoying because it is only needed for those rows and slows down
+       rendering performance. */
     cellRenderer: "BodyCell",
     cellRendererParams: {
-      // For the MarkupRow, we need to remove the flex styling so we can justify
-      // the Icon at the right end of the cell.
+      /* For the MarkupRow, we need to remove the flex styling so we can justify
+         the Icon at the right end of the cell. */
       innerCellStyle: (row: Table.BodyRow<R>) => (tabling.typeguards.isMarkupRow(row) ? { display: "block" } : {}),
       icon: (row: Table.BodyRow<R>) =>
         tabling.typeguards.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined

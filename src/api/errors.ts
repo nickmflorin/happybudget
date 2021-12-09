@@ -27,9 +27,9 @@ export enum ApiErrorTypes {
  * or an Error to be raised, so we raise this Error to indicate that the caller
  * should fail silently and allow the redirect to occur.
  *
- * Note: This is less of a user-facing problem and more of a problem with misleading
- * errors flooding Sentry due to responses not being fully defined when they are
- * expected to be.
+ * Note: This is less of a user-facing problem and more of a problem with
+ * misleading errors flooding Sentry due to responses not being fully defined
+ * when they are expected to be.
  */
 export class ForceLogout extends Error {
   constructor(message: string, name?: string) {

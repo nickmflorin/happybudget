@@ -122,7 +122,8 @@ const Cell = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
         props.isHeader === true ? props.column.pdfHeaderCellProps?.style : props.column.pdfCellProps?.style,
         callbackParams
       ),
-      // The width will be configured before the column is plugged into this component.
+      /* The width will be configured before the column is plugged into this
+         component. */
       width: `${(props.column.pdfWidth || 0.0) * 100.0}%`,
       ...evaluateCellStyle<R, M, V>(props.style, callbackParams)
     };
@@ -164,10 +165,12 @@ const Cell = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
               evaluateClassName<R, M, V>(props.textClassName, callbackParams)
             )}
             style={{
-              // NOTE: We do not differentiate between the text style and overall style for
-              // column types, since these are also used for the AG Grid tables.  We need to
-              // figure out a way to differentiate between the two, because here - we are just
-              // assuming that the column type styling only applies to the text.
+              /* NOTE: We do not differentiate between the text style and
+								 overall style for column types, since these are also used for
+								 the AG Grid tables.  We need to figure out a way to
+								 differentiate between the two, because here - we are just
+								 assuming that the column type styling only applies to the
+								 text. */
               ...(!isNil(props.column.columnType)
                 ? tabling.columns.getColumnTypeCSSStyle(props.column.columnType, {
                     header: props.isHeader || false,

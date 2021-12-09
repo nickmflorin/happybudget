@@ -62,8 +62,8 @@ const Columns: Table.Column<R, M>[] = [
       return null;
     },
     columnType: "currency",
-    // We only want to use BodyCell's in the Footer cells because it slows rendering
-    // performance down dramatically.
+    /* We only want to use BodyCell's in the Footer cells because it slows
+		   rendering performance down dramatically. */
     cellRenderer: { footer: "BodyCell" }
   }),
   columns.SelectColumn<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>({

@@ -33,8 +33,8 @@ const IconOrSpinner = ({ loading, icon, className, size = 14, style = {} }: Icon
       </div>
     );
   } else {
-    // We allow the icon to be null just in case we want to use this component
-    // as a smaller spinner to the left of text.
+    /* We allow the icon to be null just in case we want to use this component
+       as a smaller spinner to the left of text. */
     return <div className={classNames("icon-or-spinner", className)} style={style}></div>;
   }
 };

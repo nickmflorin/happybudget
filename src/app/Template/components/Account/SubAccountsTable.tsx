@@ -27,7 +27,8 @@ const ConnectedTable = connectTableToStore<TemplateSubAccountsTableProps, R, M, 
     addModelsToState: actions.account.addModelsToStateAction,
     setSearch: actions.account.setSearchAction
   },
-  // We cannot autoRequest because we have to also request the new data when the dropdown breadcrumbs change.
+  /* We cannot autoRequest because we have to also request the new data when
+     the dropdown breadcrumbs change. */
   autoRequest: false,
   selector: selectors.selectSubAccountsTableStore,
   footerRowSelectors: {

@@ -40,10 +40,10 @@ const Button = (
   ref: any
 ): JSX.Element => {
   const isDisabled = useMemo(() => disabled === true && isNil(tooltip), [disabled, tooltip]);
-  // If the button is disabled but has a tooltip, the only way to show the tooltip
-  // on hover is to allow pointer events on the Button.  This means that we cannot
-  // set the Button as disabled, but have to style the button as if it were disabled,
-  // and block click events manually.
+  /* If the button is disabled but has a tooltip, the only way to show the
+		 tooltip on hover is to allow pointer events on the Button.  This means that
+		 we cannot set the Button as disabled, but have to style the button as if it
+		 were disabled, and block click events manually. */
   const isFakeDisabled = useMemo(() => disabled === true && !isNil(tooltip), [disabled, tooltip]);
   const [isHovered, setIsHovered] = useState(false);
 

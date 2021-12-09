@@ -96,25 +96,27 @@ const withFormItemFirstInputFocused = <
           <AutoFocusInputComponent
             key={firstInputIndex}
             {...inputChildren[firstInputIndex].props}
-            // We have to manually set the defaultValue because AntD will not apply it
-            // since we are messing with the AntD form mechanics here.
+            /* We have to manually set the defaultValue because AntD will not
+							 apply it since we are messing with the AntD form mechanics
+							 here. */
             defaultValue={
               !isNil(formProps.initialValues) && !isNil(props.name) ? formProps.initialValues[props.name] : undefined
             }
             onChange={(e: React.ChangeEvent<HTMLInputElement> | number) => {
               /*
-              This is necessary in order to get changes to the fields of the <Form.Item>
-              to reflect in the Form data.  Normally, AntD handles this for us - but since
-              we are messing with the Form.Item structure here, we have to do it ourselves.
+              This is necessary in order to get changes to the fields of the
+							<Form.Item> to reflect in the Form data.  Normally, AntD handles
+							this for us - but since we are messing with the Form.Item
+							structure here, we have to do it ourselves.
 
-              Because this onChange handler can be used for many different input types, the
-              event may or may not be a traditional React.ChangeEvent.  For example, if the
-              input element is a Select component, the event will just be the value of the
-              chosen Select.Option.
+              Because this onChange handler can be used for many different input
+							types, the event may or may not be a traditional React.ChangeEvent.
+							For example, if the input element is a Select component, the event
+							will just be the value of the chosen Select.Option.
 
-              We could restrict the behavior to only apply to children input elements of
-              type <Input />, but that does not seem to be possible due to uses of
-              forwardRef (see above explanation).
+              We could restrict the behavior to only apply to children input
+							elements of type <Input />, but that does not seem to be possible
+							due to uses of forwardRef (see above explanation).
               */
               const value = isChangeEvent(e) ? e.target.value : e;
               if (!isNil(props.name)) {
@@ -146,8 +148,8 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
     /*
     Under certain conditions, we want to auto focus the first field of a Form.
     We accomplish this by looking at the children of the first Form.Item child
-    component and auto focusing the first child of the first Form.Item child component
-    if it can be focused.
+    component and auto focusing the first child of the first Form.Item child
+		component if it can be focused.
 
     <Form>
       <Form.Item>
@@ -160,17 +162,18 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
     */
     let c = Array.isArray(children) ? children : [children];
 
-    // If the Form is being used inside of a modal, we focus the first field by default.
-    // Otherwise, we do not focus the first field by default.
+    /* If the Form is being used inside of a modal, we focus the first field by
+			 default.  Otherwise, we do not focus the first field by default. */
     const defaultAutoFocusFirstField = props.form.isInModal === true ? true : false;
     const propAutoFocusField = !isNil(autoFocusField) ? autoFocusField : props.form.autoFocusField;
     const useAutoFocusField = !isNil(propAutoFocusField) ? propAutoFocusField : defaultAutoFocusFirstField;
 
-    // We cannot use the HOC components after the first render.  This is because AntD always rerenders
-    // the entire form when a field changes, so whenever we would change another field, it would auto
-    // focus the other field designated by `autoFocusField` again.  However, we cannot use an empty
-    // array for the dependency array of this useEffect, because then the Form.Item(s) would not
-    // update appropriately when props change.
+    /* We cannot use the HOC components after the first render.  This is because
+			 AntD always rerenders the entire form when a field changes, so whenever
+			 we would change another field, it would auto focus the other field
+			 designated by `autoFocusField` again.  However, we cannot use an empty
+       array for the dependency array of this useEffect, because then the
+			 Form.Item(s) would not update appropriately when props change. */
     if (firstRender === true) {
       if (useAutoFocusField === true) {
         const formItemChildren = filter(c, (ci: JSX.Element) => ci.type === RootForm.Item || ci.type === FormItemComp);

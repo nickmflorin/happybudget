@@ -24,9 +24,9 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     columnType: "longText",
     index: 1,
     suppressSizeToFit: false,
-    // The custom cell renderer here is only needed to include the Markup icon,
-    // which is annoying because it is only needed for those rows and slows down
-    // rendering performance.
+    /* The custom cell renderer here is only needed to include the Markup icon,
+       which is annoying because it is only needed for those rows and slows down
+       rendering performance. */
     cellRenderer: "BodyCell",
     pdfHeaderName: "Category Description",
     pdfFooter: { value: "Grand Total" },
@@ -37,8 +37,8 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
       return r.data.description || "";
     },
     cellRendererParams: {
-      // For the MarkupRow, we need to remove the flex styling so we can justify
-      // the Icon at the right end of the cell.
+      /* For the MarkupRow, we need to remove the flex styling so we can justify
+         the Icon at the right end of the cell. */
       innerCellStyle: (row: Table.BodyRow<R>) => (tabling.typeguards.isMarkupRow(row) ? { display: "block" } : {}),
       icon: (row: Table.BodyRow<R>) =>
         tabling.typeguards.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined
@@ -88,8 +88,8 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     width: 60,
     valueSetter: tabling.valueSetters.floatValueSetter<R>("quantity"),
     columnType: "number",
-    // If the plurality of the quantity changes, we need to refresh the refresh
-    // the unit column to change the plurality of the tag in the cell.
+    /* If the plurality of the quantity changes, we need to refresh the refresh
+       the unit column to change the plurality of the tag in the cell. */
     refreshColumns: (change: Table.CellChange<number>) => {
       if (isNil(change.newValue) && isNil(change.oldValue)) {
         return [];

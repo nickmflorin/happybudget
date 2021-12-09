@@ -69,18 +69,18 @@ const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
       overlay={
         <ClickAwayListener
           onClickAway={(e: any) => {
-            // react-click-away-listener does a pretty shitty job of weeding out
-            // click events inside the element that it's ClickAwayListener
-            // component wraps.
-            // Note that this logic falls apart if a custom overlay is being
-            // used.
+            /* react-click-away-listener does a pretty shitty job of weeding out
+               click events inside the element that it's ClickAwayListener
+               component wraps.
+               Note that this logic falls apart if a custom overlay is being
+               used. */
             const menu = document.getElementById(menuId);
             if (!isNil(menu) && util.html.isNodeDescendantOf(menu, e.target)) {
               return;
             }
-            // Since the dropdown button (props.children) is rendered outside
-            // of the menu (where the ClickAway is detected), clicking the
-            // button will also trigger the ClickAway, so we need to avoid it.
+            /* Since the dropdown button (props.children) is rendered outside
+               of the menu (where the ClickAway is detected), clicking the
+               button will also trigger the ClickAway, so we need to avoid it. */
             const button = document.getElementById(buttonId);
             if (!isNil(button) && !util.html.isNodeDescendantOf(button, e.target)) {
               setVisible(false);

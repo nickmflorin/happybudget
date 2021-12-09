@@ -9,8 +9,8 @@ import PageFooter from "./PageFooter";
 import "./index.scss";
 
 interface PageProps extends StandardComponentProps {
-  // Required for pages that do not have a full page table in them to get the
-  // content area scrollable.
+  /* Required for pages that do not have a full page table in them to get the
+     content area scrollable. */
   readonly contentScrollable?: boolean;
   readonly children?: SingleOrArray<ReactNode>;
   readonly loading?: boolean;

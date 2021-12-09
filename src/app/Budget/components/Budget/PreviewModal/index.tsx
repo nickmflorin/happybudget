@@ -108,8 +108,9 @@ const PreviewModal = ({
             setBudgetResponse(b);
             previewer.current?.render(b, cs.data, options);
           })
-          // TODO: We should probably display the error in the modal and not let the default toast
-          // package display it in the top right of the window.
+          /* TODO: We should probably display the error in the modal and not let
+						 the default toast package display it in the top right of the
+						 window. */
           .catch((e: Error) => notifications.requestError(e))
           .finally(() => setLoadingData(false));
       });

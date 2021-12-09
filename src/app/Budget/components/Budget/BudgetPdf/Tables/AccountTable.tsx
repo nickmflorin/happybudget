@@ -112,9 +112,10 @@ const AccountTable = ({
               const details = subAccount.children;
               const markups = subAccount.children_markups;
               /*
-              Note: If there are no details, then there are no markups that are assigned to
-              a given detail.  And if a Markup is not assigned any children, it will be automatically
-              deleted by the backend.  However, we still include in the conditional check here for
+              Note: If there are no details, then there are no markups that are
+							assigned to a given detail.  And if a Markup is not assigned any
+							children, it will be automatically deleted by the backend.
+							However, we still include in the conditional check here for
               completeness sake.
               */
               if (details.length === 0 && markups.length === 0) {

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 const LeafLogo = (): JSX.Element => {
   return (
     <svg xmlns={"http://www.w3.org/2000/svg"} width={"45.784"} height={"51.637"} viewBox={"0 0 45.784 51.637"}>

@@ -19,7 +19,8 @@ const Layout = (props: LayoutProps): JSX.Element => {
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
   useEffect(() => {
-    // We want to hide the sidebar by default on mobile devices but show it by default on larger devices.
+    /* We want to hide the sidebar by default on mobile devices but show it by
+       default on larger devices. */
     setSidebarVisible(!isMobile);
   }, [isMobile]);
 

@@ -61,8 +61,8 @@ const EditMarkupModal = <
         let mutated = { ...payload } as Http.MarkupPayload;
         // FLAT Markups do not have any children.
         if (mutated.unit === model.models.MarkupUnitModels.PERCENT.id) {
-          // The children should not be an empty list as the Form should have already validated
-          // that.
+          /* The children should not be an empty list as the Form should have
+						 already validated that. */
           mutated = { ...mutated, children };
           if (!isNaN(parseFloat(rate))) {
             mutated = {

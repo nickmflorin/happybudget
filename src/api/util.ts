@@ -8,7 +8,8 @@ export const parseErrors = (error: Http.IHttpClientError | Http.ErrorResponse | 
 
 export const parseError = <T extends Http.Error>(
   error: Http.IHttpClientError | Http.ErrorResponse | Http.Error[],
-  // For field level errors, there will often be more than one error in the response.
+  /* For field level errors, there will often be more than one error in the
+     response. */
   error_type: "http" | "unknown" | "global" | "auth"
 ): T | null => {
   const filtered = filter(parseErrors(error), { error_type }) as T[];

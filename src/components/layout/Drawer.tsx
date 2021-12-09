@@ -60,9 +60,9 @@ const Drawer = ({ children, className, visible, style = {}, onClickAway }: Drawe
     <Portal id={"drawer-target"} visible={visible}>
       <ClickAwayListener
         onClickAway={(event: any) => {
-          // When there are elements that trigger the opening/closing of a drawer,
-          // they must be attributed with [role="drawer-toggle"].  This way, those
-          // elements will not trigger a click away.
+          /* When there are elements that trigger the opening/closing of a drawer,
+             they must be attributed with [role="drawer-toggle"].  This way, those
+             elements will not trigger a click away. */
           let ignoreClick = false;
           /* eslint-disable quotes */
           document.querySelectorAll('[role="drawer-toggle"]').forEach((el: Element) => {

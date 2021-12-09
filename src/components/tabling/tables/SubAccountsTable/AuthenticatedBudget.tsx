@@ -55,7 +55,8 @@ const AuthenticatedBudgetSubAccountsTable = (
   });
 
   const processFringesCellFromClipboard = hooks.useDynamicCallback((value: string) => {
-    // Here, we convert from IDs to Rows then back to IDs to ensure that the IDs are valid.
+    /* Here, we convert from IDs to Rows then back to IDs to ensure that the
+       IDs are valid. */
     return map(
       model.util.getModelsByIds<Tables.FringeRow>(props.fringes, model.util.parseIdsFromDeliminatedString(value), {
         warnOnMissing: false
@@ -92,8 +93,9 @@ const AuthenticatedBudgetSubAccountsTable = (
       },
       contact: {
         onDataChange: (id: Table.ModelRowId, change: Table.CellChange<R>) => {
-          // If the Row does not already have a populated value for `rate`, we populate
-          // the `rate` value based on the selected Contact (if non-null).
+          /* If the Row does not already have a populated value for `rate`,
+						 we populate the `rate` value based on the selected Contact
+						 (if non-null). */
           if (change.newValue !== null) {
             const row = table.current.getRow(id);
             if (!isNil(row) && tabling.typeguards.isModelRow(row) && row.data.rate === null) {
@@ -153,9 +155,9 @@ const AuthenticatedBudgetSubAccountsTable = (
               const selectedRows = filter(params.selectedRows, (r: Table.BodyRow<R>) =>
                 tabling.typeguards.isModelRow(r)
               ) as Table.ModelRow<R>[];
-              // If rows are explicitly selected for the Markup, we want to include them
-              // as the default children for the Markup in the modal, which will default the
-              // unit in the modal to PERCENT.
+              /* If rows are explicitly selected for the Markup, we want to
+								 include them as the default children for the Markup in the
+								 modal, which will default the unit in the modal to PERCENT. */
               if (selectedRows.length !== 0) {
                 props.onMarkupRows?.(selectedRows);
               } else {

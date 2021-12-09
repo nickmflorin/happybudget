@@ -47,11 +47,13 @@ const RecoverPassword = (): JSX.Element => {
               });
             })
             .catch((e: Error) => {
-              // Before redirecting to this page - the token will have already been validated,
-              // so it is an edge case that we would get an authentication error related to the
-              // token here.  If however we do get that error, we just redirect back to the
-              // login page and display the error for simplicity case (versus duplicating all the
-              // error handling code here).
+              /* Before redirecting to this page - the token will have already
+								 been validated, so it is an edge case that we would get an
+								 authentication error related to the token here.
+
+								 If however we do get that error, we just redirect back to the
+                 login page and display the error for simplicity case (versus
+								 duplicating all the error handling code here). */
               if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
                 setRedirect({ pathname: "/login", state: { error: e, tokenType: "password-recovery" } });
               } else {

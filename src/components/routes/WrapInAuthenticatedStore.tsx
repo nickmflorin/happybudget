@@ -64,9 +64,9 @@ const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): 
       if (authenticating) {
         return <ApplicationSpinner visible={true} />;
       }
-      // If the Redux Store is not set and we are not authenticating anymore,
-      // there was an error with the token validation, in which case we should
-      // redirect to login.
+      /* If the Redux Store is not set and we are not authenticating anymore,
+         there was an error with the token validation, in which case we should
+         redirect to login. */
       return <Redirect to={"/login"} />;
     } else {
       return (

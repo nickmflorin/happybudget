@@ -26,9 +26,9 @@ export const instance = axios.create({
 export const getRequestHeaders = (): { [key: string]: string } => {
   const headers: { [key: string]: string } = {};
   const cookies = new Cookies();
-  // The CSRF Token needs to be set as a header for POST/PATCH/PUT requests
-  // with Django - unfortunately, we cannot include it as a cookie only
-  // because their middleware looks for it in the headers.
+  /* The CSRF Token needs to be set as a header for POST/PATCH/PUT requests
+     with Django - unfortunately, we cannot include it as a cookie only
+     because their middleware looks for it in the headers. */
   const csrfToken: string = cookies.get("greenbudgetcsrftoken");
   if (!isNil(csrfToken)) {
     headers["X-CSRFToken"] = csrfToken;
@@ -74,16 +74,17 @@ const throwClientError = (error: AxiosError<Http.ErrorResponse>, options: Http.R
   const url = !isNil(error.response.config.url) ? error.response.config.url : "";
   if (!isNil(response.data.force_logout)) {
     window.location.href = "/login";
-    // We throw an error because the mechanics making the API request are expecting
-    // a defined response or an Error to be thrown.  If we to return nothing, we
-    // may get misleading errors dispatched to Sentry that occur between the time
-    // this method returns and the time the redirect actually takes place.
+    /* We throw an error because the mechanics making the API request are
+			 expecting a defined response or an Error to be thrown.  If we to return
+			 nothing, we may get misleading errors dispatched to Sentry that occur
+			 between the time this method returns and the time the redirect actually
+			 takes place. */
     throw new errors.ForceLogout("User is not authenticated.");
   } else {
     if (error.response.status === 404) {
-      // On 404's Django will sometimes bypass DRF exception handling and
-      // return a 404.html template response.  We should bypass this in the
-      // backend, but for the time being we can manually raise a ClientError.
+      /* On 404's Django will sometimes bypass DRF exception handling and
+         return a 404.html template response.  We should bypass this in the
+         backend, but for the time being we can manually raise a ClientError. */
       throw new errors.ClientError({
         response,
         errors: [
@@ -214,12 +215,12 @@ export class ApiClient {
     const response: AxiosResponse<T> = await lookup[method](url, filterPayload(payload), {
       cancelToken: options.cancelToken
     });
-    // We are getting sporadic errors where the response is not defined.  I am
-    // not exactly sure why this is happening, but it could be related to request
-    // cancellation.  For now, we will just allow the return value to be undefined
-    // here and force coerce it, with the understanding that the value only seems
-    // to be undefined in cases where we would not be accessing the response
-    // data anyways (i.e. task cancellation).
+    /* We are getting sporadic errors where the response is not defined.  I am
+       not exactly sure why this is happening, but it could be related to request
+       cancellation.  For now, we will just allow the return value to be undefined
+       here and force coerce it, with the understanding that the value only seems
+       to be undefined in cases where we would not be accessing the response
+       data anyways (i.e. task cancellation). */
     return response.data;
   };
 

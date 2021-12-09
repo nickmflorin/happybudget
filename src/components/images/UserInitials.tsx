@@ -50,8 +50,8 @@ const UserInitials = ({
       return initials;
     } else {
       if (!isNil(userFirstName) && !isNil(userLastName)) {
-        // First name and last name will always be present for a User, but not necessarily
-        // a Contact.
+        /* First name and last name will always be present for a User, but not
+					 necessarily a Contact. */
         return userFirstName.charAt(0) + userLastName.charAt(0);
       } else if (!isNil(userFirstName)) {
         return userFirstName.charAt(0);

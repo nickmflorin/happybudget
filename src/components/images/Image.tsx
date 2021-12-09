@@ -30,11 +30,13 @@ const Image = (props: ImageProps): JSX.Element => {
   }, [error, props.src]);
 
   /*
-  Note: Because of weird things with AWS and S3, we will sometimes accidentally get
-  a blank image URL for an image that is saved in the backend.  TS will not pick this up
-  because we always expect the SavedImage `url` property to be defined.  In the case that
-  this happens, the onError trigger for the <img> will not be triggered as it does not get
-  triggered for null, undefined or "" sources.  If this happens, we will first
+  Note: Because of weird things with AWS and S3, we will sometimes accidentally
+	get a blank image URL for an image that is saved in the backend.  TS will not
+	pick this up because we always expect the SavedImage `url` property to be
+	defined.  In the case that this happens, the onError trigger for the <img>
+	will not be triggered as it does not get triggered for null, undefined or
+	"" sources.  If this happens, we will first
+
   (1) Use the fallbackComponent if provided
   (2) Use the fallbackSrc if provided
   (3) As a last resort, render a blank white image.
@@ -55,8 +57,9 @@ const Image = (props: ImageProps): JSX.Element => {
       <img
         className={classNames("img", props.className)}
         alt={""}
-        // Just in case the SRC bypasses TS compilation and is undefined, we will just show a blank image.
-        // Note that if the SRC is indeed null, undefined or "" - it will not trigger the onError callback.
+        /* Just in case the SRC bypasses TS compilation and is undefined, we
+					 will just show a blank image. Note that if the SRC is indeed null,
+					 undefined or "" - it will not trigger the onError callback. */
         src={props.src || props.fallbackSrc || "data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA="}
         style={props.style}
         onLoad={() => {

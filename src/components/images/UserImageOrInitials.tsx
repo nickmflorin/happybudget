@@ -28,8 +28,8 @@ const UserImageOrInitials = ({
   initialsClassName,
   ...props
 }: UserImageOrInitialsProps): JSX.Element => {
-  // If there is an error loading the image, we want to fallback to the initials
-  // but still log that the error occurred.
+  /* If there is an error loading the image, we want to fallback to the initials
+     but still log that the error occurred. */
   const [errorWithImage, setErrorWithImage] = useState<React.SyntheticEvent<HTMLImageElement> | null>(null);
 
   useEffect(() => {

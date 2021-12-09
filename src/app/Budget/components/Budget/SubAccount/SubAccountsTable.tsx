@@ -27,7 +27,8 @@ const ConnectedTable = connectTableToStore<BudgetSubAccountsTableProps, R, M, Ta
     addModelsToState: actions.subAccount.addModelsToStateAction,
     setSearch: actions.subAccount.setSearchAction
   },
-  // We cannot autoRequest because we have to also request the new data when the dropdown breadcrumbs change.
+  /* We cannot autoRequest because we have to also request the new data when
+     the dropdown breadcrumbs change. */
   autoRequest: false,
   selector: selectors.selectSubAccountsTableStore,
   footerRowSelectors: {
@@ -123,8 +124,8 @@ const SubAccountsTable = ({
             })
           )
         }
-        // Right now, the SubAccount recursion only goes 1 layer deep.
-        // Account -> SubAccount -> Detail (Recrusive SubAccount).
+        /* Right now, the SubAccount recursion only goes 1 layer deep.
+           Account -> SubAccount -> Detail (Recrusive SubAccount). */
         hideEditColumn={true}
         exportFileName={!isNil(subaccountDetail) ? `subaccount_${subaccountDetail.identifier}` : ""}
         categoryName={"Detail"}

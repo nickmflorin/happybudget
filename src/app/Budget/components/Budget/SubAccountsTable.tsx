@@ -50,9 +50,9 @@ const SubAccountsTable = ({
   const onContactCreated = useMemo(
     () => (m: Model.Contact, params?: CreateContactParams) => {
       dispatch(actions.authenticated.addContactToStateAction(m));
-      // If we have enough information from before the contact was created in the specific
-      // cell, combine that information with the new value to perform a table update, showing
-      // the created contact in the new cell.
+      /* If we have enough information from before the contact was created in
+			   the specific cell, combine that information with the new value to
+				 perform a table update, showing the created contact in the new cell. */
       const rowId = params?.rowId;
       if (!isNil(rowId)) {
         const row: Table.BodyRow<R> | null = table.current.getRow(rowId);
@@ -61,8 +61,8 @@ const SubAccountsTable = ({
             id: row.id,
             data: { contact: { oldValue: row.data.contact || null, newValue: m.id } }
           };
-          // If the Row does not already specify a rate and the Contact does specify a rate,
-          // use the rate that is specified for the Contact.
+          /* If the Row does not already specify a rate and the Contact does
+						 specify a rate, use the rate that is specified for the Contact. */
           if (m.rate !== null && row.data.rate === null) {
             rowChange = {
               ...rowChange,

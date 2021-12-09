@@ -5,9 +5,9 @@ import { isNil } from "lodash";
 import { useEffect } from "react";
 
 interface InputOnFocusProps extends React.HTMLProps<HTMLInputElement> {
-  // When unfocused, the <input> will be hidden and other content will be shown.
-  // This content can either be provided as the children of this component, or as
-  // a render callback.
+  /* When unfocused, the <input> will be hidden and other content will be shown.
+     This content can either be provided as the children of this component, or as
+     a render callback. */
   readonly renderBlurredContent?: (value: string) => JSX.Element;
   readonly renderBlurredContentOnNoValue?: boolean;
   readonly children: (value: string) => JSX.Element;
@@ -32,8 +32,8 @@ const InputOnFocus = (
     }
   }, [focused]);
 
-  // We have to expose the focus() method so that this component can be auto-focused
-  // with our Form mechanics.
+  /* We have to expose the focus() method so that this component can be
+		 auto-focused with our Form mechanics. */
   useImperativeHandle(ref, () => ({
     focus: () => setFocused(true),
     blur: () => setFocused(false)
@@ -62,9 +62,9 @@ const InputOnFocus = (
         register the click on the child but would trigger the focus/blur behavior
         of the `input-div` parent component.
 
-        `input-div-content` will tightly wrap the children component so that clicks
-        outside of the child component will still trigger the focus/blur behavior
-        of the parent `input-div` component.
+        `input-div-content` will tightly wrap the children component so that
+				clicks outside of the child component will still trigger the focus/blur
+				behavior of the parent `input-div` component.
         */
         <div
           className={"input-div-content"}
