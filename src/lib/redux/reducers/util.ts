@@ -1,6 +1,20 @@
 import { isNil, filter, map } from "lodash";
 import { util, redux } from "lib";
 
+export const isClearOnAction = <T>(clearOn: Redux.ClearOn<T>[], action: Redux.Action<T>): boolean => {
+  for (let i = 0; i < clearOn.length; i++) {
+    const clearer = clearOn[i];
+    if (redux.typeguards.isClearOnDetail(clearer)) {
+      if (clearer.action.toString() === action.type && clearer.payload(action.payload) === true) {
+        return true;
+      }
+    } else if (clearer.toString() === action.type) {
+      return true;
+    }
+  }
+  return false;
+};
+
 export const findModelInData = <M extends Model.Model, A extends Array<any> = M[]>(
   action: Redux.Action,
   data: A,

@@ -603,7 +603,7 @@ declare namespace Table {
       readonly defaultData?: Partial<R>;
       readonly createTableRows?: (config: CFG) => BodyRow<R>[];
       readonly getModelRowChildren?: (m: M) => number[];
-      readonly clearOn: import("@reduxjs/toolkit").PayloadActionCreator<any>[];
+      readonly clearOn: Redux.ClearOn<any>[];
     };
 
   type SagaConfig<

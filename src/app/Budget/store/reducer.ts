@@ -90,7 +90,13 @@ const genericReducer = combineReducers({
     reducers: {
       table: budgeting.reducers.createAuthenticatedSubAccountsTableReducer({
         initialState: initialState.account.table,
-        clearOn: [actions.account.requestAction, actions.account.setAccountIdAction],
+        clearOn: [
+          {
+            action: actions.account.requestAction,
+            payload: (p: Redux.TableRequestPayload) => !redux.typeguards.isListRequestIdsPayload(p)
+          },
+          actions.account.setAccountIdAction
+        ],
         actions: {
           tableChanged: actions.account.handleTableChangeEventAction,
           loading: actions.account.loadingAction,
@@ -122,7 +128,14 @@ const genericReducer = combineReducers({
   }),
   accounts: budgeting.reducers.createAuthenticatedAccountsTableReducer({
     initialState: initialState.account.table,
-    clearOn: [actions.accounts.requestAction, actions.setBudgetIdAction],
+    clearOn: [
+      {
+        action: actions.accounts.requestAction,
+        payload: (p: Redux.TableRequestPayload) => !redux.typeguards.isListRequestIdsPayload(p)
+      },
+      actions.setBudgetIdAction
+    ],
+
     actions: {
       tableChanged: actions.accounts.handleTableChangeEventAction,
       loading: actions.accounts.loadingAction,
@@ -145,7 +158,13 @@ const genericReducer = combineReducers({
     reducers: {
       table: budgeting.reducers.createAuthenticatedSubAccountsTableReducer({
         initialState: initialState.subaccount.table,
-        clearOn: [actions.subAccount.requestAction, actions.subAccount.setSubAccountIdAction],
+        clearOn: [
+          {
+            action: actions.subAccount.requestAction,
+            payload: (p: Redux.TableRequestPayload) => !redux.typeguards.isListRequestIdsPayload(p)
+          },
+          actions.subAccount.setSubAccountIdAction
+        ],
         actions: {
           tableChanged: actions.subAccount.handleTableChangeEventAction,
           responseSubAccountUnits: actions.responseSubAccountUnitsAction,

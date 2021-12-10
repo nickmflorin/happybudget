@@ -32,7 +32,13 @@ const genericReducer = combineReducers({
     reducers: {
       table: budgeting.reducers.createUnauthenticatedSubAccountsTableReducer({
         initialState: initialState.account.table,
-        clearOn: [actions.account.requestAction, actions.account.setAccountIdAction],
+        clearOn: [
+          {
+            action: actions.account.requestAction,
+            payload: (p: Redux.TableRequestPayload) => !redux.typeguards.isListRequestIdsPayload(p)
+          },
+          actions.account.setAccountIdAction
+        ],
         actions: {
           loading: actions.account.loadingAction,
           response: actions.account.responseAction,
@@ -68,7 +74,13 @@ const genericReducer = combineReducers({
     reducers: {
       table: budgeting.reducers.createUnauthenticatedSubAccountsTableReducer({
         initialState: initialState.account.table,
-        clearOn: [actions.subAccount.requestAction, actions.subAccount.setSubAccountIdAction],
+        clearOn: [
+          {
+            action: actions.subAccount.requestAction,
+            payload: (p: Redux.TableRequestPayload) => !redux.typeguards.isListRequestIdsPayload(p)
+          },
+          actions.subAccount.setSubAccountIdAction
+        ],
         actions: {
           loading: actions.subAccount.loadingAction,
           response: actions.subAccount.responseAction,

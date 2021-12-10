@@ -1,5 +1,4 @@
 import { isNil, reduce, map, filter, includes, intersection, uniq } from "lodash";
-import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 
 import * as redux from "../redux";
 import * as util from "../util";
@@ -497,10 +496,7 @@ export const createTableReducer = <
   return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
     let newState = { ...state };
 
-    const clearOnActionTypes: string[] = map(config.clearOn, (obj: ActionCreatorWithPayload<any, string>) =>
-      obj.toString()
-    );
-    if (includes(clearOnActionTypes, action.type)) {
+    if (redux.reducers.isClearOnAction(config.clearOn, action)) {
       newState = { ...state, data: [] };
     }
 

@@ -128,6 +128,17 @@ declare namespace Redux {
 
   type TableRequestPayload = { ids: number[] } | null;
 
+  type ActionCreator<T> = import("@reduxjs/toolkit").PayloadActionCreator<T>;
+
+  type ActionCreatorPayload<T> = T extends Redux.ActionCreator<infer P> ? P : unknown;
+
+  type ClearOnDetail<T> = {
+    readonly action: ActionCreator<T>;
+    readonly payload: (payload: T) => boolean;
+  };
+
+  type ClearOn<T> = ActionCreator<T> | ClearOnDetail<T>;
+
   interface ModelDetailResponseStore<T extends Model.HttpModel> {
     readonly data: T | null;
     readonly loading: boolean;
