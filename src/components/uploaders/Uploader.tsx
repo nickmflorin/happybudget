@@ -10,13 +10,12 @@ import { UploadFile } from "antd/lib/upload/interface";
 
 import * as api from "api";
 import { util } from "lib";
+import { Config } from "config";
+
 import { Icon, RenderWithSpinner, Image, ShowHide } from "components";
 import { ImageClearButton } from "components/buttons";
 
 import "./Uploader.scss";
-
-const ACCCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png"];
-const MAX_IMAGE_SIZE = 2; // In MB
 
 interface UploaderImageProps extends StandardComponentProps {
   readonly image: UploadedImage | SavedImage;
@@ -161,13 +160,13 @@ const Uploader = (
         listType={"picture-card"}
         showUploadList={false}
         beforeUpload={(file: File) => {
-          if (!includes(ACCCEPTED_IMAGE_TYPES, file.type)) {
+          if (!includes(Config.acceptedImageTypes, file.type)) {
             _onError(
-              `${file.type} is not an acceptable image type.  Must be one of ${ACCCEPTED_IMAGE_TYPES.join(", ")}.`
+              `${file.type} is not an acceptable image type.  Must be one of ${Config.acceptedImageTypes.join(", ")}.`
             );
             return false;
           } else if (util.files.fileSizeInMB(file) > 2) {
-            _onError(`The image must be smaller than ${MAX_IMAGE_SIZE}MB.`);
+            _onError(`The image must be smaller than ${Config.maxImageSize}MB.`);
             return false;
           }
           return true;

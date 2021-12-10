@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { map, reduce, uniq, filter, isNil } from "lodash";
 
-import { hooks, model, tabling } from "lib";
+import { hooks, models, tabling } from "lib";
 import { EditAttachmentsModal } from "components/modals";
 
 interface UseAttachmentsProps<
@@ -49,11 +49,9 @@ export const useAttachments = <
       (curr: Model.SimpleAttachment[], r: Table.ModelRow<R>) => uniq([...curr, ...r.data.attachments]),
       []
     );
-    return model.util.getModelsByIds<Model.SimpleAttachment>(
-      attachments,
-      model.util.parseIdsFromDeliminatedString(value),
-      { warnOnMissing: false }
-    );
+    return models.getModelsByIds<Model.SimpleAttachment>(attachments, models.parseIdsFromDeliminatedString(value), {
+      warnOnMissing: false
+    });
   });
 
   const modal = useMemo(() => {

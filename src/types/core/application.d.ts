@@ -4,6 +4,8 @@ declare namespace Application {
     readonly tableDebug: boolean;
     readonly whyDidYouRender: boolean;
     readonly tableRowOrdering: boolean;
+    readonly acceptedImageTypes: string[];
+    readonly maxImageSize: number; // In MB
   };
 
   type ConfigOption = {

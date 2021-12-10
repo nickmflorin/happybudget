@@ -1,4 +1,4 @@
-import { tabling, model } from "lib";
+import { tabling, budgeting } from "lib";
 
 export type FringeTableActionMap = Redux.TableActionMap<Model.Fringe> & {
   readonly responseFringeColors: Http.ListResponse<string>;
@@ -49,7 +49,7 @@ export const createAuthenticatedFringesTableReducer = (
   >({
     ...config,
     defaultData: {
-      unit: model.models.FringeUnitModels.PERCENT,
+      unit: budgeting.models.FringeUnitModels.PERCENT,
       rate: 0.0
     }
   });

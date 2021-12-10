@@ -1,5 +1,4 @@
 import React from "react";
-import { reduce } from "lodash";
 import { History, Location } from "history";
 
 import configureAgGrid from "./configureAgGrid";
@@ -7,21 +6,15 @@ import configureFontAwesome from "./configureFontAwesome";
 import configureSentry from "./configureSentry";
 import reportWebVitals from "./reportWebVitals";
 
-import * as flags from "./flags";
+import Config from "./config";
 
 export { default as componentLoader } from "./componentLoader";
 export { default as lazyWithRetry } from "./lazyWithRetry";
 export { default as registerIcons } from "./configureFontAwesome";
+export { default as Config } from "./config";
 
 export * as flags from "./flags";
 export * as localization from "./localization";
-
-export const ConfigOptions: Application.ConfigOption[] = [
-  { name: "tableDebug", default: false, prodEnv: "local" },
-  { name: "tableRowOrdering", default: true },
-  { name: "reportWebVitals", default: false, prodEnv: "local" },
-  { name: "whyDidYouRender", default: false, prodEnv: "local" }
-];
 
 const RequiredEnvironmentVariables = ["REACT_APP_API_DOMAIN", "REACT_APP_PRODUCTION_ENV"];
 
@@ -32,15 +25,6 @@ const validateEnvironmentVariables = () => {
     }
   }
 };
-
-export const Config: Application.Config = reduce(
-  ConfigOptions,
-  (curr: Application.Config, option: Application.ConfigOption) => ({
-    ...curr,
-    [option.name]: option.hardOverride === undefined ? flags.evaluateFlagFromEnvOrMemory(option) : option.hardOverride
-  }),
-  {} as Application.Config
-);
 
 let prevPath: string | null = null;
 

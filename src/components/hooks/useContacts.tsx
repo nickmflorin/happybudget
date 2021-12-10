@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { isNil } from "lodash";
 
-import { model } from "lib";
+import { models } from "lib";
 import { CreateContactModal, EditContactModal } from "components/modals";
 
 interface UseContactsProps {
@@ -37,7 +37,7 @@ const useContacts = (props: UseContactsProps): UseContactsReturnType => {
       let initialValues: Partial<Http.ContactPayload> = {};
       const name = params?.name;
       if (!isNil(name)) {
-        const [firstName, lastName] = model.util.parseFirstAndLastName(name);
+        const [firstName, lastName] = models.parseFirstAndLastName(name);
         initialValues = { first_name: firstName, last_name: lastName };
       }
       const modal = (

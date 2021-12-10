@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { DEFAULT_TAG_COLOR_SCHEME, Colors } from "style/constants";
-import { model, util, tabling } from "lib";
+import { typeguards, util, tabling } from "lib";
 
 const TagRenderer = <S extends object = React.CSSProperties>(params: ITagRenderParams<S>): JSX.Element => {
   const { contentRender, ...rest } = params;
@@ -56,12 +56,12 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
           return text;
         }
       }
-      if (model.typeguards.isTag(m)) {
+      if (typeguards.isTag(m)) {
         if (props.isPlural === true && !isNil(m.plural_title)) {
           return m.plural_title;
         }
         return m.title;
-      } else if (model.typeguards.isModelWithName(m)) {
+      } else if (typeguards.isModelWithName(m)) {
         return m.name || "";
       } else if (tabling.typeguards.isRow(m) && tabling.typeguards.isRowWithName(m)) {
         return m.data.name || "";
@@ -110,9 +110,9 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
           return validateAndReturnColor(color, "getModelColor callback");
         }
       }
-      if (model.typeguards.isTag(m)) {
+      if (typeguards.isTag(m)) {
         return validateAndReturnColor(m.color, "color");
-      } else if (model.typeguards.isModelWithColor(m)) {
+      } else if (typeguards.isModelWithColor(m)) {
         return validateAndReturnColor(m.color, "color");
       } else if (tabling.typeguards.isRow(m) && tabling.typeguards.isRowWithColor(m) && !isNil(m.data.color)) {
         return m.data.color;

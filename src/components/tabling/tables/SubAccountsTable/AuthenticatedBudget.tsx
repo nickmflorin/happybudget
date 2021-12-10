@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { isNil, find, map, filter } from "lodash";
 
 import * as api from "api";
-import { model, tabling, hooks } from "lib";
+import { models, tabling, hooks } from "lib";
 import { framework } from "components/tabling/generic";
 
 import { useAttachments } from "../hooks";
@@ -46,11 +46,11 @@ const AuthenticatedBudgetSubAccountsTable = (
     });
 
   const processUnitCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
-    model.util.inferModelFromName<Model.Tag>(props.subAccountUnits, name, { getName: (m: Model.Tag) => m.title })
+    models.inferModelFromName<Model.Tag>(props.subAccountUnits, name, { getName: (m: Model.Tag) => m.title })
   );
 
   const processFringesCellForClipboard = hooks.useDynamicCallback((row: R) => {
-    const fringes = model.util.getModelsByIds<Tables.FringeRow>(props.fringes, row.fringes);
+    const fringes = models.getModelsByIds<Tables.FringeRow>(props.fringes, row.fringes);
     return map(fringes, (fringe: Tables.FringeRow) => fringe.id).join(", ");
   });
 
@@ -58,7 +58,7 @@ const AuthenticatedBudgetSubAccountsTable = (
     /* Here, we convert from IDs to Rows then back to IDs to ensure that the
        IDs are valid. */
     return map(
-      model.util.getModelsByIds<Tables.FringeRow>(props.fringes, model.util.parseIdsFromDeliminatedString(value), {
+      models.getModelsByIds<Tables.FringeRow>(props.fringes, models.parseIdsFromDeliminatedString(value), {
         warnOnMissing: false
       }),
       (m: Tables.FringeRow) => m.id

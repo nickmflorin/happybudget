@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { isNil, map } from "lodash";
 
-import { model, tabling, hooks } from "lib";
+import { models, tabling, hooks } from "lib";
 import { framework } from "components/tabling/generic";
 
 import { UnauthenticatedBudgetTable, UnauthenticatedBudgetTableProps } from "../BudgetTable";
@@ -25,7 +25,7 @@ const UnauthenticatedBudgetSubAccountsTable = (
   const table = tabling.hooks.useTableIfNotDefined(props.table);
 
   const processFringesCellForClipboard = hooks.useDynamicCallback((row: R) => {
-    const fringes = model.util.getModelsByIds<Tables.FringeRow>(props.fringes, row.fringes);
+    const fringes = models.getModelsByIds<Tables.FringeRow>(props.fringes, row.fringes);
     return map(fringes, (fringe: Tables.FringeRow) => fringe.data.name).join(", ");
   });
 

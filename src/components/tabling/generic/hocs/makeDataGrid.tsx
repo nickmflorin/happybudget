@@ -6,7 +6,7 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 
 import { CellMouseOverEvent, CellFocusedEvent } from "@ag-grid-community/core";
 
-import { tabling, hooks, model } from "lib";
+import { tabling, hooks, budgeting } from "lib";
 
 interface InjectedDataGridProps {
   readonly id: Table.GridId;
@@ -30,7 +30,7 @@ export type WithDataGridProps<T> = T & InjectedDataGridProps;
 
 const getRowColorDef = <R extends Table.RowData>(row: Table.BodyRow<R>): Table.RowColorDef => {
   if (tabling.typeguards.isGroupRow(row)) {
-    const colorDef = model.util.getGroupColorDefinition(row);
+    const colorDef = budgeting.models.getGroupColorDefinition(row);
     if (!isNil(colorDef?.color) && !isNil(colorDef?.backgroundColor)) {
       return {
         color: colorDef?.color,

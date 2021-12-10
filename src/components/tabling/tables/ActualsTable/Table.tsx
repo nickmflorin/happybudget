@@ -2,7 +2,7 @@ import React from "react";
 import { map, filter } from "lodash";
 
 import * as api from "api";
-import { model, tabling, hooks } from "lib";
+import { models, tabling, hooks } from "lib";
 
 import { framework, WithConnectedTableProps } from "components/tabling/generic";
 import { AuthenticatedModelTable, AuthenticatedModelTableProps } from "../ModelTable";
@@ -46,7 +46,7 @@ const ActualsTable = ({
     });
 
   const processActualTypeCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
-    model.util.inferModelFromName<Model.Tag>(props.actualTypes, name, { getName: (m: Model.Tag) => m.title })
+    models.inferModelFromName<Model.Tag>(props.actualTypes, name, { getName: (m: Model.Tag) => m.title })
   );
 
   const processOwnerCellFromClipboard = hooks.useDynamicCallback((value: string) => {
@@ -99,7 +99,7 @@ const ActualsTable = ({
       );
       /* NOTE: If there are multiple owners with the same identifier, this will
          return the first and issue a warning. */
-      return model.util.inferModelFromName<Model.SimpleSubAccount | Model.SimpleMarkup>(availableOwners, value, {
+      return models.inferModelFromName<Model.SimpleSubAccount | Model.SimpleMarkup>(availableOwners, value, {
         getName: (m: Model.SimpleSubAccount | Model.SimpleMarkup) => m.identifier
       });
     }

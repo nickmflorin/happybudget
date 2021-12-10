@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { isNil, filter } from "lodash";
 
-import { tabling, hooks, model } from "lib";
+import { tabling, hooks, models } from "lib";
 import { framework } from "components/tabling/generic";
 
 import { AuthenticatedBudgetTable, AuthenticatedBudgetTableProps } from "../BudgetTable";
@@ -28,7 +28,7 @@ const AuthenticatedTemplateSubAccountsTable = (
   const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
 
   const processUnitCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
-    model.util.inferModelFromName<Model.Tag>(props.subAccountUnits, name, { getName: (m: Model.Tag) => m.title })
+    models.inferModelFromName<Model.Tag>(props.subAccountUnits, name, { getName: (m: Model.Tag) => m.title })
   );
 
   const columns = useMemo(

@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 
-import * as typeguards from "lib/model/typeguards";
+import { typeguards } from "lib";
 
 import { Icon, FullSize, VerticalFlexCenter } from "components";
 import { UserImageOrInitials, EditImageOverlay } from "components/images";

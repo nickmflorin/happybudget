@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { model } from "lib";
+import { typeguards } from "lib";
 
 import { TemplateForm } from "components/forms";
 
@@ -51,7 +51,7 @@ const EditTemplateModal = (props: EditTemplateModalProps): JSX.Element => {
 				`budget.image`, we would not be able to differentiate between Scenario
 				(1) and Scenario (2).
         */
-        if (isNil(file) || model.typeguards.isUploadedImage(file)) {
+        if (isNil(file) || typeguards.isUploadedImage(file)) {
           return { ...p, image: !isNil(file) ? file.data : null };
         }
         return p;

@@ -1,4 +1,4 @@
-import { model, tabling } from "lib";
+import { models, budgeting, tabling } from "lib";
 import { columns } from "../../generic";
 
 type R = Tables.FringeRowData;
@@ -42,7 +42,7 @@ const Columns: Table.Column<R, M>[] = [
     cellRenderer: { data: "FringeUnitCell" },
     cellEditor: "FringeUnitEditor",
     processCellFromClipboard: (name: string) =>
-      model.util.findChoiceForName<Model.FringeUnit>(model.models.FringeUnits, name)
+      models.findChoiceForName<Model.FringeUnit>(budgeting.models.FringeUnits, name)
   }),
   columns.BodyColumn<R, M>({
     field: "cutoff",

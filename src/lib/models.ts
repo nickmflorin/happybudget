@@ -1,29 +1,23 @@
-import { isNil, filter, find, map, forEach, reduce } from "lodash";
-import { util, tabling } from "lib";
-import { Colors } from "style/constants";
-import * as models from "./models";
+import { find, filter, isNil, forEach, reduce, map } from "lodash";
+
+/* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
+/* eslint-disable no-shadow */
+export enum ContactTypeNames {
+  CONTRACTOR = "Contractor",
+  EMPLOYEE = "Employee",
+  VENDOR = "Vendor"
+}
+
+export const ContactTypeModels: { [key: string]: Model.ContactType } = {
+  CONTRACTOR: { id: 0, name: ContactTypeNames.CONTRACTOR },
+  EMPLOYEE: { id: 1, name: ContactTypeNames.EMPLOYEE },
+  VENDOR: { id: 2, name: ContactTypeNames.VENDOR }
+};
+
+export const ContactTypes = Object.values(ContactTypeModels);
 
 export const contactName = (contact: Model.Contact): string | null =>
-  contact.contact_type?.id === models.ContactTypeModels.VENDOR.id ? contact.company : contact.full_name;
-
-export const getGroupColorDefinition = (
-  group: Style.HexColor | Model.Group | Table.GroupRow<any>
-): Table.RowColorDef => {
-  if (!isNil(group)) {
-    let color =
-      typeof group === "string" ? group : tabling.typeguards.isRow(group) ? group.groupData.color : group.color;
-    if (!isNil(color)) {
-      return {
-        backgroundColor: color,
-        color: util.colors.contrastedForegroundColor(color)
-      };
-    }
-  }
-  return {
-    backgroundColor: Colors.COLOR_NO_COLOR,
-    color: util.colors.contrastedForegroundColor(Colors.COLOR_NO_COLOR)
-  };
-};
+  contact.contact_type?.id === ContactTypeModels.VENDOR.id ? contact.company : contact.full_name;
 
 export const findChoiceForName = <M extends Model.Choice<number, string>>(
   ms: M[],

@@ -1,6 +1,6 @@
 import { isNil } from "lodash";
 import Cookies from "universal-cookie";
-import { model } from "lib";
+import { budgeting } from "lib";
 
 type Designation = "budgets" | "templates";
 
@@ -19,7 +19,7 @@ export const getBudgetUrl = (
 ): BudgetUrl => {
   if (isNil(entity)) {
     return `/budgets/${budget.id}/accounts`;
-  } else if (model.typeguards.isAccount(entity)) {
+  } else if (budgeting.typeguards.isAccount(entity)) {
     return `/budgets/${budget.id}/accounts/${entity.id}`;
   } else {
     return `/budgets/${budget.id}/subaccounts/${entity.id}`;
@@ -32,7 +32,7 @@ export const getTemplateUrl = (
 ): TemplateUrl => {
   if (isNil(entity)) {
     return `/templates/${budget.id}/accounts`;
-  } else if (model.typeguards.isAccount(entity)) {
+  } else if (budgeting.typeguards.isAccount(entity)) {
     return `/templates/${budget.id}/accounts/${entity.id}`;
   } else {
     return `/templates/${budget.id}/subaccounts/${entity.id}`;
@@ -43,7 +43,7 @@ export const getUrl = (
   budget: Model.Budget | Model.Template,
   entity?: Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount
 ): BudgetUrl | TemplateUrl =>
-  model.typeguards.isBudget(budget) ? getBudgetUrl(budget, entity) : getTemplateUrl(budget, entity);
+  budgeting.typeguards.isBudget(budget) ? getBudgetUrl(budget, entity) : getTemplateUrl(budget, entity);
 
 type PluggableID = ID | "([0-9]+)";
 
@@ -107,7 +107,7 @@ export const setLastVisited = (
   budget: Model.Budget | Model.Template,
   entity?: Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount
 ): void => {
-  const designation: Designation = model.typeguards.isBudget(budget) ? "budgets" : "templates";
+  const designation: Designation = budgeting.typeguards.isBudget(budget) ? "budgets" : "templates";
   const urlCookies = getLastVisitedCookies(designation);
   const url = getUrl(budget, entity);
   urlCookies[budget.id] = url;

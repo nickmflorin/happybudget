@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { isNil, map } from "lodash";
 
-import { model } from "lib";
+import * as api from "api";
 
 import { Form, Icon } from "components";
 import { Input, Select, ColorSelect } from "components/fields";
@@ -17,7 +17,7 @@ const GroupForm = <M extends Model.SimpleAccount | Model.SimpleSubAccount>({
   availableChildrenLoading,
   ...props
 }: GroupFormProps<M>): JSX.Element => {
-  const [colors, loading, error] = model.hooks.useGroupColors();
+  const [colors, loading, error] = api.useGroupColors();
 
   useEffect(() => {
     props.form.setLoading(loading);

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useCallback } from "react";
 import { isNil, includes, reduce } from "lodash";
 
-import { model, ui } from "lib";
+import { ui } from "lib";
 import * as api from "api";
 
 import Modal, { ModalProps } from "./Modal";
@@ -56,7 +56,7 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
   const Form = ui.hooks.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
   const [getToken] = api.useCancelToken({ preserve: true, createOnInit: true });
   const isMounted = ui.hooks.useIsMounted();
-  const [instance, loading, error] = model.hooks.useModel(id, {
+  const [instance, loading, error] = api.useModel(id, {
     request,
     onModelLoaded,
     conditional: () => open === true,

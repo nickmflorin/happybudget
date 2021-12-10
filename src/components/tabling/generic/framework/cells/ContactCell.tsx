@@ -3,7 +3,7 @@ import { find, isNil } from "lodash";
 import classNames from "classnames";
 
 import { Tag } from "components/tagging";
-import { model } from "lib";
+import { models } from "lib";
 import { useContacts, useContactsLoaded } from "store/hooks";
 
 import { Cell } from "./generic";
@@ -60,7 +60,7 @@ const ContactCell = <
           className={classNames("tag--contact", { focused: isFocused })}
           color={"#EFEFEF"}
           textColor={"#2182e4"}
-          text={!isNil(m) ? model.util.contactName(m) : ""}
+          text={!isNil(m) ? models.contactName(m) : ""}
           onClick={() => props.onEditContact({ contact: m.id, rowId: row.id })}
           disabled={!isFocused}
         />

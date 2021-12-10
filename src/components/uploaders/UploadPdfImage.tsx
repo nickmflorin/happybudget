@@ -2,10 +2,10 @@ import React from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
+import { typeguards, util } from "lib";
+
 import { Icon } from "components";
 import { ClearButton } from "components/buttons";
-import * as typeguards from "lib/model/typeguards";
-import { truncateFileName } from "lib/util/files";
 
 import Uploader, { UploaderProps } from "./Uploader";
 import "./UploadPdfImage.scss";
@@ -35,7 +35,7 @@ const UploadPdfImage = (props: UploaderProps): JSX.Element => {
               <Icon icon={"check-circle"} weight={"solid"} style={{ marginLeft: 6 }} />
               <div className={"upload-text file-text"}>
                 {typeguards.isUploadedImage(params.image)
-                  ? truncateFileName(params.image.fileName || params.image.name, 18)
+                  ? util.files.truncateFileName(params.image.fileName || params.image.name, 18)
                   : `Saved ${params.image.extension} Image`}
               </div>
               <ClearButton

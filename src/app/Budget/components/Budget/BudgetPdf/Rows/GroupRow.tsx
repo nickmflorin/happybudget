@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
-import { model } from "lib";
+import { budgeting } from "lib";
 
 import { RowExplicitCellProps } from "../Cells/Cell";
 import BodyRow, { BodyRowProps } from "./BodyRow";
@@ -17,7 +17,7 @@ const GroupRow = <R extends Table.RowData, M extends Model.RowHttpModel = Model.
 ): JSX.Element => {
   const cellStyle = useMemo(() => {
     if (!isNil(props.row)) {
-      const colorDef = model.util.getGroupColorDefinition(props.row);
+      const colorDef = budgeting.models.getGroupColorDefinition(props.row);
       return {
         backgroundColor: !isNil(colorDef.backgroundColor) ? colorDef.backgroundColor : "#EFEFEF"
       };
@@ -27,7 +27,7 @@ const GroupRow = <R extends Table.RowData, M extends Model.RowHttpModel = Model.
 
   const cellTextStyle = useMemo(() => {
     if (!isNil(props.row)) {
-      const colorDef = model.util.getGroupColorDefinition(props.row);
+      const colorDef = budgeting.models.getGroupColorDefinition(props.row);
       return {
         color: !isNil(colorDef.color) ? colorDef.color : "#424242"
       };

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { ui, model } from "lib";
+import { ui, budgeting } from "lib";
 
 import { MarkupForm } from "components/forms";
 import { IMarkupForm } from "components/forms/MarkupForm";
@@ -60,7 +60,7 @@ const EditMarkupModal = <
         let { rate, children, ...payload } = p;
         let mutated = { ...payload } as Http.MarkupPayload;
         // FLAT Markups do not have any children.
-        if (mutated.unit === model.models.MarkupUnitModels.PERCENT.id) {
+        if (mutated.unit === budgeting.models.MarkupUnitModels.PERCENT.id) {
           /* The children should not be an empty list as the Form should have
 						 already validated that. */
           mutated = { ...mutated, children };
@@ -85,7 +85,7 @@ const EditMarkupModal = <
           { name: "description", value: markup.description },
           { name: "unit", value: markup.unit?.id === undefined ? null : markup.unit.id }
         ];
-        if (model.typeguards.isPercentMarkup(markup)) {
+        if (budgeting.typeguards.isPercentMarkup(markup)) {
           fields = [
             ...fields,
             { name: "children", value: markup.children },

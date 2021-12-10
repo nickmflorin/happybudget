@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { filter } from "lodash";
 
-import { hooks, model, tabling } from "lib";
+import { hooks, models, tabling } from "lib";
 
 import { MultipleTags } from "components/tagging";
 import { Cell } from "components/tabling/generic/framework/cells";
@@ -18,7 +18,7 @@ const FringesCell = ({ value, onAddFringes, ...props }: FringesCellProps): JSX.E
   );
 
   const applicableFringes: Tables.FringeRow[] = useMemo(() => {
-    return model.util.getModelsByIds(
+    return models.getModelsByIds(
       filter(fringes, (r: Table.BodyRow<Tables.FringeRowData>) =>
         tabling.typeguards.isModelRow(r)
       ) as Tables.FringeRow[],

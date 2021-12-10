@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { model } from "lib";
+import { typeguards } from "lib";
 
 import "./EntityText.scss";
 
@@ -55,15 +55,15 @@ export const EntityTextIdentifier = ({ className, style, ...props }: TextProps):
 const EntityText: React.FC<EntityTextProps> = ({ children, className, fillEmpty, style = {} }) => {
   const identifier = useMemo(
     () =>
-      model.typeguards.isModelWithIdentifier(children)
+      typeguards.isModelWithIdentifier(children)
         ? children.identifier
-        : model.typeguards.isModelWithName(children)
+        : typeguards.isModelWithName(children)
         ? children.name
         : undefined,
     [children]
   );
   const description = useMemo(
-    () => (model.typeguards.isModelWithDescription(children) ? children.description : undefined),
+    () => (typeguards.isModelWithDescription(children) ? children.description : undefined),
     [children]
   );
 

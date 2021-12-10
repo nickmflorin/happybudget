@@ -1,6 +1,7 @@
 import { isNil, reduce, filter } from "lodash";
 
-import { tabling, model } from "lib";
+import { tabling } from "lib";
+import * as models from "./models";
 import * as typeguards from "./typeguards";
 
 type WithActual<R extends Tables.BudgetRowData> =
@@ -31,7 +32,7 @@ export const fringeContribution = <R extends Tables.BudgetRowData = Tables.Budge
   // Only SubAccount(s) have a Fringe Contribution.
   tabling.typeguards.isRow(obj) && typeguards.isSubAccountRow(obj)
     ? obj.data.fringe_contribution
-    : !tabling.typeguards.isRow(obj) && (model.typeguards.isSubAccount(obj) || model.typeguards.isPdfSubAccount(obj))
+    : !tabling.typeguards.isRow(obj) && (typeguards.isSubAccount(obj) || typeguards.isPdfSubAccount(obj))
     ? obj.fringe_contribution
     : 0.0;
 
@@ -51,7 +52,7 @@ export const contributionFromMarkups = <R extends Table.RowData = Tables.BudgetR
 ): number => {
   const unit = (m: Model.Markup | Table.MarkupRow<R>) => (tabling.typeguards.isRow(m) ? m.markupData.unit : m.unit);
   return reduce(
-    filter(markups, (m: Model.Markup | Table.MarkupRow<R>) => unit(m).id === model.models.MarkupUnitModels.PERCENT.id),
+    filter(markups, (m: Model.Markup | Table.MarkupRow<R>) => unit(m).id === models.MarkupUnitModels.PERCENT.id),
     (curr: number, markup: Model.Markup | Table.MarkupRow<R>): number => {
       const rate = tabling.typeguards.isRow(markup) ? markup.markupData.rate : markup.rate;
       if (!isNil(rate)) {
@@ -71,7 +72,7 @@ export const contributionFromFringes = (value: number, fringes: (Model.Fringe | 
       const rate = tabling.typeguards.isRow(fringe) ? fringe.data.rate : fringe.rate;
       const cutoff = tabling.typeguards.isRow(fringe) ? fringe.data.cutoff : fringe.cutoff;
       if (!isNil(unit) && !isNil(rate)) {
-        if (unit.id === model.models.FringeUnitModels.FLAT.id) {
+        if (unit.id === models.FringeUnitModels.FLAT.id) {
           return curr + rate;
         } else {
           if (cutoff === null || cutoff >= value) {

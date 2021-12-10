@@ -1,5 +1,5 @@
 import { reduce, filter, isNil, includes } from "lodash";
-import { util, model } from "lib";
+import { util, budgeting } from "lib";
 
 import * as typeguards from "./typeguards";
 
@@ -291,7 +291,7 @@ export class MarkupRowManager<
           },
           config.model
         ),
-        children: model.typeguards.isPercentMarkup(config.model) ? config.model.children : [],
+        children: budgeting.typeguards.isPercentMarkup(config.model) ? config.model.children : [],
         markupData: {
           unit: config.model.unit,
           rate: config.model.rate

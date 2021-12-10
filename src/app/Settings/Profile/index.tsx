@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { ui, model } from "lib";
+import { ui, typeguards } from "lib";
 import { hooks, actions } from "store";
 
 import { FormContainer, UserProfileForm } from "components/forms";
@@ -66,7 +66,7 @@ const Profile = (): JSX.Element => {
           onFinish={(values: Partial<Http.UserPayload>) => {
             form.setLoading(true);
             let payload = { ...values };
-            if (!isNil(image) && model.typeguards.isUploadedImage(image)) {
+            if (!isNil(image) && typeguards.isUploadedImage(image)) {
               payload = { ...payload, profile_image: image.data };
             } else if (isNil(image)) {
               payload = { ...payload, profile_image: null };

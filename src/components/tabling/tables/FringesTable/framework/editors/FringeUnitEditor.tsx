@@ -1,6 +1,6 @@
 import { ForwardedRef, forwardRef } from "react";
 
-import { model } from "lib";
+import { budgeting } from "lib";
 import { framework } from "components/tabling/generic";
 import { ChoiceSelectEditor } from "components/tabling/generic/framework/editors";
 
@@ -20,7 +20,7 @@ const FringeUnitEditor = (
     <ChoiceSelectEditor<Model.FringeUnit, Tables.FringeRowData, Model.Fringe, Tables.FringeTableStore>
       searchIndices={["name"]}
       ref={ref}
-      models={model.models.FringeUnits}
+      models={budgeting.models.FringeUnits}
       {...props}
     />
   );
