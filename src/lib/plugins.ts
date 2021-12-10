@@ -48,8 +48,16 @@ const parseLastIdentifiedUser = (id: PluginId): number | null => {
 
 const parseDurationSinceLastIdentify = (id: PluginId, user: Model.User): number | null => {
   const plugin = getPlugin(id);
-  const lastIdentifiedTime = cookies.get(plugin.keys.user);
+  const lastIdentifiedTime = cookies.get(plugin.keys.time);
   const now = moment();
+  try {
+    new Date(lastIdentifiedTime).toISOString();
+  } catch (e: unknown) {
+    if (e instanceof RangeError) {
+      return null;
+    }
+    throw e;
+  }
   const mmt = moment.tz(lastIdentifiedTime, user.timezone);
   if (mmt.isValid()) {
     const duration = moment.duration(now.diff(mmt));
