@@ -6,10 +6,10 @@
 	flex-direction: column;
 
 	.ant-modal-content {
-		min-height: 500px;
+		min-height: 90vh;
 
 		.ant-modal-body {
-			height: calc(60vh - 72px);
+			height: calc(90vh - 72px);
 			padding-bottom: 36px;
 		}
 	}
