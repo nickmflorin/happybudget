@@ -1,3 +1,6 @@
+import { isNil } from "lodash";
+import { ValueSetterParams } from "@ag-grid-community/core";
+
 import { models, budgeting, tabling } from "lib";
 import { columns } from "../../generic";
 
@@ -31,10 +34,40 @@ const Columns: Table.Column<R, M>[] = [
   columns.BodyColumn<R, M>({
     field: "rate",
     headerName: "Rate",
-    valueFormatter: tabling.formatters.percentageValueFormatter,
-    valueSetter: tabling.valueSetters.percentageToDecimalValueSetter<R>("rate"),
     columnType: "percentage",
-    width: 100
+    width: 100,
+    valueSetter: (params: ValueSetterParams) => {
+      const row: Table.BodyRow<R> = params.data;
+      if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
+        const unit = row.data.unit === null ? budgeting.models.FringeUnitModels.PERCENT : row.data.unit;
+        return unit.id === budgeting.models.FringeUnitModels.FLAT.id
+          ? tabling.valueSetters.floatValueSetter<R>("rate")(params)
+          : tabling.valueSetters.percentageToDecimalValueSetter<R>("rate")(params);
+      }
+      /* Here, we have to assume that the value should be formatted as a
+         percentage. */
+      return tabling.valueSetters.percentageToDecimalValueSetter<R>("rate")(params);
+    },
+    valueFormatter: (params: Table.AGFormatterParams) => {
+      if (tabling.formatters.isAgFormatterParams(params)) {
+        const row: Table.BodyRow<R> = params.data;
+        if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
+          // The default Fringe Unit in the backend is PERCENT.
+          const unit = row.data.unit === null ? budgeting.models.FringeUnitModels.PERCENT : row.data.unit;
+          return unit.id === budgeting.models.FringeUnitModels.FLAT.id
+            ? tabling.formatters.currencyValueFormatter(params)
+            : tabling.formatters.percentageValueFormatter(params);
+        }
+        /* Here, we have to assume that the value should be formatted as a
+           percentage. */
+        return tabling.formatters.percentageValueFormatter(params);
+      } else {
+        /* The only time the params would be native formatter params would be if
+				   this column was being used in a PDF - which it isn't, so this is safe
+				   for now. */
+        return tabling.formatters.percentageValueFormatter(params);
+      }
+    }
   }),
   columns.ChoiceSelectColumn<R, M, Model.FringeUnit>({
     field: "unit",

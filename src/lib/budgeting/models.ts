@@ -9,7 +9,7 @@ export enum FringeUnitNames {
   FLAT = "Flat"
 }
 
-export const FringeUnitModels: { [key: string]: Model.FringeUnit } = {
+export const FringeUnitModels: { [key in "PERCENT" | "FLAT"]: Model.FringeUnit } = {
   PERCENT: { id: 0, name: FringeUnitNames.PERCENT },
   FLAT: { id: 1, name: FringeUnitNames.FLAT }
 };

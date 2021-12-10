@@ -1,6 +1,6 @@
 import { util } from "lib";
 
-const isAgFormatterParams = <P extends string | number>(
+export const isAgFormatterParams = <P extends string | number>(
   params: Table.NativeFormatterParams<P> | Table.AGFormatterParams
 ): params is Table.AGFormatterParams => typeof params === "object";
 
