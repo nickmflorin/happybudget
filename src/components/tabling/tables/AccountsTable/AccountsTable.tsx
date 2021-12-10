@@ -17,12 +17,10 @@ const AccountsTable = <T extends AccountsTableProps>(
         showPageFooter={false}
         pinFirstColumn={true}
         cookieNames={{ ...props.cookieNames, hiddenColumns: "account-table-hidden-columns" }}
-        getModelRowName={(r: Table.ModelRow<R>) => r.data.identifier || r.data.description}
-        getPlaceholderRowName={(r: Table.PlaceholderRow<R>) => r.data.identifier || r.data.description}
+        getModelRowName={(r: Table.DataRow<R>) => r.data.identifier || r.data.description}
         getMarkupRowName={(r: Table.MarkupRow<R>) => r.data.identifier}
         getMarkupRowLabel={"Markup"}
         getModelRowLabel={"Account"}
-        getPlaceholderRowLabel={"Account"}
       />
     );
   };

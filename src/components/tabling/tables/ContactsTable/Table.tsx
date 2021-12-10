@@ -42,12 +42,8 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
         rowHeight={40}
         sizeToFit={true}
         constrainTableFooterHorizontally={true}
-        getModelRowName={(r: Table.ModelRow<R>) => util.conditionalJoinString(r.data.first_name, r.data.last_name)}
-        getPlaceholderRowName={(r: Table.PlaceholderRow<R>) =>
-          util.conditionalJoinString(r.data.first_name, r.data.last_name)
-        }
+        getModelRowName={(r: Table.DataRow<R>) => util.conditionalJoinString(r.data.first_name, r.data.last_name)}
         getModelRowLabel={"Contact"}
-        getPlaceholderRowLabel={"Contact"}
         framework={Framework}
         actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
           framework.actions.ToggleColumnAction<R, M>(table.current, params),

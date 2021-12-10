@@ -24,12 +24,10 @@ function SubAccountsTable<T extends SubAccountsTableProps>(
         pinFirstColumn={true}
         cookieNames={{ ...props.cookieNames, hiddenColumns: "subaccount-table-hidden-columns" }}
         framework={Framework}
-        getModelRowName={(r: Table.ModelRow<R>) => r.data.identifier || r.data.description}
-        getPlaceholderRowName={(r: Table.PlaceholderRow<R>) => r.data.identifier || r.data.description}
+        getModelRowName={(r: Table.DataRow<R>) => r.data.identifier || r.data.description}
         getMarkupRowName={(r: Table.MarkupRow<R>) => r.data.identifier}
         getMarkupRowLabel={"Markup"}
         getModelRowLabel={"Line"}
-        getPlaceholderRowLabel={"Line"}
       />
     );
   };

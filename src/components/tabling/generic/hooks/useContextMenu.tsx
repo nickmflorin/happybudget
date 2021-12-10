@@ -7,12 +7,10 @@ import { tabling, hooks, util } from "lib";
 export type UseContextMenuParams<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
   readonly apis: Table.GridApis | null;
   readonly data: Table.BodyRow<R>[];
-  readonly getModelRowLabel?: Table.RowStringGetter<Table.ModelRow<R>>;
-  readonly getModelRowName?: Table.RowStringGetter<Table.ModelRow<R>>;
+  readonly getModelRowLabel?: Table.RowStringGetter<Table.DataRow<R>>;
+  readonly getModelRowName?: Table.RowStringGetter<Table.DataRow<R>>;
   readonly getGroupRowLabel?: Table.RowStringGetter<Table.GroupRow<R>>;
   readonly getGroupRowName?: Table.RowStringGetter<Table.GroupRow<R>>;
-  readonly getPlaceholderRowLabel?: Table.RowStringGetter<Table.PlaceholderRow<R>>;
-  readonly getPlaceholderRowName?: Table.RowStringGetter<Table.PlaceholderRow<R>>;
   readonly getMarkupRowLabel?: Table.RowStringGetter<Table.MarkupRow<R>>;
   readonly getMarkupRowName?: Table.RowStringGetter<Table.MarkupRow<R>>;
   readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
@@ -30,40 +28,54 @@ const evaluateRowStringGetter = <R extends Table.BodyRow>(
   row: R
 ): Table.RowNameLabelType | undefined => (typeof value === "function" ? value(row) : value);
 
+type RowStringGetterCase<R extends Table.RowData, RW extends Table.BodyRow<R> = Table.BodyRow<R>> = {
+  readonly getter: Table.RowStringGetter<RW> | undefined;
+  readonly flt: (r: Table.BodyRow<R>) => boolean;
+};
+
+const evaluateCases = <R extends Table.RowData>(
+  cases: RowStringGetterCase<R, any>[],
+  row: Table.BodyRow<R>,
+  def: Table.RowNameLabelType
+): string => {
+  for (let i = 0; i < cases.length; i++) {
+    const getter = cases[i].getter;
+    if (!isNil(getter) && cases[i].flt(row) === true) {
+      let evaluated: Table.RowNameLabelType | undefined = evaluateRowStringGetter(getter, row);
+      return !isNil(evaluated) ? String(evaluated) : String(def);
+    }
+  }
+  return String(def);
+};
+
 /* eslint-disable indent */
 const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   params: UseContextMenuParams<R, M>
 ): [(row: Table.BodyRow<R>, node: Table.RowNode) => Table.MenuItemDef[]] => {
   const getRowName = useMemo(
-    () => (row: Table.BodyRow<R>) => {
-      if (tabling.typeguards.isModelRow(row)) {
-        return evaluateRowStringGetter(params.getModelRowName, row);
-      } else if (tabling.typeguards.isMarkupRow(row)) {
-        return evaluateRowStringGetter(params.getMarkupRowName, row);
-      } else if (tabling.typeguards.isPlaceholderRow(row)) {
-        return evaluateRowStringGetter(params.getPlaceholderRowName, row);
-      } else if (tabling.typeguards.isGroupRow(row)) {
-        return evaluateRowStringGetter(params.getGroupRowName, row);
-      }
-      return undefined;
-    },
-    [params.getModelRowName, params.getMarkupRowName, params.getPlaceholderRowName, params.getGroupRowName]
+    () =>
+      (row: Table.BodyRow<R>, def: Table.RowNameLabelType): string => {
+        const cases: RowStringGetterCase<R, any>[] = [
+          { getter: params.getModelRowName, flt: tabling.typeguards.isDataRow },
+          { getter: params.getMarkupRowName, flt: tabling.typeguards.isMarkupRow },
+          { getter: params.getGroupRowName, flt: tabling.typeguards.isGroupRow }
+        ];
+        return evaluateCases(cases, row, def);
+      },
+    [params.getModelRowLabel, params.getMarkupRowLabel, params.getGroupRowLabel]
   );
 
   const getRowLabel = useMemo(
-    () => (row: Table.BodyRow<R>) => {
-      if (tabling.typeguards.isModelRow(row)) {
-        return evaluateRowStringGetter(params.getModelRowLabel, row);
-      } else if (tabling.typeguards.isMarkupRow(row)) {
-        return evaluateRowStringGetter(params.getMarkupRowLabel, row);
-      } else if (tabling.typeguards.isPlaceholderRow(row)) {
-        return evaluateRowStringGetter(params.getPlaceholderRowLabel, row);
-      } else if (tabling.typeguards.isGroupRow(row)) {
-        return evaluateRowStringGetter(params.getGroupRowLabel, row);
-      }
-      return undefined;
-    },
-    [params.getModelRowLabel, params.getMarkupRowLabel, params.getPlaceholderRowLabel, params.getGroupRowLabel]
+    () =>
+      (row: Table.BodyRow<R>, def: Table.RowNameLabelType = "Row"): string => {
+        const cases: RowStringGetterCase<R, any>[] = [
+          { getter: params.getModelRowLabel, flt: tabling.typeguards.isDataRow },
+          { getter: params.getMarkupRowLabel, flt: tabling.typeguards.isMarkupRow },
+          { getter: params.getGroupRowLabel, flt: tabling.typeguards.isGroupRow }
+        ];
+        return evaluateCases(cases, row, def);
+      },
+    [params.getModelRowLabel, params.getMarkupRowLabel, params.getGroupRowLabel]
   );
 
   const findGroupableRowsAbove = useMemo(
@@ -137,9 +149,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
             contextMenuItems = [
               ...contextMenuItems,
               {
-                name: `Remove ${getRowLabel(row) || "Row"} from ${
-                  getRowName(groupRow) || groupRow.groupData.name
-                } Subtotal`,
+                name: `Remove ${getRowLabel(row)} from ${getRowName(groupRow, groupRow.groupData.name)} Subtotal`,
                 icon: '<i class="far fa-folder-minus context-icon"></i>',
                 action: () =>
                   params.onChangeEvent({
@@ -155,13 +165,13 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
               if (groupableRowsAbove.length === 1) {
                 label = `Create a Subtotal`;
               } else {
-                label = `Subtotal ${getRowLabel(row) || "Row"}s Above`;
+                label = `Subtotal ${getRowLabel(row)}s Above`;
                 const lastRow: Table.ModelRow<R> | Table.MarkupRow<R> | undefined =
                   groupableRowsAbove[groupableRowsAbove.length - 1];
                 if (!isNil(lastRow)) {
-                  const endpoints = [getRowName(row), getRowName(lastRow)];
-                  if (!(endpoints[0] === undefined && endpoints[1] === undefined)) {
-                    label = `Subtotal ${getRowLabel(row) || "Row"}s ${util.conditionalJoinString(
+                  const endpoints = [getRowName(row, ""), getRowName(lastRow, "")];
+                  if (!(endpoints[0] === "" && endpoints[1] === "")) {
+                    label = `Subtotal ${getRowLabel(row)}s ${util.conditionalJoinString(
                       endpoints[1] || null,
                       endpoints[0] || null,
                       {
@@ -188,7 +198,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
                   name: "Add to Subtotal",
                   icon: '<i class="far fa-folder-plus context-icon"></i>',
                   subMenu: map(groupRows, (gr: Table.GroupRow<R>) => ({
-                    name: `${getRowName(gr) || gr.groupData.name}`,
+                    name: `${getRowName(gr, gr.groupData.name)}`,
                     icon: '<i class="far fa-folders context-icon"></i>',
                     action: () =>
                       params.onChangeEvent({
@@ -325,7 +335,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
       let contextMenuItems = [
         ...(!isNil(params.getGroupRowContextMenuItems) ? params.getGroupRowContextMenuItems(row, node) : []),
         {
-          name: `Ungroup ${getRowName(row) || row.groupData.name}`,
+          name: `Ungroup ${getRowName(row, row.groupData.name)}`,
           icon: '<i class="far fa-folder-minus context-icon"></i>',
           action: () =>
             params.onChangeEvent({
@@ -340,7 +350,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
       if (!isNil(editGroupConfig)) {
         contextMenuItems = [
           {
-            name: `Edit ${getRowName(row) || row.groupData.name}`,
+            name: `Edit ${getRowName(row, row.groupData.name)}`,
             icon: '<i class="far fa-pencil context-icon"></i>',
             action: () => editGroupConfig.action(row, false)
           },

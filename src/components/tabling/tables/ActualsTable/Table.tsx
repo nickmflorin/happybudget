@@ -114,10 +114,8 @@ const ActualsTable = ({
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
         cookieNames={{ hiddenColumns: "actuals-table-hidden-columns" }}
-        getModelRowName={(r: Table.ModelRow<R>) => r.data.name}
-        getPlaceholderRowName={(r: Table.PlaceholderRow<R>) => r.data.name}
+        getModelRowName={(r: Table.DataRow<R>) => r.data.name}
         getModelRowLabel={"Sub Account"}
-        getPlaceholderRowLabel={"Sub Account"}
         framework={Framework}
         actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
           framework.actions.ToggleColumnAction(table.current, params),
