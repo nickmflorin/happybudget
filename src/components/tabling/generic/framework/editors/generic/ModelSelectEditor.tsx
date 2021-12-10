@@ -34,13 +34,13 @@ const ModelSelectEditor = <
       className={props.className}
       editor={editor}
       selected={!isNil(editor.value) ? editor.value.id : []}
-      onChange={(params: MenuChangeEvent<C>) => editor.onChange(params.model, params.event)}
+      onChange={(params: MenuChangeEvent<MenuItemSelectedState, C>) => editor.onChange(params.model, params.event)}
       models={models}
     />
   );
 };
 
-export default forwardRef(ModelSelectEditor) as {
+export default React.memo(forwardRef(ModelSelectEditor)) as {
   <
     C extends Model.HttpModel,
     R extends Table.RowData = Table.RowData,

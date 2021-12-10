@@ -47,12 +47,15 @@ const FringesEditor = (props: FringesEditorProps, ref: ForwardedRef<any>) => {
         getModelColor: (m: Tables.FringeRow) => m.data.color,
         getModelText: (m: Tables.FringeRow) => m.data.name
       }}
-      onChange={(e: MenuChangeEvent<Tables.FringeRow>) => {
+      onChange={(e: MenuChangeEvent<MenuItemSelectedState, Tables.FringeRow>) => {
         const selectedStates = filter(
-          e.state,
-          (s: IMenuItemState<Tables.FringeRow>) => s.selected === true
-        ) as IMenuItemState<Tables.FringeRow>[];
-        const ms = map(selectedStates, (s: IMenuItemState<Tables.FringeRow>) => s.model.id);
+          e.menuState,
+          (s: MenuItemStateWithModel<MenuItemSelectedState, Tables.FringeRow>) => s.selected === true
+        ) as MenuItemStateWithModel<MenuItemSelectedState, Tables.FringeRow>[];
+        const ms = map(
+          selectedStates,
+          (s: MenuItemStateWithModel<MenuItemSelectedState, Tables.FringeRow>) => s.model.id
+        );
         editor.onChange(ms, e.event, false);
       }}
       searchIndices={[["data", "name"]]}

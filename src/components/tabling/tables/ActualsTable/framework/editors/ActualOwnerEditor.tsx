@@ -38,7 +38,7 @@ const ActualOwnerEditor = ({ setSearch, ...props }: ActualOwnerEditorProps, ref:
       onChange={(m: Model.SimpleSubAccount | Model.SimpleMarkup, e: Table.CellDoneEditingEvent) => {
         editor.onChange(m, e);
       }}
-      menu={editor.menu as NonNullRef<IMenuRef<Model.ActualOwner>>}
+      menu={editor.menu as NonNullRef<IMenuRef<MenuItemSelectedState, Model.ActualOwner>>}
       focusSearchOnCharPress={true}
     />
   );

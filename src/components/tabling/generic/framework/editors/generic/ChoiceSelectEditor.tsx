@@ -1,4 +1,4 @@
-import { ForwardedRef, forwardRef } from "react";
+import React, { ForwardedRef, forwardRef } from "react";
 import { isNil } from "lodash";
 
 import useModelMenuEditor, { UseModelMenuEditorParams } from "./useModelMenuEditor";
@@ -34,13 +34,13 @@ const ChoiceSelectEditor = <
       className={props.className}
       editor={editor}
       selected={!isNil(editor.value) ? editor.value.id : []}
-      onChange={(params: MenuChangeEvent<C>) => editor.onChange(params.model, params.event)}
+      onChange={(params: MenuChangeEvent<MenuItemSelectedState, C>) => editor.onChange(params.model, params.event)}
       models={models}
     />
   );
 };
 
-export default forwardRef(ChoiceSelectEditor) as {
+export default React.memo(forwardRef(ChoiceSelectEditor)) as {
   <
     C extends Model.Choice<number, string>,
     R extends Table.RowData = Table.RowData,

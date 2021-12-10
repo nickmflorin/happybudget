@@ -67,7 +67,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
                   deleting={isDeleting(template.id)}
                   onEdit={() => history.push(`/templates/${template.id}/accounts`)}
                   onEditNameImage={() => setTemplateToEdit(template.id)}
-                  onDelete={(e: MenuItemClickEvent<MenuItemModel>) => {
+                  onDelete={(e: MenuItemModelClickEvent) => {
                     setDeleting(template.id);
                     api
                       .deleteTemplate(template.id)
@@ -79,7 +79,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
                       .finally(() => setDeleted(template.id));
                   }}
                   onClick={() => setTemplateToDerive(template.id)}
-                  onMoveToCommunity={(e: MenuItemClickEvent<MenuItemModel>) => {
+                  onMoveToCommunity={(e: MenuItemModelClickEvent) => {
                     setMoving(template.id);
                     api
                       .updateTemplate(template.id, { community: true })
@@ -91,7 +91,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
                       .catch((err: Error) => notifications.requestError(err))
                       .finally(() => setMoved(template.id));
                   }}
-                  onDuplicate={(e: MenuItemClickEvent<MenuItemModel>) => {
+                  onDuplicate={(e: MenuItemModelClickEvent) => {
                     setDuplicating(template.id);
                     api
                       .duplicateTemplate(template.id)

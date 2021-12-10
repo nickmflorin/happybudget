@@ -4,11 +4,18 @@ import { filter, map, isNil } from "lodash";
 import { tabling } from "lib";
 import Dropdown, { DropdownMenuItemsProps } from "./Dropdown";
 
-type OmitDropdownProps = "menuMode" | "menuCheckbox" | "menuSelected" | "menuItems";
+type OmitDropdownProps = "menuMode" | "menuCheckbox" | "menuSelected" | "menuItems" | "onChange";
+
+type ColumnMenuModel = {
+  readonly id: string;
+  readonly label: string;
+};
+
 export interface ToggleColumnsDropdownProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
-  extends Omit<DropdownMenuItemsProps, OmitDropdownProps> {
+  extends Omit<DropdownMenuItemsProps<MenuItemSelectedState, ColumnMenuModel>, OmitDropdownProps> {
   readonly columns: Table.Column<R, M>[];
   readonly hiddenColumns?: Table.HiddenColumns;
+  readonly onChange?: (field: string, visible: boolean) => void;
 }
 
 /* eslint-disable indent */
@@ -40,7 +47,7 @@ const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.RowHttpM
   );
 
   return (
-    <Dropdown
+    <Dropdown<MenuItemSelectedState, ColumnMenuModel>
       {...props}
       menuMode={"multiple"}
       includeSearch={true}
@@ -53,6 +60,9 @@ const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.RowHttpM
         id: tabling.columns.normalizedField<R, M>(col) as string,
         label: col.headerName || ""
       }))}
+      onChange={(e: MenuChangeEvent<MenuItemSelectedState, ColumnMenuModel>) =>
+        props.onChange?.(e.model.id, e.state.selected)
+      }
     />
   );
 };

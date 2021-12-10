@@ -63,7 +63,7 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
                 hidingOrShowing={isTogglingVisibility(template.id)}
                 duplicating={isDuplicating(template.id)}
                 deleting={isDeleting(template.id)}
-                onToggleVisibility={(e: MenuItemClickEvent<MenuItemModel>) => {
+                onToggleVisibility={(e: MenuItemModelClickEvent) => {
                   if (user.is_staff === false) {
                     throw new Error("Behavior prohibited for non-staff users.");
                   }
@@ -91,7 +91,7 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
                 }}
                 onEdit={() => history.push(`/templates/${template.id}/accounts`)}
                 onEditNameImage={() => setTemplateToEdit(template.id)}
-                onDelete={(e: MenuItemClickEvent<MenuItemModel>) => {
+                onDelete={(e: MenuItemModelClickEvent) => {
                   setDeleting(template.id);
                   api
                     .deleteTemplate(template.id)
@@ -103,7 +103,7 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
                     .finally(() => setDeleted(template.id));
                 }}
                 onClick={() => setTemplateToDerive(template.id)}
-                onDuplicate={(e: MenuItemClickEvent<MenuItemModel>) => {
+                onDuplicate={(e: MenuItemModelClickEvent) => {
                   setDuplicating(template.id);
                   api
                     .duplicateTemplate(template.id)

@@ -102,7 +102,7 @@ const Budgets = (): JSX.Element => {
                   onClick={() => history.push(`/budgets/${budget.id}`)}
                   onEdit={() => setBudgetToEdit(budget.id)}
                   onDelete={() => setBudgetToDelete(budget)}
-                  onDuplicate={(e: MenuItemClickEvent<MenuItemModel>) => {
+                  onDuplicate={(e: MenuItemModelClickEvent) => {
                     setDuplicating(budget.id);
                     api
                       .duplicateBudget(budget.id)

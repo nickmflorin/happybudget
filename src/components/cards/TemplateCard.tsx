@@ -15,9 +15,9 @@ interface TemplateCardProps {
   onEdit: () => void;
   onEditNameImage: () => void;
   onClick: () => void;
-  onDelete: (e: MenuItemClickEvent<MenuItemModel>) => void;
-  onMoveToCommunity: (e: MenuItemClickEvent<MenuItemModel>) => void;
-  onDuplicate: (e: MenuItemClickEvent<MenuItemModel>) => void;
+  onDelete: (e: MenuItemModelClickEvent) => void;
+  onMoveToCommunity: (e: MenuItemModelClickEvent) => void;
+  onDuplicate: (e: MenuItemModelClickEvent) => void;
 }
 
 const TemplateCard = ({
@@ -68,7 +68,7 @@ const TemplateCard = ({
           id: "duplicate",
           label: "Duplicate",
           icon: <Icon icon={"clone"} weight={"light"} />,
-          onClick: (e: MenuItemClickEvent<MenuItemModel>) => onDuplicate(e),
+          onClick: (e: MenuItemModelClickEvent) => onDuplicate(e),
           keepDropdownOpenOnClick: true,
           loading: duplicating,
           disabled: duplicating
@@ -77,7 +77,7 @@ const TemplateCard = ({
           id: "move",
           label: "Move to Community",
           icon: <Icon icon={"user-friends"} weight={"light"} />,
-          onClick: (e: MenuItemClickEvent<MenuItemModel>) => onMoveToCommunity(e),
+          onClick: (e: MenuItemModelClickEvent) => onMoveToCommunity(e),
           keepDropdownOpenOnClick: true,
           visible: user.is_staff === true,
           loading: moving,
@@ -87,7 +87,7 @@ const TemplateCard = ({
           id: "delete",
           label: "Delete",
           icon: <Icon icon={"trash"} weight={"light"} />,
-          onClick: (e: MenuItemClickEvent<MenuItemModel>) => onDelete(e),
+          onClick: (e: MenuItemModelClickEvent) => onDelete(e),
           keepDropdownOpenOnClick: true,
           loading: deleting,
           disabled: deleting

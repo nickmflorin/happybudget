@@ -7,8 +7,9 @@ import { Checkbox } from "antd";
 
 import { IconOrSpinner, VerticalFlexCenter, Spinner } from "components";
 
-const PrivateCommonMenuItem = <M extends MenuItemModel>(
-  props: ICommonMenuItem<M> & { readonly isExtra: boolean; readonly children: JSX.Element }
+/* eslint-disable indent */
+const PrivateCommonMenuItem = <S extends object = MenuItemSelectedState, M extends MenuItemModel<S> = MenuItemModel<S>>(
+  props: ICommonMenuItem<S, M> & { readonly isExtra: boolean; readonly children: JSX.Element }
 ): JSX.Element => {
   const history = useHistory();
 
@@ -33,9 +34,11 @@ const PrivateCommonMenuItem = <M extends MenuItemModel>(
           if (!isNil(props.model.url)) {
             history.push(props.model.url);
           }
-          props.onClick?.({ event: e, model: props.model, closeParentDropdown: props.closeParentDropdown });
-          if (props.model.keepDropdownOpenOnClick !== true && props.keepDropdownOpenOnClick !== true) {
-            props.closeParentDropdown?.();
+          props.onClick?.(e);
+          if (props.model.keepDropdownOpenOnClick !== undefined) {
+            props.model.keepDropdownOpenOnClick !== true && props.closeParentDropdown?.();
+          } else if (props.keepDropdownOpenOnClick !== undefined) {
+            props.keepDropdownOpenOnClick !== true && props.closeParentDropdown?.();
           }
         }
       }}
@@ -47,37 +50,67 @@ const PrivateCommonMenuItem = <M extends MenuItemModel>(
 
 const CommonMenuItem = React.memo(PrivateCommonMenuItem) as typeof PrivateCommonMenuItem;
 
-export const ExtraMenuItem = (props: IExtraMenuItem): JSX.Element => {
+interface ContentWrapperProps {
+  readonly loading?: boolean;
+  readonly icon?: IconOrElement;
+  readonly children: JSX.Element;
+}
+
+const ContentWrapper = (props: ContentWrapperProps): JSX.Element => {
+  return (
+    <React.Fragment>
+      {!isNil(props.icon) && (
+        <VerticalFlexCenter>
+          <IconOrSpinner size={16} loading={props.loading} icon={props.icon} />
+        </VerticalFlexCenter>
+      )}
+      {isNil(props.icon) && props.loading && (
+        <VerticalFlexCenter>
+          <Spinner size={16} />
+        </VerticalFlexCenter>
+      )}
+      {props.children}
+    </React.Fragment>
+  );
+};
+
+export const ExtraMenuItem = <S extends object = MenuItemSelectedState>(props: IExtraMenuItem): JSX.Element => {
   if (props.model.visible === false) {
     return <></>;
   }
   return (
-    <CommonMenuItem {...props} onClick={props.model.onClick} isExtra={true}>
-      <React.Fragment>
-        {!isNil(props.model.icon) && (
-          <VerticalFlexCenter>
-            <IconOrSpinner size={16} loading={props.model.loading} icon={props.model.icon} />
-          </VerticalFlexCenter>
-        )}
-        {isNil(props.model.icon) && props.model.loading && (
-          <VerticalFlexCenter>
-            <Spinner size={16} />
-          </VerticalFlexCenter>
-        )}
+    <CommonMenuItem<S, any>
+      {...props}
+      onClick={(e: Table.CellDoneEditingEvent) => {
+        props.onClick?.({
+          event: e,
+          closeParentDropdown: props.closeParentDropdown
+        });
+      }}
+      isExtra={true}
+    >
+      <ContentWrapper icon={props.model.icon} loading={props.model.loading}>
         <VerticalFlexCenter>
           <span className={"text-wrapper"}>{props.model.label}</span>
         </VerticalFlexCenter>
-      </React.Fragment>
+      </ContentWrapper>
     </CommonMenuItem>
   );
 };
 
-const PrivateMenuItem = <M extends MenuItemModel>(props: IMenuItem<M> & { readonly label?: string }): JSX.Element => {
+type AnyMenuItemSelectedState<T extends object> = T & MenuItemSelectedState;
+
+const isSelectedState = <T extends object>(state: T): state is AnyMenuItemSelectedState<T> =>
+  (state as AnyMenuItemSelectedState<T>).selected !== undefined;
+
+const PrivateMenuItem = <S extends object = MenuItemSelectedState, M extends MenuItemModel<S> = MenuItemModel<S>>(
+  props: IMenuItem<S, M>
+): JSX.Element => {
   const m = useMemo(() => {
     if (!isNil(props.label)) {
       return { ...props.model, label: props.label };
     } else if (!isNil(props.getLabel)) {
-      return { ...props.model, label: props.getLabel(props.model) };
+      return { ...props.model, label: props.getLabel(props.model, props.state) };
     } else {
       return props.model;
     }
@@ -88,28 +121,38 @@ const PrivateMenuItem = <M extends MenuItemModel>(props: IMenuItem<M> & { readon
   }
 
   return (
-    <CommonMenuItem {...props} isExtra={false}>
+    <CommonMenuItem<S, M>
+      {...props}
+      isExtra={false}
+      onClick={(e: Table.CellDoneEditingEvent) => {
+        props.onClick?.({
+          event: e,
+          model: props.model,
+          state: props.state,
+          closeParentDropdown: props.closeParentDropdown
+        });
+      }}
+    >
       <React.Fragment>
-        {props.checkbox && <Checkbox checked={props.selected} />}
-        {!isNil(m.icon) && (
-          <VerticalFlexCenter>
-            <IconOrSpinner size={16} loading={m.loading} icon={m.icon} />
-          </VerticalFlexCenter>
-        )}
-        {isNil(m.icon) && m.loading && (
-          <VerticalFlexCenter>
-            <Spinner size={16} />
-          </VerticalFlexCenter>
-        )}
-        <VerticalFlexCenter>
-          {!isNil(props.renderContent) ? (
-            props.renderContent(m)
-          ) : !isNil(m.render) ? (
-            m.render()
-          ) : (
-            <span className={"text-wrapper"}>{m.label}</span>
-          )}
-        </VerticalFlexCenter>
+        {props.checkbox && isSelectedState(props.state) && <Checkbox checked={props.state.selected} />}
+        <ContentWrapper icon={props.model.icon} loading={props.model.loading}>
+          <React.Fragment>
+            <VerticalFlexCenter>
+              {!isNil(props.renderContent) ? (
+                props.renderContent(m, props.state)
+              ) : !isNil(m.render) ? (
+                m.render()
+              ) : (
+                <span className={"text-wrapper"}>{m.label}</span>
+              )}
+            </VerticalFlexCenter>
+            {!isNil(props.renderAfterLabel) && (
+              <VerticalFlexCenter style={{ marginLeft: 5 }}>
+                {props.renderAfterLabel(m, props.state)}
+              </VerticalFlexCenter>
+            )}
+          </React.Fragment>
+        </ContentWrapper>
       </React.Fragment>
     </CommonMenuItem>
   );

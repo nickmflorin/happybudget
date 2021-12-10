@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { filter, map, isNil } from "lodash";
+import { filter, map, isNil, reduce } from "lodash";
 
 import { tabling } from "lib";
 import Dropdown from "./Dropdown";
@@ -7,7 +7,7 @@ import Dropdown from "./Dropdown";
 export interface ExportCSVDropdownProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
   readonly children: React.ReactChild | React.ReactChild[];
   readonly columns: Table.Column<R, M>[];
-  readonly onDownload: (state: IMenuItemState<MenuItemModel>[]) => void;
+  readonly onDownload: (ids: string[]) => void;
   readonly hiddenColumns?: Table.HiddenColumns;
 }
 
@@ -50,12 +50,17 @@ const ExportCSVDropdown = <R extends Table.RowData, M extends Model.RowHttpModel
       keepDropdownOpenOnClick={true}
       clientSearching={true}
       searchIndices={["label"]}
-      onChange={(e: MenuChangeEvent<MenuItemModel>) => {
-        const selectedStates = filter(
-          e.state,
-          (s: IMenuItemState<MenuItemModel>) => s.selected === true
-        ) as IMenuItemState<MenuItemModel>[];
-        const selectedIds = map(selectedStates, (state: IMenuItemState<MenuItemModel>) => String(state.model.id));
+      onChange={(e: MenuChangeEvent) => {
+        const selectedIds: string[] = reduce(
+          e.menuState,
+          (curr: string[], s: MenuItemStateWithModel) => {
+            if (s.selected === true) {
+              return [...curr, String(s.model.id)];
+            }
+            return curr;
+          },
+          []
+        );
         setSelected(selectedIds as (keyof R | string)[]);
       }}
       menuSelected={selected as string[]}
@@ -65,7 +70,19 @@ const ExportCSVDropdown = <R extends Table.RowData, M extends Model.RowHttpModel
       }))}
       menuButtons={[
         {
-          onClick: (e: MenuButtonClickEvent<MenuItemModel>) => props.onDownload(e.state),
+          onClick: (e: MenuButtonClickEvent) => {
+            const selectedIds: string[] = reduce(
+              e.menuState,
+              (curr: string[], s: MenuItemStateWithModel) => {
+                if (s.selected === true) {
+                  return [...curr, String(s.model.id)];
+                }
+                return curr;
+              },
+              []
+            );
+            props.onDownload(selectedIds);
+          },
           label: "Download",
           className: "btn btn--primary"
         }

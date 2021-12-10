@@ -1,4 +1,4 @@
-import { forwardRef, ForwardedRef } from "react";
+import React, { forwardRef, ForwardedRef } from "react";
 import { filter, isNil } from "lodash";
 
 import { tabling } from "lib";
@@ -43,7 +43,7 @@ const ContactEditor = <
       selected={editor.value}
       onSearch={(v: string) => props.setSearch(v)}
       models={filter(contacts, (m: Model.Contact) => m.full_name !== "")}
-      onChange={(e: MenuChangeEvent<Model.Contact>) => editor.onChange(e.model.id, e.event)}
+      onChange={(e: MenuChangeEvent<MenuItemSelectedState, Model.Contact>) => editor.onChange(e.model.id, e.event)}
       searchIndices={["first_name", "last_name"]}
       tagProps={{ color: "#EFEFEF", textColor: "#2182e4", modelTextField: "full_name", className: "tag--contact" }}
       extra={[
@@ -77,4 +77,4 @@ const ContactEditor = <
   );
 };
 
-export default forwardRef(ContactEditor);
+export default React.memo(forwardRef(ContactEditor));

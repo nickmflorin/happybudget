@@ -1,4 +1,3 @@
-import { map, filter } from "lodash";
 import { util } from "lib";
 import { ExportCSVDropdown, ToggleColumnsDropdown } from "components/dropdowns";
 
@@ -22,14 +21,9 @@ export const ExportCSVAction = <R extends Table.RowData, M extends Model.RowHttp
       <ExportCSVDropdown<R, M>
         columns={params.columns}
         hiddenColumns={params.hiddenColumns}
-        onDownload={(state: IMenuItemState<MenuItemModel>[]) => {
-          if (state.length !== 0) {
-            const selectedStates = filter(
-              state,
-              (s: IMenuItemState<MenuItemModel>) => s.selected === true
-            ) as IMenuItemState<MenuItemModel>[];
-            const selectedIds = map(selectedStates, (s: IMenuItemState<MenuItemModel>) => String(s.model.id));
-            const csvData = table.getCSVData(selectedIds);
+        onDownload={(ids: string[]) => {
+          if (ids.length !== 0) {
+            const csvData = table.getCSVData(ids);
             util.files.downloadAsCsvFile(exportFileName, csvData);
           }
         }}
@@ -52,12 +46,12 @@ export const ToggleColumnAction = <R extends Table.RowData, M extends Model.RowH
       <ToggleColumnsDropdown
         hiddenColumns={params.hiddenColumns}
         columns={params.columns}
-        onChange={(p: MenuChangeEvent<MenuItemModel>) =>
+        onChange={(field: string, visible: boolean) => {
           table.changeColumnVisibility({
-            field: String(p.model.id),
-            visible: p.selected
-          })
-        }
+            field,
+            visible
+          });
+        }}
       >
         {children}
       </ToggleColumnsDropdown>

@@ -14,8 +14,8 @@ interface BudgetCardProps {
   readonly duplicating: boolean;
   readonly onEdit: () => void;
   readonly onClick: () => void;
-  readonly onDelete: (e: MenuItemClickEvent<MenuItemModel>) => void;
-  readonly onDuplicate: (e: MenuItemClickEvent<MenuItemModel>) => void;
+  readonly onDelete: (e: MenuItemModelClickEvent) => void;
+  readonly onDuplicate: (e: MenuItemModelClickEvent) => void;
 }
 
 const BudgetCard = ({
@@ -67,7 +67,7 @@ const BudgetCard = ({
           id: "duplicate",
           label: "Duplicate",
           icon: <Icon icon={"clone"} weight={"light"} />,
-          onClick: (e: MenuItemClickEvent<MenuItemModel>) => onDuplicate(e),
+          onClick: (e: MenuItemModelClickEvent) => onDuplicate(e),
           keepDropdownOpenOnClick: true,
           loading: duplicating,
           disabled: duplicating
@@ -76,7 +76,7 @@ const BudgetCard = ({
           id: "delete",
           label: "Delete",
           icon: <Icon icon={"trash"} weight={"light"} />,
-          onClick: (e: MenuItemClickEvent<MenuItemModel>) => onDelete(e),
+          onClick: (e: MenuItemModelClickEvent) => onDelete(e),
           keepDropdownOpenOnClick: false
         }
       ]}

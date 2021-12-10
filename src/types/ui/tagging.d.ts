@@ -33,11 +33,11 @@ declare interface ITagRenderParams<S extends object = React.CSSProperties> {
   readonly disabled?: boolean;
 }
 
-declare type TagProps<M extends Model.Model = Model.Model, S extends object = React.CSSProperties> = {
+declare type TagProps<M extends Model.Model = Model.Model, STYLE extends object = React.CSSProperties> = {
   readonly className?: string;
   readonly textClassName?: string;
-  readonly style?: S;
-  readonly textStyle?: S;
+  readonly style?: STYLE;
+  readonly textStyle?: STYLE;
   readonly children?: string | M | null;
   readonly text?: string | null;
   readonly pluralText?: string | null;
@@ -54,9 +54,9 @@ declare type TagProps<M extends Model.Model = Model.Model, S extends object = Re
   readonly colorIndex?: number;
   readonly fillWidth?: boolean;
   // Used for custom rendering of the tag - mostly applicable for PDF purposes.
-  readonly render?: (params: ITagRenderParams<S>) => JSX.Element;
+  readonly render?: (params: ITagRenderParams<STYLE>) => JSX.Element;
   // Used for custom rendering of the tag content.
-  readonly contentRender?: (params: Omit<ITagRenderParams<S>, "contentRender">) => JSX.Element;
+  readonly contentRender?: (params: Omit<ITagRenderParams<STYLE>, "contentRender">) => JSX.Element;
   readonly onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   readonly disabled?: boolean;
 };

@@ -9,7 +9,7 @@ export interface GenericModelMenuEditorProps<
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends Table.EditorParams<R, M, S, V>,
-    ModelTagsMenuProps<C>,
+    ModelTagsMenuProps<C, MenuItemSelectedState>,
     StandardComponentProps {
   readonly searchIndices: SearchIndicies;
   readonly editor: IEditor<V, C, R, M, S>;

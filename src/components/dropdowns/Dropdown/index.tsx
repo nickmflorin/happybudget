@@ -18,11 +18,14 @@ export interface DropdownOverlayProps extends BaseDropdownProps {
   readonly overlay: React.ReactElement | (() => React.ReactElement);
 }
 
-export interface DropdownMenuItemsProps extends BaseDropdownProps {
+export interface DropdownMenuItemsProps<
+  S extends object = MenuItemSelectedState,
+  M extends MenuItemModel<S> = MenuItemModel<S>
+> extends BaseDropdownProps {
   readonly menuProps?: StandardComponentProps;
-  readonly menuItems: MenuItemModel[];
+  readonly menuItems: M[];
   readonly menuMode?: "single" | "multiple";
-  readonly menuButtons?: IMenuButton<MenuItemModel>[];
+  readonly menuButtons?: IMenuButton<S, M>[];
   readonly menuCheckbox?: boolean;
   readonly menuDefaultSelected?: ID[];
   readonly menuSelected?: ID[];
@@ -30,19 +33,28 @@ export interface DropdownMenuItemsProps extends BaseDropdownProps {
   readonly searchIndices?: SearchIndicies;
   readonly clientSearching?: boolean;
   readonly keepDropdownOpenOnClick?: boolean;
-  readonly onChange?: (params: MenuChangeEvent<MenuItemModel>) => void;
+  readonly onChange?: (params: MenuChangeEvent<S, M>) => void;
 }
 
-export type DropdownProps = DropdownOverlayProps | DropdownMenuItemsProps;
+export type DropdownProps<S extends object = MenuItemSelectedState, M extends MenuItemModel<S> = MenuItemModel<S>> =
+  | DropdownOverlayProps
+  | DropdownMenuItemsProps<S, M>;
 
-export const isPropsWithOverlay = (props: DropdownProps): props is DropdownOverlayProps =>
-  (props as DropdownOverlayProps).overlay !== undefined;
+/* eslint-disable indent */
+export const isPropsWithOverlay = <
+  S extends object = MenuItemSelectedState,
+  M extends MenuItemModel<S> = MenuItemModel<S>
+>(
+  props: DropdownProps<S, M>
+): props is DropdownOverlayProps => (props as DropdownOverlayProps).overlay !== undefined;
 
-const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
+const Dropdown = <S extends object = MenuItemSelectedState, M extends MenuItemModel<S> = MenuItemModel<S>>(
+  props: DropdownProps<S, M>
+): JSX.Element => {
   const [visible, setVisible] = useState(false);
   const buttonId = useMemo(() => uniqueId("dropdown-button-"), []);
   const menuId = useMemo(() => uniqueId("dropdown-menu-"), []);
-  const menuRef = ui.hooks.useMenu();
+  const menuRef = ui.hooks.useMenu<S, M>();
 
   useEffect(() => {
     const keyListener = (e: KeyboardEvent) => {
@@ -96,7 +108,7 @@ const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
                 props.overlay
               )
             ) : (
-              <Menu
+              <Menu<S, M>
                 {...props.menuProps}
                 id={menuId}
                 menu={menuRef}
@@ -127,4 +139,4 @@ const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
   );
 };
 
-export default React.memo(Dropdown);
+export default React.memo(Dropdown) as typeof Dropdown;

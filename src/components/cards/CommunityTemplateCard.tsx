@@ -15,9 +15,9 @@ interface CommunityTemplateCardProps {
   onEdit: () => void;
   onEditNameImage: () => void;
   onClick: () => void;
-  onDuplicate: (e: MenuItemClickEvent<MenuItemModel>) => void;
-  onToggleVisibility: (e: MenuItemClickEvent<MenuItemModel>) => void;
-  onDelete: (e: MenuItemClickEvent<MenuItemModel>) => void;
+  onDuplicate: (e: MenuItemModelClickEvent) => void;
+  onToggleVisibility: (e: MenuItemModelClickEvent) => void;
+  onDelete: (e: MenuItemModelClickEvent) => void;
 }
 
 const CommunityTemplateCard = ({
@@ -72,21 +72,21 @@ const CommunityTemplateCard = ({
                 id: "duplicate",
                 label: "Duplicate",
                 icon: <Icon icon={"clone"} weight={"light"} />,
-                onClick: (e: MenuItemClickEvent<MenuItemModel>) => onDuplicate(e),
+                onClick: (e: MenuItemModelClickEvent) => onDuplicate(e),
                 loading: duplicating
               },
               {
                 id: "hide_show",
                 label: template.hidden === true ? "Show" : "Hide",
                 icon: <Icon weight={"light"} icon={template.hidden === true ? "eye" : "eye-slash"} />,
-                onClick: (e: MenuItemClickEvent<MenuItemModel>) => onToggleVisibility(e),
+                onClick: (e: MenuItemModelClickEvent) => onToggleVisibility(e),
                 loading: hidingOrShowing
               },
               {
                 id: "delete",
                 label: "Delete",
                 icon: <Icon icon={"trash"} weight={"light"} />,
-                onClick: (e: MenuItemClickEvent<MenuItemModel>) => onDelete(e),
+                onClick: (e: MenuItemModelClickEvent) => onDelete(e),
                 loading: deleting
               }
             ]

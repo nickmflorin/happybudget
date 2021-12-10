@@ -7,9 +7,9 @@ import { ShowHide, Icon } from "components";
 import "./EmptyCard.scss";
 
 interface EmptyCardProps extends StandardComponentProps {
-  title?: string;
-  icon?: IconProp;
-  onClick?: () => void;
+  readonly title?: string;
+  readonly icon?: IconProp;
+  readonly onClick?: () => void;
 }
 
 const EmptyCard = ({ title, icon, onClick, className, style = {} }: EmptyCardProps): JSX.Element => {

@@ -13,7 +13,7 @@ import * as typeguards from "./typeguards";
 
 export * from "./tsxHooks";
 
-export const InitialMenuRef: IMenuRef<any> = {
+export const InitialMenuRef: IMenuRef<any, any> = {
   getState: () => [],
   getSearchValue: () => "",
   incrementFocusedIndex: () => {},
@@ -24,12 +24,21 @@ export const InitialMenuRef: IMenuRef<any> = {
   focusSearch: (value: boolean, search?: string) => {}
 };
 
-export const useMenu = <M extends Model.Model>(): NonNullRef<IMenuRef<M>> => {
-  return useRef<IMenuRef<M>>(InitialMenuRef);
+export const useMenu = <
+  S extends object = MenuItemSelectedState,
+  M extends MenuItemModel<S> = MenuItemModel<S>
+>(): NonNullRef<IMenuRef<S, M>> => {
+  return useRef<IMenuRef<S, M>>(InitialMenuRef);
 };
 
-export const useMenuIfNotDefined = <M extends Model.Model>(menu?: NonNullRef<IMenuRef<M>>): NonNullRef<IMenuRef<M>> => {
-  const ref = useRef<IMenuRef<M>>(InitialMenuRef);
+/* eslint-disable indent */
+export const useMenuIfNotDefined = <
+  S extends object = MenuItemSelectedState,
+  M extends MenuItemModel<S> = MenuItemModel<S>
+>(
+  menu?: NonNullRef<IMenuRef<S, M>>
+): NonNullRef<IMenuRef<S, M>> => {
+  const ref = useRef<IMenuRef<S, M>>(InitialMenuRef);
   const returnRef = useMemo(() => (!isNil(menu) ? menu : ref), [menu, ref.current]);
   return returnRef;
 };

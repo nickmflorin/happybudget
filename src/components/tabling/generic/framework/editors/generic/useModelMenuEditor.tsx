@@ -24,7 +24,7 @@ export type IEditor<
   readonly isFirstRender: boolean;
   readonly value: V | null;
   readonly changedEvent: Table.CellDoneEditingEvent | null;
-  readonly menu: NonNullRef<IMenuRef<C>>;
+  readonly menu: NonNullRef<IMenuRef<MenuItemSelectedState, C>>;
 };
 
 /* eslint-disable indent */
@@ -37,7 +37,7 @@ const useModelMenuEditor = <
 >(
   params: UseModelMenuEditorParams<V, R, M, S> & { readonly forwardedRef: ForwardedRef<any> }
 ): [IEditor<V, C, R, M, S>] => {
-  const menu = ui.hooks.useMenu<C>();
+  const menu = ui.hooks.useMenu<MenuItemSelectedState, C>();
 
   const isFirstRender = ui.hooks.useTrackFirstRender();
   const [value, setValue] = useState<V | null>(params.value);
