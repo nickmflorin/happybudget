@@ -1,11 +1,42 @@
 import moment from "moment-timezone";
 import Cookies from "universal-cookie";
-import { isNil } from "lodash";
+import { isNil, find } from "lodash";
 
 const cookies = new Cookies();
 
-const parseLastIdentifiedUser = (): number | null => {
-  const lastIdentifiedUser = cookies.get("lastIdentifiedCannyUser");
+type KeyType = "time" | "user";
+type PluginId = "segment" | "canny";
+
+/* eslint-disable-next-line no-unused-vars */
+type PluginKeys<K extends string> = { [key in KeyType]: K };
+
+type Plugin<ID extends PluginId, K extends string> = { id: ID; keys: PluginKeys<K>; delayTime: number };
+
+const Plugins: Plugin<PluginId, string>[] = [
+  {
+    id: "segment",
+    delayTime: 15,
+    keys: {
+      time: "lastIdentifiedSegmentTime",
+      user: "lastIdentifiedSegmentUser"
+    }
+  },
+  {
+    id: "canny",
+    delayTime: 6,
+    keys: {
+      time: "lastIdentifiedCannyTime",
+      user: "lastIdentifiedCannyUser"
+    }
+  }
+];
+
+const getPlugin = <ID extends PluginId, K extends string>(id: ID): Plugin<ID, K> =>
+  find(Plugins, { id } as any) as Plugin<ID, K>;
+
+const parseLastIdentifiedUser = (id: PluginId): number | null => {
+  const plugin = getPlugin(id);
+  const lastIdentifiedUser = cookies.get(plugin.keys.user);
   if (typeof lastIdentifiedUser === "string") {
     const userId = parseInt(lastIdentifiedUser);
     if (!isNaN(userId)) {
@@ -15,8 +46,9 @@ const parseLastIdentifiedUser = (): number | null => {
   return null;
 };
 
-const parseDurationSinceLastIdentify = (user: Model.User): number | null => {
-  const lastIdentifiedTime = cookies.get("lastIdentifiedCannyTime");
+const parseDurationSinceLastIdentify = (id: PluginId, user: Model.User): number | null => {
+  const plugin = getPlugin(id);
+  const lastIdentifiedTime = cookies.get(plugin.keys.user);
   const now = moment();
   const mmt = moment.tz(lastIdentifiedTime, user.timezone);
   if (mmt.isValid()) {
@@ -24,6 +56,28 @@ const parseDurationSinceLastIdentify = (user: Model.User): number | null => {
     return duration.minutes();
   }
   return null;
+};
+
+const identifyRequired = (id: PluginId, user: Model.User): boolean => {
+  const userId = parseLastIdentifiedUser(id);
+  const delta = parseDurationSinceLastIdentify(id, user);
+  return isNil(userId) || isNil(delta) || (!isNil(delta) && delta > 6) || (!isNil(userId) && userId !== user.id);
+};
+
+const postIdentify = (id: PluginId, user: Model.User) => {
+  const plugin = getPlugin(id);
+  cookies.set(plugin.keys.user, user.id, { path: "/" });
+  cookies.set(plugin.keys.time, moment().toISOString(), { path: "/" });
+};
+
+export const identifySegment = (user: Model.User) => {
+  if (identifyRequired("segment", user) && process.env.NODE_ENV !== "development") {
+    window.analytics.identify(user.id, {
+      name: user.full_name,
+      email: user.email
+    });
+    postIdentify("segment", user);
+  }
 };
 
 /**
@@ -37,13 +91,10 @@ const parseDurationSinceLastIdentify = (user: Model.User): number | null => {
  * @param user  The currently logged in user.
  */
 export const identifyCanny = (user: Model.User) => {
-  const userId = parseLastIdentifiedUser();
-  const delta = parseDurationSinceLastIdentify(user);
-  if (isNil(userId) || isNil(delta) || (!isNil(delta) && delta > 6) || (!isNil(userId) && userId !== user.id)) {
+  if (identifyRequired("canny", user)) {
     /* We do not want to makes calls to Canny's API in local development by
        default. */
     if (!isNil(process.env.REACT_APP_CANNY_APP_ID)) {
-      console.info("Identifying canny");
       window.Canny("identify", {
         appID: process.env.REACT_APP_CANNY_APP_ID,
         user: {
@@ -54,8 +105,7 @@ export const identifyCanny = (user: Model.User) => {
           created: new Date(user.date_joined).toISOString()
         }
       });
-      cookies.set("lastIdentifiedCannyUser", user.id, { path: "/" });
-      cookies.set("lastIdentifiedCannyTime", moment().toISOString(), { path: "/" });
+      postIdentify("canny", user);
     } else if (process.env.NODE_ENV === "production") {
       console.warn(
         `Could not identify Canny user as ENV variable 'REACT_APP_CANNY_APP_ID'
@@ -63,4 +113,9 @@ export const identifyCanny = (user: Model.User) => {
       );
     }
   }
+};
+
+export const identify = (user: Model.User) => {
+  identifyCanny(user);
+  identifySegment(user);
 };
