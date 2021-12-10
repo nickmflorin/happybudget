@@ -39,10 +39,11 @@ const parseDurationSinceLastIdentify = (user: Model.User): number | null => {
 export const identifyCanny = (user: Model.User) => {
   const userId = parseLastIdentifiedUser();
   const delta = parseDurationSinceLastIdentify(user);
-  if (!isNil(userId) && !isNil(delta) && delta > 6) {
+  if (isNil(userId) || isNil(delta) || (!isNil(delta) && delta > 6) || (!isNil(userId) && userId !== user.id)) {
     /* We do not want to makes calls to Canny's API in local development by
        default. */
     if (!isNil(process.env.REACT_APP_CANNY_APP_ID)) {
+      console.info("Identifying canny");
       window.Canny("identify", {
         appID: process.env.REACT_APP_CANNY_APP_ID,
         user: {
@@ -53,8 +54,8 @@ export const identifyCanny = (user: Model.User) => {
           created: new Date(user.date_joined).toISOString()
         }
       });
-      cookies.set("lastIdentifiedCannyUser", user.id);
-      cookies.set("lastIdentifiedCannyTime", moment().toISOString());
+      cookies.set("lastIdentifiedCannyUser", user.id, { path: "/" });
+      cookies.set("lastIdentifiedCannyTime", moment().toISOString(), { path: "/" });
     } else if (process.env.NODE_ENV === "production") {
       console.warn(
         `Could not identify Canny user as ENV variable 'REACT_APP_CANNY_APP_ID'
