@@ -177,7 +177,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       if (fringeIds.length !== 0) {
         const subaccounts = yield select(selectSubAccountsStore);
         const subaccountsWithFringesChanged: Table.ModelRow<Tables.SubAccountRowData>[] = filter(
-          filter(subaccounts, (r: Tables.SubAccountRow) => tabling.typeguards.isModelRow(r)),
+          filter(subaccounts.data, (r: Tables.SubAccountRow) => tabling.typeguards.isModelRow(r)),
           (r: Tables.SubAccountRow) => intersection(r.data.fringes, fringeIds).length !== 0
         ) as Table.ModelRow<Tables.SubAccountRowData>[];
         if (subaccountsWithFringesChanged.length !== 0) {
