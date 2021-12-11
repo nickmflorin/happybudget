@@ -2,12 +2,18 @@
 
 .templates-page {
 	.sub-menu {
-		max-width: 700px;
+		max-width: 700px !important;
 
 		.search-wrapper {
 			display: flex;
 
+			.input {
+				flex-grow: 100;
+			}
+
 			> * {
+				width: auto;
+
 				&:not(:last-child) {
 					margin-right: 10px;
 				}
