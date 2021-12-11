@@ -13,7 +13,7 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
   columns.IdentifierColumn<R, M, PDFM>({
     field: "identifier",
     pdfHeaderName: "Acct #",
-    pdfWidth: 0.1,
+    pdfWidth: 0.08,
     pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
   }),
   columns.BodyColumn<R, M, string | null, PDFM>({
@@ -78,7 +78,7 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     columnType: "contact",
     index: 2,
     width: 120,
-    pdfWidth: 0.14,
+    pdfWidth: 0.12,
     requiresAuthentication: true
   }),
   columns.BodyColumn<R, M, number, PDFM>({
