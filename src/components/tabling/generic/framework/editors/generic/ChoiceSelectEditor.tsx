@@ -40,7 +40,7 @@ const ChoiceSelectEditor = <
   );
 };
 
-export default React.memo(forwardRef(ChoiceSelectEditor)) as {
+export default forwardRef(ChoiceSelectEditor) as {
   <
     C extends Model.Choice<number, string>,
     R extends Table.RowData = Table.RowData,

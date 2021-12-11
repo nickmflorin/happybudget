@@ -47,21 +47,21 @@ const Columns: Table.Column<R, M>[] = [
     colId: "estimated",
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
-    pdfWidth: 0.3,
+    pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.estimatedValueGetter
   }),
   columns.ActualColumn<R, M, PDFM>({
     field: "actual",
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
-    pdfWidth: 0.3,
+    pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.actualValueGetter
   }),
   columns.VarianceColumn<R, M, PDFM>({
     colId: "variance",
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
-    pdfWidth: 0.3,
+    pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.varianceValueGetter
   }),
   columns.FakeColumn<R, M, PDFM>({ field: "nominal_value" }),

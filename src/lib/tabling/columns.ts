@@ -97,7 +97,12 @@ export const normalizePdfColumnWidths = <
   // Determine the total width of all the columns that have a specified width.
   const totalSpecifiedWidth = reduce(
     columns,
-    (prev: number, c: C) => (baseFilter(c) ? prev + (c.pdfWidth || 0.0) : 0.0),
+    (prev: number, c: C) => {
+      if (baseFilter(c) && c.pdfWidth !== undefined) {
+        return prev + c.pdfWidth;
+      }
+      return prev;
+    },
     0.0
   );
 

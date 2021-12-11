@@ -77,4 +77,4 @@ const ContactEditor = <
   );
 };
 
-export default React.memo(forwardRef(ContactEditor));
+export default forwardRef(ContactEditor);

@@ -6,6 +6,7 @@ export const isClearOnDetail = <T>(obj: Redux.ClearOn<T>): obj is Redux.ClearOnD
   (obj as Redux.ClearOnDetail<T>).payload !== undefined && (obj as Redux.ClearOnDetail<T>).action !== undefined;
 
 export const isListRequestIdsPayload = (obj: Redux.TableRequestPayload): obj is { ids: number[] } =>
+  obj !== null &&
   typeof obj === "object" &&
   (obj as { ids: number[] }).ids !== undefined &&
   Array.isArray((obj as { ids: number[] }).ids);
