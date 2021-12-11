@@ -71,8 +71,8 @@ const Templates = (): JSX.Element => {
             selected={page}
             onChange={(item: IHorizontalMenuItem<TemplatesPage>) => setPage(item.id)}
             items={[
-              { id: "my-templates", label: "My Templates", onClick: () => history.push("/templates") },
-              { id: "discover", label: "Discover", onClick: () => history.push("/discover") }
+              { id: "discover", label: "Discover", onClick: () => history.push("/discover") },
+              { id: "my-templates", label: "My Templates", onClick: () => history.push("/templates") }
             ]}
           />,
           <div className={"search-wrapper"}>

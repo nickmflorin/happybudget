@@ -18,7 +18,7 @@ const Dashboard = (): JSX.Element => {
           label: "New Project",
           icon: <Icon icon={"file-plus"} weight={"light"} />,
           activeIcon: <Icon icon={"file-plus"} weight={"solid"} />,
-          onClick: () => history.push("/templates"),
+          onClick: () => history.push("/discover"),
           active: location.pathname.startsWith("/templates") || location.pathname.startsWith("/discover")
         },
         {

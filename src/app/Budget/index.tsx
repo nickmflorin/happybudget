@@ -32,7 +32,7 @@ const RootBudget = (): JSX.Element => {
         {
           icon: <Icon weight={"light"} icon={"file-plus"} />,
           activeIcon: <Icon weight={"solid"} icon={"file-plus"} />,
-          onClick: () => history.push("/templates"),
+          onClick: () => history.push("/discover"),
           tooltip: {
             title: "Templates",
             placement: "right"
