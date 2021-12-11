@@ -11,7 +11,7 @@ export interface GenericModelMenuEditorProps<
 > extends Table.EditorParams<R, M, S, V>,
     ModelTagsMenuProps<C, MenuItemSelectedState>,
     StandardComponentProps {
-  readonly searchIndices: SearchIndicies;
+  readonly searchIndices?: SearchIndicies;
   readonly editor: IEditor<V, C, R, M, S>;
   readonly tagProps?: Omit<TagProps<C>, "children" | "model" | "text">;
 }

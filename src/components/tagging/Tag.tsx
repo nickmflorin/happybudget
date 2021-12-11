@@ -55,6 +55,7 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
         if (!isNil(text)) {
           return text;
         }
+        return "";
       }
       if (typeguards.isTag(m)) {
         if (props.isPlural === true && !isNil(m.plural_title)) {
