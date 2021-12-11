@@ -41,7 +41,7 @@ const Columns: Table.Column<R, M>[] = [
       if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
         const unit = row.data.unit === null ? budgeting.models.FringeUnitModels.PERCENT : row.data.unit;
         return unit.id === budgeting.models.FringeUnitModels.FLAT.id
-          ? tabling.valueSetters.floatValueSetter<R>("rate")(params)
+          ? tabling.valueSetters.numericValueSetter<R>("rate")(params)
           : tabling.valueSetters.percentageToDecimalValueSetter<R>("rate")(params);
       }
       /* Here, we have to assume that the value should be formatted as a

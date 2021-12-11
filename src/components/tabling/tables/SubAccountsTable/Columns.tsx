@@ -86,7 +86,7 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     headerName: "Qty",
     pdfWidth: 0.05,
     width: 60,
-    valueSetter: tabling.valueSetters.floatValueSetter<R>("quantity"),
+    valueSetter: tabling.valueSetters.numericValueSetter<R>("quantity"),
     columnType: "number",
     /* If the plurality of the quantity changes, we need to refresh the refresh
        the unit column to change the plurality of the tag in the cell. */
@@ -118,7 +118,7 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     headerName: "X",
     width: 60,
     pdfWidth: 0.05,
-    valueSetter: tabling.valueSetters.floatValueSetter<R>("multiplier"),
+    valueSetter: tabling.valueSetters.numericValueSetter<R>("multiplier"),
     columnType: "number"
   }),
   columns.BodyColumn<R, M, number | null, PDFM>({
@@ -127,7 +127,7 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     width: 100,
     pdfWidth: 0.05,
     valueFormatter: tabling.formatters.currencyValueFormatter,
-    valueSetter: tabling.valueSetters.floatValueSetter<R>("rate"),
+    valueSetter: tabling.valueSetters.numericValueSetter<R>("rate"),
     columnType: "currency"
   }),
   columns.SelectColumn<R, M, number[], PDFM>({

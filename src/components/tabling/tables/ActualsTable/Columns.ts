@@ -54,13 +54,13 @@ const Columns: Table.Column<R, M>[] = [
     minWidth: 100,
     flex: 1,
     valueFormatter: tabling.formatters.currencyValueFormatter,
-    valueSetter: tabling.valueSetters.floatValueSetter<R>("value"),
-    processCellFromClipboard: (value: string) => {
-      if (!isNaN(parseFloat(value))) {
-        return parseFloat(value);
-      }
-      return null;
-    },
+    valueSetter: tabling.valueSetters.numericValueSetter<R>("value"),
+    /* processCellFromClipboard: (value: string) => {
+         if (!isNaN(parseFloat(value))) {
+           return parseFloat(value);
+         }
+         return null;
+       }, */
     columnType: "currency",
     /* We only want to use BodyCell's in the Footer cells because it slows
 		   rendering performance down dramatically. */

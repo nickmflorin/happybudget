@@ -76,7 +76,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     headerName: "Rate",
     columnType: "currency",
     valueFormatter: tabling.formatters.currencyValueFormatter,
-    valueSetter: tabling.valueSetters.floatValueSetter<R>("rate"),
+    valueSetter: tabling.valueSetters.numericValueSetter<R>("rate"),
     width: 75,
     minWidth: 75
   }),

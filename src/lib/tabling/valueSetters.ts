@@ -3,46 +3,42 @@ import { ValueSetterParams } from "@ag-grid-community/core";
 
 import * as util from "../util";
 
+const numericValueConverter = (value: any): number | null | false => {
+  if (value === null || value === undefined) {
+    return null;
+  } else if (typeof value === "number") {
+    return value;
+  } else if (typeof value === "string") {
+    if (!isNaN(parseFloat(value))) {
+      return parseFloat(value);
+    }
+    let stringValue: string = value.replace(/[^0-9.-]+/g, "");
+    if (stringValue.trim() === "") {
+      return false;
+    }
+    return numericValueConverter(stringValue);
+  }
+  return false;
+};
+
+/* prettier-ignore */
+export const numericValueSetter =
+  <R extends Table.RowData>(field: keyof R) =>
+    (params: ValueSetterParams): boolean => {
+      const result = numericValueConverter(params.newValue);
+      if (result === false) {
+        return false;
+      }
+      params.data.data[field] = result;
+      return true;
+    };
+
 /* prettier-ignore */
 export const percentageToDecimalValueSetter =
   <R extends Table.RowData>(field: keyof R) =>
     (params: ValueSetterParams): boolean => {
       if (params.newValue === "" || !isNaN(parseFloat(params.newValue))) {
         params.data.data[field] = parseFloat(params.newValue) / 100;
-        return true;
-      }
-      return false;
-    };
-
-/* prettier-ignore */
-export const floatValueSetter =
-  <R extends Table.RowData>(field: keyof R, nullable = true) =>
-    (params: ValueSetterParams): boolean => {
-      if (params.newValue === undefined && nullable) {
-        params.data.data[field] = null;
-        return true;
-      } else if (params.newValue === null && nullable) {
-        params.data.data[field] = null;
-        return true;
-      } else if (!isNaN(parseFloat(params.newValue))) {
-        params.data.data[field] = parseFloat(params.newValue);
-        return true;
-      }
-      return false;
-    };
-
-/* prettier-ignore */
-export const integerValueSetter =
-  <R extends Table.RowData>(field: keyof R, nullable = true) =>
-    (params: ValueSetterParams): boolean => {
-      if (params.newValue === undefined && nullable) {
-        params.data.data[field] = null;
-        return true;
-      } else if (params.newValue === null && nullable) {
-        params.data.data[field] = null;
-        return true;
-      } else if (!isNaN(parseInt(params.newValue))) {
-        params.data.data[field] = parseInt(params.newValue);
         return true;
       }
       return false;
