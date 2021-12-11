@@ -1,7 +1,8 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
 
-import { Dropdown, Icon } from "components";
+import { Icon } from "components";
+import { DropdownMenu } from "components/dropdowns";
 
 interface BudgetDropdownProps {
   readonly children: JSX.Element;
@@ -12,8 +13,8 @@ const BudgetDropdown: React.FC<BudgetDropdownProps> = ({ children, onNewBudget }
   const history = useHistory();
 
   return (
-    <Dropdown
-      menuItems={[
+    <DropdownMenu
+      models={[
         {
           id: "new-blank-budget",
           label: "New Blank Budget",
@@ -30,7 +31,7 @@ const BudgetDropdown: React.FC<BudgetDropdownProps> = ({ children, onNewBudget }
       placement={"bottomLeft"}
     >
       {children}
-    </Dropdown>
+    </DropdownMenu>
   );
 };
 

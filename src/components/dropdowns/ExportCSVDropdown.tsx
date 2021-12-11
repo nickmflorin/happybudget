@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { filter, map, isNil, reduce } from "lodash";
 
 import { tabling } from "lib";
-import Dropdown from "./Dropdown";
+import DropdownMenu from "./DropdownMenu";
 
 export interface ExportCSVDropdownProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
   readonly children: React.ReactChild | React.ReactChild[];
@@ -43,9 +43,9 @@ const ExportCSVDropdown = <R extends Table.RowData, M extends Model.RowHttpModel
   }, [props.columns, props.hiddenColumns]);
 
   return (
-    <Dropdown
-      menuMode={"multiple"}
-      menuCheckbox={true}
+    <DropdownMenu
+      mode={"multiple"}
+      checkbox={true}
       includeSearch={true}
       keepDropdownOpenOnClick={true}
       clientSearching={true}
@@ -63,12 +63,12 @@ const ExportCSVDropdown = <R extends Table.RowData, M extends Model.RowHttpModel
         );
         setSelected(selectedIds as (keyof R | string)[]);
       }}
-      menuSelected={selected as string[]}
-      menuItems={map(exportableColumns, (col: Table.Column<R, M>) => ({
+      selected={selected as string[]}
+      models={map(exportableColumns, (col: Table.Column<R, M>) => ({
         id: tabling.columns.normalizedField<R, M>(col) as string,
         label: col.headerName || ""
       }))}
-      menuButtons={[
+      buttons={[
         {
           onClick: (e: MenuButtonClickEvent) => {
             const selectedIds: string[] = reduce(
@@ -89,7 +89,7 @@ const ExportCSVDropdown = <R extends Table.RowData, M extends Model.RowHttpModel
       ]}
     >
       {props.children}
-    </Dropdown>
+    </DropdownMenu>
   );
 };
 

@@ -3,8 +3,9 @@ import { useHistory } from "react-router-dom";
 import { map, isNil, orderBy, forEach } from "lodash";
 import classNames from "classnames";
 
-import { Dropdown, TooltipWrapper } from "components";
+import { TooltipWrapper } from "components";
 import { Button } from "components/buttons";
+import { DropdownMenu } from "components/dropdowns";
 
 import "./BreadCrumbs.scss";
 
@@ -84,14 +85,13 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
       suppressClickBehavior={!isNil(item.options) && item.options.length !== 0}
     >
       {!isNil(item.options) && item.options.length !== 0 ? (
-        <Dropdown
-          trigger={["click"]}
-          overlayClassName={"bread-crumb-dropdown"}
-          menuDefaultSelected={[item.id]}
-          menuItems={orderBy(item.options, (obj: MenuItemModel) => obj.id)}
+        <DropdownMenu
+          menuClassName={"bread-crumb-dropdown"}
+          defaultSelected={[item.id]}
+          models={orderBy(item.options, (obj: MenuItemModel) => obj.id)}
         >
           {renderDropdownButton(item)}
-        </Dropdown>
+        </DropdownMenu>
       ) : (
         <div className={"text-wrapper"}>{renderItem(item)}</div>
       )}

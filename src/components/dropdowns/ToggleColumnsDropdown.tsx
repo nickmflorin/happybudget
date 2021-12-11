@@ -2,9 +2,9 @@ import React, { useMemo } from "react";
 import { filter, map, isNil } from "lodash";
 
 import { tabling } from "lib";
-import Dropdown, { DropdownMenuItemsProps } from "./Dropdown";
+import DropdownMenu, { DropdownMenuProps } from "./DropdownMenu";
 
-type OmitDropdownProps = "menuMode" | "menuCheckbox" | "menuSelected" | "menuItems" | "onChange";
+type OmitDropdownProps = "mode" | "checkbox" | "selected" | "models" | "onChange";
 
 type ColumnMenuModel = {
   readonly id: string;
@@ -12,7 +12,7 @@ type ColumnMenuModel = {
 };
 
 export interface ToggleColumnsDropdownProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
-  extends Omit<DropdownMenuItemsProps<MenuItemSelectedState, ColumnMenuModel>, OmitDropdownProps> {
+  extends Omit<DropdownMenuProps<MenuItemSelectedState, ColumnMenuModel>, OmitDropdownProps> {
   readonly columns: Table.Column<R, M>[];
   readonly hiddenColumns?: Table.HiddenColumns;
   readonly onChange?: (field: string, visible: boolean) => void;
@@ -47,16 +47,16 @@ const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.RowHttpM
   );
 
   return (
-    <Dropdown<MenuItemSelectedState, ColumnMenuModel>
+    <DropdownMenu<MenuItemSelectedState, ColumnMenuModel>
       {...props}
-      menuMode={"multiple"}
+      mode={"multiple"}
       includeSearch={true}
       searchIndices={["label"]}
       clientSearching={true}
-      menuCheckbox={true}
-      menuSelected={selected as string[]}
+      checkbox={true}
+      selected={selected as string[]}
       keepDropdownOpenOnClick={true}
-      menuItems={map(hideableColumns, (col: Table.Column<R, M>) => ({
+      models={map(hideableColumns, (col: Table.Column<R, M>) => ({
         id: tabling.columns.normalizedField<R, M>(col) as string,
         label: col.headerName || ""
       }))}

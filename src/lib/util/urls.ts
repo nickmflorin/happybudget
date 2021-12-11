@@ -1,5 +1,4 @@
-import { forEach, isNil } from "lodash";
-import urljoin from "url-join";
+import { forEach, isNil, reduce } from "lodash";
 
 /**
  * Returns the React app domain from the environment variable
@@ -14,30 +13,6 @@ export const getDomain = (): string => {
     throw new Error("The REACT_APP_DOMAIN environment variable is missing from the .env file.");
   }
   return domain;
-};
-
-/**
- * Takes a URL path as a single string or a series of arguments
- * and constructs a URL that is in the domain defined by the ENV
- * DOMAIN variable.
- *
- * @param parts A series of arguments that constructs the path of the
- * desired URL.
- *
- * Ex)
- *
- * relativizeUrlPath("admin", "users", "5")
- * >>> http://localhost:3000/admin/users/5
- */
-export const relativizeUrlPath = (...parts: string[]): string => {
-  let path: string = urljoin(...parts);
-  /* The first part in the array of PATH components should really start with
-     a leading slash, but just in case it doesn't we will safeguard against
-		 that. */
-  if (!path.startsWith("/")) {
-    path = `/${path}`;
-  }
-  return `${getDomain()}${path}`;
 };
 
 /**
@@ -93,7 +68,7 @@ export const addQueryParamsToUrl = (
 };
 
 /**
- * Given an object representing the ordering of fields that should be applied
+ * Given an array representing the ordering of fields that should be applied
  * to the GET request, converts the object to a string so that it can be used
  * as a query parameter.
  *
@@ -101,15 +76,19 @@ export const addQueryParamsToUrl = (
  *                 compatible string.  Each field in the object should have
  *                 value 1 or -1.
  */
-export const convertOrderingQueryToString = (ordering: Http.Ordering): string => {
-  let orderingStrings: string[] = [];
-  forEach(ordering, (order: number, field: string) => {
-    if (order === 1) {
-      orderingStrings.push(field);
-    } else if (order === -1) {
-      orderingStrings.push(`-${field}`);
-    }
-  });
+export const convertOrderingQueryToString = <F extends string = string>(ordering: Http.Ordering<F>): string => {
+  const orderingStrings: string[] = reduce(
+    ordering,
+    (prev: string[], order: Http.FieldOrder<F>) => {
+      if (order.order === 1) {
+        return [...prev, order.field];
+      } else if (order.order === -1) {
+        return [...prev, `-${order.field}`];
+      }
+      return prev;
+    },
+    []
+  );
   if (orderingStrings.length !== 0) {
     return orderingStrings.join(",");
   }

@@ -20,15 +20,22 @@ declare namespace Http {
   type V1Url = `v1/${string}/`;
 
   type Order = 1 | -1 | 0;
-  type Ordering = { [key: string]: Order };
+  type DefinitiveOrder = 1 | -1;
+  type FieldOrder<F extends string = string> = {
+    readonly field: F;
+    readonly order: Order;
+  };
 
-  interface ListQuery extends Query {
-    readonly ordering?: Ordering;
+  /* eslint-disable-next-line no-unused-vars */
+  type Ordering<F extends string = string> = FieldOrder<F>[];
+
+  type ListQuery<O extends string = string> = {
+    readonly ordering?: Ordering<O>;
     readonly page?: number;
     readonly page_size?: number;
     readonly simple?: boolean;
     readonly search?: string;
-  }
+  };
 
   type Service<T = any> = (...args: any[]) => T;
 }

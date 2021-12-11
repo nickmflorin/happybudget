@@ -1,7 +1,9 @@
 import React from "react";
-import { Dropdown, Icon } from "components";
 
 import { useLoggedInUser } from "store/hooks";
+
+import { Icon } from "components";
+import { DropdownMenu } from "components/dropdowns";
 
 interface TemplateDropdownProps {
   readonly children: JSX.Element;
@@ -21,8 +23,8 @@ const TemplateDropdown: React.FC<TemplateDropdownProps> = ({
   const user = useLoggedInUser();
 
   return (
-    <Dropdown
-      menuItems={[
+    <DropdownMenu
+      models={[
         {
           id: "create-new-budget",
           label: "New Blank Budget",
@@ -47,7 +49,7 @@ const TemplateDropdown: React.FC<TemplateDropdownProps> = ({
       placement={"bottomLeft"}
     >
       {children}
-    </Dropdown>
+    </DropdownMenu>
   );
 };
 

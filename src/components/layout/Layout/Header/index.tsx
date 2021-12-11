@@ -5,8 +5,9 @@ import { isNil } from "lodash";
 
 import { Layout } from "antd";
 
-import { Icon, Dropdown, ShowHide, SavingChanges } from "components";
+import { Icon, ShowHide, SavingChanges } from "components";
 import { IconButton } from "components/buttons";
+import { DropdownMenu } from "components/dropdowns";
 import { SidebarLogo } from "components/svgs";
 import { AccountCircleLink } from "components/links";
 import { useLoggedInUser } from "store/hooks";
@@ -74,11 +75,10 @@ const Header = ({
 
         <div className={"primary-header-right"}>
           <div id={"saving-changes"}>{!isNil(saving) && <SavingChanges saving={saving} />}</div>
-          <Dropdown
+          <DropdownMenu
             className={"header-dropdown"}
-            menuProps={{ className: "header-dropdown-menu" }}
-            trigger={["click"]}
-            menuItems={[
+            menuClassName={"header-dropdown-menu"}
+            models={[
               {
                 id: "feedback",
                 label: "Feedback/Feature Request",
@@ -105,10 +105,9 @@ const Header = ({
             ]}
           >
             <HelpLink />
-          </Dropdown>
-          <Dropdown
-            trigger={["click"]}
-            menuItems={[
+          </DropdownMenu>
+          <DropdownMenu
+            models={[
               {
                 id: "profile",
                 label: "Profile",
@@ -133,7 +132,7 @@ const Header = ({
             ]}
           >
             <AccountCircleLink user={user} />
-          </Dropdown>
+          </DropdownMenu>
         </div>
       </div>
       <div id={"supplementary-header"}></div>

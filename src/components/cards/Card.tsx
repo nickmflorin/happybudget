@@ -3,8 +3,9 @@ import React, { useMemo, useState } from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
-import { Icon, ShowHide, RenderWithSpinner, Dropdown } from "components";
+import { Icon, ShowHide, RenderWithSpinner } from "components";
 import { IconButton } from "components/buttons";
+import { DropdownMenu } from "components/dropdowns";
 import { BudgetCardImage } from "components/images";
 
 import "./Card.scss";
@@ -48,12 +49,12 @@ const Card = ({
           <Icon className={"icon--hidden"} icon={"eye-slash"} weight={"solid"} />
         </ShowHide>
         {!isNil(dropdown) && (
-          <Dropdown menuItems={dropdown} placement={"bottomRight"} trigger={["click"]}>
+          <DropdownMenu models={dropdown} placement={"bottomRight"}>
             <IconButton
               className={classNames("dropdown-ellipsis", dropdownEllipsisClassName)}
               icon={<Icon icon={"ellipsis-v"} weight={"light"} />}
             />
-          </Dropdown>
+          </DropdownMenu>
         )}
         <BudgetCardImage
           image={image}

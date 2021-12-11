@@ -143,5 +143,16 @@ declare type IMenu<
   readonly onSearch?: (value: string) => void;
   readonly onFocusCallback?: (focused: boolean) => void;
   readonly renderItemContent?: (model: M, s: S) => JSX.Element;
+  readonly renderItemContentAfterLabel?: (model: M, s: S) => JSX.Element;
   readonly closeParentDropdown?: () => void;
+};
+
+type OrderingMenuModel<F extends string = string> = {
+  readonly id: F;
+  readonly label: string;
+  readonly icon: IconOrElement;
+};
+
+type OrderingMenuItemState = {
+  readonly order: Http.Order;
 };

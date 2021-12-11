@@ -1,7 +1,3 @@
-declare type Order = 1 | -1 | 0;
-declare type DefinitiveOrder = 1 | -1;
-declare type Ordering<T = string> = { [key: T]: Order };
-
 declare type SearchIndex = string | string[];
 declare type SearchIndicies = SearchIndex[];
 

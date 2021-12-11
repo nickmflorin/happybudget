@@ -43,6 +43,20 @@ export const useMenuIfNotDefined = <
   return returnRef;
 };
 
+export const InitialDropdownRef: IDropdownRef = {
+  setVisible: (visible: boolean) => {}
+};
+
+export const useDropdown = (): NonNullRef<IDropdownRef> => {
+  return useRef<IDropdownRef>(InitialDropdownRef);
+};
+
+export const useDropdownIfNotDefined = (dropdown?: NonNullRef<IDropdownRef>): NonNullRef<IDropdownRef> => {
+  const ref = useRef<IDropdownRef>(InitialDropdownRef);
+  const returnRef = useMemo(() => (!isNil(dropdown) ? dropdown : ref), [dropdown, ref.current]);
+  return returnRef;
+};
+
 type FormNotifyAction = {
   readonly notifications: SingleOrArray<FormNotification>;
   readonly type?: AlertType;
