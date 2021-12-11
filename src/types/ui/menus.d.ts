@@ -55,7 +55,6 @@ declare type MenuItemModel<S extends object = MenuItemSelectedState> = Model.Mod
   readonly disabled?: boolean;
   readonly keepDropdownOpenOnClick?: boolean;
   readonly onClick?: (e: MenuItemModelClickEvent<S>) => void;
-  readonly render?: () => import("react").ReactNode;
 };
 
 declare type ExtraMenuItemModel = Omit<MenuItemModel, "onClick"> & {
@@ -87,7 +86,7 @@ declare interface IMenuItem<S extends object = MenuItemSelectedState, M extends 
   readonly state: S;
   readonly getLabel?: (m: M, s: S) => string;
   readonly renderContent?: (model: M, s: S) => JSX.Element;
-  readonly renderAfterLabel?: (model: M, s: S) => JSX.Element;
+  readonly iconAfterLabel?: (model: M, s: S) => JSX.Element;
   readonly onClick?: (params: MenuItemClickEvent<S, M>) => void;
 }
 
@@ -143,7 +142,7 @@ declare type IMenu<
   readonly onSearch?: (value: string) => void;
   readonly onFocusCallback?: (focused: boolean) => void;
   readonly renderItemContent?: (model: M, s: S) => JSX.Element;
-  readonly renderItemContentAfterLabel?: (model: M, s: S) => JSX.Element;
+  readonly itemIconAfterLabel?: (model: M, s: S) => JSX.Element;
   readonly closeParentDropdown?: () => void;
 };
 

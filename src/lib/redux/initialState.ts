@@ -17,7 +17,8 @@ export const initialAuthenticatedModelListResponseState: Redux.AuthenticatedMode
   selected: [],
   creating: false,
   deleting: [],
-  updating: []
+  updating: [],
+  ordering: []
 };
 
 export const initialTableState: Redux.TableStore<any> = {

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { ReactNode, useMemo } from "react";
 import { useHistory } from "react-router-dom";
 import classNames from "classnames";
 import { isNil } from "lodash";
@@ -53,23 +53,25 @@ const CommonMenuItem = React.memo(PrivateCommonMenuItem) as typeof PrivateCommon
 interface ContentWrapperProps {
   readonly loading?: boolean;
   readonly icon?: IconOrElement;
-  readonly children: JSX.Element;
+  readonly children: ReactNode;
+  readonly iconAfterLabel?: IconOrElement;
 }
 
 const ContentWrapper = (props: ContentWrapperProps): JSX.Element => {
   return (
     <React.Fragment>
       {!isNil(props.icon) && (
-        <VerticalFlexCenter>
-          <IconOrSpinner size={16} loading={props.loading} icon={props.icon} />
-        </VerticalFlexCenter>
+        <div className={"icon-wrapper-left"}>
+          <IconOrSpinner size={14} loading={props.loading} icon={props.icon} />
+        </div>
       )}
       {isNil(props.icon) && props.loading && (
-        <VerticalFlexCenter>
-          <Spinner size={16} />
-        </VerticalFlexCenter>
+        <div className={"icon-wrapper-left"}>
+          <Spinner size={14} />
+        </div>
       )}
       {props.children}
+      {!isNil(props.iconAfterLabel) && <div className={"icon-wrapper-right"}>{props.iconAfterLabel}</div>}
     </React.Fragment>
   );
 };
@@ -90,9 +92,7 @@ export const ExtraMenuItem = <S extends object = MenuItemSelectedState>(props: I
       isExtra={true}
     >
       <ContentWrapper icon={props.model.icon} loading={props.model.loading}>
-        <VerticalFlexCenter>
-          <span className={"text-wrapper"}>{props.model.label}</span>
-        </VerticalFlexCenter>
+        <div className={"text-wrapper"}>{props.model.label}</div>
       </ContentWrapper>
     </CommonMenuItem>
   );
@@ -135,23 +135,16 @@ const PrivateMenuItem = <S extends object = MenuItemSelectedState, M extends Men
     >
       <React.Fragment>
         {props.checkbox && isSelectedState(props.state) && <Checkbox checked={props.state.selected} />}
-        <ContentWrapper icon={props.model.icon} loading={props.model.loading}>
-          <React.Fragment>
-            <VerticalFlexCenter>
-              {!isNil(props.renderContent) ? (
-                props.renderContent(m, props.state)
-              ) : !isNil(m.render) ? (
-                m.render()
-              ) : (
-                <span className={"text-wrapper"}>{m.label}</span>
-              )}
-            </VerticalFlexCenter>
-            {!isNil(props.renderAfterLabel) && (
-              <VerticalFlexCenter style={{ marginLeft: 5 }}>
-                {props.renderAfterLabel(m, props.state)}
-              </VerticalFlexCenter>
-            )}
-          </React.Fragment>
+        <ContentWrapper
+          icon={props.model.icon}
+          loading={props.model.loading}
+          iconAfterLabel={props.iconAfterLabel?.(m, props.state)}
+        >
+          {!isNil(props.renderContent) ? (
+            props.renderContent(m, props.state)
+          ) : (
+            <div className={"text-wrapper"}>{m.label}</div>
+          )}
         </ContentWrapper>
       </React.Fragment>
     </CommonMenuItem>

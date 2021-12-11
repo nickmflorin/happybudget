@@ -128,6 +128,8 @@ declare namespace Redux {
 
   type TableRequestPayload = { ids: number[] } | null;
 
+  type UpdateOrderingPayload<F extends string = string> = { field: F; order: Http.Order };
+
   type ActionCreator<T> = import("@reduxjs/toolkit").PayloadActionCreator<T>;
 
   type ActionCreatorPayload<T> = T extends Redux.ActionCreator<infer P> ? P : unknown;
@@ -177,6 +179,7 @@ declare namespace Redux {
     readonly updating: ModelListActionStore;
     readonly creating: boolean;
     readonly selected: number[];
+    readonly ordering: Http.Ordering<string>;
   }
 
   type ModelListResponseActionMap<M extends Model.HttpModel> = ListResponseActionMap<M>;
@@ -190,6 +193,7 @@ declare namespace Redux {
     readonly updateInState: UpdateActionPayload<M>;
     readonly setSearch?: string;
     readonly setPagination: Pagination;
+    readonly updateOrdering?: UpdateOrderingPayload<string>;
   };
 
   interface ModelListResponseTaskMap {

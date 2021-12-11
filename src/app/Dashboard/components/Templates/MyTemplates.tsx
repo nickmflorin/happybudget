@@ -105,7 +105,6 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
                 />
               );
             })}
-
             <ShowHide show={templates.length !== 0}>
               <EmptyCard title={"New Template"} icon={"plus"} onClick={() => setCreateTempateModalOpen(true)} />
             </ShowHide>

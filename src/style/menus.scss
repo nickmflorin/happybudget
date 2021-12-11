@@ -47,12 +47,27 @@
     }
   }
 
-  span.text-wrapper {
+	.icon-wrapper-left {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		margin-right: 6px;
+	}
+
+  .text-wrapper {
     font-family: $roboto;
     font-size: 13px;
     color: $text-secondary !important;
-    line-height: 30px;
+    line-height: 24px;
+		flex-grow: 100;
   }
+
+	.icon-wrapper-right {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		margin-left: 6px;
+	}
 
   &.selected {
     background-color: #f1f1f1 !important;

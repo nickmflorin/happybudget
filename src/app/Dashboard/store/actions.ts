@@ -9,7 +9,8 @@ export const ActionType = {
     UpdateInState: "dashboard.budgets.UpdateInState",
     RemoveFromState: "dashboard.budgets.RemoveFromState",
     AddToState: "dashboard.budgets.AddToState",
-    SetPagination: "dashboard.budgets.SetPagination"
+    SetPagination: "dashboard.budgets.SetPagination",
+    UpdateOrdering: "dashboard.budgets.UpdateOrdering"
   },
   Templates: {
     Loading: "dashboard.templates.Loading",
@@ -50,6 +51,7 @@ export const loadingBudgetsAction = createAction<boolean>(ActionType.Budgets.Loa
 export const responseBudgetsAction = createAction<Http.ListResponse<Model.SimpleBudget>>(ActionType.Budgets.Response);
 export const setBudgetsSearchAction = createAction<string>(ActionType.Budgets.SetSearch);
 export const setBudgetsPaginationAction = createAction<Pagination>(ActionType.Budgets.SetPagination);
+export const updateBudgetsOrderingAction = createAction<Redux.UpdateOrderingPayload>(ActionType.Budgets.UpdateOrdering);
 export const updateBudgetInStateAction = createAction<Redux.UpdateActionPayload<Model.Budget>>(
   ActionType.Budgets.UpdateInState
 );

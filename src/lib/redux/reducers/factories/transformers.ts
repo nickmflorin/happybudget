@@ -132,6 +132,28 @@ export const authenticatedModelListResponseReducerTransformers = <
     }
     return st;
   },
+  updateOrdering: (st: S = initialState, action: Redux.Action<Redux.UpdateOrderingPayload<string>>) => {
+    if (action.isAuthenticated === true) {
+      const existing: Http.FieldOrder<string> | undefined = find(st.ordering, { field: action.payload.field } as any);
+      if (isNil(existing)) {
+        redux.util.warnInconsistentState({
+          action: action,
+          reason: "Ordering for field does not exist in state when it is expected to."
+        });
+        return st;
+      } else {
+        return {
+          ...st,
+          ordering: util.replaceInArray<Http.FieldOrder<string>>(
+            st.ordering,
+            { field: action.payload.field },
+            { ...existing, order: action.payload.order }
+          )
+        };
+      }
+    }
+    return st;
+  },
   setPagination: (st: S = initialState, action: Redux.Action<Pagination>) => {
     return !isNil(action.payload.pageSize)
       ? { ...st, page: action.payload.page, pageSize: action.payload.pageSize }

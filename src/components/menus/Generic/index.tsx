@@ -31,7 +31,7 @@ type MenuState<S extends object = MenuItemSelectedState, M extends MenuItemModel
 };
 
 const initialMenuState: MenuState<any, any> = {
-  focusedIndex: 0,
+  focusedIndex: null,
   availableItems: []
 };
 
@@ -497,7 +497,7 @@ const Menu = <S extends object = MenuItemSelectedState, M extends MenuItemModel<
                   menuId={props.id}
                   state={getItemState(item.model, selected)}
                   renderContent={props.renderItemContent}
-                  renderAfterLabel={props.renderItemContentAfterLabel}
+                  iconAfterLabel={props.itemIconAfterLabel}
                   focused={menuState.focusedIndex === indexMap[getModelIdentifier(item.model)]}
                   checkbox={props.checkbox}
                   closeParentDropdown={props.closeParentDropdown}

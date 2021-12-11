@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 import { Pagination } from "antd";
 
 import { Icon } from "components";
-import { Button, CircleIconButton } from "components/buttons";
+import { PrimaryButtonIconToggle } from "components/buttons";
 import { SearchInput } from "components/fields";
 import { Page } from "components/layout";
 import { HorizontalMenu } from "components/menus";
@@ -87,18 +87,12 @@ const Templates = (): JSX.Element => {
                 }
               }}
             />
-            <CircleIconButton
-              className={"btn--primary"}
+            <PrimaryButtonIconToggle
               icon={<Icon icon={"plus"} weight={"light"} />}
               onClick={() => setCreateBudgetModalOpen(true)}
+              text={"New Blank Budget"}
+              breakpoint={"medium"}
             />
-            <Button
-              className={"btn--primary btn-non-circle"}
-              icon={<Icon icon={"plus"} weight={"light"} />}
-              onClick={() => setCreateBudgetModalOpen(true)}
-            >
-              {"New Blank Budget"}
-            </Button>
           </div>
         ]}
         contentScrollable={true}

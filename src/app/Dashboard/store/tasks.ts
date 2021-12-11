@@ -9,9 +9,9 @@ export function* getBudgetsTask(action: Redux.Action): SagaIterator {
   const query = yield select((state: Application.Authenticated.Store) => ({
     search: state.dashboard.budgets.search,
     page: state.dashboard.budgets.page,
-    page_size: state.dashboard.budgets.pageSize
+    page_size: state.dashboard.budgets.pageSize,
+    ordering: state.dashboard.budgets.ordering
   }));
-
   yield put(actions.loadingBudgetsAction(true));
   try {
     const response: Http.ListResponse<Model.SimpleBudget> = yield api.request(api.getBudgets, query);

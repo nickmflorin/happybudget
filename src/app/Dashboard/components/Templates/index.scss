@@ -2,32 +2,14 @@
 
 .templates-page {
 	.sub-menu {
+		max-width: 700px;
+
 		.search-wrapper {
 			display: flex;
 
 			> * {
 				&:not(:last-child) {
 					margin-right: 10px;
-				}
-			}
-
-			.btn-non-circle {
-				display: none;
-				margin-right: 0px;
-				min-width: 145px;
-
-				@include media(">=xl") {
-					display: inherit;
-				}
-			}
-
-			.btn--circle-icon {
-				margin-right: 0px;
-				@include media(">=xl") {
-					display: none;
-				}
-				.icon {
-					margin-right: 0;
 				}
 			}
 		}

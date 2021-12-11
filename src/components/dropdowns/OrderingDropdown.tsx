@@ -41,16 +41,16 @@ const OrderingDropdown = <F extends string = string>({
         if (isNil(currentOrder)) {
           console.error(`Could not find ordering for field ${e.model.id} in state!`);
         } else {
-          onChange(e.model.id, currentOrder.order === -1 ? 0 : currentOrder.order === 1 ? -1 : 1);
+          onChange(e.model.id, currentOrder.order === 0 ? -1 : currentOrder.order === -1 ? 1 : 0);
         }
       }}
-      renderItemContentAfterLabel={(m: OrderingMenuModel<F>, s: OrderingMenuItemState) => {
+      itemIconAfterLabel={(m: OrderingMenuModel<F>, s: OrderingMenuItemState) => {
         if (s.order === 1) {
           return <Icon icon={"arrow-up"} />;
         } else if (s.order === -1) {
           return <Icon icon={"arrow-down"} />;
         }
-        return <></>;
+        return <Icon style={{ opacity: 0 }} icon={"arrow-down"} />;
       }}
     />
   );

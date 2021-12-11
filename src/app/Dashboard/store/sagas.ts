@@ -33,6 +33,10 @@ function* watchForSearchBudgetsSaga(): SagaIterator {
   yield debounce(250, actions.setBudgetsSearchAction.toString(), tasks.getBudgetsTask);
 }
 
+function* watchForUpdateBudgetsOrdering(): SagaIterator {
+  yield takeLatest(actions.updateBudgetsOrderingAction.toString(), tasks.getBudgetsTask);
+}
+
 function* watchForSearchTemplatesSaga(): SagaIterator {
   yield debounce(250, actions.setTemplatesSearchAction.toString(), tasks.getTemplatesTask);
 }
@@ -68,6 +72,7 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForTemplatesRefreshSaga);
   yield spawn(watchForSearchTemplatesSaga);
   yield spawn(watchForBudgetsRefreshSaga);
+  yield spawn(watchForUpdateBudgetsOrdering);
   yield spawn(watchForSearchBudgetsSaga);
   yield spawn(watchForCommunityTemplatesRefreshSaga);
   yield spawn(watchForSearchCommunityTemplatesSaga);

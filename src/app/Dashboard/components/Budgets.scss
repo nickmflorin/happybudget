@@ -1,0 +1,11 @@
+@import 'style/_imports';
+
+.budgets-page {
+	.sub-menu {
+		@include media('<xl') {
+			.input {
+				max-width: unset !important;
+			}
+		}
+	}
+}

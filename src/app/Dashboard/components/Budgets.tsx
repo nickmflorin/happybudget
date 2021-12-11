@@ -8,17 +8,17 @@ import * as api from "api";
 import { redux, notifications } from "lib";
 
 import { Icon } from "components";
-import { Button, CircleIconButton } from "components/buttons";
+import { PrimaryButtonIconToggle, DefaultButtonIconToggle } from "components/buttons";
 import { BudgetCard } from "components/cards";
+import { BudgetDropdown, OrderingDropdown } from "components/dropdowns";
 import { NoBudgets } from "components/empty";
 import { Input } from "components/fields";
 import { Page } from "components/layout";
 import { EditBudgetModal, DeleteBudgetModal, CreateBudgetModal } from "components/modals";
 import { BudgetEmptyIcon } from "components/svgs";
 
-import { actions } from "../../store";
-import BudgetDropdown from "./BudgetDropdown";
-import "./index.scss";
+import { actions } from "../store";
+import "./Budgets.scss";
 
 const selectBudgets = (state: Application.Authenticated.Store) => state.dashboard.budgets.data;
 const selectBudgetsResponseReceived = (state: Application.Authenticated.Store) =>
@@ -28,6 +28,7 @@ const selectBudgetPage = (state: Application.Authenticated.Store) => state.dashb
 const selectBudgetPageSize = (state: Application.Authenticated.Store) => state.dashboard.budgets.pageSize;
 const selectBudgetsCount = (state: Application.Authenticated.Store) => state.dashboard.budgets.count;
 const selectBudgetsSearch = (state: Application.Authenticated.Store) => state.dashboard.budgets.search;
+const selectBudgetsOrdering = (state: Application.Authenticated.Store) => state.dashboard.budgets.ordering;
 
 const Budgets = (): JSX.Element => {
   const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
@@ -36,8 +37,6 @@ const Budgets = (): JSX.Element => {
   const [budgetToEdit, setBudgetToEdit] = useState<number | null>(null);
   const [budgetToDelete, setBudgetToDelete] = useState<Model.Budget | null>(null);
   const [createBudgetModalOpen, setCreateBudgetModalOpen] = useState(false);
-  const search = useSelector(selectBudgetsSearch);
-
   const history = useHistory();
 
   const dispatch: Redux.Dispatch = useDispatch();
@@ -47,6 +46,8 @@ const Budgets = (): JSX.Element => {
   const currentPage = useSelector(selectBudgetPage);
   const currentPageSize = useSelector(selectBudgetPageSize);
   const budgetsCount = useSelector(selectBudgetsCount);
+  const search = useSelector(selectBudgetsSearch);
+  const ordering = useSelector(selectBudgetsOrdering);
 
   useEffect(() => {
     dispatch(actions.requestBudgetsAction(null));
@@ -71,13 +72,29 @@ const Budgets = (): JSX.Element => {
             }
           />,
           <BudgetDropdown onNewBudget={() => setCreateBudgetModalOpen(true)}>
-            <CircleIconButton className={"btn--primary"} icon={<Icon icon={"plus"} weight={"light"} />} />
+            <PrimaryButtonIconToggle
+              breakpoint={"medium"}
+              icon={<Icon icon={"plus"} weight={"light"} />}
+              text={"Create Budget"}
+            />
           </BudgetDropdown>,
-          <BudgetDropdown onNewBudget={() => setCreateBudgetModalOpen(true)}>
-            <Button className={"btn--primary btn-non-circle"} icon={<Icon icon={"plus"} weight={"light"} />}>
-              {"Create Budget"}
-            </Button>
-          </BudgetDropdown>
+          <OrderingDropdown
+            ordering={ordering}
+            onChange={(field: string, order: Http.Order) =>
+              dispatch(actions.updateBudgetsOrderingAction({ field, order }))
+            }
+            models={[
+              { id: "created_at", icon: "bars-sort", label: "Created" },
+              { id: "updated_at", icon: "timer", label: "Last Updated" },
+              { id: "name", icon: "sort-alpha-down", label: "Name" }
+            ]}
+          >
+            <DefaultButtonIconToggle
+              breakpoint={"medium"}
+              icon={<Icon icon={"bars-filter"} weight={"light"} />}
+              text={"Order By"}
+            />
+          </OrderingDropdown>
         ]}
       >
         {budgets.length === 0 && responseWasReceived ? (

@@ -2,6 +2,7 @@ import { combineReducers } from "redux";
 import { redux, tabling } from "lib";
 import { ContactsTable } from "components/tabling";
 
+import initialState from "./initialState";
 import * as actions from "./actions";
 
 const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
@@ -59,7 +60,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
     Model.SimpleBudget,
     Omit<Redux.AuthenticatedModelListResponseActionMap<Model.SimpleBudget>, "updating" | "deleting" | "creating">
   >({
-    initialState: redux.initialState.initialAuthenticatedModelListResponseState,
+    initialState: initialState.budgets,
     actions: {
       request: actions.requestBudgetsAction,
       response: actions.responseBudgetsAction,
@@ -68,7 +69,8 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
       addToState: actions.addBudgetToStateAction,
       removeFromState: actions.removeBudgetFromStateAction,
       updateInState: actions.updateBudgetInStateAction,
-      setPagination: actions.setBudgetsPaginationAction
+      setPagination: actions.setBudgetsPaginationAction,
+      updateOrdering: actions.updateBudgetsOrderingAction
     }
   })
 });
