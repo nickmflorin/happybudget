@@ -143,21 +143,21 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfValueGetter: budgeting.valueGetters.estimatedValueGetter,
-    pdfWidth: 0.13
+    pdfWidth: 0.12
   }),
   columns.ActualColumn<R, M, PDFM>({
     field: "actual",
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfValueGetter: budgeting.valueGetters.actualValueGetter,
-    pdfWidth: 0.13
+    pdfWidth: 0.12
   }),
   columns.VarianceColumn<R, M, PDFM>({
     colId: "variance",
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfValueGetter: budgeting.valueGetters.varianceValueGetter,
-    pdfWidth: 0.13
+    pdfWidth: 0.12
   }),
   columns.FakeColumn<R, M, PDFM>({ field: "nominal_value" }),
   columns.FakeColumn<R, M, PDFM>({ field: "markup_contribution" }),
