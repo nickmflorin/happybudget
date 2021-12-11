@@ -21,7 +21,7 @@ const AttachmentListItem = ({ attachment, deleting, onClick, ...props }: Attachm
 
   return (
     <div {...props} className={classNames("attachment-list-item", props.className, { disabled: deleting })}>
-      <div className={"action-wrapper"}>
+      <div className={"file-action-wrapper"}>
         <FileIcon className={"icon--attachment"} name={attachment.name} ext={attachment.extension} />
       </div>
       <Fancybox options={{ infinite: false }}>
@@ -31,7 +31,7 @@ const AttachmentListItem = ({ attachment, deleting, onClick, ...props }: Attachm
       </Fancybox>
       <div style={{ display: "flex", flexGrow: 100, justifyContent: "right" }}>
         <div className={"text-wrapper size"}>{util.files.fileSizeString(attachment.size)}</div>
-        <div className={"action-wrapper"}>
+        <div className={"button-action-wrapper"}>
           <IconButton
             disabled={downloading}
             loading={downloading}
@@ -52,7 +52,7 @@ const AttachmentListItem = ({ attachment, deleting, onClick, ...props }: Attachm
             icon={<Icon icon={"arrow-circle-down"} weight={"regular"} />}
           />
         </div>
-        <div className={"action-wrapper"}>
+        <div className={"button-action-wrapper"}>
           <TrashButton loading={deleting} disabled={deleting} onClick={() => onClick?.()} />
         </div>
       </div>
