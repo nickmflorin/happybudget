@@ -23,7 +23,8 @@ const getColor = (obj: M, index: number) =>
   budgeting.typeguards.isGroup(obj)
     ? obj.color || Colors.COLOR_NO_COLOR
     : util.colors.getLoopedColorInScheme(DEFAULT_COLOR_SCHEME, index);
-const getLabel = (obj: M) => (budgeting.typeguards.isGroup(obj) ? obj.name : obj.identifier || obj.description || "");
+const getLabel = (obj: M) =>
+  budgeting.typeguards.isGroup(obj) ? `Group ${obj.name}` : `Account ${obj.identifier || obj.description || ""}`;
 const getId = (obj: M) => `${obj.type}-${obj.id}`;
 
 const Metrics: Charts.BudgetTotal.Metric[] = [
@@ -136,10 +137,7 @@ const BudgetTotal = ({ budget, ...props }: BudgetTotalProps): JSX.Element => {
           }
         }}
       />
-      <BudgetTotalChart<Datum>
-        data={data}
-        tooltipLabelPrefix={(d: Charts.ComputedDatum<Datum>) => (d.data.type === "account" ? "Account" : "Group")}
-      />
+      <BudgetTotalChart<Datum> data={data} />
     </Tile>
   );
 };

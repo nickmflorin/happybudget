@@ -2,6 +2,8 @@ import { ResponsiveBar } from "@nivo/bar";
 import { BarTooltipProps } from "@nivo/bar/dist/types";
 import { isNil } from "lodash";
 
+import { tabling } from "lib";
+
 import Tooltip from "./Tooltip";
 
 interface BudgetTotalChartProps<D extends Charts.Datum = Charts.Datum> {
@@ -17,6 +19,7 @@ const ActualsByDateChart = <D extends Charts.Datum = Charts.Datum>(props: Budget
       margin={{ top: 20, right: 10, bottom: 22, left: 40 }}
       colors={{ datum: "data.color" }}
       borderWidth={1}
+      borderRadius={6}
       borderColor={{ from: "color" }}
       axisBottom={{
         tickSize: 5,
@@ -34,6 +37,7 @@ const ActualsByDateChart = <D extends Charts.Datum = Charts.Datum>(props: Budget
             labelPrefix={props.tooltipLabelPrefix?.(params)}
             label={params.indexValue}
             value={params.value}
+            valueFormatter={(v: string | number) => tabling.formatters.currencyValueFormatter(v)}
           />
         );
       }}

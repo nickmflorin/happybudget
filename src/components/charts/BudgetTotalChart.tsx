@@ -1,6 +1,8 @@
 import { ResponsivePie } from "@nivo/pie";
 import { isNil } from "lodash";
 
+import { tabling } from "lib";
+
 import Tooltip from "./Tooltip";
 
 interface BudgetTotalChartProps<D extends Charts.Datum = Charts.Datum> {
@@ -13,7 +15,7 @@ const BudgetTotalChart = <D extends Charts.Datum = Charts.Datum>(props: BudgetTo
   return (
     <ResponsivePie<D>
       data={props.data}
-      margin={{ top: 10, right: 10, bottom: 10, left: 30 }}
+      margin={{ top: 10, right: 10, bottom: 10, left: 0 }}
       innerRadius={0.92}
       activeOuterRadiusOffset={8}
       colors={{ datum: "data.color" }}
@@ -21,6 +23,7 @@ const BudgetTotalChart = <D extends Charts.Datum = Charts.Datum>(props: BudgetTo
       borderColor={{ from: "color" }}
       enableArcLinkLabels={false}
       enableArcLabels={false}
+      valueFormat={"<$.2~s"}
       legends={[
         {
           anchor: "left",
@@ -42,6 +45,7 @@ const BudgetTotalChart = <D extends Charts.Datum = Charts.Datum>(props: BudgetTo
           <Tooltip<Charts.ComputedDatum<D>>
             labelPrefix={props.tooltipLabelPrefix?.(params.datum)}
             datum={params.datum}
+            valueFormatter={(v: string | number) => tabling.formatters.currencyValueFormatter(v)}
           />
         )
       }
