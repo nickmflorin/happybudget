@@ -102,18 +102,27 @@ const BudgetTotal = (props: BudgetTotalProps): JSX.Element => {
     [hooks.useDeepEqualMemo(groups), hooks.useDeepEqualMemo(accounts), metric, grouped]
   );
 
+  /* eslint-disable indent */
+  const budgetTotal = useMemo(() => {
+    if (!isNil(props.budget)) {
+      switch (metric) {
+        case "actual":
+          return tabling.formatters.currencyValueFormatter(budgeting.businessLogic.actualValue(props.budget));
+        case "variance":
+          return tabling.formatters.currencyValueFormatter(budgeting.businessLogic.varianceValue(props.budget));
+        default:
+          return tabling.formatters.currencyValueFormatter(budgeting.businessLogic.estimatedValue(props.budget));
+      }
+    }
+    return tabling.formatters.currencyValueFormatter(0);
+  }, [props.budget, metric]);
+
   return (
     <Tile
       title={"Budget Total"}
-      subTitle={
-        !isNil(props.budget)
-          ? tabling.formatters.currencyValueFormatter(budgeting.businessLogic.estimatedValue(props.budget))
-          : "0.00"
-      }
+      subTitle={budgetTotal}
       contentProps={{ style: { height: 250 } }}
-      style={{
-        maxWidth: 700
-      }}
+      style={{ maxWidth: 700 }}
     >
       <BudgetTotalChartForm
         initialValues={{ grouped: true, metric: "estimated" }}

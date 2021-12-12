@@ -121,7 +121,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
         budgetId,
         requestPayload
       );
-      config.actions.updateBudgetInState({ id: r.data.id, data: r.data });
+      yield put(config.actions.updateBudgetInState({ id: r.data.id, data: r.data }));
     } catch (err: unknown) {
       notifications.requestError(err as Error, errorMessage);
     } finally {
@@ -133,7 +133,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     yield put(config.actions.saving(true));
     try {
       const r: Http.BulkDeleteResponse<Model.Budget> = yield api.request(api.bulkDeleteBudgetActuals, budgetId, ids);
-      config.actions.updateBudgetInState({ id: r.data.id, data: r.data });
+      yield put(config.actions.updateBudgetInState({ id: r.data.id, data: r.data }));
     } catch (err: unknown) {
       notifications.requestError(err as Error, errorMessage);
     } finally {
