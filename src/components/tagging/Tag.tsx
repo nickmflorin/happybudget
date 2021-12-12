@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { DEFAULT_TAG_COLOR_SCHEME, Colors } from "style/constants";
+import { DEFAULT_COLOR_SCHEME, Colors } from "style/constants";
 import { typeguards, util, tabling } from "lib";
 
 const TagRenderer = <S extends object = React.CSSProperties>(params: ITagRenderParams<S>): JSX.Element => {
@@ -34,7 +34,7 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
   props: TagProps<M, S>
 ): JSX.Element => {
   const colorScheme = useMemo(() => {
-    let tagColorScheme = DEFAULT_TAG_COLOR_SCHEME;
+    let tagColorScheme = DEFAULT_COLOR_SCHEME;
     if (!isNil(props.scheme)) {
       tagColorScheme = props.scheme;
     }

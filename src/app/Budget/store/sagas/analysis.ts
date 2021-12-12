@@ -11,13 +11,22 @@ function* request(action: Redux.Action<null>): SagaIterator {
   const objId = yield select((state: Application.Authenticated.Store) => state.budget.id);
   if (!isNil(objId)) {
     yield put(actions.analysis.loadingAction(true));
-    let effects = [api.request(api.getBudgetAccounts, objId, {}), api.request(api.getBudgetAccountGroups, objId, {})];
+    let effects = [
+      api.request(api.getBudgetAccounts, objId, {}),
+      api.request(api.getBudgetAccountGroups, objId, {}),
+      api.request(api.getActuals, objId, {})
+    ];
     try {
-      const [accounts, groups]: [Http.ListResponse<Model.Account>, Http.ListResponse<Model.Group>] = yield all(effects);
+      const [accounts, groups, actuals]: [
+        Http.ListResponse<Model.Account>,
+        Http.ListResponse<Model.Group>,
+        Http.ListResponse<Model.Actual>
+      ] = yield all(effects);
       yield put(
         actions.analysis.responseAction({
           accounts,
-          groups
+          groups,
+          actuals
         })
       );
     } catch (e: unknown) {
@@ -25,7 +34,8 @@ function* request(action: Redux.Action<null>): SagaIterator {
       yield put(
         actions.analysis.responseAction({
           accounts: { count: 0, data: [] },
-          groups: { count: 0, data: [] }
+          groups: { count: 0, data: [] },
+          actuals: { count: 0, data: [] }
         })
       );
     } finally {

@@ -262,6 +262,10 @@
 		font-size: 22px;
 		font-weight: 500;
 	}
+
+	.tile-content {
+		flex-grow: 100;
+	}
 }
 
 .card-base {

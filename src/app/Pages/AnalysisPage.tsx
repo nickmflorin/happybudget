@@ -37,7 +37,7 @@ const AnalysisPage = ({ budget, children }: AnalysisPageProps): JSX.Element => {
           ]}
         />
       </Portal>
-      {children}
+      <div style={{ overflowY: "scroll" }}>{children}</div>
     </React.Fragment>
   );
 };

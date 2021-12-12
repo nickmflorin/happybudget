@@ -5,6 +5,7 @@ import { AnalysisPage } from "app/Pages";
 
 import { actions } from "../../store";
 import BudgetTotal from "./BudgetTotal";
+import ActualsByDate from "./ActualsByDate";
 
 interface AnalysisProps {
   readonly budget: Model.Budget | null;
@@ -20,7 +21,10 @@ const Analysis = ({ budget, budgetId }: AnalysisProps): JSX.Element => {
 
   return (
     <AnalysisPage budget={budget}>
-      <BudgetTotal budget={budget} />
+      <div style={{ display: "flex" }}>
+        <BudgetTotal budget={budget} style={{ width: "50%" }} />
+        <ActualsByDate style={{ marginLeft: 15, width: "50%" }} />
+      </div>
     </AnalysisPage>
   );
 };

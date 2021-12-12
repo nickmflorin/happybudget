@@ -12,6 +12,10 @@ export const initialAnalysisState: Modules.Budget.AnalysisStore = {
     data: [],
     count: 0
   },
+  actuals: {
+    data: [],
+    count: 0
+  },
   groups: {
     data: [],
     count: 0

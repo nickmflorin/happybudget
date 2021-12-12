@@ -1,19 +1,24 @@
 import { ResponsivePie } from "@nivo/pie";
+import { isNil } from "lodash";
 
-interface BudgetTotalChartProps {
-  readonly data: Charts.Pie.Datum[];
+import Tooltip from "./Tooltip";
+
+interface BudgetTotalChartProps<D extends Charts.Datum = Charts.Datum> {
+  readonly data: D[];
+  readonly tooltip?: (datum: Charts.ComputedDatum<D>) => JSX.Element;
+  readonly tooltipLabelPrefix?: (datum: Charts.ComputedDatum<D>) => string;
 }
 
-const BudgetTotalChart = (props: BudgetTotalChartProps): JSX.Element => {
+const BudgetTotalChart = <D extends Charts.Datum = Charts.Datum>(props: BudgetTotalChartProps<D>): JSX.Element => {
   return (
-    <ResponsivePie<Charts.Pie.Datum>
+    <ResponsivePie<D>
       data={props.data}
-      margin={{ top: 10, right: -230, bottom: 10, left: 30 }}
+      margin={{ top: 10, right: 10, bottom: 10, left: 30 }}
       innerRadius={0.92}
       activeOuterRadiusOffset={8}
       colors={{ datum: "data.color" }}
       borderWidth={1}
-      borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
+      borderColor={{ from: "color" }}
       enableArcLinkLabels={false}
       enableArcLabels={false}
       legends={[
@@ -30,28 +35,16 @@ const BudgetTotalChart = (props: BudgetTotalChartProps): JSX.Element => {
           itemDirection: "left-to-right"
         }
       ]}
-      tooltip={(params: { datum: Charts.Pie.Datum }) => (
-        <div
-          style={{
-            padding: 12,
-            background: params.datum.color,
-            borderRadius: "8px"
-          }}
-        >
-          <strong>
-            {params.datum.label}
-            {": "}
-            {params.datum.value}
-          </strong>
-        </div>
-      )}
-      theme={{
-        tooltip: {
-          container: {
-            background: "#333"
-          }
-        }
-      }}
+      tooltip={(params: { datum: Charts.ComputedDatum<D> }): JSX.Element =>
+        !isNil(props.tooltip) ? (
+          props.tooltip(params.datum)
+        ) : (
+          <Tooltip<Charts.ComputedDatum<D>>
+            labelPrefix={props.tooltipLabelPrefix?.(params.datum)}
+            datum={params.datum}
+          />
+        )
+      }
     />
   );
 };

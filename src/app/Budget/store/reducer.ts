@@ -53,13 +53,17 @@ const analysisReducer: Redux.Reducer<Modules.Budget.AnalysisStore> = (
   } else if (action.type === actions.analysis.requestAction.toString()) {
     return { ...state, responseWasReceived: false };
   } else if (action.type === actions.analysis.responseAction.toString()) {
-    const response: { groups: Http.ListResponse<Model.Group>; accounts: Http.ListResponse<Model.Account> } =
-      action.payload;
+    const response: {
+      groups: Http.ListResponse<Model.Group>;
+      accounts: Http.ListResponse<Model.Account>;
+      actuals: Http.ListResponse<Model.Actual>;
+    } = action.payload;
     return {
       ...state,
       responseWasReceived: true,
       accounts: response.accounts,
-      groups: response.groups
+      groups: response.groups,
+      actuals: response.actuals
     };
   }
   return state;

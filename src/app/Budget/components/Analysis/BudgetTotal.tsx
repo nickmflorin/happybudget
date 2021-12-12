@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { find, reduce, filter, includes, map, isNil } from "lodash";
 
 import { redux, budgeting, hooks, tabling, util, ui } from "lib";
-import { DEFAULT_TAG_COLOR_SCHEME, Colors } from "style/constants";
+import { DEFAULT_COLOR_SCHEME, Colors } from "style/constants";
 
 import { BudgetTotalChart } from "components/charts";
 import { BudgetTotalChartForm, BudgetTotalChartFormValues } from "components/forms";
@@ -17,11 +17,12 @@ const selectAccounts = redux.selectors.simpleDeepEqualSelector(
 );
 
 type M = Model.Group | Model.Account;
+type Datum = Charts.Datum & { readonly type: "account" | "group" };
 
 const getColor = (obj: M, index: number) =>
   budgeting.typeguards.isGroup(obj)
     ? obj.color || Colors.COLOR_NO_COLOR
-    : util.colors.getLoopedColorInScheme(DEFAULT_TAG_COLOR_SCHEME, index);
+    : util.colors.getLoopedColorInScheme(DEFAULT_COLOR_SCHEME, index);
 const getLabel = (obj: M) => (budgeting.typeguards.isGroup(obj) ? obj.name : obj.identifier || obj.description || "");
 const getId = (obj: M) => `${obj.type}-${obj.id}`;
 
@@ -43,18 +44,14 @@ const Metrics: Charts.BudgetTotal.Metric[] = [
   }
 ];
 
-const getMetricDatum = (
-  id: Charts.BudgetTotal.MetricId,
-  obj: M,
-  objs: Model.Account[],
-  index: number
-): Charts.Pie.Datum => {
+const getMetricDatum = (id: Charts.BudgetTotal.MetricId, obj: M, objs: Model.Account[], index: number): Datum => {
   const metric = find(Metrics, { id } as any) as Charts.BudgetTotal.Metric;
   return {
     label: getLabel(obj),
     id: getId(obj),
     color: getColor(obj, index),
-    value: metric.getValue(obj, objs)
+    value: metric.getValue(obj, objs),
+    type: obj.type
   };
 };
 
@@ -63,13 +60,13 @@ const generateData = (
   groups: Model.Group[],
   accounts: Model.Account[],
   grouped: boolean
-): Charts.Pie.Datum[] => {
+): Datum[] => {
   let accountsWithoutGroup: Model.Account[] = [...accounts];
-  let groupDatums: Charts.Pie.Datum[] = [];
+  let groupDatums: Datum[] = [];
   if (grouped === true) {
     groupDatums = reduce(
       groups,
-      (curr: Charts.Pie.Datum[], g: Model.Group, i: number) => {
+      (curr: Datum[], g: Model.Group, i: number) => {
         /* Remove the accounts from `accountsWithoutGroup` that are already
 					 accounted for via their parent Group. */
         accountsWithoutGroup = filter(accountsWithoutGroup, (a: Model.Account) => !includes(g.children, a.id));
@@ -84,11 +81,11 @@ const generateData = (
   ];
 };
 
-interface BudgetTotalProps {
+interface BudgetTotalProps extends StandardComponentProps {
   readonly budget: Model.Budget | null;
 }
 
-const BudgetTotal = (props: BudgetTotalProps): JSX.Element => {
+const BudgetTotal = ({ budget, ...props }: BudgetTotalProps): JSX.Element => {
   const [metric, setMetric] = useState<Charts.BudgetTotal.MetricId>("estimated");
   const [grouped, setGrouped] = useState(true);
 
@@ -104,25 +101,26 @@ const BudgetTotal = (props: BudgetTotalProps): JSX.Element => {
 
   /* eslint-disable indent */
   const budgetTotal = useMemo(() => {
-    if (!isNil(props.budget)) {
+    if (!isNil(budget)) {
       switch (metric) {
         case "actual":
-          return tabling.formatters.currencyValueFormatter(budgeting.businessLogic.actualValue(props.budget));
+          return tabling.formatters.currencyValueFormatter(budgeting.businessLogic.actualValue(budget));
         case "variance":
-          return tabling.formatters.currencyValueFormatter(budgeting.businessLogic.varianceValue(props.budget));
+          return tabling.formatters.currencyValueFormatter(budgeting.businessLogic.varianceValue(budget));
         default:
-          return tabling.formatters.currencyValueFormatter(budgeting.businessLogic.estimatedValue(props.budget));
+          return tabling.formatters.currencyValueFormatter(budgeting.businessLogic.estimatedValue(budget));
       }
     }
     return tabling.formatters.currencyValueFormatter(0);
-  }, [props.budget, metric]);
+  }, [budget, metric]);
 
   return (
     <Tile
+      {...props}
       title={"Budget Total"}
       subTitle={budgetTotal}
       contentProps={{ style: { height: 250 } }}
-      style={{ maxWidth: 700 }}
+      style={props.style}
     >
       <BudgetTotalChartForm
         initialValues={{ grouped: true, metric: "estimated" }}
@@ -138,7 +136,10 @@ const BudgetTotal = (props: BudgetTotalProps): JSX.Element => {
           }
         }}
       />
-      <BudgetTotalChart data={data} />
+      <BudgetTotalChart<Datum>
+        data={data}
+        tooltipLabelPrefix={(d: Charts.ComputedDatum<Datum>) => (d.data.type === "account" ? "Account" : "Group")}
+      />
     </Tile>
   );
 };

@@ -44,6 +44,7 @@ declare namespace Modules {
     type AnalysisStore = {
       readonly accounts: Omit<Redux.ModelListResponseStore<Model.Account>, "loading" | "responseWasReceived">;
       readonly groups: Omit<Redux.ModelListResponseStore<Model.Group>, "loading" | "responseWasReceived">;
+      readonly actuals: Omit<Redux.ModelListResponseStore<Model.Actual>, "loading" | "responseWasReceived">;
       readonly loading: boolean;
       readonly responseWasReceived: boolean;
     };

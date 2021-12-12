@@ -9,7 +9,7 @@ export const Breakpoints: Style.Breakpoints = {
   xxxl: 1580
 };
 
-export const DEFAULT_TAG_COLOR_SCHEME: Style.HexColor[] = [
+export const DEFAULT_COLOR_SCHEME: Style.HexColor[] = [
   "#d5d5e5",
   "#ffd2ba",
   "#beebff",
@@ -30,7 +30,8 @@ export const Colors: { [key: string]: Style.HexColor } = {
   TEXT_PRIMARY: "#404152",
   TEXT_SECONDARY: "#424242",
   TABLE_BORDER: "#F7F7F7",
-  COLOR_NO_COLOR: "#EFEFEF"
+  COLOR_NO_COLOR: "#EFEFEF",
+  GREEN: "#0fb767"
 };
 
 export const TABLE_BORDER_RADIUS = 8;
