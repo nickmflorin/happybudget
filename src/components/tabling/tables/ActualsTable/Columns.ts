@@ -53,6 +53,9 @@ const Columns: Table.Column<R, M>[] = [
     width: 100,
     minWidth: 100,
     flex: 1,
+    footer: {
+      cellStyle: { textAlign: "right" }
+    },
     valueFormatter: tabling.formatters.currencyValueFormatter,
     valueSetter: tabling.valueSetters.numericValueSetter<R>("value"),
     /* processCellFromClipboard: (value: string) => {

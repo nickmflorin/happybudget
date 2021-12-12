@@ -59,11 +59,7 @@ export const CalculatedColumn = <
       }
       return tabling.aggrid.mergeClassNamesFn("cell--calculated", col?.cellClass)(params);
     },
-    valueFormatter: tabling.formatters.currencyValueFormatter,
-    cellRendererParams: {
-      ...col?.cellRendererParams,
-      renderRedIfNegative: true
-    }
+    valueFormatter: tabling.formatters.currencyValueFormatter
   };
 };
 
