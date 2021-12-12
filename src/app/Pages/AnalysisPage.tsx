@@ -28,11 +28,13 @@ const AnalysisPage = ({ budget, children }: AnalysisPageProps): JSX.Element => {
             },
             {
               requiredParams: ["b"],
-              func: ({ b }: { b: Model.Budget }) => ({
-                id: b.id,
-                label: "Analysis",
-                url: `${budgeting.urls.getUrl(b)}/analysis`
-              })
+              func: ({ b }: { b: Model.Budget }) => {
+                return {
+                  id: b.id,
+                  label: "Analysis",
+                  url: `${budgeting.urls.getUrl(b, "base")}/analysis`
+                };
+              }
             }
           ]}
         />

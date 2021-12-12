@@ -4,20 +4,25 @@ import { budgeting } from "lib";
 
 type Designation = "budgets" | "templates";
 
+type BaseUrl<D extends Designation = Designation> = `/${D}/${number}`;
 type AccountsUrl<D extends Designation = Designation> = `/${D}/${number}/accounts`;
 type AccountUrl<D extends Designation = Designation> = `/${D}/${number}/accounts/${number}`;
 type SubAccountUrl<D extends Designation = Designation> = `/${D}/${number}/subaccounts/${number}`;
 
 type BudgetingUrl<D extends Designation = Designation> = AccountsUrl<D> | AccountUrl<D> | SubAccountUrl<D>;
 
+type BudgetBaseUrl = BaseUrl<"budgets">;
 type BudgetUrl = BudgetingUrl<"budgets">;
+type TemplateBaseUrl = BaseUrl<"templates">;
 type TemplateUrl = BudgetingUrl<"templates">;
 
 export const getBudgetUrl = (
   budget: Model.Budget,
-  entity?: Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount
-): BudgetUrl => {
-  if (isNil(entity)) {
+  entity?: Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount | "base"
+): BudgetUrl | BudgetBaseUrl => {
+  if (entity === "base") {
+    return `/budgets/${budget.id}`;
+  } else if (isNil(entity)) {
     return `/budgets/${budget.id}/accounts`;
   } else if (budgeting.typeguards.isAccount(entity)) {
     return `/budgets/${budget.id}/accounts/${entity.id}`;
@@ -28,9 +33,11 @@ export const getBudgetUrl = (
 
 export const getTemplateUrl = (
   budget: Model.Template,
-  entity?: Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount
-): TemplateUrl => {
-  if (isNil(entity)) {
+  entity?: Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount | "base"
+): TemplateUrl | TemplateBaseUrl => {
+  if (entity === "base") {
+    return `/templates/${budget.id}`;
+  } else if (isNil(entity)) {
     return `/templates/${budget.id}/accounts`;
   } else if (budgeting.typeguards.isAccount(entity)) {
     return `/templates/${budget.id}/accounts/${entity.id}`;
@@ -41,8 +48,8 @@ export const getTemplateUrl = (
 
 export const getUrl = (
   budget: Model.Budget | Model.Template,
-  entity?: Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount
-): BudgetUrl | TemplateUrl =>
+  entity?: Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount | "base"
+): BudgetUrl | BudgetBaseUrl | TemplateUrl | TemplateBaseUrl =>
   budgeting.typeguards.isBudget(budget) ? getBudgetUrl(budget, entity) : getTemplateUrl(budget, entity);
 
 type PluggableID = ID | "([0-9]+)";
