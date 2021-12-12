@@ -11,4 +11,5 @@ export { default as SignupForm } from "./SignupForm";
 export { default as ResetPasswordForm } from "./ResetPasswordForm";
 export { default as RecoverPasswordForm } from "./RecoverPasswordForm";
 export * from "./Form";
-export { default as FormContainer } from "./FormContainer";
+export { default as BudgetTotalChartForm } from "./BudgetTotalChartForm";
+export * from "./BudgetTotalChartForm";

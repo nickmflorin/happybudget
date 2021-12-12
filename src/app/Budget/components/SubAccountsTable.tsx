@@ -3,11 +3,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { isNil, filter } from "lodash";
 
 import { tabling } from "lib";
-
 import { actions, selectors } from "store";
+
 import { useContacts, CreateContactParams, EditContactParams } from "components/hooks";
 import { SubAccountsTable as GenericSubAccountsTable } from "components/tabling";
-import { selectFringes, selectSubAccountUnits } from "../../store/selectors";
+
+import { selectFringes, selectSubAccountUnits } from "../store/selectors";
 import FringesModal from "./FringesModal";
 
 type R = Tables.SubAccountRowData;

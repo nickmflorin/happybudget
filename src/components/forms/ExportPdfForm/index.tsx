@@ -332,7 +332,8 @@ const ExportForm = (
       {...props}
       autoFocusField={false}
       initialValues={rawFormInitialValues}
-      className={classNames("export-form", "condensed", props.className)}
+      condensed={true}
+      className={classNames("export-form", props.className)}
       onFinish={(values: Omit<ExportFormOptions, NonFormFields>) => {
         props.onFinish?.(formData(values));
       }}

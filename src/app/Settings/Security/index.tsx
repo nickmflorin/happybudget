@@ -2,8 +2,8 @@ import * as api from "api";
 import { ui } from "lib";
 import { toast } from "react-toastify";
 
-import { FormContainer, ChangePasswordForm } from "components/forms";
-import { Page } from "components/layout";
+import { ChangePasswordForm } from "components/forms";
+import { Page, Tile } from "components/layout";
 import { ChangePasswordFormValues } from "components/forms/ChangePasswordForm";
 
 const Security = (): JSX.Element => {
@@ -11,7 +11,7 @@ const Security = (): JSX.Element => {
 
   return (
     <Page className={"security"} title={"Security"}>
-      <FormContainer style={{ maxWidth: 500 }}>
+      <Tile style={{ maxWidth: 500 }}>
         <ChangePasswordForm
           form={form}
           title={"Change Your Password"}
@@ -34,7 +34,7 @@ const Security = (): JSX.Element => {
               });
           }}
         />
-      </FormContainer>
+      </Tile>
     </Page>
   );
 };

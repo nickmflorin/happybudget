@@ -7,8 +7,9 @@ import * as api from "api";
 import { ui, typeguards } from "lib";
 import { hooks, actions } from "store";
 
-import { FormContainer, UserProfileForm } from "components/forms";
+import { UserProfileForm } from "components/forms";
 import { ImageAndName } from "components/fields";
+import { Tile } from "components/layout";
 import { IImageAndNameRef } from "components/fields/ImageAndName";
 import { Page } from "components/layout";
 
@@ -46,7 +47,7 @@ const Profile = (): JSX.Element => {
 
   return (
     <Page className={"profile"} title={"Profile"}>
-      <FormContainer style={{ maxWidth: 500 }}>
+      <Tile style={{ maxWidth: 500 }}>
         <UserProfileForm
           form={form}
           onValuesChange={onValuesChange}
@@ -85,7 +86,7 @@ const Profile = (): JSX.Element => {
               });
           }}
         />
-      </FormContainer>
+      </Tile>
     </Page>
   );
 };

@@ -12,7 +12,7 @@ interface SubAccountPageProps<B extends Model.Budget | Model.Template> {
   readonly budget: B | null;
   readonly subaccountId: string;
   readonly detail: Model.SubAccount | null;
-  readonly children: JSX.Element;
+  readonly children: React.ReactChild | React.ReactChild[];
 }
 
 const SubAccountPage = <B extends Model.Budget | Model.Template>({

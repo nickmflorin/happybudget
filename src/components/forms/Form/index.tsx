@@ -140,7 +140,7 @@ const withFormItemFirstInputFocused = <
 };
 
 const PrivateForm = <T extends { [key: string]: any } = any>(
-  { loading, children, autoFocusField, title, titleIcon, ...props }: PrivateFormProps<T>,
+  { loading, condensed, children, autoFocusField, title, titleIcon, ...props }: PrivateFormProps<T>,
   ref: any
 ): JSX.Element => {
   const firstRender = ui.hooks.useTrackFirstRender();
@@ -217,7 +217,7 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
       {...props}
       name={!isNil(props.name) ? props.name : props.form.isInModal === true ? "form_in_modal" : undefined}
       ref={ref}
-      className={classNames(props.className, "form")}
+      className={classNames(props.className, "form", { condensed })}
     >
       {!isNil(title) &&
         (typeof title === "string" && !isNil(titleIcon) ? (

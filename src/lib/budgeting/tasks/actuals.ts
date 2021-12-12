@@ -14,6 +14,7 @@ export type ActualsTableActionMap = Redux.AuthenticatedTableActionMap<R, M> & {
   readonly loadingActualOwners: boolean;
   readonly responseActualOwners: Http.ListResponse<Model.ActualOwner>;
   readonly responseActualTypes: Http.ListResponse<Model.Tag>;
+  readonly updateBudgetInState: Redux.UpdateActionPayload<Model.Budget>;
 };
 
 export type ActualsTableTaskConfig = Table.TaskConfig<R, M, ActualsTableActionMap> & {
@@ -101,8 +102,8 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     selectStore: config.selectStore,
     loadingActions: [config.actions.saving],
     responseActions: (r: Http.BulkResponse<Model.Budget, M>, e: Table.RowAddEvent<R>) => [
-      // Note: We also have access to the updated budget here, we should use that.
-      config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children })
+      config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children }),
+      config.actions.updateBudgetInState({ id: r.data.id, data: r.data })
     ],
     bulkCreate: (objId: number) => [api.bulkCreateBudgetActuals, objId]
   });
@@ -115,8 +116,12 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
   ): SagaIterator {
     yield put(config.actions.saving(true));
     try {
-      // Note: We also have access to the updated budget here, we should use that.
-      yield api.request(api.bulkUpdateBudgetActuals, budgetId, requestPayload);
+      const r: Http.BulkResponse<Model.Budget, M> = yield api.request(
+        api.bulkUpdateBudgetActuals,
+        budgetId,
+        requestPayload
+      );
+      config.actions.updateBudgetInState({ id: r.data.id, data: r.data });
     } catch (err: unknown) {
       notifications.requestError(err as Error, errorMessage);
     } finally {
@@ -127,8 +132,8 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
   function* bulkDeleteTask(budgetId: number, ids: number[], errorMessage: string): SagaIterator {
     yield put(config.actions.saving(true));
     try {
-      // Note: We also have access to the updated budget here, we should use that.
-      yield api.request(api.bulkDeleteBudgetActuals, budgetId, ids);
+      const r: Http.BulkDeleteResponse<Model.Budget> = yield api.request(api.bulkDeleteBudgetActuals, budgetId, ids);
+      config.actions.updateBudgetInState({ id: r.data.id, data: r.data });
     } catch (err: unknown) {
       notifications.requestError(err as Error, errorMessage);
     } finally {

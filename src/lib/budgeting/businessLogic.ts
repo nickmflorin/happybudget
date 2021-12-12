@@ -1,8 +1,17 @@
-import { isNil, reduce, filter } from "lodash";
+import { isNil, reduce, filter, includes } from "lodash";
 
 import { tabling } from "lib";
 import * as models from "./models";
 import * as typeguards from "./typeguards";
+
+type GroupObj<R extends Tables.BudgetRowData> = Table.GroupRow<R> | Model.Group;
+
+type GroupChild<R extends Tables.BudgetRowData> =
+  | Table.DataRow<R>
+  | Model.Account
+  | Model.SubAccount
+  | Model.PdfAccount
+  | Model.PdfSubAccount;
 
 type WithActual<R extends Tables.BudgetRowData> =
   | Table.DataRow<R>
@@ -16,8 +25,20 @@ type WithActual<R extends Tables.BudgetRowData> =
 
 type WithEstimation<R extends Tables.BudgetRowData> = WithActual<R> | Model.Template;
 
-export const nominalValue = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(obj: WithEstimation<R>) =>
-  tabling.typeguards.isRow(obj) ? obj.data.nominal_value : obj.nominal_value;
+/* eslint-disable indent */
+const isGroupObj = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(
+  obj: WithEstimation<R> | GroupObj<R>
+): obj is GroupObj<R> =>
+  (tabling.typeguards.isRow(obj) && tabling.typeguards.isGroupRow(obj)) ||
+  (!tabling.typeguards.isRow(obj) && typeguards.isGroup(obj));
+
+export const nominalValue = <
+  R extends Tables.BudgetRowData = Tables.BudgetRowData,
+  C extends GroupChild<R> = GroupChild<R>
+>(
+  obj: WithEstimation<R>,
+  children?: C[]
+): number => (tabling.typeguards.isRow(obj) ? obj.data.nominal_value : obj.nominal_value);
 
 export const accumulatedMarkupContribution = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(
   obj: WithEstimation<R>
@@ -36,15 +57,70 @@ export const fringeContribution = <R extends Tables.BudgetRowData = Tables.Budge
     ? obj.fringe_contribution
     : 0.0;
 
-export const estimatedValue = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(m: WithEstimation<R>): number => {
-  return nominalValue(m) + accumulatedMarkupContribution(m) + accumulatedFringeContribution(m) + fringeContribution(m);
+export const estimatedValue = <
+  R extends Tables.BudgetRowData = Tables.BudgetRowData,
+  C extends GroupChild<R> = GroupChild<R>
+>(
+  obj: WithEstimation<R> | GroupObj<R>,
+  /* These are not necessarily only the models associated with being a child of
+	   the Group, as they will be filtered down to be so regardless. */
+  children?: C[]
+): number => {
+  if (isGroupObj(obj)) {
+    if (children === undefined) {
+      throw new Error(
+        `The children must be provided in order to calculate value for a Group
+				related object.`
+      );
+    }
+    return reduce(
+      filter(children, (c: C) => includes(obj.children, c.id)) as C[],
+      (curr: number, c: C) => curr + nominalValue(c),
+      0.0
+    );
+  }
+  return (
+    nominalValue(obj) +
+    accumulatedMarkupContribution(obj) +
+    accumulatedFringeContribution(obj) +
+    fringeContribution(obj)
+  );
 };
 
-export const actualValue = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(obj: WithActual<R>): number =>
-  tabling.typeguards.isRow(obj) ? obj.data.actual : obj.actual;
+export const actualValue = <
+  R extends Tables.BudgetRowData = Tables.BudgetRowData,
+  C extends GroupChild<R> = GroupChild<R>
+>(
+  obj: WithEstimation<R> | GroupObj<R>,
+  /* These are not necessarily only the models associated with being a child of
+	   the Group, as they will be filtered down to be so regardless. */
+  children?: C[]
+): number => {
+  if (isGroupObj(obj)) {
+    if (children === undefined) {
+      throw new Error(
+        `The children must be provided in order to calculate value for a Group
+				related object.`
+      );
+    }
+    return reduce(
+      filter(children, (c: C) => includes(obj.children, c.id)) as C[],
+      (curr: number, c: C) => curr + actualValue(c),
+      0.0
+    );
+  }
+  return tabling.typeguards.isRow(obj) ? obj.data.actual : obj.actual;
+};
 
-export const varianceValue = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(m: WithActual<R>): number =>
-  estimatedValue(m) - actualValue(m);
+export const varianceValue = <
+  R extends Tables.BudgetRowData = Tables.BudgetRowData,
+  C extends GroupChild<R> = GroupChild<R>
+>(
+  obj: WithEstimation<R> | GroupObj<R>,
+  /* These are not necessarily only the models associated with being a child of
+	   the Group, as they will be filtered down to be so regardless. */
+  children?: C[]
+): number => estimatedValue(obj, children) - actualValue(obj, children);
 
 export const contributionFromMarkups = <R extends Table.RowData = Tables.BudgetRowData>(
   value: number,

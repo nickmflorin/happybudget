@@ -5,12 +5,14 @@ import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import { tabling, budgeting } from "lib";
 import { ActualsTable } from "components/tabling";
 
+import { updateBudgetInStateAction } from "../actions";
 import { actuals as actions } from "../actions";
 
 const ActionMap: Redux.ActionMapObject<budgeting.tasks.actuals.ActualsTableActionMap> & {
   readonly request: ActionCreatorWithPayload<Redux.TableRequestPayload>;
 } = {
   tableChanged: actions.handleTableChangeEventAction,
+  updateBudgetInState: updateBudgetInStateAction,
   loading: actions.loadingAction,
   request: actions.requestAction,
   response: actions.responseAction,

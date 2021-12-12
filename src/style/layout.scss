@@ -239,7 +239,31 @@
   }
 }
 
-// Panels and Cards
+// Panels, Tiles and Cards
+.tile {
+  border-radius: 10px;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: $white;
+  border: 1px solid $gray-light;
+  padding: 20px;
+	position: relative;
+
+	.title {
+		color: $text-tertiary;
+		font-size: 14px;
+		font-weight: 500;
+	}
+
+	.sub-title {
+		color: $text-primary;
+		font-size: 22px;
+		font-weight: 500;
+	}
+}
+
 .card-base {
   background: $white;
   position: relative;

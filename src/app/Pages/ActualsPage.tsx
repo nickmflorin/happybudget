@@ -4,15 +4,12 @@ import { budgeting } from "lib";
 
 import { Portal, BreadCrumbs } from "components/layout";
 
-interface AccountsPageProps<B extends Model.Budget | Model.Template> {
-  readonly budget: B | null;
+interface ActualsPageProps {
+  readonly budget: Model.Budget | null;
   readonly children: React.ReactChild | React.ReactChild[];
 }
 
-const AccountsPage = <B extends Model.Budget | Model.Template>({
-  budget,
-  children
-}: AccountsPageProps<B>): JSX.Element => {
+const ActualsPage = ({ budget, children }: ActualsPageProps): JSX.Element => {
   return (
     <React.Fragment>
       <Portal id={"breadcrumbs"}>
@@ -28,6 +25,14 @@ const AccountsPage = <B extends Model.Budget | Model.Template>({
                 tooltip: { title: "Top Sheet", placement: "bottom" },
                 url: budgeting.urls.getUrl(b)
               })
+            },
+            {
+              requiredParams: ["b"],
+              func: ({ b }: { b: Model.Budget }) => ({
+                id: b.id,
+                label: "Actuals Log",
+                url: `${budgeting.urls.getUrl(b)}/actuals`
+              })
             }
           ]}
         />
@@ -37,4 +42,4 @@ const AccountsPage = <B extends Model.Budget | Model.Template>({
   );
 };
 
-export default React.memo(AccountsPage);
+export default React.memo(ActualsPage);

@@ -6,7 +6,8 @@ import { isNil, filter, reduce } from "lodash";
 import { redux, tabling } from "lib";
 import { actions as globalActions, selectors } from "store";
 
-import { Portal, BreadCrumbs } from "components/layout";
+import { ActualsPage } from "app/Pages";
+
 import { useContacts, CreateContactParams } from "components/hooks";
 import { ActualsTable, connectTableToStore } from "components/tabling";
 
@@ -84,57 +85,47 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
   });
 
   return (
-    <React.Fragment>
-      <Portal id={"breadcrumbs"}>
-        <BreadCrumbs
-          items={[
-            {
-              id: "actuals",
-              primary: true,
-              label: "Actuals Log",
-              tooltip: { title: "Actuals Log", placement: "bottom" }
-            }
-          ]}
+    <ActualsPage budget={budget}>
+      <React.Fragment>
+        <ConnectedActualsTable
+          table={table}
+          contacts={contacts}
+          actualTypes={actualTypes}
+          onOwnersSearch={(value: string) => dispatch(actions.actuals.setActualOwnersSearchAction(value))}
+          exportFileName={!isNil(budget) ? `${budget.name}_actuals` : "actuals"}
+          onNewContact={(params: { name?: string; rowId: Table.ModelRowId }) => createContact(params)}
+          onEditContact={(params: { contact: number; rowId: Table.ModelRowId }) =>
+            editContact({ id: params.contact, rowId: params.rowId })
+          }
+          onSearchContact={(v: string) => dispatch(globalActions.authenticated.setContactsSearchAction(v))}
+          onAttachmentRemoved={(row: Table.ModelRow<R>, id: number) =>
+            dispatch(
+              actions.actuals.updateRowsInStateAction({
+                id: row.id,
+                data: {
+                  attachments: filter(row.data.attachments, (a: Model.SimpleAttachment) => a.id !== id)
+                }
+              })
+            )
+          }
+          onAttachmentAdded={(row: Table.ModelRow<R>, attachment: Model.Attachment) =>
+            dispatch(
+              actions.actuals.updateRowsInStateAction({
+                id: row.id,
+                data: {
+                  attachments: [
+                    ...row.data.attachments,
+                    { id: attachment.id, name: attachment.name, extension: attachment.extension, url: attachment.url }
+                  ]
+                }
+              })
+            )
+          }
         />
-      </Portal>
-      <ConnectedActualsTable
-        table={table}
-        contacts={contacts}
-        actualTypes={actualTypes}
-        onOwnersSearch={(value: string) => dispatch(actions.actuals.setActualOwnersSearchAction(value))}
-        exportFileName={!isNil(budget) ? `${budget.name}_actuals` : "actuals"}
-        onNewContact={(params: { name?: string; rowId: Table.ModelRowId }) => createContact(params)}
-        onEditContact={(params: { contact: number; rowId: Table.ModelRowId }) =>
-          editContact({ id: params.contact, rowId: params.rowId })
-        }
-        onSearchContact={(v: string) => dispatch(globalActions.authenticated.setContactsSearchAction(v))}
-        onAttachmentRemoved={(row: Table.ModelRow<R>, id: number) =>
-          dispatch(
-            actions.actuals.updateRowsInStateAction({
-              id: row.id,
-              data: {
-                attachments: filter(row.data.attachments, (a: Model.SimpleAttachment) => a.id !== id)
-              }
-            })
-          )
-        }
-        onAttachmentAdded={(row: Table.ModelRow<R>, attachment: Model.Attachment) =>
-          dispatch(
-            actions.actuals.updateRowsInStateAction({
-              id: row.id,
-              data: {
-                attachments: [
-                  ...row.data.attachments,
-                  { id: attachment.id, name: attachment.name, extension: attachment.extension, url: attachment.url }
-                ]
-              }
-            })
-          )
-        }
-      />
-      {editContactModal}
-      {createContactModal}
-    </React.Fragment>
+        {editContactModal}
+        {createContactModal}
+      </React.Fragment>
+    </ActualsPage>
   );
 };
 

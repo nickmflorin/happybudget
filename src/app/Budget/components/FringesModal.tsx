@@ -3,7 +3,7 @@ import { isNil } from "lodash";
 import { FringesTable, connectTableToStore } from "components/tabling";
 import GenericFringesModal, { GenericFringesModalProps } from "components/modals/FringesModal";
 
-import { actions, selectors } from "../../store";
+import { actions, selectors } from "../store";
 
 const ConnectedFringesTable = connectTableToStore<
   FringesTable.Props,

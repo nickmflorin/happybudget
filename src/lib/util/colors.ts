@@ -4,3 +4,6 @@ export const contrastedForegroundColor = (backgroundColor: Style.HexColor): stri
   const b = parseInt(backgroundColor.substring(5, 7), 16) * 0.114;
   return r + g + b < 200 ? "white" : "#3f4252";
 };
+
+export const getLoopedColorInScheme = (scheme: Style.HexColor[], index: number) =>
+  scheme[index] !== undefined ? scheme[index] : scheme[scheme.length % index];

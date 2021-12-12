@@ -8,7 +8,7 @@ import { budgeting, redux, tabling } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
 import { AccountsTable as GenericAccountsTable, connectTableToStore } from "components/tabling";
 
-import { actions, selectors } from "../../../store";
+import { actions, selectors } from "../../store";
 
 type R = Tables.AccountRowData;
 type M = Model.Account;

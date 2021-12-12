@@ -236,7 +236,6 @@ textarea {
 .ant-select {
   @extend .input-base;
   box-shadow: none !important;
-  min-width: 200px;
   background-color: $white !important;
 
   &:not(.ant-select-disabled):hover .ant-select-selector {

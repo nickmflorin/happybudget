@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 
 import { Checkbox } from "antd";
 
-import { IconOrSpinner, VerticalFlexCenter, Spinner } from "components";
+import { IconOrSpinner, Spinner } from "components";
 
 /* eslint-disable indent */
 const PrivateCommonMenuItem = <S extends object = MenuItemSelectedState, M extends MenuItemModel<S> = MenuItemModel<S>>(

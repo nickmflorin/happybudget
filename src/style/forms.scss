@@ -12,18 +12,7 @@ form {
   color: $text-secondary;
   font-family: $avenir;
   font-weight: 600 !important;
-  height: 36px !important;
-}
-
-.form-container {
-  border-radius: 10px;
-  max-height: 100%;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  background-color: $white;
-  border: 1px solid $gray-light;
-  padding: 20px;
+  height: 26px !important;
 }
 
 .form {
@@ -91,15 +80,6 @@ form {
       }
     }
 
-    &.condensed {
-      margin-bottom: 5px;
-      &.form-item-section {
-        .form-item {
-          margin-bottom: 0px;
-        }
-      }
-    }
-
     // When a text field in a form has an error, do not give the text field a
     // red border and highlight the prefix icon red.
     &.ant-form-item-has-error {
@@ -125,6 +105,25 @@ form {
       font-weight: 400 !important;
       color: $text-secondary !important;
       padding-left: 2px;
+			padding-bottom: 0px !important;
+
+			label, .label {
+				@extend .label-base;
+				margin-bottom: 2px;
+
+				&.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
+					margin-left: 0px;
+
+					&:before {
+						content: none;
+					}
+				}
+
+				&--section {
+					margin-bottom: 8px;
+					font-size: 13px;
+				}
+			}
 
       & > label.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
         margin-left: -3px;
@@ -147,7 +146,7 @@ form {
         font-weight: 400;
       }
       .ant-form-item-control-input {
-        min-height: 36px;
+        min-height: 24px;
       }
     }
 
@@ -159,18 +158,6 @@ form {
         font-size: 11px;
         line-height: 12px;
         margin-left: 5px;
-      }
-    }
-
-    &.condensed {
-      .form-item {
-        margin-bottom: 5px;
-
-        &.form-item-section {
-          .form-item {
-            margin-bottom: 0px;
-          }
-        }
       }
     }
   }
@@ -198,6 +185,18 @@ form {
       }
     }
   }
+
+	&.condensed {
+		.form-item {
+			margin-bottom: 5px;
+
+			&.form-item-section {
+				.form-item {
+					margin-bottom: 0px;
+				}
+			}
+		}
+	}
 }
 
 label,
@@ -207,30 +206,6 @@ label,
   &--section {
     font-size: 13px;
     color: $text-primary;
-  }
-}
-
-.ant-form-item-label {
-  padding-bottom: 0px !important;
-  height: 36px;
-
-  label,
-  .label {
-    @extend .label-base;
-    margin-bottom: 2px;
-
-    &::after {
-      content: "" !important;
-      position: relative;
-      top: -0.5px;
-      margin: 0 8px 0 2px;
-    }
-
-    &--section {
-      margin-bottom: 8px;
-      font-size: 13px;
-      color: $text-primary;
-    }
   }
 }
 
@@ -251,28 +226,6 @@ label,
 
     .ant-switch-inner {
       color: $white;
-    }
-  }
-}
-
-.ant-form-vertical {
-  .ant-form-item {
-    // For horizontally laid out forms, where the label is to the left of the
-    // field, the label must still be 36px in height to align properly with the
-    // fields which are also 36px.
-    .ant-form-item-label {
-      height: 26px !important;
-      label {
-        height: 26px !important;
-
-        &.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
-          margin-left: 0px;
-
-          &:before {
-            content: none;
-          }
-        }
-      }
     }
   }
 }

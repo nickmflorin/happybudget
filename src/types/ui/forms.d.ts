@@ -48,4 +48,5 @@ declare interface FormProps<T> extends Omit<RootFormProps, "style" | "id" | "cla
   readonly autoFocusField?: boolean | number;
   readonly titleIcon?: IconOrElement;
   readonly title?: string | JSX.Element;
+  readonly condensed?: boolean;
 }

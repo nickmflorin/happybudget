@@ -10,7 +10,7 @@ import { Modal } from "components";
 import { ExportPdfForm } from "components/forms";
 import { SubAccountsTable } from "components/tabling";
 
-import { actions } from "../../../store";
+import { actions } from "../../store";
 
 import Previewer, { IPreviewerRef } from "./Previewer";
 import "./index.scss";

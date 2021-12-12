@@ -7,7 +7,7 @@ import { budgeting } from "lib";
 
 import { SubAccountPage } from "app/Pages";
 
-import { actions } from "../../../store";
+import { actions } from "../../store";
 import SubAccountsTable from "./SubAccountsTable";
 
 const selectDetail = (state: Application.Authenticated.Store) => state.budget.subaccount.detail.data;

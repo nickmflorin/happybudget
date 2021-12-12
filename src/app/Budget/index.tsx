@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect, Route, Switch, useHistory, useLocation, useParams, useRouteMatch } from "react-router-dom";
 import { isNil } from "lodash";
@@ -7,7 +7,7 @@ import { budgeting } from "lib";
 import { Icon, RenderIfValidId } from "components";
 import { Layout } from "components/layout";
 
-import { Budget, Actuals, Analysis } from "./components";
+import { Account, SubAccount, PreviewModal, Accounts, Actuals, Analysis } from "./components";
 import { actions, selectors } from "./store";
 
 const RootBudget = (): JSX.Element => {
@@ -17,6 +17,8 @@ const RootBudget = (): JSX.Element => {
   const { budgetId } = useParams<{ budgetId: string }>();
   const match = useRouteMatch();
   const budget = useSelector(selectors.selectBudgetDetail);
+
+  const [previewModalVisible, setPreviewModalVisible] = useState(false);
 
   useEffect(() => {
     if (!isNaN(parseInt(budgetId))) {
@@ -75,16 +77,16 @@ const RootBudget = (): JSX.Element => {
 							 the case that Actual(s) were changed.  We only request the Budget
 							 when the Budget ID changes, which it will not have here, so we
 							 need to trigger the effect to manually request the data. */
-            let state = {};
-            if (location.pathname.startsWith(`/budgets/${budgetId}/actuals`)) {
-              state = { requestData: true };
-            }
+            /* let state = {};
+               if (location.pathname.startsWith(`/budgets/${budgetId}/actuals`)) {
+                 state = { requestData: true };
+               } */
             if (!isNaN(parseInt(budgetId)) && !budgeting.urls.isBudgetRelatedUrl(location.pathname)) {
               const budgetLastVisited = budgeting.urls.getLastVisited("budgets", budgetId);
               if (!isNil(budgetLastVisited)) {
-                history.push(budgetLastVisited, state);
+                history.push(budgetLastVisited);
               } else {
-                history.push(`/budgets/${budgetId}`, state);
+                history.push(`/budgets/${budgetId}`);
               }
             }
           },
@@ -118,14 +120,36 @@ const RootBudget = (): JSX.Element => {
             render={() => <Analysis budgetId={parseInt(budgetId)} budget={budget} />}
           />
           <Route
-            path={[
-              "/budgets/:budgetId/accounts/:accountId",
-              "/budgets/:budgetId/accounts",
-              "/budgets/:budgetId/subaccounts/:subaccountId"
-            ]}
-            render={() => <Budget budgetId={parseInt(budgetId)} budget={budget} />}
+            exact
+            path={"/budgets/:budgetId/accounts/:accountId"}
+            render={() => (
+              <Account budgetId={parseInt(budgetId)} budget={budget} setPreviewModalVisible={setPreviewModalVisible} />
+            )}
+          />
+          <Route
+            path={"/budgets/:budgetId/accounts"}
+            render={() => (
+              <Accounts budgetId={parseInt(budgetId)} budget={budget} setPreviewModalVisible={setPreviewModalVisible} />
+            )}
+          />
+          <Route
+            path={"/budgets/:budgetId/subaccounts/:subaccountId"}
+            render={() => (
+              <SubAccount
+                budgetId={parseInt(budgetId)}
+                budget={budget}
+                setPreviewModalVisible={setPreviewModalVisible}
+              />
+            )}
           />
         </Switch>
+        <PreviewModal
+          visible={previewModalVisible}
+          onCancel={() => setPreviewModalVisible(false)}
+          budgetId={parseInt(budgetId)}
+          budgetName={!isNil(budget) ? `${budget.name}` : `Sample Budget ${new Date().getFullYear()}`}
+          filename={!isNil(budget) ? `${budget.name}.pdf` : "budget.pdf"}
+        />
       </RenderIfValidId>
     </Layout>
   );

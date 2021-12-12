@@ -22,6 +22,8 @@
     "@fortawesome/pro-regular-svg-icons": "^6.0.0-beta3",
     "@fortawesome/pro-solid-svg-icons": "^6.0.0-beta3",
     "@fortawesome/react-fontawesome": "^0.1.16",
+    "@nivo/core": "^0.74.0",
+    "@nivo/pie": "^0.74.0",
     "@react-pdf/renderer": "^2.0.16",
     "@reduxjs/toolkit": "^1.6.1",
     "@sentry/integrations": "^6.13.3",
