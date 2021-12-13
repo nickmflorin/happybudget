@@ -74,6 +74,7 @@ const Header = ({
           <DropdownMenu
             className={"header-dropdown"}
             menuClassName={"header-dropdown-menu"}
+            menuId={"support-menu"}
             models={[
               {
                 id: "feedback",
@@ -91,9 +92,6 @@ const Header = ({
                 icon: <Icon icon={"bullhorn"} weight={"light"} />
               },
               {
-                /* TODO: implement custom Intercom Launcher
-                   https://www.intercom.com/help/en/articles/
-									 2894-customize-the-intercom-messenger-technical */
                 id: "intercom-chat",
                 label: "Chat with Support",
                 icon: <Icon icon={"comment-dots"} weight={"light"} />

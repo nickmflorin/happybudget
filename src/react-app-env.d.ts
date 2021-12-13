@@ -2,6 +2,7 @@ declare interface Window {
   analytics: any;
   __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any;
   Canny: any;
+  Intercom: any;
 }
 
 declare namespace NodeJS {

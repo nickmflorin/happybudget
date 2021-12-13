@@ -5,7 +5,7 @@ import { isNil, find } from "lodash";
 const cookies = new Cookies();
 
 type KeyType = "time" | "user";
-type PluginId = "segment" | "canny";
+type PluginId = "segment" | "canny" | "intercom";
 
 /* eslint-disable-next-line no-unused-vars */
 type PluginKeys<K extends string> = { [key in KeyType]: K };
@@ -27,6 +27,14 @@ const Plugins: Plugin<PluginId, string>[] = [
     keys: {
       time: "lastIdentifiedCannyTime",
       user: "lastIdentifiedCannyUser"
+    }
+  },
+  {
+    id: "intercom",
+    delayTime: 0,
+    keys: {
+      time: "lastIdentifiedIntercomTime",
+      user: "lastIdentifiedIntercomUser"
     }
   }
 ];
@@ -123,7 +131,28 @@ export const identifyCanny = (user: Model.User) => {
   }
 };
 
+export const identifyIntercom = (user: Model.User) => {
+  if (identifyRequired("intercom", user)) {
+    if (!isNil(process.env.REACT_APP_INTERCOM_APP_ID)) {
+      window.Intercom("boot", {
+        app_id: process.env.REACT_APP_INTERCOM_APP_ID,
+        user_id: user.id,
+        email: user.email,
+        name: user.full_name,
+        created_at: new Date(user.date_joined).toISOString(),
+        custom_launcher_selector: "#support-menu-item-intercom-chat"
+      });
+    } else if (process.env.NODE_ENV === "production") {
+      console.warn(
+        `Could not identify Intercom user as ENV variable 'REACT_APP_INTERCOM_APP_ID'
+				is not defined.`
+      );
+    }
+  }
+};
+
 export const identify = (user: Model.User) => {
   identifyCanny(user);
   identifySegment(user);
+  identifyIntercom(user);
 };

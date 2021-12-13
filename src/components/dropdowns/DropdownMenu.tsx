@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { uniqueId } from "lodash";
+import { isNil, uniqueId } from "lodash";
 
 import { Menu } from "components/menus";
 import { ui } from "lib";
@@ -14,6 +14,7 @@ export type DropdownMenuProps<
   Pick<DropdownProps, "children" | "dropdown" | "placement"> & {
     readonly menuClassName?: string;
     readonly menuStyle?: React.CSSProperties;
+    readonly menuId?: string;
   };
 
 const DropdownMenu = <S extends object = MenuItemSelectedState, M extends MenuItemModel<S> = MenuItemModel<S>>({
@@ -22,10 +23,12 @@ const DropdownMenu = <S extends object = MenuItemSelectedState, M extends MenuIt
   className,
   placement,
   dropdown,
+  menuId,
   ...props
 }: DropdownMenuProps<S, M>): JSX.Element => {
   const [visible, setVisible] = useState(false);
-  const menuId = useMemo(() => uniqueId("dropdown-menu-"), []);
+
+  const _menuId = useMemo(() => (!isNil(menuId) ? menuId : uniqueId("dropdown-menu-")), [menuId]);
   const menu = ui.hooks.useMenuIfNotDefined<S, M>(props.menu);
   const dropdownRef = ui.hooks.useDropdownIfNotDefined(dropdown);
 
@@ -49,13 +52,13 @@ const DropdownMenu = <S extends object = MenuItemSelectedState, M extends MenuIt
     <Dropdown
       dropdown={dropdownRef}
       className={className}
-      overlayId={menuId}
+      overlayId={_menuId}
       placement={placement}
       overlay={
         <Menu<S, M>
           {...props}
           menu={menu}
-          id={menuId}
+          id={_menuId}
           className={menuClassName}
           style={menuStyle}
           closeParentDropdown={() => dropdownRef.current.setVisible(false)}
