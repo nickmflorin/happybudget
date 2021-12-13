@@ -18,7 +18,6 @@ import { EditBudgetModal, DeleteBudgetModal, CreateBudgetModal } from "component
 import { BudgetEmptyIcon } from "components/svgs";
 
 import { actions } from "../store";
-import "./Budgets.scss";
 
 const selectBudgets = (state: Application.Authenticated.Store) => state.dashboard.budgets.data;
 const selectBudgetsResponseReceived = (state: Application.Authenticated.Store) =>
@@ -43,9 +42,9 @@ const Budgets = (): JSX.Element => {
   const budgets = useSelector(selectBudgets);
   const loading = useSelector(selectLoadingBudgets);
   const responseWasReceived = useSelector(selectBudgetsResponseReceived);
-  const currentPage = useSelector(selectBudgetPage);
-  const currentPageSize = useSelector(selectBudgetPageSize);
-  const budgetsCount = useSelector(selectBudgetsCount);
+  const page = useSelector(selectBudgetPage);
+  const pageSize = useSelector(selectBudgetPageSize);
+  const count = useSelector(selectBudgetsCount);
   const search = useSelector(selectBudgetsSearch);
   const ordering = useSelector(selectBudgetsOrdering);
 
@@ -56,7 +55,7 @@ const Budgets = (): JSX.Element => {
   return (
     <React.Fragment>
       <Page
-        pageProps={{ className: "budgets-page" }}
+        pageProps={{ className: "dashboard-page" }}
         className={"budgets"}
         loading={loading}
         title={"My Budgets"}
@@ -140,11 +139,17 @@ const Budgets = (): JSX.Element => {
             <Pagination
               hideOnSinglePage={false}
               showSizeChanger={true}
-              defaultPageSize={currentPageSize}
-              defaultCurrent={currentPage}
-              total={budgetsCount}
-              onChange={(page: number, pageSize: number | undefined) => {
-                dispatch(actions.setBudgetsPaginationAction(pageSize === undefined ? { page } : { page, pageSize }));
+              defaultPageSize={10}
+              defaultCurrent={1}
+              pageSize={pageSize}
+              current={page}
+              total={count}
+              onChange={(pg: number, pgSize: number | undefined) => {
+                dispatch(
+                  actions.setBudgetsPaginationAction(
+                    pageSize === undefined ? { page: pg } : { page: pg, pageSize: pgSize }
+                  )
+                );
               }}
             />
           </Page.Footer>

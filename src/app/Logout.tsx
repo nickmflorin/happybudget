@@ -9,12 +9,8 @@ export const Logout = (): JSX.Element => {
   useEffect(() => {
     api
       .logout()
-      .then(() => {
-        setRedirect(true);
-      })
-      .catch(e => {
-        notifications.requestError(e, { message: "There was an error logging out." });
-      });
+      .then(() => setRedirect(true))
+      .catch(e => notifications.requestError(e, { message: "There was an error logging out." }));
   }, []);
 
   if (redirect === true) {

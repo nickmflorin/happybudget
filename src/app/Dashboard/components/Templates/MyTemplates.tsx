@@ -3,27 +3,37 @@ import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { map, isNil } from "lodash";
 
+import { Pagination } from "antd";
+
 import * as api from "api";
 import { redux, notifications } from "lib";
 
-import { WrapInApplicationSpinner, ShowHide } from "components";
+import { ShowHide, Icon } from "components";
+import { PrimaryButtonIconToggle } from "components/buttons";
 import { TemplateCard, EmptyCard } from "components/cards";
 import { NoBudgets } from "components/empty";
+import { SearchInput } from "components/fields";
+import { Page } from "components/layout";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
 import { TemplateEmptyIcon } from "components/svgs";
 
 import { actions } from "../../store";
 
 const selectTemplates = (state: Application.Authenticated.Store) => state.dashboard.templates.data;
-const selectTemplatesResponseReceived = (state: Application.Authenticated.Store) =>
+const selectResponseWasReceived = (state: Application.Authenticated.Store) =>
   state.dashboard.templates.responseWasReceived;
-const selectLoadingTemplates = (state: Application.Authenticated.Store) => state.dashboard.templates.loading;
+const selectLoading = (state: Application.Authenticated.Store) => state.dashboard.templates.loading;
+const selectPage = (state: Application.Authenticated.Store) => state.dashboard.templates.page;
+const selectPageSize = (state: Application.Authenticated.Store) => state.dashboard.templates.pageSize;
+const selectCount = (state: Application.Authenticated.Store) => state.dashboard.templates.count;
+const selectSearch = (state: Application.Authenticated.Store) => state.dashboard.templates.search;
 
 interface MyTemplatesProps {
-  setTemplateToDerive: (template: number) => void;
+  readonly setTemplateToDerive: (template: number) => void;
+  readonly setCreateBudgetModalOpen: (v: boolean) => void;
 }
 
-const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.Element => {
+const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, setTemplateToDerive }): JSX.Element => {
   const [templateToEdit, setTemplateToEdit] = useState<number | undefined>(undefined);
   const [createTemplateModalOpen, setCreateTempateModalOpen] = useState(false);
   const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
@@ -32,8 +42,12 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
 
   const dispatch: Redux.Dispatch = useDispatch();
   const templates = useSelector(selectTemplates);
-  const loading = useSelector(selectLoadingTemplates);
-  const responseWasReceived = useSelector(selectTemplatesResponseReceived);
+  const loading = useSelector(selectLoading);
+  const responseWasReceived = useSelector(selectResponseWasReceived);
+  const page = useSelector(selectPage);
+  const pageSize = useSelector(selectPageSize);
+  const count = useSelector(selectCount);
+  const search = useSelector(selectSearch);
 
   const history = useHistory();
 
@@ -42,8 +56,29 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
   }, []);
 
   return (
-    <div className={"my-templates"}>
-      <WrapInApplicationSpinner loading={loading}>
+    <React.Fragment>
+      <Page
+        className={"discover"}
+        pageProps={{ className: "dashboard-page" }}
+        title={"Discover"}
+        loading={loading}
+        subMenu={[
+          <SearchInput
+            placeholder={"Search Templates..."}
+            value={search}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              dispatch(actions.setTemplatesSearchAction(event.target.value))
+            }
+          />,
+          <PrimaryButtonIconToggle
+            icon={<Icon icon={"plus"} weight={"light"} />}
+            onClick={() => setCreateBudgetModalOpen(true)}
+            text={"New Blank Budget"}
+            breakpoint={"medium"}
+          />
+        ]}
+        contentScrollable={true}
+      >
         {templates.length === 0 && responseWasReceived ? (
           <NoBudgets
             title={"You don't have any templates yet!"}
@@ -86,7 +121,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
                       .then((response: Model.Template) => {
                         e.closeParentDropdown?.();
                         dispatch(actions.removeTemplateFromStateAction(template.id));
-                        dispatch(actions.addCommunityTemplateToStateAction(response));
+                        dispatch(actions.addTemplateToStateAction(response));
                       })
                       .catch((err: Error) => notifications.requestError(err))
                       .finally(() => setMoved(template.id));
@@ -110,7 +145,27 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
             </ShowHide>
           </div>
         )}
-      </WrapInApplicationSpinner>
+        {templates.length !== 0 && responseWasReceived && (
+          <Page.Footer>
+            <Pagination
+              hideOnSinglePage={false}
+              showSizeChanger={true}
+              defaultPageSize={10}
+              defaultCurrent={1}
+              pageSize={pageSize}
+              current={page}
+              total={count}
+              onChange={(pg: number, pgSize: number | undefined) => {
+                dispatch(
+                  actions.setTemplatesPaginationAction(
+                    pageSize === undefined ? { page: pg } : { page: pg, pageSize: pgSize }
+                  )
+                );
+              }}
+            />
+          </Page.Footer>
+        )}
+      </Page>
       {!isNil(templateToEdit) && (
         <EditTemplateModal
           open={true}
@@ -131,7 +186,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
           history.push(`/templates/${template.id}/accounts`);
         }}
       />
-    </div>
+    </React.Fragment>
   );
 };
 

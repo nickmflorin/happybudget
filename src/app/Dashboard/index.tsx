@@ -1,7 +1,7 @@
 import { Switch, useHistory, useLocation } from "react-router-dom";
 
 import { Icon } from "components";
-import { Layout } from "components/layout";
+import { ExpandedLayout } from "components/layout";
 import { PrivateRoute } from "components/routes";
 import { Contacts, Templates, Budgets } from "./components";
 
@@ -12,14 +12,28 @@ const Dashboard = (): JSX.Element => {
   const location = useLocation();
 
   return (
-    <Layout
+    <ExpandedLayout
       sidebar={[
         {
-          label: "New Project",
+          label: "Templates",
           icon: <Icon icon={"file-plus"} weight={"light"} />,
           activeIcon: <Icon icon={"file-plus"} weight={"solid"} />,
-          onClick: () => history.push("/discover"),
-          active: location.pathname.startsWith("/templates") || location.pathname.startsWith("/discover")
+          submenu: [
+            {
+              label: "Discover",
+              icon: <Icon icon={"users"} weight={"light"} />,
+              activeIcon: <Icon icon={"users"} weight={"solid"} />,
+              onClick: () => history.push("/discover"),
+              active: location.pathname.startsWith("/discover")
+            },
+            {
+              label: "My Templates",
+              icon: <Icon icon={"folder-open"} weight={"light"} />,
+              activeIcon: <Icon icon={"folder-open"} weight={"solid"} />,
+              onClick: () => history.push("/templates"),
+              active: location.pathname.startsWith("/templates")
+            }
+          ]
         },
         {
           label: "My Budgets",
@@ -43,7 +57,7 @@ const Dashboard = (): JSX.Element => {
         <PrivateRoute exact path={"/budgets"} component={Budgets} />
         <PrivateRoute path={["/templates", "/discover"]} component={Templates} />
       </Switch>
-    </Layout>
+    </ExpandedLayout>
   );
 };
 

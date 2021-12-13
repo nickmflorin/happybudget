@@ -4,7 +4,7 @@ import { Redirect, Route, Switch, useHistory, useLocation, useParams, useRouteMa
 
 import { budgeting } from "lib";
 import { RenderIfValidId, Icon } from "components";
-import { Layout } from "components/layout";
+import { CollapsedLayout } from "components/layout";
 
 import { actions, selectors } from "./store";
 
@@ -25,8 +25,7 @@ const Budget = (): JSX.Element => {
   }, [budgetId]);
 
   return (
-    <Layout
-      collapsed
+    <CollapsedLayout
       className={"layout--budget"}
       sidebar={[
         {
@@ -59,7 +58,7 @@ const Budget = (): JSX.Element => {
           />
         </Switch>
       </RenderIfValidId>
-    </Layout>
+    </CollapsedLayout>
   );
 };
 

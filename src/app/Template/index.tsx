@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 
 import { budgeting } from "lib";
 import { RenderIfValidId, Icon } from "components";
-import { Layout } from "components/layout";
+import { CollapsedLayout } from "components/layout";
 
 import { Account, Accounts, SubAccount } from "./components";
 import { actions, selectors } from "./store";
@@ -25,8 +25,7 @@ const Template = (): JSX.Element => {
   }, [templateId]);
 
   return (
-    <Layout
-      collapsed
+    <CollapsedLayout
       className={"layout--budget"}
       sidebar={[
         {
@@ -79,7 +78,7 @@ const Template = (): JSX.Element => {
           />
         </Switch>
       </RenderIfValidId>
-    </Layout>
+    </CollapsedLayout>
   );
 };
 

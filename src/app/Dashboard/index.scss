@@ -1,5 +1,15 @@
 @import "style/_imports";
 
+.dashboard-page {
+	.sub-menu {
+		@include media('<xl') {
+			.input {
+				max-width: unset !important;
+			}
+		}
+	}
+}
+
 .dashboard-card-grid-base {
   margin-bottom: 15px;
   display: grid;

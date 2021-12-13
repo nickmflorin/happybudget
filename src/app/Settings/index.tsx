@@ -1,7 +1,7 @@
 import { Switch, useHistory, useLocation } from "react-router-dom";
 
 import { Icon } from "components";
-import { Layout } from "components/layout";
+import { ExpandedLayout } from "components/layout";
 import { PrivateRoute } from "components/routes";
 import * as config from "config";
 
@@ -13,7 +13,7 @@ const Settings = (): JSX.Element => {
   const location = useLocation();
 
   return (
-    <Layout
+    <ExpandedLayout
       sidebar={[
         {
           label: "Profile",
@@ -35,7 +35,7 @@ const Settings = (): JSX.Element => {
         <PrivateRoute exact path={"/profile"} component={Profile} />
         <PrivateRoute exact path={"/security"} component={Security} />
       </Switch>
-    </Layout>
+    </ExpandedLayout>
   );
 };
 

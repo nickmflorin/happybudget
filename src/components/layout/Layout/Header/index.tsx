@@ -17,18 +17,18 @@ import HelpLink from "./HelpLink";
 import "./index.scss";
 
 export interface HeaderProps extends StandardComponentProps {
-  readonly sidebarVisible: boolean;
-  readonly collapsed?: boolean | undefined;
+  readonly showHeaderSidebarToggle?: boolean | undefined;
   readonly showHeaderLogo?: boolean | undefined;
   readonly saving?: boolean;
+  readonly sidebarVisible: boolean;
   readonly toggleSidebar: () => void;
 }
 
 const Header = ({
   sidebarVisible,
-  collapsed,
   toggleSidebar,
   showHeaderLogo,
+  showHeaderSidebarToggle,
   saving,
   ...props
 }: HeaderProps): JSX.Element => {
@@ -45,11 +45,7 @@ const Header = ({
     >
       <div className={"primary-header"}>
         <div className={"primary-header-left"}>
-          {/* In the case that we are not using a collapsed layout, we always
-					show the sidebar toggle button - the only exception is cases where the
-					screen is very large and we do not allow the sidebar to be toggled,
-					but in those cases this button is hidden with media queries. */}
-          <ShowHide show={!sidebarVisible || collapsed === false}>
+          <ShowHide show={showHeaderSidebarToggle}>
             <IconButton
               className={"btn--sidebar-toggle"}
               icon={(params: ClickableIconCallbackParams) => {

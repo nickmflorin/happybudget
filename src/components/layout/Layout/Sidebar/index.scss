@@ -1,7 +1,66 @@
 @import "style/_imports";
 
+.sidebar-menu {
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	margin-top: 60px;
+}
+
+.sidebar-menu-item {
+	position: relative;
+	padding: 0 !important;
+	background: transparent !important;
+	margin-bottom: 20px;
+
+	&:hover {
+		> .sidebar-menu-item-content {
+			background-color: rgba(232, 232, 232, 0.5) !important;
+			> .icon-container {
+				svg {
+					color: $green;
+				}
+			}
+		}
+	}
+
+	&.active {
+		> .sidebar-menu-item-content {
+			background-color: $green !important;
+			> .icon-container {
+				svg {
+					color: $white !important;
+				}
+			}
+			> .text-container {
+				color: $white !important;
+			}
+		}
+	}
+
+	> .sidebar-menu-item-content {
+		border-radius: 4px;
+		border: 1px solid $transparent;
+		display: flex;
+
+		> .icon-container {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+
+			svg {
+				color: $text-secondary;
+				height: 22px;
+				width: auto;
+			}
+		}
+	}
+}
+
 .sidebar {
-  padding: 20px 10px;
+	hr {
+    width: 80%;
+  }
 
   .logo-container {
     width: 100%;
@@ -18,166 +77,131 @@
     }
   }
 
-  .sidebar-menu {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    margin-top: 60px;
+	&--expanded {
+		@extend .sidebar;
+		padding: 20px 10px;
 
-    .sidebar-menu-item {
-      position: relative;
-      padding: 0 !important;
-      background: transparent !important;
-      margin-bottom: 20px;
+		.logo-container {
+			.logo-link {
+				text-align: center;
+				height: 40px;
 
-      &:hover {
-        > .sidebar-menu-item-item {
-          background-color: rgba(232, 232, 232, 0.5) !important;
-          > .icon-container {
-            svg {
-              color: $green;
-            }
-          }
-        }
-      }
+				svg {
+					max-height: 40px;
+					max-width: 200px;
+				}
+			}
+		}
 
-      &.active {
-        > .sidebar-menu-item-item {
-          background-color: $green !important;
-          > .icon-container {
-            svg {
-              color: $white !important;
-            }
-          }
-          > .text-container {
-            color: $white !important;
-          }
-        }
-      }
+		.btn--sidebar-close {
+			position: absolute;
+			top: 10px;
+			right: 10px;
+		}
 
-      > .sidebar-menu-item-item {
-        border-radius: 4px;
-        border: 1px solid $transparent;
-        height: 50px;
-        padding: 8px 8px 8px 20px;
-        display: flex;
+		.sidebar-menu {
+			.sidebar-menu-item {
+				margin-bottom: 20px;
 
-        > .icon-container {
-          margin-right: 25px;
-          width: 15px;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
+				> .sidebar-menu-item-content {
+					border-radius: 4px;
+					border: 1px solid $transparent;
+					height: 50px;
+					padding: 8px 8px 8px 20px;
 
-          svg {
-            color: $text-secondary;
-            height: 22px;
-            width: auto;
-          }
-        }
+					> .icon-container {
+						margin-right: 25px;
+						width: 15px;
+					}
 
-        > .text-container {
-          font-size: 15px;
-          text-transform: unset !important;
-          font-family: $avenir;
-          font-weight: 600;
-          color: $text-primary;
-          line-height: 32px;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          white-space: nowrap;
-        }
-      }
-    }
+					> .text-container {
+						font-size: 15px;
+						text-transform: unset !important;
+						font-family: $avenir;
+						font-weight: 600;
+						color: $text-primary;
+						line-height: 32px;
+						text-overflow: ellipsis;
+						overflow: hidden;
+						white-space: nowrap;
+					}
+				}
+			}
+		}
 
-    &.nested {
-      padding-left: 40px;
-      margin-top: 4px;
-      min-height: 40px;
+		.sidebar-sub-menu {
+			padding-left: 15px;
 
-      .spinner {
-        position: absolute;
-        top: 70%;
-        left: calc(50% - 8px);
-      }
+			.sidebar-menu-item {
+				margin-bottom: 10px;
 
-      .sidebar-menu-item {
-        min-width: 120px;
-        margin-bottom: 4px;
+				> .sidebar-menu-item-content {
+					border-radius: 4px;
+					border: 1px solid $transparent;
+					height: 36px;
+					padding: 6px 6px 6px 20px;
 
-        > .sidebar-menu-item-item {
-          > .text-container {
-            font-size: 13px;
-          }
-        }
-      }
-    }
-  }
+					> .icon-container {
+						margin-right: 25px;
+						width: 15px;
+					}
 
-  .btn--sidebar-close {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-  }
+					> .text-container {
+						font-size: 13px;
+						text-transform: unset !important;
+						font-family: $avenir;
+						font-weight: 500;
+						color: $text-primary;
+						line-height: 22px;
+						text-overflow: ellipsis;
+						overflow: hidden;
+						white-space: nowrap;
+					}
+				}
+			}
+		}
+	}
 
-  &.expanded-layout {
-    @include media("<=medium") {
-      .btn--sidebar-close {
-        display: block;
-      }
-    }
-  }
+	&--collapsed {
+		@extend .sidebar;
+		padding: 0px !important;
 
-  &.collapsed-layout {
-    padding: 0px !important;
+		.logo-container {
+			.logo-link {
+				padding-top: 9px;
+				padding-bottom: 9px;
+				height: 58px;
 
-    .logo-container {
-      width: 100%;
+				svg {
+					max-width: 25px;
+				}
+			}
+		}
 
-      .logo-link {
-        padding-top: 9px;
-        padding-bottom: 9px;
-        height: 58px;
-
-        svg {
-          max-width: 25px;
-        }
-      }
-    }
-
-    // The sidebar toggle button is not shown in the header for the expanded
-    // layout case - so it is only applicable here.
-    .btn--sidebar-toggle {
+		.btn--sidebar-toggle {
       margin: 0 auto;
     }
 
-    .sidebar-menu {
-      .sidebar-menu-item {
-        margin-bottom: 10px;
+		.sidebar-menu {
+			.sidebar-menu-item {
+				margin-bottom: 10px;
 
-        > .sidebar-menu-item-item {
-          border-top-left-radius: 0px;
-          border-bottom-left-radius: 0px;
-          padding-top: 4px !important;
-          padding-bottom: 4px !important;
-          height: 42px;
-          justify-content: center;
-          align-items: center;
-          padding: 8px;
-          -webkit-box-align: center;
-          -webkit-box-pack: center;
+				> .sidebar-menu-item-content {
+					border-top-left-radius: 0px;
+					border-bottom-left-radius: 0px;
+					height: 42px;
+					justify-content: center;
+					align-items: center;
+					padding: 4px 8px;
+					-webkit-box-align: center;
+					-webkit-box-pack: center;
 
-          > .icon-container {
-            width: auto;
-            margin-right: 0px;
-          }
-        }
-      }
-    }
-  }
-
-  hr {
-    width: 80%;
-  }
+					> .icon-container {
+						width: auto;
+						margin-right: 0px;
+					}
+				}
+			}
+		}
+	}
 }

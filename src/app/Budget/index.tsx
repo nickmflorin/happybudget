@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 
 import { budgeting } from "lib";
 import { Icon, RenderIfValidId } from "components";
-import { Layout } from "components/layout";
+import { CollapsedLayout } from "components/layout";
 
 import { Account, SubAccount, PreviewModal, Accounts, Actuals, Analysis } from "./components";
 import { actions, selectors } from "./store";
@@ -27,8 +27,7 @@ const RootBudget = (): JSX.Element => {
   }, [budgetId]);
 
   return (
-    <Layout
-      collapsed
+    <CollapsedLayout
       className={"layout--budget"}
       sidebar={[
         {
@@ -151,7 +150,7 @@ const RootBudget = (): JSX.Element => {
           filename={!isNil(budget) ? `${budget.name}.pdf` : "budget.pdf"}
         />
       </RenderIfValidId>
-    </Layout>
+    </CollapsedLayout>
   );
 };
 

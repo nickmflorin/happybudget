@@ -126,8 +126,12 @@
     min-height: 100vh;
 
     @include expanded_layout_dimensions();
-    &.collapsed-layout {
+    &--collapsed {
       @include collapsed_layout_dimensions();
+			.sidebar-container {
+        // This is important to align the sidebar toggle button in the header.
+        padding-top: 8px;
+      }
     }
 
     .sidebar-container {
@@ -135,13 +139,6 @@
       position: fixed;
       height: 100vh;
       @include transition(margin-left 0.2s ease-out);
-    }
-
-    &.collapsed-layout {
-      .sidebar-container {
-        // This is important to align the sidebar toggle button in the header.
-        padding-top: 8px;
-      }
     }
 
     .layout-content {

@@ -17,10 +17,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "noFallthroughCasesInSwitch": true,
-    "experimentalDecorators": true,
-    "sourceMap": true,
-    "inlineSources": true,
-    "sourceRoot": "src"
+    "experimentalDecorators": true
   },
   "include": ["src"],
   "exclude": ["node_modules"]

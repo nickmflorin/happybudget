@@ -3,11 +3,16 @@ import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { map, isNil } from "lodash";
 
+import { Pagination } from "antd";
+
 import * as api from "api";
 import { redux, notifications } from "lib";
 
-import { WrapInApplicationSpinner, ShowHide } from "components";
+import { ShowHide, Icon } from "components";
+import { PrimaryButtonIconToggle } from "components/buttons";
 import { CommunityTemplateCard, EmptyCard } from "components/cards";
+import { SearchInput } from "components/fields";
+import { Page } from "components/layout";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
 import { IsStaff } from "components/permissions";
 
@@ -16,15 +21,20 @@ import { useLoggedInUser } from "store/hooks";
 import { actions } from "../../store";
 
 const selectTemplates = (state: Application.Authenticated.Store) => state.dashboard.community.data;
-const selectTemplatesResponseReceived = (state: Application.Authenticated.Store) =>
+const selectResponseReceived = (state: Application.Authenticated.Store) =>
   state.dashboard.community.responseWasReceived;
-const selectLoadingTemplates = (state: Application.Authenticated.Store) => state.dashboard.community.loading;
+const selectLoading = (state: Application.Authenticated.Store) => state.dashboard.community.loading;
+const selectPage = (state: Application.Authenticated.Store) => state.dashboard.community.page;
+const selectPageSize = (state: Application.Authenticated.Store) => state.dashboard.community.pageSize;
+const selectCount = (state: Application.Authenticated.Store) => state.dashboard.community.count;
+const selectSearch = (state: Application.Authenticated.Store) => state.dashboard.community.search;
 
 interface DiscoverProps {
-  setTemplateToDerive: (template: number) => void;
+  readonly setTemplateToDerive: (template: number) => void;
+  readonly setCreateBudgetModalOpen: (v: boolean) => void;
 }
 
-const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element => {
+const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTemplateToDerive }): JSX.Element => {
   const [templateToEdit, setTemplateToEdit] = useState<number | undefined>(undefined);
   const [createTemplateModalOpen, setCreateTempateModalOpen] = useState(false);
   const user = useLoggedInUser();
@@ -34,8 +44,12 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
 
   const dispatch: Redux.Dispatch = useDispatch();
   const templates = useSelector(selectTemplates);
-  const loading = useSelector(selectLoadingTemplates);
-  const responseWasReceived = useSelector(selectTemplatesResponseReceived);
+  const loading = useSelector(selectLoading);
+  const responseWasReceived = useSelector(selectResponseReceived);
+  const page = useSelector(selectPage);
+  const pageSize = useSelector(selectPageSize);
+  const count = useSelector(selectCount);
+  const search = useSelector(selectSearch);
 
   const history = useHistory();
 
@@ -44,8 +58,29 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
   }, []);
 
   return (
-    <div className={"my-templates"}>
-      <WrapInApplicationSpinner loading={loading}>
+    <React.Fragment>
+      <Page
+        className={"discover"}
+        pageProps={{ className: "dashboard-page" }}
+        title={"Discover"}
+        loading={loading}
+        subMenu={[
+          <SearchInput
+            placeholder={"Search Templates..."}
+            value={search}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              dispatch(actions.setCommunityTemplatesSearchAction(event.target.value))
+            }
+          />,
+          <PrimaryButtonIconToggle
+            icon={<Icon icon={"plus"} weight={"light"} />}
+            onClick={() => setCreateBudgetModalOpen(true)}
+            text={"New Blank Budget"}
+            breakpoint={"medium"}
+          />
+        ]}
+        contentScrollable={true}
+      >
         <div className={"dashboard-card-grid"}>
           {map(templates, (template: Model.Template, index: number) => {
             /* The API will exclude hidden community templates for non-staff
@@ -131,7 +166,24 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
             </ShowHide>
           </IsStaff>
         </div>
-      </WrapInApplicationSpinner>
+        <Page.Footer>
+          <Pagination
+            hideOnSinglePage={false}
+            showSizeChanger={true}
+            defaultPageSize={10}
+            current={page}
+            pageSize={pageSize}
+            total={count}
+            onChange={(pg: number, pgSize: number | undefined) =>
+              dispatch(
+                actions.setCommunityTemplatesPaginationAction(
+                  pageSize === undefined ? { page: pg } : { page: pg, pageSize: pgSize }
+                )
+              )
+            }
+          />
+        </Page.Footer>
+      </Page>
       {!isNil(templateToEdit) && (
         <IsStaff>
           <EditTemplateModal
@@ -157,7 +209,7 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
           }}
         />
       </IsStaff>
-    </div>
+    </React.Fragment>
   );
 };
 

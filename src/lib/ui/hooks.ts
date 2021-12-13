@@ -13,6 +13,22 @@ import * as typeguards from "./typeguards";
 
 export * from "./tsxHooks";
 
+export const InitialLayoutRef: ILayoutRef = {
+  setSidebarVisible: (visible: boolean) => {},
+  toggleSidebar: () => {},
+  sidebarVisible: true
+};
+
+export const useLayout = (): NonNullRef<ILayoutRef> => {
+  return useRef<ILayoutRef>(InitialLayoutRef);
+};
+
+export const useLayoutIfNotDefined = (layout?: NonNullRef<ILayoutRef>): NonNullRef<ILayoutRef> => {
+  const ref = useRef<ILayoutRef>(InitialLayoutRef);
+  const returnRef = useMemo(() => (!isNil(layout) ? layout : ref), [layout, ref.current]);
+  return returnRef;
+};
+
 export const InitialMenuRef: IMenuRef<any, any> = {
   getState: () => [],
   getSearchValue: () => "",
