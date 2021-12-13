@@ -29,7 +29,8 @@ export function* getTemplatesTask(action: Redux.Action): SagaIterator {
     return {
       search: state.dashboard.templates.search,
       page: state.dashboard.templates.page,
-      page_size: state.dashboard.templates.pageSize
+      page_size: state.dashboard.templates.pageSize,
+      ordering: state.dashboard.budgets.ordering
     };
   });
   yield put(actions.loadingTemplatesAction(true));
@@ -49,7 +50,8 @@ export function* getCommunityTemplatesTask(action: Redux.Action): SagaIterator {
     return {
       search: state.dashboard.community.search,
       page: state.dashboard.community.page,
-      page_size: state.dashboard.community.pageSize
+      page_size: state.dashboard.community.pageSize,
+      ordering: state.dashboard.budgets.ordering
     };
   });
   yield put(actions.loadingCommunityTemplatesAction(true));

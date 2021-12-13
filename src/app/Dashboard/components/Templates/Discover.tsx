@@ -9,8 +9,9 @@ import * as api from "api";
 import { redux, notifications } from "lib";
 
 import { ShowHide, Icon } from "components";
-import { PrimaryButtonIconToggle } from "components/buttons";
+import { PrimaryButtonIconToggle, DefaultButtonIconToggle } from "components/buttons";
 import { CommunityTemplateCard, EmptyCard } from "components/cards";
+import { OrderingDropdown } from "components/dropdowns";
 import { SearchInput } from "components/fields";
 import { Page } from "components/layout";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
@@ -28,6 +29,7 @@ const selectPage = (state: Application.Authenticated.Store) => state.dashboard.c
 const selectPageSize = (state: Application.Authenticated.Store) => state.dashboard.community.pageSize;
 const selectCount = (state: Application.Authenticated.Store) => state.dashboard.community.count;
 const selectSearch = (state: Application.Authenticated.Store) => state.dashboard.community.search;
+const selectOrdering = (state: Application.Authenticated.Store) => state.dashboard.community.ordering;
 
 interface DiscoverProps {
   readonly setTemplateToDerive: (template: number) => void;
@@ -50,6 +52,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
   const pageSize = useSelector(selectPageSize);
   const count = useSelector(selectCount);
   const search = useSelector(selectSearch);
+  const ordering = useSelector(selectOrdering);
 
   const history = useHistory();
 
@@ -77,7 +80,24 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
             onClick={() => setCreateBudgetModalOpen(true)}
             text={"New Blank Budget"}
             breakpoint={"medium"}
-          />
+          />,
+          <OrderingDropdown
+            ordering={ordering}
+            onChange={(field: string, order: Http.Order) =>
+              dispatch(actions.updateCommunityTemplatesOrderingAction({ field, order }))
+            }
+            models={[
+              { id: "created_at", icon: "bars-sort", label: "Created" },
+              { id: "updated_at", icon: "timer", label: "Last Updated" },
+              { id: "name", icon: "sort-alpha-down", label: "Name" }
+            ]}
+          >
+            <DefaultButtonIconToggle
+              breakpoint={"medium"}
+              icon={<Icon icon={"bars-filter"} weight={"light"} />}
+              text={"Order By"}
+            />
+          </OrderingDropdown>
         ]}
         contentScrollable={true}
       >

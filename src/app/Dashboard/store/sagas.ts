@@ -41,8 +41,16 @@ function* watchForSearchTemplatesSaga(): SagaIterator {
   yield debounce(250, actions.setTemplatesSearchAction.toString(), tasks.getTemplatesTask);
 }
 
+function* watchForUpdateTemplatesOrdering(): SagaIterator {
+  yield takeLatest(actions.updateTemplatesOrderingAction.toString(), tasks.getTemplatesTask);
+}
+
 function* watchForSearchCommunityTemplatesSaga(): SagaIterator {
   yield debounce(250, actions.setCommunityTemplatesSearchAction.toString(), tasks.getCommunityTemplatesTask);
+}
+
+function* watchForUpdateCommunityTemplatesOrdering(): SagaIterator {
+  yield takeLatest(actions.updateCommunityTemplatesOrderingAction.toString(), tasks.getCommunityTemplatesTask);
 }
 
 const ActionMap = {
@@ -73,6 +81,8 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForSearchTemplatesSaga);
   yield spawn(watchForBudgetsRefreshSaga);
   yield spawn(watchForUpdateBudgetsOrdering);
+  yield spawn(watchForUpdateTemplatesOrdering);
+  yield spawn(watchForUpdateCommunityTemplatesOrdering);
   yield spawn(watchForSearchBudgetsSaga);
   yield spawn(watchForCommunityTemplatesRefreshSaga);
   yield spawn(watchForSearchCommunityTemplatesSaga);

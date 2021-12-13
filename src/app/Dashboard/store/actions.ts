@@ -20,7 +20,8 @@ export const ActionType = {
     UpdateInState: "dashboard.templates.UpdateInState",
     RemoveFromState: "dashboard.templates.RemoveFromState",
     AddToState: "dashboard.templates.AddToState",
-    SetPagination: "dashboard.templates.SetPagination"
+    SetPagination: "dashboard.templates.SetPagination",
+    UpdateOrdering: "dashboard.templates.UpdateOrdering"
   },
   Community: {
     Loading: "dashboard.community.Loading",
@@ -30,7 +31,8 @@ export const ActionType = {
     UpdateInState: "dashboard.community.UpdateInState",
     RemoveFromState: "dashboard.community.RemoveFromState",
     AddToState: "dashboard.community.AddToState",
-    SetPagination: "dashboard.community.SetPagination"
+    SetPagination: "dashboard.community.SetPagination",
+    UpdateOrdering: "dashboard.community.UpdateOrdering"
   },
   Contacts: {
     TableChanged: "dashboard.contacts.TableChanged",
@@ -65,6 +67,9 @@ export const responseTemplatesAction = createAction<Http.ListResponse<Model.Simp
 );
 export const setTemplatesSearchAction = createAction<string>(ActionType.Templates.SetSearch);
 export const setTemplatesPaginationAction = createAction<Pagination>(ActionType.Templates.SetPagination);
+export const updateTemplatesOrderingAction = createAction<Redux.UpdateOrderingPayload>(
+  ActionType.Templates.UpdateOrdering
+);
 export const updateTemplateInStateAction = createAction<Redux.UpdateActionPayload<Model.Template>>(
   ActionType.Templates.UpdateInState
 );
@@ -78,6 +83,9 @@ export const responseCommunityTemplatesAction = createAction<Http.ListResponse<M
 );
 export const setCommunityTemplatesSearchAction = createAction<string>(ActionType.Community.SetSearch);
 export const setCommunityTemplatesPaginationAction = createAction<Pagination>(ActionType.Community.SetPagination);
+export const updateCommunityTemplatesOrderingAction = createAction<Redux.UpdateOrderingPayload>(
+  ActionType.Community.UpdateOrdering
+);
 export const updateCommunityTemplateInStateAction = createAction<Redux.UpdateActionPayload<Model.Template>>(
   ActionType.Community.UpdateInState
 );

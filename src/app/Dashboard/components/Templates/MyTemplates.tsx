@@ -9,8 +9,9 @@ import * as api from "api";
 import { redux, notifications } from "lib";
 
 import { ShowHide, Icon } from "components";
-import { PrimaryButtonIconToggle } from "components/buttons";
+import { PrimaryButtonIconToggle, DefaultButtonIconToggle } from "components/buttons";
 import { TemplateCard, EmptyCard } from "components/cards";
+import { OrderingDropdown } from "components/dropdowns";
 import { NoBudgets } from "components/empty";
 import { SearchInput } from "components/fields";
 import { Page } from "components/layout";
@@ -27,6 +28,7 @@ const selectPage = (state: Application.Authenticated.Store) => state.dashboard.t
 const selectPageSize = (state: Application.Authenticated.Store) => state.dashboard.templates.pageSize;
 const selectCount = (state: Application.Authenticated.Store) => state.dashboard.templates.count;
 const selectSearch = (state: Application.Authenticated.Store) => state.dashboard.templates.search;
+const selectOrdering = (state: Application.Authenticated.Store) => state.dashboard.templates.ordering;
 
 interface MyTemplatesProps {
   readonly setTemplateToDerive: (template: number) => void;
@@ -48,6 +50,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
   const pageSize = useSelector(selectPageSize);
   const count = useSelector(selectCount);
   const search = useSelector(selectSearch);
+  const ordering = useSelector(selectOrdering);
 
   const history = useHistory();
 
@@ -75,7 +78,24 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
             onClick={() => setCreateBudgetModalOpen(true)}
             text={"New Blank Budget"}
             breakpoint={"medium"}
-          />
+          />,
+          <OrderingDropdown
+            ordering={ordering}
+            onChange={(field: string, order: Http.Order) =>
+              dispatch(actions.updateTemplatesOrderingAction({ field, order }))
+            }
+            models={[
+              { id: "created_at", icon: "bars-sort", label: "Created" },
+              { id: "updated_at", icon: "timer", label: "Last Updated" },
+              { id: "name", icon: "sort-alpha-down", label: "Name" }
+            ]}
+          >
+            <DefaultButtonIconToggle
+              breakpoint={"medium"}
+              icon={<Icon icon={"bars-filter"} weight={"light"} />}
+              text={"Order By"}
+            />
+          </OrderingDropdown>
         ]}
         contentScrollable={true}
       >

@@ -37,7 +37,8 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
       addToState: actions.addTemplateToStateAction,
       removeFromState: actions.removeTemplateFromStateAction,
       updateInState: actions.updateTemplateInStateAction,
-      setPagination: actions.setTemplatesPaginationAction
+      setPagination: actions.setTemplatesPaginationAction,
+      updateOrdering: actions.updateTemplatesOrderingAction
     }
   }),
   community: redux.reducers.createAuthenticatedModelListResponseReducer<
@@ -53,7 +54,8 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
       addToState: actions.addCommunityTemplateToStateAction,
       removeFromState: actions.removeCommunityTemplateFromStateAction,
       updateInState: actions.updateCommunityTemplateInStateAction,
-      setPagination: actions.setCommunityTemplatesPaginationAction
+      setPagination: actions.setCommunityTemplatesPaginationAction,
+      updateOrdering: actions.updateCommunityTemplatesOrderingAction
     }
   }),
   budgets: redux.reducers.createAuthenticatedModelListResponseReducer<
