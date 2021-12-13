@@ -1,7 +1,7 @@
 import classNames from "classnames";
 
-import { RowExplicitCellProps } from "../Cells/Cell";
-import HeaderCell from "../Cells/HeaderCell";
+import { RowExplicitCellProps } from "../cells/Cell";
+import HeaderCell from "../cells/HeaderCell";
 import Row, { RowProps } from "./Row";
 
 interface HeaderRowProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>

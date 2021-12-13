@@ -1,7 +1,7 @@
 import classNames from "classnames";
 
-import { BodyCell } from "../Cells";
-import { RowExplicitBodyCellProps } from "../Cells/BodyCell";
+import { BodyCell } from "../cells";
+import { RowExplicitBodyCellProps } from "../cells/BodyCell";
 import Row, { RowProps } from "./Row";
 
 export interface BodyRowProps<
@@ -24,7 +24,6 @@ const BodyRow = <
   cellProps,
   ...props
 }: BodyRowProps<R, M, RW>): JSX.Element => (
-  /* eslint-disable indent */
   <Row
     {...props}
     className={classNames("body-tr", props.className)}

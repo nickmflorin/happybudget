@@ -4,11 +4,11 @@ import { isNil, map, filter, find, includes } from "lodash";
 import { ShowHide } from "components";
 import { Document, View, Page, Tag, Text, NoDataPage } from "components/pdf";
 import { AccountsTable as GenericAccountsTable, SubAccountsTable as GenericSubAccountsTable } from "components/tabling";
+import { AccountsTable, AccountTable } from "components/tabling/pdf";
 import { tabling, budgeting } from "lib";
 
 import PageHeader from "./PageHeader";
 import Notes from "./Notes";
-import { AccountsTable, AccountTable } from "./Tables";
 
 interface BudgetPdfProps {
   readonly budget: Model.PdfBudget;

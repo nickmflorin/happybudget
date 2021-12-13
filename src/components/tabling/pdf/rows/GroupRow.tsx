@@ -4,7 +4,7 @@ import classNames from "classnames";
 
 import { budgeting } from "lib";
 
-import { RowExplicitCellProps } from "../Cells/Cell";
+import { RowExplicitCellProps } from "../cells/Cell";
 import BodyRow, { BodyRowProps } from "./BodyRow";
 
 interface GroupRowProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>

@@ -5,3 +5,4 @@ export { default as RichText } from "./RichText";
 export * from "./primitive";
 export * from "./text";
 export { default as Previewer } from "./Previewer";
+export * from "./Previewer";

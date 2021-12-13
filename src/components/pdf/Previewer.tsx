@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, forwardRef, ForwardedRef, useImperativeHandle } from "react";
+import React, { useEffect, useMemo, useState, RefObject, useImperativeHandle } from "react";
 import { Page } from "react-pdf/dist/esm/entry.webpack";
 import { pdf as PDF } from "@react-pdf/renderer";
 import { debounce, isNil } from "lodash";
@@ -12,16 +12,21 @@ import { RenderDocument } from "./primitive";
 
 import "./Previewer.scss";
 
-interface PreviewerProps {
-  readonly onExport: () => void;
+export interface PreviewerProps {
+  readonly filename: string;
+  readonly previewer?: RefObject<Pdf.IPreviewerRef>;
   readonly loadingData?: boolean;
   readonly renderComponent: () => JSX.Element | undefined;
+  readonly onExportSuccess?: () => void;
 }
 
-const Previewer = (
-  { onExport, loadingData, renderComponent }: PreviewerProps,
-  ref: ForwardedRef<Pdf.IPreviewerRef>
-): JSX.Element => {
+const Previewer = ({
+  onExportSuccess,
+  loadingData,
+  renderComponent,
+  filename,
+  previewer
+}: PreviewerProps): JSX.Element => {
   const [generatingPdf, setGeneratingPdf] = useState(false);
   const [numPages, setNumPages] = useState(0);
   const [page, setPage] = useState(1);
@@ -62,24 +67,29 @@ const Previewer = (
 
   const debouncedRender = useMemo(() => debounce(render, 20), []);
 
+  const exportPdf = useMemo(
+    () => () => {
+      if (!isNil(file)) {
+        util.files.download(file, !filename.endsWith(".pdf") ? `${filename}.pdf` : filename, {
+          includeExtensionInName: false
+        });
+        onExportSuccess?.();
+      }
+    },
+    [file, filename, onExportSuccess]
+  );
+
   useEffect(() => {
     return () => {
       debouncedRender.cancel();
     };
   }, []);
 
-  useImperativeHandle(ref, () => ({
+  useImperativeHandle(previewer, () => ({
     render,
     debouncedRender,
     refreshRequired: () => setRefreshRequired(true),
-    export: (filename: string, onSuccess?: () => void) => {
-      if (!isNil(file)) {
-        util.files.download(file, !filename.endsWith(".pdf") ? `${filename}.pdf` : filename, {
-          includeExtensionInName: false
-        });
-        onSuccess?.();
-      }
-    }
+    export: exportPdf
   }));
 
   return (
@@ -117,7 +127,7 @@ const Previewer = (
           className={"btn btn--primary"}
           htmlType={"submit"}
           disabled={generatingPdf || loadingData}
-          onClick={() => onExport()}
+          onClick={() => exportPdf()}
         >
           {"Export"}
         </Button>
@@ -126,4 +136,4 @@ const Previewer = (
   );
 };
 
-export default React.memo(forwardRef(Previewer));
+export default React.memo(Previewer);

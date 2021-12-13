@@ -4,8 +4,8 @@ import classNames from "classnames";
 
 import { tabling, hooks, budgeting } from "lib";
 
+import { BodyRow, HeaderRow, FooterRow, GroupRow } from "../rows";
 import Table from "./Table";
-import { BodyRow, HeaderRow, FooterRow, GroupRow } from "../Rows";
 
 type M = Model.PdfSubAccount;
 type R = Tables.SubAccountRowData;
@@ -263,14 +263,7 @@ const AccountTable = ({
     ];
   });
 
-  const rows = generateRows();
-  return (
-    <Table>
-      {map(rows, (r: JSX.Element, index: number) => (
-        <React.Fragment key={index}>{r}</React.Fragment>
-      ))}
-    </Table>
-  );
+  return <Table generateRows={generateRows} />;
 };
 
 export default AccountTable;

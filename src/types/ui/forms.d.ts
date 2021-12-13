@@ -50,3 +50,27 @@ declare interface FormProps<T> extends Omit<RootFormProps, "style" | "id" | "cla
   readonly title?: string | JSX.Element;
   readonly condensed?: boolean;
 }
+
+declare type HeaderTemplateFormData = {
+  readonly header: string | null;
+  readonly left_image: UploadedImage | SavedImage | null;
+  readonly left_info: string | null;
+  readonly right_image: UploadedImage | SavedImage | null;
+  readonly right_info: string | null;
+};
+
+declare interface ExportPdfFormOptions {
+  readonly columns: string[];
+  readonly excludeZeroTotals: boolean;
+}
+
+declare type IExportFormRef<O extends ExportPdfFormOptions = ExportPdfFormOptions> = {
+  readonly getFormData: () => O;
+};
+
+declare interface ExportBudgetPdfFormOptions extends ExportPdfFormOptions {
+  readonly header: HeaderTemplateFormData;
+  readonly tables?: TableOption[] | null | undefined;
+  readonly notes?: string | null;
+  readonly includeNotes: boolean;
+}

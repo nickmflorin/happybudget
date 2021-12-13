@@ -3,25 +3,23 @@ import { useSelector, useDispatch } from "react-redux";
 import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
-import { registerFonts } from "style/pdf";
 import { redux, ui, tabling, notifications, pdf } from "lib";
 
-import { Modal } from "components";
-import { ExportPdfForm } from "components/forms";
-import { Previewer } from "components/pdf";
+import { ExportBudgetPdfForm } from "components/forms";
+import { PreviewModal } from "components/modals";
 import { SubAccountsTable } from "components/tabling";
 
-import { actions } from "../../store";
-import BudgetPdf from "../BudgetPdf";
+import { actions } from "../store";
+import BudgetPdf from "./BudgetPdf";
 
-import "./index.scss";
+import "./BudgetPreviewModal.scss";
 
 const SubAccountColumns = filter(
   SubAccountsTable.Columns,
   (c: Table.PdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>) => c.includeInPdf !== false
 ) as Table.PdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>[];
 
-const DEFAULT_OPTIONS: ExportFormOptions = {
+const DEFAULT_OPTIONS: ExportBudgetPdfFormOptions = {
   excludeZeroTotals: false,
   header: {
     header: `<h2>Sample Budget ${new Date().getFullYear()}</h2><p>Cost Summary</p>`,
@@ -69,7 +67,7 @@ const selectHeaderTemplateLoading = redux.selectors.simpleShallowEqualSelector(
   (state: Application.Authenticated.Store) => state.budget.headerTemplates.loadingDetail
 );
 
-const PreviewModal = ({
+const BudgetPreviewModal = ({
   budgetId,
   budgetName,
   visible,
@@ -82,9 +80,9 @@ const PreviewModal = ({
 
   const [contactsResponse, setContactsResponse] = useState<Http.ListResponse<Model.Contact> | null>(null);
   const [budgetResponse, setBudgetResponse] = useState<Model.PdfBudget | null>(null);
-  const [options, setOptions] = useState<ExportFormOptions>(DEFAULT_OPTIONS);
+  const [options, setOptions] = useState<ExportBudgetPdfFormOptions>(DEFAULT_OPTIONS);
 
-  const form = ui.hooks.useForm<ExportFormOptions>({ isInModal: true });
+  const form = ui.hooks.useForm<ExportBudgetPdfFormOptions>({ isInModal: true });
   const dispatch = useDispatch();
 
   const headerTemplatesLoading = useSelector(selectHeaderTemplatesLoading);
@@ -105,35 +103,36 @@ const PreviewModal = ({
   useEffect(() => {
     if (visible === true) {
       dispatch(actions.pdf.requestHeaderTemplatesAction(null));
-      registerFonts().then(() => {
-        const promises: [Promise<Model.PdfBudget>, Promise<Http.ListResponse<Model.Contact>>] = [
-          api.getBudgetPdf(budgetId),
-          api.getContacts()
-        ];
-        setLoadingData(true);
-        Promise.all(promises)
-          .then(([b, cs]: [Model.PdfBudget, Http.ListResponse<Model.Contact>]) => {
-            setContactsResponse(cs);
-            setBudgetResponse(b);
-            const pdfComponent = BudgetPdfFunc({
-              budget: b,
-              contacts: cs.data,
-              options: convertOptions(options)
-            });
-            previewer.current?.render(pdfComponent);
-          })
-          /* TODO: We should probably display the error in the modal and not let
+      // TODO: Need to use cancel tokens here.
+      const promises: [Promise<Model.PdfBudget>, Promise<Http.ListResponse<Model.Contact>>] = [
+        api.getBudgetPdf(budgetId),
+        /* TODO: We might be able to avoid the additional request by using the
+				   contacts from the store. */
+        api.getContacts()
+      ];
+      setLoadingData(true);
+      Promise.all(promises)
+        .then(([b, cs]: [Model.PdfBudget, Http.ListResponse<Model.Contact>]) => {
+          setContactsResponse(cs);
+          setBudgetResponse(b);
+          const pdfComponent = BudgetPdfFunc({
+            budget: b,
+            contacts: cs.data,
+            options: convertOptions(options)
+          });
+          previewer.current?.render(pdfComponent);
+        })
+        /* TODO: We should probably display the error in the modal and not let
 						 the default toast package display it in the top right of the
 						 window. */
-          .catch((e: Error) => notifications.requestError(e))
-          .finally(() => setLoadingData(false));
-      });
+        .catch((e: Error) => notifications.requestError(e))
+        .finally(() => setLoadingData(false));
     }
   }, [visible]);
 
   const convertOptions = useMemo(
     () =>
-      (opts: ExportFormOptions): PdfBudgetTable.Options => ({
+      (opts: ExportBudgetPdfFormOptions): PdfBudgetTable.Options => ({
         ...opts,
         notes: pdf.parsers.convertHtmlIntoNodes(opts.notes || "") || [],
         header: {
@@ -160,58 +159,51 @@ const PreviewModal = ({
   );
 
   return (
-    <Modal
-      className={"export-preview-modal"}
-      title={"Export"}
+    <PreviewModal
       visible={visible}
-      onCancel={() => onCancel()}
-      getContainer={false}
-      footer={null}
+      onCancel={onCancel}
+      previewer={previewer}
+      loadingData={loadingData}
+      renderComponent={renderComponent}
+      filename={filename}
+      onExportSuccess={onSuccess}
     >
-      <div className={"export-form-container"}>
-        <ExportPdfForm
-          form={form}
-          initialValues={{
-            ...DEFAULT_OPTIONS,
-            header: {
-              ...DEFAULT_OPTIONS.header,
-              header: `<h2>${budgetName}</h2><p>Cost Summary</p>`
-            }
-          }}
-          loading={headerTemplateLoading}
-          headerTemplates={headerTemplates}
-          headerTemplatesLoading={headerTemplatesLoading}
-          accountsLoading={loadingData}
-          accounts={!isNil(budgetResponse) ? budgetResponse.children : []}
-          disabled={isNil(budgetResponse) || isNil(contactsResponse)}
-          columns={SubAccountColumns}
-          onValuesChange={(changedValues: Partial<ExportFormOptions>, values: ExportFormOptions) => {
-            setOptions(values);
-            previewer.current?.refreshRequired();
-          }}
-          displayedHeaderTemplate={displayedHeaderTemplate}
-          onClearHeaderTemplate={() => dispatch(actions.pdf.clearHeaderTemplateAction(null))}
-          onLoadHeaderTemplate={(id: number) => dispatch(actions.pdf.loadHeaderTemplateAction(id))}
-          onHeaderTemplateDeleted={(id: number) => {
-            if (!isNil(displayedHeaderTemplate) && displayedHeaderTemplate.id === id) {
-              dispatch(actions.pdf.clearHeaderTemplateAction(null));
-            }
-            dispatch(actions.pdf.removeHeaderTemplateFromStateAction(id));
-          }}
-          onHeaderTemplateCreated={(template: Model.HeaderTemplate) => {
-            dispatch(actions.pdf.addHeaderTemplateToStateAction(template));
-            dispatch(actions.pdf.displayHeaderTemplateAction(template));
-          }}
-        />
-      </div>
-      <Previewer
-        ref={previewer}
-        loadingData={loadingData}
-        renderComponent={renderComponent}
-        onExport={() => previewer.current?.export(filename, onSuccess)}
+      <ExportBudgetPdfForm
+        form={form}
+        initialValues={{
+          ...DEFAULT_OPTIONS,
+          header: {
+            ...DEFAULT_OPTIONS.header,
+            header: `<h2>${budgetName}</h2><p>Cost Summary</p>`
+          }
+        }}
+        loading={headerTemplateLoading}
+        headerTemplates={headerTemplates}
+        headerTemplatesLoading={headerTemplatesLoading}
+        accountsLoading={loadingData}
+        accounts={!isNil(budgetResponse) ? budgetResponse.children : []}
+        disabled={isNil(budgetResponse) || isNil(contactsResponse)}
+        columns={SubAccountColumns}
+        onValuesChange={(changedValues: Partial<ExportBudgetPdfFormOptions>, values: ExportBudgetPdfFormOptions) => {
+          setOptions(values);
+          previewer.current?.refreshRequired();
+        }}
+        displayedHeaderTemplate={displayedHeaderTemplate}
+        onClearHeaderTemplate={() => dispatch(actions.pdf.clearHeaderTemplateAction(null))}
+        onLoadHeaderTemplate={(id: number) => dispatch(actions.pdf.loadHeaderTemplateAction(id))}
+        onHeaderTemplateDeleted={(id: number) => {
+          if (!isNil(displayedHeaderTemplate) && displayedHeaderTemplate.id === id) {
+            dispatch(actions.pdf.clearHeaderTemplateAction(null));
+          }
+          dispatch(actions.pdf.removeHeaderTemplateFromStateAction(id));
+        }}
+        onHeaderTemplateCreated={(template: Model.HeaderTemplate) => {
+          dispatch(actions.pdf.addHeaderTemplateToStateAction(template));
+          dispatch(actions.pdf.displayHeaderTemplateAction(template));
+        }}
       />
-    </Modal>
+    </PreviewModal>
   );
 };
 
-export default PreviewModal;
+export default BudgetPreviewModal;

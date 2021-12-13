@@ -59,23 +59,6 @@ declare interface ClickableProps extends StandardComponentProps {
   readonly icon?: ClickableIconOrElement;
 }
 
-declare type HeaderTemplateFormData = {
-  readonly header: string | null;
-  readonly left_image: UploadedImage | SavedImage | null;
-  readonly left_info: string | null;
-  readonly right_image: UploadedImage | SavedImage | null;
-  readonly right_info: string | null;
-};
-
-declare interface ExportFormOptions {
-  readonly header: HeaderTemplateFormData;
-  readonly columns: string[];
-  readonly tables?: TableOption[] | null | undefined;
-  readonly excludeZeroTotals: boolean;
-  readonly notes?: string | null;
-  readonly includeNotes: boolean;
-}
-
 declare type PasswordValidationID = "lowercase" | "uppercase" | "number" | "character" | "minChar";
 declare type PasswordValidationName = { id: ValidationId; name: string };
 /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */

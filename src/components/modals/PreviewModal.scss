@@ -41,16 +41,6 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
         flex-grow: 100;
         margin-right: 10px;
         padding-right: 20px;
-
-        .export-header-sides {
-          @include media("<=xl") {
-            flex-direction: column;
-            .export-header-side-item {
-              width: 100%;
-              margin-left: 0px !important;
-            }
-          }
-        }
       }
 
       .previewer {
@@ -86,22 +76,6 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
         margin-right: 0px;
         padding-right: 0px;
 
-        .separator {
-          margin: 8px auto !important;
-        }
-
-        .export-header-sides {
-          flex-direction: column;
-          .export-header-side-item {
-            width: 100%;
-            margin-left: 0px !important;
-
-            .pdf-image-uploader {
-              width: 100%;
-            }
-          }
-        }
-
         .form-item {
           margin-bottom: 5px !important;
 
@@ -119,22 +93,6 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
             .label--section {
               height: 18px !important;
               line-height: 18px;
-              margin-bottom: 8px;
-            }
-          }
-        }
-
-        .header-template-save-form {
-          flex-direction: column;
-          .header-template-save-form-content {
-            flex-direction: column;
-
-            > * {
-              margin-right: 0px;
-              width: 100%;
-            }
-
-            > *:not(:last-child) {
               margin-bottom: 8px;
             }
           }
@@ -204,7 +162,7 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
       display: flex;
 
       .export-form-container {
-        .export-form {
+        .form {
           max-height: 100%;
         }
       }

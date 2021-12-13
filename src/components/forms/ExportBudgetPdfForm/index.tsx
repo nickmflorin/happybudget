@@ -22,11 +22,7 @@ import "./index.scss";
 type NonFormFields = "includeNotes" | "notes" | "header";
 type RichTextFields = "notes" | "header";
 
-export type IExportFormRef = {
-  readonly getFormData: () => ExportFormOptions;
-};
-
-interface ExportFormProps extends FormProps<ExportFormOptions> {
+interface ExportFormProps extends FormProps<ExportBudgetPdfFormOptions> {
   readonly disabled?: boolean;
   readonly columns: Table.Column<Tables.SubAccountRowData, Model.PdfSubAccount>[];
   readonly accounts: Model.PdfAccount[];
@@ -57,7 +53,7 @@ const ExportForm = (
     onHeaderTemplateDeleted,
     ...props
   }: ExportFormProps,
-  ref: ForwardedRef<IExportFormRef>
+  ref: ForwardedRef<IExportFormRef<ExportBudgetPdfFormOptions>>
 ): JSX.Element => {
   const leftInfoEditor = useRef<IEditor>(null);
   const rightInfoEditor = useRef<IEditor>(null);
@@ -76,15 +72,15 @@ const ExportForm = (
   );
 
   const _formDataWithoutHeader = useMemo(() => {
-    return (values: Omit<ExportFormOptions, NonFormFields>): Omit<ExportFormOptions, "header"> => {
-      let options: Partial<ExportFormOptions> = {
+    return (values: Omit<ExportBudgetPdfFormOptions, NonFormFields>): Omit<ExportBudgetPdfFormOptions, "header"> => {
+      let options: Partial<ExportBudgetPdfFormOptions> = {
         ...values,
         includeNotes
       };
       if (includeNotes === true) {
         options = { ...options, notes: notesHtml };
       }
-      return options as ExportFormOptions;
+      return options as ExportBudgetPdfFormOptions;
     };
   }, [notesHtml, includeNotes]);
 
@@ -103,7 +99,7 @@ const ExportForm = (
   );
 
   const formData = useMemo(() => {
-    return (values: Omit<ExportFormOptions, NonFormFields>): ExportFormOptions => {
+    return (values: Omit<ExportBudgetPdfFormOptions, NonFormFields>): ExportBudgetPdfFormOptions => {
       return { ..._formDataWithoutHeader(values), header: getHeaderTemplateData() };
     };
   }, [_formDataWithoutHeader, getHeaderTemplateData]);
@@ -114,7 +110,7 @@ const ExportForm = (
       leftInfoEditor.current?.setData(displayedHeaderTemplate.left_info || "");
       rightInfoEditor.current?.setData(displayedHeaderTemplate.right_info || "");
 
-      const values: ExportFormOptions = props.form.getFieldsValue();
+      const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
       _setRightImage(displayedHeaderTemplate.right_image);
       _setLeftImage(displayedHeaderTemplate.left_image);
       props.onValuesChange?.(
@@ -133,7 +129,7 @@ const ExportForm = (
   const setLeftImage = useMemo(
     () => (img: UploadedImage | SavedImage | null) => {
       _setLeftImage(img);
-      const values: ExportFormOptions = props.form.getFieldsValue();
+      const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
       props.onValuesChange?.(
         { header: { ...getHeaderTemplateData(), left_image: img } },
         { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), left_image: img } }
@@ -145,7 +141,7 @@ const ExportForm = (
   const setRightImage = useMemo(
     () => (img: UploadedImage | SavedImage | null) => {
       _setRightImage(img);
-      const values: ExportFormOptions = props.form.getFieldsValue();
+      const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
       props.onValuesChange?.(
         { header: { ...getHeaderTemplateData(), right_image: img } },
         { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), right_image: img } }
@@ -156,7 +152,7 @@ const ExportForm = (
 
   const setHeader = useMemo(
     () => (html: string) => {
-      const values: ExportFormOptions = props.form.getFieldsValue();
+      const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
       props.onValuesChange?.(
         { header: { ...getHeaderTemplateData(), header: html } },
         { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), header: html } }
@@ -167,7 +163,7 @@ const ExportForm = (
 
   const setLeftInfo = useMemo(
     () => (html: string) => {
-      const values: ExportFormOptions = props.form.getFieldsValue();
+      const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
       props.onValuesChange?.(
         { header: { ...getHeaderTemplateData(), left_info: html } },
         { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), left_info: html } }
@@ -178,7 +174,7 @@ const ExportForm = (
 
   const setRightInfo = useMemo(
     () => (html: string) => {
-      const values: ExportFormOptions = props.form.getFieldsValue();
+      const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
       props.onValuesChange?.(
         { header: { ...getHeaderTemplateData(), right_info: html } },
         { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), right_info: html } }
@@ -189,16 +185,16 @@ const ExportForm = (
 
   useImperativeHandle(ref, () => ({
     getFormData: () => {
-      const values: ExportFormOptions = props.form.getFieldsValue();
+      const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
       return formData(values);
     }
   }));
 
-  const rawFormInitialValues = useMemo<Omit<ExportFormOptions, RichTextFields> | undefined>(():
-    | Omit<ExportFormOptions, RichTextFields>
+  const rawFormInitialValues = useMemo<Omit<ExportBudgetPdfFormOptions, RichTextFields> | undefined>(():
+    | Omit<ExportBudgetPdfFormOptions, RichTextFields>
     | undefined => {
     if (!isNil(props.initialValues)) {
-      const { header, notes, ...rest } = props.initialValues as ExportFormOptions;
+      const { header, notes, ...rest } = props.initialValues as ExportBudgetPdfFormOptions;
       return rest;
     }
     return undefined;
@@ -334,12 +330,12 @@ const ExportForm = (
       initialValues={rawFormInitialValues}
       condensed={true}
       className={classNames("export-form", props.className)}
-      onFinish={(values: Omit<ExportFormOptions, NonFormFields>) => {
+      onFinish={(values: Omit<ExportBudgetPdfFormOptions, NonFormFields>) => {
         props.onFinish?.(formData(values));
       }}
       onValuesChange={(
-        changedValues: Partial<Omit<ExportFormOptions, NonFormFields>>,
-        values: Omit<ExportFormOptions, NonFormFields>
+        changedValues: Partial<Omit<ExportBudgetPdfFormOptions, NonFormFields>>,
+        values: Omit<ExportBudgetPdfFormOptions, NonFormFields>
       ) => {
         /* Note: Since the images are not included as a part of the underlying
 					 Form mechanics, they will not trigger this hook.  This means that we
@@ -423,7 +419,7 @@ const ExportForm = (
             defaultChecked={isNil(rawFormInitialValues?.tables)}
             checked={showAllTables}
             onChange={(e: CheckboxChangeEvent) => {
-              const values: ExportFormOptions = props.form.getFieldsValue();
+              const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
               setShowAllTables(e.target.checked);
               if (e.target.checked === true) {
                 props.form.setFields([{ name: "tables", value: undefined }]);
@@ -475,7 +471,7 @@ const ExportForm = (
             unCheckedChildren={"OFF"}
             defaultChecked={false}
             onChange={(checked: boolean) => {
-              const values: ExportFormOptions = props.form.getFieldsValue();
+              const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
               props.onValuesChange?.({ includeNotes: checked }, { ...formData(values), includeNotes: checked });
               setIncludeNotes(checked);
             }}
@@ -489,7 +485,7 @@ const ExportForm = (
               initialValue={props.initialValues?.header?.notes || ""}
               onChange={(html: string) => {
                 setNotesHtml(html);
-                const values: ExportFormOptions = props.form.getFieldsValue();
+                const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
                 props.onValuesChange?.({ notes: html }, { ...formData(values), notes: html });
               }}
             />

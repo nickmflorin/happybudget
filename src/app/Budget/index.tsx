@@ -7,7 +7,7 @@ import { budgeting } from "lib";
 import { Icon, RenderIfValidId } from "components";
 import { CollapsedLayout } from "components/layout";
 
-import { Account, SubAccount, PreviewModal, Accounts, Actuals, Analysis } from "./components";
+import { Account, SubAccount, BudgetPreviewModal, Accounts, Actuals, Analysis } from "./components";
 import { actions, selectors } from "./store";
 
 const RootBudget = (): JSX.Element => {
@@ -142,7 +142,7 @@ const RootBudget = (): JSX.Element => {
             )}
           />
         </Switch>
-        <PreviewModal
+        <BudgetPreviewModal
           visible={previewModalVisible}
           onCancel={() => setPreviewModalVisible(false)}
           budgetId={parseInt(budgetId)}

@@ -2,8 +2,8 @@ import React, { useMemo } from "react";
 import { includes, reduce, map } from "lodash";
 
 import { tabling, hooks } from "lib";
+import { BodyRow, GroupRow, HeaderRow, FooterRow } from "../rows";
 import Table from "./Table";
-import { BodyRow, GroupRow, HeaderRow, FooterRow } from "../Rows";
 
 type M = Model.PdfAccount;
 type R = Tables.AccountRowData;
@@ -58,14 +58,7 @@ const AccountsTable = ({
     ];
   });
 
-  const rows = generateRows();
-  return (
-    <Table>
-      {map(rows, (r: JSX.Element, index: number) => (
-        <React.Fragment key={index}>{r}</React.Fragment>
-      ))}
-    </Table>
-  );
+  return <Table generateRows={generateRows} />;
 };
 
 export default AccountsTable;

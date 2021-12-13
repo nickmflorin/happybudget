@@ -1,4 +1,4 @@
-import { isNil } from "lodash";
+import { isNil, reduce } from "lodash";
 
 import { tabling, util } from "lib";
 import { columns } from "../../generic";
@@ -11,12 +11,15 @@ const Columns: Table.Column<R, M>[] = [
     field: "name",
     headerName: "Description",
     minWidth: 200,
+    pdfFlexGrow: true,
     flex: 2,
-    columnType: "longText"
+    columnType: "longText",
+    pdfFooter: { value: "Grand Total" }
   }),
   columns.SelectColumn({
     field: "contact",
     headerName: "Contact",
+    pdfWidth: 0.12,
     width: 120,
     minWidth: 120,
     cellRenderer: { data: "ContactCell" },
@@ -26,6 +29,7 @@ const Columns: Table.Column<R, M>[] = [
   columns.BodyColumn<R, M>({
     field: "date",
     headerName: "Date",
+    pdfWidth: 0.08,
     width: 100,
     minWidth: 100,
     flex: 1,
@@ -42,6 +46,7 @@ const Columns: Table.Column<R, M>[] = [
   columns.TagSelectColumn({
     field: "actual_type",
     headerName: "Type",
+    pdfWidth: 0.12,
     cellRenderer: { data: "ActualTypeCell" },
     cellEditor: "ActualTypeEditor",
     width: 140,
@@ -52,28 +57,26 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "Amount",
     width: 100,
     minWidth: 100,
+    pdfWidth: 0.1,
     flex: 1,
     footer: {
       cellStyle: { textAlign: "right" }
     },
     valueFormatter: tabling.formatters.currencyValueFormatter,
     valueSetter: tabling.valueSetters.numericValueSetter<R>("value"),
-    /* processCellFromClipboard: (value: string) => {
-         if (!isNaN(parseFloat(value))) {
-           return parseFloat(value);
-         }
-         return null;
-       }, */
     columnType: "currency",
     /* We only want to use BodyCell's in the Footer cells because it slows
 		   rendering performance down dramatically. */
-    cellRenderer: { footer: "BodyCell" }
+    cellRenderer: { footer: "BodyCell" },
+    pdfFooterValueGetter: (rows: Table.DataRow<R>[]) =>
+      reduce(rows, (sum: number, s: Table.DataRow<R>) => sum + (s.data.value || 0), 0)
   }),
   columns.SelectColumn<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>({
     field: "owner",
     headerName: "Sub-Account",
     minWidth: 200,
     width: 200,
+    pdfWidth: 0.12,
     getHttpValue: (
       value: Model.SimpleSubAccount | Model.SimpleMarkup | null
     ): Model.GenericHttpModel<"markup"> | Model.GenericHttpModel<"subaccount"> | null => {
@@ -92,7 +95,8 @@ const Columns: Table.Column<R, M>[] = [
     field: "attachments",
     width: 140,
     minWidth: 140,
-    canBeExported: false
+    canBeExported: false,
+    includeInPdf: false
   }),
   columns.BodyColumn<R, M>({
     field: "purchase_order",
@@ -101,7 +105,8 @@ const Columns: Table.Column<R, M>[] = [
     minWidth: 100,
     flex: 1,
     columnType: "number",
-    tableColumnType: "body"
+    tableColumnType: "body",
+    pdfWidth: 0.08
   }),
   columns.BodyColumn<R, M>({
     field: "payment_id",
@@ -109,7 +114,8 @@ const Columns: Table.Column<R, M>[] = [
     width: 80,
     minWidth: 80,
     flex: 1,
-    columnType: "number"
+    columnType: "number",
+    pdfWidth: 0.08
   }),
   columns.BodyColumn<R, M>({
     field: "notes",
@@ -117,7 +123,8 @@ const Columns: Table.Column<R, M>[] = [
     width: 100,
     minWidth: 100,
     flex: 1,
-    columnType: "longText"
+    columnType: "longText",
+    includeInPdf: false
   })
 ];
 
