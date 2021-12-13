@@ -44,6 +44,7 @@ export type AuthenticatedTableProps<
     readonly confirmRowDelete?: boolean;
     readonly children: RenderPropChild<AuthenticatedTableDataGridProps<R, M>>;
     readonly rowHasCheckboxSelection?: (row: Table.EditableRow<R>) => boolean;
+    readonly localizePopupParent?: boolean;
   };
 
 const TableFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, any>>({

@@ -34,6 +34,7 @@ const FringesTable: React.FC<WithConnectedTableProps<Props, R, M, S>> = ({ expor
       cookieNames={{ hiddenColumns: "fringes-table-hidden-columns" }}
       columns={Columns}
       confirmRowDelete={false}
+      localizePopupParent
     />
   );
 };

@@ -112,6 +112,7 @@ export interface GridProps<R extends Table.RowData, M extends Model.RowHttpModel
   readonly onCellKeyDown?: (event: CellKeyDownEvent) => void;
   readonly onGridReady: (e: Table.GridReadyEvent) => void;
   readonly onFirstDataRendered: (e: Table.FirstDataRenderedEvent) => void;
+  readonly localizePopupParent?: boolean;
 }
 
 /* eslint-disable indent */
@@ -125,6 +126,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
   rowClass,
   checkboxColumn,
   style,
+  localizePopupParent,
   ...props
 }: GridProps<R, M>): JSX.Element => {
   const localColumns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
@@ -343,7 +345,11 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
         modules={AllModules}
         overlayNoRowsTemplate={"<span></span>"}
         overlayLoadingTemplate={"<span></span>"}
-        popupParent={document.getElementById(tableId) || undefined}
+        popupParent={
+          localizePopupParent
+            ? document.getElementById(tableId) || undefined
+            : document.querySelector("body") || undefined
+        }
       />
     </div>
   );
