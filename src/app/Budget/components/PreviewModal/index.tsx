@@ -1,18 +1,19 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
 import { registerFonts } from "style/pdf";
-import { redux, ui, tabling, notifications } from "lib";
+import { redux, ui, tabling, notifications, pdf } from "lib";
 
 import { Modal } from "components";
 import { ExportPdfForm } from "components/forms";
+import { Previewer } from "components/pdf";
 import { SubAccountsTable } from "components/tabling";
 
 import { actions } from "../../store";
+import BudgetPdf from "../BudgetPdf";
 
-import Previewer, { IPreviewerRef } from "./Previewer";
 import "./index.scss";
 
 const SubAccountColumns = filter(
@@ -37,6 +38,14 @@ const DEFAULT_OPTIONS: ExportFormOptions = {
     (field: string | undefined) => !isNil(field)
   ) as string[]
 };
+
+interface BudgetPdfFuncProps {
+  readonly budget: Model.PdfBudget;
+  readonly contacts: Model.Contact[];
+  readonly options: PdfBudgetTable.Options;
+}
+
+const BudgetPdfFunc = (props: BudgetPdfFuncProps): JSX.Element => <BudgetPdf {...props} />;
 
 interface PreviewModalProps {
   readonly onSuccess?: () => void;
@@ -68,7 +77,7 @@ const PreviewModal = ({
   onSuccess,
   onCancel
 }: PreviewModalProps): JSX.Element => {
-  const previewer = useRef<IPreviewerRef>(null);
+  const previewer = useRef<Pdf.IPreviewerRef>(null);
   const [loadingData, setLoadingData] = useState(false);
 
   const [contactsResponse, setContactsResponse] = useState<Http.ListResponse<Model.Contact> | null>(null);
@@ -106,7 +115,12 @@ const PreviewModal = ({
           .then(([b, cs]: [Model.PdfBudget, Http.ListResponse<Model.Contact>]) => {
             setContactsResponse(cs);
             setBudgetResponse(b);
-            previewer.current?.render(b, cs.data, options);
+            const pdfComponent = BudgetPdfFunc({
+              budget: b,
+              contacts: cs.data,
+              options: convertOptions(options)
+            });
+            previewer.current?.render(pdfComponent);
           })
           /* TODO: We should probably display the error in the modal and not let
 						 the default toast package display it in the top right of the
@@ -116,6 +130,34 @@ const PreviewModal = ({
       });
     }
   }, [visible]);
+
+  const convertOptions = useMemo(
+    () =>
+      (opts: ExportFormOptions): PdfBudgetTable.Options => ({
+        ...opts,
+        notes: pdf.parsers.convertHtmlIntoNodes(opts.notes || "") || [],
+        header: {
+          ...opts.header,
+          header: pdf.parsers.convertHtmlIntoNodes(opts.header.header || "") || [],
+          left_info: pdf.parsers.convertHtmlIntoNodes(opts.header.left_info || "") || [],
+          right_info: pdf.parsers.convertHtmlIntoNodes(opts.header.right_info || "") || []
+        }
+      }),
+    []
+  );
+
+  const renderComponent = useMemo(
+    () => () => {
+      if (!isNil(budgetResponse) && !isNil(contactsResponse)) {
+        return BudgetPdfFunc({
+          budget: budgetResponse,
+          contacts: contactsResponse.data,
+          options: convertOptions(options)
+        });
+      }
+    },
+    [budgetResponse, contactsResponse, options]
+  );
 
   return (
     <Modal
@@ -165,12 +207,8 @@ const PreviewModal = ({
       <Previewer
         ref={previewer}
         loadingData={loadingData}
+        renderComponent={renderComponent}
         onExport={() => previewer.current?.export(filename, onSuccess)}
-        onRefresh={() => {
-          if (!isNil(budgetResponse) && !isNil(contactsResponse)) {
-            previewer.current?.render(budgetResponse, contactsResponse.data, options);
-          }
-        }}
       />
     </Modal>
   );

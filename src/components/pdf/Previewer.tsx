@@ -1,43 +1,26 @@
 import React, { useEffect, useMemo, useState, forwardRef, ForwardedRef, useImperativeHandle } from "react";
 import { Page } from "react-pdf/dist/esm/entry.webpack";
 import { pdf as PDF } from "@react-pdf/renderer";
-import { debounce } from "lodash";
+import { debounce, isNil } from "lodash";
 
 import { Pagination } from "antd";
 
-import { util, pdf } from "lib";
+import { util } from "lib";
 
-import { ShowHide } from "components";
 import { Button } from "components/buttons";
-import { RenderDocument } from "components/pdf";
+import { RenderDocument } from "./primitive";
 
-import BudgetPdf from "../BudgetPdf";
-import { isNil } from "lodash";
+import "./Previewer.scss";
 
 interface PreviewerProps {
   readonly onExport: () => void;
   readonly loadingData?: boolean;
-  readonly onRefresh: () => void;
+  readonly renderComponent: () => JSX.Element | undefined;
 }
-
-export interface IPreviewerRef {
-  readonly render: (budget: Model.PdfBudget, contacts: Model.Contact[], opts: ExportFormOptions) => void;
-  readonly debouncedRender: (budget: Model.PdfBudget, contacts: Model.Contact[], opts: ExportFormOptions) => void;
-  readonly export: (filename: string, onSuccess?: () => void) => void;
-  readonly refreshRequired: () => void;
-}
-
-interface BudgetPdfFuncProps {
-  readonly budget: Model.PdfBudget;
-  readonly contacts: Model.Contact[];
-  readonly options: PdfBudgetTable.Options;
-}
-
-const BudgetPdfFunc = (props: BudgetPdfFuncProps): JSX.Element => <BudgetPdf {...props} />;
 
 const Previewer = (
-  { onExport, loadingData, onRefresh }: PreviewerProps,
-  ref: ForwardedRef<IPreviewerRef>
+  { onExport, loadingData, renderComponent }: PreviewerProps,
+  ref: ForwardedRef<Pdf.IPreviewerRef>
 ): JSX.Element => {
   const [generatingPdf, setGeneratingPdf] = useState(false);
   const [numPages, setNumPages] = useState(0);
@@ -45,24 +28,14 @@ const Previewer = (
   const [file, setFile] = useState<string | ArrayBuffer | null>(null);
   const [refreshRequired, setRefreshRequired] = useState(false);
 
-  const convertOptions = useMemo(
-    () =>
-      (opts: ExportFormOptions): PdfBudgetTable.Options => ({
-        ...opts,
-        notes: pdf.parsers.convertHtmlIntoNodes(opts.notes || "") || [],
-        header: {
-          ...opts.header,
-          header: pdf.parsers.convertHtmlIntoNodes(opts.header.header || "") || [],
-          left_info: pdf.parsers.convertHtmlIntoNodes(opts.header.left_info || "") || [],
-          right_info: pdf.parsers.convertHtmlIntoNodes(opts.header.right_info || "") || []
-        }
-      }),
-    []
-  );
-
   const render = useMemo(
-    () => async (budget: Model.PdfBudget, contacts: Model.Contact[], opts: ExportFormOptions) => {
-      const pdfComponent = BudgetPdfFunc({ budget, contacts, options: convertOptions(opts) });
+    () => async (component?: JSX.Element) => {
+      let pdfComponent: JSX.Element | undefined;
+      if (!isNil(component)) {
+        pdfComponent = component;
+      } else {
+        pdfComponent = renderComponent();
+      }
       if (!isNil(pdfComponent)) {
         setGeneratingPdf(true);
         PDF(pdfComponent)
@@ -88,12 +61,10 @@ const Previewer = (
   );
 
   const debouncedRender = useMemo(() => debounce(render, 20), []);
-  const debouncedRefresh = useMemo(() => debounce(onRefresh, 20), []);
 
   useEffect(() => {
     return () => {
       debouncedRender.cancel();
-      debouncedRefresh.cancel();
     };
   }, []);
 
@@ -113,18 +84,18 @@ const Previewer = (
 
   return (
     <div className={"previewer"}>
-      <ShowHide show={refreshRequired}>
+      {refreshRequired && (
         <Button
           className={"btn btn--over"}
           disabled={generatingPdf || loadingData}
           onClick={() => {
             setRefreshRequired(false);
-            onRefresh();
+            render();
           }}
         >
           {"Refresh"}
         </Button>
-      </ShowHide>
+      )}
       <div className={"preview-content"}>
         <RenderDocument
           file={file}

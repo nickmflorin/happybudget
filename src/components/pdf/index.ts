@@ -4,3 +4,4 @@ export { default as NoDataPage } from "./NoDataPage";
 export { default as RichText } from "./RichText";
 export * from "./primitive";
 export * from "./text";
+export { default as Previewer } from "./Previewer";

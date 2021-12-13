@@ -54,25 +54,7 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
       }
 
       .previewer {
-        width: calc(#{$canvas-width} + 6px) !important;
-
-        .preview-content {
-          height: calc(100% - 72px);
-          width: calc(#{$canvas-width} + 6px) !important;
-
-          .react-pdf__Document {
-            .react-pdf__Page__canvas {
-              height: $pdf-canvas-height !important;
-              width: $canvas-width !important;
-            }
-            // I honestly do not know what this is, or why it is there, but it's presence
-            // seems to cause all sorts of weird behavior with scrolling and hiding it
-            // does not seem to have an affect.
-            .react-pdf__Page__textContent {
-              display: none !important;
-            }
-          }
-        }
+				max-width: 500px;
       }
     }
   }
@@ -161,25 +143,6 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
 
       .previewer {
         overflow-y: unset;
-        width: calc(100% + 6px) !important;
-
-        .preview-content {
-          height: calc(100% - 72px);
-          width: 100% !important;
-
-          .react-pdf__Document {
-            .react-pdf__Page__canvas {
-              height: $pdf-canvas-height !important;
-              width: calc(100% - 6px) !important;
-            }
-            // I honestly do not know what this is, or why it is there, but it's presence
-            // seems to cause all sorts of weird behavior with scrolling and hiding it
-            // does not seem to have an affect.
-            .react-pdf__Page__textContent {
-              display: none !important;
-            }
-          }
-        }
       }
     }
   }
@@ -243,39 +206,6 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
       .export-form-container {
         .export-form {
           max-height: 100%;
-        }
-      }
-
-      .previewer {
-        display: flex;
-        flex-direction: column;
-        position: relative;
-
-        .btn--over {
-          position: absolute;
-          top: 5px;
-          right: 5px;
-        }
-
-        .preview-content {
-          position: relative;
-          padding: 2px;
-          border: 1px solid $gray-light;
-          margin-bottom: 10px;
-          overflow-y: scroll;
-        }
-
-        .preview-footer {
-          height: 72px;
-
-          .ant-pagination {
-            height: 36px !important;
-            width: auto;
-            text-align: center;
-          }
-          .btn {
-            width: 100%;
-          }
         }
       }
     }
