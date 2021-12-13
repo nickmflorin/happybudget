@@ -58,9 +58,9 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
   return (
     <React.Fragment>
       <Page
-        className={"discover"}
+        className={"my-templates"}
         pageProps={{ className: "dashboard-page" }}
-        title={"Discover"}
+        title={"My Templates"}
         loading={loading}
         subMenu={[
           <SearchInput
