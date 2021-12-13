@@ -1,4 +1,3 @@
-export { default as HorizontalMenu } from "./HorizontalMenu";
 export { default as ModelMenu } from "./ModelMenu";
 export { default as ModelTagsMenu } from "./ModelTagsMenu";
 export * from "./ModelTagsMenu";
