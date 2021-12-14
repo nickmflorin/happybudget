@@ -6,7 +6,7 @@ import { filter, intersection } from "lodash";
 import * as api from "api";
 import { budgeting, tabling } from "lib";
 
-import { AccountsTable } from "components/tabling";
+import { AccountsTable } from "tabling";
 
 import { accounts as actions, loadingTemplateAction, updateTemplateInStateAction } from "../actions";
 

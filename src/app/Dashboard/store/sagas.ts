@@ -3,7 +3,7 @@ import { spawn, takeLatest, debounce } from "redux-saga/effects";
 
 import { contacts } from "store/tasks";
 import { tabling } from "lib";
-import { ContactsTable } from "components/tabling";
+import { ContactsTable } from "tabling";
 
 import * as actions from "./actions";
 import * as tasks from "./tasks";

@@ -2,7 +2,7 @@ import { combineReducers } from "redux";
 import { filter, intersection } from "lodash";
 
 import { redux, budgeting } from "lib";
-import { AccountsTable, SubAccountsTable, FringesTable } from "components/tabling";
+import { AccountsTable, SubAccountsTable, FringesTable } from "tabling";
 
 import * as actions from "./actions";
 import initialState from "./initialState";

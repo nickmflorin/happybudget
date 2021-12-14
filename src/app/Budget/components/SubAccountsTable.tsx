@@ -6,7 +6,7 @@ import { tabling } from "lib";
 import { actions, selectors } from "store";
 
 import { useContacts, CreateContactParams, EditContactParams } from "components/hooks";
-import { SubAccountsTable as GenericSubAccountsTable } from "components/tabling";
+import { SubAccountsTable as GenericSubAccountsTable } from "tabling";
 
 import { selectFringes, selectSubAccountUnits } from "../store/selectors";
 import FringesModal from "./FringesModal";

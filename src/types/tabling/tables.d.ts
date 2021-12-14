@@ -73,3 +73,25 @@ declare namespace Tables {
 
   type ContactTableStore = Redux.TableStore<ContactRowData>;
 }
+
+declare namespace PdfBudgetTable {
+  // Either the TopSheet page or an ID of the account.
+  type TableOption = "topsheet" | number;
+
+  type HeaderOptions = {
+    readonly header: Pdf.HTMLNode[];
+    readonly left_image: UploadedImage | SavedImage | null;
+    readonly left_info: Pdf.HTMLNode[] | null;
+    readonly right_image: UploadedImage | SavedImage | null;
+    readonly right_info: Pdf.HTMLNode[] | null;
+  };
+
+  interface Options {
+    readonly header: HeaderOptions;
+    readonly columns: string[];
+    readonly tables?: TableOption[] | null | undefined;
+    readonly excludeZeroTotals: boolean;
+    readonly notes?: Pdf.HTMLNode[];
+    readonly includeNotes: boolean;
+  }
+}

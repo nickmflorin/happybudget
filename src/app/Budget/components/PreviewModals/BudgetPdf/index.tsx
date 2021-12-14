@@ -3,8 +3,8 @@ import { isNil, map, filter, find, includes } from "lodash";
 
 import { ShowHide } from "components";
 import { Document, View, Page, Tag, Text, NoDataPage } from "components/pdf";
-import { AccountsTable as GenericAccountsTable, SubAccountsTable as GenericSubAccountsTable } from "components/tabling";
-import { AccountsTable, AccountTable } from "components/tabling/pdf";
+import { AccountsTable as GenericAccountsTable, SubAccountsTable as GenericSubAccountsTable } from "tabling";
+import { AccountsTable, AccountTable } from "tabling/pdf";
 import { tabling, budgeting } from "lib";
 
 import PageHeader from "./PageHeader";

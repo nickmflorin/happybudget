@@ -7,7 +7,7 @@ import { tabling, redux } from "lib";
 
 import { Page } from "components/layout";
 import { useContacts } from "components/hooks";
-import { ContactsTable, connectTableToStore } from "components/tabling";
+import { ContactsTable, connectTableToStore } from "tabling";
 
 import { actions } from "../store";
 

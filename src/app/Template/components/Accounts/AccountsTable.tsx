@@ -6,7 +6,7 @@ import { isNil, map } from "lodash";
 
 import { tabling, budgeting, redux } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
-import { AccountsTable as GenericAccountsTable, connectTableToStore } from "components/tabling";
+import { AccountsTable as GenericAccountsTable, connectTableToStore } from "tabling";
 
 import { actions, selectors } from "../../store";
 

@@ -8,7 +8,7 @@ import { selectors } from "store";
 
 import { ExportBudgetPdfForm } from "components/forms";
 import { PreviewModal } from "components/modals";
-import { SubAccountsTable } from "components/tabling";
+import { SubAccountsTable } from "tabling";
 
 import { actions } from "../../store";
 import BudgetPdf from "./BudgetPdf";

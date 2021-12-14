@@ -4,7 +4,7 @@ import { createSelector } from "reselect";
 import { isNil, filter } from "lodash";
 
 import { redux, budgeting, tabling } from "lib";
-import { SubAccountsTable as GenericSubAccountsTable, connectTableToStore } from "components/tabling";
+import { SubAccountsTable as GenericSubAccountsTable, connectTableToStore } from "tabling";
 
 import { actions } from "../../store";
 

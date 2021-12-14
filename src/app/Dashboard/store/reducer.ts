@@ -1,6 +1,6 @@
 import { combineReducers } from "redux";
 import { redux, tabling } from "lib";
-import { ContactsTable } from "components/tabling";
+import { ContactsTable } from "tabling";
 
 import initialState from "./initialState";
 import * as actions from "./actions";

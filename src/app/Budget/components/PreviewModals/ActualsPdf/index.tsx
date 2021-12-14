@@ -5,8 +5,8 @@ import { tabling } from "lib";
 import { Colors } from "style/constants";
 
 import { Document, Page, Tag, Text } from "components/pdf";
-import { ActualsTable as GenericActualsTable } from "components/tabling";
-import { ActualsTable } from "components/tabling/pdf";
+import { ActualsTable as GenericActualsTable } from "tabling";
+import { ActualsTable } from "tabling/pdf";
 
 import PageHeader from "./PageHeader";
 

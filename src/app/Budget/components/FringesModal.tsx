@@ -1,6 +1,6 @@
 import { isNil } from "lodash";
 
-import { FringesTable, connectTableToStore } from "components/tabling";
+import { FringesTable, connectTableToStore } from "tabling";
 import GenericFringesModal, { GenericFringesModalProps } from "components/modals/FringesModal";
 
 import { actions, selectors } from "../store";

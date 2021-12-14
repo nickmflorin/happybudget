@@ -3,7 +3,7 @@ import { spawn, debounce } from "redux-saga/effects";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 
 import { tabling, budgeting } from "lib";
-import { ActualsTable } from "components/tabling";
+import { ActualsTable } from "tabling";
 
 import { updateBudgetInStateAction } from "../actions";
 import { actuals as actions } from "../actions";

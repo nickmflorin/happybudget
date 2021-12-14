@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 
 import * as api from "api";
 import { budgeting, tabling, notifications } from "lib";
-import { FringesTable } from "components/tabling";
+import { FringesTable } from "tabling";
 
 import * as actions from "../actions";
 

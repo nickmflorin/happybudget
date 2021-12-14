@@ -6,7 +6,7 @@ import { isNil, map, filter } from "lodash";
 
 import { redux, tabling, budgeting } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
-import { connectTableToStore } from "components/tabling";
+import { connectTableToStore } from "tabling";
 
 import { actions, selectors } from "../../store";
 import BudgetSubAccountsTable, { BudgetSubAccountsTableProps } from "../SubAccountsTable";

@@ -1,7 +1,7 @@
 import { combineReducers } from "redux";
 
 import { redux, budgeting } from "lib";
-import { SubAccountsTable, FringesTable, ActualsTable, AccountsTable } from "components/tabling";
+import { SubAccountsTable, FringesTable, ActualsTable, AccountsTable } from "tabling";
 
 import * as actions from "./actions";
 import initialState, { initialHeaderTemplatesState } from "./initialState";

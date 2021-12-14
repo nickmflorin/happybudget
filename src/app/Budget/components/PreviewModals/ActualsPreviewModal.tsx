@@ -9,7 +9,7 @@ import { selectors } from "store";
 
 import { ExportActualsPdfForm } from "components/forms";
 import { PreviewModal } from "components/modals";
-import { ActualsTable } from "components/tabling";
+import { ActualsTable } from "tabling";
 
 import ActualsPdf from "./ActualsPdf";
 import "./ActualsPreviewModal.scss";

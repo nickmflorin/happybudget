@@ -9,7 +9,7 @@ import { actions as globalActions, selectors } from "store";
 import { ActualsPage } from "app/Pages";
 
 import { useContacts, CreateContactParams } from "components/hooks";
-import { ActualsTable, connectTableToStore } from "components/tabling";
+import { ActualsTable, connectTableToStore } from "tabling";
 
 import { actions } from "../store";
 import { ActualsPreviewModal } from "./PreviewModals";

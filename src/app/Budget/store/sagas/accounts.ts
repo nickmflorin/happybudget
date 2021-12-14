@@ -5,7 +5,7 @@ import { spawn } from "redux-saga/effects";
 import * as api from "api";
 import { budgeting, tabling } from "lib";
 
-import { AccountsTable } from "components/tabling";
+import { AccountsTable } from "tabling";
 
 import { accounts as actions, loadingBudgetAction, updateBudgetInStateAction } from "../actions";
 

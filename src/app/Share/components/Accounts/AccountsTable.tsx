@@ -2,7 +2,7 @@ import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
 import { budgeting, redux } from "lib";
-import { AccountsTable as GenericAccountsTable, connectTableToStore } from "components/tabling";
+import { AccountsTable as GenericAccountsTable, connectTableToStore } from "tabling";
 
 import { actions } from "../../store";
 

@@ -5,7 +5,7 @@ import { isNil, filter, intersection } from "lodash";
 import * as api from "api";
 import { budgeting, tabling, notifications } from "lib";
 
-import { SubAccountsTable } from "components/tabling";
+import { SubAccountsTable } from "tabling";
 
 import {
   account as actions,
