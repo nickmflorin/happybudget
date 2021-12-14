@@ -1,4 +1,4 @@
-import { isNil, find, filter, includes } from "lodash";
+import { isNil, find, filter, includes, reduce } from "lodash";
 import { redux, util } from "lib";
 
 /* eslint-disable indent */
@@ -144,10 +144,15 @@ export const authenticatedModelListResponseReducerTransformers = <
       } else {
         return {
           ...st,
-          ordering: util.replaceInArray<Http.FieldOrder<string>>(
+          ordering: reduce(
             st.ordering,
-            { field: action.payload.field },
-            { ...existing, order: action.payload.order }
+            (curr: Http.Ordering<string>, o: Http.FieldOrder<string>) => {
+              if (o.field === action.payload.field) {
+                return [...curr, { ...o, order: action.payload.order }];
+              }
+              return [...curr, { ...o, order: 0 }];
+            },
+            []
           )
         };
       }

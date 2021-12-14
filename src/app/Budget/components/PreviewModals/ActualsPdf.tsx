@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { isNil, filter, find, includes } from "lodash";
 
-import { Document, Page, Tag, Text, View } from "components/pdf";
+import { Document, Page, Tag, Text } from "components/pdf";
 import { ActualsTable as GenericActualsTable } from "components/tabling";
 import { ActualsTable } from "components/tabling/pdf";
 

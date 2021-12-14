@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import { includes, reduce, map } from "lodash";
+import { useMemo } from "react";
+import { includes, reduce } from "lodash";
 
 import { tabling, hooks } from "lib";
 import { BodyRow, GroupRow, HeaderRow, FooterRow } from "../rows";

@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { isNil, filter, reduce, find, map, includes } from "lodash";
+import { isNil, filter, reduce, find, includes } from "lodash";
 import classNames from "classnames";
 
 import { tabling, hooks, budgeting } from "lib";
