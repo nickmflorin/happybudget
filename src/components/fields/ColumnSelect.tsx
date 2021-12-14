@@ -43,7 +43,12 @@ const ColumnSelect = <R extends Table.RowData, M extends Model.RowHttpModel>({
             ? find(tabling.models.ColumnTypes, { id: column.columnType })
             : undefined;
           return (
-            <Tag className={"column-select-tag"} style={{ marginRight: 3 }} {...params}>
+            <Tag
+              className={"column-select-tag"}
+              style={{ marginRight: 3 }}
+              onMouseDown={e => e.stopPropagation()}
+              {...params}
+            >
               {!isNil(colType) && !isNil(colType.icon) && (
                 <div className={"icon-wrapper"}>
                   {ui.typeguards.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}
