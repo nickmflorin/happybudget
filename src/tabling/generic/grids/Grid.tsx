@@ -316,7 +316,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
   const getRowNodeId = useMemo(() => (r: any) => r.id, []);
 
   return (
-    <div className={classNames("ag-theme-alpine", "grid", className)} style={style}>
+    <div id={`${tableId}-${id}`} className={classNames("ag-theme-alpine", "grid", className)} style={style}>
       <AgGridReact
         headerHeight={38}
         cellFlashDelay={100}

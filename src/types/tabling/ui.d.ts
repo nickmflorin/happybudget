@@ -3,10 +3,18 @@ declare namespace Table {
     readonly getCSVData: (fields?: string[]) => CSVData;
   };
 
+  type TableNotification = {
+    readonly message: string;
+    readonly detail?: string;
+    readonly duration?: number;
+  };
+
   type TableInstance<
     R extends RowData = RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel
   > = DataGridInstance & {
+    readonly removeNotification: () => void;
+    readonly notify: (notification: TableNotification) => void;
     readonly getFocusedRow: () => BodyRow<R> | null;
     readonly getRow: (id: BodyRowId) => BodyRow<R> | null;
     readonly getRows: () => BodyRow<R>[];

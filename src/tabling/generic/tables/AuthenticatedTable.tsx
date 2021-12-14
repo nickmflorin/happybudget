@@ -20,6 +20,7 @@ import {
   configureTable
 } from "../hocs";
 import TableWrapper from "./TableWrapper";
+import useNotifications from "./useNotifications";
 
 export type AuthenticatedTableDataGridProps<
   R extends Table.RowData,
@@ -84,6 +85,7 @@ const AuthenticatedTable = <
   const grid = tabling.hooks.useDataGrid();
   const [selectedRows, setSelectedRows] = useState<Table.EditableRow<R>[]>([]);
   const [deleteRows, setDeleteRows] = useState<Table.EditableRow<R>[] | undefined>(undefined);
+  const [removeNotification, notify] = useNotifications(props.id);
 
   /**
    * Note: Ideally, we would be including the selector in the mechanics of the
@@ -232,6 +234,8 @@ const AuthenticatedTable = <
 
   useImperativeHandle(props.table, () => ({
     ...grid.current,
+    notify,
+    removeNotification,
     changeColumnVisibility: props.changeColumnVisibility,
     applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R, M>>) =>
       Array.isArray(event) ? map(event, (e: Table.ChangeEvent<R, M>) => _onChangeEvent(e)) : _onChangeEvent(event),

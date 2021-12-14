@@ -1,528 +1,560 @@
-@import "./ag_theme";
+@import './ag_theme';
 
 .cell-dropdown {
-  border-radius: 0px;
-  border: none !important;
-  padding-top: 4px;
-  background-color: transparent;
+	border-radius: 0px;
+	border: none !important;
+	padding-top: 4px;
+	background-color: transparent;
 
-  .model-tags-menu {
-    border: 1px solid #efefef;
-  }
+	.model-tags-menu {
+		border: 1px solid #efefef;
+	}
 }
 
 @mixin grid_borders($color) {
-  .grid {
-    .ag-header {
-      background-color: $color !important;
-    }
-    .row {
-      > .cell {
-        border-bottom: 1px solid $color;
-        border-left: 1px solid $color;
-      }
-    }
-  }
+	.grid {
+		.ag-header {
+			background-color: $color !important;
+		}
+		.row {
+			> .cell {
+				border-bottom: 1px solid $color;
+				border-left: 1px solid $color;
+			}
+		}
+	}
 }
 
 @mixin grid_row_height($height) {
-  .row {
-    > .cell {
-      line-height: $height;
+	.row {
+		> .cell {
+			line-height: $height;
 
-      &.ag-cell-inline-editing {
-        height: $height;
-      }
-    }
-  }
+			&.ag-cell-inline-editing {
+				height: $height;
+			}
+		}
+	}
 }
 
 @mixin grid_background($color) {
-  // Fixes problem with range selection and hover causing white "blocks" in table.
-  .ag-root
-    .ag-body-viewport:not(.ag-has-focus)
-    .row:not(.row--group)
-    .ag-cell-range-selected-1:not(.ag-cell-inline-editing) {
-    background-color: $color !important;
-  }
-  .row:not(.ag-row-hover):not(.row--group) {
-    > .cell:not(.cell--calculated) {
-      background-color: $color;
-      &.ag-cell-range-selected {
-        background-color: $color;
-      }
-    }
-  }
+	// Fixes problem with range selection and hover causing white "blocks" in table.
+	.ag-root
+		.ag-body-viewport:not(.ag-has-focus)
+		.row:not(.row--group)
+		.ag-cell-range-selected-1:not(.ag-cell-inline-editing) {
+		background-color: $color !important;
+	}
+	.row:not(.ag-row-hover):not(.row--group) {
+		> .cell:not(.cell--calculated) {
+			background-color: $color;
+			&.ag-cell-range-selected {
+				background-color: $color;
+			}
+		}
+	}
 }
 
 @mixin footer_grid_background($color) {
-  @include grid_background($color);
-  .row {
-    > .cell {
-      // Here, we use the !important flag because the rows should not change color on hover.
-      background-color: $color !important;
-      &.ag-cell-range-selected {
-        background-color: $color !important;
-      }
-    }
-  }
+	@include grid_background($color);
+	.row {
+		> .cell {
+			// Here, we use the !important flag because the rows should not change color on hover.
+			background-color: $color !important;
+			&.ag-cell-range-selected {
+				background-color: $color !important;
+			}
+		}
+	}
 }
 
 .ag-react-container {
-  width: 100%;
+	width: 100%;
 }
 
 .table {
-  display: flex;
-  flex-direction: column;
-  max-height: 100%;
-  height: 100%;
-
-  @include grid_borders($table-border-color);
-
-  .ag-header {
-    border: none;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-
-    .ag-header-row {
-      > .ag-header-cell {
-        padding-left: 10px;
-        padding-right: 10px;
-        letter-spacing: 0.045em;
-        font-size: 12px;
-        font-weight: 400;
-        font-family: $roboto;
-
-        .inner-cell--header {
-          display: flex;
-          width: 100%;
-
-          .icon--table-header {
-            color: $grid-icon-color;
-            margin-right: 8px;
-          }
-
-          .text {
-            line-height: 36px;
-            flex-grow: 100;
-            font-weight: 400;
-          }
-
-          .btn--table-header-edit {
-            margin-left: 8px;
-            height: 18px;
-            width: 18px;
-            padding: 2px;
-            float: right;
-
-            svg {
-              height: 14px;
-              width: 14px;
-            }
-          }
-        }
-      }
-    }
-
-    .ag-pinned-left-header {
-      border-right: none !important;
-    }
-  }
-
-  .grid {
-    .ag-pinned-left-cols-container {
-      z-index: 1;
-    }
-
-    @include grid_row_height(36px);
-
-    .row {
-      border: none !important;
-      color: #3a3a3a;
-
-      &:first-child {
-        .ag-cell:not(.ag-cell-focus) {
-          border-top: none !important;
-        }
-      }
-
-      > .cell {
-        padding-left: 6px;
-        padding-right: 6px;
-        font-size: 13px;
-        font-family: $roboto;
-        font-weight: 400;
-        overflow: hidden;
-        overflow-x: hidden;
-        text-overflow: ellipsis;
-        // This is needed so that we can display white space in our cells without
-        // AG Grid trimming them.  Note that this sometimes causes issues with cell
-        // text overflow.  We still need to figure out a mores sustainable solution.
-        white-space: pre;
-        -webkit-font-smoothing: subpixel-antialiased;
-        // Because we have a 2px border width when the cell is selected and a 1px border
-        // width when it is not selected, if we do not apply this flex centering the text
-        // shifts on selection.
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-
-        .inner-cell {
-          height: 100%;
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-        }
-
-        &--action {
-          // white-space break-spaces messes with the checkbox selection cells.
-          white-space: nowrap !important;
-        }
-
-        // In the case that the cell renders HTML (like a tag) it is much easier
-        // to vertically center the content with flex than it is to pad each cell
-        // to center the rendered HTML.  It is important that we do not apply this
-        // flex to cells that just render text, because they will already be vertically
-        // centered and it messes with the cell's ability to truncate text.
-        &--renders-html {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-        }
-
-        &--full-size {
-          padding: 0px !important;
-
-          .ag-react-container {
-            height: 100%;
-
-            .inner-cell {
-              padding-left: 6px;
-              padding-right: 6px;
-            }
-          }
-        }
-
-        &.ag-cell-inline-editing {
-          border-radius: 0px !important;
-
-          .ag-input-field-input,
-          .ag-text-field-input {
-            padding: 0px !important;
-            border: none !important;
-            box-shadow: none !important;
-            background-color: transparent !important;
-          }
-        }
-
-        // This will vertically center the text nicely while also not adjusting the
-        // vertical location of the text when the cell is selected.
-        .ag-react-container {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-        }
-
-        .ag-selection-checkbox {
-          height: 16px;
-          margin-right: 0px;
-        }
-
-        &.ag-cell-focus {
-          border: 2px solid $green !important;
-          &.cell--not-selectable {
-            border: unset !important;
-            .ag-fill-handle {
-              display: none !important;
-            }
-          }
-        }
-
-        .ag-fill-handle {
-          background-color: $green;
-        }
-      }
-    }
-  }
-
-  .grid--footer {
-    .ag-header {
-      height: 0px !important;
-      min-height: 0px !important;
-    }
-  }
-
-  .core-table {
-    display: flex;
-    flex-direction: column;
-    max-height: 100%;
-    height: 100%;
-
-    &.with-page-footer {
-      max-height: calc(100% - 40px);
-    }
-
-    .ag-popup-editor {
-      margin-top: 36px;
-    }
-
-    .grid--data {
-      max-height: calc(100% - 40px);
-
-      @include grid_background($white);
-
-      .ag-root-wrapper {
-        overflow: visible;
-        max-height: 100% !important;
-        .ag-root-wrapper-body {
-          overflow-y: hidden;
-          max-height: 100% !important;
-          .ag-body-viewport {
-            overflow-y: scroll !important;
-          }
-        }
-      }
-
-      .ag-row:last-child {
-        border-bottom: none !important;
-      }
-
-      .row {
-        > .cell {
-          .icon-wrapper {
-            width: 16px;
-            margin-right: 6px;
-            float: right;
-
-            .icon {
-              height: 16px;
-              width: 16px;
-            }
-          }
-
-          &--drag {
-            .inner-cell {
-              .icon {
-                &:hover {
-                  cursor: pointer;
-                }
-              }
-            }
-          }
-
-          &--action {
-            border: unset !important;
-            text-align: center;
-            padding: 2px;
-
-            > * {
-              margin: 0 auto;
-            }
-          }
-
-          &--calculated {
-            background-color: #f7fffa;
-            .ag-fill-handle {
-              display: none !important;
-            }
-            &:not(.ag-cell-range-top) {
-              border-top-color: transparent;
-            }
-            &:not(.ag-cell-range-right) {
-              border-right-color: transparent;
-            }
-            &:not(.ag-cell-range-left) {
-              border-left-color: transparent;
-            }
-            &:not(.ag-cell-range-bottom) {
-              border-bottom-color: transparent;
-            }
-            &.negative {
-              color: $red !important;
-            }
-          }
-        }
-
-        &.ag-row-hover {
-          background-color: $gray-highlight;
-          > .cell {
-            background-color: $gray-highlight;
-            &.cell--calculated {
-              background-color: $gray-highlight;
-            }
-          }
-        }
-
-        &--group {
-          border-bottom: none !important;
-          // Since the entire row is colored (instead of coloring the individual
-          // cells) we have to apply the radius to the entire row AND the first/
-          // last cells.  If the radius isn't applied to the row, the underlying
-          // curved radii of the first and last cells will not be seen.
-          border-radius: 10px !important;
-
-          > .cell {
-            font-weight: 400 !important;
-            border: none !important;
-            background-color: inherit !important;
-
-            &[aria-colindex="1"] {
-              border-bottom-left-radius: 8px;
-              border-top-left-radius: 8px;
-            }
-
-            &.ag-cell-range-right {
-              border-bottom-right-radius: 8px;
-              border-top-right-radius: 8px;
-            }
-
-            &.ag-cell-last-left-pinned {
-              border-right: 0px;
-              overflow: visible;
-            }
-
-            .btn--icon-only {
-              &.ag-grid-action-button {
-                &:hover {
-                  background-color: transparent;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    &.with-table-menu {
-      .grid--data {
-        max-height: calc(100% - 40px - 40px);
-      }
-    }
-
-    .grid--table-footer {
-      flex: none;
-      height: 40px;
-
-      .ag-body-viewport {
-        border-bottom-left-radius: 8px;
-        border-bottom-right-radius: 8px;
-      }
-
-      &.constrain-horizontally {
-        .ag-center-cols-viewport {
-          max-width: 100%;
-          overflow-x: hidden;
-          .ag-center-cols-container {
-            max-width: 100%;
-          }
-        }
-      }
-
-      @include footer_grid_background($table-border-color);
-
-      .row {
-        border-bottom: none !important;
-        > .cell {
-          border: none !important;
-
-          &[aria-colindex="1"] {
-            border-bottom-left-radius: 8px;
-          }
-          &.ag-cell-range-right {
-            border-bottom-right-radius: 8px;
-          }
-        }
-      }
-    }
-  }
-
-  .page-footer-grid-wrapper {
-    flex-grow: 100;
-    display: flex;
-    flex-direction: column;
-    min-height: 40px;
-
-    .grid--page-footer {
-      flex: none;
-      height: 30px;
-      margin-top: 10px;
-
-      .ag-body-viewport {
-        border-radius: 8px;
-      }
-
-      &.constrain-horizontally {
-        .ag-center-cols-viewport {
-          max-width: 100%;
-          overflow-x: hidden;
-          .ag-center-cols-container {
-            max-width: 100%;
-          }
-        }
-      }
-
-      @include footer_grid_background(#d3d3d3);
-
-      .row {
-        border-bottom: none !important;
-
-        > .cell {
-          border: none !important;
-          line-height: 28px;
-
-          &[aria-colindex="1"] {
-            border-bottom-left-radius: 8px;
-            border-top-left-radius: 8px;
-          }
-          &.ag-cell-range-right {
-            border-bottom-right-radius: 8px;
-            border-top-right-radius: 8px;
-          }
-        }
-      }
-    }
-  }
-
-  &--minimal {
-    @include grid_borders($transparent);
-    font-family: $avenir !important;
-
-    .ag-header {
-      border: none;
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
-
-      .ag-header-row {
-        > .ag-header-cell {
-          background-color: $white;
-        }
-      }
-    }
-
-    .core-table {
-      .grid--data {
-        @include grid_row_height(40px);
-        @include grid_background($white);
-        .row {
-          > .cell {
-            font-family: $avenir;
-            .link--table {
-              font-family: $avenir;
-              text-align: inherit !important;
-            }
-          }
-        }
-      }
-      .grid--table-footer {
-        @include footer_grid_background($white);
-        .row {
-          > .cell {
-            font-family: $avenir;
-          }
-        }
-      }
-    }
-  }
+	display: flex;
+	flex-direction: column;
+	max-height: 100%;
+	height: 100%;
+
+	@include grid_borders($table-border-color);
+
+	.ag-header {
+		border: none;
+		border-top-left-radius: 8px;
+		border-top-right-radius: 8px;
+
+		.ag-header-row {
+			> .ag-header-cell {
+				padding-left: 10px;
+				padding-right: 10px;
+				letter-spacing: 0.045em;
+				font-size: 12px;
+				font-weight: 400;
+				font-family: $roboto;
+
+				.inner-cell--header {
+					display: flex;
+					width: 100%;
+
+					.icon--table-header {
+						color: $grid-icon-color;
+						margin-right: 8px;
+					}
+
+					.text {
+						line-height: 36px;
+						flex-grow: 100;
+						font-weight: 400;
+					}
+
+					.btn--table-header-edit {
+						margin-left: 8px;
+						height: 18px;
+						width: 18px;
+						padding: 2px;
+						float: right;
+
+						svg {
+							height: 14px;
+							width: 14px;
+						}
+					}
+				}
+			}
+		}
+
+		.ag-pinned-left-header {
+			border-right: none !important;
+		}
+	}
+
+	.grid {
+		position: relative;
+
+		.ag-pinned-left-cols-container {
+			z-index: 1;
+		}
+
+		@include grid_row_height(36px);
+
+		.row {
+			border: none !important;
+			color: #3a3a3a;
+
+			&:first-child {
+				.ag-cell:not(.ag-cell-focus) {
+					border-top: none !important;
+				}
+			}
+
+			> .cell {
+				padding-left: 6px;
+				padding-right: 6px;
+				font-size: 13px;
+				font-family: $roboto;
+				font-weight: 400;
+				overflow: hidden;
+				overflow-x: hidden;
+				text-overflow: ellipsis;
+				// This is needed so that we can display white space in our cells without
+				// AG Grid trimming them.  Note that this sometimes causes issues with cell
+				// text overflow.  We still need to figure out a mores sustainable solution.
+				white-space: pre;
+				-webkit-font-smoothing: subpixel-antialiased;
+				// Because we have a 2px border width when the cell is selected and a 1px border
+				// width when it is not selected, if we do not apply this flex centering the text
+				// shifts on selection.
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+
+				.inner-cell {
+					height: 100%;
+					width: 100%;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+				}
+
+				&--action {
+					// white-space break-spaces messes with the checkbox selection cells.
+					white-space: nowrap !important;
+				}
+
+				// In the case that the cell renders HTML (like a tag) it is much easier
+				// to vertically center the content with flex than it is to pad each cell
+				// to center the rendered HTML.  It is important that we do not apply this
+				// flex to cells that just render text, because they will already be vertically
+				// centered and it messes with the cell's ability to truncate text.
+				&--renders-html {
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+				}
+
+				&--full-size {
+					padding: 0px !important;
+
+					.ag-react-container {
+						height: 100%;
+
+						.inner-cell {
+							padding-left: 6px;
+							padding-right: 6px;
+						}
+					}
+				}
+
+				&.ag-cell-inline-editing {
+					border-radius: 0px !important;
+
+					.ag-input-field-input,
+					.ag-text-field-input {
+						padding: 0px !important;
+						border: none !important;
+						box-shadow: none !important;
+						background-color: transparent !important;
+					}
+				}
+
+				// This will vertically center the text nicely while also not adjusting the
+				// vertical location of the text when the cell is selected.
+				.ag-react-container {
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+				}
+
+				.ag-selection-checkbox {
+					height: 16px;
+					margin-right: 0px;
+				}
+
+				&.ag-cell-focus {
+					border: 2px solid $green !important;
+					&.cell--not-selectable {
+						border: unset !important;
+						.ag-fill-handle {
+							display: none !important;
+						}
+					}
+				}
+
+				.ag-fill-handle {
+					background-color: $green;
+				}
+			}
+		}
+	}
+
+	.grid--footer {
+		.ag-header {
+			height: 0px !important;
+			min-height: 0px !important;
+		}
+	}
+
+	.core-table {
+		display: flex;
+		flex-direction: column;
+		max-height: 100%;
+		height: 100%;
+
+		&.with-page-footer {
+			max-height: calc(100% - 40px);
+		}
+
+		.ag-popup-editor {
+			margin-top: 36px;
+		}
+
+		.grid--data {
+			max-height: calc(100% - 40px);
+
+			@include grid_background($white);
+
+			.table-notification {
+				background-color: rgba(0, 0, 0, 0.6);
+				color: $white;
+				max-width: 320px;
+				padding: 6px 10px;
+				border-radius: 6px;
+				display: flex;
+				flex-direction: column;
+
+				.table-notification-header {
+					display: flex;
+					flex-direction: row;
+					margin-bottom: 8px;
+
+					.message {
+						font-size: 13px;
+						font-weight: 500;
+						font-family: $avenir;
+					}
+				}
+
+				.table-notification-content {
+					.detail {
+						font-size: 11px;
+						font-weight: 400;
+						font-family: $avenir;
+					}
+				}
+			}
+
+			.ag-root-wrapper {
+				overflow: visible;
+				max-height: 100% !important;
+				.ag-root-wrapper-body {
+					overflow-y: hidden;
+					max-height: 100% !important;
+					.ag-body-viewport {
+						overflow-y: scroll !important;
+					}
+				}
+			}
+
+			.ag-row:last-child {
+				border-bottom: none !important;
+			}
+
+			.row {
+				> .cell {
+					.icon-wrapper {
+						width: 16px;
+						margin-right: 6px;
+						float: right;
+
+						.icon {
+							height: 16px;
+							width: 16px;
+						}
+					}
+
+					&--drag {
+						.inner-cell {
+							.icon {
+								&:hover {
+									cursor: pointer;
+								}
+							}
+						}
+					}
+
+					&--action {
+						border: unset !important;
+						text-align: center;
+						padding: 2px;
+
+						> * {
+							margin: 0 auto;
+						}
+					}
+
+					&--calculated {
+						background-color: #f7fffa;
+						.ag-fill-handle {
+							display: none !important;
+						}
+						&:not(.ag-cell-range-top) {
+							border-top-color: transparent;
+						}
+						&:not(.ag-cell-range-right) {
+							border-right-color: transparent;
+						}
+						&:not(.ag-cell-range-left) {
+							border-left-color: transparent;
+						}
+						&:not(.ag-cell-range-bottom) {
+							border-bottom-color: transparent;
+						}
+						&.negative {
+							color: $red !important;
+						}
+					}
+				}
+
+				&.ag-row-hover {
+					background-color: $gray-highlight;
+					> .cell {
+						background-color: $gray-highlight;
+						&.cell--calculated {
+							background-color: $gray-highlight;
+						}
+					}
+				}
+
+				&--group {
+					border-bottom: none !important;
+					// Since the entire row is colored (instead of coloring the individual
+					// cells) we have to apply the radius to the entire row AND the first/
+					// last cells.  If the radius isn't applied to the row, the underlying
+					// curved radii of the first and last cells will not be seen.
+					border-radius: 10px !important;
+
+					> .cell {
+						font-weight: 400 !important;
+						border: none !important;
+						background-color: inherit !important;
+
+						&[aria-colindex='1'] {
+							border-bottom-left-radius: 8px;
+							border-top-left-radius: 8px;
+						}
+
+						&.ag-cell-range-right {
+							border-bottom-right-radius: 8px;
+							border-top-right-radius: 8px;
+						}
+
+						&.ag-cell-last-left-pinned {
+							border-right: 0px;
+							overflow: visible;
+						}
+
+						.btn--icon-only {
+							&.ag-grid-action-button {
+								&:hover {
+									background-color: transparent;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		&.with-table-menu {
+			.grid--data {
+				max-height: calc(100% - 40px - 40px);
+			}
+		}
+
+		.grid--table-footer {
+			flex: none;
+			height: 40px;
+
+			.ag-body-viewport {
+				border-bottom-left-radius: 8px;
+				border-bottom-right-radius: 8px;
+			}
+
+			&.constrain-horizontally {
+				.ag-center-cols-viewport {
+					max-width: 100%;
+					overflow-x: hidden;
+					.ag-center-cols-container {
+						max-width: 100%;
+					}
+				}
+			}
+
+			@include footer_grid_background($table-border-color);
+
+			.row {
+				border-bottom: none !important;
+				> .cell {
+					border: none !important;
+
+					&[aria-colindex='1'] {
+						border-bottom-left-radius: 8px;
+					}
+					&.ag-cell-range-right {
+						border-bottom-right-radius: 8px;
+					}
+				}
+			}
+		}
+	}
+
+	.page-footer-grid-wrapper {
+		flex-grow: 100;
+		display: flex;
+		flex-direction: column;
+		min-height: 40px;
+
+		.grid--page-footer {
+			flex: none;
+			height: 30px;
+			margin-top: 10px;
+
+			.ag-body-viewport {
+				border-radius: 8px;
+			}
+
+			&.constrain-horizontally {
+				.ag-center-cols-viewport {
+					max-width: 100%;
+					overflow-x: hidden;
+					.ag-center-cols-container {
+						max-width: 100%;
+					}
+				}
+			}
+
+			@include footer_grid_background(#d3d3d3);
+
+			.row {
+				border-bottom: none !important;
+
+				> .cell {
+					border: none !important;
+					line-height: 28px;
+
+					&[aria-colindex='1'] {
+						border-bottom-left-radius: 8px;
+						border-top-left-radius: 8px;
+					}
+					&.ag-cell-range-right {
+						border-bottom-right-radius: 8px;
+						border-top-right-radius: 8px;
+					}
+				}
+			}
+		}
+	}
+
+	&--minimal {
+		@include grid_borders($transparent);
+		font-family: $avenir !important;
+
+		.ag-header {
+			border: none;
+			border-top-left-radius: 8px;
+			border-top-right-radius: 8px;
+
+			.ag-header-row {
+				> .ag-header-cell {
+					background-color: $white;
+				}
+			}
+		}
+
+		.core-table {
+			.grid--data {
+				@include grid_row_height(40px);
+				@include grid_background($white);
+				.row {
+					> .cell {
+						font-family: $avenir;
+						.link--table {
+							font-family: $avenir;
+							text-align: inherit !important;
+						}
+					}
+				}
+			}
+			.grid--table-footer {
+				@include footer_grid_background($white);
+				.row {
+					> .cell {
+						font-family: $avenir;
+					}
+				}
+			}
+		}
+	}
 }

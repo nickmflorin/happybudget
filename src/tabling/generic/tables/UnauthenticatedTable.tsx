@@ -110,6 +110,8 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
 
   useImperativeHandle(props.table, () => ({
     ...grid.current,
+    notify: (notification: Table.TableNotification) => {},
+    removeNotification: () => {},
     changeColumnVisibility: props.changeColumnVisibility,
     applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R, M>>) => {},
     getRowsAboveAndIncludingFocusedRow: () => {
