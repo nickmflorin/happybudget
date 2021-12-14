@@ -1,11 +1,15 @@
+import classNames from "classnames";
+
 import { Icon } from "components";
-import { Link } from "components/links";
+import { Link, LinkProps } from "components/links";
 
 import "./HelpLink.scss";
 
-const HelpLink = ({ onClick }: { readonly onClick?: () => void }): JSX.Element => {
+type HelpLinkProps = Omit<LinkProps, "children">;
+
+const HelpLink = (props: HelpLinkProps): JSX.Element => {
   return (
-    <Link className={"help-link"} onClick={onClick}>
+    <Link {...props} className={classNames("help-link", props.className)}>
       <Icon icon={"question-circle"} />
       <div className={"text-container"}>{"Help"}</div>
     </Link>

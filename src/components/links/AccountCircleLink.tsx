@@ -7,16 +7,16 @@ import { UserImageOrInitialsProps } from "components/images/UserImageOrInitials"
 
 import "./AccountCircleLink.scss";
 
-const AccountCircleLink = ({
-  className,
-  style,
-  onClick,
-  ...props
-}: UserImageOrInitialsProps & { readonly onClick?: () => void }): JSX.Element => {
-  /* Note: We have to expose the onClick prop in order for this component to be
-		 used inside of an AntD dropdown. */
+interface AccountCircleLinkProps extends UserImageOrInitialsProps {
+  readonly id?: any;
+  readonly className?: string;
+  readonly style?: React.CSSProperties;
+  readonly onClick?: () => void;
+}
+
+const AccountCircleLink = ({ id, className, style, onClick, ...props }: AccountCircleLinkProps): JSX.Element => {
   return (
-    <Link to={"#"} className={classNames("account-circle-link", className)} style={style} onClick={onClick}>
+    <Link to={"#"} id={id} className={classNames("account-circle-link", className)} style={style} onClick={onClick}>
       <UserImageOrInitials {...props} />
     </Link>
   );
