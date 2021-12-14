@@ -9,6 +9,7 @@ import { PreviewModal } from "components/modals";
 import { ActualsTable } from "components/tabling";
 
 import ActualsPdf from "./ActualsPdf";
+import "./ActualsPreviewModal.scss";
 
 type M = Model.Actual;
 type R = Tables.ActualRowData;
@@ -35,7 +36,7 @@ interface ActualsPdfFuncProps {
 
 const ActualsPdfFunc = (props: ActualsPdfFuncProps): JSX.Element => <ActualsPdf {...props} />;
 
-interface PreviewModalProps {
+interface ActualsPreviewModalProps {
   readonly onSuccess?: () => void;
   readonly onCancel: () => void;
   readonly visible: boolean;
@@ -44,14 +45,14 @@ interface PreviewModalProps {
   readonly budget: Model.Budget;
 }
 
-const BudgetPreviewModal = ({
+const ActualsPreviewModal = ({
   budget,
   budgetId,
   visible,
   filename,
   onSuccess,
   onCancel
-}: PreviewModalProps): JSX.Element => {
+}: ActualsPreviewModalProps): JSX.Element => {
   const previewer = useRef<Pdf.IPreviewerRef>(null);
   const [options, setOptions] = useState<ExportPdfFormOptions>(DEFAULT_OPTIONS);
   const [actualsResponse, setActualsResponse] = useState<Http.ListResponse<M> | null>(null);
@@ -113,6 +114,7 @@ const BudgetPreviewModal = ({
       renderComponent={renderComponent}
       filename={filename}
       onExportSuccess={onSuccess}
+      className={"actuals-preview-modal"}
     >
       <ExportActualsPdfForm
         form={form}
@@ -130,4 +132,4 @@ const BudgetPreviewModal = ({
   );
 };
 
-export default BudgetPreviewModal;
+export default ActualsPreviewModal;

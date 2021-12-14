@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { isNil, filter, reduce } from "lodash";
@@ -12,6 +12,7 @@ import { useContacts, CreateContactParams } from "components/hooks";
 import { ActualsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../store";
+import { ActualsPreviewModal } from "./PreviewModals";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;
@@ -49,6 +50,8 @@ interface ActualsProps {
 }
 
 const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
+  const [previewModalVisible, setPreviewModalVisible] = useState(false);
+
   const dispatch = useDispatch();
   const contacts = useSelector(selectors.selectContacts);
   const table = tabling.hooks.useTable<R>();
@@ -97,6 +100,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
           onEditContact={(params: { contact: number; rowId: Table.ModelRowId }) =>
             editContact({ id: params.contact, rowId: params.rowId })
           }
+          onExportPdf={() => setPreviewModalVisible(true)}
           onSearchContact={(v: string) => dispatch(globalActions.authenticated.setContactsSearchAction(v))}
           onAttachmentRemoved={(row: Table.ModelRow<R>, id: number) =>
             dispatch(
@@ -124,6 +128,15 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
         />
         {editContactModal}
         {createContactModal}
+        {!isNil(budget) && (
+          <ActualsPreviewModal
+            visible={previewModalVisible}
+            onCancel={() => setPreviewModalVisible(false)}
+            budgetId={budgetId}
+            budget={budget}
+            filename={!isNil(budget) ? `${budget.name}_actuals.pdf` : "budget_actuals.pdf"}
+          />
+        )}
       </React.Fragment>
     </ActualsPage>
   );

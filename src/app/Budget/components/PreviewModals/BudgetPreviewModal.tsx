@@ -9,7 +9,7 @@ import { ExportBudgetPdfForm } from "components/forms";
 import { PreviewModal } from "components/modals";
 import { SubAccountsTable } from "components/tabling";
 
-import { actions } from "../store";
+import { actions } from "../../store";
 import BudgetPdf from "./BudgetPdf";
 
 import "./BudgetPreviewModal.scss";
@@ -167,6 +167,7 @@ const BudgetPreviewModal = ({
       renderComponent={renderComponent}
       filename={filename}
       onExportSuccess={onSuccess}
+      className={"budget-preview-modal"}
     >
       <ExportBudgetPdfForm
         form={form}

@@ -42,7 +42,7 @@
 	}
 }
 
-.export-preview-modal {
+.budget-preview-modal {
 	@include media('<=xxl') {
 		@include export_preview_landscape_modal_sizing();
 	}

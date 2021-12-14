@@ -22,6 +22,7 @@ export type ActualsTableProps = Omit<AuthenticatedModelTableProps<R, M>, "column
     readonly onAttachmentRemoved: (row: Table.ModelRow<R>, id: number) => void;
     readonly onAttachmentAdded: (row: Table.ModelRow<R>, attachment: Model.Attachment) => void;
     readonly onOwnersSearch: (value: string) => void;
+    readonly onExportPdf: () => void;
   };
 
 const ActualsTable = ({
@@ -120,6 +121,7 @@ const ActualsTable = ({
         actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
           framework.actions.ToggleColumnAction(table.current, params),
           framework.actions.ExportCSVAction(table.current, params, exportFileName)
+          // framework.actions.ExportPdfAction(props.onExportPdf)
         ]}
         columns={tabling.columns.normalizeColumns<R, M>(props.columns, {
           owner: (col: Table.Column<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>) => ({
