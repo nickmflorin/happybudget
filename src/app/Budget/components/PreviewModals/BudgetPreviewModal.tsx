@@ -4,6 +4,7 @@ import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
 import { redux, ui, tabling, notifications, pdf } from "lib";
+import { selectors } from "store";
 
 import { ExportBudgetPdfForm } from "components/forms";
 import { PreviewModal } from "components/modals";
@@ -77,9 +78,11 @@ const BudgetPreviewModal = ({
 }: PreviewModalProps): JSX.Element => {
   const previewer = useRef<Pdf.IPreviewerRef>(null);
   const [loadingData, setLoadingData] = useState(false);
+  const [getToken] = api.useCancelToken({ preserve: true, createOnInit: true });
 
-  const [contactsResponse, setContactsResponse] = useState<Http.ListResponse<Model.Contact> | null>(null);
-  const [budgetResponse, setBudgetResponse] = useState<Model.PdfBudget | null>(null);
+  const contacts = useSelector(selectors.selectContacts);
+
+  const [budget, setBudget] = useState<Model.PdfBudget | null>(null);
   const [options, setOptions] = useState<ExportBudgetPdfFormOptions>(DEFAULT_OPTIONS);
 
   const form = ui.hooks.useForm<ExportBudgetPdfFormOptions>({ isInModal: true });
@@ -103,28 +106,17 @@ const BudgetPreviewModal = ({
   useEffect(() => {
     if (visible === true) {
       dispatch(actions.pdf.requestHeaderTemplatesAction(null));
-      // TODO: Need to use cancel tokens here.
-      const promises: [Promise<Model.PdfBudget>, Promise<Http.ListResponse<Model.Contact>>] = [
-        api.getBudgetPdf(budgetId),
-        /* TODO: We might be able to avoid the additional request by using the
-				   contacts from the store. */
-        api.getContacts()
-      ];
-      setLoadingData(true);
-      Promise.all(promises)
-        .then(([b, cs]: [Model.PdfBudget, Http.ListResponse<Model.Contact>]) => {
-          setContactsResponse(cs);
-          setBudgetResponse(b);
+      api
+        .getBudgetPdf(budgetId, { cancelToken: getToken() })
+        .then((response: Model.PdfBudget) => {
+          setBudget(response);
           const pdfComponent = BudgetPdfFunc({
-            budget: b,
-            contacts: cs.data,
+            budget: response,
+            contacts,
             options: convertOptions(options)
           });
           previewer.current?.render(pdfComponent);
         })
-        /* TODO: We should probably display the error in the modal and not let
-						 the default toast package display it in the top right of the
-						 window. */
         .catch((e: Error) => notifications.requestError(e))
         .finally(() => setLoadingData(false));
     }
@@ -147,15 +139,15 @@ const BudgetPreviewModal = ({
 
   const renderComponent = useMemo(
     () => () => {
-      if (!isNil(budgetResponse) && !isNil(contactsResponse)) {
+      if (!isNil(budget)) {
         return BudgetPdfFunc({
-          budget: budgetResponse,
-          contacts: contactsResponse.data,
+          budget,
+          contacts,
           options: convertOptions(options)
         });
       }
     },
-    [budgetResponse, contactsResponse, options]
+    [budget, contacts, options]
   );
 
   return (
@@ -182,8 +174,8 @@ const BudgetPreviewModal = ({
         headerTemplates={headerTemplates}
         headerTemplatesLoading={headerTemplatesLoading}
         accountsLoading={loadingData}
-        accounts={!isNil(budgetResponse) ? budgetResponse.children : []}
-        disabled={isNil(budgetResponse) || isNil(contactsResponse)}
+        accounts={!isNil(budget) ? budget.children : []}
+        disabled={isNil(budget)}
         columns={SubAccountColumns}
         onValuesChange={(changedValues: Partial<ExportBudgetPdfFormOptions>, values: ExportBudgetPdfFormOptions) => {
           setOptions(values);

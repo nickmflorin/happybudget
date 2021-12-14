@@ -27,17 +27,14 @@ const BodyRow = <
   <Row
     {...props}
     className={classNames("body-tr", props.className)}
-    renderCell={(params: { column: Table.PdfColumn<R, M>; indented: boolean; colIndex: number }) => {
-      return (
-        <BodyCell<R, M>
-          colIndex={params.colIndex}
-          column={params.column}
-          indented={params.indented}
-          data={props.data}
-          row={props.row}
-          {...cellProps}
-        />
-      );
+    renderCell={(params: {
+      lastChild: boolean;
+      firstChild: boolean;
+      column: Table.PdfColumn<R, M>;
+      indented: boolean;
+      colIndex: number;
+    }) => {
+      return <BodyCell<R, M> {...params} data={props.data} row={props.row} {...cellProps} />;
     }}
   />
 );

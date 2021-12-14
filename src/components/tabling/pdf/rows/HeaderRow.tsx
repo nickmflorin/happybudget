@@ -17,8 +17,13 @@ const HeaderRow = <R extends Table.RowData, M extends Model.RowHttpModel = Model
     <Row<R, M>
       {...props}
       className={classNames("header-tr", props.className)}
-      renderCell={(params: { column: Table.PdfColumn<R, M>; colIndex: number }) => {
-        return <HeaderCell<R, M> colIndex={params.colIndex} column={params.column} {...cellProps} />;
+      renderCell={(params: {
+        lastChild: boolean;
+        firstChild: boolean;
+        column: Table.PdfColumn<R, M>;
+        colIndex: number;
+      }) => {
+        return <HeaderCell<R, M> {...params} {...cellProps} />;
       }}
     />
   );

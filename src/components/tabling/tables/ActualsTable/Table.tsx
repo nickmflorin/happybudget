@@ -120,8 +120,8 @@ const ActualsTable = ({
         framework={Framework}
         actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
           framework.actions.ToggleColumnAction(table.current, params),
-          framework.actions.ExportCSVAction(table.current, params, exportFileName)
-          // framework.actions.ExportPdfAction(props.onExportPdf)
+          framework.actions.ExportCSVAction(table.current, params, exportFileName),
+          framework.actions.ExportPdfAction(props.onExportPdf)
         ]}
         columns={tabling.columns.normalizeColumns<R, M>(props.columns, {
           owner: (col: Table.Column<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>) => ({

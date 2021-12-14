@@ -24,7 +24,8 @@
     "jsx": "react-jsx",
     "skipDefaultLibCheck": true,
     "resolveJsonModule": true,
-    "incremental": true
+    "incremental": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
     "src"

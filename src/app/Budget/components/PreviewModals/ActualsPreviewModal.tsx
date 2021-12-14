@@ -1,8 +1,11 @@
 import { useEffect, useState, useRef, useMemo } from "react";
+import { useSelector } from "react-redux";
 import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
 import { ui, tabling, notifications } from "lib";
+
+import { selectors } from "store";
 
 import { ExportActualsPdfForm } from "components/forms";
 import { PreviewModal } from "components/modals";
@@ -54,38 +57,32 @@ const ActualsPreviewModal = ({
   onCancel
 }: ActualsPreviewModalProps): JSX.Element => {
   const previewer = useRef<Pdf.IPreviewerRef>(null);
+  const [getToken] = api.useCancelToken({ preserve: true, createOnInit: true });
+
+  const contacts = useSelector(selectors.selectContacts);
+
   const [options, setOptions] = useState<ExportPdfFormOptions>(DEFAULT_OPTIONS);
-  const [actualsResponse, setActualsResponse] = useState<Http.ListResponse<M> | null>(null);
-  const [contactsResponse, setContactsResponse] = useState<Http.ListResponse<Model.Contact> | null>(null);
+  const [actuals, setActuals] = useState<M[] | null>(null);
   const [loadingData, setLoadingData] = useState(false);
 
   const form = ui.hooks.useForm<ExportPdfFormOptions>({ isInModal: true });
 
   useEffect(() => {
     if (visible === true) {
-      // TODO: Need to use cancel tokens here.
-      const promises: [Promise<Http.ListResponse<M>>, Promise<Http.ListResponse<Model.Contact>>] = [
-        api.getActuals(budgetId),
-        /* TODO: We might be able to avoid the additional request by using the
-				   contacts from the store. */
-        api.getContacts()
-      ];
-      setLoadingData(true);
-      Promise.all(promises)
-        .then(([as, cs]: [Http.ListResponse<M>, Http.ListResponse<Model.Contact>]) => {
-          setContactsResponse(cs);
-          setActualsResponse(as);
+      api
+        .getActuals(budgetId, {}, { cancelToken: getToken() })
+        .then((response: Http.ListResponse<M>) => {
+          setActuals(response.data);
           const pdfComponent = ActualsPdfFunc({
             budget,
-            contacts: cs.data,
-            actuals: as.data,
+            contacts,
+            actuals: response.data,
             options
           });
           previewer.current?.render(pdfComponent);
-        })
-        /* TODO: We should probably display the error in the modal and not let
-						the default toast package display it in the top right of the
-						window. */
+        }) /* TODO: We should probably display the error in the modal and not let
+							the default toast package display it in the top right of the
+							window. */
         .catch((e: Error) => notifications.requestError(e))
         .finally(() => setLoadingData(false));
     }
@@ -93,16 +90,16 @@ const ActualsPreviewModal = ({
 
   const renderComponent = useMemo(
     () => () => {
-      if (!isNil(contactsResponse) && !isNil(actualsResponse)) {
+      if (!isNil(actuals)) {
         return ActualsPdfFunc({
           budget,
-          contacts: contactsResponse.data,
-          actuals: actualsResponse.data,
+          contacts,
+          actuals,
           options
         });
       }
     },
-    [budget, contactsResponse, actualsResponse, options]
+    [budget, contacts, actuals, options]
   );
 
   return (
@@ -119,9 +116,9 @@ const ActualsPreviewModal = ({
       <ExportActualsPdfForm
         form={form}
         initialValues={DEFAULT_OPTIONS}
-        actuals={!isNil(actualsResponse) ? actualsResponse.data : []}
+        actuals={actuals || []}
         actualsLoading={loadingData}
-        disabled={isNil(actualsResponse)}
+        disabled={isNil(actuals)}
         columns={ActualColumns}
         onValuesChange={(changedValues: Partial<ExportPdfFormOptions>, values: ExportPdfFormOptions) => {
           setOptions(values);

@@ -200,6 +200,12 @@ const TableStyles: Pdf.ExtensionStyles = {
     paddingRight: 4,
     border: "none"
   },
+  "th-first-child": {
+    paddingLeft: 8
+  },
+  "th-last-child": {
+    paddingRight: 8
+  },
   td: {
     paddingLeft: 4,
     paddingRight: 4,
@@ -213,6 +219,12 @@ const TableStyles: Pdf.ExtensionStyles = {
     borderBottomWidth: 0,
     borderRightWidth: 0,
     borderColor: Colors.TABLE_BORDER
+  },
+  "td-first-child": {
+    paddingLeft: 8
+  },
+  "td-last-child": {
+    paddingRight: 8
   },
   "td-border-right": {
     borderRightWidth: 1
@@ -248,16 +260,30 @@ const TableStyles: Pdf.ExtensionStyles = {
   "detail-group-indent-td": {
     paddingLeft: 14
   },
-  "cell-text": { margin: "auto", width: "100%" },
+  "cell-text": { width: "100%" },
   "th-text": { marginTop: 6, fontSize: 8, color: "#595959", fontWeight: 700 },
   "td-text": { marginTop: 4, fontSize: 9, color: "#1F1F1F", fontWeight: 600 },
-  tag: { height: 14, paddingLeft: 2, paddingRight: 2, paddingTop: 1, paddingBottom: 1, borderRadius: 20, marginTop: 2 },
-  "tag--contact": { borderRadius: 6 },
+  tag: {
+    height: 14,
+    paddingLeft: 2,
+    paddingRight: 2,
+    paddingTop: 1,
+    paddingBottom: 1,
+    borderRadius: 20,
+    marginTop: 2
+  },
+  "tag--contact": { borderRadius: 4 },
+  "tag--account": {
+    fontWeight: 500,
+    borderWidth: 0.5,
+    borderColor: Colors.TEXT_SECONDARY,
+    borderRadius: 3
+  },
   "tag-text": {
     fontSize: 8,
     fontWeight: 400,
     textAlign: "center",
-    marginTop: 1
+    marginTop: 0.5
   },
   "fill-width": { textAlign: "center", width: "100%" },
   "group-tr-td-text": { color: "#595959", fontWeight: 700 },
@@ -269,8 +295,10 @@ const TableStyles: Pdf.ExtensionStyles = {
 };
 
 const ExportStyles: Pdf.ExtensionStyles = {
-  "budget-page-header": {},
-  "budget-page-primary-header": {},
+  "page-header": {
+    marginBottom: 10
+  },
+  "page-primary-header": {},
   "budget-page-sub-header": {
     display: "flex",
     minHeight: 70,

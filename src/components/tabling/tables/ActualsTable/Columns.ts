@@ -11,7 +11,7 @@ const Columns: Table.Column<R, M>[] = [
     field: "name",
     headerName: "Description",
     minWidth: 200,
-    pdfFlexGrow: true,
+    pdfWidth: 0.12,
     flex: 2,
     columnType: "longText",
     pdfFooter: { value: "Grand Total" }
@@ -19,7 +19,7 @@ const Columns: Table.Column<R, M>[] = [
   columns.SelectColumn({
     field: "contact",
     headerName: "Contact",
-    pdfWidth: 0.12,
+    pdfWidth: 0.18,
     width: 120,
     minWidth: 120,
     cellRenderer: { data: "ContactCell" },
@@ -29,7 +29,7 @@ const Columns: Table.Column<R, M>[] = [
   columns.BodyColumn<R, M>({
     field: "date",
     headerName: "Date",
-    pdfWidth: 0.08,
+    pdfWidth: 0.18,
     width: 100,
     minWidth: 100,
     flex: 1,
@@ -38,6 +38,8 @@ const Columns: Table.Column<R, M>[] = [
     cellEditorPopupPosition: "below",
     valueFormatter: tabling.formatters.dateValueFormatter,
     valueSetter: tabling.valueSetters.dateTimeValueSetter<R>("date"),
+    pdfFormatter: (params: Table.NativeFormatterParams<string>) =>
+      isNil(params) || params === "" ? "" : tabling.formatters.dateValueFormatter(params),
     columnType: "date",
     processCellForCSV: (row: R) => {
       return (!isNil(row.date) && util.dates.toDate(row.date)) || "";
@@ -46,7 +48,7 @@ const Columns: Table.Column<R, M>[] = [
   columns.TagSelectColumn({
     field: "actual_type",
     headerName: "Type",
-    pdfWidth: 0.12,
+    pdfWidth: 0.18,
     cellRenderer: { data: "ActualTypeCell" },
     cellEditor: "ActualTypeEditor",
     width: 140,
@@ -62,6 +64,8 @@ const Columns: Table.Column<R, M>[] = [
     footer: {
       cellStyle: { textAlign: "right" }
     },
+    pdfFormatter: (params: Table.NativeFormatterParams<string>) =>
+      isNil(params) || params === "" ? "" : tabling.formatters.currencyValueFormatter(params),
     valueFormatter: tabling.formatters.currencyValueFormatter,
     valueSetter: tabling.valueSetters.numericValueSetter<R>("value"),
     columnType: "currency",
@@ -76,7 +80,7 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "Sub-Account",
     minWidth: 200,
     width: 200,
-    pdfWidth: 0.12,
+    pdfWidth: 0.18,
     getHttpValue: (
       value: Model.SimpleSubAccount | Model.SimpleMarkup | null
     ): Model.GenericHttpModel<"markup"> | Model.GenericHttpModel<"subaccount"> | null => {

@@ -19,6 +19,8 @@ const Row = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHt
       column: Table.PdfColumn<R, M>;
       indented: boolean;
       colIndex: number;
+      firstChild: boolean;
+      lastChild: boolean;
     }) => JSX.Element;
   }
 ): JSX.Element => {
@@ -38,7 +40,9 @@ const Row = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHt
             {props.renderCell({
               column,
               indented: !isNil(props.columnIndent) ? colIndex < props.columnIndent : false,
-              colIndex
+              colIndex,
+              firstChild: colIndex === 0,
+              lastChild: colIndex === filter(props.columns, columnFilter).length - 1
             })}
           </React.Fragment>
         );

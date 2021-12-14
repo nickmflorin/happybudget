@@ -23,7 +23,7 @@ declare interface ITagRenderParams<S extends object = React.CSSProperties> {
   readonly textClassName: string | undefined;
   readonly style: S | undefined;
   readonly textStyle: S | undefined;
-  readonly color: Style.HexColor;
+  readonly color: Style.HexColor | null;
   readonly textColor: string;
   readonly uppercase: boolean;
   readonly fillWidth: boolean;
@@ -42,7 +42,7 @@ declare type TagProps<M extends Model.Model = Model.Model, STYLE extends object 
   readonly text?: string | null;
   readonly pluralText?: string | null;
   readonly textColor?: Style.HexColor;
-  readonly color?: Style.HexColor;
+  readonly color?: Style.HexColor | null;
   readonly model?: M | null;
   readonly isPlural?: boolean;
   readonly modelTextField?: keyof M;

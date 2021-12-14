@@ -6,12 +6,12 @@ declare namespace Table {
 
   type AgGridProps = import("@ag-grid-community/react/lib/interfaces").AgGridReactProps;
 
-  type NativeFormatterParams<P extends string | number> = P | null;
+  type NativeFormatterParams<P> = P | null;
   type AGFormatterParams = import("@ag-grid-community/core").ValueFormatterParams;
 
   type AGFormatter = (params: AGFormatterParams) => string;
 
-  type NativeFormatter<P extends string | number> = (params: NativeFormatterParams<P>) => string;
+  type NativeFormatter<P> = (params: NativeFormatterParams<P>) => string;
 
   type GridApi = import("@ag-grid-community/core").GridApi;
   type ColumnApi = import("@ag-grid-community/core").ColumnApi;
@@ -344,7 +344,7 @@ declare namespace Table {
     readonly pdfHeaderCellProps?: PdfCellStandardProps<R, PDFM, V>;
     readonly pdfFooter?: PdfFooterColumn<V>;
     readonly pdfCellContentsVisible?: PdfOptionalCellCallback<R, PDFM, V, boolean>;
-    readonly pdfFormatter?: (value: string | number) => string;
+    readonly pdfFormatter?: NativeFormatter<V>;
     readonly pdfValueGetter?: PdfValueGetter<R, V>;
     readonly pdfFooterValueGetter?: V | null | PdfFooterValueGetter<R, V>;
     readonly pdfCellRenderer?: (params: PdfCellCallbackParams<R, PDFM, V>) => JSX.Element;

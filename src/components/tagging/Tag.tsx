@@ -7,6 +7,15 @@ import { typeguards, util, tabling } from "lib";
 
 const TagRenderer = <S extends object = React.CSSProperties>(params: ITagRenderParams<S>): JSX.Element => {
   const { contentRender, ...rest } = params;
+
+  const style = useMemo(() => {
+    let st = { ...params.style, color: params.textColor };
+    if (params.color !== null) {
+      return { ...st, backgroundColor: params.color };
+    }
+    return st;
+  }, [params.style, params.color, params.textColor]);
+
   return (
     <div
       className={classNames(
@@ -16,7 +25,7 @@ const TagRenderer = <S extends object = React.CSSProperties>(params: ITagRenderP
         { disabled: params.disabled },
         params.className
       )}
-      style={{ ...params.style, backgroundColor: params.color, color: params.textColor }}
+      style={style}
       onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => !params.disabled && params.onClick?.(e)}
     >
       {!isNil(contentRender) ? (
@@ -84,10 +93,12 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
     return "";
   }, [props]);
 
-  const tagColor = useMemo((): Style.HexColor => {
-    const validateAndReturnColor = (color: Style.HexColor | null | undefined, field: string): Style.HexColor => {
-      if (isNil(color)) {
+  const tagColor = useMemo((): Style.HexColor | null => {
+    const validateAndReturnColor = (color: Style.HexColor | null | undefined, field: string): Style.HexColor | null => {
+      if (color === undefined) {
         return Colors.COLOR_NO_COLOR;
+      } else if (color === null) {
+        return null;
       } else if (typeof color !== "string") {
         console.error(`The field ${field} did not return a string color.`);
         return Colors.COLOR_NO_COLOR;
@@ -101,7 +112,7 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
       }
       return color;
     };
-    const getColorFromModel = (m: M): Style.HexColor => {
+    const getColorFromModel = (m: M): Style.HexColor | null => {
       if (!isNil(props.modelColorField)) {
         const modelColorFieldValue: unknown = m[props.modelColorField];
         return validateAndReturnColor(modelColorFieldValue as Style.HexColor, props.modelColorField as string);
@@ -122,7 +133,8 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
       }
       return Colors.COLOR_NO_COLOR;
     };
-    if (!isNil(props.color)) {
+
+    if (props.color !== undefined) {
       return validateAndReturnColor(props.color, "color");
     } else if (!isNil(props.children) && typeof props.children !== "string") {
       return getColorFromModel(props.children);
@@ -141,7 +153,9 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
     if (!isNil(props.textColor)) {
       return props.textColor;
     }
-    return util.colors.contrastedForegroundColor(tagColor);
+    /* The tagColor is null when we want the tag to be transparent, in which case
+		   the secondary text color should be contrasted enough on the background. */
+    return tagColor !== null ? util.colors.contrastedForegroundColor(tagColor) : Colors.TEXT_SECONDARY;
   }, [tagColor, props]);
 
   const renderParams = useMemo<ITagRenderParams<S>>(() => {

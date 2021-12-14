@@ -32,6 +32,8 @@ interface PrivateBodyCellProps<
     BodyCellProps<R, M, V> {
   readonly data: Table.BodyRow<R>[];
   readonly row?: RW;
+  readonly firstChild: boolean;
+  readonly lastChild: boolean;
 }
 
 /* eslint-disable indent */
@@ -78,12 +80,23 @@ const BodyCell = <
     return typeof rawValue === "string" || typeof rawValue === "number" ? props.column.pdfFormatter(rawValue) : "";
   }, [rawValue, props.column]);
 
+  const className = useMemo(() => {
+    let cs = ["td", props.className];
+    if (props.firstChild) {
+      cs = [...cs, "td-first-child"];
+    }
+    if (props.lastChild) {
+      cs = [...cs, "td-last-child"];
+    }
+    return cs;
+  }, [props.className, props.firstChild]);
+
   return (
     <Cell
       {...props}
       value={value}
       rawValue={rawValue}
-      className={["td", props.className]}
+      className={className}
       textClassName={["td-text", props.textClassName]}
     />
   );
