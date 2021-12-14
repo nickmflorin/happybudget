@@ -33,11 +33,12 @@ declare interface ICollapsedSidebarItem extends ISidebarItem {}
 
 declare type IExpandedSingleSidebarItem = ISidebarItem & {
   readonly label: string;
+  readonly default?: boolean;
 };
 
 declare type IExpandedParentSidebarItem = Omit<
   ISidebarItem,
-  "to" | "onClick" | "closeSidebarOnClick" | "active" | "activePathRegexes" | "tooltip"
+  "to" | "closeSidebarOnClick" | "active" | "activePathRegexes" | "tooltip"
 > & {
   readonly submenu: IExpandedSingleSidebarItem[];
   readonly label: string;

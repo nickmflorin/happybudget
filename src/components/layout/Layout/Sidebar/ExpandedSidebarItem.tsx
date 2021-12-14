@@ -1,13 +1,12 @@
 import React from "react";
 
+import { ui } from "lib";
+
 import GenericSidebarItem from "./GenericSidebarItem";
 import ParentSidebarItem from "./ParentSidebarItem";
 
-const isParentSidebarItem = (obj: IExpandedSidebarItem): obj is IExpandedParentSidebarItem =>
-  (obj as IExpandedParentSidebarItem).submenu !== undefined;
-
 const ExpandedSidebarItem = (props: IExpandedSidebarItem & StandardComponentProps): JSX.Element => {
-  if (isParentSidebarItem(props)) {
+  if (ui.typeguards.isParentSidebarItem(props)) {
     return <ParentSidebarItem {...props} />;
   }
   return (

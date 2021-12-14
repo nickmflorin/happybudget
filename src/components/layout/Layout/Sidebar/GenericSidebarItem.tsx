@@ -3,24 +3,8 @@ import { useHistory, useLocation } from "react-router-dom";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
+import { ui } from "lib";
 import { ShowHide, TooltipWrapper, Separator } from "components";
-
-const sidebarItemIsActive = <T extends ISidebarItem>(item: T, location: { pathname: string }): boolean => {
-  if (!isNil(item.active)) {
-    return item.active;
-  }
-  if (!isNil(item.activePathRegexes)) {
-    for (let i = 0; i < item.activePathRegexes.length; i++) {
-      if (location.pathname.match(item.activePathRegexes[i])) {
-        return true;
-      }
-    }
-  }
-  if (!isNil(item.to) && location.pathname.startsWith(item.to)) {
-    return true;
-  }
-  return false;
-};
 
 const GenericSidebarItem = <T extends ISidebarItem>(
   props: Omit<T, "children"> & StandardComponentProps & { readonly children?: ReactNode }
@@ -29,7 +13,7 @@ const GenericSidebarItem = <T extends ISidebarItem>(
   const location = useLocation();
 
   const active = useMemo(
-    () => sidebarItemIsActive(props, location),
+    () => ui.util.itemIsActive(props, location),
     [props.active, location.pathname, props.to, props.activePathRegexes]
   );
 

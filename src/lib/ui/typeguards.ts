@@ -18,3 +18,7 @@ export const isAlert = (a: IAlert | any): a is IAlert =>
   typeof a === "object" &&
   (a as IAlert).type !== undefined &&
   includes(["error", "warning", "info", "success"], (a as IAlert).type);
+
+export const isParentSidebarItem = (
+  obj: IExpandedSidebarItem | ICollapsedSidebarItem
+): obj is IExpandedParentSidebarItem => (obj as IExpandedParentSidebarItem).submenu !== undefined;
