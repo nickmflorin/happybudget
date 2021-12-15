@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useLocation, useHistory } from "react-router-dom";
 import { map, find, isNil } from "lodash";
 
@@ -14,6 +14,14 @@ const ParentSidebarItem = (props: IExpandedParentSidebarItem): JSX.Element => {
   const history = useHistory();
 
   const { submenu, ...item } = props;
+  const isActive = useMemo(() => ui.util.itemIsActive(props, location), [props, location]);
+
+  useEffect(() => {
+    if (isActive === true) {
+      setOpen(true);
+    }
+  }, [isActive]);
+
   return (
     <React.Fragment>
       <ExpandedSidebarItem
@@ -21,19 +29,17 @@ const ParentSidebarItem = (props: IExpandedParentSidebarItem): JSX.Element => {
         style={{ marginBottom: 10 }}
         onClick={() => {
           /* The parent will be active if any of it's children items are active,
-						 and if this is the case then we do not want to perform any action
-						 when the parent is clicked (because it is already open - at least
-						 it should be).
+					and if this is the case then we do not want to perform any action
+					when the parent is clicked (because it is already open - at least
+					it should be).
 
-						 If the parent is not active however, we want to perform an action
-						 based on whether or not the submenu is already open.  If the
-						 submenu is already open, we simply want to close it.  If the
-						 submenu is not open however, we not only want to open it but we
-						 want to "click" the default item.
-					*/
-          if (!ui.util.itemIsActive(props, location)) {
+					If the parent is not active however, we want to perform an action
+					based on whether or not the submenu is already open.  If the
+					submenu is already open, we simply want to close it.  If the
+					submenu is not open however, we not only want to open it but we
+					want to "click" the default item. */
+          if (!isActive) {
             if (!open) {
-              setOpen(true);
               let defaultItem = find(submenu, (i: IExpandedSingleSidebarItem) => i.default === true);
               if (defaultItem === undefined) {
                 defaultItem = submenu[0];
@@ -50,13 +56,6 @@ const ParentSidebarItem = (props: IExpandedParentSidebarItem): JSX.Element => {
               setOpen(false);
             }
           } else if (!open) {
-            /* This should not happen, but just in case it does we do not want
-						   the user to get stuck in a state where they cannot get the submenu
-						   back open. */
-            console.warn(
-              `Inconsistent State: Parent sidebar item ${props.label} is active
-							but not open.`
-            );
             setOpen(true);
           }
         }}
@@ -76,4 +75,4 @@ const ParentSidebarItem = (props: IExpandedParentSidebarItem): JSX.Element => {
   );
 };
 
-export default React.memo(ParentSidebarItem);
+export default ParentSidebarItem;
