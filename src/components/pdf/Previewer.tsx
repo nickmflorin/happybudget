@@ -67,7 +67,7 @@ const Previewer = ({
           .finally(() => setGeneratingPdf(false));
       }
     },
-    []
+    [renderComponent]
   );
 
   const debouncedRender = useMemo(() => debounce(render, 20), []);
@@ -125,9 +125,9 @@ const Previewer = ({
         <Button
           className={"btn btn--over"}
           disabled={generatingPdf || loadingData}
-          onClick={() => {
+          onClick={async () => {
             setRefreshRequired(false);
-            render();
+            await render();
           }}
         >
           {"Refresh"}
