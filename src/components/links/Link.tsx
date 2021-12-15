@@ -7,7 +7,7 @@ import { TooltipWrapper } from "components";
 
 export type LinkProps = StandardComponentWithChildrenProps &
   ClickableProps &
-  React.AnchorHTMLAttributes<HTMLAnchorElement>;
+  Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "onMouseEnter" | "onMouseLeave">;
 
 /**
  * A consistently styled <a> component with functionality allowing the link to
