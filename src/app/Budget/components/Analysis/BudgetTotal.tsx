@@ -45,13 +45,17 @@ const Metrics: Charts.BudgetTotal.Metric[] = [
   }
 ];
 
-const getMetricDatum = (id: Charts.BudgetTotal.MetricId, obj: M, objs: Model.Account[], index: number): Datum => {
+const getMetricValue = (id: Charts.BudgetTotal.MetricId, obj: M, objs: Model.Account[]): number => {
   const metric = find(Metrics, { id } as any) as Charts.BudgetTotal.Metric;
+  return metric.getValue(obj, objs);
+};
+
+const getMetricDatum = (id: Charts.BudgetTotal.MetricId, obj: M, objs: Model.Account[], index: number): Datum => {
   return {
     label: getLabel(obj),
     id: getId(obj),
     color: getColor(obj, index),
-    value: metric.getValue(obj, objs),
+    value: getMetricValue(id, obj, objs),
     type: obj.type
   };
 };
@@ -75,11 +79,19 @@ const generateData = (
       },
       []
     );
+    if (accountsWithoutGroup.length !== 0) {
+      const fakeGroup: Model.Group = {
+        color: Colors.COLOR_NO_COLOR,
+        name: "Other",
+        id: 10000,
+        type: "group",
+        children: map(accountsWithoutGroup, (a: Model.Account) => a.id)
+      };
+      groupDatums = [...groupDatums, getMetricDatum(metric, fakeGroup, accounts, groupDatums.length)];
+    }
+    return groupDatums;
   }
-  return [
-    ...groupDatums,
-    ...map(accountsWithoutGroup, (a: Model.Account, i: number) => getMetricDatum(metric, a, accounts, i))
-  ];
+  return map(accountsWithoutGroup, (a: Model.Account, i: number) => getMetricDatum(metric, a, accounts, i));
 };
 
 interface BudgetTotalProps extends StandardComponentProps {
