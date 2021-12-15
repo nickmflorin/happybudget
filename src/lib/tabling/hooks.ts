@@ -12,7 +12,7 @@ export const useDataGrid = (): NonNullRef<Table.DataGridInstance> => {
 
 export const InitialTableRef: Table.TableInstance<any, any> = {
   ...InitialGridRef,
-  notify: (notification: Table.TableNotification) => {},
+  notify: (notification: TableNotification) => {},
   removeNotification: () => {},
   getFocusedRow: () => null,
   getRow: () => null,

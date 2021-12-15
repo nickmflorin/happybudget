@@ -30,7 +30,7 @@ function* request(action: Redux.Action<null>): SagaIterator {
         })
       );
     } catch (e: unknown) {
-      notifications.requestError(e as Error, "There was an error retrieving the analysis data.");
+      notifications.requestError(e as Error, { message: "There was an error retrieving the analysis data." });
       yield put(
         actions.analysis.responseAction({
           accounts: { count: 0, data: [] },

@@ -17,7 +17,7 @@ type IRedirect = {
   readonly state?: {
     readonly error?: Error | undefined;
     readonly tokenType: Http.TokenType | undefined;
-    readonly notification?: IAlert | string | undefined;
+    readonly notification?: AppNotification | string | undefined;
   };
 };
 
@@ -57,8 +57,8 @@ const ResetPassword = (): JSX.Element => {
                   state: {
                     notification: {
                       closable: true,
-                      type: "success",
-                      title: "Your password was successfully changed."
+                      level: "success",
+                      message: "Your password was successfully changed."
                     },
                     tokenType: "password-recovery"
                   }

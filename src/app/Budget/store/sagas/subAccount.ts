@@ -23,7 +23,7 @@ function* getSubAccount(action: Redux.Action<null>): SagaIterator {
       const response: Model.SubAccount = yield api.request(api.getSubAccount, subaccountId);
       yield put(actions.responseSubAccountAction(response));
     } catch (e: unknown) {
-      notifications.requestError(e as Error, "There was an error retrieving the sub account.");
+      notifications.requestError(e as Error, { message: "There was an error retrieving the sub account." });
       yield put(actions.responseSubAccountAction(null));
     }
   }

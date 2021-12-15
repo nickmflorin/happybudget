@@ -15,19 +15,10 @@ const Tag = <M extends Model.Model = Model.Model>(params: TagProps<M, Style>): J
         }
         /* Since this is not HTML, the Tag will not auto size based on the text
 				   it contains - so unless we specify a rule for the Tag width, it will
-				   fill up the entire cell horizontally.  This rule seems to work
-				   relatively well, but might need fine tuning.
-
-					 The border-radius is one thing that seems to cause this to not work
-					 as well - so if we could figure out a way to vary the multiplier here
-					 with border-radius, that would be an improvement.
+				   fill up the entire cell horizontally.  After several attempts to come
+					 up with this rule - I am convinced it is not an easy task.  So for
+					 now, we will just let the tag fill up the full width.
 					*/
-        let multiplier = 4.8;
-        let coeff = p.text.length / 1200.0;
-        for (let i = 0; i < p.text.length; i++) {
-          multiplier = multiplier + Math.max(0.02 - coeff * i * i, 0);
-        }
-        style = { ...style, width: multiplier * p.text.length };
         return (
           <View
             className={classNames("tag", { uppercase: p.uppercase }, { "fill-width": p.fillWidth }, p.className)}

@@ -40,9 +40,9 @@ const RecoverPassword = (): JSX.Element => {
             .recoverPassword(values.email)
             .then(() => {
               form.notify({
-                type: "success",
-                title: "Email successfully sent.",
-                message: "Please check your inbox.",
+                level: "success",
+                message: "Email successfully sent.",
+                detail: "Please check your inbox.",
                 closable: true
               });
             })

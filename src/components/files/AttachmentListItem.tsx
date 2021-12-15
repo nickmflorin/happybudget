@@ -41,8 +41,9 @@ const AttachmentListItem = ({ attachment, deleting, onClick, ...props }: Attachm
                 .getDataFromURL(attachment.url)
                 .then((response: string | ArrayBuffer) => util.files.download(response, attachment.name))
                 .catch((e: Error) => {
-                  notifications.error(e, {
+                  notifications.error({
                     notifyUser: true,
+                    detail: e,
                     message: "There was an error downloading your attachment.",
                     dispatchToSentry: true
                   });

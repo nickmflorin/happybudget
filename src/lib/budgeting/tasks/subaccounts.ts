@@ -151,7 +151,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
             yield put(config.actions.response({ models: models.data, groups: groups.data, markups: markups?.data }));
           }
         } catch (e: unknown) {
-          notifications.requestError(e as Error, "There was an error retrieving the table data.");
+          notifications.requestError(e as Error, { message: "There was an error retrieving the table data." });
           yield put(config.actions.response({ models: [], markups: [], groups: [] }));
         } finally {
           yield put(config.actions.loading(false));
@@ -165,7 +165,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       const response: Http.ListResponse<Model.Fringe> = yield api.request(config.services.requestFringes, objId, {});
       yield put(config.actions.responseFringes({ models: response.data }));
     } catch (e: unknown) {
-      notifications.requestError(e as Error, "There was an error retrieving the table fringes.");
+      notifications.requestError(e as Error, { message: "There was an error retrieving the table fringes." });
       yield put(config.actions.responseFringes({ models: [] }));
     }
   }
@@ -175,7 +175,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       const response = yield api.request(api.getSubAccountUnits);
       yield put(config.actions.responseSubAccountUnits(response));
     } catch (e: unknown) {
-      notifications.requestError(e as Error, "There was an error retrieving the table units.");
+      notifications.requestError(e as Error, { message: "There was an error retrieving the table units." });
       yield put(config.actions.responseSubAccountUnits({ data: [], count: 0 }));
     }
   }
@@ -221,7 +221,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
         yield put(config.actions.updateParentInState({ id: response.data.id, data: response.data }));
       } catch (err: unknown) {
-        notifications.requestError(err as Error, errorMessage);
+        notifications.requestError(err as Error, { message: errorMessage });
       } finally {
         yield put(config.actions.loadingBudget(false));
         yield put(config.actions.saving(false));
@@ -254,7 +254,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         */
         yield all(validEffects);
       } catch (err: unknown) {
-        notifications.requestError(err as Error, "There was an error updating the table rows.");
+        notifications.requestError(err as Error, { message: "There was an error updating the table rows." });
       } finally {
         yield put(config.actions.saving(false));
       }
@@ -336,7 +336,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
             })
           );
         } catch (err: unknown) {
-          notifications.requestError(err as Error, "There was an error adding the row.");
+          notifications.requestError(err as Error, { message: "There was an error adding the row." });
         } finally {
           yield put(config.actions.saving(false));
         }
@@ -365,7 +365,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
           })
         );
       } catch (err: unknown) {
-        notifications.requestError(err as Error, "There was an error moving the row.");
+        notifications.requestError(err as Error, { message: "There was an error moving the row." });
       } finally {
         yield put(config.actions.saving(false));
       }
@@ -403,7 +403,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
           try {
             yield all([call(deleteGroups, groupRowIds), call(bulkDeleteRows, objId, modelRowIds, markupRowIds)]);
           } catch (err: unknown) {
-            notifications.requestError(err as Error, "There was an error removing the rows.");
+            notifications.requestError(err as Error, { message: "There was an error removing the rows." });
           } finally {
             yield put(config.actions.saving(false));
             yield put(config.actions.loadingBudget(false));

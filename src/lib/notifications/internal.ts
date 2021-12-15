@@ -1,19 +1,18 @@
 import { toast } from "react-toastify";
 import * as Sentry from "@sentry/react";
-import { isNil, includes } from "lodash";
+import { isNil } from "lodash";
 
 import * as api from "api";
+import { isNotificationForConsole, isNotificationForSentry } from "./typeguards";
+import { notificationDetailToString } from ".";
 
-export const notificationToString = (e: AppNotification) => {
-  return e instanceof Error ? String(e) : typeof e === "string" ? e : JSON.stringify(e);
-};
-
-export const userFacingMessage = (e: AppNotification, context?: AppNotificationContext): string => {
-  const contextualMessage = context?.message;
+export const userFacingMessage = (e: InternalNotification): string => {
+  const contextualMessage = e?.message;
   if (!isNil(contextualMessage)) {
     return contextualMessage;
   }
-  return notificationToString(e);
+  const detail: NotificationDetail | undefined = e.detail;
+  return detail !== undefined ? notificationDetailToString(detail) : "";
 };
 
 /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -35,30 +34,23 @@ const consoleMethod = (level: AppNotificationConsoleLevel): Console["warn" | "er
   return console[consoleMethodMap[level]];
 };
 
-const isConsoleNotification = (
-  context: AppNotificationContext
-): context is AppNotificationContext<AppNotificationConsoleLevel> =>
-  includes(["error", "warning", "info"], context.level);
-
-export const notifyUser = (e: AppNotification, context: AppNotificationContext) => {
-  const toaster = toastMethodMap[context.level];
-  toaster(userFacingMessage(e, context));
+export const notifyUser = (e: InternalNotification) => {
+  const toaster = toastMethodMap[e.level];
+  toaster(userFacingMessage(e));
 };
 
-export const isContextForSentry = (context: AppNotificationContext) => includes(["error", "warning"], context.level);
-
-export const notify = (e: AppNotification, context: AppNotificationContext) => {
+export const notify = (e: InternalNotification) => {
   /* Note: Issuing a console.warn or console.error will automatically dispatch
      to Sentry. */
-  const defaultDispatchToSentry = isContextForSentry(context) ? true : false;
-  const dispatchToSentry = context.dispatchToSentry === undefined ? defaultDispatchToSentry : context.dispatchToSentry;
+  const defaultDispatchToSentry = isNotificationForSentry(e) ? true : false;
+  const dispatchToSentry = e.dispatchToSentry === undefined ? defaultDispatchToSentry : e.dispatchToSentry;
 
   let consoler: Console["warn" | "error" | "info"] | null = null;
-  if (isConsoleNotification(context)) {
-    consoler = consoleMethod(context.level);
+  if (isNotificationForConsole(e)) {
+    consoler = consoleMethod(e.level);
     /* If this is a warning or error, it will be automatically dispatched to
        Sentry - unless we disable it temporarily. */
-    if (dispatchToSentry === false && isContextForSentry(context)) {
+    if (dispatchToSentry === false && isNotificationForSentry(e)) {
       /* If this is an error or warning and we do not want to send to Sentry,
          we must temporarily disable it. */
       Sentry.withScope((scope: Sentry.Scope) => {
@@ -80,39 +72,38 @@ export const notify = (e: AppNotification, context: AppNotificationContext) => {
       consoler(e);
     }
   }
-  if (context.notifyUser) {
-    notifyUser(e, context);
+  if (e.notifyUser) {
+    notifyUser(e);
   }
 };
 
-export const success = (e: string) => notify(e, { notifyUser: true, level: "success" });
+export const success = (e: string) => notify({ message: e, notifyUser: true, level: "success" });
 
-export const info = (e: string) => notify(e, { notifyUser: true, level: "info" });
+export const info = (e: string) => notify({ message: e, notifyUser: true, level: "info" });
 
-export const warn = (e: AppNotification, c?: string | Omit<AppNotificationContext, "level">) => {
-  const context = typeof c === "string" ? { message: c } : c;
-  notify(e, { ...context, level: "warning" });
+export const warn = (e: Omit<InternalNotification, "level"> | string) => {
+  notify({ ...(typeof e === "string" ? { message: e } : e), level: "warning" });
 };
 
-export const error = (e: AppNotification, c?: string | Omit<AppNotificationContext, "level">) => {
-  const context = typeof c === "string" ? { message: c } : c;
-  notify(e, { ...context, level: "error" });
+export const error = (e: Omit<InternalNotification, "level"> | string) => {
+  notify({ ...(typeof e === "string" ? { message: e } : e), level: "error" });
 };
 
-export const requestError = (e: Error, c?: string | Omit<AppNotificationContext, "level">) => {
-  const context = typeof c === "string" ? { message: c } : c;
+export const requestError = (e: Error, c?: Omit<InternalNotification, "level" | "detail" | "dispatchToSentry">) => {
   if (e instanceof api.ClientError) {
-    warn(e, {
+    warn({
+      detail: e,
       notifyUser: true,
       dispatchToSentry: false,
       message: "There was a problem with your request.",
-      ...context
+      ...c
     });
   } else if (e instanceof api.NetworkError) {
-    warn(e, {
+    warn({
+      detail: e,
       notifyUser: true,
       message: "There was a problem communicating with the server.",
-      ...context,
+      ...c,
       dispatchToSentry: true
     });
   } else if (!(e instanceof api.ForceLogout)) {

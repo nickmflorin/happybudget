@@ -3,12 +3,6 @@ declare namespace Table {
     readonly getCSVData: (fields?: string[]) => CSVData;
   };
 
-  type TableNotification = {
-    readonly message: string;
-    readonly detail?: string;
-    readonly duration?: number;
-  };
-
   type TableInstance<
     R extends RowData = RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel

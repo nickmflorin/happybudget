@@ -56,7 +56,7 @@ export function* getTemplateTask(action: Redux.Action<null>): SagaIterator {
       const response: Model.Template = yield api.request(api.getTemplate, templateId);
       yield put(actions.responseTemplateAction(response));
     } catch (e: unknown) {
-      notifications.requestError(e as Error, "There was an error retrieving the template.");
+      notifications.requestError(e as Error, { message: "There was an error retrieving the template." });
       yield put(actions.responseTemplateAction(null));
     } finally {
       yield put(actions.loadingTemplateAction(false));

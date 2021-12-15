@@ -42,7 +42,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
           call(contactsTasks.request, action as Redux.Action<null>)
         ]);
       } catch (e: unknown) {
-        notifications.requestError(e as Error, "There was an error retrieving the table data.");
+        notifications.requestError(e as Error, { message: "There was an error retrieving the table data." });
         yield put(config.actions.response({ models: [] }));
       } finally {
         yield put(config.actions.loading(false));
@@ -82,7 +82,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
         const response = yield api.request(api.getBudgetActualOwners, budgetId, { search, page_size: 10 });
         yield put(config.actions.responseActualOwners(response));
       } catch (e: unknown) {
-        notifications.requestError(e as Error, "There was an error retrieving the budget's items.");
+        notifications.requestError(e as Error, { message: "There was an error retrieving the budget's items." });
         yield put(config.actions.responseActualOwners({ count: 0, data: [] }));
       } finally {
         yield put(config.actions.loadingActualOwners(false));
@@ -123,7 +123,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
       );
       yield put(config.actions.updateBudgetInState({ id: r.data.id, data: r.data }));
     } catch (err: unknown) {
-      notifications.requestError(err as Error, errorMessage);
+      notifications.requestError(err as Error, { message: errorMessage });
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -135,7 +135,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
       const r: Http.BulkDeleteResponse<Model.Budget> = yield api.request(api.bulkDeleteBudgetActuals, budgetId, ids);
       yield put(config.actions.updateBudgetInState({ id: r.data.id, data: r.data }));
     } catch (err: unknown) {
-      notifications.requestError(err as Error, errorMessage);
+      notifications.requestError(err as Error, { message: errorMessage });
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -154,7 +154,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
         })
       );
     } catch (err: unknown) {
-      notifications.requestError(err as Error, "There was an error moving the row.");
+      notifications.requestError(err as Error, { message: "There was an error moving the row." });
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -176,7 +176,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
           })
         );
       } catch (err: unknown) {
-        notifications.requestError(err as Error, "There was an error adding the row.");
+        notifications.requestError(err as Error, { message: "There was an error adding the row." });
       } finally {
         yield put(config.actions.saving(false));
       }

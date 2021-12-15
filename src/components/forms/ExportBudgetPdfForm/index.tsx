@@ -358,7 +358,7 @@ const ExportForm = (
             <UploadPdfImage
               value={!isNil(displayedHeaderTemplate) ? displayedHeaderTemplate.left_image : null}
               onChange={(left_image: UploadedImage | null) => setLeftImage(left_image)}
-              onError={(error: Error | string) => props.form.notify(typeof error === "string" ? error : error.message)}
+              onError={(error: Error | string) => props.form.notify(error)}
             />
             <CKEditor
               ref={leftInfoEditor}
@@ -370,7 +370,7 @@ const ExportForm = (
           <Form.ItemStyle className={"export-header-side-item"} label={"Right Side"}>
             <UploadPdfImage
               onChange={(right_image: UploadedImage | null) => setRightImage(right_image)}
-              onError={(error: Error | string) => props.form.notify(typeof error === "string" ? error : error.message)}
+              onError={(error: Error | string) => props.form.notify(error)}
             />
             <CKEditor
               ref={rightInfoEditor}

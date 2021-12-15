@@ -1,6 +1,6 @@
 import { isNil } from "lodash";
 
-const TableNotification = (props: Table.TableNotification) => {
+const TableNotification = (props: TableNotification) => {
   return (
     <div className={"table-notification"}>
       <div className={"table-notification-header"}>

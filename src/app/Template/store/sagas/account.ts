@@ -23,7 +23,7 @@ function* getAccount(action: Redux.Action<null>): SagaIterator {
       const response: Model.Account = yield api.request(api.getAccount, accountId);
       yield put(actions.responseAccountAction(response));
     } catch (e: unknown) {
-      notifications.requestError(e as Error, "There was an error retrieving the account.");
+      notifications.requestError(e as Error, { message: "There was an error retrieving the account." });
       yield put(actions.responseAccountAction(null));
     }
   }

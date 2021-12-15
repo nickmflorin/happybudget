@@ -95,7 +95,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       try {
         yield all([call(requestFringes, objId), call(requestFringeColors)]);
       } catch (e: unknown) {
-        notifications.requestError(e as Error, "There was an error retrieving the table data.");
+        notifications.requestError(e as Error, { message: "There was an error retrieving the table data." });
         yield put(config.actions.response({ models: [] }));
       } finally {
         yield put(config.actions.loading(false));
@@ -201,7 +201,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         }
       }
     } catch (err: unknown) {
-      notifications.requestError(err as Error, errorMessage);
+      notifications.requestError(err as Error, { message: errorMessage });
     } finally {
       if (!tabling.typeguards.isGroupEvent(e)) {
         yield put(config.actions.loadingBudget(false));
@@ -217,7 +217,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       const response: Http.BulkDeleteResponse<B> = yield api.request(config.services.bulkDelete, budgetId, ids);
       yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
     } catch (err: unknown) {
-      notifications.requestError(err as Error, errorMessage);
+      notifications.requestError(err as Error, { message: errorMessage });
     } finally {
       yield put(config.actions.saving(false));
       yield put(config.actions.loadingBudget(false));
@@ -240,7 +240,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
           })
         );
       } catch (err: unknown) {
-        notifications.requestError(err as Error, "There was an error adding the row.");
+        notifications.requestError(err as Error, { message: "There was an error adding the row." });
       } finally {
         yield put(config.actions.saving(false));
       }
@@ -260,7 +260,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         })
       );
     } catch (err: unknown) {
-      notifications.requestError(err as Error, "There was an error moving the row.");
+      notifications.requestError(err as Error, { message: "There was an error moving the row." });
     } finally {
       yield put(config.actions.saving(false));
     }

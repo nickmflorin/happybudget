@@ -17,7 +17,7 @@ const Login = (): JSX.Element => {
   const history = useHistory();
   const location = useLocation<{
     readonly error?: Error | undefined;
-    readonly notification?: IAlert | string | undefined;
+    readonly notification?: AppNotification | string | undefined;
     readonly tokenType?: "email-confirmation" | "password-recovery" | undefined;
   }>();
 
@@ -30,26 +30,31 @@ const Login = (): JSX.Element => {
         );
       }
       if (isNil(userId) || e.code === api.ErrorCodes.TOKEN_INVALID) {
-        form.notify(<TokenNotification tokenType={tokenType} userId={userId} code={e.code} />);
+        form.notify(
+          TokenNotification({
+            tokenType,
+            userId,
+            code: e.code
+          })
+        );
       } else {
         form.notify(
-          <TokenNotification
-            tokenType={tokenType}
-            userId={userId}
-            code={e.code}
-            onSuccess={() =>
+          TokenNotification({
+            tokenType,
+            userId,
+            code: e.code,
+            onSuccess: () =>
               form.notify(
                 {
-                  type: "success",
-                  title: "Confirmation email successfully sent.",
-                  message: "Please check your inbox.",
+                  level: "success",
+                  message: "Confirmation email successfully sent.",
+                  detail: "Please check your inbox.",
                   closable: true
                 },
                 { append: true }
-              )
-            }
-            onError={(err: Error) => form.handleRequestError(err, { closable: true })}
-          />
+              ),
+            onError: (err: Error) => form.handleRequestError(err)
+          })
         );
       }
     },
@@ -64,7 +69,7 @@ const Login = (): JSX.Element => {
           return true;
         }
       } else if (e.code === api.ErrorCodes.ACCOUNT_NOT_APPROVED) {
-        form.notify(<UnapprovedUserNotification />);
+        form.notify(UnapprovedUserNotification({}));
         return true;
       } else if (e.code === api.ErrorCodes.ACCOUNT_NOT_VERIFIED) {
         if (isNil(userId)) {
@@ -75,22 +80,22 @@ const Login = (): JSX.Element => {
           );
         }
         form.notify(
-          <UnverifiedEmailNotification
-            userId={userId}
-            onSuccess={() =>
+          UnverifiedEmailNotification({
+            userId,
+            onSuccess: () =>
               form.notify(
                 {
-                  type: "success",
-                  title: "Confirmation email successfully sent.",
-                  message: "Please check your inbox.",
+                  level: "success",
+                  message: "Confirmation email successfully sent.",
+                  detail: "Please check your inbox.",
                   closable: true
                 },
                 { append: true }
-              )
-            }
-            onError={(err: Error) => form.handleRequestError(err, { closable: true })}
-          />
+              ),
+            onError: (err: Error) => form.handleRequestError(err)
+          })
         );
+
         return true;
       }
       return false;

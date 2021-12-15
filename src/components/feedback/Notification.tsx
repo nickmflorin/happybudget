@@ -1,48 +1,50 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { isNil } from "lodash";
 
+import { notifications } from "lib";
 import { ButtonLink } from "components/buttons";
 
-import { AlertProps } from "./Alert";
 import Error from "./Error";
 import Warning from "./Warning";
 import Success from "./Success";
 import Info from "./Info";
 
-export type NotificationProps = Omit<AlertProps, "type" | "alert"> & {
-  readonly type?: AlertType;
-  readonly alert?: IAlert;
-  readonly includeLink?: { readonly text?: string; readonly onClick?: () => void; readonly loading?: boolean };
-};
+const Notification = ({
+  includeLink,
+  detail,
+  children,
+  ...props
+}: AppNotification & { readonly children?: string }) => {
+  const [linkLoading, setLinkLoading] = useState(false);
 
-const Notification: React.FC<NotificationProps> = ({ children, includeLink, ...props }) => {
-  const type = useMemo(() => {
-    return !isNil(props.type) ? props.type : props.alert?.type || "error";
-  }, [props.alert, props.type]);
+  const fullDetail = useMemo(() => {
+    return !isNil(children) ? children : detail;
+  }, [detail, children]);
 
-  const _children = useMemo(() => {
+  const detailWithLink = useMemo(() => {
     if (!isNil(includeLink)) {
+      const linkObj: AppNotificationLink = includeLink({ setLoading: setLinkLoading });
       return (
         <span>
-          {children}
-          <ButtonLink loading={includeLink?.loading} style={{ marginLeft: 6 }} onClick={() => includeLink?.onClick?.()}>
-            {includeLink?.text}
+          {fullDetail !== undefined && notifications.notificationDetailToString(fullDetail)}
+          <ButtonLink loading={linkLoading} style={{ marginLeft: 6 }} onClick={() => linkObj.onClick?.()}>
+            {linkObj.text}
           </ButtonLink>
         </span>
       );
     } else {
-      return children;
+      return fullDetail !== undefined ? notifications.notificationDetailToString(fullDetail) : undefined;
     }
-  }, [children, includeLink]);
+  }, [fullDetail, includeLink, linkLoading]);
 
-  if (type === "warning") {
-    return <Warning {...props}>{_children}</Warning>;
-  } else if (type === "error") {
-    return <Error {...props}>{_children}</Error>;
-  } else if (type === "success") {
-    return <Success {...props}>{_children}</Success>;
+  if (props.level === "warning") {
+    return <Warning {...props} detail={detailWithLink} />;
+  } else if (props.level === "error") {
+    return <Error {...props} detail={detailWithLink} />;
+  } else if (props.level === "success") {
+    return <Success {...props} detail={detailWithLink} />;
   } else {
-    return <Info {...props}>{_children}</Info>;
+    return <Info {...props} detail={detailWithLink} />;
   }
 };
 

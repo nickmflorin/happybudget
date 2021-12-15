@@ -13,7 +13,7 @@ function* loadHeaderTemplateTask(id: number): SagaIterator {
     const response: Model.HeaderTemplate = yield api.request(api.getHeaderTemplate, id);
     yield put(actions.displayHeaderTemplateAction(response));
   } catch (e: unknown) {
-    notifications.requestError(e as Error, "There was an error loading the header template.");
+    notifications.requestError(e as Error, { message: "There was an error loading the header template." });
   } finally {
     yield put(actions.setLoadingHeaderTemplateDetailAction(false));
   }
@@ -36,7 +36,7 @@ function* getHeaderTemplatesTask(): SagaIterator {
     const response: Http.ListResponse<Model.SimpleHeaderTemplate> = yield api.request(api.getHeaderTemplates, {});
     yield put(actions.responseHeaderTemplatesAction(response));
   } catch (e: unknown) {
-    notifications.requestError(e as Error, "There was an error retrieving the header templates.");
+    notifications.requestError(e as Error, { message: "There was an error retrieving the header templates." });
     yield put(actions.responseHeaderTemplatesAction({ data: [], count: 0 }));
   } finally {
     yield put(actions.loadingHeaderTemplatesAction(false));

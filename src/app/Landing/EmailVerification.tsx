@@ -11,7 +11,7 @@ type IRedirect = {
   readonly state?: {
     readonly error?: Error;
     readonly tokenType?: Http.TokenType;
-    readonly notification?: IAlert;
+    readonly notification?: AppNotification;
   };
 };
 
@@ -28,7 +28,11 @@ const EmailVerification = (): JSX.Element => {
           setRedirect({
             pathname: "/login",
             state: {
-              notification: { closable: true, type: "success", title: "Your email address was successfully verified." }
+              notification: {
+                closable: true,
+                level: "success",
+                message: "Your email address was successfully verified."
+              }
             }
           });
         })

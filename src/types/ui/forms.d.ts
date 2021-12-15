@@ -1,32 +1,14 @@
 declare type RootFormInstance<T> = import("antd/lib/form").FormInstance<T>;
 declare type RootFormProps = import("antd/lib/form").FormProps;
 
-declare type FormFieldNotification = {
-  readonly field: string;
-  readonly message: string;
-};
-
-declare type FormNotificationWithMeta<S> = {
-  readonly type?: AlertType;
-  readonly closable?: boolean;
-  readonly notification: S;
-};
-
-declare type RawFormNotification = JSX.Element | FormFieldNotification | IAlert | string | Http.Error;
-
-declare type FormNotification = RawFormNotification | FormNotificationWithMeta<Http.Error | string>;
-
-declare type FormNotifyOptions = {
-  readonly type?: AlertType;
-  readonly append?: boolean;
-  readonly closable?: boolean;
-};
-
 declare interface FormInstance<T> extends RootFormInstance<T> {
-  readonly notify: (notifications: SingleOrArray<FormNotification>, opts?: FormNotifyOptions) => void;
+  readonly notify: (
+    notifications: SingleOrArray<FormNotification | Error | Http.Error | string>,
+    opts?: AppNotificationOptions
+  ) => void;
   readonly clearNotifications: () => void;
   readonly setLoading: (value: boolean) => void;
-  readonly handleRequestError: (e: Error, opts?: FormNotifyOptions) => void;
+  readonly handleRequestError: (e: Error, opts?: AppNotificationOptions) => void;
   readonly notifications: FormNotification[];
   readonly loading: boolean | undefined;
   readonly isInModal?: boolean;

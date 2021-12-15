@@ -8,7 +8,7 @@ interface DeleteRowsModalProps extends DeleteModalProps {
 function DeleteRowsModal({ rows, ...props }: DeleteRowsModalProps): JSX.Element {
   return (
     <DeleteModal {...props} title={"Delete Rows"}>
-      <Notification type={"warning"} title={`You are about to delete ${rows.length} rows.`}>
+      <Notification level={"warning"} message={`You are about to delete ${rows.length} rows.`}>
         {"This action is not recoverable, the data will be permanently erased"}
       </Notification>
     </DeleteModal>

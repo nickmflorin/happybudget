@@ -17,7 +17,7 @@ const Signup = (): JSX.Element => {
   const handleAuthError = useMemo(
     () => (e: Http.AuthError) => {
       if (e.code === api.ErrorCodes.ACCOUNT_NOT_ON_WAITLIST) {
-        form.notify(<UserNotOnWaitlistNotification />);
+        form.notify(UserNotOnWaitlistNotification());
         return true;
       }
       return false;
@@ -71,25 +71,24 @@ const Signup = (): JSX.Element => {
             .register(values)
             .then((user: Model.User) => {
               form.notify(
-                <UnverifiedEmailNotification
-                  userId={user.id}
-                  title={"Verify Email"}
-                  type={"success"}
-                  message={`Successfully registered.  An email was sent to ${user.email} to verify the
-										email address on the account.  Didn't receive it?`}
-                  onSuccess={() =>
+                UnverifiedEmailNotification({
+                  userId: user.id,
+                  message: "Verify Email",
+                  level: "success",
+                  detail: `Successfully registered.  An email was sent to ${user.email} to verify the
+								email address on the account.  Didn't receive it?`,
+                  onSuccess: () =>
                     form.notify(
                       {
-                        type: "success",
-                        title: "Confirmation email successfully sent.",
-                        message: "Please check your inbox.",
+                        level: "success",
+                        message: "Confirmation email successfully sent.",
+                        detail: "Please check your inbox.",
                         closable: true
                       },
                       { append: true }
-                    )
-                  }
-                  onError={(err: Error) => form.handleRequestError(err, { closable: true })}
-                />
+                    ),
+                  onError: (err: Error) => form.handleRequestError(err)
+                })
               );
             })
             .catch((e: Error) => handleError(e))

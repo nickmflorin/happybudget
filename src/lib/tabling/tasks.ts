@@ -84,7 +84,7 @@ export const createBulkTask = <
       const response: RSP = yield api.request(...config.bulkCreate(...args), requestPayload);
       yield all(map(config.responseActions(response, e), (action: Redux.Action<any>) => put(action)));
     } catch (err: unknown) {
-      notifications.requestError(err as Error, errorMessage);
+      notifications.requestError(err as Error, { message: errorMessage });
     } finally {
       yield all(map(config.loadingActions, (action: PayloadActionCreator<boolean>) => put(action(false))));
     }

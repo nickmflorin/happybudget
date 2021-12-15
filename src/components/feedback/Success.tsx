@@ -3,12 +3,8 @@ import Alert, { AlertProps } from "./Alert";
 
 export interface SuccessProps extends Omit<AlertProps, "type"> {}
 
-const Success: React.FC<SuccessProps> = ({ children, className, ...props }) => {
-  return (
-    <Alert {...props} className={classNames("success", className)} type={"success"}>
-      {children}
-    </Alert>
-  );
-};
+const Success: React.FC<SuccessProps> = ({ children, className, ...props }) => (
+  <Alert {...props} className={classNames("success", className)} level={"success"} />
+);
 
 export default Success;

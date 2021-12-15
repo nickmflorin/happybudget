@@ -4,7 +4,6 @@ import classNames from "classnames";
 
 import { Form as RootForm, Input } from "antd";
 
-import * as api from "api";
 import { RenderWithSpinner } from "components";
 import { Notification } from "components/feedback";
 import { ui } from "lib";
@@ -237,22 +236,7 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
         {props.form.notifications.length !== 0 && (
           <div className={"form-alert-wrapper"}>
             {map(props.form.notifications, (n: FormNotification, index: number) => {
-              const type: AlertType | undefined = ui.typeguards.isRawFormNotification(n) ? undefined : n.type;
-              const notification = ui.typeguards.isRawFormNotification(n) ? n : n.notification;
-              if (!ui.typeguards.isFormFieldNotification(notification)) {
-                if (typeof notification === "string" || api.typeguards.isHttpError(notification)) {
-                  return (
-                    <Notification key={index} type={type}>
-                      {notification}
-                    </Notification>
-                  );
-                } else if (ui.typeguards.isAlert(notification)) {
-                  return <Notification key={index} type={notification.type} alert={notification} />;
-                } else {
-                  return <React.Fragment key={index}>{notification}</React.Fragment>;
-                }
-              }
-              return <></>;
+              return <Notification key={index} {...n} />;
             })}
           </div>
         )}

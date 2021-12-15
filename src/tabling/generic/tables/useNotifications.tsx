@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 
 import TableNotification from "./TableNotification";
 
-const useNotifications = (id: string): [() => void, (n: Table.TableNotification) => void] => {
+const useNotifications = (id: string): [() => void, (n: TableNotification) => void] => {
   const currentContainer = useRef<HTMLDivElement | null>(null);
 
   const removeNotification = useMemo(
@@ -17,7 +17,7 @@ const useNotifications = (id: string): [() => void, (n: Table.TableNotification)
   );
 
   const notify = useMemo(
-    () => (notification: Table.TableNotification) => {
+    () => (notification: TableNotification) => {
       const element = document.getElementById(`${id}-data`);
 
       /* Each <Grid /> component has as it's first and only child a <div>

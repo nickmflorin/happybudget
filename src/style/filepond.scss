@@ -1,26 +1,25 @@
 .filepond--panel-root {
-  background-color: $gray-light;
+	background-color: $gray-light;
 }
 
 .filepond--drop-label {
-  cursor: pointer;
+	cursor: pointer;
 
-  label {
-    cursor: pointer;
+	label {
+		cursor: pointer;
+	}
+}
 
-    // &:before {
-    //   font-family: "Font Awesome 6 Pro";
-    //   font-weight: 900;
-    //   content: "\f302";
-    //   margin-right: 20px;
-    // }
-  }
+.filepond--drop-label.filepond--drop-label {
+	label {
+		padding: 0 !important;
+	}
 }
 
 .filepond--credits {
-  display: none;
+	display: none;
 }
 
 .filepond--hopper {
-  margin-bottom: 0px !important;
+	margin-bottom: 0px !important;
 }

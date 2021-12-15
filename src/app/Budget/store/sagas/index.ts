@@ -59,7 +59,7 @@ function* getBudgetTask(action: Redux.Action<null>): SagaIterator {
       const response: Model.Budget = yield api.request(api.getBudget, budgetId);
       yield put(actions.responseBudgetAction(response));
     } catch (e: unknown) {
-      notifications.requestError(e as Error, "There was an error retrieving the budget.");
+      notifications.requestError(e as Error, { message: "There was an error retrieving the budget." });
       yield put(actions.responseBudgetAction(null));
     } finally {
       yield put(actions.loadingBudgetAction(false));

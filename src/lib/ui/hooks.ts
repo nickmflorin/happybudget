@@ -1,5 +1,5 @@
 import { RefObject, useRef, useEffect, useState, useMemo, useReducer } from "react";
-import { forEach, isNil, debounce, find, reduce, filter, map } from "lodash";
+import { forEach, isNil, debounce, find, reduce, filter } from "lodash";
 import * as JsSearch from "js-search";
 import axios from "axios";
 import { useMediaQuery } from "react-responsive";
@@ -9,7 +9,6 @@ import { Breakpoints } from "style/constants";
 
 import * as api from "api";
 import { util, hooks, notifications } from "lib";
-import * as typeguards from "./typeguards";
 
 export * from "./tsxHooks";
 
@@ -74,10 +73,8 @@ export const useDropdownIfNotDefined = (dropdown?: NonNullRef<IDropdownRef>): No
 };
 
 type FormNotifyAction = {
-  readonly notifications: SingleOrArray<FormNotification>;
-  readonly type?: AlertType;
+  readonly notifications: SingleOrArray<FormNotification | Error | string>;
   readonly append?: boolean;
-  readonly closable?: boolean;
 };
 
 const formNotificationReducer = (
@@ -88,18 +85,15 @@ const formNotificationReducer = (
     const ns = Array.isArray(action.notifications) ? action.notifications : [];
     return reduce(
       ns,
-      (curr: FormNotification[], n: FormNotification): FormNotification[] => {
-        if (!typeguards.isRawFormNotification(n)) {
+      (curr: FormNotification[], n: FormNotification | NotificationDetail): FormNotification[] => {
+        if (notifications.typeguards.isNotificationDetail(n)) {
           return [
             ...curr,
             {
-              notification: n.notification,
-              type: n.type || action.type,
-              closable: n.closable === undefined ? action.closable : n.closable
+              message: notifications.notificationDetailToString(n),
+              level: "error"
             }
           ];
-        } else if (!isNil(action.type) && (api.typeguards.isHttpError(n) || typeof n === "string")) {
-          return [...curr, { notification: n, type: action.type, closable: action.closable }];
         }
         return [...curr, n];
       },
@@ -111,6 +105,17 @@ const formNotificationReducer = (
 };
 
 type FieldWithErrors = { readonly name: string; readonly errors: string[] };
+
+const isFieldNotification = (
+  e: FormNotification | Http.Error | Error | string
+): e is FormFieldNotification | Http.FieldError => {
+  if (api.typeguards.isHttpError(e)) {
+    return e.error_type === "field";
+  }
+  return (
+    typeof e === "object" && !(e instanceof Error) && notifications.typeguards.formNotificationIsFieldNotification(e)
+  );
+};
 
 export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormInstance<T> => {
   const _useAntdForm = RootForm.useForm();
@@ -143,36 +148,17 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
   );
 
   const notify = useMemo(
-    () => (notes: SingleOrArray<FormNotification>, opts?: FormNotifyOptions) => {
+    () => (notes: SingleOrArray<FormNotification | Http.Error | Error | string>, opts?: AppNotificationOptions) => {
       const notices = Array.isArray(notes) ? notes : [notes];
-      const isFieldNotice = (e: FormNotification) => {
-        if (typeguards.isRawFormNotification(e)) {
-          if (api.typeguards.isHttpError(e)) {
-            return e.error_type === "field";
-          }
-          return typeguards.isFormFieldNotification(e);
-        }
-        return typeguards.isFormFieldNotification(e.notification);
-      };
       /* For the notification sources that pertain to field type errors, render
 				 those next to the individual fields of the form. */
       renderFieldErrors(
-        map(
-          filter(notices, (n: FormNotification) => isFieldNotice(n)) as (
-            | Http.FieldError
-            | FormFieldNotification
-            | FormNotificationWithMeta<Http.FieldError>
-          )[],
-          (f: Http.FieldError | FormFieldNotification | FormNotificationWithMeta<Http.FieldError>) =>
-            typeguards.isRawFormNotification(f) ? f : f.notification
-        ) as (Http.FieldError | FormFieldNotification)[]
+        filter(notices, (n: FormNotification) => isFieldNotification(n)) as (Http.FieldError | FormFieldNotification)[]
       );
       /* Filter out the notifications that do not pertain to individual fields
 				 of the form and dispatch them to the notifications store. */
       dispatchNotification({
-        notifications: filter(notices, (n: FormNotification) => !isFieldNotice(n)) as FormNotification[],
-        type: opts?.type,
-        closable: opts?.closable,
+        notifications: filter(notices, (n: FormNotification) => !isFieldNotification(n)) as FormNotification[],
         append: opts?.append
       });
     },
@@ -195,7 +181,7 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
       },
       notify,
       setLoading,
-      handleRequestError: (e: Error, opts?: FormNotifyOptions) => {
+      handleRequestError: (e: Error, opts?: AppNotificationOptions) => {
         if (!axios.isCancel(e) && !(e instanceof api.ForceLogout)) {
           notifications.requestError(e, { notifyUser: false });
           if (e instanceof api.ClientError) {

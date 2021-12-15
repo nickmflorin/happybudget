@@ -20,7 +20,7 @@ export const createTaskSet = (config: { readonly authenticated: boolean }): Redu
         yield put(actions.authenticated.responseFilteredContactsAction(response));
       }
     } catch (e: unknown) {
-      notifications.requestError(e as Error, "There was an error retrieving the contacts.");
+      notifications.requestError(e as Error, { message: "There was an error retrieving the contacts." });
       yield put(actions.responseContactsAction({ count: 0, data: [] }));
       if (config.authenticated) {
         yield put(actions.authenticated.responseFilteredContactsAction({ count: 0, data: [] }));
@@ -42,7 +42,7 @@ export const createFilteredTaskSet = (): Redux.ModelListResponseTaskMap => {
       const response: Http.ListResponse<M> = yield api.request(api.getContacts, query);
       yield put(actions.authenticated.responseFilteredContactsAction(response));
     } catch (e: unknown) {
-      notifications.requestError(e as Error, "There was an error retrieving the contacts.");
+      notifications.requestError(e as Error, { message: "There was an error retrieving the contacts." });
       yield put(actions.authenticated.responseFilteredContactsAction({ count: 0, data: [] }));
     } finally {
       yield put(actions.authenticated.loadingFilteredContactsAction(false));
@@ -62,7 +62,7 @@ export const createTableTaskSet = (
       const response: Http.ListResponse<M> = yield api.request(api.getContacts, {});
       yield put(config.actions.response({ models: response.data }));
     } catch (e: unknown) {
-      notifications.requestError(e as Error, "There was an error retrieving the contacts.");
+      notifications.requestError(e as Error, { message: "There was an error retrieving the contacts." });
       yield put(config.actions.response({ models: [] }));
     } finally {
       yield put(config.actions.loading(false));
@@ -94,7 +94,7 @@ export const createTableTaskSet = (
     try {
       yield api.request(api.bulkUpdateContacts, requestPayload);
     } catch (err: unknown) {
-      notifications.requestError(err as Error, errorMessage);
+      notifications.requestError(err as Error, { message: errorMessage });
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -105,7 +105,7 @@ export const createTableTaskSet = (
     try {
       yield api.request(api.bulkDeleteContacts, ids);
     } catch (err: unknown) {
-      notifications.requestError(err as Error, errorMessage);
+      notifications.requestError(err as Error, { message: errorMessage });
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -125,7 +125,7 @@ export const createTableTaskSet = (
         })
       );
     } catch (err: unknown) {
-      notifications.requestError(err as Error, "There was an error adding the row.");
+      notifications.requestError(err as Error, { message: "There was an error adding the row." });
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -144,7 +144,7 @@ export const createTableTaskSet = (
         })
       );
     } catch (err: unknown) {
-      notifications.requestError(err as Error, "There was an error moving the row.");
+      notifications.requestError(err as Error, { message: "There was an error moving the row." });
     } finally {
       yield put(config.actions.saving(false));
     }
