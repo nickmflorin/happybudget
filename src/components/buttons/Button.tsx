@@ -78,7 +78,7 @@ const Button = (
     } else {
       return iC;
     }
-  }, [iC]);
+  }, [iC, loading, spinnerProps]);
 
   return (
     <TooltipWrapper tooltip={tooltip}>
@@ -108,5 +108,4 @@ const Button = (
   );
 };
 
-const ForwardRefButton = forwardRef(Button);
-export default React.memo(ForwardRefButton);
+export default React.memo(forwardRef(Button));

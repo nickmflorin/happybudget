@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { toast } from "react-toastify";
 import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
@@ -160,6 +161,10 @@ const BudgetPreviewModal = ({
       filename={filename}
       onExportSuccess={onSuccess}
       className={"budget-preview-modal"}
+      onRenderError={(e: Error) => {
+        console.error(e);
+        toast.error("There was an error rendering the PDF.");
+      }}
     >
       <ExportBudgetPdfForm
         form={form}

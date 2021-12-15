@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
@@ -112,6 +113,10 @@ const ActualsPreviewModal = ({
       filename={filename}
       onExportSuccess={onSuccess}
       className={"actuals-preview-modal"}
+      onRenderError={(e: Error) => {
+        console.error(e);
+        toast.error("There was an error rendering the PDF.");
+      }}
     >
       <ExportActualsPdfForm
         form={form}

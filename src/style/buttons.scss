@@ -124,6 +124,10 @@
   @include color($c);
   @include color_on_disabled($d);
   @include color_on_hover($h);
+
+	.spinner {
+    color: $c;
+  }
 }
 
 @mixin bare_color_set($c, $h: lighten($c, 20%), $d: $disabled-color) {
@@ -287,7 +291,6 @@
   -webkit-tap-highlight-color: transparent;
 
   .spinner {
-    color: $green;
     height: 16px !important;
     width: 16px !important;
     aspect-ratio: 1;

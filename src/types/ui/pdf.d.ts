@@ -59,10 +59,16 @@ declare namespace Pdf {
     readonly loadingOnNoFile?: boolean;
   };
 
+  export interface IPreviewerExportParams {
+    readonly filename?: string;
+    readonly component?: JSX.Element;
+    readonly onSuccess?: () => void;
+  }
+
   export interface IPreviewerRef {
     readonly render: (component?: JSX.Element) => void;
     readonly debouncedRender: () => void;
-    readonly export: (filename: string, onSuccess?: () => void) => void;
+    readonly export: (params: IPreviewerExportParams) => void;
     readonly refreshRequired: () => void;
   }
 }

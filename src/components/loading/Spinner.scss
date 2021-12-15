@@ -5,11 +5,12 @@
   height: 25px;
   width: 25px;
   position: absolute;
+	color: $green;
 
   .anticon {
     height: 100%;
     width: 100%;
-    color: $green;
+    color: inherit;
 
     svg {
       height: 100%;
