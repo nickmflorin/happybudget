@@ -1,4 +1,4 @@
-import { createAction } from "@reduxjs/toolkit";
+import { redux } from "lib";
 
 export * as authenticated from "./authenticated";
 
@@ -14,11 +14,11 @@ export const GlobalActionTypes = {
   }
 };
 
-export const setDrawerVisibilityAction = createAction<boolean>(GlobalActionTypes.SetDrawerVisibility);
-export const setApplicationLoadingAction = createAction<boolean>(GlobalActionTypes.SetApplicationLoading);
+export const setDrawerVisibilityAction = redux.actions.createAction<boolean>(GlobalActionTypes.SetDrawerVisibility);
+export const setApplicationLoadingAction = redux.actions.createAction<boolean>(GlobalActionTypes.SetApplicationLoading);
 
-export const requestContactsAction = createAction<null>(GlobalActionTypes.Contacts.Request);
-export const loadingContactsAction = createAction<boolean>(GlobalActionTypes.Contacts.Loading);
-export const responseContactsAction = createAction<Http.ListResponse<Model.Contact>>(
+export const requestContactsAction = redux.actions.createAction<null>(GlobalActionTypes.Contacts.Request);
+export const loadingContactsAction = redux.actions.createAction<boolean>(GlobalActionTypes.Contacts.Loading);
+export const responseContactsAction = redux.actions.createAction<Http.ListResponse<Model.Contact>>(
   GlobalActionTypes.Contacts.Response
 );

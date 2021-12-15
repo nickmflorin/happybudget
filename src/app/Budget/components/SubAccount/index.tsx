@@ -21,12 +21,11 @@ interface SubAccountProps {
 const SubAccount = ({ budgetId, budget, setPreviewModalVisible }: SubAccountProps): JSX.Element => {
   const { subaccountId } = useParams<{ subaccountId: string }>();
   const dispatch = useDispatch();
-
   const detail = useSelector(selectDetail);
 
   useEffect(() => {
     if (!isNaN(parseInt(subaccountId))) {
-      dispatch(actions.subAccount.setSubAccountIdAction(parseInt(subaccountId)));
+      dispatch(actions.subAccount.requestSubAccountAction(parseInt(subaccountId)));
     }
   }, [subaccountId]);
 

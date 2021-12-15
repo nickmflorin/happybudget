@@ -29,13 +29,11 @@ export const initialSubAccountsTableState: Tables.SubAccountTableStore = {
 };
 
 export const initialSubAccountState: Modules.Budget.SubAccountStore = {
-  id: null,
   detail: redux.initialState.initialDetailResponseState,
   table: initialSubAccountsTableState
 };
 
 export const initialAccountState: Modules.Budget.AccountStore = {
-  id: null,
   detail: redux.initialState.initialDetailResponseState,
   table: initialSubAccountsTableState
 };
@@ -47,7 +45,6 @@ export const initialHeaderTemplatesState: Modules.Budget.HeaderTemplatesStore = 
 };
 
 const initialState: Modules.Budget.Store = {
-  id: null,
   detail: redux.initialState.initialDetailResponseState,
   account: initialAccountState,
   accounts: redux.initialState.initialTableState,

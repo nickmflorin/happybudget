@@ -53,16 +53,16 @@ const recalculateSubAccountRow = (
 };
 
 export type SubAccountTableActionMap = Redux.TableActionMap<M> & {
-  readonly responseSubAccountUnits: Http.ListResponse<Model.Tag>;
+  readonly responseSubAccountUnits: Redux.ActionCreator<Http.ListResponse<Model.Tag>>;
 };
 
 /* eslint-disable indent */
 export const createUnauthenticatedSubAccountsTableReducer = (
-  config: BudgetTableReducerConfig<R, M, S, SubAccountTableActionMap> & {
+  config: BudgetTableReducerConfig<R, M, S, Tables.SubAccountTableContext, SubAccountTableActionMap> & {
     readonly fringes: Redux.Reducer<Tables.FringeTableStore>;
   }
 ): Redux.Reducer<S> => {
-  const generic = createBudgetTableReducer<R, M, S, SubAccountTableActionMap>(config);
+  const generic = createBudgetTableReducer<R, M, S, Tables.SubAccountTableContext, SubAccountTableActionMap>(config);
 
   return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
     let newState = generic(state, action);
@@ -77,19 +77,23 @@ export const createUnauthenticatedSubAccountsTableReducer = (
   };
 };
 
-export type AuthenticatedSubAccountTableActionMap = Redux.AuthenticatedTableActionMap<R, M> & {
-  readonly responseSubAccountUnits: Http.ListResponse<Model.Tag>;
+export type AuthenticatedSubAccountTableActionMap = Redux.AuthenticatedTableActionMap<
+  R,
+  M,
+  Tables.SubAccountTableContext
+> & {
+  readonly responseSubAccountUnits: Redux.ActionCreator<Http.ListResponse<Model.Tag>>;
 };
 
 export const createAuthenticatedSubAccountsTableReducer = (
   config: Omit<
-    BudgetTableReducerConfig<R, M, S, AuthenticatedSubAccountTableActionMap> & {
+    BudgetTableReducerConfig<R, M, S, Tables.SubAccountTableContext, AuthenticatedSubAccountTableActionMap> & {
       readonly fringes: Redux.Reducer<Tables.FringeTableStore>;
     },
     "defaultData"
   >
 ): Redux.Reducer<S> => {
-  const generic = createAuthenticatedBudgetTableReducer<R, M, S>({
+  const generic = createAuthenticatedBudgetTableReducer<R, M, S, Tables.SubAccountTableContext>({
     ...config,
     defaultData: {
       markup_contribution: 0.0,

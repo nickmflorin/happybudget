@@ -1,6 +1,6 @@
 import React, { useMemo, useReducer } from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
-import { map, isNil, filter, reduce, uniqueId } from "lodash";
+import { map, isNil, filter, reduce } from "lodash";
 import { GridOptions } from "@ag-grid-community/core";
 
 import { Config } from "config";
@@ -39,7 +39,6 @@ export const DefaultFooterGridOptions: GridOptions = {
 };
 
 type TableConfigurationProvidedProps<R extends Table.RowData> = {
-  readonly id: string;
   readonly tableApis: Table.ITableApis;
   readonly hiddenColumns?: Table.HiddenColumns;
   readonly tableGridOptions: Table.TableOptionsSet;
@@ -57,6 +56,7 @@ type TableConfigurationProvidedProps<R extends Table.RowData> = {
 };
 
 export type TableConfigurationProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
+  readonly tableId: string;
   readonly cookieNames?: Table.CookieNames;
   readonly calculatedColumnWidth?: number;
   readonly hasDragColumn?: boolean;
@@ -110,7 +110,6 @@ const configureTable = <
     | React.MemoExoticComponent<React.FunctionComponent>
 ): React.FunctionComponent<T> => {
   function WithConfigureTable(props: T) {
-    const tableId = useMemo(() => uniqueId("table-"), []);
     const [_apis, dispatchApis] = useReducer(apisReducer, InitialAPIs);
 
     const [hiddenColumns, changeColumnVisibility] = useHiddenColumns<R, M>({
@@ -133,7 +132,7 @@ const configureTable = <
     const onFirstDataRendered = useMemo(
       () =>
         (event: Table.FirstDataRenderedEvent): void => {
-          const grid = document.querySelector(`#${tableId}`);
+          const grid = document.querySelector(`#${props.tableId}`);
           const cols = event.columnApi.getAllDisplayedColumns();
           const width = reduce(
             cols,
@@ -224,7 +223,6 @@ const configureTable = <
     return (
       <Component
         {...props}
-        id={tableId}
         minimal={props.minimal}
         rowHeight={props.rowHeight}
         menuPortalId={props.menuPortalId}

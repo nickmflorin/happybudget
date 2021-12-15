@@ -9,7 +9,7 @@ import { Page } from "components/layout";
 import { useContacts } from "components/hooks";
 import { ContactsTable, connectTableToStore } from "tabling";
 
-import { actions } from "../store";
+import { actions, sagas } from "../store";
 
 type M = Model.Contact;
 type R = Tables.ContactRowData;
@@ -21,9 +21,11 @@ const ConnectedContactsTable = connectTableToStore<ContactsTable.Props, R, M, Ta
     }
     return redux.initialState.initialTableState;
   },
+  onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.ContactTableContext) =>
+    dispatch(actions.requestContactsAction(null, c)),
+  createSaga: (table: NonNullRef<Table.TableInstance<R, M>>) => sagas.createContactsTableSaga(table),
   actions: {
     tableChanged: actions.handleContactsTableChangeEventAction,
-    request: actions.requestContactsAction,
     loading: actions.loadingContactsAction,
     response: actions.responseContactsAction,
     saving: actions.savingContactsTableAction,
@@ -118,6 +120,8 @@ const Contacts = (): JSX.Element => {
       <Page className={"contacts"} title={"My Contacts"}>
         <ConnectedContactsTable
           table={table}
+          actionContext={{}}
+          tableId={"contacts"}
           editColumnConfig={[
             {
               conditional: (r: Table.NonPlaceholderBodyRow<R>) => tabling.typeguards.isModelRow(r),

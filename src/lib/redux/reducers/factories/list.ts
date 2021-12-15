@@ -17,8 +17,8 @@ import * as transformers from "./transformers";
 /* eslint-disable indent */
 export const createListResponseReducer = <
   M,
-  A extends Partial<Redux.ListResponseActionMap<M>> = Redux.ListResponseActionMap<M>,
-  S extends Redux.ListResponseStore<M> = Redux.ListResponseStore<M>
+  S extends Redux.ListResponseStore<M> = Redux.ListResponseStore<M>,
+  A extends Partial<Redux.ListResponseActionMap<M, any>> = Redux.ListResponseActionMap<M, any>
 >(
   config: Redux.ReducerConfig<S, A>,
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -33,8 +33,8 @@ export const createListResponseReducer = <
 
 export const createModelListResponseReducer = <
   M extends Model.HttpModel,
-  A extends Partial<Redux.ModelListResponseActionMap<M>> = Redux.ModelListResponseActionMap<M>,
-  S extends Redux.ModelListResponseStore<M> = Redux.ModelListResponseStore<M>
+  S extends Redux.ModelListResponseStore<M> = Redux.ModelListResponseStore<M>,
+  A extends Partial<Redux.ModelListResponseActionMap<M, any>> = Redux.ModelListResponseActionMap<M, any>
 >(
   config: Redux.ReducerConfig<S, A>,
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
@@ -49,10 +49,10 @@ export const createModelListResponseReducer = <
 
 export const createAuthenticatedModelListResponseReducer = <
   M extends Model.HttpModel,
+  S extends Redux.AuthenticatedModelListResponseStore<M> = Redux.AuthenticatedModelListResponseStore<M>,
   A extends Partial<
-    Redux.AuthenticatedModelListResponseActionMap<M>
-  > = Redux.AuthenticatedModelListResponseActionMap<M>,
-  S extends Redux.AuthenticatedModelListResponseStore<M> = Redux.AuthenticatedModelListResponseStore<M>
+    Redux.AuthenticatedModelListResponseActionMap<M, any>
+  > = Redux.AuthenticatedModelListResponseActionMap<M, any>
 >(
   config: Redux.ReducerConfig<S, A>,
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */

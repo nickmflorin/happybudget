@@ -1,61 +1,44 @@
-import { SagaIterator } from "redux-saga";
-import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
-import { spawn } from "redux-saga/effects";
-import { filter, intersection } from "lodash";
-
 import * as api from "api";
 import { budgeting, tabling } from "lib";
 
-import { AccountsTable } from "tabling";
+import { accounts as actions, loadingBudgetAction, updateBudgetInStateAction } from "../actions";
 
-import { accounts as actions, loadingTemplateAction, updateTemplateInStateAction } from "../actions";
-
-const ActionMap: Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account>> & {
-  readonly request: ActionCreatorWithPayload<Redux.TableRequestPayload>;
-  readonly loadingBudget: ActionCreatorWithPayload<boolean>;
-  readonly updateBudgetInState: ActionCreatorWithPayload<Redux.UpdateActionPayload<Model.Template>>;
+const ActionMap: Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account, Tables.AccountTableContext> & {
+  readonly loadingBudget: Redux.ActionCreator<boolean>;
+  readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateActionPayload<Model.Template>>;
 } = {
-  tableChanged: actions.handleTableChangeEventAction,
   request: actions.requestAction,
+  tableChanged: actions.handleTableChangeEventAction,
   loading: actions.loadingAction,
   response: actions.responseAction,
   saving: actions.savingTableAction,
   addModelsToState: actions.addModelsToStateAction,
-  loadingBudget: loadingTemplateAction,
-  updateBudgetInState: updateTemplateInStateAction,
+  loadingBudget: loadingBudgetAction,
+  updateBudgetInState: updateBudgetInStateAction,
   setSearch: actions.setSearchAction
 };
 
-const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
-  Tables.AccountRowData,
-  Model.Account,
-  Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account> & {
-    readonly request: Redux.TableRequestPayload;
-  }
->({
-  actions: ActionMap,
-  tasks: budgeting.tasks.accounts.createTableTaskSet<Model.Template>({
-    columns: filter(
-      AccountsTable.Columns,
-      (c: Table.Column<Tables.AccountRowData, Model.Account>) =>
-        intersection([c.field, c.colId], ["variance", "actual"]).length === 0
-    ),
-    selectObjId: (state: Application.Authenticated.Store) => state.template.id,
-    selectStore: (state: Application.Authenticated.Store) => state.template.accounts,
+export const createTableSaga = (table: PotentiallyNullRef<Table.TableInstance<Tables.AccountRowData, Model.Account>>) =>
+  tabling.sagas.createAuthenticatedTableSaga<
+    Tables.AccountRowData,
+    Model.Account,
+    Tables.AccountTableContext,
+    Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account, Tables.AccountTableContext>
+  >({
     actions: ActionMap,
-    services: {
-      create: api.createTemplateAccount,
-      request: api.getTemplateAccounts,
-      requestMarkups: api.getTemplateAccountMarkups,
-      requestGroups: api.getTemplateAccountGroups,
-      bulkCreate: api.bulkCreateTemplateAccounts,
-      bulkDelete: api.bulkDeleteTemplateAccounts,
-      bulkUpdate: api.bulkUpdateTemplateAccounts,
-      bulkDeleteMarkups: api.bulkDeleteTemplateMarkups
-    }
-  })
-});
-
-export default function* rootSaga(): SagaIterator {
-  yield spawn(tableSaga);
-}
+    tasks: budgeting.tasks.accounts.createTableTaskSet<Model.Template>({
+      table,
+      selectStore: (state: Application.Authenticated.Store) => state.template.accounts,
+      actions: ActionMap,
+      services: {
+        create: api.createTemplateAccount,
+        request: api.getTemplateAccounts,
+        requestGroups: api.getTemplateAccountGroups,
+        requestMarkups: api.getTemplateAccountMarkups,
+        bulkCreate: api.bulkCreateTemplateAccounts,
+        bulkDelete: api.bulkDeleteTemplateAccounts,
+        bulkUpdate: api.bulkUpdateTemplateAccounts,
+        bulkDeleteMarkups: api.bulkDeleteTemplateMarkups
+      }
+    })
+  });

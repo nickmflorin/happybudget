@@ -14,15 +14,15 @@ const Template = (): JSX.Element => {
   const history = useHistory();
   const location = useLocation();
   const dispatch = useDispatch();
-  const { templateId } = useParams<{ templateId: string }>();
+  const { budgetId } = useParams<{ budgetId: string }>();
   const match = useRouteMatch();
-  const template = useSelector(selectors.selectTemplateDetail);
+  const budget = useSelector(selectors.selectBudgetDetail);
 
   useEffect(() => {
-    if (!isNaN(parseInt(templateId))) {
-      dispatch(actions.setTemplateIdAction(parseInt(templateId)));
+    if (!isNaN(parseInt(budgetId))) {
+      dispatch(actions.requestBudgetAction(parseInt(budgetId)));
     }
-  }, [templateId]);
+  }, [budgetId]);
 
   return (
     <CollapsedLayout
@@ -41,18 +41,18 @@ const Template = (): JSX.Element => {
           icon: <Icon icon={"file-spreadsheet"} weight={"light"} />,
           activeIcon: <Icon icon={"file-spreadsheet"} weight={"solid"} />,
           onClick: () => {
-            if (!isNaN(parseInt(templateId))) {
-              const templateLastVisited = budgeting.urls.getLastVisited("templates", parseInt(templateId));
+            if (!isNaN(parseInt(budgetId))) {
+              const templateLastVisited = budgeting.urls.getLastVisited("templates", parseInt(budgetId));
               if (!isNil(templateLastVisited)) {
                 history.push(templateLastVisited);
               } else {
-                history.push(`/templates/${templateId}`);
+                history.push(`/templates/${budgetId}`);
               }
             }
           },
           active:
             location.pathname.startsWith("/templates") &&
-            !location.pathname.startsWith(`/templates/${templateId}/fringes`),
+            !location.pathname.startsWith(`/templates/${budgetId}/fringes`),
           tooltip: {
             title: "Template",
             placement: "right"
@@ -60,21 +60,21 @@ const Template = (): JSX.Element => {
         }
       ]}
     >
-      <RenderIfValidId id={[templateId]}>
+      <RenderIfValidId id={[budgetId]}>
         <Switch>
           <Redirect exact from={match.url} to={`${match.url}/accounts`} />
           <Route
             exact
-            path={"/templates/:templateId/accounts/:accountId"}
-            render={() => <Account templateId={parseInt(templateId)} template={template} />}
+            path={"/templates/:budgetId/accounts/:accountId"}
+            render={() => <Account budgetId={parseInt(budgetId)} budget={budget} />}
           />
           <Route
-            path={"/templates/:templateId/accounts"}
-            render={() => <Accounts templateId={parseInt(templateId)} template={template} />}
+            path={"/templates/:budgetId/accounts"}
+            render={() => <Accounts budgetId={parseInt(budgetId)} budget={budget} />}
           />
           <Route
-            path={"/templates/:templateId/subaccounts/:subaccountId"}
-            render={() => <SubAccount templateId={parseInt(templateId)} template={template} />}
+            path={"/templates/:budgetId/subaccounts/:subaccountId"}
+            render={() => <SubAccount budgetId={parseInt(budgetId)} budget={budget} />}
           />
         </Switch>
       </RenderIfValidId>

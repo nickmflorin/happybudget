@@ -7,8 +7,8 @@ import { notifications, redux } from "lib";
 
 import * as actions from "../actions";
 
-function* request(action: Redux.Action<null>): SagaIterator {
-  const objId = yield select((state: Application.Authenticated.Store) => state.budget.id);
+function* request(action: Redux.Action<number>): SagaIterator {
+  const objId = yield select((state: Application.Authenticated.Store) => action.payload);
   if (!isNil(objId)) {
     yield put(actions.analysis.loadingAction(true));
     let effects = [
@@ -44,7 +44,7 @@ function* request(action: Redux.Action<null>): SagaIterator {
   }
 }
 
-const rootSaga = redux.sagas.createListResponseSaga({
+const rootSaga = redux.sagas.createListResponseSaga<number>({
   tasks: { request },
   actions: { request: actions.analysis.requestAction }
 });

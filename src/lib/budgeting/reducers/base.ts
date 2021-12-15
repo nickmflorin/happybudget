@@ -31,33 +31,36 @@ export type BudgetTableReducerConfig<
   R extends Tables.AccountRowData | Tables.SubAccountRowData,
   M extends Model.Account | Model.SubAccount,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
-> = Table.ReducerConfig<R, M, S, A>;
+  C = any,
+  A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
+> = Table.ReducerConfig<R, M, S, C, A>;
 
 export const createBudgetTableReducer = <
   R extends Tables.AccountRowData | Tables.SubAccountRowData,
   M extends Model.Account | Model.SubAccount,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
+  C = any,
+  A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
 >(
-  config: BudgetTableReducerConfig<R, M, S, A>
+  config: BudgetTableReducerConfig<R, M, S, C, A>
 ): Redux.Reducer<S> => {
-  return tabling.reducers.createTableReducer<R, M, S, A>(config);
+  return tabling.reducers.createTableReducer<R, M, S, C, A>(config);
 };
 
 export const createBudgetTableChangeEventReducer = <
   R extends Tables.AccountRowData | Tables.SubAccountRowData,
   M extends Model.Account | Model.SubAccount,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
+  C = any,
+  A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
 >(
-  config: BudgetTableReducerConfig<R, M, S, A>
+  config: BudgetTableReducerConfig<R, M, S, C, A>
 ): Redux.Reducer<S, Redux.Action<Table.ChangeEvent<R, M>>> => {
   const isSubAccountRowData = (
     data: Tables.AccountRowData | Tables.SubAccountRowData
   ): data is Tables.SubAccountRowData => (data as Tables.SubAccountRowData).fringe_contribution !== undefined;
 
-  const generic = tabling.reducers.createTableChangeEventReducer<R, M, S, A>(config);
+  const generic = tabling.reducers.createTableChangeEventReducer<R, M, S, C, A>(config);
 
   return (state: S = config.initialState, action: Redux.Action<Table.ChangeEvent<R, M>>): S => {
     let newState: S = generic(state, action);
@@ -155,15 +158,16 @@ export const createAuthenticatedBudgetTableReducer = <
   R extends Tables.AccountRowData | Tables.SubAccountRowData,
   M extends Model.Account | Model.SubAccount,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
+  C = any,
+  A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
 >(
-  config: BudgetTableReducerConfig<R, M, S, A> & {
+  config: BudgetTableReducerConfig<R, M, S, C, A> & {
     readonly recalculateRow?: (state: S, action: Redux.Action, row: Table.DataRow<R>) => Partial<R>;
   }
 ): Redux.Reducer<S> => {
-  const eventReducer = createBudgetTableChangeEventReducer(config);
+  const eventReducer = createBudgetTableChangeEventReducer<R, M, S, C, A>(config);
 
-  return tabling.reducers.createAuthenticatedTableReducer<R, M, S, A>({
+  return tabling.reducers.createAuthenticatedTableReducer<R, M, S, C, A>({
     ...config,
     eventReducer
   });

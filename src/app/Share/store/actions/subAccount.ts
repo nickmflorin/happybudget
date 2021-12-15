@@ -1,15 +1,20 @@
-import { createAction } from "@reduxjs/toolkit";
+import { redux } from "lib";
 import ActionType from "./ActionType";
 
-export const setSubAccountIdAction = createAction<number | null>(ActionType.SubAccount.SetId);
-export const requestSubAccountAction = createAction<null>(ActionType.SubAccount.Request);
-export const loadingSubAccountAction = createAction<boolean>(ActionType.SubAccount.Loading);
-export const responseSubAccountAction = createAction<Model.SubAccount | null>(ActionType.SubAccount.Response);
+export const requestSubAccountAction = redux.actions.createAction<number>(ActionType.SubAccount.Request);
+export const loadingSubAccountAction = redux.actions.createAction<boolean>(ActionType.SubAccount.Loading);
+export const responseSubAccountAction = redux.actions.createAction<Model.SubAccount | null>(
+  ActionType.SubAccount.Response
+);
 
-export const requestAction = createAction<Redux.TableRequestPayload>(ActionType.SubAccount.SubAccounts.Request);
-export const loadingAction = createAction<boolean>(ActionType.SubAccount.SubAccounts.Loading);
-export const responseAction = createAction<Http.TableResponse<Model.SubAccount>>(
+export const requestAction = redux.actions.createContextAction<
+  Redux.TableRequestPayload,
+  Tables.SubAccountTableContext
+>(ActionType.SubAccount.SubAccounts.Request);
+
+export const loadingAction = redux.actions.createAction<boolean>(ActionType.SubAccount.SubAccounts.Loading);
+export const responseAction = redux.actions.createAction<Http.TableResponse<Model.SubAccount>>(
   ActionType.SubAccount.SubAccounts.Response
 );
 
-export const setSearchAction = createAction<string>(ActionType.SubAccount.SubAccounts.SetSearch);
+export const setSearchAction = redux.actions.createAction<string>(ActionType.SubAccount.SubAccounts.SetSearch);

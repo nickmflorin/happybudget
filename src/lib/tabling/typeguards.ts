@@ -76,20 +76,19 @@ export const isNonPlaceholderBodyRow = <R extends Table.RowData = object>(
   row: Table.Row<R>
 ): row is Table.NonPlaceholderBodyRow<R> => isEditableRow(row) || isGroupRow(row);
 
-export type ActionMapFromObject<T> = T extends Redux.ActionMapObject<infer A> ? A : never;
-
 /* eslint-disable indent */
 export const isAuthenticatedActionMap = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>,
-  B extends Pick<Redux.AuthenticatedTableActionMap<R, M>, "tableChanged"> = Pick<
-    Redux.AuthenticatedTableActionMap<R, M>,
+  C = any,
+  A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>,
+  B extends Pick<Redux.AuthenticatedTableActionMap<R, M, C>, "tableChanged"> = Pick<
+    Redux.AuthenticatedTableActionMap<R, M, C>,
     "tableChanged"
   >
 >(
-  a: Redux.ActionMapObject<A> | Redux.ActionMapObject<B>
-): a is Redux.ActionMapObject<B> => (a as Redux.ActionMapObject<B>).tableChanged !== undefined;
+  a: A | B
+): a is B => (a as B).tableChanged !== undefined;
 
 export const isKeyboardEvent = (e: Table.CellDoneEditingEvent): e is KeyboardEvent => {
   return (e as KeyboardEvent).type === "keydown" && (e as KeyboardEvent).code !== undefined;

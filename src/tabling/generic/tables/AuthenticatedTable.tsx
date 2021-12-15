@@ -29,12 +29,14 @@ export type AuthenticatedTableDataGridProps<
 
 export type AuthenticatedTableProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C = any
 > = TableConfigurationProps<R, M> &
   Omit<
     AuthenticateDataGridProps<R, M>,
     "onChangeEvent" | "columns" | "data" | "apis" | "onRowSelectionChanged" | "rowHasCheckboxSelection" | "grid"
   > & {
+    readonly actionContext: C;
     readonly table?: NonNullRef<Table.TableInstance<R, M>>;
     readonly actions?: Table.AuthenticatedMenuActions<R, M>;
     readonly constrainTableFooterHorizontally?: boolean;
@@ -43,9 +45,9 @@ export type AuthenticatedTableProps<
       | SingleOrArray<keyof R | string | ((col: Table.Column<R, M>) => boolean)>
       | ((col: Table.Column<R, M>) => boolean);
     readonly confirmRowDelete?: boolean;
+    readonly localizePopupParent?: boolean;
     readonly children: RenderPropChild<AuthenticatedTableDataGridProps<R, M>>;
     readonly rowHasCheckboxSelection?: (row: Table.EditableRow<R>) => boolean;
-    readonly localizePopupParent?: boolean;
   };
 
 const TableFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, any>>({
@@ -85,7 +87,7 @@ const AuthenticatedTable = <
   const grid = tabling.hooks.useDataGrid();
   const [selectedRows, setSelectedRows] = useState<Table.EditableRow<R>[]>([]);
   const [deleteRows, setDeleteRows] = useState<Table.EditableRow<R>[] | undefined>(undefined);
-  const [removeNotification, notify] = useNotifications(props.id);
+  const [removeNotification, notify] = useNotifications(props.tableId);
 
   /**
    * Note: Ideally, we would be including the selector in the mechanics of the
@@ -232,66 +234,71 @@ const AuthenticatedTable = <
     [props.actions, props.tableApis]
   );
 
-  useImperativeHandle(props.table, () => ({
-    ...grid.current,
-    notify,
-    removeNotification,
-    changeColumnVisibility: props.changeColumnVisibility,
-    applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R, M>>) =>
-      Array.isArray(event) ? map(event, (e: Table.ChangeEvent<R, M>) => _onChangeEvent(e)) : _onChangeEvent(event),
-    getRowsAboveAndIncludingFocusedRow: () => {
-      const apis = props.tableApis.get("data");
-      if (!isNil(apis)) {
-        const position: Table.CellPosition | null = apis.grid.getFocusedCell();
-        if (!isNil(position)) {
-          const nodes: Table.RowNode[] = [];
-          let rowIndex = position.rowIndex;
-          let node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(rowIndex);
-          while (rowIndex >= 0 && node !== undefined) {
-            nodes.push(node);
-            rowIndex = rowIndex - 1;
-            if (rowIndex >= 0) {
-              node = apis.grid.getDisplayedRowAtIndex(rowIndex);
+  useImperativeHandle(
+    props.table,
+    () => ({
+      ...grid.current,
+      notify,
+      removeNotification,
+      changeColumnVisibility: props.changeColumnVisibility,
+      getColumns: () => columns,
+      applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R, M>>) =>
+        Array.isArray(event) ? map(event, (e: Table.ChangeEvent<R, M>) => _onChangeEvent(e)) : _onChangeEvent(event),
+      getRowsAboveAndIncludingFocusedRow: () => {
+        const apis = props.tableApis.get("data");
+        if (!isNil(apis)) {
+          const position: Table.CellPosition | null = apis.grid.getFocusedCell();
+          if (!isNil(position)) {
+            const nodes: Table.RowNode[] = [];
+            let rowIndex = position.rowIndex;
+            let node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(rowIndex);
+            while (rowIndex >= 0 && node !== undefined) {
+              nodes.push(node);
+              rowIndex = rowIndex - 1;
+              if (rowIndex >= 0) {
+                node = apis.grid.getDisplayedRowAtIndex(rowIndex);
+              }
+            }
+            return map(nodes, (nd: Table.RowNode) => {
+              const row: Table.BodyRow<R> = nd.data;
+              return row;
+            });
+          }
+        }
+        return [];
+      },
+      getRows: () => {
+        const apis = props.tableApis.get("data");
+        if (!isNil(apis)) {
+          return tabling.aggrid.getRows(apis.grid);
+        }
+        return [];
+      },
+      getRow: (id: Table.BodyRowId) => {
+        const apis = props.tableApis.get("data");
+        if (!isNil(apis)) {
+          const node: Table.RowNode | undefined = apis.grid.getRowNode(String(id));
+          return !isNil(node) ? (node.data as Table.BodyRow<R>) : null;
+        }
+        return null;
+      },
+      getFocusedRow: () => {
+        const apis = props.tableApis.get("data");
+        if (!isNil(apis)) {
+          const position: Table.CellPosition | null = apis.grid.getFocusedCell();
+          if (!isNil(position)) {
+            const node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(position.rowIndex);
+            if (!isNil(node)) {
+              const row: Table.BodyRow<R> = node.data;
+              return row;
             }
           }
-          return map(nodes, (nd: Table.RowNode) => {
-            const row: Table.BodyRow<R> = nd.data;
-            return row;
-          });
         }
+        return null;
       }
-      return [];
-    },
-    getRows: () => {
-      const apis = props.tableApis.get("data");
-      if (!isNil(apis)) {
-        return tabling.aggrid.getRows(apis.grid);
-      }
-      return [];
-    },
-    getRow: (id: Table.BodyRowId) => {
-      const apis = props.tableApis.get("data");
-      if (!isNil(apis)) {
-        const node: Table.RowNode | undefined = apis.grid.getRowNode(String(id));
-        return !isNil(node) ? (node.data as Table.BodyRow<R>) : null;
-      }
-      return null;
-    },
-    getFocusedRow: () => {
-      const apis = props.tableApis.get("data");
-      if (!isNil(apis)) {
-        const position: Table.CellPosition | null = apis.grid.getFocusedCell();
-        if (!isNil(position)) {
-          const node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(position.rowIndex);
-          if (!isNil(node)) {
-            const row: Table.BodyRow<R> = node.data;
-            return row;
-          }
-        }
-      }
-      return null;
-    }
-  }));
+    }),
+    [hooks.useDeepEqualMemo(columns), notify]
+  );
 
   const addNewRow = hooks.useDynamicCallback(() => {
     const dataGridApi = props.tableApis.get("data");
@@ -306,7 +313,7 @@ const AuthenticatedTable = <
 
   return (
     <TableWrapper
-      id={props.id}
+      id={props.tableId}
       loading={props.loading}
       minimal={props.minimal}
       className={props.className}
@@ -314,7 +321,7 @@ const AuthenticatedTable = <
       showPageFooter={props.showPageFooter}
       footer={
         <PageFooterGrid
-          tableId={props.id}
+          tableId={props.tableId}
           apis={props.tableApis.get("page")}
           onGridReady={props.onPageGridReady}
           onFirstDataRendered={props.onFirstDataRendered}
@@ -343,7 +350,6 @@ const AuthenticatedTable = <
         />
         {props.children({
           ...props,
-          tableId: props.id,
           apis: props.tableApis.get("data"),
           columns: columns,
           gridOptions: props.tableGridOptions.data,
@@ -354,7 +360,7 @@ const AuthenticatedTable = <
           rowHasCheckboxSelection: props.rowHasCheckboxSelection
         })}
         <TableFooterGrid
-          tableId={props.id}
+          tableId={props.tableId}
           apis={props.tableApis.get("footer")}
           onGridReady={props.onFooterGridReady}
           onFirstDataRendered={props.onFirstDataRendered}

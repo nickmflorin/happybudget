@@ -11,21 +11,25 @@ const ActualColumns = ActualsTable.Columns;
 const AccountColumns = AccountsTable.Columns;
 const FringesColumns = FringesTable.Columns;
 
+type A = Redux.AuthenticatedModelListResponseActionMap<Model.ActualOwner, any>;
+type OwnersModelListResponseActionMap = Omit<A, "setSearch"> & {
+  readonly setSearch: Redux.ContextActionCreator<string, Tables.ActualTableContext>;
+};
+
 const headerTemplatesRootReducer: Redux.Reducer<Modules.Budget.HeaderTemplatesStore> = (
   state: Modules.Budget.HeaderTemplatesStore = initialHeaderTemplatesState,
   action: Redux.Action
 ): Modules.Budget.HeaderTemplatesStore => {
   const listResponseReducer = redux.reducers.createAuthenticatedModelListResponseReducer<
     Model.SimpleHeaderTemplate,
+    Modules.Budget.HeaderTemplatesStore,
     Pick<
       Redux.AuthenticatedModelListResponseActionMap<Model.SimpleHeaderTemplate>,
-      "request" | "loading" | "response" | "addToState" | "removeFromState"
-    >,
-    Modules.Budget.HeaderTemplatesStore
+      "loading" | "response" | "addToState" | "removeFromState"
+    >
   >({
     initialState: initialHeaderTemplatesState,
     actions: {
-      request: actions.pdf.requestHeaderTemplatesAction,
       loading: actions.pdf.loadingHeaderTemplatesAction,
       response: actions.pdf.responseHeaderTemplatesAction,
       addToState: actions.pdf.addHeaderTemplateToStateAction,
@@ -70,10 +74,6 @@ const analysisReducer: Redux.Reducer<Modules.Budget.AnalysisStore> = (
 };
 
 const genericReducer = combineReducers({
-  id: redux.reducers.createSimplePayloadReducer<number | null>({
-    initialState: null,
-    actions: { set: actions.setBudgetIdAction }
-  }),
   detail: redux.reducers.createDetailResponseReducer<Model.Budget>({
     initialState: redux.initialState.initialDetailResponseState,
     actions: {
@@ -88,7 +88,6 @@ const genericReducer = combineReducers({
     actions: {
       loading: actions.account.loadingAccountAction,
       response: actions.account.responseAccountAction,
-      setId: actions.account.setAccountIdAction,
       updateInState: actions.account.updateInStateAction
     },
     reducers: {
@@ -98,8 +97,7 @@ const genericReducer = combineReducers({
           {
             action: actions.account.requestAction,
             payload: (p: Redux.TableRequestPayload) => !redux.typeguards.isListRequestIdsPayload(p)
-          },
-          actions.account.setAccountIdAction
+          }
         ],
         actions: {
           tableChanged: actions.account.handleTableChangeEventAction,
@@ -136,8 +134,7 @@ const genericReducer = combineReducers({
       {
         action: actions.accounts.requestAction,
         payload: (p: Redux.TableRequestPayload) => !redux.typeguards.isListRequestIdsPayload(p)
-      },
-      actions.setBudgetIdAction
+      }
     ],
 
     actions: {
@@ -154,7 +151,6 @@ const genericReducer = combineReducers({
   subaccount: budgeting.reducers.createSubAccountDetailReducer({
     initialState: initialState.subaccount,
     actions: {
-      setId: actions.subAccount.setSubAccountIdAction,
       loading: actions.subAccount.loadingSubAccountAction,
       response: actions.subAccount.responseSubAccountAction,
       updateInState: actions.subAccount.updateInStateAction
@@ -166,8 +162,7 @@ const genericReducer = combineReducers({
           {
             action: actions.subAccount.requestAction,
             payload: (p: Redux.TableRequestPayload) => !redux.typeguards.isListRequestIdsPayload(p)
-          },
-          actions.subAccount.setSubAccountIdAction
+          }
         ],
         actions: {
           tableChanged: actions.subAccount.handleTableChangeEventAction,
@@ -200,7 +195,7 @@ const genericReducer = combineReducers({
   }),
   actuals: budgeting.reducers.createAuthenticatedActualsTableReducer({
     initialState: initialState.actuals,
-    clearOn: [actions.actuals.requestAction, actions.setBudgetIdAction],
+    clearOn: [actions.actuals.requestAction],
     actions: {
       tableChanged: actions.actuals.handleTableChangeEventAction,
       loading: actions.actuals.loadingAction,
@@ -214,7 +209,8 @@ const genericReducer = combineReducers({
     columns: ActualColumns,
     owners: redux.reducers.createAuthenticatedModelListResponseReducer<
       Model.ActualOwner,
-      Pick<Redux.AuthenticatedModelListResponseActionMap<Model.ActualOwner>, "loading" | "response" | "setSearch">
+      Redux.AuthenticatedModelListResponseStore<Model.ActualOwner>,
+      Pick<OwnersModelListResponseActionMap, "setSearch" | "response" | "loading">
     >({
       initialState: redux.initialState.initialAuthenticatedModelListResponseState,
       actions: {

@@ -20,12 +20,14 @@ declare namespace Redux {
   };
 
   type Task<P = any> = (action: Action<P>) => import("@redux-saga/types").SagaIterator;
+  type ContextTask<P = any, C = any> = (action: ActionWithContext<P, C>) => import("@redux-saga/types").SagaIterator;
 
   type TableEventTask<
     E extends Table.ChangeEvent<R, M>,
     R extends Table.RowData = any,
-    M extends Model.RowHttpModel = any
-  > = (event: E) => import("@redux-saga/types").SagaIterator;
+    M extends Model.RowHttpModel = any,
+    C = any
+  > = (e: E, context: C) => import("@redux-saga/types").SagaIterator;
 
   type TableBulkCreateTask<R extends Table.RowData = any, ARGS extends any[] = []> = (
     e: Table.RowAddEvent<R>,
@@ -33,26 +35,20 @@ declare namespace Redux {
     ...args: ARGS
   ) => import("redux-saga").SagaIterator;
 
-  interface TableEventTaskMapObject<R extends Table.RowData = any, M extends Model.RowHttpModel = any> {
-    readonly dataChange: TableEventTask<Table.DataChangeEvent<R>, R, M>;
-    readonly rowAdd: TableEventTask<Table.RowAddEvent<R>, R, M>;
-    readonly rowInsert: TableEventTask<Table.RowInsertEvent<R>, R, M>;
-    readonly rowPositionChanged: TableEventTask<Table.RowPositionChangedEvent, R, M>;
-    readonly rowDelete: TableEventTask<Table.RowDeleteEvent, R, M>;
-    readonly rowRemoveFromGroup: TableEventTask<Table.RowRemoveFromGroupEvent, R, M>;
-    readonly rowAddToGroup: TableEventTask<Table.RowAddToGroupEvent, R, M>;
-    readonly groupAdded: TableEventTask<Table.GroupAddedEvent, R, M>;
-    readonly groupUpdated: TableEventTask<Table.GroupUpdatedEvent, R, M>;
-    readonly modelUpdated: TableEventTask<Table.ModelUpdatedEvent<M>, R, M>;
-    readonly markupAdded: TableEventTask<Table.MarkupAddedEvent, R, M>;
-    readonly markupUpdated: TableEventTask<Table.MarkupUpdatedEvent, R, M>;
+  interface TableEventTaskMapObject<R extends Table.RowData = any, M extends Model.RowHttpModel = any, C = any> {
+    readonly dataChange: TableEventTask<Table.DataChangeEvent<R>, R, M, C>;
+    readonly rowAdd: TableEventTask<Table.RowAddEvent<R>, R, M, C>;
+    readonly rowInsert: TableEventTask<Table.RowInsertEvent<R>, R, M, C>;
+    readonly rowPositionChanged: TableEventTask<Table.RowPositionChangedEvent, R, M, C>;
+    readonly rowDelete: TableEventTask<Table.RowDeleteEvent, R, M, C>;
+    readonly rowRemoveFromGroup: TableEventTask<Table.RowRemoveFromGroupEvent, R, M, C>;
+    readonly rowAddToGroup: TableEventTask<Table.RowAddToGroupEvent, R, M, C>;
+    readonly groupAdded: TableEventTask<Table.GroupAddedEvent, R, M, C>;
+    readonly groupUpdated: TableEventTask<Table.GroupUpdatedEvent, R, M, C>;
+    readonly modelUpdated: TableEventTask<Table.ModelUpdatedEvent<M>, R, M, C>;
+    readonly markupAdded: TableEventTask<Table.MarkupAddedEvent, R, M, C>;
+    readonly markupUpdated: TableEventTask<Table.MarkupUpdatedEvent, R, M, C>;
   }
-
-  type ActionMapObject<M = any> = {
-    [K in keyof M]: undefined extends M[K]
-      ? import("@reduxjs/toolkit").PayloadActionCreator<Exclude<M[K], undefined>>
-      : import("@reduxjs/toolkit").PayloadActionCreator<M[K]>;
-  };
 
   type Reducer<S, A = Action> = import("redux").Reducer<S, A>;
   type ReducersMapObject<S = any> = {
@@ -62,11 +58,6 @@ declare namespace Redux {
   type ReducersWithAsyncMapObject<S = any> = ReducersMapObject<S> & {
     /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
     [K in AsyncId]: Reducer<any>;
-  };
-
-  type SagaManager = {
-    readonly injectSaga: (id: Table.AsyncId, saga: import("redux-saga").Saga) => void;
-    readonly ejectSaga: (id: Table.AsyncId) => void;
   };
 
   type ReducerManager<S extends Application.Store> = {
@@ -80,7 +71,8 @@ declare namespace Redux {
 
   type Store<S extends Application.Store> = import("redux").Store<S, Action> & {
     readonly reducerManager: ReducerManager<S>;
-    readonly sagaManager: SagaManager;
+    readonly injectSaga: (key: string, saga: import("redux-saga").Saga<any[]>) => boolean;
+    readonly ejectSaga: (key: string) => boolean;
   };
 
   type Dispatch = import("redux").Dispatch<Action>;
@@ -89,7 +81,15 @@ declare namespace Redux {
     readonly payload: P;
     readonly type: T;
     readonly isAuthenticated?: boolean | undefined;
+    readonly toString: () => string;
   }
+
+  interface ActionWithContext<P = any, C = any, T extends string = string> extends Action<P, T> {
+    readonly context: C;
+  }
+
+  type ActionCreator<P> = import("@reduxjs/toolkit").ActionCreatorWithPayload<P>;
+  type ContextActionCreator<P, C> = (p: P, ctx: C) => ActionWithContext<P, C>;
 
   type AuthenticatedAction<P = any> = Action<P> & { readonly isAuthenticated?: true | undefined };
 
@@ -103,15 +103,17 @@ declare namespace Redux {
   };
 
   type TaskConfig<A> = {
-    readonly actions: ActionMapObject<A>;
+    readonly actions: Omit<A, "request">;
   };
 
-  type ReducerConfig<S, A> = TaskConfig<A> & {
+  type ReducerConfig<S, A> = {
     readonly initialState: S;
+    readonly actions: A;
   };
 
-  type SagaConfig<T, A> = TaskConfig<A> & {
+  type SagaConfig<T, A> = {
     readonly tasks: T;
+    readonly actions: A;
   };
 
   type ListStore<T> = T[];
@@ -130,16 +132,12 @@ declare namespace Redux {
 
   type UpdateOrderingPayload<F extends string = string> = { field: F; order: Http.Order };
 
-  type ActionCreator<T> = import("@reduxjs/toolkit").PayloadActionCreator<T>;
-
-  type ActionCreatorPayload<T> = T extends Redux.ActionCreator<infer P> ? P : unknown;
-
-  type ClearOnDetail<T> = {
-    readonly action: ActionCreator<T>;
+  type ClearOnDetail<T, C = any> = {
+    readonly action: ActionCreator<T> | ContextActionCreator<T, C>;
     readonly payload: (payload: T) => boolean;
   };
 
-  type ClearOn<T> = ActionCreator<T> | ClearOnDetail<T>;
+  type ClearOn<T, C = any> = ActionCreator<T> | ContextActionCreator<T, C> | ClearOnDetail<T, C>;
 
   interface ModelDetailResponseStore<T extends Model.HttpModel> {
     readonly data: T | null;
@@ -147,9 +145,9 @@ declare namespace Redux {
   }
 
   interface ModelDetailResponseActionMap<M extends Model.HttpModel> {
-    readonly loading: boolean;
-    readonly response: M | null;
-    readonly updateInState: UpdateActionPayload<M>;
+    readonly loading: ActionCreator<boolean>;
+    readonly response: ActionCreator<M | null>;
+    readonly updateInState: ActionCreator<UpdateActionPayload<M>>;
   }
 
   interface ListResponseStore<T> {
@@ -159,14 +157,14 @@ declare namespace Redux {
     readonly responseWasReceived: boolean;
   }
 
-  type ListResponseActionMap<T> = {
-    readonly request: null;
-    readonly loading: boolean;
-    readonly response: Http.ListResponse<T>;
+  type ListResponseActionMap<T, P = any> = {
+    readonly request: ActionCreator<P>;
+    readonly loading: ActionCreator<boolean>;
+    readonly response: ActionCreator<Http.ListResponse<T>>;
   };
 
-  interface ListResponseTaskMap {
-    readonly request: Task<null>;
+  interface ListResponseTaskMap<P = any> {
+    readonly request: Task<P>;
   }
 
   interface ModelListResponseStore<T extends Model.HttpModel> extends ListResponseStore<T> {}
@@ -182,43 +180,50 @@ declare namespace Redux {
     readonly ordering: Http.Ordering<string>;
   }
 
-  type ModelListResponseActionMap<M extends Model.HttpModel> = ListResponseActionMap<M>;
+  type ModelListResponseActionMap<M extends Model.HttpModel, P = any> = ListResponseActionMap<M, P>;
 
-  type AuthenticatedModelListResponseActionMap<M extends Model.HttpModel> = ModelListResponseActionMap<M> & {
-    readonly updating?: ModelListActionPayload;
-    readonly creating?: boolean;
-    readonly removeFromState: number;
-    readonly deleting?: ModelListActionPayload;
-    readonly addToState: M;
-    readonly updateInState: UpdateActionPayload<M>;
-    readonly setSearch?: string;
-    readonly setPagination: Pagination;
-    readonly updateOrdering?: UpdateOrderingPayload<string>;
+  type AuthenticatedModelListResponseActionMap<M extends Model.HttpModel, P = any> = ModelListResponseActionMap<
+    M,
+    P
+  > & {
+    readonly updating?: ActionCreator<ModelListActionPayload>;
+    readonly creating?: ActionCreator<boolean>;
+    readonly removeFromState: ActionCreator<number>;
+    readonly deleting?: ActionCreator<ModelListActionPayload>;
+    readonly addToState: ActionCreator<M>;
+    readonly updateInState: ActionCreator<UpdateActionPayload<M>>;
+    /* We cannot type this strictly as string because there are some cases where
+		   supplementary data is provided (Actual Owners). */
+    readonly setSearch?: ActionCreator<string> | ContextActionCreator<string, any>;
+    readonly setPagination: ActionCreator<Pagination>;
+    readonly updateOrdering?: ActionCreator<UpdateOrderingPayload<string>>;
   };
 
-  interface ModelListResponseTaskMap {
-    readonly request: Task<null>;
+  interface ModelListResponseTaskMap<P = any> {
+    readonly request: Task<P>;
   }
 
-  type TableTaskMap<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
-    readonly request: Task<null>;
-    readonly handleChangeEvent: TableEventTask<Table.ChangeEvent<R, M>>;
+  type TableTaskMap<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel, C = any> = {
+    readonly request: ContextTask<TableRequestPayload, C>;
+    readonly handleChangeEvent: TableEventTask<Table.ChangeEvent<R, M>, R, M, C>;
   };
 
-  type TableActionMap<M extends Model.RowHttpModel = Model.RowHttpModel> = {
-    readonly loading: boolean;
-    readonly response: Http.TableResponse<M>;
-    readonly setSearch: string;
+  type TableActionMap<M extends Model.RowHttpModel = Model.RowHttpModel, C = any> = {
+    readonly request: ContextActionCreator<TableRequestPayload, C>;
+    readonly loading: ActionCreator<boolean>;
+    readonly response: ActionCreator<Http.TableResponse<M>>;
+    readonly setSearch: ActionCreator<string> | ContextActionCreator<string, C>;
   };
 
   type AuthenticatedTableActionMap<
     R extends Table.RowData = object,
-    M extends Model.RowHttpModel = Model.RowHttpModel
-  > = TableActionMap<M> & {
-    readonly tableChanged: Table.ChangeEvent<R, M>;
-    readonly saving: boolean;
-    readonly addModelsToState: AddModelsToTablePayload<M>;
-    readonly updateRowsInState?: UpdateRowsInTablePayload<R>;
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+    C = any
+  > = TableActionMap<M, C> & {
+    readonly tableChanged: ContextActionCreator<Table.ChangeEvent<R, M>, C>;
+    readonly saving: ActionCreator<boolean>;
+    readonly addModelsToState: ActionCreator<AddModelsToTablePayload<M>>;
+    readonly updateRowsInState?: ActionCreator<UpdateRowsInTablePayload<R>>;
   };
 
   type TableStore<D extends Table.RowData = object> = {

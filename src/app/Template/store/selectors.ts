@@ -3,11 +3,10 @@ import { createSelector } from "reselect";
 import { redux, budgeting } from "lib";
 import { initialSubAccountsTableState } from "./initialState";
 
-export const selectTemplateId = (state: Application.Authenticated.Store) => state.template.id;
-export const selectTemplateDetail = redux.selectors.simpleDeepEqualSelector(
+export const selectBudgetDetail = redux.selectors.simpleDeepEqualSelector(
   (state: Application.Authenticated.Store) => state.template.detail.data
 );
-export const selectTemplateDetailLoading = redux.selectors.simpleShallowEqualSelector(
+export const selectBudgetDetailLoading = redux.selectors.simpleShallowEqualSelector(
   (state: Application.Authenticated.Store) => state.template.detail.loading
 );
 

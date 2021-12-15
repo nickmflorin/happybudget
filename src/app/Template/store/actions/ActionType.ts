@@ -1,7 +1,7 @@
 const ActionType = {
-  SetId: "template.SetId",
   Loading: "template.Loading",
   Response: "template.Response",
+  Request: "template.Request",
   UpdateInState: "template.UpdateInState",
   Accounts: {
     TableChanged: "template.accounts.TableChanged",
@@ -30,7 +30,6 @@ const ActionType = {
   SubAccount: {
     Request: "template.subaccount.Request",
     UpdateInState: "template.subaccount.UpdateInState",
-    SetId: "template.subaccount.SetId",
     Loading: "template.subaccount.Loading",
     Response: "template.subaccount.Response",
     SubAccounts: {
@@ -45,7 +44,6 @@ const ActionType = {
   },
   Account: {
     UpdateInState: "template.account.UpdateInState",
-    SetId: "template.account.SetId",
     Loading: "template.account.Loading",
     Response: "template.account.Response",
     Request: "template.account.Request",

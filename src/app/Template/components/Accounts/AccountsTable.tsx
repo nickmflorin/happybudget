@@ -8,7 +8,7 @@ import { tabling, budgeting, redux } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
 import { AccountsTable as GenericAccountsTable, connectTableToStore } from "tabling";
 
-import { actions, selectors } from "../../store";
+import { actions, selectors, sagas } from "../../store";
 
 type R = Tables.AccountRowData;
 type M = Model.Account;
@@ -21,14 +21,16 @@ const ConnectedTable = connectTableToStore<
 >({
   actions: {
     tableChanged: actions.accounts.handleTableChangeEventAction,
-    request: actions.accounts.requestAction,
     loading: actions.accounts.loadingAction,
     response: actions.accounts.responseAction,
     saving: actions.accounts.savingTableAction,
     addModelsToState: actions.accounts.addModelsToStateAction,
     setSearch: actions.accounts.setSearchAction
   },
+  onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.AccountTableContext) =>
+    dispatch(actions.accounts.requestAction(null, c)),
   selector: selectors.selectAccountsTableStore,
+  createSaga: (table: NonNullRef<Table.TableInstance<R, M>>) => sagas.accounts.createTableSaga(table),
   footerRowSelectors: {
     footer: createSelector(
       redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.template.detail.data),
@@ -41,18 +43,18 @@ const ConnectedTable = connectTableToStore<
 })(GenericAccountsTable.AuthenticatedTemplate);
 
 interface AccountsTableProps {
-  readonly templateId: number;
-  readonly template: Model.Template | null;
+  readonly budgetId: number;
+  readonly budget: Model.Template | null;
 }
 
-const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Element => {
+const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element => {
   const history = useHistory();
   const dispatch = useDispatch();
 
   const table = tabling.hooks.useTable<R>();
 
   const [groupModals, onEditGroup, onCreateGroup] = useGrouping({
-    parentId: templateId,
+    parentId: budgetId,
     parentType: "template",
     table: table.current,
     onGroupUpdated: (group: Model.Group) =>
@@ -63,22 +65,24 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
   });
 
   const [markupModals, onEditMarkup, onCreateMarkup] = useMarkup({
-    parentId: templateId,
+    parentId: budgetId,
     parentType: "template",
     table: table.current,
     onResponse: (response: Http.BudgetContextDetailResponse<Model.Markup, Model.Template>) => {
-      dispatch(actions.updateTemplateInStateAction({ id: response.budget.id, data: response.budget }));
+      dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
     }
   });
 
   return (
     <React.Fragment>
       <ConnectedTable
+        tableId={"template-accounts"}
         table={table}
-        budget={template}
+        budget={budget}
+        actionContext={{ budgetId }}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
-        onRowExpand={(row: Table.ModelRow<R>) => history.push(`/templates/${templateId}/accounts/${row.id}`)}
+        onRowExpand={(row: Table.ModelRow<R>) => history.push(`/templates/${budgetId}/accounts/${row.id}`)}
         onGroupRows={(rows: Table.ModelRow<R>[]) => onCreateGroup(map(rows, (row: Table.ModelRow<R>) => row.id))}
         onMarkupRows={(rows?: Table.ModelRow<R>[]) =>
           rows === undefined ? onCreateMarkup() : onCreateMarkup(map(rows, (row: Table.ModelRow<R>) => row.id))

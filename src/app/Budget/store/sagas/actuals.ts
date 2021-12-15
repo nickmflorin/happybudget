@@ -1,15 +1,13 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, debounce } from "redux-saga/effects";
-import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 
 import { tabling, budgeting } from "lib";
-import { ActualsTable } from "tabling";
 
 import { updateBudgetInStateAction } from "../actions";
 import { actuals as actions } from "../actions";
 
-const ActionMap: Redux.ActionMapObject<budgeting.tasks.actuals.ActualsTableActionMap> & {
-  readonly request: ActionCreatorWithPayload<Redux.TableRequestPayload>;
+const ActionMap: budgeting.tasks.actuals.ActualsTableActionMap & {
+  readonly request: Redux.ContextActionCreator<Redux.TableRequestPayload, Tables.ActualTableContext>;
 } = {
   tableChanged: actions.handleTableChangeEventAction,
   updateBudgetInState: updateBudgetInStateAction,
@@ -24,24 +22,27 @@ const ActionMap: Redux.ActionMapObject<budgeting.tasks.actuals.ActualsTableActio
   responseActualTypes: actions.responseActualTypesAction
 };
 
-const tasks = budgeting.tasks.actuals.createTableTaskSet({
-  columns: ActualsTable.Columns,
-  selectStore: (state: Application.Authenticated.Store) => state.budget.actuals,
-  selectObjId: (state: Application.Authenticated.Store) => state.budget.id,
-  selectOwnersSearch: (state: Application.Authenticated.Store) => state.budget.actuals.owners.search,
-  actions: ActionMap
-});
+export const createTableSaga = (table: PotentiallyNullRef<Table.TableInstance<Tables.ActualRowData, Model.Actual>>) => {
+  const tasks = budgeting.tasks.actuals.createTableTaskSet({
+    table,
+    selectStore: (state: Application.Authenticated.Store) => state.budget.actuals,
+    selectOwnersSearch: (state: Application.Authenticated.Store) => state.budget.actuals.owners.search,
+    actions: ActionMap
+  });
 
-const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
-  Tables.ActualRowData,
-  Model.Actual,
-  Redux.AuthenticatedTableActionMap<Tables.ActualRowData, Model.Actual>
->({
-  actions: ActionMap,
-  tasks: tasks
-});
+  const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
+    Tables.ActualRowData,
+    Model.Actual,
+    Tables.ActualTableContext,
+    Redux.AuthenticatedTableActionMap<Tables.ActualRowData, Model.Actual, Tables.ActualTableContext>
+  >({
+    actions: ActionMap,
+    tasks: tasks
+  });
 
-export default function* rootSaga(): SagaIterator {
-  yield spawn(tableSaga);
-  yield debounce(250, actions.setActualOwnersSearchAction.toString(), tasks.requestActualOwners);
-}
+  function* rootSaga(): SagaIterator {
+    yield spawn(tableSaga);
+    yield debounce(250, actions.setActualOwnersSearchAction.toString(), tasks.requestActualOwners);
+  }
+  return rootSaga;
+};

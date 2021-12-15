@@ -1,17 +1,23 @@
-import { createAction } from "@reduxjs/toolkit";
+import { redux } from "lib";
 import ActionType from "./ActionType";
 
-export const requestHeaderTemplatesAction = createAction<null>(ActionType.HeaderTemplates.Request);
-export const loadingHeaderTemplatesAction = createAction<boolean>(ActionType.HeaderTemplates.Loading);
-export const responseHeaderTemplatesAction = createAction<Http.ListResponse<Model.SimpleHeaderTemplate>>(
+export const requestHeaderTemplatesAction = redux.actions.createAction<null>(ActionType.HeaderTemplates.Request);
+export const loadingHeaderTemplatesAction = redux.actions.createAction<boolean>(ActionType.HeaderTemplates.Loading);
+export const responseHeaderTemplatesAction = redux.actions.createAction<Http.ListResponse<Model.SimpleHeaderTemplate>>(
   ActionType.HeaderTemplates.Response
 );
-export const addHeaderTemplateToStateAction = createAction<Model.SimpleHeaderTemplate>(
+export const addHeaderTemplateToStateAction = redux.actions.createAction<Model.SimpleHeaderTemplate>(
   ActionType.HeaderTemplates.AddToState
 );
-export const removeHeaderTemplateFromStateAction = createAction<number>(ActionType.HeaderTemplates.RemoveFromState);
+export const removeHeaderTemplateFromStateAction = redux.actions.createAction<number>(
+  ActionType.HeaderTemplates.RemoveFromState
+);
 
-export const setLoadingHeaderTemplateDetailAction = createAction<boolean>(ActionType.HeaderTemplates.LoadingDetail);
-export const loadHeaderTemplateAction = createAction<number>(ActionType.HeaderTemplates.Load);
-export const clearHeaderTemplateAction = createAction<null>(ActionType.HeaderTemplates.Clear);
-export const displayHeaderTemplateAction = createAction<Model.HeaderTemplate>(ActionType.HeaderTemplates.Display);
+export const setLoadingHeaderTemplateDetailAction = redux.actions.createAction<boolean>(
+  ActionType.HeaderTemplates.LoadingDetail
+);
+export const loadHeaderTemplateAction = redux.actions.createAction<number>(ActionType.HeaderTemplates.Load);
+export const clearHeaderTemplateAction = redux.actions.createAction<null>(ActionType.HeaderTemplates.Clear);
+export const displayHeaderTemplateAction = redux.actions.createAction<Model.HeaderTemplate>(
+  ActionType.HeaderTemplates.Display
+);

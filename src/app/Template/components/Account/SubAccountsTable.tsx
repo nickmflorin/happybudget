@@ -8,7 +8,7 @@ import { redux, tabling, budgeting } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
 import { connectTableToStore } from "tabling";
 
-import { actions, selectors } from "../../store";
+import { actions, selectors, sagas } from "../../store";
 import TemplateSubAccountsTable, { TemplateSubAccountsTableProps } from "../SubAccountsTable";
 
 type M = Model.SubAccount;
@@ -27,9 +27,9 @@ const ConnectedTable = connectTableToStore<TemplateSubAccountsTableProps, R, M, 
     addModelsToState: actions.account.addModelsToStateAction,
     setSearch: actions.account.setSearchAction
   },
-  /* We cannot autoRequest because we have to also request the new data when
-     the dropdown breadcrumbs change. */
-  autoRequest: false,
+  onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.SubAccountTableContext) =>
+    dispatch(actions.account.requestAction(null, c)),
+  createSaga: (table: NonNullRef<Table.TableInstance<R, M>>) => sagas.account.createTableSaga(table),
   selector: selectors.selectSubAccountsTableStore,
   footerRowSelectors: {
     page: createSelector(
@@ -57,16 +57,16 @@ const ConnectedTable = connectTableToStore<TemplateSubAccountsTableProps, R, M, 
 
 interface SubAccountsTableProps {
   readonly accountId: number;
-  readonly templateId: number;
-  readonly template: Model.Template | null;
+  readonly budgetId: number;
+  readonly budget: Model.Template | null;
 }
 
-const SubAccountsTable = ({ template, templateId, accountId }: SubAccountsTableProps): JSX.Element => {
+const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps): JSX.Element => {
   const dispatch = useDispatch();
   const history = useHistory();
 
   const accountDetail = useSelector(selectAccountDetail);
-  const table = tabling.hooks.useTable<R>();
+  const table = tabling.hooks.useTable<Tables.SubAccountRowData>();
 
   const [groupModals, onEditGroup, onCreateGroup] = useGrouping({
     parentId: accountId,
@@ -85,21 +85,24 @@ const SubAccountsTable = ({ template, templateId, accountId }: SubAccountsTableP
     table: table.current,
     onResponse: (response: Http.BudgetParentContextDetailResponse<Model.Markup, Model.Account, Model.Template>) => {
       dispatch(actions.account.updateInStateAction({ id: response.parent.id, data: response.parent }));
-      dispatch(actions.updateTemplateInStateAction({ id: response.budget.id, data: response.budget }));
+      dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
     }
   });
 
   return (
     <React.Fragment>
       <ConnectedTable
-        template={template}
-        templateId={templateId}
+        id={accountId}
+        budget={budget}
+        budgetId={budgetId}
+        actionContext={{ budgetId, id: accountId }}
+        tableId={"template-account-subaccounts"}
         table={table}
         exportFileName={!isNil(accountDetail) ? `account_${accountDetail.identifier}` : ""}
         categoryName={"Sub Account"}
         identifierFieldHeader={"Account"}
-        onRowExpand={(row: Table.ModelRow<R>) => history.push(`/templates/${templateId}/subaccounts/${row.id}`)}
-        onBack={() => history.push(`/templates/${templateId}/accounts?row=${accountId}`)}
+        onRowExpand={(row: Table.ModelRow<R>) => history.push(`/templates/${budgetId}/subaccounts/${row.id}`)}
+        onBack={() => history.push(`/templates/${budgetId}/accounts?row=${accountId}`)}
         onGroupRows={(rows: Table.ModelRow<R>[]) => onCreateGroup(map(rows, (row: Table.ModelRow<R>) => row.id))}
         onMarkupRows={(rows?: Table.ModelRow<R>[]) =>
           rows === undefined ? onCreateMarkup() : onCreateMarkup(map(rows, (row: Table.ModelRow<R>) => row.id))

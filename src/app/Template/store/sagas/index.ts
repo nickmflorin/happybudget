@@ -1,16 +1,17 @@
 import { SagaIterator } from "redux-saga";
-import { spawn, call, put, select, takeLatest, all } from "redux-saga/effects";
-import { isNil } from "lodash";
+import { spawn, takeLatest, put } from "redux-saga/effects";
 
 import * as api from "api";
 import { budgeting, tabling, notifications } from "lib";
-import { FringesTable } from "tabling";
 
 import * as actions from "../actions";
 
 import accountSaga from "./account";
-import budgetSaga from "./accounts";
 import subAccountSaga from "./subAccount";
+
+export * as accounts from "./accounts";
+export * as account from "./account";
+export * as subAccount from "./subAccount";
 
 const FringesActionMap = {
   requestAccount: actions.account.requestAccountAction,
@@ -22,60 +23,45 @@ const FringesActionMap = {
   response: actions.responseFringesAction,
   saving: actions.savingFringesTableAction,
   addModelsToState: actions.addFringeModelsToStateAction,
-  loadingBudget: actions.loadingTemplateAction,
-  updateBudgetInState: actions.updateTemplateInStateAction,
+  loadingBudget: actions.loadingBudgetAction,
+  updateBudgetInState: actions.updateBudgetInStateAction,
   setSearch: actions.setFringesSearchAction,
   responseFringeColors: actions.responseFringeColorsAction
 };
 
-const FringesTasks = budgeting.tasks.fringes.createTableTaskSet<Model.Template>({
-  columns: FringesTable.Columns,
-  selectObjId: (state: Application.Authenticated.Store) => state.template.id,
-  selectAccountTableStore: (state: Application.Authenticated.Store) => state.template.account.table,
-  selectSubAccountTableStore: (state: Application.Authenticated.Store) => state.template.subaccount.table,
-  actions: FringesActionMap,
-  services: {
-    create: api.createTemplateFringe,
-    request: api.getTemplateFringes,
-    bulkCreate: api.bulkCreateTemplateFringes,
-    bulkDelete: api.bulkDeleteTemplateFringes,
-    bulkUpdate: api.bulkUpdateTemplateFringes
-  }
-});
-
-const fringesTableSaga = tabling.sagas.createAuthenticatedTableSaga<Tables.FringeRowData, Model.Fringe>({
-  actions: FringesActionMap,
-  tasks: FringesTasks
-});
-
-export function* getTemplateTask(action: Redux.Action<null>): SagaIterator {
-  const templateId = yield select((state: Application.Authenticated.Store) => state.template.id);
-  if (!isNil(templateId)) {
-    yield put(actions.loadingTemplateAction(true));
-    try {
-      const response: Model.Template = yield api.request(api.getTemplate, templateId);
-      yield put(actions.responseTemplateAction(response));
-    } catch (e: unknown) {
-      notifications.requestError(e as Error, { message: "There was an error retrieving the template." });
-      yield put(actions.responseTemplateAction(null));
-    } finally {
-      yield put(actions.loadingTemplateAction(false));
-    }
+function* getBudgetTask(action: Redux.Action<number>): SagaIterator {
+  yield put(actions.loadingBudgetAction(true));
+  try {
+    const response: Model.Template = yield api.request(api.getTemplate, action.payload);
+    yield put(actions.responseBudgetAction(response));
+  } catch (e: unknown) {
+    notifications.requestError(e as Error, { message: "There was an error retrieving the budget." });
+    yield put(actions.responseBudgetAction(null));
+  } finally {
+    yield put(actions.loadingBudgetAction(false));
   }
 }
 
-function* getData(action: Redux.Action<any>): SagaIterator {
-  yield all([call(getTemplateTask, action), call(FringesTasks.request, action)]);
-}
-
-function* watchForTemplateIdChangedSaga(): SagaIterator {
-  yield takeLatest(actions.setTemplateIdAction.toString(), getData);
-}
+export const createFringesTableSaga = (table: NonNullRef<Table.TableInstance<Tables.FringeRowData, Model.Fringe>>) =>
+  tabling.sagas.createAuthenticatedTableSaga<Tables.FringeRowData, Model.Fringe, Tables.FringeTableContext>({
+    actions: { ...FringesActionMap, request: actions.requestFringesAction },
+    tasks: budgeting.tasks.fringes.createTableTaskSet<Model.Template>({
+      table,
+      selectAccountTableStore: (state: Application.Authenticated.Store) => state.template.account.table,
+      selectSubAccountTableStore: (state: Application.Authenticated.Store) => state.template.subaccount.table,
+      actions: FringesActionMap,
+      services: {
+        create: api.createTemplateFringe,
+        request: api.getTemplateFringes,
+        bulkCreate: api.bulkCreateTemplateFringes,
+        bulkDelete: api.bulkDeleteTemplateFringes,
+        bulkUpdate: api.bulkUpdateTemplateFringes
+      }
+    })
+  });
 
 export default function* rootSaga(): SagaIterator {
-  yield spawn(watchForTemplateIdChangedSaga);
-  yield spawn(fringesTableSaga);
   yield spawn(accountSaga);
-  yield spawn(budgetSaga);
   yield spawn(subAccountSaga);
+  yield takeLatest(actions.requestBudgetAction.toString(), getBudgetTask);
 }

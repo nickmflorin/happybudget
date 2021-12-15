@@ -24,7 +24,7 @@ const Account = ({ budgetId, budget, setPreviewModalVisible }: AccountProps): JS
 
   useEffect(() => {
     if (!isNaN(parseInt(accountId))) {
-      dispatch(actions.account.setAccountIdAction(parseInt(accountId)));
+      dispatch(actions.account.requestAccountAction(parseInt(accountId)));
     }
   }, [accountId]);
 

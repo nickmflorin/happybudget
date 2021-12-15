@@ -1,16 +1,15 @@
-import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import { forEach, isNil } from "lodash";
 import { util } from "lib";
 
 const findReducerForAction = <S, A extends { [key: string]: any }>(
   /* eslint-disable indent */
-  action: Redux.Action,
-  map: Partial<Redux.ActionMapObject<A>>,
+  action: Redux.Action | Redux.ActionWithContext,
+  map: Partial<A>,
   transformers: Redux.Transformers<S, A>
 ): Redux.Reducer<S> | undefined => {
   let key: string;
   for (key in map) {
-    const mapped: ActionCreatorWithPayload<any> | undefined = map[key];
+    const mapped: Redux.ActionCreator<any> | undefined = map[key];
     if (!isNil(mapped) && action.type === mapped.toString()) {
       return transformers[key];
     }

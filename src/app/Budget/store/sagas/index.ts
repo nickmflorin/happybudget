@@ -1,19 +1,20 @@
 import { SagaIterator } from "redux-saga";
-import { spawn, takeLatest, call, put, select, all } from "redux-saga/effects";
-import { isNil } from "lodash";
+import { spawn, takeLatest, put } from "redux-saga/effects";
 
 import * as api from "api";
 import { budgeting, tabling, notifications } from "lib";
-import { FringesTable } from "tabling";
 
 import * as actions from "../actions";
 
-import accountSaga from "./account";
-import accountsSaga from "./accounts";
-import actualsSaga from "./actuals";
-import subAccountSaga from "./subAccount";
 import pdfSaga from "./pdf";
 import analysisSaga from "./analysis";
+import accountSaga from "./account";
+import subAccountSaga from "./subAccount";
+
+export * as accounts from "./accounts";
+export * as actuals from "./actuals";
+export * as account from "./account";
+export * as subAccount from "./subAccount";
 
 const FringesActionMap = {
   requestAccount: actions.account.requestAccountAction,
@@ -31,57 +32,41 @@ const FringesActionMap = {
   responseFringeColors: actions.responseFringeColorsAction
 };
 
-const FringesTasks = budgeting.tasks.fringes.createTableTaskSet<Model.Budget>({
-  columns: FringesTable.Columns,
-  selectObjId: (state: Application.Authenticated.Store) => state.budget.id,
-  selectAccountTableStore: (state: Application.Authenticated.Store) => state.budget.account.table,
-  selectSubAccountTableStore: (state: Application.Authenticated.Store) => state.budget.subaccount.table,
-  actions: FringesActionMap,
-  services: {
-    create: api.createBudgetFringe,
-    request: api.getBudgetFringes,
-    bulkCreate: api.bulkCreateBudgetFringes,
-    bulkDelete: api.bulkDeleteBudgetFringes,
-    bulkUpdate: api.bulkUpdateBudgetFringes
-  }
-});
-
-const fringesTableSaga = tabling.sagas.createAuthenticatedTableSaga<Tables.FringeRowData, Model.Fringe>({
-  actions: FringesActionMap,
-  tasks: FringesTasks
-});
-
-function* getBudgetTask(action: Redux.Action<null>): SagaIterator {
-  const budgetId = yield select((state: Application.Authenticated.Store) => state.budget.id);
-  if (!isNil(budgetId)) {
-    yield put(actions.loadingBudgetAction(true));
-    try {
-      const response: Model.Budget = yield api.request(api.getBudget, budgetId);
-      yield put(actions.responseBudgetAction(response));
-    } catch (e: unknown) {
-      notifications.requestError(e as Error, { message: "There was an error retrieving the budget." });
-      yield put(actions.responseBudgetAction(null));
-    } finally {
-      yield put(actions.loadingBudgetAction(false));
-    }
+function* getBudgetTask(action: Redux.Action<number>): SagaIterator {
+  yield put(actions.loadingBudgetAction(true));
+  try {
+    const response: Model.Budget = yield api.request(api.getBudget, action.payload);
+    yield put(actions.responseBudgetAction(response));
+  } catch (e: unknown) {
+    notifications.requestError(e as Error, { message: "There was an error retrieving the budget." });
+    yield put(actions.responseBudgetAction(null));
+  } finally {
+    yield put(actions.loadingBudgetAction(false));
   }
 }
 
-function* getData(action: Redux.Action<any>): SagaIterator {
-  yield all([call(getBudgetTask, action), call(FringesTasks.request, action)]);
-}
-
-function* watchForBudgetIdChangedSaga(): SagaIterator {
-  yield takeLatest(actions.setBudgetIdAction.toString(), getData);
-}
+export const createFringesTableSaga = (table: NonNullRef<Table.TableInstance<Tables.FringeRowData, Model.Fringe>>) =>
+  tabling.sagas.createAuthenticatedTableSaga<Tables.FringeRowData, Model.Fringe, Tables.FringeTableContext>({
+    actions: { ...FringesActionMap, request: actions.requestFringesAction },
+    tasks: budgeting.tasks.fringes.createTableTaskSet<Model.Budget>({
+      table,
+      selectAccountTableStore: (state: Application.Authenticated.Store) => state.budget.account.table,
+      selectSubAccountTableStore: (state: Application.Authenticated.Store) => state.budget.subaccount.table,
+      actions: FringesActionMap,
+      services: {
+        create: api.createBudgetFringe,
+        request: api.getBudgetFringes,
+        bulkCreate: api.bulkCreateBudgetFringes,
+        bulkDelete: api.bulkDeleteBudgetFringes,
+        bulkUpdate: api.bulkUpdateBudgetFringes
+      }
+    })
+  });
 
 export default function* rootSaga(): SagaIterator {
-  yield spawn(watchForBudgetIdChangedSaga);
-  yield spawn(fringesTableSaga);
-  yield spawn(accountSaga);
-  yield spawn(accountsSaga);
-  yield spawn(actualsSaga);
-  yield spawn(subAccountSaga);
   yield spawn(pdfSaga);
   yield spawn(analysisSaga);
+  yield spawn(accountSaga);
+  yield spawn(subAccountSaga);
+  yield takeLatest(actions.requestBudgetAction.toString(), getBudgetTask);
 }

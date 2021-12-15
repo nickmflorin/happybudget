@@ -8,7 +8,7 @@ import { budgeting, redux, tabling } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
 import { AccountsTable as GenericAccountsTable, connectTableToStore } from "tabling";
 
-import { actions, selectors } from "../../store";
+import { actions, selectors, sagas } from "../../store";
 
 type R = Tables.AccountRowData;
 type M = Model.Account;
@@ -17,11 +17,11 @@ const ConnectedTable = connectTableToStore<
   GenericAccountsTable.AuthenticatedBudgetProps,
   R,
   M,
-  Tables.AccountTableStore
+  Tables.AccountTableStore,
+  Tables.AccountTableContext
 >({
   actions: {
     tableChanged: actions.accounts.handleTableChangeEventAction,
-    request: actions.accounts.requestAction,
     loading: actions.accounts.loadingAction,
     response: actions.accounts.responseAction,
     saving: actions.accounts.savingTableAction,
@@ -29,6 +29,9 @@ const ConnectedTable = connectTableToStore<
     setSearch: actions.accounts.setSearchAction
   },
   selector: selectors.selectAccountsTableStore,
+  onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.AccountTableContext) =>
+    dispatch(actions.accounts.requestAction(null, c)),
+  createSaga: (table: NonNullRef<Table.TableInstance<R, M>>) => sagas.accounts.createTableSaga(table),
   footerRowSelectors: {
     footer: createSelector(
       redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.detail.data),
@@ -78,7 +81,9 @@ const AccountsTable = ({ budgetId, budget, setPreviewModalVisible }: AccountsTab
     <React.Fragment>
       <ConnectedTable
         budget={budget}
+        actionContext={{ budgetId }}
         table={table}
+        tableId={"budget-accounts"}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
         onExportPdf={() => setPreviewModalVisible(true)}

@@ -3,7 +3,7 @@ import { isNil } from "lodash";
 import { FringesTable, connectTableToStore } from "tabling";
 import GenericFringesModal, { GenericFringesModalProps } from "components/modals/FringesModal";
 
-import { actions, selectors } from "../store";
+import { actions, selectors, sagas } from "../store";
 
 const ConnectedFringesTable = connectTableToStore<
   FringesTable.Props,
@@ -11,7 +11,10 @@ const ConnectedFringesTable = connectTableToStore<
   Model.Fringe,
   Tables.FringeTableStore
 >({
-  autoRequest: false,
+  createSaga: (table: NonNullRef<Table.TableInstance<Tables.FringeRowData, Model.Fringe>>) =>
+    sagas.createFringesTableSaga(table),
+  onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.FringeTableContext) =>
+    dispatch(actions.requestFringesAction(null, c)),
   actions: {
     tableChanged: actions.handleFringesTableChangeEventAction,
     loading: actions.loadingFringesAction,
@@ -25,12 +28,18 @@ const ConnectedFringesTable = connectTableToStore<
 
 interface FringesModalProps extends Pick<GenericFringesModalProps, "open" | "onCancel"> {
   readonly budget: Model.Template | null;
+  readonly budgetId: number;
+  readonly id: number;
 }
 
-const FringesModal: React.FC<FringesModalProps> = ({ budget, open, onCancel }) => {
+const FringesModal: React.FC<FringesModalProps> = ({ id, budget, budgetId, open, onCancel }) => {
   return (
     <GenericFringesModal open={open} onCancel={onCancel}>
-      <ConnectedFringesTable exportFileName={!isNil(budget) ? `${budget.name}_fringes` : "fringes"} />
+      <ConnectedFringesTable
+        actionContext={{ budgetId, id }}
+        tableId={"template-fringes"}
+        exportFileName={!isNil(budget) ? `${budget.name}_fringes` : "fringes"}
+      />
     </GenericFringesModal>
   );
 };

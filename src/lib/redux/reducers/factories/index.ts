@@ -4,7 +4,9 @@ export * from "./util";
 export * from "./detail";
 export * from "./list";
 
-export const createSimplePayloadReducer = <P>(config: Redux.ReducerConfig<P, { set: P }>): Redux.Reducer<P> => {
+export const createSimplePayloadReducer = <P>(
+  config: Redux.ReducerConfig<P, { set: Redux.ActionCreator<P> }>
+): Redux.Reducer<P> => {
   const reducer: Redux.Reducer<P> = (state: P = config.initialState, action: Redux.Action<P>): P => {
     if (config.actions.set.toString() === action.type) {
       return action.payload;
@@ -15,7 +17,7 @@ export const createSimplePayloadReducer = <P>(config: Redux.ReducerConfig<P, { s
 };
 
 export const createSimpleBooleanReducer = (
-  config: Omit<Redux.ReducerConfig<boolean, { set: boolean }>, "initialState">
+  config: Omit<Redux.ReducerConfig<boolean, { set: Redux.ActionCreator<boolean> }>, "initialState">
 ): Redux.Reducer<boolean> => createSimplePayloadReducer<boolean>({ ...config, initialState: false });
 
 /**
@@ -36,7 +38,7 @@ export const createSimpleBooleanReducer = (
 export const createModelListActionReducer =
   (
     config: Omit<
-      Redux.ReducerConfig<Redux.ModelListActionStore, { change: Redux.ModelListActionPayload }>,
+      Redux.ReducerConfig<Redux.ModelListActionStore, { change: Redux.ActionCreator<Redux.ModelListActionPayload> }>,
       "initialState"
     >
   ) =>

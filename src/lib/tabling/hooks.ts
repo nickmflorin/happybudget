@@ -12,8 +12,18 @@ export const useDataGrid = (): NonNullRef<Table.DataGridInstance> => {
 
 export const InitialTableRef: Table.TableInstance<any, any> = {
   ...InitialGridRef,
-  notify: (notification: TableNotification) => {},
+  notify: (notification: TableNotification) => {
+    console.warn(
+      `Cannot dispatch notification ${JSON.stringify(
+        notification
+      )} to table because table ref has not been attached yet.`
+    );
+  },
   removeNotification: () => {},
+  getColumns: () => {
+    console.warn("Cannot retrieve table columns yet because table ref has not been attached yet!");
+    return [];
+  },
   getFocusedRow: () => null,
   getRow: () => null,
   getRows: () => [],

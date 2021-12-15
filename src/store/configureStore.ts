@@ -8,6 +8,7 @@ import { isAuthenticatedStore } from "lib/redux/typeguards";
 
 import GlobalReduxConfig from "./config";
 import createReducerManager from "./createReducerManager";
+import createSagaManager from "./createSagaManager";
 import { createStaticAuthenticatedReducers, createStaticUnauthenticatedReducers } from "./reducer";
 import { createAuthenticatedRootSaga, createUnauthenticatedRootSaga } from "./sagas";
 import { createAuthenticatedInitialState, createUnauthenticatedInitialState } from "./initialState";
@@ -51,14 +52,16 @@ const configureGenericStore = <S extends Application.Store>(
     enhancers = composeEnhancers(applyMiddleware(...baseMiddleware, routerMiddleware(history)), sentryReduxEnhancer);
   }
 
-  const store: Redux.Store<S> = {
+  const store: Omit<Redux.Store<S>, "injectSaga" | "ejectSaga"> = {
     reducerManager,
     ...createStore<S, Redux.Action, any, any>(reducerManager.reduce, initialState as PreloadedState<S>, enhancers)
   };
 
-  // Start the application saga.
-  sagaMiddleware.run(rootSaga);
-  return store;
+  /* Start the application saga and establish the saga injector.  We must do this
+     after we create the store, because the SagaMiddleware must be mounted to
+     run the root saga. */
+  const [injectSaga, ejectSaga] = createSagaManager(sagaMiddleware.run, rootSaga);
+  return { ...store, injectSaga, ejectSaga };
 };
 
 export const configureAuthenticatedStore = (user: Model.User): Redux.Store<Application.Authenticated.Store> => {

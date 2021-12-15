@@ -6,12 +6,11 @@ const TableNotification = (props: TableNotification) => {
       <div className={"table-notification-header"}>
         <div className={"message"}>{props.message}</div>
       </div>
-      {!isNil(props.detail)}{" "}
-      {
+      {!isNil(props.detail) && (
         <div className={"table-notification-content"}>
           <div className={"detail"}>{props.detail}</div>
         </div>
-      }
+      )}
     </div>
   );
 };

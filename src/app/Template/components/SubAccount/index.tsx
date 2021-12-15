@@ -3,42 +3,40 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { isNil } from "lodash";
 
-import { redux, budgeting } from "lib";
+import { budgeting } from "lib";
 
 import { SubAccountPage } from "app/Pages";
 
 import { actions } from "../../store";
-import SubAccountBudgetTable from "./SubAccountsTable";
+import SubAccountsTable from "./SubAccountsTable";
 
-const selectDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.template.subaccount.detail.data
-);
+const selectDetail = (state: Application.Authenticated.Store) => state.budget.subaccount.detail.data;
 
 interface SubAccountProps {
-  readonly templateId: number;
-  readonly template: Model.Template | null;
+  readonly budgetId: number;
+  readonly budget: Model.Template | null;
 }
 
-const SubAccount = ({ template, templateId }: SubAccountProps): JSX.Element => {
+const SubAccount = ({ budgetId, budget }: SubAccountProps): JSX.Element => {
   const { subaccountId } = useParams<{ subaccountId: string }>();
   const dispatch = useDispatch();
   const detail = useSelector(selectDetail);
 
   useEffect(() => {
     if (!isNaN(parseInt(subaccountId))) {
-      dispatch(actions.subAccount.setSubAccountIdAction(parseInt(subaccountId)));
+      dispatch(actions.subAccount.requestSubAccountAction(parseInt(subaccountId)));
     }
   }, [subaccountId]);
 
   useEffect(() => {
-    if (!isNil(template) && !isNil(detail)) {
-      budgeting.urls.setLastVisited(template, detail);
+    if (!isNil(budget) && !isNil(detail)) {
+      budgeting.urls.setLastVisited(budget, detail);
     }
-  }, [template]);
+  }, [budget, detail]);
 
   return (
-    <SubAccountPage detail={detail} budget={template} subaccountId={subaccountId}>
-      <SubAccountBudgetTable template={template} templateId={templateId} subaccountId={parseInt(subaccountId)} />
+    <SubAccountPage detail={detail} subaccountId={subaccountId} budget={budget}>
+      <SubAccountsTable budget={budget} budgetId={budgetId} subaccountId={parseInt(subaccountId)} />
     </SubAccountPage>
   );
 };

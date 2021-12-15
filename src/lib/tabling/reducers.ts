@@ -160,9 +160,10 @@ export const createTableChangeEventReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
+  C = any,
+  A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
 >(
-  config: Table.ReducerConfig<R, M, S, A> & {
+  config: Table.ReducerConfig<R, M, S, C, A> & {
     readonly recalculateRow?: (
       state: S,
       action: Redux.Action<Table.ChangeEvent<R, M>>,
@@ -489,9 +490,10 @@ export const createTableReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
+  C = any,
+  A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
 >(
-  config: Table.ReducerConfig<R, M, S, A>
+  config: Table.ReducerConfig<R, M, S, C, A>
 ): Redux.Reducer<S> => {
   return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
     let newState = { ...state };
@@ -502,23 +504,13 @@ export const createTableReducer = <
 
     if (action.type === config.actions.response.toString()) {
       const response: Http.TableResponse<M> = action.payload;
-      if (!isNil(config.createTableRows)) {
-        return {
-          ...newState,
-          data: config.createTableRows({
-            ...config,
-            response
-          })
-        };
-      } else {
-        return {
-          ...newState,
-          data: data.createTableRows<R, M>({
-            ...config,
-            response
-          })
-        };
-      }
+      return {
+        ...newState,
+        data: data.createTableRows<R, M>({
+          ...config,
+          response
+        })
+      };
     } else if (action.type === config.actions.setSearch.toString()) {
       const search: string = action.payload;
       return { ...newState, search };
@@ -530,27 +522,29 @@ export const createTableReducer = <
 export const createUnauthenticatedTableReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+  C = any
 >(
-  config: Table.ReducerConfig<R, M, S, Redux.TableActionMap<M>>
+  config: Table.ReducerConfig<R, M, S, C, Redux.TableActionMap<M, C>>
 ): Redux.Reducer<S> => {
-  return createTableReducer<R, M, S, Redux.TableActionMap<M>>(config);
+  return createTableReducer<R, M, S, C, Redux.TableActionMap<M, C>>(config);
 };
 
 export const createAuthenticatedTableReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
+  C = any,
+  A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
 >(
-  config: Table.ReducerConfig<R, M, S, A> & {
+  config: Table.ReducerConfig<R, M, S, C, A> & {
     readonly getModelRowChildren?: (m: M) => number[];
     readonly eventReducer?: Redux.Reducer<S>;
     readonly recalculateRow?: (state: S, action: Redux.Action, row: Table.DataRow<R>) => Partial<R>;
   }
 ): Redux.Reducer<S> => {
-  const tableEventReducer = config.eventReducer || createTableChangeEventReducer<R, M, S, A>(config);
-  const generic = createTableReducer<R, M, S, A>(config);
+  const tableEventReducer = config.eventReducer || createTableChangeEventReducer<R, M, S, C, A>(config);
+  const generic = createTableReducer<R, M, S, C, A>(config);
 
   return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
     let newState = generic(state, action);

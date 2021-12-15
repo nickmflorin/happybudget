@@ -28,7 +28,9 @@ export function takeWithCancellableById<P>(actionType: string, task: Redux.Task<
   return call(takeWithCancellableByIdSaga, actionType, task, getId);
 }
 
-export const createListResponseSaga = (config: Redux.SagaConfig<Redux.ListResponseTaskMap, { request: null }>) => {
+export const createListResponseSaga = <P = null>(
+  config: Redux.SagaConfig<Redux.ListResponseTaskMap<P>, { request: Redux.ActionCreator<P> }>
+) => {
   function* requestSaga(): SagaIterator {
     let lastTasks;
     while (true) {
@@ -45,8 +47,8 @@ export const createListResponseSaga = (config: Redux.SagaConfig<Redux.ListRespon
   return rootSaga;
 };
 
-export const createModelListResponseSaga = <M extends Model.HttpModel>(
-  config: Redux.SagaConfig<Redux.ModelListResponseTaskMap, Pick<Redux.ModelListResponseActionMap<M>, "request">>
+export const createModelListResponseSaga = <M extends Model.HttpModel, P = null>(
+  config: Redux.SagaConfig<Redux.ModelListResponseTaskMap<P>, Pick<Redux.ModelListResponseActionMap<M>, "request">>
 ) => {
   function* requestSaga(): SagaIterator {
     let lastTasks;

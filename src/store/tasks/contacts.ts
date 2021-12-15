@@ -52,10 +52,15 @@ export const createFilteredTaskSet = (): Redux.ModelListResponseTaskMap => {
 };
 
 export const createTableTaskSet = (
-  config: Table.TaskConfig<R, M, Redux.AuthenticatedTableActionMap<R, M>> & {
+  config: Table.TaskConfig<
+    R,
+    M,
+    Tables.ContactTableContext,
+    Redux.AuthenticatedTableActionMap<R, M, Tables.ContactTableContext>
+  > & {
     readonly selectStore: (state: Application.Authenticated.Store) => Tables.ContactTableStore;
   }
-): Redux.TableTaskMap<R> => {
+): Redux.TableTaskMap<R, M, Tables.ContactTableContext> => {
   function* tableRequest(action: Redux.Action): SagaIterator {
     yield put(config.actions.loading(true));
     try {
@@ -76,7 +81,7 @@ export const createTableTaskSet = (
     P,
     Http.BulkModelResponse<M>
   >({
-    columns: config.columns,
+    table: config.table,
     selectStore: config.selectStore,
     loadingActions: [config.actions.saving],
     responseActions: (r: Http.BulkModelResponse<M>, e: Table.RowAddEvent<R>) => [
@@ -116,13 +121,16 @@ export const createTableTaskSet = (
     try {
       const response: M = yield api.request(api.createContact, {
         previous: e.payload.previous,
-        ...tabling.http.postPayload(e.payload.data, config.columns)
+        ...tabling.http.postPayload(e.payload.data, config.table.current?.getColumns() || [])
       });
       yield put(
-        config.actions.tableChanged({
-          type: "modelAdded",
-          payload: { model: response }
-        })
+        config.actions.tableChanged(
+          {
+            type: "modelAdded",
+            payload: { model: response }
+          },
+          {}
+        )
       );
     } catch (err: unknown) {
       notifications.requestError(err as Error, { message: "There was an error adding the row." });
@@ -131,17 +139,23 @@ export const createTableTaskSet = (
     }
   }
 
-  function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent): SagaIterator {
+  function* handleRowPositionChangedEvent(
+    e: Table.RowPositionChangedEvent,
+    context: Tables.ContactTableContext
+  ): SagaIterator {
     yield put(config.actions.saving(true));
     try {
       const response: M = yield api.request(api.updateContact, e.payload.id, {
         previous: e.payload.previous
       });
       yield put(
-        config.actions.tableChanged({
-          type: "modelUpdated",
-          payload: { model: response }
-        })
+        config.actions.tableChanged(
+          {
+            type: "modelUpdated",
+            payload: { model: response }
+          },
+          {}
+        )
       );
     } catch (err: unknown) {
       notifications.requestError(err as Error, { message: "There was an error moving the row." });
@@ -150,11 +164,11 @@ export const createTableTaskSet = (
     }
   }
 
-  function* handleRowAddEvent(e: Table.RowAddEvent<R>): SagaIterator {
+  function* handleRowAddEvent(e: Table.RowAddEvent<R>, context: Tables.ContactTableContext): SagaIterator {
     yield fork(bulkCreateTask, e, "There was an error creating the rows.");
   }
 
-  function* handleRowDeleteEvent(e: Table.RowDeleteEvent): SagaIterator {
+  function* handleRowDeleteEvent(e: Table.RowDeleteEvent, context: Tables.ContactTableContext): SagaIterator {
     const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
     const modelRowIds = filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[];
     if (modelRowIds.length !== 0) {
@@ -162,10 +176,16 @@ export const createTableTaskSet = (
     }
   }
 
-  function* handleDataChangeEvent(e: Table.DataChangeEvent<R, Table.ModelRowId>): SagaIterator {
+  function* handleDataChangeEvent(
+    e: Table.DataChangeEvent<R, Table.ModelRowId>,
+    context: Tables.ContactTableContext
+  ): SagaIterator {
     const merged = tabling.events.consolidateRowChanges(e.payload);
     if (merged.length !== 0) {
-      const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns);
+      const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(
+        merged,
+        config.table.current?.getColumns() || []
+      );
       if (requestPayload.data.length !== 0) {
         yield fork(bulkUpdateTask, e, requestPayload, "There was an error updating the rows.");
       }

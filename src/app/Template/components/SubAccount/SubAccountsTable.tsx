@@ -8,7 +8,7 @@ import { redux, tabling, budgeting } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
 import { connectTableToStore } from "tabling";
 
-import { actions, selectors } from "../../store";
+import { actions, selectors, sagas } from "../../store";
 import TemplateSubAccountsTable, { TemplateSubAccountsTableProps } from "../SubAccountsTable";
 
 type M = Model.SubAccount;
@@ -27,9 +27,9 @@ const ConnectedTable = connectTableToStore<TemplateSubAccountsTableProps, R, M, 
     addModelsToState: actions.subAccount.addModelsToStateAction,
     setSearch: actions.subAccount.setSearchAction
   },
-  /* We cannot autoRequest because we have to also request the new data when
-     the dropdown breadcrumbs change. */
-  autoRequest: false,
+  createSaga: (table: NonNullRef<Table.TableInstance<R, M>>) => sagas.subAccount.createTableSaga(table),
+  onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.SubAccountTableContext) =>
+    dispatch(actions.subAccount.requestAction(null, c)),
   selector: selectors.selectSubAccountsTableStore,
   footerRowSelectors: {
     page: createSelector(
@@ -53,11 +53,11 @@ const ConnectedTable = connectTableToStore<TemplateSubAccountsTableProps, R, M, 
 
 interface SubAccountsTableProps {
   readonly subaccountId: number;
-  readonly templateId: number;
-  readonly template: Model.Template | null;
+  readonly budgetId: number;
+  readonly budget: Model.Template | null;
 }
 
-const SubAccountsTable = ({ templateId, template, subaccountId }: SubAccountsTableProps): JSX.Element => {
+const SubAccountsTable = ({ budgetId, budget, subaccountId }: SubAccountsTableProps): JSX.Element => {
   const dispatch = useDispatch();
   const history = useHistory();
   const subaccountDetail = useSelector(selectSubAccountDetail);
@@ -80,16 +80,19 @@ const SubAccountsTable = ({ templateId, template, subaccountId }: SubAccountsTab
     table: table.current,
     onResponse: (response: Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, Model.Template>) => {
       dispatch(actions.subAccount.updateInStateAction({ id: response.parent.id, data: response.parent }));
-      dispatch(actions.updateTemplateInStateAction({ id: response.budget.id, data: response.budget }));
+      dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
     }
   });
 
   return (
     <React.Fragment>
       <ConnectedTable
-        template={template}
-        templateId={templateId}
+        tableId={"template-subaccount-subaccounts"}
+        id={subaccountId}
+        budget={budget}
+        budgetId={budgetId}
         table={table}
+        actionContext={{ id: subaccountId, budgetId }}
         /* Right now, the SubAccount recursion only goes 1 layer deep.
            Account -> SubAccount -> Detail (Recrusive SubAccount). */
         hideEditColumn={true}
@@ -104,9 +107,9 @@ const SubAccountsTable = ({ templateId, template, subaccountId }: SubAccountsTab
           ) {
             const ancestor = subaccountDetail.ancestors[subaccountDetail.ancestors.length - 1];
             if (ancestor.type === "subaccount") {
-              history.push(`/templates/${templateId}/subaccounts/${ancestor.id}?row=${subaccountId}`);
+              history.push(`/templates/${budgetId}/subaccounts/${ancestor.id}?row=${subaccountId}`);
             } else {
-              history.push(`/templates/${templateId}/accounts/${ancestor.id}?row=${subaccountId}`);
+              history.push(`/templates/${budgetId}/accounts/${ancestor.id}?row=${subaccountId}`);
             }
           }
         }}

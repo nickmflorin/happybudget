@@ -15,11 +15,12 @@ type OmitTableProps = "menuPortalId" | "columns" | "fringes" | "subAccountUnits"
 
 export interface TemplateSubAccountsTableProps
   extends Omit<GenericSubAccountsTable.AuthenticatedTemplateProps, OmitTableProps> {
-  readonly templateId: number;
-  readonly template: Model.Template | null;
+  readonly id: number;
+  readonly budgetId: number;
+  readonly budget: Model.Template | null;
 }
 
-const SubAccountsTable = ({ template, templateId, ...props }: TemplateSubAccountsTableProps): JSX.Element => {
+const SubAccountsTable = ({ id, budget, budgetId, ...props }: TemplateSubAccountsTableProps): JSX.Element => {
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
   const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
   const fringes = useSelector(selectFringes);
@@ -41,7 +42,13 @@ const SubAccountsTable = ({ template, templateId, ...props }: TemplateSubAccount
           ) as Tables.FringeRow[]
         }
       />
-      <FringesModal budget={template} open={fringesModalVisible} onCancel={() => setFringesModalVisible(false)} />
+      <FringesModal
+        id={id}
+        budget={budget}
+        budgetId={budgetId}
+        open={fringesModalVisible}
+        onCancel={() => setFringesModalVisible(false)}
+      />
     </React.Fragment>
   );
 };

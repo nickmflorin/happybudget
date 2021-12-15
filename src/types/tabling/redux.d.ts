@@ -4,45 +4,49 @@ declare namespace Table {
   type TaskConfig<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
+    C = any,
+    A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
   > = Redux.TaskConfig<A> & {
-    readonly columns: Column<R, M>[];
+    /* There are edge cases where the table will be null when switching between
+		   tables very fast. */
+    readonly table: PotentiallyNullRef<Table.TableInstance<R, M>>;
   };
 
   type ReducerConfig<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
-    A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>,
-    CFG extends CreateTableDataConfig<R, M> = CreateTableDataConfig<R, M>
-  > = TaskConfig<R, M, A> &
-    Omit<CFG, "gridId" | "response"> & {
-      readonly initialState: S;
-      readonly defaultData?: Partial<R>;
-      readonly createTableRows?: (config: CFG) => BodyRow<R>[];
-      readonly getModelRowChildren?: (m: M) => number[];
-      readonly clearOn: Redux.ClearOn<any>[];
-    };
+    C = any,
+    A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
+  > = Omit<TaskConfig<R, M, C, A>, "table"> & {
+    readonly initialState: S;
+    readonly columns: Column<R, M>[];
+    readonly defaultData?: Partial<R>;
+    readonly getModelRowChildren?: (m: M) => number[];
+    readonly clearOn: Redux.ClearOn<any, C>[];
+  };
 
   type SagaConfig<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>
-  > = Redux.SagaConfig<Redux.TableTaskMap<R, M>, A>;
+    C = any,
+    A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
+  > = Redux.SagaConfig<Redux.TableTaskMap<R, M, C>, A>;
 
   type StoreConfig<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
-    A extends Redux.TableActionMap<M> & { readonly request?: Redux.TableRequestPayload } = Redux.TableActionMap<M> & {
-      readonly request?: Redux.TableRequestPayload;
-    }
+    C = any,
+    A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
   > = {
-    readonly autoRequest?: boolean;
     readonly asyncId?: AsyncId;
-    readonly actions: Redux.ActionMapObject<A>;
-    readonly selector?: (state: Application.Store) => S;
+    readonly actions: Omit<A, "request">;
     readonly footerRowSelectors?: Partial<FooterGridSet<RowDataSelector<R>>>;
+    readonly onSagaConnected: (dispatch: import("redux").Dispatch, context: C) => void;
+    readonly onSagaReconnected?: (dispatch: import("redux").Dispatch, context: C) => void;
+    readonly selector?: (state: Application.Store) => S;
     readonly reducer?: Redux.Reducer<S>;
+    readonly createSaga?: (t: NonNullRef<Table.TableInstance<R, M>>) => Saga<any[]>;
   };
 }

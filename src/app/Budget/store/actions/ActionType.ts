@@ -1,7 +1,7 @@
 const ActionType = {
-  SetId: "budget.SetId",
   Loading: "budget.Loading",
   Response: "budget.Response",
+  Request: "budget.Request",
   UpdateInState: "budget.UpdateInState",
   HeaderTemplates: {
     Loading: "budget.headertemplates.Loading",
@@ -48,7 +48,6 @@ const ActionType = {
   },
   SubAccount: {
     Request: "budget.subaccount.Request",
-    SetId: "budget.subaccount.SetId",
     Loading: "budget.subaccount.Loading",
     Response: "budget.subaccount.Response",
     UpdateInState: "budget.subaccount.UpdateInState",
@@ -65,7 +64,6 @@ const ActionType = {
   },
   Account: {
     Request: "budget.account.Request",
-    SetId: "budget.account.SetId",
     Loading: "budget.account.Loading",
     Response: "budget.account.Response",
     UpdateInState: "budget.account.UpdateInState",

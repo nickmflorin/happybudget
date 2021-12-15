@@ -9,7 +9,8 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
   contacts: tabling.reducers.createAuthenticatedTableReducer<
     Tables.ContactRowData,
     Model.Contact,
-    Tables.ContactTableStore
+    Tables.ContactTableStore,
+    Tables.ContactTableContext
   >({
     columns: ContactsTable.Columns,
     clearOn: [actions.requestContactsAction],
@@ -26,6 +27,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
   }),
   templates: redux.reducers.createAuthenticatedModelListResponseReducer<
     Model.SimpleTemplate,
+    Redux.AuthenticatedModelListResponseStore<Model.SimpleTemplate>,
     Omit<Redux.AuthenticatedModelListResponseActionMap<Model.SimpleTemplate>, "updating" | "deleting" | "creating">
   >({
     initialState: redux.initialState.initialAuthenticatedModelListResponseState,
@@ -43,6 +45,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
   }),
   community: redux.reducers.createAuthenticatedModelListResponseReducer<
     Model.SimpleTemplate,
+    Redux.AuthenticatedModelListResponseStore<Model.SimpleTemplate>,
     Omit<Redux.AuthenticatedModelListResponseActionMap<Model.SimpleTemplate>, "updating" | "deleting" | "creating">
   >({
     initialState: redux.initialState.initialAuthenticatedModelListResponseState,
@@ -60,6 +63,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
   }),
   budgets: redux.reducers.createAuthenticatedModelListResponseReducer<
     Model.SimpleBudget,
+    Redux.AuthenticatedModelListResponseStore<Model.SimpleBudget>,
     Omit<Redux.AuthenticatedModelListResponseActionMap<Model.SimpleBudget>, "updating" | "deleting" | "creating">
   >({
     initialState: initialState.budgets,

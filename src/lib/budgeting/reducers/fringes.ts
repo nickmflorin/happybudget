@@ -1,12 +1,18 @@
 import { tabling, budgeting } from "lib";
 
 export type FringeTableActionMap = Redux.TableActionMap<Model.Fringe> & {
-  readonly responseFringeColors: Http.ListResponse<string>;
+  readonly responseFringeColors: Redux.ActionCreator<Http.ListResponse<string>>;
 };
 
 /* eslint-disable indent */
 export const createUnauthenticatedFringesTableReducer = (
-  config: Table.ReducerConfig<Tables.FringeRowData, Model.Fringe, Tables.FringeTableStore, FringeTableActionMap>
+  config: Table.ReducerConfig<
+    Tables.FringeRowData,
+    Model.Fringe,
+    Tables.FringeTableStore,
+    Tables.FringeTableContext,
+    FringeTableActionMap
+  >
 ): Redux.Reducer<Tables.FringeTableStore> => {
   type S = Tables.FringeTableStore;
 
@@ -28,15 +34,22 @@ export const createUnauthenticatedFringesTableReducer = (
 
 export type AuthenticatedFringeTableActionMap = Redux.AuthenticatedTableActionMap<
   Tables.FringeRowData,
-  Model.Fringe
+  Model.Fringe,
+  Tables.FringeTableContext
 > & {
-  readonly responseFringeColors: Http.ListResponse<string>;
+  readonly responseFringeColors: Redux.ActionCreator<Http.ListResponse<string>>;
 };
 
 /* eslint-disable indent */
 export const createAuthenticatedFringesTableReducer = (
   config: Omit<
-    Table.ReducerConfig<Tables.FringeRowData, Model.Fringe, Tables.FringeTableStore, AuthenticatedFringeTableActionMap>,
+    Table.ReducerConfig<
+      Tables.FringeRowData,
+      Model.Fringe,
+      Tables.FringeTableStore,
+      Tables.FringeTableContext,
+      AuthenticatedFringeTableActionMap
+    >,
     "defaultData"
   >
 ): Redux.Reducer<Tables.FringeTableStore> => {
@@ -45,7 +58,8 @@ export const createAuthenticatedFringesTableReducer = (
   const generic = tabling.reducers.createAuthenticatedTableReducer<
     Tables.FringeRowData,
     Model.Fringe,
-    Tables.FringeTableStore
+    Tables.FringeTableStore,
+    Tables.FringeTableContext
   >({
     ...config,
     defaultData: {

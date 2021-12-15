@@ -7,20 +7,20 @@ import { AccountsPage } from "app/Pages";
 import AccountsTable from "./AccountsTable";
 
 interface AccountsProps {
-  readonly templateId: number;
-  readonly template: Model.Template | null;
+  readonly budgetId: number;
+  readonly budget: Model.Template | null;
 }
 
-const Accounts = ({ templateId, template }: AccountsProps): JSX.Element => {
+const Accounts = ({ budgetId, budget }: AccountsProps): JSX.Element => {
   useEffect(() => {
-    if (!isNil(template)) {
-      budgeting.urls.setLastVisited(template);
+    if (!isNil(budget)) {
+      budgeting.urls.setLastVisited(budget);
     }
-  }, [template]);
+  }, [budget]);
 
   return (
-    <AccountsPage budget={template}>
-      <AccountsTable template={template} templateId={templateId} />
+    <AccountsPage budget={budget}>
+      <AccountsTable budget={budget} budgetId={budgetId} />
     </AccountsPage>
   );
 };

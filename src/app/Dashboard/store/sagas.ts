@@ -3,7 +3,6 @@ import { spawn, takeLatest, debounce } from "redux-saga/effects";
 
 import { contacts } from "store/tasks";
 import { tabling } from "lib";
-import { ContactsTable } from "tabling";
 
 import * as actions from "./actions";
 import * as tasks from "./tasks";
@@ -63,18 +62,20 @@ const ActionMap = {
   setSearch: actions.setContactsSearchAction
 };
 
-const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
-  Tables.ContactRowData,
-  Model.Contact,
-  Redux.AuthenticatedTableActionMap<Tables.ContactRowData, Model.Contact>
->({
-  actions: ActionMap,
-  tasks: contacts.createTableTaskSet({
-    columns: ContactsTable.Columns,
-    selectStore: (state: Application.Authenticated.Store) => state.dashboard.contacts,
-    actions: ActionMap
-  })
-});
+export const createContactsTableSaga = (table: NonNullRef<Table.TableInstance<Tables.ContactRowData, Model.Contact>>) =>
+  tabling.sagas.createAuthenticatedTableSaga<
+    Tables.ContactRowData,
+    Model.Contact,
+    Tables.ContactTableContext,
+    Redux.AuthenticatedTableActionMap<Tables.ContactRowData, Model.Contact, Tables.ContactTableContext>
+  >({
+    actions: ActionMap,
+    tasks: contacts.createTableTaskSet({
+      table,
+      selectStore: (state: Application.Authenticated.Store) => state.dashboard.contacts,
+      actions: ActionMap
+    })
+  });
 
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForTemplatesRefreshSaga);
@@ -86,5 +87,4 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForSearchBudgetsSaga);
   yield spawn(watchForCommunityTemplatesRefreshSaga);
   yield spawn(watchForSearchCommunityTemplatesSaga);
-  yield spawn(tableSaga);
 }

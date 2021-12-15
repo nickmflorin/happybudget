@@ -1,31 +1,25 @@
 import { SagaIterator } from "redux-saga";
-import { call, put, select, spawn, all, takeLatest } from "redux-saga/effects";
-import { isNil, filter, intersection } from "lodash";
+import { put, takeLatest } from "redux-saga/effects";
 
 import * as api from "api";
 import { budgeting, tabling, notifications } from "lib";
 
-import { SubAccountsTable } from "tabling";
-
 import {
   subAccount as actions,
-  loadingTemplateAction,
-  updateTemplateInStateAction,
-  responseFringesAction,
+  loadingBudgetAction,
+  updateBudgetInStateAction,
   responseFringeColorsAction,
+  responseFringesAction,
   responseSubAccountUnitsAction
 } from "../actions";
 
-function* getSubAccount(action: Redux.Action<null>): SagaIterator {
-  const subaccountId = yield select((state: Application.Authenticated.Store) => state.template.subaccount.id);
-  if (!isNil(subaccountId)) {
-    try {
-      const response: Model.SubAccount = yield api.request(api.getSubAccount, subaccountId);
-      yield put(actions.responseSubAccountAction(response));
-    } catch (e: unknown) {
-      notifications.requestError(e as Error, { message: "There was an error retrieving the sub account." });
-      yield put(actions.responseSubAccountAction(null));
-    }
+function* getSubAccount(action: Redux.Action<number>): SagaIterator {
+  try {
+    const response: Model.SubAccount = yield api.request(api.getSubAccount, action.payload);
+    yield put(actions.responseSubAccountAction(response));
+  } catch (e: unknown) {
+    notifications.requestError(e as Error, { message: "There was an error retrieving the sub account." });
+    yield put(actions.responseSubAccountAction(null));
   }
 }
 
@@ -36,52 +30,44 @@ const ActionMap = {
   response: actions.responseAction,
   saving: actions.savingTableAction,
   addModelsToState: actions.addModelsToStateAction,
-  loadingBudget: loadingTemplateAction,
-  updateBudgetInState: updateTemplateInStateAction,
+  loadingBudget: loadingBudgetAction,
+  updateBudgetInState: updateBudgetInStateAction,
   setSearch: actions.setSearchAction,
   responseFringes: responseFringesAction,
-  responseSubAccountUnits: responseSubAccountUnitsAction,
-  responseFringeColors: responseFringeColorsAction
+  responseFringeColors: responseFringeColorsAction,
+  responseSubAccountUnits: responseSubAccountUnitsAction
 };
 
-const Tasks = budgeting.tasks.subaccounts.createTableTaskSet<Model.SubAccount, Model.Template>({
-  columns: filter(
-    SubAccountsTable.Columns as Table.Column<Tables.SubAccountRowData, Model.SubAccount>[],
-    (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
-      intersection([c.field, c.colId], ["variance", "contact", "actual"]).length === 0
-  ),
-  selectBudgetId: (state: Application.Authenticated.Store) => state.template.id,
-  selectStore: (state: Application.Authenticated.Store) => state.template.subaccount.table,
-  selectObjId: (state: Application.Authenticated.Store) => state.template.subaccount.id,
-  actions: ActionMap,
-  services: {
-    create: api.createSubAccountSubAccount,
-    request: api.getSubAccountSubAccounts,
-    requestMarkups: api.getSubAccountSubAccountMarkups,
-    requestGroups: api.getSubAccountSubAccountGroups,
-    requestFringes: api.getTemplateFringes,
-    bulkCreate: api.bulkCreateSubAccountSubAccounts,
-    bulkDelete: api.bulkDeleteSubAccountSubAccounts,
-    bulkUpdate: api.bulkUpdateSubAccountSubAccounts,
-    bulkDeleteMarkups: api.bulkDeleteSubAccountMarkups
-  }
-});
+export const createTableSaga = (
+  table: PotentiallyNullRef<Table.TableInstance<Tables.SubAccountRowData, Model.SubAccount>>
+) =>
+  tabling.sagas.createAuthenticatedTableSaga<
+    Tables.SubAccountRowData,
+    Model.SubAccount,
+    Tables.SubAccountTableContext,
+    Redux.AuthenticatedTableActionMap<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableContext>
+  >({
+    actions: { ...ActionMap, request: actions.requestAction },
+    tasks: budgeting.tasks.subaccounts.createTableTaskSet<Model.SubAccount, Model.Template>({
+      table,
+      selectStore: (state: Application.Authenticated.Store) => state.template.subaccount.table,
+      actions: ActionMap,
+      services: {
+        create: api.createSubAccountSubAccount,
+        request: api.getSubAccountSubAccounts,
+        requestGroups: api.getSubAccountSubAccountGroups,
+        requestMarkups: api.getSubAccountSubAccountMarkups,
+        requestFringes: api.getTemplateFringes,
+        bulkCreate: api.bulkCreateSubAccountSubAccounts,
+        bulkDelete: api.bulkDeleteSubAccountSubAccounts,
+        bulkUpdate: api.bulkUpdateSubAccountSubAccounts,
+        bulkDeleteMarkups: api.bulkDeleteSubAccountMarkups
+      }
+    })
+  });
 
-const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
-  Tables.SubAccountRowData,
-  Model.SubAccount,
-  Redux.AuthenticatedTableActionMap<Tables.SubAccountRowData, Model.SubAccount>
->({
-  actions: ActionMap,
-  tasks: Tasks
-});
-
-function* getData(action: Redux.Action<any>): SagaIterator {
-  yield all([call(getSubAccount, action), call(Tasks.request, action)]);
-}
-
-export default function* rootSaga(): SagaIterator {
+function* rootSaga(): SagaIterator {
   yield takeLatest(actions.requestSubAccountAction.toString(), getSubAccount);
-  yield takeLatest(actions.setSubAccountIdAction.toString(), getData);
-  yield spawn(tableSaga);
 }
+
+export default rootSaga;

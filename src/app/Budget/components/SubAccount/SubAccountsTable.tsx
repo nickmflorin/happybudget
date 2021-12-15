@@ -8,7 +8,7 @@ import { redux, tabling, budgeting } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
 import { connectTableToStore } from "tabling";
 
-import { actions, selectors } from "../../store";
+import { actions, selectors, sagas } from "../../store";
 import BudgetSubAccountsTable, { BudgetSubAccountsTableProps } from "../SubAccountsTable";
 
 type M = Model.SubAccount;
@@ -27,10 +27,10 @@ const ConnectedTable = connectTableToStore<BudgetSubAccountsTableProps, R, M, Ta
     addModelsToState: actions.subAccount.addModelsToStateAction,
     setSearch: actions.subAccount.setSearchAction
   },
-  /* We cannot autoRequest because we have to also request the new data when
-     the dropdown breadcrumbs change. */
-  autoRequest: false,
   selector: selectors.selectSubAccountsTableStore,
+  createSaga: (table: NonNullRef<Table.TableInstance<R, M>>) => sagas.subAccount.createTableSaga(table),
+  onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.SubAccountTableContext) =>
+    dispatch(actions.subAccount.requestAction(null, c)),
   footerRowSelectors: {
     page: createSelector(
       redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.detail.data),
@@ -99,6 +99,9 @@ const SubAccountsTable = ({
       <ConnectedTable
         budget={budget}
         budgetId={budgetId}
+        id={subaccountId}
+        actionContext={{ id: subaccountId, budgetId }}
+        tableId={"budget-subaccount-subaccounts"}
         table={table}
         setPreviewModalVisible={setPreviewModalVisible}
         onAttachmentRemoved={(row: Table.ModelRow<R>, id: number) =>

@@ -11,7 +11,7 @@ import { ActualsPage } from "app/Pages";
 import { useContacts, CreateContactParams } from "components/hooks";
 import { ActualsTable, connectTableToStore } from "tabling";
 
-import { actions } from "../store";
+import { actions, sagas } from "../store";
 import { ActualsPreviewModal } from "./PreviewModals";
 
 type R = Tables.ActualRowData;
@@ -24,13 +24,15 @@ const selectActualTypes = redux.selectors.simpleDeepEqualSelector(
 const ConnectedActualsTable = connectTableToStore<ActualsTable.ActualsTableProps, R, M, Tables.ActualTableStore>({
   actions: {
     tableChanged: actions.actuals.handleTableChangeEventAction,
-    request: actions.actuals.requestAction,
     loading: actions.actuals.loadingAction,
     response: actions.actuals.responseAction,
     saving: actions.actuals.savingTableAction,
     addModelsToState: actions.actuals.addModelsToStateAction,
     setSearch: actions.actuals.setSearchAction
   },
+  onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.ActualTableContext) =>
+    dispatch(actions.actuals.requestAction(null, c)),
+  createSaga: (table: NonNullRef<Table.TableInstance<R, M>>) => sagas.actuals.createTableSaga(table),
   selector: redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.actuals),
   footerRowSelectors: {
     footer: createSelector(
@@ -92,9 +94,11 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
       <React.Fragment>
         <ConnectedActualsTable
           table={table}
+          actionContext={{ budgetId }}
+          tableId={"budget-actuals"}
           contacts={contacts}
           actualTypes={actualTypes}
-          onOwnersSearch={(value: string) => dispatch(actions.actuals.setActualOwnersSearchAction(value))}
+          onOwnersSearch={(value: string) => dispatch(actions.actuals.setActualOwnersSearchAction(value, { budgetId }))}
           exportFileName={!isNil(budget) ? `${budget.name}_actuals` : "actuals"}
           onNewContact={(params: { name?: string; rowId: Table.ModelRowId }) => createContact(params)}
           onEditContact={(params: { contact: number; rowId: Table.ModelRowId }) =>

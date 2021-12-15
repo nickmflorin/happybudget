@@ -64,7 +64,7 @@ const PageFooterGrid = FooterGrid<any, any, UnauthenticatedFooterGridProps<any>>
 const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: WithUnauthenticatedDataGridProps<
     R,
-    WithConnectedTableProps<WithConfiguredTableProps<UnauthenticatedTableProps<R, M>, R>, R>
+    WithConnectedTableProps<WithConfiguredTableProps<UnauthenticatedTableProps<R, M>, R>, R, M>
   >
 ): JSX.Element => {
   const grid = tabling.hooks.useDataGrid();
@@ -108,69 +108,74 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
     );
   }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns]);
 
-  useImperativeHandle(props.table, () => ({
-    ...grid.current,
-    notify: (notification: TableNotification) => {},
-    removeNotification: () => {},
-    changeColumnVisibility: props.changeColumnVisibility,
-    applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R, M>>) => {},
-    getRowsAboveAndIncludingFocusedRow: () => {
-      const apis = props.tableApis.get("data");
-      if (!isNil(apis)) {
-        const position: Table.CellPosition | null = apis.grid.getFocusedCell();
-        if (!isNil(position)) {
-          const nodes: Table.RowNode[] = [];
-          let rowIndex = position.rowIndex;
-          let node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(rowIndex);
-          while (rowIndex >= 0 && node !== undefined) {
-            nodes.push(node);
-            rowIndex = rowIndex - 1;
-            if (rowIndex >= 0) {
-              node = apis.grid.getDisplayedRowAtIndex(rowIndex);
+  useImperativeHandle(
+    props.table,
+    () => ({
+      ...grid.current,
+      notify: (notification: TableNotification) => {},
+      removeNotification: () => {},
+      getColumns: () => columns,
+      applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R, M>>) => {},
+      changeColumnVisibility: props.changeColumnVisibility,
+      getRowsAboveAndIncludingFocusedRow: () => {
+        const apis = props.tableApis.get("data");
+        if (!isNil(apis)) {
+          const position: Table.CellPosition | null = apis.grid.getFocusedCell();
+          if (!isNil(position)) {
+            const nodes: Table.RowNode[] = [];
+            let rowIndex = position.rowIndex;
+            let node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(rowIndex);
+            while (rowIndex >= 0 && node !== undefined) {
+              nodes.push(node);
+              rowIndex = rowIndex - 1;
+              if (rowIndex >= 0) {
+                node = apis.grid.getDisplayedRowAtIndex(rowIndex);
+              }
+            }
+            return map(nodes, (nd: Table.RowNode) => {
+              const row: Table.BodyRow<R> = nd.data;
+              return row;
+            });
+          }
+        }
+        return [];
+      },
+      getRows: () => {
+        const apis = props.tableApis.get("data");
+        if (!isNil(apis)) {
+          return tabling.aggrid.getRows(apis.grid);
+        }
+        return [];
+      },
+      getRow: (id: Table.BodyRowId) => {
+        const apis = props.tableApis.get("data");
+        if (!isNil(apis)) {
+          const node: Table.RowNode | undefined = apis.grid.getRowNode(String(id));
+          return !isNil(node) ? (node.data as Table.BodyRow<R>) : null;
+        }
+        return null;
+      },
+      getFocusedRow: () => {
+        const apis = props.tableApis.get("data");
+        if (!isNil(apis)) {
+          const position: Table.CellPosition | null = apis.grid.getFocusedCell();
+          if (!isNil(position)) {
+            const node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(position.rowIndex);
+            if (!isNil(node)) {
+              const row: Table.BodyRow<R> = node.data;
+              return row;
             }
           }
-          return map(nodes, (nd: Table.RowNode) => {
-            const row: Table.BodyRow<R> = nd.data;
-            return row;
-          });
         }
+        return null;
       }
-      return [];
-    },
-    getRows: () => {
-      const apis = props.tableApis.get("data");
-      if (!isNil(apis)) {
-        return tabling.aggrid.getRows(apis.grid);
-      }
-      return [];
-    },
-    getRow: (id: Table.BodyRowId) => {
-      const apis = props.tableApis.get("data");
-      if (!isNil(apis)) {
-        const node: Table.RowNode | undefined = apis.grid.getRowNode(String(id));
-        return !isNil(node) ? (node.data as Table.BodyRow<R>) : null;
-      }
-      return null;
-    },
-    getFocusedRow: () => {
-      const apis = props.tableApis.get("data");
-      if (!isNil(apis)) {
-        const position: Table.CellPosition | null = apis.grid.getFocusedCell();
-        if (!isNil(position)) {
-          const node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(position.rowIndex);
-          if (!isNil(node)) {
-            const row: Table.BodyRow<R> = node.data;
-            return row;
-          }
-        }
-      }
-      return null;
-    }
-  }));
+    }),
+    [hooks.useDeepEqualMemo(columns)]
+  );
 
   return (
     <TableWrapper
-      id={props.id}
+      id={props.tableId}
       loading={props.loading}
       minimal={props.minimal}
       className={props.className}
@@ -178,7 +183,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
       showPageFooter={props.showPageFooter}
       footer={
         <PageFooterGrid
-          tableId={props.id}
+          tableId={props.tableId}
           onGridReady={props.onPageGridReady}
           onFirstDataRendered={props.onFirstDataRendered}
           gridOptions={props.tableGridOptions.page}
@@ -193,7 +198,6 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
         <UnauthenticatedMenu<R, M> {...props} apis={props.tableApis.get("data")} />
         {props.children({
           ...props,
-          tableId: props.id,
           apis: props.tableApis.get("data"),
           columns: columns,
           grid,
@@ -201,7 +205,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
           onGridReady: props.onDataGridReady
         })}
         <TableFooterGrid
-          tableId={props.id}
+          tableId={props.tableId}
           onGridReady={props.onFooterGridReady}
           onFirstDataRendered={props.onFirstDataRendered}
           gridOptions={props.tableGridOptions.footer}

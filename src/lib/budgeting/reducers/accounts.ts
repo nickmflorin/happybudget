@@ -4,7 +4,9 @@ type R = Tables.AccountRowData;
 type M = Model.Account;
 type S = Tables.AccountTableStore;
 
-type ReducerConfig<A extends Redux.TableActionMap<M> = Redux.TableActionMap<M>> = Table.ReducerConfig<R, M, S, A>;
+type ReducerConfig<
+  A extends Redux.TableActionMap<M, Tables.AccountTableContext> = Redux.TableActionMap<M, Tables.ActualTableContext>
+> = Table.ReducerConfig<R, M, S, Tables.AccountTableContext, A>;
 
 /* eslint-disable indent */
 export const createUnauthenticatedAccountsTableReducer = (config: ReducerConfig): Redux.Reducer<S> => {
@@ -12,9 +14,9 @@ export const createUnauthenticatedAccountsTableReducer = (config: ReducerConfig)
 };
 
 export const createAuthenticatedAccountsTableReducer = (
-  config: Omit<ReducerConfig<Redux.AuthenticatedTableActionMap<R, M>>, "defaultData">
+  config: Omit<ReducerConfig<Redux.AuthenticatedTableActionMap<R, M, Tables.AccountTableContext>>, "defaultData">
 ): Redux.Reducer<S> =>
-  createAuthenticatedBudgetTableReducer<R, M, S>({
+  createAuthenticatedBudgetTableReducer<R, M, S, Tables.AccountTableContext>({
     defaultData: {
       markup_contribution: 0.0,
       actual: 0.0,

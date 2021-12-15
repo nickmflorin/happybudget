@@ -22,7 +22,7 @@ const RootBudget = (): JSX.Element => {
 
   useEffect(() => {
     if (!isNaN(parseInt(budgetId))) {
-      dispatch(actions.setBudgetIdAction(parseInt(budgetId)));
+      dispatch(actions.requestBudgetAction(parseInt(budgetId)));
     }
   }, [budgetId]);
 

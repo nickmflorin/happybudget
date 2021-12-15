@@ -30,11 +30,14 @@ type OmitTableProps =
 export interface BudgetSubAccountsTableProps
   extends Omit<GenericSubAccountsTable.AuthenticatedBudgetProps, OmitTableProps> {
   readonly budgetId: number;
+  // The ID of either the Account or SubAccount.
+  readonly id: number;
   readonly budget: Model.Budget | null;
   readonly setPreviewModalVisible: (v: boolean) => void;
 }
 
 const SubAccountsTable = ({
+  id,
   budget,
   budgetId,
   setPreviewModalVisible,
@@ -130,7 +133,13 @@ const SubAccountsTable = ({
       />
       {createContactModal}
       {editContactModal}
-      <FringesModal budget={budget} open={fringesModalVisible} onCancel={() => setFringesModalVisible(false)} />
+      <FringesModal
+        budgetId={budgetId}
+        id={id}
+        budget={budget}
+        open={fringesModalVisible}
+        onCancel={() => setFringesModalVisible(false)}
+      />
     </React.Fragment>
   );
 };

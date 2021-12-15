@@ -1,7 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useStore, useSelector, useDispatch } from "react-redux";
 import hoistNonReactStatics from "hoist-non-react-statics";
-
 import { isNil } from "lodash";
 import { redux, tabling } from "lib";
 
@@ -14,8 +13,9 @@ type ProvidedProps<
   readonly data: Table.BodyRow<R>[];
   readonly loading: boolean;
   readonly saving: boolean;
-  readonly selector: (state: Application.Store) => S;
+  readonly table: NonNullRef<Table.TableInstance<R, M>>;
   readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
+  readonly selector: (state: Application.Store) => S;
   readonly onSearch: (v: string) => void;
   readonly onChangeEvent: (e: Table.ChangeEvent<R, M>) => void;
 };
@@ -30,18 +30,19 @@ export type WithConnectedTableProps<
 /* eslint-disable indent */
 const connectTableToStore =
   <
-    T,
+    T extends {
+      readonly tableId: string;
+      readonly table?: NonNullRef<Table.TableInstance<R, M>>;
+      readonly actionContext: C;
+    },
     R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    S extends Redux.TableStore<R> = Redux.TableStore<R>
+    S extends Redux.TableStore<R> = Redux.TableStore<R>,
+    C = any
   >(
-    config: Table.StoreConfig<
-      R,
-      M,
-      S,
-      | (Redux.TableActionMap<M> & { readonly request?: Redux.TableRequestPayload })
-      | (Redux.AuthenticatedTableActionMap<R, M> & { readonly request?: Redux.TableRequestPayload })
-    >
+    config:
+      | Table.StoreConfig<R, M, S, C, Redux.TableActionMap<M, C>>
+      | Table.StoreConfig<R, M, S, C, Redux.AuthenticatedTableActionMap<R, M, C>>
   ) =>
   (
     Component:
@@ -67,10 +68,17 @@ const connectTableToStore =
       const search = useSelector(selectSearch);
       const loading = useSelector(selectLoading);
       const saving = useSelector(selectSaving);
+      const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
+
+      const [ready, setReady] = useState(false);
+
       const dispatch = useDispatch();
 
       useEffect(() => {
         const asyncId = config.asyncId;
+        if (!isNil(config.reducer) && isNil(asyncId)) {
+          console.warn("'asyncId' must be provided when offloading reducers to table.");
+        }
         if (!isNil(asyncId) && !isNil(config.reducer)) {
           store.reducerManager.injectReducer(asyncId, config.reducer);
           return () => {
@@ -80,30 +88,58 @@ const connectTableToStore =
       }, []);
 
       useEffect(() => {
-        if (config.autoRequest !== false && !isNil(config.actions.request)) {
-          dispatch(config.actions.request(null));
+        /* It is extremely important that the ONLY dependency to this Saga is
+           the `tableId` - if additional dependencies are added, it can lead to
+           multiple Sagas being created for a given table... which means every
+           action will make multiple requests to the backend API. */
+        if (!isNil(config.createSaga)) {
+          const saga = config.createSaga(table);
+          const wasInjected = store.injectSaga(`${props.tableId}-saga`, saga);
+          if (wasInjected === true) {
+            config.onSagaConnected(dispatch, props.actionContext);
+          } else {
+            if (!isNil(config.onSagaReconnected)) {
+              config.onSagaReconnected(dispatch, props.actionContext);
+            } else {
+              config.onSagaConnected(dispatch, props.actionContext);
+            }
+          }
+          setReady(true);
+          return () => {
+            store.ejectSaga(`${props.tableId}-saga`);
+          };
+        } else {
+          setReady(true);
         }
-      }, []);
+      }, [props.tableId]);
 
       return (
         <Component
           {...props}
           search={search}
-          data={data}
+          /* This is necessary in order to not show stale data in a "flash" when
+					   the page initially loads and before the data in the store is
+						 updated.  The time between the stale data "flash" and the updated
+						 data is visible in the table is the time that it takes to inject
+						 the Saga. */
+          data={ready === true ? data : []}
+          table={table}
           loading={loading}
           selector={selector}
           footerRowSelectors={config.footerRowSelectors}
           saving={saving}
           onChangeEvent={(e: Table.ChangeEvent<R, M>) => {
-            if (tabling.typeguards.isAuthenticatedActionMap<R, M>(config.actions)) {
-              dispatch(config.actions.tableChanged(e));
+            if ((config.actions as Redux.AuthenticatedTableActionMap<R, M, C>).tableChanged !== undefined) {
+              dispatch(
+                (config.actions as Redux.AuthenticatedTableActionMap<R, M, C>).tableChanged(e, props.actionContext)
+              );
             }
           }}
-          onSearch={(v: string) => dispatch(config.actions.setSearch(v))}
+          onSearch={(v: string) => dispatch(config.actions.setSearch(v, props.actionContext))}
         />
       );
     };
-    return hoistNonReactStatics(WithStoreConfigured, React.memo(Component));
+    return hoistNonReactStatics(WithStoreConfigured, Component);
   };
 
 export default connectTableToStore;

@@ -9,6 +9,7 @@ declare namespace Table {
   > = DataGridInstance & {
     readonly removeNotification: () => void;
     readonly notify: (notification: TableNotification) => void;
+    readonly getColumns: () => Table.Column<R, M>[];
     readonly getFocusedRow: () => BodyRow<R> | null;
     readonly getRow: (id: BodyRowId) => BodyRow<R> | null;
     readonly getRows: () => BodyRow<R>[];

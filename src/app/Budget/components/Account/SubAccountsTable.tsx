@@ -8,7 +8,7 @@ import { redux, tabling, budgeting } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
 import { connectTableToStore } from "tabling";
 
-import { actions, selectors } from "../../store";
+import { actions, selectors, sagas } from "../../store";
 import BudgetSubAccountsTable, { BudgetSubAccountsTableProps } from "../SubAccountsTable";
 
 type M = Model.SubAccount;
@@ -18,7 +18,13 @@ const selectAccountDetail = redux.selectors.simpleDeepEqualSelector(
   (state: Application.Authenticated.Store) => state.budget.account.detail.data
 );
 
-const ConnectedTable = connectTableToStore<BudgetSubAccountsTableProps, R, M, Tables.SubAccountTableStore>({
+const ConnectedTable = connectTableToStore<
+  BudgetSubAccountsTableProps,
+  R,
+  M,
+  Tables.SubAccountTableStore,
+  Tables.SubAccountTableContext
+>({
   actions: {
     tableChanged: actions.account.handleTableChangeEventAction,
     loading: actions.account.loadingAction,
@@ -27,10 +33,10 @@ const ConnectedTable = connectTableToStore<BudgetSubAccountsTableProps, R, M, Ta
     addModelsToState: actions.account.addModelsToStateAction,
     setSearch: actions.account.setSearchAction
   },
-  /* We cannot autoRequest because we have to also request the new data when
-     the dropdown breadcrumbs change. */
-  autoRequest: false,
   selector: selectors.selectSubAccountsTableStore,
+  onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.SubAccountTableContext) =>
+    dispatch(actions.account.requestAction(null, c)),
+  createSaga: (table: PotentiallyNullRef<Table.TableInstance<R, M>>) => sagas.account.createTableSaga(table),
   footerRowSelectors: {
     page: createSelector(
       redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.detail.data),
@@ -72,7 +78,7 @@ const SubAccountsTable = ({
   const history = useHistory();
 
   const accountDetail = useSelector(selectAccountDetail);
-  const table = tabling.hooks.useTable<R>();
+  const table = tabling.hooks.useTable<Tables.SubAccountRowData>();
 
   const [groupModals, onEditGroup, onCreateGroup] = useGrouping({
     parentId: accountId,
@@ -100,6 +106,9 @@ const SubAccountsTable = ({
       <ConnectedTable
         budget={budget}
         budgetId={budgetId}
+        id={accountId}
+        actionContext={{ budgetId, id: accountId }}
+        tableId={"budget-account-subaccounts"}
         table={table}
         onAttachmentRemoved={(row: Table.ModelRow<R>, id: number) =>
           dispatch(

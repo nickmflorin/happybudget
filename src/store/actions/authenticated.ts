@@ -1,4 +1,4 @@
-import { createAction } from "@reduxjs/toolkit";
+import { redux } from "lib";
 
 const ActionTypes = {
   User: {
@@ -15,18 +15,18 @@ const ActionTypes = {
   }
 };
 
-export const updateLoggedInUserAction = createAction<Model.User>(ActionTypes.User.UpdateInState);
+export const updateLoggedInUserAction = redux.actions.createAction<Model.User>(ActionTypes.User.UpdateInState);
 
-export const removeContactFromStateAction = createAction<number>(ActionTypes.Contacts.RemoveFromState);
-export const updateContactInStateAction = createAction<Redux.UpdateActionPayload<Model.Contact>>(
+export const removeContactFromStateAction = redux.actions.createAction<number>(ActionTypes.Contacts.RemoveFromState);
+export const updateContactInStateAction = redux.actions.createAction<Redux.UpdateActionPayload<Model.Contact>>(
   ActionTypes.Contacts.UpdateInState
 );
-export const addContactToStateAction = createAction<Model.Contact>(ActionTypes.Contacts.AddToState);
-export const setContactsSearchAction = createAction<string>(ActionTypes.Contacts.SetSearch);
+export const addContactToStateAction = redux.actions.createAction<Model.Contact>(ActionTypes.Contacts.AddToState);
+export const setContactsSearchAction = redux.actions.createAction<string>(ActionTypes.Contacts.SetSearch);
 
-export const requestFilteredContactsAction = createAction<null>(ActionTypes.Contacts.RequestFiltered);
-export const loadingFilteredContactsAction = createAction<boolean>(ActionTypes.Contacts.LoadingFiltered);
-export const responseFilteredContactsAction = createAction<Http.ListResponse<Model.Contact>>(
+export const requestFilteredContactsAction = redux.actions.createAction<null>(ActionTypes.Contacts.RequestFiltered);
+export const loadingFilteredContactsAction = redux.actions.createAction<boolean>(ActionTypes.Contacts.LoadingFiltered);
+export const responseFilteredContactsAction = redux.actions.createAction<Http.ListResponse<Model.Contact>>(
   ActionTypes.Contacts.ResponseFiltered
 );
 

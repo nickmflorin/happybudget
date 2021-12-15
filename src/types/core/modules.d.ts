@@ -1,7 +1,6 @@
 declare namespace Modules {
   declare namespace Template {
     type AccountOrSubAccountStore<D extends Model.HttpModel> = {
-      readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<D>;
     };
 
@@ -14,7 +13,6 @@ declare namespace Modules {
     };
 
     interface Store {
-      readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<Model.Template>;
       readonly subaccount: SubAccountStore;
       readonly account: AccountStore;
@@ -29,7 +27,6 @@ declare namespace Modules {
     }
 
     type AccountOrSubAccountStore<D extends Model.HttpModel> = {
-      readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<D>;
     };
 
@@ -50,7 +47,6 @@ declare namespace Modules {
     };
 
     interface Store {
-      readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<Model.Budget>;
       readonly subaccount: SubAccountStore;
       readonly account: AccountStore;
@@ -72,7 +68,6 @@ declare namespace Modules {
 
   declare namespace Share {
     type AccountOrSubAccountStore<D extends Model.HttpModel> = {
-      readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<D>;
     };
 
@@ -85,7 +80,6 @@ declare namespace Modules {
     };
 
     interface Store {
-      readonly id: number | null;
       readonly detail: Redux.ModelDetailResponseStore<Model.Budget>;
       readonly subaccount: SubAccountStore;
       readonly account: AccountStore;

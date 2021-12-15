@@ -1,7 +1,6 @@
 import { redux } from "lib";
 
 export const initialSubAccountState: Modules.Share.SubAccountStore = {
-  id: null,
   detail: redux.initialState.initialDetailResponseState,
   table: {
     ...redux.initialState.initialTableState,
@@ -14,7 +13,6 @@ export const initialSubAccountState: Modules.Share.SubAccountStore = {
 };
 
 export const initialAccountState: Modules.Share.AccountStore = {
-  id: null,
   detail: redux.initialState.initialDetailResponseState,
   table: {
     ...redux.initialState.initialTableState,
@@ -27,7 +25,6 @@ export const initialAccountState: Modules.Share.AccountStore = {
 };
 
 const initialState: Modules.Share.Store = {
-  id: null,
   detail: redux.initialState.initialDetailResponseState,
   account: initialAccountState,
   subaccount: initialSubAccountState

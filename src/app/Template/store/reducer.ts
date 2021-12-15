@@ -8,16 +8,12 @@ import * as actions from "./actions";
 import initialState from "./initialState";
 
 const genericReducer = combineReducers({
-  id: redux.reducers.createSimplePayloadReducer<number | null>({
-    initialState: null,
-    actions: { set: actions.setTemplateIdAction }
-  }),
   detail: redux.reducers.createDetailResponseReducer<Model.Template>({
     initialState: redux.initialState.initialDetailResponseState,
     actions: {
-      loading: actions.loadingTemplateAction,
-      response: actions.responseTemplateAction,
-      updateInState: actions.updateTemplateInStateAction
+      loading: actions.loadingBudgetAction,
+      response: actions.responseBudgetAction,
+      updateInState: actions.updateBudgetInStateAction
     }
   }),
   accounts: budgeting.reducers.createAuthenticatedAccountsTableReducer({
@@ -26,8 +22,7 @@ const genericReducer = combineReducers({
       {
         action: actions.accounts.requestAction,
         payload: (p: Redux.TableRequestPayload) => !redux.typeguards.isListRequestIdsPayload(p)
-      },
-      actions.setTemplateIdAction
+      }
     ],
     actions: {
       tableChanged: actions.accounts.handleTableChangeEventAction,
@@ -49,7 +44,6 @@ const genericReducer = combineReducers({
     actions: {
       loading: actions.account.loadingAccountAction,
       response: actions.account.responseAccountAction,
-      setId: actions.account.setAccountIdAction,
       updateInState: actions.account.updateInStateAction
     },
     reducers: {
@@ -59,8 +53,7 @@ const genericReducer = combineReducers({
           {
             action: actions.account.requestAction,
             payload: (p: Redux.TableRequestPayload) => !redux.typeguards.isListRequestIdsPayload(p)
-          },
-          actions.account.setAccountIdAction
+          }
         ],
         actions: {
           tableChanged: actions.account.handleTableChangeEventAction,
@@ -97,7 +90,6 @@ const genericReducer = combineReducers({
   subaccount: budgeting.reducers.createSubAccountDetailReducer({
     initialState: initialState.subaccount,
     actions: {
-      setId: actions.subAccount.setSubAccountIdAction,
       loading: actions.subAccount.loadingSubAccountAction,
       response: actions.subAccount.responseSubAccountAction,
       updateInState: actions.subAccount.updateInStateAction
@@ -109,8 +101,7 @@ const genericReducer = combineReducers({
           {
             action: actions.subAccount.requestAction,
             payload: (p: Redux.TableRequestPayload) => !redux.typeguards.isListRequestIdsPayload(p)
-          },
-          actions.subAccount.setSubAccountIdAction
+          }
         ],
         actions: {
           tableChanged: actions.subAccount.handleTableChangeEventAction,

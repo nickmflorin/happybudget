@@ -1,7 +1,7 @@
 const ActionType = {
-  SetId: "share.SetId",
   Loading: "share.Loading",
   Response: "share.Response",
+  Request: "share.Request",
   Fringes: {
     Loading: "share.fringes.Loading",
     Response: "share.fringes.Response",
@@ -21,7 +21,6 @@ const ActionType = {
     Response: "share.subaccountunits.Response"
   },
   SubAccount: {
-    SetId: "share.subaccount.SetId",
     Loading: "share.subaccount.Loading",
     Response: "share.subaccount.Response",
     Request: "share.subaccount.Request",
@@ -33,7 +32,6 @@ const ActionType = {
     }
   },
   Account: {
-    SetId: "share.account.SetId",
     Loading: "share.account.Loading",
     Response: "share.account.Response",
     Request: "share.account.Request",

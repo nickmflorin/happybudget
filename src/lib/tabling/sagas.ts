@@ -1,6 +1,6 @@
 import { Saga, SagaIterator } from "redux-saga";
 import { spawn, take, call, cancel, actionChannel, delay, flush, fork } from "redux-saga/effects";
-import { isNil, map } from "lodash";
+import { isNil, map, isEqual } from "lodash";
 
 import { tabling } from "lib";
 
@@ -8,11 +8,10 @@ import { tabling } from "lib";
 export const createTableSaga = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  A extends Redux.TableActionMap<M> & { readonly request?: any } = Redux.TableActionMap<M> & {
-    readonly request?: any;
-  }
+  C = any,
+  A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
 >(
-  config: Table.SagaConfig<R, M, A>
+  config: Table.SagaConfig<R, M, C, A>
 ): Saga => {
   function* requestSaga(): SagaIterator {
     let lastTasks;
@@ -36,25 +35,33 @@ export const createTableSaga = <
 export const createUnauthenticatedTableSaga = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  A extends Redux.TableActionMap<M> & { readonly request?: any } = Redux.TableActionMap<M> & {
-    readonly request?: any;
-  }
+  C = any,
+  A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
 >(
-  config: Table.SagaConfig<R, M, A>
+  config: Table.SagaConfig<R, M, C, A>
 ): Saga => {
-  return createTableSaga<R, M, A>(config);
+  return createTableSaga<R, M, C, A>(config);
+};
+
+type Batch<
+  E extends Table.ChangeEvent<R, M>,
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C = any
+> = {
+  readonly events: E[];
+  // All of the events in a batch must have the same context.
+  readonly context: C;
 };
 
 /* eslint-disable indent */
 export const createAuthenticatedTableSaga = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  A extends Redux.AuthenticatedTableActionMap<R, M> & { readonly request?: any } = Redux.AuthenticatedTableActionMap<
-    R,
-    M
-  > & { readonly request?: any }
+  C = any,
+  A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
 >(
-  config: Table.SagaConfig<R, M, A>
+  config: Table.SagaConfig<R, M, C, A>
 ): Saga => {
   /**
    * Flushes events that are queued in the Action Channel by batching like,
@@ -68,46 +75,88 @@ export const createAuthenticatedTableSaga = <
    * Events: [A, A, A, B, A, A, B, B, C, B, C, A, A, B]
    * In Batches: [[A, A, A], [B], [A, A], [B, B], [C], [B], [C], [A, A], B]
    */
-  function* flushEvents(actions: Redux.Action<Table.ChangeEvent<R, M>>[]): SagaIterator {
-    const events: Table.ChangeEvent<R, M>[] = map(actions, (a: Redux.Action<Table.ChangeEvent<R, M>>) => a.payload);
+  function* flushEvents(actions: Redux.ActionWithContext<Table.ChangeEvent<R, M>, C>[]): SagaIterator {
+    const events: Table.ChangeEvent<R, M>[] = map(
+      actions,
+      (a: Redux.ActionWithContext<Table.ChangeEvent<R, M>, C>) => a.payload
+    );
+    const contexts: C[] = map(actions, (a: Redux.ActionWithContext<Table.ChangeEvent<R, M>, C>) => a.context);
 
-    function* flushDataBatch(batch: Table.DataChangeEvent<R>[]): SagaIterator {
-      if (batch.length !== 0) {
-        const event = tabling.events.consolidateDataChangeEvents(batch);
+    function* flushDataBatch(batch: Batch<Table.DataChangeEvent<R>, R, M, C>): SagaIterator {
+      if (batch.events.length !== 0) {
+        const event = tabling.events.consolidateDataChangeEvents(batch.events);
         if (!Array.isArray(event.payload) || event.payload.length !== 0) {
-          yield call(config.tasks.handleChangeEvent, event);
+          yield call(config.tasks.handleChangeEvent, event, batch.context);
         }
       }
     }
 
-    function* flushRowAddBatch(batch: Table.RowAddDataEvent<R>[]): SagaIterator {
-      if (batch.length !== 0) {
-        const event = tabling.events.consolidateRowAddEvents(batch);
+    function* flushRowAddBatch(batch: Batch<Table.RowAddDataEvent<R>, R, M, C>): SagaIterator {
+      if (batch.events.length !== 0) {
+        const event = tabling.events.consolidateRowAddEvents(batch.events);
         if (!Array.isArray(event.payload) || event.payload.length !== 0) {
-          yield call(config.tasks.handleChangeEvent, event);
+          yield call(config.tasks.handleChangeEvent, event, batch.context);
         }
       }
     }
 
-    let runningDataChangeBatch: Table.DataChangeEvent<R>[] = [];
-    let runningRowAddBatch: Table.RowAddDataEvent<R>[] = [];
+    let runningDataChangeBatch: Batch<Table.DataChangeEvent<R>, R, M, C> = {
+      events: [],
+      context: {} as C // Will be added when we encounter first event.
+    };
+    let runningRowAddBatch: Batch<Table.RowAddDataEvent<R>, R, M, C> = {
+      events: [],
+      context: {} as C // Will be added when we encounter first event.
+    };
+
+    const addEventToBatch = <E extends Table.DataChangeEvent<R> | Table.RowAddDataEvent<R>>(
+      batch: Batch<E, R, M, C>,
+      e: E,
+      c: C
+    ) => {
+      if (batch.events.length === 0) {
+        return { ...batch, events: [e], context: c };
+      } else {
+        if (!isEqual(c, batch.context)) {
+          throw new Error(
+            `Contexts for batched events of type ${e.type} are not equal! ${JSON.stringify(
+              batch.context
+            )} != ${JSON.stringify(c)}`
+          );
+        }
+        return { ...batch, events: [...batch.events, e] };
+      }
+    };
 
     for (let i = 0; i < events.length; i++) {
       const e = events[i];
+      const c = contexts[i];
       if (tabling.typeguards.isDataChangeEvent(e)) {
-        runningDataChangeBatch = [...runningDataChangeBatch, e];
+        runningDataChangeBatch = addEventToBatch(runningDataChangeBatch, e, c);
         yield fork(flushRowAddBatch, runningRowAddBatch);
-        runningRowAddBatch = [];
+        runningRowAddBatch = {
+          events: [],
+          context: {} as C
+        };
       } else if (tabling.typeguards.isRowAddEvent(e) && tabling.typeguards.isRowAddDataEvent(e)) {
-        runningRowAddBatch = [...runningRowAddBatch, e];
+        runningRowAddBatch = addEventToBatch(runningRowAddBatch, e, c);
         yield fork(flushDataBatch, runningDataChangeBatch);
-        runningDataChangeBatch = [];
+        runningDataChangeBatch = {
+          events: [],
+          context: {} as C
+        };
       } else {
         yield fork(flushDataBatch, runningDataChangeBatch);
-        runningDataChangeBatch = [];
+        runningDataChangeBatch = {
+          events: [],
+          context: {} as C
+        };
         yield fork(flushRowAddBatch, runningRowAddBatch);
-        runningRowAddBatch = [];
-        yield fork(config.tasks.handleChangeEvent, e);
+        runningRowAddBatch = {
+          events: [],
+          context: {} as C
+        };
+        yield fork(config.tasks.handleChangeEvent, e, c);
       }
     }
     // Cleanup leftover events at the end.
@@ -118,12 +167,12 @@ export const createAuthenticatedTableSaga = <
   function* tableChangeEventSaga(): SagaIterator {
     const changeChannel = yield actionChannel(config.actions.tableChanged.toString());
     while (true) {
-      const action = yield take(changeChannel);
+      const action: Redux.ActionWithContext<Table.ChangeEvent<R, M>, C> = yield take(changeChannel);
       const e: Table.ChangeEvent<R, M> = action.payload;
 
       if (tabling.typeguards.isDataChangeEvent(e)) {
         yield delay(200);
-        const actions: Redux.Action<Table.ChangeEvent<R, M>>[] = yield flush(changeChannel);
+        const actions: Redux.ActionWithContext<Table.ChangeEvent<R, M>, C>[] = yield flush(changeChannel);
         yield call(flushEvents, [action, ...actions]);
       } else if (
         /* We do not want to buffer RowAdd events if the row is being added either
@@ -136,15 +185,15 @@ export const createAuthenticatedTableSaga = <
 					 to update other cell values as it submits a separate DataChangeEvent
 					 for every new cell value. */
         yield delay(500);
-        const actions: Redux.Action<Table.ChangeEvent<R, M>>[] = yield flush(changeChannel);
+        const actions: Redux.ActionWithContext<Table.ChangeEvent<R, M>, C>[] = yield flush(changeChannel);
         yield call(flushEvents, [action, ...actions]);
       } else {
-        yield call(config.tasks.handleChangeEvent, e);
+        yield call(config.tasks.handleChangeEvent, e, action.context);
       }
     }
   }
 
-  const baseTableSaga = createTableSaga<R, M, A>(config);
+  const baseTableSaga = createTableSaga<R, M, C, A>(config);
 
   function* rootSaga(): SagaIterator {
     yield spawn(baseTableSaga);

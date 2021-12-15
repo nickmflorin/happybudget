@@ -8,7 +8,7 @@ declare namespace Tables {
   interface AccountRowData extends BudgetRowData {}
 
   type AccountRow = Table.ModelRow<AccountRowData>;
-
+  type AccountTableContext = { readonly budgetId: number };
   type AccountTableStore = Redux.BudgetTableStore<AccountRowData>;
 
   interface SubAccountRowData
@@ -21,14 +21,14 @@ declare namespace Tables {
   }
 
   type SubAccountRow = Table.ModelRow<SubAccountRowData>;
-
+  type SubAccountTableContext = { readonly id: number; readonly budgetId: number };
   type SubAccountTableStore = Redux.BudgetTableStore<SubAccountRowData> & {
     readonly fringes: FringeTableStore;
     readonly subaccountUnits: Model.Tag[];
   };
 
   type FringeRowData = Pick<Model.Fringe, "color" | "name" | "description" | "cutoff" | "rate" | "unit">;
-
+  type FringeTableContext = { readonly id: number; readonly budgetId: number };
   type FringeRow = Table.ModelRow<FringeRowData>;
   type FringeTableStore = Redux.TableStore<FringeRowData> & {
     readonly fringeColors: string[];
@@ -49,7 +49,7 @@ declare namespace Tables {
   >;
 
   type ActualRow = Table.ModelRow<ActualRowData>;
-
+  type ActualTableContext = { readonly budgetId: number };
   type ActualTableStore = Redux.TableStore<ActualRowData> & {
     readonly owners: Redux.AuthenticatedModelListResponseStore<Model.ActualOwner>;
     readonly types: Model.Tag[];
@@ -70,7 +70,7 @@ declare namespace Tables {
   >;
 
   type ContactRow = Table.ModelRow<ContactRowData>;
-
+  type ContactTableContext = {};
   type ContactTableStore = Redux.TableStore<ContactRowData>;
 }
 
