@@ -7,6 +7,8 @@ import { actions } from "../../store";
 import BudgetTotal from "./BudgetTotal";
 import ActualsByDate from "./ActualsByDate";
 
+import "./index.scss";
+
 interface AnalysisProps {
   readonly budget: Model.Budget | null;
   readonly budgetId: number;
@@ -21,9 +23,11 @@ const Analysis = ({ budget, budgetId }: AnalysisProps): JSX.Element => {
 
   return (
     <AnalysisPage budget={budget}>
-      <div style={{ display: "flex" }}>
-        <BudgetTotal budget={budget} style={{ width: "50%" }} />
-        <ActualsByDate style={{ marginLeft: 15, width: "50%" }} />
+      <div style={{ overflowY: "scroll" }}>
+        <div className={"analysis-charts"}>
+          <BudgetTotal className={"analysis-chart"} budget={budget} />
+          <ActualsByDate className={"analysis-chart"} />
+        </div>
       </div>
     </AnalysisPage>
   );

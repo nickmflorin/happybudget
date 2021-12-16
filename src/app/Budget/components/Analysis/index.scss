@@ -1,0 +1,15 @@
+@import "style/_imports";
+
+.analysis-charts {
+  display: grid;
+  grid-template-columns: repeat (1fr);
+  grid-gap: 15px;
+
+  @include media(">=xl") {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .analysis-chart {
+    min-width: 50%;
+  }
+}
