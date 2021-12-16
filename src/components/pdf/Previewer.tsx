@@ -6,6 +6,7 @@ import { debounce, isNil } from "lodash";
 import { Pagination } from "antd";
 
 import { util, hooks } from "lib";
+import { registerFonts } from "style/pdf";
 
 import { Button } from "components/buttons";
 import { RenderDocument } from "./primitive";
@@ -24,14 +25,18 @@ export interface PreviewerProps {
 
 const generateFile = async (component: JSX.Element): Promise<string | ArrayBuffer> =>
   new Promise<ArrayBuffer | string>((resolve, reject) => {
-    PDF(component)
-      .toBlob()
-      .then((blb: Blob) => {
-        util.files
-          .getDataFromBlob(blb)
-          .then((result: ArrayBuffer | string) => resolve(result))
-          .catch((e: Error) => reject(e));
-      })
+    registerFonts()
+      .then(() =>
+        PDF(component)
+          .toBlob()
+          .then((blb: Blob) => {
+            util.files
+              .getDataFromBlob(blb)
+              .then((result: ArrayBuffer | string) => resolve(result))
+              .catch((e: Error) => reject(e));
+          })
+          .catch((e: Error) => reject(e))
+      )
       .catch((e: Error) => reject(e));
   });
 

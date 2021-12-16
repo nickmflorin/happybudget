@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { registerFonts } from "style/pdf";
+import React from "react";
 import classNames from "classnames";
 
 import { Modal } from "components";
@@ -23,13 +22,6 @@ const PreviewModal = ({
   children,
   ...props
 }: PreviewModalProps): JSX.Element => {
-  useEffect(() => {
-    const register = async () => await registerFonts();
-    if (visible === true) {
-      register();
-    }
-  }, [visible]);
-
   return (
     <Modal
       className={classNames("export-preview-modal", className)}
@@ -46,4 +38,4 @@ const PreviewModal = ({
   );
 };
 
-export default PreviewModal;
+export default React.memo(PreviewModal);
