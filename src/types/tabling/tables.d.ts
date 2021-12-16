@@ -91,3 +91,11 @@ declare namespace PdfBudgetTable {
     readonly includeNotes: boolean;
   };
 }
+
+declare namespace PdfActualsTable {
+  type Options = {
+    readonly header: Pdf.HTMLNode[];
+    readonly columns: string[];
+    readonly excludeZeroTotals: boolean;
+  };
+}

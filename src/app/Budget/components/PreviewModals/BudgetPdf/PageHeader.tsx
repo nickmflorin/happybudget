@@ -86,11 +86,9 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
 
   return (
     <View className={"page-header"}>
-      {!isNil(props.header.header) && (
-        <View className={"page-primary-header"}>
-          <RichText nodes={props.header.header} />
-        </View>
-      )}
+      <View className={"page-primary-header"}>
+        <RichText nodes={props.header.header} />
+      </View>
       {(!isNil(subHeaderLeft) || !isNil(subHeaderRight)) && (
         <View className={"budget-page-sub-header"}>
           {!isNil(subHeaderLeft) && (

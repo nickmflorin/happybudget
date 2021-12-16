@@ -4,7 +4,7 @@ import { isNil, map, filter } from "lodash";
 import classNames from "classnames";
 
 import * as api from "api";
-import { ui, tabling } from "lib";
+import { ui, tabling, pdf } from "lib";
 
 import { selectors } from "store";
 
@@ -20,18 +20,19 @@ type C = Table.Column<R, M>;
 
 const ActualColumns = filter(ActualsTable.Columns, (c: C) => c.includeInPdf !== false) as C[];
 
-const DEFAULT_OPTIONS: ExportPdfFormOptions = {
+const DEFAULT_OPTIONS: ExportActualsPdfFormOptions = {
   excludeZeroTotals: false,
   columns: filter(
     map(ActualColumns, (column: C) => tabling.columns.normalizedField<R, M>(column)),
     (field: string | undefined) => !isNil(field)
-  ) as string[]
+  ) as string[],
+  header: `<h2>Sample Title ${new Date().getFullYear()}</h2><p>Sample Subtitle</p>`
 };
 
 interface ActualsPdfFuncProps {
   readonly actuals: M[];
   readonly contacts: Model.Contact[];
-  readonly options: ExportPdfFormOptions;
+  readonly options: PdfActualsTable.Options;
   readonly budget: Model.Budget;
 }
 
@@ -56,12 +57,28 @@ const ActualsPreviewModal = ({
 
   const contacts = useSelector(selectors.selectContacts);
 
-  const [options, setOptions] = useState<ExportPdfFormOptions>(DEFAULT_OPTIONS);
+  const [options, setOptions] = useState<ExportActualsPdfFormOptions>(DEFAULT_OPTIONS);
   const [actuals, setActuals] = useState<M[] | null>(null);
   const [loadingData, setLoadingData] = useState(false);
 
-  const form = ui.hooks.useForm<ExportPdfFormOptions>({ isInModal: true });
+  const form = ui.hooks.useForm<ExportActualsPdfFormOptions>({ isInModal: true });
   const modal = ui.hooks.useModal();
+
+  const convertOptions = useMemo(
+    () =>
+      (opts: ExportActualsPdfFormOptions): PdfActualsTable.Options => ({
+        ...opts,
+        header: pdf.parsers.convertHtmlIntoNodes(opts.header || "") || []
+      }),
+    []
+  );
+
+  useEffect(() => {
+    setOptions({
+      ...DEFAULT_OPTIONS,
+      header: `<h2>${budget.name}</h2><p>Actuals Summary</p>`
+    });
+  }, [budget.name]);
 
   useEffect(() => {
     if (props.open === true) {
@@ -73,7 +90,7 @@ const ActualsPreviewModal = ({
             budget,
             contacts,
             actuals: response.data,
-            options
+            options: convertOptions(options)
           });
           previewer.current?.render(pdfComponent);
         }) /* TODO: We should probably display the error in the modal and not let
@@ -91,7 +108,7 @@ const ActualsPreviewModal = ({
           budget,
           contacts,
           actuals,
-          options
+          options: convertOptions(options)
         });
       }
     },
@@ -111,9 +128,13 @@ const ActualsPreviewModal = ({
     >
       <ExportActualsPdfForm
         form={form}
-        initialValues={DEFAULT_OPTIONS}
+        initialValues={{
+          ...DEFAULT_OPTIONS,
+          header: `<h2>${budget.name}</h2><p>Actuals Summary</p>`
+        }}
+        disabled={isNil(actuals)}
         columns={ActualColumns}
-        onValuesChange={(changedValues: Partial<ExportPdfFormOptions>, values: ExportPdfFormOptions) => {
+        onValuesChange={(changedValues: Partial<ExportActualsPdfFormOptions>, values: ExportActualsPdfFormOptions) => {
           setOptions(values);
           previewer.current?.refreshRequired();
         }}

@@ -1,14 +1,14 @@
-import { View, Heading } from "components/pdf";
+import { View, RichText } from "components/pdf";
 
 interface PageHeaderProps {
-  readonly header: string;
+  readonly header: PdfActualsTable.Options["header"];
 }
 
 const PageHeader = (props: PageHeaderProps): JSX.Element => {
   return (
     <View className={"page-header"}>
       <View className={"page-primary-header"}>
-        <Heading level={2}>{props.header}</Heading>
+        <RichText nodes={props.header} />
       </View>
     </View>
   );

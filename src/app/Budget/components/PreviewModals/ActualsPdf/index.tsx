@@ -18,7 +18,7 @@ interface ActualsPdfProps {
   readonly budget: Model.Budget;
   readonly actuals: Model.Actual[];
   readonly contacts: Model.Contact[];
-  readonly options: ExportPdfFormOptions;
+  readonly options: PdfActualsTable.Options;
 }
 
 const ActualColumns = filter(GenericActualsTable.Columns, (c: C) => c.includeInPdf !== false) as C[];
@@ -81,7 +81,7 @@ const ActualsPdf = ({ budget, actuals, contacts, options }: ActualsPdfProps): JS
 
   return (
     <Document>
-      <Page header={<PageHeader header={budget.name} />}>
+      <Page header={<PageHeader header={options.header} />}>
         <ActualsTable data={filteredActuals} columns={actualColumns} options={options} />
       </Page>
     </Document>

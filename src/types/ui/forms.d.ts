@@ -50,3 +50,7 @@ declare type ExportBudgetPdfFormOptions = ExportPdfFormOptions & {
   readonly notes?: string | null;
   readonly includeNotes: boolean;
 };
+
+declare type ExportActualsPdfFormOptions = ExportPdfFormOptions & {
+  readonly header: string | null;
+};
