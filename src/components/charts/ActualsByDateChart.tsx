@@ -17,6 +17,7 @@ const ActualsByDateChart = <D extends Charts.Datum = Charts.Datum>(props: Budget
     <ResponsiveBar<D>
       data={props.data}
       margin={{ top: 20, right: 10, bottom: 22, left: 40 }}
+      padding={0.8}
       colors={{ datum: "data.color" }}
       borderWidth={1}
       borderRadius={6}
