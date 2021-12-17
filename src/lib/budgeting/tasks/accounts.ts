@@ -196,7 +196,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       const effects: (StrictEffect | null)[] = map(changes, (ch: Table.RowChange<R, Table.MarkupRowId>) => {
         const payload = tabling.http.patchPayload<R, Http.MarkupPayload, C>(
           ch,
-          config.table.current?.getColumns() || []
+          tabling.columns.getColumnsFromRef(config.table) || []
         );
         if (!isNil(payload)) {
           return api.request(api.updateMarkup, tabling.managers.markupId(ch.id), payload);
@@ -332,7 +332,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         const response: C = yield api.request(config.services.create, context.budgetId, {
           previous: e.payload.previous,
           group: isNil(e.payload.group) ? null : tabling.managers.groupId(e.payload.group),
-          ...tabling.http.postPayload(e.payload.data, config.table.current?.getColumns() || [])
+          ...tabling.http.postPayload(e.payload.data, tabling.columns.getColumnsFromRef(config.table) || [])
         });
         /* The Group is not attributed to the Model in a detail response, so
 					 if the group did change we have to use the value from the event
@@ -402,11 +402,12 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       const dataChanges: Table.RowChange<R, Table.ModelRowId>[] = filter(merged, (value: Table.RowChange<R>) =>
         tabling.typeguards.isModelRowId(value.id)
       ) as Table.RowChange<R, Table.ModelRowId>[];
+
       yield fork(updateMarkupTask, markupChanges);
       if (dataChanges.length !== 0) {
         const requestPayload = tabling.http.createBulkUpdatePayload<R, P, C>(
           dataChanges,
-          config.table.current?.getColumns() || []
+          tabling.columns.getColumnsFromRef(config.table) || []
         );
         if (requestPayload.data.length !== 0) {
           yield fork(bulkUpdateTask, context.budgetId, requestPayload, "There was an error updating the rows.");

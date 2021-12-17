@@ -238,7 +238,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     try {
       const response: M = yield api.request(config.services.create, context.budgetId, {
         previous: e.payload.previous,
-        ...tabling.http.postPayload(e.payload.data, config.table.current?.getColumns() || [])
+        ...tabling.http.postPayload(e.payload.data, tabling.columns.getColumnsFromRef(config.table) || [])
       });
       yield put(
         config.actions.tableChanged(
@@ -301,7 +301,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     if (merged.length !== 0) {
       const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(
         merged,
-        config.table.current?.getColumns() || []
+        tabling.columns.getColumnsFromRef(config.table) || []
       );
       if (requestPayload.data.length !== 0) {
         yield fork(bulkUpdateTask, e, requestPayload, context, "There was an error updating the rows.");

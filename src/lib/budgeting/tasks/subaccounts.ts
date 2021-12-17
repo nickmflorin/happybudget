@@ -242,7 +242,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       const effects: (StrictEffect | null)[] = map(changes, (ch: Table.RowChange<R, Table.MarkupRowId>) => {
         const payload = tabling.http.patchPayload<R, Http.MarkupPayload, C>(
           ch,
-          config.table.current?.getColumns() || []
+          tabling.columns.getColumnsFromRef(config.table) || []
         );
         if (!isNil(payload)) {
           return api.request(api.updateMarkup, tabling.managers.markupId(ch.id), payload);
@@ -330,7 +330,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         const response: C = yield api.request(config.services.create, context.id, {
           previous: e.payload.previous,
           group: isNil(e.payload.group) ? null : tabling.managers.groupId(e.payload.group),
-          ...tabling.http.postPayload(e.payload.data, config.table.current?.getColumns() || [])
+          ...tabling.http.postPayload(e.payload.data, tabling.columns.getColumnsFromRef(config.table) || [])
         });
         /* The Group is not attributed to the Model in a detail response, so
 					 if the group did change we have to use the value from the event
@@ -441,7 +441,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       if (dataChanges.length !== 0) {
         const requestPayload = tabling.http.createBulkUpdatePayload<R, P, C>(
           dataChanges,
-          config.table.current?.getColumns() || []
+          tabling.columns.getColumnsFromRef(config.table) || []
         );
         if (requestPayload.data.length !== 0) {
           yield call(bulkUpdateTask, context.id, requestPayload, "There was an error updating the rows.");
