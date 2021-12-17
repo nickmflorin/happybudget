@@ -11,7 +11,7 @@ const Columns: Table.Column<R, M>[] = [
     field: "name",
     headerName: "Description",
     minWidth: 200,
-    pdfWidth: 0.12,
+    pdfFlexGrow: true,
     flex: 2,
     columnType: "longText",
     pdfFooter: { value: "Grand Total" }
@@ -19,7 +19,7 @@ const Columns: Table.Column<R, M>[] = [
   columns.SelectColumn({
     field: "contact",
     headerName: "Contact",
-    pdfWidth: 0.18,
+    pdfWidth: 0.1,
     width: 120,
     minWidth: 120,
     cellRenderer: { data: "ContactCell" },
@@ -29,7 +29,7 @@ const Columns: Table.Column<R, M>[] = [
   columns.BodyColumn<R, M>({
     field: "date",
     headerName: "Date",
-    pdfWidth: 0.18,
+    pdfWidth: 0.1,
     width: 100,
     minWidth: 100,
     flex: 1,
@@ -48,7 +48,7 @@ const Columns: Table.Column<R, M>[] = [
   columns.TagSelectColumn({
     field: "actual_type",
     headerName: "Type",
-    pdfWidth: 0.18,
+    pdfWidth: 0.1,
     cellRenderer: { data: "ActualTypeCell" },
     cellEditor: "ActualTypeEditor",
     width: 140,
@@ -80,7 +80,7 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "Sub-Account",
     minWidth: 200,
     width: 200,
-    pdfWidth: 0.18,
+    pdfWidth: 0.1,
     getHttpValue: (
       value: Model.SimpleSubAccount | Model.SimpleMarkup | null
     ): Model.GenericHttpModel<"markup"> | Model.GenericHttpModel<"subaccount"> | null => {
@@ -126,9 +126,9 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "Notes",
     width: 100,
     minWidth: 100,
+    pdfWidth: 0.13,
     flex: 1,
-    columnType: "longText",
-    includeInPdf: false
+    columnType: "longText"
   })
 ];
 

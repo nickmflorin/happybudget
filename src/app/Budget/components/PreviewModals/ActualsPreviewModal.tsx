@@ -13,7 +13,6 @@ import { PreviewModal } from "components/modals";
 import { ActualsTable } from "tabling";
 
 import ActualsPdf from "./ActualsPdf";
-import "./ActualsPreviewModal.scss";
 
 type M = Model.Actual;
 type R = Tables.ActualRowData;
