@@ -31,6 +31,7 @@ const ExportActualsPdfForm = (
       autoFocusField={false}
       condensed={true}
       className={classNames("export-form", props.className)}
+      layout={"vertical"}
     >
       <Form.ItemSection
         label={"Table Options"}
