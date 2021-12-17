@@ -9,6 +9,8 @@ import { DropDownProps as AntdDropdownProps } from "antd/lib/dropdown";
 import { util } from "lib";
 
 export interface DropdownProps extends Omit<AntdDropdownProps, "overlay" | "visible"> {
+  readonly visible?: boolean;
+  readonly setVisible?: (visible: boolean) => void;
   readonly overlayId?: string;
   readonly onClickAway?: (e: MouseEvent | TouchEvent) => void;
   readonly children: React.ReactChild | React.ReactChild[];
@@ -16,19 +18,37 @@ export interface DropdownProps extends Omit<AntdDropdownProps, "overlay" | "visi
   readonly dropdown?: NonNullRef<IDropdownRef>;
 }
 
-const Dropdown = ({ onClickAway, children, overlay, overlayId, dropdown, ...props }: DropdownProps): JSX.Element => {
-  const [visible, setVisible] = useState(false);
+const Dropdown = ({
+  onClickAway,
+  setVisible,
+  visible,
+  children,
+  overlay,
+  overlayId,
+  dropdown,
+  ...props
+}: DropdownProps): JSX.Element => {
+  const [_visible, _setVisible] = useState(false);
   const _overlayId = useMemo(() => (!isNil(overlayId) ? overlayId : uniqueId("dropdown-overlay-")), [overlayId]);
   const buttonId = useMemo(() => uniqueId("dropdown-button-"), []);
 
+  const isVisible = useMemo(() => (visible !== undefined ? visible : _visible), [visible, _visible]);
+  const setIsVisible = useMemo(
+    () => (v: boolean) => {
+      _setVisible(v);
+      setVisible?.(v);
+    },
+    [setVisible]
+  );
+
   useImperativeHandle(dropdown, () => ({
-    setVisible
+    setVisible: _setVisible
   }));
 
   return (
     <AntdDropdown
       {...props}
-      visible={visible}
+      visible={isVisible}
       className={classNames("dropdown", props.className)}
       trigger={props.trigger || ["click"]}
       overlay={
@@ -52,7 +72,7 @@ const Dropdown = ({ onClickAway, children, overlay, overlayId, dropdown, ...prop
                button will also trigger the ClickAway, so we need to avoid it. */
             const button = document.getElementById(buttonId);
             if (!isNil(button) && !util.html.isNodeDescendantOf(button, e.target as Element | HTMLElement)) {
-              setVisible(false);
+              setIsVisible(false);
               onClickAway?.(e);
             }
           }}
@@ -68,7 +88,7 @@ const Dropdown = ({ onClickAway, children, overlay, overlayId, dropdown, ...prop
       }
     >
       {React.Children.only(children) && React.isValidElement(children)
-        ? React.cloneElement(children, { id: buttonId, onClick: () => setVisible(!visible) })
+        ? React.cloneElement(children, { id: buttonId, onClick: () => setIsVisible(!visible) })
         : children}
     </AntdDropdown>
   );

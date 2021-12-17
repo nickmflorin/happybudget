@@ -496,7 +496,7 @@ const Menu = <S extends object = MenuItemSelectedState, M extends MenuItemModel<
                   model={item.model}
                   menuId={props.id}
                   state={getItemState(item.model, selected)}
-                  renderContent={props.renderItemContent}
+                  renderContent={props.renderItemContent || item.model.renderContent}
                   iconAfterLabel={props.itemIconAfterLabel}
                   focused={menuState.focusedIndex === indexMap[getModelIdentifier(item.model)]}
                   checkbox={props.checkbox}

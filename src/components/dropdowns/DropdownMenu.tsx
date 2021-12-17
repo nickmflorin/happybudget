@@ -30,7 +30,6 @@ const DropdownMenu = <S extends object = MenuItemSelectedState, M extends MenuIt
 
   const _menuId = useMemo(() => (!isNil(menuId) ? menuId : uniqueId("dropdown-menu-")), [menuId]);
   const menu = ui.hooks.useMenuIfNotDefined<S, M>(props.menu);
-  const dropdownRef = ui.hooks.useDropdownIfNotDefined(dropdown);
 
   useEffect(() => {
     const keyListener = (e: KeyboardEvent) => {
@@ -50,10 +49,11 @@ const DropdownMenu = <S extends object = MenuItemSelectedState, M extends MenuIt
 
   return (
     <Dropdown
-      dropdown={dropdownRef}
       className={className}
       overlayId={_menuId}
       placement={placement}
+      visible={visible}
+      setVisible={setVisible}
       overlay={
         <Menu<S, M>
           {...props}
@@ -61,7 +61,7 @@ const DropdownMenu = <S extends object = MenuItemSelectedState, M extends MenuIt
           id={_menuId}
           className={menuClassName}
           style={menuStyle}
-          closeParentDropdown={() => dropdownRef.current.setVisible(false)}
+          closeParentDropdown={() => setVisible(false)}
         />
       }
     >

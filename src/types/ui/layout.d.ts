@@ -13,7 +13,7 @@ declare interface IBreadCrumbItem extends Omit<MenuItemModel, "render"> {
   readonly tooltip?: Tooltip;
   readonly options?: MenuItemModel[];
   readonly primary?: boolean;
-  readonly render?: () => React.ReactChild;
+  readonly renderContent?: () => React.ReactChild;
 }
 
 declare interface ISidebarItem {

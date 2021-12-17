@@ -61,8 +61,8 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
   const renderItem = (i: IBreadCrumbItem) => {
     if (!isNil(i.label)) {
       return i.label;
-    } else if (!isNil(i.render)) {
-      return i.render();
+    } else if (!isNil(i.renderContent)) {
+      return i.renderContent();
     }
     return <></>;
   };
@@ -70,8 +70,8 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
   const renderDropdownButton = (i: IBreadCrumbItem): React.ReactChild => {
     if (!isNil(i.label)) {
       return <Button>{i.label}</Button>;
-    } else if (!isNil(i.render)) {
-      return i.render();
+    } else if (!isNil(i.renderContent)) {
+      return i.renderContent();
     }
     return <></>;
   };

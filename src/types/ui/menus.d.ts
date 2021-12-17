@@ -54,6 +54,7 @@ declare type MenuItemModel<S extends object = MenuItemSelectedState> = Model.Mod
   readonly visible?: boolean;
   readonly disabled?: boolean;
   readonly keepDropdownOpenOnClick?: boolean;
+  readonly renderContent?: () => JSX.Element;
   readonly onClick?: (e: MenuItemModelClickEvent<S>) => void;
 };
 

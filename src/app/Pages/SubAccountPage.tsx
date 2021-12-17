@@ -49,14 +49,14 @@ const SubAccountPage = <B extends Model.Budget | Model.Template>({
                   ...map(ancestors, (ancestor: Model.SimpleAccount | Model.SimpleSubAccount) => {
                     return {
                       id: ancestor.id,
-                      render: () => <EntityText fillEmpty={"---------"}>{ancestor}</EntityText>,
+                      renderContent: () => <EntityText fillEmpty={"---------"}>{ancestor}</EntityText>,
                       url: budgeting.urls.getUrl(b, ancestor)
                     };
                   }),
                   {
                     id: subaccount.id,
                     url: budgeting.urls.getUrl(b, subaccount),
-                    render: () => {
+                    renderContent: () => {
                       if (siblings.length !== 0) {
                         return <EntityTextButton fillEmpty={"---------"}>{subaccount}</EntityTextButton>;
                       }
@@ -65,7 +65,7 @@ const SubAccountPage = <B extends Model.Budget | Model.Template>({
                     options: map(siblings, (option: Model.SimpleSubAccount) => ({
                       id: option.id,
                       url: budgeting.urls.getUrl(b, option),
-                      render: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
+                      renderContent: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
                     }))
                   }
                 ];

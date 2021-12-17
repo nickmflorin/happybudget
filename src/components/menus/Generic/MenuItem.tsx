@@ -35,10 +35,15 @@ const PrivateCommonMenuItem = <S extends object = MenuItemSelectedState, M exten
             history.push(props.model.url);
           }
           props.onClick?.(e);
+          // First, check if the model itself overrides the dropdown visibility.
           if (props.model.keepDropdownOpenOnClick !== undefined) {
-            props.model.keepDropdownOpenOnClick !== true && props.closeParentDropdown?.();
-          } else if (props.keepDropdownOpenOnClick !== undefined) {
-            props.keepDropdownOpenOnClick !== true && props.closeParentDropdown?.();
+            if (props.model.keepDropdownOpenOnClick !== true) {
+              props.closeParentDropdown?.();
+            }
+          } else {
+            if (props.keepDropdownOpenOnClick !== false) {
+              props.closeParentDropdown?.();
+            }
           }
         }
       }}

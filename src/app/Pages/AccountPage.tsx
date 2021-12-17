@@ -45,7 +45,7 @@ const AccountPage = <B extends Model.Budget | Model.Template>({
                   id: account.id,
                   primary: true,
                   url: budgeting.urls.getUrl(b, account),
-                  render: () => {
+                  renderContent: () => {
                     if (siblings.length !== 0) {
                       return <EntityTextButton fillEmpty={"---------"}>{account}</EntityTextButton>;
                     }
@@ -54,7 +54,7 @@ const AccountPage = <B extends Model.Budget | Model.Template>({
                   options: map(siblings, (option: Model.SimpleAccount) => ({
                     id: option.id,
                     url: budgeting.urls.getUrl(b, option),
-                    render: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
+                    renderContent: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
                   }))
                 };
               }
