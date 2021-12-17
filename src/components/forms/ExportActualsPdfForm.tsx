@@ -10,12 +10,10 @@ import { ColumnSelect } from "components/fields";
 interface ExportActualsPdfFormProps extends FormProps<ExportPdfFormOptions> {
   readonly disabled?: boolean;
   readonly columns: Table.Column<Tables.ActualRowData, Model.Actual>[];
-  readonly actuals: Model.Actual[];
-  readonly actualsLoading?: boolean;
 }
 
 const ExportActualsPdfForm = (
-  { actualsLoading, actuals, disabled, columns, ...props }: ExportActualsPdfFormProps,
+  { disabled, columns, ...props }: ExportActualsPdfFormProps,
   ref: ForwardedRef<IExportFormRef>
 ): JSX.Element => {
   useImperativeHandle(ref, () => ({

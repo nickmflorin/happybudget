@@ -120,8 +120,6 @@ const ActualsPreviewModal = ({
       <ExportActualsPdfForm
         form={form}
         initialValues={DEFAULT_OPTIONS}
-        actuals={actuals || []}
-        actualsLoading={loadingData}
         disabled={isNil(actuals)}
         columns={ActualColumns}
         onValuesChange={(changedValues: Partial<ExportPdfFormOptions>, values: ExportPdfFormOptions) => {
