@@ -42,6 +42,7 @@ const ActualsByDateChart = <D extends Charts.Datum = Charts.Datum>(props: Budget
           />
         );
       }}
+      enableLabel={false}
     />
   );
 };
