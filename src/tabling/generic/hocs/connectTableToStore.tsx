@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useStore, useSelector, useDispatch } from "react-redux";
 import hoistNonReactStatics from "hoist-non-react-statics";
 import { isNil } from "lodash";
@@ -71,6 +71,7 @@ const connectTableToStore =
       const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
 
       const [ready, setReady] = useState(false);
+      const sagaInjected = useRef<boolean>(false);
 
       const dispatch = useDispatch();
 
@@ -87,31 +88,34 @@ const connectTableToStore =
         }
       }, []);
 
+      /* It is extremely important that the ONLY dependency to this Saga is
+				 the `tableId` - if additional dependencies are added, it can lead to
+				 multiple Sagas being created for a given table... which means every
+				 action will make multiple requests to the backend API. */
       useEffect(() => {
-        /* It is extremely important that the ONLY dependency to this Saga is
-           the `tableId` - if additional dependencies are added, it can lead to
-           multiple Sagas being created for a given table... which means every
-           action will make multiple requests to the backend API. */
         if (!isNil(config.createSaga)) {
-          const saga = config.createSaga(table);
-          const wasInjected = store.injectSaga(`${props.tableId}-saga`, saga);
-          if (wasInjected === true) {
-            config.onSagaConnected(dispatch, props.actionContext);
-          } else {
-            if (!isNil(config.onSagaReconnected)) {
-              config.onSagaReconnected(dispatch, props.actionContext);
-            } else {
+          if (sagaInjected.current === false) {
+            if (!store.hasSaga(`${props.tableId}-saga`)) {
+              const saga = config.createSaga(table.current);
+              store.injectSaga(`${props.tableId}-saga`, saga);
               config.onSagaConnected(dispatch, props.actionContext);
+            } else {
+              if (!isNil(config.onSagaReconnected)) {
+                config.onSagaReconnected(dispatch, props.actionContext);
+              } else {
+                config.onSagaConnected(dispatch, props.actionContext);
+              }
             }
+            sagaInjected.current = true;
+            setReady(true);
+            return () => {
+              store.ejectSaga(`${props.tableId}-saga`);
+            };
           }
-          setReady(true);
-          return () => {
-            store.ejectSaga(`${props.tableId}-saga`);
-          };
         } else {
           setReady(true);
         }
-      }, [props.tableId]);
+      }, [props.tableId, table.current]);
 
       return (
         <Component

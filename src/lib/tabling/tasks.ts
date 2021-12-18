@@ -37,7 +37,7 @@ type CreateBulkTaskConfig<
   RSP,
   ARGS extends any[]
 > = {
-  readonly table: PotentiallyNullRef<Table.TableInstance<R, M>>;
+  readonly table: Table.TableInstance<R, M>;
   readonly loadingActions: Redux.ActionCreator<boolean>[];
   readonly responseActions: (r: RSP, e: Table.RowAddEvent<R>) => Redux.Action<any>[];
   readonly selectStore: (state: Application.Authenticated.Store) => S;
@@ -63,7 +63,7 @@ export const createBulkTask = <
 
     let data: Partial<R>[];
     if (tabling.typeguards.isRowAddCountPayload(payload) || tabling.typeguards.isRowAddIndexPayload(payload)) {
-      data = tabling.patterns.generateNewRowData({ store, ...payload }, config.table.current?.getColumns() || []);
+      data = tabling.patterns.generateNewRowData({ store, ...payload }, config.table.getColumns());
     } else {
       data = payload;
     }
@@ -80,7 +80,7 @@ export const createBulkTask = <
     }
     const requestPayload: Http.BulkCreatePayload<P> = tabling.http.createBulkCreatePayload<R, P, M>(
       data,
-      config.table.current?.getColumns() || []
+      config.table.getColumns()
     );
     yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean>) => put(action(true))));
     try {

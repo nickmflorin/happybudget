@@ -20,10 +20,7 @@ export const InitialTableRef: Table.TableInstance<any, any> = {
     );
   },
   removeNotification: () => {},
-  getColumns: () => {
-    console.warn("Cannot retrieve table columns yet because table ref has not been attached yet!");
-    return [];
-  },
+  getColumns: () => [],
   getFocusedRow: () => null,
   getRow: () => null,
   getRows: () => [],

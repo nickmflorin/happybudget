@@ -32,31 +32,6 @@ export const getColumn = <R extends Table.RowData, M extends Model.RowHttpModel>
   }
 };
 
-export const getColumnsFromRef = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  ref: PotentiallyNullRef<Table.TableInstance<R, M>>
-): Table.Column<R, M>[] => {
-  /* There is a brief period of time between when the page with the table is
-		 initially rendered and when the table instance ref (Table.TableInstance)
-		 is established/tied to the actual Table (via useImperativeHandle).
-
-		 In that time lapse, the table instance will either be `null` or will
-		 have it's initial values (which returns [] for columns).
-
-		 While this period of time is extremely small, and it would be nearly
-		 impossible for a user to make a change to the table during this period
-		 of time, we still want to log a warning if this occurs (at least for now).
-	*/
-  if (isNil(ref.current)) {
-    console.warn("Columns not active yet as table ref hasn't been established.");
-    return [];
-  }
-  const cols = ref.current.getColumns();
-  if (cols.length === 0) {
-    console.warn("Columns not active yet as table ref hasn't been established.");
-  }
-  return cols;
-};
-
 export const callWithColumn = <R extends Table.RowData, M extends Model.RowHttpModel, RT = any>(
   columns: Table.Column<R, M>[],
   field: keyof R | string,

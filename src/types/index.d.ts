@@ -47,10 +47,6 @@ type NonNullRef<T> = {
   readonly current: T;
 };
 
-type PotentiallyNullRef<T> = {
-  readonly current: T | null;
-};
-
 type SetUndefined<T, W extends keyof T> = Omit<T, W> & Record<W, undefined>;
 type SetOptional<T, W extends keyof T> = Omit<T, W> & Partial<Pick<T, W>>;
 type SetRequired<T, W extends keyof T> = Omit<T, W> & Required<Pick<T, W>>;

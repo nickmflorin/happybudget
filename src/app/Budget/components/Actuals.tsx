@@ -32,7 +32,7 @@ const ConnectedActualsTable = connectTableToStore<ActualsTable.ActualsTableProps
   },
   onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.ActualTableContext) =>
     dispatch(actions.actuals.requestAction(null, c)),
-  createSaga: (table: NonNullRef<Table.TableInstance<R, M>>) => sagas.actuals.createTableSaga(table),
+  createSaga: (table: Table.TableInstance<R, M>) => sagas.actuals.createTableSaga(table),
   selector: redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.actuals),
   footerRowSelectors: {
     footer: createSelector(

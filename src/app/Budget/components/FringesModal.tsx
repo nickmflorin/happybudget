@@ -22,8 +22,7 @@ const ConnectedFringesTable = connectTableToStore<
   },
   onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.FringeTableContext) =>
     dispatch(actions.requestFringesAction(null, c)),
-  createSaga: (table: NonNullRef<Table.TableInstance<Tables.FringeRowData, Model.Fringe>>) =>
-    sagas.createFringesTableSaga(table),
+  createSaga: (table: Table.TableInstance<Tables.FringeRowData, Model.Fringe>) => sagas.createFringesTableSaga(table),
   selector: selectors.selectFringesStore
 })(FringesTable.Table);
 

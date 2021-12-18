@@ -28,7 +28,7 @@ const ConnectedTable = connectTableToStore<BudgetSubAccountsTableProps, R, M, Ta
     setSearch: actions.subAccount.setSearchAction
   },
   selector: selectors.selectSubAccountsTableStore,
-  createSaga: (table: NonNullRef<Table.TableInstance<R, M>>) => sagas.subAccount.createTableSaga(table),
+  createSaga: (table: Table.TableInstance<R, M>) => sagas.subAccount.createTableSaga(table),
   onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.SubAccountTableContext) =>
     dispatch(actions.subAccount.requestAction(null, c)),
   footerRowSelectors: {

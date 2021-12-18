@@ -38,9 +38,7 @@ const ActionMap = {
   responseSubAccountUnits: responseSubAccountUnitsAction
 };
 
-export const createTableSaga = (
-  table: PotentiallyNullRef<Table.TableInstance<Tables.SubAccountRowData, Model.SubAccount>>
-) =>
+export const createTableSaga = (table: Table.TableInstance<Tables.SubAccountRowData, Model.SubAccount>) =>
   tabling.sagas.createAuthenticatedTableSaga<
     Tables.SubAccountRowData,
     Model.SubAccount,

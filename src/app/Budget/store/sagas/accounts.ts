@@ -18,7 +18,7 @@ const ActionMap: Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.
   setSearch: actions.setSearchAction
 };
 
-export const createTableSaga = (table: PotentiallyNullRef<Table.TableInstance<Tables.AccountRowData, Model.Account>>) =>
+export const createTableSaga = (table: Table.TableInstance<Tables.AccountRowData, Model.Account>) =>
   tabling.sagas.createAuthenticatedTableSaga<
     Tables.AccountRowData,
     Model.Account,

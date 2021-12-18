@@ -121,7 +121,7 @@ export const createTableTaskSet = (
     try {
       const response: M = yield api.request(api.createContact, {
         previous: e.payload.previous,
-        ...tabling.http.postPayload(e.payload.data, tabling.columns.getColumnsFromRef(config.table) || [])
+        ...tabling.http.postPayload(e.payload.data, config.table.getColumns())
       });
       yield put(
         config.actions.tableChanged(
@@ -182,10 +182,7 @@ export const createTableTaskSet = (
   ): SagaIterator {
     const merged = tabling.events.consolidateRowChanges(e.payload);
     if (merged.length !== 0) {
-      const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(
-        merged,
-        tabling.columns.getColumnsFromRef(config.table) || []
-      );
+      const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.table.getColumns());
       if (requestPayload.data.length !== 0) {
         yield fork(bulkUpdateTask, e, requestPayload, "There was an error updating the rows.");
       }

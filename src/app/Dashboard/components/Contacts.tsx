@@ -23,7 +23,7 @@ const ConnectedContactsTable = connectTableToStore<ContactsTable.Props, R, M, Ta
   },
   onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.ContactTableContext) =>
     dispatch(actions.requestContactsAction(null, c)),
-  createSaga: (table: NonNullRef<Table.TableInstance<R, M>>) => sagas.createContactsTableSaga(table),
+  createSaga: (table: Table.TableInstance<R, M>) => sagas.createContactsTableSaga(table),
   actions: {
     tableChanged: actions.handleContactsTableChangeEventAction,
     loading: actions.loadingContactsAction,

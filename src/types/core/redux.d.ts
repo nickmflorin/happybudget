@@ -73,6 +73,7 @@ declare namespace Redux {
     readonly reducerManager: ReducerManager<S>;
     readonly injectSaga: (key: string, saga: import("redux-saga").Saga<any[]>) => boolean;
     readonly ejectSaga: (key: string) => boolean;
+    readonly hasSaga: (key: string) => boolean;
   };
 
   type Dispatch = import("redux").Dispatch<Action>;

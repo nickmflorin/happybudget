@@ -4,13 +4,13 @@ import { isNil } from "lodash";
 const createSagaManager = (
   runSaga: SagaMiddleware["run"],
   rootSaga: Saga<any[]>
-): [(key: string, saga: Saga<any[]>) => boolean, (key: string) => boolean] => {
+): [(key: string, saga: Saga<any[]>) => boolean, (key: string) => boolean, (key: string) => boolean] => {
   const injectedSagas = new Map<string, Task>();
 
-  const isInjected = (key: string) => injectedSagas.has(key);
+  const hasSaga = (key: string) => injectedSagas.has(key);
 
   const injectSaga = (key: string, saga: Saga<any[]>): boolean => {
-    if (!isInjected(key)) {
+    if (!hasSaga(key)) {
       /* Sagas return tasks when they are executed - which can be used to cancel
 			   them... we might want to look into this for when we eject the saga. */
       const task = runSaga(saga);
@@ -34,7 +34,7 @@ const createSagaManager = (
   };
 
   injectSaga("root", rootSaga);
-  return [injectSaga, ejectSaga];
+  return [injectSaga, ejectSaga, hasSaga];
 };
 
 export default createSagaManager;

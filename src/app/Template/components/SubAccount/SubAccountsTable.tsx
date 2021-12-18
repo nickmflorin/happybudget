@@ -27,7 +27,7 @@ const ConnectedTable = connectTableToStore<TemplateSubAccountsTableProps, R, M, 
     addModelsToState: actions.subAccount.addModelsToStateAction,
     setSearch: actions.subAccount.setSearchAction
   },
-  createSaga: (table: NonNullRef<Table.TableInstance<R, M>>) => sagas.subAccount.createTableSaga(table),
+  createSaga: (table: Table.TableInstance<R, M>) => sagas.subAccount.createTableSaga(table),
   onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.SubAccountTableContext) =>
     dispatch(actions.subAccount.requestAction(null, c)),
   selector: selectors.selectSubAccountsTableStore,

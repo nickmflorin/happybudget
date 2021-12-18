@@ -36,7 +36,7 @@ const ConnectedTable = connectTableToStore<
   selector: selectors.selectSubAccountsTableStore,
   onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.SubAccountTableContext) =>
     dispatch(actions.account.requestAction(null, c)),
-  createSaga: (table: PotentiallyNullRef<Table.TableInstance<R, M>>) => sagas.account.createTableSaga(table),
+  createSaga: (table: Table.TableInstance<R, M>) => sagas.account.createTableSaga(table),
   footerRowSelectors: {
     page: createSelector(
       redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.detail.data),

@@ -29,7 +29,7 @@ const ConnectedTable = connectTableToStore<TemplateSubAccountsTableProps, R, M, 
   },
   onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.SubAccountTableContext) =>
     dispatch(actions.account.requestAction(null, c)),
-  createSaga: (table: NonNullRef<Table.TableInstance<R, M>>) => sagas.account.createTableSaga(table),
+  createSaga: (table: Table.TableInstance<R, M>) => sagas.account.createTableSaga(table),
   selector: selectors.selectSubAccountsTableStore,
   footerRowSelectors: {
     page: createSelector(

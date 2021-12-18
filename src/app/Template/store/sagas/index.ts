@@ -42,7 +42,7 @@ function* getBudgetTask(action: Redux.Action<number>): SagaIterator {
   }
 }
 
-export const createFringesTableSaga = (table: NonNullRef<Table.TableInstance<Tables.FringeRowData, Model.Fringe>>) =>
+export const createFringesTableSaga = (table: Table.TableInstance<Tables.FringeRowData, Model.Fringe>) =>
   tabling.sagas.createAuthenticatedTableSaga<Tables.FringeRowData, Model.Fringe, Tables.FringeTableContext>({
     actions: { ...FringesActionMap, request: actions.requestFringesAction },
     tasks: budgeting.tasks.fringes.createTableTaskSet<Model.Template>({

@@ -21,7 +21,7 @@ export const useRefIfNotDefined = <T extends { [key: string]: any }>(
   prop?: { current: T }
 ): { current: T } => {
   const ref = hook();
-  const returnRef = useMemo(() => (!isNil(prop) ? prop : ref), [prop, ref.current]);
+  const returnRef = useMemo(() => (!isNil(prop) ? prop : ref), [prop, ref]);
   return returnRef;
 };
 

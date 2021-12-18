@@ -62,7 +62,7 @@ const ActionMap = {
   setSearch: actions.setContactsSearchAction
 };
 
-export const createContactsTableSaga = (table: NonNullRef<Table.TableInstance<Tables.ContactRowData, Model.Contact>>) =>
+export const createContactsTableSaga = (table: Table.TableInstance<Tables.ContactRowData, Model.Contact>) =>
   tabling.sagas.createAuthenticatedTableSaga<
     Tables.ContactRowData,
     Model.Contact,

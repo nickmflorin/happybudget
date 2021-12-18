@@ -9,7 +9,7 @@ declare namespace Table {
   > = Redux.TaskConfig<A> & {
     /* There are edge cases where the table will be null when switching between
 		   tables very fast. */
-    readonly table: PotentiallyNullRef<Table.TableInstance<R, M>>;
+    readonly table: Table.TableInstance<R, M>;
   };
 
   type ReducerConfig<
@@ -47,6 +47,6 @@ declare namespace Table {
     readonly onSagaReconnected?: (dispatch: import("redux").Dispatch, context: C) => void;
     readonly selector?: (state: Application.Store) => S;
     readonly reducer?: Redux.Reducer<S>;
-    readonly createSaga?: (t: NonNullRef<Table.TableInstance<R, M>>) => Saga<any[]>;
+    readonly createSaga?: (t: Table.TableInstance<R, M>) => Saga<any[]>;
   };
 }

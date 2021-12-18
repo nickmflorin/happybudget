@@ -22,7 +22,7 @@ const ActionMap: budgeting.tasks.actuals.ActualsTableActionMap & {
   responseActualTypes: actions.responseActualTypesAction
 };
 
-export const createTableSaga = (table: PotentiallyNullRef<Table.TableInstance<Tables.ActualRowData, Model.Actual>>) => {
+export const createTableSaga = (table: Table.TableInstance<Tables.ActualRowData, Model.Actual>) => {
   const tasks = budgeting.tasks.actuals.createTableTaskSet({
     table,
     selectStore: (state: Application.Authenticated.Store) => state.budget.actuals,

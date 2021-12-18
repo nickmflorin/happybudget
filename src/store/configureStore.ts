@@ -60,8 +60,8 @@ const configureGenericStore = <S extends Application.Store>(
   /* Start the application saga and establish the saga injector.  We must do this
      after we create the store, because the SagaMiddleware must be mounted to
      run the root saga. */
-  const [injectSaga, ejectSaga] = createSagaManager(sagaMiddleware.run, rootSaga);
-  return { ...store, injectSaga, ejectSaga };
+  const [injectSaga, ejectSaga, hasSaga] = createSagaManager(sagaMiddleware.run, rootSaga);
+  return { ...store, injectSaga, ejectSaga, hasSaga };
 };
 
 export const configureAuthenticatedStore = (user: Model.User): Redux.Store<Application.Authenticated.Store> => {

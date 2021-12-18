@@ -234,14 +234,17 @@ const AuthenticatedTable = <
     [props.actions, props.tableApis]
   );
 
-  useImperativeHandle(
-    props.table,
-    () => ({
+  const getColumns = hooks.useDynamicCallback(() => {
+    return columns;
+  });
+
+  useImperativeHandle(props.table, () => {
+    return {
       ...grid.current,
       notify,
       removeNotification,
       changeColumnVisibility: props.changeColumnVisibility,
-      getColumns: () => columns,
+      getColumns,
       applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R, M>>) =>
         Array.isArray(event) ? map(event, (e: Table.ChangeEvent<R, M>) => _onChangeEvent(e)) : _onChangeEvent(event),
       getRowsAboveAndIncludingFocusedRow: () => {
@@ -296,9 +299,8 @@ const AuthenticatedTable = <
         }
         return null;
       }
-    }),
-    [hooks.useDeepEqualMemo(columns), notify]
-  );
+    };
+  });
 
   const addNewRow = hooks.useDynamicCallback(() => {
     const dataGridApi = props.tableApis.get("data");
