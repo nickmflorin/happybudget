@@ -213,7 +213,6 @@ export const createTableChangeEventReducer = <
       }
       /* For each Row that was changed, apply that change to the Row stored in
          state. */
-      let modifiedRows: Table.EditableRow<R>[] = [];
       return reduce(
         changesPerRow,
         (s: S, dt: { changes: Table.RowChange<R>[]; row: Table.EditableRow<R> }) => {
@@ -225,7 +224,6 @@ export const createTableChangeEventReducer = <
           if (!isNil(config.recalculateRow) && typeguards.isDataRow(r)) {
             r = { ...r, data: { ...r.data, ...config.recalculateRow(s, action, r) } };
           }
-          modifiedRows = [...modifiedRows, r];
           return {
             ...s,
             data: util.replaceInArray<Table.BodyRow<R>>(s.data, { id: r.id }, r)
