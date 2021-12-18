@@ -17,7 +17,8 @@ const ConnectedTable = connectTableToStore<
   GenericAccountsTable.AuthenticatedTemplateProps,
   R,
   M,
-  Tables.AccountTableStore
+  Tables.AccountTableStore,
+  Tables.AccountTableContext
 >({
   actions: {
     tableChanged: actions.accounts.handleTableChangeEventAction,
@@ -33,7 +34,7 @@ const ConnectedTable = connectTableToStore<
   createSaga: (table: Table.TableInstance<R, M>) => sagas.accounts.createTableSaga(table),
   footerRowSelectors: {
     footer: createSelector(
-      redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.template.detail.data),
+      redux.selectors.simpleDeepEqualSelector((state: Application.AuthenticatedStore) => state.template.detail.data),
       (budget: Model.Template | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
         estimated: !isNil(budget) ? budgeting.businessLogic.estimatedValue(budget) : 0.0
@@ -51,7 +52,7 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const table = tabling.hooks.useTable<R>();
+  const table = tabling.hooks.useTable<R, M>();
 
   const [groupModals, onEditGroup, onCreateGroup] = useGrouping({
     parentId: budgetId,

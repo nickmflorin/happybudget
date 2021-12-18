@@ -23,39 +23,50 @@ export type UseContextMenuParams<R extends Table.RowData, M extends Model.RowHtt
   readonly editColumnConfig?: Table.EditColumnRowConfig<R>[];
 };
 
-const evaluateRowStringGetter = <R extends Table.BodyRow>(
-  value: Table.RowStringGetter<R> | undefined,
-  row: R
+const evaluateRowStringGetter = <R extends Table.RowData, RW extends Table.BodyRow<R>>(
+  value: Table.RowStringGetter<RW> | undefined,
+  row: RW
 ): Table.RowNameLabelType | undefined => (typeof value === "function" ? value(row) : value);
+
+type IsRowType<R extends Table.RowData, RW extends Table.BodyRow<R> = Table.BodyRow<R>> = (
+  row: Table.Row<R>
+) => row is RW;
 
 type RowStringGetterCase<R extends Table.RowData, RW extends Table.BodyRow<R> = Table.BodyRow<R>> = {
   readonly getter: Table.RowStringGetter<RW> | undefined;
-  readonly flt: (r: Table.BodyRow<R>) => boolean;
+  readonly flt: IsRowType<R, RW>;
 };
 
-const evaluateCases = <R extends Table.RowData>(
-  cases: RowStringGetterCase<R, any>[],
-  row: Table.BodyRow<R>,
+const evaluateCases = <R extends Table.RowData, RW extends Table.BodyRow<R>>(
+  cases: Array<
+    | RowStringGetterCase<R, Table.DataRow<R>>
+    | RowStringGetterCase<R, Table.GroupRow<R>>
+    | RowStringGetterCase<R, Table.MarkupRow<R>>
+  >,
+  row: RW,
   def: Table.RowNameLabelType
 ): string => {
   for (let i = 0; i < cases.length; i++) {
-    const getter = cases[i].getter;
+    const getter = cases[i].getter as Table.RowStringGetter<RW> | undefined;
     if (!isNil(getter) && cases[i].flt(row) === true) {
-      let evaluated: Table.RowNameLabelType | undefined = evaluateRowStringGetter(getter, row);
+      const evaluated: Table.RowNameLabelType | undefined = evaluateRowStringGetter(getter, row);
       return !isNil(evaluated) ? String(evaluated) : String(def);
     }
   }
   return String(def);
 };
 
-/* eslint-disable indent */
 const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   params: UseContextMenuParams<R, M>
 ): [(row: Table.BodyRow<R>, node: Table.RowNode) => Table.MenuItemDef[]] => {
   const getRowName = useMemo(
     () =>
       (row: Table.BodyRow<R>, def: Table.RowNameLabelType): string => {
-        const cases: RowStringGetterCase<R, any>[] = [
+        const cases: [
+          RowStringGetterCase<R, Table.DataRow<R>>,
+          RowStringGetterCase<R, Table.MarkupRow<R>>,
+          RowStringGetterCase<R, Table.GroupRow<R>>
+        ] = [
           { getter: params.getModelRowName, flt: tabling.typeguards.isDataRow },
           { getter: params.getMarkupRowName, flt: tabling.typeguards.isMarkupRow },
           { getter: params.getGroupRowName, flt: tabling.typeguards.isGroupRow }
@@ -68,7 +79,11 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
   const getRowLabel = useMemo(
     () =>
       (row: Table.BodyRow<R>, def: Table.RowNameLabelType = "Row"): string => {
-        const cases: RowStringGetterCase<R, any>[] = [
+        const cases: [
+          RowStringGetterCase<R, Table.DataRow<R>>,
+          RowStringGetterCase<R, Table.MarkupRow<R>>,
+          RowStringGetterCase<R, Table.GroupRow<R>>
+        ] = [
           { getter: params.getModelRowLabel, flt: tabling.typeguards.isDataRow },
           { getter: params.getMarkupRowLabel, flt: tabling.typeguards.isMarkupRow },
           { getter: params.getGroupRowLabel, flt: tabling.typeguards.isGroupRow }

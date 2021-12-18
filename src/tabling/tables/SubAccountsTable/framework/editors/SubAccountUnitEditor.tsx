@@ -15,6 +15,7 @@ const SubAccountUnitEditor = (
     >,
     "models" | "searchIndices"
   >,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   ref: any
 ) => {
   const units = useSelector((state: Application.Store) => props.selector(state).subaccountUnits);

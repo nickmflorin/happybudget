@@ -6,7 +6,6 @@ import { ui } from "lib";
 
 import { Icon } from "components";
 
-/* eslint-disable indent */
 const Cell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,

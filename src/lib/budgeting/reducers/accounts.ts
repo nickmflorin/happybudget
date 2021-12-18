@@ -8,9 +8,8 @@ type ReducerConfig<
   A extends Redux.TableActionMap<M, Tables.AccountTableContext> = Redux.TableActionMap<M, Tables.ActualTableContext>
 > = Table.ReducerConfig<R, M, S, Tables.AccountTableContext, A>;
 
-/* eslint-disable indent */
 export const createUnauthenticatedAccountsTableReducer = (config: ReducerConfig): Redux.Reducer<S> => {
-  return createBudgetTableReducer<R, M, S>(config);
+  return createBudgetTableReducer<R, M, S, Tables.AccountTableContext>(config);
 };
 
 export const createAuthenticatedAccountsTableReducer = (

@@ -5,8 +5,8 @@ import * as api from "api";
 import { notifications } from "lib";
 import * as actions from "./actions";
 
-export function* getBudgetsTask(action: Redux.Action): SagaIterator {
-  const query = yield select((state: Application.Authenticated.Store) => ({
+export function* getBudgetsTask(): SagaIterator {
+  const query = yield select((state: Application.AuthenticatedStore) => ({
     search: state.dashboard.budgets.search,
     page: state.dashboard.budgets.page,
     page_size: state.dashboard.budgets.pageSize,
@@ -17,15 +17,16 @@ export function* getBudgetsTask(action: Redux.Action): SagaIterator {
     const response: Http.ListResponse<Model.SimpleBudget> = yield api.request(api.getBudgets, query);
     yield put(actions.responseBudgetsAction(response));
   } catch (e: unknown) {
-    notifications.requestError(e as Error, { message: "There was an error retrieving the budgets." });
+    // TODO: Need to implement a banner notification here.
+    notifications.requestError(e as Error);
     yield put(actions.responseBudgetsAction({ count: 0, data: [] }));
   } finally {
     yield put(actions.loadingBudgetsAction(false));
   }
 }
 
-export function* getTemplatesTask(action: Redux.Action): SagaIterator {
-  const query = yield select((state: Application.Authenticated.Store) => {
+export function* getTemplatesTask(): SagaIterator {
+  const query = yield select((state: Application.AuthenticatedStore) => {
     return {
       search: state.dashboard.templates.search,
       page: state.dashboard.templates.page,
@@ -38,15 +39,16 @@ export function* getTemplatesTask(action: Redux.Action): SagaIterator {
     const response: Http.ListResponse<Model.SimpleTemplate> = yield api.request(api.getTemplates, query);
     yield put(actions.responseTemplatesAction(response));
   } catch (e: unknown) {
-    notifications.requestError(e as Error, { message: "There was an error retrieving the templates." });
+    // TODO: Need to implement a banner notification here.
+    notifications.requestError(e as Error);
     yield put(actions.responseTemplatesAction({ count: 0, data: [] }));
   } finally {
     yield put(actions.loadingTemplatesAction(false));
   }
 }
 
-export function* getCommunityTemplatesTask(action: Redux.Action): SagaIterator {
-  const query = yield select((state: Application.Authenticated.Store) => {
+export function* getCommunityTemplatesTask(): SagaIterator {
+  const query = yield select((state: Application.AuthenticatedStore) => {
     return {
       search: state.dashboard.community.search,
       page: state.dashboard.community.page,
@@ -59,7 +61,8 @@ export function* getCommunityTemplatesTask(action: Redux.Action): SagaIterator {
     const response: Http.ListResponse<Model.SimpleTemplate> = yield api.request(api.getCommunityTemplates, query);
     yield put(actions.responseCommunityTemplatesAction(response));
   } catch (e: unknown) {
-    notifications.requestError(e as Error, { message: "There was an error retrieving the community templates." });
+    // TODO: Need to implement a banner notification here.
+    notifications.requestError(e as Error);
     yield put(actions.responseCommunityTemplatesAction({ count: 0, data: [] }));
   } finally {
     yield put(actions.loadingCommunityTemplatesAction(false));

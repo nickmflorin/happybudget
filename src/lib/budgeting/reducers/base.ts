@@ -7,7 +7,7 @@ import { redux, tabling, util, budgeting } from "lib";
  * is also provided, it will only return the MarkupRow if that MarkupRow also
  * pertains to the specific rowId.
  */
-/* eslint-disable indent */
+
 export const markupRowFromState = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
   action: Redux.Action,
   st: S,
@@ -31,7 +31,7 @@ export type BudgetTableReducerConfig<
   R extends Tables.AccountRowData | Tables.SubAccountRowData,
   M extends Model.Account | Model.SubAccount,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C = any,
+  C extends Table.Context = Table.Context,
   A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
 > = Table.ReducerConfig<R, M, S, C, A>;
 
@@ -39,7 +39,7 @@ export const createBudgetTableReducer = <
   R extends Tables.AccountRowData | Tables.SubAccountRowData,
   M extends Model.Account | Model.SubAccount,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C = any,
+  C extends Table.Context = Table.Context,
   A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
 >(
   config: BudgetTableReducerConfig<R, M, S, C, A>
@@ -51,7 +51,7 @@ export const createBudgetTableChangeEventReducer = <
   R extends Tables.AccountRowData | Tables.SubAccountRowData,
   M extends Model.Account | Model.SubAccount,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C = any,
+  C extends Table.Context = Table.Context,
   A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
 >(
   config: BudgetTableReducerConfig<R, M, S, C, A>
@@ -99,7 +99,7 @@ export const createBudgetTableChangeEventReducer = <
         the MarkupRow to reflect these new values, and then finally update the
         MarkupRow again to reflect the new children.
         */
-        let updatedMarkupRow = markupRowManager.create({ model: e.payload });
+        const updatedMarkupRow = markupRowManager.create({ model: e.payload });
         const childrenRows = filter(
           newState.data,
           (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) && includes(updatedMarkupRow.children, r.id)
@@ -158,7 +158,7 @@ export const createAuthenticatedBudgetTableReducer = <
   R extends Tables.AccountRowData | Tables.SubAccountRowData,
   M extends Model.Account | Model.SubAccount,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C = any,
+  C extends Table.Context = Table.Context,
   A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
 >(
   config: BudgetTableReducerConfig<R, M, S, C, A> & {

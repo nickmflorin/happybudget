@@ -1,5 +1,5 @@
 import { isNil, filter, find } from "lodash";
-import { util, redux } from "lib";
+import { util, notifications } from "lib";
 
 export * from "./factories";
 export * from "./util";
@@ -25,7 +25,7 @@ export const modelListActionReducer: Redux.Reducer<
   } else {
     const instance: Redux.ModelListActionInstance | undefined = find(st, { id: action.payload.id });
     if (isNil(instance)) {
-      redux.util.warnInconsistentState({
+      notifications.inconsistentStateError({
         action: "Removing from model list action state.",
         reason: "The instance does not exist in state when it is expected to."
       });

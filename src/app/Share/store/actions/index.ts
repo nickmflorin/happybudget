@@ -20,7 +20,9 @@ export const loadingFringesAction = redux.actions.createAction<boolean>(ActionTy
 export const responseFringesAction = redux.actions.createAction<Http.TableResponse<Model.Fringe>>(
   ActionType.Fringes.Response
 );
-export const setFringesSearchAction = redux.actions.createAction<string>(ActionType.Fringes.SetSearch);
+export const setFringesSearchAction = redux.actions.createContextAction<string, Tables.FringeTableContext>(
+  ActionType.Fringes.SetSearch
+);
 
 export const responseSubAccountUnitsAction = redux.actions.createAction<Http.ListResponse<Model.Tag>>(
   ActionType.SubAccountUnits.Response

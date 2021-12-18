@@ -7,16 +7,16 @@ const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
 export type UseModelMenuEditorParams<
-  V = ID,
-  R extends Table.RowData = Table.RowData,
+  V extends Table.RawRowValue,
+  R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
-> = Table.EditorParams<R, M, S, V>;
+> = Table.EditorParams<R, M, S, V | null>;
 
 export type IEditor<
-  V = ID,
-  C extends Model.Model = Model.Model,
-  R extends Table.RowData = Table.RowData,
+  V extends Table.RawRowValue,
+  C extends Model.Model,
+  R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = Omit<UseModelMenuEditorParams<V, R, M, S>, "forwardedRef"> & {
@@ -27,14 +27,14 @@ export type IEditor<
   readonly menu: NonNullRef<IMenuRef<MenuItemSelectedState, C>>;
 };
 
-/* eslint-disable indent */
 const useModelMenuEditor = <
+  V extends Table.RawRowValue,
   C extends Model.Model,
-  V = C,
-  R extends Table.RowData = Table.RowData,
+  R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   params: UseModelMenuEditorParams<V, R, M, S> & { readonly forwardedRef: ForwardedRef<any> }
 ): [IEditor<V, C, R, M, S>] => {
   const menu = ui.hooks.useMenu<MenuItemSelectedState, C>();

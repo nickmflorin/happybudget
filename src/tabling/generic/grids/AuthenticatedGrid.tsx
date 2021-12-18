@@ -11,15 +11,12 @@ export interface AuthenticatedGridProps<R extends Table.RowData, M extends Model
   extends GridProps<R, M> {
   readonly apis: Table.GridApis | null;
   readonly framework?: Table.Framework;
-  readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
   readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
   readonly onRowSelectionChanged?: (rows: Table.EditableRow<R>[]) => void;
 }
 
-/* eslint-disable indent */
 const AuthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
   framework,
-  footerRowSelectors,
   ...props
 }: AuthenticatedGridProps<R, M>): JSX.Element => {
   const frameworkComponents = useMemo<Table.FrameworkGroup>((): Table.FrameworkGroup => {
@@ -27,7 +24,7 @@ const AuthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpModel
     return {
       ...reduce(
         combinedFramework.cells?.[props.id],
-        (prev: Table.FrameworkGroup, cell: React.ComponentType<any>, name: string) => ({
+        (prev: Table.FrameworkGroup, cell: React.ComponentType<Record<string, unknown>>, name: string) => ({
           ...prev,
           [name]: cell
         }),
@@ -35,7 +32,7 @@ const AuthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpModel
       ),
       ...reduce(
         combinedFramework.editors,
-        (prev: Table.FrameworkGroup, editor: React.ComponentType<any>, name: string) => {
+        (prev: Table.FrameworkGroup, editor: React.ComponentType<Record<string, unknown>>, name: string) => {
           return { ...prev, [name]: editor };
         },
         {}
@@ -54,14 +51,12 @@ const AuthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpModel
     );
   }, [hooks.useDeepEqualMemo(props.columns)]);
 
-  const onSelectionChanged: (e: SelectionChangedEvent) => void = hooks.useDynamicCallback(
-    (e: SelectionChangedEvent) => {
-      if (!isNil(props.apis)) {
-        const selected: Table.EditableRow<R>[] = props.apis.grid.getSelectedRows();
-        props.onRowSelectionChanged?.(selected);
-      }
+  const onSelectionChanged: (e: SelectionChangedEvent) => void = hooks.useDynamicCallback(() => {
+    if (!isNil(props.apis)) {
+      const selected: Table.EditableRow<R>[] = props.apis.grid.getSelectedRows();
+      props.onRowSelectionChanged?.(selected);
     }
-  );
+  });
   return (
     <Grid
       {...props}

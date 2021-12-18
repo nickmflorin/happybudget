@@ -6,11 +6,10 @@ import { createSelector } from "reselect";
 import * as api from "api";
 import { tabling, notifications } from "lib";
 
-/* eslint-disable indent */
 export const createChangeEventHandler = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  C = any
+  C extends Table.Context = Table.Context
 >(
   handlers: Partial<Redux.TableEventTaskMapObject<R, M, C>>
 ): Redux.TableEventTask<Table.ChangeEvent<R, M>, R, M, C> => {
@@ -28,29 +27,31 @@ export const createChangeEventHandler = <
   return handleChangeEvent;
 };
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 type BulkCreate<RSP, ARGS extends any[]> = (...args: ARGS) => [Http.Service<Promise<RSP>>, ...ARGS];
 
 type CreateBulkTaskConfig<
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  S extends Redux.TableStore,
+  S extends Redux.TableStore<R>,
   RSP,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   ARGS extends any[]
 > = {
   readonly table: Table.TableInstance<R, M>;
   readonly loadingActions: Redux.ActionCreator<boolean>[];
-  readonly responseActions: (r: RSP, e: Table.RowAddEvent<R>) => Redux.Action<any>[];
-  readonly selectStore: (state: Application.Authenticated.Store) => S;
+  readonly responseActions: (r: RSP, e: Table.RowAddEvent<R>) => Redux.Action[];
+  readonly selectStore: (state: Application.AuthenticatedStore) => S;
   readonly bulkCreate: BulkCreate<RSP, ARGS>;
 };
 
-/* eslint-disable indent */
 export const createBulkTask = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  S extends Redux.TableStore,
-  P,
+  S extends Redux.TableStore<R>,
+  P extends Http.PayloadObj,
   RSP,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   ARGS extends any[] = []
 >(
   config: CreateBulkTaskConfig<R, M, S, RSP, ARGS>
@@ -78,16 +79,17 @@ export const createBulkTask = <
             new rows are being created.`
       );
     }
-    const requestPayload: Http.BulkCreatePayload<P> = tabling.http.createBulkCreatePayload<R, P, M>(
+    const requestPayload: Http.BulkCreatePayload<P> = tabling.http.createBulkCreatePayload<R, M, P>(
       data,
       config.table.getColumns()
     );
     yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean>) => put(action(true))));
     try {
       const response: RSP = yield api.request(...config.bulkCreate(...args), requestPayload);
-      yield all(map(config.responseActions(response, e), (action: Redux.Action<any>) => put(action)));
+      yield all(map(config.responseActions(response, e), (action: Redux.Action) => put(action)));
     } catch (err: unknown) {
-      notifications.requestError(err as Error, { message: errorMessage });
+      config.table.notify({ message: errorMessage, level: "error" });
+      notifications.requestError(err as Error);
     } finally {
       yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean>) => put(action(false))));
     }

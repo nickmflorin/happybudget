@@ -10,9 +10,7 @@ import { EditModelModal, EditModelModalProps } from "./generic";
 
 const MemoizedBudgetForm = React.memo(BudgetForm);
 
-interface EditBudgetModalProps extends EditModelModalProps<Model.Budget> {}
-
-const EditBudgetModal = (props: EditBudgetModalProps): JSX.Element => {
+const EditBudgetModal = (props: EditModelModalProps<Model.Budget>): JSX.Element => {
   const [file, setFile] = useState<UploadedImage | SavedImage | null>(null);
 
   return (

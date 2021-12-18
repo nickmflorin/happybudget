@@ -96,7 +96,6 @@ export interface UploaderProps extends Omit<UploaderContentProps, "data" | "erro
   readonly onClear?: () => void;
   readonly onChange: (params: UploadedImage | null) => void;
   readonly onError: (error: Error | string) => void;
-  readonly hoverOverlay?: (params: { visible: boolean; children: () => JSX.Element }) => JSX.Element;
 }
 
 const Uploader = (
@@ -109,7 +108,6 @@ const Uploader = (
     value,
     showClear,
     imageClearButtonProps,
-    hoverOverlay,
     onChange,
     onError,
     onClear,
@@ -121,6 +119,11 @@ const Uploader = (
   const [loading, setLoading] = useState(false);
   const [image, _setImage] = useState<UploadedImage | SavedImage | null>(null);
 
+  const setImage = (img: UploadedImage | null) => {
+    _setImage(img);
+    onChange(img);
+  };
+
   const _onError = (e: string | Error) => {
     setError(e);
     onError(e);
@@ -131,11 +134,6 @@ const Uploader = (
     setLoading(false);
     setImage(null);
     onClear?.();
-  };
-
-  const setImage = (img: UploadedImage | null) => {
-    _setImage(img);
-    onChange(img);
   };
 
   useImperativeHandle(ref, () => ({
@@ -202,18 +200,15 @@ const Uploader = (
             }
           }
         }}
-        customRequest={(options: UploadRequestOption<any>) => {
+        customRequest={(options: UploadRequestOption<Http.FileUploadResponse>) => {
           const requestBody = new FormData();
           requestBody.append("image", options.file);
           api
             .tempUploadImage(requestBody)
-            .then((response: AxiosResponse<Http.FileUploadResponse>) => {
-              !isNil(options.onSuccess) && options.onSuccess(response.data, response.request);
-            })
-            .catch((e: Error) => {
-              // TODO: Improve error handling here.
-              !isNil(options.onError) && options.onError(e);
-            });
+            .then((response: AxiosResponse<Http.FileUploadResponse>) =>
+              options.onSuccess?.(response.data, response.request)
+            )
+            .catch((e: Error) => options.onError?.(e));
         }}
       >
         <RenderWithSpinner size={24} loading={loading && showLoadingIndicator}>
@@ -221,7 +216,7 @@ const Uploader = (
             <ImageClearButton
               {...imageClearButtonProps}
               style={{ position: "absolute", top: -17, right: -17, ...imageClearButtonProps?.style }}
-              onClick={(e: React.MouseEvent<any>) => {
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                 e.stopPropagation();
                 e.preventDefault();
                 _onClear();

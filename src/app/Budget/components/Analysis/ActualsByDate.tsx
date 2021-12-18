@@ -11,7 +11,7 @@ import { ActualsByDateChart } from "components/charts";
 import { Tile } from "components/layout";
 
 const selectActuals = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.budget.analysis.actuals.data
+  (state: Application.AuthenticatedStore) => state.budget.analysis.actuals.data
 );
 
 type ActualWithDate = Omit<Model.Actual, "date"> & { readonly date: string };
@@ -30,7 +30,7 @@ const generateData = (actuals: Model.Actual[]): Charts.Datum[] => {
     ),
     getMonthString
   );
-  return map(Object.keys(actualsByMonth), (key: string, index: number) => {
+  return map(Object.keys(actualsByMonth), (key: string) => {
     return {
       color: Colors.GREEN,
       label: key,
@@ -49,7 +49,7 @@ const generateData = (actuals: Model.Actual[]): Charts.Datum[] => {
   });
 };
 
-interface ActualsByDateProps extends StandardComponentProps {}
+type ActualsByDateProps = StandardComponentProps;
 
 const ActualsByDate = (props: ActualsByDateProps): JSX.Element => {
   const actuals = useSelector(selectActuals);

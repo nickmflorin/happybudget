@@ -9,7 +9,6 @@ export type ColorCellProps<
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = Table.CellProps<R, M, S, string | null>;
 
-/* eslint-disable indent */
 const ColorCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,

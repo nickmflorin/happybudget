@@ -1,16 +1,19 @@
 declare namespace Http {
+  type RawResponseValue = string | number | null;
+  type Response = { [key: string]: RawResponseValue | Response | Response[] };
+
   type ErrorResponse = {
     readonly errors: Error[];
     readonly user_id?: number;
     readonly force_logout?: true;
   };
 
-  interface ListResponse<T> {
+  type ListResponse<T> = {
     readonly count: number;
     readonly data: T[];
     readonly next?: string | null;
     readonly previous?: string | null;
-  }
+  };
 
   type TableResponse<M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly models: M[];
@@ -18,9 +21,9 @@ declare namespace Http {
     readonly markups?: Model.Markup[];
   };
 
-  interface FileUploadResponse {
+  type FileUploadResponse = {
     readonly fileUrl: string;
-  }
+  };
 
   type MarkupResponseTypes<B extends Model.Budget | Model.Template> =
     | BudgetContextDetailResponse<Model.Markup, B>

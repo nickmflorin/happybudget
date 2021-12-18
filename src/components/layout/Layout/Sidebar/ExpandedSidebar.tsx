@@ -14,11 +14,10 @@ import "./index.scss";
 
 export interface ExpandedSidebarProps
   extends Omit<GenericSidebarProps<IExpandedSidebarItem>, "renderItem" | "children"> {
-  readonly closeOnClick?: () => void;
   readonly toggle: () => void;
 }
 
-const ExpandedSidebar = ({ closeOnClick, toggle, ...props }: ExpandedSidebarProps): JSX.Element => {
+const ExpandedSidebar = ({ toggle, ...props }: ExpandedSidebarProps): JSX.Element => {
   const isMobile = ui.hooks.useLessThanBreakpoint("medium");
 
   return (

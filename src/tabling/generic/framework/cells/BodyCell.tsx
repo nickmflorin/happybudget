@@ -4,7 +4,6 @@ import { ValueCell } from "./generic";
 import useFormattedValue from "./useFormattedValue";
 import connectCellToStore from "./connectCellToStore";
 
-/* eslint-disable indent */
 const BodyCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,

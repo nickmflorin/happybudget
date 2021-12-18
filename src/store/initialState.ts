@@ -6,12 +6,12 @@ export const createInitialUserState = (user: Model.User): Model.User => {
 };
 
 function createModularApplicationState(
-  config: Application.Authenticated.ModuleConfig[]
-): Application.Authenticated.ModuleStores;
+  config: Application.AuthenticatedModuleConfig[]
+): Application.AuthenticatedModuleStores;
 
 function createModularApplicationState(
-  config: Application.Unauthenticated.ModuleConfig[]
-): Application.Unauthenticated.ModuleStores;
+  config: Application.UnauthenticatedModuleConfig[]
+): Application.UnauthenticatedModuleStores;
 
 function createModularApplicationState(config: Application.AnyModuleConfig[]): Application.ModuleStores {
   return reduce(
@@ -28,33 +28,33 @@ function createModularApplicationState(config: Application.AnyModuleConfig[]): A
 
 export const createUnauthenticatedInitialState = (
   config: Application.AnyModuleConfig[]
-): Application.Unauthenticated.Store => {
+): Application.UnauthenticatedStore => {
   return {
     ...createModularApplicationState(
       filter(config, (c: Application.AnyModuleConfig) =>
         redux.typeguards.isUnauthenticatedModuleConfig(c)
-      ) as Application.Unauthenticated.ModuleConfig[]
+      ) as Application.UnauthenticatedModuleConfig[]
     ),
     drawerVisible: false,
     loading: false,
     contacts: redux.initialState.initialListResponseState
-  } as Application.Unauthenticated.Store;
+  } as Application.UnauthenticatedStore;
 };
 
 export const createAuthenticatedInitialState = (
   config: Application.AnyModuleConfig[],
   user: Model.User
-): Application.Authenticated.Store => {
+): Application.AuthenticatedStore => {
   return {
     ...createModularApplicationState(
       filter(
         config,
         (c: Application.AnyModuleConfig) => !redux.typeguards.isUnauthenticatedModuleConfig(c)
-      ) as Application.Authenticated.ModuleConfig[]
+      ) as Application.AuthenticatedModuleConfig[]
     ),
     user: createInitialUserState(user),
     drawerVisible: false,
     loading: false,
     contacts: redux.initialState.initialModelListResponseState
-  } as Application.Authenticated.Store;
+  } as Application.AuthenticatedStore;
 };

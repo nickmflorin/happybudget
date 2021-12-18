@@ -14,11 +14,12 @@ export interface FringesEditorProps
   readonly colId: keyof Tables.SubAccountRowData;
 }
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const FringesEditor = (props: FringesEditorProps, ref: ForwardedRef<any>) => {
   const fringes = useSelector((state: Application.Store) => props.selector(state).fringes.data);
   const [editor] = framework.editors.useModelMenuEditor<
+    number[],
     Tables.FringeRow,
-    ID[],
     Tables.SubAccountRowData,
     Model.SubAccount,
     Tables.SubAccountTableStore

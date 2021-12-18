@@ -40,11 +40,9 @@ type InternalAuthenticatedMenuProps<
   readonly hasDragColumn: boolean;
 };
 
-/* eslint-disable indent */
 const AuthenticatedMenu = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: Omit<InternalAuthenticatedMenuProps<R, M>, "menuPortalId"> & { readonly detached: boolean }
 ) => (
-  /* eslint-disable indent */
   <div
     className={classNames(
       "table-action-menu",

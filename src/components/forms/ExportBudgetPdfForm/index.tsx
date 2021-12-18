@@ -22,9 +22,12 @@ import "./index.scss";
 type NonFormFields = "includeNotes" | "notes" | "header";
 type RichTextFields = "notes" | "header";
 
+type R = Tables.SubAccountRowData;
+type M = Model.PdfSubAccount;
+type C = Table.Column<R, M>;
+
 interface ExportFormProps extends FormProps<ExportBudgetPdfFormOptions> {
-  readonly disabled?: boolean;
-  readonly columns: Table.Column<Tables.SubAccountRowData, Model.PdfSubAccount>[];
+  readonly columns: C[];
   readonly accounts: Model.PdfAccount[];
   readonly accountsLoading?: boolean;
   readonly displayedHeaderTemplate: Model.HeaderTemplate | null;
@@ -41,7 +44,6 @@ const ExportForm = (
   {
     accountsLoading,
     accounts,
-    disabled,
     columns,
     displayedHeaderTemplate,
     headerTemplates,
@@ -85,7 +87,6 @@ const ExportForm = (
   }, [notesHtml, includeNotes]);
 
   const getHeaderTemplateData = useMemo<() => HeaderTemplateFormData>(
-    /* eslint-disable indent */
     () => (): HeaderTemplateFormData => {
       return {
         header: headerEditor.current?.getData() || null,
@@ -118,11 +119,11 @@ const ExportForm = (
         { ..._formDataWithoutHeader(values), header: displayedHeaderTemplate }
       );
     } else {
-      headerEditor.current?.setData(props.initialValues?.header.header || "");
-      leftInfoEditor.current?.setData(props.initialValues?.header.left_info || "");
-      rightInfoEditor.current?.setData(props.initialValues?.header.right_info || "");
-      _setLeftImage(props.initialValues?.header.left_image || null);
-      _setRightImage(props.initialValues?.header.right_image || null);
+      headerEditor.current?.setData(props.initialValues?.header?.header || "");
+      leftInfoEditor.current?.setData(props.initialValues?.header?.left_info || "");
+      rightInfoEditor.current?.setData(props.initialValues?.header?.right_info || "");
+      _setLeftImage(props.initialValues?.header?.left_image || null);
+      _setRightImage(props.initialValues?.header?.right_image || null);
     }
   }, [displayedHeaderTemplate]);
 
@@ -194,6 +195,7 @@ const ExportForm = (
     | Omit<ExportBudgetPdfFormOptions, RichTextFields>
     | undefined => {
     if (!isNil(props.initialValues)) {
+      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
       const { header, notes, ...rest } = props.initialValues as ExportBudgetPdfFormOptions;
       return rest;
     }
@@ -202,7 +204,7 @@ const ExportForm = (
 
   const createTemplate = useMemo(
     () => (name: string, original?: Model.HeaderTemplate) => {
-      let data: HeaderTemplateFormData = getHeaderTemplateData();
+      const data: HeaderTemplateFormData = getHeaderTemplateData();
       let requestPayload: Http.HeaderTemplatePayload = {
         left_info: data.left_info,
         header: data.header,
@@ -263,7 +265,7 @@ const ExportForm = (
 
   const updateTemplate = useMemo(
     () => (template: Model.HeaderTemplate) => {
-      let data: HeaderTemplateFormData = getHeaderTemplateData();
+      const data: HeaderTemplateFormData = getHeaderTemplateData();
       let requestPayload: Http.HeaderTemplatePayload = {
         left_info: data.left_info,
         header: data.header,
@@ -403,14 +405,9 @@ const ExportForm = (
         labelStyle={{ marginBottom: "5px !important" }}
       >
         <Form.Item label={"Columns"} name={"columns"}>
-          <ColumnSelect
-            getLabel={(c: Table.Column<Tables.SubAccountRowData, Model.PdfSubAccount>) =>
-              c.pdfHeaderName || c.headerName || ""
-            }
-            columns={filter(
-              columns,
-              (c: Table.Column<Tables.SubAccountRowData, Model.PdfSubAccount>) => c.tableColumnType !== "fake"
-            )}
+          <ColumnSelect<R, M, C>
+            getLabel={(c: C) => c.pdfHeaderName || c.headerName || ""}
+            columns={filter(columns, (c: C) => c.tableColumnType !== "fake")}
           />
         </Form.Item>
 
@@ -482,7 +479,7 @@ const ExportForm = (
           <Form.ItemStyle>
             <CKEditor
               style={{ height: 140 }}
-              initialValue={props.initialValues?.header?.notes || ""}
+              initialValue={props.initialValues?.notes || ""}
               onChange={(html: string) => {
                 setNotesHtml(html);
                 const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();

@@ -3,13 +3,14 @@ import { useRef } from "react";
 import * as hooks from "../hooks";
 
 export const InitialGridRef: Table.DataGridInstance = {
-  getCSVData: (fields?: string[]) => []
+  getCSVData: () => []
 };
 
 export const useDataGrid = (): NonNullRef<Table.DataGridInstance> => {
   return useRef<Table.DataGridInstance>(InitialGridRef);
 };
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const InitialTableRef: Table.TableInstance<any, any> = {
   ...InitialGridRef,
   notify: (notification: TableNotification) => {
@@ -19,27 +20,25 @@ export const InitialTableRef: Table.TableInstance<any, any> = {
       )} to table because table ref has not been attached yet.`
     );
   },
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   removeNotification: () => {},
   getColumns: () => [],
   getFocusedRow: () => null,
   getRow: () => null,
   getRows: () => [],
   getRowsAboveAndIncludingFocusedRow: () => [],
-  changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange>) => {},
-  applyTableChange: (event: SingleOrArray<Table.ChangeEvent<any>>) => {}
+  /* eslint-disable @typescript-eslint/no-empty-function */
+  changeColumnVisibility: () => {},
+  /* eslint-disable @typescript-eslint/no-empty-function */
+  applyTableChange: () => {}
 };
 
-export const useTable = <
-  R extends Table.RowData = object,
-  M extends Model.RowHttpModel = Model.RowHttpModel
->(): NonNullRef<Table.TableInstance<R, M>> => {
+export const useTable = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(): NonNullRef<
+  Table.TableInstance<R, M>
+> => {
   return useRef<Table.TableInstance<R, M>>(InitialTableRef);
 };
 
-/* eslint-disable indent */
-export const useTableIfNotDefined = <
-  R extends Table.RowData = object,
-  M extends Model.RowHttpModel = Model.RowHttpModel
->(
+export const useTableIfNotDefined = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   table?: NonNullRef<Table.TableInstance<R, M>>
 ): NonNullRef<Table.TableInstance<R, M>> => hooks.useRefIfNotDefined<Table.TableInstance<R, M>>(useTable, table);

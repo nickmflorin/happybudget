@@ -1,24 +1,22 @@
 declare namespace Tables {
-  interface BudgetRowData extends Model.LineMetrics {
+  type BudgetRowData = Model.LineMetrics & {
     readonly identifier: string | null;
     readonly description: string | null;
-    readonly type: "subaccount" | "account";
-  }
+  };
 
-  interface AccountRowData extends BudgetRowData {}
+  type AccountRowData = BudgetRowData;
 
   type AccountRow = Table.ModelRow<AccountRowData>;
   type AccountTableContext = { readonly budgetId: number };
   type AccountTableStore = Redux.BudgetTableStore<AccountRowData>;
 
-  interface SubAccountRowData
-    extends BudgetRowData,
-      Pick<
-        Model.SubAccount,
-        "quantity" | "unit" | "multiplier" | "rate" | "fringes" | "fringe_contribution" | "attachments"
-      > {
-    readonly contact?: number | null;
-  }
+  type SubAccountRowData = BudgetRowData &
+    Pick<
+      Model.SubAccount,
+      "quantity" | "unit" | "multiplier" | "rate" | "fringes" | "fringe_contribution" | "attachments"
+    > & {
+      readonly contact?: number | null;
+    };
 
   type SubAccountRow = Table.ModelRow<SubAccountRowData>;
   type SubAccountTableContext = { readonly id: number; readonly budgetId: number };
@@ -70,7 +68,7 @@ declare namespace Tables {
   >;
 
   type ContactRow = Table.ModelRow<ContactRowData>;
-  type ContactTableContext = {};
+  type ContactTableContext = Table.Context;
   type ContactTableStore = Redux.TableStore<ContactRowData>;
 }
 
@@ -86,12 +84,12 @@ declare namespace PdfBudgetTable {
     readonly right_info: Pdf.HTMLNode[] | null;
   };
 
-  interface Options {
+  type Options = {
     readonly header: HeaderOptions;
     readonly columns: string[];
     readonly tables?: TableOption[] | null | undefined;
     readonly excludeZeroTotals: boolean;
     readonly notes?: Pdf.HTMLNode[];
     readonly includeNotes: boolean;
-  }
+  };
 }

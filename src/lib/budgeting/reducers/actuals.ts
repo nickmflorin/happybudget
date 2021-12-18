@@ -7,7 +7,6 @@ export type ActualTableActionMap = Redux.AuthenticatedTableActionMap<R, M, Table
   readonly responseActualTypes: Redux.ActionCreator<Http.ListResponse<Model.Tag>>;
 };
 
-/* eslint-disable indent */
 export const createAuthenticatedActualsTableReducer = (
   config: Table.ReducerConfig<R, M, Tables.ActualTableStore, Tables.ActualTableContext, ActualTableActionMap> & {
     readonly owners: Redux.Reducer<Redux.AuthenticatedModelListResponseStore<Model.ActualOwner>>;
@@ -22,7 +21,7 @@ export const createAuthenticatedActualsTableReducer = (
     Tables.ActualTableContext
   >(config);
 
-  return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
+  return (state: S | undefined = config.initialState, action: Redux.Action): S => {
     let newState = generic(state, action);
     if (action.type === config.actions.responseActualTypes.toString()) {
       const payload: Http.ListResponse<Model.Tag> = action.payload;

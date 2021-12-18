@@ -8,13 +8,10 @@ import Grid, { GridProps } from "./Grid";
 export interface UnauthenticatedGridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
   extends GridProps<R, M> {
   readonly framework?: Table.Framework;
-  readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
 }
 
-/* eslint-disable indent */
 const UnauthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
   framework,
-  footerRowSelectors,
   ...props
 }: UnauthenticatedGridProps<R, M>): JSX.Element => {
   const frameworkComponents = useMemo<Table.FrameworkGroup>((): Table.FrameworkGroup => {
@@ -22,7 +19,7 @@ const UnauthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpMod
     return {
       ...reduce(
         combinedFramework.cells?.[props.id],
-        (prev: Table.FrameworkGroup, cell: React.ComponentType<any>, name: string) => ({
+        (prev: Table.FrameworkGroup, cell: React.ComponentType<Record<string, unknown>>, name: string) => ({
           ...prev,
           [name]: cell
         }),

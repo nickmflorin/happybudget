@@ -17,4 +17,6 @@ export const responseAction = redux.actions.createAction<Http.TableResponse<Mode
   ActionType.SubAccount.SubAccounts.Response
 );
 
-export const setSearchAction = redux.actions.createAction<string>(ActionType.SubAccount.SubAccounts.SetSearch);
+export const setSearchAction = redux.actions.createContextAction<string, Tables.SubAccountTableContext>(
+  ActionType.SubAccount.SubAccounts.SetSearch
+);

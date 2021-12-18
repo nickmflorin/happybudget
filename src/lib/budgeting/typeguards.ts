@@ -1,3 +1,4 @@
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const isSubAccountRow = (r: Table.DataRow<any>): r is Table.DataRow<Tables.SubAccountRowData> =>
   (r.data as Tables.SubAccountRowData).fringe_contribution !== undefined;
 
@@ -19,7 +20,6 @@ export const isAccount = <M extends Model.Account | Model.SimpleAccount = Model.
   m: Model.HttpModel
 ): m is M => (m as M).type === "account";
 
-/* eslint-disable indent */
 export const isSubAccount = <
   M extends Model.SubAccount | Model.SimpleSubAccount = Model.SubAccount | Model.SimpleSubAccount
 >(
@@ -45,7 +45,6 @@ export const isTemplate = <M extends Model.Template | Model.SimpleTemplate = Mod
 export const isModelWithChildren = <M extends Model.Model>(model: M): model is M & { children: M[] } =>
   (model as M & { children: M[] }).children !== undefined && Array.isArray((model as M & { children: M[] }).children);
 
-/* eslint-disable indent */
 export const isModelWithGroup = <M extends Model.Model>(
   m: M | (M & { readonly group: Model.Group | null })
 ): m is M & { readonly group: Model.Group | null } =>

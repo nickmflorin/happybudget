@@ -3,6 +3,10 @@ import mime from "mime";
 
 export const fileSizeInMB = (file: File | number) => (typeof file === "number" ? file : file.size) / 1024 / 1024;
 
+export const getFileType = (filename: string): string | undefined => filename.split(".").pop();
+
+export const fileSizeString = (file: File | number) => `${fileSizeInMB(file).toFixed(2)} MB`;
+
 class InvalidFileNameError extends Error {
   constructor(filename: string) {
     super(`The filename ${filename} is invalid.`);
@@ -23,7 +27,7 @@ export const parseFileNameAndExtension = (name: string, ext?: string): [string, 
       explicitExtension = ext.slice(1);
     }
   }
-  let extensionFromName = getFileType(name);
+  const extensionFromName = getFileType(name);
   if (isNil(extensionFromName)) {
     if (isNil(explicitExtension)) {
       throw new InvalidFileNameError(name);
@@ -37,10 +41,6 @@ export const parseFileNameAndExtension = (name: string, ext?: string): [string, 
   }
   return [name, extension];
 };
-
-export const getFileType = (filename: string): string | undefined => filename.split(".").pop();
-
-export const fileSizeString = (file: File | number) => `${fileSizeInMB(file).toFixed(2)} MB`;
 
 export const getDataFromBlob = (file: File | Blob): Promise<string | ArrayBuffer> =>
   new Promise((resolve, reject) => {
@@ -91,7 +91,7 @@ export const downloadBlob = async (blob: Blob, name: string) => {
 };
 
 export const extensionIsImage = (ext: string) => {
-  let mimeType = mime.getType(ext);
+  const mimeType = mime.getType(ext);
   if (isNil(mimeType)) {
     throw new InvalidFileExtensionError(ext);
   }
@@ -103,13 +103,14 @@ export const download = async (
   nm: string,
   options: DownloadOptions = { includeExtensionInName: true }
 ) => {
+  /* eslint-disable-next-line prefer-const */
   let [name, extension] = parseFileNameAndExtension(nm, options.ext);
   if (!name.endsWith(extension) && options.includeExtensionInName === true) {
     name = `${name}.${extension}`;
   } else if (name.endsWith(extension) && options.includeExtensionInName === false) {
     name = name.slice(0, name.indexOf(extension) - 1);
   }
-  let mimeType = mime.getType(extension);
+  const mimeType = mime.getType(extension);
   if (isNil(mimeType)) {
     throw new InvalidFileExtensionError(extension);
   }

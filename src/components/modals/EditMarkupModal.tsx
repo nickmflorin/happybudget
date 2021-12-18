@@ -19,7 +19,6 @@ interface EditMarkupModalProps<
   readonly parentType: Model.ParentType | "template";
 }
 
-/* eslint-disable indent */
 const EditMarkupModal = <
   M extends Model.SimpleAccount | Model.SimpleSubAccount,
   B extends Model.Budget | Model.Template,
@@ -57,7 +56,7 @@ const EditMarkupModal = <
       request={api.getMarkup}
       update={api.updateMarkup}
       interceptPayload={(p: MarkupFormValues) => {
-        let { rate, children, ...payload } = p;
+        const { rate, children, ...payload } = p;
         let mutated = { ...payload } as Http.MarkupPayload;
         // FLAT Markups do not have any children.
         if (mutated.unit === budgeting.models.MarkupUnitModels.PERCENT.id) {
@@ -97,7 +96,7 @@ const EditMarkupModal = <
         form.setFields(fields);
       }}
     >
-      {(m: Model.Markup | null) => (
+      {() => (
         <MarkupForm
           ref={markupRef}
           form={form}

@@ -1,4 +1,3 @@
-/* eslint-disable indent */
 import React, { useState, useRef, useImperativeHandle, ForwardedRef, forwardRef } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
@@ -28,7 +27,11 @@ const InputOnFocus = (
 
   useEffect(() => {
     if (!isNil(innerRef.current)) {
-      focused === true ? innerRef.current.focus() : innerRef.current.blur();
+      if (focused) {
+        innerRef.current.focus();
+      } else {
+        innerRef.current.blur();
+      }
     }
   }, [focused]);
 
@@ -45,8 +48,8 @@ const InputOnFocus = (
       className={classNames("input-div", props.className)}
       tabIndex={0}
       style={props.style}
-      onFocus={(e: React.FocusEvent<HTMLDivElement>) => setFocused(true)}
-      onBlur={(e: React.FocusEvent<HTMLDivElement>) => setFocused(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
     >
       {focused === true ||
       (renderBlurredContentOnNoValue === false && (props.value === undefined || props.value === "")) ? (

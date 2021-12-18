@@ -35,7 +35,8 @@ function* getBudgetTask(action: Redux.Action<number>): SagaIterator {
     const response: Model.Template = yield api.request(api.getTemplate, action.payload);
     yield put(actions.responseBudgetAction(response));
   } catch (e: unknown) {
-    notifications.requestError(e as Error, { message: "There was an error retrieving the budget." });
+    // TODO: We need to build in banner notifications for this event.
+    notifications.requestError(e as Error);
     yield put(actions.responseBudgetAction(null));
   } finally {
     yield put(actions.loadingBudgetAction(false));
@@ -47,8 +48,8 @@ export const createFringesTableSaga = (table: Table.TableInstance<Tables.FringeR
     actions: { ...FringesActionMap, request: actions.requestFringesAction },
     tasks: budgeting.tasks.fringes.createTableTaskSet<Model.Template>({
       table,
-      selectAccountTableStore: (state: Application.Authenticated.Store) => state.template.account.table,
-      selectSubAccountTableStore: (state: Application.Authenticated.Store) => state.template.subaccount.table,
+      selectAccountTableStore: (state: Application.AuthenticatedStore) => state.template.account.table,
+      selectSubAccountTableStore: (state: Application.AuthenticatedStore) => state.template.subaccount.table,
       actions: FringesActionMap,
       services: {
         create: api.createTemplateFringe,

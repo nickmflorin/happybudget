@@ -4,11 +4,10 @@ import { isNil, map, isEqual } from "lodash";
 
 import { tabling } from "lib";
 
-/* eslint-disable indent */
 export const createTableSaga = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  C = any,
+  C extends Table.Context = Table.Context,
   A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
 >(
   config: Table.SagaConfig<R, M, C, A>
@@ -35,7 +34,7 @@ export const createTableSaga = <
 export const createUnauthenticatedTableSaga = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  C = any,
+  C extends Table.Context = Table.Context,
   A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
 >(
   config: Table.SagaConfig<R, M, C, A>
@@ -47,18 +46,17 @@ type Batch<
   E extends Table.ChangeEvent<R, M>,
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  C = any
+  C extends Table.Context = Table.Context
 > = {
   readonly events: E[];
   // All of the events in a batch must have the same context.
   readonly context: C;
 };
 
-/* eslint-disable indent */
 export const createAuthenticatedTableSaga = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  C = any,
+  C extends Table.Context = Table.Context,
   A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
 >(
   config: Table.SagaConfig<R, M, C, A>

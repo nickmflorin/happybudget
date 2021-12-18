@@ -14,7 +14,9 @@ export const loadingAction = redux.actions.createAction<boolean>(ActionType.Acco
 export const responseAction = redux.actions.createAction<Http.TableResponse<Model.Account>>(
   ActionType.Accounts.Response
 );
-export const setSearchAction = redux.actions.createAction<string>(ActionType.Accounts.SetSearch);
+export const setSearchAction = redux.actions.createContextAction<string, Tables.AccountTableContext>(
+  ActionType.Accounts.SetSearch
+);
 export const addModelsToStateAction = redux.actions.createAction<Redux.AddModelsToTablePayload<Model.Account>>(
   ActionType.Accounts.AddToState
 );

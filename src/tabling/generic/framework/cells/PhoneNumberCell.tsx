@@ -4,7 +4,6 @@ import { isNil } from "lodash";
 import { tabling } from "lib";
 import LinkCell, { LinkCellProps } from "./LinkCell";
 
-/* eslint-disable indent */
 const PhoneNumberCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,

@@ -51,19 +51,7 @@ type OverriddenAgProps =
   | "tabToNextCell"
   | "frameworkComponents";
 
-type ExtendAgGridProps = false;
-type ExtensionProps = ExtendAgGridProps extends true ? Omit<Table.AgGridProps, OverriddenAgProps> : {};
-
-/*
-Note: Right now, we are restricting the use of AG Grid props to those that are
-      explicitly defined. If we want to use an additional prop, the best practice
-      is to define the prop we want to use ourselves.  This is done because AG
-      Grid's typing is prone to errors.
-      If we want to open the flood gates and allow our tables to define an AG
-      Grid prop anywhere when they are created, we can simply set
-      ExtendAgGridProps to true above.
-*/
-type UseAgProps<R extends Table.RowData> = ExtensionProps & {
+type UseAgProps<R extends Table.RowData> = Omit<Table.AgGridProps, OverriddenAgProps> & {
   readonly allowContextMenuWithControlKey?: boolean;
   readonly frameworkComponents?: Table.FrameworkGroup;
   readonly suppressCopyRowsToClipboard?: boolean;
@@ -79,8 +67,8 @@ type UseAgProps<R extends Table.RowData> = ExtensionProps & {
   readonly onGridReady: (e: GridReadyEvent) => void;
   readonly onFirstDataRendered: (e: FirstDataRenderedEvent) => void;
   readonly onCellDoubleClicked?: (e: CellDoubleClickedEvent) => void;
-  readonly processDataFromClipboard?: (params: ProcessDataFromClipboardParams) => any;
-  readonly processCellFromClipboard?: (params: ProcessCellForExportParams) => string;
+  readonly processDataFromClipboard?: (params: ProcessDataFromClipboardParams) => string[][];
+  readonly processCellFromClipboard?: (params: ProcessCellForExportParams) => Table.RawRowValue;
   readonly onCellEditingStarted?: (event: CellEditingStartedEvent) => void;
   readonly onPasteStart?: (event: PasteStartEvent) => void;
   readonly onPasteEnd?: (event: PasteEndEvent) => void;
@@ -115,7 +103,6 @@ export interface GridProps<R extends Table.RowData, M extends Model.RowHttpModel
   readonly localizePopupParent?: boolean;
 }
 
-/* eslint-disable indent */
 const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
   id,
   tableId,
@@ -159,6 +146,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
         	While AG Grid will not break if we include extra properties on the
 					ColDef(s) (properties from our own custom Table.Column model) - they
 					will complain a lot. So we need to try to remove them. */
+          /* eslint-disable @typescript-eslint/no-unused-vars */
           const {
             footer,
             page,
@@ -202,7 +190,6 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
           return {
             ...agColumn,
             field: col.field as string,
-            cellStyle: !isNil(col.cellStyle) ? (col.cellStyle as { [key: string]: any }) : undefined,
             suppressMenu: true,
             valueGetter: (params: ValueGetterParams) => {
               if (!isNil(params.node)) {
@@ -219,7 +206,6 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
               return col.nullValue !== undefined ? col.nullValue : null;
             },
             cellRenderer:
-              /* eslint-disable indent */
               typeof col.cellRenderer === "string"
                 ? col.cellRenderer
                 : !isNil(col.cellRenderer)
@@ -229,18 +215,17 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
             editable: (params: EditableCallbackParams) => {
               const row: Table.Row<R> = params.node.data;
               if (tabling.typeguards.isBodyRow(row)) {
-                return tabling.columns.isEditable(col, row);
+                return tabling.columns.isEditable<R, M, typeof col>(col, row);
               }
               return false;
             },
             cellClass: (params: CellClassParams) => {
               const row: Table.Row<R> = params.node.data;
               if (tabling.typeguards.isEditableRow(row)) {
-                /* eslint-disable indent */
                 const isSelectable = isNil(col.selectable)
                   ? true
                   : typeof col.selectable === "function"
-                  ? col.selectable({ row, column: col })
+                  ? col.selectable({ row })
                   : col.selectable;
                 return tabling.aggrid.mergeClassNames<CellClassParams>(params, "cell", col.cellClass, {
                   "cell--not-selectable": isSelectable === false
@@ -313,6 +298,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
     []
   );
 
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const getRowNodeId = useMemo(() => (r: any) => r.id, []);
 
   return (

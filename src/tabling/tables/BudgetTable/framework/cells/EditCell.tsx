@@ -5,7 +5,6 @@ import { tabling } from "lib";
 
 import { EditCell as GenericEditCell, EditCellProps } from "tabling/generic/framework/cells";
 
-/* eslint-disable indent */
 const EditCell = <
   R extends Tables.BudgetRowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,

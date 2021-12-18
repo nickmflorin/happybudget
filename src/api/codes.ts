@@ -43,23 +43,22 @@ export const ErrorCodes: { [key: string]: Http.ErrorCode } = {
   ...UnknownErrorCodes
 };
 
-export type ErrorFilter = ((error: Http.Error) => boolean) | { [key: string]: any };
-export type ErrorStandardizer<T> = (error: T) => T;
+type ErrorFilter = ((error: Http.Error) => boolean) | Record<string, unknown>;
+type ErrorStandardizer<T> = (error: T) => T;
 
 const testError = (filt: ErrorFilter, error: Http.Error): boolean =>
   typeof filt === "function" ? filt(error) : isMatch(error, filt);
 
-/* prettier-ignore */
-export const Standard =
+const Standard =
   <T extends Http.Error = Http.Error>(f: ErrorFilter, standardizer: ErrorStandardizer<T>): ErrorStandardizer<T> =>
-    (error: T): T => {
-      if (testError(f, error)) {
-        return standardizer(error);
-      }
-      return error;
-    };
+  (error: T): T => {
+    if (testError(f, error)) {
+      return standardizer(error);
+    }
+    return error;
+  };
 
-export const STANDARDS: ErrorStandardizer<any>[] = [
+const STANDARDS: ErrorStandardizer<Http.FieldError>[] = [
   Standard<Http.FieldError>(
     (error: Http.Error) => error.error_type === "field" && error.code === ErrorCodes.UNIQUE,
     (error: Http.FieldError) => ({ ...error, message: `The field ${error.field} must be unique.` })
@@ -71,7 +70,14 @@ export const STANDARDS: ErrorStandardizer<any>[] = [
 ];
 
 export const standardizeError = <T extends Http.Error = Http.Error>(error: T) => {
-  return reduce(STANDARDS, (e: T, standard) => standard(e), error);
+  return reduce(
+    STANDARDS,
+    (e: T, standard: ErrorStandardizer<Http.FieldError>): T => {
+      const fn = standard as unknown as ErrorStandardizer<T>;
+      return fn(error);
+    },
+    error
+  );
 };
 
 export const standardizedErrorMessage = <T extends Http.Error = Http.Error>(error: T) =>

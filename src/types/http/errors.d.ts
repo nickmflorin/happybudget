@@ -55,7 +55,7 @@ declare namespace Http {
   interface IHttpClientError extends IBaseError {
     readonly url: string;
     readonly status: number;
-    readonly response: import("axios").AxiosResponse<any>;
+    readonly response: import("axios").AxiosResponse<Http.ErrorReponse>;
     readonly errors: Error[];
     readonly userId?: number;
     readonly globalError: GlobalError | null;

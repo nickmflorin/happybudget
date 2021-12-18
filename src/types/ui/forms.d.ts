@@ -24,6 +24,7 @@ declare interface FormProps<T> extends Omit<RootFormProps, "style" | "id" | "cla
   readonly titleIcon?: IconOrElement;
   readonly title?: string | JSX.Element;
   readonly condensed?: boolean;
+  readonly initialValues?: Partial<T>;
 }
 
 declare type HeaderTemplateFormData = {
@@ -34,18 +35,18 @@ declare type HeaderTemplateFormData = {
   readonly right_info: string | null;
 };
 
-declare interface ExportPdfFormOptions {
+declare type ExportPdfFormOptions = {
   readonly columns: string[];
   readonly excludeZeroTotals: boolean;
-}
+};
 
 declare type IExportFormRef<O extends ExportPdfFormOptions = ExportPdfFormOptions> = {
   readonly getFormData: () => O;
 };
 
-declare interface ExportBudgetPdfFormOptions extends ExportPdfFormOptions {
+declare type ExportBudgetPdfFormOptions = ExportPdfFormOptions & {
   readonly header: HeaderTemplateFormData;
   readonly tables?: TableOption[] | null | undefined;
   readonly notes?: string | null;
   readonly includeNotes: boolean;
-}
+};

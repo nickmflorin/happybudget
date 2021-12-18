@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import GenericMenu from "./Generic";
 
-const ModelMenu = <M extends Model.Model, S extends object = MenuItemSelectedState>(
+const ModelMenu = <M extends Model.Model, S extends Record<string, unknown> = MenuItemSelectedState>(
   props: IMenu<S, M>
 ): JSX.Element => <GenericMenu<S, M> {...props} className={classNames("model-menu", props.className)} />;
 

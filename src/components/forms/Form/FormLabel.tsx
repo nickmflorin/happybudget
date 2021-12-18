@@ -10,9 +10,7 @@ interface FormLabelProps extends StandardComponentWithChildrenProps {
 const FormLabel = ({ section, columnType, ...props }: FormLabelProps): JSX.Element => {
   return (
     <label className={classNames({ "label--section": section }, props.className)} style={props.style}>
-      <FormLabelContent columnType={columnType} section={section}>
-        {props.children}
-      </FormLabelContent>
+      <FormLabelContent columnType={columnType}>{props.children}</FormLabelContent>
     </label>
   );
 };

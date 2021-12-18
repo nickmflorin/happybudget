@@ -9,7 +9,7 @@ interface ContactNameCellProps extends Table.CellProps<Tables.ContactRowData, Mo
   readonly onEditContact: (id: number) => void;
 }
 
-const ContactNameCell = ({ value, ...props }: ContactNameCellProps): JSX.Element => {
+const ContactNameCell = (props: ContactNameCellProps): JSX.Element => {
   const row: Table.BodyRow<Tables.ContactRowData> = props.node.data;
   return (
     <Cell {...props}>

@@ -12,10 +12,11 @@ interface FringesColorEditorProps
   value: string | null;
 }
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const FringesColorEditor = (props: FringesColorEditorProps, ref: any) => {
   const isFirstRender = ui.hooks.useTrackFirstRender();
   const [value, setValue] = useState<string | null>(props.value);
-  const colors = useSelector((state: Application.Authenticated.Store) => props.selector(state).fringeColors);
+  const colors = useSelector((state: Application.AuthenticatedStore) => props.selector(state).fringeColors);
 
   useEffect(() => {
     if (!isFirstRender) {

@@ -7,7 +7,6 @@ const cookies = new Cookies();
 type KeyType = "time" | "user";
 type PluginId = "segment" | "canny" | "intercom";
 
-/* eslint-disable-next-line no-unused-vars */
 type PluginKeys<K extends string> = { [key in KeyType]: K };
 
 type Plugin<ID extends PluginId, K extends string> = { id: ID; keys: PluginKeys<K>; delayTime: number };
@@ -40,7 +39,7 @@ const Plugins: Plugin<PluginId, string>[] = [
 ];
 
 const getPlugin = <ID extends PluginId, K extends string>(id: ID): Plugin<ID, K> =>
-  find(Plugins, { id } as any) as Plugin<ID, K>;
+  find(Plugins, { id }) as Plugin<ID, K>;
 
 const parseLastIdentifiedUser = (id: PluginId): number | null => {
   const plugin = getPlugin(id);

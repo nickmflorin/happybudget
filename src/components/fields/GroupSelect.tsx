@@ -10,6 +10,7 @@ import Select, { SelectProps } from "./Select";
 // Does not seem to be exportable from AntD/RCSelect so we just copy it here.
 type CustomTagProps = {
   readonly label: React.ReactNode;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   readonly value: any;
   readonly disabled: boolean;
   readonly onClose: (event?: React.MouseEvent<HTMLElement, MouseEvent>) => void;

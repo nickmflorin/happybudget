@@ -7,13 +7,11 @@ export const ExportPdfAction = (onExport: () => void): Table.MenuActionObj => ({
   onClick: () => onExport()
 });
 
-/* eslint-disable indent */
 export const ExportCSVAction = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   table: Table.TableInstance<R, M>,
   params: Table.MenuActionParams<R, M>,
   exportFileName: string
 ): Table.MenuActionObj => ({
-  /* eslint-disable indent */
   label: "Export CSV",
   icon: "file-csv",
   wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => {
@@ -38,7 +36,6 @@ export const ToggleColumnAction = <R extends Table.RowData, M extends Model.RowH
   table: Table.TableInstance<R, M>,
   params: Table.MenuActionParams<R, M>
 ): Table.MenuActionObj => ({
-  /* eslint-disable indent */
   label: "Columns",
   icon: "line-columns",
   wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => {

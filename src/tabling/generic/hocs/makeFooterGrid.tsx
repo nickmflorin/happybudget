@@ -28,7 +28,6 @@ export interface UnauthenticatedFooterGridProps<
   readonly constrainHorizontally?: boolean;
 }
 
-/* eslint-disable indent */
 const FooterGrid =
   <
     R extends Table.RowData,
@@ -38,7 +37,9 @@ const FooterGrid =
     config: Table.FooterGridConfig<R, M>
   ) =>
   (
-    Component: React.ComponentClass<WithFooterGridProps<T>, {}> | React.FunctionComponent<WithFooterGridProps<T>>
+    Component:
+      | React.ComponentClass<WithFooterGridProps<T>, Record<string, unknown>>
+      | React.FunctionComponent<WithFooterGridProps<T>>
   ): React.FunctionComponent<Omit<T, "id">> => {
     function WithFooterGrid(props: T) {
       const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {

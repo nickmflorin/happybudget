@@ -1,6 +1,6 @@
 import React, { lazy } from "react";
 
-type LazyReturnType = { default: React.ComponentType<any> };
+type LazyReturnType = { default: React.ComponentType<Record<string, unknown>> };
 
 /**
  * Sometimes, when lazy loading components, a user's browser will automatically
@@ -13,7 +13,7 @@ type LazyReturnType = { default: React.ComponentType<any> };
  * cache and tries to lazy load the component by its newer bundle name.
  *
  * Reference: https://raphael-leger.medium.com/
- * 	react-webpack-chunkloaderror-loading-chunk-x-failed-ac385bd110e0
+ *   react-webpack-chunkloaderror-loading-chunk-x-failed-ac385bd110e0
  */
 const lazyWithRetry = (lazyComponent: () => Promise<LazyReturnType>) =>
   lazy(async () => {
@@ -35,7 +35,7 @@ const lazyWithRetry = (lazyComponent: () => Promise<LazyReturnType>) =>
            evaluated as potentially undefined and would not allow us to use them
            in the DOM tree.  It is purely a typing fix, as this line will never
            get reached because of the window.location.reload() */
-        return { default: lazy(() => import("./DefaultComponent")) as React.ComponentType<any> };
+        return { default: lazy(() => import("./DefaultComponent")) as React.ComponentType<Record<string, unknown>> };
       }
       /* The page has already been reloaded.  Assuming that the user is using
          the latest version of the application, let the application crash and

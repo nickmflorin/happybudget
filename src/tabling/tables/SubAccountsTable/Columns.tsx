@@ -7,16 +7,15 @@ import { columns } from "../../generic";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
-type PDFM = Model.PdfSubAccount;
 
-const Columns: Table.Column<R, M, any, PDFM>[] = [
-  columns.IdentifierColumn<R, M, PDFM>({
+const Columns: Table.Column<R, M>[] = [
+  columns.IdentifierColumn<"subaccount", R, M>({
     field: "identifier",
     pdfHeaderName: "Acct #",
     pdfWidth: 0.08,
     pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
   }),
-  columns.BodyColumn<R, M, string | null, PDFM>({
+  columns.BodyColumn<R, M, string | null>({
     field: "description",
     minWidth: 200,
     flex: 100,
@@ -81,7 +80,7 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     pdfWidth: 0.12,
     requiresAuthentication: true
   }),
-  columns.BodyColumn<R, M, number, PDFM>({
+  columns.BodyColumn<R, M, number>({
     field: "quantity",
     headerName: "Qty",
     pdfWidth: 0.05,
@@ -113,7 +112,7 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     width: 100,
     pdfWidth: 0.07
   }),
-  columns.BodyColumn<R, M, number | null, PDFM>({
+  columns.BodyColumn<R, M, number | null>({
     field: "multiplier",
     headerName: "X",
     width: 60,
@@ -121,7 +120,7 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     valueSetter: tabling.valueSetters.numericValueSetter<R>("multiplier"),
     columnType: "number"
   }),
-  columns.BodyColumn<R, M, number | null, PDFM>({
+  columns.BodyColumn<R, M, number | null>({
     field: "rate",
     headerName: "Rate",
     width: 100,
@@ -130,7 +129,7 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     valueSetter: tabling.valueSetters.numericValueSetter<R>("rate"),
     columnType: "currency"
   }),
-  columns.SelectColumn<R, M, number[], PDFM>({
+  columns.SelectColumn<R, M, number[]>({
     field: "fringes",
     headerName: "Fringes",
     cellRenderer: { data: "FringesCell" },
@@ -138,32 +137,32 @@ const Columns: Table.Column<R, M, any, PDFM>[] = [
     nullValue: [],
     includeInPdf: false
   }),
-  columns.EstimatedColumn<R, M, PDFM>({
+  columns.EstimatedColumn<R, M>({
     colId: "estimated",
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfValueGetter: budgeting.valueGetters.estimatedValueGetter,
     pdfWidth: 0.12
   }),
-  columns.ActualColumn<R, M, PDFM>({
+  columns.ActualColumn<R, M>({
     field: "actual",
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfValueGetter: budgeting.valueGetters.actualValueGetter,
     pdfWidth: 0.12
   }),
-  columns.VarianceColumn<R, M, PDFM>({
+  columns.VarianceColumn<R, M>({
     colId: "variance",
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfValueGetter: budgeting.valueGetters.varianceValueGetter,
     pdfWidth: 0.12
   }),
-  columns.FakeColumn<R, M, PDFM>({ field: "nominal_value" }),
-  columns.FakeColumn<R, M, PDFM>({ field: "markup_contribution" }),
-  columns.FakeColumn<R, M, PDFM>({ field: "fringe_contribution" }),
-  columns.FakeColumn<R, M, PDFM>({ field: "accumulated_fringe_contribution" }),
-  columns.FakeColumn<R, M, PDFM>({ field: "accumulated_markup_contribution" })
+  columns.FakeColumn<R, M>({ field: "nominal_value" }),
+  columns.FakeColumn<R, M>({ field: "markup_contribution" }),
+  columns.FakeColumn<R, M>({ field: "fringe_contribution" }),
+  columns.FakeColumn<R, M>({ field: "accumulated_fringe_contribution" }),
+  columns.FakeColumn<R, M>({ field: "accumulated_markup_contribution" })
 ];
 
 export default Columns;

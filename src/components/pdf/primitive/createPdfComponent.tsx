@@ -13,7 +13,6 @@ import { mergeStylesFromClassName } from "style/pdf";
  */
 export const createPdfComponent =
   <P extends StandardPdfComponentProps = StandardPdfComponentProps>(
-    /* eslint-disable indent */
     Component: React.ComponentType<Omit<P, "className">>
   ): React.FC<P> =>
   ({ className, ...props }: P): JSX.Element =>

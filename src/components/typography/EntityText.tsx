@@ -51,7 +51,6 @@ export const EntityTextIdentifier = ({ className, style, ...props }: TextProps):
   );
 };
 
-/* eslint-disable indent */
 const EntityText: React.FC<EntityTextProps> = ({ children, className, fillEmpty, style = {} }) => {
   const identifier = useMemo(
     () =>

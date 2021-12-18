@@ -3,7 +3,7 @@ import { util, tabling } from "lib";
 import { Colors } from "style/constants";
 
 /* eslint-disable no-shadow */
-/* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export enum FringeUnitNames {
   PERCENT = "Percent",
   FLAT = "Flat"
@@ -17,7 +17,7 @@ export const FringeUnitModels: { [key in "PERCENT" | "FLAT"]: Model.FringeUnit }
 export const FringeUnits = Object.values(FringeUnitModels);
 
 /* eslint-disable no-shadow */
-/* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export enum MarkupUnitNames {
   PERCENT = "Percent",
   FLAT = "Flat"
@@ -30,11 +30,11 @@ export const MarkupUnitModels: { [key: string]: Model.MarkupUnit } = {
 
 export const MarkupUnits = Object.values(MarkupUnitModels);
 
-export const getGroupColorDefinition = (
-  group: Style.HexColor | Model.Group | Table.GroupRow<any>
+export const getGroupColorDefinition = <R extends Table.RowData>(
+  group: Style.HexColor | Model.Group | Table.GroupRow<R>
 ): Table.RowColorDef => {
   if (!isNil(group)) {
-    let color =
+    const color =
       typeof group === "string" ? group : tabling.typeguards.isRow(group) ? group.groupData.color : group.color;
     if (!isNil(color)) {
       return {

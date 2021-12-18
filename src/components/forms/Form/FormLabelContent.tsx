@@ -5,12 +5,11 @@ import { tabling, ui } from "lib";
 import { Icon } from "components";
 
 interface FormLabelContentProps {
-  readonly section?: boolean;
   readonly columnType?: Table.ColumnTypeId;
   readonly children: React.ReactNode | undefined;
 }
 
-const FormLabelContent = ({ section, columnType, ...props }: FormLabelContentProps): JSX.Element => {
+const FormLabelContent = ({ columnType, ...props }: FormLabelContentProps): JSX.Element => {
   const cType: Table.ColumnType | undefined = useMemo(() => {
     return !isNil(columnType) ? find(tabling.models.ColumnTypes, obj => obj.id === columnType) : undefined;
   }, [columnType]);

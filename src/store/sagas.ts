@@ -18,9 +18,9 @@ export const createUnauthenticatedRootSaga = (config: Application.AnyModuleConfi
   function* applicationSaga(): SagaIterator {
     const unauthenticatedConfig = filter(config, (c: Application.AnyModuleConfig) =>
       redux.typeguards.isUnauthenticatedModuleConfig(c)
-    ) as Application.Unauthenticated.ModuleConfig[];
-    for (var i = 0; i < unauthenticatedConfig.length; i++) {
-      const moduleConfig: Application.Unauthenticated.ModuleConfig = unauthenticatedConfig[i];
+    ) as Application.UnauthenticatedModuleConfig[];
+    for (let i = 0; i < unauthenticatedConfig.length; i++) {
+      const moduleConfig: Application.UnauthenticatedModuleConfig = unauthenticatedConfig[i];
       if (!isNil(moduleConfig.rootSaga)) {
         yield spawn(moduleConfig.rootSaga);
       }
@@ -48,9 +48,9 @@ export const createAuthenticatedRootSaga = (config: Application.AnyModuleConfig[
     const authenticatedConfig = filter(
       config,
       (c: Application.AnyModuleConfig) => !redux.typeguards.isUnauthenticatedModuleConfig(c)
-    ) as Application.Authenticated.ModuleConfig[];
-    for (var i = 0; i < authenticatedConfig.length; i++) {
-      const moduleConfig: Application.Authenticated.ModuleConfig = authenticatedConfig[i];
+    ) as Application.AuthenticatedModuleConfig[];
+    for (let i = 0; i < authenticatedConfig.length; i++) {
+      const moduleConfig: Application.AuthenticatedModuleConfig = authenticatedConfig[i];
       if (!isNil(moduleConfig.rootSaga)) {
         yield spawn(moduleConfig.rootSaga);
       }

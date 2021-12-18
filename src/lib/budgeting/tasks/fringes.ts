@@ -51,14 +51,14 @@ export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Ta
   FringesTableActionMap<B>
 > & {
   readonly services: FringeTableServiceSet<B>;
-  readonly selectAccountTableStore: (state: Application.Authenticated.Store) => Tables.SubAccountTableStore;
-  readonly selectSubAccountTableStore: (state: Application.Authenticated.Store) => Tables.SubAccountTableStore;
+  readonly selectAccountTableStore: (state: Application.AuthenticatedStore) => Tables.SubAccountTableStore;
+  readonly selectSubAccountTableStore: (state: Application.AuthenticatedStore) => Tables.SubAccountTableStore;
 };
 
 export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   config: FringesTableTaskConfig<B>
 ): Redux.TableTaskMap<R, M, Tables.FringeTableContext> => {
-  const selectPath = (s: Application.Authenticated.Store) => s.router.location.pathname;
+  const selectPath = (s: Application.AuthenticatedStore) => s.router.location.pathname;
 
   const selectTableStore = createSelector(
     [selectPath, config.selectAccountTableStore, config.selectSubAccountTableStore],
@@ -92,20 +92,6 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     }
   );
 
-  function* request(
-    action: Redux.ActionWithContext<Redux.TableRequestPayload, Tables.FringeTableContext>
-  ): SagaIterator {
-    yield put(config.actions.loading(true));
-    try {
-      yield all([call(requestFringes, action.context.budgetId), call(requestFringeColors)]);
-    } catch (e: unknown) {
-      notifications.requestError(e as Error, { message: "There was an error retrieving the table data." });
-      yield put(config.actions.response({ models: [] }));
-    } finally {
-      yield put(config.actions.loading(false));
-    }
-  }
-
   function* requestFringes(objId: number): SagaIterator {
     const response: Http.ListResponse<M> = yield api.request(config.services.request, objId, {});
     if (response.data.length === 0) {
@@ -122,6 +108,21 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   function* requestFringeColors(): SagaIterator {
     const response = yield api.request(api.getFringeColors);
     yield put(config.actions.responseFringeColors(response));
+  }
+
+  function* request(
+    action: Redux.ActionWithContext<Redux.TableRequestPayload, Tables.FringeTableContext>
+  ): SagaIterator {
+    yield put(config.actions.loading(true));
+    try {
+      yield all([call(requestFringes, action.context.budgetId), call(requestFringeColors)]);
+    } catch (e: unknown) {
+      config.table.notify({ message: "There was an error retrieving the table data.", level: "error" });
+      notifications.requestError(e as Error);
+      yield put(config.actions.response({ models: [] }));
+    } finally {
+      yield put(config.actions.loading(false));
+    }
   }
 
   const bulkCreateTask: Redux.TableBulkCreateTask<R, [number]> = tabling.tasks.createBulkTask<
@@ -159,7 +160,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         requestPayload
       );
       yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
-      const path = yield select((s: Application.Authenticated.Store) => s.router.location.pathname);
+      const path = yield select((s: Application.AuthenticatedStore) => s.router.location.pathname);
 
       const FRINGE_QUANTITATIVE_FIELDS: (keyof Http.FringePayload)[] = ["cutoff", "rate", "unit"];
 
@@ -167,7 +168,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         return (
           filter(
             map(FRINGE_QUANTITATIVE_FIELDS, (field: keyof Http.FringePayload) => p[field]),
-            (v: any) => v !== undefined
+            (v: Http.FringePayload[keyof Http.FringePayload]) => v !== undefined
           ).length !== 0
         );
       };
@@ -210,7 +211,8 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         }
       }
     } catch (err: unknown) {
-      notifications.requestError(err as Error, { message: errorMessage });
+      config.table.notify({ message: errorMessage, level: "error" });
+      notifications.requestError(err as Error);
     } finally {
       if (!tabling.typeguards.isGroupEvent(e)) {
         yield put(config.actions.loadingBudget(false));
@@ -226,7 +228,8 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       const response: Http.BulkDeleteResponse<B> = yield api.request(config.services.bulkDelete, budgetId, ids);
       yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
     } catch (err: unknown) {
-      notifications.requestError(err as Error, { message: errorMessage });
+      config.table.notify({ message: errorMessage, level: "error" });
+      notifications.requestError(err as Error);
     } finally {
       yield put(config.actions.saving(false));
       yield put(config.actions.loadingBudget(false));
@@ -238,7 +241,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     try {
       const response: M = yield api.request(config.services.create, context.budgetId, {
         previous: e.payload.previous,
-        ...tabling.http.postPayload(e.payload.data, config.table.getColumns())
+        ...tabling.http.postPayload<R, M, P>(e.payload.data, config.table.getColumns())
       });
       yield put(
         config.actions.tableChanged(
@@ -250,7 +253,8 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         )
       );
     } catch (err: unknown) {
-      notifications.requestError(err as Error, { message: "There was an error adding the row." });
+      config.table.notify({ message: "There was an error adding the table rows.", level: "error" });
+      notifications.requestError(err as Error);
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -275,7 +279,8 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         )
       );
     } catch (err: unknown) {
-      notifications.requestError(err as Error, { message: "There was an error moving the row." });
+      config.table.notify({ message: "There was an error moving the table rows.", level: "error" });
+      notifications.requestError(err as Error);
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -299,7 +304,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   ): SagaIterator {
     const merged = tabling.events.consolidateRowChanges<R, Table.ModelRowId>(e.payload);
     if (merged.length !== 0) {
-      const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.table.getColumns());
+      const requestPayload = tabling.http.createBulkUpdatePayload<R, M, P>(merged, config.table.getColumns());
       if (requestPayload.data.length !== 0) {
         yield fork(bulkUpdateTask, e, requestPayload, context, "There was an error updating the rows.");
       }
@@ -316,7 +321,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       /* It is safe to assume that the ID of the row for which data is being
 				 changed will always be a ModelRowId - but we have to force coerce that
 				 here. */
-      dataChange: handleDataChangeEvent as Redux.TableEventTask<Table.DataChangeEvent<R>>
+      dataChange: handleDataChangeEvent as Redux.TableEventTask<Table.DataChangeEvent<R>, R, M>
     })
   };
 };

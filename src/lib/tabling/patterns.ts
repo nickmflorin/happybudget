@@ -14,6 +14,7 @@ type SeparatorAndIndex = {
 
 type PatternValue = string | number | null;
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const isPatternValue = (value: any): value is PatternValue =>
   value === null || typeof value === "string" || typeof value === "number";
 
@@ -249,7 +250,7 @@ export const findPreviousModelRows = <R extends Table.RowData>(
     }
   };
 
-  let modelRowsOrData: (Table.ModelRow<R> | Table.PlaceholderRow<R> | Partial<R>)[] = [];
+  const modelRowsOrData: (Table.ModelRow<R> | Table.PlaceholderRow<R> | Partial<R>)[] = [];
 
   /* Because of how the timing of when the values are actually placed inside of
      the AGGrid table, when we are filling cells from a drag handle, we need to
@@ -288,13 +289,13 @@ const detectPatternFromPreviousRows = <R extends Table.RowData>(
   yet, only the data that is used to create the new rows via the API.
   */
   previousRows: Table.PreviousValues<Table.ModelRow<R> | Partial<R> | Table.PlaceholderRow<R>>,
-  field: keyof R
+  field: string
 ): PatternValue | null => {
   let columnSupportsSmartInference = true;
 
   const previousValues = mapPreviousValues<
     Table.ModelRow<R> | Partial<R> | Table.PlaceholderRow<R>,
-    R[keyof R] | undefined
+    Table.RawRowValue | undefined
   >(previousRows, (ri: Table.ModelRow<R> | Partial<R> | Table.PlaceholderRow<R>) => {
     /*
       If the object is a Row, then we know the value will not be undefined
@@ -350,26 +351,24 @@ const detectPatternFromPreviousRows = <R extends Table.RowData>(
 export const inferFillCellValue = <R extends Table.RowData, M extends Model.RowHttpModel>(
   params: FillOperationParams,
   columns: Table.Column<R, M>[]
-): any => {
+): Table.RawRowValue => {
   if (params.direction === "down") {
-    const c: Table.Column<R, M> | null = columnFns.getColumn(columns, params.column.getColId());
+    const c: Table.Column<R, M> | null = columnFns.getColumn<R, M>(columns, params.column.getColId());
     /* The column will be by default not-fake and readable (`isRead !== false`)
 			 since it is already in the table. */
     if (!isNil(c) && c.smartInference === true && !isNil(params.rowNode.rowIndex)) {
       const previousRows = findPreviousModelRows<R>({ api: params.api, newIndex: params.rowNode.rowIndex }, true);
       if (!isNil(previousRows)) {
-        return detectPatternFromPreviousRows(previousRows, params.column.getColId() as keyof R);
+        return detectPatternFromPreviousRows(previousRows, params.column.getColId());
       }
     }
   }
   return null;
 };
 
-/* eslint-disable indent */
 export const generateNewRowData = <R extends Table.RowData, M extends Model.RowHttpModel>(
   source: Source<R>,
   columns: Table.Column<R, M>[]
-  /* eslint-disable indent */
 ): Partial<R>[] => {
   if (isReduxSource(source) && source.count !== undefined && source.count !== 1) {
     if (source.count === 0) {
@@ -379,9 +378,9 @@ export const generateNewRowData = <R extends Table.RowData, M extends Model.RowH
          because in the case we are generating multiple RowData objects, the
 				 previously created RowData object needs to factor into the pattern
 				 recognition. */
-      let runningRows: Partial<R>[] = [];
+      const runningRows: Partial<R>[] = [];
       for (let i = 0; i < source.count; i++) {
-        let runningSource = { ...source, count: 1, store: [...source.store, ...runningRows] };
+        const runningSource = { ...source, count: 1, store: [...source.store, ...runningRows] };
         const newRowData = generateNewRowData(runningSource, columns);
         runningRows.push(newRowData[0]);
       }

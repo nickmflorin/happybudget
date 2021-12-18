@@ -1,10 +1,13 @@
 import React from "react";
 import { includes } from "lodash";
 
-/* eslint-disable indent */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const excludeRowsOfType =
-  <T extends { node: Table.RowNode } = any, R extends Table.RowData = object>(types: Table.RowType[] | Table.RowType) =>
-  (Component: React.ComponentClass<T, {}> | React.FunctionComponent<T>) => {
+  <T extends { node: Table.RowNode } = { node: Table.RowNode }, R extends Table.RowData = any>(
+    types: Table.RowType[] | Table.RowType
+  ) =>
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  (Component: React.ComponentClass<any, any> | React.FunctionComponent<any>) => {
     const typesToExclude = Array.isArray(types) ? types : [types];
     const WithExcludeRowsOfType = (props: T): JSX.Element => {
       const row: Table.BodyRow<R> = props.node.data;

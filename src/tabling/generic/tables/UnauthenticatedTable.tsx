@@ -37,10 +37,12 @@ export type UnauthenticatedTableProps<
   readonly children: RenderPropChild<UnauthenticatedTableDataGridProps<R, M>>;
 };
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const TableFooterGrid = FooterGrid<any, any, UnauthenticatedFooterGridProps<any>>({
   id: "footer",
   className: "grid--table-footer",
   rowClass: "row--table-footer",
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   getFooterColumn: (col: Table.Column<any, any, any>) => col.footer || null
 })(UnauthenticatedGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
@@ -48,11 +50,13 @@ const TableFooterGrid = FooterGrid<any, any, UnauthenticatedFooterGridProps<any>
   ): JSX.Element;
 };
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const PageFooterGrid = FooterGrid<any, any, UnauthenticatedFooterGridProps<any>>({
   id: "page",
   className: "grid--page-footer",
   rowClass: "row--page-footer",
   rowHeight: 28,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   getFooterColumn: (col: Table.Column<any, any, any>) => col.page || null
 })(UnauthenticatedGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
@@ -60,10 +64,8 @@ const PageFooterGrid = FooterGrid<any, any, UnauthenticatedFooterGridProps<any>>
   ): JSX.Element;
 };
 
-/* eslint-disable indent */
 const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: WithUnauthenticatedDataGridProps<
-    R,
     WithConnectedTableProps<WithConfiguredTableProps<UnauthenticatedTableProps<R, M>, R>, R, M>
   >
 ): JSX.Element => {
@@ -112,10 +114,13 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
     props.table,
     () => ({
       ...grid.current,
-      notify: (notification: TableNotification) => {},
+      /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+      notify: () => {},
+      /* eslint-disable-next-line @typescript-eslint/no-empty-function */
       removeNotification: () => {},
       getColumns: () => columns,
-      applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R, M>>) => {},
+      /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+      applyTableChange: () => {},
       changeColumnVisibility: props.changeColumnVisibility,
       getRowsAboveAndIncludingFocusedRow: () => {
         const apis = props.tableApis.get("data");
@@ -220,12 +225,13 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
 };
 
 type Props = WithUnauthenticatedDataGridProps<
-  any,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   WithConnectedTableProps<WithConfiguredTableProps<UnauthenticatedTableProps<any>, any>, any>
 >;
 
 const Memoized = React.memo(UnauthenticatedTable) as typeof UnauthenticatedTable;
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export default configureTable<any, any, Props>(Memoized) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
     props: UnauthenticatedTableProps<R, M>

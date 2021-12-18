@@ -12,7 +12,7 @@ import PageHeader from "./PageHeader";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;
-type C = Table.PdfColumn<R, M>;
+type C = Table.Column<R, M>;
 
 interface ActualsPdfProps {
   readonly budget: Model.Budget;
@@ -25,7 +25,7 @@ const ActualColumns = filter(GenericActualsTable.Columns, (c: C) => c.includeInP
 
 const ActualsPdf = ({ budget, actuals, contacts, options }: ActualsPdfProps): JSX.Element => {
   const actualColumns = useMemo(() => {
-    let columns = tabling.columns.normalizeColumns(ActualColumns, {
+    let columns = tabling.columns.normalizeColumns<R, M>(ActualColumns, {
       description: {
         pdfFooterValueGetter: `${budget.name} Total`
       },
@@ -65,11 +65,11 @@ const ActualsPdf = ({ budget, actuals, contacts, options }: ActualsPdfProps): JS
         }
       },
       actual_type: {
-        pdfCellRenderer: (params: Table.PdfCellCallbackParams<R, M>) =>
+        pdfCellRenderer: (params: Table.PdfCellCallbackParams<R, M, Model.Tag | null>) =>
           params.rawValue !== null ? <Tag fillWidth={false} model={params.rawValue} /> : <Text></Text>
       }
     });
-    columns = tabling.columns.normalizePdfColumnWidths(columns, (c: C) =>
+    columns = tabling.columns.normalizePdfColumnWidths<R, M, C>(columns, (c: C) =>
       includes(options.columns, tabling.columns.normalizedField<R, M>(c))
     );
     return tabling.columns.orderColumns<R, M>(columns);

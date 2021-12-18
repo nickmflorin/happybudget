@@ -24,12 +24,12 @@ const AccountPage = <B extends Model.Budget | Model.Template>({
   return (
     <RenderIfValidId id={[accountId]}>
       <Portal id={"breadcrumbs"}>
-        <BreadCrumbs
+        <BreadCrumbs<{ b: B; account: Model.Account }>
           params={{ b: budget, account: detail }}
           items={[
             {
               requiredParams: ["b"],
-              func: ({ b }: { b: Model.Budget }) => ({
+              func: ({ b }: { b: B }) => ({
                 id: b.id,
                 primary: true,
                 label: b.name,
@@ -39,7 +39,7 @@ const AccountPage = <B extends Model.Budget | Model.Template>({
             },
             {
               requiredParams: ["b", "account"],
-              func: ({ b, account }: { b: Model.Budget; account: Model.Account }) => {
+              func: ({ b, account }: { b: B; account: Model.Account }) => {
                 const siblings = account.siblings || [];
                 return {
                   id: account.id,

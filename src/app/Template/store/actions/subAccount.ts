@@ -31,4 +31,6 @@ export const addModelsToStateAction = redux.actions.createAction<Redux.AddModels
   ActionType.SubAccount.SubAccounts.AddToState
 );
 
-export const setSearchAction = redux.actions.createAction<string>(ActionType.SubAccount.SubAccounts.SetSearch);
+export const setSearchAction = redux.actions.createContextAction<string, Tables.SubAccountTableContext>(
+  ActionType.SubAccount.SubAccounts.SetSearch
+);

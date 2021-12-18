@@ -11,22 +11,15 @@ const ActualColumns = ActualsTable.Columns;
 const AccountColumns = AccountsTable.Columns;
 const FringesColumns = FringesTable.Columns;
 
-type A = Redux.AuthenticatedModelListResponseActionMap<Model.ActualOwner, any>;
-type OwnersModelListResponseActionMap = Omit<A, "setSearch"> & {
-  readonly setSearch: Redux.ContextActionCreator<string, Tables.ActualTableContext>;
-};
-
 const headerTemplatesRootReducer: Redux.Reducer<Modules.Budget.HeaderTemplatesStore> = (
   state: Modules.Budget.HeaderTemplatesStore = initialHeaderTemplatesState,
   action: Redux.Action
 ): Modules.Budget.HeaderTemplatesStore => {
   const listResponseReducer = redux.reducers.createAuthenticatedModelListResponseReducer<
     Model.SimpleHeaderTemplate,
-    Modules.Budget.HeaderTemplatesStore,
-    Pick<
-      Redux.AuthenticatedModelListResponseActionMap<Model.SimpleHeaderTemplate>,
-      "loading" | "response" | "addToState" | "removeFromState"
-    >
+    null,
+    Table.Context,
+    Modules.Budget.HeaderTemplatesStore
   >({
     initialState: initialHeaderTemplatesState,
     actions: {
@@ -50,7 +43,7 @@ const headerTemplatesRootReducer: Redux.Reducer<Modules.Budget.HeaderTemplatesSt
 
 const analysisReducer: Redux.Reducer<Modules.Budget.AnalysisStore> = (
   state: Modules.Budget.AnalysisStore = initialState.analysis,
-  action: Redux.Action<any>
+  action: Redux.Action
 ): Modules.Budget.AnalysisStore => {
   if (action.type === actions.analysis.loadingAction.toString()) {
     return { ...state, loading: action.payload };
@@ -209,8 +202,9 @@ const genericReducer = combineReducers({
     columns: ActualColumns,
     owners: redux.reducers.createAuthenticatedModelListResponseReducer<
       Model.ActualOwner,
-      Redux.AuthenticatedModelListResponseStore<Model.ActualOwner>,
-      Pick<OwnersModelListResponseActionMap, "setSearch" | "response" | "loading">
+      null,
+      Tables.ActualTableContext,
+      Redux.AuthenticatedModelListResponseStore<Model.ActualOwner>
     >({
       initialState: redux.initialState.initialAuthenticatedModelListResponseState,
       actions: {

@@ -13,7 +13,7 @@ interface WrapInAuthenticatedStoreProps {
 
 const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): JSX.Element => {
   const [authenticating, setAuthenticating] = useState(true);
-  const [reduxStore, setReduxStore] = useState<Store<Application.Unauthenticated.Store, Redux.Action> | undefined>(
+  const [reduxStore, setReduxStore] = useState<Store<Application.UnauthenticatedStore, Redux.Action> | undefined>(
     undefined
   );
 

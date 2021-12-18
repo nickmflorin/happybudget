@@ -1,4 +1,4 @@
-import { isNil, reduce } from "lodash";
+import { isNil, reduce, filter } from "lodash";
 
 import { tabling, util } from "lib";
 import { columns } from "../../generic";
@@ -26,7 +26,7 @@ const Columns: Table.Column<R, M>[] = [
     cellEditor: "ContactEditor",
     columnType: "contact"
   }),
-  columns.BodyColumn<R, M>({
+  columns.BodyColumn<R, M, string>({
     field: "date",
     headerName: "Date",
     pdfWidth: 0.1,
@@ -54,7 +54,7 @@ const Columns: Table.Column<R, M>[] = [
     width: 140,
     minWidth: 140
   }),
-  columns.BodyColumn<R, M>({
+  columns.BodyColumn<R, M, number | null>({
     field: "value",
     headerName: "Amount",
     width: 100,
@@ -64,16 +64,20 @@ const Columns: Table.Column<R, M>[] = [
     footer: {
       cellStyle: { textAlign: "right" }
     },
-    pdfFormatter: (params: Table.NativeFormatterParams<string>) =>
-      isNil(params) || params === "" ? "" : tabling.formatters.currencyValueFormatter(params),
+    pdfFormatter: (params: Table.NativeFormatterParams<number | null>) =>
+      isNil(params) ? "0.0" : tabling.formatters.currencyValueFormatter(params),
     valueFormatter: tabling.formatters.currencyValueFormatter,
     valueSetter: tabling.valueSetters.numericValueSetter<R>("value"),
     columnType: "currency",
     /* We only want to use BodyCell's in the Footer cells because it slows
 		   rendering performance down dramatically. */
     cellRenderer: { footer: "BodyCell" },
-    pdfFooterValueGetter: (rows: Table.DataRow<R>[]) =>
-      reduce(rows, (sum: number, s: Table.DataRow<R>) => sum + (s.data.value || 0), 0)
+    pdfFooterValueGetter: (rows: Table.BodyRow<R>[]) =>
+      reduce(
+        filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R>[],
+        (sum: number, s: Table.ModelRow<R>) => sum + (s.data.value || 0),
+        0
+      )
   }),
   columns.SelectColumn<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>({
     field: "owner",

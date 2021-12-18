@@ -48,17 +48,23 @@ export const getQueryParams = (url: string): { [key: string]: string } => {
  */
 export const addQueryParamsToUrl = (
   url: string,
-  query: { [key: string]: unknown } = {},
-  options: { filter?: any[] } = { filter: [] }
+  query: Http.RawQuery = {},
+  options: { filter: (string | number)[] } = { filter: [] }
 ): string => {
-  const existingQuery = getQueryParams(url);
+  const existingQuery = getQueryParams(url) as Http.RawQuery;
   const newQuery = query || {};
-  const mergedQuery = { ...existingQuery, ...newQuery };
+  const mergedQuery: Http.RawQuery = { ...existingQuery, ...newQuery };
 
   const urlParams = new URLSearchParams();
-  forEach(mergedQuery, (value: unknown, key: string) => {
-    if (!isNil(value) && (isNil(options.filter) || !options.filter.includes(value))) {
-      urlParams.append(key, String(value));
+  forEach(mergedQuery, (value: Http.RawQuery[keyof Http.RawQuery], key: string) => {
+    if (!isNil(value)) {
+      if (typeof value === "string" || typeof value === "number") {
+        if (isNil(options.filter) || !options.filter.includes(value)) {
+          urlParams.append(key, String(value));
+        }
+      } else {
+        urlParams.append(key, String(value));
+      }
     }
   });
   if (urlParams.toString() !== "") {

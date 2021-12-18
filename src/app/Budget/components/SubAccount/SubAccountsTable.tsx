@@ -15,10 +15,16 @@ type M = Model.SubAccount;
 type R = Tables.SubAccountRowData;
 
 const selectSubAccountDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.budget.subaccount.detail.data
+  (state: Application.AuthenticatedStore) => state.budget.subaccount.detail.data
 );
 
-const ConnectedTable = connectTableToStore<BudgetSubAccountsTableProps, R, M, Tables.SubAccountTableStore>({
+const ConnectedTable = connectTableToStore<
+  BudgetSubAccountsTableProps,
+  R,
+  M,
+  Tables.SubAccountTableStore,
+  Tables.SubAccountTableContext
+>({
   actions: {
     tableChanged: actions.subAccount.handleTableChangeEventAction,
     loading: actions.subAccount.loadingAction,
@@ -33,7 +39,7 @@ const ConnectedTable = connectTableToStore<BudgetSubAccountsTableProps, R, M, Ta
     dispatch(actions.subAccount.requestAction(null, c)),
   footerRowSelectors: {
     page: createSelector(
-      redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.detail.data),
+      redux.selectors.simpleDeepEqualSelector((state: Application.AuthenticatedStore) => state.budget.detail.data),
       (budget: Model.Budget | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
         estimated: !isNil(budget) ? budgeting.businessLogic.estimatedValue(budget) : 0.0,
@@ -43,7 +49,7 @@ const ConnectedTable = connectTableToStore<BudgetSubAccountsTableProps, R, M, Ta
     ),
     footer: createSelector(
       redux.selectors.simpleDeepEqualSelector(
-        (state: Application.Authenticated.Store) => state.budget.subaccount.detail.data
+        (state: Application.AuthenticatedStore) => state.budget.subaccount.detail.data
       ),
       (detail: Model.SubAccount | null) => ({
         identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
@@ -71,7 +77,7 @@ const SubAccountsTable = ({
   const dispatch = useDispatch();
   const history = useHistory();
   const subaccountDetail = useSelector(selectSubAccountDetail);
-  const table = tabling.hooks.useTable<R>();
+  const table = tabling.hooks.useTable<R, M>();
 
   const [groupModals, onEditGroup, onCreateGroup] = useGrouping({
     parentId: subaccountId,
@@ -133,7 +139,7 @@ const SubAccountsTable = ({
         exportFileName={!isNil(subaccountDetail) ? `subaccount_${subaccountDetail.identifier}` : ""}
         categoryName={"Detail"}
         identifierFieldHeader={"Line"}
-        onBack={(row?: Tables.FringeRowData) => {
+        onBack={() => {
           if (
             !isNil(subaccountDetail) &&
             !isNil(subaccountDetail.ancestors) &&

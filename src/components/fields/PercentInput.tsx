@@ -2,9 +2,7 @@ import React from "react";
 import { Icon } from "components";
 import Input, { InputProps } from "./Input";
 
-interface PercentInputProps extends InputProps {}
-
-const PercentInput = (props: PercentInputProps): JSX.Element => {
+const PercentInput = (props: InputProps): JSX.Element => {
   return <Input size={"large"} {...props} suffix={<Icon icon={"percentage"} />} />;
 };
 

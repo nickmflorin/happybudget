@@ -11,7 +11,6 @@ export interface ExportCSVDropdownProps<R extends Table.RowData, M extends Model
   readonly hiddenColumns?: Table.HiddenColumns;
 }
 
-/* eslint-disable indent */
 const ExportCSVDropdown = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: ExportCSVDropdownProps<R, M>
 ): JSX.Element => {
@@ -31,7 +30,7 @@ const ExportCSVDropdown = <R extends Table.RowData, M extends Model.RowHttpModel
 
   useEffect(() => {
     const exportable: Table.Column<R, M>[] = filter(exportableColumns, (col: Table.Column<R, M>) => {
-      const field: keyof R | string | undefined = tabling.columns.normalizedField<R, M>(col);
+      const field: string | undefined = tabling.columns.normalizedField<R, M>(col);
       return !isNil(field) && (isNil(props.hiddenColumns) || props.hiddenColumns[field] !== true);
     });
     setSelected(

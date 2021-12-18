@@ -10,11 +10,11 @@ export const nowAsString = (): string => {
   return mmt.format(localization.MOMENT_DATETIME_FORMAT);
 };
 
-interface IDateOptions {
-  strict: boolean;
-  onError: string | null;
-  tz: string | null;
-}
+type IDateOptions = {
+  readonly strict: boolean;
+  readonly onError: string | null;
+  readonly tz: string | null;
+};
 
 const createDefaultMergedOptions = (options?: Partial<IDateOptions>) => {
   return util.mergeWithDefaults<IDateOptions>(options || {}, {
@@ -29,10 +29,10 @@ const createDefaultMergedOptions = (options?: Partial<IDateOptions>) => {
  * to utc time
  *
  * @param {(string | Moment)} value:
- * 		The value to be converted to a moment, defaults to utilizing utc
+ *   The value to be converted to a moment, defaults to utilizing utc
  * @param {Partial<IDateOptions>} [options]
- * 		Options used modify moment. The moment will be cast to tz, or utc if
- * 		there is none.
+ *   Options used modify moment. The moment will be cast to tz, or utc if
+ *   there is none.
  * @returns {(Moment | undefined)}
  */
 export const toLocalizedMoment = (value: string | Moment, options?: Partial<IDateOptions>): Moment | undefined => {
@@ -116,12 +116,12 @@ export const toDisplayTime = Converter(localization.TIME_DISPLAY_FORMAT);
  * A string representing a general time from now to the specified moment
  *
  * @param {string} value
- * 		The time string, assumed to be in utc
+ *   The time string, assumed to be in utc
  * @param {Partial<IDateOptions>} [options]
- * 		Options used modify moment. The moment will be cast to tz, or utc if there
- * 		is none.
+ *   Options used modify moment. The moment will be cast to tz, or utc if there
+ *   is none.
  * @returns {string}
- * 		String determining an amount of time lapse, in readable form
+ *   String determining an amount of time lapse, in readable form
  */
 export const toDisplayTimeSince = (value: string | Moment, options?: Partial<IDateOptions>): string => {
   const Options = createDefaultMergedOptions(options);
@@ -165,13 +165,13 @@ export const toDisplayTimeSince = (value: string | Moment, options?: Partial<IDa
  * Determines whether or not the specified moment occured within the past 24 hours
  *
  * @param {(string | Moment)} value:
- * 		Either a string date/time or a Moment instance that will be converted to a
- * 		date display format. A string is assumed to be in UTC.
+ *   Either a string date/time or a Moment instance that will be converted to a
+ *   date display format. A string is assumed to be in UTC.
  * @param {Partial<IDateOptions>} [options]
- * 		Options used modify moment. The moment will be cast to tz, or utc if there
- * 		is none.
+ *   Options used modify moment. The moment will be cast to tz, or utc if there
+ *   is none.
  * @returns {boolean}:
- * 		Boolean as to whether the moment occured in the past 24 hours
+ *   Boolean as to whether the moment occured in the past 24 hours
  */
 export const isToday = (value: string | Moment, options?: Partial<IDateOptions>): boolean => {
   const Options = createDefaultMergedOptions(options);
@@ -179,6 +179,6 @@ export const isToday = (value: string | Moment, options?: Partial<IDateOptions>)
   const now = moment();
 
   const duration = moment.duration(now.diff(mmt));
-  let days = duration.days();
+  const days = duration.days();
   return days < 1 ? true : false;
 };

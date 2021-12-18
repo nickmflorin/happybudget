@@ -13,11 +13,10 @@ import "./index.scss";
 
 export interface CollapsedSidebarProps
   extends Omit<GenericSidebarProps<ICollapsedSidebarItem>, "renderItem" | "children"> {
-  readonly closeOnClick?: () => void;
   readonly toggle: () => void;
 }
 
-const CollapsedSidebar = ({ closeOnClick, toggle, ...props }: CollapsedSidebarProps): JSX.Element => {
+const CollapsedSidebar = ({ toggle, ...props }: CollapsedSidebarProps): JSX.Element => {
   return (
     <GenericSidebar<ICollapsedSidebarItem>
       {...props}

@@ -25,8 +25,8 @@ const ActionMap: budgeting.tasks.actuals.ActualsTableActionMap & {
 export const createTableSaga = (table: Table.TableInstance<Tables.ActualRowData, Model.Actual>) => {
   const tasks = budgeting.tasks.actuals.createTableTaskSet({
     table,
-    selectStore: (state: Application.Authenticated.Store) => state.budget.actuals,
-    selectOwnersSearch: (state: Application.Authenticated.Store) => state.budget.actuals.owners.search,
+    selectStore: (state: Application.AuthenticatedStore) => state.budget.actuals,
+    selectOwnersSearch: (state: Application.AuthenticatedStore) => state.budget.actuals.owners.search,
     actions: ActionMap
   });
 

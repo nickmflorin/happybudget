@@ -1,10 +1,6 @@
-import { Route } from "react-router-dom";
+import { Route, RouteProps } from "react-router-dom";
 
-interface LandingRouteProps {
-  [key: string]: any;
-}
-
-const LandingRoute = ({ ...props }: LandingRouteProps): JSX.Element => {
+const LandingRoute = (props: RouteProps): JSX.Element => {
   return (
     <div className={"landing-content"}>
       <Route {...props} />

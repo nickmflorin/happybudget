@@ -6,17 +6,16 @@ import { columns } from "../../generic";
 
 type R = Tables.AccountRowData;
 type M = Model.Account;
-type PDFM = Model.PdfAccount;
 
 const Columns: Table.Column<R, M>[] = [
-  columns.IdentifierColumn<R, M, PDFM>({
+  columns.IdentifierColumn<"account", R, M>({
     field: "identifier",
     headerName: "Account",
     pdfHeaderName: "Acct #",
     pdfWidth: 0.1,
     pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
   }),
-  columns.BodyColumn<R, M, string | null, PDFM>({
+  columns.BodyColumn<R, M, string | null>({
     field: "description",
     headerName: "Account Description",
     pdfFlexGrow: true,
@@ -43,31 +42,31 @@ const Columns: Table.Column<R, M>[] = [
       return r.data.description || "";
     }
   }),
-  columns.EstimatedColumn<R, M, PDFM>({
+  columns.EstimatedColumn<R, M>({
     colId: "estimated",
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.estimatedValueGetter
   }),
-  columns.ActualColumn<R, M, PDFM>({
+  columns.ActualColumn<R, M>({
     field: "actual",
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.actualValueGetter
   }),
-  columns.VarianceColumn<R, M, PDFM>({
+  columns.VarianceColumn<R, M>({
     colId: "variance",
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.varianceValueGetter
   }),
-  columns.FakeColumn<R, M, PDFM>({ field: "nominal_value" }),
-  columns.FakeColumn<R, M, PDFM>({ field: "markup_contribution" }),
-  columns.FakeColumn<R, M, PDFM>({ field: "accumulated_fringe_contribution" }),
-  columns.FakeColumn<R, M, PDFM>({ field: "accumulated_markup_contribution" })
+  columns.FakeColumn<R, M>({ field: "nominal_value" }),
+  columns.FakeColumn<R, M>({ field: "markup_contribution" }),
+  columns.FakeColumn<R, M>({ field: "accumulated_fringe_contribution" }),
+  columns.FakeColumn<R, M>({ field: "accumulated_markup_contribution" })
 ];
 
 export default Columns;

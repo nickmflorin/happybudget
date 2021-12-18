@@ -6,7 +6,6 @@ export const orderActions = (actions: Table.MenuActionObj[]): Table.MenuActionOb
   return [...orderBy(actionsWithIndex, ["index"], ["asc"]), ...actionsWithoutIndex];
 };
 
-/* eslint-disable indent */
 export const evaluateActions = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,

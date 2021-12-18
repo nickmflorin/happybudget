@@ -5,18 +5,22 @@ import { View } from "components/pdf";
 
 export type RowProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
 > = StandardPdfComponentProps & {
-  readonly columns: Table.PdfColumn<R, M>[];
+  readonly columns: C[];
   readonly columnIndent?: number;
-  readonly columnIsVisible?: (c: Table.PdfColumn<R, M>) => boolean;
+  readonly columnIsVisible?: (c: C) => boolean;
 };
 
-/* eslint-disable indent */
-const Row = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  props: RowProps<R, M> & {
+const Row = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
+>(
+  props: RowProps<R, M, C> & {
     readonly renderCell: (params: {
-      column: Table.PdfColumn<R, M>;
+      column: C;
       indented: boolean;
       colIndex: number;
       firstChild: boolean;
@@ -27,14 +31,14 @@ const Row = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHt
   const columnFilter = useMemo(() => {
     const visibleFilter = props.columnIsVisible;
     if (!isNil(visibleFilter)) {
-      return (c: Table.PdfColumn<R, M>) => c.tableColumnType !== "fake" && visibleFilter(c);
+      return (c: C) => c.tableColumnType !== "fake" && visibleFilter(c);
     }
-    return (c: Table.PdfColumn<R, M>) => c.tableColumnType !== "fake";
+    return (c: C) => c.tableColumnType !== "fake";
   }, [props.columnIsVisible]);
 
   return (
     <View style={props.style} className={classNames("tr", props.className)} wrap={false}>
-      {map(filter(props.columns, columnFilter), (column: Table.PdfColumn<R, M>, colIndex: number) => {
+      {map(filter(props.columns, columnFilter), (column: C, colIndex: number) => {
         return (
           <React.Fragment key={colIndex}>
             {props.renderCell({

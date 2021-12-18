@@ -14,6 +14,7 @@ const FringeUnitEditor = (
     >,
     "models" | "searchIndices"
   >,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   ref: ForwardedRef<any>
 ) => {
   return (

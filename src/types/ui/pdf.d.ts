@@ -33,7 +33,7 @@ declare namespace Pdf {
   type SupportedFontStyle = { name: FontStyleName; tag: SupportedFontStyleTag };
 
   type Font = {
-    readonly src: any;
+    readonly src: string;
     readonly fontWeight: FontWeight;
     readonly fontStyle?: "italic";
   };

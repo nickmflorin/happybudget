@@ -1,6 +1,6 @@
 import { Route } from "react-router-dom";
 
-const ApplicationRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
+const ApplicationRoute = ({ ...props }: Record<string, unknown>): JSX.Element => {
   return <Route {...props} />;
 };
 

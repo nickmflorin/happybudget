@@ -52,7 +52,7 @@ const EditGroupModal = <M extends Model.SimpleAccount | Model.SimpleSubAccount>(
         ]);
       }}
     >
-      {(m: Model.Group | null) => (
+      {() => (
         <GroupForm
           form={form}
           availableChildren={availableChildren}

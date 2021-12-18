@@ -26,7 +26,7 @@ const Action = <
   readonly iconStyle?: React.CSSProperties;
 }): JSX.Element => {
   const icon: IconProp = useMemo(() => {
-    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
     const map: { [key in Table.EditRowActionBehavior]: IconProp } = {
       edit: "pencil",
       expand: "expand-alt"
@@ -58,7 +58,7 @@ const Action = <
         ? props.config.tooltip(props.row, { hovered: props.hovered, disabled })
         : props.config.tooltip;
     }
-    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
     const defaultTooltipMap: { [key in Table.EditRowActionBehavior]: string } = {
       edit: "Edit",
       expand: "Expand"
@@ -82,7 +82,6 @@ const Action = <
   );
 };
 
-/* eslint-disable indent */
 const EditCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,

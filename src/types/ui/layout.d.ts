@@ -4,9 +4,9 @@ declare type ILayoutRef = {
   readonly toggleSidebar: () => void;
 };
 
-declare interface ILazyBreadCrumbItem {
-  readonly requiredParams: string[];
-  readonly func: (params: any) => IBreadCrumbItem | IBreadCrumbItem[];
+declare interface ILazyBreadCrumbItem<P extends Record<string, unknown> = Record<string, unknown>> {
+  readonly requiredParams: (keyof P)[];
+  readonly func: (params: P) => IBreadCrumbItem | IBreadCrumbItem[];
 }
 
 declare interface IBreadCrumbItem extends Omit<MenuItemModel, "render"> {
@@ -29,7 +29,7 @@ declare interface ISidebarItem {
   readonly onClick?: () => void;
 }
 
-declare interface ICollapsedSidebarItem extends ISidebarItem {}
+type ICollapsedSidebarItem = ISidebarItem;
 
 declare type IExpandedSingleSidebarItem = ISidebarItem & {
   readonly label: string;

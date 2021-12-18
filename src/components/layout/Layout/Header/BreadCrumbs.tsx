@@ -1,6 +1,6 @@
 import React, { ReactNode, useMemo } from "react";
 import { useHistory } from "react-router-dom";
-import { map, isNil, orderBy, forEach } from "lodash";
+import { map, isNil, orderBy, reduce } from "lodash";
 import classNames from "classnames";
 
 import { TooltipWrapper } from "components";
@@ -9,8 +9,10 @@ import { DropdownMenu } from "components/dropdowns";
 
 import "./BreadCrumbs.scss";
 
-const isLazyBreadCrumbItem = (item: IBreadCrumbItem | ILazyBreadCrumbItem): item is ILazyBreadCrumbItem => {
-  return (item as ILazyBreadCrumbItem).func !== undefined;
+const isLazyBreadCrumbItem = <P extends Record<string, unknown> = Record<string, unknown>>(
+  item: IBreadCrumbItem | ILazyBreadCrumbItem<P>
+): item is ILazyBreadCrumbItem<P> => {
+  return (item as ILazyBreadCrumbItem<P>).func !== undefined;
 };
 
 interface BreadCrumbGenericItemProps extends StandardComponentProps {
@@ -126,30 +128,39 @@ const BreadCrumbItems = ({ children }: BreadCrumbItemsProps): JSX.Element => {
   }
 };
 
-interface BreadCrumbsProps extends StandardComponentProps {
-  readonly items?: (IBreadCrumbItem | ILazyBreadCrumbItem)[];
+interface BreadCrumbsProps<P extends Record<string, unknown> = Record<string, unknown>> extends StandardComponentProps {
+  readonly items?: (IBreadCrumbItem | ILazyBreadCrumbItem<P>)[];
   readonly itemProps?: StandardComponentProps;
-  readonly params?: { [key: string]: any };
+  readonly params?: { [key in keyof P]: P[keyof P] | null };
   readonly children?: JSX.Element[];
 }
 
-const BreadCrumbs = ({ items, itemProps, params, children, ...props }: BreadCrumbsProps): JSX.Element => {
+const BreadCrumbs = <P extends Record<string, unknown> = Record<string, unknown>>({
+  items,
+  itemProps,
+  params,
+  children,
+  ...props
+}: BreadCrumbsProps<P>): JSX.Element => {
   const parametersPresent = useMemo(
     () =>
-      (item: ILazyBreadCrumbItem): [boolean, { [key: string]: any }] => {
+      (item: ILazyBreadCrumbItem<P>): [boolean, P] => {
         if ((item.requiredParams.length !== 0 && !isNil(params) && Object.keys(params).length === 0) || isNil(params)) {
-          return [false, {}];
+          return [false, {} as P];
         }
         let allRequiredParamsPresent = true;
-        let presentParamsObj: { [key: string]: any } = {};
-        forEach(item.requiredParams, (param: string) => {
-          if (isNil(params[param])) {
-            allRequiredParamsPresent = false;
-            return false;
-          } else {
-            presentParamsObj[param] = params[param];
-          }
-        });
+        const presentParamsObj: P = reduce(
+          item.requiredParams,
+          (curr: P, param: keyof P) => {
+            if (isNil(params[param])) {
+              allRequiredParamsPresent = false;
+              return curr;
+            } else {
+              return { ...curr, [param]: params[param] };
+            }
+          },
+          {} as P
+        );
         return [allRequiredParamsPresent, presentParamsObj];
       },
     [params]
@@ -161,7 +172,7 @@ const BreadCrumbs = ({ items, itemProps, params, children, ...props }: BreadCrum
     }
     let transformed: IBreadCrumbItem[] = [];
     for (let i = 0; i < items.length; i++) {
-      const item: IBreadCrumbItem | ILazyBreadCrumbItem = items[i];
+      const item: IBreadCrumbItem | ILazyBreadCrumbItem<P> = items[i];
       if (isLazyBreadCrumbItem(item)) {
         const [allRequiredParamsPresent, presentParamsObj] = parametersPresent(item);
         if (allRequiredParamsPresent === true) {

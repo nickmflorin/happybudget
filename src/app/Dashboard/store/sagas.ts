@@ -72,7 +72,7 @@ export const createContactsTableSaga = (table: Table.TableInstance<Tables.Contac
     actions: ActionMap,
     tasks: contacts.createTableTaskSet({
       table,
-      selectStore: (state: Application.Authenticated.Store) => state.dashboard.contacts,
+      selectStore: (state: Application.AuthenticatedStore) => state.dashboard.contacts,
       actions: ActionMap
     })
   });

@@ -1,9 +1,9 @@
 import classNames from "classnames";
 import Alert, { AlertProps } from "./Alert";
 
-export interface ErrorProps extends Omit<AlertProps, "type"> {}
+export type ErrorProps = Omit<AlertProps, "level">;
 
-const Error: React.FC<ErrorProps> = ({ children, className, ...props }) => (
+const Error: React.FC<ErrorProps> = ({ className, ...props }) => (
   <Alert {...props} className={classNames("error", className)} level={"error"} />
 );
 

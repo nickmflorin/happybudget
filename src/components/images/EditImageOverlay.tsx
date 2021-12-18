@@ -23,7 +23,7 @@ const EditImageOverlay = ({ onClear, isImage, ...props }: EditImageOverlayProps)
             </div>
             {!isNil(onClear) && (
               <ImageClearButton
-                onClick={(e: React.MouseEvent<any>) => {
+                onClick={(e: React.MouseEvent) => {
                   e.stopPropagation();
                   e.preventDefault();
                   onClear();

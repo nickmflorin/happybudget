@@ -1,15 +1,19 @@
 declare namespace Http {
   type Method = "POST" | "PATCH" | "GET" | "DELETE";
 
-  interface RequestOptions {
+  type RequestOptions = {
     readonly retries?: number;
     readonly headers?: { [key: string]: string };
-    readonly cancelToken?: import("axios").CancelToken | undefined | null;
-  }
+    readonly cancelToken?: import("axios").CancelToken | undefined;
+  };
 
-  interface Query {
-    [key: string]: any;
-  }
+  type RawQuery = {
+    readonly page_size?: number;
+    readonly page?: number;
+    readonly search?: string;
+    readonly simple?: boolean;
+    readonly ordering?: string;
+  };
 
   type TokenType = "email-confirmation" | "password-recovery";
 
@@ -26,16 +30,12 @@ declare namespace Http {
     readonly order: Order;
   };
 
-  /* eslint-disable-next-line no-unused-vars */
   type Ordering<F extends string = string> = FieldOrder<F>[];
 
-  type ListQuery<O extends string = string> = {
+  type ListQuery<O extends string = string> = Omit<RawQuery, "ordering"> & {
     readonly ordering?: Ordering<O>;
-    readonly page?: number;
-    readonly page_size?: number;
-    readonly simple?: boolean;
-    readonly search?: string;
   };
 
-  type Service<T = any> = (...args: any[]) => T;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type Service<T> = (...args: any[]) => T;
 }

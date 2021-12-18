@@ -1,36 +1,42 @@
 declare namespace Http {
-  type NonModelPayloadFields = "created_by" | "id" | "type";
+  type _RawPayloadValue =
+    | ArrayBuffer
+    | boolean
+    | string
+    | number
+    | null
+    | number[]
+    | Model.GenericHttpModel<Model.HttpModelType>;
 
-  type Payload = { [key: string]: any };
+  type RawPayloadValue = _RawPayloadValue | Record<string, _RawPayloadValue>[];
 
-  type ModelPayload<M extends Model.Model> = {
-    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-    [key in keyof Omit<M, NonModelPayloadFields>]?: any;
-  };
+  type _PayloadObj = Record<string, RawPayloadValue>;
+  type PayloadObj = { readonly data: _PayloadObj[] } | _PayloadObj;
+  type Payload = FormData | PayloadObj;
 
-  interface SocialPayload {
+  type SocialPayload = {
     readonly token_id: string;
     readonly provider: string;
-  }
+  };
 
-  interface RegistrationPayload {
+  type RegistrationPayload = {
     readonly first_name: string;
     readonly last_name: string;
     readonly email: string;
     readonly password: string;
-  }
+  };
 
-  interface ResetPasswordPayload {
+  type ResetPasswordPayload = {
     readonly password: string;
     readonly token: string;
-  }
+  };
 
-  interface ChangePasswordPayload {
+  type ChangePasswordPayload = {
     readonly password: string;
     readonly new_password: string;
-  }
+  };
 
-  interface UserPayload {
+  type UserPayload = {
     readonly profile_image?: string | ArrayBuffer | null;
     readonly first_name: string;
     readonly last_name: string;
@@ -39,93 +45,111 @@ declare namespace Http {
     readonly city?: string | null;
     readonly phone_number?: string | null;
     readonly timezone?: string;
-  }
+  };
 
-  interface FringePayload {
+  type FringePayload = {
     readonly name: string;
     readonly description?: string | null;
     readonly cutoff?: number | null;
     readonly rate: number;
-    readonly unit?: Model.FringeUnit;
+    readonly unit?: Model.FringeUnitId;
     readonly color?: string | null;
     readonly previous?: number | null;
-  }
+  };
 
-  interface MarkupPayload {
+  type MarkupPayload = {
     readonly identifier?: string | null;
     readonly description?: string | null;
     readonly unit: Model.MarkupUnitId;
     readonly rate?: number | null;
     readonly children?: number[];
     readonly groups?: number[];
-  }
+  };
 
-  interface ModifyMarkupPayload {
+  type ModifyMarkupPayload = {
     readonly children?: number[];
     readonly groups?: number[];
-  }
+  };
 
-  interface BudgetPayload {
-    readonly name: string;
+  type BudgetPayload = {
+    readonly name: Model.Budget["name"];
     readonly template?: number;
     readonly image?: string | ArrayBuffer | null;
-  }
+  };
 
-  interface TemplatePayload {
-    readonly name: string;
+  type TemplatePayload = {
     readonly image?: string | ArrayBuffer | null;
     readonly community?: boolean;
     readonly hidden?: boolean;
-  }
+    readonly name: Model.Template["name"];
+  };
 
-  interface GroupPayload {
-    readonly name?: string;
-    readonly color?: string;
-    readonly children?: number[];
+  type GroupPayload = {
     readonly children_markups?: number[];
-  }
+    readonly name: Model.Group["name"];
+    readonly color?: Model.Group["color"];
+    readonly children?: number[];
+  };
 
-  interface AccountPayload extends Omit<ModelPayload<Model.Account>, "order"> {
+  type AccountPayload = {
     readonly group?: number | null;
     readonly previous?: number | null;
-  }
+    readonly identifier?: Model.Account["identifier"];
+    readonly description?: Model.Account["description"];
+  };
 
-  type SubAccountPayload = Omit<ModelPayload<Model.SubAccount>, "unit" | "attachments" | "order"> & {
+  type SubAccountPayload = {
+    readonly description?: Model.SubAccount["description"];
+    readonly identifier?: Model.SubAccount["identifier"];
+    readonly contact?: Model.SubAccount["contact"];
+    readonly quantity?: Model.SubAccount["quantity"];
+    readonly rate?: Model.SubAccount["rate"];
+    readonly multiplier?: Model.SubAccount["multiplier"];
+    readonly fringes?: Model.SubAccount["fringes"];
     readonly unit?: number | null;
     readonly group?: number | null;
-    readonly attachments?: number[];
+    readonly attachments?: Model.SubAccount["attachments"];
     readonly previous?: number | null;
   };
 
-  interface ActualPayload extends Omit<ModelPayload<Model.Actual>, "owner" | "actual_type" | "attachments" | "order"> {
+  type ActualPayload = {
+    readonly contact?: Model.Actual["contact"];
+    readonly name?: Model.Actual["name"];
+    readonly purchase_order?: Model.Actual["purchase_order"];
+    readonly date?: Model.Actual["date"];
+    readonly payment_id?: Model.Actual["payment_id"];
+    readonly value?: Model.Actual["value"];
     readonly actual_type?: number | null;
     readonly attachments?: number[];
     readonly owner: Model.GenericHttpModel<"subaccount"> | Model.GenericHttpModel<"markup"> | null;
     readonly previous?: number | null;
-  }
+  };
 
-  interface HeaderTemplatePayload extends ModelPayload<Model.HeaderTemplate> {
+  type HeaderTemplatePayload = {
+    readonly name?: Model.HeaderTemplate["name"];
+    readonly header?: Model.HeaderTemplate["header"];
+    readonly left_info?: Model.HeaderTemplate["left_info"];
+    readonly right_info?: PModel.HeaderTemplate["right_info"];
     readonly left_image?: string | ArrayBuffer | null;
     readonly right_image?: string | ArrayBuffer | null;
     readonly original?: number;
-  }
+  };
 
-  interface ContactPayload {
+  type ContactPayload = {
+    readonly company?: Model.Contact["company"];
+    readonly position?: Model.Contact["position"];
+    readonly rate?: Model.Contact["rate"];
+    readonly city?: Model.Contact["city"];
+    readonly phone_number?: Model.Contact["phone_number"];
+    readonly email?: Model.Contact["email"];
     readonly contact_type?: Model.ContactTypeId | null;
-    readonly first_name?: string | null;
-    readonly last_name?: string | null;
-    readonly company?: string | null;
-    readonly position?: string | null;
-    readonly city?: string | null;
-    readonly email?: string | null;
-    readonly phone_number?: string | null;
-    readonly rate?: number | null;
     readonly image?: ArrayBuffer | string | null;
-    readonly attachments?: number[];
     readonly previous?: number | null;
-  }
+    readonly first_name: Model.Contact["first_name"];
+    readonly last_name: Model.Contact["last_name"];
+  };
 
-  type BulkCreatePayload<T extends Payload> = { data: Partial<T>[] };
-  type ModelBulkUpdatePayload<T extends Payload> = Partial<T> & { readonly id: number };
-  type BulkUpdatePayload<T extends Payload> = { data: ModelBulkUpdatePayload<T>[] };
+  type BulkCreatePayload<T extends PayloadObj> = { data: Partial<T>[] };
+  type ModelBulkUpdatePayload<T extends PayloadObj> = Partial<T> & { readonly id: number };
+  type BulkUpdatePayload<T extends PayloadObj> = { data: ModelBulkUpdatePayload<T>[] };
 }

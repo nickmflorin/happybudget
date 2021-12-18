@@ -27,8 +27,9 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
   }),
   templates: redux.reducers.createAuthenticatedModelListResponseReducer<
     Model.SimpleTemplate,
-    Redux.AuthenticatedModelListResponseStore<Model.SimpleTemplate>,
-    Omit<Redux.AuthenticatedModelListResponseActionMap<Model.SimpleTemplate>, "updating" | "deleting" | "creating">
+    null,
+    Tables.ContactTableContext,
+    Redux.AuthenticatedModelListResponseStore<Model.SimpleTemplate>
   >({
     initialState: redux.initialState.initialAuthenticatedModelListResponseState,
     actions: {
@@ -45,8 +46,9 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
   }),
   community: redux.reducers.createAuthenticatedModelListResponseReducer<
     Model.SimpleTemplate,
-    Redux.AuthenticatedModelListResponseStore<Model.SimpleTemplate>,
-    Omit<Redux.AuthenticatedModelListResponseActionMap<Model.SimpleTemplate>, "updating" | "deleting" | "creating">
+    null,
+    Tables.ContactTableContext,
+    Redux.AuthenticatedModelListResponseStore<Model.SimpleTemplate>
   >({
     initialState: redux.initialState.initialAuthenticatedModelListResponseState,
     actions: {
@@ -63,8 +65,9 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
   }),
   budgets: redux.reducers.createAuthenticatedModelListResponseReducer<
     Model.SimpleBudget,
-    Redux.AuthenticatedModelListResponseStore<Model.SimpleBudget>,
-    Omit<Redux.AuthenticatedModelListResponseActionMap<Model.SimpleBudget>, "updating" | "deleting" | "creating">
+    null,
+    Tables.ContactTableContext,
+    Redux.AuthenticatedModelListResponseStore<Model.SimpleBudget>
   >({
     initialState: initialState.budgets,
     actions: {

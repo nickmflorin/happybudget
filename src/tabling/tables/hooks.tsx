@@ -27,7 +27,6 @@ type UseAttachmentsReturnType<R extends Tables.ActualRowData | Tables.SubAccount
   JSX.Element | null
 ];
 
-/* eslint-disable indent */
 export const useAttachments = <
   R extends Tables.ActualRowData | Tables.SubAccountRowData | Tables.ContactRowData,
   M extends Model.RowHttpModel = Model.RowHttpModel

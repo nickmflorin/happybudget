@@ -1,13 +1,14 @@
-import { forwardRef, useState, useEffect, useImperativeHandle } from "react";
+import { forwardRef, useState, useEffect, useImperativeHandle, ForwardedRef } from "react";
 import { isNil } from "lodash";
 import DatePicker from "react-datepicker";
 
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
-type DateEditorProps = Table.EditorParams<Tables.ActualRow, Model.Actual>;
+type DateEditorProps = Table.EditorParams<Tables.ActualRowData, Model.Actual>;
 
-const DateEditor = (props: DateEditorProps, ref: any): JSX.Element => {
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+const DateEditor = (props: DateEditorProps, ref: ForwardedRef<any>): JSX.Element => {
   const [date, setDate] = useState<Date | null>(!isNil(props.value) ? new Date(props.value) : null);
   const [editing, setEditing] = useState(true);
 

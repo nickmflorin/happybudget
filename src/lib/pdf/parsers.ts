@@ -20,7 +20,7 @@ export const cleanText = (text: string) => {
 };
 
 export const removeWhitespace = (node: Node) => {
-  for (var i = node.childNodes.length; i-- > 0; ) {
+  for (let i = node.childNodes.length; i-- > 0; ) {
     const child = node.childNodes[i];
     if (!isNil(child.nodeValue) && child.nodeType === 3 && child.nodeValue.match(/^\s*$/)) {
       node.removeChild(child);
@@ -41,7 +41,7 @@ export const isSupportedNode = (node: Node): boolean => {
 export const removeUnsupportedNodes = (element: Node): Node[] => {
   const _prune = (node: Node) => {
     if (node.nodeType === node.ELEMENT_NODE) {
-      let newNodes: Node[] = reduce(
+      const newNodes: Node[] = reduce(
         node.childNodes,
         (curr: Node[], child: Node) => {
           _prune(child);
@@ -161,8 +161,8 @@ export const structureNode = (node: Node): Pdf.HTMLNode[] => {
 };
 
 export const convertHtmlIntoDoc = (html: string): Node => {
-  let doc = new DOMParser().parseFromString(html, "text/html");
-  let element = doc.body;
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  const element = doc.body;
   removeWhitespace(element);
   return element;
 };

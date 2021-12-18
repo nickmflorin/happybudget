@@ -2,7 +2,8 @@ import React, { useRef, useCallback, useEffect, useMemo } from "react";
 import { dequal as deepEqual } from "dequal";
 import { isEqual, isNil } from "lodash";
 
-var equal = require("fast-deep-equal/es6");
+/* eslint-disable-next-line @typescript-eslint/no-var-requires */
+const equal = require("fast-deep-equal/es6");
 
 type UseEffectParams = Parameters<typeof useEffect>;
 type EffectCallback = UseEffectParams[0];
@@ -16,7 +17,7 @@ export const useIsFirstRender = () => {
   return firstRender;
 };
 
-export const useRefIfNotDefined = <T extends { [key: string]: any }>(
+export const useRefIfNotDefined = <T extends Record<string, unknown>>(
   hook: () => { current: T },
   prop?: { current: T }
 ): { current: T } => {
@@ -25,9 +26,12 @@ export const useRefIfNotDefined = <T extends { [key: string]: any }>(
   return returnRef;
 };
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const useDynamicCallback = <T = any>(callback: (...args: any[]) => T) => {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const ref = useRef<any>();
   ref.current = callback;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const func: (...args: any[]) => T = (...args: any[]) => ref.current.apply(this, args);
   return useCallback(func, []);
 };
@@ -43,11 +47,13 @@ export const deepCompareFn = (method?: DeepEqualCheck) => {
   }[method];
 };
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const deepCompare = (a: any, b: any, method?: DeepEqualCheck) => {
   return deepCompareFn(method)(a, b);
 };
 
-export const deepMemo = (c: React.ComponentType<any>, method?: DeepEqualCheck) => React.memo(c, deepCompareFn(method));
+export const deepMemo = (c: React.ComponentType<Record<string, unknown>>, method?: DeepEqualCheck) =>
+  React.memo(c, deepCompareFn(method));
 
 export const useDeepEqualMemoDeps = (value: DependencyList, method?: DeepEqualCheck) => {
   const ref = useRef<DependencyList>();

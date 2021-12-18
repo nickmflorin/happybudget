@@ -6,17 +6,23 @@ import { ActualOwnersMenu } from "components/menus";
 import { framework } from "tabling/generic";
 
 interface ActualOwnerEditorProps
-  extends Table.EditorParams<Tables.ActualRowData, Model.Actual, Tables.ActualTableStore, Model.SimpleSubAccount> {
+  extends Table.EditorParams<
+    Tables.ActualRowData,
+    Model.Actual,
+    Tables.ActualTableStore,
+    Model.SimpleSubAccount | Model.SimpleMarkup | null
+  > {
   readonly setSearch: (value: string) => void;
 }
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const ActualOwnerEditor = ({ setSearch, ...props }: ActualOwnerEditorProps, ref: ForwardedRef<any>) => {
-  const owners = useSelector((state: Application.Authenticated.Store) => props.selector(state).owners.data);
-  const search = useSelector((state: Application.Authenticated.Store) => props.selector(state).owners.search);
-  const loading = useSelector((state: Application.Authenticated.Store) => props.selector(state).owners.loading);
+  const owners = useSelector((state: Application.AuthenticatedStore) => props.selector(state).owners.data);
+  const search = useSelector((state: Application.AuthenticatedStore) => props.selector(state).owners.search);
+  const loading = useSelector((state: Application.AuthenticatedStore) => props.selector(state).owners.loading);
 
   const [editor] = framework.editors.useModelMenuEditor<
-    Model.SimpleSubAccount | Model.SimpleMarkup,
+    Model.SimpleSubAccount | Model.SimpleMarkup | null,
     Model.SimpleSubAccount | Model.SimpleMarkup,
     Tables.ActualRowData,
     Model.Actual,

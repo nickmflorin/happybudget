@@ -18,12 +18,13 @@ const AttachmentsFilePond = (props: AttachmentsFilePondProps): JSX.Element => {
 
   return (
     <FilePond
-      // @ts-ignore 2769 There seems to be an issue with the types between FilePondFile and InitialFilePondFile
-      files={files}
+      /* There seems to be an issue with the types between FilePondFile and
+         InitialFilePondFile */
+      files={files as unknown as ActualFileObject[]}
       onupdatefiles={setFiles}
       allowMultiple={true}
       labelIdle={"Drag & Drop or Click to Browse"}
-      labelFileProcessingError={(error: any) => {
+      labelFileProcessingError={(error: { body: string }) => {
         return error.body || "There was an error processing the attachment.";
       }}
       name={"files"}
@@ -49,8 +50,8 @@ const AttachmentsFilePond = (props: AttachmentsFilePondProps): JSX.Element => {
         process: (
           fieldName: string,
           file: ActualFileObject,
-          metadata: { [key: string]: any },
-          load: (p: string | { [key: string]: any }) => void,
+          metadata: Record<string, unknown>,
+          load: (p: string | Record<string, unknown>) => void,
           error: (errorText: string) => void,
           progress: ProgressServerConfigFunction,
           abort: () => void

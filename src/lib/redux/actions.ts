@@ -3,17 +3,17 @@ export { createAction } from "@reduxjs/toolkit";
 /**
  * Modified version of @redux.js/toolkit's `createAction` method that uses an
  * action creator that attaches the context to the given action.
- * @param type 					 The action type.
+ * @param type  The action type.
  * @param prepareAction  Callback to prepare action.
- * @returns 						 Function to create action.
+ * @returns  Function to create action.
  */
-export function createContextAction<P, C>(
+export function createContextAction<P extends Redux.ActionPayload, C extends Table.Context>(
   type: string,
   prepareAction?: (p: P, c: C) => Omit<Redux.Action<P>, "type">
-): (p: P, c: C) => Redux.ActionWithContext<P, C> {
+): Redux.ContextActionCreator<P, C> {
   function actionCreator(payload: P, context: C) {
     if (prepareAction) {
-      let prepared = prepareAction(payload, context);
+      const prepared = prepareAction(payload, context);
       if (!prepared) {
         throw new Error("prepareAction did not return an object");
       }

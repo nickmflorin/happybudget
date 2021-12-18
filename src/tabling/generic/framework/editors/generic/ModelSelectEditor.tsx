@@ -6,7 +6,7 @@ import GenericModelMenuEditor, { GenericModelMenuEditorProps } from "./GenericMo
 
 export interface ModelSelectEditorProps<
   C extends Model.HttpModel,
-  R extends Table.RowData = Table.RowData,
+  R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends GenericModelMenuEditorProps<C, C, R, M, S>,
@@ -16,14 +16,14 @@ export interface ModelSelectEditorProps<
   readonly tagProps?: Omit<TagProps<C>, "children" | "model" | "text">;
 }
 
-/* eslint-disable indent */
 const ModelSelectEditor = <
   C extends Model.HttpModel,
-  R extends Table.RowData = Table.RowData,
+  R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   { models, ...props }: ModelSelectEditorProps<C, R, M, S>,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   ref: ForwardedRef<any>
 ) => {
   const [editor] = useModelMenuEditor<C, C, R, M, S>({ ...props, forwardedRef: ref });
@@ -43,10 +43,11 @@ const ModelSelectEditor = <
 export default forwardRef(ModelSelectEditor) as {
   <
     C extends Model.HttpModel,
-    R extends Table.RowData = Table.RowData,
+    R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>
   >(
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     props: ModelSelectEditorProps<C, R, M, S> & { ref: ForwardedRef<any> }
   ): JSX.Element;
 };

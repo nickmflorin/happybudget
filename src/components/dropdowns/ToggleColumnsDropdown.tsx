@@ -18,7 +18,6 @@ export interface ToggleColumnsDropdownProps<R extends Table.RowData, M extends M
   readonly onChange?: (field: string, visible: boolean) => void;
 }
 
-/* eslint-disable indent */
 const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: ToggleColumnsDropdownProps<R, M>
 ): JSX.Element => {

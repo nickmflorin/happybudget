@@ -4,10 +4,10 @@ import { redux, budgeting } from "lib";
 import { initialSubAccountsTableState } from "./initialState";
 
 export const selectBudgetDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.template.detail.data
+  (state: Application.AuthenticatedStore) => state.template.detail.data
 );
 export const selectBudgetDetailLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Application.Authenticated.Store) => state.template.detail.loading
+  (state: Application.AuthenticatedStore) => state.template.detail.loading
 );
 
 export const selectAccountsTableStore = redux.selectors.simpleDeepEqualSelector((store: Application.Store) => {

@@ -13,7 +13,7 @@ const AnalysisPage = ({ budget, children }: AnalysisPageProps): JSX.Element => {
   return (
     <React.Fragment>
       <Portal id={"breadcrumbs"}>
-        <BreadCrumbs
+        <BreadCrumbs<{ b: Model.Budget }>
           params={{ b: budget }}
           items={[
             {

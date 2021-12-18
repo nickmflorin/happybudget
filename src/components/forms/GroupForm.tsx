@@ -43,8 +43,8 @@ const GroupForm = <M extends Model.SimpleAccount | Model.SimpleSubAccount>({
         label={"Subtotal Accounts"}
         rules={[
           { required: false },
-          ({ getFieldValue }: { getFieldValue: any }) => ({
-            validator(rule: any, value: string) {
+          () => ({
+            validator(rule: unknown, value: string) {
               if (value.length === 0) {
                 return Promise.reject("At least one account must be selected.");
               }

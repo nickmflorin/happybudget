@@ -18,7 +18,7 @@ declare type PluralityWithModel<M extends Model.Model = Model.Model> = {
   readonly model: M;
 };
 
-declare interface ITagRenderParams<S extends object = React.CSSProperties> {
+declare interface ITagRenderParams<S extends React.CSSProperties | Pdf.Style = React.CSSProperties> {
   readonly className: string | undefined;
   readonly textClassName: string | undefined;
   readonly style: S | undefined;
@@ -33,7 +33,10 @@ declare interface ITagRenderParams<S extends object = React.CSSProperties> {
   readonly disabled?: boolean;
 }
 
-declare type TagProps<M extends Model.Model = Model.Model, STYLE extends object = React.CSSProperties> = {
+declare type TagProps<
+  M extends Model.Model = Model.Model,
+  STYLE extends React.CSSProperties | Pdf.Style = React.CSSProperties
+> = {
   readonly className?: string;
   readonly textClassName?: string;
   readonly style?: STYLE;

@@ -15,10 +15,16 @@ type M = Model.SubAccount;
 type R = Tables.SubAccountRowData;
 
 const selectAccountDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.template.account.detail.data
+  (state: Application.AuthenticatedStore) => state.template.account.detail.data
 );
 
-const ConnectedTable = connectTableToStore<TemplateSubAccountsTableProps, R, M, Tables.SubAccountTableStore>({
+const ConnectedTable = connectTableToStore<
+  TemplateSubAccountsTableProps,
+  R,
+  M,
+  Tables.SubAccountTableStore,
+  Tables.SubAccountTableContext
+>({
   actions: {
     tableChanged: actions.account.handleTableChangeEventAction,
     loading: actions.account.loadingAction,
@@ -33,7 +39,7 @@ const ConnectedTable = connectTableToStore<TemplateSubAccountsTableProps, R, M, 
   selector: selectors.selectSubAccountsTableStore,
   footerRowSelectors: {
     page: createSelector(
-      redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.template.detail.data),
+      redux.selectors.simpleDeepEqualSelector((state: Application.AuthenticatedStore) => state.template.detail.data),
       (template: Model.Template | null) => ({
         identifier: !isNil(template) && !isNil(template.name) ? `${template.name} Total` : "Budget Total",
         estimated: !isNil(template) ? budgeting.businessLogic.estimatedValue(template) : 0.0,
@@ -43,7 +49,7 @@ const ConnectedTable = connectTableToStore<TemplateSubAccountsTableProps, R, M, 
     ),
     footer: createSelector(
       redux.selectors.simpleDeepEqualSelector(
-        (state: Application.Authenticated.Store) => state.template.account.detail.data
+        (state: Application.AuthenticatedStore) => state.template.account.detail.data
       ),
       (detail: Model.Account | null) => ({
         identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
@@ -66,7 +72,7 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
   const history = useHistory();
 
   const accountDetail = useSelector(selectAccountDetail);
-  const table = tabling.hooks.useTable<Tables.SubAccountRowData>();
+  const table = tabling.hooks.useTable<R, M>();
 
   const [groupModals, onEditGroup, onCreateGroup] = useGrouping({
     parentId: accountId,

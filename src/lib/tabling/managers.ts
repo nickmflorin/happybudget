@@ -35,7 +35,8 @@ abstract class RowManager<RId extends Table.RowId, TP extends Table.RowType, Gri
     this.gridId = config.gridId;
   }
 
-  public createBasic(config: CreateRowConfig<RId>, ...args: any[]): Table.IRow<RId, TP, Grid> {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  public createBasic(config: CreateRowConfig<RId>): Table.IRow<RId, TP, Grid> {
     return {
       id: config.id,
       rowType: this.rowType,
@@ -83,8 +84,10 @@ abstract class BodyRowManager<
     this.columns = config.columns;
   }
 
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   abstract getValueForRow(field: keyof R, col: Table.Column<R, M>, ...args: any[]): R[keyof R] | undefined;
 
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   createData(...args: any[]): R {
     return reduce(
       filter(this.columns, (c: Table.Column<R, M>) => c.isRead !== false),
@@ -103,6 +106,7 @@ abstract class BodyRowManager<
     );
   }
 
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   public createBasic(config: CreateBodyRowConfig<RId, R>, ...args: any[]): Table.IBodyRow<RId, TP, R> {
     return {
       ...super.createBasic(config),
@@ -136,7 +140,7 @@ export class PlaceholderRowManager<
   }
 
   getValueForRow(field: keyof R, col: Table.Column<R, M>, data?: Partial<R>) {
-    let value = this.defaultData === undefined ? undefined : this.defaultData[field];
+    const value = this.defaultData === undefined ? undefined : this.defaultData[field];
     if (value === undefined) {
       return data === undefined ? undefined : data[field];
     }
@@ -247,7 +251,6 @@ type CreateMarkupRowFromDataConfig<R extends Table.RowData> = {
 
 type CreateMarkupRowConfig<R extends Table.RowData> = CreateMarkupRowFromModelConfig | CreateMarkupRowFromDataConfig<R>;
 
-/* eslint-disable indent */
 const isMarkupRowConfigWithModel = <R extends Table.RowData>(
   config: CreateMarkupRowConfig<R>
 ): config is CreateMarkupRowFromModelConfig => (config as CreateMarkupRowFromModelConfig).model !== undefined;
@@ -327,7 +330,6 @@ type CreateGroupRowFromDataConfig<R extends Table.RowData> = {
 
 type CreateGroupRowConfig<R extends Table.RowData> = CreateGroupRowFromModelConfig | CreateGroupRowFromDataConfig<R>;
 
-/* eslint-disable indent */
 const isGroupRowConfigWithModel = <R extends Table.RowData>(
   config: CreateGroupRowConfig<R>
 ): config is CreateGroupRowFromModelConfig => (config as CreateGroupRowFromModelConfig).model !== undefined;

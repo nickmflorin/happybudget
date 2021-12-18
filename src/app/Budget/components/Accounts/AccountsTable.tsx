@@ -34,7 +34,7 @@ const ConnectedTable = connectTableToStore<
   createSaga: (table: Table.TableInstance<R, M>) => sagas.accounts.createTableSaga(table),
   footerRowSelectors: {
     footer: createSelector(
-      redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.detail.data),
+      redux.selectors.simpleDeepEqualSelector((state: Application.AuthenticatedStore) => state.budget.detail.data),
       (budget: Model.Budget | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
         estimated: !isNil(budget) ? budgeting.businessLogic.estimatedValue(budget) : 0.0,
@@ -55,7 +55,7 @@ const AccountsTable = ({ budgetId, budget, setPreviewModalVisible }: AccountsTab
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const table = tabling.hooks.useTable<R>();
+  const table = tabling.hooks.useTable<R, M>();
 
   const [groupModals, onEditGroup, onCreateGroup] = useGrouping({
     parentId: budgetId,

@@ -10,7 +10,6 @@ export type UnauthenticatedBudgetTableProps<
   readonly onBack?: () => void;
 };
 
-/* eslint-disable indent */
 const UnauthenticatedBudgetTable = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: UnauthenticatedBudgetTableProps<R, M>
 ): JSX.Element => {

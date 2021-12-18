@@ -7,12 +7,9 @@ import { hooks, models, tabling } from "lib";
 import { MultipleTags } from "components/tagging";
 import { Cell } from "tabling/generic/framework/cells";
 
-export interface FringesCellProps
-  extends Table.CellProps<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore> {
-  readonly onAddFringes: () => void;
-}
+export type FringesCellProps = Table.CellProps<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore>;
 
-const FringesCell = ({ value, onAddFringes, ...props }: FringesCellProps): JSX.Element => {
+const FringesCell = ({ value, ...props }: FringesCellProps): JSX.Element => {
   const fringes: Table.BodyRow<Tables.FringeRowData>[] = useSelector(
     (state: Application.Store) => props.selector(state).fringes.data
   );

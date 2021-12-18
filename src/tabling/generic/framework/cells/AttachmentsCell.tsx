@@ -45,7 +45,6 @@ interface AttachmentsCellProps<
   readonly onAttachmentAdded: (row: Table.ModelRow<R>, attachment: Model.Attachment) => void;
 }
 
-/* eslint-disable indent */
 const AttachmentsCell = <
   R extends Tables.ActualRowData | Tables.SubAccountRowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,

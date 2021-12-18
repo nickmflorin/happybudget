@@ -14,6 +14,7 @@ type M = Model.Fringe;
 
 export interface Props extends Omit<AuthenticatedModelTableProps<R, M>, "columns" | "actions"> {
   readonly exportFileName: string;
+  readonly actionContext: Tables.FringeTableContext;
 }
 
 const FringesTable: React.FC<WithConnectedTableProps<Props, R, M, S>> = ({ exportFileName, ...props }): JSX.Element => {

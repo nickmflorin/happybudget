@@ -1,10 +1,12 @@
 import * as Sentry from "@sentry/react";
+import { isNil } from "lodash";
 
 import * as api from "api";
+import { toTitleCase } from "lib/util/formatters";
 
-type InternalNotificationOptions = Pick<InternalNotification, "dispatchToSentry" | "level" | "message">;
+type InternalNotificationOptions = Pick<InternalNotification, "dispatchToSentry" | "level">;
 
-/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 const consoleMethodMap: { [key in AppNotificationConsoleLevel]: "warn" | "error" | "info" } = {
   warning: "warn",
   error: "error",
@@ -21,7 +23,6 @@ const isNotificationObj = (n: InternalNotification | NotificationDetail): n is I
 const isError = (n: InternalNotification | NotificationDetail): n is Error =>
   typeof n !== "string" && n instanceof Error;
 
-/* eslint-disable indent */
 const shouldDispatchToSentry = (
   e: InternalNotification | NotificationDetail,
   opts?: InternalNotificationOptions
@@ -54,13 +55,13 @@ const notificationLevel = (
 const consoleMessage = (e: InternalNotification | NotificationDetail): string | Error =>
   isNotificationObj(e) ? e.message || e.error || "" : api.typeguards.isHttpError(e) ? e.message : e;
 
-export const notify = (e: InternalNotification | NotificationDetail, opts?: InternalNotificationOptions) => {
+export const notify = (e: InternalNotification | NotificationDetail, opts?: InternalNotificationOptions): void => {
   /* Note: Issuing a console.warn or console.error will automatically dispatch
      to Sentry. */
   const dispatchToSentry = shouldDispatchToSentry(e, opts);
   const level = notificationLevel(e, opts);
 
-  let consoler: Console["warn" | "error"] = consoleMethod(level);
+  const consoler: Console["warn" | "error"] = consoleMethod(level);
   /* If this is a warning or error, it will be automatically dispatched to
        Sentry - unless we disable it temporarily. */
   if (dispatchToSentry === false) {
@@ -84,6 +85,54 @@ export const notify = (e: InternalNotification | NotificationDetail, opts?: Inte
   } else {
     consoler(consoleMessage(e));
   }
+};
+
+type InconsistentStateError = {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  readonly action?: Redux.Action | string;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  readonly payload?: any;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  [key: string]: any;
+};
+
+export const inconsistentStateError = (e: InconsistentStateError, opts?: InternalNotificationOptions): void => {
+  const { action, payload, ...context } = e;
+  const actionString: string | undefined = !isNil(action)
+    ? typeof action === "string"
+      ? action
+      : action.type
+    : action;
+
+  const payloadSting: string | undefined = !isNil(e.payload)
+    ? JSON.stringify(e.payload)
+    : !isNil(action) && typeof action !== "string"
+    ? JSON.stringify(action.payload)
+    : payload;
+
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const addParamValue = (message: string, paramName: string, value: any) =>
+    message + `\n\t${toTitleCase(paramName)}: ${value}`;
+
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const addParam = (message: string, paramName: string, paramValue: any) => {
+    if (paramValue !== undefined) {
+      return addParamValue(message, paramName, paramValue);
+    }
+    return message;
+  };
+
+  let message = addParam(addParam("Inconsistent State!", "action", actionString), "payload", payloadSting);
+  Object.keys(context).forEach((key: string) => {
+    message = addParam(message, key, context[key]);
+  });
+
+  notify({
+    dispatchToSentry: true,
+    level: "warning",
+    ...opts,
+    message
+  });
 };
 
 export const requestError = (e: Error, opts?: InternalNotificationOptions) => {

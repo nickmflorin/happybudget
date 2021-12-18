@@ -48,7 +48,7 @@ const AuthenticatedBudgetAccountsTable = (props: AuthenticatedBudgetProps): JSX.
             const selectedRows = filter(params.selectedRows, (r: Table.BodyRow<R>) =>
               tabling.typeguards.isModelRow(r)
             ) as Table.ModelRow<R>[];
-            /* eslint-disable indent */
+
             const rows: Table.ModelRow<R>[] =
               selectedRows.length !== 0
                 ? selectedRows

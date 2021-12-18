@@ -16,12 +16,12 @@ const AccountsPage = <B extends Model.Budget | Model.Template>({
   return (
     <React.Fragment>
       <Portal id={"breadcrumbs"}>
-        <BreadCrumbs
+        <BreadCrumbs<{ b: B }>
           params={{ b: budget }}
           items={[
             {
               requiredParams: ["b"],
-              func: ({ b }: { b: Model.Budget }) => ({
+              func: ({ b }: { b: B }) => ({
                 id: b.id,
                 primary: true,
                 label: b.name,

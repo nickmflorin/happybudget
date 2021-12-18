@@ -5,7 +5,7 @@ import { CellRange } from "@ag-grid-community/core";
 import * as typeguards from "./typeguards";
 
 export const getRows = <R extends Table.RowData, RW extends Table.Row<R> = Table.Row<R>>(api: Table.GridApi): RW[] => {
-  let rows: RW[] = [];
+  const rows: RW[] = [];
   api.forEachNode((node: Table.RowNode) => rows.push(node.data));
   return rows;
 };
@@ -147,7 +147,6 @@ export const mergeClassNames = <T>(params: T, ...args: Table.ClassName<T>[]): st
   return classNames(stringClassNames);
 };
 
-/* eslint-disable indent */
 export const mergeClassNamesFn =
   <T>(...args: Table.ClassName<T>[]): ((params: T) => string) =>
   (params: T) =>

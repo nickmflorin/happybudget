@@ -29,7 +29,7 @@ const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: 
   const headerRef = useRef<IImageAndNameRef | null>(null);
 
   const onValuesChange = useMemo(
-    () => (changedValues: Partial<Http.ContactPayload>, values: Http.ContactPayload) => {
+    () => (changedValues: Partial<Http.ContactPayload>) => {
       if (!isNil(changedValues.first_name)) {
         headerRef.current?.setFirstName(changedValues.first_name);
       }
@@ -84,7 +84,6 @@ const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: 
             form={form}
             onValuesChange={onValuesChange}
             attachmentsProps={
-              /* eslint-disable indent */
               !isNil(m)
                 ? {
                     onAttachmentRemoved: onAttachmentRemoved,

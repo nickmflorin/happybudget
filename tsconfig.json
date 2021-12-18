@@ -8,8 +8,8 @@
       "esnext"
     ],
     "typeRoots": [
-      "./node_modules/@types/",
-      "./src/types/"
+      "./src/types/",
+      "node_modules/@types",
     ],
     "allowJs": false,
     "skipLibCheck": true,
@@ -28,9 +28,9 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "src"
+    "src/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules/**"
   ]
 }

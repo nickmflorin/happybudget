@@ -10,7 +10,6 @@ export interface CollapsedLayoutProps extends Omit<GenericLayoutProps, "sidebar"
 }
 
 const CollapsedLayout = (props: CollapsedLayoutProps): JSX.Element => {
-  const isMobile = ui.hooks.useLessThanBreakpoint("medium");
   const layout = ui.hooks.useLayoutIfNotDefined(props.layout);
 
   return (
@@ -18,13 +17,7 @@ const CollapsedLayout = (props: CollapsedLayoutProps): JSX.Element => {
       layout={layout}
       className={classNames("layout--collapsed", props.className)}
       style={props.style}
-      sidebar={
-        <CollapsedSidebar
-          sidebar={props.sidebar}
-          toggle={() => layout.current.toggleSidebar()}
-          closeOnClick={isMobile ? () => layout.current.setSidebarVisible(false) : undefined}
-        />
-      }
+      sidebar={<CollapsedSidebar sidebar={props.sidebar} toggle={() => layout.current.toggleSidebar()} />}
     >
       {props.children}
     </GenericLayout>

@@ -23,7 +23,9 @@ export const requestAction = redux.actions.createContextAction<Redux.TableReques
 );
 export const loadingAction = redux.actions.createAction<boolean>(ActionType.Actuals.Loading);
 export const responseAction = redux.actions.createAction<Http.TableResponse<Model.Actual>>(ActionType.Actuals.Response);
-export const setSearchAction = redux.actions.createAction<string>(ActionType.Actuals.SetSearch);
+export const setSearchAction = redux.actions.createContextAction<string, Tables.ActualTableContext>(
+  ActionType.Actuals.SetSearch
+);
 export const addModelsToStateAction = redux.actions.createAction<Redux.AddModelsToTablePayload<Model.Actual>>(
   ActionType.Actuals.AddToState
 );

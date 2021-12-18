@@ -6,14 +6,17 @@ import { isAuthenticatedStore } from "./typeguards";
 export const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual);
 export const createShallowEqualSelector = createSelectorCreator(defaultMemoize, shallowEqual);
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const simpleDeepEqualSelector = <T = any>(func: Redux.GenericSelectorFunc<any, T>) => {
   return createDeepEqualSelector(func, (data: T) => data);
 };
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const simpleShallowEqualSelector = <T = any>(func: Redux.GenericSelectorFunc<any, T>) => {
   return createShallowEqualSelector(func, (data: T) => data);
 };
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const createGlobalSelector = <T = any>(
   authenticatedFunc: Redux.AuthenticatedSelectorFunc<T>,
   UnauthenticatedFunc: Redux.UnauthenticatedSelectorFunc<T>

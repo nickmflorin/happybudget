@@ -18,7 +18,6 @@ export type AuthenticatedBudgetTableProps<
   readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
 };
 
-/* eslint-disable indent */
 const AuthenticatedBudgetTable = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
   onEditMarkup,
   onEditGroup,

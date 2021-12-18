@@ -87,7 +87,7 @@ export const isBudgetRelatedUrl = (url: string, id: PluggableID = "([0-9]+)"): u
 export const isTemplateRelatedUrl = (url: string, id: PluggableID = "([0-9]+)"): boolean =>
   isSubAccountUrl(url, "templates", id) || isAccountUrl(url, "templates", id) || isAccountsUrl(url, "templates", id);
 
-const getLastVisitedCookies = (designation: Designation): { [key: string]: any } => {
+const getLastVisitedCookies = (designation: Designation): Record<string, unknown> => {
   const cookies = new Cookies();
   const lastVisited = cookies.get(`${designation}-last-visited`);
   if (typeof lastVisited !== "object") {
@@ -101,10 +101,12 @@ export const getLastVisited = (designation: Designation, id: ID): string | null 
   const cookies = getLastVisitedCookies(designation);
   if (!isNil(cookies[`${id}`])) {
     if (
-      (typeof cookies[`${id}`] === "string" && designation === "budgets" && isBudgetRelatedUrl(cookies[`${id}`], id)) ||
-      (designation === "templates" && isTemplateRelatedUrl(cookies[`${id}`], id))
+      (typeof cookies[`${id}`] === "string" &&
+        designation === "budgets" &&
+        isBudgetRelatedUrl(cookies[`${id}`] as string, id)) ||
+      (designation === "templates" && isTemplateRelatedUrl(cookies[`${id}`] as string, id))
     ) {
-      return cookies[`${id}`];
+      return cookies[`${id}`] as string;
     }
   }
   return null;

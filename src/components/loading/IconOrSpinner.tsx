@@ -8,10 +8,9 @@ import { Spinner, Icon } from "components";
 import "./IconOrSpinner.scss";
 
 interface IconOrSpinnerProps extends StandardComponentProps {
-  loading?: boolean;
-  icon?: IconOrElement;
-  size?: number;
-  [key: string]: any;
+  readonly loading?: boolean;
+  readonly icon?: IconOrElement;
+  readonly size?: number;
 }
 
 const IconOrSpinner = ({ loading, icon, className, size = 14, style = {} }: IconOrSpinnerProps): JSX.Element => {

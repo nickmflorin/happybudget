@@ -1,41 +1,65 @@
 declare namespace Redux {
-  type GenericSelectorFunc<S, T = any> = (state: S) => T;
-  type AuthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Application.Authenticated.Store, T>;
-  type UnauthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Application.Unauthenticated.Store, T>;
+  type GenericSelectorFunc<S, T = unknown> = (state: S) => T;
+  type AuthenticatedSelectorFunc<T = unknown> = GenericSelectorFunc<Application.AuthenticatedStore, T>;
+  type UnauthenticatedSelectorFunc<T = unknown> = GenericSelectorFunc<Application.UnauthenticatedStore, T>;
 
-  type SwitchSelectorFunc<AUTH extends boolean = true, T = any> = AUTH extends true
+  type SwitchSelectorFunc<AUTH extends boolean = true, T = unknown> = AUTH extends true
     ? AuthenticatedSelectorFunc<T>
     : UnauthenticatedSelectorFunc<T>;
 
-  type SelectorFunc<T = any> = AuthenticatedSelectorFunc<T> | UnauthenticatedSelectorFunc<T>;
+  type SelectorFunc<T = unknown> = AuthenticatedSelectorFunc<T> | UnauthenticatedSelectorFunc<T>;
 
   type AsyncId = `async-${string}`;
 
-  /* eslint-disable-next-line no-unused-vars */
-  type AsyncStores<S = any> = { [key in AsyncId]: S };
+  type AsyncStores<S> = { [key in AsyncId]: S };
 
-  type Transformers<S = any, A = any> = {
-    /* eslint-disable-next-line no-unused-vars */
-    [K in keyof A]-?: Reducer<S>;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type ActionMap<C extends Table.Context = any> = Record<string, ActionCreator<any> | ContextActionCreator<any, C>>;
+
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type InferActionPayload<A> = A extends Action<infer P, any>
+    ? P
+    : /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    A extends ActionWithContext<infer P, any>
+    ? P
+    : never;
+
+  type InferAction<CREATOR> = CREATOR extends ContextActionCreator<infer P, infer C>
+    ? ActionWithContext<P, C>
+    : CREATOR extends ActionCreator<infer P>
+    ? Action<P>
+    : never;
+
+  type Transformers<S, A extends ActionMap<C>> = {
+    [K in keyof A]-?: Reducer<S, InferAction<A[K]>>;
   };
 
-  type Task<P = any> = (action: Action<P>) => import("@redux-saga/types").SagaIterator;
-  type ContextTask<P = any, C = any> = (action: ActionWithContext<P, C>) => import("@redux-saga/types").SagaIterator;
+  type _ActionPayload = string | number | boolean | Record<string, unknown>;
+  type ActionPayload = _ActionPayload | null | _ActionPayload[];
+
+  type Task<P extends ActionPayload = ActionPayload> = (action: Action<P>) => import("@redux-saga/types").SagaIterator;
+  type ContextTask<P extends ActionPayload = ActionPayload, C extends Table.Context = Table.Context> = (
+    action: ActionWithContext<P, C>
+  ) => import("@redux-saga/types").SagaIterator;
 
   type TableEventTask<
     E extends Table.ChangeEvent<R, M>,
-    R extends Table.RowData = any,
-    M extends Model.RowHttpModel = any,
-    C = any
+    R extends Table.RowData,
+    M extends Model.RowHttpModel,
+    C extends Table.Context = Table.Context
   > = (e: E, context: C) => import("@redux-saga/types").SagaIterator;
 
-  type TableBulkCreateTask<R extends Table.RowData = any, ARGS extends any[] = []> = (
+  type TableBulkCreateTask<R extends Table.RowData, ARGS extends Array<unknown> = []> = (
     e: Table.RowAddEvent<R>,
     errorMessage: string,
     ...args: ARGS
   ) => import("redux-saga").SagaIterator;
 
-  interface TableEventTaskMapObject<R extends Table.RowData = any, M extends Model.RowHttpModel = any, C = any> {
+  type TableEventTaskMapObject<
+    R extends Table.RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+    C extends Table.Context = Table.Context
+  > = {
     readonly dataChange: TableEventTask<Table.DataChangeEvent<R>, R, M, C>;
     readonly rowAdd: TableEventTask<Table.RowAddEvent<R>, R, M, C>;
     readonly rowInsert: TableEventTask<Table.RowInsertEvent<R>, R, M, C>;
@@ -48,53 +72,69 @@ declare namespace Redux {
     readonly modelUpdated: TableEventTask<Table.ModelUpdatedEvent<M>, R, M, C>;
     readonly markupAdded: TableEventTask<Table.MarkupAddedEvent, R, M, C>;
     readonly markupUpdated: TableEventTask<Table.MarkupUpdatedEvent, R, M, C>;
-  }
-
-  type Reducer<S, A = Action> = import("redux").Reducer<S, A>;
-  type ReducersMapObject<S = any> = {
-    [K in keyof S]-?: Reducer<S[K]>;
   };
 
-  type ReducersWithAsyncMapObject<S = any> = ReducersMapObject<S> & {
-    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-    [K in AsyncId]: Reducer<any>;
+  type Reducer<S, A = Action> = import("redux").Reducer<S, A>;
+  type ReducersMapObject<S> = {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    [K in keyof S]-?: Reducer<S[K], Action<any>>;
+  };
+
+  type ReducersWithAsyncMapObject<S> = ReducersMapObject<S> & {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    [K in AsyncId]: Reducer<S[K], Action<any>>;
   };
 
   type ReducerManager<S extends Application.Store> = {
     readonly getReducerMap: () => ReducersWithAsyncMapObject<S>;
     readonly reduce: (state: S | undefined, action: Action) => S;
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     readonly injectReducer: (key: Table.AsyncId, reducer: Reducer<any>) => void;
     readonly ejectReducer: (key: Table.AsyncId) => void;
   };
 
-  type StoreObj = Record<string, any> | boolean | number;
+  type StoreObj = Record<string, unknown> | boolean | number;
 
   type Store<S extends Application.Store> = import("redux").Store<S, Action> & {
     readonly reducerManager: ReducerManager<S>;
-    readonly injectSaga: (key: string, saga: import("redux-saga").Saga<any[]>) => boolean;
+    readonly injectSaga: (key: string, saga: import("redux-saga").Saga) => boolean;
     readonly ejectSaga: (key: string) => boolean;
     readonly hasSaga: (key: string) => boolean;
   };
 
   type Dispatch = import("redux").Dispatch<Action>;
 
-  interface Action<P = any, T extends string = string> {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type Action<P extends ActionPayload = any, T extends string = string> = {
     readonly payload: P;
     readonly type: T;
     readonly isAuthenticated?: boolean | undefined;
-    readonly toString: () => string;
-  }
+  };
 
-  interface ActionWithContext<P = any, C = any, T extends string = string> extends Action<P, T> {
+  type ActionWithContext<
+    P extends ActionPayload = ActionPayload,
+    C extends Table.Context = Table.Context
+  > = Action<P> & {
     readonly context: C;
+  };
+
+  type ActionCreator<P extends ActionPayload> = {
+    type: string;
+    toString: () => string;
+    (p: P): Action<P>;
+  };
+
+  interface ContextActionCreator<P extends ActionPayload, C extends Table.Context> {
+    type: string;
+    toString: () => string;
+    (p: P, ctx: C): ActionWithContext<P, C>;
   }
 
-  type ActionCreator<P> = import("@reduxjs/toolkit").ActionCreatorWithPayload<P>;
-  type ContextActionCreator<P, C> = (p: P, ctx: C) => ActionWithContext<P, C>;
+  type AuthenticatedAction<P extends ActionPayload = ActionPayload> = Action<P> & {
+    readonly isAuthenticated?: true | undefined;
+  };
 
-  type AuthenticatedAction<P = any> = Action<P> & { readonly isAuthenticated?: true | undefined };
-
-  type UnauthenticatedAction<P = any> = Action<P> & { readonly isAuthenticated: false };
+  type UnauthenticatedAction<P extends ActionPayload = ActionPayload> = Action<P> & { readonly isAuthenticated: false };
 
   type ModelLookup<M extends Model.Model> = ID | ((m: M) => boolean);
 
@@ -103,16 +143,16 @@ declare namespace Redux {
     readonly name?: string;
   };
 
-  type TaskConfig<A> = {
+  type TaskConfig<A extends ActionMap> = {
     readonly actions: Omit<A, "request">;
   };
 
-  type ReducerConfig<S, A> = {
+  type ReducerConfig<S, A extends ActionMap> = {
     readonly initialState: S;
-    readonly actions: A;
+    readonly actions: Partial<A>;
   };
 
-  type SagaConfig<T, A> = {
+  type SagaConfig<T, A extends ActionMap> = {
     readonly tasks: T;
     readonly actions: A;
   };
@@ -124,53 +164,56 @@ declare namespace Redux {
 
   type ModelListActionStore = ModelListActionInstance[];
 
-  interface UpdateActionPayload<T extends object, Id extends ID = number> {
+  type UpdateActionPayload<T extends Record<string, unknown>, Id extends ID = number> = {
     id: Id;
     data: Partial<T>;
-  }
+  };
 
   type TableRequestPayload = { ids: number[] } | null;
 
   type UpdateOrderingPayload<F extends string = string> = { field: F; order: Http.Order };
 
-  type ClearOnDetail<T, C = any> = {
+  type ClearOnDetail<T extends ActionPayload, C extends Table.Context = Table.Context> = {
     readonly action: ActionCreator<T> | ContextActionCreator<T, C>;
     readonly payload: (payload: T) => boolean;
   };
 
-  type ClearOn<T, C = any> = ActionCreator<T> | ContextActionCreator<T, C> | ClearOnDetail<T, C>;
+  type ClearOn<T extends ActionPayload, C extends Table.Context = Table.Context> =
+    | ActionCreator<T>
+    | ContextActionCreator<T, C>
+    | ClearOnDetail<T, C>;
 
-  interface ModelDetailResponseStore<T extends Model.HttpModel> {
+  type ModelDetailResponseStore<T extends Model.HttpModel> = {
     readonly data: T | null;
     readonly loading: boolean;
-  }
+  };
 
-  interface ModelDetailResponseActionMap<M extends Model.HttpModel> {
+  type ModelDetailResponseActionMap<M extends Model.HttpModel> = {
     readonly loading: ActionCreator<boolean>;
     readonly response: ActionCreator<M | null>;
     readonly updateInState: ActionCreator<UpdateActionPayload<M>>;
-  }
+  };
 
-  interface ListResponseStore<T> {
+  type ListResponseStore<T> = {
     readonly data: T[];
     readonly count: number;
     readonly loading: boolean;
     readonly responseWasReceived: boolean;
-  }
+  };
 
-  type ListResponseActionMap<T, P = any> = {
+  type ListResponseActionMap<T, P extends ActionPayload = ActionPayload> = {
     readonly request: ActionCreator<P>;
     readonly loading: ActionCreator<boolean>;
     readonly response: ActionCreator<Http.ListResponse<T>>;
   };
 
-  interface ListResponseTaskMap<P = any> {
+  type ListResponseTaskMap<P extends ActionPayload = ActionPayload> = {
     readonly request: Task<P>;
-  }
+  };
 
-  interface ModelListResponseStore<T extends Model.HttpModel> extends ListResponseStore<T> {}
+  type ModelListResponseStore<T extends Model.HttpModel> = ListResponseStore<T>;
 
-  interface AuthenticatedModelListResponseStore<T extends Model.HttpModel> extends ModelListResponseStore<T> {
+  type AuthenticatedModelListResponseStore<T extends Model.HttpModel> = ModelListResponseStore<T> & {
     readonly search: string;
     readonly page: number;
     readonly pageSize: number;
@@ -179,47 +222,53 @@ declare namespace Redux {
     readonly creating: boolean;
     readonly selected: number[];
     readonly ordering: Http.Ordering<string>;
-  }
+  };
 
-  type ModelListResponseActionMap<M extends Model.HttpModel, P = any> = ListResponseActionMap<M, P>;
-
-  type AuthenticatedModelListResponseActionMap<M extends Model.HttpModel, P = any> = ModelListResponseActionMap<
+  type ModelListResponseActionMap<M extends Model.HttpModel, P extends ActionPayload = null> = ListResponseActionMap<
     M,
     P
-  > & {
+  >;
+
+  type AuthenticatedModelListResponseActionMap<
+    M extends Model.HttpModel,
+    P extends ActionPayload = null,
+    C extends Table.Context = Table.Context
+  > = ModelListResponseActionMap<M, P> & {
     readonly updating?: ActionCreator<ModelListActionPayload>;
     readonly creating?: ActionCreator<boolean>;
     readonly removeFromState: ActionCreator<number>;
     readonly deleting?: ActionCreator<ModelListActionPayload>;
     readonly addToState: ActionCreator<M>;
     readonly updateInState: ActionCreator<UpdateActionPayload<M>>;
-    /* We cannot type this strictly as string because there are some cases where
-		   supplementary data is provided (Actual Owners). */
-    readonly setSearch?: ActionCreator<string> | ContextActionCreator<string, any>;
+    readonly setSearch?: ContextActionCreator<string, C>;
     readonly setPagination: ActionCreator<Pagination>;
     readonly updateOrdering?: ActionCreator<UpdateOrderingPayload<string>>;
   };
 
-  interface ModelListResponseTaskMap<P = any> {
+  type ModelListResponseTaskMap<P extends ActionPayload = null> = {
     readonly request: Task<P>;
-  }
+  };
 
-  type TableTaskMap<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel, C = any> = {
+  type TableTaskMap<
+    R extends Table.RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+    C extends Table.Context = Table.Context
+  > = {
     readonly request: ContextTask<TableRequestPayload, C>;
     readonly handleChangeEvent: TableEventTask<Table.ChangeEvent<R, M>, R, M, C>;
   };
 
-  type TableActionMap<M extends Model.RowHttpModel = Model.RowHttpModel, C = any> = {
+  type TableActionMap<M extends Model.RowHttpModel = Model.RowHttpModel, C extends Table.Context = Table.Context> = {
     readonly request: ContextActionCreator<TableRequestPayload, C>;
     readonly loading: ActionCreator<boolean>;
     readonly response: ActionCreator<Http.TableResponse<M>>;
-    readonly setSearch: ActionCreator<string> | ContextActionCreator<string, C>;
+    readonly setSearch: ContextActionCreator<string, C>;
   };
 
   type AuthenticatedTableActionMap<
-    R extends Table.RowData = object,
+    R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    C = any
+    C extends Table.Context = Table.Context
   > = TableActionMap<M, C> & {
     readonly tableChanged: ContextActionCreator<Table.ChangeEvent<R, M>, C>;
     readonly saving: ActionCreator<boolean>;
@@ -227,7 +276,7 @@ declare namespace Redux {
     readonly updateRowsInState?: ActionCreator<UpdateRowsInTablePayload<R>>;
   };
 
-  type TableStore<D extends Table.RowData = object> = {
+  type TableStore<D extends Table.RowData> = {
     readonly data: Table.BodyRow<D>[];
     readonly search: string;
     readonly loading: boolean;

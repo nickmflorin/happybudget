@@ -16,10 +16,11 @@ import BudgetPdf from "./BudgetPdf";
 
 import "./BudgetPreviewModal.scss";
 
-const SubAccountColumns = filter(
-  SubAccountsTable.Columns,
-  (c: Table.PdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>) => c.includeInPdf !== false
-) as Table.PdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>[];
+type R = Tables.SubAccountRowData;
+type M = Model.PdfSubAccount;
+type C = Table.Column<R, M>;
+
+const SubAccountColumns = filter(SubAccountsTable.Columns, (c: C) => c.includeInPdf !== false) as C[];
 
 const DEFAULT_OPTIONS: ExportBudgetPdfFormOptions = {
   excludeZeroTotals: false,
@@ -32,9 +33,7 @@ const DEFAULT_OPTIONS: ExportBudgetPdfFormOptions = {
   },
   includeNotes: false,
   columns: filter(
-    map(SubAccountColumns, (column: Table.PdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>) =>
-      tabling.columns.normalizedField<Tables.SubAccountRowData, Model.PdfSubAccount>(column)
-    ),
+    map(SubAccountColumns, (column: C) => tabling.columns.normalizedField<R, M>(column)),
     (field: string | undefined) => !isNil(field)
   ) as string[]
 };
@@ -55,16 +54,16 @@ interface PreviewModalProps extends ModalProps {
 }
 
 const selectHeaderTemplatesLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Application.Authenticated.Store) => state.budget.headerTemplates.loading
+  (state: Application.AuthenticatedStore) => state.budget.headerTemplates.loading
 );
 const selectHeaderTemplates = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.budget.headerTemplates.data
+  (state: Application.AuthenticatedStore) => state.budget.headerTemplates.data
 );
 const selectDisplayedHeaderTemplate = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.budget.headerTemplates.displayedTemplate
+  (state: Application.AuthenticatedStore) => state.budget.headerTemplates.displayedTemplate
 );
 const selectHeaderTemplateLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Application.Authenticated.Store) => state.budget.headerTemplates.loadingDetail
+  (state: Application.AuthenticatedStore) => state.budget.headerTemplates.loadingDetail
 );
 
 const BudgetPreviewModal = ({
@@ -91,6 +90,21 @@ const BudgetPreviewModal = ({
   const headerTemplates = useSelector(selectHeaderTemplates);
   const displayedHeaderTemplate = useSelector(selectDisplayedHeaderTemplate);
   const headerTemplateLoading = useSelector(selectHeaderTemplateLoading);
+
+  const convertOptions = useMemo(
+    () =>
+      (opts: ExportBudgetPdfFormOptions): PdfBudgetTable.Options => ({
+        ...opts,
+        notes: pdf.parsers.convertHtmlIntoNodes(opts.notes || "") || [],
+        header: {
+          ...opts.header,
+          header: pdf.parsers.convertHtmlIntoNodes(opts.header.header || "") || [],
+          left_info: pdf.parsers.convertHtmlIntoNodes(opts.header.left_info || "") || [],
+          right_info: pdf.parsers.convertHtmlIntoNodes(opts.header.right_info || "") || []
+        }
+      }),
+    []
+  );
 
   useEffect(() => {
     setOptions({
@@ -120,21 +134,6 @@ const BudgetPreviewModal = ({
         .finally(() => setLoadingData(false));
     }
   }, [props.open]);
-
-  const convertOptions = useMemo(
-    () =>
-      (opts: ExportBudgetPdfFormOptions): PdfBudgetTable.Options => ({
-        ...opts,
-        notes: pdf.parsers.convertHtmlIntoNodes(opts.notes || "") || [],
-        header: {
-          ...opts.header,
-          header: pdf.parsers.convertHtmlIntoNodes(opts.header.header || "") || [],
-          left_info: pdf.parsers.convertHtmlIntoNodes(opts.header.left_info || "") || [],
-          right_info: pdf.parsers.convertHtmlIntoNodes(opts.header.right_info || "") || []
-        }
-      }),
-    []
-  );
 
   const renderComponent = useMemo(
     () => () => {
@@ -174,7 +173,6 @@ const BudgetPreviewModal = ({
         headerTemplatesLoading={headerTemplatesLoading}
         accountsLoading={loadingData}
         accounts={!isNil(budget) ? budget.children : []}
-        disabled={isNil(budget)}
         columns={SubAccountColumns}
         onValuesChange={(changedValues: Partial<ExportBudgetPdfFormOptions>, values: ExportBudgetPdfFormOptions) => {
           setOptions(values);

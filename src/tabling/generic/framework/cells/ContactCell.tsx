@@ -16,7 +16,6 @@ interface ContactCellProps<
   readonly onEditContact: (params: { contact: number; rowId: Table.ModelRowId }) => void;
 }
 
-/* eslint-disable indent */
 const ContactCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
@@ -31,7 +30,7 @@ const ContactCell = <
 
   const m = useMemo(() => {
     if (!isNil(value)) {
-      const c: Model.Contact | undefined = find(contacts, { id: value } as any);
+      const c: Model.Contact | undefined = find(contacts, { id: value });
       if (isNil(c)) {
         if (loaded === true) {
           console.error(`Could not find contact ${value} in store.`);

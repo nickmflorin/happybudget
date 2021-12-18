@@ -1,6 +1,6 @@
 import { initialState, rootReducer, rootSaga } from "./store";
 
-const Config: Application.Authenticated.ModuleConfig<Modules.Dashboard.Store> = {
+const Config: Application.AuthenticatedModuleConfig<Modules.Dashboard.Store> = {
   rootReducer: rootReducer,
   rootSaga: rootSaga,
   initialState: initialState,

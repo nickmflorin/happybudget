@@ -8,7 +8,7 @@ import { UserImageOrInitialsProps } from "components/images/UserImageOrInitials"
 import "./AccountCircleLink.scss";
 
 interface AccountCircleLinkProps extends UserImageOrInitialsProps {
-  readonly id?: any;
+  readonly id?: string;
   readonly className?: string;
   readonly style?: React.CSSProperties;
   readonly onClick?: () => void;

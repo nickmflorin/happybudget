@@ -8,7 +8,6 @@ import { Cell } from "./generic";
 
 import "./DragCell.scss";
 
-/* eslint-disable indent */
 const DragCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,

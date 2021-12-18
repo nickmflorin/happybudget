@@ -1,6 +1,6 @@
 import { find, filter, isNil, forEach, reduce, map } from "lodash";
 
-/* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-shadow */
 export enum ContactTypeNames {
   CONTRACTOR = "Contractor",
@@ -19,18 +19,18 @@ export const ContactTypes = Object.values(ContactTypeModels);
 export const contactName = (contact: Model.Contact): string | null =>
   contact.contact_type?.id === ContactTypeModels.VENDOR.id ? contact.company : contact.full_name;
 
-export const findChoiceForName = <M extends Model.Choice<number, string>>(
+export const findChoiceForName = <M extends Model.Choice = Model.Choice>(
   ms: M[],
   name: string,
   caseSensitive = true
 ): M | null => {
   return caseSensitive
-    ? find(ms, { name } as any) || null
-    : find(ms, (model: M) => model.name.toLowerCase() === name.toLowerCase()) || null;
+    ? (find(ms, { name }) as M | undefined) || null
+    : (find(ms, (model: M) => model.name.toLowerCase() === name.toLowerCase()) as M | undefined) || null;
 };
 
-export const findChoiceForId = <M extends Model.Choice<number, string>>(ms: M[], id: ID): M | null => {
-  return find(ms, { id } as any) || null;
+export const findChoiceForId = (ms: Model.Choice[], id: number): Model.Choice | null => {
+  return find(ms, { id }) || null;
 };
 
 type InferModelFromNameParams<M extends Model.Model> = {
@@ -109,7 +109,7 @@ export const inferModelFromName = <M extends Model.Model>(
  */
 export const parseFirstAndLastName = (name: string): [string | null, string | null] => {
   const parts = name.trim().split(" ");
-  const names: any[] = ["", []];
+  const names: [string, (string | null)[]] = ["", []];
   forEach(parts, (part: string) => {
     if (part !== "") {
       if (names[0] === "") {
@@ -148,10 +148,10 @@ type GetModelsByIdOptions = {
 
 export const getModelById = <M extends Model.Model>(
   ms: M[],
-  id: ID,
+  id: M["id"],
   options: GetModelsByIdOptions = { throwOnMissing: false, warnOnMissing: true }
 ): M | null => {
-  const model: M | undefined = find(ms, { id } as any);
+  const model: M | undefined = find(ms, { id }) as M | undefined;
   if (isNil(model)) {
     if (options.throwOnMissing === true) {
       throw new Error(`Cannot find ${options.modelName || "model"} with ID ${id} in provided models!`);

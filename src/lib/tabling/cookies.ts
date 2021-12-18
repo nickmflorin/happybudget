@@ -1,10 +1,12 @@
 import { includes, isNil, reduce } from "lodash";
 import Cookies from "universal-cookie";
 
-export const parseHiddenColumns = <R extends Table.RowData>(
+export const parseHiddenColumns = (
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   obj: any,
-  validateAgainst?: (keyof R | string)[]
+  validateAgainst?: string[]
 ): Table.HiddenColumns => {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   let data: any = null;
   if (typeof obj === "string") {
     try {

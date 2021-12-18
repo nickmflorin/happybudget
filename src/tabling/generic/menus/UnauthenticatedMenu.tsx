@@ -26,11 +26,9 @@ type InternalUnauthenticatedMenuProps<
   readonly hiddenColumns?: Table.HiddenColumns;
 };
 
-/* eslint-disable indent */
 const UnauthenticatedMenu = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: Omit<InternalUnauthenticatedMenuProps<R, M>, "menuPortalId"> & { readonly detached: boolean }
 ) => (
-  /* eslint-disable indent */
   <div className={classNames("table-action-menu", { detached: props.detached })}>
     <div className={"table-menu-left"}>
       {!isNil(props.actions) && (

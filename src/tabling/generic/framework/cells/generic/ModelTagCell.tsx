@@ -12,7 +12,6 @@ export interface ModelTagCellProps<
   readonly tagProps?: Omit<TagProps<V>, "model" | "text" | "children">;
 }
 
-/* eslint-disable indent */
 const ModelTagCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
@@ -23,7 +22,7 @@ const ModelTagCell = <
   tagProps,
   ...props
 }: ModelTagCellProps<R, M, S, V>): JSX.Element => {
-  return <Cell {...props}>{!isNil(value) ? <Tag<V, any> model={value} {...tagProps} /> : <></>}</Cell>;
+  return <Cell {...props}>{!isNil(value) ? <Tag<V> model={value} {...tagProps} /> : <></>}</Cell>;
 };
 
 export default React.memo(ModelTagCell) as typeof ModelTagCell;

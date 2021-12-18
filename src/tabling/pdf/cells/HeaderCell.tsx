@@ -3,8 +3,12 @@ import classNames from "classnames";
 
 import Cell, { CellProps } from "./Cell";
 
-const HeaderCell = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  props: Omit<CellProps<R, M>, "rawValue" | "value"> & {
+const HeaderCell = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
+>(
+  props: Omit<CellProps<R, M, C>, "rawValue" | "value"> & {
     readonly firstChild: boolean;
     readonly lastChild: boolean;
   }
@@ -21,12 +25,16 @@ const HeaderCell = <R extends Table.RowData, M extends Model.RowHttpModel = Mode
   }, [props.className, props.firstChild]);
 
   return (
-    <Cell
+    <Cell<R, M, C>
       {...props}
       className={className}
       textClassName={classNames("th-text", props.textClassName)}
       isHeader={true}
-      rawValue={(props.column.pdfHeaderName || props.column.headerName || "") as unknown as R[keyof R]}
+      rawValue={
+        (props.column.pdfHeaderName as Table.InferColumnValue<C>) ||
+        (props.column.headerName as Table.InferColumnValue<C>) ||
+        ("" as Table.InferColumnValue<C>)
+      }
       value={props.column.pdfHeaderName || props.column.headerName || ""}
     />
   );

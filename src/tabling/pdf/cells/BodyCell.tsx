@@ -3,50 +3,50 @@ import { isNil } from "lodash";
 
 import Cell, { PrivateCellProps, RowExplicitCellProps, CellProps } from "./Cell";
 
-type ValueGetter<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = R[keyof R]> = (
-  c: Table.PdfColumn<R, M, V>,
-  rows: Table.BodyRow<R>[]
-) => V | null | undefined;
+type ValueGetter<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
+> = (c: C, rows: Table.BodyRow<R>[]) => Table.InferColumnValue<C>;
 
 export interface RowExplicitBodyCellProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  V = R[keyof R]
-> extends RowExplicitCellProps<R, M, V> {
-  readonly valueGetter?: ValueGetter<R, M, V>;
+  C extends Table.Column<R, M> = Table.Column<R, M>
+> extends RowExplicitCellProps<R, M, C> {
+  readonly valueGetter?: ValueGetter<R, M, C>;
 }
 
 export interface BodyCellProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  V = R[keyof R]
-> extends RowExplicitBodyCellProps<R, M, V>,
-    CellProps<R, M, V> {}
+  C extends Table.Column<R, M> = Table.Column<R, M>
+> extends RowExplicitBodyCellProps<R, M, C>,
+    CellProps<R, M, C> {}
 
 interface PrivateBodyCellProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  RW extends Table.BodyRow<R> = Table.BodyRow<R>,
-  V = R[keyof R]
-> extends Omit<PrivateCellProps<R, M, V>, "value" | "rawValue">,
-    BodyCellProps<R, M, V> {
+  C extends Table.Column<R, M> = Table.Column<R, M>,
+  RW extends Table.BodyRow<R> = Table.BodyRow<R>
+> extends Omit<PrivateCellProps<R, M, C>, "value" | "rawValue">,
+    BodyCellProps<R, M, C> {
   readonly data: Table.BodyRow<R>[];
   readonly row?: RW;
   readonly firstChild: boolean;
   readonly lastChild: boolean;
 }
 
-/* eslint-disable indent */
 const BodyCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  RW extends Table.BodyRow<R> = Table.BodyRow<R>,
-  V = R[keyof R]
+  C extends Table.Column<R, M> = Table.Column<R, M>,
+  RW extends Table.BodyRow<R> = Table.BodyRow<R>
 >({
   data,
   ...props
-}: PrivateBodyCellProps<R, M, RW, V>): JSX.Element => {
-  const rawValue: V | null = useMemo((): V | null => {
+}: PrivateBodyCellProps<R, M, C, RW>): JSX.Element => {
+  const rawValue: Table.InferColumnValue<C> = useMemo((): Table.InferColumnValue<C> => {
     if (!isNil(props.valueGetter)) {
       const valueFromValueGetter = props.valueGetter(props.column, data);
       if (valueFromValueGetter !== undefined) {
@@ -56,21 +56,21 @@ const BodyCell = <
       if (!isNil(props.column.pdfValueGetter)) {
         return props.column.pdfValueGetter(props.row, data);
       } else if (!isNil(props.column.field)) {
-        const value = props.row.data[props.column.field];
+        const value = props.row.data[props.column.field] as Table.InferColumnValue<C>;
         if (value === null) {
-          return null;
+          return null as Table.InferColumnValue<C>;
         } else if (typeof value !== "string" && typeof value !== "number") {
           /* If there is a custom cell renderer, the value can be anything since
              it will not be directly rendered in the DOM. */
           if (isNil(props.column.cellRenderer)) {
-            return null;
+            return null as Table.InferColumnValue<C>;
           }
-          return value as unknown as V;
+          return value;
         }
-        return value as unknown as V;
+        return value;
       }
     }
-    return null;
+    return null as Table.InferColumnValue<C>;
   }, [props.row, props.column]);
 
   const value = useMemo(() => {
@@ -92,7 +92,7 @@ const BodyCell = <
   }, [props.className, props.firstChild]);
 
   return (
-    <Cell
+    <Cell<R, M, C>
       {...props}
       value={value}
       rawValue={rawValue}

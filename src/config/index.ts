@@ -58,6 +58,7 @@ const configureApplication = async (history: History) => {
 		 any other imports are performed. */
   if (process.env.NODE_ENV === "development" && Config.whyDidYouRender) {
     console.info("Registering WYDR");
+    /* eslint-disable-next-line @typescript-eslint/no-var-requires */
     const whyDidYouRender = require("@welldone-software/why-did-you-render");
     whyDidYouRender(React, {
       trackAllPureComponents: true,

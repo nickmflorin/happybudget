@@ -1,6 +1,6 @@
 import { initialState, rootReducer } from "./store";
 
-const Config: Application.Unauthenticated.ModuleConfig = {
+const Config: Application.UnauthenticatedModuleConfig = {
   rootReducer,
   initialState,
   label: "share",

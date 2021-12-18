@@ -10,28 +10,30 @@ import {
   getFontSourceModuleName
 } from "./constants";
 
-export const importFontModules = (): Promise<{ [key: string]: any }> => import("./fonts");
+type Modules = Record<string, unknown>;
 
-export const getPdfFont = (font: Style.Font, modules: { [key: string]: any }): Pdf.Font | null => {
+export const importFontModules = (): Promise<Modules> => import("./fonts");
+
+export const getPdfFont = (font: Style.Font, modules: Modules): Pdf.Font | null => {
   const moduleName = getFontSourceModuleName(font);
   if (isNil(modules[moduleName])) {
     console.warn(`Module ${moduleName} is not on fonts path for ${fontToString(font)}.  It will not be registered.`);
     return null;
   } else if (font.italic === true) {
     return {
-      src: modules[moduleName],
+      src: modules[moduleName] as string,
       fontWeight: FontWeightMap[font.weight],
       fontStyle: "italic"
     };
   } else {
     return {
-      src: modules[moduleName],
+      src: modules[moduleName] as string,
       fontWeight: FontWeightMap[font.weight]
     };
   }
 };
 
-export const registerFontFace = (fontFace: Style.FontFace, modules: { [key: string]: any }) => {
+export const registerFontFace = (fontFace: Style.FontFace, modules: Record<string, unknown>) => {
   const fontFaceFonts: Style.Font[] = fontsFromFontFace(fontFace);
   const pdfFonts = map(fontFaceFonts, (font: Style.Font) => getPdfFont(font, modules));
   Font.register({
@@ -41,7 +43,7 @@ export const registerFontFace = (fontFace: Style.FontFace, modules: { [key: stri
 };
 
 export const registerFonts = (): Promise<void> => {
-  return importFontModules().then((modules: { [key: string]: any }) => {
+  return importFontModules().then((modules: Record<string, unknown>) => {
     map(SupportedFontFaces, (fontFace: Style.FontFace) => registerFontFace(fontFace, modules));
   });
 };
@@ -148,7 +150,6 @@ const TableStyles: Pdf.ExtensionStyles = {
   table: {
     /* Note: react-pdf does not "support" display: table, even though it works
 			 fine, their TS bindings disallow it. */
-    /* @ts-ignore */
     display: "table",
     width: "auto",
     backgroundColor: "white",
@@ -350,6 +351,7 @@ export const styleForClassName = (className: string): Pdf.Style => {
   }
   style = Styles[className.trim()];
   if (!isNil(style.ext)) {
+    /* eslint-disable prefer-const */
     let { ext, ...coreStyle } = style;
     const extensions = Array.isArray(ext) ? ext : [ext];
     coreStyle = !isNil(coreStyle) ? coreStyle : {};

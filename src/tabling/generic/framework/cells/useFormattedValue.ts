@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { ValueFormatterParams } from "@ag-grid-community/core";
 import { isNil } from "lodash";
 
-/* eslint-disable indent */
 const useFormattedValue = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
@@ -12,7 +11,6 @@ const useFormattedValue = <
 ) => {
   const formatterParams = useMemo<ValueFormatterParams | null>(
     () =>
-      /* eslint-disable indent */
       !isNil(props.colDef) && !isNil(props.column)
         ? {
             value: props.value,

@@ -10,10 +10,10 @@ import { BudgetTotalChartForm, BudgetTotalChartFormValues } from "components/for
 import { Tile } from "components/layout";
 
 const selectGroups = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.budget.analysis.groups.data
+  (state: Application.AuthenticatedStore) => state.budget.analysis.groups.data
 );
 const selectAccounts = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.budget.analysis.accounts.data
+  (state: Application.AuthenticatedStore) => state.budget.analysis.accounts.data
 );
 
 type M = Model.Group | Model.Account;
@@ -46,7 +46,7 @@ const Metrics: Charts.BudgetTotal.Metric[] = [
 ];
 
 const getMetricValue = (id: Charts.BudgetTotal.MetricId, obj: M, objs: Model.Account[]): number => {
-  const metric = find(Metrics, { id } as any) as Charts.BudgetTotal.Metric;
+  const metric = find(Metrics, { id }) as Charts.BudgetTotal.Metric;
   return metric.getValue(obj, objs);
 };
 
@@ -112,7 +112,6 @@ const BudgetTotal = ({ budget, ...props }: BudgetTotalProps): JSX.Element => {
     [hooks.useDeepEqualMemo(groups), hooks.useDeepEqualMemo(accounts), metric, grouped]
   );
 
-  /* eslint-disable indent */
   const budgetTotal = useMemo(() => {
     if (!isNil(budget)) {
       switch (metric) {

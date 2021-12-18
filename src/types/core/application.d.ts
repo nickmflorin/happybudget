@@ -16,71 +16,69 @@ declare namespace Application {
     readonly prodEnv?: SingleOrArray<NodeJS.ProcessEnv["PRODUCTION_ENV"]>;
   };
 
-  declare namespace Authenticated {
-    type ModuleLabel = "dashboard" | "budget" | "template";
-    type AnyModuleStore = Modules.Budget.Store | Modules.Dashboard.Store | Modules.Template.Store;
-    type ModuleStores = {
-      readonly dashboard: Modules.Dashboard.Store;
-      readonly budget: Modules.Budget.Store;
-      readonly template: Modules.Template.Store;
-    };
-    type ModuleReducers = Redux.ReducersMapObject<ModuleStores>;
+  type AuthenticatedModuleLabel = "dashboard" | "budget" | "template";
+  type AuthenticatedAnyModuleStore = Modules.Budget.Store | Modules.Dashboard.Store | Modules.Template.Store;
+  type AuthenticatedModuleStores = {
+    readonly dashboard: Modules.Dashboard.Store;
+    readonly budget: Modules.Budget.Store;
+    readonly template: Modules.Template.Store;
+  };
+  type AuthenticatedModuleReducers = Redux.ReducersMapObject<AuthenticatedModuleStores>;
 
-    type StaticStores = ModuleStores & {
-      readonly router: import("connected-react-router").RouterState<import("history").LocationState>;
-      readonly drawerVisible: boolean;
-      readonly loading: boolean;
-      readonly user: Model.User;
-      readonly contacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
-      readonly filteredContacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
-    };
+  type AuthenticatedStaticStores = AuthenticatedModuleStores & {
+    readonly router: import("connected-react-router").RouterState<import("history").LocationState>;
+    readonly drawerVisible: boolean;
+    readonly loading: boolean;
+    readonly user: Model.User;
+    readonly contacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
+    readonly filteredContacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
+  };
 
-    type StaticReducers = Redux.ReducersMapObject<StaticStores>;
+  type AuthenticatedStaticReducers = Redux.ReducersMapObject<StaticStores>;
 
-    type Store = StaticStores & Redux.AsyncStores<Redux.TableStore>;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type AuthenticatedStore = AuthenticatedStaticStores & Redux.AsyncStores<Redux.TableStore<any>>;
 
-    type Reducers = Redux.ReducersMapObject<Store>;
+  type AuthenticatedReducers = Redux.ReducersMapObject<AuthenticatedStore>;
 
-    type ModuleConfig<S extends AnyModuleStore = any> = Omit<
-      Application.ModuleConfig<ModuleLabel, S>,
-      "isUnauthenticated"
-    > & {
-      readonly isUnauthenticated?: false;
-    };
-  }
+  type AuthenticatedModuleConfig<S extends AuthenticatedAnyModuleStore = AuthenticatedAnyModuleStore> = Omit<
+    ModuleConfig<AuthenticatedModuleLabel, S>,
+    "isUnauthenticated"
+  > & {
+    readonly isUnauthenticated?: false;
+  };
 
-  declare namespace Unauthenticated {
-    type ModuleLabel = "share";
-    type AnycModuleStore = Modules.Share.Store;
-    type ModuleStores = {
-      readonly share: Modules.Share.Store;
-    };
+  type UnauthenticatedModuleLabel = "share";
+  type UnauthenticatedAnycModuleStore = Modules.Share.Store;
+  type UnauthenticatedModuleStores = {
+    readonly share: Modules.Share.Store;
+  };
 
-    type ModuleReducers = Redux.ReducersMapObject<ModuleStores>;
+  type UnauthenticatedModuleReducers = Redux.ReducersMapObject<UnauthenticatedModuleStores>;
 
-    type StaticStores = ModuleStores & {
-      readonly drawerVisible: boolean;
-      readonly loading: boolean;
-      readonly contacts: Redux.ListResponseStore<Model.Contact>;
-    };
+  type UnauthenticatedStaticStores = UnauthenticatedModuleStores & {
+    readonly drawerVisible: boolean;
+    readonly loading: boolean;
+    readonly contacts: Redux.ListResponseStore<Model.Contact>;
+  };
 
-    type StaticReducers = Redux.ReducersMapObject<StaticStores>;
+  type UnauthenticatedStaticReducers = Redux.ReducersMapObject<UnauthenticatedStaticStores>;
 
-    type Store = StaticStores & Redux.AsyncStores<Redux.TableStore>;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type UnauthenticatedStore = UnauthenticatedStaticStores & Redux.AsyncStores<Redux.TableStore<any>>;
 
-    type Reducers = Redux.ReducersMapObject<Store>;
+  type UnauthenticatedReducers = Redux.ReducersMapObject<UnauthenticatedStore>;
 
-    type ModuleConfig<S extends Modules.Share.Store = any> = Omit<
-      Application.ModuleConfig<ModuleLabel, S>,
-      "isUnauthenticated"
-    > & {
-      readonly isUnauthenticated: true;
-    };
-  }
+  type UnauthenticatedModuleConfig<S extends Modules.Share.Store = Modules.Share.Store> = Omit<
+    ModuleConfig<UnauthenticatedModuleLabel, S>,
+    "isUnauthenticated"
+  > & {
+    readonly isUnauthenticated: true;
+  };
 
-  type AnyModuleLabel = Authenticated.ModuleLabel | Unauthenticated.ModuleLabel;
+  type AnyModuleLabel = AuthenticatedModuleLabel | UnauthenticatedModuleLabel;
 
-  interface ModuleConfig<L extends AnyModuleLabel, S extends Redux.StoreObj> {
+  interface ModuleConfig<L extends AnyModuleLabel, S> {
     readonly rootSaga?: import("redux-saga").Saga;
     readonly rootReducer: Redux.Reducer<S>;
     readonly initialState: S | (() => S);
@@ -88,17 +86,18 @@ declare namespace Application {
     readonly isUnauthenticated?: boolean;
   }
 
-  type AnyModuleConfig = Authenticated.ModuleConfig | Unauthenticated.ModuleConfig;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type AnyModuleConfig = AuthenticatedModuleConfig<any> | UnauthenticatedModuleConfig<any>;
 
-  type ModuleStores = Authenticated.ModuleStores | Unauthenticated.ModuleStores;
+  type ModuleStores = AuthenticatedModuleStores | UnauthenticatedModuleStores;
 
-  type ModuleReducers = Authenticated.ModuleReducers | Unauthenticated.ModuleReducers;
+  type ModuleReducers = AuthenticatedModuleReducers | UnauthenticatedModuleReducers;
 
-  type StaticReducers = Authenticated.StaticReducers | Unauthenticated.StaticReducers;
+  type StaticReducers = AuthenticatedStaticReducers | UnauthenticatedStaticReducers;
 
-  type StaticStores = Authenticated.StaticStores | Unauthenticated.StaticStores;
+  type StaticStores = AuthenticatedStaticStores | UnauthenticatedStaticStores;
 
-  type Store = Authenticated.Store | Unauthenticated.Store;
+  type Store = AuthenticatedStore | UnauthenticatedStore;
 
-  type Reducers = Authenticated.Reducers | Unauthenticated.Reducers;
+  type Reducers = AuthenticatedReducers | UnauthenticatedReducers;
 }

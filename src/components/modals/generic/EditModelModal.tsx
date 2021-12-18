@@ -11,7 +11,7 @@ export interface EditModelModalProps<M extends Model.Model, R = M> extends Modal
   readonly onSuccess: (m: R) => void;
 }
 
-interface PrivateEditModelModalProps<M extends Model.Model, P extends Http.ModelPayload<M>, V = P, R = M>
+interface PrivateEditModelModalProps<M extends Model.Model, P extends Http.PayloadObj, V = P, R = M>
   extends EditModelModalProps<M, R> {
   readonly form?: FormInstance<V>;
   readonly title?: string | JSX.Element | ((m: M, form: FormInstance<V>) => JSX.Element | string);
@@ -25,13 +25,12 @@ interface PrivateEditModelModalProps<M extends Model.Model, P extends Http.Model
   readonly convertEmptyStringsToNull?: (keyof P)[] | boolean;
 }
 
-const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V = P, R = M>({
+const EditModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = P, R = M>({
   id,
   autoFocusField,
   form,
   onModelLoaded,
   onSuccess,
-  onCancel,
   request,
   update,
   children,
@@ -43,11 +42,10 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
   const Form = ui.hooks.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
   const [getToken] = api.useCancelToken({ preserve: true, createOnInit: true });
   const isMounted = ui.hooks.useIsMounted();
-  const [instance, loading, error] = api.useModel(id, {
+  const [instance, loading, error] = api.useModel<M>(id, {
     request,
     onModelLoaded,
     conditional: () => props.open === true,
-    deps: [props.open],
     getToken
   });
 
@@ -90,7 +88,7 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
             (curr: P, value: P[keyof P], k: string) =>
               ((Array.isArray(convertEmptyStringsToNull) && includes(convertEmptyStringsToNull, k as keyof P)) ||
                 (!Array.isArray(convertEmptyStringsToNull) && convertEmptyStringsToNull !== false)) &&
-              value === ""
+              value === ("" as unknown as P[keyof P])
                 ? { ...curr, [k]: null }
                 : curr,
             payload

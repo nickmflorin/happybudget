@@ -7,10 +7,10 @@ import { redux } from "lib";
 import * as actions from "./actions";
 import { createInitialUserState } from "./initialState";
 
-const createUserReducer = (user: Model.User): Redux.Reducer<Model.User> => {
+const createUserReducer = (user: Model.User): Redux.Reducer<Model.User, Redux.Action<Model.User>> => {
   const initialUserState = createInitialUserState(user);
 
-  return (state: Model.User = initialUserState, action: Redux.Action): Model.User => {
+  return (state: Model.User = initialUserState, action: Redux.Action<Model.User>): Model.User => {
     let newState = { ...state };
     if (action.type === actions.authenticated.updateLoggedInUserAction.toString()) {
       newState = { ...newState, ...action.payload };
@@ -19,7 +19,10 @@ const createUserReducer = (user: Model.User): Redux.Reducer<Model.User> => {
   };
 };
 
-const loadingReducer: Redux.Reducer<boolean> = (state: boolean = false, action: Redux.Action): boolean => {
+const loadingReducer: Redux.Reducer<boolean, Redux.Action<boolean>> = (
+  state = false,
+  action: Redux.Action<boolean>
+): boolean => {
   if (!isNil(action.payload) && action.type === actions.setApplicationLoadingAction.toString()) {
     return action.payload;
   }
@@ -27,12 +30,12 @@ const loadingReducer: Redux.Reducer<boolean> = (state: boolean = false, action: 
 };
 
 function createModularApplicationReducer(
-  config: Application.Authenticated.ModuleConfig[]
-): Application.Authenticated.ModuleReducers;
+  config: Application.AuthenticatedModuleConfig[]
+): Application.AuthenticatedModuleReducers;
 
 function createModularApplicationReducer(
-  config: Application.Unauthenticated.ModuleConfig[]
-): Application.Unauthenticated.ModuleReducers;
+  config: Application.UnauthenticatedModuleConfig[]
+): Application.UnauthenticatedModuleReducers;
 
 function createModularApplicationReducer(config: Application.AnyModuleConfig[]): Application.ModuleReducers {
   return reduce(
@@ -54,21 +57,22 @@ function createModularApplicationReducer(config: Application.AnyModuleConfig[]):
 export const createStaticAuthenticatedReducers = (
   config: Application.AnyModuleConfig[],
   user: Model.User,
-  history: History<any>
-): Application.Authenticated.StaticReducers => {
+  history: History
+): Application.AuthenticatedStaticReducers => {
   const moduleReducers = createModularApplicationReducer(
     filter(
       config,
       (c: Application.AnyModuleConfig) => !redux.typeguards.isUnauthenticatedModuleConfig(c)
-    ) as Application.Authenticated.ModuleConfig[]
+    ) as Application.AuthenticatedModuleConfig[]
   );
   return {
     ...moduleReducers,
     router: connectRouter(history),
     contacts: redux.reducers.createAuthenticatedModelListResponseReducer<
       Model.Contact,
-      Redux.AuthenticatedModelListResponseStore<Model.Contact>,
-      Omit<Redux.AuthenticatedModelListResponseActionMap<Model.Contact>, "setPagination">
+      null,
+      Tables.ContactTableContext,
+      Redux.AuthenticatedModelListResponseStore<Model.Contact>
     >({
       initialState: redux.initialState.initialAuthenticatedModelListResponseState,
       actions: {
@@ -82,8 +86,9 @@ export const createStaticAuthenticatedReducers = (
     }),
     filteredContacts: redux.reducers.createAuthenticatedModelListResponseReducer<
       Model.Contact,
-      Redux.AuthenticatedModelListResponseStore<Model.Contact>,
-      Omit<Redux.AuthenticatedModelListResponseActionMap<Model.Contact>, "setPagination">
+      null,
+      Tables.ContactTableContext,
+      Redux.AuthenticatedModelListResponseStore<Model.Contact>
     >({
       initialState: redux.initialState.initialAuthenticatedModelListResponseState,
       actions: {
@@ -111,13 +116,12 @@ export const createStaticAuthenticatedReducers = (
  * @param config  The application Redux configuration.
  */
 export const createStaticUnauthenticatedReducers = (
-  config: Application.AnyModuleConfig[],
-  history: History<any>
-): Application.Unauthenticated.StaticReducers => {
+  config: Application.AnyModuleConfig[]
+): Application.UnauthenticatedStaticReducers => {
   const moduleReducers = createModularApplicationReducer(
     filter(config, (c: Application.AnyModuleConfig) =>
       redux.typeguards.isUnauthenticatedModuleConfig(c)
-    ) as Application.Unauthenticated.ModuleConfig[]
+    ) as Application.UnauthenticatedModuleConfig[]
   );
   return {
     ...moduleReducers,

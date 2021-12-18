@@ -18,7 +18,7 @@ interface WrapInAuthenticatedStoreProps {
 const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): JSX.Element => {
   const [redirect, setRedirect] = useState(false);
   const [authenticating, setAuthenticating] = useState(true);
-  const [reduxStore, setReduxStore] = useState<Store<Application.Authenticated.Store, Redux.Action> | undefined>(
+  const [reduxStore, setReduxStore] = useState<Store<Application.AuthenticatedStore, Redux.Action> | undefined>(
     undefined
   );
   const [newCancelToken] = api.useCancelToken();

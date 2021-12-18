@@ -9,16 +9,16 @@ import { util } from "lib";
 
 import "./LandingForm.scss";
 
-export interface ILoginFormValues {
+export type ILoginFormValues = {
   readonly email?: string;
   readonly password?: string;
-}
+};
 
 interface LoginFormProps extends FormProps<ILoginFormValues> {
   readonly loading: boolean;
   readonly onSubmit: (values: ILoginFormValues) => void;
   readonly onGoogleSuccess: (tokenId: string) => void;
-  readonly onGoogleError: (error: any) => void;
+  readonly onGoogleError: (error: Record<string, unknown>) => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({
@@ -40,7 +40,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           { required: true, message: "Please enter a valid email." },
           () => ({
             validateTrigger: "onSubmit",
-            validator(rule: any, value: string) {
+            validator(rule: unknown, value: string) {
               if (value !== "" && !util.validate.validateEmail(value)) {
                 return Promise.reject("The email does not meet our requirements.");
               }

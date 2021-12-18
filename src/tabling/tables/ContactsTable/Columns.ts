@@ -80,7 +80,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     width: 75,
     minWidth: 75
   }),
-  columns.ChoiceSelectColumn<R, M, Model.ContactType>({
+  columns.ChoiceSelectColumn<R, M, Model.ContactType | null>({
     field: "contact_type",
     headerName: "Type",
     defaultHidden: true,

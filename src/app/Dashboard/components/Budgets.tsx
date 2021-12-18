@@ -19,15 +19,15 @@ import { BudgetEmptyIcon } from "components/svgs";
 
 import { actions } from "../store";
 
-const selectBudgets = (state: Application.Authenticated.Store) => state.dashboard.budgets.data;
-const selectBudgetsResponseReceived = (state: Application.Authenticated.Store) =>
+const selectBudgets = (state: Application.AuthenticatedStore) => state.dashboard.budgets.data;
+const selectBudgetsResponseReceived = (state: Application.AuthenticatedStore) =>
   state.dashboard.budgets.responseWasReceived;
-const selectLoadingBudgets = (state: Application.Authenticated.Store) => state.dashboard.budgets.loading;
-const selectBudgetPage = (state: Application.Authenticated.Store) => state.dashboard.budgets.page;
-const selectBudgetPageSize = (state: Application.Authenticated.Store) => state.dashboard.budgets.pageSize;
-const selectBudgetsCount = (state: Application.Authenticated.Store) => state.dashboard.budgets.count;
-const selectBudgetsSearch = (state: Application.Authenticated.Store) => state.dashboard.budgets.search;
-const selectBudgetsOrdering = (state: Application.Authenticated.Store) => state.dashboard.budgets.ordering;
+const selectLoadingBudgets = (state: Application.AuthenticatedStore) => state.dashboard.budgets.loading;
+const selectBudgetPage = (state: Application.AuthenticatedStore) => state.dashboard.budgets.page;
+const selectBudgetPageSize = (state: Application.AuthenticatedStore) => state.dashboard.budgets.pageSize;
+const selectBudgetsCount = (state: Application.AuthenticatedStore) => state.dashboard.budgets.count;
+const selectBudgetsSearch = (state: Application.AuthenticatedStore) => state.dashboard.budgets.search;
+const selectBudgetsOrdering = (state: Application.AuthenticatedStore) => state.dashboard.budgets.ordering;
 
 const Budgets = (): JSX.Element => {
   const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
@@ -67,7 +67,7 @@ const Budgets = (): JSX.Element => {
             allowClear={true}
             prefix={<Icon icon={"search"} weight={"light"} />}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              dispatch(actions.setBudgetsSearchAction(event.target.value))
+              dispatch(actions.setBudgetsSearchAction(event.target.value, {}))
             }
           />,
           <BudgetDropdown onNewBudget={() => setCreateBudgetModalOpen(true)}>
@@ -181,7 +181,7 @@ const Budgets = (): JSX.Element => {
         <DeleteBudgetModal
           open={true}
           onCancel={() => setBudgetToDelete(null)}
-          onOk={(e: React.MouseEvent<HTMLElement>) => {
+          onOk={() => {
             setBudgetToDelete(null);
             setDeleting(budgetToDelete.id);
             api

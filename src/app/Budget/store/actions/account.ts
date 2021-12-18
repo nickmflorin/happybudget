@@ -33,4 +33,6 @@ export const updateRowsInStateAction = redux.actions.createAction<
   Redux.UpdateRowsInTablePayload<Tables.SubAccountRowData>
 >(ActionType.Account.SubAccounts.UpdateRowsInState);
 
-export const setSearchAction = redux.actions.createAction<string>(ActionType.Account.SubAccounts.SetSearch);
+export const setSearchAction = redux.actions.createContextAction<string, Tables.SubAccountTableContext>(
+  ActionType.Account.SubAccounts.SetSearch
+);

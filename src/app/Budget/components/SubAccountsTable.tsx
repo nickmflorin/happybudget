@@ -30,6 +30,7 @@ type OmitTableProps =
 export interface BudgetSubAccountsTableProps
   extends Omit<GenericSubAccountsTable.AuthenticatedBudgetProps, OmitTableProps> {
   readonly budgetId: number;
+  readonly actionContext: Tables.SubAccountTableContext;
   // The ID of either the Account or SubAccount.
   readonly id: number;
   readonly budget: Model.Budget | null;
@@ -128,7 +129,7 @@ const SubAccountsTable = ({
             tabling.typeguards.isModelRow(f)
           ) as Tables.FringeRow[]
         }
-        onSearchContact={(v: string) => dispatch(actions.authenticated.setContactsSearchAction(v))}
+        onSearchContact={(v: string) => dispatch(actions.authenticated.setContactsSearchAction(v, { id, budgetId }))}
         onNewContact={(params: { name?: string; rowId: Table.ModelRowId }) => createContact(params)}
       />
       {createContactModal}

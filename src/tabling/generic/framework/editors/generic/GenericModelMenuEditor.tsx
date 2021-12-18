@@ -3,12 +3,12 @@ import { ModelTagsMenu, ModelTagsMenuProps } from "components/menus";
 import { IEditor } from "./useModelMenuEditor";
 
 export interface GenericModelMenuEditorProps<
-  V = ID,
-  C extends Model.HttpModel = Model.HttpModel,
-  R extends Table.RowData = Table.RowData,
+  V extends Table.RawRowValue,
+  C extends Model.HttpModel,
+  R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
-> extends Table.EditorParams<R, M, S, V>,
+> extends Table.EditorParams<R, M, S, V | null>,
     ModelTagsMenuProps<C, MenuItemSelectedState>,
     StandardComponentProps {
   readonly searchIndices?: SearchIndicies;
@@ -16,11 +16,10 @@ export interface GenericModelMenuEditorProps<
   readonly tagProps?: Omit<TagProps<C>, "children" | "model" | "text">;
 }
 
-/* eslint-disable indent */
 const GenericModelMenuEditor = <
+  V extends Table.RawRowValue,
   C extends Model.HttpModel,
-  V = ID,
-  R extends Table.RowData = Table.RowData,
+  R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(

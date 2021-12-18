@@ -32,14 +32,14 @@ export const formatAsPhoneNumber: Table.NativeFormatter<number | string> = (valu
   if (value === null || String(value).trim() === "") {
     return "";
   }
-  let numeric = String(value).replace(/\D/g, "");
+  const numeric = String(value).replace(/\D/g, "");
   if (numeric.length >= 12) {
     // Don't format string.
     return numeric;
   } else if (numeric.length === 11 || numeric.length === 10) {
     const match = numeric.match(/^(1|)?(\d{3})(\d{3})(\d{4})$/);
     if (match) {
-      var intlCode = match[1] ? "+1 " : "";
+      const intlCode = match[1] ? "+1 " : "";
       return [intlCode, "(", match[2], ") ", match[3], " ", match[4]].join("");
     } else {
       return numeric;

@@ -4,7 +4,7 @@ import * as codes from "./codes";
 import * as util from "./util";
 
 /* eslint-disable no-shadow */
-/* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export enum HttpErrorTypes {
   CLIENT = "CLIENT",
   NETWORK = "NETWORK",

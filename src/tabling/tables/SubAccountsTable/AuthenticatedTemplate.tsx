@@ -12,6 +12,7 @@ type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
 
 export type AuthenticatedTemplateProps = Omit<AuthenticatedBudgetTableProps<R, M>, "columns"> & {
+  readonly actionContext: Tables.SubAccountTableContext;
   readonly subAccountUnits: Model.Tag[];
   readonly fringes: Table.BodyRow<Tables.FringeRowData>[];
   readonly categoryName: "Sub Account" | "Detail";
@@ -33,8 +34,8 @@ const AuthenticatedTemplateSubAccountsTable = (
 
   const columns = useMemo(
     () =>
-      tabling.columns.normalizeColumns(Columns, {
-        identifier: (col: Table.Column<R, M>) => ({
+      tabling.columns.normalizeColumns<R, M>(Columns, {
+        identifier: () => ({
           headerName: props.identifierFieldHeader
         }),
         description: { headerName: `${props.categoryName} Description` },

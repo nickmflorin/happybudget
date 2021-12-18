@@ -8,24 +8,24 @@ import { util } from "lib";
 
 import "./LandingForm.scss";
 
-export interface ISignupFormValues {
+export type ISignupFormValues = {
   readonly email: string;
   readonly password: string;
   readonly first_name: string;
   readonly last_name: string;
-}
+};
 
 interface SignupFormProps extends FormProps<ISignupFormValues> {
   readonly form: FormInstance<ISignupFormValues>;
   readonly loading: boolean;
   readonly onSubmit: (values: ISignupFormValues) => void;
   readonly onGoogleSuccess: (tokenId: string) => void;
-  readonly onGoogleError: (error: any) => void;
+  readonly onGoogleError: (error: Record<string, unknown>) => void;
 }
 
 const SignupForm = ({ loading, onSubmit, onGoogleSuccess, onGoogleError, ...props }: SignupFormProps): JSX.Element => {
   return (
-    <Form.Form
+    <Form.Form<ISignupFormValues>
       {...props}
       className={classNames("landing-form", props.className)}
       onFinish={(values: ISignupFormValues) => onSubmit(values)}
@@ -40,8 +40,8 @@ const SignupForm = ({ loading, onSubmit, onGoogleSuccess, onGoogleError, ...prop
         name={"email"}
         rules={[
           { required: true, message: "Please enter a valid email." },
-          ({ getFieldValue }: { getFieldValue: any }) => ({
-            validator(rule: any, value: string) {
+          () => ({
+            validator(rule: unknown, value: string) {
               if (value !== "" && !util.validate.validateEmail(value)) {
                 return Promise.reject("The email does not meet our requirements.");
               }
@@ -56,8 +56,8 @@ const SignupForm = ({ loading, onSubmit, onGoogleSuccess, onGoogleError, ...prop
         name={"password"}
         rules={[
           { required: true, message: "Please enter a valid password." },
-          ({ getFieldValue }: { getFieldValue: any }) => ({
-            validator(rule: any, value: string) {
+          () => ({
+            validator(rule: unknown, value: string) {
               if (value !== "" && !util.validate.validatePassword(value)) {
                 return Promise.reject("The password does not meet our requirements.");
               }

@@ -1,3 +1,4 @@
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const initialListResponseState: Redux.ListResponseStore<any> = {
   loading: false,
   data: [],
@@ -5,10 +6,12 @@ export const initialListResponseState: Redux.ListResponseStore<any> = {
   responseWasReceived: false
 };
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const initialModelListResponseState: Redux.ModelListResponseStore<any> = {
   ...initialListResponseState
 };
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const initialAuthenticatedModelListResponseState: Redux.AuthenticatedModelListResponseStore<any> = {
   ...initialModelListResponseState,
   search: "",
@@ -21,6 +24,7 @@ export const initialAuthenticatedModelListResponseState: Redux.AuthenticatedMode
   ordering: []
 };
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const initialTableState: Redux.TableStore<any> = {
   data: [],
   loading: false,
@@ -28,6 +32,7 @@ export const initialTableState: Redux.TableStore<any> = {
   saving: false
 };
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const initialDetailResponseState: Redux.ModelDetailResponseStore<any> = {
   loading: false,
   data: undefined

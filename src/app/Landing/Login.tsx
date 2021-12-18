@@ -120,6 +120,7 @@ const Login = (): JSX.Element => {
   useEffect(() => {
     if (!isNil(location.state?.error)) {
       const e = location.state.error;
+      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
       const { state, ...statelessLocation } = location;
       history.replace(statelessLocation);
       handleError(e);
@@ -150,12 +151,12 @@ const Login = (): JSX.Element => {
             .catch((e: Error) => handleError(e))
             .finally(() => setLoading(false));
         }}
-        onGoogleError={(error: object) => {
+        onGoogleError={(error: Record<string, unknown>) => {
           notifications.notify({ level: "error", dispatchToSentry: true, message: JSON.stringify(error) });
           form.notify("There was an error authenticating with Google.");
         }}
         onSubmit={(values: ILoginFormValues) => {
-          let email = values.email;
+          const email = values.email;
           if (!isNil(email) && !isNil(values.password)) {
             api
               .login(email.toLowerCase(), values.password)

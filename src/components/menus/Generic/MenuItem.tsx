@@ -7,8 +7,10 @@ import { Checkbox } from "antd";
 
 import { IconOrSpinner, Spinner } from "components";
 
-/* eslint-disable indent */
-const PrivateCommonMenuItem = <S extends object = MenuItemSelectedState, M extends MenuItemModel<S> = MenuItemModel<S>>(
+const PrivateCommonMenuItem = <
+  S extends Record<string, unknown> = MenuItemSelectedState,
+  M extends MenuItemModel<S> = MenuItemModel<S>
+>(
   props: ICommonMenuItem<S, M> & { readonly isExtra: boolean; readonly children: JSX.Element }
 ): JSX.Element => {
   const history = useHistory();
@@ -81,11 +83,14 @@ const ContentWrapper = (props: ContentWrapperProps): JSX.Element => {
   );
 };
 
-export const ExtraMenuItem = <S extends object = MenuItemSelectedState>(props: IExtraMenuItem): JSX.Element => {
+export const ExtraMenuItem = <S extends Record<string, unknown> = MenuItemSelectedState>(
+  props: IExtraMenuItem
+): JSX.Element => {
   if (props.model.visible === false) {
     return <></>;
   }
   return (
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     <CommonMenuItem<S, any>
       {...props}
       onClick={(e: Table.CellDoneEditingEvent) => {
@@ -103,12 +108,15 @@ export const ExtraMenuItem = <S extends object = MenuItemSelectedState>(props: I
   );
 };
 
-type AnyMenuItemSelectedState<T extends object> = T & MenuItemSelectedState;
+type AnyMenuItemSelectedState<T extends Record<string, unknown>> = T & MenuItemSelectedState;
 
-const isSelectedState = <T extends object>(state: T): state is AnyMenuItemSelectedState<T> =>
+const isSelectedState = <T extends Record<string, unknown>>(state: T): state is AnyMenuItemSelectedState<T> =>
   (state as AnyMenuItemSelectedState<T>).selected !== undefined;
 
-const PrivateMenuItem = <S extends object = MenuItemSelectedState, M extends MenuItemModel<S> = MenuItemModel<S>>(
+const PrivateMenuItem = <
+  S extends Record<string, unknown> = MenuItemSelectedState,
+  M extends MenuItemModel<S> = MenuItemModel<S>
+>(
   props: IMenuItem<S, M>
 ): JSX.Element => {
   const m = useMemo(() => {

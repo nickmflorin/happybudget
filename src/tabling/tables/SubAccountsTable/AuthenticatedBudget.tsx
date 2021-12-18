@@ -16,6 +16,7 @@ type M = Model.SubAccount;
 
 export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>, "columns"> &
   WithContactsProps & {
+    readonly actionContext: Tables.SubAccountTableContext;
     readonly subAccountUnits: Model.Tag[];
     readonly fringes: Tables.FringeRow[];
     readonly categoryName: "Sub Account" | "Detail";
@@ -66,8 +67,8 @@ const AuthenticatedBudgetSubAccountsTable = (
   });
 
   const columns = useMemo(() => {
-    return tabling.columns.normalizeColumns(props.columns, {
-      identifier: (col: Table.Column<R, M>) => ({
+    return tabling.columns.normalizeColumns<R, M>(props.columns, {
+      identifier: () => ({
         headerName: props.identifierFieldHeader
       }),
       description: { headerName: `${props.categoryName} Description` },
@@ -92,14 +93,14 @@ const AuthenticatedBudgetSubAccountsTable = (
         processCellForClipboard: processFringesCellForClipboard
       },
       contact: {
-        onDataChange: (id: Table.ModelRowId, change: Table.CellChange<R>) => {
+        onDataChange: (id: Table.ModelRowId, change: Table.CellChange) => {
           /* If the Row does not already have a populated value for `rate`,
 						 we populate the `rate` value based on the selected Contact
 						 (if non-null). */
           if (change.newValue !== null) {
             const row = table.current.getRow(id);
             if (!isNil(row) && tabling.typeguards.isModelRow(row) && row.data.rate === null) {
-              const contact: Model.Contact | undefined = find(props.contacts, { id: change.newValue } as any);
+              const contact: Model.Contact | undefined = find(props.contacts, { id: change.newValue });
               if (!isNil(contact) && !isNil(contact.rate)) {
                 table.current.applyTableChange({
                   type: "dataChange",

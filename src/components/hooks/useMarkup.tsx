@@ -17,7 +17,6 @@ interface UseMarkupProps<
 
 type UseMarkupReturnType = [JSX.Element, (m: number) => void, (ms?: number[]) => void];
 
-/* eslint-disable indent */
 const useMarkup = <
   R extends Tables.BudgetRowData,
   M extends Model.RowHttpModel,

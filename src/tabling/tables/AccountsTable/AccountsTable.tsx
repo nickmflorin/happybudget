@@ -4,11 +4,12 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 type R = Tables.AccountRowData;
 
 export type AccountsTableProps = {
+  readonly actionContext: Tables.AccountTableContext;
   readonly cookieNames?: Omit<Table.CookieNames, "hiddenColumns">;
 };
 
 const AccountsTable = <T extends AccountsTableProps>(
-  Component: React.ComponentClass<T, {}> | React.FunctionComponent<T>
+  Component: React.ComponentClass<T, Record<string, unknown>> | React.FunctionComponent<T>
 ): React.FunctionComponent<T> => {
   const WithAccountsTable = (props: T) => {
     return (

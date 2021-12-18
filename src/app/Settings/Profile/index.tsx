@@ -33,7 +33,7 @@ const Profile = (): JSX.Element => {
   }, [user]);
 
   const onValuesChange = useMemo(
-    () => (changedValues: Partial<Http.ContactPayload>, values: Http.ContactPayload) => {
+    () => (changedValues: Partial<Http.ContactPayload>) => {
       if (!isNil(changedValues.first_name)) {
         headerRef.current?.setFirstName(changedValues.first_name);
       }

@@ -16,7 +16,6 @@ export type LinkCellProps<
   readonly rel?: string | undefined;
 };
 
-/* eslint-disable indent */
 const LinkCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,

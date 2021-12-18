@@ -12,7 +12,6 @@ interface AuthenticatedToolbarProps<R extends Table.RowData, M extends Model.Row
   readonly selectedRows: Table.EditableRow<R>[];
 }
 
-/* eslint-disable indent */
 const AuthenticatedToolbar = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: AuthenticatedToolbarProps<R, M>
 ): JSX.Element => {

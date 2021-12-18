@@ -18,10 +18,16 @@ type R = Tables.ActualRowData;
 type M = Model.Actual;
 
 const selectActualTypes = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.budget.actuals.types
+  (state: Application.AuthenticatedStore) => state.budget.actuals.types
 );
 
-const ConnectedActualsTable = connectTableToStore<ActualsTable.ActualsTableProps, R, M, Tables.ActualTableStore>({
+const ConnectedActualsTable = connectTableToStore<
+  ActualsTable.ActualsTableProps,
+  R,
+  M,
+  Tables.ActualTableStore,
+  Tables.ActualTableContext
+>({
   actions: {
     tableChanged: actions.actuals.handleTableChangeEventAction,
     loading: actions.actuals.loadingAction,
@@ -33,10 +39,10 @@ const ConnectedActualsTable = connectTableToStore<ActualsTable.ActualsTableProps
   onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.ActualTableContext) =>
     dispatch(actions.actuals.requestAction(null, c)),
   createSaga: (table: Table.TableInstance<R, M>) => sagas.actuals.createTableSaga(table),
-  selector: redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.actuals),
+  selector: redux.selectors.simpleDeepEqualSelector((state: Application.AuthenticatedStore) => state.budget.actuals),
   footerRowSelectors: {
     footer: createSelector(
-      redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.actuals.data),
+      redux.selectors.simpleDeepEqualSelector((state: Application.AuthenticatedStore) => state.budget.actuals.data),
       (rows: Table.BodyRow<Tables.ActualRowData>[]) => {
         return {
           value: reduce(rows, (sum: number, s: Table.BodyRow<Tables.ActualRowData>) => sum + (s.data.value || 0), 0)
@@ -56,7 +62,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
 
   const dispatch = useDispatch();
   const contacts = useSelector(selectors.selectContacts);
-  const table = tabling.hooks.useTable<R>();
+  const table = tabling.hooks.useTable<R, M>();
   const actualTypes = useSelector(selectActualTypes);
 
   const onContactCreated = useMemo(
@@ -69,7 +75,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
       if (!isNil(rowId)) {
         const row: Table.BodyRow<R> | null = table.current.getRow(rowId);
         if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
-          let rowChange: Table.RowChange<R> = {
+          const rowChange: Table.RowChange<R> = {
             id: row.id,
             data: { contact: { oldValue: row.data.contact || null, newValue: m.id } }
           };
@@ -105,7 +111,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
             editContact({ id: params.contact, rowId: params.rowId })
           }
           onExportPdf={() => setPreviewModalVisible(true)}
-          onSearchContact={(v: string) => dispatch(globalActions.authenticated.setContactsSearchAction(v))}
+          onSearchContact={(v: string) => dispatch(globalActions.authenticated.setContactsSearchAction(v, {}))}
           onAttachmentRemoved={(row: Table.ModelRow<R>, id: number) =>
             dispatch(
               actions.actuals.updateRowsInStateAction({

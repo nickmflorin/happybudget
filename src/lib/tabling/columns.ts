@@ -3,7 +3,6 @@ import { find, isNil, reduce, filter, orderBy, map } from "lodash";
 
 import * as Models from "./models";
 
-/* eslint-disable indent */
 export const getEditColumnRowConfig = <
   R extends Table.RowData,
   RW extends Table.NonPlaceholderBodyRow<R> = Table.NonPlaceholderBodyRow<R>
@@ -19,11 +18,23 @@ export const getEditColumnRowConfig = <
   return filtered.length !== 0 ? filtered[0] : null;
 };
 
-export const getColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  columns: Table.Column<R, M>[],
-  field: keyof R | string
-): Table.Column<R, M> | null => {
-  const foundColumn = find(columns, (c: Table.Column<R, M>) => normalizedField<R, M>(c) === field);
+export const normalizedField = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
+>(
+  col: C
+): string | undefined => (col.field !== undefined ? (col.field as string) : col.colId);
+
+export const getColumn = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
+>(
+  columns: C[],
+  field: string
+): C | null => {
+  const foundColumn = find(columns, (c: C) => normalizedField<R, M, C>(c) === field);
   if (!isNil(foundColumn)) {
     return foundColumn;
   } else {
@@ -32,23 +43,25 @@ export const getColumn = <R extends Table.RowData, M extends Model.RowHttpModel>
   }
 };
 
-export const callWithColumn = <R extends Table.RowData, M extends Model.RowHttpModel, RT = any>(
-  columns: Table.Column<R, M>[],
-  field: keyof R | string,
-  callback: (col: Table.Column<R, M>) => RT | null
+export const callWithColumn = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
+>(
+  columns: C[],
+  field: string,
+  callback: (col: C) => void
 ) => {
-  const foundColumn = getColumn(columns, field);
+  const foundColumn = getColumn<R, M, C>(columns, field);
   return !isNil(foundColumn) ? callback(foundColumn) : null;
 };
 
-/* eslint-disable indent */
 export const isEditable = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
-  V = any,
-  PDFM extends Model.RowHttpModel = any
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
 >(
-  column: Table.Column<R, M, V, PDFM>,
+  column: C,
   row: Table.BodyRow<R>
 ): boolean => {
   if (isNil(column.editable)) {
@@ -56,18 +69,8 @@ export const isEditable = <
   } else if (typeof column.editable === "boolean") {
     return column.editable;
   }
-  return column.editable({ column, row });
+  return column.editable({ row });
 };
-
-export const normalizedField = <
-  R extends Table.RowData,
-  M extends Model.RowHttpModel,
-  V = any,
-  PDFM extends Model.RowHttpModel = any,
-  P extends { readonly field?: keyof R; readonly colId?: string } = Table.Column<R, M, V, PDFM>
->(
-  col: P
-): string | undefined => (col.field !== undefined ? (col.field as string) : col.colId);
 
 type ColumnTypeVariantOptions = {
   header?: boolean;
@@ -76,15 +79,12 @@ type ColumnTypeVariantOptions = {
 
 export const normalizePdfColumnWidths = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
-  V,
-  PDFM extends Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
 >(
-  cs: Table.Column<R, M, V, PDFM>[],
-  flt?: (c: Table.Column<R, M, V, PDFM>) => boolean
+  cs: C[],
+  flt?: (c: C) => boolean
 ) => {
-  type C = Table.Column<R, M, V, PDFM>;
-
   let columns = [...cs];
 
   const baseFilter = (c: C) => {
@@ -111,14 +111,14 @@ export const normalizePdfColumnWidths = <
   const flexColumns = filter(columns, (c: C) => baseFilter(c) && !isNil(c.pdfFlexGrow));
   if (flexColumns.length !== 0 && totalSpecifiedWidth < 1.0) {
     const flexColumn = flexColumns[0];
-    const normalizedFlexField = normalizedField<R, M, V, PDFM>(flexColumn);
+    const normalizedFlexField = normalizedField<R, M, C>(flexColumn);
 
     /* If there are multiple columns with 'pdfFlexGrow' specified, we cannot apply
        the flex to all of the columns because we would have to split the leftover
 			 space up between the columns with 'pdfFlexGrow' which can get
 			 hairy/complicated - and is not needed at this point. */
     if (flexColumns.length !== 1) {
-      const flexColumnFields: (string | undefined)[] = map(flexColumns, (c: C) => normalizedField<R, M, V, PDFM>(c));
+      const flexColumnFields: (string | undefined)[] = map(flexColumns, (c: C) => normalizedField<R, M, C>(c));
       console.warn(
         `Found multiple columns, ${flexColumnFields.join(", ")}, with 'pdfFlexGrow' specified.
         Since only one column can flex grow in the PDF, only the column ${flexColumnFields[0]}
@@ -130,11 +130,11 @@ export const normalizePdfColumnWidths = <
        much space should be available. */
     const columnsWithoutSpecifiedWidth = filter(
       columns,
-      (c: C) => baseFilter(c) && isNil(c.pdfWidth) && normalizedFlexField !== normalizedField<R, M, V, PDFM>(c)
+      (c: C) => baseFilter(c) && isNil(c.pdfWidth) && normalizedFlexField !== normalizedField<R, M, C>(c)
     );
     if (columnsWithoutSpecifiedWidth.length !== 0) {
       const missingWidthFields: (string | undefined)[] = map(columnsWithoutSpecifiedWidth, (c: C) =>
-        normalizedField<R, M, V, PDFM>(c)
+        normalizedField<R, M, C>(c)
       );
       console.warn(
         `Cannot apply 'pdfFlexGrow' to column ${normalizedFlexField} because
@@ -145,7 +145,7 @@ export const normalizePdfColumnWidths = <
          with 'pdfFlexGrow' applied to take up the remaining space in the
 				 table. */
       return map(columns, (c: C) => {
-        if (normalizedField<R, M, V, PDFM>(c) === normalizedFlexField) {
+        if (normalizedField<R, M, C>(c) === normalizedFlexField) {
           return { ...c, pdfWidth: 1.0 - totalSpecifiedWidth };
         }
         return c;
@@ -183,7 +183,7 @@ export const getColumnTypeCSSStyle = (
 ): React.CSSProperties => {
   let colType: Table.ColumnType;
   if (typeof type === "string") {
-    const ct: Table.ColumnType | undefined = find(Models.ColumnTypes, { id: type } as any);
+    const ct: Table.ColumnType | undefined = find(Models.ColumnTypes, { id: type });
     if (isNil(ct)) {
       return {};
     }
@@ -201,32 +201,28 @@ export const getColumnTypeCSSStyle = (
   return style;
 };
 
-type ColumnUpdate<R extends Table.RowData, M extends Model.RowHttpModel, PDFM extends Model.RowHttpModel = any> =
-  | Partial<Table.Column<R, M>>
-  | ((p: Table.Column<R, M, any, PDFM>) => Partial<Table.Column<R, M>>);
+type ColumnUpdate<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
+> = Partial<C> | ((p: C) => Partial<C>);
 
 export const normalizeColumns = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
-  PDFM extends Model.RowHttpModel = any
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
 >(
-  /* TODO: Assuming any here for D can cause bugs - where the update might have
-		 fields in it that are not allowed.  We should come up with a cleaner
-		 solution. */
-  columns: Table.Column<R, M, any, PDFM>[],
+  columns: C[],
   updates?: {
-    [key: string]: ColumnUpdate<R, M, PDFM>;
+    [key: string]: ColumnUpdate<R, M, C>;
   }
-): Table.Column<R, M, any, PDFM>[] => {
-  const normalizeUpdate = (
-    d: ColumnUpdate<R, M, PDFM>,
-    c: Table.Column<R, M, any, PDFM>
-  ): Partial<Table.Column<R, M, any, PDFM>> => (typeof d === "function" ? d(c) : d);
+): C[] => {
+  const normalizeUpdate = (d: ColumnUpdate<R, M, C>, c: C): Partial<C> => (typeof d === "function" ? d(c) : d);
 
-  const getUpdateForColumn = (c: Table.Column<R, M, any, PDFM>): ColumnUpdate<R, M, PDFM> => {
+  const getUpdateForColumn = (c: C): ColumnUpdate<R, M, C> => {
     if (!isNil(updates)) {
-      const id = normalizedField<R, M>(c);
-      const data: ColumnUpdate<R, M, PDFM> = updates[id as string] || {};
+      const id = normalizedField<R, M, C>(c);
+      const data: ColumnUpdate<R, M, C> = updates[id as string] || {};
       /* Data pertaining to a specific column ID should be given precedence to
          data defined more generally for the TableColumnType. */
       return { ...normalizeUpdate(updates[c.tableColumnType], c), ...normalizeUpdate(data, c) };
@@ -236,7 +232,7 @@ export const normalizeColumns = <
 
   return reduce(
     columns,
-    (evaluated: Table.Column<R, M, any, PDFM>[], c: Table.Column<R, M, any, PDFM>): Table.Column<R, M, any, PDFM>[] => {
+    (evaluated: C[], c: C): C[] => {
       if (!isNil(updates)) {
         const data = getUpdateForColumn(c);
         if (typeof data === "function") {
@@ -252,34 +248,26 @@ export const normalizeColumns = <
 
 export const orderColumns = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
-  PDFM extends Model.RowHttpModel = any
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
 >(
-  columns: Table.Column<R, M, any, PDFM>[]
-): Table.Column<R, M, any, PDFM>[] => {
-  const actionColumns = filter(columns, (col: Table.Column<R, M, any, PDFM>) => col.tableColumnType === "action");
-  const calculatedColumns = filter(
-    columns,
-    (col: Table.Column<R, M, any, PDFM>) => col.tableColumnType === "calculated"
-  );
-  const bodyColumns = filter(columns, (col: Table.Column<R, M, any, PDFM>) => col.tableColumnType === "body");
+  columns: C[]
+): C[] => {
+  const actionColumns = filter(columns, (col: C) => col.tableColumnType === "action");
+  const calculatedColumns = filter(columns, (col: C) => col.tableColumnType === "calculated");
+  const bodyColumns = filter(columns, (col: C) => col.tableColumnType === "body");
   /* It doesn't matter where the fake columns go in the ordering because they
 		 are not displayed - all we care about is that they are present. */
-  const fakeColumns = filter(columns, (col: Table.Column<R, M, any, PDFM>) => col.tableColumnType === "fake");
+  const fakeColumns = filter(columns, (col: C) => col.tableColumnType === "fake");
 
-  const actionColumnsWithIndex = filter(actionColumns, (col: Table.Column<R, M, any, PDFM>) => !isNil(col.index));
-  const actionColumnsWithoutIndex = filter(actionColumns, (col: Table.Column<R, M, any, PDFM>) => isNil(col.index));
+  const actionColumnsWithIndex = filter(actionColumns, (col: C) => !isNil(col.index));
+  const actionColumnsWithoutIndex = filter(actionColumns, (col: C) => isNil(col.index));
 
-  const calculatedColumnsWithIndex = filter(
-    calculatedColumns,
-    (col: Table.Column<R, M, any, PDFM>) => !isNil(col.index)
-  );
-  const calculatedColumnsWithoutIndex = filter(calculatedColumns, (col: Table.Column<R, M, any, PDFM>) =>
-    isNil(col.index)
-  );
+  const calculatedColumnsWithIndex = filter(calculatedColumns, (col: C) => !isNil(col.index));
+  const calculatedColumnsWithoutIndex = filter(calculatedColumns, (col: C) => isNil(col.index));
 
-  const bodyColumnsWithIndex = filter(bodyColumns, (col: Table.Column<R, M, any, PDFM>) => !isNil(col.index));
-  const bodyColumnsWithoutIndex = filter(bodyColumns, (col: Table.Column<R, M, any, PDFM>) => isNil(col.index));
+  const bodyColumnsWithIndex = filter(bodyColumns, (col: C) => !isNil(col.index));
+  const bodyColumnsWithoutIndex = filter(bodyColumns, (col: C) => isNil(col.index));
 
   return [
     ...fakeColumns,

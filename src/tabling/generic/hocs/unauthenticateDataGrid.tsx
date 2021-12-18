@@ -13,8 +13,8 @@ import { hooks } from "lib";
 
 import { useClipboard, useCellNavigation } from "../hooks";
 
-type InjectedUnauthenticatedDataGridProps<R extends Table.RowData> = {
-  readonly getCSVData: (fields?: (keyof R | string)[]) => CSVData;
+type InjectedUnauthenticatedDataGridProps = {
+  readonly getCSVData: (fields?: string[]) => CSVData;
   readonly processCellForClipboard: (params: ProcessCellForExportParams) => string;
   readonly onCellKeyDown: (event: CellKeyDownEvent) => void;
   readonly navigateToNextCell: (params: NavigateToNextCellParams) => Table.CellPosition;
@@ -30,9 +30,8 @@ export interface UnauthenticateDataGridProps<
   readonly grid: NonNullRef<Table.DataGridInstance>;
 }
 
-export type WithUnauthenticatedDataGridProps<R extends Table.RowData, T> = T & InjectedUnauthenticatedDataGridProps<R>;
+export type WithUnauthenticatedDataGridProps<T> = T & InjectedUnauthenticatedDataGridProps;
 
-/* eslint-disable indent */
 const unauthenticatedDataGrid =
   <
     R extends Table.RowData,
@@ -43,15 +42,15 @@ const unauthenticatedDataGrid =
   ) =>
   (
     Component:
-      | React.ComponentClass<WithUnauthenticatedDataGridProps<R, T>, {}>
-      | React.FunctionComponent<WithUnauthenticatedDataGridProps<R, T>>
+      | React.ComponentClass<WithUnauthenticatedDataGridProps<T>, Record<string, unknown>>
+      | React.FunctionComponent<WithUnauthenticatedDataGridProps<T>>
   ): React.FunctionComponent<T> => {
     function WithUnauthenticatedDataGrid(props: T) {
       const [processCellForClipboard, getCSVData] = useClipboard<R, M>({
         columns: props.columns,
         apis: props.apis
       });
-      /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
       const [navigateToNextCell, tabToNextCell, _, moveToNextRow] = useCellNavigation<R, M>({
         apis: props.apis,
         columns: props.columns,
@@ -67,8 +66,8 @@ const unauthenticatedDataGrid =
 
       const onCellKeyDown: (e: Table.CellKeyDownEvent) => void = hooks.useDynamicCallback(
         (e: Table.CellKeyDownEvent) => {
-          /* @ts-ignore  AG Grid's Event Object is Wrong */
-          if (!isNil(e.e) & (e.e.code === "Enter") && !isNil(e.rowIndex)) {
+          const ev = e.event as KeyboardEvent | null | undefined; // AG Grid's Event Object is Wrong
+          if (!isNil(ev) && ev.code === "Enter" && !isNil(e.rowIndex)) {
             moveToNextRow({ rowIndex: e.rowIndex, column: e.column });
           }
         }

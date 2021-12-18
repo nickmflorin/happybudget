@@ -24,11 +24,11 @@ const isPluralityWithModel = <M extends Model.Model = Model.Model>(
  *
  * (1) Explicitly Provided ITag Objects:
  *     <MultipleTags tags={[
- * 				{ text: "foo", color: "red" }, { text: "bar", color: "blue" }]} />
+ *     { text: "foo", color: "red" }, { text: "bar", color: "blue" }]} />
  *
  * (2) Provided Model (M) Objects:
  *     <MultipleTags models={
- * 				[ {...}, {...} ]} modelColorField={"color"} modelTextField={"name"}]} />
+ *     [ {...}, {...} ]} modelColorField={"color"} modelTextField={"name"}]} />
  *
  * (3) Children <Tag> Components:
  *     <MultipleTags><Tag /><Tag /></MultipleTags>
@@ -37,7 +37,6 @@ export const MultipleTags = <M extends Model.Model = Model.Model>(props: Multipl
   return (
     <div className={classNames("multiple-tags-wrapper", props.className)} style={props.style}>
       {!isNil(props.models) ? (
-        /* eslint-disable indent */
         props.models.length !== 0 || isNil(props.onMissing) ? (
           map(props.models, (m: M | PluralityWithModel<M>, index: number) => {
             return (

@@ -7,7 +7,7 @@ import { ui } from "lib";
 import Dropdown, { DropdownProps } from "./Dropdown";
 
 export type DropdownMenuProps<
-  S extends object = MenuItemSelectedState,
+  S extends Record<string, unknown> = MenuItemSelectedState,
   M extends MenuItemModel<S> = MenuItemModel<S>
 > = Omit<IMenu<S, M>, "className" | "style"> &
   Pick<StandardComponentProps, "className"> &
@@ -17,12 +17,14 @@ export type DropdownMenuProps<
     readonly menuId?: string;
   };
 
-const DropdownMenu = <S extends object = MenuItemSelectedState, M extends MenuItemModel<S> = MenuItemModel<S>>({
+const DropdownMenu = <
+  S extends Record<string, unknown> = MenuItemSelectedState,
+  M extends MenuItemModel<S> = MenuItemModel<S>
+>({
   menuClassName,
   menuStyle,
   className,
   placement,
-  dropdown,
   menuId,
   ...props
 }: DropdownMenuProps<S, M>): JSX.Element => {

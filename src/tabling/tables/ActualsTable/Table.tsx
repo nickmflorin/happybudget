@@ -17,6 +17,7 @@ type M = Model.Actual;
 
 export type ActualsTableProps = Omit<AuthenticatedModelTableProps<R, M>, "columns"> &
   WithContactsProps & {
+    readonly actionContext: Tables.ActualTableContext;
     readonly exportFileName: string;
     readonly actualTypes: Model.Tag[];
     readonly onAttachmentRemoved: (row: Table.ModelRow<R>, id: number) => void;
@@ -27,11 +28,7 @@ export type ActualsTableProps = Omit<AuthenticatedModelTableProps<R, M>, "column
 
 const ActualsTable = ({
   exportFileName,
-  contacts,
   onOwnersSearch,
-  onNewContact,
-  onEditContact,
-  onSearchContact,
   ...props
 }: WithWithContactsProps<WithConnectedTableProps<ActualsTableProps, R, M>, R, M>): JSX.Element => {
   const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
@@ -124,7 +121,7 @@ const ActualsTable = ({
           framework.actions.ExportPdfAction(props.onExportPdf)
         ]}
         columns={tabling.columns.normalizeColumns<R, M>(props.columns, {
-          owner: (col: Table.Column<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>) => ({
+          owner: (col: Table.Column<R, M>) => ({
             processCellFromClipboard: processOwnerCellFromClipboard,
             cellEditorParams: {
               ...col.cellEditorParams,

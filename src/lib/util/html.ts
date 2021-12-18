@@ -1,5 +1,5 @@
 export const isNodeDescendantOf = (parent: HTMLElement | Element, child: HTMLElement | Element) => {
-  var node = child.parentNode;
+  let node = child.parentNode;
   while (node != null) {
     if (node === parent) {
       return true;

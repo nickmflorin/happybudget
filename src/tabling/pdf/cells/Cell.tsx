@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { Style } from "@react-pdf/types";
 import classNames from "classnames";
 import { isNil, map, flatten, reduce } from "lodash";
 
@@ -8,26 +7,24 @@ import { View, Text } from "components/pdf";
 import { tabling } from "lib";
 
 const isCallback = <
+  RV,
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  V = R[keyof R],
-  RV = any
+  C extends Table.Column<R, M> = Table.Column<R, M>
 >(
-  /* eslint-disable indent */
-  prop: Table.PdfOptionalCellCallback<R, M, V, RV>
-): prop is Table.PdfCellCallback<R, M, V, RV> => {
+  prop: Table.PdfOptionalCellCallback<RV, R, M, Table.InferColumnValue<C>>
+): prop is Table.PdfCellCallback<RV, R, M, Table.InferColumnValue<C>> => {
   return typeof prop === "function";
 };
 
 const evaluateOptionalCallbackProp = <
+  RV,
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  V = R[keyof R],
-  RV = any
+  C extends Table.Column<R, M> = Table.Column<R, M>
 >(
-  /* eslint-disable indent */
-  prop: Table.PdfOptionalCellCallback<R, M, V, RV> | undefined,
-  params: Table.PdfCellCallbackParams<R, M, V>
+  prop: Table.PdfOptionalCellCallback<RV, R, M, Table.InferColumnValue<C>> | undefined,
+  params: Table.PdfCellCallbackParams<R, M, Table.InferColumnValue<C>>
 ) => {
   if (isCallback(prop)) {
     return prop(params);
@@ -35,56 +32,81 @@ const evaluateOptionalCallbackProp = <
   return prop;
 };
 
-const evaluateClassName = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = R[keyof R]>(
-  className: Table.PdfCellClassName<R, M, V>,
-  params: Table.PdfCellCallbackParams<R, M, V>
+const evaluateClassName = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
+>(
+  className: Table.PdfCellClassName<R, M, Table.InferColumnValue<C>>,
+  params: Table.PdfCellCallbackParams<R, M, Table.InferColumnValue<C>>
 ): (string | undefined)[] => {
   if (Array.isArray(className)) {
-    const parts: (string | Table.PdfCellCallback<R, M, V> | Table.PdfCellClassName<R, M, V> | undefined)[] = className;
+    const parts: (
+      | string
+      | Table.PdfCellCallback<string, R, M, Table.InferColumnValue<C>>
+      | Table.PdfCellClassName<R, M, Table.InferColumnValue<C>>
+      | undefined
+    )[] = className;
     return flatten(
-      map(parts, (csName: string | Table.PdfCellCallback<R, M, V> | Table.PdfCellClassName<R, M, V> | undefined) =>
-        evaluateClassName(csName, params)
+      map(
+        parts,
+        (
+          csName:
+            | string
+            | Table.PdfCellCallback<string, R, M, Table.InferColumnValue<C>>
+            | Table.PdfCellClassName<R, M, Table.InferColumnValue<C>>
+            | undefined
+        ) => evaluateClassName(csName, params)
       )
     );
   } else {
-    return [evaluateOptionalCallbackProp<R, M, V>(className, params)];
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    return [evaluateOptionalCallbackProp<any, R, M, C>(className, params)];
   }
 };
 
-const evaluateCellStyle = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = R[keyof R]>(
-  styleObj: Table.PdfCellStyle<R, M, V>,
-  params: Table.PdfCellCallbackParams<R, M, V>
-): Style | undefined => {
+const evaluateCellStyle = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
+>(
+  styleObj: Table.PdfCellStyle<R, M, Table.InferColumnValue<C>>,
+  params: Table.PdfCellCallbackParams<R, M, Table.InferColumnValue<C>>
+): Pdf.Style | undefined => {
   if (Array.isArray(styleObj)) {
     return reduce(
       styleObj,
-      (obj: Style, newObj: Table.PdfCellStyle<R, M, V>) => ({
+      (obj: Pdf.Style, newObj: Table.PdfCellStyle<R, M, Table.InferColumnValue<C>>) => ({
         ...obj,
         ...evaluateCellStyle(newObj, params)
       }),
       {}
     );
   } else {
-    return evaluateOptionalCallbackProp<R, M, V>(styleObj, params);
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    return evaluateOptionalCallbackProp<any, R, M, C>(styleObj, params);
   }
 };
 
 export interface RowExplicitCellProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  V = R[keyof R]
+  C extends Table.Column<R, M> = Table.Column<R, M>
 > {
-  readonly style?: Table.PdfCellStyle<R, M, V>;
-  readonly className?: Table.PdfCellClassName<R, M, V>;
-  readonly textStyle?: Table.PdfCellStyle<R, M, V>;
-  readonly textClassName?: Table.PdfCellClassName<R, M, V>;
-  readonly cellContentsVisible?: Table.PdfOptionalCellCallback<R, M, any, boolean>;
-  readonly cellContentsInvisible?: Table.PdfOptionalCellCallback<R, M, any, boolean>;
+  readonly style?: Table.PdfCellStyle<R, M, Table.InferColumnValue<C>>;
+  readonly className?: Table.PdfCellClassName<R, M, Table.InferColumnValue<C>>;
+  readonly textStyle?: Table.PdfCellStyle<R, M, Table.InferColumnValue<C>>;
+  readonly textClassName?: Table.PdfCellClassName<R, M, Table.InferColumnValue<C>>;
+  readonly cellContentsVisible?: Table.PdfOptionalCellCallback<boolean, R, M>;
+  readonly cellContentsInvisible?: Table.PdfOptionalCellCallback<boolean, R, M>;
 }
 
-export interface CellProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = R[keyof R]>
-  extends RowExplicitCellProps<R, M, V> {
-  readonly column: Table.PdfColumn<R, M, V>;
+export interface CellProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
+> extends RowExplicitCellProps<R, M, C> {
+  readonly column: C;
   readonly colIndex: number;
   readonly isHeader?: boolean;
   readonly debug?: boolean;
@@ -94,17 +116,21 @@ export interface CellProps<R extends Table.RowData, M extends Model.RowHttpModel
 export interface PrivateCellProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  V = R[keyof R]
-> extends CellProps<R, M, V> {
+  C extends Table.Column<R, M> = Table.Column<R, M>
+> extends CellProps<R, M, C> {
   readonly row?: Table.Row<R>;
-  readonly rawValue: V | null;
+  readonly rawValue: Table.InferColumnValue<C>;
   readonly value: string;
 }
 
-const Cell = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel, V = R[keyof R]>(
-  props: PrivateCellProps<R, M, V>
+const Cell = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
+>(
+  props: PrivateCellProps<R, M, C>
 ): JSX.Element => {
-  const callbackParams = useMemo<Table.PdfCellCallbackParams<R, M, V>>(() => {
+  const callbackParams = useMemo<Table.PdfCellCallbackParams<R, M, Table.InferColumnValue<C>>>(() => {
     return {
       colIndex: props.colIndex,
       column: props.column,
@@ -118,25 +144,25 @@ const Cell = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
 
   const cellStyle = useMemo(() => {
     return {
-      ...evaluateOptionalCallbackProp<R, M, V, Style>(
+      ...evaluateOptionalCallbackProp<Pdf.Style, R, M, C>(
         props.isHeader === true ? props.column.pdfHeaderCellProps?.style : props.column.pdfCellProps?.style,
         callbackParams
       ),
       /* The width will be configured before the column is plugged into this
          component. */
       width: `${(props.column.pdfWidth || 0.0) * 100.0}%`,
-      ...evaluateCellStyle<R, M, V>(props.style, callbackParams)
+      ...evaluateCellStyle<R, M, C>(props.style, callbackParams)
     };
   }, [props.column]);
 
   return (
     <View
       className={classNames(
-        evaluateClassName<R, M, V>(
+        evaluateClassName<R, M, C>(
           props.isHeader === true ? props.column.pdfHeaderCellProps?.className : props.column.pdfCellProps?.className,
           callbackParams
         ),
-        evaluateClassName<R, M, V>(props.className, callbackParams),
+        evaluateClassName<R, M, C>(props.className, callbackParams),
         { indented: props.indented === true }
       )}
       style={cellStyle}
@@ -145,9 +171,9 @@ const Cell = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
       <ShowHide
         hide={
           props.indented === true ||
-          evaluateOptionalCallbackProp<R, M, V, boolean>(props.cellContentsVisible, callbackParams) === false ||
-          evaluateOptionalCallbackProp<R, M, V, boolean>(props.cellContentsInvisible, callbackParams) === true ||
-          evaluateOptionalCallbackProp<R, M, V, boolean>(props.column.pdfCellContentsVisible, callbackParams) === false
+          evaluateOptionalCallbackProp<boolean, R, M, C>(props.cellContentsVisible, callbackParams) === false ||
+          evaluateOptionalCallbackProp<boolean, R, M, C>(props.cellContentsInvisible, callbackParams) === true ||
+          evaluateOptionalCallbackProp<boolean, R, M, C>(props.column.pdfCellContentsVisible, callbackParams) === false
         }
       >
         {props.isHeader !== true && !isNil(props.column.pdfCellRenderer) ? (
@@ -156,13 +182,13 @@ const Cell = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
           <Text
             className={classNames(
               "cell-text",
-              evaluateClassName<R, M, V>(
+              evaluateClassName<R, M, C>(
                 props.isHeader === true
                   ? props.column.pdfHeaderCellProps?.textClassName
                   : props.column.pdfCellProps?.textClassName,
                 callbackParams
               ),
-              evaluateClassName<R, M, V>(props.textClassName, callbackParams)
+              evaluateClassName<R, M, C>(props.textClassName, callbackParams)
             )}
             style={{
               /* NOTE: We do not differentiate between the text style and
@@ -176,14 +202,14 @@ const Cell = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
                     header: props.isHeader || false,
                     pdf: true
                   })
-                : ({} as Style)),
-              ...evaluateOptionalCallbackProp<R, M, V, Style>(
+                : ({} as Pdf.Style)),
+              ...evaluateOptionalCallbackProp<Pdf.Style, R, M, C>(
                 props.isHeader === true
                   ? props.column.pdfHeaderCellProps?.textStyle
                   : props.column.pdfCellProps?.textStyle,
                 callbackParams
               ),
-              ...evaluateCellStyle<R, M, V>(props.textStyle, callbackParams)
+              ...evaluateCellStyle<R, M, C>(props.textStyle, callbackParams)
             }}
           >
             {props.value || ""}

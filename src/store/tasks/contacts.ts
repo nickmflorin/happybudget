@@ -11,7 +11,7 @@ type M = Model.Contact;
 type P = Http.ContactPayload;
 
 export const createTaskSet = (config: { readonly authenticated: boolean }): Redux.ModelListResponseTaskMap => {
-  function* request(action: Redux.Action<null>): SagaIterator {
+  function* request(): SagaIterator {
     yield put(actions.loadingContactsAction(true));
     try {
       const response: Http.ListResponse<M> = yield api.request(api.getContacts, {});
@@ -20,7 +20,8 @@ export const createTaskSet = (config: { readonly authenticated: boolean }): Redu
         yield put(actions.authenticated.responseFilteredContactsAction(response));
       }
     } catch (e: unknown) {
-      notifications.requestError(e as Error, { message: "There was an error retrieving the contacts." });
+      // TODO: We need to build in banner notifications for this event.
+      notifications.requestError(e as Error);
       yield put(actions.responseContactsAction({ count: 0, data: [] }));
       if (config.authenticated) {
         yield put(actions.authenticated.responseFilteredContactsAction({ count: 0, data: [] }));
@@ -33,16 +34,17 @@ export const createTaskSet = (config: { readonly authenticated: boolean }): Redu
 };
 
 export const createFilteredTaskSet = (): Redux.ModelListResponseTaskMap => {
-  function* request(action: Redux.Action<null>): SagaIterator {
+  function* request(): SagaIterator {
     yield put(actions.authenticated.loadingFilteredContactsAction(true));
-    let query: Http.ListQuery = yield select((state: Application.Authenticated.Store) => ({
+    const query: Http.ListQuery = yield select((state: Application.AuthenticatedStore) => ({
       search: state.filteredContacts.search
     }));
     try {
       const response: Http.ListResponse<M> = yield api.request(api.getContacts, query);
       yield put(actions.authenticated.responseFilteredContactsAction(response));
     } catch (e: unknown) {
-      notifications.requestError(e as Error, { message: "There was an error retrieving the contacts." });
+      // TODO: We need to build in banner notifications for this event.
+      notifications.requestError(e as Error);
       yield put(actions.authenticated.responseFilteredContactsAction({ count: 0, data: [] }));
     } finally {
       yield put(actions.authenticated.loadingFilteredContactsAction(false));
@@ -58,16 +60,17 @@ export const createTableTaskSet = (
     Tables.ContactTableContext,
     Redux.AuthenticatedTableActionMap<R, M, Tables.ContactTableContext>
   > & {
-    readonly selectStore: (state: Application.Authenticated.Store) => Tables.ContactTableStore;
+    readonly selectStore: (state: Application.AuthenticatedStore) => Tables.ContactTableStore;
   }
 ): Redux.TableTaskMap<R, M, Tables.ContactTableContext> => {
-  function* tableRequest(action: Redux.Action): SagaIterator {
+  function* tableRequest(): SagaIterator {
     yield put(config.actions.loading(true));
     try {
       const response: Http.ListResponse<M> = yield api.request(api.getContacts, {});
       yield put(config.actions.response({ models: response.data }));
     } catch (e: unknown) {
-      notifications.requestError(e as Error, { message: "There was an error retrieving the contacts." });
+      notifications.requestError(e as Error);
+      config.table.notify({ message: "There was an error retrieving the contacts.", level: "error" });
       yield put(config.actions.response({ models: [] }));
     } finally {
       yield put(config.actions.loading(false));
@@ -99,7 +102,8 @@ export const createTableTaskSet = (
     try {
       yield api.request(api.bulkUpdateContacts, requestPayload);
     } catch (err: unknown) {
-      notifications.requestError(err as Error, { message: errorMessage });
+      notifications.requestError(err as Error);
+      config.table.notify({ message: errorMessage, level: "error" });
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -110,7 +114,8 @@ export const createTableTaskSet = (
     try {
       yield api.request(api.bulkDeleteContacts, ids);
     } catch (err: unknown) {
-      notifications.requestError(err as Error, { message: errorMessage });
+      notifications.requestError(err as Error);
+      config.table.notify({ message: errorMessage, level: "error" });
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -121,7 +126,7 @@ export const createTableTaskSet = (
     try {
       const response: M = yield api.request(api.createContact, {
         previous: e.payload.previous,
-        ...tabling.http.postPayload(e.payload.data, config.table.getColumns())
+        ...tabling.http.postPayload<R, M, P>(e.payload.data, config.table.getColumns())
       });
       yield put(
         config.actions.tableChanged(
@@ -133,16 +138,14 @@ export const createTableTaskSet = (
         )
       );
     } catch (err: unknown) {
-      notifications.requestError(err as Error, { message: "There was an error adding the row." });
+      notifications.requestError(err as Error);
+      config.table.notify({ message: "There was an error adding the rows.", level: "error" });
     } finally {
       yield put(config.actions.saving(false));
     }
   }
 
-  function* handleRowPositionChangedEvent(
-    e: Table.RowPositionChangedEvent,
-    context: Tables.ContactTableContext
-  ): SagaIterator {
+  function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent): SagaIterator {
     yield put(config.actions.saving(true));
     try {
       const response: M = yield api.request(api.updateContact, e.payload.id, {
@@ -158,17 +161,18 @@ export const createTableTaskSet = (
         )
       );
     } catch (err: unknown) {
-      notifications.requestError(err as Error, { message: "There was an error moving the row." });
+      notifications.requestError(err as Error);
+      config.table.notify({ message: "There was an error moving the rows.", level: "error" });
     } finally {
       yield put(config.actions.saving(false));
     }
   }
 
-  function* handleRowAddEvent(e: Table.RowAddEvent<R>, context: Tables.ContactTableContext): SagaIterator {
+  function* handleRowAddEvent(e: Table.RowAddEvent<R>): SagaIterator {
     yield fork(bulkCreateTask, e, "There was an error creating the rows.");
   }
 
-  function* handleRowDeleteEvent(e: Table.RowDeleteEvent, context: Tables.ContactTableContext): SagaIterator {
+  function* handleRowDeleteEvent(e: Table.RowDeleteEvent): SagaIterator {
     const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
     const modelRowIds = filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[];
     if (modelRowIds.length !== 0) {
@@ -176,13 +180,10 @@ export const createTableTaskSet = (
     }
   }
 
-  function* handleDataChangeEvent(
-    e: Table.DataChangeEvent<R, Table.ModelRowId>,
-    context: Tables.ContactTableContext
-  ): SagaIterator {
+  function* handleDataChangeEvent(e: Table.DataChangeEvent<R, Table.ModelRowId>): SagaIterator {
     const merged = tabling.events.consolidateRowChanges(e.payload);
     if (merged.length !== 0) {
-      const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.table.getColumns());
+      const requestPayload = tabling.http.createBulkUpdatePayload<R, M, P>(merged, config.table.getColumns());
       if (requestPayload.data.length !== 0) {
         yield fork(bulkUpdateTask, e, requestPayload, "There was an error updating the rows.");
       }
@@ -199,7 +200,12 @@ export const createTableTaskSet = (
       /* It is safe to assume that the ID of the row for which data is being
 			   changed will always be a ModelRowId - but we have to force coerce that
 				 here. */
-      dataChange: handleDataChangeEvent as Redux.TableEventTask<Table.DataChangeEvent<R>>
+      dataChange: handleDataChangeEvent as Redux.TableEventTask<
+        Table.DataChangeEvent<R>,
+        R,
+        M,
+        Tables.ContactTableContext
+      >
     })
   };
 };

@@ -1,7 +1,10 @@
-import { isNil, filter, map } from "lodash";
-import { util, redux } from "lib";
+import { isNil, filter, map, find } from "lodash";
+import { redux, notifications } from "lib";
 
-export const isClearOnAction = <T>(clearOn: Redux.ClearOn<T>[], action: Redux.Action<T>): boolean => {
+export const isClearOnAction = <T extends Redux.ActionPayload, C extends Table.Context = Table.Context>(
+  clearOn: Redux.ClearOn<T, C>[],
+  action: Redux.Action<T>
+): boolean => {
   for (let i = 0; i < clearOn.length; i++) {
     const clearer = clearOn[i];
     if (redux.typeguards.isClearOnDetail(clearer)) {
@@ -15,42 +18,42 @@ export const isClearOnAction = <T>(clearOn: Redux.ClearOn<T>[], action: Redux.Ac
   return false;
 };
 
-export const findModelInData = <M extends Model.Model, A extends Array<any> = M[]>(
+export const findModelInData = <M extends Model.Model>(
   action: Redux.Action,
-  data: A,
+  data: M[],
   id: Redux.ModelLookup<M>,
   options: Redux.FindModelOptions = { name: "Model", warnIfMissing: true }
 ): M | null => {
   const predicate = typeof id === "number" || typeof id === "string" ? (m: M) => m.id === id : id;
-  const m = util.findWithDistributedTypes<M, A>(data, predicate);
+  const m = find(data, predicate);
   if (!isNil(m)) {
     return m;
   } else {
     if (options.warnIfMissing !== false) {
-      let warningData: any = {
+      const warningData = {
         action: action,
         reason: `${options.name || "Model"} does not exist in state when it is expected to.`,
         ids: JSON.stringify(map(data, (mi: M) => mi.id)),
         model: options.name
       };
       if (typeof id === "function") {
-        redux.util.warnInconsistentState({
+        notifications.inconsistentStateError({
           ...warningData,
           id: "provided as callback",
           evaluatedCallback: JSON.stringify(map(data, (mi: M) => id(mi))),
           model: options.name
         });
       } else {
-        redux.util.warnInconsistentState({ ...warningData, id });
+        notifications.inconsistentStateError({ ...warningData, id });
       }
     }
     return null;
   }
 };
 
-export const findModelsInData = <M extends Model.Model, A extends Array<any> = M[]>(
+export const findModelsInData = <M extends Model.Model>(
   action: Redux.Action,
-  data: A,
+  data: M[],
   ids: Redux.ModelLookup<M>[],
   options: Redux.FindModelOptions = { name: "Model", warnIfMissing: true }
 ): M[] =>
@@ -59,38 +62,19 @@ export const findModelsInData = <M extends Model.Model, A extends Array<any> = M
     (m: M | null) => m !== null
   ) as M[];
 
-export const modelFromState = <M extends Model.Model, A extends Array<any> = M[]>(
-  /* eslint-disable indent */
+export const modelFromState = <M extends Model.Model>(
   action: Redux.Action,
-  data: A,
+  data: M[],
   id: Redux.ModelLookup<M> | M,
   options: Redux.FindModelOptions = { name: "Model", warnIfMissing: true }
 ): M | null => {
   if (typeof id === "number" || typeof id === "string" || typeof id === "function") {
-    return findModelInData<M, A>(action, data, id, options);
+    return findModelInData<M>(action, data, id, options);
   }
   return id;
 };
 
-/**
- * Function to sequentially apply a series of simple reducers of form
- * (state, action) => newState into a larger reducer.
- *
- * This is useful in allowing users to cleanly write reducers for specific
- * action types without needing a giant switch statement.
- */
-export const composeReducers = (initialState: any, ...args: any) => {
-  const withIdentity: Redux.Reducer<any>[] = [(x: any) => x].concat(args);
-  const composed = (prevState: any = initialState, action: Redux.Action) =>
-    withIdentity.reduce(
-      (state: any, reducer: Redux.Reducer<any>) => Object.assign(initialState, state, reducer(prevState, action)),
-      {}
-    );
-  return composed;
-};
-
 export const identityReducer =
   <S>(initialState: S): Redux.Reducer<S> =>
-  /* eslint-disable indent */
-  (st: S = initialState, action: Redux.Action) =>
+  (st: S = initialState) =>
     st;

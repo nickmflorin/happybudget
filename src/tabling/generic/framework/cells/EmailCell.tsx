@@ -2,7 +2,6 @@ import React from "react";
 import { isNil } from "lodash";
 import LinkCell, { LinkCellProps } from "./LinkCell";
 
-/* eslint-disable indent */
 const EmailCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,

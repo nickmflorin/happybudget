@@ -7,26 +7,19 @@ import Table from "./Table";
 
 type M = Model.PdfAccount;
 type R = Tables.AccountRowData;
+type C = Table.Column<R, M>;
 
 type AccountsTableProps = {
-  readonly data: Model.PdfAccount[];
+  readonly data: M[];
   readonly groups: Model.Group[];
   readonly markups: Model.Markup[];
-  readonly columns: Table.PdfColumn<R, M>[];
+  readonly columns: C[];
   readonly options: PdfBudgetTable.Options;
 };
 
-const AccountsTable = ({
-  /* eslint-disable indent */
-  columns,
-  markups,
-  data,
-  groups,
-  options
-}: AccountsTableProps): JSX.Element => {
+const AccountsTable = ({ columns, markups, data, groups, options }: AccountsTableProps): JSX.Element => {
   const accountColumnIsVisible = useMemo(
-    () => (c: Table.PdfColumn<Tables.AccountRowData, Model.PdfAccount>) =>
-      includes(options.columns, tabling.columns.normalizedField<Tables.AccountRowData, Model.PdfAccount>(c)),
+    () => (c: C) => includes(options.columns, tabling.columns.normalizedField<R, M>(c)),
     [options.columns]
   );
 
@@ -42,19 +35,19 @@ const AccountsTable = ({
           if (tabling.typeguards.isModelRow(row) || tabling.typeguards.isMarkupRow(row)) {
             return [
               ...rws,
-              <BodyRow columnIsVisible={accountColumnIsVisible} columns={columns} row={row} data={rowData} />
+              <BodyRow<R, M, C> columnIsVisible={accountColumnIsVisible} columns={columns} row={row} data={rowData} />
             ];
           } else if (tabling.typeguards.isGroupRow(row)) {
             return [
               ...rws,
-              <GroupRow row={row} columnIsVisible={accountColumnIsVisible} columns={columns} data={rowData} />
+              <GroupRow<R, M, C> row={row} columnIsVisible={accountColumnIsVisible} columns={columns} data={rowData} />
             ];
           }
           return rws;
         },
-        [<HeaderRow columnIsVisible={accountColumnIsVisible} columns={columns} />]
+        [<HeaderRow<R, M, C> columnIsVisible={accountColumnIsVisible} columns={columns} />]
       ),
-      <FooterRow columnIsVisible={accountColumnIsVisible} columns={columns} data={rowData} />
+      <FooterRow<R, M, C> columnIsVisible={accountColumnIsVisible} columns={columns} data={rowData} />
     ];
   });
 

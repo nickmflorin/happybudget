@@ -18,7 +18,6 @@ interface CreateMarkupModalProps<
 
 type MarkupFormValues = Omit<Http.MarkupPayload, "rate"> & { readonly rate: string };
 
-/* eslint-disable indent */
 const CreateMarkupModal = <
   M extends Model.SimpleAccount | Model.SimpleSubAccount,
   B extends Model.Budget | Model.Template,
@@ -63,7 +62,7 @@ const CreateMarkupModal = <
         api.createTableMarkup(id, parentType, payload, options)
       }
       interceptPayload={(p: MarkupFormValues) => {
-        let { rate, children: markupChildren, ...payload } = p;
+        const { rate, children: markupChildren, ...payload } = p;
         let mutated = { ...payload } as Http.MarkupPayload;
         // FLAT Markups do not have any children.
         if (mutated.unit === budgeting.models.MarkupUnitModels.PERCENT.id) {

@@ -1,6 +1,18 @@
 import * as api from "api";
 
-/* eslint-disable indent */
+type TableChildrenService<M extends Model.HttpModel> = (
+  id: number,
+  q?: Http.ListQuery,
+  o?: Http.RequestOptions
+) => Promise<Http.ListResponse<M>>;
+
+type ParentTypeModelMap = {
+  account: Model.SubAccount;
+  subaccount: Model.SubAccount;
+  budget: Model.Account;
+  template: Model.Account;
+};
+
 export const getTableChildren = <
   M extends Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount
 >(
@@ -10,19 +22,14 @@ export const getTableChildren = <
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<M>> => {
   const serviceMap: {
-    /* eslint-disable-next-line no-unused-vars */
-    [key in Model.ParentType | "template"]: (
-      id: number,
-      q?: Http.ListQuery,
-      o?: Http.RequestOptions
-    ) => Promise<Http.ListResponse<any>>;
+    [key in Model.ParentType | "template"]: TableChildrenService<ParentTypeModelMap[key]>;
   } = {
     budget: api.getBudgetAccounts,
     template: api.getTemplateAccounts,
     account: api.getAccountSubAccounts,
     subaccount: api.getSubAccountSubAccounts
   };
-  return serviceMap[parentType](parentId, query, options);
+  return serviceMap[parentType](parentId, query, options) as Promise<Http.ListResponse<M>>;
 };
 
 export const createTableMarkup = <
@@ -40,7 +47,6 @@ export const createTableMarkup = <
     | Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount>;
 
   const serviceMap: {
-    /* eslint-disable-next-line no-unused-vars */
     [key in Model.ParentType | "template"]: (
       id: number,
       p: Http.MarkupPayload,
@@ -62,7 +68,6 @@ export const getTableGroups = (
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.Group>> => {
   const serviceMap: {
-    /* eslint-disable-next-line no-unused-vars */
     [key in Model.ParentType | "template"]: (
       id: number,
       q?: Http.ListQuery,
@@ -84,7 +89,6 @@ export const createTableGroup = (
   options: Http.RequestOptions = {}
 ): Promise<Model.Group> => {
   const serviceMap: {
-    /* eslint-disable-next-line no-unused-vars */
     [key in Model.ParentType | "template"]: (
       id: number,
       p: Http.GroupPayload,

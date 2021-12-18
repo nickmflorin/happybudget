@@ -15,7 +15,9 @@ import { createAuthenticatedInitialState, createUnauthenticatedInitialState } fr
 
 export const history = createBrowserHistory();
 
-const authenticatedActionMiddleware: Middleware<{}, Application.Store> = api => next => action => {
+type MD = Middleware<Record<string, unknown>, Application.Store>;
+
+const authenticatedActionMiddleware: MD = api => next => action => {
   const state = api.getState();
   if (isAuthenticatedStore(state)) {
     return next({ ...action, isAuthenticated: true });
@@ -26,7 +28,7 @@ const authenticatedActionMiddleware: Middleware<{}, Application.Store> = api => 
 const configureGenericStore = <S extends Application.Store>(
   initialState: S,
   staticReducers: Redux.ReducersMapObject<S>,
-  rootSaga: Saga<any[]>
+  rootSaga: Saga
 ): Redux.Store<S> => {
   /* Create the redux-saga middleware that allows the sagas to run as side-effects
      in the application.  If in a production environment, instruct the middleware
@@ -37,10 +39,11 @@ const configureGenericStore = <S extends Application.Store>(
   }
   const sagaMiddleware = createSagaMiddleware(sagaMiddlewareOptions);
 
-  let baseMiddleware: Middleware<{}, Application.Store>[] = [sagaMiddleware, authenticatedActionMiddleware];
+  let baseMiddleware: MD[] = [sagaMiddleware, authenticatedActionMiddleware];
   baseMiddleware =
     process.env.NODE_ENV !== "production"
-      ? [require("redux-immutable-state-invariant").default(), ...baseMiddleware]
+      ? /* eslint-disable-next-line @typescript-eslint/no-var-requires */
+        [require("redux-immutable-state-invariant").default(), ...baseMiddleware]
       : baseMiddleware;
 
   const reducerManager = createReducerManager<S>(staticReducers, initialState);
@@ -54,7 +57,11 @@ const configureGenericStore = <S extends Application.Store>(
 
   const store: Omit<Redux.Store<S>, "injectSaga" | "ejectSaga"> = {
     reducerManager,
-    ...createStore<S, Redux.Action, any, any>(reducerManager.reduce, initialState as PreloadedState<S>, enhancers)
+    ...createStore<S, Redux.Action, typeof composeEnhancers, never>(
+      reducerManager.reduce,
+      initialState as PreloadedState<S>,
+      enhancers
+    )
   };
 
   /* Start the application saga and establish the saga injector.  We must do this
@@ -64,16 +71,20 @@ const configureGenericStore = <S extends Application.Store>(
   return { ...store, injectSaga, ejectSaga, hasSaga };
 };
 
-export const configureAuthenticatedStore = (user: Model.User): Redux.Store<Application.Authenticated.Store> => {
+export const configureAuthenticatedStore = (user: Model.User): Redux.Store<Application.AuthenticatedStore> => {
   const initialState = createAuthenticatedInitialState(GlobalReduxConfig, user);
   const applicationReducers = createStaticAuthenticatedReducers(GlobalReduxConfig, user, history);
   const applicationSaga = createAuthenticatedRootSaga(GlobalReduxConfig);
-  return configureGenericStore<Application.Authenticated.Store>(initialState, applicationReducers, applicationSaga);
+  return configureGenericStore<Application.AuthenticatedStore>(
+    initialState,
+    applicationReducers as Redux.ReducersMapObject<Application.AuthenticatedStore>,
+    applicationSaga
+  );
 };
 
-export const configureUnauthenticatedStore = (): Redux.Store<Application.Unauthenticated.Store> => {
+export const configureUnauthenticatedStore = (): Redux.Store<Application.UnauthenticatedStore> => {
   const initialState = createUnauthenticatedInitialState(GlobalReduxConfig);
-  const applicationReducers = createStaticUnauthenticatedReducers(GlobalReduxConfig, history);
+  const applicationReducers = createStaticUnauthenticatedReducers(GlobalReduxConfig);
   const applicationSaga = createUnauthenticatedRootSaga(GlobalReduxConfig);
-  return configureGenericStore<Application.Unauthenticated.Store>(initialState, applicationReducers, applicationSaga);
+  return configureGenericStore<Application.UnauthenticatedStore>(initialState, applicationReducers, applicationSaga);
 };

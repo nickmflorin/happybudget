@@ -8,7 +8,6 @@ type InjectMarkupsAndGroupsConfig<R extends Table.RowData> = {
   readonly groups?: Table.GroupRow<R>[];
 };
 
-/* eslint-disable indent */
 export const injectMarkupsAndGroups = <R extends Table.RowData>(
   config: InjectMarkupsAndGroupsConfig<R>
 ): (Table.DataRow<R> | Table.MarkupRow<R> | Table.GroupRow<R>)[] => {
@@ -103,7 +102,7 @@ export const createTableRows = <R extends Table.RowData, M extends Model.RowHttp
   return orderTableRows([
     ...reduce(
       config.response.models,
-      (curr: Table.ModelRow<R>[], m: M, index: number) => [...curr, modelRowManager.create({ model: m })],
+      (curr: Table.ModelRow<R>[], m: M) => [...curr, modelRowManager.create({ model: m })],
       []
     ),
     ...reduce(

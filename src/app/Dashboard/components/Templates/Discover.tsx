@@ -21,15 +21,14 @@ import { useLoggedInUser } from "store/hooks";
 
 import { actions } from "../../store";
 
-const selectTemplates = (state: Application.Authenticated.Store) => state.dashboard.community.data;
-const selectResponseReceived = (state: Application.Authenticated.Store) =>
-  state.dashboard.community.responseWasReceived;
-const selectLoading = (state: Application.Authenticated.Store) => state.dashboard.community.loading;
-const selectPage = (state: Application.Authenticated.Store) => state.dashboard.community.page;
-const selectPageSize = (state: Application.Authenticated.Store) => state.dashboard.community.pageSize;
-const selectCount = (state: Application.Authenticated.Store) => state.dashboard.community.count;
-const selectSearch = (state: Application.Authenticated.Store) => state.dashboard.community.search;
-const selectOrdering = (state: Application.Authenticated.Store) => state.dashboard.community.ordering;
+const selectTemplates = (state: Application.AuthenticatedStore) => state.dashboard.community.data;
+const selectResponseReceived = (state: Application.AuthenticatedStore) => state.dashboard.community.responseWasReceived;
+const selectLoading = (state: Application.AuthenticatedStore) => state.dashboard.community.loading;
+const selectPage = (state: Application.AuthenticatedStore) => state.dashboard.community.page;
+const selectPageSize = (state: Application.AuthenticatedStore) => state.dashboard.community.pageSize;
+const selectCount = (state: Application.AuthenticatedStore) => state.dashboard.community.count;
+const selectSearch = (state: Application.AuthenticatedStore) => state.dashboard.community.search;
+const selectOrdering = (state: Application.AuthenticatedStore) => state.dashboard.community.ordering;
 
 interface DiscoverProps {
   readonly setTemplateToDerive: (template: number) => void;
@@ -72,7 +71,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
             placeholder={"Search Templates..."}
             value={search}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              dispatch(actions.setCommunityTemplatesSearchAction(event.target.value))
+              dispatch(actions.setCommunityTemplatesSearchAction(event.target.value, {}))
             }
           />,
           <PrimaryButtonIconToggle

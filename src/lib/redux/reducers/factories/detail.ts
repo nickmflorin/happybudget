@@ -14,16 +14,12 @@ import { createObjectReducerFromTransformers } from "./util";
  */
 export const createDetailResponseReducer = <
   M extends Model.HttpModel,
-  A extends Partial<Redux.ModelDetailResponseActionMap<M>> = Redux.ModelDetailResponseActionMap<M>,
   S extends Redux.ModelDetailResponseStore<M> = Redux.ModelDetailResponseStore<M>
 >(
-  /* eslint-disable indent */
-  config: Redux.ReducerConfig<S, A>,
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  subReducers?: { [Property in keyof Partial<S>]: Redux.Reducer<any> } | null | {}
+  config: Redux.ReducerConfig<S, Redux.ModelDetailResponseActionMap<M>>
 ): Redux.Reducer<S> => {
   const transformers: Redux.Transformers<S, Redux.ModelDetailResponseActionMap<M>> = {
-    response: (st: S = config.initialState, action: Redux.Action<M>) => ({
+    response: (st: S = config.initialState, action: Redux.Action<M | null>) => ({
       ...st,
       data: action.payload
     }),
@@ -33,5 +29,5 @@ export const createDetailResponseReducer = <
       data: { ...st.data, ...action.payload.data }
     })
   };
-  return createObjectReducerFromTransformers<S, A>(config, transformers, subReducers);
+  return createObjectReducerFromTransformers<S, Redux.ModelDetailResponseActionMap<M>>(config, transformers);
 };

@@ -5,7 +5,7 @@ import * as api from "api";
 const EMAIL_CONFIRMATION_ERROR_MESSAGE = "There was an error verifying your email.";
 const PASSWORD_RECOVERY_ERROR_MESSAGE = "There was an error resetting your password.";
 
-/* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const TOKEN_NOTIFICATION_MESSAGES: { [key in Http.TokenType]: string } = {
   "email-confirmation": EMAIL_CONFIRMATION_ERROR_MESSAGE,
   "password-recovery": PASSWORD_RECOVERY_ERROR_MESSAGE
@@ -34,12 +34,12 @@ interface TokenNotificationProps {
 }
 
 export const TokenNotification = (props: TokenNotificationProps): UINotification => {
-  let detail = TOKEN_NOTIFICATION_DETAILS[props.code];
+  const detail = TOKEN_NOTIFICATION_DETAILS[props.code];
   return {
     level: TOKEN_NOTIFICATION_TYPES[props.code],
     detail: typeof detail === "function" ? detail(props.userId) : detail,
     message: TOKEN_NOTIFICATION_MESSAGES[props.tokenType],
-    /* eslint-disable indent */
+
     includeLink:
       !isNil(props.userId) && props.tokenType === "email-confirmation"
         ? ({ setLoading }) => ({
@@ -69,7 +69,7 @@ interface UnverifiedEmailNotificationProps {
 export const UnverifiedEmailNotification = (props: UnverifiedEmailNotificationProps): UINotification => ({
   level: "warning",
   message: props.message,
-  /* eslint-disable indent */
+
   detail: !isNil(props.detail)
     ? props.detail
     : !isNil(props.userId)

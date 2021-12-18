@@ -25,20 +25,14 @@ type WithActual<R extends Tables.BudgetRowData> =
 
 type WithEstimation<R extends Tables.BudgetRowData> = WithActual<R> | Model.Template;
 
-/* eslint-disable indent */
 const isGroupObj = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(
   obj: WithEstimation<R> | GroupObj<R>
 ): obj is GroupObj<R> =>
   (tabling.typeguards.isRow(obj) && tabling.typeguards.isGroupRow(obj)) ||
   (!tabling.typeguards.isRow(obj) && typeguards.isGroup(obj));
 
-export const nominalValue = <
-  R extends Tables.BudgetRowData = Tables.BudgetRowData,
-  C extends GroupChild<R> = GroupChild<R>
->(
-  obj: WithEstimation<R>,
-  children?: C[]
-): number => (tabling.typeguards.isRow(obj) ? obj.data.nominal_value : obj.nominal_value);
+export const nominalValue = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(obj: WithEstimation<R>): number =>
+  tabling.typeguards.isRow(obj) ? obj.data.nominal_value : obj.nominal_value;
 
 export const accumulatedMarkupContribution = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(
   obj: WithEstimation<R>
@@ -48,7 +42,6 @@ export const accumulatedFringeContribution = <R extends Tables.BudgetRowData = T
   obj: WithEstimation<R>
 ) => (tabling.typeguards.isRow(obj) ? obj.data.accumulated_fringe_contribution : obj.accumulated_fringe_contribution);
 
-/* eslint-disable indent */
 export const fringeContribution = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(obj: WithEstimation<R>) =>
   // Only SubAccount(s) have a Fringe Contribution.
   tabling.typeguards.isRow(obj) && typeguards.isSubAccountRow(obj)
@@ -140,7 +133,10 @@ export const contributionFromMarkups = <R extends Table.RowData = Tables.BudgetR
   );
 };
 
-export const contributionFromFringes = (value: number, fringes: (Model.Fringe | Tables.FringeRow)[]): number => {
+export const contributionFromFringes = (
+  value: number,
+  fringes: (Model.Fringe | Table.ModelRow<Tables.FringeRowData>)[]
+): number => {
   return reduce(
     fringes,
     (curr: number, fringe: Model.Fringe | Tables.FringeRow): number => {

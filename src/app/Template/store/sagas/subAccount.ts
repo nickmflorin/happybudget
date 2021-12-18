@@ -18,7 +18,8 @@ function* getSubAccount(action: Redux.Action<number>): SagaIterator {
     const response: Model.SubAccount = yield api.request(api.getSubAccount, action.payload);
     yield put(actions.responseSubAccountAction(response));
   } catch (e: unknown) {
-    notifications.requestError(e as Error, { message: "There was an error retrieving the sub account." });
+    // TODO: We need to build in banner notifications for this event.
+    notifications.requestError(e as Error);
     yield put(actions.responseSubAccountAction(null));
   }
 }
@@ -48,7 +49,7 @@ export const createTableSaga = (table: Table.TableInstance<Tables.SubAccountRowD
     actions: { ...ActionMap, request: actions.requestAction },
     tasks: budgeting.tasks.subaccounts.createTableTaskSet<Model.SubAccount, Model.Template>({
       table,
-      selectStore: (state: Application.Authenticated.Store) => state.template.subaccount.table,
+      selectStore: (state: Application.AuthenticatedStore) => state.template.subaccount.table,
       actions: ActionMap,
       services: {
         create: api.createSubAccountSubAccount,

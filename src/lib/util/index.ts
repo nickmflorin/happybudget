@@ -1,4 +1,4 @@
-import { forEach, findIndex, find, isNil, map, filter, reduce } from "lodash";
+import { forEach, findIndex, find, isNil, reduce } from "lodash";
 import { sumChars } from "./string";
 
 export * as colors from "./colors";
@@ -6,53 +6,15 @@ export * as dates from "./dates";
 export * as events from "./events";
 export * as files from "./files";
 export * as formatters from "./formatters";
-export * as forms from "./forms";
 export * as html from "./html";
 export * as urls from "./urls";
 export * as validate from "./validate";
 
 export * from "./string";
 
-export const setToArray = <T>(a: Set<T>): T[] => {
-  const arr: T[] = [];
-  a.forEach((v: T) => arr.push(v));
-  return arr;
-};
-
-export const setsEqual = <T>(a: Set<T>, b: Set<T>): boolean => {
-  return a.size === b.size && setToArray(a).every(value => b.has(value));
-};
-
-export const differenceBetweenTwoSets = <T>(a: Set<T>, b: Set<T>): Set<T> => {
-  const difference: T[] = [];
-  a.forEach((v: T) => {
-    if (!b.has(v)) {
-      difference.push(v);
-    }
-  });
-  b.forEach((v: T) => {
-    if (!a.has(v)) {
-      difference.push(v);
-    }
-  });
-  return new Set(difference);
-};
-
-export const destruct = (obj: { [key: string]: any }, ...keys: string[]) =>
-  keys.reduce((a, c) => ({ ...a, [c]: obj[c] }), {});
-
-export const removeFromArray = (items: any[], key: any, value: any) => {
-  const newItems = [...items];
-  const index = findIndex(newItems, [key, value]);
-  if (index >= 0) {
-    newItems.splice(index, 1);
-  }
-  return newItems;
-};
-
-export const conditionalCheckObj = <T extends { [key: string]: any }>(
+export const conditionalCheckObj = <T extends Record<string, unknown>>(
   obj: T,
-  check: { [key: string]: any }
+  check: Record<string, unknown>
 ): boolean => {
   let allEqual = true;
   Object.keys(check).forEach((k: string) => {
@@ -64,46 +26,9 @@ export const conditionalCheckObj = <T extends { [key: string]: any }>(
   return allEqual;
 };
 
-export const findWithDistributedTypes = <M, A extends Array<any> = Array<M>>(
-  array: A,
-  predicate: ((i: M) => boolean) | { [key: string]: any }
-): M | null => {
-  for (let i = 0; i < array.length; i++) {
-    const m = array[i] as M;
-    if (typeof predicate === "function") {
-      if (predicate(m)) {
-        return m;
-      }
-    } else {
-      if (conditionalCheckObj(m, predicate)) {
-        return m;
-      }
-    }
-  }
-  return null;
-};
-
-/* TODO: It would be nice if we could figure out a pure TS solution for this.
-   The problem is that sometimes, when we call replaceInArray with a union,
-   we don't want it to be distributed.
-   replaceInArray<Cat | Dog> => (Cat | Dog) != Cat[] | Dog[] */
-export const replaceInArrayDistributedTypes = <M, A extends Array<any> = Array<M>>(
-  array: A,
-  predicate: ((i: M) => boolean) | { [key: string]: any },
-  newValue: M
-): A => {
-  const currentValue = findWithDistributedTypes<M, A>(array, predicate) as M | null;
-  const newArray = [...array];
-  if (!isNil(currentValue)) {
-    const index = findIndex<M>(array, currentValue);
-    newArray[index] = newValue;
-  }
-  return newArray as A;
-};
-
 export const replaceInArray = <T>(
   array: T[],
-  predicate: ((i: T) => boolean) | { [key: string]: any },
+  predicate: ((i: T) => boolean) | Record<string, unknown>,
   newValue: T
 ): T[] => {
   const currentValue = find(array, predicate) as T | undefined;
@@ -115,9 +40,9 @@ export const replaceInArray = <T>(
   return newArray;
 };
 
-export const updateInArray = <T extends object>(
+export const updateInArray = <T extends Record<string, unknown>>(
   array: T[],
-  predicate: ((i: T) => boolean) | { [key: string]: any },
+  predicate: ((i: T) => boolean) | Record<string, unknown>,
   updateValue: Partial<T>
 ): T[] => {
   const currentValue = find(array, predicate) as T | undefined;
@@ -127,21 +52,13 @@ export const updateInArray = <T extends object>(
   return array;
 };
 
-export const selectRandom = <T = any>(array: T[]): T => {
+export const selectRandom = <T = Record<string, unknown>>(array: T[]): T => {
   return array[Math.floor(Math.random() * array.length)];
 };
 
-export const selectConsistent = <T = any>(array: T[], name: string): T => {
+export const selectConsistent = <T = Record<string, unknown>>(array: T[], name: string): T => {
   const index = sumChars(name) % array.length;
   return array[index];
-};
-
-export const filteredMap = <T = any, A = any>(
-  array: T[],
-  iteree: (element: T) => any,
-  filt: (element: A) => boolean = (element: A) => !isNil(element)
-): T[] => {
-  return filter(map(array, iteree), filt);
 };
 
 export const generateRandomNumericId = (): number => {
@@ -157,9 +74,9 @@ export const sumArray = (values: number[]): number => {
  * default object and merging the value if and only if the key did not exist
  * in the original object.
  */
-export const mergeWithDefaults = <T extends object>(obj: Partial<T>, defaults: T): T => {
+export const mergeWithDefaults = <T extends Record<string, unknown>>(obj: Partial<T>, defaults: T): T => {
   let merged = { ...obj };
-  forEach(defaults, (value: any, key: string) => {
+  forEach(defaults, (value: T[keyof T], key: string) => {
     if (!Object.prototype.hasOwnProperty.call(obj, key)) {
       merged = { ...merged, [key]: value };
     }
@@ -167,8 +84,7 @@ export const mergeWithDefaults = <T extends object>(obj: Partial<T>, defaults: T
   return merged as T;
 };
 
-/* prettier-ignore */
 export const getKeyValue =
-  <T extends object, U extends keyof T>(key: U) =>
-    (obj: T): T[U] =>
-      obj[key];
+  <T extends Record<string, unknown>, U extends keyof T>(key: U) =>
+  (obj: T): T[U] =>
+    obj[key];

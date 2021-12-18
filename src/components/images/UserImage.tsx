@@ -29,7 +29,7 @@ const UserImage = ({ user, src, ...props }: UserImageProps): JSX.Element => {
       src={imageSrc}
       onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
         console.error(`Error loading user image at src ${imageSrc}!`);
-        !isNil(props.onError) && props.onError(e);
+        props.onError?.(e);
       }}
     />
   ) : (

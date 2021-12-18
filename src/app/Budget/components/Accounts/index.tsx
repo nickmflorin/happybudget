@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { isNil } from "lodash";
 
-import { budgeting, hooks } from "lib";
+import { budgeting } from "lib";
 import { AccountsPage } from "app/Pages";
 import AccountsTable from "./AccountsTable";
 
@@ -25,4 +25,4 @@ const Accounts = ({ budget, budgetId, setPreviewModalVisible }: AccountsProps): 
   );
 };
 
-export default hooks.deepMemo(Accounts);
+export default React.memo(Accounts);

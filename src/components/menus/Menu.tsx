@@ -1,6 +1,6 @@
 import GenericMenu from "./Generic";
 
-const Menu = <S extends object = MenuItemSelectedState, M extends MenuItemModel<S> = MenuItemModel<S>>(
+const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M extends MenuItemModel<S> = MenuItemModel<S>>(
   props: IMenu<S, M>
 ): JSX.Element => <GenericMenu<S, M> {...props} />;
 

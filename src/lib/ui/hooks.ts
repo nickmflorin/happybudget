@@ -11,7 +11,9 @@ import { util, hooks, notifications } from "lib";
 export * from "./tsxHooks";
 
 export const InitialLayoutRef: ILayoutRef = {
-  setSidebarVisible: (visible: boolean) => {},
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+  setSidebarVisible: () => {},
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   toggleSidebar: () => {},
   sidebarVisible: true
 };
@@ -26,31 +28,35 @@ export const useLayoutIfNotDefined = (layout?: NonNullRef<ILayoutRef>): NonNullR
   return returnRef;
 };
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const InitialMenuRef: IMenuRef<any, any> = {
   getState: () => [],
   getSearchValue: () => "",
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   incrementFocusedIndex: () => {},
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   decrementFocusedIndex: () => {},
   getModelAtFocusedIndex: () => null,
-  performActionAtFocusedIndex: (e: KeyboardEvent) => {},
-  focus: (value: boolean) => {},
-  focusSearch: (value: boolean, search?: string) => {}
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+  performActionAtFocusedIndex: () => {},
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+  focus: () => {},
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+  focusSearch: () => {}
 };
 
 export const useMenu = <
-  S extends object = MenuItemSelectedState,
+  S extends Record<string, unknown> = MenuItemSelectedState,
   M extends MenuItemModel<S> = MenuItemModel<S>
 >(): NonNullRef<IMenuRef<S, M>> => {
   return useRef<IMenuRef<S, M>>(InitialMenuRef);
 };
 
 export const useMenuIfNotDefined = <
-  S extends object = MenuItemSelectedState,
+  S extends Record<string, unknown> = MenuItemSelectedState,
   M extends MenuItemModel<S> = MenuItemModel<S>
 >(
-  /* eslint-disable-next-line indent */
   menu?: NonNullRef<IMenuRef<S, M>>
-  /* eslint-disable-next-line indent */
 ): NonNullRef<IMenuRef<S, M>> => {
   const ref = useRef<IMenuRef<S, M>>(InitialMenuRef);
   const returnRef = useMemo(() => (!isNil(menu) ? menu : ref), [menu, ref.current]);
@@ -59,10 +65,12 @@ export const useMenuIfNotDefined = <
 
 export const InitialModalRef: ModalInstance = {
   notifications: [],
+  /* eslint-disable @typescript-eslint/no-empty-function */
   clearNotifications: () => {},
-  notify: (ns: SingleOrArray<UINotification | Error | Http.Error | string>, opts?: UINotificationOptions) => {},
-  setLoading: (v: boolean) => {},
-  handleRequestError: (e: Error, opts?: UINotificationOptions) => {},
+  /* eslint-disable @typescript-eslint/no-empty-function */
+  notify: () => {},
+  setLoading: () => {},
+  handleRequestError: () => {},
   loading: false
 };
 
@@ -70,18 +78,15 @@ export const useModal = (): NonNullRef<ModalInstance> => {
   return useRef<ModalInstance>(InitialModalRef);
 };
 
-export const useModalIfNotDefined = (
-  /* eslint-disable-next-line indent */
-  modal?: NonNullRef<ModalInstance>
-  /* eslint-disable-next-line indent */
-): NonNullRef<ModalInstance> => {
+export const useModalIfNotDefined = (modal?: NonNullRef<ModalInstance>): NonNullRef<ModalInstance> => {
   const ref = useRef<ModalInstance>(InitialModalRef);
   const returnRef = useMemo(() => (!isNil(modal) ? modal : ref), [modal, ref.current]);
   return returnRef;
 };
 
 export const InitialDropdownRef: IDropdownRef = {
-  setVisible: (visible: boolean) => {}
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+  setVisible: () => {}
 };
 
 export const useDropdown = (): NonNullRef<IDropdownRef> => {
@@ -102,7 +107,7 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
 
   const handleFieldErrors = useMemo(
     () => (errors: UIFieldNotification[]) => {
-      let fieldsWithErrors = reduce(
+      const fieldsWithErrors = reduce(
         errors,
         (curr: FieldWithErrors[], e: UIFieldNotification): FieldWithErrors[] => {
           const existing = find(curr, { name: e.field });
@@ -214,8 +219,8 @@ export const usePortalReference = (id: string | number) => {
    * - We want the ref to consistently point to the same DOM element and only
    *   ever run once.
    * @link
-   * 	https://reactjs.org/docs/hooks-faq.html#how-to-create-expensive-objects
-   * 		-lazily
+   * https://reactjs.org/docs/hooks-faq.html#how-to-create-expensive-objects
+   * -lazily
    */
   const getRootElem = () => {
     if (!rootElemRef.current) {

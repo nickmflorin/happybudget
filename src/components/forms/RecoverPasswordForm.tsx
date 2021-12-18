@@ -10,9 +10,9 @@ import { util } from "lib";
 
 import "./LandingForm.scss";
 
-export interface IRecoverPasswordFormValues {
+export type IRecoverPasswordFormValues = {
   readonly email: string;
-}
+};
 
 interface RecoverPasswordFormProps extends FormProps<IRecoverPasswordFormValues> {
   readonly loading: boolean;
@@ -36,7 +36,7 @@ const RecoverPasswordForm: React.FC<RecoverPasswordFormProps> = ({
           { required: true, message: "Please enter a valid email." },
           () => ({
             validateTrigger: "onSubmit",
-            validator(rule: any, value: string) {
+            validator(rule: unknown, value: string) {
               if (value !== "" && !util.validate.validateEmail(value)) {
                 return Promise.reject("The email does not meet our requirements.");
               }

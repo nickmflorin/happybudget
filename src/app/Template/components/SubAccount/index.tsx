@@ -10,7 +10,7 @@ import { SubAccountPage } from "app/Pages";
 import { actions } from "../../store";
 import SubAccountsTable from "./SubAccountsTable";
 
-const selectDetail = (state: Application.Authenticated.Store) => state.budget.subaccount.detail.data;
+const selectDetail = (state: Application.AuthenticatedStore) => state.budget.subaccount.detail.data;
 
 interface SubAccountProps {
   readonly budgetId: number;

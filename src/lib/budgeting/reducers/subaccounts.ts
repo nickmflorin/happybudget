@@ -7,7 +7,6 @@ type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
 type S = Tables.SubAccountTableStore;
 
-/* eslint-disable indent */
 const recalculateSubAccountRow = (
   st: S,
   action: Redux.Action,
@@ -24,12 +23,12 @@ const recalculateSubAccountRow = (
     tabling.typeguards.isPlaceholderRow<R>(row) || (!isNil(row.children) && row.children.length === 0);
 
   if (isValidToRecalculate) {
-    const fringes: Tables.FringeRow[] = redux.reducers.findModelsInData(
+    const fringes: Table.ModelRow<Tables.FringeRowData>[] = redux.reducers.findModelsInData(
       action,
       filter(st.fringes.data, (r: Table.BodyRow<Tables.FringeRowData>) => tabling.typeguards.isModelRow(r)),
       row.data.fringes,
       { name: "Fringe" }
-    );
+    ) as Table.ModelRow<Tables.FringeRowData>[];
     if (!isNil(row.data.quantity) && !isNil(row.data.rate)) {
       const multiplier = row.data.multiplier || 1.0;
       return {
@@ -52,11 +51,10 @@ const recalculateSubAccountRow = (
   };
 };
 
-export type SubAccountTableActionMap = Redux.TableActionMap<M> & {
+export type SubAccountTableActionMap = Redux.TableActionMap<M, Tables.SubAccountTableContext> & {
   readonly responseSubAccountUnits: Redux.ActionCreator<Http.ListResponse<Model.Tag>>;
 };
 
-/* eslint-disable indent */
 export const createUnauthenticatedSubAccountsTableReducer = (
   config: BudgetTableReducerConfig<R, M, S, Tables.SubAccountTableContext, SubAccountTableActionMap> & {
     readonly fringes: Redux.Reducer<Tables.FringeTableStore>;
@@ -64,7 +62,7 @@ export const createUnauthenticatedSubAccountsTableReducer = (
 ): Redux.Reducer<S> => {
   const generic = createBudgetTableReducer<R, M, S, Tables.SubAccountTableContext, SubAccountTableActionMap>(config);
 
-  return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
+  return (state: S | undefined = config.initialState, action: Redux.Action): S => {
     let newState = generic(state, action);
     newState = { ...newState, fringes: config.fringes(newState.fringes, action) };
 
@@ -105,7 +103,7 @@ export const createAuthenticatedSubAccountsTableReducer = (
     recalculateRow: recalculateSubAccountRow
   });
 
-  return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
+  return (state: S | undefined = config.initialState, action: Redux.Action): S => {
     let newState = generic(state, action);
     newState = { ...newState, fringes: config.fringes(newState.fringes, action) };
 

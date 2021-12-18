@@ -16,16 +16,14 @@ import ActualsPdf from "./ActualsPdf";
 
 type M = Model.Actual;
 type R = Tables.ActualRowData;
+type C = Table.Column<R, M>;
 
-const ActualColumns = filter(
-  ActualsTable.Columns,
-  (c: Table.PdfColumn<R, M>) => c.includeInPdf !== false
-) as Table.PdfColumn<R, M>[];
+const ActualColumns = filter(ActualsTable.Columns, (c: C) => c.includeInPdf !== false) as C[];
 
 const DEFAULT_OPTIONS: ExportPdfFormOptions = {
   excludeZeroTotals: false,
   columns: filter(
-    map(ActualColumns, (column: Table.PdfColumn<R, M>) => tabling.columns.normalizedField<R, M>(column)),
+    map(ActualColumns, (column: C) => tabling.columns.normalizedField<R, M>(column)),
     (field: string | undefined) => !isNil(field)
   ) as string[]
 };
@@ -114,7 +112,6 @@ const ActualsPreviewModal = ({
       <ExportActualsPdfForm
         form={form}
         initialValues={DEFAULT_OPTIONS}
-        disabled={isNil(actuals)}
         columns={ActualColumns}
         onValuesChange={(changedValues: Partial<ExportPdfFormOptions>, values: ExportPdfFormOptions) => {
           setOptions(values);

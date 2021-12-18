@@ -7,7 +7,7 @@ import "./RenderDocument.scss";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-const RenderDocument = ({ loading, onLoadStarted, ...props }: Pdf.RenderDocumentProps): JSX.Element => {
+const RenderDocument = ({ loading, ...props }: Pdf.RenderDocumentProps): JSX.Element => {
   return (
     <RenderOrSpinner loading={loading || (isNil(props.file) && props.loadingOnNoFile === true)}>
       {!isNil(props.file) && (

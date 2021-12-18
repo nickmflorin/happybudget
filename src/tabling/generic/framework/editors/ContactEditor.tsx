@@ -17,24 +17,24 @@ interface ContactEditorProps<
   readonly setSearch: (value: string) => void;
 }
 
-/* eslint-disable indent */
 const ContactEditor = <
   R extends Table.RowData & { readonly contact: number | null },
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   props: ContactEditorProps<R, M, S>,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   ref: ForwardedRef<any>
 ) => {
   const contacts = useFilteredContacts();
   const loading = useFilteredContactsLoading();
 
-  const [editor] = framework.editors.useModelMenuEditor<Model.Contact, ID, R, M, S>({
+  const [editor] = framework.editors.useModelMenuEditor<number, Model.Contact, R, M, S>({
     ...props,
     forwardedRef: ref
   });
   return (
-    <GenericModelMenuEditor<Model.Contact, ID, R, M, S>
+    <GenericModelMenuEditor<number, Model.Contact, R, M, S>
       {...props}
       editor={editor}
       style={{ width: 160 }}

@@ -1,11 +1,10 @@
 import { isNil, find, filter, includes, reduce } from "lodash";
-import { redux, util } from "lib";
+import { redux, util, notifications } from "lib";
 
-/* eslint-disable indent */
 export const listResponseReducerTransformers = <M, S extends Redux.ListResponseStore<M> = Redux.ListResponseStore<M>>(
   initialState: S
 ): Redux.Transformers<S, Redux.ListResponseActionMap<M>> => ({
-  request: (st: S = initialState, action: Redux.Action<Http.ListResponse<M>>) => ({
+  request: (st: S = initialState) => ({
     ...st,
     responseWasReceived: false
   }),
@@ -22,22 +21,24 @@ export const listResponseReducerTransformers = <M, S extends Redux.ListResponseS
 
 export const modelListResponseReducerTransformers = <
   M extends Model.HttpModel,
-  S extends Redux.ModelListResponseStore<M> | Redux.ModelListResponseStore<M>
+  S extends Redux.ModelListResponseStore<M> | Redux.ModelListResponseStore<M>,
+  P extends Redux.ActionPayload = null
 >(
   initialState: S
-): Redux.Transformers<S, Redux.ModelListResponseActionMap<M>> => ({
+): Redux.Transformers<S, Redux.ModelListResponseActionMap<M, P>> => ({
   ...listResponseReducerTransformers<M, S>(initialState)
 });
 
-/* eslint-disable indent */
 export const authenticatedModelListResponseReducerTransformers = <
   M extends Model.HttpModel,
-  S extends Redux.AuthenticatedModelListResponseStore<M> | Redux.AuthenticatedModelListResponseStore<M>
+  S extends Redux.AuthenticatedModelListResponseStore<M> | Redux.AuthenticatedModelListResponseStore<M>,
+  P extends Redux.ActionPayload = null,
+  C extends Table.Context = Table.Context
 >(
   initialState: S
-): Redux.Transformers<S, Redux.AuthenticatedModelListResponseActionMap<M>> => ({
+): Redux.Transformers<S, Redux.AuthenticatedModelListResponseActionMap<M, P, C>> => ({
   ...listResponseReducerTransformers<M, S>(initialState),
-  setSearch: (st: S = initialState, action: Redux.Action<string>) => ({
+  setSearch: (st: S = initialState, action: Redux.ActionWithContext<string, C>) => ({
     ...st,
     search: action.payload
   }),
@@ -50,7 +51,7 @@ export const authenticatedModelListResponseReducerTransformers = <
       responseWasReceived: true
     };
   },
-  request: (st: S = initialState, action: Redux.Action<null>) => ({
+  request: (st: S = initialState) => ({
     ...st,
     data: [],
     count: 0,
@@ -61,7 +62,7 @@ export const authenticatedModelListResponseReducerTransformers = <
     if (action.isAuthenticated === true) {
       const existing = find(st.data, { id: action.payload });
       if (isNil(existing)) {
-        redux.util.warnInconsistentState({
+        notifications.inconsistentStateError({
           action: action,
           reason: "Instance does not exist in state when it is expected to."
         });
@@ -83,16 +84,15 @@ export const authenticatedModelListResponseReducerTransformers = <
   },
   updateInState: (st: S = initialState, action: Redux.Action<Redux.UpdateActionPayload<M>>) => {
     if (action.isAuthenticated === true) {
-      const existing: M | undefined = find(st.data, { id: action.payload.id } as any);
-      /* TODO: If the entity does not exist in the state when updating, should
-         we auto add it? */
+      const existing: M | undefined = find(st.data, { id: action.payload.id }) as M | undefined;
       if (isNil(existing)) {
-        redux.util.warnInconsistentState({
+        notifications.inconsistentStateError({
           action: action,
           reason: "Instance does not exist in state when it is expected to."
         });
         return st;
       }
+      /* eslint-disable @typescript-eslint/no-unused-vars */
       const { id: _, ...withoutId } = action.payload.data;
       return {
         ...st,
@@ -121,7 +121,7 @@ export const authenticatedModelListResponseReducerTransformers = <
     if (action.isAuthenticated === true) {
       const existing = find(st.data, { id: action.payload.id });
       if (!isNil(existing)) {
-        redux.util.warnInconsistentState({
+        notifications.inconsistentStateError({
           action: action,
           reason: "Instance already exists in state when it is not expected to."
         });
@@ -134,9 +134,9 @@ export const authenticatedModelListResponseReducerTransformers = <
   },
   updateOrdering: (st: S = initialState, action: Redux.Action<Redux.UpdateOrderingPayload<string>>) => {
     if (action.isAuthenticated === true) {
-      const existing: Http.FieldOrder<string> | undefined = find(st.ordering, { field: action.payload.field } as any);
+      const existing: Http.FieldOrder<string> | undefined = find(st.ordering, { field: action.payload.field });
       if (isNil(existing)) {
-        redux.util.warnInconsistentState({
+        notifications.inconsistentStateError({
           action: action,
           reason: "Ordering for field does not exist in state when it is expected to."
         });

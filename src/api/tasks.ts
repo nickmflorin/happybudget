@@ -13,12 +13,14 @@ type ProvidedRequestOptions =
       readonly headers: { [key: string]: string };
     };
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const isProvidedRequestConfig = (arg: any): arg is ProvidedRequestOptions =>
   typeof arg === "object" &&
   ((arg as { readonly retries: number }).retries !== undefined ||
     (arg as { readonly headers: { [key: string]: string } }).headers !== undefined);
 
-export const request = <T = any>(service: Http.Service<T>, ...args: any[]) =>
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+export const request = <T>(service: Http.Service<T>, ...args: any[]) =>
   call(function* (): SagaIterator {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();

@@ -22,7 +22,6 @@ type ChangeHiddenColumnsAction = Redux.Action<SingleOrArray<Table.ColumnVisibili
 };
 type HiddenColumnsAction = SetHiddenColumnsAction | ChangeHiddenColumnsAction;
 
-/* eslint-disable indent */
 const hiddenColumnsReducer = (state: Table.HiddenColumns = {}, action: HiddenColumnsAction): Table.HiddenColumns => {
   if (action.type === "SET") {
     if (!isNil(action.cookie)) {
@@ -64,7 +63,7 @@ const useHiddenColumns = <R extends Table.RowData, M extends Model.RowHttpModel 
         ) as string[]
       );
     }
-    let hidden: Table.HiddenColumns = reduce(
+    const hidden: Table.HiddenColumns = reduce(
       params.columns,
       (curr: Table.HiddenColumns, c: Table.Column<R, M>) => {
         if (c.canBeHidden !== false) {

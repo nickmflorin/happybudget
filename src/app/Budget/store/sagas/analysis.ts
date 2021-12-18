@@ -1,6 +1,5 @@
 import { SagaIterator } from "redux-saga";
-import { put, select, all } from "redux-saga/effects";
-import { isNil } from "lodash";
+import { put, all } from "redux-saga/effects";
 
 import * as api from "api";
 import { notifications, redux } from "lib";
@@ -8,39 +7,37 @@ import { notifications, redux } from "lib";
 import * as actions from "../actions";
 
 function* request(action: Redux.Action<number>): SagaIterator {
-  const objId = yield select((state: Application.Authenticated.Store) => action.payload);
-  if (!isNil(objId)) {
-    yield put(actions.analysis.loadingAction(true));
-    let effects = [
-      api.request(api.getBudgetAccounts, objId, {}),
-      api.request(api.getBudgetAccountGroups, objId, {}),
-      api.request(api.getActuals, objId, {})
-    ];
-    try {
-      const [accounts, groups, actuals]: [
-        Http.ListResponse<Model.Account>,
-        Http.ListResponse<Model.Group>,
-        Http.ListResponse<Model.Actual>
-      ] = yield all(effects);
-      yield put(
-        actions.analysis.responseAction({
-          accounts,
-          groups,
-          actuals
-        })
-      );
-    } catch (e: unknown) {
-      notifications.requestError(e as Error, { message: "There was an error retrieving the analysis data." });
-      yield put(
-        actions.analysis.responseAction({
-          accounts: { count: 0, data: [] },
-          groups: { count: 0, data: [] },
-          actuals: { count: 0, data: [] }
-        })
-      );
-    } finally {
-      yield put(actions.analysis.loadingAction(false));
-    }
+  yield put(actions.analysis.loadingAction(true));
+  const effects = [
+    api.request(api.getBudgetAccounts, action.payload, {}),
+    api.request(api.getBudgetAccountGroups, action.payload, {}),
+    api.request(api.getActuals, action.payload, {})
+  ];
+  try {
+    const [accounts, groups, actuals]: [
+      Http.ListResponse<Model.Account>,
+      Http.ListResponse<Model.Group>,
+      Http.ListResponse<Model.Actual>
+    ] = yield all(effects);
+    yield put(
+      actions.analysis.responseAction({
+        accounts,
+        groups,
+        actuals
+      })
+    );
+  } catch (e: unknown) {
+    // TODO: We need to build in banner notifications for this event.
+    notifications.requestError(e as Error);
+    yield put(
+      actions.analysis.responseAction({
+        accounts: { count: 0, data: [] },
+        groups: { count: 0, data: [] },
+        actuals: { count: 0, data: [] }
+      })
+    );
+  } finally {
+    yield put(actions.analysis.loadingAction(false));
   }
 }
 

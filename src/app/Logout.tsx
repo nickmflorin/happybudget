@@ -10,7 +10,7 @@ export const Logout = (): JSX.Element => {
     api
       .logout()
       .then(() => setRedirect(true))
-      .catch(e => notifications.requestError(e, { message: "There was an error logging out." }));
+      .catch(e => notifications.requestError(e));
   }, []);
 
   if (redirect === true) {

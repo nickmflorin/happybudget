@@ -12,7 +12,7 @@ declare module "@ckeditor/ckeditor5-react" {
   import { EditorConfig } from "@ckeditor/ckeditor5-core/src/editor/editorconfig";
   import * as React from "react";
 
-  type CKEditorProps = {
+  declare type CKEditorProps = {
     disabled?: boolean;
     editor: typeof BalloonEditor;
     data?: string;
@@ -28,27 +28,36 @@ declare module "@ckeditor/ckeditor5-react" {
   export { CKEditor, CKEditorProps, Event as CKEditorEvent, BalloonEditor as EditorInstance };
 }
 
-type ID = string | number;
+declare type ID = string | number;
 
-type FnWithTypedArgs<T, ARGS extends any[]> = (...args: ARGS) => T;
+declare type FnWithTypedArgs<T, ARGS extends Array> = (...args: ARGS) => T;
 
-type NonNullable<T> = Exclude<T, null | undefined>;
+declare type NonNullable<T> = Exclude<T, null | undefined>;
 
-type Writeable<T extends { [x: string]: any }, K extends string> = {
-  [P in K]: T[P];
-};
+declare type SingleOrArray<T> = T | T[];
 
-type SingleOrArray<T> = T | T[];
+declare type FlattenIfArray<T> = T extends (infer R)[] ? R : T;
+declare type ArrayIfSingle<T> = T extends Array ? T : T[];
 
-type FlattenIfArray<T> = T extends (infer R)[] ? R : T;
-type ArrayIfSingle<T> = T extends Array<any> ? T : T[];
-
-type NonNullRef<T> = {
+declare type NonNullRef<T> = {
   readonly current: T;
 };
 
-type SetUndefined<T, W extends keyof T> = Omit<T, W> & Record<W, undefined>;
-type SetOptional<T, W extends keyof T> = Omit<T, W> & Partial<Pick<T, W>>;
-type SetRequired<T, W extends keyof T> = Omit<T, W> & Required<Pick<T, W>>;
+declare type SetUndefined<T, W extends keyof T> = Omit<T, W> & Record<W, undefined>;
+declare type SetOptional<T, W extends keyof T> = Omit<T, W> & Partial<Pick<T, W>>;
+declare type SetRequired<T, W extends keyof T> = Omit<T, W> & Required<Pick<T, W>>;
 
-type RenderPropChild<PARAMS = any> = (p: PARAMS) => import("react").ReactElement<any, any>;
+declare type RenderPropChild<PARAMS, P extends Record<string, unknown> = Record<string, unknown>> = (
+  p: PARAMS
+) => import("react").ReactElement<P, string>;
+
+/* Adopted from AntD */
+declare type RecursivePartial<T> = T extends Record<string, unknown>
+  ? {
+      [P in keyof T]?: T[P] extends (infer U)[]
+        ? RecursivePartial<U>[]
+        : T[P] extends Record<string, unknown>
+        ? RecursivePartial<T[P]>
+        : T[P];
+    }
+  : never;

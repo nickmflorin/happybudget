@@ -20,15 +20,15 @@ import { TemplateEmptyIcon } from "components/svgs";
 
 import { actions } from "../../store";
 
-const selectTemplates = (state: Application.Authenticated.Store) => state.dashboard.templates.data;
-const selectResponseWasReceived = (state: Application.Authenticated.Store) =>
+const selectTemplates = (state: Application.AuthenticatedStore) => state.dashboard.templates.data;
+const selectResponseWasReceived = (state: Application.AuthenticatedStore) =>
   state.dashboard.templates.responseWasReceived;
-const selectLoading = (state: Application.Authenticated.Store) => state.dashboard.templates.loading;
-const selectPage = (state: Application.Authenticated.Store) => state.dashboard.templates.page;
-const selectPageSize = (state: Application.Authenticated.Store) => state.dashboard.templates.pageSize;
-const selectCount = (state: Application.Authenticated.Store) => state.dashboard.templates.count;
-const selectSearch = (state: Application.Authenticated.Store) => state.dashboard.templates.search;
-const selectOrdering = (state: Application.Authenticated.Store) => state.dashboard.templates.ordering;
+const selectLoading = (state: Application.AuthenticatedStore) => state.dashboard.templates.loading;
+const selectPage = (state: Application.AuthenticatedStore) => state.dashboard.templates.page;
+const selectPageSize = (state: Application.AuthenticatedStore) => state.dashboard.templates.pageSize;
+const selectCount = (state: Application.AuthenticatedStore) => state.dashboard.templates.count;
+const selectSearch = (state: Application.AuthenticatedStore) => state.dashboard.templates.search;
+const selectOrdering = (state: Application.AuthenticatedStore) => state.dashboard.templates.ordering;
 
 interface MyTemplatesProps {
   readonly setTemplateToDerive: (template: number) => void;
@@ -70,7 +70,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
             placeholder={"Search Templates..."}
             value={search}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              dispatch(actions.setTemplatesSearchAction(event.target.value))
+              dispatch(actions.setTemplatesSearchAction(event.target.value, {}))
             }
           />,
           <PrimaryButtonIconToggle

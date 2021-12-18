@@ -27,7 +27,6 @@ export type WithConnectedTableProps<
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = T & ProvidedProps<R, M, S>;
 
-/* eslint-disable indent */
 const connectTableToStore =
   <
     T extends {
@@ -38,7 +37,7 @@ const connectTableToStore =
     R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
-    C = any
+    C extends Table.Context = Table.Context
   >(
     config:
       | Table.StoreConfig<R, M, S, C, Redux.TableActionMap<M, C>>
@@ -46,11 +45,10 @@ const connectTableToStore =
   ) =>
   (
     Component:
-      | React.ComponentClass<WithConnectedTableProps<T, R, M, S>, {}>
+      | React.ComponentClass<WithConnectedTableProps<T, R, M, S>, Record<string, unknown>>
       | React.FunctionComponent<WithConnectedTableProps<T, R, M, S>>
   ): React.FunctionComponent<T> => {
-    let selector: (state: Application.Store) => S = (state: Application.Store) =>
-      redux.initialState.initialTableState as S;
+    let selector: (state: Application.Store) => S = () => redux.initialState.initialTableState as S;
 
     if (!isNil(config.asyncId)) {
       selector = (state: Application.Store) => state[config.asyncId as Table.AsyncId] as S;

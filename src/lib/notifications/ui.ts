@@ -16,7 +16,6 @@ const isFieldNotification = (e: UINotification | NotificationDetail): e is Http.
 const isError = (n: InternalNotification | NotificationDetail): n is Error =>
   typeof n !== "string" && n instanceof Error;
 
-/* eslint-disable indent */
 export const uiNotificationMessage = (e: UINotification | NotificationDetail) => {
   return isNotificationObj(e)
     ? e.message

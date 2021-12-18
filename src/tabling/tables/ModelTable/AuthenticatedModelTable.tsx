@@ -11,7 +11,6 @@ export type AuthenticatedModelTableProps<
   M extends Model.RowHttpModel = Model.RowHttpModel
 > = Omit<AuthenticatedTableProps<R, M>, "children">;
 
-/* eslint-disable indent */
 const AuthenticatedModelTable = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: AuthenticatedModelTableProps<R, M>
 ): JSX.Element => {

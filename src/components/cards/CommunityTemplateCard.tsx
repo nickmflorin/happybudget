@@ -53,7 +53,6 @@ const CommunityTemplateCard = ({
       image={template.image}
       hidden={user.is_staff === true && template.hidden === true}
       dropdown={
-        /* eslint-disable indent */
         user.is_staff
           ? [
               {

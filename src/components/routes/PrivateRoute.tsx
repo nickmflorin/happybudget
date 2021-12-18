@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Route, Redirect } from "react-router-dom";
+import { Route, Redirect, RouteProps } from "react-router-dom";
 import { isNil } from "lodash";
 import axios from "axios";
 
@@ -9,7 +9,7 @@ import { ui, notifications } from "lib";
 import { actions } from "store";
 import { WrapInApplicationSpinner } from "components";
 
-const PrivateRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
+const PrivateRoute = (props: RouteProps): JSX.Element => {
   const [redirect, setRedirect] = useState(false);
   const [authenticating, setAuthenticating] = useState(true);
   const dispatch: Redux.Dispatch = useDispatch();

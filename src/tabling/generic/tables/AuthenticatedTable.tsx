@@ -30,7 +30,7 @@ export type AuthenticatedTableDataGridProps<
 export type AuthenticatedTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  C = any
+  C extends Table.Context = Table.Context
 > = TableConfigurationProps<R, M> &
   Omit<
     AuthenticateDataGridProps<R, M>,
@@ -50,10 +50,12 @@ export type AuthenticatedTableProps<
     readonly rowHasCheckboxSelection?: (row: Table.EditableRow<R>) => boolean;
   };
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const TableFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, any>>({
   id: "footer",
   className: "grid--table-footer",
   rowClass: "row--table-footer",
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   getFooterColumn: (col: Table.Column<any>) => col.footer || null
 })(AuthenticatedGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
@@ -61,11 +63,13 @@ const TableFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, a
   ): JSX.Element;
 };
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const PageFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, any>>({
   id: "page",
   className: "grid--page-footer",
   rowClass: "row--page-footer",
   rowHeight: 28,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   getFooterColumn: (col: Table.Column<any>) => col.page || null
 })(AuthenticatedGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
@@ -73,14 +77,12 @@ const PageFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, an
   ): JSX.Element;
 };
 
-/* eslint-disable indent */
 const AuthenticatedTable = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   props: WithAuthenticatedDataGridProps<
-    R,
     WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<R, M>, R>, R, M, S>
   >
 ): JSX.Element => {
@@ -141,7 +143,7 @@ const AuthenticatedTable = <
 
       // TODO: We might have to also apply similiar logic for when a row is added?
       if (tabling.typeguards.isDataChangeEvent(event)) {
-        let nodesToRefresh: Table.RowNode[] = [];
+        const nodesToRefresh: Table.RowNode[] = [];
         let columnsToRefresh: (keyof R)[] = [];
 
         const changes: Table.RowChange<R>[] = tabling.events.consolidateRowChanges(event.payload);
@@ -155,8 +157,8 @@ const AuthenticatedTable = <
             for (field in rowChange.data) {
               const change = util.getKeyValue<Table.RowChangeData<R>, keyof R>(field)(
                 rowChange.data
-              ) as Table.CellChange<R>;
-              const col: Table.Column<R, M> | null = tabling.columns.getColumn(props.columns, field);
+              ) as Table.CellChange;
+              const col: Table.Column<R, M> | null = tabling.columns.getColumn<R, M>(props.columns, field);
 
               if (!isNil(col)) {
                 /* Check if the cellChange is associated with a Column that has
@@ -328,7 +330,6 @@ const AuthenticatedTable = <
           onGridReady={props.onPageGridReady}
           onFirstDataRendered={props.onFirstDataRendered}
           onChangeEvent={_onChangeEvent}
-          footerRowSelectors={props.footerRowSelectors}
           gridOptions={props.tableGridOptions.page}
           columns={columns}
           framework={props.framework}
@@ -371,7 +372,6 @@ const AuthenticatedTable = <
           hiddenColumns={props.hiddenColumns}
           onChangeEvent={_onChangeEvent}
           framework={props.framework}
-          footerRowSelectors={props.footerRowSelectors}
           constrainHorizontally={props.constrainTableFooterHorizontally}
           checkboxColumn={{
             cellRenderer: "NewRowCell",
@@ -399,13 +399,15 @@ const AuthenticatedTable = <
   );
 };
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 type Props = WithAuthenticatedDataGridProps<
-  any,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<any>, any>, any>
 >;
 
 const Memoized = React.memo(AuthenticatedTable) as typeof AuthenticatedTable;
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export default configureTable<any, any, Props>(Memoized) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
     props: AuthenticatedTableProps<R, M>

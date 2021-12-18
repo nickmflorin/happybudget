@@ -5,11 +5,13 @@ import { isNil } from "lodash";
 import { DEFAULT_COLOR_SCHEME, Colors } from "style/constants";
 import { typeguards, util, tabling } from "lib";
 
-const TagRenderer = <S extends object = React.CSSProperties>(params: ITagRenderParams<S>): JSX.Element => {
+const TagRenderer = <S extends React.CSSProperties | Pdf.Style = React.CSSProperties>(
+  params: ITagRenderParams<S>
+): JSX.Element => {
   const { contentRender, ...rest } = params;
 
   const style = useMemo(() => {
-    let st = { ...params.style, color: params.textColor };
+    const st = { ...params.style, color: params.textColor };
     if (params.color !== null) {
       return { ...st, backgroundColor: params.color };
     }
@@ -25,13 +27,13 @@ const TagRenderer = <S extends object = React.CSSProperties>(params: ITagRenderP
         { disabled: params.disabled },
         params.className
       )}
-      style={style}
+      style={style as React.CSSProperties}
       onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => !params.disabled && params.onClick?.(e)}
     >
       {!isNil(contentRender) ? (
         contentRender(rest)
       ) : (
-        <span className={params.textClassName} style={params.textStyle}>
+        <span className={params.textClassName} style={params.textStyle as React.CSSProperties}>
           {params.text}
         </span>
       )}
@@ -39,7 +41,7 @@ const TagRenderer = <S extends object = React.CSSProperties>(params: ITagRenderP
   );
 };
 
-const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSProperties>(
+const Tag = <M extends Model.Model = Model.Model, S extends React.CSSProperties | Pdf.Style = React.CSSProperties>(
   props: TagProps<M, S>
 ): JSX.Element => {
   const colorScheme = useMemo(() => {
@@ -192,7 +194,9 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
 };
 
 type MemoizedTagType = {
-  <M extends Model.Model = Model.Model, S extends object = React.CSSProperties>(props: TagProps<M, S>): JSX.Element;
+  <M extends Model.Model = Model.Model, S extends React.CSSProperties | Pdf.Style = React.CSSProperties>(
+    props: TagProps<M, S>
+  ): JSX.Element;
 };
 
 export default React.memo(Tag) as MemoizedTagType;

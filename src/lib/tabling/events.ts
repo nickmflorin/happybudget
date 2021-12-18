@@ -2,7 +2,6 @@ import { isNil, reduce, uniq, map, filter, flatten } from "lodash";
 
 import * as util from "../util";
 
-/* eslint-disable indent */
 export const cellChangeToRowChange = <R extends Table.RowData, I extends Table.EditableRowId = Table.EditableRowId>(
   cellChange: Table.SoloCellChange<R, I>
 ): Table.RowChange<R, I> => ({
@@ -57,7 +56,9 @@ const reduceChangesForRow = <R extends Table.RowData, I extends Table.EditableRo
   let rowChange = { ...initial };
   let key: keyof R;
   for (key in ch.data) {
-    const cellChange: Table.CellChange<R> | undefined = util.getKeyValue<Table.RowChangeData<R>, keyof R>(key)(ch.data);
+    const cellChange: Table.CellChange<R[keyof R]> | undefined = util.getKeyValue<Table.RowChangeData<R>, keyof R>(key)(
+      ch.data
+    );
     if (!isNil(cellChange)) {
       rowChange = addCellChangeToRowChange(rowChange, {
         ...cellChange,
@@ -195,7 +196,7 @@ export const mergeChangesWithRow = <R extends Table.RowData>(
           for (field in change.data) {
             const cellChange = util.getKeyValue<Table.RowChangeData<R>, keyof R>(field)(
               change.data
-            ) as Table.CellChange<R>;
+            ) as Table.CellChange<R[keyof R]>;
             curr = { ...curr, [field as string]: cellChange.newValue };
           }
           return curr;

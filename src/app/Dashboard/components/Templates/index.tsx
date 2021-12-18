@@ -22,7 +22,7 @@ const Templates = (): JSX.Element => {
       <Switch>
         <Route
           path={"/templates"}
-          render={(props: any) => (
+          render={() => (
             <MyTemplates
               setTemplateToDerive={setTemplateToDerive}
               setCreateBudgetModalOpen={setCreateBudgetModalOpen}
@@ -31,7 +31,7 @@ const Templates = (): JSX.Element => {
         />
         <Route
           path={"/discover"}
-          render={(props: any) => (
+          render={() => (
             <Discover setTemplateToDerive={setTemplateToDerive} setCreateBudgetModalOpen={setCreateBudgetModalOpen} />
           )}
         />

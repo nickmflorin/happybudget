@@ -49,7 +49,6 @@ const getRowColorDef = <R extends Table.RowData>(row: Table.BodyRow<R>): Table.R
   return {};
 };
 
-/* eslint-disable indent */
 const DataGrid =
   <
     R extends Table.RowData,
@@ -59,7 +58,9 @@ const DataGrid =
     config?: Table.DataGridConfig<R>
   ) =>
   (
-    Component: React.ComponentClass<WithDataGridProps<T>, {}> | React.FunctionComponent<WithDataGridProps<T>>
+    Component:
+      | React.ComponentClass<WithDataGridProps<T>, Record<string, unknown>>
+      | React.FunctionComponent<WithDataGridProps<T>>
   ): React.FunctionComponent<T> => {
     function WithDataGrid(props: T) {
       const [focused, setFocused] = useState(false);
@@ -89,7 +90,7 @@ const DataGrid =
                 const actionColumns = filter(props.columns, (c: Table.Column<R, M>) => c.tableColumnType === "action");
 
                 if (!isNil(cols) && cols.length > actionColumns.length) {
-                  let firstColumn = cols[actionColumns.length];
+                  const firstColumn = cols[actionColumns.length];
                   let focusedOnQuery = false;
                   if (!isNil(rowId) && !isNaN(parseInt(rowId))) {
                     const node = e.api.getRowNode(String(rowId));
@@ -140,7 +141,7 @@ const DataGrid =
 
       const getRowStyle: Table.GetRowStyle = useMemo(
         () =>
-          (params: Table.RowClassParams): { [key: string]: any } => {
+          (params: Table.RowClassParams): Table.RowColorDef => {
             const row: Table.BodyRow<R> = params.node.data;
             return getRowColorDef(row);
           },
@@ -156,7 +157,7 @@ const DataGrid =
             const rowNode: Table.RowNode | undefined = props.apis.grid.getDisplayedRowAtIndex(event.rowIndex);
             const column: Table.Column<R, M> | undefined = !isNil(col)
               ? col
-              : find(columns, { field: event.column.getColId() } as any);
+              : find(columns, { field: event.column.getColId() });
             if (!isNil(rowNode) && !isNil(column)) {
               const row: Table.BodyRow<R> = rowNode.data;
               return { rowNode, column, row };
@@ -173,7 +174,7 @@ const DataGrid =
           const previousFocusEvent = !isNil(oldFocusedEvent.current) ? { ...oldFocusedEvent.current } : null;
           oldFocusedEvent.current = e;
 
-          const col: Table.Column<R, M> | undefined = find(columns, { field: e.column.getColId() } as any);
+          const col: Table.Column<R, M> | undefined = find(columns, { field: e.column.getColId() });
           if (!isNil(col)) {
             const cell: Table.Cell<R, M> | null = getCellFromFocusedEvent(e);
             const previousCell = !isNil(previousFocusEvent) ? getCellFromFocusedEvent(previousFocusEvent) : null;
@@ -206,7 +207,7 @@ const DataGrid =
             if (
               includes(
                 map(columns, (col: Table.Column<R, M>) => col.field),
-                e.colDef.field as keyof R
+                e.colDef.field
               )
             ) {
               const nodes: Table.RowNode[] = [];
@@ -238,7 +239,7 @@ const DataGrid =
               const displayedColumn = displayedColumns[i];
               const field = displayedColumn.getColDef().field;
               if (!isNil(field)) {
-                const customCol = find(columns, { field } as any);
+                const customCol = find(columns, { field });
                 if (!isNil(customCol) && customCol.editable !== false) {
                   return displayedColumn;
                 }

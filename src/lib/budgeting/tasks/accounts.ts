@@ -66,7 +66,7 @@ export type AuthenticatedAccountsTableTaskConfig<B extends Model.Template | Mode
   AuthenticatedAccountsTableActionMap<B>
 > & {
   readonly services: AuthenticatedAccountsTableServiceSet<B>;
-  readonly selectStore: (state: Application.Authenticated.Store) => Tables.AccountTableStore;
+  readonly selectStore: (state: Application.AuthenticatedStore) => Tables.AccountTableStore;
 };
 
 const isAuthenticatedConfig = <B extends Model.Template | Model.Budget>(
@@ -75,7 +75,6 @@ const isAuthenticatedConfig = <B extends Model.Template | Model.Budget>(
   return (c as AuthenticatedAccountsTableTaskConfig<B>).services.bulkCreate !== undefined;
 };
 
-/* eslint-disable indent */
 export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
   config: AccountsTableTaskConfig | AuthenticatedAccountsTableTaskConfig<B>
 ): Redux.TableTaskMap<R, C, Tables.AccountTableContext> => {
@@ -129,7 +128,8 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
           yield put(config.actions.response({ models: models.data, groups: groups.data, markups: markups?.data }));
         }
       } catch (e: unknown) {
-        notifications.requestError(e as Error, { message: "There was an error retrieving the table data." });
+        config.table.notify({ message: "There was an error retrieving the table data.", level: "error" });
+        notifications.requestError(e as Error);
         yield put(config.actions.response({ models: [], groups: [], markups: [] }));
       } finally {
         yield put(config.actions.loading(false));
@@ -181,7 +181,8 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         const response: Http.BulkResponse<B, C> = yield api.request(config.services.bulkUpdate, objId, requestPayload);
         yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
       } catch (err: unknown) {
-        notifications.requestError(err as Error, { message: errorMessage });
+        config.table.notify({ message: errorMessage, level: "error" });
+        notifications.requestError(err as Error);
       } finally {
         yield put(config.actions.saving(false));
         if (isGroupEvent !== true) {
@@ -194,7 +195,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
   function* updateMarkupTask(changes: Table.RowChange<R, Table.MarkupRowId>[]): SagaIterator {
     if (isAuthenticatedConfig(config) && changes.length !== 0) {
       const effects: (StrictEffect | null)[] = map(changes, (ch: Table.RowChange<R, Table.MarkupRowId>) => {
-        const payload = tabling.http.patchPayload<R, Http.MarkupPayload, C>(ch, config.table.getColumns());
+        const payload = tabling.http.patchPayload<R, C, Http.MarkupPayload>(ch, config.table.getColumns());
         if (!isNil(payload)) {
           return api.request(api.updateMarkup, tabling.managers.markupId(ch.id), payload);
         }
@@ -216,7 +217,8 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         */
         yield all(validEffects);
       } catch (err: unknown) {
-        notifications.requestError(err as Error, { message: "There was an error updating the table rows." });
+        config.table.notify({ message: "There was an error updating the table rows.", level: "error" });
+        notifications.requestError(err as Error);
       } finally {
         yield put(config.actions.saving(false));
       }
@@ -313,7 +315,8 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
             call(bulkDeleteRows, context.budgetId, modelRowIds, markupRowIds)
           ]);
         } catch (err: unknown) {
-          notifications.requestError(err as Error, { message: "There was an error removing the rows." });
+          config.table.notify({ message: "There was an error removing the table rows.", level: "error" });
+          notifications.requestError(err as Error);
         } finally {
           yield put(config.actions.saving(false));
           yield put(config.actions.loadingBudget(false));
@@ -329,7 +332,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         const response: C = yield api.request(config.services.create, context.budgetId, {
           previous: e.payload.previous,
           group: isNil(e.payload.group) ? null : tabling.managers.groupId(e.payload.group),
-          ...tabling.http.postPayload(e.payload.data, config.table.getColumns())
+          ...tabling.http.postPayload<R, C, P>(e.payload.data, config.table.getColumns())
         });
         /* The Group is not attributed to the Model in a detail response, so
 					 if the group did change we have to use the value from the event
@@ -347,7 +350,8 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
           )
         );
       } catch (err: unknown) {
-        notifications.requestError(err as Error, { message: "There was an error adding the row." });
+        config.table.notify({ message: "There was an error adding the table rows.", level: "error" });
+        notifications.requestError(err as Error);
       } finally {
         yield put(config.actions.saving(false));
       }
@@ -381,7 +385,8 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
           )
         );
       } catch (err: unknown) {
-        notifications.requestError(err as Error, { message: "There was an error moving the row." });
+        config.table.notify({ message: "There was an error moving the table rows.", level: "error" });
+        notifications.requestError(err as Error);
       } finally {
         yield put(config.actions.saving(false));
       }
@@ -402,7 +407,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
 
       yield fork(updateMarkupTask, markupChanges);
       if (dataChanges.length !== 0) {
-        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, C>(dataChanges, config.table.getColumns());
+        const requestPayload = tabling.http.createBulkUpdatePayload<R, C, P>(dataChanges, config.table.getColumns());
         if (requestPayload.data.length !== 0) {
           yield fork(bulkUpdateTask, context.budgetId, requestPayload, "There was an error updating the rows.");
         }
@@ -412,7 +417,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
 
   return {
     request,
-    handleChangeEvent: tabling.tasks.createChangeEventHandler<R, C>({
+    handleChangeEvent: tabling.tasks.createChangeEventHandler<R, C, Tables.AccountTableContext>({
       rowRemoveFromGroup: handleRowRemoveFromGroupEvent,
       rowInsert: handleRowInsertEvent,
       rowAddToGroup: handleAddRowToGroupEvent,

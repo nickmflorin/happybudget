@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, ForwardedRef } from "react";
 import classNames from "classnames";
 
 import { EntityText } from "components/typography";
@@ -12,7 +12,10 @@ export interface EntityTextButtonProps
   onClick?: () => void;
 }
 
-const EntityTextButton = ({ children, fillEmpty, ...props }: EntityTextButtonProps, ref: any): JSX.Element => {
+const EntityTextButton = (
+  { children, fillEmpty, ...props }: EntityTextButtonProps,
+  ref: ForwardedRef<HTMLButtonElement>
+): JSX.Element => {
   return (
     <Button
       {...props}

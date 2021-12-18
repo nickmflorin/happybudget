@@ -1,9 +1,9 @@
 import classNames from "classnames";
 import Alert, { AlertProps } from "./Alert";
 
-export interface SuccessProps extends Omit<AlertProps, "type"> {}
+export type SuccessProps = Omit<AlertProps, "level">;
 
-const Success: React.FC<SuccessProps> = ({ children, className, ...props }) => (
+const Success: React.FC<SuccessProps> = ({ className, ...props }) => (
   <Alert {...props} className={classNames("success", className)} level={"success"} />
 );
 

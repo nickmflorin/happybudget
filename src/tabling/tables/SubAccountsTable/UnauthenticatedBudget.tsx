@@ -31,7 +31,7 @@ const UnauthenticatedBudgetSubAccountsTable = (
 
   const columns = useMemo(
     () =>
-      tabling.columns.normalizeColumns(Columns, {
+      tabling.columns.normalizeColumns<R, M>(Columns, {
         identifier: (col: Table.Column<R, M>) => ({
           ...col,
           headerName: props.identifierFieldHeader

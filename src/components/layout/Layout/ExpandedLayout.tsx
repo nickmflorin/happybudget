@@ -10,7 +10,6 @@ export interface ExpandedLayoutProps extends Omit<GenericLayoutProps, "sidebar">
 }
 
 const ExpandedLayout = (props: ExpandedLayoutProps): JSX.Element => {
-  const isMobile = ui.hooks.useLessThanBreakpoint("medium");
   const layout = ui.hooks.useLayoutIfNotDefined(props.layout);
 
   return (
@@ -19,13 +18,7 @@ const ExpandedLayout = (props: ExpandedLayoutProps): JSX.Element => {
       showHeaderSidebarToggle={true}
       className={classNames("layout--expanded", props.className)}
       style={props.style}
-      sidebar={
-        <ExpandedSidebar
-          sidebar={props.sidebar}
-          toggle={() => layout.current.toggleSidebar()}
-          closeOnClick={isMobile ? () => layout.current.setSidebarVisible(false) : undefined}
-        />
-      }
+      sidebar={<ExpandedSidebar sidebar={props.sidebar} toggle={() => layout.current.toggleSidebar()} />}
     >
       {props.children}
     </GenericLayout>

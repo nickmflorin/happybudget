@@ -9,25 +9,24 @@ import Table from "./Table";
 
 type M = Model.PdfSubAccount;
 type R = Tables.SubAccountRowData;
+type C = Table.Column<R, M>;
+
+type AM = Model.PdfAccount;
+type AR = Tables.AccountRowData;
+type AC = Table.Column<AR, AM>;
 
 type AccountTableProps = {
   readonly account: Model.PdfAccount;
-  readonly subAccountColumns: Table.PdfColumn<R, M>[];
-  readonly columns: Table.PdfColumn<Tables.AccountRowData, Model.PdfAccount>[];
+  readonly subAccountColumns: C[];
+  readonly columns: AC[];
   readonly options: PdfBudgetTable.Options;
 };
 
-const AccountTable = ({
-  /* eslint-disable indent */
-  columns,
-  subAccountColumns,
-  account,
-  options
-}: AccountTableProps): JSX.Element => {
+const AccountTable = ({ columns, subAccountColumns, account, options }: AccountTableProps): JSX.Element => {
   const accountSubAccountColumns = useMemo(() => {
     return reduce(
       subAccountColumns,
-      (curr: Table.PdfColumn<Tables.AccountRowData, Model.PdfAccount>[], c: Table.PdfColumn<R, M>) => {
+      (curr: AC[], c: C) => {
         return [
           ...curr,
           {
@@ -45,7 +44,7 @@ const AccountTable = ({
             pdfValueGetter: c.pdfValueGetter,
             pdfCellRenderer: c.pdfCellRenderer,
             pdfChildFooter: c.pdfChildFooter
-          } as Table.PdfColumn<Tables.AccountRowData, Model.PdfAccount>
+          } as AC
         ];
       },
       []
@@ -53,7 +52,7 @@ const AccountTable = ({
   }, [columns, subAccountColumns]);
 
   const accountSubHeaderRow: Tables.AccountRow = useMemo(() => {
-    const accountRowManager = new tabling.managers.ModelRowManager<Tables.AccountRowData, Model.PdfAccount>({
+    const accountRowManager = new tabling.managers.ModelRowManager<AR, AM>({
       columns
     });
     return accountRowManager.create({
@@ -62,25 +61,23 @@ const AccountTable = ({
   }, [account, columns]);
 
   const accountColumnIsVisible = useMemo(
-    () => (c: Table.PdfColumn<Tables.AccountRowData, Model.PdfAccount>) =>
-      includes(options.columns, tabling.columns.normalizedField<Tables.AccountRowData, Model.PdfAccount>(c)),
+    () => (c: AC) => includes(options.columns, tabling.columns.normalizedField<AR, AM>(c)),
     [options.columns]
   );
 
   const subAccountColumnIsVisible = useMemo(
-    () => (c: Table.PdfColumn<Tables.SubAccountRowData, Model.PdfSubAccount>) =>
-      includes(options.columns, tabling.columns.normalizedField<Tables.SubAccountRowData, Model.PdfSubAccount>(c)),
+    () => (c: C) => includes(options.columns, tabling.columns.normalizedField<R, M>(c)),
     [options.columns]
   );
 
   const generateRows = hooks.useDynamicCallback((): JSX.Element[] => {
-    const subAccountRowManager = new tabling.managers.ModelRowManager<Tables.SubAccountRowData, Model.PdfSubAccount>({
+    const subAccountRowManager = new tabling.managers.ModelRowManager<R, M>({
       columns: subAccountColumns
     });
     const createSubAccountFooterRow = (subaccount: M): Table.ModelRow<R> => {
       return subAccountRowManager.create({
         model: subaccount,
-        getRowValue: (m: Model.PdfSubAccount, c: Table.PdfColumn<R, M>) => {
+        getRowValue: (m: Model.PdfSubAccount, c: C) => {
           if (!isNil(c.pdfChildFooter) && !isNil(c.pdfChildFooter(m).value)) {
             return c.pdfChildFooter(m).value;
           }
@@ -121,7 +118,7 @@ const AccountTable = ({
               if (details.length === 0 && markups.length === 0) {
                 return [
                   ...rws,
-                  <BodyRow
+                  <BodyRow<R, M, C>
                     cellProps={{ className: "subaccount-td", textClassName: "subaccount-tr-td-text" }}
                     className={"subaccount-tr"}
                     columns={subAccountColumns}
@@ -155,7 +152,7 @@ const AccountTable = ({
                           data={table}
                           cellProps={{
                             textClassName: "detail-tr-td-text",
-                            className: (params: Table.PdfCellCallbackParams<R, M>) => {
+                            className: (params: Table.PdfCellCallbackParams<R, M, Table.InferColumnValue<C>>) => {
                               if (params.column.field === "description") {
                                 return classNames("detail-td", "indent-td");
                               }
@@ -175,7 +172,7 @@ const AccountTable = ({
                           columnIsVisible={subAccountColumnIsVisible}
                           columnIndent={1}
                           cellProps={{
-                            textClassName: (params: Table.PdfCellCallbackParams<R, M>) => {
+                            textClassName: (params: Table.PdfCellCallbackParams<R, M, Table.InferColumnValue<C>>) => {
                               if (params.column.field === "description") {
                                 return "detail-group-indent-td";
                               }
@@ -205,7 +202,7 @@ const AccountTable = ({
                 const footerRow = createSubAccountFooterRow(subAccount);
                 subRows = [
                   ...subRows,
-                  <BodyRow
+                  <BodyRow<R, M, C>
                     className={"subaccount-footer-tr"}
                     cellProps={{ className: "subaccount-footer-td", textClassName: "subaccount-footer-tr-td-text" }}
                     columns={subAccountColumns}
@@ -222,7 +219,7 @@ const AccountTable = ({
           } else if (tabling.typeguards.isMarkupRow(subAccountRow)) {
             return [
               ...rws,
-              <BodyRow
+              <BodyRow<R, M, C>
                 cellProps={{ className: "subaccount-td", textClassName: "subaccount-tr-td-text" }}
                 className={"subaccount-tr"}
                 columns={subAccountColumns}
@@ -234,7 +231,7 @@ const AccountTable = ({
           } else {
             return [
               ...rws,
-              <GroupRow
+              <GroupRow<R, M, C>
                 row={subAccountRow}
                 columnIsVisible={subAccountColumnIsVisible}
                 columns={subAccountColumns}
@@ -244,12 +241,12 @@ const AccountTable = ({
           }
         },
         [
-          <HeaderRow
+          <HeaderRow<R, M, C>
             className={"account-header-tr"}
             columns={subAccountColumns}
             columnIsVisible={subAccountColumnIsVisible}
           />,
-          <BodyRow<Tables.AccountRowData, Model.PdfAccount>
+          <BodyRow<AR, AM, AC>
             className={"account-sub-header-tr"}
             cellProps={{ textClassName: "account-sub-header-tr-td-text" }}
             columns={accountSubAccountColumns}
@@ -259,7 +256,7 @@ const AccountTable = ({
           />
         ]
       ),
-      <FooterRow columns={subAccountColumns} columnIsVisible={subAccountColumnIsVisible} data={table} />
+      <FooterRow<R, M, C> columns={subAccountColumns} columnIsVisible={subAccountColumnIsVisible} data={table} />
     ];
   });
 

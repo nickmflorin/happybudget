@@ -10,10 +10,10 @@ import { util } from "lib";
 
 import "./LandingForm.scss";
 
-export interface IResetPasswordFormValues {
+export type IResetPasswordFormValues = {
   readonly password: string;
   readonly confirm: string;
-}
+};
 
 interface ResetPasswordFormProps extends FormProps<IResetPasswordFormValues> {
   readonly loading: boolean;
@@ -35,8 +35,8 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
         name={"password"}
         rules={[
           { required: true, message: "Please enter a valid password." },
-          ({ getFieldValue }: { getFieldValue: any }) => ({
-            validator(rule: any, value: string) {
+          () => ({
+            validator(rule: unknown, value: string) {
               if (value !== "" && !util.validate.validatePassword(value)) {
                 return Promise.reject("The password does not meet our requirements.");
               }
@@ -58,7 +58,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
               field: keyof IResetPasswordFormValues
             ) => IResetPasswordFormValues[keyof IResetPasswordFormValues];
           }) => ({
-            validator(rule: any, value: string) {
+            validator(rule: unknown, value: string) {
               if (value !== "" && getFieldValue("password") !== value) {
                 return Promise.reject("The two passwords that you entered do not match!");
               }

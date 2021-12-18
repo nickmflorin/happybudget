@@ -4,12 +4,11 @@ import { util } from "lib";
 import Input, { InputProps } from "./Input";
 
 interface PhoneNumberInputProps extends Omit<InputProps, "onChange"> {
-  readonly displayFormattedValue?: boolean;
   readonly onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   readonly value?: number | string;
 }
 
-const PhoneNumberInput = ({ displayFormattedValue = true, onChange, ...props }: PhoneNumberInputProps): JSX.Element => {
+const PhoneNumberInput = ({ onChange, ...props }: PhoneNumberInputProps): JSX.Element => {
   const [_value, setValue] = useState<string>("");
 
   return (

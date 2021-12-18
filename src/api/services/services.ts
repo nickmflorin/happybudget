@@ -17,9 +17,9 @@ export const postService = <P extends Http.Payload, R>(path: Http.PathParams) =>
 };
 
 export const patchService = <P extends Http.Payload, R>(path: Http.PathParams) => {
-  return async (payload: P, options: Http.RequestOptions = {}): Promise<R> => {
+  return async (payload: Partial<P>, options: Http.RequestOptions = {}): Promise<R> => {
     const url = URL.v1(...path);
-    return client.patch<R>(url, payload, options);
+    return client.patch<R, P>(url, payload, options);
   };
 };
 
@@ -39,7 +39,7 @@ export const detailPatchService = <P extends Http.Payload, R>(
   return async (id: number, payload: Partial<P>, options: Http.RequestOptions = {}): Promise<R> => {
     const pt = typeof path === "function" ? path(id) : path;
     const url = URL.v1(...pt);
-    return client.patch<R>(url, payload, options);
+    return client.patch<R, P>(url, payload, options);
   };
 };
 

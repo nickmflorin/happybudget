@@ -20,9 +20,10 @@ export interface BudgetDataGridProps<R extends Table.RowData> {
 
 export type WithBudgetDataGridProps<T> = T & InjectedBudgetDataGridProps;
 
-/* eslint-disable indent */
 const BudgetDataGrid = <R extends Tables.BudgetRowData, T extends BudgetDataGridProps<R> = BudgetDataGridProps<R>>(
-  Component: React.ComponentClass<WithBudgetDataGridProps<T>, {}> | React.FunctionComponent<WithBudgetDataGridProps<T>>
+  Component:
+    | React.ComponentClass<WithBudgetDataGridProps<T>, Record<string, unknown>>
+    | React.FunctionComponent<WithBudgetDataGridProps<T>>
 ): React.FunctionComponent<T> => {
   function WithBudgetDataGrid(props: T) {
     const moveDownKeyListener = hooks.useDynamicCallback((localApi: GridApi, e: KeyboardEvent) => {
@@ -41,7 +42,7 @@ const BudgetDataGrid = <R extends Tables.BudgetRowData, T extends BudgetDataGrid
     const moveUpKeyListener = hooks.useDynamicCallback((localApi: GridApi, e: KeyboardEvent) => {
       const ctrlCmdPressed = e.ctrlKey || e.metaKey;
       if (e.key === "ArrowUp" && ctrlCmdPressed) {
-        !isNil(props.onBack) && props.onBack();
+        props.onBack?.();
       }
     });
 

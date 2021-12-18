@@ -79,7 +79,7 @@ const HeaderTemplateSaveForm = (
                 .deleteHeaderTemplate(id)
                 .then(() => onHeaderTemplateDeleted(id))
                 // .catch((e: Error) => props.form.handleRequestError(e))
-                .catch((e: Error) => setError("An error occurred while deleting the header template."))
+                .catch(() => setError("An error occurred while deleting the header template."))
                 .finally(() => setDeleting(null));
             }}
           />

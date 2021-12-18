@@ -9,6 +9,7 @@ const ActualTypeEditor = (
     framework.editors.ModelSelectEditorProps<Model.Tag, Tables.ActualRowData, Model.Actual, Tables.ActualTableStore>,
     "models" | "searchIndices"
   >,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   ref: any
 ) => {
   const types = useSelector((state: Application.Store) => props.selector(state).types);

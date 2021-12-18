@@ -14,53 +14,43 @@ import * as transformers from "./transformers";
  *                  the reducer should listen for.
  * @param options   Additional options supplied to the reducer factory.
  */
-/* eslint-disable indent */
+
 export const createListResponseReducer = <
   M,
-  S extends Redux.ListResponseStore<M> = Redux.ListResponseStore<M>,
-  A extends Partial<Redux.ListResponseActionMap<M, any>> = Redux.ListResponseActionMap<M, any>
+  P extends Redux.ActionPayload = null,
+  S extends Redux.ListResponseStore<M> = Redux.ListResponseStore<M>
 >(
-  config: Redux.ReducerConfig<S, A>,
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  subReducers?: { [Property in keyof Partial<S>]: Redux.Reducer<any> } | null | {}
+  config: Redux.ReducerConfig<S, Redux.ListResponseActionMap<M, P>>
 ): Redux.Reducer<S> => {
-  return createObjectReducerFromTransformers<S, A>(
+  return createObjectReducerFromTransformers<S, Redux.ListResponseActionMap<M, P>>(
     config,
-    transformers.listResponseReducerTransformers<M, S>(config.initialState),
-    subReducers
+    transformers.listResponseReducerTransformers<M, S>(config.initialState)
   );
 };
 
 export const createModelListResponseReducer = <
   M extends Model.HttpModel,
-  S extends Redux.ModelListResponseStore<M> = Redux.ModelListResponseStore<M>,
-  A extends Partial<Redux.ModelListResponseActionMap<M, any>> = Redux.ModelListResponseActionMap<M, any>
+  P extends Redux.ActionPayload = null,
+  S extends Redux.ModelListResponseStore<M> = Redux.ModelListResponseStore<M>
 >(
-  config: Redux.ReducerConfig<S, A>,
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  subReducers?: { [Property in keyof Partial<S>]: Redux.Reducer<any> } | null | {}
+  config: Redux.ReducerConfig<S, Redux.ModelListResponseActionMap<M, P>>
 ): Redux.Reducer<S> => {
-  return createObjectReducerFromTransformers<S, A>(
+  return createObjectReducerFromTransformers<S, Redux.ModelListResponseActionMap<M, P>>(
     config,
-    transformers.modelListResponseReducerTransformers(config.initialState),
-    subReducers
+    transformers.modelListResponseReducerTransformers(config.initialState)
   );
 };
 
 export const createAuthenticatedModelListResponseReducer = <
   M extends Model.HttpModel,
-  S extends Redux.AuthenticatedModelListResponseStore<M> = Redux.AuthenticatedModelListResponseStore<M>,
-  A extends Partial<
-    Redux.AuthenticatedModelListResponseActionMap<M, any>
-  > = Redux.AuthenticatedModelListResponseActionMap<M, any>
+  P extends Redux.ActionPayload = null,
+  C extends Table.Context = Table.Context,
+  S extends Redux.AuthenticatedModelListResponseStore<M> = Redux.AuthenticatedModelListResponseStore<M>
 >(
-  config: Redux.ReducerConfig<S, A>,
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  subReducers?: { [Property in keyof Partial<S>]: Redux.Reducer<any> } | null | {}
+  config: Redux.ReducerConfig<S, Partial<Redux.AuthenticatedModelListResponseActionMap<M, P, C>>>
 ): Redux.Reducer<S> => {
-  return createObjectReducerFromTransformers<S, A>(
+  return createObjectReducerFromTransformers<S, Redux.AuthenticatedModelListResponseActionMap<M, P, C>>(
     config,
-    transformers.authenticatedModelListResponseReducerTransformers(config.initialState),
-    subReducers
+    transformers.authenticatedModelListResponseReducerTransformers(config.initialState)
   );
 };

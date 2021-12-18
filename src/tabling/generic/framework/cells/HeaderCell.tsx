@@ -19,7 +19,6 @@ interface IHeaderCompParams {
   progressSort(multiSort: boolean): void;
   setSort(sort: string, multiSort?: boolean): void;
   showColumnMenu(menuButton: HTMLElement): void;
-  api: any;
 }
 
 export interface HeaderCellProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
@@ -29,17 +28,15 @@ export interface HeaderCellProps<R extends Table.RowData, M extends Model.RowHtt
   column: Table.Column<R, M>;
 }
 
-/* eslint-disable indent */
 const HeaderCell = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
   column,
   displayName,
   className,
   style = {},
-  onEdit,
-  ...props
+  onEdit
 }: HeaderCellProps<R, M>): JSX.Element => {
   const columnType: Table.ColumnType | null = useMemo(() => {
-    return find(tabling.models.ColumnTypes, { id: column.columnType } as any) || null;
+    return find(tabling.models.ColumnTypes, { id: column.columnType }) || null;
   }, [column]);
 
   const columnStyle = useMemo(() => {

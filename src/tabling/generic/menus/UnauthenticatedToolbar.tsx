@@ -11,7 +11,6 @@ interface UnauthenticatedToolbarProps<R extends Table.RowData, M extends Model.R
   readonly hiddenColumns?: Table.HiddenColumns;
 }
 
-/* eslint-disable indent */
 const UnauthenticatedToolbar = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: UnauthenticatedToolbarProps<R, M>
 ): JSX.Element => {

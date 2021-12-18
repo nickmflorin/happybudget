@@ -3,7 +3,10 @@ import { Tag } from "components/tagging";
 
 import TableModelMenu from "./TableModelMenu";
 
-export type ModelTagsMenuProps<M extends Model.Model, S extends object = MenuItemSelectedState> = IMenu<S, M> & {
+export type ModelTagsMenuProps<
+  M extends Model.Model,
+  S extends Record<string, unknown> = MenuItemSelectedState
+> = IMenu<S, M> & {
   readonly tagProps?: Omit<TagProps<M>, "children" | "model" | "text">;
   /* <Tag> components should be generated based on a provided Array of objects
 	   (ITag), each of which contains the properties necessary to create a <Tag>
@@ -16,7 +19,7 @@ export type ModelTagsMenuProps<M extends Model.Model, S extends object = MenuIte
   readonly onMissing?: JSX.Element | EmptyTagProps;
 };
 
-const ModelTagsMenu = <M extends Model.Model, S extends object = MenuItemSelectedState>(
+const ModelTagsMenu = <M extends Model.Model, S extends Record<string, unknown> = MenuItemSelectedState>(
   props: Omit<ModelTagsMenuProps<M, S>, "renderItemContent">
 ): JSX.Element => {
   return (

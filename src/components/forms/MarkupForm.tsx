@@ -34,7 +34,7 @@ const MarkupForm = (
     <Form.Form
       layout={"vertical"}
       {...props}
-      onValuesChange={(changedValues: any, values: any) => {
+      onValuesChange={(changedValues: Partial<MarkupFormValues>, values: MarkupFormValues) => {
         if (!isNil(changedValues.unit)) {
           setUnitState(changedValues.unit);
         }
@@ -61,8 +61,8 @@ const MarkupForm = (
         style={unitState !== budgeting.models.MarkupUnitModels.PERCENT.id ? { display: "none" } : {}}
         rules={[
           { required: false },
-          ({ getFieldValue }: { getFieldValue: any }) => ({
-            validator(rule: any, value: string) {
+          () => ({
+            validator(rule: unknown, value: string) {
               if (value !== "" && !isNil(value) && !util.validate.validateNumeric(value)) {
                 return Promise.reject("Please enter a valid number.");
               }
@@ -79,8 +79,8 @@ const MarkupForm = (
         style={unitState !== budgeting.models.MarkupUnitModels.FLAT.id ? { display: "none" } : {}}
         rules={[
           { required: false },
-          ({ getFieldValue }: { getFieldValue: any }) => ({
-            validator(rule: any, value: string) {
+          () => ({
+            validator(rule: unknown, value: string) {
               if (value !== "" && !isNil(value) && !util.validate.validateNumeric(value)) {
                 return Promise.reject("Please enter a valid number.");
               }
@@ -101,8 +101,8 @@ const MarkupForm = (
         label={"Include Accounts"}
         rules={[
           { required: false },
-          ({ getFieldValue }: { getFieldValue: any }) => ({
-            validator(rule: any, value: number[]) {
+          ({ getFieldValue }: { getFieldValue: (field: string) => number }) => ({
+            validator(rule: unknown, value: number[]) {
               /* If the unit is FLAT, we do not allow children - but we have to
 								 just filter those out in the payload before the API request as
 								 doing that validation here will prevent the form from submitting

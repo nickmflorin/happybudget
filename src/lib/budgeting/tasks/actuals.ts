@@ -18,8 +18,8 @@ export type ActualsTableActionMap = Redux.AuthenticatedTableActionMap<R, M, Tabl
 };
 
 export type ActualsTableTaskConfig = Table.TaskConfig<R, M, Tables.ActualTableContext, ActualsTableActionMap> & {
-  readonly selectStore: (state: Application.Authenticated.Store) => Tables.ActualTableStore;
-  readonly selectOwnersSearch: (state: Application.Authenticated.Store) => string;
+  readonly selectStore: (state: Application.AuthenticatedStore) => Tables.ActualTableStore;
+  readonly selectOwnersSearch: (state: Application.AuthenticatedStore) => string;
 };
 
 export type ActualsTableTaskMap = Redux.TableTaskMap<R, M, Tables.ActualTableContext> & {
@@ -28,25 +28,6 @@ export type ActualsTableTaskMap = Redux.TableTaskMap<R, M, Tables.ActualTableCon
 
 export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTableTaskMap => {
   const contactsTasks = createTaskSet({ authenticated: true });
-
-  function* request(
-    action: Redux.ActionWithContext<Redux.TableRequestPayload, Tables.ActualTableContext>
-  ): SagaIterator {
-    yield put(config.actions.loading(true));
-    try {
-      yield all([
-        call(requestActuals, action.context.budgetId),
-        call(requestActualTypes),
-        call(requestActualOwners, action as Redux.ActionWithContext<null, Tables.ActualTableContext>),
-        call(contactsTasks.request, action as Redux.Action<null>)
-      ]);
-    } catch (e: unknown) {
-      notifications.requestError(e as Error, { message: "There was an error retrieving the table data." });
-      yield put(config.actions.response({ models: [] }));
-    } finally {
-      yield put(config.actions.loading(false));
-    }
-  }
 
   function* requestActualTypes(): SagaIterator {
     const response = yield api.request(api.getActualTypes);
@@ -75,10 +56,31 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
       const response = yield api.request(api.getBudgetActualOwners, action.context.budgetId, { search, page_size: 10 });
       yield put(config.actions.responseActualOwners(response));
     } catch (e: unknown) {
-      notifications.requestError(e as Error, { message: "There was an error retrieving the budget's items." });
+      config.table.notify({ message: "There was an error retrieving the table data.", level: "error" });
+      notifications.requestError(e as Error);
       yield put(config.actions.responseActualOwners({ count: 0, data: [] }));
     } finally {
       yield put(config.actions.loadingActualOwners(false));
+    }
+  }
+
+  function* request(
+    action: Redux.ActionWithContext<Redux.TableRequestPayload, Tables.ActualTableContext>
+  ): SagaIterator {
+    yield put(config.actions.loading(true));
+    try {
+      yield all([
+        call(requestActuals, action.context.budgetId),
+        call(requestActualTypes),
+        call(requestActualOwners, action as Redux.ActionWithContext<null, Tables.ActualTableContext>),
+        call(contactsTasks.request, action as Redux.Action<null>)
+      ]);
+    } catch (e: unknown) {
+      config.table.notify({ message: "There was an error retrieving the table data.", level: "error" });
+      notifications.requestError(e as Error);
+      yield put(config.actions.response({ models: [] }));
+    } finally {
+      yield put(config.actions.loading(false));
     }
   }
 
@@ -115,7 +117,8 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
       );
       yield put(config.actions.updateBudgetInState({ id: r.data.id, data: r.data }));
     } catch (err: unknown) {
-      notifications.requestError(err as Error, { message: errorMessage });
+      config.table.notify({ message: errorMessage, level: "error" });
+      notifications.requestError(err as Error);
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -127,7 +130,8 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
       const r: Http.BulkDeleteResponse<Model.Budget> = yield api.request(api.bulkDeleteBudgetActuals, budgetId, ids);
       yield put(config.actions.updateBudgetInState({ id: r.data.id, data: r.data }));
     } catch (err: unknown) {
-      notifications.requestError(err as Error, { message: errorMessage });
+      config.table.notify({ message: errorMessage });
+      notifications.requestError(err as Error);
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -152,7 +156,8 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
         )
       );
     } catch (err: unknown) {
-      notifications.requestError(err as Error, { message: "There was an error moving the row." });
+      config.table.notify({ message: "There was an error moving the table rows.", level: "error" });
+      notifications.requestError(err as Error);
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -163,7 +168,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     try {
       const response: M = yield api.request(api.createActual, context.budgetId, {
         previous: e.payload.previous,
-        ...tabling.http.postPayload(e.payload.data, config.table.getColumns())
+        ...tabling.http.postPayload<R, M, P>(e.payload.data, config.table.getColumns())
       });
       yield put(
         config.actions.tableChanged(
@@ -175,7 +180,8 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
         )
       );
     } catch (err: unknown) {
-      notifications.requestError(err as Error, { message: "There was an error adding the row." });
+      config.table.notify({ message: "There was an error adding the table rows.", level: "error" });
+      notifications.requestError(err as Error);
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -196,7 +202,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
   function* handleDataChangeEvent(e: Table.DataChangeEvent<R>, context: Tables.ActualTableContext): SagaIterator {
     const merged = tabling.events.consolidateRowChanges(e.payload);
     if (merged.length !== 0) {
-      const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.table.getColumns());
+      const requestPayload = tabling.http.createBulkUpdatePayload<R, M, P>(merged, config.table.getColumns());
       if (requestPayload.data.length !== 0) {
         yield fork(bulkUpdateTask, context.budgetId, e, requestPayload, "There was an error updating the rows.");
       }

@@ -1,9 +1,9 @@
 import classNames from "classnames";
 import Alert, { AlertProps } from "./Alert";
 
-export interface InfoProps extends Omit<AlertProps, "type"> {}
+export type InfoProps = Omit<AlertProps, "level">;
 
-const Info: React.FC<InfoProps> = ({ children, className, ...props }) => (
+const Info: React.FC<InfoProps> = ({ className, ...props }) => (
   <Alert {...props} className={classNames("info", className)} level={"info"} />
 );
 

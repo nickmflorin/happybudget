@@ -79,7 +79,7 @@ const Previewer = ({
 
   const exportPdf = hooks.useDynamicCallback((params: Pdf.IPreviewerExportParams) => {
     // The default behavior is to regenerate the file on export.
-    let fname = params.filename || filename;
+    const fname = params.filename || filename;
     if (regenerateFileOnExport === false) {
       if (!isNil(file)) {
         util.files.download(file, !fname.endsWith(".pdf") ? `${fname}.pdf` : fname, {

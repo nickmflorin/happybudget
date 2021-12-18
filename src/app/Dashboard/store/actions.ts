@@ -53,7 +53,9 @@ export const loadingBudgetsAction = redux.actions.createAction<boolean>(ActionTy
 export const responseBudgetsAction = redux.actions.createAction<Http.ListResponse<Model.SimpleBudget>>(
   ActionType.Budgets.Response
 );
-export const setBudgetsSearchAction = redux.actions.createAction<string>(ActionType.Budgets.SetSearch);
+export const setBudgetsSearchAction = redux.actions.createContextAction<string, Table.Context>(
+  ActionType.Budgets.SetSearch
+);
 export const setBudgetsPaginationAction = redux.actions.createAction<Pagination>(ActionType.Budgets.SetPagination);
 export const updateBudgetsOrderingAction = redux.actions.createAction<Redux.UpdateOrderingPayload>(
   ActionType.Budgets.UpdateOrdering
@@ -69,7 +71,9 @@ export const loadingTemplatesAction = redux.actions.createAction<boolean>(Action
 export const responseTemplatesAction = redux.actions.createAction<Http.ListResponse<Model.SimpleTemplate>>(
   ActionType.Templates.Response
 );
-export const setTemplatesSearchAction = redux.actions.createAction<string>(ActionType.Templates.SetSearch);
+export const setTemplatesSearchAction = redux.actions.createContextAction<string, Table.Context>(
+  ActionType.Templates.SetSearch
+);
 export const setTemplatesPaginationAction = redux.actions.createAction<Pagination>(ActionType.Templates.SetPagination);
 export const updateTemplatesOrderingAction = redux.actions.createAction<Redux.UpdateOrderingPayload>(
   ActionType.Templates.UpdateOrdering
@@ -87,7 +91,9 @@ export const loadingCommunityTemplatesAction = redux.actions.createAction<boolea
 export const responseCommunityTemplatesAction = redux.actions.createAction<Http.ListResponse<Model.SimpleTemplate>>(
   ActionType.Community.Response
 );
-export const setCommunityTemplatesSearchAction = redux.actions.createAction<string>(ActionType.Community.SetSearch);
+export const setCommunityTemplatesSearchAction = redux.actions.createContextAction<string, Table.Context>(
+  ActionType.Community.SetSearch
+);
 export const setCommunityTemplatesPaginationAction = redux.actions.createAction<Pagination>(
   ActionType.Community.SetPagination
 );
@@ -110,7 +116,9 @@ export const handleContactsTableChangeEventAction = redux.actions.createContextA
 >(ActionType.Contacts.TableChanged);
 
 export const savingContactsTableAction = redux.actions.createAction<boolean>(ActionType.Contacts.Saving);
-export const setContactsSearchAction = redux.actions.createAction<string>(ActionType.Contacts.SetSearch);
+export const setContactsSearchAction = redux.actions.createContextAction<string, Tables.ContactTableContext>(
+  ActionType.Contacts.SetSearch
+);
 
 export const requestContactsAction = redux.actions.createContextAction<
   Redux.TableRequestPayload,

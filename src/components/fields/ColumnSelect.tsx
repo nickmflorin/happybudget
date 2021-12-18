@@ -8,24 +8,44 @@ import { Icon } from "components";
 import Select, { SelectProps } from "./Select";
 
 // Does not seem to be exportable from AntD/RCSelect so we just copy it here.
-type CustomTagProps = {
-  readonly label: React.ReactNode;
-  readonly value: any;
-  readonly disabled: boolean;
-  readonly onClose: (event?: React.MouseEvent<HTMLElement, MouseEvent>) => void;
-  readonly closable: boolean;
-};
+type Key = string | number;
+type RawValueType = string | number;
 
-export interface ColumnSelectProps<R extends Table.RowData, M extends Model.RowHttpModel> extends SelectProps<string> {
-  readonly columns: Table.Column<R, M>[];
-  readonly getLabel: (c: Table.Column<R, M>) => string;
+interface LabelValueType {
+  key?: Key;
+  value?: RawValueType;
+  label?: React.ReactNode;
+  isCacheable?: boolean;
 }
 
-const ColumnSelect = <R extends Table.RowData, M extends Model.RowHttpModel>({
+type DefaultValueType = RawValueType | RawValueType[] | LabelValueType | LabelValueType[];
+
+type CustomTagProps = {
+  label: React.ReactNode;
+  value: DefaultValueType;
+  disabled: boolean;
+  onClose: (event?: React.MouseEvent<HTMLElement, MouseEvent>) => void;
+  closable: boolean;
+};
+
+export interface ColumnSelectProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
+> extends SelectProps<string> {
+  readonly columns: C[];
+  readonly getLabel: (c: C) => string;
+}
+
+const ColumnSelect = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
+>({
   columns,
   getLabel,
   ...props
-}: ColumnSelectProps<R, M>): JSX.Element => {
+}: ColumnSelectProps<R, M, C>): JSX.Element => {
   return (
     <Select
       suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
@@ -34,10 +54,7 @@ const ColumnSelect = <R extends Table.RowData, M extends Model.RowHttpModel>({
       mode={"multiple"}
       showArrow
       tagRender={(params: CustomTagProps) => {
-        const column = find(
-          columns,
-          (c: Table.Column<R, M>) => tabling.columns.normalizedField<R, M>(c) === params.value
-        );
+        const column = find(columns, (c: C) => tabling.columns.normalizedField<R, M, C>(c) === params.value);
         if (!isNil(column)) {
           const colType: Table.ColumnType | undefined = !isNil(column.columnType)
             ? find(tabling.models.ColumnTypes, { id: column.columnType })
@@ -61,13 +78,13 @@ const ColumnSelect = <R extends Table.RowData, M extends Model.RowHttpModel>({
         return <></>;
       }}
     >
-      {map(columns, (column: Table.Column<R, M>, index: number) => {
+      {map(columns, (column: C, index: number) => {
         const colType = find(tabling.models.ColumnTypes, { id: column.columnType });
         return (
           <Select.Option
             className={"column-select-option"}
             key={index + 1}
-            value={tabling.columns.normalizedField<R, M>(column) as string}
+            value={tabling.columns.normalizedField<R, M, C>(column) as string}
           >
             {!isNil(colType) && !isNil(colType.icon) && (
               <div className={"icon-wrapper"}>

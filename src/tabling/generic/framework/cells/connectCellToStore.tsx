@@ -3,20 +3,18 @@ import { useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
-/* eslint-disable indent */
 const connectCellToStore = <
-  R extends Table.RowData = object,
+  R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   T extends Table.CellProps<R, M, S> = Table.CellProps<R, M, S>
 >(
-  Component: React.ComponentClass<T, {}> | React.FunctionComponent<T>
+  Component: React.ComponentClass<T, Record<string, unknown>> | React.FunctionComponent<T>
 ) => {
   const WithConnectedCell = (
     props: T & { readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>> }
   ): JSX.Element => {
-    let selectorFn: Table.RowDataSelector<R> | ((state: Application.Store) => null) = (state: Application.Store) =>
-      null;
+    let selectorFn: Table.RowDataSelector<R> | ((state: Application.Store) => null) = () => null;
     if (props.gridId !== "data" && !isNil(props.footerRowSelectors)) {
       const fn: Table.RowDataSelector<R> | undefined = props.footerRowSelectors[props.gridId];
       if (!isNil(fn)) {

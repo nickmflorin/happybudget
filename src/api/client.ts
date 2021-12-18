@@ -9,7 +9,7 @@ import * as codes from "./codes";
 import * as errors from "./errors";
 
 /* eslint-disable no-shadow */
-/* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export enum HttpRequestMethods {
   GET = "GET",
   POST = "POST",
@@ -50,14 +50,14 @@ instance.interceptors.request.use((config: AxiosRequestConfig): AxiosRequestConf
   return config;
 });
 
-export const filterPayload = <T extends { [key: string]: any } = { [key: string]: any }>(payload: T): T => {
-  let newPayload: { [key: string]: any } = {};
+export const filterPayload = <T extends Http.PayloadObj = Http.PayloadObj>(payload: T): T => {
+  const newPayload: T = {} as T;
   Object.keys(payload).forEach((key: string) => {
-    if (payload[key] !== undefined) {
-      newPayload[key] = payload[key];
+    if (typeof payload === "object" && payload[key as keyof T] !== undefined) {
+      newPayload[key as keyof T] = payload[key as keyof T];
     }
   });
-  return newPayload as T;
+  return newPayload;
 };
 
 /**
@@ -131,7 +131,7 @@ const throwClientError = (error: AxiosError<Http.ErrorResponse>, options: Http.R
 };
 
 instance.interceptors.response.use(
-  (response: AxiosResponse<any>): AxiosResponse<any> => response,
+  (response: AxiosResponse<Http.Response>): AxiosResponse<Http.Response> => response,
   (error: AxiosError<Http.ErrorResponse>) => {
     if (!isNil(error.response)) {
       const response = error.response;
@@ -158,7 +158,7 @@ export class ApiClient {
 
   _prepare_url = (
     url: Http.V1Url,
-    query: Http.Query = {},
+    query: Http.ListQuery<string> = {},
     method:
       | HttpRequestMethods.POST
       | HttpRequestMethods.GET
@@ -168,15 +168,12 @@ export class ApiClient {
   ): Http.V1Url => {
     if (method === HttpRequestMethods.GET) {
       const { ordering, ...rest } = query;
+      let rawQuery: Http.RawQuery = { ...rest };
       // Convert Ordering to String if Present
       if (method === HttpRequestMethods.GET && !isNil(ordering)) {
-        if (typeof ordering !== "string") {
-          rest.ordering = util.urls.convertOrderingQueryToString(ordering);
-        } else {
-          rest.ordering = ordering;
-        }
+        rawQuery = { ...rawQuery, ordering: util.urls.convertOrderingQueryToString(ordering) };
       }
-      url = util.urls.addQueryParamsToUrl(url, rest, { filter: [""] }) as Http.V1Url;
+      url = util.urls.addQueryParamsToUrl(url, rawQuery, { filter: [""] }) as Http.V1Url;
     } else if (!url.endsWith("/")) {
       url = (url + "/") as Http.V1Url;
     }
@@ -202,13 +199,13 @@ export class ApiClient {
       | HttpRequestMethods.DELETE
       | HttpRequestMethods.PATCH,
     url: Http.V1Url,
-    query: Http.Query = {},
-    payload: Http.Payload = {},
+    query: Http.ListQuery<string> = {},
+    payload: Partial<Http.Payload> = {},
     options: Http.RequestOptions
   ): Promise<T> => {
     axiosRetry(this.instance, { retries: options.retries });
 
-    const lookup: { [key: string]: any } = {
+    const lookup = {
       [HttpRequestMethods.POST]: this.instance.post,
       [HttpRequestMethods.GET]: this.instance.get,
       [HttpRequestMethods.PUT]: this.instance.put,
@@ -216,9 +213,14 @@ export class ApiClient {
       [HttpRequestMethods.PATCH]: this.instance.patch
     };
     url = this._prepare_url(url, query, method);
-    const response: AxiosResponse<T> = await lookup[method](url, filterPayload(payload), {
-      cancelToken: options.cancelToken
-    });
+    let response: AxiosResponse<T>;
+    if (method === HttpRequestMethods.GET || method === HttpRequestMethods.DELETE) {
+      response = await lookup[method](url, { cancelToken: options.cancelToken });
+    } else {
+      response = await lookup[method](url, filterPayload(payload as Http.PayloadObj), {
+        cancelToken: options.cancelToken
+      });
+    }
     /* We are getting sporadic errors where the response is not defined.  I am
        not exactly sure why this is happening, but it could be related to request
        cancellation.  For now, we will just allow the return value to be undefined
@@ -235,7 +237,11 @@ export class ApiClient {
    * @param query   The query parameters to embed in the URL.
    * @param options The options for the request (see IRequestOptions).
    */
-  get = async <T>(url: Http.V1Url, query: Http.Query = {}, options: Http.RequestOptions = {}): Promise<T> => {
+  get = async <T>(
+    url: Http.V1Url,
+    query: Http.ListQuery<string> = {},
+    options: Http.RequestOptions = {}
+  ): Promise<T> => {
     return this.request<T>(HttpRequestMethods.GET, url, query, {}, options);
   };
 
@@ -273,13 +279,17 @@ export class ApiClient {
    * @param payload    The JSON body of the request.
    * @param options    The options for the request (see IRequestOptions).
    */
-  post = async <T>(url: Http.V1Url, payload: Http.Payload = {}, options: Http.RequestOptions = {}): Promise<T> => {
+  post = async <T, P extends Http.Payload = Http.Payload>(
+    url: Http.V1Url,
+    payload: P = {} as P,
+    options: Http.RequestOptions = {}
+  ): Promise<T> => {
     return this.request<T>(HttpRequestMethods.POST, url, {}, payload, options);
   };
 
-  upload = async <T>(
+  upload = async <T, P extends Http.Payload = Http.Payload>(
     url: Http.V1Url,
-    payload: Http.Payload = {},
+    payload: P = {} as P,
     options: Http.RequestOptions = {}
   ): Promise<AxiosResponse<T>> => {
     url = this._prepare_url(url, {}, HttpRequestMethods.POST);
@@ -287,17 +297,6 @@ export class ApiClient {
       cancelToken: options.cancelToken || undefined,
       headers: options.headers
     });
-  };
-
-  /**
-   * Sends a PUT request to the provided URL.
-   *
-   * @param url        The URL to send the PUT request.
-   * @param payload    The JSON body of the request.
-   * @param options    The options for the request (see IRequestOptions).
-   */
-  put = async <T>(url: Http.V1Url, payload: Http.Payload = {}, options: Http.RequestOptions = {}): Promise<T> => {
-    return this.request<T>(HttpRequestMethods.PUT, url, {}, payload, options);
   };
 
   /**
@@ -318,7 +317,11 @@ export class ApiClient {
    * @param payload    The JSON body of the request.
    * @param options    The options for the request (see IRequestOptions).
    */
-  patch = async <T>(url: Http.V1Url, payload: Http.Payload = {}, options: Http.RequestOptions = {}): Promise<T> => {
+  patch = async <T, P extends Http.Payload = Http.Payload>(
+    url: Http.V1Url,
+    payload: Partial<P> = {} as P,
+    options: Http.RequestOptions = {}
+  ): Promise<T> => {
     return this.request(HttpRequestMethods.PATCH, url, {}, payload, options);
   };
 }

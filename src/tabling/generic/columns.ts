@@ -3,10 +3,9 @@ import { SuppressKeyboardEventParams, CellClassParams } from "@ag-grid-community
 
 import { util, tabling, budgeting } from "lib";
 
-/* eslint-disable indent */
 export const ActionColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  col: Partial<Table.Column<R, M, any>>
-): Table.Column<R, M, any> => ({
+  col: Partial<Table.Column<R, M>>
+): Table.Column<R, M> => ({
   ...col,
   selectable: false,
   tableColumnType: "action",
@@ -21,22 +20,18 @@ export const ActionColumn = <R extends Table.RowData, M extends Model.RowHttpMod
   canBeExported: false
 });
 
-export const FakeColumn = <R extends Table.RowData, M extends Model.RowHttpModel, PDFM extends Model.RowHttpModel>(
-  col: Partial<Table.Column<R, M, any, PDFM>>
-): Table.Column<R, M, any, PDFM> => ({
+export const FakeColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+  col: Partial<Table.Column<R, M>>
+): Table.Column<R, M> => ({
   ...col,
   canBeHidden: false,
   tableColumnType: "fake"
 });
 
-export const CalculatedColumn = <
-  R extends Table.RowData,
-  M extends Model.RowHttpModel,
-  PDFM extends Model.RowHttpModel
->(
-  col: Partial<Table.Column<R, M, number, PDFM>>,
+export const CalculatedColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+  col: Partial<Table.Column<R, M, number>>,
   width?: number
-): Table.Column<R, M, number, PDFM> => {
+): Table.Column<R, M, number> => {
   return {
     ...col,
     cellStyle: { textAlign: "right", ...col?.cellStyle },
@@ -93,11 +88,10 @@ export const AttachmentsColumn = <
 export const BodyColumn = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  V = any,
-  PDFM extends Model.RowHttpModel = any
+  V extends Table.RawRowValue = Table.RawRowValue
 >(
-  col?: Partial<Table.Column<R, M, V, PDFM>>
-): Table.Column<R, M, V, PDFM> => {
+  col?: Partial<Table.Column<R, M, V>>
+): Table.Column<R, M, V> => {
   return {
     ...col,
     tableColumnType: "body"
@@ -109,7 +103,6 @@ export const DragColumn = <R extends Table.RowData, M extends Model.RowHttpModel
   width?: number
 ): Table.Column<R, M> =>
   ActionColumn({
-    /* eslint-disable indent */
     ...col,
     colId: "drag",
     cellClass: ["cell--renders-html", "cell--drag"],
@@ -119,11 +112,10 @@ export const DragColumn = <R extends Table.RowData, M extends Model.RowHttpModel
   }) as Table.Column<R, M>;
 
 export const EditColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  col: Partial<Table.Column<R, M, any>>,
+  col: Partial<Table.Column<R, M>>,
   width?: number
-): Table.Column<R, M, any> =>
+): Table.Column<R, M> =>
   ActionColumn({
-    /* eslint-disable indent */
     cellRenderer: { data: "EditCell" },
     ...col,
     width: !isNil(width) ? width : 30,
@@ -137,7 +129,6 @@ export const CheckboxColumn = <R extends Table.RowData, M extends Model.RowHttpM
   width?: number
 ): Table.Column<R, M> =>
   ActionColumn({
-    /* eslint-disable indent */
     cellRenderer: "EmptyCell",
     ...col,
     colId: "checkbox",
@@ -162,12 +153,11 @@ export const CheckboxColumn = <R extends Table.RowData, M extends Model.RowHttpM
 export const SelectColumn = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  V = any,
-  PDFM extends Model.RowHttpModel = any
+  V extends Table.RawRowValue = Table.RawRowValue
 >(
-  col: Partial<Table.Column<R, M, V, PDFM>>
-): Table.Column<R, M, V, PDFM> => {
-  return BodyColumn<R, M, V, PDFM>({
+  col: Partial<Table.Column<R, M, V>>
+): Table.Column<R, M, V> => {
+  return BodyColumn<R, M, V>({
     columnType: "singleSelect",
     suppressSizeToFit: true,
     ...col,
@@ -186,18 +176,14 @@ export const SelectColumn = <
   });
 };
 
-export const TagSelectColumn = <
-  R extends Table.RowData,
-  M extends Model.RowHttpModel,
-  PDFM extends Model.RowHttpModel = any
->(
-  col: Partial<Table.Column<R, M, Model.Tag, PDFM>>
-): Table.Column<R, M, Model.Tag, PDFM> => {
+export const TagSelectColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+  col: Partial<Table.Column<R, M, Model.Tag>>
+): Table.Column<R, M, Model.Tag> => {
   return SelectColumn({
     processCellForClipboard: (row: R) => {
       const field = col?.field || (col?.colId as keyof R);
       if (!isNil(field)) {
-        const m: Model.Tag | undefined = util.getKeyValue<R, keyof R>(field)(row) as any;
+        const m: Model.Tag | undefined = util.getKeyValue<R, keyof R>(field)(row) as unknown as Model.Tag | undefined;
         return m?.title || "";
       }
       return "";
@@ -209,17 +195,16 @@ export const TagSelectColumn = <
 export const ChoiceSelectColumn = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  C extends Model.Choice<any, any> = Model.Choice<any, any>,
-  PDFM extends Model.RowHttpModel = any
+  C extends Model.Choice<number, string> | null = Model.Choice<number, string> | null
 >(
-  col: Partial<Table.Column<R, M, C, PDFM>>
-): Table.Column<R, M, C, PDFM> => {
-  return SelectColumn<R, M, C, PDFM>({
+  col: Partial<Table.Column<R, M, C>>
+): Table.Column<R, M, C> => {
+  return SelectColumn<R, M, C>({
     getHttpValue: (value: C | null): ID | null => (!isNil(value) ? value.id : null),
     processCellForClipboard: (row: R) => {
       const field = col.field || (col.colId as keyof R);
       if (!isNil(field)) {
-        const m: C | undefined = util.getKeyValue<R, keyof R>(field)(row) as any;
+        const m: C | undefined = util.getKeyValue<R, keyof R>(field)(row) as unknown as C | undefined;
         return m?.name || "";
       }
       return "";
@@ -228,15 +213,14 @@ export const ChoiceSelectColumn = <
   });
 };
 
-/* eslint-disable indent */
 export const IdentifierColumn = <
+  T extends "account" | "subaccount",
   R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel,
-  PDFM extends Model.RowHttpModel = any
+  M extends Model.RowHttpModel<T>
 >(
-  props: Partial<Table.Column<R, M, string | null, PDFM>>
-): Table.Column<R, M, string | null, PDFM> => {
-  return BodyColumn<R, M, string | null, PDFM>({
+  props: Partial<Table.Column<R, M, string | null>>
+): Table.Column<R, M, string | null> => {
+  return BodyColumn<R, M, string | null>({
     columnType: "number",
     smartInference: true,
     ...props,
@@ -293,42 +277,30 @@ export const IdentifierColumn = <
   });
 };
 
-export const EstimatedColumn = <
-  R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel,
-  PDFM extends Model.RowHttpModel = any
->(
-  props: Partial<Table.Column<R, M, number, PDFM>>
-): Table.Column<R, M, number, PDFM> => {
-  return CalculatedColumn<R, M, PDFM>({
+export const EstimatedColumn = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel>(
+  props: Partial<Table.Column<R, M, number>>
+): Table.Column<R, M, number> => {
+  return CalculatedColumn<R, M>({
     ...props,
     headerName: "Estimated",
     valueGetter: budgeting.valueGetters.estimatedValueGetter
   });
 };
 
-export const ActualColumn = <
-  R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel,
-  PDFM extends Model.RowHttpModel = any
->(
-  props: Partial<Table.Column<R, M, number, PDFM>>
-): Table.Column<R, M, number, PDFM> => {
-  return CalculatedColumn<R, M, PDFM>({
+export const ActualColumn = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel>(
+  props: Partial<Table.Column<R, M, number>>
+): Table.Column<R, M, number> => {
+  return CalculatedColumn<R, M>({
     ...props,
     headerName: "Actual",
     valueGetter: budgeting.valueGetters.actualValueGetter
   });
 };
 
-export const VarianceColumn = <
-  R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel,
-  PDFM extends Model.RowHttpModel = any
->(
-  props: Partial<Table.Column<R, M, number, PDFM>>
-): Table.Column<R, M, number, PDFM> => {
-  return CalculatedColumn<R, M, PDFM>({
+export const VarianceColumn = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel>(
+  props: Partial<Table.Column<R, M, number>>
+): Table.Column<R, M, number> => {
+  return CalculatedColumn<R, M>({
     ...props,
     headerName: "Variance",
     valueGetter: budgeting.valueGetters.varianceValueGetter

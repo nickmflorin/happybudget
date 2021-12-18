@@ -8,7 +8,6 @@ import * as typeguards from "./typeguards";
 import * as managers from "./managers";
 import * as patterns from "./patterns";
 
-/* eslint-disable indent */
 export const groupRowFromState = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
   action: Redux.Action,
   st: S,
@@ -60,7 +59,7 @@ const removeRowsFromTheirGroupsIfTheyExist = <
   };
   type AlteredGroups = { [key: Table.GroupRowId]: Alteration };
 
-  let alteredGroupsWithChildren: AlteredGroups = reduce(
+  const alteredGroupsWithChildren: AlteredGroups = reduce(
     rowIds,
     (alterations: AlteredGroups, rowId: Table.ModelRowId | Table.ModelRow<R>) => {
       let r: Table.ModelRow<R> | null = null;
@@ -74,7 +73,7 @@ const removeRowsFromTheirGroupsIfTheyExist = <
         r = rowId;
       }
       if (!isNil(r)) {
-        let groupRow = rowGroupRowFromState<R, S>(action, st, r.id, { warnIfMissing: false });
+        const groupRow = rowGroupRowFromState<R, S>(action, st, r.id, { warnIfMissing: false });
         if (!isNil(groupRow)) {
           /* This will be overwrittten if a group belongs to multiple rows
 						 associated with the provided IDS - but that is what we want, because
@@ -123,7 +122,7 @@ const updateRowGroup = <R extends Table.RowData, S extends Redux.TableStore<R> =
     /* If any of the ModelRow(s) already belong to Group(s), they must be
 			 disassociated from those Group(s) since a ModelRow can only belong to one
 			 and only one Group. */
-    let newState = removeRowsFromTheirGroupsIfTheyExist(st, action, ids);
+    const newState = removeRowsFromTheirGroupsIfTheyExist(st, action, ids);
     /* Find the rows associated with this Group including the rows that are
 			 being added to the group.  Note that this is intentionally redundant (as
 			 we simply set the children propery to these IDs afterwards anyways) - but
@@ -160,7 +159,7 @@ export const createTableChangeEventReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C = any,
+  C extends Table.Context = Table.Context,
   A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
 >(
   config: Table.ReducerConfig<R, M, S, C, A> & {
@@ -187,7 +186,7 @@ export const createTableChangeEventReducer = <
       const consolidated = events.consolidateRowChanges(e.payload);
 
       // Note: This grouping may be redundant - we should investigate.
-      let changesPerRow: {
+      const changesPerRow: {
         [key: ID]: { changes: Table.RowChange<R>[]; row: Table.EditableRow<R> };
       } = {};
       for (let i = 0; i < consolidated.length; i++) {
@@ -266,7 +265,7 @@ export const createTableChangeEventReducer = <
 
 			The ordering is applied in AG Grid and subsequently, after the API request
 			succeeds, here, because it provides a much smoother experience to do it
-			immediately via AG Grid	and then do it in the background here.  However,
+			immediately via AG Grid and then do it in the background here.  However,
 			even though it is in the background here, we need to keep the state
 			ordering consistent.
 			*/
@@ -300,7 +299,7 @@ export const createTableChangeEventReducer = <
                   payload.model.id,
                   { warnIfMissing: false }
                 );
-                let previousGroupRowId = !isNil(previousGroupRow) ? previousGroupRow.id : null;
+                const previousGroupRowId = !isNil(previousGroupRow) ? previousGroupRow.id : null;
                 // Make sure the Group actually changed before proceeding.
                 if (previousGroupRowId !== groupRowId) {
                   if (groupRowId !== null) {
@@ -371,7 +370,7 @@ export const createTableChangeEventReducer = <
 
 			For Markup and Model Rows, we first have to remove the rows that we are
 			going to delete from their respective groups (if they exist).  When this
-			is done, the row data for the	groups will also be calculated based on the
+			is done, the row data for the groups will also be calculated based on the
 			new set of rows belonging to each group.
 
 			Then, we need to actually remove the rows, whether they are group rows or
@@ -384,7 +383,7 @@ export const createTableChangeEventReducer = <
         filter(state.data, (r: Table.BodyRow<R>) => typeguards.isModelRow(r)) as Table.ModelRow<R>[],
         filter(ids, (id: Table.ModelRowId | Table.MarkupRowId) => typeguards.isModelRowId(id)) as Table.ModelRowId[]
       );
-      let newState = removeRowsFromTheirGroupsIfTheyExist(state, action, modelRows);
+      const newState = removeRowsFromTheirGroupsIfTheyExist(state, action, modelRows);
       return reorderRows({
         ...newState,
         data: filter(newState.data, (ri: Table.BodyRow<R>) => !includes(ids, ri.id))
@@ -418,7 +417,7 @@ export const createTableChangeEventReducer = <
         state.data,
         (r: Table.Row<R>) => typeguards.isGroupRow(r) && intersection(r.children, newGroupRow.children).length !== 0
       ) as Table.GroupRow<R>[];
-      let newState = reduce(
+      const newState = reduce(
         groupsWithChild,
         (st: S, group: Table.GroupRow<R>) => {
           return {
@@ -457,7 +456,7 @@ export const createTableChangeEventReducer = <
           state.data,
           (r: Table.Row<R>) => typeguards.isGroupRow(r) && intersection(r.children, newGroupRow.children).length !== 0
         ) as Table.GroupRow<R>[];
-        let newState = reduce(
+        const newState = reduce(
           groupsWithChild,
           (st: S, group: Table.GroupRow<R>) => {
             return {
@@ -488,12 +487,12 @@ export const createTableReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C = any,
+  C extends Table.Context = Table.Context,
   A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
 >(
   config: Table.ReducerConfig<R, M, S, C, A>
 ): Redux.Reducer<S> => {
-  return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
+  return (state: S | undefined = config.initialState, action: Redux.Action): S => {
     let newState = { ...state };
 
     if (redux.reducers.isClearOnAction(config.clearOn, action)) {
@@ -521,7 +520,7 @@ export const createUnauthenticatedTableReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C = any
+  C extends Table.Context = Table.Context
 >(
   config: Table.ReducerConfig<R, M, S, C, Redux.TableActionMap<M, C>>
 ): Redux.Reducer<S> => {
@@ -532,7 +531,7 @@ export const createAuthenticatedTableReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C = any,
+  C extends Table.Context = Table.Context,
   A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
 >(
   config: Table.ReducerConfig<R, M, S, C, A> & {
@@ -544,8 +543,8 @@ export const createAuthenticatedTableReducer = <
   const tableEventReducer = config.eventReducer || createTableChangeEventReducer<R, M, S, C, A>(config);
   const generic = createTableReducer<R, M, S, C, A>(config);
 
-  return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
-    let newState = generic(state, action);
+  return (state: S | undefined = config.initialState, action: Redux.Action): S => {
+    const newState = generic(state, action);
     if (action.type === config.actions.tableChanged.toString()) {
       return tableEventReducer(newState, action);
     } else if (action.type === config.actions.saving.toString()) {
@@ -589,7 +588,7 @@ export const createAuthenticatedTableReducer = <
             action,
             filter(newState.data, (ri: Table.BodyRow<R>) => typeguards.isModelRow(ri)),
             update.id
-          );
+          ) as Table.ModelRow<R> | null;
           if (!isNil(r)) {
             return reorderRows({
               ...s,

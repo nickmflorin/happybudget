@@ -4,11 +4,11 @@ export * from "./util";
 export * from "./detail";
 export * from "./list";
 
-export const createSimplePayloadReducer = <P>(
+export const createSimplePayloadReducer = <P extends Redux.ActionPayload>(
   config: Redux.ReducerConfig<P, { set: Redux.ActionCreator<P> }>
 ): Redux.Reducer<P> => {
   const reducer: Redux.Reducer<P> = (state: P = config.initialState, action: Redux.Action<P>): P => {
-    if (config.actions.set.toString() === action.type) {
+    if (config.actions.set?.toString() === action.type) {
       return action.payload;
     }
     return state;
@@ -42,9 +42,8 @@ export const createModelListActionReducer =
       "initialState"
     >
   ) =>
-  /* eslint-disable indent */
   (st: Redux.ModelListActionStore = [], action: Redux.Action<Redux.ModelListActionPayload>) => {
-    if (config.actions.change.toString() === action.type) {
+    if (config.actions.change?.toString() === action.type) {
       return modelListActionReducer(st, action);
     }
     return st;

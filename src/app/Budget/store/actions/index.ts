@@ -31,7 +31,9 @@ export const handleFringesTableChangeEventAction = redux.actions.createContextAc
 >(ActionType.Fringes.TableChanged);
 
 export const savingFringesTableAction = redux.actions.createAction<boolean>(ActionType.Fringes.Saving);
-export const setFringesSearchAction = redux.actions.createAction<string>(ActionType.Fringes.SetSearch);
+export const setFringesSearchAction = redux.actions.createContextAction<string, Tables.FringeTableContext>(
+  ActionType.Fringes.SetSearch
+);
 export const addFringeModelsToStateAction = redux.actions.createAction<Redux.AddModelsToTablePayload<Model.Fringe>>(
   ActionType.Fringes.AddToState
 );

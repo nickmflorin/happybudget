@@ -69,7 +69,7 @@ const Contacts = (): JSX.Element => {
     []
   );
 
-  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   const [__, editContactModal, editContact, _] = useContacts({
     onCreated: (m: Model.Contact) => dispatch(globalActions.authenticated.addContactToStateAction(m)),
     onUpdated: (m: Model.Contact) =>

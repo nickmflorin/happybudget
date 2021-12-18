@@ -13,7 +13,7 @@ const ActualsPage = ({ budget, children }: ActualsPageProps): JSX.Element => {
   return (
     <React.Fragment>
       <Portal id={"breadcrumbs"}>
-        <BreadCrumbs
+        <BreadCrumbs<{ b: Model.Budget }>
           params={{ b: budget }}
           items={[
             {

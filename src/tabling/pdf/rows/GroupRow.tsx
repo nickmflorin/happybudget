@@ -7,13 +7,20 @@ import { budgeting } from "lib";
 import { RowExplicitCellProps } from "../cells/Cell";
 import BodyRow, { BodyRowProps } from "./BodyRow";
 
-interface GroupRowProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
-  extends BodyRowProps<R, M, Table.GroupRow<R>> {
-  readonly cellProps?: RowExplicitCellProps<R, M>;
+interface GroupRowProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
+> extends BodyRowProps<R, M, C, Table.GroupRow<R>> {
+  readonly cellProps?: RowExplicitCellProps<R, M, C>;
 }
 
-const GroupRow = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  props: GroupRowProps<R, M>
+const GroupRow = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
+>(
+  props: GroupRowProps<R, M, C>
 ): JSX.Element => {
   const cellStyle = useMemo(() => {
     if (!isNil(props.row)) {
@@ -49,7 +56,7 @@ const GroupRow = <R extends Table.RowData, M extends Model.RowHttpModel = Model.
             /* We have to add a borderLeft to the first indented column for the
 						   Group Row because the Row itself will not have a borderLeft
 							 attribute on it and the Row starts one column to the right. */
-            /* eslint-disable indent */
+
             return params.indented === false ? "group-tr-td" : params.colIndex === 0 ? "td-border-left" : "";
           }
         ],

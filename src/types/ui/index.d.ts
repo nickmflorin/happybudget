@@ -4,7 +4,7 @@ declare type SearchIndicies = SearchIndex[];
 declare type StandardComponentPropNames = "id" | "className" | "style";
 
 declare interface StandardComponentProps {
-  readonly id?: any;
+  readonly id?: string;
   readonly className?: string;
   readonly style?: React.CSSProperties;
 }
@@ -61,7 +61,7 @@ declare interface ClickableProps extends StandardComponentProps {
 
 declare type PasswordValidationID = "lowercase" | "uppercase" | "number" | "character" | "minChar";
 declare type PasswordValidationName = { id: ValidationId; name: string };
-/* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 declare type PasswordValidationState = { [key in ValidationId]: boolean };
 
 declare type Pagination = {

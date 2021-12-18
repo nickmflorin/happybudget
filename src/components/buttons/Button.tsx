@@ -1,4 +1,4 @@
-import React, { useState, useMemo, forwardRef } from "react";
+import React, { useState, useMemo, forwardRef, ForwardedRef } from "react";
 import classNames from "classnames";
 import { Button as AntDButton } from "antd";
 import { ButtonProps as AntDButtonProps } from "antd/lib/button";
@@ -37,7 +37,7 @@ const Button = (
     spinnerProps,
     ...props
   }: ButtonProps,
-  ref: any
+  ref: ForwardedRef<HTMLButtonElement>
 ): JSX.Element => {
   const isDisabled = useMemo(() => disabled === true && isNil(tooltip), [disabled, tooltip]);
   /* If the button is disabled but has a tooltip, the only way to show the

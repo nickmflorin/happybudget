@@ -22,7 +22,6 @@ export type WithWithContactsProps<
   M extends Model.RowHttpModel = Model.RowHttpModel
 > = InjectedContactsProps<R, M> & T;
 
-/* eslint-disable indent */
 const withContacts =
   <
     R extends Tables.SubAccountRowData | Tables.ActualRowData,
@@ -32,9 +31,8 @@ const withContacts =
     columns: Table.Column<R, M>[]
   ) =>
   (
-    Component:
-      | React.ComponentClass<WithWithContactsProps<T, R, M>, {}>
-      | React.FunctionComponent<WithWithContactsProps<T, R, M>>
+    Component: /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    React.ComponentClass<WithWithContactsProps<T, R, M>, any> | React.FunctionComponent<WithWithContactsProps<T, R, M>>
   ): React.FunctionComponent<T> => {
     function WithContacts(props: T) {
       const processCellFromClipboard = hooks.useDynamicCallback((name: string) => {
@@ -55,7 +53,7 @@ const withContacts =
         if (isNil(id)) {
           return "";
         }
-        const m: Model.Contact | undefined = find(props.contacts, { id } as any);
+        const m: Model.Contact | undefined = find(props.contacts, { id });
         return m?.full_name || "";
       });
 
@@ -68,7 +66,7 @@ const withContacts =
       });
 
       const cols = useMemo(() => {
-        return tabling.columns.normalizeColumns(columns, {
+        return tabling.columns.normalizeColumns<R, M>(columns, {
           contact: {
             cellRendererParams: { onEditContact: props.onEditContact },
             cellEditorParams: { onNewContact: props.onNewContact, setSearch: props.onSearchContact },

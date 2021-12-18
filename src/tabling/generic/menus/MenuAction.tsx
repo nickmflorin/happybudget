@@ -30,7 +30,6 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
         disabled={action.disabled}
         icon={ui.typeguards.iconIsJSX(action.icon) ? action.icon : <Icon icon={action.icon} />}
         tooltip={
-          /* eslint-disable indent */
           !isNil(action.tooltip)
             ? typeof action.tooltip === "string"
               ? {
@@ -57,7 +56,6 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
         disabled={action.disabled}
         icon={ui.typeguards.iconIsJSX(action.icon) ? action.icon : <Icon icon={action.icon} />}
         tooltip={
-          /* eslint-disable indent */
           !isNil(action.tooltip)
             ? typeof action.tooltip === "string"
               ? {

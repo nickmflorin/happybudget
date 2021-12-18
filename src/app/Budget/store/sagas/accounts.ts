@@ -28,7 +28,7 @@ export const createTableSaga = (table: Table.TableInstance<Tables.AccountRowData
     actions: ActionMap,
     tasks: budgeting.tasks.accounts.createTableTaskSet<Model.Budget>({
       table,
-      selectStore: (state: Application.Authenticated.Store) => state.budget.accounts,
+      selectStore: (state: Application.AuthenticatedStore) => state.budget.accounts,
       actions: ActionMap,
       services: {
         create: api.createBudgetAccount,

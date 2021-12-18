@@ -8,10 +8,7 @@ import * as actions from "./actions";
 import initialState from "./initialState";
 
 const genericReducer = combineReducers({
-  detail: redux.reducers.createDetailResponseReducer<
-    Model.Budget,
-    Omit<Redux.ModelDetailResponseActionMap<Model.Budget>, "updateInState">
-  >({
+  detail: redux.reducers.createDetailResponseReducer<Model.Budget>({
     initialState: redux.initialState.initialDetailResponseState,
     actions: {
       loading: actions.loadingBudgetAction,

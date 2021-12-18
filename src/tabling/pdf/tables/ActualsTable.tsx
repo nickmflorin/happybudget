@@ -7,17 +7,17 @@ import Table from "./Table";
 
 type M = Model.Actual;
 type R = Tables.ActualRowData;
+type C = Table.Column<R, M>;
 
 type ActualsTableProps = {
   readonly data: Model.Actual[];
-  readonly columns: Table.PdfColumn<R, M>[];
+  readonly columns: Table.Column<R, M>[];
   readonly options: ExportPdfFormOptions;
 };
 
 const ActualsTable = ({ columns, data, options }: ActualsTableProps): JSX.Element => {
   const columnIsVisible = useMemo(
-    () => (c: Table.PdfColumn<Tables.ActualRowData, Model.Actual>) =>
-      includes(options.columns, tabling.columns.normalizedField<Tables.ActualRowData, Model.Actual>(c)),
+    () => (c: C) => includes(options.columns, tabling.columns.normalizedField<R, M>(c)),
     [options.columns]
   );
 
@@ -31,13 +31,16 @@ const ActualsTable = ({ columns, data, options }: ActualsTableProps): JSX.Elemen
         rowData,
         (rws: JSX.Element[], row: Table.BodyRow<R>) => {
           if (tabling.typeguards.isModelRow(row)) {
-            return [...rws, <BodyRow columnIsVisible={columnIsVisible} columns={columns} row={row} data={rowData} />];
+            return [
+              ...rws,
+              <BodyRow<R, M, C> columnIsVisible={columnIsVisible} columns={columns} row={row} data={rowData} />
+            ];
           }
           return rws;
         },
-        [<HeaderRow columnIsVisible={columnIsVisible} columns={columns} />]
+        [<HeaderRow<R, M, C> columnIsVisible={columnIsVisible} columns={columns} />]
       ),
-      <FooterRow columnIsVisible={columnIsVisible} columns={columns} data={rowData} />
+      <FooterRow<R, M, C> columnIsVisible={columnIsVisible} columns={columns} data={rowData} />
     ];
   });
 

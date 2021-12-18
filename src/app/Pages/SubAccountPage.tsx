@@ -24,12 +24,12 @@ const SubAccountPage = <B extends Model.Budget | Model.Template>({
   return (
     <RenderIfValidId id={[subaccountId]}>
       <Portal id={"breadcrumbs"}>
-        <BreadCrumbs
+        <BreadCrumbs<{ b: B; subaccount: Model.SubAccount }>
           params={{ b: budget, subaccount: detail }}
           items={[
             {
               requiredParams: ["b"],
-              func: ({ b }: { b: Model.Budget }) => ({
+              func: ({ b }: { b: B }) => ({
                 id: b.id,
                 primary: true,
                 label: b.name,
@@ -39,7 +39,7 @@ const SubAccountPage = <B extends Model.Budget | Model.Template>({
             },
             {
               requiredParams: ["b", "subaccount"],
-              func: ({ b, subaccount }: { b: Model.Budget; subaccount: Model.SubAccount }): IBreadCrumbItem[] => {
+              func: ({ b, subaccount }: { b: B; subaccount: Model.SubAccount }): IBreadCrumbItem[] => {
                 const siblings = subaccount.siblings || [];
                 const ancestors = (subaccount.ancestors || []).slice(1) as [
                   Model.SimpleAccount,

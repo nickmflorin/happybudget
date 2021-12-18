@@ -26,8 +26,10 @@ export default class TableApis implements Table.ITableApis {
     this.store[id] = apis;
   };
 
-  public gridMap = (callback: (api: Table.GridApi) => any) => map(this.gridApis, (api: Table.GridApi) => callback(api));
-  public columnMap = (callback: (api: Table.ColumnApi) => any) =>
+  public gridMap = (callback: (api: Table.GridApi) => void) =>
+    map(this.gridApis, (api: Table.GridApi) => callback(api));
+
+  public columnMap = (callback: (api: Table.ColumnApi) => void) =>
     map(this.columnApis, (api: Table.ColumnApi) => callback(api));
 
   public clone = (): TableApis => {
@@ -35,6 +37,7 @@ export default class TableApis implements Table.ITableApis {
   };
 
   public get gridApis(): Table.GridApi[] {
+    /* eslint-disable-next-line @typescript-eslint/no-this-alias */
     const self = this;
     const ids: Table.GridId[] = Object.keys(this.store) as Table.GridId[];
     return reduce(
@@ -51,6 +54,7 @@ export default class TableApis implements Table.ITableApis {
   }
 
   public get columnApis() {
+    /* eslint-disable-next-line @typescript-eslint/no-this-alias */
     const self = this;
     const ids: Table.GridId[] = Object.keys(this.store) as Table.GridId[];
     return reduce(

@@ -3,14 +3,14 @@ import { isNil, map, reduce, filter } from "lodash";
 
 import { ProcessCellForExportParams, ProcessDataFromClipboardParams } from "@ag-grid-community/core";
 
-import { hooks, util, tabling } from "lib";
+import { hooks, tabling } from "lib";
 
 import useClipboard, { UseClipboardParams, UseClipboardReturnType } from "./useClipboard";
 
 type UseAuthenticatedClipboardReturnType<R extends Table.RowData> = [
-  ...UseClipboardReturnType<R>,
-  (p: ProcessCellForExportParams) => string,
-  (p: ProcessDataFromClipboardParams) => CSVData,
+  ...UseClipboardReturnType,
+  (p: ProcessCellForExportParams) => Table.RawRowValue,
+  (p: ProcessDataFromClipboardParams) => string[][],
   (p: Table.SoloCellChange<R> | null) => void
 ];
 
@@ -22,70 +22,88 @@ type UseAuthenticatedClipboardParams<R extends Table.RowData, M extends Model.Ro
   readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
 };
 
-const columnIsWritable = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  columns: Table.Column<R, M>[],
+const columnIsWritable = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
+>(
+  columns: C[],
   col: Table.AgColumn
-): [Table.Column<R, M>, true] | [null, false] | [Table.Column<R, M>, false] => {
+): [C, boolean] | [null, false] => {
   const field = col.getColId();
   if (!isNil(field)) {
-    const c = tabling.columns.getColumn(columns, field);
+    const c = tabling.columns.getColumn<R, M, C>(columns, field);
     return !isNil(c) ? [c, c.isWrite !== false] : [c, false];
   }
   return [null, false];
 };
 
-const getWritableColumnsAfter = <R extends Table.RowData, M extends Model.RowHttpModel>(
+const getWritableColumnsAfter = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+  C extends Table.Column<R, M> = Table.Column<R, M>
+>(
   api: Table.ColumnApi,
-  columns: Table.Column<R, M>[],
+  columns: C[],
   col: Table.AgColumn
-): Table.Column<R, M>[] => {
-  const cols: Table.Column<R, M>[] = [];
+): C[] => {
+  const cols: C[] = [];
   let current: Table.AgColumn | null = col;
   while (!isNil(current)) {
     const [c, writable] = columnIsWritable<R, M>(columns, current);
     if (writable) {
       /* If the column is writable, the first value of the array will be
          non-null so this type coercion is safe. */
-      cols.push(c as Table.Column<R, M>);
+      cols.push(c as C);
     }
     current = api.getDisplayedColAfter(current);
   }
   return cols;
 };
 
-const processValueFromClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
+const processValueFromClipboard = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+  V extends Table.RawRowValue = Table.RawRowValue,
+  C extends Table.Column<R, M, V> = Table.Column<R, M, V>
+>(
   value: string,
-  c: Table.Column<R, M>,
+  c: C,
   row?: Table.BodyRow<R> // Will not be defined when adding rows.
-) => {
+): V => {
   /* If the value is undefined, it is something wonky with AG Grid.  We should
 		 return the current value as to not cause data loss. */
   if (value === undefined) {
     if (!isNil(c.field) && !isNil(row)) {
-      return util.getKeyValue<R, keyof R>(c.field as keyof R)(row.data);
+      return row.data[c.field] as V;
     }
-    return c.nullValue === undefined ? null : c.nullValue;
+    return c.nullValue === undefined ? (null as V) : c.nullValue;
   } else {
     const processor = c.processCellFromClipboard;
     if (!isNil(processor)) {
-      value = processor(value);
+      const processedValue = processor(value);
       // The value should never be undefined at this point.
-      if (typeof value === "string" && String(value).trim() === "") {
-        return c.nullValue === undefined ? null : c.nullValue;
+      if (typeof processedValue === "string" && String(processedValue).trim() === "") {
+        return c.nullValue === undefined ? (null as V) : c.nullValue;
       }
     }
-    return value;
+    return value as V;
   }
 };
 
-const processArrayFromClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
+const processArrayFromClipboard = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+  V extends Table.RawRowValue = Table.RawRowValue,
+  C extends Table.Column<R, M, V> = Table.Column<R, M, V>
+>(
   api: Table.ColumnApi,
-  cols: Table.Column<R, M>[],
+  cols: C[],
   col: Table.AgColumn,
   arr: string[],
   row?: Table.BodyRow<R> // Will not be defined when adding rows.
-): R[keyof R][] | undefined => {
-  const columns = getWritableColumnsAfter(api, cols, col);
+): V[] | undefined => {
+  const columns = getWritableColumnsAfter<R, M>(api, cols, col) as C[];
   if (columns.length < arr.length) {
     console.warn(
       `There are ${cols.length} writable displayed columns, but the data array
@@ -99,9 +117,9 @@ const processArrayFromClipboard = <R extends Table.RowData, M extends Model.RowH
   }
   return reduce(
     arr,
-    (curr: R[keyof R][], value: string, index: number) => {
+    (curr: V[], value: string, index: number) => {
       const c = columns[index]; // Will be in the array because of the above check.
-      return [...curr, processValueFromClipboard(value, c, row)];
+      return [...curr, processValueFromClipboard<R, M, V, C>(value, c, row)];
     },
     []
   );
@@ -113,12 +131,12 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
   const [cutCellChange, setCellCutChange] = useState<Table.SoloCellChange<R> | null>(null);
   const [processCellForClipboard, getCSVData] = useClipboard({ ...params, setCellCutChange });
 
-  const processCellFromClipboard: (p: ProcessCellForExportParams) => string = hooks.useDynamicCallback(
+  const processCellFromClipboard: (p: ProcessCellForExportParams) => Table.RawRowValue = hooks.useDynamicCallback(
     (p: ProcessCellForExportParams) => {
       if (!isNil(p.node)) {
         const node: Table.RowNode = p.node;
         const field = p.column.getColId();
-        const c = tabling.columns.getColumn(params.columns, field);
+        const c = tabling.columns.getColumn<R, M>(params.columns, field);
         if (!isNil(c)) {
           if (!isNil(cutCellChange)) {
             p = { ...p, value: cutCellChange.oldValue };
@@ -129,7 +147,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
             setCellCutChange(null);
           }
           const row: Table.BodyRow<R> = node.data;
-          return processValueFromClipboard(p.value, c, row);
+          return processValueFromClipboard<R, M>(p.value, c, row);
         } else {
           console.error(`Could not find column for field ${field}!`);
           return "";
@@ -139,7 +157,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
     }
   );
 
-  const processDataFromClipboard: (p: ProcessDataFromClipboardParams) => CSVData = hooks.useDynamicCallback(
+  const processDataFromClipboard: (p: ProcessDataFromClipboardParams) => string[][] = hooks.useDynamicCallback(
     (p: ProcessDataFromClipboardParams) => {
       const apis: Table.GridApis | null = params.apis;
       if (!isNil(apis)) {
@@ -156,20 +174,20 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
              means we are trying to copy and paste with the focused cell being
              associated with a column like the index column. */
           // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-          const [c, writable] = columnIsWritable(params.columns, focusedCell.column);
+          const [c, writable] = columnIsWritable<R, M>(params.columns, focusedCell.column);
           if (writable === false) {
             return [];
           }
 
-          let newRowData: any[] = [];
+          let newRowData: string[][] = [];
 
           /* First, we need to separate out the data that corresponds to rows
 						 that should be added vs. rows that should be updated, and stagger
 						 the data corresponding to rows being updated such the paste
 						 operation will skip Group Rows. */
-          const updateRowData: any[] = reduce(
+          const updateRowData: string[][] = reduce(
             p.data,
-            (curr: (R[keyof R] | string)[][], arr: string[], i: number) => {
+            (curr: string[][], arr: string[], i: number) => {
               const rowIndex = focusedCell.rowIndex + i;
               if (rowIndex >= lastIndex) {
                 newRowData = [...newRowData, arr];
@@ -210,10 +228,15 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
 						 clipboard processing callbacks.  However, since we are concerned
 						 with data for new rows here, we have to manually apply some of
              that logic. */
-          newRowData = reduce(
+          const processedNewRowData = reduce(
             newRowData,
-            (curr: R[keyof R][][], rowData: string[], i: number) => {
-              const processed = processArrayFromClipboard(apis.column, params.columns, focusedCell.column, rowData);
+            (curr: Table.RawRowValue[][], rowData: string[]) => {
+              const processed = processArrayFromClipboard<R, M>(
+                apis.column,
+                params.columns,
+                focusedCell.column,
+                rowData
+              );
               if (isNil(processed)) {
                 return curr;
               }
@@ -226,10 +249,10 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
 						 pasted data corresponding to rows that should be added to the
 						 table - and then dispatch an event to add these rows to the table
 						 with the data provided. */
-          const cols = getWritableColumnsAfter(apis.column, params.columns, focusedCell.column);
+          const cols = getWritableColumnsAfter<R, M>(apis.column, params.columns, focusedCell.column);
           const payload = reduce(
-            newRowData,
-            (curr: Partial<R>[], rowData: R[keyof R][], i: number) => {
+            processedNewRowData,
+            (curr: Partial<R>[], rowData: Table.RawRowValue[]) => {
               /* TODO: Allow the default new row data to be defined and included
 								 in the new row data here - similiarly to how it is defined for
 								 the reducers. */
@@ -237,7 +260,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
                 ...curr,
                 reduce(
                   cols,
-                  /* eslint-disable indent */
+
                   (currD: Partial<R>, ci: Table.Column<R, M>, index: number): Partial<R> => {
                     if (!isNil(ci.parseIntoFields)) {
                       /* Note: We must apply the logic to nullify certain values
@@ -285,7 +308,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
             params.onChangeEvent({
               type: "rowAdd",
               payload,
-              placeholderIds: map(payload, (py: Partial<R>) => tabling.managers.placeholderRowId())
+              placeholderIds: map(payload, () => tabling.managers.placeholderRowId())
             });
           }
           /* All we need to do is return the data corresponding to updates to

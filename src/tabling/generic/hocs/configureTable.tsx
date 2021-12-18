@@ -99,7 +99,6 @@ const apisReducer = (state: tabling.TableApis = InitialAPIs, action: SetApiActio
   return newApis;
 };
 
-/* eslint-disable indent */
 const configureTable = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
@@ -118,16 +117,16 @@ const configureTable = <
       apis: _apis
     });
 
-    const onDataGridReady = useMemo(() => (e: Table.GridReadyEvent) => onGridReady(e, "data"), []);
-    const onFooterGridReady = useMemo(() => (e: Table.GridReadyEvent) => onGridReady(e, "footer"), []);
-    const onPageGridReady = useMemo(() => (e: Table.GridReadyEvent) => onGridReady(e, "page"), []);
-
     const onGridReady = useMemo(
       () => (e: Table.GridReadyEvent, gridId: Table.GridId) => {
         dispatchApis({ gridId, payload: { api: e.api, columnApi: e.columnApi } });
       },
       []
     );
+
+    const onDataGridReady = useMemo(() => (e: Table.GridReadyEvent) => onGridReady(e, "data"), []);
+    const onFooterGridReady = useMemo(() => (e: Table.GridReadyEvent) => onGridReady(e, "footer"), []);
+    const onPageGridReady = useMemo(() => (e: Table.GridReadyEvent) => onGridReady(e, "page"), []);
 
     const onFirstDataRendered = useMemo(
       () =>

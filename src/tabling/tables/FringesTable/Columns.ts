@@ -69,7 +69,7 @@ const Columns: Table.Column<R, M>[] = [
       }
     }
   }),
-  columns.ChoiceSelectColumn<R, M, Model.FringeUnit>({
+  columns.ChoiceSelectColumn<R, M, Model.FringeUnit | null>({
     field: "unit",
     headerName: "Unit",
     cellRenderer: { data: "FringeUnitCell" },

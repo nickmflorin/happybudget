@@ -5,7 +5,7 @@ import { LicenseManager } from "@ag-grid-enterprise/core";
 
 const configureAgGrid = () => {
   console.info("Configuring AG Grid");
-  let agGridKey = process.env.REACT_APP_AG_GRID_KEY;
+  const agGridKey = process.env.REACT_APP_AG_GRID_KEY;
   if (!isNil(agGridKey)) {
     console.info("Setting AG Grid License Key");
     LicenseManager.setLicenseKey(agGridKey);

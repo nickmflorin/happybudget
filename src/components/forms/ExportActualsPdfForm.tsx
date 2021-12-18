@@ -8,12 +8,11 @@ import { Form } from "components";
 import { ColumnSelect } from "components/fields";
 
 interface ExportActualsPdfFormProps extends FormProps<ExportPdfFormOptions> {
-  readonly disabled?: boolean;
   readonly columns: Table.Column<Tables.ActualRowData, Model.Actual>[];
 }
 
 const ExportActualsPdfForm = (
-  { disabled, columns, ...props }: ExportActualsPdfFormProps,
+  { columns, ...props }: ExportActualsPdfFormProps,
   ref: ForwardedRef<IExportFormRef>
 ): JSX.Element => {
   useImperativeHandle(ref, () => ({
@@ -37,7 +36,7 @@ const ExportActualsPdfForm = (
         labelStyle={{ marginBottom: "5px !important" }}
       >
         <Form.Item label={"Columns"} name={"columns"}>
-          <ColumnSelect
+          <ColumnSelect<Tables.ActualRowData, Model.Actual>
             getLabel={(c: Table.Column<Tables.ActualRowData, Model.Actual>) => c.pdfHeaderName || c.headerName || ""}
             columns={filter(
               columns,

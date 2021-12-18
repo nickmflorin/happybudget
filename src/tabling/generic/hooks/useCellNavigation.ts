@@ -85,7 +85,6 @@ const findNextNavigatableNodes = <R extends Table.RowData>(
   }
 };
 
-/* eslint-disable indent */
 const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   params: UseCellNavigationParams<R, M>
 ): UseCellNavigationReturnType => {
@@ -93,14 +92,14 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
     (p: NavigateToNextCellParams): Table.CellPosition => {
       if (!isNil(p.nextCellPosition)) {
         const field = p.nextCellPosition.column.getColId();
-        const column = tabling.columns.getColumn(params.columns, field);
+        const column = tabling.columns.getColumn<R, M>(params.columns, field);
         if (!isNil(column)) {
           const verticalAscend = p.previousCellPosition.rowIndex < p.nextCellPosition.rowIndex;
           const verticalDescend = p.previousCellPosition.rowIndex > p.nextCellPosition.rowIndex;
 
           if (verticalAscend === true || verticalDescend === true) {
             const direction: "asc" | "desc" = verticalAscend === true ? "asc" : "desc";
-            /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+            /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
             const [rowNodes, _, additionalIndex] = findNextNavigatableNodes(p.api, p.nextCellPosition.rowIndex, {
               direction,
               includeRowInNavigation: params.includeRowInNavigation
@@ -132,10 +131,10 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
 				 case when we are at the bottom right of the table. */
       if (!p.editing && p.nextCellPosition !== null) {
         const field = p.nextCellPosition.column.getColId();
-        const column = tabling.columns.getColumn(params.columns, field);
+        const column = tabling.columns.getColumn<R, M>(params.columns, field);
         if (!isNil(column) && column.tableColumnType === "action") {
           let nextCellPosition = { ...p.nextCellPosition };
-          /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+          /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
           const [rowNodes, _, additionalIndex] = findNextNavigatableNodes(p.api, p.nextCellPosition.rowIndex, {
             includeRowInNavigation: params.includeRowInNavigation
           });
@@ -173,26 +172,12 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
     params.apis?.grid.clearRangeSelection();
   });
 
-  const moveToNextColumn: (loc: Table.CellPosition) => void = hooks.useDynamicCallback((loc: Table.CellPosition) => {
-    const agColumns = params.apis?.column.getAllColumns();
-    if (!isNil(agColumns)) {
-      const index = agColumns.indexOf(loc.column);
-      if (index !== -1) {
-        if (index === agColumns.length - 1) {
-          moveToNextRow({ rowIndex: loc.rowIndex, column: agColumns[0] });
-        } else {
-          moveToLocation({ rowIndex: loc.rowIndex, column: agColumns[index + 1] });
-        }
-      }
-    }
-  });
-
   const moveToNextRow: (loc: Table.CellPosition) => void = hooks.useDynamicCallback((loc: Table.CellPosition) => {
     if (!isNil(params.apis)) {
       const node: Table.RowNode | undefined = params.apis.grid.getDisplayedRowAtIndex(loc.rowIndex);
       if (!isNil(node)) {
         const row: Table.BodyRow<R> = node.data;
-        /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+        /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
         const [nodes, rowIndex, _] = findNextNavigatableNodes(params.apis.grid, loc.rowIndex + 1, {
           includeRowInNavigation: params.includeRowInNavigation,
           direction: "asc"
@@ -203,7 +188,7 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
         /* We only want to add a new row if we are either at the last BodyRow of
 					 the entire table or at the last ModelRow of the entire table (in which
 					 case the only BodyRow(s) after it should be MarkupRow(s)). */
-        const newRowRequired = (r: Table.BodyRow<R>, rws: Table.BodyRow<R>[]) => {
+        const newRowRequired = (r: Table.BodyRow<R>) => {
           if (rows.length === 0) {
             return true;
           } else if (
@@ -216,13 +201,27 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
         };
 
         if (!isNil(node)) {
-          if (newRowRequired(row, rows)) {
+          if (newRowRequired(row)) {
             if (!isNil(params.onNewRowRequired)) {
               params.onNewRowRequired(loc.rowIndex);
             }
           } else {
             moveToLocation({ rowIndex, column: loc.column });
           }
+        }
+      }
+    }
+  });
+
+  const moveToNextColumn: (loc: Table.CellPosition) => void = hooks.useDynamicCallback((loc: Table.CellPosition) => {
+    const agColumns = params.apis?.column.getAllColumns();
+    if (!isNil(agColumns)) {
+      const index = agColumns.indexOf(loc.column);
+      if (index !== -1) {
+        if (index === agColumns.length - 1) {
+          moveToNextRow({ rowIndex: loc.rowIndex, column: agColumns[0] });
+        } else {
+          moveToLocation({ rowIndex: loc.rowIndex, column: agColumns[index + 1] });
         }
       }
     }

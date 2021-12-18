@@ -18,8 +18,9 @@ const BudgetForm: React.FC<BudgetFormProps> = ({ originalImage, onImageChange, .
       layout={"vertical"}
       {...props}
       onFinish={(values: Http.BudgetPayload) => {
-        let payload = { ...values };
+        const payload = { ...values };
         if (payload.template === undefined) {
+          /* eslint-disable @typescript-eslint/no-unused-vars */
           const { template, ...newPayload } = payload;
           if (!isNil(props.onFinish)) {
             props.onFinish(newPayload);

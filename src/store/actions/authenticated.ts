@@ -22,7 +22,9 @@ export const updateContactInStateAction = redux.actions.createAction<Redux.Updat
   ActionTypes.Contacts.UpdateInState
 );
 export const addContactToStateAction = redux.actions.createAction<Model.Contact>(ActionTypes.Contacts.AddToState);
-export const setContactsSearchAction = redux.actions.createAction<string>(ActionTypes.Contacts.SetSearch);
+export const setContactsSearchAction = redux.actions.createContextAction<string, Tables.ContactTableContext>(
+  ActionTypes.Contacts.SetSearch
+);
 
 export const requestFilteredContactsAction = redux.actions.createAction<null>(ActionTypes.Contacts.RequestFiltered);
 export const loadingFilteredContactsAction = redux.actions.createAction<boolean>(ActionTypes.Contacts.LoadingFiltered);

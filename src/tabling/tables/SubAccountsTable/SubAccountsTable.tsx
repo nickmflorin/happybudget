@@ -13,7 +13,7 @@ export type WithSubAccountsTableProps<T> = T;
 
 function SubAccountsTable<T extends SubAccountsTableProps>(
   Component:
-    | React.ComponentClass<WithSubAccountsTableProps<T>, {}>
+    | React.ComponentClass<WithSubAccountsTableProps<T>, Record<string, unknown>>
     | React.FunctionComponent<WithSubAccountsTableProps<T>>
 ): React.FunctionComponent<T> {
   const WithSubAccountsTable = (props: T): JSX.Element => {

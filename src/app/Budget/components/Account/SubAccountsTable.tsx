@@ -15,7 +15,7 @@ type M = Model.SubAccount;
 type R = Tables.SubAccountRowData;
 
 const selectAccountDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.budget.account.detail.data
+  (state: Application.AuthenticatedStore) => state.budget.account.detail.data
 );
 
 const ConnectedTable = connectTableToStore<
@@ -39,7 +39,7 @@ const ConnectedTable = connectTableToStore<
   createSaga: (table: Table.TableInstance<R, M>) => sagas.account.createTableSaga(table),
   footerRowSelectors: {
     page: createSelector(
-      redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.detail.data),
+      redux.selectors.simpleDeepEqualSelector((state: Application.AuthenticatedStore) => state.budget.detail.data),
       (budget: Model.Budget | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
         estimated: !isNil(budget) ? budgeting.businessLogic.estimatedValue(budget) : 0.0,
@@ -49,7 +49,7 @@ const ConnectedTable = connectTableToStore<
     ),
     footer: createSelector(
       redux.selectors.simpleDeepEqualSelector(
-        (state: Application.Authenticated.Store) => state.budget.account.detail.data
+        (state: Application.AuthenticatedStore) => state.budget.account.detail.data
       ),
       (detail: Model.Account | null) => ({
         identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
@@ -78,7 +78,7 @@ const SubAccountsTable = ({
   const history = useHistory();
 
   const accountDetail = useSelector(selectAccountDetail);
-  const table = tabling.hooks.useTable<Tables.SubAccountRowData>();
+  const table = tabling.hooks.useTable<R, M>();
 
   const [groupModals, onEditGroup, onCreateGroup] = useGrouping({
     parentId: accountId,

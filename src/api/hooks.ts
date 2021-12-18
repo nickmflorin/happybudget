@@ -4,6 +4,7 @@ import { isNil } from "lodash";
 
 import * as services from "./services";
 
+/* eslint-disable @typescript-eslint/no-empty-function */
 const DefaultCanceler: Canceler = () => {};
 
 interface UseCancelTokenConfig {
@@ -35,7 +36,6 @@ export const useCancelToken = (config?: UseCancelTokenConfig): [() => CancelToke
 };
 
 export type ModelHookOptions<M extends Model.Model> = {
-  readonly deps?: any[];
   readonly onModelLoaded?: (m: M) => void;
   readonly conditional?: () => boolean;
   readonly getToken?: null | (() => CancelToken);
@@ -67,7 +67,7 @@ export const useModel = <M extends Model.Model>(
           setLoading(false);
         });
     }
-  }, [...(options?.deps || [])]);
+  }, []);
 
   return [model, loading, error];
 };

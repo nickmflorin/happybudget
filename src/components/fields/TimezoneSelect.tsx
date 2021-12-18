@@ -6,17 +6,46 @@ import { Icon } from "components";
 import { Select } from "components/fields";
 import { SelectProps } from "components/fields/Select";
 
-interface TimezoneSelectProps extends SelectProps<string> {}
+// Copied directly from RC-Select
+interface OptionCoreData {
+  key?: string | number;
+  disabled?: boolean;
+  value: string | number;
+  title?: string;
+  className?: string;
+  style?: React.CSSProperties;
+  label?: React.ReactNode;
+  children?: React.ReactNode;
+}
 
-const TimezoneSelect: React.FC<TimezoneSelectProps> = ({ placeholder = "Time Zone", ...props }) => {
+// Copied directly from RC-Select
+interface OptionData extends OptionCoreData {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  [prop: string]: any;
+}
+
+// Copied directly from RC-Select
+export interface OptionGroupData {
+  key?: string | number;
+  label?: React.ReactNode;
+  options: OptionData[];
+  className?: string;
+  style?: React.CSSProperties;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  [prop: string]: any;
+}
+
+const TimezoneSelect: React.FC<SelectProps<string>> = ({ placeholder = "Time Zone", ...props }) => {
   return (
     <Select
-      placeholder={"Time Zone"}
+      placeholder={placeholder}
       suffixIcon={<Icon icon={"clock"} weight={"solid"} />}
       showArrow
       showSearch
-      filterOption={(input: any, option: any) =>
-        !isNil(option) ? option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0 : false
+      filterOption={(input: string, option?: OptionData | OptionGroupData) =>
+        !isNil(option) && !isNil(option.children)
+          ? (option.children as string).toLowerCase().indexOf(input.toLowerCase()) >= 0
+          : false
       }
       {...props}
     >

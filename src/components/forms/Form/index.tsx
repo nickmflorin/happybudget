@@ -1,4 +1,4 @@
-import React, { useEffect, forwardRef, useMemo } from "react";
+import React, { useEffect, forwardRef, useMemo, ForwardedRef } from "react";
 import { filter, isNil, find, indexOf, map } from "lodash";
 import classNames from "classnames";
 
@@ -16,13 +16,9 @@ import FormItemComp from "./FormItem";
 import FormLabel from "./FormLabel";
 import FormTitle from "./FormTitle";
 
-interface PrivateFormProps<T = any> extends FormProps<T> {
+interface PrivateFormProps<T = Record<string, unknown>> extends FormProps<T> {
   children: JSX.Element[] | JSX.Element;
 }
-
-const isChangeEvent = (e: React.ChangeEvent<any> | any): e is React.ChangeEvent<any> => {
-  return (e as React.ChangeEvent<any>).target !== undefined;
-};
 
 /**
  * HOC for an input type field that will auto focus the field on render.  This
@@ -30,8 +26,7 @@ const isChangeEvent = (e: React.ChangeEvent<any> | any): e is React.ChangeEvent<
  * first in a Form.
  */
 const withAutoFocusInput =
-  <P extends object>(Component: React.ComponentType<P>) =>
-  /* eslint-disable indent */
+  <P extends Record<string, unknown>>(Component: React.ComponentType<P>) =>
   (props: P): JSX.Element => {
     const inputRef = React.useRef<Input>(null);
 
@@ -48,11 +43,11 @@ const withAutoFocusInput =
  * is capable of being focused.
  */
 const withFormItemFirstInputFocused = <
-  T extends { [key: string]: any },
+  T extends Record<string, unknown>,
   P extends { children: JSX.Element[] | JSX.Element; name: string } = {
     children: JSX.Element[] | JSX.Element;
     name: string;
-    [key: string]: any;
+    [key: string]: unknown;
   }
 >(
   Component: React.ComponentType<P>,
@@ -117,8 +112,9 @@ const withFormItemFirstInputFocused = <
 							elements of type <Input />, but that does not seem to be possible
 							due to uses of forwardRef (see above explanation).
               */
-              const value = isChangeEvent(e) ? e.target.value : e;
+              const value = typeof e !== "number" ? e.target.value : e;
               if (!isNil(props.name)) {
+                /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
                 formProps.form.setFieldsValue({ [props.name]: value } as any);
               }
               if (!isNil(inputChildren[0].props.onChange)) {
@@ -138,9 +134,11 @@ const withFormItemFirstInputFocused = <
   return React.memo(FormItem);
 };
 
-const PrivateForm = <T extends { [key: string]: any } = any>(
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+const PrivateForm = <T extends Record<string, unknown> = any>(
   { loading, condensed, children, autoFocusField, title, titleIcon, ...props }: PrivateFormProps<T>,
-  ref: any
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  ref: ForwardedRef<any>
 ): JSX.Element => {
   const firstRender = ui.hooks.useTrackFirstRender();
   const childrenArray = useMemo<JSX.Element[]>(() => {
@@ -183,7 +181,7 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
               formItemChildren[0].type,
               props
             );
-            let newComponent = (
+            const newComponent = (
               <AutFocusFirstInputFormItemComponent key={firstFormItemIndex} {...formItemChildren[0].props} />
             );
             c = [...c.slice(0, firstFormItemIndex), newComponent, ...c.slice(firstFormItemIndex + 1)];
@@ -196,7 +194,7 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
           const formItemIndexInOverall = indexOf(c, formItemChildren[useAutoFocusField]);
           if (formItemIndexInOverall !== -1) {
             const AutFocusFirstInputFormItemComponent = withFormItemFirstInputFocused<T>(formItemAtIndex.type, props);
-            let newComponent = (
+            const newComponent = (
               <AutFocusFirstInputFormItemComponent key={formItemIndexInOverall} {...formItemAtIndex.props} />
             );
             c = [...c.slice(0, formItemIndexInOverall), newComponent, ...c.slice(formItemIndexInOverall + 1)];

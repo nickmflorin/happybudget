@@ -10,7 +10,7 @@ export interface CreateModelModalProps<M extends Model.Model, R = M> extends Mod
   readonly onSuccess: (m: R) => void;
 }
 
-interface PrivateCreateModelModalProps<M extends Model.Model, P extends Http.ModelPayload<M>, V = P, R = M>
+interface PrivateCreateModelModalProps<M extends Model.Model, P extends Http.PayloadObj, V = P, R = M>
   extends CreateModelModalProps<M, R> {
   readonly form?: FormInstance<V>;
   readonly title?: string | JSX.Element | ((form: FormInstance<V>) => JSX.Element | string);
@@ -21,7 +21,7 @@ interface PrivateCreateModelModalProps<M extends Model.Model, P extends Http.Mod
   readonly convertEmptyStringsToNull?: (keyof P)[] | boolean;
 }
 
-const CreateModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V = P, R = M>({
+const CreateModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = P, R = M>({
   autoFocusField,
   form,
   create,
@@ -54,7 +54,7 @@ const CreateModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>,
               (curr: P, value: P[keyof P], k: string) =>
                 ((Array.isArray(convertEmptyStringsToNull) && includes(convertEmptyStringsToNull, k as keyof P)) ||
                   (!Array.isArray(convertEmptyStringsToNull) && convertEmptyStringsToNull !== false)) &&
-                value === ""
+                value === ("" as unknown as P[keyof P])
                   ? { ...curr, [k]: null }
                   : curr,
               payload
