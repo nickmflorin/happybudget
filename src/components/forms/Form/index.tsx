@@ -235,7 +235,7 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
         )}
         {props.form.notifications.length !== 0 && (
           <div className={"form-alert-wrapper"}>
-            {map(props.form.notifications, (n: FormNotification, index: number) => {
+            {map(props.form.notifications, (n: UINotification, index: number) => {
               return <Notification key={index} {...n} />;
             })}
           </div>

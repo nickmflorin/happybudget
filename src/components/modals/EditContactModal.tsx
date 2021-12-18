@@ -91,6 +91,7 @@ const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: 
                     onAttachmentAdded: onAttachmentAdded,
                     listAttachments: api.getContactAttachments,
                     deleteAttachment: api.deleteContactAttachment,
+                    onError: (notification: UINotification) => form.notify(notification),
                     path: `/v1/contacts/${m.id}/attachments/`,
                     id: m.id
                   }

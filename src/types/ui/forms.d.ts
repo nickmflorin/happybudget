@@ -1,15 +1,8 @@
 declare type RootFormInstance<T> = import("antd/lib/form").FormInstance<T>;
 declare type RootFormProps = import("antd/lib/form").FormProps;
 
-declare interface FormInstance<T> extends RootFormInstance<T> {
-  readonly notify: (
-    notifications: SingleOrArray<FormNotification | Error | Http.Error | string>,
-    opts?: AppNotificationOptions
-  ) => void;
-  readonly clearNotifications: () => void;
+declare interface FormInstance<T> extends RootFormInstance<T>, UINotificationsHandler {
   readonly setLoading: (value: boolean) => void;
-  readonly handleRequestError: (e: Error, opts?: AppNotificationOptions) => void;
-  readonly notifications: FormNotification[];
   readonly loading: boolean | undefined;
   readonly isInModal?: boolean;
   /* If it is a boolean, it will automatically focus the first field based on

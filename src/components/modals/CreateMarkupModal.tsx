@@ -10,7 +10,7 @@ import { CreateModelModal, CreateModelModalProps } from "./generic";
 interface CreateMarkupModalProps<
   B extends Model.Budget | Model.Template,
   R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
-> extends CreateModelModalProps<Model.Markup, R> {
+> extends Omit<CreateModelModalProps<Model.Markup, R>, "children"> {
   readonly id: number;
   readonly children?: number[];
   readonly parentType: Model.ParentType | "template";

@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useDispatch } from "react-redux";
-import { toast } from "react-toastify";
 import { isNil } from "lodash";
 
 import * as api from "api";
@@ -75,8 +74,8 @@ const Profile = (): JSX.Element => {
             api
               .updateActiveUser(payload)
               .then((response: Model.User) => {
+                // TODO: Display success notification in banner.
                 dispatch(actions.authenticated.updateLoggedInUserAction(response));
-                toast.success("Your information has been successfully saved.");
               })
               .catch((e: Error) => {
                 form.handleRequestError(e);

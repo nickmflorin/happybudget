@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { toast } from "react-toastify";
 import { isNil, map, filter } from "lodash";
+import classNames from "classnames";
 
 import * as api from "api";
-import { ui, tabling, notifications } from "lib";
+import { ui, tabling } from "lib";
 
 import { selectors } from "store";
 
@@ -39,10 +39,8 @@ interface ActualsPdfFuncProps {
 
 const ActualsPdfFunc = (props: ActualsPdfFuncProps): JSX.Element => <ActualsPdf {...props} />;
 
-interface ActualsPreviewModalProps {
+interface ActualsPreviewModalProps extends ModalProps {
   readonly onSuccess?: () => void;
-  readonly onCancel: () => void;
-  readonly visible: boolean;
   readonly filename: string;
   readonly budgetId: number;
   readonly budget: Model.Budget;
@@ -51,10 +49,9 @@ interface ActualsPreviewModalProps {
 const ActualsPreviewModal = ({
   budget,
   budgetId,
-  visible,
   filename,
   onSuccess,
-  onCancel
+  ...props
 }: ActualsPreviewModalProps): JSX.Element => {
   const previewer = useRef<Pdf.IPreviewerRef>(null);
   const [getToken] = api.useCancelToken({ preserve: true, createOnInit: true });
@@ -66,9 +63,10 @@ const ActualsPreviewModal = ({
   const [loadingData, setLoadingData] = useState(false);
 
   const form = ui.hooks.useForm<ExportPdfFormOptions>({ isInModal: true });
+  const modal = ui.hooks.useModal();
 
   useEffect(() => {
-    if (visible === true) {
+    if (props.open === true) {
       api
         .getActuals(budgetId, {}, { cancelToken: getToken() })
         .then((response: Http.ListResponse<M>) => {
@@ -83,10 +81,10 @@ const ActualsPreviewModal = ({
         }) /* TODO: We should probably display the error in the modal and not let
 							the default toast package display it in the top right of the
 							window. */
-        .catch((e: Error) => notifications.requestError(e))
+        .catch((e: Error) => modal.current.handleRequestError(e))
         .finally(() => setLoadingData(false));
     }
-  }, [visible]);
+  }, [props.open]);
 
   const renderComponent = useMemo(
     () => () => {
@@ -104,18 +102,14 @@ const ActualsPreviewModal = ({
 
   return (
     <PreviewModal
-      visible={visible}
-      onCancel={onCancel}
+      {...props}
+      modal={modal}
       previewer={previewer}
       loadingData={loadingData}
       renderComponent={renderComponent}
       filename={filename}
       onExportSuccess={onSuccess}
-      className={"actuals-preview-modal"}
-      onRenderError={(e: Error) => {
-        console.error(e);
-        toast.error("There was an error rendering the PDF.");
-      }}
+      className={classNames("actuals-preview-modal", props.className)}
     >
       <ExportActualsPdfForm
         form={form}

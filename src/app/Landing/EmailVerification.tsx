@@ -11,7 +11,7 @@ type IRedirect = {
   readonly state?: {
     readonly error?: Error;
     readonly tokenType?: Http.TokenType;
-    readonly notification?: AppNotification;
+    readonly notification?: UINotification;
   };
 };
 

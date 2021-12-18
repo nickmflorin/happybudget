@@ -10,6 +10,7 @@ import AttachmentsFilePond from "./AttachmentsFilePond";
 export interface EditAttachmentsProps {
   readonly id: number;
   readonly path: string;
+  readonly onError: (notification: UINotification) => void;
   readonly onAttachmentRemoved?: (id: number) => void;
   readonly onAttachmentAdded?: (m: Model.Attachment) => void;
   readonly listAttachments: (
@@ -70,6 +71,7 @@ const EditAttachments = (props: EditAttachmentsProps): JSX.Element => {
           className={"mb--15"}
           attachments={attachments}
           loading={loadingAttachments}
+          onError={props.onError}
           isDeleting={isDeleting}
           onDelete={onDelete}
           style={{ maxHeight: 400, overflowY: "scroll" }}

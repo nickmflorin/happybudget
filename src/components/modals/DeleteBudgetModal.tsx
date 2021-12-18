@@ -1,7 +1,7 @@
 import { Notification } from "components/feedback";
-import { DeleteModal, DeleteModalProps } from "./generic";
+import { DeleteModal } from "./generic";
 
-interface DeleteBudgetModalProps extends DeleteModalProps {
+interface DeleteBudgetModalProps extends ModalProps {
   readonly budget: Model.Budget;
 }
 

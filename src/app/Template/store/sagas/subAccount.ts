@@ -1,5 +1,5 @@
 import { SagaIterator } from "redux-saga";
-import { put, takeLatest } from "redux-saga/effects";
+import { put, takeLatest, spawn } from "redux-saga/effects";
 
 import * as api from "api";
 import { budgeting, tabling, notifications } from "lib";
@@ -64,8 +64,12 @@ export const createTableSaga = (table: Table.TableInstance<Tables.SubAccountRowD
     })
   });
 
+function* watchForRequestAction(): SagaIterator {
+  yield takeLatest([actions.requestSubAccountAction.toString()], getSubAccount);
+}
+
 function* rootSaga(): SagaIterator {
-  yield takeLatest(actions.requestSubAccountAction.toString(), getSubAccount);
+  yield spawn(watchForRequestAction);
 }
 
 export default rootSaga;

@@ -1,6 +1,5 @@
 import * as api from "api";
 import { ui } from "lib";
-import { toast } from "react-toastify";
 
 import { ChangePasswordForm } from "components/forms";
 import { Page, Tile } from "components/layout";
@@ -24,7 +23,8 @@ const Security = (): JSX.Element => {
             api
               .changeUserPassword(payload)
               .then(() => {
-                toast.success("Password changed successfully");
+                // TODO: Display success notification in banner.
+                form.notify({ message: "Password changed successfully", level: "success" });
               })
               .catch((e: Error) => {
                 form.handleRequestError(e);

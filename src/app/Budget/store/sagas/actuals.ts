@@ -40,9 +40,13 @@ export const createTableSaga = (table: Table.TableInstance<Tables.ActualRowData,
     tasks: tasks
   });
 
+  function* listenForSearchSaga(): SagaIterator {
+    yield debounce(250, actions.setActualOwnersSearchAction.toString(), tasks.requestActualOwners);
+  }
+
   function* rootSaga(): SagaIterator {
     yield spawn(tableSaga);
-    yield debounce(250, actions.setActualOwnersSearchAction.toString(), tasks.requestActualOwners);
+    yield spawn(listenForSearchSaga);
   }
   return rootSaga;
 };

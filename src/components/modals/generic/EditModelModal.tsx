@@ -4,23 +4,11 @@ import { isNil, includes, reduce } from "lodash";
 import { ui } from "lib";
 import * as api from "api";
 
-import Modal, { ModalProps } from "./Modal";
+import Modal from "./Modal";
 
-type OmitModalProps =
-  | "visible"
-  | "children"
-  | "onCancel"
-  | "okText"
-  | "cancelText"
-  | "okButtonProps"
-  | "title"
-  | "onOk";
-
-export interface EditModelModalProps<M extends Model.Model, R = M> extends Omit<ModalProps, OmitModalProps> {
+export interface EditModelModalProps<M extends Model.Model, R = M> extends ModalProps {
   readonly id: number;
-  readonly open: boolean;
   readonly onSuccess: (m: R) => void;
-  readonly onCancel: () => void;
 }
 
 interface PrivateEditModelModalProps<M extends Model.Model, P extends Http.ModelPayload<M>, V = P, R = M>
@@ -39,7 +27,6 @@ interface PrivateEditModelModalProps<M extends Model.Model, P extends Http.Model
 
 const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V = P, R = M>({
   id,
-  open,
   autoFocusField,
   form,
   onModelLoaded,
@@ -59,28 +46,28 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
   const [instance, loading, error] = api.useModel(id, {
     request,
     onModelLoaded,
-    conditional: () => open === true,
-    deps: [open],
+    conditional: () => props.open === true,
+    deps: [props.open],
     getToken
   });
 
   useEffect(() => {
-    if (open === true) {
+    if (props.open === true) {
       Form.setLoading(loading);
     }
   }, [loading]);
 
   useEffect(() => {
-    if (!isNil(error) && open === true) {
+    if (!isNil(error) && props.open === true) {
       Form.handleRequestError(error);
     }
-  }, [error, open]);
+  }, [error, props.open]);
 
   useEffect(() => {
-    if (!isNil(instance) && open === true) {
+    if (!isNil(instance) && props.open === true) {
       setFormData(instance, Form);
     }
-  }, [instance, open]);
+  }, [instance, props.open]);
 
   const title = useMemo(() => {
     if (typeof props.title === "function") {
@@ -135,12 +122,8 @@ const EditModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V
   return (
     <Modal
       {...props}
-      visible={open}
-      destroyOnClose={true}
-      onCancel={() => onCancel()}
       okText={"Save"}
       cancelText={"Cancel"}
-      getContainer={false}
       title={title}
       okButtonProps={{ disabled: Form.loading || loading }}
       onOk={onOk}

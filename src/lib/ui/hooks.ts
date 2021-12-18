@@ -1,13 +1,11 @@
-import { RefObject, useRef, useEffect, useState, useMemo, useReducer } from "react";
-import { forEach, isNil, debounce, find, reduce, filter } from "lodash";
+import { RefObject, useRef, useEffect, useState, useMemo } from "react";
+import { forEach, isNil, debounce, find, reduce } from "lodash";
 import * as JsSearch from "js-search";
-import axios from "axios";
 import { useMediaQuery } from "react-responsive";
 import { Form as RootForm } from "antd";
 
 import { Breakpoints } from "style/constants";
 
-import * as api from "api";
 import { util, hooks, notifications } from "lib";
 
 export * from "./tsxHooks";
@@ -46,15 +44,39 @@ export const useMenu = <
   return useRef<IMenuRef<S, M>>(InitialMenuRef);
 };
 
-/* eslint-disable indent */
 export const useMenuIfNotDefined = <
   S extends object = MenuItemSelectedState,
   M extends MenuItemModel<S> = MenuItemModel<S>
 >(
+  /* eslint-disable-next-line indent */
   menu?: NonNullRef<IMenuRef<S, M>>
+  /* eslint-disable-next-line indent */
 ): NonNullRef<IMenuRef<S, M>> => {
   const ref = useRef<IMenuRef<S, M>>(InitialMenuRef);
   const returnRef = useMemo(() => (!isNil(menu) ? menu : ref), [menu, ref.current]);
+  return returnRef;
+};
+
+export const InitialModalRef: ModalInstance = {
+  notifications: [],
+  clearNotifications: () => {},
+  notify: (ns: SingleOrArray<UINotification | Error | Http.Error | string>, opts?: UINotificationOptions) => {},
+  setLoading: (v: boolean) => {},
+  handleRequestError: (e: Error, opts?: UINotificationOptions) => {},
+  loading: false
+};
+
+export const useModal = (): NonNullRef<ModalInstance> => {
+  return useRef<ModalInstance>(InitialModalRef);
+};
+
+export const useModalIfNotDefined = (
+  /* eslint-disable-next-line indent */
+  modal?: NonNullRef<ModalInstance>
+  /* eslint-disable-next-line indent */
+): NonNullRef<ModalInstance> => {
+  const ref = useRef<ModalInstance>(InitialModalRef);
+  const returnRef = useMemo(() => (!isNil(modal) ? modal : ref), [modal, ref.current]);
   return returnRef;
 };
 
@@ -72,63 +94,17 @@ export const useDropdownIfNotDefined = (dropdown?: NonNullRef<IDropdownRef>): No
   return returnRef;
 };
 
-type FormNotifyAction = {
-  readonly notifications: SingleOrArray<FormNotification | Error | string>;
-  readonly append?: boolean;
-};
-
-const formNotificationReducer = (
-  state: FormNotification[] = [],
-  action: FormNotifyAction | undefined
-): FormNotification[] => {
-  if (!isNil(action)) {
-    const ns = Array.isArray(action.notifications) ? action.notifications : [];
-    return reduce(
-      ns,
-      (curr: FormNotification[], n: FormNotification | NotificationDetail): FormNotification[] => {
-        if (notifications.typeguards.isNotificationDetail(n)) {
-          return [
-            ...curr,
-            {
-              message: notifications.notificationDetailToString(n),
-              level: "error"
-            }
-          ];
-        }
-        return [...curr, n];
-      },
-      action.append === true ? state : []
-    );
-  } else {
-    return [];
-  }
-};
-
-type FieldWithErrors = { readonly name: string; readonly errors: string[] };
-
-const isFieldNotification = (
-  e: FormNotification | Http.Error | Error | string
-): e is FormFieldNotification | Http.FieldError => {
-  if (api.typeguards.isHttpError(e)) {
-    return e.error_type === "field";
-  }
-  return (
-    typeof e === "object" && !(e instanceof Error) && notifications.typeguards.formNotificationIsFieldNotification(e)
-  );
-};
-
 export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormInstance<T> => {
   const _useAntdForm = RootForm.useForm();
   const antdForm = _useAntdForm[0];
 
-  const [ns, dispatchNotification] = useReducer(formNotificationReducer, []);
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
 
-  const renderFieldErrors = useMemo(
-    () => (errors: (Http.FieldError | FormFieldNotification)[]) => {
+  const handleFieldErrors = useMemo(
+    () => (errors: UIFieldNotification[]) => {
       let fieldsWithErrors = reduce(
         errors,
-        (curr: FieldWithErrors[], e: Http.FieldError | FormFieldNotification): FieldWithErrors[] => {
+        (curr: FieldWithErrors[], e: UIFieldNotification): FieldWithErrors[] => {
           const existing = find(curr, { name: e.field });
           if (!isNil(existing)) {
             return util.replaceInArray<FieldWithErrors>(
@@ -147,58 +123,28 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
     [antdForm.setFields]
   );
 
-  const notify = useMemo(
-    () => (notes: SingleOrArray<FormNotification | Http.Error | Error | string>, opts?: AppNotificationOptions) => {
-      const notices = Array.isArray(notes) ? notes : [notes];
-      /* For the notification sources that pertain to field type errors, render
-				 those next to the individual fields of the form. */
-      renderFieldErrors(
-        filter(notices, (n: FormNotification) => isFieldNotification(n)) as (Http.FieldError | FormFieldNotification)[]
-      );
-      /* Filter out the notifications that do not pertain to individual fields
-				 of the form and dispatch them to the notifications store. */
-      dispatchNotification({
-        notifications: filter(notices, (n: FormNotification) => !isFieldNotification(n)) as FormNotification[],
-        append: opts?.append
-      });
-    },
-    [renderFieldErrors]
-  );
+  const NotificationsHandler = notifications.ui.useNotifications({
+    handleFieldErrors
+  });
 
   const wrapForm = useMemo<FormInstance<T>>(() => {
     return {
       ...antdForm,
       autoFocusField: form?.autoFocusField,
-      notifications: ns,
-      clearNotifications: () => dispatchNotification(undefined),
+      ...NotificationsHandler,
       submit: () => {
-        dispatchNotification(undefined);
+        NotificationsHandler.clearNotifications();
         antdForm.submit();
       },
       resetFields: () => {
-        dispatchNotification(undefined);
+        NotificationsHandler.clearNotifications();
         antdForm.resetFields();
       },
-      notify,
       setLoading,
-      handleRequestError: (e: Error, opts?: AppNotificationOptions) => {
-        if (!axios.isCancel(e) && !(e instanceof api.ForceLogout)) {
-          notifications.requestError(e, { notifyUser: false });
-          if (e instanceof api.ClientError) {
-            notify(e.errors, opts);
-          } else if (e instanceof api.NetworkError) {
-            notify("There was a problem communicating with the server.", opts);
-          } else if (e instanceof api.ServerError) {
-            notify("There was a problem communicating with the server.", opts);
-          } else {
-            throw e;
-          }
-        }
-      },
       loading,
       ...form
     };
-  }, [form, antdForm, loading, ns, notify]);
+  }, [form, antdForm, loading, NotificationsHandler]);
 
   return wrapForm;
 };

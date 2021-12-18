@@ -17,7 +17,7 @@ const Login = (): JSX.Element => {
   const history = useHistory();
   const location = useLocation<{
     readonly error?: Error | undefined;
-    readonly notification?: AppNotification | string | undefined;
+    readonly notification?: UINotification | string | undefined;
     readonly tokenType?: "email-confirmation" | "password-recovery" | undefined;
   }>();
 
@@ -150,8 +150,8 @@ const Login = (): JSX.Element => {
             .catch((e: Error) => handleError(e))
             .finally(() => setLoading(false));
         }}
-        onGoogleError={(error: any) => {
-          notifications.error(error);
+        onGoogleError={(error: object) => {
+          notifications.notify({ level: "error", dispatchToSentry: true, message: JSON.stringify(error) });
           form.notify("There was an error authenticating with Google.");
         }}
         onSubmit={(values: ILoginFormValues) => {

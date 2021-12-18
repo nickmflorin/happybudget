@@ -1,39 +1,48 @@
 import React from "react";
 import classNames from "classnames";
 
+import { ui, notifications } from "lib";
+
 import { Modal } from "components";
 import { Previewer, PreviewerProps } from "components/pdf";
 
 import "./PreviewModal.scss";
 
-interface PreviewModalProps extends PreviewerProps, StandardComponentProps {
-  readonly onSuccess?: () => void;
-  readonly onCancel: () => void;
-  readonly visible: boolean;
+interface PreviewModalProps
+  extends Omit<PreviewerProps, "onRenderError">,
+    StandardComponentProps,
+    Pick<ModalProps, "onCancel" | "open" | "modal"> {
   readonly children: JSX.Element;
 }
 
-const PreviewModal = ({
-  className,
-  style,
-  visible,
-  onSuccess,
-  onCancel,
-  children,
-  ...props
-}: PreviewModalProps): JSX.Element => {
+const PreviewModal = ({ className, style, open, onCancel, children, ...props }: PreviewModalProps): JSX.Element => {
+  const modal = ui.hooks.useModalIfNotDefined(props.modal);
+
   return (
     <Modal
       className={classNames("export-preview-modal", className)}
       style={style}
       title={"Export"}
-      visible={visible}
-      onCancel={() => onCancel()}
-      getContainer={false}
+      open={open}
+      onCancel={onCancel}
+      modal={modal}
       footer={null}
     >
       <div className={"export-form-container"}>{children}</div>
-      <Previewer {...props} />
+      <Previewer
+        {...props}
+        onRenderError={(e: Error) => {
+          notifications.notify({
+            error: e,
+            level: "error",
+            dispatchToSentry: true
+          });
+          modal.current.notify({
+            message: "There was a problem rendering your document.",
+            level: "error"
+          });
+        }}
+      />
     </Modal>
   );
 };

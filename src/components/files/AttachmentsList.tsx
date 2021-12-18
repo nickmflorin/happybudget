@@ -12,9 +12,10 @@ interface AttachmentsListProps extends StandardComponentProps {
   readonly loading?: boolean;
   readonly onDelete?: (m: Model.Attachment) => void;
   readonly isDeleting?: (id: number) => void;
+  readonly onError: (notification: UINotification) => void;
 }
 
-const AttachmentsList = ({ attachments, loading, onDelete, isDeleting, ...props }: AttachmentsListProps) => {
+const AttachmentsList = ({ attachments, loading, onDelete, isDeleting, onError, ...props }: AttachmentsListProps) => {
   return (
     <RenderWithSpinner loading={loading}>
       <div {...props} className={classNames("attachments-list", props.className)}>
@@ -24,6 +25,7 @@ const AttachmentsList = ({ attachments, loading, onDelete, isDeleting, ...props 
             attachment={attachment}
             onClick={() => onDelete?.(attachment)}
             deleting={isDeleting?.(attachment.id) || false}
+            onError={onError}
           />
         ))}
       </div>

@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo, useRef, useReducer } from "react";
-import { toast } from "react-toastify";
 import { isNil, map } from "lodash";
 import { Progress } from "antd";
 
 import * as api from "api";
-import { ui } from "lib";
+import { ui, notifications } from "lib";
 
 import { Icon } from "components";
 import { AttachmentText } from "components/files";
@@ -94,7 +93,8 @@ const AttachmentsCell = <
 
     const handleDrop = (e: DragEvent) => {
       const error = (message: string) => {
-        toast.error(message);
+        // TODO: Display error in banner.
+        notifications.notify({ message, level: "error", dispatchToSentry: true });
         progressCancel();
       };
 

@@ -18,7 +18,7 @@ const Application = (): JSX.Element => {
         <Redirect exact from={"/"} to={"/budgets"} />
         <PrivateRoute path={"/budgets/:budgetId"} component={Budget} />
         <PrivateRoute path={"/templates/:budgetId"} component={Template} />
-        <PrivateRoute path={["/budgets", "/contacts", "/templates", "/discover", "/new"]} component={Dashboard} />
+        <PrivateRoute path={["/budgets", "/contacts", "/templates", "/discover"]} component={Dashboard} />
         <PrivateRoute path={["/profile", "/security"]} component={Settings} />
         <Route exact path={"/logout"} component={Logout} />
         <NotFoundRoute />

@@ -7,7 +7,7 @@ interface SocialButtonProps {
   text: string;
   onGoogleSuccess: (tokenId: string) => void;
   // TODO: Come up with interface for Google structured error.
-  onGoogleError: (error: any) => void;
+  onGoogleError: (error: object) => void;
 }
 
 const isOfflineResponse = (
@@ -41,7 +41,7 @@ const SocialButton = ({ provider, text, onGoogleSuccess, onGoogleError }: Social
             onGoogleSuccess(response.tokenId);
           }
         }}
-        onFailure={(response: any) => onGoogleError(response)}
+        onFailure={(response: object) => onGoogleError(response)}
         cookiePolicy={"single_host_origin"}
       />
     );

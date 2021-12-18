@@ -28,7 +28,7 @@ const PrivateRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
           if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
             setRedirect(true);
           } else {
-            notifications.requestError(e, { notifyUser: false });
+            notifications.requestError(e);
           }
         }
       })

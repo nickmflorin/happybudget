@@ -1,7 +1,7 @@
 import { isNil } from "lodash";
 
 import { FringesTable, connectTableToStore } from "tabling";
-import GenericFringesModal, { GenericFringesModalProps } from "components/modals/FringesModal";
+import GenericFringesModal from "components/modals/FringesModal";
 
 import { actions, selectors, sagas } from "../store";
 
@@ -26,7 +26,7 @@ const ConnectedFringesTable = connectTableToStore<
   selector: selectors.selectFringesStore
 })(FringesTable.Table);
 
-interface FringesModalProps extends Pick<GenericFringesModalProps, "open" | "onCancel"> {
+interface FringesModalProps extends Pick<ModalProps, "open" | "onCancel"> {
   readonly budgetId: number;
   readonly budget: Model.Budget | null;
   readonly id: number; // ID of Account or SubAccount

@@ -4,22 +4,10 @@ import { isNil, includes, reduce } from "lodash";
 import * as api from "api";
 import { ui } from "lib";
 
-import Modal, { ModalProps } from "./Modal";
+import Modal from "./Modal";
 
-type OmitModalProps =
-  | "visible"
-  | "children"
-  | "onCancel"
-  | "okText"
-  | "cancelText"
-  | "okButtonProps"
-  | "title"
-  | "onOk";
-
-export interface CreateModelModalProps<M extends Model.Model, R = M> extends Omit<ModalProps, OmitModalProps> {
-  readonly open: boolean;
+export interface CreateModelModalProps<M extends Model.Model, R = M> extends ModalProps {
   readonly onSuccess: (m: R) => void;
-  readonly onCancel: () => void;
 }
 
 interface PrivateCreateModelModalProps<M extends Model.Model, P extends Http.ModelPayload<M>, V = P, R = M>
@@ -34,7 +22,6 @@ interface PrivateCreateModelModalProps<M extends Model.Model, P extends Http.Mod
 }
 
 const CreateModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>, V = P, R = M>({
-  open,
   autoFocusField,
   form,
   create,
@@ -100,11 +87,8 @@ const CreateModelModal = <M extends Model.Model, P extends Http.ModelPayload<M>,
   return (
     <Modal
       {...props}
-      visible={open}
       okText={"Create"}
       cancelText={"Cancel"}
-      getContainer={false}
-      destroyOnClose={true}
       title={title}
       okButtonProps={{ disabled: Form.loading }}
       onOk={onOk}

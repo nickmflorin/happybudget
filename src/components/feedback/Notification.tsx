@@ -14,7 +14,7 @@ const Notification = ({
   detail,
   children,
   ...props
-}: AppNotification & { readonly children?: string }) => {
+}: ExternalNotification & { readonly children?: string }) => {
   const [linkLoading, setLinkLoading] = useState(false);
 
   const fullDetail = useMemo(() => {
@@ -37,7 +37,7 @@ const Notification = ({
     }
   }, [fullDetail, includeLink, linkLoading]);
 
-  if (props.level === "warning") {
+  if (props.level === "warning" || props.level === undefined) {
     return <Warning {...props} detail={detailWithLink} />;
   } else if (props.level === "error") {
     return <Error {...props} detail={detailWithLink} />;

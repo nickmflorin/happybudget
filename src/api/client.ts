@@ -106,10 +106,14 @@ const throwClientError = (error: AxiosError<Http.ErrorResponse>, options: Http.R
         userId: response.data.user_id
       });
     } else {
-      notifications.warn(`
+      notifications.notify({
+        level: "error",
+        dispatchToSentry: true,
+        message: `
           The response body from the backend does not conform to a standard convention for indicating
           a client error - the specific type of error cannot be determined.
-      `);
+      `
+      });
       throw new errors.ClientError({
         response,
         errors: [

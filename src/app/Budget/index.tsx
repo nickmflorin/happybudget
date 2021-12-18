@@ -143,7 +143,7 @@ const RootBudget = (): JSX.Element => {
           />
         </Switch>
         <BudgetPreviewModal
-          visible={previewModalVisible}
+          open={previewModalVisible}
           onCancel={() => setPreviewModalVisible(false)}
           budgetId={parseInt(budgetId)}
           budgetName={!isNil(budget) ? `${budget.name}` : `Sample Budget ${new Date().getFullYear()}`}

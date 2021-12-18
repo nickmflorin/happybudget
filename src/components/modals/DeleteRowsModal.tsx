@@ -1,7 +1,7 @@
 import { Notification } from "components/feedback";
-import { DeleteModal, DeleteModalProps } from "./generic";
+import { DeleteModal } from "./generic";
 
-interface DeleteRowsModalProps extends DeleteModalProps {
+interface DeleteRowsModalProps extends ModalProps {
   readonly rows: Model.Model[];
 }
 

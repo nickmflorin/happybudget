@@ -14,9 +14,10 @@ interface AttachmentListItemProps extends StandardComponentProps {
   readonly attachment: Model.Attachment;
   readonly deleting?: boolean;
   readonly onClick?: () => void;
+  readonly onError: (notification: UINotification) => void;
 }
 
-const AttachmentListItem = ({ attachment, deleting, onClick, ...props }: AttachmentListItemProps) => {
+const AttachmentListItem = ({ attachment, deleting, onClick, onError, ...props }: AttachmentListItemProps) => {
   const [downloading, setDownloading] = useState(false);
 
   return (
@@ -41,11 +42,14 @@ const AttachmentListItem = ({ attachment, deleting, onClick, ...props }: Attachm
                 .getDataFromURL(attachment.url)
                 .then((response: string | ArrayBuffer) => util.files.download(response, attachment.name))
                 .catch((e: Error) => {
-                  notifications.error({
-                    notifyUser: true,
-                    detail: e,
-                    message: "There was an error downloading your attachment.",
+                  notifications.notify({
+                    error: e,
+                    level: "error",
                     dispatchToSentry: true
+                  });
+                  onError({
+                    detail: e,
+                    message: "There was an error downloading your attachment."
                   });
                 })
                 .finally(() => setDownloading(false));

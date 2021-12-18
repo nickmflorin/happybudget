@@ -16,6 +16,17 @@
   }
 }
 
+.modal-alert-wrapper {
+	margin-top: 15px;
+	width: 100%;
+
+	> .alert {
+		&:not(:last-child) {
+			margin-bottom: 8px;
+		}
+	}
+}
+
 .ant-modal-content {
   border-radius: 10px;
   overflow-y: hidden;

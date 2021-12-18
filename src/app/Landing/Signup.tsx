@@ -61,9 +61,8 @@ const Signup = (): JSX.Element => {
             .catch((e: Error) => handleError(e))
             .finally(() => setLoading(false));
         }}
-        onGoogleError={(error: any) => {
-          // TODO: Try to do a better job parsing the error.
-          notifications.error(error);
+        onGoogleError={(error: object) => {
+          notifications.notify({ level: "error", dispatchToSentry: true, message: JSON.stringify(error) });
           form.notify("There was an error authenticating with Google.");
         }}
         onSubmit={(values: ISignupFormValues) => {

@@ -134,7 +134,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
         {createContactModal}
         {!isNil(budget) && (
           <ActualsPreviewModal
-            visible={previewModalVisible}
+            open={previewModalVisible}
             onCancel={() => setPreviewModalVisible(false)}
             budgetId={budgetId}
             budget={budget}

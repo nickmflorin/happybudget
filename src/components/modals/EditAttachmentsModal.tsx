@@ -1,17 +1,14 @@
 import classNames from "classnames";
-import { ModalProps as RootModalProps } from "antd/lib/modal";
 
+import { ui } from "lib";
 import { EditAttachments, EditAttachmentsProps } from "components/files";
 
 import { Modal } from "./generic";
 
-interface EditAttachmentsModalProps extends RootModalProps, EditAttachmentsProps {
-  readonly open: boolean;
-}
+interface EditAttachmentsModalProps extends ModalProps, Omit<EditAttachmentsProps, "onError"> {}
 
 const EditAttachmentsModal = ({
   id,
-  open,
   path,
   onAttachmentRemoved,
   listAttachments,
@@ -19,13 +16,13 @@ const EditAttachmentsModal = ({
   onAttachmentAdded,
   ...props
 }: EditAttachmentsModalProps): JSX.Element => {
+  const modal = ui.hooks.useModalIfNotDefined(props.modal);
+
   return (
     <Modal
       {...props}
       className={classNames("modal--no-footer", props.className)}
-      visible={open}
-      destroyOnClose={true}
-      getContainer={false}
+      modal={modal}
       title={"Attachments"}
       titleIcon={"paperclip"}
       footer={null}
@@ -37,6 +34,7 @@ const EditAttachmentsModal = ({
         onAttachmentRemoved={onAttachmentRemoved}
         listAttachments={listAttachments}
         deleteAttachment={deleteAttachment}
+        onError={(notification: UINotification) => modal.current.notify(notification)}
       />
     </Modal>
   );

@@ -39,7 +39,7 @@ const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): 
           if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
             setRedirect(true);
           } else {
-            notifications.requestError(e, { notifyUser: false });
+            notifications.requestError(e);
           }
         }
       })

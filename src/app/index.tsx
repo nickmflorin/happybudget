@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { Router, Switch, Route } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
 import { History } from "history";
 import "style/index.scss";
 
@@ -21,7 +20,6 @@ interface AppProps {
 function App(props: AppProps): JSX.Element {
   return (
     <Router history={props.history}>
-      <ToastContainer />
       <div className={"root"}>
         <div id={"application-spinner-container"}></div>
         <Suspense fallback={<ApplicationSpinner visible={true} />}>

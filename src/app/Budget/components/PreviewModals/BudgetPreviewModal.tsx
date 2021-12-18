@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { toast } from "react-toastify";
 import { isNil, map, filter } from "lodash";
+import classNames from "classnames";
 
 import * as api from "api";
-import { redux, ui, tabling, notifications, pdf } from "lib";
+import { redux, ui, tabling, pdf } from "lib";
 import { selectors } from "store";
 
 import { ExportBudgetPdfForm } from "components/forms";
@@ -47,10 +47,8 @@ interface BudgetPdfFuncProps {
 
 const BudgetPdfFunc = (props: BudgetPdfFuncProps): JSX.Element => <BudgetPdf {...props} />;
 
-interface PreviewModalProps {
+interface PreviewModalProps extends ModalProps {
   readonly onSuccess?: () => void;
-  readonly onCancel: () => void;
-  readonly visible: boolean;
   readonly budgetId: number;
   readonly budgetName: string;
   readonly filename: string;
@@ -72,10 +70,9 @@ const selectHeaderTemplateLoading = redux.selectors.simpleShallowEqualSelector(
 const BudgetPreviewModal = ({
   budgetId,
   budgetName,
-  visible,
   filename,
   onSuccess,
-  onCancel
+  ...props
 }: PreviewModalProps): JSX.Element => {
   const previewer = useRef<Pdf.IPreviewerRef>(null);
   const [loadingData, setLoadingData] = useState(false);
@@ -87,6 +84,7 @@ const BudgetPreviewModal = ({
   const [options, setOptions] = useState<ExportBudgetPdfFormOptions>(DEFAULT_OPTIONS);
 
   const form = ui.hooks.useForm<ExportBudgetPdfFormOptions>({ isInModal: true });
+  const modal = ui.hooks.useModal();
   const dispatch = useDispatch();
 
   const headerTemplatesLoading = useSelector(selectHeaderTemplatesLoading);
@@ -105,7 +103,7 @@ const BudgetPreviewModal = ({
   }, [budgetName]);
 
   useEffect(() => {
-    if (visible === true) {
+    if (props.open === true) {
       dispatch(actions.pdf.requestHeaderTemplatesAction(null));
       api
         .getBudgetPdf(budgetId, { cancelToken: getToken() })
@@ -118,10 +116,10 @@ const BudgetPreviewModal = ({
           });
           previewer.current?.render(pdfComponent);
         })
-        .catch((e: Error) => notifications.requestError(e))
+        .catch((e: Error) => modal.current.handleRequestError(e))
         .finally(() => setLoadingData(false));
     }
-  }, [visible]);
+  }, [props.open]);
 
   const convertOptions = useMemo(
     () =>
@@ -153,18 +151,14 @@ const BudgetPreviewModal = ({
 
   return (
     <PreviewModal
-      visible={visible}
-      onCancel={onCancel}
+      {...props}
       previewer={previewer}
       loadingData={loadingData}
       renderComponent={renderComponent}
       filename={filename}
+      modal={modal}
       onExportSuccess={onSuccess}
-      className={"budget-preview-modal"}
-      onRenderError={(e: Error) => {
-        console.error(e);
-        toast.error("There was an error rendering the PDF.");
-      }}
+      className={classNames("budget-preview-modal", props.className)}
     >
       <ExportBudgetPdfForm
         form={form}

@@ -1,38 +1,44 @@
-import { ReactNode } from "react";
-import { isNil } from "lodash";
+import React, { ReactNode, useImperativeHandle, useState } from "react";
+import { isNil, map } from "lodash";
 import classNames from "classnames";
 
 import { Modal as RootModal } from "antd";
-import { ModalProps as RootModalProps } from "antd/lib/modal";
+
+import { notifications } from "lib";
 import { RenderWithSpinner } from "components";
+import { Notification } from "components/feedback";
 
 import ModalTitle from "./ModalTitle";
 
-export interface ModalProps extends RootModalProps {
-  readonly loading?: boolean;
-  readonly children: ReactNode;
-  readonly titleIcon?: IconOrElement;
-  readonly okButtonClass?: string;
-}
-
 const Modal = ({
-  loading,
   children,
   titleIcon,
   okButtonClass = "btn--primary",
   okButtonProps = {},
   cancelButtonProps = {},
+  modal,
+  buttonSpinnerOnLoad = false,
+  open,
   ...props
-}: ModalProps): JSX.Element => {
+}: ModalProps & { readonly children: ReactNode }): JSX.Element => {
+  const [loading, setLoading] = useState(false);
+  const notificationsHandler = notifications.ui.useNotifications();
+
+  useImperativeHandle(modal, () => ({ ...notificationsHandler, loading, setLoading }));
+
   return (
     <RootModal
       cancelText={"Cancel"}
+      destroyOnClose={true}
+      getContainer={false}
       okButtonProps={{
         ...okButtonProps,
-        className: classNames("btn", okButtonClass)
+        className: classNames("btn", okButtonClass),
+        loading: buttonSpinnerOnLoad === true && loading
       }}
       cancelButtonProps={{ ...cancelButtonProps, className: "btn btn--default" }}
       {...props}
+      visible={open}
       title={
         typeof props.title === "string" && !isNil(titleIcon) ? (
           <ModalTitle icon={titleIcon} title={props.title} />
@@ -41,7 +47,16 @@ const Modal = ({
         )
       }
     >
-      <RenderWithSpinner loading={loading}>{children}</RenderWithSpinner>
+      <RenderWithSpinner loading={buttonSpinnerOnLoad === false && loading}>
+        {notificationsHandler.notifications.length !== 0 && (
+          <div className={"modal-alert-wrapper"}>
+            {map(notificationsHandler.notifications, (n: UINotification, index: number) => {
+              return <Notification key={index} {...n} />;
+            })}
+          </div>
+        )}
+        <React.Fragment>{children}</React.Fragment>
+      </RenderWithSpinner>
     </RootModal>
   );
 };
