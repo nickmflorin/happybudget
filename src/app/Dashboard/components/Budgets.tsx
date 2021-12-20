@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { map, isNil } from "lodash";
+import { isNil, map, find } from "lodash";
 import { Pagination } from "antd";
 
 import * as api from "api";
@@ -18,6 +18,12 @@ import { EditBudgetModal, DeleteBudgetModal, CreateBudgetModal } from "component
 import { BudgetEmptyIcon } from "components/svgs";
 
 import { actions } from "../store";
+
+const OrderLabelMap: { [key: string]: string } = {
+  updated_at: "Last Updated",
+  created_at: "Created",
+  name: "Name"
+};
 
 const selectBudgets = (state: Application.AuthenticatedStore) => state.dashboard.budgets.data;
 const selectBudgetsResponseReceived = (state: Application.AuthenticatedStore) =>
@@ -51,6 +57,11 @@ const Budgets = (): JSX.Element => {
   useEffect(() => {
     dispatch(actions.requestBudgetsAction(null));
   }, []);
+
+  const label = useMemo(() => {
+    const order = find(ordering, (o: Http.FieldOrder) => o.order !== 0) as Http.FieldOrder | undefined;
+    return order === undefined ? "Order By" : OrderLabelMap[order.field] || "Order By";
+  }, [ordering]);
 
   return (
     <React.Fragment>
@@ -92,9 +103,10 @@ const Budgets = (): JSX.Element => {
           >
             <DefaultButtonIconToggle
               key={3}
+              style={{ width: "140px" }}
               breakpoint={"medium"}
               icon={<Icon icon={"bars-filter"} weight={"light"} />}
-              text={"Order By"}
+              text={label}
             />
           </OrderingDropdown>
         ]}
