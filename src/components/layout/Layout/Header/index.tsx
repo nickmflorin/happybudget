@@ -95,6 +95,21 @@ const Header = ({
                 id: "intercom-chat",
                 label: "Chat with Support",
                 icon: <Icon icon={"comment-dots"} weight={"light"} />
+              },
+              {
+                id: "faq",
+                label: "FAQ",
+                onClick: () => {
+                  if (!isNil(process.env.REACT_APP_INTERCOM_SUPPORT_URL)) {
+                    window.open(process.env.REACT_APP_INTERCOM_SUPPORT_URL, "_blank");
+                  } else {
+                    console.warn(
+                      `Could not identify Intercom support URL as ENV variable
+											'REACT_APP_INTERCOM_SUPPORT_URL; is not defined.`
+                    );
+                  }
+                },
+                icon: <Icon icon={"question-circle"} weight={"light"} />
               }
             ]}
           >

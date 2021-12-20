@@ -14,5 +14,6 @@ declare namespace NodeJS {
     readonly REACT_APP_GOOGLE_CLIENT_KEY: string | undefined;
     readonly REACT_APP_API_DOMAIN: string;
     readonly REACT_APP_CANNY_FEEDBACK_URL: string | undefined;
+    readonly REACT_APP_INTERCOM_SUPPORT_URL: string | undefined;
   }
 }
