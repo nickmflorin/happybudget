@@ -345,6 +345,7 @@ const ExportForm = (
 					 change. */
         props.onValuesChange?.(changedValues, formData(values));
       }}
+      layout={"vertical"}
     >
       <Form.ItemSection label={"Header"}>
         <Form.ItemStyle label={"Title"}>

@@ -105,25 +105,26 @@ form {
       font-weight: 400 !important;
       color: $text-secondary !important;
       padding-left: 2px;
-			padding-bottom: 0px !important;
+      padding-bottom: 0px !important;
 
-			label, .label {
-				@extend .label-base;
-				margin-bottom: 2px;
+      label,
+      .label {
+        @extend .label-base;
+        margin-bottom: 2px;
 
-				&.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
-					margin-left: 0px;
+        &.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
+          margin-left: 0px;
 
-					&:before {
-						content: none;
-					}
-				}
+          &:before {
+            content: none;
+          }
+        }
 
-				&--section {
-					margin-bottom: 8px;
-					font-size: 13px;
-				}
-			}
+        &--section {
+          margin-bottom: 8px;
+          font-size: 13px;
+        }
+      }
 
       & > label.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
         margin-left: -3px;
@@ -186,11 +187,11 @@ form {
     }
   }
 
-	&.condensed {
-		.form-item {
-			margin-bottom: 5px;
-		}
-	}
+  &.condensed {
+    .form-item {
+      margin-bottom: 5px;
+    }
+  }
 }
 
 label,
@@ -203,8 +204,17 @@ label,
   }
 }
 
-.ant-form-vertical .ant-form-item:last-child {
-  margin-bottom: 0px !important;
+.ant-form-vertical {
+  .ant-form-item:last-child {
+    margin-bottom: 0px !important;
+  }
+
+  // On the vertical form layout, AntD removes the colon after the label,
+  // which removes the spacing between the checkbox and label. This keeps
+  // the label/chekcbox spacing consistent.
+  label.ant-checkbox-wrapper {
+    margin: 0 2px 0 8px;
+  }
 }
 
 .ant-switch {
