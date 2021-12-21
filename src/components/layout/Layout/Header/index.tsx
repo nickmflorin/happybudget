@@ -98,7 +98,7 @@ const Header = ({
               },
               {
                 id: "faq",
-                label: "FAQ",
+                label: "Support Articles",
                 onClick: () => {
                   if (!isNil(process.env.REACT_APP_INTERCOM_SUPPORT_URL)) {
                     window.open(process.env.REACT_APP_INTERCOM_SUPPORT_URL, "_blank");
