@@ -9,7 +9,6 @@ import * as codes from "./codes";
 import * as errors from "./errors";
 
 /* eslint-disable no-shadow */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 export enum HttpRequestMethods {
   GET = "GET",
   POST = "POST",
@@ -66,7 +65,7 @@ export const filterPayload = <T extends Http.PayloadObj = Http.PayloadObj>(paylo
  *
  * @param error The AxiosError that was raised.
  */
-const throwClientError = (error: AxiosError<Http.ErrorResponse>, options: Http.RequestOptions) => {
+const throwClientError = (error: AxiosError<Http.ErrorResponse>) => {
   if (isNil(error.response) || isNil(error.response.data)) {
     return;
   }
@@ -136,7 +135,7 @@ instance.interceptors.response.use(
     if (!isNil(error.response)) {
       const response = error.response;
       if (response.status >= 400 && response.status < 500) {
-        throwClientError(error, response.config);
+        throwClientError(error);
       } else {
         const url = !isNil(error.request.config) ? error.request.config.url : undefined;
         throw new errors.ServerError({ status: error.response.status, url });

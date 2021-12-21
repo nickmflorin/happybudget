@@ -6,7 +6,6 @@ import { toTitleCase } from "lib/util/formatters";
 
 type InternalNotificationOptions = Pick<InternalNotification, "dispatchToSentry" | "level">;
 
-/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 const consoleMethodMap: { [key in AppNotificationConsoleLevel]: "warn" | "error" | "info" } = {
   warning: "warn",
   error: "error",

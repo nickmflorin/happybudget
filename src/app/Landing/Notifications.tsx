@@ -5,7 +5,6 @@ import * as api from "api";
 const EMAIL_CONFIRMATION_ERROR_MESSAGE = "There was an error verifying your email.";
 const PASSWORD_RECOVERY_ERROR_MESSAGE = "There was an error resetting your password.";
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
 const TOKEN_NOTIFICATION_MESSAGES: { [key in Http.TokenType]: string } = {
   "email-confirmation": EMAIL_CONFIRMATION_ERROR_MESSAGE,
   "password-recovery": PASSWORD_RECOVERY_ERROR_MESSAGE

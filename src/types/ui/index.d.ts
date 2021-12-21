@@ -61,7 +61,6 @@ declare interface ClickableProps extends StandardComponentProps {
 
 declare type PasswordValidationID = "lowercase" | "uppercase" | "number" | "character" | "minChar";
 declare type PasswordValidationName = { id: ValidationId; name: string };
-/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 declare type PasswordValidationState = { [key in ValidationId]: boolean };
 
 declare type Pagination = {

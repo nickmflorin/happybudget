@@ -36,7 +36,6 @@ export const Colors: { [key: string]: Style.HexColor } = {
 
 export const TABLE_BORDER_RADIUS = 8;
 
-/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 export const FontWeightMap: { [key in Style.FontWeightName]: Style.FontWeight } = {
   Bold: 700,
   Regular: 400,

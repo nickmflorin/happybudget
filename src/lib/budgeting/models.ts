@@ -3,7 +3,6 @@ import { util, tabling } from "lib";
 import { Colors } from "style/constants";
 
 /* eslint-disable no-shadow */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 export enum FringeUnitNames {
   PERCENT = "Percent",
   FLAT = "Flat"
@@ -17,7 +16,6 @@ export const FringeUnitModels: { [key in "PERCENT" | "FLAT"]: Model.FringeUnit }
 export const FringeUnits = Object.values(FringeUnitModels);
 
 /* eslint-disable no-shadow */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 export enum MarkupUnitNames {
   PERCENT = "Percent",
   FLAT = "Flat"

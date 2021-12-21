@@ -5,7 +5,6 @@ import { isNil } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconPrefix } from "@fortawesome/fontawesome-svg-core";
 
-/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 const PrefixMap: { [key in IconWeight]: IconPrefix } = { light: "fal", regular: "far", solid: "fas" };
 
 const Icon = forwardRef(

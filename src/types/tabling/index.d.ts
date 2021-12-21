@@ -119,8 +119,6 @@ declare namespace Table {
 			 available to cells based on which grid they lie in. */
     readonly getRowColorDef: (row: BodyRow<R>) => RowColorDef;
     readonly selector: (state: Application.Store) => S;
-    readonly onClear?: (row: BodyRow<R>, column: Column<R, M>) => void;
-    readonly showClear?: (row: BodyRow<R>, column: Column<R, M>) => boolean;
     readonly onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
     readonly onChangeEvent?: (event: ChangeEvent<R, M>) => void;
   }
@@ -179,7 +177,6 @@ declare namespace Table {
     readonly id: I;
   };
 
-  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   type RowChangeData<R extends RowData> = { [Property in keyof R]?: CellChange };
 
   type RowChange<R extends RowData, I extends EditableRowId = EditableRowId> = {

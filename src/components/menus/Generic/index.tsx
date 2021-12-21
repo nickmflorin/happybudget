@@ -311,8 +311,7 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
   const getItemState = useMemo(() => {
     const explicitStateGetter = props.getItemState;
     if (!isNil(explicitStateGetter)) {
-      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      return (m: M, sel: ID[]): S => explicitStateGetter(m);
+      return (m: M): S => explicitStateGetter(m);
     }
     return (m: M, sel: ID[], def?: { readonly id: ID; readonly selected: boolean }): S =>
       ({
