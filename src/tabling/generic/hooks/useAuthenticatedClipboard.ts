@@ -22,39 +22,17 @@ type UseAuthenticatedClipboardParams<R extends Table.RowData, M extends Model.Ro
   readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
 };
 
-const columnIsWritable = <
-  R extends Table.RowData,
-  M extends Model.RowHttpModel,
-  C extends Table.Column<R, M> = Table.Column<R, M>
->(
-  columns: C[],
-  col: Table.AgColumn
-): [C, boolean] | [null, false] => {
-  const field = col.getColId();
-  if (!isNil(field)) {
-    const c = tabling.columns.getColumn<R, M, C>(columns, field);
-    return !isNil(c) ? [c, c.isWrite !== false] : [c, false];
-  }
-  return [null, false];
-};
-
-const getWritableColumnsAfter = <
-  R extends Table.RowData,
-  M extends Model.RowHttpModel,
-  C extends Table.Column<R, M> = Table.Column<R, M>
->(
+const getWritableColumnsAfter = <R extends Table.RowData, M extends Model.RowHttpModel>(
   api: Table.ColumnApi,
-  columns: C[],
+  columns: Table.DataColumn<R, M>[],
   col: Table.AgColumn
-): C[] => {
-  const cols: C[] = [];
+): Table.BodyColumn<R, M>[] => {
+  const cols: Table.BodyColumn<R, M>[] = [];
   let current: Table.AgColumn | null = col;
   while (!isNil(current)) {
-    const [c, writable] = columnIsWritable<R, M>(columns, current);
-    if (writable) {
-      /* If the column is writable, the first value of the array will be
-         non-null so this type coercion is safe. */
-      cols.push(c as C);
+    const c = tabling.columns.getColumn(columns, current.getColId());
+    if (!isNil(c) && tabling.typeguards.isBodyColumn<R, M>(c)) {
+      cols.push(c);
     }
     current = api.getDisplayedColAfter(current);
   }
@@ -64,28 +42,41 @@ const getWritableColumnsAfter = <
 const processValueFromClipboard = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  V extends Table.RawRowValue = Table.RawRowValue,
-  C extends Table.Column<R, M, V> = Table.Column<R, M, V>
+  V extends Table.RawRowValue = Table.RawRowValue
 >(
   value: string,
-  c: C,
+  c: Table.BodyColumn<R, M, V>,
   row?: Table.BodyRow<R> // Will not be defined when adding rows.
-): V => {
+): V | undefined => {
   /* If the value is undefined, it is something wonky with AG Grid.  We should
 		 return the current value as to not cause data loss. */
   if (value === undefined) {
-    if (!isNil(c.field) && !isNil(row)) {
+    if (!isNil(row)) {
+      if (tabling.typeguards.isMarkupRow(row)) {
+        if (!isNil(c.markupField)) {
+          const v = row.data[c.markupField];
+          return v as unknown as V;
+        }
+        /* We return undefined to communicate to the calling logic that the
+           column is not applicable for this row. */
+        return undefined;
+      } else if (tabling.typeguards.isGroupRow(row)) {
+        /* We return undefined to communicate to the calling logic that the
+           column is not applicable for this row. */
+        return undefined;
+      }
       return row.data[c.field] as V;
     }
-    return c.nullValue === undefined ? (null as V) : c.nullValue;
+    return c.nullValue;
   } else {
     const processor = c.processCellFromClipboard;
     if (!isNil(processor)) {
       const processedValue = processor(value);
       // The value should never be undefined at this point.
       if (typeof processedValue === "string" && String(processedValue).trim() === "") {
-        return c.nullValue === undefined ? (null as V) : c.nullValue;
+        return c.nullValue;
       }
+      return processedValue;
     }
     return value as V;
   }
@@ -94,16 +85,15 @@ const processValueFromClipboard = <
 const processArrayFromClipboard = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  V extends Table.RawRowValue = Table.RawRowValue,
-  C extends Table.Column<R, M, V> = Table.Column<R, M, V>
+  V extends Table.RawRowValue = Table.RawRowValue
 >(
   api: Table.ColumnApi,
-  cols: C[],
+  cols: Table.DataColumn<R, M, V>[],
   col: Table.AgColumn,
   arr: string[],
   row?: Table.BodyRow<R> // Will not be defined when adding rows.
 ): V[] | undefined => {
-  const columns = getWritableColumnsAfter<R, M>(api, cols, col) as C[];
+  const columns = getWritableColumnsAfter<R, M>(api, cols, col);
   if (columns.length < arr.length) {
     console.warn(
       `There are ${cols.length} writable displayed columns, but the data array
@@ -119,7 +109,14 @@ const processArrayFromClipboard = <
     arr,
     (curr: V[], value: string, index: number) => {
       const c = columns[index]; // Will be in the array because of the above check.
-      return [...curr, processValueFromClipboard<R, M, V, C>(value, c, row)];
+      const processed = processValueFromClipboard<R, M, V>(value, c, row);
+      /* If the processed value is undefined, this means that the column is not
+         applicable for that row, so we tell AGGrid that the pasted value should
+         just be treated as an empty string. */
+      if (processed === undefined) {
+        return [...curr, "" as V];
+      }
+      return [...curr, processed];
     },
     []
   );
@@ -136,8 +133,8 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
       if (!isNil(p.node)) {
         const node: Table.RowNode = p.node;
         const field = p.column.getColId();
-        const c = tabling.columns.getColumn<R, M>(params.columns, field);
-        if (!isNil(c)) {
+        const c = tabling.columns.getColumn(params.columns, field);
+        if (!isNil(c) && tabling.typeguards.isBodyColumn(c)) {
           if (!isNil(cutCellChange)) {
             p = { ...p, value: cutCellChange.oldValue };
             params.onChangeEvent({
@@ -147,10 +144,10 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
             setCellCutChange(null);
           }
           const row: Table.BodyRow<R> = node.data;
-          return processValueFromClipboard<R, M>(p.value, c, row);
-        } else {
-          console.error(`Could not find column for field ${field}!`);
-          return "";
+          /* The proccessed clipboard value will be undefined in the case that
+             the column is not applicable for that row. */
+          const processed: Table.InferV<typeof c> | undefined = processValueFromClipboard<R, M>(p.value, c, row);
+          return processed === undefined ? "" : processed;
         }
       }
       return "";
@@ -173,9 +170,8 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
           /* If the first column from the focused cell is not writable, that
              means we are trying to copy and paste with the focused cell being
              associated with a column like the index column. */
-          // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-          const [c, writable] = columnIsWritable<R, M>(params.columns, focusedCell.column);
-          if (writable === false) {
+          const c = tabling.columns.getColumn(params.columns, focusedCell.column.getColId());
+          if (isNil(c) || !tabling.typeguards.isBodyColumn<R, M>(c)) {
             return [];
           }
 
@@ -233,7 +229,9 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
             (curr: Table.RawRowValue[][], rowData: string[]) => {
               const processed = processArrayFromClipboard<R, M>(
                 apis.column,
-                params.columns,
+                filter(params.columns, (ci: Table.RealColumn<R, M>) =>
+                  tabling.typeguards.isDataColumn(ci)
+                ) as Table.DataColumn<R, M>[],
                 focusedCell.column,
                 rowData
               );
@@ -249,7 +247,13 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
 						 pasted data corresponding to rows that should be added to the
 						 table - and then dispatch an event to add these rows to the table
 						 with the data provided. */
-          const cols = getWritableColumnsAfter<R, M>(apis.column, params.columns, focusedCell.column);
+          const cols = getWritableColumnsAfter<R, M>(
+            apis.column,
+            filter(params.columns, (ci: Table.RealColumn<R, M>) =>
+              tabling.typeguards.isDataColumn(ci)
+            ) as Table.DataColumn<R, M>[],
+            focusedCell.column
+          );
           const payload = reduce(
             processedNewRowData,
             (curr: Partial<R>[], rowData: Table.RawRowValue[]) => {
@@ -260,8 +264,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
                 ...curr,
                 reduce(
                   cols,
-
-                  (currD: Partial<R>, ci: Table.Column<R, M>, index: number): Partial<R> => {
+                  (currD: Partial<R>, ci: Table.BodyColumn<R, M>, index: number): Partial<R> => {
                     if (!isNil(ci.parseIntoFields)) {
                       /* Note: We must apply the logic to nullify certain values
 												 because the values here do not pass through the
@@ -272,11 +275,12 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
                         ...currD,
                         ...reduce(
                           parsed,
-                          (v: Partial<R>, parsedField: Table.ParsedColumnField<R>) => {
+                          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                          (v: Partial<R>, parsedField: Table.ParsedColumnField<R, any, Table.ModelRow<R>>) => {
                             if (parsedField.value === "") {
                               return {
                                 ...v,
-                                [parsedField.field]: ci.nullValue === undefined ? null : ci.nullValue
+                                [parsedField.field]: ci.nullValue
                               };
                             }
                             return { ...v, [parsedField.field]: parsedField.value };
@@ -288,10 +292,10 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
                       /* Note: We do not use the colId for creating the RowData
 											   object - the colId is used for cases where the Column
 												 is not associated with a field of the Row Data. */
-                      if (rowData[index] === ("" as unknown as R[keyof R])) {
+                      if (rowData[index] === "") {
                         return {
                           ...currD,
-                          [ci.field]: ci.nullValue === undefined ? null : ci.nullValue
+                          [ci.field]: ci.nullValue
                         };
                       }
                       return { ...currD, [ci.field]: rowData[index] };

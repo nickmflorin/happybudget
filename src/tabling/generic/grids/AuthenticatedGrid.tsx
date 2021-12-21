@@ -40,14 +40,13 @@ const AuthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpModel
     };
   }, [framework, props.id]);
 
-  const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
+  const columns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
     return map(
       props.columns,
-      (col: Table.Column<R, M>): Table.Column<R, M> =>
-        ({
-          ...col,
-          cellRendererParams: { ...col.cellRendererParams, onChangeEvent: props.onChangeEvent, readOnly: false }
-        } as Table.Column<R, M>)
+      (col: Table.RealColumn<R, M>): Table.RealColumn<R, M> => ({
+        ...col,
+        cellRendererParams: { ...col.cellRendererParams, onChangeEvent: props.onChangeEvent, readOnly: false }
+      })
     );
   }, [hooks.useDeepEqualMemo(props.columns)]);
 

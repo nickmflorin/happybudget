@@ -49,7 +49,7 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
           framework.actions.ToggleColumnAction<R, M>(table.current, params),
           framework.actions.ExportCSVAction<R, M>(table.current, params, exportFileName)
         ]}
-        columns={tabling.columns.normalizeColumns<R, M>(Columns, {
+        columns={tabling.columns.normalizeColumns(tabling.columns.filterRealColumns(Columns), {
           attachments: (col: Table.Column<R, M>) => ({
             onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditAttachments(row.id),
             processCellFromClipboard: processAttachmentsCellFromClipboard,

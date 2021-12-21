@@ -26,7 +26,7 @@ export interface UnauthenticateDataGridProps<
   M extends Model.RowHttpModel = Model.RowHttpModel
 > {
   readonly apis: Table.GridApis | null;
-  readonly columns: Table.Column<R, M>[];
+  readonly columns: Table.RealColumn<R, M>[];
   readonly grid: NonNullRef<Table.DataGridInstance>;
 }
 
@@ -57,8 +57,8 @@ const unauthenticatedDataGrid =
         includeRowInNavigation: config?.includeRowInNavigation
       });
 
-      const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-        return map(props.columns, (col: Table.Column<R, M>) => ({
+      const columns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
+        return map(props.columns, (col: Table.RealColumn<R, M>) => ({
           ...col,
           editable: false
         }));

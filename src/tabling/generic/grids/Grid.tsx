@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { map, isNil, cloneDeep, filter } from "lodash";
+import { map, isNil, cloneDeep } from "lodash";
 import classNames from "classnames";
 
 import { AgGridReact } from "@ag-grid-community/react";
@@ -84,8 +84,8 @@ export interface GridProps<R extends Table.RowData, M extends Model.RowHttpModel
   readonly data?: Table.BodyRow<R>[];
   readonly hiddenColumns?: Table.HiddenColumns;
   readonly gridOptions: Table.GridOptions;
-  readonly checkboxColumn?: Partial<Table.Column<R, M>>;
-  readonly columns: Table.Column<R, M>[];
+  readonly checkboxColumn?: Table.PartialActionColumn<R, M>;
+  readonly columns: Table.RealColumn<R, M>[];
   readonly className?: Table.GeneralClassName;
   readonly style?: React.CSSProperties;
   readonly rowClass?: Table.RowClassName;
@@ -116,128 +116,142 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
   localizePopupParent,
   ...props
 }: GridProps<R, M>): JSX.Element => {
-  const localColumns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-    let cs: Table.Column<R, M>[] = map(columns, (col: Table.Column<R, M>, index: number): Table.Column<R, M> => {
-      const field = tabling.columns.normalizedField<R, M>(col);
-      const hidden = !isNil(field) && (isNil(hiddenColumns) || hiddenColumns[field] === true);
-      return {
-        ...col,
-        headerComponentParams: { ...col.headerComponentParams, column: col },
-        cellRendererParams: { ...col.cellRendererParams, columns, customCol: col, gridId: id },
-        hide: hidden,
-        resizable: index === columns.length - 1 ? false : !isNil(col.resizable) ? col.resizable : true,
-        cellStyle: !isNil(col.columnType)
-          ? { ...tabling.columns.getColumnTypeCSSStyle(col.columnType), ...col.cellStyle }
-          : col.cellStyle
-      } as Table.Column<R, M>;
-    });
+  const localColumns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
+    let cs: Table.RealColumn<R, M>[] = map(
+      columns,
+      (col: Table.RealColumn<R, M>, index: number): Table.RealColumn<R, M> => {
+        const field = tabling.columns.normalizedField<R, M>(col);
+        const hidden = !isNil(field) && (isNil(hiddenColumns) || hiddenColumns[field] === true);
+        return {
+          ...col,
+          headerComponentParams: { ...col.headerComponentParams, column: col },
+          cellRendererParams: { ...col.cellRendererParams, columns, customCol: col, gridId: id },
+          hide: hidden,
+          resizable: index === columns.length - 1 ? false : !isNil(col.resizable) ? col.resizable : true,
+          cellStyle: tabling.typeguards.isDataColumn(col)
+            ? !isNil(col.dataType)
+              ? { ...tabling.columns.getColumnTypeCSSStyle(col.dataType), ...col.cellStyle }
+              : col.cellStyle
+            : col.cellStyle
+        };
+      }
+    );
     cs = !isNil(checkboxColumn)
-      ? util.updateInArray<Table.Column<R, M>>(cs, { colId: "checkbox" }, checkboxColumn)
+      ? util.updateInArray<Table.RealColumn<R, M>>(cs, { colId: "checkbox" }, checkboxColumn)
       : cs;
     return cs;
   }, [hiddenColumns]);
 
   const colDefs = useMemo(
     () =>
-      map(
-        filter(localColumns, (c: Table.Column<R, M>) => c.tableColumnType !== "fake"),
-        (col: Table.Column<R, M>): ColDef => {
-          /*
+      map(localColumns, (col: Table.RealColumn<R, M>): ColDef => {
+        const cellRenderer: string | undefined =
+          typeof col.cellRenderer === "string"
+            ? col.cellRenderer
+            : !isNil(col.cellRenderer)
+            ? col.cellRenderer[id]
+            : undefined;
+        /*
         	While AG Grid will not break if we include extra properties on the
 					ColDef(s) (properties from our own custom Table.Column model) - they
 					will complain a lot. So we need to try to remove them. */
-          /* eslint-disable @typescript-eslint/no-unused-vars */
-          const {
-            footer,
-            page,
-            selectable,
-            requiresAuthentication,
-            index,
-            canBeExported,
-            canBeHidden,
-            isRead,
-            isWrite,
-            columnType,
-            tableColumnType,
-            nullValue,
-            smartInference,
-            defaultNewRowValue,
-            defaultHidden,
-            includeInPdf,
-            pdfWidth,
-            pdfHeaderName,
-            pdfFooter,
-            pdfFooterValueGetter,
-            pdfCellContentsVisible,
-            pdfHeaderCellProps,
-            pdfCellProps,
-            pdfFlexGrow,
-            pdfValueGetter,
-            pdfChildFooter,
-            pdfCellRenderer,
-            pdfFormatter,
-            onDataChange,
-            parseIntoFields,
-            refreshColumns,
-            onCellDoubleClicked,
-            processCellForClipboard,
-            processCellForCSV,
-            processCellFromClipboard,
-            getHttpValue,
-            getRowValue,
-            ...agColumn
-          } = col;
-          return {
-            ...agColumn,
-            field: col.field as string,
-            suppressMenu: true,
-            valueGetter: (params: ValueGetterParams) => {
-              if (!isNil(params.node)) {
-                const row: Table.Row<R> = params.node.data;
-                if (tabling.typeguards.isBodyRow(row)) {
-                  if (isNil(col.valueGetter)) {
-                    return row.data[params.column.getColId() as keyof R];
-                  } else {
-                    const rows = tabling.aggrid.getRows<R, Table.BodyRow<R>>(params.api);
-                    return col.valueGetter(row, rows);
+        return {
+          ...tabling.columns.parseBaseColumn<R, M, typeof col>(col),
+          suppressMenu: true,
+          valueGetter: tabling.typeguards.isDataColumn(col)
+            ? (params: ValueGetterParams) => {
+                if (!isNil(params.node)) {
+                  const row: Table.Row<R> = params.node.data;
+                  if (tabling.typeguards.isBodyRow(row)) {
+                    if (isNil(col.valueGetter)) {
+                      if (tabling.typeguards.isMarkupRow(row)) {
+                        if (!isNil(col.markupField)) {
+                          if (row.data[col.markupField] === undefined) {
+                            /* The row managers should prevent this, but you never
+															 know. */
+                            console.error(
+                              `Undefined value for row ${row.id} (type = ${row.rowType})
+															encountered for field ${col.markupField}!`
+                            );
+                            return col.nullValue;
+                          }
+                          return row.data[col.markupField];
+                        } else {
+                          return col.nullValue;
+                        }
+                      } else if (tabling.typeguards.isGroupRow(row)) {
+                        if (!isNil(col.groupField)) {
+                          if (row.data[col.groupField] === undefined) {
+                            /* The row managers should prevent this, but you never
+															 know. */
+                            console.error(
+                              `Undefined value for row ${row.id} (type = ${row.rowType})
+															encountered for field ${col.groupField}!`
+                            );
+                            return col.nullValue;
+                          }
+                          return row.data[col.groupField];
+                        } else {
+                          return col.nullValue;
+                        }
+                      } else {
+                        if (row.data[col.field] === undefined) {
+                          /* The row managers should prevent this, but you never
+														 know. */
+                          console.error(
+                            `Undefined value for row ${row.id} (type = ${row.rowType})
+														encountered for field ${col.field}!`
+                          );
+                          return col.nullValue;
+                        }
+                        return row.data[col.field];
+                      }
+                    } else {
+                      const rows = tabling.aggrid.getRows<R, Table.BodyRow<R>>(params.api);
+                      return col.valueGetter(row, rows);
+                    }
                   }
                 }
+                return col.nullValue;
               }
-              return col.nullValue !== undefined ? col.nullValue : null;
-            },
-            cellRenderer:
-              typeof col.cellRenderer === "string"
-                ? col.cellRenderer
-                : !isNil(col.cellRenderer)
-                ? col.cellRenderer[id]
-                : undefined,
-            colSpan: (params: ColSpanParams) => (!isNil(col.colSpan) ? col.colSpan({ ...params, columns }) : 1),
-            editable: (params: EditableCallbackParams) => {
-              const row: Table.Row<R> = params.node.data;
-              if (tabling.typeguards.isBodyRow(row)) {
-                return tabling.columns.isEditable<R, M, typeof col>(col, row);
-              }
-              return false;
-            },
-            cellClass: (params: CellClassParams) => {
-              const row: Table.Row<R> = params.node.data;
-              if (tabling.typeguards.isEditableRow(row)) {
-                const isSelectable = isNil(col.selectable)
+            : undefined,
+          cellRenderer,
+          colSpan: (params: ColSpanParams) =>
+            tabling.typeguards.isRealColumn(col)
+              ? !isNil(col.colSpan)
+                ? col.colSpan({
+                    ...params,
+                    columns: localColumns
+                  })
+                : 1
+              : 1,
+          editable: (params: EditableCallbackParams) => {
+            const row: Table.Row<R> = params.node.data;
+            if (tabling.typeguards.isBodyRow(row) && tabling.typeguards.isBodyColumn(col)) {
+              return tabling.columns.isEditable<R, M>(col, row);
+            }
+            return false;
+          },
+          cellClass: (params: CellClassParams) => {
+            const row: Table.Row<R> = params.node.data;
+            if (tabling.typeguards.isEditableRow(row)) {
+              const isSelectable = tabling.typeguards.isBodyColumn(col)
+                ? isNil(col.selectable)
                   ? true
                   : typeof col.selectable === "function"
                   ? col.selectable({ row })
-                  : col.selectable;
-                return tabling.aggrid.mergeClassNames<CellClassParams>(params, "cell", col.cellClass, {
-                  "cell--not-selectable": isSelectable === false
-                });
-              }
+                  : col.selectable
+                : tabling.typeguards.isCalculatedColumn(col);
               return tabling.aggrid.mergeClassNames<CellClassParams>(params, "cell", col.cellClass, {
-                "cell--not-selectable": true
+                "cell--not-selectable": isSelectable === false
               });
             }
-          };
-        }
-      ),
+            return tabling.aggrid.mergeClassNames<CellClassParams>(params, "cell", col.cellClass, {
+              "cell--not-selectable": true
+            });
+          }
+        };
+      }),
     []
   );
 

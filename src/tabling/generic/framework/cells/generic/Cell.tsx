@@ -9,9 +9,12 @@ import { Icon } from "components";
 const Cell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  V extends Table.RawRowValue = any,
+  C extends Table.RealColumn<R, M, V> = Table.BodyColumn<R, M, V>
 >(
-  props: Table.CellWithChildrenProps<R, M, S>,
+  props: Table.CellWithChildrenProps<R, M, S, V, C>,
   ref: ForwardedRef<HTMLDivElement>
 ): JSX.Element => {
   const row: Table.BodyRow<R> = props.node.data;
@@ -61,9 +64,12 @@ type CellComponent = {
   <
     R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    S extends Redux.TableStore<R> = Redux.TableStore<R>
+    S extends Redux.TableStore<R> = Redux.TableStore<R>,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    V extends Table.RawRowValue = any,
+    C extends Table.RealColumn<R, M, V> = Table.BodyColumn<R, M, V>
   >(
-    props: Table.CellWithChildrenProps<R, M, S> & { readonly ref?: RefObject<HTMLDivElement> }
+    props: Table.CellWithChildrenProps<R, M, S, V, C> & { readonly ref?: RefObject<HTMLDivElement> }
   ): JSX.Element;
 };
 

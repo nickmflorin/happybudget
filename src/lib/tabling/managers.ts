@@ -2,6 +2,7 @@ import { reduce, filter, isNil, includes } from "lodash";
 import { util, budgeting } from "lib";
 
 import * as typeguards from "./typeguards";
+import * as columnFns from "./columns";
 
 export const markupRowId = (r: number): Table.MarkupRowId => `markup-${r}`;
 export const markupId = (r: Table.MarkupRowId): number => parseInt(r.split("markup-")[1]);
@@ -17,26 +18,26 @@ export const safeEditableRowId = (r: Table.EditableRowId): Table.EditableRowId =
 export const editableId = (r: Table.EditableRowId): number =>
   typeguards.isMarkupRowId(r) ? markupId(r) : parseInt(String(r));
 
-type CreateRowConfig<RId extends Table.RowId> = {
-  readonly id: RId;
+type CreateRowConfig<RW extends Table.Row<R>, R extends Table.RowData> = {
+  readonly id: RW["id"];
 };
 
-type RowManagerConfig<TP extends Table.RowType, Grid extends Table.GridId = Table.GridId> = {
-  readonly rowType: TP;
-  readonly gridId: Grid;
+type RowManagerConfig<RW extends Table.Row<R>, R extends Table.RowData> = {
+  readonly rowType: RW["rowType"];
+  readonly gridId: RW["gridId"];
 };
 
-abstract class RowManager<RId extends Table.RowId, TP extends Table.RowType, Grid extends Table.GridId = Table.GridId> {
-  public rowType: TP;
-  public gridId: Grid;
+abstract class RowManager<RW extends Table.Row<R>, R extends Table.RowData> {
+  public rowType: RW["rowType"];
+  public gridId: RW["gridId"];
 
-  constructor(config: RowManagerConfig<TP, Grid>) {
+  constructor(config: RowManagerConfig<RW, R>) {
     this.rowType = config.rowType;
     this.gridId = config.gridId;
   }
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  public createBasic(config: CreateRowConfig<RId>): Table.IRow<RId, TP, Grid> {
+  public createBasic(config: CreateRowConfig<RW, R>): Pick<RW, "id" | "rowType" | "gridId"> {
     return {
       id: config.id,
       rowType: this.rowType,
@@ -45,9 +46,9 @@ abstract class RowManager<RId extends Table.RowId, TP extends Table.RowType, Gri
   }
 }
 
-export const createRow = <RId extends Table.RowId, TP extends Table.RowType, Grid extends Table.GridId = Table.GridId>(
-  config: RowManagerConfig<TP, Grid> & CreateRowConfig<RId>
-): Table.IRow<RId, TP, Grid> => {
+export const createRow = <RW extends Table.Row<R>, R extends Table.RowData>(
+  config: RowManagerConfig<RW, R> & CreateRowConfig<RW, R>
+): Pick<RW, "id" | "rowType" | "gridId"> => {
   return {
     id: config.id,
     rowType: config.rowType,
@@ -56,47 +57,59 @@ export const createRow = <RId extends Table.RowId, TP extends Table.RowType, Gri
 };
 
 export const createFooterRow = <Grid extends Table.FooterGridId = Table.FooterGridId>(
-  config: Omit<RowManagerConfig<"footer", Grid>, "rowType">
-): Table.FooterRow => createRow({ ...config, rowType: "footer", id: footerRowId(config.gridId) });
+  config: Omit<RowManagerConfig<Table.FooterRow<Grid>, Table.RowData>, "rowType">
+): Table.FooterRow =>
+  createRow<Table.FooterRow, Table.RowData>({ ...config, rowType: "footer", id: footerRowId(config.gridId) });
 
-type CreateBodyRowConfig<RId extends Table.BodyRowId, R extends Table.RowData> = CreateRowConfig<RId> & {
-  readonly data?: R;
+type CreateBodyRowConfig<RW extends Table.BodyRow<R>, R extends Table.RowData> = CreateRowConfig<RW, R> & {
+  readonly data?: RW["data"];
 };
 
 type BodyRowManagerConfig<
-  TP extends Table.BodyRowType,
+  RW extends Table.BodyRow<R>,
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
-> = Omit<RowManagerConfig<TP, "data">, "gridId"> & {
+> = Omit<RowManagerConfig<RW, R>, "gridId"> & {
   readonly columns: Table.Column<R, M>[];
 };
 
 abstract class BodyRowManager<
-  RId extends Table.BodyRowId,
-  TP extends Table.BodyRowType,
+  RW extends Table.BodyRow<R>,
   R extends Table.RowData,
   M extends Model.RowHttpModel
-> extends RowManager<RId, TP, "data"> {
+> extends RowManager<RW, R> {
   public columns: Table.Column<R, M>[];
 
-  constructor(config: BodyRowManagerConfig<TP, R, M>) {
+  constructor(config: BodyRowManagerConfig<RW, R, M>) {
     super({ ...config, gridId: "data" });
     this.columns = config.columns;
   }
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  abstract getValueForRow(field: keyof R, col: Table.Column<R, M>, ...args: any[]): R[keyof R] | undefined;
+  abstract getValueForRow<
+    V extends Table.RawRowValue,
+    C extends Table.ModelColumn<R, M, V>
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  >(col: C, ...args: any[]): [V | undefined, boolean];
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   createData(...args: any[]): R {
     return reduce(
-      filter(this.columns, (c: Table.Column<R, M>) => c.isRead !== false),
-      (obj: R, c: Table.Column<R, M>) => {
-        if (!isNil(c.field)) {
-          const nullValue = c.nullValue === undefined ? null : c.nullValue;
-          const value = this.getValueForRow(c.field, c, ...args);
+      columnFns.filterModelColumns(this.columns),
+      (obj: R, c: Table.ModelColumn<R, M>): R => {
+        /* If we are dealing with a calculated or body column, we only read
+					the value directly from the model if that column does not have
+					`isRead` set to false. */
+        const [value, isApplicable] = this.getValueForRow(c, ...args);
+        if (isApplicable) {
           if (value === undefined) {
-            return { ...obj, [c.field]: nullValue };
+            /* If the DataColumn is intentionally flagged with `isRead = false`,
+							 this means we do not pull the value from the Model but the value
+							 is instead set with value getters. */
+            if (typeguards.isDataColumn(c) && c.isRead === false) {
+              return obj;
+            }
+            console.error(`Could not obtain row value for field ${c.field}, ${JSON.stringify(args)}!`);
+            return { ...obj, [c.field]: c.nullValue };
           }
           return { ...obj, [c.field]: value };
         }
@@ -106,8 +119,11 @@ abstract class BodyRowManager<
     );
   }
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  public createBasic(config: CreateBodyRowConfig<RId, R>, ...args: any[]): Table.IBodyRow<RId, TP, R> {
+  public createBasic(
+    config: CreateBodyRowConfig<RW, R>,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    ...args: any[]
+  ): Pick<RW, "id" | "rowType" | "gridId" | "data"> {
     return {
       ...super.createBasic(config),
       data: config.data || this.createData(...args)
@@ -120,31 +136,38 @@ type CreatePlaceholderRowConfig<R extends Table.RowData> = {
   readonly data?: Partial<R>;
 };
 
-type PlaceholderRowConfig<R extends Table.RowData, M extends Model.RowHttpModel> = Omit<
-  BodyRowManagerConfig<"placeholder", R, M>,
-  "rowType"
-> & {
+type PlaceholderRowConfig<
+  RW extends Table.PlaceholderRow<R>,
+  R extends Table.RowData,
+  M extends Model.RowHttpModel
+> = Omit<BodyRowManagerConfig<RW, R, M>, "rowType"> & {
   readonly defaultData?: Partial<R>;
 };
 
 export class PlaceholderRowManager<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
-> extends BodyRowManager<Table.PlaceholderRowId, "placeholder", R, M> {
+> extends BodyRowManager<Table.PlaceholderRow<R>, R, M> {
   public getRowChildren: ((m: M) => number[]) | undefined;
   public defaultData?: Partial<R>;
 
-  constructor(config: PlaceholderRowConfig<R, M>) {
+  constructor(config: PlaceholderRowConfig<Table.PlaceholderRow<R>, R, M>) {
     super({ ...config, rowType: "placeholder" });
     this.defaultData = config.defaultData;
   }
 
-  getValueForRow(field: keyof R, col: Table.Column<R, M>, data?: Partial<R>) {
-    const value = this.defaultData === undefined ? undefined : this.defaultData[field];
+  getValueForRow<V extends Table.RawRowValue, C extends Table.ModelColumn<R, M, V>>(
+    col: C,
+    data?: Partial<R>
+  ): [V | undefined, boolean] {
+    const value = this.defaultData === undefined ? undefined : (this.defaultData[col.field] as V | undefined);
     if (value === undefined) {
-      return data === undefined ? undefined : data[field];
+      if (data === undefined || data[col.field] === undefined) {
+        return [col.nullValue, false];
+      }
+      return [data[col.field] as unknown as V, true];
     }
-    return value;
+    return [value, true];
   }
 
   create(config: CreatePlaceholderRowConfig<R>): Table.PlaceholderRow<R> {
@@ -155,15 +178,16 @@ export class PlaceholderRowManager<
   }
 }
 
-type GetRowValue<R extends Table.RowData, M extends Model.RowHttpModel> = (
+type GetRowValue<R extends Table.RowData, M extends Model.RowHttpModel, V extends Table.RawRowValue> = (
   m: M,
-  col: Table.Column<R, M>
-) => R[keyof R] | undefined;
+  col: Table.DataColumn<R, M>,
+  original: (ci: Table.DataColumn<R, M>, mi: M) => V | undefined
+) => V | undefined;
 
 type CreateModelRowFromModelConfig<R extends Table.RowData, M extends Model.RowHttpModel> = {
   readonly model: M;
   // Used solely for PDF purposes.
-  readonly getRowValue?: GetRowValue<R, M> | undefined;
+  readonly getRowValue?: GetRowValue<R, M, Table.RawRowValue> | undefined;
 };
 
 type CreateModelRowFromDataConfig<R extends Table.RowData> = {
@@ -189,7 +213,7 @@ type ModelRowManagerConfig<R extends Table.RowData, M extends Model.RowHttpModel
 export class ModelRowManager<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
-> extends BodyRowManager<Table.ModelRowId, "model", R, M> {
+> extends BodyRowManager<Table.ModelRow<R>, R, M> {
   public getRowChildren: ((m: M) => number[]) | undefined;
 
   constructor(config: ModelRowManagerConfig<R, M>) {
@@ -197,17 +221,23 @@ export class ModelRowManager<
     this.getRowChildren = config.getRowChildren;
   }
 
-  getValueForRow(field: keyof R, col: Table.Column<R, M>, m: M, getRowValue?: GetRowValue<R, M>) {
-    let value: R[keyof R] | undefined = undefined;
-    if (!isNil(getRowValue)) {
-      value = getRowValue(m, col);
-    } else if (!isNil(col.getRowValue)) {
-      value = col.getRowValue(m);
+  getValueForRow<
+    V extends Table.RawRowValue,
+    C extends Table.ModelColumn<R, M, V>
+    // The optional `getRowValue` callback is only used for PDF cases.
+  >(col: C, m: M, getRowValue?: GetRowValue<R, M, V>): [V | undefined, boolean] {
+    if (!isNil(getRowValue) && typeguards.isDataColumn<R, M>(col)) {
+      return [
+        getRowValue(m, col, (colr: Table.DataColumn<R, M>, mr: M) => this.getValueForRow<V, C>(colr as C, mr)[0]),
+        true
+      ];
+    } else {
+      if (!isNil(col.getRowValue)) {
+        return [col.getRowValue(m), true];
+      } else {
+        return [util.getKeyValue<M, keyof M>(col.field as keyof M)(m) as unknown as V | undefined, true];
+      }
     }
-    if (value === undefined) {
-      value = util.getKeyValue<M, keyof M>(field as keyof M)(m) as unknown as R[keyof R];
-    }
-    return value;
   }
 
   create(config: CreateModelRowConfig<R, M>): Table.ModelRow<R> {
@@ -243,7 +273,7 @@ type CreateMarkupRowFromModelConfig = {
 
 type CreateMarkupRowFromDataConfig<R extends Table.RowData> = {
   readonly id: Table.MarkupRowId;
-  readonly data: R;
+  readonly data: Pick<R, keyof Model.Markup>;
   readonly children?: number[];
   readonly unit: Model.Markup["unit"];
   readonly rate: Model.Markup["rate"];
@@ -262,15 +292,23 @@ type MarkupRowManagerConfig<R extends Table.RowData, M extends Model.RowHttpMode
 export class MarkupRowManager<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
-> extends BodyRowManager<Table.MarkupRowId, "markup", R, M> {
+> extends BodyRowManager<Table.MarkupRow<R>, R, M> {
   constructor(config: MarkupRowManagerConfig<R, M>) {
     super({ ...config, rowType: "markup" });
   }
 
-  getValueForRow(field: keyof R, col: Table.Column<R, M>, markup: Model.Markup) {
-    return util.getKeyValue<Model.Markup, keyof Model.Markup>(field as keyof Model.Markup)(
-      markup
-    ) as unknown as R[keyof R];
+  getValueForRow<V extends Table.RawRowValue, C extends Table.ModelColumn<R, M, V>>(
+    col: C,
+    markup: Model.Markup
+  ): [V | undefined, boolean] {
+    // The FakeColumn(s) are not applicable for Markups.
+    if (typeguards.isDataColumn<R, M>(col) && !isNil(col.markupField)) {
+      return [markup[col.markupField] as V | undefined, true];
+    }
+    /* We want to indicate that the value is nnot applicable for the column so
+		 	 that it is not included in the row data and a warning is not issued when
+			 the value is undefined */
+    return [undefined, false];
   }
 
   removeChildren(row: Table.MarkupRow<R>, ids: SingleOrArray<number>): Table.MarkupRow<R> {
@@ -322,7 +360,7 @@ type CreateGroupRowFromModelConfig = {
 
 type CreateGroupRowFromDataConfig<R extends Table.RowData> = {
   readonly id: Table.GroupRowId;
-  readonly data: R;
+  readonly data: Pick<R, keyof Model.Group>;
   readonly children?: number[];
   readonly name: Model.Group["name"];
   readonly color: Model.Group["color"];
@@ -341,15 +379,23 @@ type GroupRowManagerConfig<R extends Table.RowData, M extends Model.RowHttpModel
 export class GroupRowManager<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
-> extends BodyRowManager<Table.GroupRowId, "group", R, M> {
+> extends BodyRowManager<Table.GroupRow<R>, R, M> {
   constructor(config: GroupRowManagerConfig<R, M>) {
     super({ ...config, rowType: "group" });
   }
 
-  getValueForRow(field: keyof R, col: Table.Column<R, M>, group: Model.Group) {
-    return util.getKeyValue<Partial<Model.Group>, keyof Model.Group>(field as keyof Model.Group)(
-      group
-    ) as unknown as R[keyof R];
+  getValueForRow<V extends Table.RawRowValue, C extends Table.ModelColumn<R, M, V>>(
+    col: C,
+    group: Model.Group
+  ): [V | undefined, boolean] {
+    // The FakeColumn(s) are not applicable for Groups.
+    if (typeguards.isDataColumn<R, M>(col) && !isNil(col.groupField)) {
+      return [group[col.groupField] as V, true];
+    }
+    /* We want to indicate that the value is not applicable for the column so
+		 	 that it is not included in the row data and a warning is not issued when
+			 the value is undefined */
+    return [undefined, false];
   }
 
   removeChildren(row: Table.GroupRow<R>, ids: SingleOrArray<number>): Table.GroupRow<R> {

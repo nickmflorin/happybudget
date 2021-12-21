@@ -11,6 +11,7 @@
       "./src/types/",
       "node_modules/@types",
     ],
+    "noEmitOnError": true,
     "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": true,

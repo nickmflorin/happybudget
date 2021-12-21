@@ -8,13 +8,14 @@ type R = Tables.ContactRowData;
 type M = Model.Contact;
 
 const Columns: Table.Column<Tables.ContactRowData, M>[] = [
-  columns.FakeColumn({ field: "first_name" }),
-  columns.FakeColumn({ field: "last_name" }),
-  columns.FakeColumn({ field: "image" }),
+  columns.FakeColumn({ field: "first_name", nullValue: null }),
+  columns.FakeColumn({ field: "last_name", nullValue: null }),
+  columns.FakeColumn({ field: "image", nullValue: null }),
   columns.BodyColumn<R, M, string | null>({
-    colId: "names_and_image",
+    field: "names_and_image",
+    nullValue: null,
     headerName: "Name",
-    columnType: "text",
+    dataType: "text",
     cellRenderer: { data: "ContactNameCell" },
     editable: true,
     cellClass: "cell--renders-html",
@@ -38,50 +39,57 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
       }
       return true;
     },
-    valueGetter: (row: Table.BodyRow<R>) => util.conditionalJoinString(row.data.first_name, row.data.last_name)
+    valueGetter: (row: Table.BodyRow<R>) =>
+      tabling.typeguards.isModelRow(row) ? util.conditionalJoinString(row.data.first_name, row.data.last_name) : null
   }),
   columns.BodyColumn<R, M>({
     field: "company",
+    nullValue: null,
     headerName: "Company",
-    columnType: "text",
+    dataType: "text",
     width: 100,
     minWidth: 100
   }),
   columns.BodyColumn<R, M>({
     field: "position",
+    nullValue: null,
     headerName: "Job Title",
-    columnType: "text",
+    dataType: "text",
     width: 100,
     minWidth: 100
   }),
   columns.BodyColumn<R, M>({
     field: "phone_number",
+    nullValue: null,
     headerName: "Phone Number",
-    columnType: "phone",
+    dataType: "phone",
     cellRenderer: { data: "PhoneNumberCell" },
     width: 120,
     minWidth: 120
   }),
   columns.BodyColumn<R, M>({
     field: "email",
+    nullValue: null,
     headerName: "Email",
-    columnType: "email",
+    dataType: "email",
     cellRenderer: { data: "EmailCell" },
-    valueSetter: tabling.valueSetters.emailValueSetter<R>("email"),
+    valueSetter: tabling.valueSetters.emailValueSetter("email"),
     width: 100,
     minWidth: 100
   }),
   columns.BodyColumn<R, M>({
     field: "rate",
+    nullValue: null,
     headerName: "Rate",
-    columnType: "currency",
+    dataType: "currency",
     valueFormatter: tabling.formatters.currencyValueFormatter,
-    valueSetter: tabling.valueSetters.numericValueSetter<R>("rate"),
+    valueSetter: tabling.valueSetters.numericValueSetter("rate"),
     width: 75,
     minWidth: 75
   }),
   columns.ChoiceSelectColumn<R, M, Model.ContactType | null>({
     field: "contact_type",
+    nullValue: null,
     headerName: "Type",
     defaultHidden: true,
     cellRenderer: { data: "ContactTypeCell" },

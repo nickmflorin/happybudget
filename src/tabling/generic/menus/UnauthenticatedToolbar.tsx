@@ -6,7 +6,7 @@ import TableMenuAction from "./MenuAction";
 
 interface UnauthenticatedToolbarProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
   readonly apis: Table.GridApis | null;
-  readonly columns: Table.Column<R, M>[];
+  readonly columns: Table.DataColumn<R, M>[];
   readonly actions: Table.UnauthenticatedMenuActions<R, M>;
   readonly hiddenColumns?: Table.HiddenColumns;
 }

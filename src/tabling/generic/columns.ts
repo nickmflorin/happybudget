@@ -4,34 +4,24 @@ import { SuppressKeyboardEventParams, CellClassParams } from "@ag-grid-community
 import { util, tabling, budgeting } from "lib";
 
 export const ActionColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  col: Partial<Table.Column<R, M>>
-): Table.Column<R, M> => ({
+  col: Table.PartialActionColumn<R, M> & { readonly colId: Table.ActionColumnId }
+): Table.ActionColumn<R, M> => ({
   ...col,
-  selectable: false,
-  tableColumnType: "action",
-  isRead: false,
-  isWrite: false,
-  headerName: "",
-  editable: false,
+  cType: "action",
   suppressSizeToFit: true,
   resizable: false,
-  cellClass: tabling.aggrid.mergeClassNamesFn("cell--action", col.cellClass),
-  canBeHidden: false,
-  canBeExported: false
+  cellClass: tabling.aggrid.mergeClassNamesFn("cell--action", col.cellClass)
 });
 
-export const FakeColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  col: Partial<Table.Column<R, M>>
-): Table.Column<R, M> => ({
+export const FakeColumn = (col: Table.PartialFakeColumn): Table.FakeColumn => ({
   ...col,
-  canBeHidden: false,
-  tableColumnType: "fake"
+  cType: "fake"
 });
 
 export const CalculatedColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  col: Partial<Table.Column<R, M, number>>,
+  col: Omit<Table.PartialCalculatedColumn<R, M>, "nullValue">,
   width?: number
-): Table.Column<R, M, number> => {
+): Table.CalculatedColumn<R, M> => {
   return {
     ...col,
     cellStyle: { textAlign: "right", ...col?.cellStyle },
@@ -42,10 +32,8 @@ export const CalculatedColumn = <R extends Table.RowData, M extends Model.RowHtt
       page: "CalculatedCell"
     },
     nullValue: 0.0,
-    tableColumnType: "calculated",
-    columnType: "sum",
-    isRead: true,
-    isWrite: false,
+    cType: "calculated",
+    dataType: "sum",
     suppressSizeToFit: true,
     width: !isNil(width) ? width : 100,
     cellClass: (params: CellClassParams) => {
@@ -58,50 +46,46 @@ export const CalculatedColumn = <R extends Table.RowData, M extends Model.RowHtt
   };
 };
 
+export const BodyColumn = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+  V extends Table.RawRowValue = Table.RawRowValue
+>(
+  col: Table.PartialBodyColumn<R, M, V>
+): Table.BodyColumn<R, M, V> => {
+  return {
+    ...col,
+    cType: "body"
+  };
+};
+
 export const AttachmentsColumn = <
   R extends Tables.ActualRowData | Tables.SubAccountRowData | Tables.ContactRowData,
   M extends Model.RowHttpModel
 >(
-  col: Partial<Table.Column<R, M, Model.SimpleAttachment[]>>,
+  col: Omit<Table.PartialBodyColumn<R, M, Model.SimpleAttachment[]>, "nullValue">,
   width?: number
-): Table.Column<R, M, Model.SimpleAttachment[]> => {
-  return {
+): Table.BodyColumn<R, M, Model.SimpleAttachment[]> =>
+  BodyColumn({
     ...col,
     headerName: "Attachments",
     editable: true,
     requiresAuthentication: true,
     cellRenderer: { data: "AttachmentsCell" },
     cellEditor: "NullCellEditor",
-    tableColumnType: "body",
-    columnType: "file",
+    dataType: "file",
     /* We want to make the attachments cell full size for purposes of dragging
        and dropping media - and we add the padding inside of the cell itself. */
     cellClass: "cell--full-size",
-    isRead: true,
-    isWrite: true,
     nullValue: [],
     width: !isNil(width) ? width : 140,
     getHttpValue: (value: Model.SimpleAttachment[]) => map(value, (m: Model.SimpleAttachment) => m.id)
-  };
-};
-
-export const BodyColumn = <
-  R extends Table.RowData,
-  M extends Model.RowHttpModel,
-  V extends Table.RawRowValue = Table.RawRowValue
->(
-  col?: Partial<Table.Column<R, M, V>>
-): Table.Column<R, M, V> => {
-  return {
-    ...col,
-    tableColumnType: "body"
-  };
-};
+  });
 
 export const DragColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  col: Partial<Table.Column<R, M>>,
+  col: Table.PartialActionColumn<R, M>,
   width?: number
-): Table.Column<R, M> =>
+): Table.ActionColumn<R, M> =>
   ActionColumn({
     ...col,
     colId: "drag",
@@ -109,12 +93,12 @@ export const DragColumn = <R extends Table.RowData, M extends Model.RowHttpModel
     cellRenderer: { data: "DragCell" },
     width: !isNil(width) ? width : 10,
     maxWidth: !isNil(width) ? width : 10
-  }) as Table.Column<R, M>;
+  });
 
 export const EditColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  col: Partial<Table.Column<R, M>>,
+  col: Table.PartialActionColumn<R, M>,
   width?: number
-): Table.Column<R, M> =>
+): Table.ActionColumn<R, M> =>
   ActionColumn({
     cellRenderer: { data: "EditCell" },
     ...col,
@@ -124,10 +108,10 @@ export const EditColumn = <R extends Table.RowData, M extends Model.RowHttpModel
   });
 
 export const CheckboxColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  col: Partial<Table.Column<R, M>>,
+  col: Table.PartialActionColumn<R, M>,
   hasEditColumn: boolean,
   width?: number
-): Table.Column<R, M> =>
+): Table.ActionColumn<R, M> =>
   ActionColumn({
     cellRenderer: "EmptyCell",
     ...col,
@@ -146,7 +130,7 @@ export const CheckboxColumn = <R extends Table.RowData, M extends Model.RowHttpM
         paddingRight: 0
       }
     }
-  }) as Table.Column<R, M>;
+  });
 
 /* Abstract - not meant to be used by individual columns.  It just enforces that
    the clipboard processing props are provided. */
@@ -155,10 +139,10 @@ export const SelectColumn = <
   M extends Model.RowHttpModel,
   V extends Table.RawRowValue = Table.RawRowValue
 >(
-  col: Partial<Table.Column<R, M, V>>
-): Table.Column<R, M, V> => {
+  col: Table.PartialBodyColumn<R, M, V>
+): Table.BodyColumn<R, M, V> => {
   return BodyColumn<R, M, V>({
-    columnType: "singleSelect",
+    dataType: "singleSelect",
     suppressSizeToFit: true,
     ...col,
     cellEditorPopup: true,
@@ -177,16 +161,19 @@ export const SelectColumn = <
 };
 
 export const TagSelectColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  col: Partial<Table.Column<R, M, Model.Tag>>
-): Table.Column<R, M, Model.Tag> => {
+  col: Table.PartialBodyColumn<R, M, Model.Tag | null>
+): Table.BodyColumn<R, M, Model.Tag | null> => {
   return SelectColumn({
     processCellForClipboard: (row: R) => {
-      const field = col?.field || (col?.colId as keyof R);
-      if (!isNil(field)) {
-        const m: Model.Tag | undefined = util.getKeyValue<R, keyof R>(field)(row) as unknown as Model.Tag | undefined;
-        return m?.title || "";
+      const m: Model.Tag | undefined = util.getKeyValue<R, keyof R>(col.field)(row) as unknown as Model.Tag | undefined;
+      if (m === undefined) {
+        console.error(
+          `Could not parse choice select column ${col.field} for clipboard,
+					row = ${JSON.stringify(row)}.`
+        );
+        return "";
       }
-      return "";
+      return m?.title || "";
     },
     getHttpValue: (value: Model.Tag | null): ID | null => (!isNil(value) ? value.id : null),
     ...col
@@ -195,19 +182,22 @@ export const TagSelectColumn = <R extends Table.RowData, M extends Model.RowHttp
 export const ChoiceSelectColumn = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  C extends Model.Choice<number, string> | null = Model.Choice<number, string> | null
+  V extends Model.Choice<number, string> | null = Model.Choice<number, string> | null
 >(
-  col: Partial<Table.Column<R, M, C>>
-): Table.Column<R, M, C> => {
-  return SelectColumn<R, M, C>({
-    getHttpValue: (value: C | null): ID | null => (!isNil(value) ? value.id : null),
+  col: Table.PartialBodyColumn<R, M, V>
+): Table.BodyColumn<R, M, V> => {
+  return SelectColumn<R, M, V>({
+    getHttpValue: (value: V | null): number | null => (!isNil(value) ? value.id : null),
     processCellForClipboard: (row: R) => {
-      const field = col.field || (col.colId as keyof R);
-      if (!isNil(field)) {
-        const m: C | undefined = util.getKeyValue<R, keyof R>(field)(row) as unknown as C | undefined;
-        return m?.name || "";
+      const m: V | undefined = util.getKeyValue<R, keyof R>(col.field)(row) as unknown as V | undefined;
+      if (m === undefined) {
+        console.error(
+          `Could not parse choice select column ${col.field} for clipboard,
+					row = ${JSON.stringify(row)}.`
+        );
+        return "";
       }
-      return "";
+      return m?.name || "";
     },
     ...col
   });
@@ -218,12 +208,13 @@ export const IdentifierColumn = <
   R extends Tables.BudgetRowData,
   M extends Model.RowHttpModel<T>
 >(
-  props: Partial<Table.Column<R, M, string | null>>
-): Table.Column<R, M, string | null> => {
+  col: Omit<Table.PartialBodyColumn<R, M, string | null>, "nullValue">
+): Table.BodyColumn<R, M, string | null> => {
   return BodyColumn<R, M, string | null>({
-    columnType: "number",
+    nullValue: null,
+    dataType: "number",
     smartInference: true,
-    ...props,
+    ...col,
     footer: {
       /* We always want the text in the identifier cell to be present, but the
 			   column itself isn't always wide enough.  However, applying a colSpan
@@ -261,9 +252,11 @@ export const IdentifierColumn = <
         */
         const agColumns: Table.AgColumn[] | undefined = params.columnApi?.getAllDisplayedColumns();
         if (!isNil(agColumns)) {
-          const originalCalculatedColumns = map(
-            filter(params.columns, (c: Table.Column<R, M>) => c.tableColumnType === "calculated"),
-            (c: Table.Column<R, M>) => tabling.columns.normalizedField<R, M>(c)
+          const originalCalculatedColumns: string[] = map(
+            filter(params.columns, (c: Table.RealColumn<R, M>) =>
+              tabling.typeguards.isCalculatedColumn(c)
+            ) as Table.CalculatedColumn<R, M>[],
+            (c: Table.CalculatedColumn<R, M>) => tabling.columns.normalizedField<R, M>(c)
           );
           const indexOfIdentifierColumn = findIndex(agColumns, (c: Table.AgColumn) => c.getColId() === "identifier");
           const indexOfFirstCalculatedColumn = findIndex(agColumns, (c: Table.AgColumn) =>
@@ -278,8 +271,8 @@ export const IdentifierColumn = <
 };
 
 export const EstimatedColumn = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel>(
-  props: Partial<Table.Column<R, M, number>>
-): Table.Column<R, M, number> => {
+  props: Omit<Table.PartialCalculatedColumn<R, M>, "nullValue">
+): Table.CalculatedColumn<R, M> => {
   return CalculatedColumn<R, M>({
     ...props,
     headerName: "Estimated",
@@ -288,8 +281,8 @@ export const EstimatedColumn = <R extends Tables.BudgetRowData, M extends Model.
 };
 
 export const ActualColumn = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel>(
-  props: Partial<Table.Column<R, M, number>>
-): Table.Column<R, M, number> => {
+  props: Omit<Table.PartialCalculatedColumn<R, M>, "nullValue">
+): Table.CalculatedColumn<R, M> => {
   return CalculatedColumn<R, M>({
     ...props,
     headerName: "Actual",
@@ -298,8 +291,8 @@ export const ActualColumn = <R extends Tables.BudgetRowData, M extends Model.Row
 };
 
 export const VarianceColumn = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel>(
-  props: Partial<Table.Column<R, M, number>>
-): Table.Column<R, M, number> => {
+  props: Omit<Table.PartialCalculatedColumn<R, M>, "nullValue">
+): Table.CalculatedColumn<R, M> => {
   return CalculatedColumn<R, M>({
     ...props,
     headerName: "Variance",

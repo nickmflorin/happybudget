@@ -8,10 +8,20 @@ const IdentifierCell = <
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
 >(
-  props: Table.ValueCellProps<R, M, S>
+  props: Table.ValueCellProps<R, M, S, string | null>
 ): JSX.Element => {
-  return <ValueCell<R, M> {...props} />;
+  return <ValueCell<R, M, S, string | null> {...props} />;
 };
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export default framework.connectCellToStore<any, any>(React.memo(IdentifierCell)) as typeof IdentifierCell;
+export default framework.connectCellToStore<
+  Table.ValueCellProps<
+    Tables.BudgetRowData,
+    Model.RowHttpModel,
+    Redux.BudgetTableStore<Tables.BudgetRowData>,
+    string | null
+  >,
+  Tables.BudgetRowData,
+  Model.RowHttpModel,
+  Redux.BudgetTableStore<Tables.BudgetRowData>,
+  string | null
+>(React.memo(IdentifierCell)) as typeof IdentifierCell;

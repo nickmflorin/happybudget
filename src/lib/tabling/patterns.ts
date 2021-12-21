@@ -350,10 +350,10 @@ const detectPatternFromPreviousRows = <R extends Table.RowData>(
 
 export const inferFillCellValue = <R extends Table.RowData, M extends Model.RowHttpModel>(
   params: FillOperationParams,
-  columns: Table.Column<R, M>[]
+  columns: Table.BodyColumn<R, M>[]
 ): Table.RawRowValue => {
   if (params.direction === "down") {
-    const c: Table.Column<R, M> | null = columnFns.getColumn<R, M>(columns, params.column.getColId());
+    const c: Table.BodyColumn<R, M> | null = columnFns.getColumn(columns, params.column.getColId());
     /* The column will be by default not-fake and readable (`isRead !== false`)
 			 since it is already in the table. */
     if (!isNil(c) && c.smartInference === true && !isNil(params.rowNode.rowIndex)) {
@@ -368,7 +368,7 @@ export const inferFillCellValue = <R extends Table.RowData, M extends Model.RowH
 
 export const generateNewRowData = <R extends Table.RowData, M extends Model.RowHttpModel>(
   source: Source<R>,
-  columns: Table.Column<R, M>[]
+  columns: Table.BodyColumn<R, M>[]
 ): Partial<R>[] => {
   if (isReduxSource(source) && source.count !== undefined && source.count !== 1) {
     if (source.count === 0) {
@@ -390,23 +390,20 @@ export const generateNewRowData = <R extends Table.RowData, M extends Model.RowH
     return [
       reduce(
         columns,
-        (curr: Partial<R>, c: Table.Column<R, M>) => {
-          const field = c.field;
-          if (c.isRead !== false && !isNil(field)) {
-            if (c.smartInference === true) {
-              if (isAgSource(source) && isNil(source.newIndex)) {
-                source = { ...source, newIndex: aggrid.getRows(source.api).length };
-              }
-              const previousRows = findPreviousModelRows<R>(source);
-              if (!isNil(previousRows)) {
-                const inferred = detectPatternFromPreviousRows(previousRows, field);
-                if (!isNil(inferred)) {
-                  return { ...curr, [field]: inferred };
-                }
-              }
-            } else if (c.defaultNewRowValue !== undefined) {
-              return { ...curr, [field]: c.defaultNewRowValue };
+        (curr: Partial<R>, c: Table.BodyColumn<R, M>) => {
+          if (c.smartInference === true) {
+            if (isAgSource(source) && isNil(source.newIndex)) {
+              source = { ...source, newIndex: aggrid.getRows(source.api).length };
             }
+            const previousRows = findPreviousModelRows<R>(source);
+            if (!isNil(previousRows)) {
+              const inferred = detectPatternFromPreviousRows(previousRows, c.field);
+              if (!isNil(inferred)) {
+                return { ...curr, [c.field]: inferred };
+              }
+            }
+          } else if (c.defaultNewRowValue !== undefined) {
+            return { ...curr, [c.field]: c.defaultNewRowValue };
           }
           return curr;
         },

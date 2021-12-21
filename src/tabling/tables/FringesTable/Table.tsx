@@ -33,7 +33,7 @@ const FringesTable: React.FC<WithConnectedTableProps<Props, R, M, S>> = ({ expor
       showPageFooter={false}
       framework={Framework}
       cookieNames={{ hiddenColumns: "fringes-table-hidden-columns" }}
-      columns={Columns}
+      columns={tabling.columns.filterRealColumns(Columns)}
       confirmRowDelete={false}
       localizePopupParent
     />

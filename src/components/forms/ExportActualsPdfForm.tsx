@@ -1,6 +1,6 @@
 import { useRef, useMemo, forwardRef, ForwardedRef, useImperativeHandle } from "react";
 import classNames from "classnames";
-import { isNil, filter } from "lodash";
+import { isNil } from "lodash";
 
 import { Switch } from "antd";
 
@@ -10,9 +10,10 @@ import { CKEditor } from "components/richtext";
 
 type NonFormFields = "header";
 type RichTextFields = "header";
+
 interface ExportActualsPdfFormProps extends FormProps<ExportActualsPdfFormOptions> {
   readonly disabled?: boolean;
-  readonly columns: Table.Column<Tables.ActualRowData, Model.Actual>[];
+  readonly columns: Table.DataColumn<Tables.ActualRowData, Model.Actual>[];
 }
 
 const ExportActualsPdfForm = (
@@ -76,11 +77,10 @@ const ExportActualsPdfForm = (
       >
         <Form.Item label={"Columns"} name={"columns"}>
           <ColumnSelect<Tables.ActualRowData, Model.Actual>
-            getLabel={(c: Table.Column<Tables.ActualRowData, Model.Actual>) => c.pdfHeaderName || c.headerName || ""}
-            columns={filter(
-              columns,
-              (c: Table.Column<Tables.ActualRowData, Model.Actual>) => c.tableColumnType !== "fake"
-            )}
+            getLabel={(c: Table.DataColumn<Tables.ActualRowData, Model.Actual>) =>
+              c.pdfHeaderName || c.headerName || ""
+            }
+            columns={columns}
           />
         </Form.Item>
 

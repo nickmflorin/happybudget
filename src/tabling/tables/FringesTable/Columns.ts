@@ -10,43 +10,47 @@ type M = Model.Fringe;
 const Columns: Table.Column<R, M>[] = [
   columns.BodyColumn<R, M>({
     field: "name",
-    columnType: "text",
+    nullValue: null,
+    dataType: "text",
     headerName: "Name",
     width: 120
   }),
   columns.BodyColumn<R, M>({
     field: "color",
+    nullValue: null,
     headerName: "Color",
     cellClass: "cell--renders-html",
     cellRenderer: { data: "ColorCell" },
     cellEditor: "FringesColorEditor",
     width: 100,
-    columnType: "singleSelect",
+    dataType: "singleSelect",
     cellEditorPopup: true,
     cellEditorPopupPosition: "below"
   }),
   columns.BodyColumn<R, M>({
     field: "description",
+    nullValue: null,
     headerName: "Description",
-    columnType: "longText",
+    dataType: "longText",
     flex: 100
   }),
   columns.BodyColumn<R, M>({
     field: "rate",
     headerName: "Rate",
-    columnType: "percentage",
+    nullValue: null,
+    dataType: "percentage",
     width: 100,
     valueSetter: (params: ValueSetterParams) => {
       const row: Table.BodyRow<R> = params.data;
       if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
         const unit = row.data.unit === null ? budgeting.models.FringeUnitModels.PERCENT : row.data.unit;
         return unit.id === budgeting.models.FringeUnitModels.FLAT.id
-          ? tabling.valueSetters.numericValueSetter<R>("rate")(params)
-          : tabling.valueSetters.percentageToDecimalValueSetter<R>("rate")(params);
+          ? tabling.valueSetters.numericValueSetter("rate")(params)
+          : tabling.valueSetters.percentageToDecimalValueSetter("rate")(params);
       }
       /* Here, we have to assume that the value should be formatted as a
          percentage. */
-      return tabling.valueSetters.percentageToDecimalValueSetter<R>("rate")(params);
+      return tabling.valueSetters.percentageToDecimalValueSetter("rate")(params);
     },
     valueFormatter: (params: Table.AGFormatterParams) => {
       if (tabling.formatters.isAgFormatterParams(params)) {
@@ -71,6 +75,7 @@ const Columns: Table.Column<R, M>[] = [
   }),
   columns.ChoiceSelectColumn<R, M, Model.FringeUnit | null>({
     field: "unit",
+    nullValue: null,
     headerName: "Unit",
     cellRenderer: { data: "FringeUnitCell" },
     cellEditor: "FringeUnitEditor",
@@ -78,9 +83,10 @@ const Columns: Table.Column<R, M>[] = [
       models.findChoiceForName<Model.FringeUnit>(budgeting.models.FringeUnits, name)
   }),
   columns.BodyColumn<R, M>({
+    nullValue: null,
     field: "cutoff",
     headerName: "Cutoff",
-    columnType: "number",
+    dataType: "number",
     width: 100
   })
 ];

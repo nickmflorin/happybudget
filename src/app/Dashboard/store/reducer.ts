@@ -1,4 +1,5 @@
 import { combineReducers } from "redux";
+
 import { redux, tabling } from "lib";
 import { ContactsTable } from "tabling";
 
@@ -12,7 +13,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
     Tables.ContactTableStore,
     Tables.ContactTableContext
   >({
-    columns: ContactsTable.Columns,
+    columns: tabling.columns.filterModelColumns(ContactsTable.Columns),
     clearOn: [actions.requestContactsAction],
     actions: {
       tableChanged: actions.handleContactsTableChangeEventAction,

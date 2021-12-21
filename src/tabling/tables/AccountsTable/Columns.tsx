@@ -10,6 +10,7 @@ type M = Model.Account;
 const Columns: Table.Column<R, M>[] = [
   columns.IdentifierColumn<"account", R, M>({
     field: "identifier",
+    markupField: "identifier",
     headerName: "Account",
     pdfHeaderName: "Acct #",
     pdfWidth: 0.1,
@@ -17,11 +18,13 @@ const Columns: Table.Column<R, M>[] = [
   }),
   columns.BodyColumn<R, M, string | null>({
     field: "description",
+    markupField: "description",
+    nullValue: null,
     headerName: "Account Description",
     pdfFlexGrow: true,
     minWidth: 200,
     flex: 100,
-    columnType: "longText",
+    dataType: "longText",
     /* The custom cell renderer here is only needed to include the Markup icon,
        which is annoying because it is only needed for those rows and slows down
        rendering performance. */
@@ -43,7 +46,8 @@ const Columns: Table.Column<R, M>[] = [
     }
   }),
   columns.EstimatedColumn<R, M>({
-    colId: "estimated",
+    field: "estimated",
+    isRead: false,
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfWidth: 0.15,
@@ -51,22 +55,25 @@ const Columns: Table.Column<R, M>[] = [
   }),
   columns.ActualColumn<R, M>({
     field: "actual",
+    markupField: "actual",
+    isRead: true,
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.actualValueGetter
   }),
   columns.VarianceColumn<R, M>({
-    colId: "variance",
+    field: "variance",
+    isRead: false,
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.varianceValueGetter
   }),
-  columns.FakeColumn<R, M>({ field: "nominal_value" }),
-  columns.FakeColumn<R, M>({ field: "markup_contribution" }),
-  columns.FakeColumn<R, M>({ field: "accumulated_fringe_contribution" }),
-  columns.FakeColumn<R, M>({ field: "accumulated_markup_contribution" })
+  columns.FakeColumn({ field: "nominal_value", nullValue: 0.0 }),
+  columns.FakeColumn({ field: "markup_contribution", nullValue: 0.0 }),
+  columns.FakeColumn({ field: "accumulated_fringe_contribution", nullValue: 0.0 }),
+  columns.FakeColumn({ field: "accumulated_markup_contribution", nullValue: 0.0 })
 ];
 
 export default Columns;

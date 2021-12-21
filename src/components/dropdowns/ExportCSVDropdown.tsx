@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { filter, map, isNil, reduce } from "lodash";
 
-import { tabling } from "lib";
 import DropdownMenu from "./DropdownMenu";
 
 export interface ExportCSVDropdownProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
   readonly children: React.ReactChild | React.ReactChild[];
-  readonly columns: Table.Column<R, M>[];
+  readonly columns: Table.DataColumn<R, M>[];
   readonly onDownload: (ids: string[]) => void;
   readonly hiddenColumns?: Table.HiddenColumns;
 }
@@ -14,31 +13,18 @@ export interface ExportCSVDropdownProps<R extends Table.RowData, M extends Model
 const ExportCSVDropdown = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: ExportCSVDropdownProps<R, M>
 ): JSX.Element => {
-  const [selected, setSelected] = useState<(keyof R | string)[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
 
-  const exportableColumns = useMemo<Table.Column<R, M>[]>(
-    () =>
-      filter(
-        props.columns,
-        (col: Table.Column<R, M>) =>
-          col.canBeExported !== false &&
-          col.tableColumnType !== "fake" &&
-          !isNil(tabling.columns.normalizedField<R, M>(col))
-      ),
+  const exportableColumns = useMemo<Table.DataColumn<R, M>[]>(
+    () => filter(props.columns, (col: Table.DataColumn<R, M>) => col.canBeExported !== false),
     [props.columns]
   );
 
   useEffect(() => {
-    const exportable: Table.Column<R, M>[] = filter(exportableColumns, (col: Table.Column<R, M>) => {
-      const field: string | undefined = tabling.columns.normalizedField<R, M>(col);
-      return !isNil(field) && (isNil(props.hiddenColumns) || props.hiddenColumns[field] !== true);
+    const exportable: Table.DataColumn<R, M>[] = filter(exportableColumns, (col: Table.DataColumn<R, M>) => {
+      return isNil(props.hiddenColumns) || props.hiddenColumns[col.field] !== true;
     });
-    setSelected(
-      filter(
-        map(exportable, (col: Table.Column<R, M>) => tabling.columns.normalizedField<R, M>(col)),
-        (field: keyof R | string | undefined) => !isNil(field)
-      ) as (keyof R | string)[]
-    );
+    setSelected(map(exportable, (col: Table.DataColumn<R, M>) => col.field));
   }, [props.columns, props.hiddenColumns]);
 
   return (
@@ -60,11 +46,11 @@ const ExportCSVDropdown = <R extends Table.RowData, M extends Model.RowHttpModel
           },
           []
         );
-        setSelected(selectedIds as (keyof R | string)[]);
+        setSelected(selectedIds as string[]);
       }}
       selected={selected as string[]}
-      models={map(exportableColumns, (col: Table.Column<R, M>) => ({
-        id: tabling.columns.normalizedField<R, M>(col) as string,
+      models={map(exportableColumns, (col: Table.DataColumn<R, M>) => ({
+        id: col.field,
         label: col.headerName || ""
       }))}
       buttons={[

@@ -12,7 +12,7 @@ import PageHeader from "./PageHeader";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;
-type C = Table.Column<R, M>;
+type C = Table.ModelColumn<R, M>;
 
 interface ActualsPdfProps {
   readonly budget: Model.Budget;
@@ -21,11 +21,16 @@ interface ActualsPdfProps {
   readonly options: PdfActualsTable.Options;
 }
 
-const ActualColumns = filter(GenericActualsTable.Columns, (c: C) => c.includeInPdf !== false) as C[];
+const ActualColumns = filter(
+  GenericActualsTable.Columns,
+  (c: Table.Column<R, M>) =>
+    tabling.typeguards.isModelColumn(c) &&
+    ((!tabling.typeguards.isFakeColumn(c) && c.includeInPdf !== false) || tabling.typeguards.isFakeColumn(c))
+) as Table.ModelColumn<R, M>[];
 
 const ActualsPdf = ({ budget, actuals, contacts, options }: ActualsPdfProps): JSX.Element => {
-  const actualColumns = useMemo(() => {
-    let columns = tabling.columns.normalizeColumns<R, M>(ActualColumns, {
+  const actualColumns: Table.ModelColumn<R, M>[] = useMemo(() => {
+    const columns = tabling.columns.normalizeColumns(ActualColumns, {
       description: {
         pdfFooterValueGetter: `${budget.name} Total`
       },
@@ -69,10 +74,9 @@ const ActualsPdf = ({ budget, actuals, contacts, options }: ActualsPdfProps): JS
           params.rawValue !== null ? <Tag fillWidth={false} model={params.rawValue} /> : <Text></Text>
       }
     });
-    columns = tabling.columns.normalizePdfColumnWidths<R, M, C>(columns, (c: C) =>
-      includes(options.columns, tabling.columns.normalizedField<R, M>(c))
+    return tabling.columns.orderColumns(
+      tabling.columns.normalizePdfColumnWidths(columns, (c: C) => includes(options.columns, c.field))
     );
-    return tabling.columns.orderColumns<R, M>(columns);
   }, [contacts]);
 
   const filteredActuals = useMemo<Model.Actual[]>(() => {

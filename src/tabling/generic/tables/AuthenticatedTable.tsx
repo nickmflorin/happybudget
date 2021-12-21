@@ -1,5 +1,5 @@
 import React, { useImperativeHandle, useState, useMemo } from "react";
-import { forEach, isNil, uniq, map, filter, intersection } from "lodash";
+import { forEach, isNil, uniq, map, filter, includes } from "lodash";
 
 import { tabling, util, hooks } from "lib";
 import { Config } from "config";
@@ -42,8 +42,8 @@ export type AuthenticatedTableProps<
     readonly constrainTableFooterHorizontally?: boolean;
     readonly constrainPageFooterHorizontally?: boolean;
     readonly excludeColumns?:
-      | SingleOrArray<keyof R | string | ((col: Table.Column<R, M>) => boolean)>
-      | ((col: Table.Column<R, M>) => boolean);
+      | SingleOrArray<string | ((col: Table.DataColumn<R, M>) => boolean)>
+      | ((col: Table.DataColumn<R, M>) => boolean);
     readonly confirmRowDelete?: boolean;
     readonly localizePopupParent?: boolean;
     readonly children: RenderPropChild<AuthenticatedTableDataGridProps<R, M>>;
@@ -56,7 +56,7 @@ const TableFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, a
   className: "grid--table-footer",
   rowClass: "row--table-footer",
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  getFooterColumn: (col: Table.Column<any>) => col.footer || null
+  getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.footer || null
 })(AuthenticatedGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
     props: Omit<AuthenticatedFooterGridProps<R, M>, "id">
@@ -70,7 +70,7 @@ const PageFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, an
   rowClass: "row--page-footer",
   rowHeight: 28,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  getFooterColumn: (col: Table.Column<any>) => col.page || null
+  getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.page || null
 })(AuthenticatedGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
     props: Omit<AuthenticatedFooterGridProps<R, M>, "id">
@@ -102,24 +102,24 @@ const AuthenticatedTable = <
    * and configureTable in any order, and the selector will still be included in
    * the editor and renderer params for each column.
    */
-  const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-    const evaluateColumnExclusionProp = (c: Table.Column<R, M>): boolean => {
+  const columns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
+    const evaluateColumnExclusionProp = (c: Table.DataColumn<R, M>): boolean => {
       if (!isNil(props.excludeColumns)) {
         if (typeof props.excludeColumns === "function") {
           return props.excludeColumns(c);
         }
-        return (
-          intersection(Array.isArray(props.excludeColumns) ? props.excludeColumns : [props.excludeColumns], [
-            c.field,
-            c.colId
-          ]).length !== 0
-        );
+        return includes(Array.isArray(props.excludeColumns) ? props.excludeColumns : [props.excludeColumns], c.field);
       }
       return false;
     };
     return map(
-      filter(props.columns, (c: Table.Column<R, M>) => !evaluateColumnExclusionProp(c)),
-      (c: Table.Column<R, M>) => ({
+      filter(
+        props.columns,
+        (c: Table.RealColumn<R, M>) =>
+          (tabling.typeguards.isDataColumn(c) && !evaluateColumnExclusionProp(c)) ||
+          tabling.typeguards.isActionColumn(c)
+      ),
+      (c: Table.RealColumn<R, M>) => ({
         ...c,
         cellRendererParams: {
           ...c.cellRendererParams,
@@ -144,7 +144,7 @@ const AuthenticatedTable = <
       // TODO: We might have to also apply similiar logic for when a row is added?
       if (tabling.typeguards.isDataChangeEvent(event)) {
         const nodesToRefresh: Table.RowNode[] = [];
-        let columnsToRefresh: (keyof R)[] = [];
+        let columnsToRefresh: string[] = [];
 
         const changes: Table.RowChange<R>[] = tabling.events.consolidateRowChanges(event.payload);
 
@@ -153,14 +153,13 @@ const AuthenticatedTable = <
           if (!isNil(node)) {
             let hasColumnsToRefresh = false;
 
-            let field: keyof R;
+            let field: keyof Table.EditableRow<R>["data"];
             for (field in rowChange.data) {
-              const change = util.getKeyValue<Table.RowChangeData<R>, keyof R>(field)(
+              const change = util.getKeyValue<Table.RowChangeData<R>, keyof Table.EditableRow<R>["data"]>(field)(
                 rowChange.data
               ) as Table.CellChange;
-              const col: Table.Column<R, M> | null = tabling.columns.getColumn<R, M>(props.columns, field);
-
-              if (!isNil(col)) {
+              const col: Table.RealColumn<R, M> | null = tabling.columns.getColumn(props.columns, field);
+              if (!isNil(col) && tabling.typeguards.isBodyColumn<R, M>(col)) {
                 /* Check if the cellChange is associated with a Column that has
 									 it's own change event handler. */
                 if (tabling.typeguards.isModelRowId(rowChange.id)) {
@@ -236,17 +235,14 @@ const AuthenticatedTable = <
     [props.actions, props.tableApis]
   );
 
-  const getColumns = hooks.useDynamicCallback(() => {
-    return columns;
-  });
-
   useImperativeHandle(props.table, () => {
     return {
       ...grid.current,
       notify,
       removeNotification,
       changeColumnVisibility: props.changeColumnVisibility,
-      getColumns,
+      getColumns: () =>
+        filter(columns, (c: Table.RealColumn<R, M>) => tabling.typeguards.isBodyColumn(c)) as Table.BodyColumn<R, M>[],
       applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R, M>>) =>
         Array.isArray(event) ? map(event, (e: Table.ChangeEvent<R, M>) => _onChangeEvent(e)) : _onChangeEvent(event),
       getRowsAboveAndIncludingFocusedRow: () => {
@@ -343,6 +339,12 @@ const AuthenticatedTable = <
           {...props}
           apis={props.tableApis.get("data")}
           actions={actions}
+          columns={
+            filter(columns, (c: Table.RealColumn<R, M>) => tabling.typeguards.isDataColumn(c)) as Table.DataColumn<
+              R,
+              M
+            >[]
+          }
           selectedRows={selectedRows}
           hasEditColumn={props.hasEditColumn}
           hasDragColumn={

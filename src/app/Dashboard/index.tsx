@@ -3,6 +3,7 @@ import { Switch, useHistory, useLocation } from "react-router-dom";
 import { Icon } from "components";
 import { ExpandedLayout } from "components/layout";
 import { PrivateRoute } from "components/routes";
+
 import { Contacts, Templates, Budgets } from "./components";
 
 import "./index.scss";

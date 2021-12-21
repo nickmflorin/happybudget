@@ -27,24 +27,6 @@ export const isBodyRow = <R extends Table.RowData>(row: Table.Row<R>): row is Ta
 export const isBodyRowId = (id: Table.RowId): id is Table.FooterRowId =>
   typeof id === "string" && !id.startsWith("footer-");
 
-export const isRowWithColor = <R extends Table.RowData>(
-  r: Table.Row<R> | Table.RowWithColor<R>
-): r is Table.RowWithColor<R> => {
-  return isBodyRow(r) && (r as Table.RowWithColor<R>).data.color !== undefined;
-};
-
-export const isRowWithName = <R extends Table.RowData>(
-  r: Table.Row<R> | Table.RowWithName<R>
-): r is Table.RowWithName<R> => {
-  return isBodyRow(r) && (r as Table.RowWithName<R>).data.name !== undefined;
-};
-
-export const isRowWithDescription = <R extends Table.RowData>(
-  r: Table.Row<R> | Table.RowWithDescription<R>
-): r is Table.RowWithDescription<R> => {
-  return isBodyRow(r) && (r as Table.RowWithDescription<R>).data.description !== undefined;
-};
-
 export const isRowWithIdentifier = <R extends Table.RowData>(
   r: Table.Row<R> | Table.RowWithIdentifier<R>
 ): r is Table.RowWithIdentifier<R> => {
@@ -69,6 +51,53 @@ export const isDataRowId = (id: Table.RowId): id is Table.DataRowId => isModelRo
 
 export const isEditableRow = <R extends Table.RowData>(row: Table.Row<R>): row is Table.EditableRow<R> =>
   (isModelRow(row) && row.gridId === "data") || isMarkupRow(row);
+
+export const isRowWithColor = <R extends Table.RowData>(
+  r: Table.Row<R> | Table.RowWithColor<R>
+): r is Table.RowWithColor<R> => {
+  return isModelRow(r) && (r as Table.RowWithColor<R>).data.color !== undefined;
+};
+
+export const isRowWithName = <R extends Table.RowData>(
+  r: Table.Row<R> | Table.RowWithName<R>
+): r is Table.RowWithName<R> => {
+  return isModelRow(r) && (r as Table.RowWithName<R>).data.name !== undefined;
+};
+
+export const isRowWithDescription = <R extends Table.RowData>(
+  r: Table.Row<R> | Table.RowWithDescription<R>
+): r is Table.RowWithDescription<R> => {
+  return isModelRow(r) && (r as Table.RowWithDescription<R>).data.description !== undefined;
+};
+
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+export const isBodyColumn = <R extends Table.RowData, M extends Model.RowHttpModel, V extends Table.RawRowValue = any>(
+  c: Table.Column<R, M, V>
+): c is Table.BodyColumn<R, M, V> => (c as Table.BodyColumn<R, M, V>).cType === "body";
+
+export const isCalculatedColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+  c: Table.Column<R, M>
+): c is Table.CalculatedColumn<R, M> => (c as Table.CalculatedColumn<R, M>).cType === "calculated";
+
+export const isActionColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+  c: Table.Column<R, M>
+): c is Table.ActionColumn<R, M> => (c as Table.ActionColumn<R, M>).cType === "action";
+
+export const isDataColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+  c: Table.Column<R, M>
+): c is Table.DataColumn<R, M> => isBodyColumn(c) || isCalculatedColumn(c);
+
+export const isFakeColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+  c: Table.Column<R, M>
+): c is Table.FakeColumn<M> => (c as Table.FakeColumn<M>).cType === "fake";
+
+export const isRealColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+  c: Table.Column<R, M>
+): c is Table.RealColumn<R, M> => isDataColumn(c) || isActionColumn(c);
+
+export const isModelColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+  c: Table.Column<R, M>
+): c is Table.ModelColumn<R, M> => isDataColumn(c) || isFakeColumn(c);
 
 export const isNonPlaceholderBodyRow = <R extends Table.RowData>(
   row: Table.Row<R>
@@ -98,20 +127,20 @@ export const isSyntheticClickEvent = (e: Table.CellDoneEditingEvent): e is Synth
 export const isDataChangeEvent = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  I extends Table.EditableRowId = Table.EditableRowId
+  RW extends Table.EditableRow<R> = Table.EditableRow<R>
 >(
-  e: Table.ChangeEvent<R, M>
-): e is Table.DataChangeEvent<R, I> => {
-  return (e as Table.DataChangeEvent<R, I>).type === "dataChange";
+  e: Table.ChangeEvent<R, M, RW>
+): e is Table.DataChangeEvent<R, RW> => {
+  return (e as Table.DataChangeEvent<R, RW>).type === "dataChange";
 };
 
 export const isActionWithDataChangeEvent = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  I extends Table.EditableRowId = Table.EditableRowId
+  RW extends Table.EditableRow<R> = Table.EditableRow<R>
 >(
-  a: Redux.Action<Table.ChangeEvent<R, M>>
-): a is Redux.Action<Table.DataChangeEvent<R, I>> => {
+  a: Redux.Action<Table.ChangeEvent<R, M, RW>>
+): a is Redux.Action<Table.DataChangeEvent<R, RW>> => {
   return isDataChangeEvent(a.payload);
 };
 

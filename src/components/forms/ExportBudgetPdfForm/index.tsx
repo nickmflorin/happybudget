@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, forwardRef, ForwardedRef, useImperativeHandle, useEffect } from "react";
 import classNames from "classnames";
-import { map, isNil, find, filter, debounce } from "lodash";
+import { map, isNil, find, debounce } from "lodash";
 
 import { Select, Switch, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
@@ -24,7 +24,7 @@ type RichTextFields = "notes" | "header";
 
 type R = Tables.SubAccountRowData;
 type M = Model.PdfSubAccount;
-type C = Table.Column<R, M>;
+type C = Table.DataColumn<R, M>;
 
 interface ExportFormProps extends FormProps<ExportBudgetPdfFormOptions> {
   readonly columns: C[];
@@ -406,10 +406,7 @@ const ExportForm = (
         labelStyle={{ marginBottom: "5px !important" }}
       >
         <Form.Item label={"Columns"} name={"columns"}>
-          <ColumnSelect<R, M, C>
-            getLabel={(c: C) => c.pdfHeaderName || c.headerName || ""}
-            columns={filter(columns, (c: C) => c.tableColumnType !== "fake")}
-          />
+          <ColumnSelect<R, M, C> getLabel={(c: C) => c.pdfHeaderName || c.headerName || ""} columns={columns} />
         </Form.Item>
 
         <Form.ItemStyle label={"Show All Tables"}>

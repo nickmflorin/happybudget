@@ -1,7 +1,7 @@
 import { combineReducers } from "redux";
 import { filter } from "lodash";
 
-import { redux, budgeting } from "lib";
+import { redux, budgeting, tabling } from "lib";
 import { SubAccountsTable, FringesTable } from "tabling";
 
 import * as actions from "./actions";
@@ -39,11 +39,16 @@ const genericReducer = combineReducers({
         getModelRowChildren: (m: Model.SubAccount) => m.children,
         columns: filter(
           SubAccountsTable.Columns as Table.Column<Tables.SubAccountRowData, Model.SubAccount>[],
-          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) => c.requiresAuthentication !== true
-        ),
+          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
+            tabling.typeguards.isModelColumn(c) &&
+            ((!tabling.typeguards.isFakeColumn(c) && c.requiresAuthentication !== true) ||
+              tabling.typeguards.isFakeColumn(c))
+        ) as Table.ModelColumn<Tables.SubAccountRowData, Model.SubAccount>[],
         fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
           initialState: initialState.account.table.fringes,
-          columns: FringesTable.Columns,
+          columns: filter(FringesTable.Columns, (c: Table.Column<Tables.FringeRowData, Model.Fringe>) =>
+            tabling.typeguards.isModelColumn(c)
+          ) as Table.ModelColumn<Tables.FringeRowData, Model.Fringe>[],
           clearOn: [actions.requestFringesAction],
           actions: {
             responseFringeColors: actions.responseFringeColorsAction,
@@ -79,11 +84,16 @@ const genericReducer = combineReducers({
         getModelRowChildren: (m: Model.SubAccount) => m.children,
         columns: filter(
           SubAccountsTable.Columns as Table.Column<Tables.SubAccountRowData, Model.SubAccount>[],
-          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) => c.requiresAuthentication !== true
-        ),
+          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
+            tabling.typeguards.isModelColumn(c) &&
+            ((!tabling.typeguards.isFakeColumn(c) && c.requiresAuthentication !== true) ||
+              tabling.typeguards.isFakeColumn(c))
+        ) as Table.ModelColumn<Tables.SubAccountRowData, Model.SubAccount>[],
         fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
           initialState: initialState.subaccount.table.fringes,
-          columns: FringesTable.Columns,
+          columns: filter(FringesTable.Columns, (c: Table.Column<Tables.FringeRowData, Model.Fringe>) =>
+            tabling.typeguards.isModelColumn(c)
+          ) as Table.ModelColumn<Tables.FringeRowData, Model.Fringe>[],
           clearOn: [actions.requestFringesAction],
           actions: {
             responseFringeColors: actions.responseFringeColorsAction,

@@ -9,11 +9,13 @@ import Table from "./Table";
 
 type M = Model.PdfSubAccount;
 type R = Tables.SubAccountRowData;
-type C = Table.Column<R, M>;
+type C = Table.ModelColumn<R, M>;
+type DC = Table.DataColumn<R, M>;
 
 type AM = Model.PdfAccount;
 type AR = Tables.AccountRowData;
-type AC = Table.Column<AR, AM>;
+type AC = Table.ModelColumn<AR, AM>;
+type ADC = Table.DataColumn<AR, AM>;
 
 type AccountTableProps = {
   readonly account: Model.PdfAccount;
@@ -27,23 +29,31 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
     return reduce(
       subAccountColumns,
       (curr: AC[], c: C) => {
+        if (tabling.typeguards.isDataColumn(c)) {
+          return [
+            ...curr,
+            {
+              field: c.field,
+              cType: c.cType,
+              dataType: c.dataType,
+              pdfWidth: c.pdfWidth,
+              pdfCellProps: c.pdfCellProps,
+              pdfHeaderCellProps: c.pdfHeaderCellProps,
+              pdfFooter: c.pdfFooter,
+              pdfCellContentsVisible: c.pdfCellContentsVisible,
+              pdfFooterValueGetter: c.pdfFooterValueGetter,
+              pdfFormatter: c.pdfFormatter,
+              pdfValueGetter: c.pdfValueGetter,
+              pdfCellRenderer: c.pdfCellRenderer,
+              pdfChildFooter: c.pdfChildFooter
+            } as AC
+          ];
+        }
         return [
           ...curr,
           {
             field: c.field,
-            colId: c.colId,
-            tableColumnType: c.tableColumnType,
-            columnType: c.columnType,
-            pdfWidth: c.pdfWidth,
-            pdfCellProps: c.pdfCellProps,
-            pdfHeaderCellProps: c.pdfHeaderCellProps,
-            pdfFooter: c.pdfFooter,
-            pdfCellContentsVisible: c.pdfCellContentsVisible,
-            pdfFooterValueGetter: c.pdfFooterValueGetter,
-            pdfFormatter: c.pdfFormatter,
-            pdfValueGetter: c.pdfValueGetter,
-            pdfCellRenderer: c.pdfCellRenderer,
-            pdfChildFooter: c.pdfChildFooter
+            cType: c.cType
           } as AC
         ];
       },
@@ -60,27 +70,28 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
     });
   }, [account, columns]);
 
-  const accountColumnIsVisible = useMemo(
-    () => (c: AC) => includes(options.columns, tabling.columns.normalizedField<AR, AM>(c)),
-    [options.columns]
-  );
+  const accountColumnIsVisible = useMemo(() => (c: ADC) => includes(options.columns, c.field), [options.columns]);
 
-  const subAccountColumnIsVisible = useMemo(
-    () => (c: C) => includes(options.columns, tabling.columns.normalizedField<R, M>(c)),
-    [options.columns]
-  );
+  const subAccountColumnIsVisible = useMemo(() => (c: DC) => includes(options.columns, c.field), [options.columns]);
 
   const generateRows = hooks.useDynamicCallback((): JSX.Element[] => {
     const subAccountRowManager = new tabling.managers.ModelRowManager<R, M>({
       columns: subAccountColumns
     });
+
     const createSubAccountFooterRow = (subaccount: M): Table.ModelRow<R> => {
       return subAccountRowManager.create({
         model: subaccount,
-        getRowValue: (m: Model.PdfSubAccount, c: C) => {
+        getRowValue: (
+          m: Model.PdfSubAccount,
+          c: Table.DataColumn<R, M>,
+          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+          original: (coli: Table.DataColumn<R, M>, mi: Model.PdfSubAccount) => any
+        ) => {
           if (!isNil(c.pdfChildFooter) && !isNil(c.pdfChildFooter(m).value)) {
             return c.pdfChildFooter(m).value;
           }
+          return original(c, m);
         }
       });
     };
@@ -118,10 +129,10 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
               if (details.length === 0 && markups.length === 0) {
                 return [
                   ...rws,
-                  <BodyRow<R, M, C>
+                  <BodyRow<R, M>
                     cellProps={{ className: "subaccount-td", textClassName: "subaccount-tr-td-text" }}
                     className={"subaccount-tr"}
-                    columns={subAccountColumns}
+                    columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
                     columnIsVisible={subAccountColumnIsVisible}
                     data={table}
                     row={subAccountRow}
@@ -145,14 +156,14 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                       return [
                         ...subRws,
                         <BodyRow<R, M>
-                          columns={subAccountColumns}
+                          columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
                           columnIsVisible={subAccountColumnIsVisible}
                           className={"detail-tr"}
                           row={detailRow}
                           data={table}
                           cellProps={{
                             textClassName: "detail-tr-td-text",
-                            className: (params: Table.PdfCellCallbackParams<R, M, Table.InferColumnValue<C>>) => {
+                            className: (params: Table.PdfCellCallbackParams<R, M>) => {
                               if (params.column.field === "description") {
                                 return classNames("detail-td", "indent-td");
                               }
@@ -168,11 +179,11 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                           className={"detail-group-tr"}
                           row={detailRow}
                           data={table}
-                          columns={subAccountColumns}
+                          columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
                           columnIsVisible={subAccountColumnIsVisible}
                           columnIndent={1}
                           cellProps={{
-                            textClassName: (params: Table.PdfCellCallbackParams<R, M, Table.InferColumnValue<C>>) => {
+                            textClassName: (params: Table.PdfCellCallbackParams<R, M>) => {
                               if (params.column.field === "description") {
                                 return "detail-group-indent-td";
                               }
@@ -192,7 +203,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                           !includes(["description", "identifier"], tabling.columns.normalizedField<R, M>(params.column))
                       }}
                       className={"subaccount-tr"}
-                      columns={subAccountColumns}
+                      columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
                       data={table}
                       row={subAccountRow}
                       columnIsVisible={subAccountColumnIsVisible}
@@ -202,10 +213,10 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                 const footerRow = createSubAccountFooterRow(subAccount);
                 subRows = [
                   ...subRows,
-                  <BodyRow<R, M, C>
+                  <BodyRow<R, M>
                     className={"subaccount-footer-tr"}
                     cellProps={{ className: "subaccount-footer-td", textClassName: "subaccount-footer-tr-td-text" }}
-                    columns={subAccountColumns}
+                    columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
                     columnIsVisible={subAccountColumnIsVisible}
                     data={table}
                     row={footerRow}
@@ -219,10 +230,10 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
           } else if (tabling.typeguards.isMarkupRow(subAccountRow)) {
             return [
               ...rws,
-              <BodyRow<R, M, C>
+              <BodyRow<R, M>
                 cellProps={{ className: "subaccount-td", textClassName: "subaccount-tr-td-text" }}
                 className={"subaccount-tr"}
-                columns={subAccountColumns}
+                columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
                 columnIsVisible={subAccountColumnIsVisible}
                 data={table}
                 row={subAccountRow}
@@ -231,32 +242,36 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
           } else {
             return [
               ...rws,
-              <GroupRow<R, M, C>
+              <GroupRow<R, M>
                 row={subAccountRow}
                 columnIsVisible={subAccountColumnIsVisible}
-                columns={subAccountColumns}
+                columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
                 data={table}
               />
             ];
           }
         },
         [
-          <HeaderRow<R, M, C>
+          <HeaderRow<R, M>
             className={"account-header-tr"}
-            columns={subAccountColumns}
+            columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
             columnIsVisible={subAccountColumnIsVisible}
           />,
-          <BodyRow<AR, AM, AC>
+          <BodyRow<AR, AM>
             className={"account-sub-header-tr"}
             cellProps={{ textClassName: "account-sub-header-tr-td-text" }}
-            columns={accountSubAccountColumns}
+            columns={filter(accountSubAccountColumns, (c: AC) => tabling.typeguards.isDataColumn(c)) as ADC[]}
             columnIsVisible={accountColumnIsVisible}
             data={table}
             row={accountSubHeaderRow}
           />
         ]
       ),
-      <FooterRow<R, M, C> columns={subAccountColumns} columnIsVisible={subAccountColumnIsVisible} data={table} />
+      <FooterRow<R, M>
+        columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
+        columnIsVisible={subAccountColumnIsVisible}
+        data={table}
+      />
     ];
   });
 

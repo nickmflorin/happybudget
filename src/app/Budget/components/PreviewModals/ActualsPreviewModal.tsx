@@ -16,9 +16,12 @@ import ActualsPdf from "./ActualsPdf";
 
 type M = Model.Actual;
 type R = Tables.ActualRowData;
-type C = Table.Column<R, M>;
+type C = Table.DataColumn<R, M>;
 
-const ActualColumns = filter(ActualsTable.Columns, (c: C) => c.includeInPdf !== false) as C[];
+const ActualColumns = filter(
+  ActualsTable.Columns,
+  (c: Table.Column<R, M>) => tabling.typeguards.isDataColumn(c) && c.includeInPdf !== false
+) as C[];
 
 const DEFAULT_OPTIONS: ExportActualsPdfFormOptions = {
   excludeZeroTotals: false,

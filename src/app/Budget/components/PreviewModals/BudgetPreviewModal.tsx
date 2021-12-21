@@ -18,9 +18,12 @@ import "./BudgetPreviewModal.scss";
 
 type R = Tables.SubAccountRowData;
 type M = Model.PdfSubAccount;
-type C = Table.Column<R, M>;
+type C = Table.DataColumn<R, M>;
 
-const SubAccountColumns = filter(SubAccountsTable.Columns, (c: C) => c.includeInPdf !== false) as C[];
+const SubAccountColumns = filter(
+  SubAccountsTable.Columns,
+  (c: Table.Column<R, M>) => tabling.typeguards.isDataColumn(c) && c.includeInPdf !== false
+) as C[];
 
 const DEFAULT_OPTIONS: ExportBudgetPdfFormOptions = {
   excludeZeroTotals: false,

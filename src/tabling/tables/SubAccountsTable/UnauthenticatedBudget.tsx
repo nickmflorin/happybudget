@@ -31,13 +31,13 @@ const UnauthenticatedBudgetSubAccountsTable = (
 
   const columns = useMemo(
     () =>
-      tabling.columns.normalizeColumns<R, M>(Columns, {
-        identifier: (col: Table.Column<R, M>) => ({
+      tabling.columns.normalizeColumns(tabling.columns.filterRealColumns(Columns), {
+        identifier: (col: Table.BodyColumn<R, M>) => ({
           ...col,
           headerName: props.identifierFieldHeader
         }),
         description: { headerName: `${props.categoryName} Description` },
-        unit: (col: Table.Column<R, M>) => ({ ...col, models: props.subAccountUnits }),
+        unit: (col: Table.BodyColumn<R, M>) => ({ ...col, models: props.subAccountUnits }),
         fringes: {
           processCellForClipboard: processFringesCellForClipboard
         }

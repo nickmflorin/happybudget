@@ -5,10 +5,12 @@ import { isNil } from "lodash";
 const useFormattedValue = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+  V extends string | number | null = string | number | null,
+  C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>
 >(
-  props: Table.ValueCellProps<R, M, S>
-) => {
+  props: Table.ValueCellProps<R, M, S, V, C>
+): V => {
   const formatterParams = useMemo<ValueFormatterParams | null>(
     () =>
       !isNil(props.colDef) && !isNil(props.column)
@@ -42,7 +44,7 @@ const useFormattedValue = <
     }
     return props.value;
   }, [props.value, props.colDef]);
-  return cellValue;
+  return cellValue as V;
 };
 
 export default useFormattedValue;

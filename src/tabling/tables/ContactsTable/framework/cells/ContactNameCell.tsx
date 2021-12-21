@@ -10,7 +10,7 @@ interface ContactNameCellProps extends Table.CellProps<Tables.ContactRowData, Mo
 }
 
 const ContactNameCell = (props: ContactNameCellProps): JSX.Element => {
-  const row: Table.BodyRow<Tables.ContactRowData> = props.node.data;
+  const row: Table.ModelRow<Tables.ContactRowData> = props.node.data;
   return (
     <Cell {...props}>
       <div style={{ display: "flex", justifyContent: "left", alignItems: "center" }}>

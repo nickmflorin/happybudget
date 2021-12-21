@@ -10,17 +10,17 @@ import BodyRow, { BodyRowProps } from "./BodyRow";
 interface GroupRowProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  C extends Table.Column<R, M> = Table.Column<R, M>
-> extends BodyRowProps<R, M, C, Table.GroupRow<R>> {
-  readonly cellProps?: RowExplicitCellProps<R, M, C>;
+  V extends Table.RawRowValue = Table.RawRowValue
+> extends BodyRowProps<R, M, V, Table.GroupRow<R>> {
+  readonly cellProps?: RowExplicitCellProps<R, M, V>;
 }
 
 const GroupRow = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  C extends Table.Column<R, M> = Table.Column<R, M>
+  V extends Table.RawRowValue = Table.RawRowValue
 >(
-  props: GroupRowProps<R, M, C>
+  props: GroupRowProps<R, M, V>
 ): JSX.Element => {
   const cellStyle = useMemo(() => {
     if (!isNil(props.row)) {
@@ -52,7 +52,7 @@ const GroupRow = <
         ...props.cellProps,
         className: [
           props.cellProps?.className,
-          (params: Table.PdfCellCallbackParams<R, M>) => {
+          (params: Table.PdfCellCallbackParams<R, M, V>) => {
             /* We have to add a borderLeft to the first indented column for the
 						   Group Row because the Row itself will not have a borderLeft
 							 attribute on it and the Row starts one column to the right. */

@@ -9,25 +9,28 @@ type M = Model.Actual;
 const Columns: Table.Column<R, M>[] = [
   columns.BodyColumn<R, M>({
     field: "name",
+    nullValue: null,
     headerName: "Description",
     minWidth: 200,
     pdfFlexGrow: true,
     flex: 2,
-    columnType: "longText",
+    dataType: "longText",
     pdfFooter: { value: "Grand Total" }
   }),
   columns.SelectColumn({
     field: "contact",
+    nullValue: null,
     headerName: "Contact",
     pdfWidth: 0.1,
     width: 120,
     minWidth: 120,
     cellRenderer: { data: "ContactCell" },
     cellEditor: "ContactEditor",
-    columnType: "contact"
+    dataType: "contact"
   }),
-  columns.BodyColumn<R, M, string>({
+  columns.BodyColumn<R, M, string | null>({
     field: "date",
+    nullValue: null,
     headerName: "Date",
     pdfWidth: 0.1,
     width: 100,
@@ -37,16 +40,17 @@ const Columns: Table.Column<R, M>[] = [
     cellEditorPopup: true,
     cellEditorPopupPosition: "below",
     valueFormatter: tabling.formatters.dateValueFormatter,
-    valueSetter: tabling.valueSetters.dateTimeValueSetter<R>("date"),
+    valueSetter: tabling.valueSetters.dateTimeValueSetter("date"),
     pdfFormatter: (params: Table.NativeFormatterParams<string>) =>
       isNil(params) || params === "" ? "" : tabling.formatters.dateValueFormatter(params),
-    columnType: "date",
+    dataType: "date",
     processCellForCSV: (row: R) => {
       return (!isNil(row.date) && util.dates.toDate(row.date)) || "";
     }
   }),
   columns.TagSelectColumn({
     field: "actual_type",
+    nullValue: null,
     headerName: "Type",
     pdfWidth: 0.1,
     cellRenderer: { data: "ActualTypeCell" },
@@ -56,6 +60,7 @@ const Columns: Table.Column<R, M>[] = [
   }),
   columns.BodyColumn<R, M, number | null>({
     field: "value",
+    nullValue: null,
     headerName: "Amount",
     width: 100,
     minWidth: 100,
@@ -67,8 +72,8 @@ const Columns: Table.Column<R, M>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<number | null>) =>
       isNil(params) ? "0.0" : tabling.formatters.currencyValueFormatter(params),
     valueFormatter: tabling.formatters.currencyValueFormatter,
-    valueSetter: tabling.valueSetters.numericValueSetter<R>("value"),
-    columnType: "currency",
+    valueSetter: tabling.valueSetters.numericValueSetter("value"),
+    dataType: "currency",
     /* We only want to use BodyCell's in the Footer cells because it slows
 		   rendering performance down dramatically. */
     cellRenderer: { footer: "BodyCell" },
@@ -81,6 +86,7 @@ const Columns: Table.Column<R, M>[] = [
   }),
   columns.SelectColumn<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>({
     field: "owner",
+    nullValue: null,
     headerName: "Sub-Account",
     minWidth: 200,
     width: 200,
@@ -108,31 +114,34 @@ const Columns: Table.Column<R, M>[] = [
   }),
   columns.BodyColumn<R, M>({
     field: "purchase_order",
+    nullValue: null,
     headerName: "PO",
     width: 100,
     minWidth: 100,
     flex: 1,
-    columnType: "number",
-    tableColumnType: "body",
+    dataType: "number",
+    type: "body",
     pdfWidth: 0.08
   }),
   columns.BodyColumn<R, M>({
     field: "payment_id",
+    nullValue: null,
     headerName: "Pay ID",
     width: 80,
     minWidth: 80,
     flex: 1,
-    columnType: "number",
+    dataType: "number",
     pdfWidth: 0.08
   }),
   columns.BodyColumn<R, M>({
     field: "notes",
+    nullValue: null,
     headerName: "Notes",
     width: 100,
     minWidth: 100,
     pdfWidth: 0.13,
     flex: 1,
-    columnType: "longText"
+    dataType: "longText"
   })
 ];
 

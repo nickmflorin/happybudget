@@ -332,7 +332,10 @@ export const createTableChangeEventReducer = <
       const p: Partial<R>[] | Table.RowAddIndexPayload | Table.RowAddCountPayload = e.payload;
       let d: Partial<R>[];
       if (typeguards.isRowAddCountPayload(p) || typeguards.isRowAddIndexPayload(p)) {
-        d = patterns.generateNewRowData({ store: state.data, ...p }, config.columns);
+        d = patterns.generateNewRowData(
+          { store: state.data, ...p },
+          filter(config.columns, (c: Table.DataColumn<R, M>) => typeguards.isBodyColumn(c)) as Table.BodyColumn<R, M>[]
+        );
       } else {
         d = p;
       }

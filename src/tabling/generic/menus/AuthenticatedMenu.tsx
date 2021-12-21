@@ -19,7 +19,7 @@ import AuthenticatedToolbar from "./AuthenticatedToolbar";
 import "./index.scss";
 
 export interface AuthenticatedMenuProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
-  readonly columns: Table.Column<R, M>[];
+  readonly columns: Table.DataColumn<R, M>[];
   readonly search?: string;
   readonly menuPortalId?: string;
   readonly actions?: Table.AuthenticatedMenuActions<R, M>;

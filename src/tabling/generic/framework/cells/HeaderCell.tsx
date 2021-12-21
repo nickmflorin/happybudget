@@ -24,8 +24,8 @@ interface IHeaderCompParams {
 export interface HeaderCellProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
   extends Omit<IHeaderCompParams, "column">,
     StandardComponentProps {
-  onEdit?: (field: keyof R, column: Table.Column<R, M>) => void;
-  column: Table.Column<R, M>;
+  onEdit?: (field: string, column: Table.BodyColumn<R, M>) => void;
+  column: Table.RealColumn<R, M>;
 }
 
 const HeaderCell = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
@@ -35,30 +35,32 @@ const HeaderCell = <R extends Table.RowData, M extends Model.RowHttpModel = Mode
   style = {},
   onEdit
 }: HeaderCellProps<R, M>): JSX.Element => {
-  const columnType: Table.ColumnType | null = useMemo(() => {
-    return find(tabling.models.ColumnTypes, { id: column.columnType }) || null;
+  const dataType: Table.ColumnDataType | null = useMemo(() => {
+    return tabling.typeguards.isDataColumn(column)
+      ? find(tabling.models.ColumnTypes, { id: column.dataType }) || null
+      : null;
   }, [column]);
 
   const columnStyle = useMemo(() => {
-    if (!isNil(columnType)) {
-      return tabling.columns.getColumnTypeCSSStyle(columnType, { header: true });
+    if (!isNil(dataType)) {
+      return tabling.columns.getColumnTypeCSSStyle(dataType, { header: true });
     }
     return {};
-  }, [columnType]);
+  }, [dataType]);
 
   return (
     <div className={classNames("inner-cell--header", className)} style={{ ...columnStyle, ...style }}>
-      {!isNil(columnType) && !isNil(columnType.icon) && (
+      {!isNil(dataType) && !isNil(dataType.icon) && (
         <VerticalFlexCenter>
-          {ui.typeguards.iconIsJSX(columnType.icon) ? (
-            columnType.icon
+          {ui.typeguards.iconIsJSX(dataType.icon) ? (
+            dataType.icon
           ) : (
-            <Icon className={"icon--table-header"} icon={columnType.icon} weight={"solid"} />
+            <Icon className={"icon--table-header"} icon={dataType.icon} weight={"solid"} />
           )}
         </VerticalFlexCenter>
       )}
       <div className={"text"}>{displayName}</div>
-      {!isNil(onEdit) && (
+      {!isNil(onEdit) && tabling.typeguards.isBodyColumn(column) && (
         <VerticalFlexCenter>
           <IconButton
             className={"btn--table-header-edit"}

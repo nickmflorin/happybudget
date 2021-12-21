@@ -13,7 +13,7 @@ const DragCell = <
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
-  props: Table.CellProps<R, M, S>
+  props: Table.CellProps<R, M, S, null, Table.ActionColumn<R, M>>
 ): JSX.Element => {
   const row: Table.BodyRow<R> = props.node.data;
   const iconRef = useRef(null);

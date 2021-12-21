@@ -1,15 +1,15 @@
 import { combineReducers } from "redux";
 
-import { redux, budgeting } from "lib";
+import { redux, budgeting, tabling } from "lib";
 import { SubAccountsTable, FringesTable, ActualsTable, AccountsTable } from "tabling";
 
 import * as actions from "./actions";
 import initialState, { initialHeaderTemplatesState } from "./initialState";
 
-const SubAccountColumns = SubAccountsTable.Columns;
-const ActualColumns = ActualsTable.Columns;
-const AccountColumns = AccountsTable.Columns;
-const FringesColumns = FringesTable.Columns;
+const SubAccountColumns = tabling.columns.filterModelColumns(SubAccountsTable.Columns);
+const ActualColumns = tabling.columns.filterModelColumns(ActualsTable.Columns);
+const AccountColumns = tabling.columns.filterModelColumns(AccountsTable.Columns);
+const FringesColumns = tabling.columns.filterModelColumns(FringesTable.Columns);
 
 const headerTemplatesRootReducer: Redux.Reducer<Modules.Budget.HeaderTemplatesStore> = (
   state: Modules.Budget.HeaderTemplatesStore = initialHeaderTemplatesState,

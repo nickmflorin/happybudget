@@ -20,7 +20,7 @@ declare namespace Table {
 
   type CreateTableDataConfig<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly response: Http.TableResponse<M>;
-    readonly columns: Column<R, M>[];
+    readonly columns: ModelColumn<R, M>[];
     readonly getModelRowChildren?: (m: M) => number[];
   };
 
@@ -29,7 +29,7 @@ declare namespace Table {
   type ClassNameParamCallback<T> = (params: T) => ClassName<T>;
 
   // Copied directly from AG Grid Documentation and more strictly typed.
-  interface AgEditorRef<V extends Table.RawRowValue> {
+  interface AgEditorRef<V extends RawRowValue> {
     // Should return the final value to the grid, the result of the editing
     getValue(): V;
     /* Gets called once after initialised.
@@ -99,11 +99,11 @@ declare namespace Table {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
   > {
-    readonly value: V | null;
+    readonly value: V;
     readonly keyPress: number | null;
     readonly charPress: string | null;
-    readonly column: Column<R, M, V>;
-    readonly columns: Column<R, M>[];
+    readonly column: BodyColumn<R, M, V>;
+    readonly columns: DataColumn<R, M>[];
     readonly colDef: import("@ag-grid-community/core").ColDef;
     readonly node: import("@ag-grid-community/core").RowNode;
     readonly data: R;
@@ -123,16 +123,17 @@ declare namespace Table {
   }
 
   interface CellProps<
-    R extends RowData,
+    R extends RowData = RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
+    C extends RealColumn<R, M, V> = BodyColumn<R, M, V>
   > extends Omit<import("@ag-grid-community/core").ICellRendererParams, "value">,
       StandardComponentProps {
     readonly loading?: boolean;
     readonly hideClear?: boolean;
-    readonly customCol: Column<R, M, V>;
+    readonly customCol: C;
     readonly value: V;
     readonly gridId: GridId;
     readonly icon?: IconOrElement | ((row: BodyRow<R>) => IconOrElement | undefined | null);
@@ -144,22 +145,28 @@ declare namespace Table {
     readonly getRowColorDef: (row: BodyRow<R>) => RowColorDef;
     readonly selector: (state: Application.Store) => S;
     readonly onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
-    readonly onChangeEvent?: (event: ChangeEvent<R, M>) => void;
+    readonly onChangeEvent?: (event: ChangeEvent<R, M, Table.EditableRow<R>>) => void;
   }
 
   type CellWithChildrenProps<
-    R extends RowData,
+    R extends RowData = RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    S extends Redux.TableStore<R> = Redux.TableStore<R>
-  > = Omit<CellProps<R, M, S>, "value"> & {
+    S extends Redux.TableStore<R> = Redux.TableStore<R>,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    V extends RawRowValue = any,
+    C extends RealColumn<R, M, V> = BodyColumn<R, M, V>
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  > = Omit<CellProps<R, M, S, any, C>, "value"> & {
     readonly children: import("react").ReactNode;
   };
 
   type ValueCellProps<
-    R extends RowData,
+    R extends RowData = RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    S extends Redux.TableStore<R> = Redux.TableStore<R>
-  > = CellProps<R, M, S, string | number | null> & {
+    S extends Redux.TableStore<R> = Redux.TableStore<R>,
+    V extends string | number | null = string | number | null,
+    C extends DataColumn<R, M, V> = BodyColumn<R, M, V>
+  > = CellProps<R, M, S, V, C> & {
     /* This is used for extending cells.  Normally, the value formatter will be
 			 included on the ColDef of the associated column.  But when extending a
 			 Cell, we sometimes want to provide a formatter for that specific cell. */
@@ -194,27 +201,34 @@ declare namespace Table {
 
   type SoloCellChange<
     R extends RowData,
-    I extends EditableRowId = EditableRowId,
+    RW extends Table.EditableRow<R> = Table.EditableRow<R>,
     V extends RawRowValue = any
   > = CellChange<V> & {
-    readonly field: keyof R;
-    readonly id: I;
+    readonly field: keyof RW["data"];
+    readonly id: RW["id"];
   };
 
-  type RowChangeData<R extends RowData> = { [Property in keyof R]?: CellChange };
-
-  type RowChange<R extends RowData, I extends EditableRowId = EditableRowId> = {
-    readonly id: I;
-    readonly data: RowChangeData<R>;
+  type RowChangeData<R extends RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>> = {
+    [Property in keyof RW["data"]]?: CellChange;
   };
 
-  type DataChangePayload<R extends RowData, I extends EditableRowId = EditableRowId> = SingleOrArray<RowChange<R, I>>;
+  type RowChange<R extends RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>> = {
+    readonly id: RW["id"];
+    readonly data: RowChangeData<R, RW>;
+  };
 
-  type ConsolidatedChange<R extends RowData, I extends EditableRowId = EditableRowId> = RowChange<R, I>[];
+  type DataChangePayload<R extends RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>> = SingleOrArray<
+    RowChange<R, RW>
+  >;
 
-  type DataChangeEvent<R extends RowData, I extends EditableRowId = EditableRowId> = {
+  type ConsolidatedChange<R extends RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>> = RowChange<
+    R,
+    RW
+  >[];
+
+  type DataChangeEvent<R extends RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>> = {
     readonly type: "dataChange";
-    readonly payload: DataChangePayload<R, I>;
+    readonly payload: DataChangePayload<R, RW>;
   };
 
   type RowInsertPayload<R extends RowData> = {
@@ -332,8 +346,12 @@ declare namespace Table {
 
   type GroupEvent = RowRemoveFromGroupEvent | RowAddToGroupEvent | GroupUpdatedEvent | GroupAddedEvent;
 
-  type ChangeEvent<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> =
-    | DataChangeEvent<R>
+  type ChangeEvent<
+    R extends RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+    RW extends Table.EditableRow<R> = Table.EditableRow<R>
+  > =
+    | DataChangeEvent<R, RW>
     | RowAddEvent<R>
     | RowInsertEvent<R>
     | ModelAddedEvent<M>
@@ -361,7 +379,7 @@ declare namespace Table {
 
   type AgColumn = import("@ag-grid-community/core").Column;
 
-  type ColumnTypeId =
+  type ColumnDataTypeId =
     | "text"
     | "longText"
     | "singleSelect"
@@ -376,34 +394,28 @@ declare namespace Table {
     | "date";
 
   type ColumnAlignment = "right" | "left" | null;
-  type TableColumnTypeId = "action" | "body" | "calculated" | "fake";
+  type ColumnTypeId = "action" | "body" | "calculated" | "fake";
 
-  interface ColumnType {
-    readonly id: ColumnTypeId;
+  interface ColumnDataType {
+    readonly id: ColumnDataTypeId;
     readonly style?: React.CSSProperties;
     readonly icon?: IconOrElement;
-    readonly pdfOverrides?: Omit<Partial<ColumnType>, "id">;
-    readonly headerOverrides?: Omit<Partial<ColumnType>, "id" | "icon" | "pdfOverrides">;
+    readonly pdfOverrides?: Omit<Partial<ColumnDataType>, "id">;
+    readonly headerOverrides?: Omit<Partial<ColumnDataType>, "id" | "icon" | "pdfOverrides">;
   }
 
   type ColSpanParams<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel
   > = import("@ag-grid-community/core").ColSpanParams & {
-    readonly columns: Column<R, M>[];
+    readonly columns: RealColumn<R, M>[];
   };
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   interface PdfFooterColumn<V extends RawRowValue = any> {
-    readonly value?: V | null;
+    readonly value?: V;
     readonly textStyle?: import("@react-pdf/types").Style;
   }
-
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type PdfValueGetter<R extends RowData, V extends RawRowValue = any> = (r: BodyRow<R>, rows: BodyRow<R>[]) => V | null;
-
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type PdfFooterValueGetter<R extends RowData, V extends RawRowValue = any> = (rows: BodyRow<R>[]) => V | null;
 
   type OmitColDefParams =
     | "field"
@@ -417,8 +429,12 @@ declare namespace Table {
     | "valueGetter"
     | "onCellDoubleClicked";
 
-  type ParsedColumnField<R extends RowData, V extends RawRowValue = any> = {
-    field: keyof R;
+  type ParsedColumnField<
+    R extends RowData,
+    V extends RawRowValue = any,
+    RW extends Table.EditableRow<R> = Table.EditableRow<R>
+  > = {
+    field: keyof RW["data"];
     value: V;
   };
 
@@ -438,73 +454,209 @@ declare namespace Table {
     readonly row: BodyRow<R>;
   };
 
-  type InferColumnValue<C> = C extends Column<RowData, Model.RowHttpModel, infer V> ? V : never;
+  type InferR<C> = C extends Column<infer R, any, any> ? R : never;
+  type InferM<C> = C extends Column<any, infer M, any> ? M : never;
+  type InferV<C> = C extends Column<any, any, infer V> ? V : never;
 
-  type InferColumnRowData<C> = C extends Column<infer R, Model.RowHttpModel, RawRowValue> ? R : never;
+  type BaseColumn = Omit<ColDef, OmitColDefParams>;
 
-  type Column<
-    R extends RowData,
-    M extends Model.RowHttpModel = Model.RowHttpModel,
+  type BaseRealColumn<
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
-  > = Omit<ColDef, OmitColDefParams> & {
-    readonly field?: string;
-    readonly colId?: string;
-    readonly headerName?: string;
-    readonly pdfHeaderName?: string;
-    readonly columnType?: ColumnTypeId;
-    readonly tableColumnType: TableColumnTypeId;
+    R extends RowData = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    M extends Model.RowHttpModel = any
+  > = {
     readonly index?: number;
-    readonly nullValue?: V;
-    readonly selectable?: boolean | ((params: ColumnCallbackParams<R>) => boolean) | undefined;
-    readonly editable?: boolean | ((params: ColumnCallbackParams<R>) => boolean);
-    readonly footer?: FooterColumn<R, M>;
-    readonly page?: FooterColumn<R, M>;
-    readonly isRead?: boolean;
-    readonly isWrite?: boolean;
     readonly cellRenderer?: string | Partial<GridSet<string>>;
     readonly cellClass?: CellClassName;
+    readonly footer?: FooterColumn<R, M>;
+    readonly colSpan?: (params: ColSpanParams<R, M>) => number;
+    readonly onCellFocus?: (params: CellFocusedParams<R, M>) => void;
+    readonly onCellUnfocus?: (params: CellFocusedParams<R, M>) => void;
+    readonly onCellDoubleClicked?: (row: ModelRow<R>) => void;
+  };
+
+  type FakeColumn<
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    M extends Model.RowHttpModel = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    V extends RawRowValue = any
+  > = BaseColumn & {
+    readonly cType: "fake";
+    readonly field: string;
+    readonly nullValue: V;
+    readonly getRowValue?: (m: M) => V;
+  };
+
+  type PartialFakeColumn<
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    M extends Model.RowHttpModel = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    V extends RawRowValue = any
+  > = Omit<Partial<FakeColumn<M, V>>, "field" | "nullValue"> & Pick<FakeColumn<M, V>, "field" | "nullValue">;
+
+  type ActionColumnId = "checkbox" | "edit" | "drag";
+
+  type ActionColumn<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = BaseColumn &
+    BaseRealColumn<R, M> & {
+      readonly cType: "action";
+      readonly colId: ActionColumnId;
+    };
+
+  type PartialActionColumn<
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    R extends RowData = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    M extends Model.RowHttpModel = any
+  > = Omit<Partial<ActionColumn<R, M>>, "colId">;
+
+  type BaseDataColumn<
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    R extends RowData = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    M extends Model.RowHttpModel = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    V extends RawRowValue = any
+  > = {
+    /* The field will only be used to pull data from the model if the `isRead`
+       field is `true`, otherwise, it will just be used as the AG Grid colId. */
+    readonly field: string;
+    // This field will be used to pull data from the Markup model if applicable.
+    readonly markupField?: keyof Model.Markup;
+    // This field will be used to pull data from the Group model if applicable.
+    readonly groupField?: keyof Model.Group;
+    /* This value will be used in the case that undefined values are
+       unexpectedly encountered (in which case an error will be issued) or
+       another value that we treat as null is encountered (i.e. blank strings). */
+    readonly nullValue: V;
+    /* This field, when false, indicates that the column value should not be
+       pulled from the model, but is instead set by other means (usually
+       value getters). */
+    readonly isRead?: boolean;
+    readonly headerName?: string;
+    readonly pdfHeaderName?: string;
+    readonly dataType?: ColumnDataTypeId;
+    readonly page?: FooterColumn<R, M>;
     readonly defaultHidden?: boolean;
     readonly canBeHidden?: boolean;
     readonly canBeExported?: boolean;
     readonly requiresAuthentication?: boolean;
-    readonly smartInference?: boolean;
     readonly defaultNewRowValue?: boolean;
+    readonly includeInPdf?: boolean;
     readonly valueGetter?: (row: BodyRow<R>, rows: BodyRow<R>[]) => V;
     readonly getRowValue?: (m: M) => V;
     readonly getHttpValue?: (value: V) => Http.RawPayloadValue;
-    readonly onDataChange?: (id: ModelRowId, event: CellChange<V>) => void;
-    readonly colSpan?: (params: ColSpanParams<R, M>) => number;
-    readonly onCellFocus?: (params: CellFocusedParams<R, M>) => void;
-    readonly onCellUnfocus?: (params: CellFocusedParams<R, M>) => void;
-    readonly refreshColumns?: (change: CellChange<V>) => string[];
-    readonly parseIntoFields?: (value: V) => ParsedColumnField<R, V>[];
     readonly processCellForCSV?: (row: R) => string | number;
     readonly processCellForClipboard?: (row: R) => string | number;
-    readonly processCellFromClipboard?: (value: string) => V;
-    readonly onCellDoubleClicked?: (row: ModelRow<R>) => void;
-    readonly includeInPdf?: boolean;
-    /* In the PDF case, since we cannot dynamically resize columns, the width
-			 refers to a ratio of the column width to the overall table width assuming
-			 that all columns are present.  When columns are hidden/shown, this ratio
-			 is adjusted. */
     readonly pdfWidth?: number;
     readonly pdfFlexGrow?: true;
+    readonly pdfFooter?: PdfFooterColumn<V>;
     readonly pdfCellProps?: PdfCellStandardProps<R, M, V>;
     readonly pdfHeaderCellProps?: PdfCellStandardProps<R, M, V>;
-    readonly pdfFooter?: PdfFooterColumn<V>;
     readonly pdfCellContentsVisible?: PdfOptionalCellCallback<boolean, R, M, V>;
-    readonly pdfFormatter?: NativeFormatter<V>;
-    readonly pdfValueGetter?: PdfValueGetter<R, V>;
-    readonly pdfFooterValueGetter?: V | null | PdfFooterValueGetter<R, V>;
     readonly pdfCellRenderer?: (params: PdfCellCallbackParams<R, M, V>) => JSX.Element;
+    readonly pdfFormatter?: NativeFormatter<V>;
+    readonly pdfValueGetter?: (r: BodyRow<R>, rows: BodyRow<R>[]) => V;
+    readonly pdfFooterValueGetter?: V | ((rows: BodyRow<R>[]) => V);
     /* NOTE: This only applies for the individual Account tables, not the the
 			 overall Accounts */
     readonly pdfChildFooter?: (s: M) => PdfFooterColumn<V>;
   };
 
+  type BodyColumn<
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    R extends RowData = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    M extends Model.RowHttpModel = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    V extends RawRowValue = any
+  > = BaseColumn &
+    BaseRealColumn<R, M> &
+    BaseDataColumn<R, M, V> & {
+      readonly cType: "body";
+      readonly selectable?: boolean | ((params: ColumnCallbackParams<R>) => boolean) | undefined;
+      readonly editable?: boolean | ((params: ColumnCallbackParams<R>) => boolean);
+      readonly smartInference?: boolean;
+      readonly processCellFromClipboard?: (value: string) => V;
+      readonly parseIntoFields?: (value: V) => ParsedColumnField<R, V, ModelRow<R>>[];
+      readonly onDataChange?: (id: ModelRowId, event: CellChange<V>) => void;
+      readonly refreshColumns?: (change: CellChange<V>) => string[];
+    };
+
+  type PartialBodyColumn<
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    R extends RowData = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    M extends Model.RowHttpModel = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    V extends RawRowValue = any
+  > = Omit<Partial<BodyColumn<R, M, V>>, "field" | "nullValue"> & Pick<BodyColumn<R, M, V>, "field" | "nullValue">;
+
+  type CalculatedColumn<
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    R extends RowData = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    M extends Model.RowHttpModel = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    V extends RawRowValue = any
+  > = BaseColumn &
+    BaseRealColumn<R, M> &
+    BaseDataColumn<R, M, V> & {
+      /* The field will only be used to pull data from the model if the `isRead`
+       field is `true`, otherwise, it will just be used as the AG Grid colId. */
+      readonly cType: "calculated";
+    };
+
+  type PartialCalculatedColumn<
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    R extends RowData = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    M extends Model.RowHttpModel = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    V extends RawRowValue = any
+  > = Omit<Partial<CalculatedColumn<R, M, V>>, "field" | "nullValue"> &
+    Pick<CalculatedColumn<R, M, V>, "field" | "nullValue">;
+
+  type DataColumn<
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    R extends RowData = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    M extends Model.RowHttpModel = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    V extends RawRowValue = any
+  > = BodyColumn<R, M, V> | CalculatedColumn<R, M, V>;
+
+  type ModelColumn<
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    R extends RowData = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    M extends Model.RowHttpModel = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    V extends RawRowValue = any
+  > = DataColumn<R, M, V> | FakeColumn<M, V>;
+
+  type RealColumn<
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    R extends RowData = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    M extends Model.RowHttpModel = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    V extends RawRowValue = any
+  > = BodyColumn<R, M, V> | CalculatedColumn<R, M, V> | ActionColumn<R, M>;
+
+  type Column<
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    R extends RowData = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    M extends Model.RowHttpModel = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    V extends RawRowValue = any
+  > = BodyColumn<R, M, V> | ActionColumn<R, M> | CalculatedColumn<R, M, V> | FakeColumn<M, V>;
+
+  type InferBodyColumn<C> = C extends Column<infer R, infer M, infer V> ? BodyColumn<R, M, V> : never;
+
   interface FooterColumn<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
-    extends Pick<Column<R, M>, "colSpan"> {
+    extends Pick<DataColumn<R, M>, "colSpan"> {
     readonly cellStyle?: CellStyle;
   }
 
@@ -541,7 +693,7 @@ declare namespace Table {
   > = {
     readonly row?: Row<R>;
     readonly colIndex: number;
-    readonly column: Column<R, M, V>;
+    readonly column: DataColumn<R, M, V>;
     readonly isHeader: boolean;
     readonly rawValue: V;
     readonly value: string;
@@ -583,6 +735,7 @@ declare namespace Table {
   > {
     [n: number]: PdfOptionalCellCallback<import("@react-pdf/types").Style, R, M, V> | _PdfCellStyle<R, M, V>;
   }
+
   type PdfCellStyle<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
@@ -602,7 +755,7 @@ declare namespace Table {
 
   type Cell<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly row: BodyRow<R>;
-    readonly column: Column<R, M>;
+    readonly column: RealColumn<R, M>;
     readonly rowNode: import("@ag-grid-community/core").RowNode;
   };
 
@@ -658,6 +811,7 @@ declare namespace Table {
   type _RawRowValue = string | number | Array<string> | Array<number>;
   type _RowValueObj = Record<string, _RawRowValue | null>;
   type RawRowValue = _RawRowValue | null | _RowValueObj | Array<_RawRowValue> | Array<_RowValueObj>;
+  type CalculatedColumnValue = number | null;
 
   type RowData = Record<string, RawRowValue>;
 
@@ -682,12 +836,12 @@ declare namespace Table {
     readonly children: [];
   };
 
-  type GroupRow<R extends RowData> = IBodyRow<GroupRowId, "group", R> & {
+  type GroupRow<R extends RowData> = IBodyRow<GroupRowId, "group", Pick<R, keyof Model.Group>> & {
     readonly children: number[];
     readonly groupData: Pick<Model.Group, "name" | "color">;
   };
 
-  type MarkupRow<R extends RowData> = IBodyRow<MarkupRowId, "markup", R> & {
+  type MarkupRow<R extends RowData> = IBodyRow<MarkupRowId, "markup", Pick<R, keyof Model.Markup>> & {
     readonly children: number[];
     readonly markupData: Pick<Model.Markup, "unit" | "rate">;
   };
@@ -700,13 +854,13 @@ declare namespace Table {
   type BodyRow<D extends RowData> = ModelRow<D> | PlaceholderRow<D> | GroupRow<D> | MarkupRow<D>;
   type Row<D extends RowData> = BodyRow<D> | FooterRow;
 
-  type RowWithColor<D extends RowData> = BodyRow<D & { color: Style.HexColor | null }>;
+  type RowWithColor<D extends RowData> = ModelRow<D & { color: Style.HexColor | null }>;
 
-  type RowWithName<D extends RowData> = BodyRow<D & { name: string | null }>;
+  type RowWithName<D extends RowData> = ModelRow<D & { name: string | null }>;
 
-  type RowWithDescription<D extends RowData> = BodyRow<D & { description: string | null }>;
+  type RowWithDescription<D extends RowData> = ModelRow<D & { description: string | null }> | MarkupRow<D>;
 
-  type RowWithIdentifier<D extends RowData> = BodyRow<D & { identifier: string | null }>;
+  type RowWithIdentifier<D extends RowData> = ModelRow<D & { identifier: string | null }> | MarkupRow<D>;
   /* ------------------------- Rows -------------------------------------- */
 
   /* ------------------------- Redux -------------------------------------- */
@@ -737,7 +891,7 @@ declare namespace Table {
     A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
   > = Omit<TaskConfig<R, M, C, A>, "table"> & {
     readonly initialState: S;
-    readonly columns: Column<R, M>[];
+    readonly columns: ModelColumn<R, M>[];
     readonly defaultData?: Partial<R>;
     readonly getModelRowChildren?: (m: M) => number[];
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -775,7 +929,7 @@ declare namespace Table {
   type TableInstance<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = DataGridInstance & {
     readonly removeNotification: () => void;
     readonly notify: (notification: TableNotification) => void;
-    readonly getColumns: () => Column<R, M>[];
+    readonly getColumns: () => BodyColumn<R, M>[];
     readonly getFocusedRow: () => BodyRow<R> | null;
     readonly getRow: (id: BodyRowId) => BodyRow<R> | null;
     readonly getRows: () => BodyRow<R>[];
@@ -799,7 +953,7 @@ declare namespace Table {
 
   type MenuActionParams<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly apis: GridApis;
-    readonly columns: Column<R, M>[];
+    readonly columns: DataColumn<R, M>[];
     readonly hiddenColumns?: HiddenColumns;
   };
 
@@ -876,7 +1030,7 @@ declare namespace Table {
     readonly rowClass: RowClassName;
     readonly className: GeneralClassName;
     readonly rowHeight?: number;
-    readonly getFooterColumn: (column: Column<R, M>) => FooterColumn<R, M> | null;
+    readonly getFooterColumn: (column: DataColumn<R, M>) => FooterColumn<R, M> | null;
   };
   /* ------------------------- UI -------------------------------------- */
 }

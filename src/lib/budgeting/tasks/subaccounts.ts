@@ -254,9 +254,9 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     }
   }
 
-  function* updateMarkupTask(changes: Table.RowChange<R, Table.MarkupRowId>[]): SagaIterator {
+  function* updateMarkupTask(changes: Table.RowChange<R, Table.MarkupRow<R>>[]): SagaIterator {
     if (isAuthenticatedConfig(config) && changes.length !== 0) {
-      const effects: (StrictEffect | null)[] = map(changes, (ch: Table.RowChange<R, Table.MarkupRowId>) => {
+      const effects: (StrictEffect | null)[] = map(changes, (ch: Table.RowChange<R, Table.MarkupRow<R>>) => {
         const payload = tabling.http.patchPayload<R, C, Http.MarkupPayload>(ch, config.table.getColumns());
         if (!isNil(payload)) {
           return api.request(api.updateMarkup, tabling.managers.markupId(ch.id), payload);
@@ -448,13 +448,13 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     if (isAuthenticatedConfig(config)) {
       const merged = tabling.events.consolidateRowChanges<R>(e.payload);
 
-      const markupChanges: Table.RowChange<R, Table.MarkupRowId>[] = filter(merged, (value: Table.RowChange<R>) =>
+      const markupChanges: Table.RowChange<R, Table.MarkupRow<R>>[] = filter(merged, (value: Table.RowChange<R>) =>
         tabling.typeguards.isMarkupRowId(value.id)
-      ) as Table.RowChange<R, Table.MarkupRowId>[];
+      ) as Table.RowChange<R, Table.MarkupRow<R>>[];
 
-      const dataChanges: Table.RowChange<R, Table.ModelRowId>[] = filter(merged, (value: Table.RowChange<R>) =>
+      const dataChanges: Table.RowChange<R, Table.ModelRow<R>>[] = filter(merged, (value: Table.RowChange<R>) =>
         tabling.typeguards.isModelRowId(value.id)
-      ) as Table.RowChange<R, Table.ModelRowId>[];
+      ) as Table.RowChange<R, Table.ModelRow<R>>[];
       yield fork(updateMarkupTask, markupChanges);
       if (dataChanges.length !== 0) {
         const requestPayload = tabling.http.createBulkUpdatePayload<R, C, P>(dataChanges, config.table.getColumns());

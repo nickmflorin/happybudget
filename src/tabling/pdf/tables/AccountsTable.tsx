@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { includes, reduce } from "lodash";
+import { includes, reduce, filter } from "lodash";
 
 import { tabling, hooks } from "lib";
 import { BodyRow, GroupRow, HeaderRow, FooterRow } from "../rows";
@@ -7,7 +7,8 @@ import Table from "./Table";
 
 type M = Model.PdfAccount;
 type R = Tables.AccountRowData;
-type C = Table.Column<R, M>;
+type C = Table.ModelColumn<R, M>;
+type DC = Table.DataColumn<R, M>;
 
 type AccountsTableProps = {
   readonly data: M[];
@@ -18,10 +19,7 @@ type AccountsTableProps = {
 };
 
 const AccountsTable = ({ columns, markups, data, groups, options }: AccountsTableProps): JSX.Element => {
-  const accountColumnIsVisible = useMemo(
-    () => (c: C) => includes(options.columns, tabling.columns.normalizedField<R, M>(c)),
-    [options.columns]
-  );
+  const accountColumnIsVisible = useMemo(() => (c: DC) => includes(options.columns, c.field), [options.columns]);
 
   const generateRows = hooks.useDynamicCallback((): JSX.Element[] => {
     const rowData = tabling.data.createTableRows<R, M>({
@@ -35,19 +33,38 @@ const AccountsTable = ({ columns, markups, data, groups, options }: AccountsTabl
           if (tabling.typeguards.isModelRow(row) || tabling.typeguards.isMarkupRow(row)) {
             return [
               ...rws,
-              <BodyRow<R, M, C> columnIsVisible={accountColumnIsVisible} columns={columns} row={row} data={rowData} />
+              <BodyRow<R, M>
+                columnIsVisible={accountColumnIsVisible}
+                columns={filter(columns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
+                row={row}
+                data={rowData}
+              />
             ];
           } else if (tabling.typeguards.isGroupRow(row)) {
             return [
               ...rws,
-              <GroupRow<R, M, C> row={row} columnIsVisible={accountColumnIsVisible} columns={columns} data={rowData} />
+              <GroupRow<R, M>
+                row={row}
+                columnIsVisible={accountColumnIsVisible}
+                columns={filter(columns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
+                data={rowData}
+              />
             ];
           }
           return rws;
         },
-        [<HeaderRow<R, M, C> columnIsVisible={accountColumnIsVisible} columns={columns} />]
+        [
+          <HeaderRow<R, M>
+            columnIsVisible={accountColumnIsVisible}
+            columns={filter(columns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
+          />
+        ]
       ),
-      <FooterRow<R, M, C> columnIsVisible={accountColumnIsVisible} columns={columns} data={rowData} />
+      <FooterRow<R, M>
+        columnIsVisible={accountColumnIsVisible}
+        columns={filter(columns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
+        data={rowData}
+      />
     ];
   });
 

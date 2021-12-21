@@ -11,7 +11,7 @@ export interface EditCellProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
-> extends Table.CellProps<R, M, S, null> {
+> extends Table.CellProps<R, M, S, null, Table.ActionColumn<R, M>> {
   readonly editColumnConfig: Table.EditColumnRowConfig<R>[];
   readonly alwaysShow?: (row: Table.BodyRow<R>) => boolean;
 }

@@ -10,8 +10,8 @@ export const Framework: Table.Framework = {
   },
   cells: {
     data: {
-      SubAccountUnitCell: framework.excludeRowsOfType(["group"])(cells.SubAccountUnitCell),
-      FringesCell: framework.excludeRowsOfType(["group"])(cells.FringesCell)
+      SubAccountUnitCell: framework.excludeRowsOfType(["group", "markup"])(cells.SubAccountUnitCell),
+      FringesCell: framework.excludeRowsOfType(["group", "markup"])(cells.FringesCell)
     }
   }
 };

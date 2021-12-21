@@ -5,7 +5,7 @@ import { tabling } from "lib";
 
 type UseHiddenColumnsParams<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
   readonly cookie?: string;
-  readonly columns: Table.Column<R, M>[];
+  readonly columns: Table.DataColumn<R, M>[];
   readonly apis: tabling.TableApis;
 };
 
@@ -56,8 +56,8 @@ const useHiddenColumns = <R extends Table.RowData, M extends Model.RowHttpModel 
         params.cookie,
         filter(
           map(
-            filter(params.columns, (c: Table.Column<R, M>) => c.canBeHidden !== false),
-            (c: Table.Column<R, M>) => c.field || c.colId
+            filter(params.columns, (c: Table.DataColumn<R, M>) => c.canBeHidden !== false),
+            (c: Table.DataColumn<R, M>) => c.field
           ),
           (f: string | undefined) => !isNil(f)
         ) as string[]
@@ -65,7 +65,7 @@ const useHiddenColumns = <R extends Table.RowData, M extends Model.RowHttpModel 
     }
     const hidden: Table.HiddenColumns = reduce(
       params.columns,
-      (curr: Table.HiddenColumns, c: Table.Column<R, M>) => {
+      (curr: Table.HiddenColumns, c: Table.DataColumn<R, M>) => {
         if (c.canBeHidden !== false) {
           const field = tabling.columns.normalizedField<R, M>(c);
           if (!isNil(field)) {

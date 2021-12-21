@@ -6,9 +6,9 @@ import Cell, { CellProps } from "./Cell";
 const HeaderCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  C extends Table.Column<R, M> = Table.Column<R, M>
+  V extends Table.RawRowValue = Table.RawRowValue
 >(
-  props: Omit<CellProps<R, M, C>, "rawValue" | "value"> & {
+  props: Omit<CellProps<R, M, V>, "rawValue" | "value"> & {
     readonly firstChild: boolean;
     readonly lastChild: boolean;
   }
@@ -25,16 +25,12 @@ const HeaderCell = <
   }, [props.className, props.firstChild]);
 
   return (
-    <Cell<R, M, C>
+    <Cell<R, M, V>
       {...props}
       className={className}
       textClassName={classNames("th-text", props.textClassName)}
       isHeader={true}
-      rawValue={
-        (props.column.pdfHeaderName as Table.InferColumnValue<C>) ||
-        (props.column.headerName as Table.InferColumnValue<C>) ||
-        ("" as Table.InferColumnValue<C>)
-      }
+      rawValue={(props.column.pdfHeaderName as V) || (props.column.headerName as V) || ("" as V)}
       value={props.column.pdfHeaderName || props.column.headerName || ""}
     />
   );

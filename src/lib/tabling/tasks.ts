@@ -1,10 +1,11 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select, all } from "redux-saga/effects";
-import { isNil, map } from "lodash";
+import { isNil, map, filter } from "lodash";
 import { createSelector } from "reselect";
 
 import * as api from "api";
 import { tabling, notifications } from "lib";
+import * as typeguards from "./typeguards";
 
 export const createChangeEventHandler = <
   R extends Table.RowData,
@@ -64,7 +65,12 @@ export const createBulkTask = <
 
     let data: Partial<R>[];
     if (tabling.typeguards.isRowAddCountPayload(payload) || tabling.typeguards.isRowAddIndexPayload(payload)) {
-      data = tabling.patterns.generateNewRowData({ store, ...payload }, config.table.getColumns());
+      data = tabling.patterns.generateNewRowData(
+        { store, ...payload },
+        filter(config.table.getColumns(), (c: Table.DataColumn<R, M>) =>
+          typeguards.isBodyColumn(c)
+        ) as Table.BodyColumn<R, M>[]
+      );
     } else {
       data = payload;
     }
@@ -81,7 +87,10 @@ export const createBulkTask = <
     }
     const requestPayload: Http.BulkCreatePayload<P> = tabling.http.createBulkCreatePayload<R, M, P>(
       data,
-      config.table.getColumns()
+      filter(config.table.getColumns(), (c: Table.DataColumn<R, M>) => typeguards.isBodyColumn(c)) as Table.BodyColumn<
+        R,
+        M
+      >[]
     );
     yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean>) => put(action(true))));
     try {

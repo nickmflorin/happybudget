@@ -2,25 +2,28 @@ import { isNil, reduce, uniq, map, filter, flatten } from "lodash";
 
 import * as util from "../util";
 
-export const cellChangeToRowChange = <R extends Table.RowData, I extends Table.EditableRowId = Table.EditableRowId>(
-  cellChange: Table.SoloCellChange<R, I>
-): Table.RowChange<R, I> => ({
+export const cellChangeToRowChange = <R extends Table.RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>>(
+  cellChange: Table.SoloCellChange<R, RW>
+): Table.RowChange<R, RW> => ({
   id: cellChange.id,
   data: {
     [cellChange.field]: {
       oldValue: cellChange.oldValue,
       newValue: cellChange.newValue
     }
-  } as Table.RowChangeData<R>
+  } as Table.RowChangeData<R, RW>
 });
 
-export const addCellChangeToRowChange = <R extends Table.RowData, I extends Table.EditableRowId = Table.EditableRowId>(
-  rowChange: Table.RowChange<R, I>,
-  cellChange: Table.SoloCellChange<R, I>
-): Table.RowChange<R, I> => {
-  const fieldChange = util.getKeyValue<Table.RowChangeData<R>, keyof R>(cellChange.field)(rowChange.data) as
-    | Omit<Table.SoloCellChange<R, I>, "field" | "id">
-    | undefined;
+export const addCellChangeToRowChange = <
+  R extends Table.RowData,
+  RW extends Table.EditableRow<R> = Table.EditableRow<R>
+>(
+  rowChange: Table.RowChange<R, RW>,
+  cellChange: Table.SoloCellChange<R, RW>
+): Table.RowChange<R, RW> => {
+  const fieldChange = util.getKeyValue<Table.RowChangeData<R, RW>, keyof RW["data"]>(cellChange.field)(
+    rowChange.data
+  ) as Omit<Table.SoloCellChange<R, RW>, "field" | "id"> | undefined;
   if (isNil(fieldChange)) {
     return {
       ...rowChange,
@@ -46,19 +49,20 @@ export const addCellChangeToRowChange = <R extends Table.RowData, I extends Tabl
   }
 };
 
-const reduceChangesForRow = <R extends Table.RowData, I extends Table.EditableRowId = Table.EditableRowId>(
-  initial: Table.RowChange<R, I>,
-  ch: Table.RowChange<R, I>
-): Table.RowChange<R, I> => {
+const reduceChangesForRow = <R extends Table.RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>>(
+  initial: Table.RowChange<R, RW>,
+  ch: Table.RowChange<R, RW>
+): Table.RowChange<R, RW> => {
   if (initial.id !== ch.id) {
     throw new Error("Cannot reduce table changes for different rows.");
   }
   let rowChange = { ...initial };
-  let key: keyof R;
+  let key: keyof RW["data"];
   for (key in ch.data) {
-    const cellChange: Table.CellChange<R[keyof R]> | undefined = util.getKeyValue<Table.RowChangeData<R>, keyof R>(key)(
-      ch.data
-    );
+    const cellChange: Table.CellChange<R[keyof R]> | undefined = util.getKeyValue<
+      Table.RowChangeData<R, RW>,
+      keyof RW["data"]
+    >(key)(ch.data);
     if (!isNil(cellChange)) {
       rowChange = addCellChangeToRowChange(rowChange, {
         ...cellChange,
@@ -70,11 +74,11 @@ const reduceChangesForRow = <R extends Table.RowData, I extends Table.EditableRo
   return rowChange;
 };
 
-const flattenRowChanges = <R extends Table.RowData, I extends Table.EditableRowId = Table.EditableRowId>(
-  changes: Table.RowChange<R, I>[]
-): Table.RowChange<R, I> | null => {
+const flattenRowChanges = <R extends Table.RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>>(
+  changes: Table.RowChange<R, RW>[]
+): Table.RowChange<R, RW> | null => {
   if (changes.length !== 0) {
-    const ids: I[] = uniq(map(changes, (ch: Table.RowChange<R, I>) => ch.id));
+    const ids: RW["id"][] = uniq(map(changes, (ch: Table.RowChange<R, RW>) => ch.id));
     if (ids.length !== 1) {
       throw new Error("Can only flatten row changes that belong to the same row.");
     }
@@ -83,21 +87,21 @@ const flattenRowChanges = <R extends Table.RowData, I extends Table.EditableRowI
   return null;
 };
 
-const reduceChangesForCell = <R extends Table.RowData, I extends Table.EditableRowId = Table.EditableRowId>(
-  initial: Table.RowChange<R, I>,
-  ch: Table.SoloCellChange<R, I>
-): Table.RowChange<R, I> => {
+const reduceChangesForCell = <R extends Table.RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>>(
+  initial: Table.RowChange<R, RW>,
+  ch: Table.SoloCellChange<R, RW>
+): Table.RowChange<R, RW> => {
   if (initial.id !== ch.id) {
     throw new Error("Cannot reduce table changes for different rows.");
   }
   return addCellChangeToRowChange(initial, ch);
 };
 
-const flattenCellChanges = <R extends Table.RowData, I extends Table.EditableRowId = Table.EditableRowId>(
-  changes: Table.SoloCellChange<R, I>[]
-): Table.RowChange<R, I> | null => {
+const flattenCellChanges = <R extends Table.RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>>(
+  changes: Table.SoloCellChange<R, RW>[]
+): Table.RowChange<R, RW> | null => {
   if (changes.length !== 0) {
-    const ids: I[] = uniq(map(changes, (ch: Table.SoloCellChange<R, I>) => ch.id));
+    const ids: RW["id"][] = uniq(map(changes, (ch: Table.SoloCellChange<R, RW>) => ch.id));
     if (ids.length !== 1) {
       throw new Error("Can only flatten cell changes that belong to the same row.");
     }
@@ -106,19 +110,19 @@ const flattenCellChanges = <R extends Table.RowData, I extends Table.EditableRow
   return null;
 };
 
-export const consolidateCellChanges = <R extends Table.RowData, I extends Table.EditableRowId = Table.EditableRowId>(
-  changes: Table.SoloCellChange<R, I>[] | Table.SoloCellChange<R, I>
-): Table.RowChange<R, I>[] => {
-  const cellChanges: Table.SoloCellChange<R, I>[] = Array.isArray(changes) ? changes : [changes];
+export const consolidateCellChanges = <R extends Table.RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>>(
+  changes: Table.SoloCellChange<R, RW>[] | Table.SoloCellChange<R, RW>
+): Table.RowChange<R, RW>[] => {
+  const cellChanges: Table.SoloCellChange<R, RW>[] = Array.isArray(changes) ? changes : [changes];
   /* Note: It is difficult to use a groupBy operation here because the operation
      will convert integer IDs to string IDs so they can index the output
 		 object. */
-  const ids: Table.EditableRowId[] = uniq(map(cellChanges, (ch: Table.SoloCellChange<R, I>) => ch.id));
+  const ids: Table.EditableRowId[] = uniq(map(cellChanges, (ch: Table.SoloCellChange<R, RW>) => ch.id));
   return reduce(
     ids,
-    (curr: Table.RowChange<R, I>[], id: Table.EditableRowId) => {
-      const changesForRow = filter(cellChanges, (ch: Table.SoloCellChange<R, I>) => ch.id === id);
-      const flattened: Table.RowChange<R, I> | null = flattenCellChanges(changesForRow);
+    (curr: Table.RowChange<R, RW>[], id: Table.EditableRowId) => {
+      const changesForRow = filter(cellChanges, (ch: Table.SoloCellChange<R, RW>) => ch.id === id);
+      const flattened: Table.RowChange<R, RW> | null = flattenCellChanges(changesForRow);
       if (!isNil(flattened)) {
         return [...curr, flattened];
       }
@@ -128,19 +132,19 @@ export const consolidateCellChanges = <R extends Table.RowData, I extends Table.
   );
 };
 
-export const consolidateRowChanges = <R extends Table.RowData, I extends Table.EditableRowId = Table.EditableRowId>(
-  changes: Table.RowChange<R, I>[] | Table.RowChange<R, I>
-): Table.ConsolidatedChange<R, I> => {
-  const rowChanges: Table.RowChange<R, I>[] = Array.isArray(changes) ? changes : [changes];
+export const consolidateRowChanges = <R extends Table.RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>>(
+  changes: Table.RowChange<R, RW>[] | Table.RowChange<R, RW>
+): Table.ConsolidatedChange<R, RW> => {
+  const rowChanges: Table.RowChange<R, RW>[] = Array.isArray(changes) ? changes : [changes];
   /* Note: It is difficult to use a groupBy operation here because the operation
      will convert integer IDs to string IDs so they can index the output
 		 object. */
-  const ids: Table.EditableRowId[] = uniq(map(rowChanges, (ch: Table.RowChange<R, I>) => ch.id));
+  const ids: RW["id"][] = uniq(map(rowChanges, (ch: Table.RowChange<R, RW>) => ch.id));
   return reduce(
     ids,
-    (curr: Table.RowChange<R, I>[], id: Table.EditableRowId) => {
-      const changesForRow = filter(rowChanges, (ch: Table.RowChange<R, I>) => ch.id === id);
-      const flattened: Table.RowChange<R, I> | null = flattenRowChanges(changesForRow);
+    (curr: Table.RowChange<R, RW>[], id: RW["id"]) => {
+      const changesForRow = filter(rowChanges, (ch: Table.RowChange<R, RW>) => ch.id === id);
+      const flattened: Table.RowChange<R, RW> | null = flattenRowChanges(changesForRow);
       if (!isNil(flattened)) {
         return [...curr, flattened];
       }
@@ -162,13 +166,13 @@ export const consolidateRowAddEvents = <R extends Table.RowData>(
 
 export const consolidateDataChangeEvents = <
   R extends Table.RowData,
-  I extends Table.EditableRowId = Table.EditableRowId
+  RW extends Table.EditableRow<R> = Table.EditableRow<R>
 >(
-  events: Table.DataChangeEvent<R, I>[]
-): Table.DataChangeEvent<R, I> => {
-  const rowChanges: Table.RowChange<R, I>[] = reduce(
+  events: Table.DataChangeEvent<R, RW>[]
+): Table.DataChangeEvent<R, RW> => {
+  const rowChanges: Table.RowChange<R, RW>[] = reduce(
     events,
-    (curr: Table.RowChange<R, I>[], e: Table.DataChangeEvent<R, I>) => [
+    (curr: Table.RowChange<R, RW>[], e: Table.DataChangeEvent<R, RW>): Table.RowChange<R, RW>[] => [
       ...curr,
       ...(Array.isArray(e.payload) ? e.payload : [e.payload])
     ],
@@ -177,32 +181,30 @@ export const consolidateDataChangeEvents = <
   return { type: "dataChange", payload: consolidateRowChanges(rowChanges) };
 };
 
-export const mergeChangesWithRow = <R extends Table.RowData>(
+export const mergeChangesWithRow = <R extends Table.RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>>(
   id: Table.RowId,
-  row: Table.EditableRow<R>,
-  changes: Table.DataChangePayload<R>
-): Table.EditableRow<R> => {
-  const consolidated: Table.ConsolidatedChange<R> = consolidateRowChanges<R>(changes);
-  return {
-    ...row,
-    data: reduce(
-      consolidated,
-      (curr: R, change: Table.RowChange<R>) => {
-        if (change.id !== id) {
-          console.error("Cannot apply table changes from one row to another row!");
-          return curr;
-        } else {
-          let field: keyof R;
-          for (field in change.data) {
-            const cellChange = util.getKeyValue<Table.RowChangeData<R>, keyof R>(field)(
-              change.data
-            ) as Table.CellChange<R[keyof R]>;
-            curr = { ...curr, [field as string]: cellChange.newValue };
-          }
-          return curr;
+  row: RW,
+  changes: Table.DataChangePayload<R, RW>
+): RW => {
+  const consolidated: Table.ConsolidatedChange<R, RW> = consolidateRowChanges<R, RW>(changes);
+  const data: RW["data"] = reduce(
+    consolidated,
+    (curr: RW["data"], change: Table.RowChange<R, RW>) => {
+      if (change.id !== id) {
+        console.error("Cannot apply table changes from one row to another row!");
+        return curr;
+      } else {
+        let field: keyof RW["data"];
+        for (field in change.data) {
+          const cellChange = util.getKeyValue<Table.RowChangeData<R, RW>, keyof RW["data"]>(field)(
+            change.data
+          ) as Table.CellChange<R[keyof R]>;
+          curr = { ...curr, [field as string]: cellChange.newValue };
         }
-      },
-      { ...row.data }
-    )
-  };
+        return curr;
+      }
+    },
+    { ...row.data }
+  );
+  return { ...row, data };
 };

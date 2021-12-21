@@ -60,10 +60,10 @@ export type TableConfigurationProps<R extends Table.RowData, M extends Model.Row
   readonly cookieNames?: Table.CookieNames;
   readonly calculatedColumnWidth?: number;
   readonly hasDragColumn?: boolean;
-  readonly checkboxColumn?: Partial<Table.Column<R, M>>;
+  readonly checkboxColumn?: Table.PartialActionColumn<R, M>;
   readonly checkboxColumnWidth?: number;
   readonly hideEditColumn?: boolean;
-  readonly editColumn?: Partial<Table.Column<R, M>>;
+  readonly editColumn?: Table.PartialActionColumn<R, M>;
   readonly editColumnWidth?: number;
   readonly editColumnConfig?: Table.EditColumnRowConfig<R>[];
   readonly showPageFooter?: boolean;
@@ -77,7 +77,7 @@ export type TableConfigurationProps<R extends Table.RowData, M extends Model.Row
   readonly savingChangesPortalId?: string;
   readonly framework?: Table.Framework;
   readonly className?: Table.GeneralClassName;
-  readonly columns: Table.Column<R, M>[];
+  readonly columns: Table.RealColumn<R, M>[];
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
 };
 
@@ -113,7 +113,12 @@ const configureTable = <
 
     const [hiddenColumns, changeColumnVisibility] = useHiddenColumns<R, M>({
       cookie: props.cookieNames?.hiddenColumns,
-      columns: map(filter(props.columns, (col: Table.Column<R, M>) => col.canBeHidden !== false)),
+      columns: map(
+        filter(
+          props.columns,
+          (col: Table.RealColumn<R, M>) => tabling.typeguards.isDataColumn(col) && col.canBeHidden !== false
+        ) as Table.DataColumn<R, M>[]
+      ),
       apis: _apis
     });
 
@@ -161,21 +166,20 @@ const configureTable = <
       [props.editColumnConfig, props.hideEditColumn]
     );
 
-    const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-      const pinFirstColumn = (cs: Table.Column<R, M>[]) => {
-        const displayedCols = filter(cs, (c: Table.Column<R, M>) => c.tableColumnType !== "fake");
-        if (displayedCols.length !== 0) {
-          return util.replaceInArray<Table.Column<R, M>>(
+    const columns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
+      const pinFirstColumn = (cs: Table.RealColumn<R, M>[]) => {
+        if (cs.length !== 0) {
+          return util.replaceInArray<Table.RealColumn<R, M>>(
             cs,
-            (c: Table.Column<R, M>) =>
-              tabling.columns.normalizedField<R, M>(c) === tabling.columns.normalizedField<R, M>(displayedCols[0]),
-            { ...displayedCols[0], pinned: "left" }
+            (c: Table.RealColumn<R, M>) =>
+              tabling.columns.normalizedField<R, M>(c) === tabling.columns.normalizedField<R, M>(cs[0]),
+            { ...cs[0], pinned: "left" }
           );
         }
         return cs;
       };
 
-      let cols = tabling.columns.orderColumns<R, M>(props.columns);
+      let cols = tabling.columns.orderColumns(props.columns);
       cols = props.pinFirstColumn ? pinFirstColumn(cols) : cols;
 
       if (hasEditColumn === true) {

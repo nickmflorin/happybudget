@@ -4,13 +4,13 @@ import FormLabelContent from "./FormLabelContent";
 
 interface FormLabelProps extends StandardComponentWithChildrenProps {
   readonly section?: boolean;
-  readonly columnType?: Table.ColumnTypeId;
+  readonly dataType?: Table.ColumnDataTypeId;
 }
 
-const FormLabel = ({ section, columnType, ...props }: FormLabelProps): JSX.Element => {
+const FormLabel = ({ section, dataType, ...props }: FormLabelProps): JSX.Element => {
   return (
     <label className={classNames({ "label--section": section }, props.className)} style={props.style}>
-      <FormLabelContent columnType={columnType}>{props.children}</FormLabelContent>
+      <FormLabelContent dataType={dataType}>{props.children}</FormLabelContent>
     </label>
   );
 };

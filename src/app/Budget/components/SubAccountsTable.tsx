@@ -62,7 +62,7 @@ const SubAccountsTable = ({
       if (!isNil(rowId)) {
         const row: Table.BodyRow<R> | null = table.current.getRow(rowId);
         if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
-          let rowChange: Table.RowChange<R> = {
+          let rowChange: Table.RowChange<R, Table.ModelRow<R>> = {
             id: row.id,
             data: { contact: { oldValue: row.data.contact || null, newValue: m.id } }
           };

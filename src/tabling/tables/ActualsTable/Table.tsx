@@ -53,8 +53,8 @@ const ActualsTable = ({
     }
     let availableOwners: (Model.SimpleSubAccount | Model.SimpleMarkup)[] = filter(
       map(
-        filter(props.data, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)),
-        (row: Table.BodyRow<R>) => row.data.owner
+        filter(props.data, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[],
+        (row: Table.DataRow<R>) => row.data.owner
       ),
       (owner: Model.SimpleSubAccount | Model.SimpleMarkup | null) => owner !== null
     ) as (Model.SimpleSubAccount | Model.SimpleMarkup)[];
@@ -120,7 +120,7 @@ const ActualsTable = ({
           framework.actions.ExportCSVAction(table.current, params, exportFileName),
           framework.actions.ExportPdfAction(props.onExportPdf)
         ]}
-        columns={tabling.columns.normalizeColumns<R, M>(props.columns, {
+        columns={tabling.columns.normalizeColumns(props.columns, {
           owner: (col: Table.Column<R, M>) => ({
             processCellFromClipboard: processOwnerCellFromClipboard,
             cellEditorParams: {
@@ -153,5 +153,7 @@ type ActualsTableType = {
 };
 
 export default React.memo(
-  withContacts<R, M, WithConnectedTableProps<ActualsTableProps, R, M>>(Columns)(ActualsTable)
+  withContacts<R, M, WithConnectedTableProps<ActualsTableProps, R, M>>(tabling.columns.filterRealColumns(Columns))(
+    ActualsTable
+  )
 ) as ActualsTableType;

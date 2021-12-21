@@ -69,7 +69,7 @@ const AuthenticatedBudgetAccountsTable = (props: AuthenticatedBudgetProps): JSX.
           !isNil(props.budget) ? `${props.budget.type}_${props.budget.name}_accounts` : ""
         )
       ]}
-      columns={Columns}
+      columns={tabling.columns.filterRealColumns(Columns)}
     />
   );
 };

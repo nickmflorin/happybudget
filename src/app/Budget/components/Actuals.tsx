@@ -43,7 +43,12 @@ const ConnectedActualsTable = connectTableToStore<
       (state: Application.AuthenticatedStore) => state.budget.actuals.data,
       (rows: Table.BodyRow<Tables.ActualRowData>[]) => {
         return {
-          value: reduce(rows, (sum: number, s: Table.BodyRow<Tables.ActualRowData>) => sum + (s.data.value || 0), 0)
+          value: reduce(
+            rows,
+            (sum: number, s: Table.BodyRow<Tables.ActualRowData>) =>
+              tabling.typeguards.isModelRow(s) ? sum + (s.data.value || 0) : sum,
+            0
+          )
         };
       }
     )

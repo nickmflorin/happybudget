@@ -1,4 +1,4 @@
-import { findIndex, isNil, map, filter, includes } from "lodash";
+import { findIndex, isNil, map, includes } from "lodash";
 import { Column } from "@ag-grid-community/core";
 
 import { tabling, budgeting } from "lib";
@@ -11,16 +11,19 @@ type M = Model.SubAccount;
 const Columns: Table.Column<R, M>[] = [
   columns.IdentifierColumn<"subaccount", R, M>({
     field: "identifier",
+    markupField: "identifier",
     pdfHeaderName: "Acct #",
     pdfWidth: 0.08,
     pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
   }),
   columns.BodyColumn<R, M, string | null>({
     field: "description",
+    nullValue: null,
+    markupField: "description",
     minWidth: 200,
     flex: 100,
     pdfFlexGrow: true,
-    columnType: "longText",
+    dataType: "longText",
     index: 1,
     suppressSizeToFit: false,
     /* The custom cell renderer here is only needed to include the Markup icon,
@@ -47,13 +50,10 @@ const Columns: Table.Column<R, M>[] = [
       if ((tabling.typeguards.isModelRow(row) && row.children.length !== 0) || tabling.typeguards.isMarkupRow(row)) {
         const agColumns: Column[] | undefined = params.columnApi?.getAllDisplayedColumns();
         if (!isNil(agColumns)) {
-          const originalCalculatedColumns = filter(
-            map(
-              filter(params.columns, (col: Table.Column<R, M>) => col.tableColumnType === "calculated"),
-              (col: Table.Column<R, M>) => col.field || col.colId
-            ),
-            (f: keyof R | string | undefined) => !isNil(f)
-          ) as string[];
+          const originalCalculatedColumns = map(
+            tabling.columns.filterCalculatedColumns(params.columns),
+            (col: Table.CalculatedColumn<R, M>) => col.field
+          );
           const indexOfDescriptionColumn = findIndex(agColumns, (col: Column) => col.getColId() === "description");
           const indexOfFirstCalculatedColumn = findIndex(agColumns, (col: Column) =>
             includes(originalCalculatedColumns, col.getColId())
@@ -71,25 +71,27 @@ const Columns: Table.Column<R, M>[] = [
   }),
   columns.SelectColumn({
     field: "contact",
+    nullValue: null,
     headerName: "Contact",
     cellRenderer: { data: "ContactCell" },
     cellEditor: "ContactEditor",
-    columnType: "contact",
+    dataType: "contact",
     index: 2,
     width: 120,
     pdfWidth: 0.12,
     requiresAuthentication: true
   }),
-  columns.BodyColumn<R, M, number>({
+  columns.BodyColumn<R, M, number | null>({
     field: "quantity",
+    nullValue: null,
     headerName: "Qty",
     pdfWidth: 0.05,
     width: 60,
-    valueSetter: tabling.valueSetters.numericValueSetter<R>("quantity"),
-    columnType: "number",
+    valueSetter: tabling.valueSetters.numericValueSetter("quantity"),
+    dataType: "number",
     /* If the plurality of the quantity changes, we need to refresh the refresh
        the unit column to change the plurality of the tag in the cell. */
-    refreshColumns: (change: Table.CellChange<number>) => {
+    refreshColumns: (change: Table.CellChange<number | null>) => {
       if (isNil(change.newValue) && isNil(change.oldValue)) {
         return [];
       } else if (
@@ -106,6 +108,7 @@ const Columns: Table.Column<R, M>[] = [
   }),
   columns.TagSelectColumn({
     field: "unit",
+    nullValue: null,
     headerName: "Unit",
     cellRenderer: { data: "SubAccountUnitCell" },
     cellEditor: "SubAccountUnitEditor",
@@ -114,20 +117,22 @@ const Columns: Table.Column<R, M>[] = [
   }),
   columns.BodyColumn<R, M, number | null>({
     field: "multiplier",
+    nullValue: null,
     headerName: "X",
     width: 60,
     pdfWidth: 0.05,
-    valueSetter: tabling.valueSetters.numericValueSetter<R>("multiplier"),
-    columnType: "number"
+    valueSetter: tabling.valueSetters.numericValueSetter("multiplier"),
+    dataType: "number"
   }),
   columns.BodyColumn<R, M, number | null>({
     field: "rate",
+    nullValue: null,
     headerName: "Rate",
     width: 100,
     pdfWidth: 0.05,
     valueFormatter: tabling.formatters.currencyValueFormatter,
-    valueSetter: tabling.valueSetters.numericValueSetter<R>("rate"),
-    columnType: "currency"
+    valueSetter: tabling.valueSetters.numericValueSetter("rate"),
+    dataType: "currency"
   }),
   columns.SelectColumn<R, M, number[]>({
     field: "fringes",
@@ -138,7 +143,8 @@ const Columns: Table.Column<R, M>[] = [
     includeInPdf: false
   }),
   columns.EstimatedColumn<R, M>({
-    colId: "estimated",
+    field: "estimated",
+    isRead: false,
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfValueGetter: budgeting.valueGetters.estimatedValueGetter,
@@ -146,23 +152,26 @@ const Columns: Table.Column<R, M>[] = [
   }),
   columns.ActualColumn<R, M>({
     field: "actual",
+    markupField: "actual",
+    isRead: true,
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfValueGetter: budgeting.valueGetters.actualValueGetter,
     pdfWidth: 0.12
   }),
   columns.VarianceColumn<R, M>({
-    colId: "variance",
+    field: "variance",
+    isRead: false,
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfValueGetter: budgeting.valueGetters.varianceValueGetter,
     pdfWidth: 0.12
   }),
-  columns.FakeColumn<R, M>({ field: "nominal_value" }),
-  columns.FakeColumn<R, M>({ field: "markup_contribution" }),
-  columns.FakeColumn<R, M>({ field: "fringe_contribution" }),
-  columns.FakeColumn<R, M>({ field: "accumulated_fringe_contribution" }),
-  columns.FakeColumn<R, M>({ field: "accumulated_markup_contribution" })
+  columns.FakeColumn({ field: "nominal_value", nullValue: 0.0 }),
+  columns.FakeColumn({ field: "markup_contribution", nullValue: 0.0 }),
+  columns.FakeColumn({ field: "fringe_contribution", nullValue: 0.0 }),
+  columns.FakeColumn({ field: "accumulated_fringe_contribution", nullValue: 0.0 }),
+  columns.FakeColumn({ field: "accumulated_markup_contribution", nullValue: 0.0 })
 ];
 
 export default Columns;

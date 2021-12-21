@@ -77,7 +77,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "tsc": "tsc",
+    "tsc:watch": "tsc -w"
   },
   "browserslist": {
     "production": [

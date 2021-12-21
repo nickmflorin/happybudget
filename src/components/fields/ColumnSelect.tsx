@@ -31,7 +31,7 @@ type CustomTagProps = {
 export interface ColumnSelectProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  C extends Table.Column<R, M> = Table.Column<R, M>
+  C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>
 > extends SelectProps<string> {
   readonly columns: C[];
   readonly getLabel: (c: C) => string;
@@ -40,7 +40,7 @@ export interface ColumnSelectProps<
 const ColumnSelect = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  C extends Table.Column<R, M> = Table.Column<R, M>
+  C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>
 >({
   columns,
   getLabel,
@@ -54,10 +54,10 @@ const ColumnSelect = <
       mode={"multiple"}
       showArrow
       tagRender={(params: CustomTagProps) => {
-        const column = find(columns, (c: C) => tabling.columns.normalizedField<R, M, C>(c) === params.value);
+        const column = tabling.columns.getColumn(columns, params.value as string);
         if (!isNil(column)) {
-          const colType: Table.ColumnType | undefined = !isNil(column.columnType)
-            ? find(tabling.models.ColumnTypes, { id: column.columnType })
+          const colType: Table.ColumnDataType | undefined = !isNil(column.dataType)
+            ? find(tabling.models.ColumnTypes, { id: column.dataType })
             : undefined;
           return (
             <Tag
@@ -79,13 +79,9 @@ const ColumnSelect = <
       }}
     >
       {map(columns, (column: C, index: number) => {
-        const colType = find(tabling.models.ColumnTypes, { id: column.columnType });
+        const colType = find(tabling.models.ColumnTypes, { id: column.dataType });
         return (
-          <Select.Option
-            className={"column-select-option"}
-            key={index + 1}
-            value={tabling.columns.normalizedField<R, M, C>(column) as string}
-          >
+          <Select.Option className={"column-select-option"} key={index + 1} value={column.field}>
             {!isNil(colType) && !isNil(colType.icon) && (
               <div className={"icon-wrapper"}>
                 {ui.typeguards.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}

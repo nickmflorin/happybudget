@@ -18,38 +18,48 @@ interface BudgetPdfProps {
 
 type M = Model.PdfSubAccount;
 type R = Tables.SubAccountRowData;
-type C = Table.Column<R, M>;
+type C = Table.ModelColumn<R, M>;
 
 type AM = Model.PdfAccount;
 type AR = Tables.AccountRowData;
-type AC = Table.Column<AR, AM>;
+type AC = Table.ModelColumn<AR, AM>;
 
-const AccountColumns = filter(GenericAccountsTable.Columns, (c: AC) => c.includeInPdf !== false) as AC[];
+const AccountColumns = filter(
+  GenericAccountsTable.Columns,
+  (c: Table.Column<AR, AM>) =>
+    tabling.typeguards.isModelColumn(c) &&
+    ((!tabling.typeguards.isFakeColumn(c) && c.includeInPdf !== false) || tabling.typeguards.isFakeColumn(c))
+) as AC[];
 
-const SubAccountColumns = filter(GenericSubAccountsTable.Columns, (c: C) => c.includeInPdf !== false) as C[];
+const SubAccountColumns = filter(
+  GenericSubAccountsTable.Columns,
+  (c: Table.Column<R, M>) =>
+    tabling.typeguards.isModelColumn(c) &&
+    ((!tabling.typeguards.isFakeColumn(c) && c.includeInPdf !== false) || tabling.typeguards.isFakeColumn(c))
+) as C[];
 
 const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element => {
   const accountColumns = useMemo<AC[]>(() => {
-    let columns = tabling.columns.normalizeColumns<AR, AM, AC>(AccountColumns, {
+    const columns = tabling.columns.normalizeColumns(AccountColumns, {
       estimated: {
         pdfFooterValueGetter: budgeting.businessLogic.estimatedValue(budget)
       },
       variance: {
         pdfFooterValueGetter: budgeting.businessLogic.varianceValue(budget)
       },
+
       actual: {
         pdfFooterValueGetter: budgeting.businessLogic.actualValue(budget)
       }
     });
-    columns = tabling.columns.normalizePdfColumnWidths<AR, AM, AC>(columns, (c: AC) =>
-      includes(options.columns, tabling.columns.normalizedField<AR, AM, AC>(c))
+    return tabling.columns.orderColumns(
+      tabling.columns.normalizePdfColumnWidths(columns, (c: AC) => includes(options.columns, c.field))
     );
-    return tabling.columns.orderColumns<AR, AM, AC>(columns);
   }, []);
 
   const subaccountColumns = useMemo(() => {
     return (account: AM): C[] => {
-      let columns = tabling.columns.normalizeColumns<R, M, C>(SubAccountColumns, {
+      let columns = tabling.columns.normalizeColumns(SubAccountColumns, {
         description: {
           pdfFooterValueGetter: !isNil(account.description)
             ? `${account.description} Total`
@@ -117,10 +127,8 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
           }
         }
       });
-      columns = tabling.columns.normalizePdfColumnWidths<R, M, C>(columns, (c: C) =>
-        includes(options.columns, tabling.columns.normalizedField<R, M>(c))
-      );
-      return tabling.columns.orderColumns<R, M, C>(columns);
+      columns = tabling.columns.normalizePdfColumnWidths(columns, (c: C) => includes(options.columns, c.field));
+      return tabling.columns.orderColumns(columns);
     };
   }, []);
 

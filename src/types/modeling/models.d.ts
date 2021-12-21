@@ -129,11 +129,13 @@ declare namespace Model {
 
   type FlatMarkup = Omit<UnknownMarkup, "unit"> & {
     readonly unit: Choice<1, "Flat">;
+    readonly actual: number;
   };
 
   type PercentMarkup = Omit<UnknownMarkup, "unit"> & {
     readonly children: number[];
     readonly unit: Choice<0, "Percent">;
+    readonly actual: number;
   };
 
   type Markup = FlatMarkup | PercentMarkup;

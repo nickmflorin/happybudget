@@ -266,10 +266,10 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   }
 
   function* handleDataChangeEvent(
-    e: Table.DataChangeEvent<R, Table.ModelRowId>,
+    e: Table.DataChangeEvent<R, Table.ModelRow<R>>,
     context: Tables.FringeTableContext
   ): SagaIterator {
-    const merged = tabling.events.consolidateRowChanges<R, Table.ModelRowId>(e.payload);
+    const merged = tabling.events.consolidateRowChanges<R, Table.ModelRow<R>>(e.payload);
     if (merged.length !== 0) {
       const requestPayload = tabling.http.createBulkUpdatePayload<R, M, P>(merged, config.table.getColumns());
       if (requestPayload.data.length !== 0) {

@@ -22,7 +22,7 @@ const numericValueConverter = (value: Table.RawRowValue): number | null | false 
 };
 
 export const numericValueSetter =
-  <R extends Table.RowData>(field: keyof R) =>
+  (field: string) =>
   (params: ValueSetterParams): boolean => {
     const result = numericValueConverter(params.newValue);
     if (result === false) {
@@ -33,7 +33,7 @@ export const numericValueSetter =
   };
 
 export const percentageToDecimalValueSetter =
-  <R extends Table.RowData>(field: keyof R) =>
+  (field: string) =>
   (params: ValueSetterParams): boolean => {
     if (params.newValue === "" || !isNaN(parseFloat(params.newValue))) {
       params.data.data[field] = parseFloat(params.newValue) / 100;
@@ -43,7 +43,7 @@ export const percentageToDecimalValueSetter =
   };
 
 export const dateTimeValueSetter =
-  <R extends Table.RowData>(field: keyof R) =>
+  (field: string) =>
   (params: ValueSetterParams): boolean => {
     if (params.newValue === undefined || params.newValue === null) {
       params.data.data[field] = null;
@@ -58,7 +58,7 @@ export const dateTimeValueSetter =
   };
 
 export const emailValueSetter =
-  <R extends Table.RowData>(field: keyof R) =>
+  (field: string) =>
   (params: ValueSetterParams): boolean => {
     if (params.newValue === undefined || params.newValue === null) {
       params.data.data[field] = null;

@@ -1,5 +1,5 @@
 import React, { useImperativeHandle, useMemo } from "react";
-import { map, isNil, filter, intersection } from "lodash";
+import { map, isNil, filter, includes } from "lodash";
 
 import { hooks, tabling } from "lib";
 
@@ -32,8 +32,8 @@ export type UnauthenticatedTableProps<
   readonly constrainTableFooterHorizontally?: boolean;
   readonly constrainPageFooterHorizontally?: boolean;
   readonly excludeColumns?:
-    | SingleOrArray<keyof R | string | ((col: Table.Column<R, M>) => boolean)>
-    | ((col: Table.Column<R, M>) => boolean);
+    | SingleOrArray<string | ((col: Table.DataColumn<R, M>) => boolean)>
+    | ((col: Table.DataColumn<R, M>) => boolean);
   readonly children: RenderPropChild<UnauthenticatedTableDataGridProps<R, M>>;
 };
 
@@ -43,7 +43,7 @@ const TableFooterGrid = FooterGrid<any, any, UnauthenticatedFooterGridProps<any>
   className: "grid--table-footer",
   rowClass: "row--table-footer",
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  getFooterColumn: (col: Table.Column<any, any, any>) => col.footer || null
+  getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.footer || null
 })(UnauthenticatedGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
     props: Omit<UnauthenticatedFooterGridProps<R, M>, "id">
@@ -57,7 +57,7 @@ const PageFooterGrid = FooterGrid<any, any, UnauthenticatedFooterGridProps<any>>
   rowClass: "row--page-footer",
   rowHeight: 28,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  getFooterColumn: (col: Table.Column<any, any, any>) => col.page || null
+  getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.page || null
 })(UnauthenticatedGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
     props: Omit<UnauthenticatedFooterGridProps<R, M>, "id" | "grid">
@@ -81,24 +81,24 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
    * and configureTable in any order, and the selector will still be included in
    * the editor and renderer params for each column.
    */
-  const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-    const evaluateColumnExclusionProp = (c: Table.Column<R, M>): boolean => {
+  const columns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
+    const evaluateColumnExclusionProp = (c: Table.DataColumn<R, M>): boolean => {
       if (!isNil(props.excludeColumns)) {
         if (typeof props.excludeColumns === "function") {
           return props.excludeColumns(c);
         }
-        return (
-          intersection(Array.isArray(props.excludeColumns) ? props.excludeColumns : [props.excludeColumns], [
-            c.field,
-            c.colId
-          ]).length === 0
-        );
+        return includes(Array.isArray(props.excludeColumns) ? props.excludeColumns : [props.excludeColumns], c.field);
       }
       return false;
     };
     return map(
-      filter(props.columns, (c: Table.Column<R, M>) => !evaluateColumnExclusionProp(c)),
-      (c: Table.Column<R, M>) => ({
+      filter(
+        props.columns,
+        (c: Table.RealColumn<R, M>) =>
+          (tabling.typeguards.isDataColumn(c) && !evaluateColumnExclusionProp(c)) ||
+          tabling.typeguards.isActionColumn(c)
+      ),
+      (c: Table.RealColumn<R, M>) => ({
         ...c,
         cellRendererParams: {
           ...c.cellRendererParams,
@@ -118,7 +118,8 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
       notify: () => {},
       /* eslint-disable-next-line @typescript-eslint/no-empty-function */
       removeNotification: () => {},
-      getColumns: () => columns,
+      getColumns: () =>
+        filter(columns, (c: Table.RealColumn<R, M>) => tabling.typeguards.isBodyColumn(c)) as Table.BodyColumn<R, M>[],
       /* eslint-disable-next-line @typescript-eslint/no-empty-function */
       applyTableChange: () => {},
       changeColumnVisibility: props.changeColumnVisibility,
@@ -200,7 +201,11 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
       }
     >
       <React.Fragment>
-        <UnauthenticatedMenu<R, M> {...props} apis={props.tableApis.get("data")} />
+        <UnauthenticatedMenu<R, M>
+          {...props}
+          columns={tabling.columns.filterDataColumns(columns)}
+          apis={props.tableApis.get("data")}
+        />
         {props.children({
           ...props,
           apis: props.tableApis.get("data"),

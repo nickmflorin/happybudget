@@ -7,25 +7,30 @@ import Row, { RowProps } from "./Row";
 interface HeaderRowProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  C extends Table.Column<R, M> = Table.Column<R, M>
-> extends RowProps<R, M, C> {
-  readonly cellProps?: RowExplicitCellProps<R, M, C>;
+  V extends Table.RawRowValue = Table.RawRowValue
+> extends RowProps<R, M, V> {
+  readonly cellProps?: RowExplicitCellProps<R, M, V>;
 }
 
 const HeaderRow = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  C extends Table.Column<R, M> = Table.Column<R, M>
+  V extends Table.RawRowValue = Table.RawRowValue
 >({
   cellProps,
   ...props
-}: HeaderRowProps<R, M, C>): JSX.Element => {
+}: HeaderRowProps<R, M, V>): JSX.Element => {
   return (
-    <Row<R, M, C>
+    <Row<R, M, V>
       {...props}
       className={classNames("header-tr", props.className)}
-      renderCell={(params: { lastChild: boolean; firstChild: boolean; column: C; colIndex: number }) => {
-        return <HeaderCell<R, M> {...params} {...cellProps} />;
+      renderCell={(params: {
+        lastChild: boolean;
+        firstChild: boolean;
+        column: Table.DataColumn<R, M, V>;
+        colIndex: number;
+      }) => {
+        return <HeaderCell<R, M, V> {...params} {...cellProps} />;
       }}
     />
   );

@@ -180,7 +180,7 @@ export const createTableTaskSet = (
     }
   }
 
-  function* handleDataChangeEvent(e: Table.DataChangeEvent<R, Table.ModelRowId>): SagaIterator {
+  function* handleDataChangeEvent(e: Table.DataChangeEvent<R, Table.ModelRow<R>>): SagaIterator {
     const merged = tabling.events.consolidateRowChanges(e.payload);
     if (merged.length !== 0) {
       const requestPayload = tabling.http.createBulkUpdatePayload<R, M, P>(merged, config.table.getColumns());

@@ -6,7 +6,7 @@ import { tabling, hooks, models } from "lib";
 
 interface InjectedContactsProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
-  readonly columns: Table.Column<R, M>[];
+  readonly columns: Table.RealColumn<R, M>[];
 }
 
 export interface WithContactsProps {
@@ -28,7 +28,7 @@ const withContacts =
     M extends Model.RowHttpModel = Model.RowHttpModel,
     T extends WithContactsProps = WithContactsProps
   >(
-    columns: Table.Column<R, M>[]
+    columns: Table.RealColumn<R, M>[]
   ) =>
   (
     Component: /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -66,7 +66,7 @@ const withContacts =
       });
 
       const cols = useMemo(() => {
-        return tabling.columns.normalizeColumns<R, M>(columns, {
+        return tabling.columns.normalizeColumns(columns, {
           contact: {
             cellRendererParams: { onEditContact: props.onEditContact },
             cellEditorParams: { onNewContact: props.onNewContact, setSearch: props.onSearchContact },
@@ -98,10 +98,14 @@ const withContacts =
 						unfocused case).
             */
             const rowNodes: Table.RowNode[] = [];
-            if (params.cell.column.field === "contact") {
+            if (tabling.typeguards.isBodyColumn(params.cell.column) && params.cell.column.field === "contact") {
               rowNodes.push(params.cell.rowNode);
             }
-            if (!isNil(params.previousCell) && params.previousCell.column.field === "contact") {
+            if (
+              !isNil(params.previousCell) &&
+              tabling.typeguards.isBodyColumn(params.previousCell.column) &&
+              params.previousCell.column.field === "contact"
+            ) {
               rowNodes.push(params.previousCell.rowNode);
             }
             if (rowNodes.length !== 0) {

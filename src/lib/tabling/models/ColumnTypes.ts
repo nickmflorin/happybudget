@@ -1,4 +1,4 @@
-const ColumnTypes: Table.ColumnType[] = [
+const ColumnTypes: Table.ColumnDataType[] = [
   {
     id: "text",
     icon: "font-case",

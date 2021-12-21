@@ -6,21 +6,22 @@ import BodyRow, { BodyRowProps } from "./BodyRow";
 const FooterRow = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  C extends Table.Column<R, M> = Table.Column<R, M>
+  V extends Table.RawRowValue = Table.RawRowValue
 >(
-  props: BodyRowProps<R, M, C>
+  props: BodyRowProps<R, M, V>
 ): JSX.Element => {
   return (
-    <BodyRow<R, M, C>
+    <BodyRow<R, M, V>
       {...props}
       className={classNames("footer-tr", props.className)}
       columns={props.columns}
       cellProps={{
         textClassName: "footer-tr-td-text",
-        valueGetter: (c: C, rows: Table.BodyRow<R>[]) => {
+        valueGetter: (c: Table.DataColumn<R, M, V>, rows: Table.BodyRow<R>[]): V => {
           if (!isNil(c.pdfFooterValueGetter)) {
             return typeof c.pdfFooterValueGetter === "function" ? c.pdfFooterValueGetter(rows) : c.pdfFooterValueGetter;
           }
+          return "" as V;
         }
       }}
     />

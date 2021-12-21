@@ -1,11 +1,27 @@
 import { combineReducers } from "redux";
 import { filter, intersection } from "lodash";
 
-import { redux, budgeting } from "lib";
+import { redux, budgeting, tabling } from "lib";
 import { AccountsTable, SubAccountsTable, FringesTable } from "tabling";
 
 import * as actions from "./actions";
 import initialState from "./initialState";
+
+const SubAccountColumns = filter(
+  SubAccountsTable.Columns,
+  (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
+    tabling.typeguards.isModelColumn(c) && intersection([c.field], ["variance", "actual", "contact"]).length === 0
+) as Table.ModelColumn<Tables.SubAccountRowData, Model.SubAccount>[];
+
+const AccountColumns = filter(
+  AccountsTable.Columns,
+  (c: Table.Column<Tables.AccountRowData, Model.Account>) =>
+    tabling.typeguards.isModelColumn(c) && intersection([c.field], ["variance", "actual"]).length === 0
+) as Table.ModelColumn<Tables.AccountRowData, Model.Account>[];
+
+const FringesColumns = filter(FringesTable.Columns, (c: Table.Column<Tables.FringeRowData, Model.Fringe>) =>
+  tabling.typeguards.isModelColumn(c)
+) as Table.ModelColumn<Tables.FringeRowData, Model.Fringe>[];
 
 const genericReducer = combineReducers({
   detail: redux.reducers.createDetailResponseReducer<Model.Template>({
@@ -32,11 +48,7 @@ const genericReducer = combineReducers({
       addModelsToState: actions.accounts.addModelsToStateAction,
       setSearch: actions.accounts.setSearchAction
     },
-    columns: filter(
-      AccountsTable.Columns,
-      (c: Table.Column<Tables.AccountRowData, Model.Account>) =>
-        intersection([c.field, c.colId], ["variance", "actual"]).length === 0
-    ),
+    columns: AccountColumns,
     getModelRowChildren: (m: Model.Account) => m.children
   }),
   account: budgeting.reducers.createAccountDetailReducer({
@@ -65,14 +77,10 @@ const genericReducer = combineReducers({
           setSearch: actions.account.setSearchAction
         },
         getModelRowChildren: (m: Model.SubAccount) => m.children,
-        columns: filter(
-          SubAccountsTable.Columns as Table.Column<Tables.SubAccountRowData, Model.SubAccount>[],
-          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
-            intersection([c.field, c.colId], ["variance", "contact", "actual"]).length === 0
-        ),
+        columns: SubAccountColumns,
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
           initialState: initialState.account.table.fringes,
-          columns: FringesTable.Columns,
+          columns: FringesColumns,
           clearOn: [actions.requestFringesAction],
           actions: {
             responseFringeColors: actions.responseFringeColorsAction,
@@ -112,15 +120,11 @@ const genericReducer = combineReducers({
           addModelsToState: actions.subAccount.addModelsToStateAction,
           setSearch: actions.subAccount.setSearchAction
         },
-        columns: filter(
-          SubAccountsTable.Columns as Table.Column<Tables.SubAccountRowData, Model.SubAccount>[],
-          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
-            intersection([c.field, c.colId], ["variance", "contact", "actual"]).length === 0
-        ),
+        columns: SubAccountColumns,
         getModelRowChildren: (m: Model.SubAccount) => m.children,
         fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
           initialState: initialState.subaccount.table.fringes,
-          columns: FringesTable.Columns,
+          columns: FringesColumns,
           clearOn: [actions.requestFringesAction],
           actions: {
             responseFringeColors: actions.responseFringeColorsAction,

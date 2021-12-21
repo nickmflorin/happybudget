@@ -67,7 +67,7 @@ const AuthenticatedBudgetSubAccountsTable = (
   });
 
   const columns = useMemo(() => {
-    return tabling.columns.normalizeColumns<R, M>(props.columns, {
+    return tabling.columns.normalizeColumns(props.columns, {
       identifier: () => ({
         headerName: props.identifierFieldHeader
       }),
@@ -184,4 +184,6 @@ const AuthenticatedBudgetSubAccountsTable = (
 
 const AsSubAccountsTable = SubAccountsTable(AuthenticatedBudgetSubAccountsTable);
 
-export default React.memo(withContacts<R, M, AuthenticatedBudgetProps>(Columns)(AsSubAccountsTable));
+export default React.memo(
+  withContacts<R, M, AuthenticatedBudgetProps>(tabling.columns.filterRealColumns(Columns))(AsSubAccountsTable)
+);
