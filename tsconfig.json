@@ -25,7 +25,8 @@
     "skipDefaultLibCheck": true,
     "resolveJsonModule": true,
     "incremental": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "sourceMap": true
   },
   "include": [
     "src/**/*.ts"

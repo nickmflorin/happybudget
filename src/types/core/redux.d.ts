@@ -1,13 +1,18 @@
 declare namespace Redux {
-  type GenericSelectorFunc<S, T = unknown> = (state: S) => T;
-  type AuthenticatedSelectorFunc<T = unknown> = GenericSelectorFunc<Application.AuthenticatedStore, T>;
-  type UnauthenticatedSelectorFunc<T = unknown> = GenericSelectorFunc<Application.UnauthenticatedStore, T>;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type GenericSelectorFunc<S, T = any> = (state: S) => T;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type AuthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Application.AuthenticatedStore, T>;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type UnauthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Application.UnauthenticatedStore, T>;
 
-  type SwitchSelectorFunc<AUTH extends boolean = true, T = unknown> = AUTH extends true
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type SwitchSelectorFunc<AUTH extends boolean = true, T = any> = AUTH extends true
     ? AuthenticatedSelectorFunc<T>
     : UnauthenticatedSelectorFunc<T>;
 
-  type SelectorFunc<T = unknown> = AuthenticatedSelectorFunc<T> | UnauthenticatedSelectorFunc<T>;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type SelectorFunc<T = any> = AuthenticatedSelectorFunc<T> | UnauthenticatedSelectorFunc<T>;
 
   type AsyncId = `async-${string}`;
 
