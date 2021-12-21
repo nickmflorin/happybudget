@@ -13,10 +13,8 @@ declare namespace Tables {
   type SubAccountRowData = BudgetRowData &
     Pick<
       Model.SubAccount,
-      "quantity" | "unit" | "multiplier" | "rate" | "fringes" | "fringe_contribution" | "attachments"
-    > & {
-      readonly contact?: number | null;
-    };
+      "quantity" | "unit" | "multiplier" | "rate" | "fringes" | "fringe_contribution" | "attachments" | "contact"
+    >;
 
   type SubAccountRow = Table.ModelRow<SubAccountRowData>;
   type SubAccountTableContext = { readonly id: number; readonly budgetId: number };
