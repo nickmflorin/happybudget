@@ -17,7 +17,7 @@ export const selectAccountsTableStore = redux.selectors.simpleDeepEqualSelector(
   return redux.initialState.initialTableState;
 });
 
-export const selectSubAccountsTableStore = redux.selectors.simpleDeepEqualSelector((store: Application.Store) => {
+export const selectSubAccountsTableStore = (store: Application.Store) => {
   if (redux.typeguards.isAuthenticatedStore(store)) {
     const path = store.router.location.pathname;
     if (budgeting.urls.isAccountUrl(path)) {
@@ -27,7 +27,7 @@ export const selectSubAccountsTableStore = redux.selectors.simpleDeepEqualSelect
     }
   }
   return initialSubAccountsTableState;
-});
+};
 
 export const selectFringesStore = createSelector(
   selectSubAccountsTableStore,

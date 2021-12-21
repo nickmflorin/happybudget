@@ -39,16 +39,14 @@ const ConnectedTable = connectTableToStore<
   selector: selectors.selectSubAccountsTableStore,
   footerRowSelectors: {
     page: createSelector(
-      redux.selectors.simpleDeepEqualSelector((state: Application.AuthenticatedStore) => state.template.detail.data),
+      (state: Application.AuthenticatedStore) => state.template.detail.data,
       (template: Model.Template | null) => ({
         identifier: !isNil(template) && !isNil(template.name) ? `${template.name} Total` : "Budget Total",
         estimated: !isNil(template) ? budgeting.businessLogic.estimatedValue(template) : 0.0
       })
     ),
     footer: createSelector(
-      redux.selectors.simpleDeepEqualSelector(
-        (state: Application.AuthenticatedStore) => state.template.subaccount.detail.data
-      ),
+      (state: Application.AuthenticatedStore) => state.template.subaccount.detail.data,
       (detail: Model.SubAccount | null) => ({
         identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
         estimated: !isNil(detail) ? budgeting.businessLogic.estimatedValue(detail) : 0.0

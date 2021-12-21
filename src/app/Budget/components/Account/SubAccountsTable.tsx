@@ -39,7 +39,7 @@ const ConnectedTable = connectTableToStore<
   createSaga: (table: Table.TableInstance<R, M>) => sagas.account.createTableSaga(table),
   footerRowSelectors: {
     page: createSelector(
-      redux.selectors.simpleDeepEqualSelector((state: Application.AuthenticatedStore) => state.budget.detail.data),
+      (state: Application.AuthenticatedStore) => state.budget.detail.data,
       (budget: Model.Budget | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
         estimated: !isNil(budget) ? budgeting.businessLogic.estimatedValue(budget) : 0.0,
@@ -48,9 +48,7 @@ const ConnectedTable = connectTableToStore<
       })
     ),
     footer: createSelector(
-      redux.selectors.simpleDeepEqualSelector(
-        (state: Application.AuthenticatedStore) => state.budget.account.detail.data
-      ),
+      (state: Application.AuthenticatedStore) => state.budget.account.detail.data,
       (detail: Model.Account | null) => ({
         identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
         estimated: !isNil(detail) ? budgeting.businessLogic.estimatedValue(detail) : 0.0,

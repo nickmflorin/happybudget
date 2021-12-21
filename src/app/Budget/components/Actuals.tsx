@@ -42,7 +42,7 @@ const ConnectedActualsTable = connectTableToStore<
   selector: redux.selectors.simpleDeepEqualSelector((state: Application.AuthenticatedStore) => state.budget.actuals),
   footerRowSelectors: {
     footer: createSelector(
-      redux.selectors.simpleDeepEqualSelector((state: Application.AuthenticatedStore) => state.budget.actuals.data),
+      (state: Application.AuthenticatedStore) => state.budget.actuals.data,
       (rows: Table.BodyRow<Tables.ActualRowData>[]) => {
         return {
           value: reduce(rows, (sum: number, s: Table.BodyRow<Tables.ActualRowData>) => sum + (s.data.value || 0), 0)

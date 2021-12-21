@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { createSelector } from "reselect";
 import { isNil, map } from "lodash";
 
-import { tabling, budgeting, redux } from "lib";
+import { tabling, budgeting } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
 import { AccountsTable as GenericAccountsTable, connectTableToStore } from "tabling";
 
@@ -34,7 +34,7 @@ const ConnectedTable = connectTableToStore<
   createSaga: (table: Table.TableInstance<R, M>) => sagas.accounts.createTableSaga(table),
   footerRowSelectors: {
     footer: createSelector(
-      redux.selectors.simpleDeepEqualSelector((state: Application.AuthenticatedStore) => state.template.detail.data),
+      (state: Application.AuthenticatedStore) => state.template.detail.data,
       (budget: Model.Template | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
         estimated: !isNil(budget) ? budgeting.businessLogic.estimatedValue(budget) : 0.0

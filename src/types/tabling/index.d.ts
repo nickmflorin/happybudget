@@ -686,7 +686,11 @@ declare namespace Table {
   /* ------------------------- Rows -------------------------------------- */
 
   /* ------------------------- Redux -------------------------------------- */
-  type RowDataSelector<R extends RowData> = (state: Application.Store) => Partial<R>;
+  /* We need to allow any for RowDataSelector instead of Application.Store because
+     there is a typing issue with reselect in regard to the footer row
+		 selectors. */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type RowDataSelector<R extends RowData> = (state: any) => Partial<R>;
 
   type Context = Record<string, number>;
 
