@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { isNil, filter } from "lodash";
 
@@ -21,8 +21,6 @@ const ConnectedContactsTable = connectTableToStore<ContactsTable.Props, R, M, Ta
     }
     return redux.initialState.initialTableState;
   },
-  onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.ContactTableContext) =>
-    dispatch(actions.requestContactsAction(null, c)),
   createSaga: (table: Table.TableInstance<R, M>) => sagas.createContactsTableSaga(table),
   actions: {
     tableChanged: actions.handleContactsTableChangeEventAction,
@@ -39,6 +37,10 @@ const Contacts = (): JSX.Element => {
   const table = tabling.hooks.useTable<R, M>();
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(actions.requestContactsAction(null, {}));
+  }, []);
 
   const onAttachmentRemoved = useMemo(
     () => (row: Table.ModelRow<R>, id: number) =>

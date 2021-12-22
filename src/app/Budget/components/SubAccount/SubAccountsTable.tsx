@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
@@ -35,8 +35,6 @@ const ConnectedTable = connectTableToStore<
   },
   selector: selectors.selectSubAccountsTableStore,
   createSaga: (table: Table.TableInstance<R, M>) => sagas.subAccount.createTableSaga(table),
-  onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.SubAccountTableContext) =>
-    dispatch(actions.subAccount.requestAction(null, c)),
   footerRowSelectors: {
     page: createSelector(
       (state: Application.AuthenticatedStore) => state.budget.detail.data,
@@ -75,7 +73,11 @@ const SubAccountsTable = ({
   const dispatch = useDispatch();
   const history = useHistory();
   const subaccountDetail = useSelector(selectSubAccountDetail);
-  const table = tabling.hooks.useTable<R, M>();
+  const table = tabling.hooks.useTable<Tables.SubAccountRowData, Model.SubAccount>();
+
+  useEffect(() => {
+    dispatch(actions.subAccount.requestAction(null, { id: subaccountId, budgetId }));
+  }, [subaccountId, budgetId]);
 
   const [groupModals, onEditGroup, onCreateGroup] = useGrouping({
     parentId: subaccountId,

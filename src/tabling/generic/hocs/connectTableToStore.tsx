@@ -96,13 +96,6 @@ const connectTableToStore =
             if (!store.hasSaga(`${props.tableId}-saga`)) {
               const saga = config.createSaga(table.current);
               store.injectSaga(`${props.tableId}-saga`, saga);
-              config.onSagaConnected(dispatch, props.actionContext);
-            } else {
-              if (!isNil(config.onSagaReconnected)) {
-                config.onSagaReconnected(dispatch, props.actionContext);
-              } else {
-                config.onSagaConnected(dispatch, props.actionContext);
-              }
             }
             sagaInjected.current = true;
             setReady(true);

@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { isNil } from "lodash";
 
 import { FringesTable, connectTableToStore } from "tabling";
@@ -13,8 +15,6 @@ const ConnectedFringesTable = connectTableToStore<
   Tables.FringeTableContext
 >({
   createSaga: (table: Table.TableInstance<Tables.FringeRowData, Model.Fringe>) => sagas.createFringesTableSaga(table),
-  onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.FringeTableContext) =>
-    dispatch(actions.requestFringesAction(null, c)),
   actions: {
     tableChanged: actions.handleFringesTableChangeEventAction,
     loading: actions.loadingFringesAction,
@@ -33,6 +33,12 @@ interface FringesModalProps extends Pick<ModalProps, "open" | "onCancel"> {
 }
 
 const FringesModal: React.FC<FringesModalProps> = ({ id, budget, budgetId, open, onCancel }) => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(actions.requestFringesAction(null, { id, budgetId }));
+  }, [budgetId]);
+
   return (
     <GenericFringesModal open={open} onCancel={onCancel}>
       <ConnectedFringesTable

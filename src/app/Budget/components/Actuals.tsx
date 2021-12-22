@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { isNil, filter, reduce } from "lodash";
@@ -36,8 +36,6 @@ const ConnectedActualsTable = connectTableToStore<
     addModelsToState: actions.actuals.addModelsToStateAction,
     setSearch: actions.actuals.setSearchAction
   },
-  onSagaConnected: (dispatch: Redux.Dispatch, c: Tables.ActualTableContext) =>
-    dispatch(actions.actuals.requestAction(null, c)),
   createSaga: (table: Table.TableInstance<R, M>) => sagas.actuals.createTableSaga(table),
   selector: redux.selectors.simpleDeepEqualSelector((state: Application.AuthenticatedStore) => state.budget.actuals),
   footerRowSelectors: {
@@ -64,6 +62,10 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
   const contacts = useSelector(selectors.selectContacts);
   const table = tabling.hooks.useTable<R, M>();
   const actualTypes = useSelector(selectActualTypes);
+
+  useEffect(() => {
+    dispatch(actions.actuals.requestAction(null, { budgetId }));
+  }, [budgetId]);
 
   const onContactCreated = useMemo(
     () => (m: Model.Contact, params?: CreateContactParams) => {

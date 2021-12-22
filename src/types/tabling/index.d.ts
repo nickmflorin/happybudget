@@ -737,8 +737,6 @@ declare namespace Table {
     readonly asyncId?: AsyncId;
     readonly actions: Omit<A, "request">;
     readonly footerRowSelectors?: Partial<FooterGridSet<RowDataSelector<R>>>;
-    readonly onSagaConnected: (dispatch: import("redux").Dispatch, context: C) => void;
-    readonly onSagaReconnected?: (dispatch: import("redux").Dispatch, context: C) => void;
     readonly selector?: (state: Application.Store) => S;
     readonly reducer?: Redux.Reducer<S>;
     readonly createSaga?: (t: TableInstance<R, M>) => import("redux-saga").Saga;
