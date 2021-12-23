@@ -521,6 +521,7 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
                     key={index}
                     menuId={menuId}
                     model={item.extra}
+                    onClick={item.extra.onClick}
                     focused={menuState.focusedIndex === index + availableModelItems.length}
                   />
                 );
