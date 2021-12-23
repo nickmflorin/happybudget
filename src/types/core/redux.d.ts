@@ -259,7 +259,7 @@ declare namespace Redux {
     M extends Model.RowHttpModel = Model.RowHttpModel,
     C extends Table.Context = Table.Context
   > = {
-    readonly request: ContextTask<TableRequestPayload, C>;
+    readonly request?: ContextTask<TableRequestPayload, C>;
     readonly handleChangeEvent: TableEventTask<Table.ChangeEvent<R, M>, R, M, C>;
   };
 

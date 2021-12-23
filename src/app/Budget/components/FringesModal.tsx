@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { isNil } from "lodash";
 
 import { FringesTable, connectTableToStore } from "tabling";
@@ -33,12 +31,6 @@ interface FringesModalProps extends Pick<ModalProps, "open" | "onCancel"> {
 }
 
 const FringesModal: React.FC<FringesModalProps> = ({ id, budget, budgetId, open, onCancel }) => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(actions.requestFringesAction(null, { id, budgetId }));
-  }, [budgetId]);
-
   return (
     <GenericFringesModal open={open} onCancel={onCancel}>
       <ConnectedFringesTable

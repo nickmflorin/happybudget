@@ -28,6 +28,30 @@ declare namespace Table {
 
   type ClassNameParamCallback<T> = (params: T) => ClassName<T>;
 
+  // Copied directly from AG Grid Documentation and more strictly typed.
+  interface AgEditorRef<V extends Table.RawRowValue> {
+    // Should return the final value to the grid, the result of the editing
+    getValue(): V;
+    /* Gets called once after initialised.
+       If you return true, the editor will appear in a popup */
+    isPopup?(): boolean;
+    /* Gets called once, only if isPopup() returns true. Return "over" if the
+       popup should cover the cell, or "under" if it should be positioned below
+       leaving the cell value visible. If this method is not present, the
+       default is "over" */
+    getPopupPosition?(): string;
+    /* Gets called once before editing starts, to give editor a chance to
+       cancel the editing before it even starts. */
+    isCancelBeforeStart?(): boolean;
+    /* Gets called once when editing is finished (eg if Enter is pressed).
+       If you return true, then the result of the edit will be ignored. */
+    isCancelAfterEnd?(): boolean;
+    // If doing full row edit, then gets called when tabbing into the cell.
+    focusIn?(): boolean;
+    // If doing full row edit, then gets called when tabbing out of the cell.
+    focusOut?(): boolean;
+  }
+
   /* ------------------------- Framework ------------------------------------ */
   type GridApi = import("@ag-grid-community/core").GridApi;
   type ColumnApi = import("@ag-grid-community/core").ColumnApi;

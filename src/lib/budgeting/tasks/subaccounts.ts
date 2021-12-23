@@ -60,6 +60,7 @@ export type SubAccountsTableActionMap = Redux.TableActionMap<C, Tables.SubAccoun
   readonly loadingBudget: Redux.ActionCreator<boolean>;
   readonly responseSubAccountUnits: Redux.ActionCreator<Http.ListResponse<Model.Tag>>;
   readonly responseFringes: Redux.ActionCreator<Http.TableResponse<Model.Fringe>>;
+  readonly responseFringeColors: Redux.ActionCreator<Http.ListResponse<string>>;
 };
 
 export type AuthenticatedSubAccountsTableActionMap<
@@ -71,6 +72,7 @@ export type AuthenticatedSubAccountsTableActionMap<
   readonly updateParentInState: Redux.ActionCreator<Redux.UpdateActionPayload<M>>;
   readonly responseSubAccountUnits: Redux.ActionCreator<Http.ListResponse<Model.Tag>>;
   readonly responseFringes: Redux.ActionCreator<Http.TableResponse<Model.Fringe>>;
+  readonly responseFringeColors: Redux.ActionCreator<Http.ListResponse<string>>;
 };
 
 export type SubAccountsTableTaskConfig = Table.TaskConfig<
@@ -109,6 +111,17 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       config.table.notify({ message: "There was an error retrieving the table data.", level: "error" });
       notifications.requestError(exports as Error);
       yield put(config.actions.responseFringes({ models: [] }));
+    }
+  }
+
+  function* requestFringesColors(): SagaIterator {
+    try {
+      const response = yield api.request(api.getFringeColors);
+      yield put(config.actions.responseFringeColors(response));
+    } catch (e: unknown) {
+      config.table.notify({ message: "There was an error retrieving the table data.", level: "error" });
+      notifications.requestError(exports as Error);
+      yield put(config.actions.responseFringeColors({ data: [], count: 0 }));
     }
   }
 
@@ -159,6 +172,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         yield fork(contactsTasks.request, action as Redux.Action);
         yield fork(requestSubAccountUnits);
         yield fork(requestFringes, action.context.budgetId);
+        yield fork(requestFringesColors);
         const [models, groups, markups]: [
           Http.ListResponse<C>,
           Http.ListResponse<Model.Group>,

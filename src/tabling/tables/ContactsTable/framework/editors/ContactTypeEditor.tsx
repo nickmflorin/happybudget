@@ -13,8 +13,7 @@ const ContactTypeEditor = (
     >,
     "models" | "searchIndices"
   >,
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  ref: ForwardedRef<any>
+  ref: ForwardedRef<Table.AgEditorRef<Model.ContactType>>
 ) => {
   return (
     <ChoiceSelectEditor<Model.ContactType, Tables.ContactRowData, Model.Contact, Tables.ContactTableStore>

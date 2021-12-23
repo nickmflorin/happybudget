@@ -1,5 +1,5 @@
 import { SagaIterator } from "redux-saga";
-import { put, call, fork, select, all } from "redux-saga/effects";
+import { put, fork, select } from "redux-saga/effects";
 import { map, filter, intersection, reduce } from "lodash";
 import { createSelector } from "reselect";
 
@@ -91,39 +91,6 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       return initialSubAccountsTableState;
     }
   );
-
-  function* requestFringes(objId: number): SagaIterator {
-    const response: Http.ListResponse<M> = yield api.request(config.services.request, objId, {});
-    if (response.data.length === 0) {
-      // If there is no table data, we want to default create two rows.
-      const createResponse: Http.BulkResponse<B, M> = yield api.request(config.services.bulkCreate, objId, {
-        data: [{}, {}]
-      });
-      yield put(config.actions.response({ models: createResponse.children }));
-    } else {
-      yield put(config.actions.response({ models: response.data }));
-    }
-  }
-
-  function* requestFringeColors(): SagaIterator {
-    const response = yield api.request(api.getFringeColors);
-    yield put(config.actions.responseFringeColors(response));
-  }
-
-  function* request(
-    action: Redux.ActionWithContext<Redux.TableRequestPayload, Tables.FringeTableContext>
-  ): SagaIterator {
-    yield put(config.actions.loading(true));
-    try {
-      yield all([call(requestFringes, action.context.budgetId), call(requestFringeColors)]);
-    } catch (e: unknown) {
-      config.table.notify({ message: "There was an error retrieving the table data.", level: "error" });
-      notifications.requestError(e as Error);
-      yield put(config.actions.response({ models: [] }));
-    } finally {
-      yield put(config.actions.loading(false));
-    }
-  }
 
   const bulkCreateTask: Redux.TableBulkCreateTask<R, [number]> = tabling.tasks.createBulkTask<
     R,
@@ -312,7 +279,6 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   }
 
   return {
-    request,
     handleChangeEvent: tabling.tasks.createChangeEventHandler({
       rowAdd: handleRowAddEvent,
       rowDelete: handleRowDeleteEvent,

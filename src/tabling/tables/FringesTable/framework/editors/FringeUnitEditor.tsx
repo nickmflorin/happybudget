@@ -14,8 +14,7 @@ const FringeUnitEditor = (
     >,
     "models" | "searchIndices"
   >,
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  ref: ForwardedRef<any>
+  ref: ForwardedRef<Table.AgEditorRef<Model.FringeUnit>>
 ) => {
   return (
     <ChoiceSelectEditor<Model.FringeUnit, Tables.FringeRowData, Model.Fringe, Tables.FringeTableStore>

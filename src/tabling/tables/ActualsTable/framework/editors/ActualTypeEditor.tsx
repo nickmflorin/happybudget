@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, ForwardedRef } from "react";
 import { useSelector } from "react-redux";
 
 import { framework } from "tabling/generic";
@@ -9,8 +9,7 @@ const ActualTypeEditor = (
     framework.editors.ModelSelectEditorProps<Model.Tag, Tables.ActualRowData, Model.Actual, Tables.ActualTableStore>,
     "models" | "searchIndices"
   >,
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  ref: any
+  ref: ForwardedRef<Table.AgEditorRef<Model.Tag>>
 ) => {
   const types = useSelector((state: Application.Store) => props.selector(state).types);
   return (

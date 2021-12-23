@@ -15,8 +15,10 @@ interface ActualOwnerEditorProps
   readonly setSearch: (value: string) => void;
 }
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-const ActualOwnerEditor = ({ setSearch, ...props }: ActualOwnerEditorProps, ref: ForwardedRef<any>) => {
+const ActualOwnerEditor = (
+  { setSearch, ...props }: ActualOwnerEditorProps,
+  ref: ForwardedRef<Table.AgEditorRef<Model.SimpleSubAccount | Model.SimpleMarkup | null>>
+) => {
   const owners = useSelector((state: Application.AuthenticatedStore) => props.selector(state).owners.data);
   const search = useSelector((state: Application.AuthenticatedStore) => props.selector(state).owners.search);
   const loading = useSelector((state: Application.AuthenticatedStore) => props.selector(state).owners.loading);

@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState, useEffect } from "react";
+import { forwardRef, useImperativeHandle, useState, useEffect, ForwardedRef } from "react";
 import { useSelector } from "react-redux";
 
 import { ColorGrid } from "components/tagging";
@@ -12,8 +12,7 @@ interface FringesColorEditorProps
   value: string | null;
 }
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-const FringesColorEditor = (props: FringesColorEditorProps, ref: any) => {
+const FringesColorEditor = (props: FringesColorEditorProps, ref: ForwardedRef<Table.AgEditorRef<string | null>>) => {
   const isFirstRender = ui.hooks.useTrackFirstRender();
   const [value, setValue] = useState<string | null>(props.value);
   const colors = useSelector((state: Application.AuthenticatedStore) => props.selector(state).fringeColors);

@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, ForwardedRef } from "react";
 import { useSelector } from "react-redux";
 import { isNil } from "lodash";
 
@@ -15,8 +15,7 @@ const SubAccountUnitEditor = (
     >,
     "models" | "searchIndices"
   >,
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  ref: any
+  ref: ForwardedRef<Table.AgEditorRef<Model.Tag>>
 ) => {
   const units = useSelector((state: Application.Store) => props.selector(state).subaccountUnits);
   const row: Table.DataRow<Tables.SubAccountRowData> = props.node.data;

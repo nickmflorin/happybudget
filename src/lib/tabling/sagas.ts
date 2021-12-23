@@ -14,7 +14,7 @@ export const createTableSaga = <
 ): Saga => {
   function* requestSaga(): SagaIterator {
     let lastTasks;
-    if (!isNil(config.actions.request)) {
+    if (!isNil(config.actions.request) && !isNil(config.tasks.request)) {
       while (true) {
         const action = yield take(config.actions.request.toString());
         if (lastTasks) {
