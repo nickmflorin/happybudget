@@ -155,7 +155,7 @@ export const parseBaseColumn = <R extends Table.RowData, M extends Model.RowHttp
 ): Table.BaseColumn => {
   if (typeguards.isFakeColumn<R, M>(column)) {
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-    const { cType, getRowValue, nullValue, ...agColumn } = column;
+    const { cType, getRowValue, nullValue, isApplicable, ...agColumn } = column;
     return agColumn;
   } else if (typeguards.isActionColumn<R, M>(column)) {
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
@@ -187,6 +187,7 @@ export const parseBaseColumn = <R extends Table.RowData, M extends Model.RowHttp
       pdfHeaderCellProps,
       pdfCellProps,
       pdfFlexGrow,
+      isApplicable,
       pdfValueGetter,
       pdfChildFooter,
       pdfCellRenderer,
@@ -216,6 +217,7 @@ export const parseBaseColumn = <R extends Table.RowData, M extends Model.RowHttp
       isRead,
       cType,
       nullValue,
+      isApplicable,
       smartInference,
       defaultNewRowValue,
       defaultHidden,

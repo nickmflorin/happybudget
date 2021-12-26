@@ -48,7 +48,7 @@ const AuthenticatedTemplateSubAccountsTable = (
     <AuthenticatedBudgetTable<R, M>
       {...props}
       table={table}
-      excludeColumns={["actual", "contact", "variance", "attachment"]}
+      excludeColumns={["actual", "contact", "variance", "attachments"]}
       columns={columns}
       actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
         {

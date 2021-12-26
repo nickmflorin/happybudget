@@ -45,7 +45,7 @@ export const useAttachments = <
     ) as Table.ModelRow<R>[];
     const attachments = reduce(
       modelRows,
-      (curr: Model.SimpleAttachment[], r: Table.ModelRow<R>) => uniq([...curr, ...r.data.attachments]),
+      (curr: Model.SimpleAttachment[], r: Table.ModelRow<R>) => uniq([...curr, ...(r.data.attachments || [])]),
       []
     );
     return models.getModelsByIds<Model.SimpleAttachment>(attachments, models.parseIdsFromDeliminatedString(value), {

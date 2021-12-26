@@ -216,6 +216,7 @@ declare namespace Model {
 
   type Account = AbstractAccount &
     RowHttpModel<"account"> & {
+      readonly domain: BudgetDomain;
       readonly children: number[];
       readonly siblings?: SimpleAccount[]; // Only included for detail endpoints.
       readonly ancestors?: [SimpleBudget | SimpleTemplate]; // Only included for detail endpoints.
@@ -236,16 +237,19 @@ declare namespace Model {
       readonly rate: number | null;
       readonly multiplier: number | null;
       readonly unit: Tag | null;
-      readonly contact?: number | null; // Will be undefined for Template SubAccount(s).
+      // Only applicable for non-Template cases.
+      readonly contact?: number | null;
     };
 
   type SubAccount = AbstractSubAccount &
     RowHttpModel<"subaccount"> & {
+      readonly domain: BudgetDomain;
       readonly children: number[];
       readonly object_id: number;
       readonly parent_type: "account" | "subaccount";
       readonly fringes: number[];
-      readonly attachments: SimpleAttachment[];
+      // Only applicable for non-Template cases.
+      readonly attachments?: SimpleAttachment[];
       readonly siblings?: SimpleSubAccount[]; // Only included for detail endpoints.
       /* eslint-disable-next-line max-len */
       readonly ancestors?: [SimpleBudget | SimpleTemplate, SimpleAccount, ...Array<SimpleSubAccount>]; // Only included for detail endpoints.

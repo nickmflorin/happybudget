@@ -226,6 +226,9 @@ export class ModelRowManager<
     C extends Table.ModelColumn<R, M, V>
     // The optional `getRowValue` callback is only used for PDF cases.
   >(col: C, m: M, getRowValue?: GetRowValue<R, M, V>): [V | undefined, boolean] {
+    if (col.isApplicable?.(m) === false) {
+      return [undefined, false];
+    }
     if (!isNil(getRowValue) && typeguards.isDataColumn<R, M>(col)) {
       return [
         getRowValue(m, col, (colr: Table.DataColumn<R, M>, mr: M) => this.getValueForRow<V, C>(colr as C, mr)[0]),

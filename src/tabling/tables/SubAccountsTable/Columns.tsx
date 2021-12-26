@@ -67,7 +67,8 @@ const Columns: Table.Column<R, M>[] = [
   columns.AttachmentsColumn({
     field: "attachments",
     defaultHidden: true,
-    includeInPdf: false
+    includeInPdf: false,
+    isApplicable: (m: Model.SubAccount) => m.domain === "budget"
   }),
   columns.SelectColumn({
     field: "contact",
@@ -79,7 +80,8 @@ const Columns: Table.Column<R, M>[] = [
     index: 2,
     width: 120,
     pdfWidth: 0.12,
-    requiresAuthentication: true
+    requiresAuthentication: true,
+    isApplicable: (m: Model.SubAccount) => m.domain === "budget"
   }),
   columns.BodyColumn<R, M, number | null>({
     field: "quantity",
@@ -157,7 +159,8 @@ const Columns: Table.Column<R, M>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfValueGetter: budgeting.valueGetters.actualValueGetter,
-    pdfWidth: 0.12
+    pdfWidth: 0.12,
+    isApplicable: (m: Model.SubAccount) => m.domain === "budget"
   }),
   columns.VarianceColumn<R, M>({
     field: "variance",
@@ -165,7 +168,8 @@ const Columns: Table.Column<R, M>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
     pdfValueGetter: budgeting.valueGetters.varianceValueGetter,
-    pdfWidth: 0.12
+    pdfWidth: 0.12,
+    isApplicable: (m: Model.SubAccount) => m.domain === "budget"
   }),
   columns.FakeColumn({ field: "nominal_value", nullValue: 0.0 }),
   columns.FakeColumn({ field: "markup_contribution", nullValue: 0.0 }),

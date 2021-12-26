@@ -170,8 +170,8 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
                             /* The row managers should prevent this, but you never
 															 know. */
                             console.error(
-                              `Undefined value for row ${row.id} (type = ${row.rowType})
-															encountered for field ${col.markupField}!`
+                              `Undefined value for row ${row.id} (type = ${row.rowType})` +
+                                `encountered for field ${col.markupField}!`
                             );
                             return col.nullValue;
                           }
@@ -185,8 +185,8 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
                             /* The row managers should prevent this, but you never
 															 know. */
                             console.error(
-                              `Undefined value for row ${row.id} (type = ${row.rowType})
-															encountered for field ${col.groupField}!`
+                              `Undefined value for row ${row.id} (type = ${row.rowType}) ` +
+                                `encountered for field ${col.groupField}!`
                             );
                             return col.nullValue;
                           }
@@ -199,8 +199,8 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
                           /* The row managers should prevent this, but you never
 														 know. */
                           console.error(
-                            `Undefined value for row ${row.id} (type = ${row.rowType})
-														encountered for field ${col.field}!`
+                            `Undefined value for row ${row.id} (type = ${row.rowType}) ` +
+                              `encountered for field ${col.field}!`
                           );
                           return col.nullValue;
                         }

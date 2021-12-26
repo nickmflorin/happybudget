@@ -486,6 +486,10 @@ declare namespace Table {
     readonly field: string;
     readonly nullValue: V;
     readonly getRowValue?: (m: M) => V;
+    /* Callback to indicate whether or not the column is applicable for a given
+       model.  If the column is not applicable, a warning will not be issued
+       if the column's field cannot be obtained from the model. */
+    readonly isApplicable?: (m: M) => boolean;
   };
 
   type PartialFakeColumn<
@@ -543,6 +547,10 @@ declare namespace Table {
     readonly requiresAuthentication?: boolean;
     readonly defaultNewRowValue?: boolean;
     readonly includeInPdf?: boolean;
+    /* Callback to indicate whether or not the column is applicable for a given
+       model.  If the column is not applicable, a warning will not be issued
+       if the column's field cannot be obtained from the model. */
+    readonly isApplicable?: (m: M) => boolean;
     readonly valueGetter?: (row: BodyRow<R>, rows: BodyRow<R>[]) => V;
     readonly getRowValue?: (m: M) => V;
     readonly getHttpValue?: (value: V) => Http.RawPayloadValue;

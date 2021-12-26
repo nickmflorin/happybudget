@@ -126,7 +126,7 @@ const SubAccountsTable = ({
               id: row.id,
               data: {
                 attachments: [
-                  ...row.data.attachments,
+                  ...(row.data.attachments || []),
                   { id: attachment.id, name: attachment.name, extension: attachment.extension, url: attachment.url }
                 ]
               }
