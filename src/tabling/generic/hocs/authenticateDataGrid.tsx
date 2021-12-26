@@ -447,11 +447,15 @@ const authenticateDataGrid =
       });
 
       const columns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
-        return tabling.columns.normalizeColumns(partialColumns, {
-          body: (col: Table.BodyColumn<R, M>) => ({
-            cellEditorParams: { ...col.cellEditorParams, onDoneEditing }
-          })
-        });
+        return tabling.columns.normalizeColumns(
+          partialColumns,
+          {},
+          {
+            body: (col: Table.BodyColumn<R, M>) => ({
+              cellEditorParams: { ...col.cellEditorParams, onDoneEditing }
+            })
+          }
+        );
       }, [hooks.useDeepEqualMemo(partialColumns)]);
 
       const [getContextMenuItems] = useContextMenu<R, M>(props);
