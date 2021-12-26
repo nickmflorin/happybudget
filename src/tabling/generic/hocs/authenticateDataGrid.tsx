@@ -350,13 +350,16 @@ const authenticateDataGrid =
       }, [hooks.useDeepEqualMemo(props.columns), props.apis]);
 
       const partialColumns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
-        return tabling.columns.normalizeColumns(unsuppressedColumns, {
-          body: (col: Table.BodyColumn<R, M>) => ({
-            suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
-              if (!isNil(col.suppressKeyboardEvent) && col.suppressKeyboardEvent(params) === true) {
-                return true;
-              } else if (params.editing && includes(["Tab"], params.event.code)) {
-                /*
+        return tabling.columns.normalizeColumns(
+          unsuppressedColumns,
+          {},
+          {
+            body: (col: Table.BodyColumn<R, M>) => ({
+              suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
+                if (!isNil(col.suppressKeyboardEvent) && col.suppressKeyboardEvent(params) === true) {
+                  return true;
+                } else if (params.editing && includes(["Tab"], params.event.code)) {
+                  /*
                 Our custom cell editors have built in functionality that when
 								editing is terminated via a TAB key, we move one cell to the
 								right without continuing in edit mode.  This however does not
@@ -364,57 +367,60 @@ const authenticateDataGrid =
 								controlling the edit behavior.  So we need to suppress the TAB
 								behavior when editing, and manually move the cell over.
                 */
-                return true;
-              } else if (!params.editing && includes(["Backspace", "Delete"], params.event.code)) {
-                /* Suppress Backspace/Delete events when multiple cells are
-                   selected in a range. */
-                const ranges = params.api.getCellRanges();
-                if (
-                  !isNil(ranges) &&
-                  ranges.length !== 0 &&
-                  (ranges.length !== 1 || !tabling.aggrid.rangeSelectionIsSingleCell(ranges[0]))
-                ) {
-                  const changes: Table.SoloCellChange<R>[] = flatten(
-                    map(ranges, (rng: CellRange) => getTableChangesFromRangeClear(params.api, unsuppressedColumns, rng))
-                  );
-                  if (changes.length !== 0) {
-                    props.onChangeEvent({
-                      type: "dataChange",
-                      payload: tabling.events.consolidateCellChanges(changes)
-                    });
-                  }
                   return true;
-                } else {
-                  /*
+                } else if (!params.editing && includes(["Backspace", "Delete"], params.event.code)) {
+                  /* Suppress Backspace/Delete events when multiple cells are
+                   selected in a range. */
+                  const ranges = params.api.getCellRanges();
+                  if (
+                    !isNil(ranges) &&
+                    ranges.length !== 0 &&
+                    (ranges.length !== 1 || !tabling.aggrid.rangeSelectionIsSingleCell(ranges[0]))
+                  ) {
+                    const changes: Table.SoloCellChange<R>[] = flatten(
+                      map(ranges, (rng: CellRange) =>
+                        getTableChangesFromRangeClear(params.api, unsuppressedColumns, rng)
+                      )
+                    );
+                    if (changes.length !== 0) {
+                      props.onChangeEvent({
+                        type: "dataChange",
+                        payload: tabling.events.consolidateCellChanges(changes)
+                      });
+                    }
+                    return true;
+                  } else {
+                    /*
                   For custom Cell Editor(s) with a Pop-Up, we do not want
 									Backspace/Delete to go into edit mode but instead want to clear
 									the values of the cells - so we prevent those key presses from
 									triggering edit mode in the Cell Editor and clear the value at
 									this level.
                   */
-                  const row: Table.BodyRow<R> = params.node.data;
-                  if (tabling.typeguards.isEditableRow(row) && col.cellEditorPopup === true) {
-                    const change = getCellChangeForClear(row, col);
-                    if (!isNil(change)) {
-                      props.onChangeEvent({
-                        type: "dataChange",
-                        payload: tabling.events.cellChangeToRowChange(change)
-                      });
+                    const row: Table.BodyRow<R> = params.node.data;
+                    if (tabling.typeguards.isEditableRow(row) && col.cellEditorPopup === true) {
+                      const change = getCellChangeForClear(row, col);
+                      if (!isNil(change)) {
+                        props.onChangeEvent({
+                          type: "dataChange",
+                          payload: tabling.events.cellChangeToRowChange(change)
+                        });
+                      }
+                      return true;
                     }
-                    return true;
+                    return false;
                   }
-                  return false;
+                } else if (
+                  (params.event.key === "ArrowDown" || params.event.key === "ArrowUp") &&
+                  (params.event.ctrlKey || params.event.metaKey)
+                ) {
+                  return true;
                 }
-              } else if (
-                (params.event.key === "ArrowDown" || params.event.key === "ArrowUp") &&
-                (params.event.ctrlKey || params.event.metaKey)
-              ) {
-                return true;
+                return false;
               }
-              return false;
-            }
-          })
-        });
+            })
+          }
+        );
       }, [hooks.useDeepEqualMemo(unsuppressedColumns)]);
 
       const [navigateToNextCell, tabToNextCell, moveToNextColumn, moveToNextRow] = useCellNavigation<R, M>({
