@@ -13,6 +13,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
   columns.FakeColumn({ field: "image", nullValue: null }),
   columns.BodyColumn<R, M, string | null>({
     field: "names_and_image",
+    isRead: false,
     nullValue: null,
     headerName: "Name",
     dataType: "text",
