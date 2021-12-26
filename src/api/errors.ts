@@ -3,7 +3,6 @@ import { isNil, map } from "lodash";
 import * as codes from "./codes";
 import * as util from "./util";
 
-/* eslint-disable no-shadow */
 export enum HttpErrorTypes {
   CLIENT = "CLIENT",
   NETWORK = "NETWORK",

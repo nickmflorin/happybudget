@@ -62,6 +62,7 @@ const Budgets = (): JSX.Element => {
         contentScrollable={true}
         subMenu={[
           <Input
+            key={0}
             placeholder={"Search Projects..."}
             value={search}
             allowClear={true}
@@ -70,7 +71,7 @@ const Budgets = (): JSX.Element => {
               dispatch(actions.setBudgetsSearchAction(event.target.value, {}))
             }
           />,
-          <BudgetDropdown onNewBudget={() => setCreateBudgetModalOpen(true)}>
+          <BudgetDropdown onNewBudget={() => setCreateBudgetModalOpen(true)} key={1}>
             <PrimaryButtonIconToggle
               breakpoint={"medium"}
               icon={<Icon icon={"plus"} weight={"light"} />}
@@ -78,6 +79,7 @@ const Budgets = (): JSX.Element => {
             />
           </BudgetDropdown>,
           <OrderingDropdown
+            key={2}
             ordering={ordering}
             onChange={(field: string, order: Http.Order) =>
               dispatch(actions.updateBudgetsOrderingAction({ field, order }))
@@ -89,6 +91,7 @@ const Budgets = (): JSX.Element => {
             ]}
           >
             <DefaultButtonIconToggle
+              key={3}
               breakpoint={"medium"}
               icon={<Icon icon={"bars-filter"} weight={"light"} />}
               text={"Order By"}

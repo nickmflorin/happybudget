@@ -32,6 +32,7 @@ const ActualsTable = ({ columns, data, options }: ActualsTableProps): JSX.Elemen
             return [
               ...rws,
               <BodyRow<R, M>
+                key={`row-${row.id}`}
                 columnIsVisible={columnIsVisible}
                 columns={filter(columns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
                 row={row}
@@ -43,12 +44,14 @@ const ActualsTable = ({ columns, data, options }: ActualsTableProps): JSX.Elemen
         },
         [
           <HeaderRow<R, M>
+            key={"header-row"}
             columnIsVisible={columnIsVisible}
             columns={filter(columns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
           />
         ]
       ),
       <FooterRow<R, M>
+        key={"footer-row"}
         columnIsVisible={columnIsVisible}
         columns={filter(columns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
         data={rowData}

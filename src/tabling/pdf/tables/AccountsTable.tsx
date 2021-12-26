@@ -34,6 +34,7 @@ const AccountsTable = ({ columns, markups, data, groups, options }: AccountsTabl
             return [
               ...rws,
               <BodyRow<R, M>
+                key={`row-${row.id}`}
                 columnIsVisible={accountColumnIsVisible}
                 columns={filter(columns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
                 row={row}
@@ -44,6 +45,7 @@ const AccountsTable = ({ columns, markups, data, groups, options }: AccountsTabl
             return [
               ...rws,
               <GroupRow<R, M>
+                key={`group-row-${row.id}`}
                 row={row}
                 columnIsVisible={accountColumnIsVisible}
                 columns={filter(columns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
@@ -55,12 +57,14 @@ const AccountsTable = ({ columns, markups, data, groups, options }: AccountsTabl
         },
         [
           <HeaderRow<R, M>
+            key={"header-row"}
             columnIsVisible={accountColumnIsVisible}
             columns={filter(columns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
           />
         ]
       ),
       <FooterRow<R, M>
+        key={"footer-row"}
         columnIsVisible={accountColumnIsVisible}
         columns={filter(columns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
         data={rowData}

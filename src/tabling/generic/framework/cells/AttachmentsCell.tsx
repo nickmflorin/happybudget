@@ -105,7 +105,6 @@ const AttachmentsCell = <
           api.xhr.uploadAttachmentFile(e.dataTransfer.files, props.uploadAttachmentsPath(row.id), {
             error,
             progress: (computable: boolean, percent: number, total: number) => progressUpdate(percent, total),
-            /* eslint-disable-next-line no-loop-func */
             success: (ms: Model.Attachment[]) => map(ms, (m: Model.Attachment) => props.onAttachmentAdded(row, m))
           });
         }

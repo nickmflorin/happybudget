@@ -1,3 +1,5 @@
+import React from "react";
+
 /* eslint-disable max-len */
 const NotFoundPageIcon = (): JSX.Element => {
   return (
@@ -19,8 +21,8 @@ const NotFoundPageIcon = (): JSX.Element => {
             transform={"translate(-318.929 -285.446)"}
             fill={"none"}
             stroke={"#000"}
-            stroke-miterlimit={"10"}
-            stroke-width={"16"}
+            strokeMiterlimit={"10"}
+            strokeWidth={"16"}
           />
         </g>
         <g transform={"translate(391.492 352.46)"}>
@@ -641,10 +643,10 @@ const NotFoundPageIcon = (): JSX.Element => {
         <text
           transform={"translate(200 360.096)"}
           fill={"#404152"}
-          font-size={"125"}
-          font-family={"AvenirNext-Bold, Avenir Next"}
-          font-weight={"700"}
-          letter-spacing={"-0.05em"}
+          fontSize={"125"}
+          fontFamily={"AvenirNext-Bold, Avenir Next"}
+          fontWeight={"700"}
+          letterSpacing={"-0.05em"}
         >
           <tspan x={"-114.875"} y={"0"}>
             {"404"}

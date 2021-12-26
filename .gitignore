@@ -1,10 +1,5 @@
 # Dependencies
 /node_modules
-/.pnp
-.pnp.js
-
-# Testing
-/coverage
 
 # Production
 /build
@@ -31,7 +26,3 @@ yarn-error.log*
 .idea/
 *.iml
 .project
-tsconfig.tsbuildinfo
-
-# Configuration
-config.local.*

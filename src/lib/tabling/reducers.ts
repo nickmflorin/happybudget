@@ -191,7 +191,6 @@ export const createTableChangeEventReducer = <
       } = {};
       for (let i = 0; i < consolidated.length; i++) {
         if (isNil(changesPerRow[consolidated[i].id])) {
-          /* eslint-disable no-loop-func */
           const r: Table.EditableRow<R> | null = redux.reducers.findModelInData<Table.EditableRow<R>>(
             action,
             filter(state.data, (ri: Table.BodyRow<R>) => typeguards.isEditableRow(ri)) as Table.EditableRow<R>[],

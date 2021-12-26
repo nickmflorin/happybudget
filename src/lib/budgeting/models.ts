@@ -2,7 +2,6 @@ import { isNil } from "lodash";
 import { util, tabling } from "lib";
 import { Colors } from "style/constants";
 
-/* eslint-disable no-shadow */
 export enum FringeUnitNames {
   PERCENT = "Percent",
   FLAT = "Flat"
@@ -15,7 +14,6 @@ export const FringeUnitModels: { [key in "PERCENT" | "FLAT"]: Model.FringeUnit }
 
 export const FringeUnits = Object.values(FringeUnitModels);
 
-/* eslint-disable no-shadow */
 export enum MarkupUnitNames {
   PERCENT = "Percent",
   FLAT = "Flat"

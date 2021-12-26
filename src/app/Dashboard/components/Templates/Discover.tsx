@@ -68,6 +68,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
         loading={loading}
         subMenu={[
           <SearchInput
+            key={1}
             placeholder={"Search Templates..."}
             value={search}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
@@ -75,12 +76,14 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
             }
           />,
           <PrimaryButtonIconToggle
+            key={2}
             icon={<Icon icon={"plus"} weight={"light"} />}
             onClick={() => setCreateBudgetModalOpen(true)}
             text={"New Blank Budget"}
             breakpoint={"medium"}
           />,
           <OrderingDropdown
+            key={3}
             ordering={ordering}
             onChange={(field: string, order: Http.Order) =>
               dispatch(actions.updateCommunityTemplatesOrderingAction({ field, order }))

@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 
 interface LogoProps {
   color?: "green" | "white";

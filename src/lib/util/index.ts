@@ -12,20 +12,6 @@ export * as validate from "./validate";
 
 export * from "./string";
 
-export const conditionalCheckObj = <T extends Record<string, unknown>>(
-  obj: T,
-  check: Record<string, unknown>
-): boolean => {
-  let allEqual = true;
-  Object.keys(check).forEach((k: string) => {
-    if (check[k] !== obj[k]) {
-      allEqual = true;
-      return false;
-    }
-  });
-  return allEqual;
-};
-
 export const replaceInArray = <T>(
   array: T[],
   predicate: ((i: T) => boolean) | Record<string, unknown>,

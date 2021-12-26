@@ -91,7 +91,6 @@ const useHiddenColumns = <R extends Table.RowData, M extends Model.RowHttpModel 
 
         const cs: Table.AgColumn[] | null = api.column.getAllColumns();
         if (!isNil(cs)) {
-          /* eslint-disable no-loop-func */
           const c: Table.AgColumn | undefined = find(cs, (ci: Table.AgColumn) => ci.getColId() === field);
           if (!isNil(c) && c.isVisible() === hidden) {
             params.apis.columnMap((a: Table.ColumnApi) => a.setColumnVisible(field as string, !hidden));

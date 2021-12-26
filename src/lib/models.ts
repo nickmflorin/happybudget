@@ -1,7 +1,5 @@
 import { find, filter, isNil, forEach, reduce, map } from "lodash";
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-shadow */
 export enum ContactTypeNames {
   CONTRACTOR = "Contractor",
   EMPLOYEE = "Employee",
@@ -126,7 +124,7 @@ export const parseFirstAndLastName = (name: string): [string | null, string | nu
 };
 
 export const parseIdsFromDeliminatedString = (value: string, delimiter = ","): number[] => {
-  const split: string[] = value.split(",");
+  const split: string[] = value.split(delimiter);
   return reduce(
     split,
     (curr: number[], id: string) => {

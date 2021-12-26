@@ -8,7 +8,6 @@ import { util, notifications } from "lib";
 import * as codes from "./codes";
 import * as errors from "./errors";
 
-/* eslint-disable no-shadow */
 export enum HttpRequestMethods {
   GET = "GET",
   POST = "POST",
@@ -151,8 +150,8 @@ instance.interceptors.response.use(
 export class ApiClient {
   readonly instance: AxiosInstance;
 
-  constructor(instance: AxiosInstance) {
-    this.instance = instance;
+  constructor(ins: AxiosInstance) {
+    this.instance = ins;
   }
 
   _prepare_url = (

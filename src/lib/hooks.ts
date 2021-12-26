@@ -1,9 +1,7 @@
 import React, { useRef, useCallback, useEffect, useMemo } from "react";
 import { dequal as deepEqual } from "dequal";
 import { isEqual, isNil } from "lodash";
-
-/* eslint-disable-next-line @typescript-eslint/no-var-requires */
-const equal = require("fast-deep-equal/es6");
+import equal from "fast-deep-equal/es6";
 
 type UseEffectParams = Parameters<typeof useEffect>;
 type EffectCallback = UseEffectParams[0];

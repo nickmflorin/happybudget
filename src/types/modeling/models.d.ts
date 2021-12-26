@@ -1,5 +1,4 @@
 declare namespace Model {
-  /* eslint-disable no-shadow */
   type Model = {
     readonly id: ID;
   };

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { isNil, filter, reduce, find, includes } from "lodash";
 import classNames from "classnames";
 
@@ -130,6 +130,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                 return [
                   ...rws,
                   <BodyRow<R, M>
+                    key={`sub-${subAccountRow.id}`}
                     cellProps={{ className: "subaccount-td", textClassName: "subaccount-tr-td-text" }}
                     className={"subaccount-tr"}
                     columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
@@ -156,6 +157,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                       return [
                         ...subRws,
                         <BodyRow<R, M>
+                          key={`detail-${detailRow.id}`}
                           columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
                           columnIsVisible={subAccountColumnIsVisible}
                           className={"detail-tr"}
@@ -176,6 +178,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                       return [
                         ...subRws,
                         <GroupRow
+                          key={`detail-group-${detailRow.id}`}
                           className={"detail-group-tr"}
                           row={detailRow}
                           data={table}
@@ -196,6 +199,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                   },
                   [
                     <BodyRow
+                      key={`sub-h-${subAccountRow.id}`}
                       cellProps={{
                         className: "subaccount-td",
                         textClassName: "subaccount-tr-td-text",
@@ -214,6 +218,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                 subRows = [
                   ...subRows,
                   <BodyRow<R, M>
+                    key={`sub-footer-${footerRow.id}`}
                     className={"subaccount-footer-tr"}
                     cellProps={{ className: "subaccount-footer-td", textClassName: "subaccount-footer-tr-td-text" }}
                     columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
@@ -231,6 +236,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
             return [
               ...rws,
               <BodyRow<R, M>
+                key={`sub-header-${subAccountRow.id}`}
                 cellProps={{ className: "subaccount-td", textClassName: "subaccount-tr-td-text" }}
                 className={"subaccount-tr"}
                 columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
@@ -243,6 +249,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
             return [
               ...rws,
               <GroupRow<R, M>
+                key={`sub-group-${subAccountRow.id}`}
                 row={subAccountRow}
                 columnIsVisible={subAccountColumnIsVisible}
                 columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
@@ -253,11 +260,13 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
         },
         [
           <HeaderRow<R, M>
+            key={"account-header"}
             className={"account-header-tr"}
             columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
             columnIsVisible={subAccountColumnIsVisible}
           />,
           <BodyRow<AR, AM>
+            key={`account-sub-header-${accountSubHeaderRow.id}`}
             className={"account-sub-header-tr"}
             cellProps={{ textClassName: "account-sub-header-tr-td-text" }}
             columns={filter(accountSubAccountColumns, (c: AC) => tabling.typeguards.isDataColumn(c)) as ADC[]}
@@ -268,6 +277,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
         ]
       ),
       <FooterRow<R, M>
+        key={"table-footer"}
         columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
         columnIsVisible={subAccountColumnIsVisible}
         data={table}
