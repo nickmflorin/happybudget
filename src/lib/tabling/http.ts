@@ -16,7 +16,8 @@ export const patchPayload = <
     (p: P, col: Table.BodyColumn<R, M, Table.RawRowValue>) => {
       const cellChange: Table.CellChange<Table.InferV<typeof col>> | undefined =
         change.data[col.field as keyof RW["data"]];
-      // We might not be including data for all of the cells in the row.
+      /* The row change will usually not have changes specified for every
+         single columns - only the ones that have changed. */
       if (cellChange !== undefined) {
         const cellHttpValue = cellChange.newValue;
         if (!isNil(col.getHttpValue)) {

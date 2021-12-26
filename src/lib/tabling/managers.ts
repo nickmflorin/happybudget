@@ -36,7 +36,6 @@ abstract class RowManager<RW extends Table.Row<R>, R extends Table.RowData> {
     this.gridId = config.gridId;
   }
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   public createBasic(config: CreateRowConfig<RW, R>): Pick<RW, "id" | "rowType" | "gridId"> {
     return {
       id: config.id,
