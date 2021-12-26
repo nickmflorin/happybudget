@@ -9,7 +9,7 @@ import { AccountPage } from "app/Pages";
 import { actions } from "../../store";
 import SubAccountsTable from "./SubAccountsTable";
 
-const selectDetail = (state: Application.AuthenticatedStore) => state.budget.account.detail.data;
+const selectDetail = (state: Application.AuthenticatedStore) => state.template.account.detail.data;
 
 interface AccountProps {
   readonly budgetId: number;
