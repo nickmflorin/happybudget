@@ -164,53 +164,12 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
                 if (!isNil(params.node)) {
                   const row: Table.Row<R> = params.node.data;
                   if (tabling.typeguards.isBodyRow(row)) {
-                    if (isNil(col.valueGetter)) {
-                      if (tabling.typeguards.isMarkupRow(row)) {
-                        if (!isNil(col.markupField)) {
-                          if (row.data[col.markupField] === undefined) {
-                            /* The row managers should prevent this, but you never
-															 know. */
-                            console.error(
-                              `Undefined value for row ${row.id} (type = ${row.rowType})` +
-                                `encountered for field ${col.markupField}!`
-                            );
-                            return col.nullValue;
-                          }
-                          return row.data[col.markupField];
-                        } else {
-                          return col.nullValue;
-                        }
-                      } else if (tabling.typeguards.isGroupRow(row)) {
-                        if (!isNil(col.groupField)) {
-                          if (row.data[col.groupField] === undefined) {
-                            /* The row managers should prevent this, but you never
-															 know. */
-                            console.error(
-                              `Undefined value for row ${row.id} (type = ${row.rowType}) ` +
-                                `encountered for field ${col.groupField}!`
-                            );
-                            return col.nullValue;
-                          }
-                          return row.data[col.groupField];
-                        } else {
-                          return col.nullValue;
-                        }
-                      } else {
-                        if (row.data[col.field] === undefined) {
-                          /* The row managers should prevent this, but you never
-														 know. */
-                          console.error(
-                            `Undefined value for row ${row.id} (type = ${row.rowType}) ` +
-                              `encountered for field ${col.field}!`
-                          );
-                          return col.nullValue;
-                        }
-                        return row.data[col.field];
-                      }
-                    } else {
-                      const rows = tabling.aggrid.getRows<R, Table.BodyRow<R>>(params.api);
-                      return col.valueGetter(row, rows);
-                    }
+                    return tabling.columns.getColumnRowValue(
+                      col,
+                      row,
+                      tabling.aggrid.getRows<R, Table.BodyRow<R>>(params.api),
+                      "aggrid"
+                    );
                   }
                 }
                 return col.nullValue;

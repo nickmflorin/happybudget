@@ -194,11 +194,13 @@ declare namespace Model {
   };
 
   // Abstract -- not meant for external reference.
-  type AbstractAccount = Omit<SimpleAccount, "type"> & LineMetrics;
+  type AbstractAccount = Omit<SimpleAccount, "type"> &
+    LineMetrics & {
+      readonly domain: BudgetDomain;
+    };
 
   type Account = AbstractAccount &
     RowHttpModel<"account"> & {
-      readonly domain: BudgetDomain;
       readonly children: number[];
       readonly siblings?: SimpleAccount[]; // Only included for detail endpoints.
       readonly ancestors?: [SimpleBudget | SimpleTemplate]; // Only included for detail endpoints.
@@ -214,6 +216,7 @@ declare namespace Model {
   // Abstract -- not meant for external reference.
   type AbstractSubAccount = Omit<SimpleSubAccount, "type"> &
     LineMetrics & {
+      readonly domain: BudgetDomain;
       readonly fringe_contribution: number;
       readonly quantity: number | null;
       readonly rate: number | null;
@@ -225,7 +228,6 @@ declare namespace Model {
 
   type SubAccount = AbstractSubAccount &
     RowHttpModel<"subaccount"> & {
-      readonly domain: BudgetDomain;
       readonly children: number[];
       readonly object_id: number;
       readonly parent_type: "account" | "subaccount";

@@ -159,6 +159,9 @@ export class PlaceholderRowManager<
     col: C,
     data?: Partial<R>
   ): [V | undefined, boolean] {
+    if (col.isApplicableForRowType?.(this.rowType) === false) {
+      return [undefined, false];
+    }
     const value = this.defaultData === undefined ? undefined : (this.defaultData[col.field] as V | undefined);
     if (value === undefined) {
       if (data === undefined || data[col.field] === undefined) {
@@ -225,7 +228,7 @@ export class ModelRowManager<
     C extends Table.ModelColumn<R, M, V>
     // The optional `getRowValue` callback is only used for PDF cases.
   >(col: C, m: M, getRowValue?: GetRowValue<R, M, V>): [V | undefined, boolean] {
-    if (col.isApplicable?.(m) === false) {
+    if (col.isApplicableForModel?.(m) === false) {
       return [undefined, false];
     }
     if (!isNil(getRowValue) && typeguards.isDataColumn<R, M>(col)) {

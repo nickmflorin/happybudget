@@ -42,7 +42,9 @@ export const CalculatedColumn = <R extends Table.RowData, M extends Model.RowHtt
       }
       return tabling.aggrid.mergeClassNamesFn("cell--calculated", col?.cellClass)(params);
     },
-    valueFormatter: tabling.formatters.currencyValueFormatter
+    valueFormatter: tabling.formatters.currencyValueFormatter(v =>
+      console.error(`Could not parse currency value ${v} for field ${col.field}.`)
+    )
   };
 };
 

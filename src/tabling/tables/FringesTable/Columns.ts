@@ -59,17 +59,25 @@ const Columns: Table.Column<R, M>[] = [
           // The default Fringe Unit in the backend is PERCENT.
           const unit = row.data.unit === null ? budgeting.models.FringeUnitModels.PERCENT : row.data.unit;
           return unit.id === budgeting.models.FringeUnitModels.FLAT.id
-            ? tabling.formatters.currencyValueFormatter(params)
-            : tabling.formatters.percentageValueFormatter(params);
+            ? tabling.formatters.currencyValueFormatter(v =>
+                console.error(`Could not parse currency value ${v} for field 'rate'.`)
+              )(params)
+            : tabling.formatters.percentageValueFormatter(v =>
+                console.error(`Could not parse percentage value ${v} for field 'rate'.`)
+              )(params);
         }
         /* Here, we have to assume that the value should be formatted as a
            percentage. */
-        return tabling.formatters.percentageValueFormatter(params);
+        return tabling.formatters.percentageValueFormatter(v =>
+          console.error(`Could not parse percentage value ${v} for field 'rate'.`)
+        )(params);
       } else {
         /* The only time the params would be native formatter params would be if
 				   this column was being used in a PDF - which it isn't, so this is safe
 				   for now. */
-        return tabling.formatters.percentageValueFormatter(params);
+        return tabling.formatters.percentageValueFormatter(v =>
+          console.error(`Could not parse percentage value ${v} for field 'rate'.`)
+        )(params);
       }
     }
   }),

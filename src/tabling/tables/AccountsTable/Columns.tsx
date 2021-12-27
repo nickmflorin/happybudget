@@ -1,4 +1,4 @@
-import { isNil } from "lodash";
+import { isNil, includes } from "lodash";
 import { tabling, budgeting } from "lib";
 
 import { Icon } from "components";
@@ -14,7 +14,8 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "Account",
     pdfHeaderName: "Acct #",
     pdfWidth: 0.1,
-    pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
+    pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } },
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "markup"], r)
   }),
   columns.BodyColumn<R, M, string | null>({
     field: "description",
@@ -25,6 +26,7 @@ const Columns: Table.Column<R, M>[] = [
     minWidth: 200,
     flex: 100,
     dataType: "longText",
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "markup"], r),
     /* The custom cell renderer here is only needed to include the Markup icon,
        which is annoying because it is only needed for those rows and slows down
        rendering performance. */
@@ -49,7 +51,11 @@ const Columns: Table.Column<R, M>[] = [
     field: "estimated",
     isRead: false,
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
-      isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
+      isNil(params) || params === ""
+        ? "0.00"
+        : tabling.formatters.currencyValueFormatter(v =>
+            console.error(`Could not parse currency value ${v} for PDF field 'estimated'.`)
+          )(params),
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.estimatedValueGetter
   }),
@@ -58,17 +64,31 @@ const Columns: Table.Column<R, M>[] = [
     markupField: "actual",
     isRead: true,
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
-      isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
+      isNil(params) || params === ""
+        ? "0.00"
+        : tabling.formatters.currencyValueFormatter(v =>
+            console.error(`Could not parse currency value ${v} for PDF field 'actual'.`)
+          )(params),
     pdfWidth: 0.15,
-    pdfValueGetter: budgeting.valueGetters.actualValueGetter
+    pdfValueGetter: budgeting.valueGetters.actualValueGetter,
+    /* Note: This also gets triggered for the PDF model form, but that is okay
+       because the PDF model form has a domain property as well. */
+    isApplicableForModel: (m: Model.Account) => m.domain === "budget"
   }),
   columns.VarianceColumn<R, M>({
     field: "variance",
     isRead: false,
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
-      isNil(params) || params === "" ? "0.00" : tabling.formatters.currencyValueFormatter(params),
+      isNil(params) || params === ""
+        ? "0.00"
+        : tabling.formatters.currencyValueFormatter(v =>
+            console.error(`Could not parse currency value ${v} for PDF field 'variance'.`)
+          )(params),
     pdfWidth: 0.15,
-    pdfValueGetter: budgeting.valueGetters.varianceValueGetter
+    pdfValueGetter: budgeting.valueGetters.varianceValueGetter,
+    /* Note: This also gets triggered for the PDF model form, but that is okay
+       because the PDF model form has a domain property as well. */
+    isApplicableForModel: (m: Model.Account) => m.domain === "budget"
   }),
   columns.FakeColumn({ field: "nominal_value", nullValue: 0.0 }),
   columns.FakeColumn({ field: "markup_contribution", nullValue: 0.0 }),

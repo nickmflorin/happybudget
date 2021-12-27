@@ -116,11 +116,17 @@ const BudgetTotal = ({ budget, ...props }: BudgetTotalProps): JSX.Element => {
     if (!isNil(budget)) {
       switch (metric) {
         case "actual":
-          return tabling.formatters.currencyValueFormatter(budgeting.businessLogic.actualValue(budget));
+          return tabling.formatters.currencyValueFormatter(v =>
+            console.error(`Could not parse currency from value ${v} for budget actual.`)
+          )(budgeting.businessLogic.actualValue(budget));
         case "variance":
-          return tabling.formatters.currencyValueFormatter(budgeting.businessLogic.varianceValue(budget));
+          return tabling.formatters.currencyValueFormatter(v =>
+            console.error(`Could not parse currency from value ${v} for budget variance.`)
+          )(budgeting.businessLogic.varianceValue(budget));
         default:
-          return tabling.formatters.currencyValueFormatter(budgeting.businessLogic.estimatedValue(budget));
+          return tabling.formatters.currencyValueFormatter(v =>
+            console.error(`Could not parse currency from value ${v} for budget estimated.`)
+          )(budgeting.businessLogic.estimatedValue(budget));
       }
     }
     return tabling.formatters.currencyValueFormatter(0);

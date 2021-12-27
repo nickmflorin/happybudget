@@ -1,4 +1,6 @@
+import React from "react";
 import classNames from "classnames";
+import { includes, isNil } from "lodash";
 
 import { BodyCell } from "../cells";
 import { RowExplicitBodyCellProps } from "../cells/BodyCell";
@@ -14,6 +16,11 @@ export interface BodyRowProps<
   readonly row?: RW;
   readonly cellProps?: RowExplicitBodyCellProps<R, M, V>;
   readonly data: Table.BodyRow<R>[];
+  /* Because we use columns to show multiple model types in the table (i.e.
+     we use the SubAccount columns to show both Account(s) and SubAccount(s)),
+     we need to avoid issuing warnings when the value for an model that is not
+     applicable for the overall columns cannot be parsed. */
+  readonly applicableColumns?: string[];
 }
 
 const BodyRow = <
@@ -35,7 +42,15 @@ const BodyRow = <
       indented: boolean;
       colIndex: number;
     }) => {
-      return <BodyCell<R, M, V> {...params} data={props.data} row={props.row} {...cellProps} />;
+      return (
+        <BodyCell<R, M, V>
+          {...params}
+          hideContent={!isNil(props.applicableColumns) && !includes(props.applicableColumns, params.column.field)}
+          data={props.data}
+          row={props.row}
+          {...cellProps}
+        />
+      );
     }}
   />
 );

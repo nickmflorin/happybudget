@@ -23,6 +23,69 @@ export const normalizedField = <R extends Table.RowData, M extends Model.RowHttp
   col: Table.RealColumn<R, M>
 ): string => (typeguards.isBodyColumn(col) ? col.field : typeguards.isActionColumn(col) ? col.colId : col.field);
 
+declare type Case = "pdf" | "aggrid";
+
+export const getColumnRowValue = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  V extends Table.RawRowValue = Table.RawRowValue
+>(
+  col: Table.DataColumn<R, M, V>,
+  row: Table.BodyRow<R>,
+  rows: Table.BodyRow<R>[],
+  tableCase: Case = "aggrid"
+): V => {
+  const returnNullWithWarning = (fld: string) => {
+    // The row managers should prevent this, but you never know.
+    console.error(
+      `Undefined value for row ${row.id} (type = ${row.rowType}) ` +
+        `encountered for field ${fld}! Returning ${col.nullValue}.`
+    );
+    return col.nullValue;
+  };
+
+  const valueGetter = tableCase === "aggrid" ? col.valueGetter : col.pdfValueGetter;
+
+  /* If the column does not define a valueGetter, we need to pull the row value
+     from the underlying row data. */
+  if (isNil(valueGetter)) {
+    if (typeguards.isMarkupRow(row)) {
+      if (!isNil(col.markupField)) {
+        if (row.data[col.markupField] === undefined) {
+          // The row managers should prevent this, but you never know.
+          return returnNullWithWarning(col.markupField);
+        }
+        return row.data[col.markupField] as unknown as V;
+      } else {
+        /* In this case, the column is not applicable for a MarkupRow, so we
+           just return the nullValue and do not issue a warning. */
+        return col.nullValue;
+      }
+    } else if (typeguards.isGroupRow(row)) {
+      if (!isNil(col.groupField)) {
+        if (row.data[col.groupField] === undefined) {
+          // The row managers should prevent this, but you never know.
+          return returnNullWithWarning(col.groupField);
+        }
+        return row.data[col.groupField] as unknown as V;
+      } else {
+        /* In this case, the column is not applicable for a GroupRow, so we
+           just return the nullValue and do not issue a warning. */
+        return col.nullValue;
+      }
+    } else {
+      // The field should always be applicable for the model row case.
+      if (row.data[col.field] === undefined) {
+        // The row managers should prevent this, but you never know.
+        return returnNullWithWarning(col.field);
+      }
+      return row.data[col.field] as unknown as V;
+    }
+  } else {
+    return valueGetter(row, rows);
+  }
+};
+
 export const getColumn = <CA extends Table.Column[]>(
   columns: CA,
   field: string,
@@ -151,7 +214,7 @@ export const parseBaseColumn = <R extends Table.RowData, M extends Model.RowHttp
 ): Table.BaseColumn => {
   if (typeguards.isFakeColumn<R, M>(column)) {
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-    const { cType, getRowValue, nullValue, isApplicable, ...agColumn } = column;
+    const { cType, getRowValue, nullValue, isApplicableForModel, isApplicableForRowType, ...agColumn } = column;
     return agColumn;
   } else if (typeguards.isActionColumn<R, M>(column)) {
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
@@ -179,11 +242,11 @@ export const parseBaseColumn = <R extends Table.RowData, M extends Model.RowHttp
       pdfHeaderName,
       pdfFooter,
       pdfFooterValueGetter,
-      pdfCellContentsVisible,
       pdfHeaderCellProps,
       pdfCellProps,
       pdfFlexGrow,
-      isApplicable,
+      isApplicableForModel,
+      isApplicableForRowType,
       pdfValueGetter,
       pdfChildFooter,
       pdfCellRenderer,
@@ -213,7 +276,8 @@ export const parseBaseColumn = <R extends Table.RowData, M extends Model.RowHttp
       isRead,
       cType,
       nullValue,
-      isApplicable,
+      isApplicableForModel,
+      isApplicableForRowType,
       smartInference,
       defaultNewRowValue,
       defaultHidden,
@@ -222,7 +286,6 @@ export const parseBaseColumn = <R extends Table.RowData, M extends Model.RowHttp
       pdfHeaderName,
       pdfFooter,
       pdfFooterValueGetter,
-      pdfCellContentsVisible,
       pdfHeaderCellProps,
       pdfCellProps,
       pdfFlexGrow,

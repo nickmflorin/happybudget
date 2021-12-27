@@ -83,7 +83,9 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     nullValue: null,
     headerName: "Rate",
     dataType: "currency",
-    valueFormatter: tabling.formatters.currencyValueFormatter,
+    valueFormatter: tabling.formatters.currencyValueFormatter(v =>
+      console.error(`Could not parse currency value ${v} for field 'rate'.`)
+    ),
     valueSetter: tabling.valueSetters.numericValueSetter("rate"),
     width: 75,
     minWidth: 75

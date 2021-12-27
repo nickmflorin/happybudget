@@ -39,7 +39,9 @@ const Columns: Table.Column<R, M>[] = [
     cellEditor: "DateEditor",
     cellEditorPopup: true,
     cellEditorPopupPosition: "below",
-    valueFormatter: tabling.formatters.dateValueFormatter,
+    valueFormatter: tabling.formatters.dateValueFormatter(v =>
+      console.error(`Could not parse date value ${v} for field 'date'.`)
+    ),
     valueSetter: tabling.valueSetters.dateTimeValueSetter("date"),
     pdfFormatter: (params: Table.NativeFormatterParams<string>) =>
       isNil(params) || params === "" ? "" : tabling.formatters.dateValueFormatter(params),
@@ -70,8 +72,14 @@ const Columns: Table.Column<R, M>[] = [
       cellStyle: { textAlign: "right" }
     },
     pdfFormatter: (params: Table.NativeFormatterParams<number | null>) =>
-      isNil(params) ? "0.0" : tabling.formatters.currencyValueFormatter(params),
-    valueFormatter: tabling.formatters.currencyValueFormatter,
+      isNil(params)
+        ? "0.0"
+        : tabling.formatters.currencyValueFormatter(v =>
+            console.error(`Could not parse currency value ${v} for PDF field 'value'.`)
+          )(params),
+    valueFormatter: tabling.formatters.currencyValueFormatter(v =>
+      console.error(`Could not parse currency value ${v} for field 'value'.`)
+    ),
     valueSetter: tabling.valueSetters.numericValueSetter("value"),
     dataType: "currency",
     /* We only want to use BodyCell's in the Footer cells because it slows

@@ -375,7 +375,8 @@ declare namespace Table {
   type AGFormatter = (params: AGFormatterParams) => string;
 
   type NativeFormatterParams<P> = P | null;
-  type NativeFormatter<P> = (params: NativeFormatterParams<P>) => string;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type NativeFormatter<P> = (params: NativeFormatterParams<P>, onError?: OnFormatError) => string;
 
   type ColDef = import("@ag-grid-community/core").ColDef;
 
@@ -495,7 +496,8 @@ declare namespace Table {
     /* Callback to indicate whether or not the column is applicable for a given
        model.  If the column is not applicable, a warning will not be issued
        if the column's field cannot be obtained from the model. */
-    readonly isApplicable?: (m: M) => boolean;
+    readonly isApplicableForModel?: (m: M) => boolean;
+    readonly isApplicableForRowType?: (rt: RowType) => boolean;
   };
 
   type PartialFakeColumn<
@@ -556,7 +558,8 @@ declare namespace Table {
     /* Callback to indicate whether or not the column is applicable for a given
        model.  If the column is not applicable, a warning will not be issued
        if the column's field cannot be obtained from the model. */
-    readonly isApplicable?: (m: M) => boolean;
+    readonly isApplicableForModel?: (m: M) => boolean;
+    readonly isApplicableForRowType?: (rt: RowType) => boolean;
     readonly valueGetter?: (row: BodyRow<R>, rows: BodyRow<R>[]) => V;
     readonly getRowValue?: (m: M) => V;
     readonly getHttpValue?: (value: V) => Http.RawPayloadValue;
@@ -567,7 +570,6 @@ declare namespace Table {
     readonly pdfFooter?: PdfFooterColumn<V>;
     readonly pdfCellProps?: PdfCellStandardProps<R, M, V>;
     readonly pdfHeaderCellProps?: PdfCellStandardProps<R, M, V>;
-    readonly pdfCellContentsVisible?: PdfOptionalCellCallback<boolean, R, M, V>;
     readonly pdfCellRenderer?: (params: PdfCellCallbackParams<R, M, V>) => JSX.Element;
     readonly pdfFormatter?: NativeFormatter<V>;
     readonly pdfValueGetter?: (r: BodyRow<R>, rows: BodyRow<R>[]) => V;

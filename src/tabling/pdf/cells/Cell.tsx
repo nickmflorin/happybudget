@@ -88,8 +88,6 @@ export interface RowExplicitCellProps<
   readonly className?: Table.PdfCellClassName<R, M, V>;
   readonly textStyle?: Table.PdfCellStyle<R, M, V>;
   readonly textClassName?: Table.PdfCellClassName<R, M, V>;
-  readonly cellContentsVisible?: Table.PdfOptionalCellCallback<boolean, R, M>;
-  readonly cellContentsInvisible?: Table.PdfOptionalCellCallback<boolean, R, M>;
 }
 
 export interface CellProps<
@@ -102,6 +100,7 @@ export interface CellProps<
   readonly isHeader?: boolean;
   readonly debug?: boolean;
   readonly indented?: boolean;
+  readonly hideContent?: boolean;
 }
 
 export interface PrivateCellProps<
@@ -159,14 +158,7 @@ const Cell = <
       style={cellStyle}
       debug={props.debug}
     >
-      <ShowHide
-        hide={
-          props.indented === true ||
-          evaluateOptionalCallbackProp<boolean, R, M, V>(props.cellContentsVisible, callbackParams) === false ||
-          evaluateOptionalCallbackProp<boolean, R, M, V>(props.cellContentsInvisible, callbackParams) === true ||
-          evaluateOptionalCallbackProp<boolean, R, M, V>(props.column.pdfCellContentsVisible, callbackParams) === false
-        }
-      >
+      <ShowHide hide={props.indented === true || props.hideContent === true}>
         {props.isHeader !== true && !isNil(props.column.pdfCellRenderer) ? (
           props.column.pdfCellRenderer(callbackParams)
         ) : (

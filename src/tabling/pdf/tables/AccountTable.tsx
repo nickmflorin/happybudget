@@ -30,24 +30,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
       subAccountColumns,
       (curr: AC[], c: C) => {
         if (tabling.typeguards.isDataColumn(c)) {
-          return [
-            ...curr,
-            {
-              field: c.field,
-              cType: c.cType,
-              dataType: c.dataType,
-              pdfWidth: c.pdfWidth,
-              pdfCellProps: c.pdfCellProps,
-              pdfHeaderCellProps: c.pdfHeaderCellProps,
-              pdfFooter: c.pdfFooter,
-              pdfCellContentsVisible: c.pdfCellContentsVisible,
-              pdfFooterValueGetter: c.pdfFooterValueGetter,
-              pdfFormatter: c.pdfFormatter,
-              pdfValueGetter: c.pdfValueGetter,
-              pdfCellRenderer: c.pdfCellRenderer,
-              pdfChildFooter: c.pdfChildFooter
-            } as AC
-          ];
+          return [...curr, c as AC];
         }
         return [
           ...curr,
@@ -158,6 +141,11 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                         ...subRws,
                         <BodyRow<R, M>
                           key={`detail-${detailRow.id}`}
+                          applicableColumns={
+                            tabling.typeguards.isMarkupRow(detailRow)
+                              ? ["description", "identifier", "estimated", "variance", "actual"]
+                              : undefined
+                          }
                           columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
                           columnIsVisible={subAccountColumnIsVisible}
                           className={"detail-tr"}
@@ -182,6 +170,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                           className={"detail-group-tr"}
                           row={detailRow}
                           data={table}
+                          applicableColumns={["description", "identifier", "estimated", "variance", "actual"]}
                           columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
                           columnIsVisible={subAccountColumnIsVisible}
                           columnIndent={1}
@@ -200,11 +189,16 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                   [
                     <BodyRow
                       key={`sub-h-${subAccountRow.id}`}
+                      /* We have to tell the row which columns are applicable
+											   for the Account because the columns are the SubAccount
+												 columns, and we do not want to issue undefined warnings
+												 in the case that the value cannot be pulled from the
+												 Account when it is not expected.
+												*/
+                      applicableColumns={["description", "identifier"]}
                       cellProps={{
                         className: "subaccount-td",
-                        textClassName: "subaccount-tr-td-text",
-                        cellContentsInvisible: (params: Table.PdfCellCallbackParams<R, M>) =>
-                          !includes(["description", "identifier"], tabling.columns.normalizedField<R, M>(params.column))
+                        textClassName: "subaccount-tr-td-text"
                       }}
                       className={"subaccount-tr"}
                       columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
@@ -239,6 +233,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                 key={`sub-header-${subAccountRow.id}`}
                 cellProps={{ className: "subaccount-td", textClassName: "subaccount-tr-td-text" }}
                 className={"subaccount-tr"}
+                applicableColumns={["description", "identifier", "estimated", "variance", "actual"]}
                 columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
                 columnIsVisible={subAccountColumnIsVisible}
                 data={table}
@@ -251,6 +246,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
               <GroupRow<R, M>
                 key={`sub-group-${subAccountRow.id}`}
                 row={subAccountRow}
+                applicableColumns={["description", "identifier", "estimated", "variance", "actual"]}
                 columnIsVisible={subAccountColumnIsVisible}
                 columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
                 data={table}
@@ -271,6 +267,12 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
             cellProps={{ textClassName: "account-sub-header-tr-td-text" }}
             columns={filter(accountSubAccountColumns, (c: AC) => tabling.typeguards.isDataColumn(c)) as ADC[]}
             columnIsVisible={accountColumnIsVisible}
+            /* We have to tell the row which columns are applicable for the
+							 Account because the columns are the SubAccount columns, and we
+							 do not want to issue undefined warnings in the case that the
+							 value cannot be pulled from the Account when it is not expected.
+							 */
+            applicableColumns={["description", "identifier"]}
             data={table}
             row={accountSubHeaderRow}
           />
@@ -280,6 +282,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
         key={"table-footer"}
         columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
         columnIsVisible={subAccountColumnIsVisible}
+        applicableColumns={["description", "identifier", "estimated", "variance", "actual"]}
         data={table}
       />
     ];

@@ -72,6 +72,7 @@ export const estimatedValue = <
       0.0
     );
   }
+
   return (
     nominalValue(obj) +
     accumulatedMarkupContribution(obj) +
