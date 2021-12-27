@@ -53,7 +53,7 @@ const withContacts =
         if (isNil(id)) {
           return "";
         }
-        const m: Model.Contact | undefined = find(props.contacts, { id });
+        const m = models.getModelById(props.contacts, id, { modelName: "contact" });
         return m?.full_name || "";
       });
 

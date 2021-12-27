@@ -54,30 +54,43 @@ const BodyCell = <
         let value: V | undefined = undefined;
         if (tabling.typeguards.isMarkupRow(props.row) && !isNil(props.column.markupField)) {
           value = props.row.data[props.column.markupField] as unknown as V | undefined;
+          if (value === undefined) {
+            console.error(
+              `Unexpectedly encountered undefined value for markup row ${props.row.id}, ` +
+                `column ${props.column.markupField}.  Returning ${props.column.nullValue}.`
+            );
+          }
         } else if (tabling.typeguards.isGroupRow(props.row) && !isNil(props.column.groupField)) {
           value = props.row.data[props.column.groupField] as unknown as V | undefined;
+          if (value === undefined) {
+            console.error(
+              `Unexpectedly encountered undefined value for group row ${props.row.id}, ` +
+                `column ${props.column.groupField}.   Returning ${props.column.nullValue}.`
+            );
+          }
         } else if (tabling.typeguards.isModelRow(props.row)) {
           value = props.row.data[props.column.field] as V | undefined;
+          if (value === undefined) {
+            console.error(
+              `Unexpectedly encountered undefined value for model row ${props.row.id}, ` +
+                `column ${props.column.field}.   Returning ${props.column.nullValue}.`
+            );
+          }
         }
         if (value === undefined) {
-          console.error(
-            `Unexpectedly encountered undefined value for row ${props.row.id}, column ${props.column.field}.`
-          );
-          return null as V;
-        } else if (value === null) {
-          return null as V;
+          return props.column.nullValue;
         } else if (typeof value !== "string" && typeof value !== "number") {
           /* If there is a custom cell renderer, the value can be anything since
              it will not be directly rendered in the DOM. */
           if (isNil(props.column.cellRenderer)) {
-            return null as V;
+            return props.column.nullValue;
           }
           return value;
         }
         return value;
       }
     }
-    return null as V;
+    return props.column.nullValue;
   }, [props.row, props.column]);
 
   const value = useMemo(() => {
