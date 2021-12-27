@@ -162,7 +162,7 @@ export class PlaceholderRowManager<
     const value = this.defaultData === undefined ? undefined : (this.defaultData[col.field] as V | undefined);
     if (value === undefined) {
       if (data === undefined || data[col.field] === undefined) {
-        return [col.nullValue, false];
+        return [col.nullValue, true];
       }
       return [data[col.field] as unknown as V, true];
     }
