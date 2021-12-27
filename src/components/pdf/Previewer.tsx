@@ -127,16 +127,20 @@ const Previewer = ({
   return (
     <div className={"previewer"}>
       {refreshRequired && (
-        <Button
-          className={"btn btn--over"}
-          disabled={generatingPdf || loadingData}
+        <div
+          className={"previewer-refresh"}
           onClick={async () => {
+            if (generatingPdf || loadingData) {
+              return;
+            }
             setRefreshRequired(false);
             await render();
           }}
         >
-          {"Refresh"}
-        </Button>
+          <Button className={"btn btn--over"} disabled={generatingPdf || loadingData}>
+            {"Refresh"}
+          </Button>
+        </div>
       )}
       <div className={"preview-content"}>
         <RenderDocument

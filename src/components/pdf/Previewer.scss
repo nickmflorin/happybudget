@@ -1,51 +1,65 @@
 @import "style/_imports";
 
 .previewer {
-	display: flex;
-	flex-direction: column;
-	position: relative;
-	width: calc(100% + 4px) !important;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: calc(100% + 4px) !important;
 
-	.btn--over {
-		position: absolute;
-		top: 5px;
-		right: 5px;
-	}
+  .previewer-refresh {
+    position: absolute;
+    width: 100%;
+    // previewer-refresh needs to be a sibling of preview-content
+    // in order to prevent scrolling when a pdf refresh is needed.
+    // The height would normally be calc(100% - 72px) but 82px is needed
+    // to account for the preview-content margin-bottom.
+    height: calc(100% - 82px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba($black, 0.4);
+    cursor: pointer;
+    z-index: 1;
 
-	.preview-content {
-		position: relative;
-		padding: 2px;
-		border: 1px solid $gray-light;
-		margin-bottom: 10px;
-		overflow-y: scroll;
-		height: calc(100% - 72px);
-		width: 100% !important;
+    &:hover {
+      background: rgba($black, 0.5);
+    }
+  }
 
-		.react-pdf__Document {
-			.react-pdf__Page__canvas {
-				// height: $pdf-canvas-height !important;
-				width: calc(100% - 4px) !important;
-				height: 100% !important;
-			}
-			// I honestly do not know what this is, or why it is there, but it's presence
-			// seems to cause all sorts of weird behavior with scrolling and hiding it
-			// does not seem to have an affect.
-			.react-pdf__Page__textContent {
-				display: none !important;
-			}
-		}
-	}
+  .preview-content {
+    position: relative;
+    padding: 2px;
+    border: 1px solid $gray-light;
+    margin-bottom: 10px;
+    overflow-y: scroll;
+    height: calc(100% - 72px);
+    width: 100% !important;
 
-	.preview-footer {
-		height: 72px;
+    .react-pdf__Document {
+      .react-pdf__Page__canvas {
+        // height: $pdf-canvas-height !important;
+        width: calc(100% - 4px) !important;
+        height: 100% !important;
+      }
+      // I honestly do not know what this is, or why it is there, but it's presence
+      // seems to cause all sorts of weird behavior with scrolling and hiding it
+      // does not seem to have an affect.
+      .react-pdf__Page__textContent {
+        display: none !important;
+      }
+    }
+  }
 
-		.ant-pagination {
-			height: 36px !important;
-			width: auto;
-			text-align: center;
-		}
-		.btn {
-			width: 100%;
-		}
-	}
+  .preview-footer {
+    height: 72px;
+
+    .ant-pagination {
+      height: 36px !important;
+      width: auto;
+      text-align: center;
+    }
+    .btn {
+      width: 100%;
+    }
+  }
 }
