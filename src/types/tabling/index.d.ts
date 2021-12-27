@@ -96,7 +96,7 @@ declare namespace Table {
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
-    /* eslint-disable @typescript-eslint/no-explicit-any */
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
   > {
     readonly value: V;
@@ -194,6 +194,7 @@ declare namespace Table {
     readonly type: ChangeEventId;
   };
 
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type CellChange<V extends RawRowValue = any> = {
     readonly oldValue: V;
     readonly newValue: V;
@@ -202,6 +203,7 @@ declare namespace Table {
   type SoloCellChange<
     R extends RowData,
     RW extends Table.EditableRow<R> = Table.EditableRow<R>,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
   > = CellChange<V> & {
     readonly field: keyof RW["data"];
@@ -431,6 +433,7 @@ declare namespace Table {
 
   type ParsedColumnField<
     R extends RowData,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any,
     RW extends Table.EditableRow<R> = Table.EditableRow<R>
   > = {
@@ -454,8 +457,11 @@ declare namespace Table {
     readonly row: BodyRow<R>;
   };
 
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type InferR<C> = C extends Column<infer R, any, any> ? R : never;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type InferM<C> = C extends Column<any, infer M, any> ? M : never;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type InferV<C> = C extends Column<any, any, infer V> ? V : never;
 
   type BaseColumn = Omit<ColDef, OmitColDefParams>;
@@ -697,6 +703,7 @@ declare namespace Table {
   type PdfCellCallbackParams<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
   > = {
     readonly row?: Row<R>;
@@ -712,6 +719,7 @@ declare namespace Table {
     RV,
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
   > = (params: PdfCellCallbackParams<R, M, V>) => RV;
 
@@ -719,12 +727,14 @@ declare namespace Table {
     RV,
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
   > = RV | PdfCellCallback<RV, R, M, V> | undefined;
 
   interface _PdfCellClassName<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
   > {
     [n: number]: PdfOptionalCellCallback<string, R, M, V> | _PdfCellClassName<R, M, V>;
@@ -733,12 +743,14 @@ declare namespace Table {
   type PdfCellClassName<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
   > = PdfOptionalCellCallback<string, R, M, V> | _PdfCellClassName<R, M, V>;
 
   interface _PdfCellStyle<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
   > {
     [n: number]: PdfOptionalCellCallback<import("@react-pdf/types").Style, R, M, V> | _PdfCellStyle<R, M, V>;
@@ -747,12 +759,14 @@ declare namespace Table {
   type PdfCellStyle<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
   > = PdfOptionalCellCallback<import("@react-pdf/types").Style, R, M, V> | _PdfCellStyle<R, M, V>;
 
   type PdfCellStandardProps<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
   > = {
     readonly style?: PdfCellStyle<R, M, V>;

@@ -86,16 +86,27 @@ export const notify = (e: InternalNotification | NotificationDetail, opts?: Inte
   }
 };
 
-type InconsistentStateError = {
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+type InconsistentStateError<P extends Redux.ActionPayload = Redux.ActionPayload> = {
   readonly action?: Redux.Action | string;
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  readonly payload?: any;
+  readonly payload?: P;
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   [key: string]: any;
 };
 
-export const inconsistentStateError = (e: InconsistentStateError, opts?: InternalNotificationOptions): void => {
+type ParamV<P extends Redux.ActionPayload = Redux.ActionPayload> =
+  | Redux.Action
+  | P
+  | null
+  | undefined
+  | string
+  | number
+  | string[]
+  | number[];
+
+export const inconsistentStateError = <P extends Redux.ActionPayload = Redux.ActionPayload>(
+  e: InconsistentStateError<P>,
+  opts?: InternalNotificationOptions
+): void => {
   const { action, payload, ...context } = e;
   const actionString: string | undefined = !isNil(action)
     ? typeof action === "string"
@@ -103,25 +114,23 @@ export const inconsistentStateError = (e: InconsistentStateError, opts?: Interna
       : action.type
     : action;
 
-  const payloadSting: string | undefined = !isNil(e.payload)
-    ? JSON.stringify(e.payload)
+  const payloadString: string | null | undefined = !isNil(payload)
+    ? JSON.stringify(payload)
     : !isNil(action) && typeof action !== "string"
     ? JSON.stringify(action.payload)
     : payload;
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  const addParamValue = (message: string, paramName: string, value: any) =>
+  const addParamValue = (message: string, paramName: string, value: ParamV<P>) =>
     message + `\n\t${toTitleCase(paramName)}: ${value}`;
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  const addParam = (message: string, paramName: string, paramValue: any) => {
+  const addParam = (message: string, paramName: string, paramValue: ParamV<P>) => {
     if (paramValue !== undefined) {
       return addParamValue(message, paramName, paramValue);
     }
     return message;
   };
 
-  let message = addParam(addParam("Inconsistent State!", "action", actionString), "payload", payloadSting);
+  let message = addParam(addParam("Inconsistent State!", "action", actionString), "payload", payloadString);
   Object.keys(context).forEach((key: string) => {
     message = addParam(message, key, context[key]);
   });

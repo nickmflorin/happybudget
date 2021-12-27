@@ -25,7 +25,5 @@ export const isUnauthenticatedModuleConfig = (
 ): config is Application.UnauthenticatedModuleConfig =>
   (config as Application.UnauthenticatedModuleConfig).isUnauthenticated === true;
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export const isAuthenticatedAction = (action: Redux.Action): action is Redux.AuthenticatedAction<any> =>
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  (action as Redux.AuthenticatedAction<any>).isAuthenticated === true;
+export const isAuthenticatedAction = (action: Redux.Action): action is Redux.AuthenticatedAction =>
+  (action as Redux.AuthenticatedAction).isAuthenticated === true;

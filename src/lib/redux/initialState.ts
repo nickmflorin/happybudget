@@ -35,5 +35,5 @@ export const initialTableState: Redux.TableStore<any> = {
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const initialDetailResponseState: Redux.ModelDetailResponseStore<any> = {
   loading: false,
-  data: undefined
+  data: null
 };

@@ -83,7 +83,6 @@ export const getCalculatedColumn = <CA extends Table.Column[]>(
 
 export const filterActionColumns = <CA extends Table.Column[]>(
   columns: CA
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ): CA extends Table.Column<infer R, infer M>[] ? Table.ActionColumn<R, M>[] : never =>
   filter(columns, (col: typeof columns[number]) =>
     typeguards.isActionColumn<Table.InferR<typeof col>, Table.InferM<typeof col>>(col)
@@ -91,13 +90,10 @@ export const filterActionColumns = <CA extends Table.Column[]>(
 
 export const filterFakeColumns = <CA extends Table.Column[]>(
   columns: CA
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-): CA extends Table.Column<any, infer M, infer V>[] ? Table.FakeColumn<M, V>[] : never =>
-  filter(
-    columns,
-    (col: typeof columns[number]) => typeguards.isFakeColumn<Table.InferR<typeof col>, Table.InferM<typeof col>>(col)
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  ) as CA extends Table.Column<any, infer M, infer V>[] ? Table.FakeColumn<M, V>[] : never;
+): CA extends Table.Column<Table.RowData, infer M, infer V>[] ? Table.FakeColumn<M, V>[] : never =>
+  filter(columns, (col: typeof columns[number]) =>
+    typeguards.isFakeColumn<Table.InferR<typeof col>, Table.InferM<typeof col>>(col)
+  ) as CA extends Table.Column<Table.RowData, infer M, infer V>[] ? Table.FakeColumn<M, V>[] : never;
 
 export const filterCalculatedColumns = <CA extends Table.Column[]>(
   columns: CA

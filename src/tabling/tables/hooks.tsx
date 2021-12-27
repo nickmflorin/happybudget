@@ -49,7 +49,8 @@ export const useAttachments = <
       []
     );
     return models.getModelsByIds<Model.SimpleAttachment>(attachments, models.parseIdsFromDeliminatedString(value), {
-      warnOnMissing: false
+      warnOnMissing: false,
+      modelName: "attachment"
     });
   });
 

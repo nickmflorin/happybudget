@@ -25,12 +25,10 @@ export const useRefIfNotDefined = <T extends Record<string, unknown>>(
 };
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export const useDynamicCallback = <T = any>(callback: (...args: any[]) => T) => {
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  const ref = useRef<any>();
+export const useDynamicCallback = <T>(callback: (...args: any[]) => T) => {
+  const ref = useRef<typeof callback>(callback);
   ref.current = callback;
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  const func: (...args: any[]) => T = (...args: any[]) => ref.current.apply(this, args);
+  const func: typeof callback = (...args: Parameters<typeof callback>) => ref.current.apply(this, args);
   return useCallback(func, []);
 };
 

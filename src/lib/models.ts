@@ -1,5 +1,7 @@
 import { find, filter, isNil, forEach, reduce, map } from "lodash";
 
+import { isHttpModelWithType } from "./typeguards";
+
 export enum ContactTypeNames {
   CONTRACTOR = "Contractor",
   EMPLOYEE = "Employee",
@@ -149,11 +151,20 @@ export const getModelById = <M extends Model.Model>(
   id: M["id"],
   options: GetModelsByIdOptions = { throwOnMissing: false, warnOnMissing: true }
 ): M | null => {
+  options = {
+    ...options,
+    modelName:
+      options.modelName !== undefined
+        ? options.modelName
+        : ms.length !== 0 && isHttpModelWithType(ms[0])
+        ? ms[0].type
+        : undefined
+  };
   const model: M | undefined = find(ms, { id }) as M | undefined;
   if (isNil(model)) {
     if (options.throwOnMissing === true) {
       throw new Error(`Cannot find ${options.modelName || "model"} with ID ${id} in provided models!`);
-    } else if (options.warnOnMissing === true) {
+    } else if (options.warnOnMissing !== false) {
       console.warn(`Cannot find ${options.modelName || "model"} with ID ${id} in provided models!`);
     }
     return null;

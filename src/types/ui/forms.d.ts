@@ -11,7 +11,7 @@ declare interface FormInstance<T> extends RootFormInstance<T>, UINotificationsHa
   readonly autoFocusField?: boolean | number;
 }
 
-// The declare type of iterable passed to AntD's form.setFields([...])
+// The type of iterable passed to AntD's form.setFields([...])
 declare type FormField<M> = { readonly name: keyof M; readonly value: M[keyof M] };
 
 declare interface FormProps<T> extends Omit<RootFormProps, "style" | "id" | "className">, StandardComponentProps {

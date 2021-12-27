@@ -10,8 +10,7 @@ export const useDataGrid = (): NonNullRef<Table.DataGridInstance> => {
   return useRef<Table.DataGridInstance>(InitialGridRef);
 };
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export const InitialTableRef: Table.TableInstance<any, any> = {
+export const InitialTableRef: Table.TableInstance<Table.RowData, Model.RowHttpModel> = {
   ...InitialGridRef,
   notify: (notification: TableNotification) => {
     console.warn(
@@ -36,7 +35,7 @@ export const InitialTableRef: Table.TableInstance<any, any> = {
 export const useTable = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(): NonNullRef<
   Table.TableInstance<R, M>
 > => {
-  return useRef<Table.TableInstance<R, M>>(InitialTableRef);
+  return useRef<Table.TableInstance<R, M>>(InitialTableRef as Table.TableInstance<R, M>);
 };
 
 export const useTableIfNotDefined = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
