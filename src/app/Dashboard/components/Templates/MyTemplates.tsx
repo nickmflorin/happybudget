@@ -9,7 +9,7 @@ import * as api from "api";
 import { redux, notifications } from "lib";
 
 import { ShowHide, Icon } from "components";
-import { PrimaryButtonIconToggle, DefaultButtonIconToggle } from "components/buttons";
+import { PrimaryButtonIconToggle, OrderingButtonIconToggle } from "components/buttons";
 import { TemplateCard, EmptyCard } from "components/cards";
 import { OrderingDropdown } from "components/dropdowns";
 import { NoBudgets } from "components/empty";
@@ -93,10 +93,13 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
               { id: "name", icon: "sort-alpha-down", label: "Name" }
             ]}
           >
-            <DefaultButtonIconToggle
-              breakpoint={"medium"}
-              icon={<Icon icon={"bars-filter"} weight={"light"} />}
-              text={"Order By"}
+            <OrderingButtonIconToggle
+              ordering={ordering}
+              labelMap={{
+                created_at: "Created",
+                updated_at: "Last Updated",
+                name: "Name"
+              }}
             />
           </OrderingDropdown>
         ]}

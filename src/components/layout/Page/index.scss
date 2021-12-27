@@ -10,32 +10,32 @@
     flex-direction: column;
 
     .page-header-title {
-			color: $text-primary !important;
-			font-weight: 700;
-			font-family: $avenir;
-			font-size: 28px;
-			line-height: 36px;
+      color: $text-primary !important;
+      font-weight: 700;
+      font-family: $avenir;
+      font-size: 28px;
+      line-height: 36px;
 
-			&.with-sub-menu {
-				margin-bottom: 14px;
-			}
-		}
+      &.with-sub-menu {
+        margin-bottom: 14px;
+      }
+    }
 
-		.sub-menu {
-			display: flex;
-			width: 100%;
-			max-width: 500px;
+    .sub-menu {
+      display: flex;
+      width: 100%;
+      max-width: 600px;
 
-			> * {
-				&:not(:last-child) {
-					margin-right: 10px;
-				}
-			}
+      > * {
+        &:not(:last-child) {
+          margin-right: 10px;
+        }
+      }
 
-			> .input {
-				width: auto;
-				flex-grow: 100;
-			}
-		}
+      > .input {
+        width: auto;
+        flex-grow: 100;
+      }
+    }
   }
 }

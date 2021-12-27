@@ -14,3 +14,4 @@ export { default as PrimaryButtonIconToggle } from "./PrimaryButtonIconToggle";
 export { default as DefaultButton } from "./DefaultButton";
 export { default as DefaultIconButton } from "./DefaultIconButton";
 export { default as DefaultButtonIconToggle } from "./DefaultButtonIconToggle";
+export { default as OrderingButtonIconToggle } from "./OrderingButtonIconToggle";
