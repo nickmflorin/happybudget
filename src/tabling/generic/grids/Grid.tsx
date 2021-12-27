@@ -117,11 +117,13 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
   ...props
 }: GridProps<R, M>): JSX.Element => {
   const localColumns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
-    let cs: Table.RealColumn<R, M>[] = map(
+    const cs: Table.RealColumn<R, M>[] = map(
       columns,
       (col: Table.RealColumn<R, M>, index: number): Table.RealColumn<R, M> => {
-        const field = tabling.columns.normalizedField<R, M>(col);
-        const hidden = !isNil(field) && (isNil(hiddenColumns) || hiddenColumns[field] === true);
+        const hidden =
+          tabling.typeguards.isDataColumn(col) &&
+          col.canBeHidden === true &&
+          (isNil(hiddenColumns) || hiddenColumns[col.field] === true);
         return {
           ...col,
           headerComponentParams: { ...col.headerComponentParams, column: col },
@@ -136,10 +138,9 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
         };
       }
     );
-    cs = !isNil(checkboxColumn)
+    return !isNil(checkboxColumn)
       ? util.updateInArray<Table.RealColumn<R, M>>(cs, { colId: "checkbox" }, checkboxColumn)
       : cs;
-    return cs;
   }, [hiddenColumns]);
 
   const colDefs = useMemo(
