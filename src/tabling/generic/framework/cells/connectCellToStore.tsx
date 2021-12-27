@@ -4,7 +4,6 @@ import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
 const connectCellToStore = <
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   T extends Table.ValueCellProps<R, M, S, V, C>,
   R extends Table.RowData = Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
