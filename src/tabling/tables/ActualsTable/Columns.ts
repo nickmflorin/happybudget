@@ -120,7 +120,6 @@ const Columns: Table.Column<R, M>[] = [
     minWidth: 100,
     flex: 1,
     dataType: "number",
-    type: "body",
     pdfWidth: 0.08
   }),
   columns.BodyColumn<R, M>({
