@@ -483,22 +483,45 @@ declare namespace Table {
     readonly onCellDoubleClicked?: (row: ModelRow<R>) => void;
   };
 
-  type FakeColumn<
+  type BaseModelColumn<
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
-  > = BaseColumn & {
-    readonly cType: "fake";
+  > = {
+    /* The field is used to pull data from the Model M in the case that the
+		   getRowValue callback is not provided.  In the case of a BodyColumn or
+			 CalculatedColumn, the field will only be used to pull data from the model
+			 if the `isRead` field is `true`, otherwise, it will just be used as the
+			 AG Grid colId. */
     readonly field: string;
+    /* This value will be used in the case that undefined values are
+       unexpectedly encountered (in which case an error will be issued) or
+       another value that we treat as null is encountered (i.e. blank strings). */
     readonly nullValue: V;
+    /* If not provided, the default behavior is to obtain the Row's value by
+       attribute on the Model M corresponding to the Column's designated
+			 `field`. */
     readonly getRowValue?: (m: M) => V;
     /* Callback to indicate whether or not the column is applicable for a given
        model.  If the column is not applicable, a warning will not be issued
        if the column's field cannot be obtained from the model. */
     readonly isApplicableForModel?: (m: M) => boolean;
+    /* Callback to indicate whether or not the column is applicable for a given
+       row type.  If the column is not applicable, the row will not include
+			 the Column's field in it's data. */
     readonly isApplicableForRowType?: (rt: RowType) => boolean;
   };
+
+  type FakeColumn<
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    M extends Model.RowHttpModel = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    V extends RawRowValue = any
+  > = BaseColumn &
+    BaseModelColumn<M, V> & {
+      readonly cType: "fake";
+    };
 
   type PartialFakeColumn<
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -529,18 +552,11 @@ declare namespace Table {
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
-  > = {
-    /* The field will only be used to pull data from the model if the `isRead`
-       field is `true`, otherwise, it will just be used as the AG Grid colId. */
-    readonly field: string;
+  > = BaseModelColumn<M, V> & {
     // This field will be used to pull data from the Markup model if applicable.
     readonly markupField?: keyof Model.Markup;
     // This field will be used to pull data from the Group model if applicable.
     readonly groupField?: keyof Model.Group;
-    /* This value will be used in the case that undefined values are
-       unexpectedly encountered (in which case an error will be issued) or
-       another value that we treat as null is encountered (i.e. blank strings). */
-    readonly nullValue: V;
     /* This field, when false, indicates that the column value should not be
        pulled from the model, but is instead set by other means (usually
        value getters). */
@@ -559,9 +575,11 @@ declare namespace Table {
        model.  If the column is not applicable, a warning will not be issued
        if the column's field cannot be obtained from the model. */
     readonly isApplicableForModel?: (m: M) => boolean;
+    /* Callback to indicate whether or not the column is applicable for a given
+       row type.  If the column is not applicable, the row will not include
+			 the Column's field in it's data. */
     readonly isApplicableForRowType?: (rt: RowType) => boolean;
     readonly valueGetter?: (row: BodyRow<R>, rows: BodyRow<R>[]) => V;
-    readonly getRowValue?: (m: M) => V;
     readonly getHttpValue?: (value: V) => Http.RawPayloadValue;
     readonly processCellForCSV?: (row: R) => string | number;
     readonly processCellForClipboard?: (row: R) => string | number;
@@ -618,8 +636,6 @@ declare namespace Table {
   > = BaseColumn &
     BaseRealColumn<R, M> &
     BaseDataColumn<R, M, V> & {
-      /* The field will only be used to pull data from the model if the `isRead`
-       field is `true`, otherwise, it will just be used as the AG Grid colId. */
       readonly cType: "calculated";
     };
 
@@ -668,8 +684,6 @@ declare namespace Table {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
   > = BodyColumn<R, M, V> | ActionColumn<R, M> | CalculatedColumn<R, M, V> | FakeColumn<M, V>;
-
-  type InferBodyColumn<C> = C extends Column<infer R, infer M, infer V> ? BodyColumn<R, M, V> : never;
 
   interface FooterColumn<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
     extends Pick<DataColumn<R, M>, "colSpan"> {

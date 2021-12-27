@@ -141,7 +141,6 @@ export const parseIdsFromDeliminatedString = (value: string, delimiter = ","): n
 };
 
 type GetModelsByIdOptions = {
-  readonly throwOnMissing?: boolean;
   readonly warnOnMissing?: boolean;
   readonly modelName?: string;
 };
@@ -149,7 +148,7 @@ type GetModelsByIdOptions = {
 export const getModelById = <M extends Model.Model>(
   ms: M[],
   id: M["id"],
-  options: GetModelsByIdOptions = { throwOnMissing: false, warnOnMissing: true }
+  options: GetModelsByIdOptions = { warnOnMissing: true }
 ): M | null => {
   options = {
     ...options,
@@ -162,9 +161,7 @@ export const getModelById = <M extends Model.Model>(
   };
   const model: M | undefined = find(ms, { id }) as M | undefined;
   if (isNil(model)) {
-    if (options.throwOnMissing === true) {
-      throw new Error(`Cannot find ${options.modelName || "model"} with ID ${id} in provided models!`);
-    } else if (options.warnOnMissing !== false) {
+    if (options.warnOnMissing !== false) {
       console.warn(`Cannot find ${options.modelName || "model"} with ID ${id} in provided models!`);
     }
     return null;
@@ -176,7 +173,7 @@ export const getModelById = <M extends Model.Model>(
 export const getModelsByIds = <M extends Model.Model>(
   ms: M[],
   ids: ID[],
-  options: GetModelsByIdOptions = { throwOnMissing: false, warnOnMissing: true }
+  options: GetModelsByIdOptions = { warnOnMissing: true }
 ): M[] => {
   return filter(
     map(ids, (id: ID) => getModelById(ms, id, options)),
