@@ -4,7 +4,10 @@ import { isNil } from "lodash";
 
 import TableNotification from "./TableNotification";
 
-const useNotifications = (id: string): [() => void, (n: TableNotification) => void] => {
+const useNotifications = (
+  id: string,
+  rendered: Table.GridSet<boolean>
+): [() => void, (n: TableNotification) => void] => {
   const currentContainer = useRef<HTMLDivElement | null>(null);
 
   const removeNotification = useMemo(
@@ -101,19 +104,30 @@ const useNotifications = (id: string): [() => void, (n: TableNotification) => vo
         }
       };
 
-      const container = insertContainer();
-      if (!isNil(container)) {
-        // Render the <TableNotification /> component in the DOM.
-        ReactDOM.render(<TableNotification {...notification} />, container);
+      const _notify = () => {
+        const container = insertContainer();
+        if (!isNil(container)) {
+          // Render the <TableNotification /> component in the DOM.
+          ReactDOM.render(<TableNotification {...notification} />, container);
 
-        if (notification.duration !== undefined) {
-          setTimeout(() => {
-            removeNotification();
-          }, notification.duration);
+          if (notification.duration !== undefined) {
+            setTimeout(() => {
+              removeNotification();
+            }, notification.duration);
+          }
         }
+      };
+      /* Since we are rendering the notifications in the DOM and not using
+         React components, if the table data has not yet had a chance to
+         render in the grid, we do not know what the clientHeight size of the
+         grid is. */
+      if (rendered.data === false) {
+        setTimeout(() => _notify(), 1000);
+      } else {
+        _notify();
       }
     },
-    [id, removeNotification]
+    [id, removeNotification, rendered.data]
   );
 
   return [removeNotification, notify];

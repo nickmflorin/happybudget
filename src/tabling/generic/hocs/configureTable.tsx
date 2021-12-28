@@ -1,4 +1,4 @@
-import React, { useMemo, useReducer } from "react";
+import React, { useMemo, useRef, useReducer } from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
 import { map, isNil, filter, reduce } from "lodash";
 import { GridOptions } from "@ag-grid-community/core";
@@ -39,6 +39,7 @@ export const DefaultFooterGridOptions: GridOptions = {
 };
 
 type TableConfigurationProvidedProps<R extends Table.RowData> = {
+  readonly rendered: Table.GridSet<boolean>;
   readonly tableApis: Table.ITableApis;
   readonly hiddenColumns?: Table.HiddenColumns;
   readonly tableGridOptions: Table.TableOptionsSet;
@@ -99,6 +100,22 @@ const apisReducer = (state: tabling.TableApis = InitialAPIs, action: SetApiActio
   return newApis;
 };
 
+const InitialDataRenderedSet: Table.GridSet<boolean> = {
+  data: false,
+  footer: false,
+  page: false
+};
+
+const useTrackGridDataRender = (): [Table.GridSet<boolean>, (gridId: Table.GridId) => void] => {
+  const rendered = useRef<Table.GridSet<boolean>>(InitialDataRenderedSet);
+
+  const onGridDataRendered = hooks.useDynamicCallback((gridId: Table.GridId) => {
+    rendered.current = { ...rendered.current, [gridId]: true };
+  });
+
+  return [rendered.current, onGridDataRendered];
+};
+
 const configureTable = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
@@ -110,6 +127,7 @@ const configureTable = <
 ): React.FunctionComponent<T> => {
   function WithConfigureTable(props: T) {
     const [_apis, dispatchApis] = useReducer(apisReducer, InitialAPIs);
+    const [rendered, gridDataRendered] = useTrackGridDataRender();
 
     const [hiddenColumns, changeColumnVisibility] = useHiddenColumns<R, M>({
       cookie: props.cookieNames?.hiddenColumns,
@@ -125,6 +143,7 @@ const configureTable = <
     const onGridReady = useMemo(
       () => (e: Table.GridReadyEvent, gridId: Table.GridId) => {
         dispatchApis({ gridId, payload: { api: e.api, columnApi: e.columnApi } });
+        gridDataRendered(gridId);
       },
       []
     );
@@ -228,6 +247,7 @@ const configureTable = <
     return (
       <Component
         {...props}
+        rendered={rendered}
         minimal={props.minimal}
         rowHeight={props.rowHeight}
         menuPortalId={props.menuPortalId}

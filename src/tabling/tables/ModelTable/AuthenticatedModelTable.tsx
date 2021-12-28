@@ -9,7 +9,7 @@ import {
 export type AuthenticatedModelTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
-> = Omit<AuthenticatedTableProps<R, M>, "children">;
+> = AuthenticatedTableProps<R, M>;
 
 const AuthenticatedModelTable = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: AuthenticatedModelTableProps<R, M>

@@ -46,9 +46,16 @@ export type AuthenticatedTableProps<
       | ((col: Table.DataColumn<R, M>) => boolean);
     readonly confirmRowDelete?: boolean;
     readonly localizePopupParent?: boolean;
-    readonly children: RenderPropChild<AuthenticatedTableDataGridProps<R, M>>;
     readonly rowHasCheckboxSelection?: (row: Table.EditableRow<R>) => boolean;
   };
+
+type _AuthenticatedTableProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context
+> = AuthenticatedTableProps<R, M, C> & {
+  readonly children: RenderPropChild<AuthenticatedTableDataGridProps<R, M>>;
+};
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const TableFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, any>>({
@@ -83,13 +90,13 @@ const AuthenticatedTable = <
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   props: WithAuthenticatedDataGridProps<
-    WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<R, M>, R>, R, M, S>
+    WithConnectedTableProps<WithConfiguredTableProps<_AuthenticatedTableProps<R, M>, R>, R, M, S>
   >
 ): JSX.Element => {
   const grid = tabling.hooks.useDataGrid();
   const [selectedRows, setSelectedRows] = useState<Table.EditableRow<R>[]>([]);
   const [deleteRows, setDeleteRows] = useState<Table.EditableRow<R>[] | undefined>(undefined);
-  const [removeNotification, notify] = useNotifications(props.tableId);
+  const [removeNotification, notify] = useNotifications(props.tableId, props.rendered);
 
   /**
    * Note: Ideally, we would be including the selector in the mechanics of the
@@ -407,10 +414,9 @@ const AuthenticatedTable = <
   );
 };
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 type Props = WithAuthenticatedDataGridProps<
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<any>, any>, any>
+  WithConnectedTableProps<WithConfiguredTableProps<_AuthenticatedTableProps<any>, any>, any>
 >;
 
 const Memoized = React.memo(AuthenticatedTable) as typeof AuthenticatedTable;
@@ -418,6 +424,6 @@ const Memoized = React.memo(AuthenticatedTable) as typeof AuthenticatedTable;
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export default configureTable<any, any, Props>(Memoized) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-    props: AuthenticatedTableProps<R, M>
+    props: _AuthenticatedTableProps<R, M>
   ): JSX.Element;
 };

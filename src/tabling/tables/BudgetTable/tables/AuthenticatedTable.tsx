@@ -10,7 +10,7 @@ import { Framework } from "../framework";
 export type AuthenticatedBudgetTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
-> = Omit<AuthenticatedTableProps<R, M>, "children"> & {
+> = AuthenticatedTableProps<R, M> & {
   readonly onBack?: () => void;
   readonly onLeft?: () => void;
   readonly onRight?: () => void;

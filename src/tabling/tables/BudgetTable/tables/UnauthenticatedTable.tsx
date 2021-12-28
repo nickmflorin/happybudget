@@ -6,7 +6,7 @@ import { UnauthenticatedBudgetDataGrid } from "../grids";
 export type UnauthenticatedBudgetTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
-> = Omit<UnauthenticatedTableProps<R, M>, "children"> & {
+> = UnauthenticatedTableProps<R, M> & {
   readonly onBack?: () => void;
   readonly onLeft?: () => void;
   readonly onRight?: () => void;

@@ -34,6 +34,12 @@ export type UnauthenticatedTableProps<
   readonly excludeColumns?:
     | SingleOrArray<string | ((col: Table.DataColumn<R, M>) => boolean)>
     | ((col: Table.DataColumn<R, M>) => boolean);
+};
+
+type _UnauthenticatedTableProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel
+> = UnauthenticatedTableProps<R, M> & {
   readonly children: RenderPropChild<UnauthenticatedTableDataGridProps<R, M>>;
 };
 
@@ -66,7 +72,7 @@ const PageFooterGrid = FooterGrid<any, any, UnauthenticatedFooterGridProps<any>>
 
 const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: WithUnauthenticatedDataGridProps<
-    WithConnectedTableProps<WithConfiguredTableProps<UnauthenticatedTableProps<R, M>, R>, R, M>
+    WithConnectedTableProps<WithConfiguredTableProps<_UnauthenticatedTableProps<R, M>, R>, R, M>
   >
 ): JSX.Element => {
   const grid = tabling.hooks.useDataGrid();
@@ -230,7 +236,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
 
 type Props = WithUnauthenticatedDataGridProps<
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  WithConnectedTableProps<WithConfiguredTableProps<UnauthenticatedTableProps<any>, any>, any>
+  WithConnectedTableProps<WithConfiguredTableProps<_UnauthenticatedTableProps<any>, any>, any>
 >;
 
 const Memoized = React.memo(UnauthenticatedTable) as typeof UnauthenticatedTable;
@@ -238,6 +244,6 @@ const Memoized = React.memo(UnauthenticatedTable) as typeof UnauthenticatedTable
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export default configureTable<any, any, Props>(Memoized) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-    props: UnauthenticatedTableProps<R, M>
+    props: _UnauthenticatedTableProps<R, M>
   ): JSX.Element;
 };
