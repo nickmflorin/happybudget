@@ -198,8 +198,10 @@ declare namespace Model {
   type Account = LineMetrics &
     SimpleAccount & {
       readonly children: number[];
-      readonly siblings?: SimpleAccount[]; // Only included for detail endpoints.
-      readonly ancestors?: [SimpleBudget | SimpleTemplate]; // Only included for detail endpoints.
+      // Only included for detail endpoints.
+      readonly siblings?: SimpleAccount[];
+      // Only included for detail endpoints.
+      readonly ancestors?: [SimpleBudget | SimpleTemplate];
     };
 
   type PdfAccount = LineMetrics &
@@ -230,9 +232,14 @@ declare namespace Model {
       readonly fringes: number[];
       // Only applicable for non-Template cases.
       readonly attachments?: SimpleAttachment[];
-      readonly siblings?: SimpleSubAccount[]; // Only included for detail endpoints.
-      /* eslint-disable-next-line max-len */
-      readonly ancestors?: [SimpleBudget | SimpleTemplate, SimpleAccount, ...Array<SimpleSubAccount>]; // Only included for detail endpoints.
+      // Only included for detail endpoints.
+      readonly siblings?: SimpleSubAccount[];
+      // Only included for detail endpoints.
+      readonly ancestors?: [
+        SimpleBudget | SimpleTemplate,
+        Omit<SimpleAccount, "order">,
+        ...Array<Omit<SimpleSubAccount, "order">>
+      ];
     };
 
   type PdfSubAccount = RowHttpModel<"pdf-subaccount"> &
@@ -245,7 +252,9 @@ declare namespace Model {
       readonly children_markups: Markup[];
     };
 
-  type ActualOwner = SimpleMarkup | SimpleSubAccount;
+  type Ancestor = SimpleBudget | SimpleTemplate | Omit<SimpleAccount, "order"> | Omit<SimpleSubAccount, "order">;
+
+  type ActualOwner = SimpleMarkup | Omit<SimpleSubAccount, "order" | "domain">;
 
   type Actual = RowHttpModel<"actual"> & {
     readonly contact: number | null;
