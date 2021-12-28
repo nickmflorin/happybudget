@@ -2,12 +2,12 @@ import React, { ReactNode } from "react";
 import classNames from "classnames";
 
 interface ContentProps extends StandardComponentProps {
-  children: ReactNode;
+  readonly children: ReactNode;
 }
 
-const Content = ({ children, className, style = {} }: ContentProps): JSX.Element => {
+const Content = ({ children, ...props }: ContentProps): JSX.Element => {
   return (
-    <div className={classNames("content", className)} style={style}>
+    <div {...props} className={classNames("content", props.className)}>
       <div className={"sub-content"}>{children}</div>
     </div>
   );

@@ -16,3 +16,12 @@
 .ant-select-dropdown {
   padding: 0px !important;
 }
+
+.header-dropdown-menu {
+	.dropdown-menu-item {
+		svg {
+			height: auto;
+			width: 16px;
+		}
+	}
+}
