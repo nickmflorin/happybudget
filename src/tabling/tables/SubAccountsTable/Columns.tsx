@@ -14,14 +14,12 @@ const Columns: Table.Column<R, M>[] = [
     markupField: "identifier",
     pdfHeaderName: "Acct #",
     pdfWidth: 0.08,
-    pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } },
-    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder", "markup"], r)
+    pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
   }),
   columns.BodyColumn<R, M, string | null>({
     field: "description",
     nullValue: null,
     markupField: "description",
-    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder", "markup"], r),
     minWidth: 200,
     flex: 100,
     pdfFlexGrow: true,

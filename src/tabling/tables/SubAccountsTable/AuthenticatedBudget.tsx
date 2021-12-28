@@ -69,9 +69,9 @@ const AuthenticatedBudgetSubAccountsTable = (
 
   const columns = useMemo(() => {
     return tabling.columns.normalizeColumns(props.columns, {
-      identifier: () => ({
+      identifier: {
         headerName: props.identifierFieldHeader
-      }),
+      },
       description: { headerName: `${props.categoryName} Description` },
       attachments: (col: Table.Column<R, M>) => ({
         onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditAttachments(row.id),

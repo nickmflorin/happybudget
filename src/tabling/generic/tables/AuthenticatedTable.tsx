@@ -116,18 +116,20 @@ const AuthenticatedTable = <
       filter(
         props.columns,
         (c: Table.Column<R, M>) =>
-          (tabling.typeguards.isDataColumn(c) && !evaluateColumnExclusionProp(c)) ||
-          tabling.typeguards.isActionColumn(c)
-      ) as Table.RealColumn<R, M>[],
-      (c: Table.RealColumn<R, M>) => ({
-        ...c,
-        cellRendererParams: {
-          ...c.cellRendererParams,
-          selector: props.selector,
-          footerRowSelectors: props.footerRowSelectors
-        },
-        cellEditorParams: { ...c.cellEditorParams, selector: props.selector }
-      })
+          (tabling.typeguards.isDataColumn(c) && !evaluateColumnExclusionProp(c)) || !tabling.typeguards.isDataColumn(c)
+      ) as Table.Column<R, M>[],
+      (c: Table.Column<R, M>) =>
+        tabling.typeguards.isRealColumn(c)
+          ? {
+              ...c,
+              cellRendererParams: {
+                ...c.cellRendererParams,
+                selector: props.selector,
+                footerRowSelectors: props.footerRowSelectors
+              },
+              cellEditorParams: { ...c.cellEditorParams, selector: props.selector }
+            }
+          : c
     );
   }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns]);
 

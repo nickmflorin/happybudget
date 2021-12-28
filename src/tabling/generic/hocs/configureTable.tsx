@@ -175,7 +175,7 @@ const configureTable = <
             (c: Table.Column<R, M>) =>
               tabling.typeguards.isRealColumn(c) &&
               tabling.columns.normalizedField<R, M>(c) === tabling.columns.normalizedField<R, M>(realColumns[0]),
-            { ...cs[0], pinned: "left" }
+            { ...realColumns[0], pinned: "left" }
           );
         }
         return cs;

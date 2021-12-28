@@ -141,7 +141,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
     return !isNil(checkboxColumn)
       ? util.updateInArray<Table.RealColumn<R, M>>(cs, { colId: "checkbox" }, checkboxColumn)
       : cs;
-  }, [hiddenColumns]);
+  }, [hiddenColumns, hooks.useDeepEqualMemo(columns)]);
 
   const colDefs = useMemo(
     () =>
@@ -212,7 +212,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
           }
         };
       }),
-    []
+    [hooks.useDeepEqualMemo(localColumns)]
   );
 
   const navigateToNextCell = useMemo(
