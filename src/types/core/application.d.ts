@@ -27,7 +27,6 @@ declare namespace Application {
 
   type AuthenticatedStaticStores = AuthenticatedModuleStores & {
     readonly router: import("connected-react-router").RouterState<import("history").LocationState>;
-    readonly drawerVisible: boolean;
     readonly loading: boolean;
     readonly user: Model.User;
     readonly contacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
@@ -57,7 +56,6 @@ declare namespace Application {
   type UnauthenticatedModuleReducers = Redux.ReducersMapObject<UnauthenticatedModuleStores>;
 
   type UnauthenticatedStaticStores = UnauthenticatedModuleStores & {
-    readonly drawerVisible: boolean;
     readonly loading: boolean;
     readonly contacts: Redux.ListResponseStore<Model.Contact>;
   };

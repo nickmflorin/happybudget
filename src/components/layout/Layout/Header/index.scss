@@ -110,6 +110,12 @@
         // display: none;
         display: flex;
       }
+
+      .help-link {
+        @include media(">=large") {
+          margin-right: 10px;
+        }
+      }
     }
   }
 

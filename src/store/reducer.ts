@@ -101,9 +101,6 @@ export const createStaticAuthenticatedReducers = (
         setSearch: actions.authenticated.setContactsSearchAction
       }
     }),
-    drawerVisible: redux.reducers.createSimpleBooleanReducer({
-      actions: { set: actions.setDrawerVisibilityAction }
-    }),
     loading: loadingReducer,
     user: createUserReducer(user)
   };
@@ -132,9 +129,6 @@ export const createStaticUnauthenticatedReducers = (
         response: actions.responseContactsAction,
         loading: actions.loadingContactsAction
       }
-    }),
-    drawerVisible: redux.reducers.createSimpleBooleanReducer({
-      actions: { set: actions.setDrawerVisibilityAction }
     }),
     loading: loadingReducer
   };

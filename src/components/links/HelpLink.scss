@@ -3,10 +3,6 @@
 .help-link {
   display: flex;
 
-  @include media(">=large") {
-    margin-right: 10px;
-  }
-
   .icon {
     color: $text-tertiary;
     height: 16px;

@@ -5,7 +5,6 @@ export * as authenticated from "./authenticated";
 export { default as AuthenticatedActionTypes } from "./authenticated";
 
 export const GlobalActionTypes = {
-  SetDrawerVisibility: "SetDrawerVisibility",
   SetApplicationLoading: "SetApplicationLoading",
   Contacts: {
     Request: "contacts.Request",
@@ -14,7 +13,6 @@ export const GlobalActionTypes = {
   }
 };
 
-export const setDrawerVisibilityAction = redux.actions.createAction<boolean>(GlobalActionTypes.SetDrawerVisibility);
 export const setApplicationLoadingAction = redux.actions.createAction<boolean>(GlobalActionTypes.SetApplicationLoading);
 
 export const requestContactsAction = redux.actions.createAction<null>(GlobalActionTypes.Contacts.Request);

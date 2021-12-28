@@ -9,10 +9,8 @@ import { Icon, ShowHide, SavingChanges } from "components";
 import { IconButton } from "components/buttons";
 import { DropdownMenu } from "components/dropdowns";
 import { SidebarLogo } from "components/svgs";
-import { AccountCircleLink } from "components/links";
+import { AccountCircleLink, HelpLink } from "components/links";
 import { useLoggedInUser } from "store/hooks";
-
-import HelpLink from "./HelpLink";
 
 import "./index.scss";
 

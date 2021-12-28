@@ -35,7 +35,6 @@ export const createUnauthenticatedInitialState = (
         redux.typeguards.isUnauthenticatedModuleConfig(c)
       ) as Application.UnauthenticatedModuleConfig[]
     ),
-    drawerVisible: false,
     loading: false,
     contacts: redux.initialState.initialListResponseState
   } as Application.UnauthenticatedStore;
@@ -53,7 +52,6 @@ export const createAuthenticatedInitialState = (
       ) as Application.AuthenticatedModuleConfig[]
     ),
     user: createInitialUserState(user),
-    drawerVisible: false,
     loading: false,
     contacts: redux.initialState.initialModelListResponseState
   } as Application.AuthenticatedStore;
