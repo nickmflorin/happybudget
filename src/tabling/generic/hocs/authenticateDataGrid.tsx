@@ -144,7 +144,6 @@ const getCellChangesFromEvent = <
 ): Table.SoloCellChange<R, RW>[] => {
   const row: RW = event.node.data;
   if (tabling.typeguards.isEditableRow(row)) {
-    const field = event.column.getColId();
     const column = tabling.columns.getBodyColumn(columns, event.column.getColId());
     if (!isNil(column)) {
       /*
@@ -198,24 +197,24 @@ const getCellChangesFromEvent = <
         ) as Table.SoloCellChange<R, RW>[];
       } else {
         /*
-      The logic inside this conditional is 100% a HACK - and this type of
-      programming should not be encouraged.  However, in this case, it is
-      a HACK to get around AG Grid nonsense.  It appears to be a bug with
-      AG Grid, but if you have data stored for a cell that is an Array of
-      length 1, when you drag the cell contents to fill other cells, AG Grid
-      will pass the data to the onCellValueChanged handler as only the
-      first element (i.e. [4] becomes 4).  This is problematic for Fringes,
-      since the cell value corresponds to a list of Fringe IDs, so we need
-      to make that adjustment here.
-      */
-        if (field === "fringes" && !Array.isArray(newValue)) {
+				The logic inside this conditional is 100% a HACK - and this type of
+				programming should not be encouraged.  However, in this case, it is
+				a HACK to get around AG Grid nonsense.  It appears to be a bug with
+				AG Grid, but if you have data stored for a cell that is an Array of
+				length 1, when you drag the cell contents to fill other cells, AG Grid
+				will pass the data to the onCellValueChanged handler as only the
+				first element (i.e. [4] becomes 4).  This is problematic for Fringes,
+				since the cell value corresponds to a list of Fringe IDs, so we need
+				to make that adjustment here.
+				*/
+        if (event.column.getColId() === "fringes" && !Array.isArray(newValue)) {
           newValue = [newValue];
         }
         changes = [
           {
             oldValue,
             newValue,
-            field: field as keyof RW["data"],
+            field: event.column.getColId() as keyof RW["data"],
             id: event.data.id
           }
         ];
