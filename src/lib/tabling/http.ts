@@ -1,6 +1,25 @@
 import { isNil, reduce } from "lodash";
 
 import * as managers from "./managers";
+import * as typeguards from "./typeguards";
+
+const issueWarningsForParsedFieldColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+  col: Table.BodyColumn<R, M>
+) => {
+  if (col.parsedFields?.length === 0) {
+    console.warn(
+      `Empty array found for 'parsedFields' attribute of column ${col.field}. ` +
+        "The 'parsedFields' array must contain at least 1 field."
+    );
+  }
+  if (!isNil(col.getHttpValue)) {
+    console.warn(
+      `Column ${col.field} defines 'getHttpValue' but also defines 'parsedFields'. ` +
+        "The 'getHttpValue' callback is ignored because the column's contribution " +
+        "to the HTTP payload is dictated by the individual 'parsedFields'."
+    );
+  }
+};
 
 export const patchPayload = <
   R extends Table.RowData,
@@ -9,22 +28,50 @@ export const patchPayload = <
   RW extends Table.EditableRow<R> = Table.EditableRow<R>
 >(
   change: Table.RowChange<R, RW>,
-  columns: Table.BodyColumn<R, M, Table.RawRowValue>[]
+  columns: Table.ModelColumn<R, M, Table.RawRowValue>[]
 ): P | null => {
   return reduce(
     columns,
-    (p: P, col: Table.BodyColumn<R, M, Table.RawRowValue>) => {
-      const cellChange: Table.CellChange<Table.InferV<typeof col>> | undefined =
-        change.data[col.field as keyof RW["data"]];
-      /* The row change will usually not have changes specified for every
-         single columns - only the ones that have changed. */
-      if (cellChange !== undefined) {
-        const cellHttpValue = cellChange.newValue;
-        if (!isNil(col.getHttpValue)) {
-          const callbackHttpValue = col.getHttpValue(cellHttpValue);
-          return { ...p, [col.field]: callbackHttpValue };
+    (p: P, col: Table.ModelColumn<R, M, Table.RawRowValue>) => {
+      if (typeguards.isBodyColumn(col)) {
+        /* If the column defines `parsedFields` and `parseIntoFields`, the column
+           value is derived from the Column(s) with fields dictated by the
+           `parsedFields` array.  In this case, the Column's field itself won't
+           be in the set of CellChange(s) on the RowChange, but the individual
+           `parsedFields` will be. */
+        if (!isNil(col.parsedFields)) {
+          /* Issue some warnings for edge cases just in case a Column is not
+             configured entirely properly. */
+          issueWarningsForParsedFieldColumn(col);
+          const updates: { [key: string]: Table.RawRowValue } = reduce(
+            col.parsedFields,
+            (curr: { [key: string]: Table.RawRowValue }, fld: string) => {
+              /* The CellChange will not be defined if the parsedField didn't
+                 actually change. */
+              const cellChange: Table.CellChange<Table.InferV<typeof col>> | undefined =
+                change.data[fld as keyof RW["data"]];
+              if (!isNil(cellChange)) {
+                return { ...curr, [fld]: cellChange.newValue };
+              }
+              return curr;
+            },
+            {}
+          );
+          return { ...p, ...updates };
+        } else {
+          const cellChange: Table.CellChange<Table.InferV<typeof col>> | undefined =
+            change.data[col.field as keyof RW["data"]];
+          /* The row change will usually not have changes specified for every
+         		 single columns - only the ones that have changed. */
+          if (cellChange !== undefined) {
+            const cellHttpValue = cellChange.newValue;
+            if (!isNil(col.getHttpValue)) {
+              const callbackHttpValue = col.getHttpValue(cellHttpValue);
+              return { ...p, [col.field]: callbackHttpValue };
+            }
+            return { ...p, [col.field]: cellHttpValue };
+          }
         }
-        return { ...p, [col.field]: cellHttpValue };
       }
       return p;
     },
@@ -39,7 +86,7 @@ export const bulkPatchPayload = <
   RW extends Table.EditableRow<R> = Table.EditableRow<R>
 >(
   change: Table.RowChange<R, RW>,
-  columns: Table.BodyColumn<R, M, Table.RawRowValue>[]
+  columns: Table.ModelColumn<R, M, Table.RawRowValue>[]
 ): Http.ModelBulkUpdatePayload<P> | null => {
   const patch = patchPayload<R, M, P, RW>(change, columns);
   if (!isNil(patch)) {
@@ -55,7 +102,7 @@ export const bulkPatchPayloads = <
   RW extends Table.EditableRow<R> = Table.EditableRow<R>
 >(
   p: Table.DataChangePayload<R, RW> | Table.DataChangeEvent<R, RW>,
-  columns: Table.BodyColumn<R, M, Table.RawRowValue>[]
+  columns: Table.ModelColumn<R, M, Table.RawRowValue>[]
 ): Http.ModelBulkUpdatePayload<P>[] => {
   const isEvent = (
     obj: Table.DataChangePayload<R, RW> | Table.DataChangeEvent<R, RW>
@@ -63,6 +110,7 @@ export const bulkPatchPayloads = <
 
   const payload: Table.DataChangePayload<R, RW> = isEvent(p) ? p.payload : p;
   const changes: Table.RowChange<R, RW>[] = Array.isArray(payload) ? payload : [payload];
+
   return reduce(
     changes,
     (prev: Http.ModelBulkUpdatePayload<P>[], change: Table.RowChange<R, RW>) => {
@@ -78,18 +126,20 @@ export const bulkPatchPayloads = <
 
 export const postPayload = <R extends Table.RowData, M extends Model.RowHttpModel, P extends Http.PayloadObj>(
   data: Partial<R>,
-  columns: Table.BodyColumn<R, M, Table.RawRowValue>[]
+  columns: Table.ModelColumn<R, M, Table.RawRowValue>[]
 ): P => {
   return reduce(
     columns,
-    (p: P, col: Table.BodyColumn<R, M, Table.RawRowValue>) => {
-      const value: Table.InferV<typeof col> | undefined = data[col.field] as Table.InferV<typeof col> | undefined;
-      if (value !== undefined) {
-        if (!isNil(col.getHttpValue)) {
-          const httpValue = col.getHttpValue(value);
-          return { ...p, [col.field]: httpValue };
+    (p: P, col: Table.ModelColumn<R, M, Table.RawRowValue>) => {
+      if (typeguards.isBodyColumn(col)) {
+        const value: Table.InferV<typeof col> | undefined = data[col.field] as Table.InferV<typeof col> | undefined;
+        if (value !== undefined) {
+          if (!isNil(col.getHttpValue)) {
+            const httpValue = col.getHttpValue(value);
+            return { ...p, [col.field]: httpValue };
+          }
+          return { ...p, [col.field]: value };
         }
-        return { ...p, [col.field]: value };
       }
       return p;
     },
@@ -99,7 +149,7 @@ export const postPayload = <R extends Table.RowData, M extends Model.RowHttpMode
 
 export const postPayloads = <R extends Table.RowData, M extends Model.RowHttpModel, P extends Http.PayloadObj>(
   p: Table.RowAddDataPayload<R> | Table.RowAddDataEvent<R>,
-  columns: Table.BodyColumn<R, M, Table.RawRowValue>[]
+  columns: Table.ModelColumn<R, M, Table.RawRowValue>[]
 ): P[] => {
   const isEvent = (obj: Table.RowAddDataPayload<R> | Table.RowAddDataEvent<R>): obj is Table.RowAddDataEvent<R> =>
     (obj as Table.RowAddDataEvent<R>).type === "rowAdd";
@@ -121,7 +171,7 @@ export const createBulkUpdatePayload = <
   RW extends Table.EditableRow<R> = Table.EditableRow<R>
 >(
   p: Table.DataChangePayload<R, RW>,
-  columns: Table.BodyColumn<R, M, Table.RawRowValue>[]
+  columns: Table.ModelColumn<R, M, Table.RawRowValue>[]
 ): Http.BulkUpdatePayload<P> => ({ data: bulkPatchPayloads<R, M, P, RW>(p, columns) });
 
 export const createBulkCreatePayload = <
@@ -130,7 +180,7 @@ export const createBulkCreatePayload = <
   P extends Http.PayloadObj
 >(
   p: Partial<R>[],
-  columns: Table.BodyColumn<R, M, Table.RawRowValue>[]
+  columns: Table.ModelColumn<R, M, Table.RawRowValue>[]
 ): Http.BulkCreatePayload<P> => {
   return { data: postPayloads<R, M, P>(p, columns) };
 };

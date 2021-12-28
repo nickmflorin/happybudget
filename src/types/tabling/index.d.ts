@@ -433,12 +433,10 @@ declare namespace Table {
     | "onCellDoubleClicked";
 
   type ParsedColumnField<
-    R extends RowData,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any,
-    RW extends Table.EditableRow<R> = Table.EditableRow<R>
+    V extends RawRowValue = any
   > = {
-    field: keyof RW["data"];
+    field: string;
     value: V;
   };
 
@@ -464,6 +462,30 @@ declare namespace Table {
   type InferM<C> = C extends Column<any, infer M, any> ? M : never;
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type InferV<C> = C extends Column<any, any, infer V> ? V : never;
+
+  type InferRealColumn<C extends Column> = C extends BodyColumn<infer R, infer M, infer V>
+    ? BodyColumn<R, M, V>
+    : C extends CalculatedColumn<infer R, infer M, infer V>
+    ? CalculatedColumn<R, M, V>
+    : C extends ActionColumn<infer R, infer M>
+    ? ActionColumn<R, M>
+    : never;
+
+  type InferActionColumn<C extends Column> = C extends ActionColumn<infer R, infer M> ? ActionColumn<R, M> : never;
+
+  type InferBodyColumn<C extends Column> = C extends BodyColumn<infer R, infer M, infer V>
+    ? BodyColumn<R, M, V>
+    : never;
+
+  type InferCalculatedColumn<C extends Column> = C extends CalculatedColumn<infer R, infer M, infer V>
+    ? CalculatedColumn<R, M, V>
+    : never;
+
+  type InferDataColumn<C extends Column> = C extends BodyColumn<infer R, infer M, infer V>
+    ? BodyColumn<R, M, V>
+    : C extends CalculatedColumn<infer R, infer M, infer V>
+    ? CalculatedColumn<R, M, V>
+    : never;
 
   type BaseColumn = Omit<ColDef, OmitColDefParams>;
 
@@ -612,7 +634,17 @@ declare namespace Table {
       readonly editable?: boolean | ((params: ColumnCallbackParams<R>) => boolean);
       readonly smartInference?: boolean;
       readonly processCellFromClipboard?: (value: string) => V;
-      readonly parseIntoFields?: (value: V) => ParsedColumnField<R, V, ModelRow<R>>[];
+      /* The fields that the column is derive from.  Must be provided if
+			   parseIntoFields is defined */
+      readonly parsedFields?: string[];
+      /* Callback that is used when a given column is derived from multiple other
+				 columns.  The parser must take the value for the current column (which
+				 is derived from the parsed columns) and parse the value such that the
+				 contributing part from each parsed column is returned separately.
+
+				 Must be provided if parsedFields is defined.
+				 */
+      readonly parseIntoFields?: (value: V) => ParsedColumnField<V>[];
       readonly onDataChange?: (id: ModelRowId, event: CellChange<V>) => void;
       readonly refreshColumns?: (change: CellChange<V>) => string[];
     };
@@ -967,7 +999,7 @@ declare namespace Table {
   type TableInstance<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = DataGridInstance & {
     readonly removeNotification: () => void;
     readonly notify: (notification: TableNotification) => void;
-    readonly getColumns: () => BodyColumn<R, M>[];
+    readonly getColumns: () => ModelColumn<R, M>[];
     readonly getFocusedRow: () => BodyRow<R> | null;
     readonly getRow: (id: BodyRowId) => BodyRow<R> | null;
     readonly getRows: () => BodyRow<R>[];

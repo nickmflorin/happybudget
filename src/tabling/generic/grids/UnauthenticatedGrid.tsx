@@ -28,14 +28,17 @@ const UnauthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpMod
     };
   }, [framework, props.id]);
 
-  const columns = useMemo<Table.RealColumn<R, M>[]>(
-    (): Table.RealColumn<R, M>[] =>
+  const columns = useMemo<Table.Column<R, M>[]>(
+    (): Table.Column<R, M>[] =>
       map(
         props.columns,
-        (col: Table.RealColumn<R, M>): Table.RealColumn<R, M> => ({
-          ...col,
-          cellRendererParams: { ...col.cellRendererParams, readOnly: true }
-        })
+        (col: Table.Column<R, M>): Table.Column<R, M> =>
+          tabling.typeguards.isRealColumn(col)
+            ? {
+                ...col,
+                cellRendererParams: { ...col.cellRendererParams, readOnly: true }
+              }
+            : col
       ),
     [hooks.useDeepEqualMemo(props.columns)]
   );

@@ -68,7 +68,7 @@ const AuthenticatedTemplateAccountsTable = (props: AuthenticatedTemplateProps): 
           !isNil(props.budget) ? `${props.budget.type}_${props.budget.name}_accounts` : ""
         )
       ]}
-      columns={tabling.columns.filterRealColumns(Columns)}
+      columns={Columns}
     />
   );
 };

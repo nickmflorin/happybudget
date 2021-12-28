@@ -6,7 +6,7 @@ import { tabling, hooks, models } from "lib";
 
 interface InjectedContactsProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
-  readonly columns: Table.RealColumn<R, M>[];
+  readonly columns: Table.Column<R, M>[];
 }
 
 export interface WithContactsProps {
@@ -28,7 +28,7 @@ const withContacts =
     M extends Model.RowHttpModel = Model.RowHttpModel,
     T extends WithContactsProps = WithContactsProps
   >(
-    columns: Table.RealColumn<R, M>[]
+    columns: Table.Column<R, M>[]
   ) =>
   (
     Component: /* eslint-disable-next-line @typescript-eslint/no-explicit-any */

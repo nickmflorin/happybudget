@@ -8,7 +8,7 @@ export type UseClipboardReturnType = [(params: ProcessCellForExportParams) => st
 
 export type UseClipboardParams<R extends Table.RowData, M extends Model.RowHttpModel> = {
   readonly apis: Table.GridApis | null;
-  readonly columns: Table.RealColumn<R, M>[];
+  readonly columns: Table.Column<R, M>[];
   readonly setCellCutChange?: (ch: Table.SoloCellChange<R> | null) => void;
 };
 
@@ -41,7 +41,7 @@ const useClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
   const processCellForClipboard: (p: ProcessCellForExportParams) => string = hooks.useDynamicCallback(
     (p: ProcessCellForExportParams): string => {
       if (!isNil(p.node)) {
-        const c: Table.RealColumn<R, M> | null = tabling.columns.getColumn(params.columns, p.column.getColId());
+        const c: Table.RealColumn<R, M> | null = tabling.columns.getRealColumn(params.columns, p.column.getColId());
         if (!isNil(c) && tabling.typeguards.isDataColumn(c)) {
           params.setCellCutChange?.(null);
           const row: Table.BodyRow<R> = p.node.data;
@@ -57,7 +57,7 @@ const useClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
     if (!isNil(gridApi)) {
       const cs: Table.DataColumn<R, M>[] = filter(
         params.columns,
-        (column: Table.RealColumn<R, M>) =>
+        (column: Table.Column<R, M>) =>
           tabling.typeguards.isDataColumn(column) &&
           !isNil(column.field) &&
           column.canBeExported !== false &&

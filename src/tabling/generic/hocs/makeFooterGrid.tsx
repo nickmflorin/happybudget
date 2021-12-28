@@ -42,7 +42,7 @@ const FooterGrid =
       | React.FunctionComponent<WithFooterGridProps<T>>
   ): React.FunctionComponent<Omit<T, "id">> => {
     function WithFooterGrid(props: T) {
-      const columns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
+      const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
         const UniversalFooterColumn = (col: Table.DataColumn<R, M>): Table.DataColumn<R, M> => {
           const footerColumn = config.getFooterColumn(col);
           if (!isNil(footerColumn)) {
@@ -53,7 +53,7 @@ const FooterGrid =
           }
           return col;
         };
-        return map(props.columns, (col: Table.RealColumn<R, M>) =>
+        return map(props.columns, (col: Table.Column<R, M>) =>
           tabling.typeguards.isDataColumn(col) ? UniversalFooterColumn(col) : col
         );
       }, [hooks.useDeepEqualMemo(props.columns)]);

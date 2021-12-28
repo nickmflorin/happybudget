@@ -19,7 +19,7 @@ export interface DataGridProps<R extends Table.RowData, M extends Model.RowHttpM
   readonly className?: Table.GeneralClassName;
   readonly rowClass?: Table.RowClassName;
   readonly hasEditColumn: boolean;
-  readonly columns: Table.RealColumn<R, M>[];
+  readonly columns: Table.Column<R, M>[];
   readonly search?: string;
   readonly cookieNames?: Table.CookieNames;
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
@@ -66,11 +66,15 @@ const DataGrid =
       const oldFocusedEvent = useRef<CellFocusedEvent | null>(null);
       const location = useLocation();
 
-      const columns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
-        return map(props.columns, (col: Table.RealColumn<R, M>) => ({
-          ...col,
-          cellRendererParams: { ...col.cellRendererParams, getRowColorDef }
-        }));
+      const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
+        return map(props.columns, (col: Table.Column<R, M>) =>
+          tabling.typeguards.isRealColumn(col)
+            ? {
+                ...col,
+                cellRendererParams: { ...col.cellRendererParams, getRowColorDef }
+              }
+            : col
+        );
       }, [hooks.useDeepEqualMemo(props.columns)]);
 
       const onFirstDataRendered: (e: Table.FirstDataRenderedEvent) => void = useMemo(
@@ -151,10 +155,7 @@ const DataGrid =
         const getCellFromFocusedEvent = (event: CellFocusedEvent): Table.Cell<R, M> | null => {
           if (!isNil(props.apis) && !isNil(event.rowIndex) && !isNil(event.column)) {
             const rowNode: Table.RowNode | undefined = props.apis.grid.getDisplayedRowAtIndex(event.rowIndex);
-            const column: Table.RealColumn<R, M> | null = tabling.columns.getRealColumn(
-              columns,
-              event.column.getColId()
-            );
+            const column = tabling.columns.getRealColumn(columns, event.column.getColId());
             if (!isNil(rowNode) && !isNil(column)) {
               const row: Table.BodyRow<R> = rowNode.data;
               return { rowNode, column, row };
@@ -212,7 +213,9 @@ const DataGrid =
               );
             } else if (
               includes(
-                map(columns, (col: Table.RealColumn<R, M>) => tabling.columns.normalizedField<R, M>(col)),
+                map(tabling.columns.filterRealColumns(columns), (col: Table.RealColumn<R, M>) =>
+                  tabling.columns.normalizedField<R, M>(col)
+                ),
                 e.colDef.field || e.colDef.colId
               )
             ) {

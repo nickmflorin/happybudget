@@ -1,5 +1,5 @@
 import React, { useImperativeHandle, useState, useMemo } from "react";
-import { forEach, isNil, uniq, map, filter, includes } from "lodash";
+import { forEach, isNil, uniq, map, filter, includes, reduce } from "lodash";
 
 import { tabling, util, hooks } from "lib";
 import { Config } from "config";
@@ -102,7 +102,7 @@ const AuthenticatedTable = <
    * and configureTable in any order, and the selector will still be included in
    * the editor and renderer params for each column.
    */
-  const columns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
+  const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
     const evaluateColumnExclusionProp = (c: Table.DataColumn<R, M>): boolean => {
       if (!isNil(props.excludeColumns)) {
         if (typeof props.excludeColumns === "function") {
@@ -115,10 +115,10 @@ const AuthenticatedTable = <
     return map(
       filter(
         props.columns,
-        (c: Table.RealColumn<R, M>) =>
+        (c: Table.Column<R, M>) =>
           (tabling.typeguards.isDataColumn(c) && !evaluateColumnExclusionProp(c)) ||
           tabling.typeguards.isActionColumn(c)
-      ),
+      ) as Table.RealColumn<R, M>[],
       (c: Table.RealColumn<R, M>) => ({
         ...c,
         cellRendererParams: {
@@ -155,27 +155,37 @@ const AuthenticatedTable = <
 
             let field: keyof Table.EditableRow<R>["data"];
             for (field in rowChange.data) {
-              const change = util.getKeyValue<Table.RowChangeData<R>, keyof Table.EditableRow<R>["data"]>(field)(
-                rowChange.data
-              ) as Table.CellChange;
-              const col: Table.RealColumn<R, M> | null = tabling.columns.getColumn(props.columns, field);
-              if (!isNil(col) && tabling.typeguards.isBodyColumn<R, M>(col)) {
-                /* Check if the cellChange is associated with a Column that has
-									 it's own change event handler. */
-                if (tabling.typeguards.isModelRowId(rowChange.id)) {
-                  col.onDataChange?.(rowChange.id, change);
-                }
-
-                /* Check if the cellChange is associated with a Column that when
-									 changed, should refresh other columns. */
-                if (!isNil(col.refreshColumns)) {
-                  const fieldsToRefresh = col.refreshColumns(change);
-                  if (!isNil(fieldsToRefresh) && (!Array.isArray(fieldsToRefresh) || fieldsToRefresh.length !== 0)) {
-                    hasColumnsToRefresh = true;
-                    columnsToRefresh = uniq([
-                      ...columnsToRefresh,
-                      ...(Array.isArray(fieldsToRefresh) ? fieldsToRefresh : [fieldsToRefresh])
-                    ]);
+              /* If the field in the RowChangeData is a parsedField, it does not
+                 correspond to an RealColumn, but a FakeColumn (since the field
+                 is not displayed, just used to derive the values of other
+                 columns).  In this case, we cannot apply the logic below. */
+              const parsedFields = reduce(
+                tabling.columns.filterBodyColumns(props.columns),
+                (curr: string[], c: Table.BodyColumn<R, M>) => [...curr, ...(c.parsedFields || [])],
+                []
+              );
+              if (!includes(parsedFields, field)) {
+                const change = util.getKeyValue<Table.RowChangeData<R>, keyof Table.EditableRow<R>["data"]>(field)(
+                  rowChange.data
+                ) as Table.CellChange;
+                const col: Table.Column<R, M> | null = tabling.columns.getColumn(props.columns, field);
+                if (!isNil(col) && tabling.typeguards.isBodyColumn<R, M>(col)) {
+                  /* Check if the cellChange is associated with a Column that has
+										 it's own change event handler. */
+                  if (tabling.typeguards.isModelRowId(rowChange.id)) {
+                    col.onDataChange?.(rowChange.id, change);
+                  }
+                  /* Check if the cellChange is associated with a Column that when
+										 changed, should refresh other columns. */
+                  if (!isNil(col.refreshColumns)) {
+                    const fieldsToRefresh = col.refreshColumns(change);
+                    if (!isNil(fieldsToRefresh) && (!Array.isArray(fieldsToRefresh) || fieldsToRefresh.length !== 0)) {
+                      hasColumnsToRefresh = true;
+                      columnsToRefresh = uniq([
+                        ...columnsToRefresh,
+                        ...(Array.isArray(fieldsToRefresh) ? fieldsToRefresh : [fieldsToRefresh])
+                      ]);
+                    }
                   }
                 }
               }
@@ -241,8 +251,7 @@ const AuthenticatedTable = <
       notify,
       removeNotification,
       changeColumnVisibility: props.changeColumnVisibility,
-      getColumns: () =>
-        filter(columns, (c: Table.RealColumn<R, M>) => tabling.typeguards.isBodyColumn(c)) as Table.BodyColumn<R, M>[],
+      getColumns: () => tabling.columns.filterModelColumns(columns),
       applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R, M>>) =>
         Array.isArray(event) ? map(event, (e: Table.ChangeEvent<R, M>) => _onChangeEvent(e)) : _onChangeEvent(event),
       getRowsAboveAndIncludingFocusedRow: () => {
@@ -339,12 +348,7 @@ const AuthenticatedTable = <
           {...props}
           apis={props.tableApis.get("data")}
           actions={actions}
-          columns={
-            filter(columns, (c: Table.RealColumn<R, M>) => tabling.typeguards.isDataColumn(c)) as Table.DataColumn<
-              R,
-              M
-            >[]
-          }
+          columns={tabling.columns.filterDataColumns(columns)}
           selectedRows={selectedRows}
           hasEditColumn={props.hasEditColumn}
           hasDragColumn={

@@ -85,7 +85,7 @@ export interface GridProps<R extends Table.RowData, M extends Model.RowHttpModel
   readonly hiddenColumns?: Table.HiddenColumns;
   readonly gridOptions: Table.GridOptions;
   readonly checkboxColumn?: Table.PartialActionColumn<R, M>;
-  readonly columns: Table.RealColumn<R, M>[];
+  readonly columns: Table.Column<R, M>[];
   readonly className?: Table.GeneralClassName;
   readonly style?: React.CSSProperties;
   readonly rowClass?: Table.RowClassName;
@@ -118,7 +118,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
 }: GridProps<R, M>): JSX.Element => {
   const localColumns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
     const cs: Table.RealColumn<R, M>[] = map(
-      columns,
+      tabling.columns.filterRealColumns(columns),
       (col: Table.RealColumn<R, M>, index: number): Table.RealColumn<R, M> => {
         const hidden =
           tabling.typeguards.isDataColumn(col) &&

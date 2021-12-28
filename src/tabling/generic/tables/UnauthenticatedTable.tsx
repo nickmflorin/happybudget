@@ -81,7 +81,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
    * and configureTable in any order, and the selector will still be included in
    * the editor and renderer params for each column.
    */
-  const columns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
+  const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
     const evaluateColumnExclusionProp = (c: Table.DataColumn<R, M>): boolean => {
       if (!isNil(props.excludeColumns)) {
         if (typeof props.excludeColumns === "function") {
@@ -94,10 +94,10 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
     return map(
       filter(
         props.columns,
-        (c: Table.RealColumn<R, M>) =>
+        (c: Table.Column<R, M>) =>
           (tabling.typeguards.isDataColumn(c) && !evaluateColumnExclusionProp(c)) ||
           tabling.typeguards.isActionColumn(c)
-      ),
+      ) as Table.RealColumn<R, M>[],
       (c: Table.RealColumn<R, M>) => ({
         ...c,
         cellRendererParams: {
@@ -118,8 +118,7 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
       notify: () => {},
       /* eslint-disable-next-line @typescript-eslint/no-empty-function */
       removeNotification: () => {},
-      getColumns: () =>
-        filter(columns, (c: Table.RealColumn<R, M>) => tabling.typeguards.isBodyColumn(c)) as Table.BodyColumn<R, M>[],
+      getColumns: () => tabling.columns.filterModelColumns(columns),
       /* eslint-disable-next-line @typescript-eslint/no-empty-function */
       applyTableChange: () => {},
       changeColumnVisibility: props.changeColumnVisibility,

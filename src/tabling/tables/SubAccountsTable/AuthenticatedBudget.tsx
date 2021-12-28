@@ -185,6 +185,4 @@ const AuthenticatedBudgetSubAccountsTable = (
 
 const AsSubAccountsTable = SubAccountsTable(AuthenticatedBudgetSubAccountsTable);
 
-export default React.memo(
-  withContacts<R, M, AuthenticatedBudgetProps>(tabling.columns.filterRealColumns(Columns))(AsSubAccountsTable)
-);
+export default React.memo(withContacts<R, M, AuthenticatedBudgetProps>(Columns)(AsSubAccountsTable));

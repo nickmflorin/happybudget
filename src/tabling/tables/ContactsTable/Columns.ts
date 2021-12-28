@@ -22,6 +22,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     cellClass: "cell--renders-html",
     width: 140,
     minWidth: 140,
+    parsedFields: ["first_name", "last_name"],
     parseIntoFields: (value: string | null) => {
       const parsed = !isNil(value) ? models.parseFirstAndLastName(value) : null;
       return [

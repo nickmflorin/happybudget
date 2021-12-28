@@ -229,7 +229,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
             (curr: Table.RawRowValue[][], rowData: string[]) => {
               const processed = processArrayFromClipboard<R, M>(
                 apis.column,
-                filter(params.columns, (ci: Table.RealColumn<R, M>) =>
+                filter(params.columns, (ci: Table.Column<R, M>) =>
                   tabling.typeguards.isDataColumn(ci)
                 ) as Table.DataColumn<R, M>[],
                 focusedCell.column,
@@ -249,9 +249,10 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
 						 with the data provided. */
           const cols = getWritableColumnsAfter<R, M>(
             apis.column,
-            filter(params.columns, (ci: Table.RealColumn<R, M>) =>
-              tabling.typeguards.isDataColumn(ci)
-            ) as Table.DataColumn<R, M>[],
+            filter(params.columns, (ci: Table.Column<R, M>) => tabling.typeguards.isDataColumn(ci)) as Table.DataColumn<
+              R,
+              M
+            >[],
             focusedCell.column
           );
           const payload = reduce(
@@ -275,8 +276,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
                         ...currD,
                         ...reduce(
                           parsed,
-                          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                          (v: Partial<R>, parsedField: Table.ParsedColumnField<R, any, Table.ModelRow<R>>) => {
+                          (v: Partial<R>, parsedField: Table.ParsedColumnField) => {
                             if (parsedField.value === "") {
                               return {
                                 ...v,

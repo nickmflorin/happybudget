@@ -6,7 +6,7 @@ import { hooks, tabling } from "lib";
 
 export interface UseCellNavigationParams<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
   readonly apis: Table.GridApis | null;
-  readonly columns: Table.RealColumn<R, M>[];
+  readonly columns: Table.Column<R, M>[];
   readonly includeRowInNavigation?: (row: Table.EditableRow<R>) => boolean;
   readonly onNewRowRequired?: (newRowIndex: number) => void;
 }
@@ -149,7 +149,7 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
             const actionColumns = filter(agColumns, (c: Table.AgColumn) =>
               includes(
                 map(
-                  filter(params.columns, (ci: Table.RealColumn<R, M>) =>
+                  filter(params.columns, (ci: Table.Column<R, M>) =>
                     tabling.typeguards.isActionColumn(ci)
                   ) as Table.ActionColumn<R, M>[],
                   (ci: Table.ActionColumn<R, M>) => ci.colId

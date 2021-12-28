@@ -111,37 +111,37 @@ export const getColumn = <CA extends Table.Column[]>(
 export const getRealColumn = <CA extends Table.Column[]>(
   columns: CA,
   field: string
-): Table.RealColumn<Table.InferR<typeof columns[number]>, Table.InferM<typeof columns[number]>> | null => {
-  return getColumn(columns, field, (c: CA[number]) =>
-    typeguards.isRealColumn<Table.InferR<typeof c>, Table.InferM<typeof c>>(c)
-  ) as Table.RealColumn<Table.InferR<typeof columns[number]>, Table.InferM<typeof columns[number]>>;
+): Table.InferRealColumn<CA[number]> | null => {
+  return getColumn(columns, field, (c: CA[number]) => typeguards.isRealColumn(c)) as Table.InferRealColumn<
+    CA[number]
+  > | null;
 };
 
 export const getBodyColumn = <CA extends Table.Column[]>(
   columns: CA,
   field: string
-): Table.BodyColumn<Table.InferR<typeof columns[number]>, Table.InferM<typeof columns[number]>> | null => {
-  return getColumn(columns, field, (c: CA[number]) =>
-    typeguards.isBodyColumn<Table.InferR<typeof c>, Table.InferM<typeof c>>(c)
-  ) as Table.BodyColumn<Table.InferR<typeof columns[number]>, Table.InferM<typeof columns[number]>>;
+): Table.InferBodyColumn<CA[number]> | null => {
+  return getColumn(columns, field, (c: CA[number]) => typeguards.isBodyColumn(c)) as Table.InferBodyColumn<
+    CA[number]
+  > | null;
 };
 
 export const getActionColumn = <CA extends Table.Column[]>(
   columns: CA,
   field: string
-): Table.ActionColumn<Table.InferR<typeof columns[number]>, Table.InferM<typeof columns[number]>> | null => {
-  return getColumn(columns, field, (c: CA[number]) =>
-    typeguards.isActionColumn<Table.InferR<typeof c>, Table.InferM<typeof c>>(c)
-  ) as Table.ActionColumn<Table.InferR<typeof columns[number]>, Table.InferM<typeof columns[number]>>;
+): Table.InferActionColumn<CA[number]> | null => {
+  return getColumn(columns, field, (c: CA[number]) => typeguards.isActionColumn(c)) as Table.InferActionColumn<
+    CA[number]
+  > | null;
 };
 
 export const getCalculatedColumn = <CA extends Table.Column[]>(
   columns: CA,
   field: string
-): Table.CalculatedColumn<Table.InferR<typeof columns[number]>, Table.InferM<typeof columns[number]>> | null => {
-  return getColumn(columns, field, (c: CA[number]) =>
-    typeguards.isCalculatedColumn<Table.InferR<typeof c>, Table.InferM<typeof c>>(c)
-  ) as Table.CalculatedColumn<Table.InferR<typeof columns[number]>, Table.InferM<typeof columns[number]>>;
+): Table.InferCalculatedColumn<CA[number]> | null => {
+  return getColumn(columns, field, (c: CA[number]) => typeguards.isCalculatedColumn(c)) as Table.InferCalculatedColumn<
+    CA[number]
+  > | null;
 };
 
 export const filterActionColumns = <CA extends Table.Column[]>(
@@ -276,6 +276,7 @@ export const parseBaseColumn = <R extends Table.RowData, M extends Model.RowHttp
       isRead,
       cType,
       nullValue,
+      parsedFields,
       isApplicableForModel,
       isApplicableForRowType,
       smartInference,
@@ -468,27 +469,25 @@ export const getColumnTypeCSSStyle = (
 
 type ColumnUpdate<C extends Table.RealColumn> = Partial<C> | ((p: C) => Partial<C>);
 
-type ColumnTypeUpdates<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
-  readonly body?: ColumnUpdate<Table.BodyColumn<R, M>>;
-  readonly action?: ColumnUpdate<Table.ActionColumn<R, M>>;
-  readonly calculated?: ColumnUpdate<Table.CalculatedColumn<R, M>>;
+type ColumnTypeUpdates<CA extends Table.Column[]> = {
+  readonly body?: ColumnUpdate<Table.InferBodyColumn<CA[number]>>;
+  readonly action?: ColumnUpdate<Table.InferActionColumn<CA[number]>>;
+  readonly calculated?: ColumnUpdate<Table.InferCalculatedColumn<CA[number]>>;
 };
 
 export const normalizeColumns = <CA extends Table.Column[]>(
   columns: CA,
   updates: Partial<{
-    [key: string]: ColumnUpdate<Table.BodyColumn>;
+    [key: string]: ColumnUpdate<Table.InferBodyColumn<CA[number]>>;
   }> = {},
-  typeUpdates: ColumnTypeUpdates<Table.InferR<CA[number]>, Table.InferM<CA[number]>> = {}
+  typeUpdates: ColumnTypeUpdates<CA> = {}
 ): CA => {
-  const normalizeUpdate = <CT extends Table.RealColumn<Table.InferR<CA[number]>, Table.InferM<CA[number]>>>(
+  const normalizeUpdate = <CT extends Table.InferRealColumn<CA[number]>>(
     d: ColumnUpdate<CT> | undefined,
     c: CT
   ): Partial<CT> | undefined => (typeof d === "function" ? d(c) : d);
 
-  const getUpdateForColumn = <CT extends Table.RealColumn<Table.InferR<CA[number]>, Table.InferM<CA[number]>>>(
-    c: CT
-  ): Partial<CT> | undefined => {
+  const getUpdateForColumn = <CT extends Table.InferRealColumn<CA[number]>>(c: CT): Partial<CT> | undefined => {
     if (!isNil(updates)) {
       const cTypeUpdate = typeUpdates[c.cType];
       if (cTypeUpdate !== undefined) {
@@ -501,19 +500,19 @@ export const normalizeColumns = <CA extends Table.Column[]>(
     return {};
   };
 
-  let evaluated: Table.Column<Table.InferR<CA[number]>, Table.InferM<CA[number]>>[] = [];
+  let evaluated: CA = [] as unknown as CA;
 
   for (let i = 0; i < columns.length; i++) {
     const c = columns[i];
-    if (typeguards.isRealColumn<Table.InferR<typeof c>, Table.InferM<typeof c>>(c)) {
-      const data = getUpdateForColumn(c) as Partial<typeof c>;
-      evaluated = [...evaluated, { ...c, ...data } as typeof c];
+    if (typeguards.isRealColumn(c)) {
+      const data = getUpdateForColumn(c as Table.InferRealColumn<CA[number]>) as Partial<typeof c>;
+      evaluated = [...evaluated, { ...c, ...data }] as CA;
     } else {
-      evaluated = [...evaluated, c];
+      evaluated = [...evaluated, c] as CA;
     }
   }
 
-  return evaluated as CA;
+  return evaluated;
 };
 
 export const orderColumns = <CA extends Table.Column[]>(columns: CA): CA => {

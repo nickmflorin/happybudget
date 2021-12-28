@@ -34,7 +34,7 @@ const AuthenticatedTemplateSubAccountsTable = (
 
   const columns = useMemo(
     () =>
-      tabling.columns.normalizeColumns(tabling.columns.filterRealColumns(Columns), {
+      tabling.columns.normalizeColumns(Columns, {
         identifier: () => ({
           headerName: props.identifierFieldHeader
         }),

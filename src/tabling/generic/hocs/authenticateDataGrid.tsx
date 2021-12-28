@@ -50,7 +50,7 @@ interface InjectedAuthenticatedDataGridProps {
 export interface AuthenticateDataGridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
   extends UseContextMenuParams<R, M> {
   readonly grid: NonNullRef<Table.DataGridInstance>;
-  readonly columns: Table.RealColumn<R, M>[];
+  readonly columns: Table.Column<R, M>[];
   readonly pinFirstColumn?: boolean;
   readonly pinActionColumns?: boolean;
   readonly onGroupRowsAdded?: (ids: Table.GroupRowId[], rows: Table.BodyRow<R>[]) => void;
@@ -162,21 +162,19 @@ const getCellChangesFromEvent = <
         const oldParsed = column.parseIntoFields(oldValue);
         const parsed = column.parseIntoFields(newValue);
         // The fields for the parsed values of each value should be the same.
-        const fields: (keyof R)[] = uniq([
-          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-          ...map(oldParsed, (p: Table.ParsedColumnField<R, any, Table.ModelRow<R>>) => p.field),
-          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-          ...map(parsed, (p: Table.ParsedColumnField<R, any, Table.ModelRow<R>>) => p.field)
+        const fields: string[] = uniq([
+          ...map(oldParsed, (p: Table.ParsedColumnField) => p.field),
+          ...map(parsed, (p: Table.ParsedColumnField) => p.field)
         ]);
         changes = reduce(
           fields,
           (chs: Table.SoloCellChange<R, Table.ModelRow<R>>[], fld: keyof R) => {
-            const oldParsedForField: Table.ParsedColumnField<R> | undefined = find(oldParsed, {
+            const oldParsedForField: Table.ParsedColumnField | undefined = find(oldParsed, {
               field: fld
-            }) as Table.ParsedColumnField<R>;
-            const parsedForField: Table.ParsedColumnField<R> | undefined = find(parsed, {
+            }) as Table.ParsedColumnField;
+            const parsedForField: Table.ParsedColumnField | undefined = find(parsed, {
               field: fld
-            }) as Table.ParsedColumnField<R>;
+            }) as Table.ParsedColumnField;
             /* Since the fields for each set of parsed field-value pairs will
 						   be the same, the null check here is mostly just a check to
 							 satisfy TS. */
@@ -283,7 +281,7 @@ const authenticateDataGrid =
 			memorization relies on the column transformations applied here - so they
 			cannot be applied together as it would lead to a recursion.
       */
-      const unsuppressedColumns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
+      const unsuppressedColumns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
         /*
         When the cell editor finishes editing, the AG Grid callback
 				(onCellDoneEditing) does not have any context about what event triggered
@@ -342,7 +340,7 @@ const authenticateDataGrid =
         );
       }, [hooks.useDeepEqualMemo(props.columns), props.apis]);
 
-      const partialColumns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
+      const partialColumns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
         return tabling.columns.normalizeColumns(
           unsuppressedColumns,
           {},
@@ -372,7 +370,11 @@ const authenticateDataGrid =
                   ) {
                     const changes: Table.SoloCellChange<R>[] = flatten(
                       map(ranges, (rng: CellRange) =>
-                        getTableChangesFromRangeClear(params.api, unsuppressedColumns, rng)
+                        getTableChangesFromRangeClear(
+                          params.api,
+                          tabling.columns.filterRealColumns(unsuppressedColumns),
+                          rng
+                        )
                       )
                     );
                     if (changes.length !== 0) {
@@ -448,7 +450,7 @@ const authenticateDataGrid =
         }
       });
 
-      const columns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
+      const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
         return tabling.columns.normalizeColumns(
           partialColumns,
           {},
@@ -528,7 +530,7 @@ const authenticateDataGrid =
           cellChangeEvents,
           (curr: Table.SoloCellChange<R>[], e: CellValueChangedEvent) => [
             ...curr,
-            ...getCellChangesFromEvent(columns, e)
+            ...getCellChangesFromEvent(tabling.columns.filterRealColumns(columns), e)
           ],
           []
         );
@@ -552,7 +554,7 @@ const authenticateDataGrid =
             if (e.source === "paste") {
               setCellChangeEvents([...cellChangeEvents, e]);
             } else {
-              const changes = getCellChangesFromEvent(columns, e);
+              const changes = getCellChangesFromEvent(tabling.columns.filterRealColumns(columns), e);
               if (changes.length !== 0) {
                 props.onChangeEvent({ type: "dataChange", payload: tabling.events.consolidateCellChanges(changes) });
                 const expandConfig = !isNil(props.editColumnConfig)
@@ -714,10 +716,7 @@ const authenticateDataGrid =
       }));
 
       const fillOperation = hooks.useDynamicCallback((params: FillOperationParams) => {
-        const inferredValue = tabling.patterns.inferFillCellValue(
-          params,
-          filter(columns, (c: Table.RealColumn<R, M>) => tabling.typeguards.isBodyColumn(c)) as Table.BodyColumn<R, M>[]
-        );
+        const inferredValue = tabling.patterns.inferFillCellValue(params, tabling.columns.filterBodyColumns(columns));
         if (!isNil(inferredValue)) {
           return inferredValue;
         }
