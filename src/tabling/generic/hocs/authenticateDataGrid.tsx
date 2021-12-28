@@ -108,7 +108,7 @@ const getTableChangesFromRangeClear = <R extends Table.RowData, M extends Model.
 ): Table.SoloCellChange<R>[] => {
   const changes: Table.SoloCellChange<R>[] = [];
   if (!isNil(range.startRow) && !isNil(range.endRow)) {
-    const colIds: (keyof R)[] = map(range.columns, (col: Table.AgColumn) => col.getColId() as keyof R);
+    const colIds: string[] = map(range.columns, (col: Table.AgColumn) => col.getColId());
     const startRowIndex = Math.min(range.startRow.rowIndex, range.endRow.rowIndex);
     const endRowIndex = Math.max(range.startRow.rowIndex, range.endRow.rowIndex);
     for (let i = startRowIndex; i <= endRowIndex; i++) {
@@ -117,10 +117,7 @@ const getTableChangesFromRangeClear = <R extends Table.RowData, M extends Model.
         const row: Table.BodyRow<R> = node.data;
         if (tabling.typeguards.isEditableRow(row)) {
           for (let j = 0; j < colIds.length; j++) {
-            const column = find(
-              tabling.columns.filterBodyColumns(columns),
-              (c: Table.BodyColumn<R, M>) => c.field === colIds[j]
-            );
+            const column = tabling.columns.getBodyColumn(columns, colIds[j]);
             if (!isNil(column)) {
               if (tabling.columns.isEditable<R, M>(column, row)) {
                 const change = getCellChangeForClear(row, column);
@@ -128,8 +125,6 @@ const getTableChangesFromRangeClear = <R extends Table.RowData, M extends Model.
                   changes.push(change);
                 }
               }
-            } else {
-              console.error(`Could not find column for field ${colIds[j]}!`);
             }
           }
         }
@@ -150,61 +145,59 @@ const getCellChangesFromEvent = <
   const row: RW = event.node.data;
   if (tabling.typeguards.isEditableRow(row)) {
     const field = event.column.getColId();
-    const column = find(tabling.columns.filterBodyColumns(columns), (c: Table.BodyColumn<R, M>) => c.field === field);
-    if (isNil(column)) {
-      console.error(`Could not find column for field ${field}!`);
-      return [];
-    }
-    /*
-    AG Grid treats cell values as undefined when they are cleared via edit,
-    so we need to translate that back into a null representation.
-
-    Note: Converting undefined values back to the column's corresponding null
-    values may now be handled by the valueSetter on the Table.Column object.
-    We may be able to remove - but leave now for safety.
-    */
-    const oldValue = event.oldValue === undefined ? column.nullValue : event.oldValue;
-    let newValue = event.newValue === undefined ? column.nullValue : event.newValue;
-
-    let changes: Table.SoloCellChange<R, RW>[];
-    if (!isNil(column.parseIntoFields) && tabling.typeguards.isModelRow(row)) {
-      const oldParsed = column.parseIntoFields(oldValue);
-      const parsed = column.parseIntoFields(newValue);
-      // The fields for the parsed values of each value should be the same.
-      const fields: (keyof R)[] = uniq([
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        ...map(oldParsed, (p: Table.ParsedColumnField<R, any, Table.ModelRow<R>>) => p.field),
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        ...map(parsed, (p: Table.ParsedColumnField<R, any, Table.ModelRow<R>>) => p.field)
-      ]);
-      changes = reduce(
-        fields,
-        (chs: Table.SoloCellChange<R, Table.ModelRow<R>>[], fld: keyof R) => {
-          const oldParsedForField: Table.ParsedColumnField<R> | undefined = find(oldParsed, {
-            field: fld
-          }) as Table.ParsedColumnField<R>;
-          const parsedForField: Table.ParsedColumnField<R> | undefined = find(parsed, {
-            field: fld
-          }) as Table.ParsedColumnField<R>;
-          /* Since the fields for each set of parsed field-value pairs will be the
-             same, the null check here is mostly just a check to satisfy TS. */
-          if (!isNil(oldParsedForField) && !isNil(parsedForField)) {
-            return [
-              ...chs,
-              {
-                id: row.id,
-                field: fld,
-                oldValue: oldParsedForField.value,
-                newValue: parsedForField.value
-              }
-            ];
-          }
-          return chs;
-        },
-        []
-      ) as Table.SoloCellChange<R, RW>[];
-    } else {
+    const column = tabling.columns.getBodyColumn(columns, event.column.getColId());
+    if (!isNil(column)) {
       /*
+			AG Grid treats cell values as undefined when they are cleared via edit,
+			so we need to translate that back into a null representation.
+
+			Note: Converting undefined values back to the column's corresponding null
+			values may now be handled by the valueSetter on the Table.Column object.
+			We may be able to remove - but leave now for safety.
+			*/
+      const oldValue = event.oldValue === undefined ? column.nullValue : event.oldValue;
+      let newValue = event.newValue === undefined ? column.nullValue : event.newValue;
+
+      let changes: Table.SoloCellChange<R, RW>[];
+      if (!isNil(column.parseIntoFields) && tabling.typeguards.isModelRow(row)) {
+        const oldParsed = column.parseIntoFields(oldValue);
+        const parsed = column.parseIntoFields(newValue);
+        // The fields for the parsed values of each value should be the same.
+        const fields: (keyof R)[] = uniq([
+          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+          ...map(oldParsed, (p: Table.ParsedColumnField<R, any, Table.ModelRow<R>>) => p.field),
+          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+          ...map(parsed, (p: Table.ParsedColumnField<R, any, Table.ModelRow<R>>) => p.field)
+        ]);
+        changes = reduce(
+          fields,
+          (chs: Table.SoloCellChange<R, Table.ModelRow<R>>[], fld: keyof R) => {
+            const oldParsedForField: Table.ParsedColumnField<R> | undefined = find(oldParsed, {
+              field: fld
+            }) as Table.ParsedColumnField<R>;
+            const parsedForField: Table.ParsedColumnField<R> | undefined = find(parsed, {
+              field: fld
+            }) as Table.ParsedColumnField<R>;
+            /* Since the fields for each set of parsed field-value pairs will
+						   be the same, the null check here is mostly just a check to
+							 satisfy TS. */
+            if (!isNil(oldParsedForField) && !isNil(parsedForField)) {
+              return [
+                ...chs,
+                {
+                  id: row.id,
+                  field: fld,
+                  oldValue: oldParsedForField.value,
+                  newValue: parsedForField.value
+                }
+              ];
+            }
+            return chs;
+          },
+          []
+        ) as Table.SoloCellChange<R, RW>[];
+      } else {
+        /*
       The logic inside this conditional is 100% a HACK - and this type of
       programming should not be encouraged.  However, in this case, it is
       a HACK to get around AG Grid nonsense.  It appears to be a bug with
@@ -215,19 +208,20 @@ const getCellChangesFromEvent = <
       since the cell value corresponds to a list of Fringe IDs, so we need
       to make that adjustment here.
       */
-      if (field === "fringes" && !Array.isArray(newValue)) {
-        newValue = [newValue];
-      }
-      changes = [
-        {
-          oldValue,
-          newValue,
-          field: field as keyof RW["data"],
-          id: event.data.id
+        if (field === "fringes" && !Array.isArray(newValue)) {
+          newValue = [newValue];
         }
-      ];
+        changes = [
+          {
+            oldValue,
+            newValue,
+            field: field as keyof RW["data"],
+            id: event.data.id
+          }
+        ];
+      }
+      return filter(changes, (ch: Table.SoloCellChange<R, RW>) => !isEqual(ch.oldValue, ch.newValue));
     }
-    return filter(changes, (ch: Table.SoloCellChange<R, RW>) => !isEqual(ch.oldValue, ch.newValue));
   }
   return [];
 };
