@@ -183,51 +183,47 @@ declare namespace Model {
     readonly accumulated_markup_contribution: number;
   };
 
-  type SimpleAccount = GenericHttpModel<"account"> & {
+  type SimpleAccount = RowHttpModel<"account"> & {
     readonly identifier: string | null;
     readonly description: string | null;
+    readonly domain: BudgetDomain;
   };
 
-  type SimpleSubAccount = GenericHttpModel<"subaccount"> & {
+  type SimpleSubAccount = RowHttpModel<"subaccount"> & {
     readonly identifier: string | null;
     readonly description: string | null;
+    readonly domain: BudgetDomain;
   };
 
-  // Abstract -- not meant for external reference.
-  type AbstractAccount = Omit<SimpleAccount, "type"> &
-    LineMetrics & {
-      readonly domain: BudgetDomain;
-    };
-
-  type Account = AbstractAccount &
-    RowHttpModel<"account"> & {
+  type Account = LineMetrics &
+    SimpleAccount & {
       readonly children: number[];
       readonly siblings?: SimpleAccount[]; // Only included for detail endpoints.
       readonly ancestors?: [SimpleBudget | SimpleTemplate]; // Only included for detail endpoints.
     };
 
-  type PdfAccount = AbstractAccount &
+  type PdfAccount = LineMetrics &
     RowHttpModel<"pdf-account"> & {
+      readonly identifier: string | null;
+      readonly description: string | null;
+      readonly domain: BudgetDomain;
       readonly children: PdfSubAccount[];
       readonly groups: Group[];
       readonly children_markups: Markup[];
     };
 
-  // Abstract -- not meant for external reference.
-  type AbstractSubAccount = Omit<SimpleSubAccount, "type"> &
-    LineMetrics & {
-      readonly domain: BudgetDomain;
-      readonly fringe_contribution: number;
-      readonly quantity: number | null;
-      readonly rate: number | null;
-      readonly multiplier: number | null;
-      readonly unit: Tag | null;
-      // Only applicable for non-Template cases.
-      readonly contact?: number | null;
-    };
+  type SubAccountMixin = LineMetrics & {
+    readonly fringe_contribution: number;
+    readonly quantity: number | null;
+    readonly rate: number | null;
+    readonly multiplier: number | null;
+    readonly unit: Tag | null;
+    // Only applicable for non-Template cases.
+    readonly contact?: number | null;
+  };
 
-  type SubAccount = AbstractSubAccount &
-    RowHttpModel<"subaccount"> & {
+  type SubAccount = SimpleSubAccount &
+    SubAccountMixin & {
       readonly children: number[];
       readonly object_id: number;
       readonly parent_type: "account" | "subaccount";
@@ -239,8 +235,11 @@ declare namespace Model {
       readonly ancestors?: [SimpleBudget | SimpleTemplate, SimpleAccount, ...Array<SimpleSubAccount>]; // Only included for detail endpoints.
     };
 
-  type PdfSubAccount = AbstractSubAccount &
-    RowHttpModel<"pdf-subaccount"> & {
+  type PdfSubAccount = RowHttpModel<"pdf-subaccount"> &
+    SubAccountMixin & {
+      readonly domain: BudgetDomain;
+      readonly identifier: string | null;
+      readonly description: string | null;
       readonly children: PdfSubAccount[];
       readonly groups: Group[];
       readonly children_markups: Markup[];

@@ -2,9 +2,9 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
-import { isNil, map } from "lodash";
+import { isNil, map, findIndex, orderBy } from "lodash";
 
-import { redux, tabling, budgeting } from "lib";
+import { redux, tabling, budgeting, util } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
 import { connectTableToStore } from "tabling";
 
@@ -62,7 +62,7 @@ interface SubAccountsTableProps {
 const SubAccountsTable = ({ budgetId, budget, subaccountId }: SubAccountsTableProps): JSX.Element => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const subaccountDetail = useSelector(selectSubAccountDetail);
+  const subaccount = useSelector(selectSubAccountDetail);
   const table = tabling.hooks.useTable<R, M>();
 
   useEffect(() => {
@@ -102,20 +102,53 @@ const SubAccountsTable = ({ budgetId, budget, subaccountId }: SubAccountsTablePr
         /* Right now, the SubAccount recursion only goes 1 layer deep.
            Account -> SubAccount -> Detail (Recrusive SubAccount). */
         hideEditColumn={true}
-        exportFileName={!isNil(subaccountDetail) ? `subaccount_${subaccountDetail.identifier}` : ""}
+        exportFileName={!isNil(subaccount) ? `subaccount_${subaccount.identifier}` : ""}
         categoryName={"Detail"}
         identifierFieldHeader={"Line"}
         onBack={() => {
-          if (
-            !isNil(subaccountDetail) &&
-            !isNil(subaccountDetail.ancestors) &&
-            subaccountDetail.ancestors.length !== 0
-          ) {
-            const ancestor = subaccountDetail.ancestors[subaccountDetail.ancestors.length - 1];
-            if (ancestor.type === "subaccount") {
-              history.push(`/templates/${budgetId}/subaccounts/${ancestor.id}?row=${subaccountId}`);
-            } else {
-              history.push(`/templates/${budgetId}/accounts/${ancestor.id}?row=${subaccountId}`);
+          if (!isNil(subaccount) && !isNil(subaccount.ancestors) && subaccount.ancestors.length !== 0) {
+            /* The Budget/Template ancestor should always be first, so we can
+               safely assume that the last ancestor is the Account or
+							 SubAccount. */
+            const ancestor = subaccount.ancestors[subaccount.ancestors.length - 1] as
+              | Model.SimpleAccount
+              | Model.SimpleSubAccount;
+            history.push(
+              util.urls.addQueryParamsToUrl(
+                budgeting.urls.getUrl(
+                  { type: "budget", domain: "template", id: budgetId },
+                  { type: ancestor.type, id: ancestor.id }
+                ),
+                { row: subaccountId }
+              )
+            );
+          }
+        }}
+        onLeft={() => {
+          if (!isNil(subaccount)) {
+            const siblings = orderBy([...(subaccount.siblings || []), subaccount], "order");
+            const index = findIndex(siblings, (sib: Model.SimpleSubAccount) => sib.id === subaccount.id);
+            if (index !== -1 && siblings[index - 1] !== undefined) {
+              history.push(
+                budgeting.urls.getUrl(
+                  { type: "budget", id: budgetId, domain: "template" },
+                  { type: "subaccount", id: siblings[index - 1].id }
+                )
+              );
+            }
+          }
+        }}
+        onRight={() => {
+          if (!isNil(subaccount)) {
+            const siblings = orderBy([...(subaccount.siblings || []), subaccount], "order");
+            const index = findIndex(siblings, (sib: Model.SimpleSubAccount) => sib.id === subaccount.id);
+            if (index !== -1 && siblings[index + 1] !== undefined) {
+              history.push(
+                budgeting.urls.getUrl(
+                  { type: "budget", id: budgetId, domain: "template" },
+                  { type: "subaccount", id: siblings[index + 1].id }
+                )
+              );
             }
           }
         }}

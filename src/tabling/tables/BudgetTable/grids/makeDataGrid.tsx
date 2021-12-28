@@ -16,6 +16,8 @@ export interface BudgetDataGridProps<R extends Table.RowData> {
   readonly framework?: Table.Framework;
   readonly editColumnConfig?: Table.EditColumnRowConfig<R>[];
   readonly onBack?: () => void;
+  readonly onLeft?: () => void;
+  readonly onRight?: () => void;
 }
 
 export type WithBudgetDataGridProps<T> = T & InjectedBudgetDataGridProps;
@@ -26,6 +28,22 @@ const BudgetDataGrid = <R extends Tables.BudgetRowData, T extends BudgetDataGrid
     | React.FunctionComponent<WithBudgetDataGridProps<T>>
 ): React.FunctionComponent<T> => {
   function WithBudgetDataGrid(props: T) {
+    const moveLeftKeyListener = hooks.useDynamicCallback((localApi: GridApi, e: KeyboardEvent) => {
+      const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+      if (e.key === "ArrowLeft" && ctrlCmdPressed && !isNil(props.onLeft)) {
+        e.preventDefault();
+        props.onLeft();
+      }
+    });
+
+    const moveRightKeyListener = hooks.useDynamicCallback((localApi: GridApi, e: KeyboardEvent) => {
+      const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+      if (e.key === "ArrowRight" && ctrlCmdPressed && !isNil(props.onRight)) {
+        e.preventDefault();
+        props.onRight();
+      }
+    });
+
     const moveDownKeyListener = hooks.useDynamicCallback((localApi: GridApi, e: KeyboardEvent) => {
       const ctrlCmdPressed = e.ctrlKey || e.metaKey;
       if (e.key === "ArrowDown" && ctrlCmdPressed) {
@@ -48,7 +66,7 @@ const BudgetDataGrid = <R extends Tables.BudgetRowData, T extends BudgetDataGrid
 
     useEffect(() => {
       const instantiatedListeners: ((e: KeyboardEvent) => void)[] = [];
-      const keyListeners = [moveDownKeyListener, moveUpKeyListener];
+      const keyListeners = [moveDownKeyListener, moveUpKeyListener, moveLeftKeyListener, moveRightKeyListener];
       const apis: Table.GridApis | null = props.apis;
       if (!isNil(apis)) {
         for (let i = 0; i < keyListeners.length; i++) {

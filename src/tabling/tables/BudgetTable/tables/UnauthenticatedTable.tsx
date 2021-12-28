@@ -8,6 +8,8 @@ export type UnauthenticatedBudgetTableProps<
   M extends Model.RowHttpModel = Model.RowHttpModel
 > = Omit<UnauthenticatedTableProps<R, M>, "children"> & {
   readonly onBack?: () => void;
+  readonly onLeft?: () => void;
+  readonly onRight?: () => void;
 };
 
 const UnauthenticatedBudgetTable = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(

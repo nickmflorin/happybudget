@@ -1,5 +1,5 @@
 import React from "react";
-import { map } from "lodash";
+import { map, orderBy } from "lodash";
 
 import { budgeting } from "lib";
 
@@ -40,7 +40,8 @@ const AccountPage = <B extends Model.Budget | Model.Template>({
             {
               requiredParams: ["b", "account"],
               func: ({ b, account }: { b: B; account: Model.Account }) => {
-                const siblings = account.siblings || [];
+                // We need to show the actively selected Account in the dropdown.
+                const siblings = orderBy([...(account.siblings || []), account], "order");
                 return {
                   id: account.id,
                   primary: true,
@@ -54,6 +55,7 @@ const AccountPage = <B extends Model.Budget | Model.Template>({
                   options: map(siblings, (option: Model.SimpleAccount) => ({
                     id: option.id,
                     url: budgeting.urls.getUrl(b, option),
+                    defaultFocused: option.id === account.id,
                     renderContent: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
                   }))
                 };

@@ -53,6 +53,7 @@ declare type MenuItemModel<S extends Record<string, unknown> = MenuItemSelectedS
   readonly url?: string;
   readonly visible?: boolean;
   readonly disabled?: boolean;
+  readonly defaultFocused?: boolean;
   readonly keepDropdownOpenOnClick?: boolean;
   readonly renderContent?: () => JSX.Element;
   readonly onClick?: (e: MenuItemModelClickEvent<S>) => void;

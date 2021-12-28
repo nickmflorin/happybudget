@@ -34,11 +34,15 @@ export const isPdfSubAccount = (m: Model.HttpModel): m is Model.PdfSubAccount =>
 
 export const isPdfBudget = (m: Model.HttpModel): m is Model.PdfBudget => (m as Model.PdfBudget).type === "pdf-budget";
 
-export const isBudget = <M extends Model.Budget | Model.SimpleBudget = Model.Budget | Model.SimpleBudget>(
+export const isBudget = <
+  M extends Pick<Model.Budget, "id" | "type" | "domain"> = Pick<Model.Budget, "id" | "type" | "domain">
+>(
   m: Model.HttpModel
 ): m is M => (m as M).type === "budget" && (m as M).domain === "budget";
 
-export const isTemplate = <M extends Model.Template | Model.SimpleTemplate = Model.Template | Model.SimpleTemplate>(
+export const isTemplate = <
+  M extends Pick<Model.Template, "id" | "type" | "domain"> = Pick<Model.Template, "id" | "type" | "domain">
+>(
   m: Model.HttpModel
 ): m is M => (m as M).type === "budget" && (m as M).domain === "template";
 

@@ -360,13 +360,13 @@ const authenticateDataGrid =
                   return true;
                 } else if (params.editing && includes(["Tab"], params.event.code)) {
                   /*
-                Our custom cell editors have built in functionality that when
-								editing is terminated via a TAB key, we move one cell to the
-								right without continuing in edit mode.  This however does not
-								work for the bland text cells, where we do not have cell editors
-								controlling the edit behavior.  So we need to suppress the TAB
-								behavior when editing, and manually move the cell over.
-                */
+									Our custom cell editors have built in functionality that when
+									editing is terminated via a TAB key, we move one cell to the
+									right without continuing in edit mode.  This however does not
+									work for the bland text cells, where we do not have cell editors
+									controlling the edit behavior.  So we need to suppress the TAB
+									behavior when editing, and manually move the cell over.
+									*/
                   return true;
                 } else if (!params.editing && includes(["Backspace", "Delete"], params.event.code)) {
                   /* Suppress Backspace/Delete events when multiple cells are
@@ -411,7 +411,10 @@ const authenticateDataGrid =
                     return false;
                   }
                 } else if (
-                  (params.event.key === "ArrowDown" || params.event.key === "ArrowUp") &&
+                  /* We need to suppress CMD + Arrow KeyboardEvent(s) because this
+                     is how we navigate through the nested/sibling tables in the
+                     BudgetTable case. */
+                  includes(["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"], params.event.key) &&
                   (params.event.ctrlKey || params.event.metaKey)
                 ) {
                   return true;

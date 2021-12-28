@@ -20,8 +20,8 @@ export const getDomain = (): string => {
  * an object.
  * @param url The URL for which we want to get the query parameters from.
  */
-export const getQueryParams = (url: string): { [key: string]: string } => {
-  const queryParams: { [key: string]: string } = {};
+export const getQueryParams = (url: string): Record<string, string> => {
+  const queryParams: Record<string, string> = {};
 
   const anchor = document.createElement("a");
   anchor.href = url;
@@ -48,15 +48,17 @@ export const getQueryParams = (url: string): { [key: string]: string } => {
  */
 export const addQueryParamsToUrl = (
   url: string,
-  query: Http.RawQuery = {},
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  query: Record<string, any> = {},
   options: { filter: (string | number)[] } = { filter: [] }
 ): string => {
-  const existingQuery = getQueryParams(url) as Http.RawQuery;
+  const existingQuery = getQueryParams(url);
   const newQuery = query || {};
-  const mergedQuery: Http.RawQuery = { ...existingQuery, ...newQuery };
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const mergedQuery: Record<string, any> = { ...existingQuery, ...newQuery };
 
   const urlParams = new URLSearchParams();
-  forEach(mergedQuery, (value: Http.RawQuery[keyof Http.RawQuery], key: string) => {
+  forEach(mergedQuery, (value: Record<string, string>, key: string) => {
     if (!isNil(value)) {
       if (typeof value === "string" || typeof value === "number") {
         if (isNil(options.filter) || !options.filter.includes(value)) {

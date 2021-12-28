@@ -1,5 +1,5 @@
 import React from "react";
-import { map } from "lodash";
+import { map, orderBy } from "lodash";
 
 import { budgeting } from "lib";
 
@@ -40,7 +40,9 @@ const SubAccountPage = <B extends Model.Budget | Model.Template>({
             {
               requiredParams: ["b", "subaccount"],
               func: ({ b, subaccount }: { b: B; subaccount: Model.SubAccount }): IBreadCrumbItem[] => {
-                const siblings = subaccount.siblings || [];
+                /* We need to show the actively selected SubAccount in the
+                   dropdown. */
+                const siblings = orderBy([...(subaccount.siblings || []), subaccount], "order");
                 const ancestors = (subaccount.ancestors || []).slice(1) as [
                   Model.SimpleAccount,
                   ...Array<Model.SimpleSubAccount>
@@ -65,6 +67,7 @@ const SubAccountPage = <B extends Model.Budget | Model.Template>({
                     options: map(siblings, (option: Model.SimpleSubAccount) => ({
                       id: option.id,
                       url: budgeting.urls.getUrl(b, option),
+                      defaultFocused: option.id === subaccount.id,
                       renderContent: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
                     }))
                   }

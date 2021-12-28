@@ -12,6 +12,8 @@ export type AuthenticatedBudgetTableProps<
   M extends Model.RowHttpModel = Model.RowHttpModel
 > = Omit<AuthenticatedTableProps<R, M>, "children"> & {
   readonly onBack?: () => void;
+  readonly onLeft?: () => void;
+  readonly onRight?: () => void;
   // Markup is currently not applicable for Templates.
   readonly onEditMarkup?: (row: Table.MarkupRow<R>) => void;
   readonly onEditGroup?: (row: Table.GroupRow<R>) => void;

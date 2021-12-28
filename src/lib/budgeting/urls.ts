@@ -16,9 +16,16 @@ type BudgetUrl = BudgetingUrl<"budgets">;
 type TemplateBaseUrl = BaseUrl<"templates">;
 type TemplateUrl = BudgetingUrl<"templates">;
 
+type ModelIdAndType<T extends Model.GenericHttpModel<"budget" | "account" | "subaccount">> = Pick<T, "type" | "id">;
+
 export const getBudgetUrl = (
-  budget: Model.Budget,
-  entity?: Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount | "base"
+  budget: Pick<Model.Budget, "type" | "domain" | "id">,
+  entity?:
+    | ModelIdAndType<Model.Account>
+    | ModelIdAndType<Model.SimpleAccount>
+    | ModelIdAndType<Model.SubAccount>
+    | ModelIdAndType<Model.SimpleSubAccount>
+    | "base"
 ): BudgetUrl | BudgetBaseUrl => {
   if (entity === "base") {
     return `/budgets/${budget.id}`;
@@ -32,8 +39,13 @@ export const getBudgetUrl = (
 };
 
 export const getTemplateUrl = (
-  budget: Model.Template,
-  entity?: Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount | "base"
+  budget: Pick<Model.Template, "type" | "domain" | "id">,
+  entity?:
+    | ModelIdAndType<Model.Account>
+    | ModelIdAndType<Model.SimpleAccount>
+    | ModelIdAndType<Model.SubAccount>
+    | ModelIdAndType<Model.SimpleSubAccount>
+    | "base"
 ): TemplateUrl | TemplateBaseUrl => {
   if (entity === "base") {
     return `/templates/${budget.id}`;
@@ -47,8 +59,13 @@ export const getTemplateUrl = (
 };
 
 export const getUrl = (
-  budget: Model.Budget | Model.Template,
-  entity?: Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount | "base"
+  budget: Pick<Model.Template, "type" | "domain" | "id"> | Pick<Model.Budget, "type" | "domain" | "id">,
+  entity?:
+    | ModelIdAndType<Model.Account>
+    | ModelIdAndType<Model.SimpleAccount>
+    | ModelIdAndType<Model.SubAccount>
+    | ModelIdAndType<Model.SimpleSubAccount>
+    | "base"
 ): BudgetUrl | BudgetBaseUrl | TemplateUrl | TemplateBaseUrl =>
   budgeting.typeguards.isBudget(budget) ? getBudgetUrl(budget, entity) : getTemplateUrl(budget, entity);
 

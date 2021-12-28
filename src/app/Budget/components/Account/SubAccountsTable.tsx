@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { isNil, map, filter } from "lodash";
+import { isNil, map, filter, orderBy, findIndex } from "lodash";
 import { createSelector } from "reselect";
 
-import { redux, tabling, budgeting } from "lib";
+import { redux, tabling, budgeting, util } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
 import { connectTableToStore } from "tabling";
 
@@ -73,7 +73,7 @@ const SubAccountsTable = ({
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const accountDetail = useSelector(selectAccountDetail);
+  const account = useSelector(selectAccountDetail);
   const table = tabling.hooks.useTable<Tables.SubAccountRowData, Model.SubAccount>();
 
   useEffect(() => {
@@ -134,11 +134,52 @@ const SubAccountsTable = ({
           )
         }
         setPreviewModalVisible={setPreviewModalVisible}
-        exportFileName={!isNil(accountDetail) ? `account_${accountDetail.identifier}` : ""}
+        exportFileName={!isNil(account) ? `account_${account.identifier}` : ""}
         categoryName={"Sub Account"}
         identifierFieldHeader={"Account"}
-        onRowExpand={(row: Table.ModelRow<R>) => history.push(`/budgets/${budgetId}/subaccounts/${row.id}`)}
-        onBack={() => history.push(`/budgets/${budgetId}/accounts?row=${accountId}`)}
+        onRowExpand={(row: Table.ModelRow<R>) =>
+          history.push(
+            budgeting.urls.getUrl(
+              { type: "budget", domain: "budget", id: budgetId },
+              { type: "subaccount", id: row.id }
+            )
+          )
+        }
+        onBack={() =>
+          history.push(
+            util.urls.addQueryParamsToUrl(budgeting.urls.getUrl({ type: "budget", domain: "budget", id: budgetId }), {
+              row: accountId
+            })
+          )
+        }
+        onLeft={() => {
+          if (!isNil(account)) {
+            const siblings = orderBy([...(account.siblings || []), account], "order");
+            const index = findIndex(siblings, (sib: Model.SimpleAccount) => sib.id === account.id);
+            if (index !== -1 && siblings[index - 1] !== undefined) {
+              history.push(
+                budgeting.urls.getUrl(
+                  { type: "budget", id: budgetId, domain: "budget" },
+                  { type: "account", id: siblings[index - 1].id }
+                )
+              );
+            }
+          }
+        }}
+        onRight={() => {
+          if (!isNil(account)) {
+            const siblings = orderBy([...(account.siblings || []), account], "order");
+            const index = findIndex(siblings, (sib: Model.SimpleAccount) => sib.id === account.id);
+            if (index !== -1 && siblings[index + 1] !== undefined) {
+              history.push(
+                budgeting.urls.getUrl(
+                  { type: "budget", id: budgetId, domain: "budget" },
+                  { type: "account", id: siblings[index + 1].id }
+                )
+              );
+            }
+          }
+        }}
         onGroupRows={(rows: Table.ModelRow<R>[]) => onCreateGroup(map(rows, (row: Table.ModelRow<R>) => row.id))}
         onMarkupRows={(rows?: Table.ModelRow<R>[]) =>
           rows === undefined ? onCreateMarkup() : onCreateMarkup(map(rows, (row: Table.ModelRow<R>) => row.id))
