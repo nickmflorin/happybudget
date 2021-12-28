@@ -15,13 +15,13 @@ const Columns: Table.Column<R, M>[] = [
     pdfHeaderName: "Acct #",
     pdfWidth: 0.08,
     pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } },
-    isApplicableForRowType: (r: Table.RowType) => includes(["model", "markup"], r)
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder", "markup"], r)
   }),
   columns.BodyColumn<R, M, string | null>({
     field: "description",
     nullValue: null,
     markupField: "description",
-    isApplicableForRowType: (r: Table.RowType) => includes(["model", "markup"], r),
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder", "markup"], r),
     minWidth: 200,
     flex: 100,
     pdfFlexGrow: true,
@@ -73,7 +73,7 @@ const Columns: Table.Column<R, M>[] = [
     /* Note: This also gets triggered for the PDF model form, but that is okay
        because the PDF model form has a domain property as well. */
     isApplicableForModel: (m: Model.SubAccount) => m.domain === "budget",
-    isApplicableForRowType: (r: Table.RowType) => r === "model"
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r)
   }),
   columns.SelectColumn({
     field: "contact",
@@ -89,7 +89,7 @@ const Columns: Table.Column<R, M>[] = [
     /* Note: This also gets triggered for the PDF model form, but that is okay
        because the PDF model form has a domain property as well. */
     isApplicableForModel: (m: Model.SubAccount) => m.domain === "budget",
-    isApplicableForRowType: (r: Table.RowType) => r === "model"
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r)
   }),
   columns.BodyColumn<R, M, number | null>({
     field: "quantity",
@@ -98,7 +98,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfWidth: 0.05,
     width: 60,
     valueSetter: tabling.valueSetters.numericValueSetter("quantity"),
-    isApplicableForRowType: (r: Table.RowType) => r === "model",
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r),
     dataType: "number",
     /* If the plurality of the quantity changes, we need to refresh the refresh
        the unit column to change the plurality of the tag in the cell. */
@@ -125,7 +125,7 @@ const Columns: Table.Column<R, M>[] = [
     cellEditor: "SubAccountUnitEditor",
     width: 100,
     pdfWidth: 0.07,
-    isApplicableForRowType: (r: Table.RowType) => r === "model"
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r)
   }),
   columns.BodyColumn<R, M, number | null>({
     field: "multiplier",
@@ -135,7 +135,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfWidth: 0.05,
     valueSetter: tabling.valueSetters.numericValueSetter("multiplier"),
     dataType: "number",
-    isApplicableForRowType: (r: Table.RowType) => r === "model"
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r)
   }),
   columns.BodyColumn<R, M, number | null>({
     field: "rate",
@@ -148,7 +148,7 @@ const Columns: Table.Column<R, M>[] = [
     ),
     valueSetter: tabling.valueSetters.numericValueSetter("rate"),
     dataType: "currency",
-    isApplicableForRowType: (r: Table.RowType) => r === "model"
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r)
   }),
   columns.SelectColumn<R, M, number[]>({
     field: "fringes",
@@ -157,7 +157,7 @@ const Columns: Table.Column<R, M>[] = [
     width: 140,
     nullValue: [],
     includeInPdf: false,
-    isApplicableForRowType: (r: Table.RowType) => r === "model"
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r)
   }),
   columns.EstimatedColumn<R, M>({
     field: "estimated",

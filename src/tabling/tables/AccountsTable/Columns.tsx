@@ -15,7 +15,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfHeaderName: "Acct #",
     pdfWidth: 0.1,
     pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } },
-    isApplicableForRowType: (r: Table.RowType) => includes(["model", "markup"], r)
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder", "markup"], r)
   }),
   columns.BodyColumn<R, M, string | null>({
     field: "description",
@@ -26,7 +26,7 @@ const Columns: Table.Column<R, M>[] = [
     minWidth: 200,
     flex: 100,
     dataType: "longText",
-    isApplicableForRowType: (r: Table.RowType) => includes(["model", "markup"], r),
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder", "markup"], r),
     /* The custom cell renderer here is only needed to include the Markup icon,
        which is annoying because it is only needed for those rows and slows down
        rendering performance. */
