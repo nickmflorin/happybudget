@@ -13,7 +13,6 @@ const Security = (): JSX.Element => {
       <Tile style={{ maxWidth: 500 }}>
         <ChangePasswordForm
           form={form}
-          title={"Change Your Password"}
           onFinish={(values: ChangePasswordFormValues) => {
             form.setLoading(true);
             const payload: Http.ChangePasswordPayload = {

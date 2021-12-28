@@ -47,8 +47,13 @@
 
 .img-wrapper {
   height: 100%;
-  width: 100%;
+  aspect-ratio: 1;
+  width: auto;
   position: relative;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   .img-overlay {
     display: none;
@@ -58,9 +63,17 @@
     clip-path: circle(50%);
   }
 
+  &.with-icon-fallback {
+    background-color: #efefef;
+  }
+
   &:hover {
     .img-overlay {
       display: flex;
     }
+  }
+
+  .icon-wrapper {
+    padding: 8px;
   }
 }

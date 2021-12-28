@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { ShowHide } from "components";
+import { ui } from "lib";
+import { ShowHide, Icon } from "components";
 
 export interface ImageProps extends StandardComponentProps {
   readonly src: string | null | undefined;
@@ -14,6 +15,7 @@ export interface ImageProps extends StandardComponentProps {
   readonly wrapperClassName?: string;
   readonly fallbackSrc?: string;
   readonly fallbackComponent?: JSX.Element;
+  readonly fallbackIcon?: IconOrElement;
   readonly onLoad?: () => void;
   readonly onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   readonly onError?: (e: React.SyntheticEvent<HTMLImageElement>) => void;
@@ -29,6 +31,8 @@ const Image = (props: ImageProps): JSX.Element => {
     }
   }, [error, props.src]);
 
+  const useFallback = useMemo(() => isNil(props.src) || !isNil(error), [error, props.src]);
+
   /*
   Note: Because of weird things with AWS and S3, we will sometimes accidentally
 	get a blank image URL for an image that is saved in the backend.  TS will not
@@ -41,12 +45,16 @@ const Image = (props: ImageProps): JSX.Element => {
   (2) Use the fallbackSrc if provided
   (3) As a last resort, render a blank white image.
   */
-  if (!isNil(props.fallbackComponent) && (isNil(props.src) || !isNil(error))) {
+  if (!isNil(props.fallbackComponent) && useFallback) {
     return props.fallbackComponent;
   }
   return (
     <div
-      className={classNames("img-wrapper", { circle: props.circle }, props.wrapperClassName)}
+      className={classNames(
+        "img-wrapper",
+        { circle: props.circle, "with-icon-fallback": !isNil(props.fallbackIcon) && useFallback },
+        props.wrapperClassName
+      )}
       style={props.wrapperStyle}
       onClick={props.onClick}
     >
@@ -54,22 +62,32 @@ const Image = (props: ImageProps): JSX.Element => {
       <ShowHide show={props.tint}>
         <div className={"image-tint"}></div>
       </ShowHide>
-      <img
-        className={classNames("img", props.className)}
-        alt={""}
-        /* Just in case the SRC bypasses TS compilation and is undefined, we
+      {!isNil(props.fallbackIcon) && useFallback ? (
+        <div className={"icon-wrapper"}>
+          {ui.typeguards.iconIsJSX(props.fallbackIcon) ? (
+            props.fallbackIcon
+          ) : (
+            <Icon className={"icon--image-fallback"} icon={props.fallbackIcon} />
+          )}
+        </div>
+      ) : (
+        <img
+          className={classNames("img", props.className)}
+          alt={""}
+          /* Just in case the SRC bypasses TS compilation and is undefined, we
 					 will just show a blank image. Note that if the SRC is indeed null,
 					 undefined or "" - it will not trigger the onError callback. */
-        src={props.src || props.fallbackSrc || "data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA="}
-        style={props.style}
-        onLoad={() => {
-          setError(null);
-          props.onLoad?.();
-        }}
-        onError={(e: React.SyntheticEvent<HTMLImageElement>) => setError(e)}
-      />
+          src={props.src || props.fallbackSrc || "data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA="}
+          style={props.style}
+          onLoad={() => {
+            setError(null);
+            props.onLoad?.();
+          }}
+          onError={(e: React.SyntheticEvent<HTMLImageElement>) => setError(e)}
+        />
+      )}
     </div>
   );
 };
 
-export default Image;
+export default React.memo(Image);
