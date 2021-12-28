@@ -11,7 +11,7 @@ import { Icon } from "components";
 import { PrimaryButtonIconToggle, OrderingButtonIconToggle } from "components/buttons";
 import { BudgetCard } from "components/cards";
 import { BudgetDropdown, OrderingDropdown } from "components/dropdowns";
-import { NoBudgets } from "components/empty";
+import { NoData } from "components/empty";
 import { Input } from "components/fields";
 import { Page } from "components/layout";
 import { EditBudgetModal, DeleteBudgetModal, CreateBudgetModal } from "components/modals";
@@ -103,15 +103,16 @@ const Budgets = (): JSX.Element => {
         ]}
       >
         {budgets.length === 0 && responseWasReceived ? (
-          <NoBudgets
+          <NoData
             title={"You don't have any templates yet! Create a new budget."}
             subTitle={
               // eslint-disable-next-line quotes
               'Tip: Click the "Create Budget" button above and create an empty budget or start one from a template.'
             }
+            icon={<Icon icon={"plus"} weight={"light"} />}
           >
             <BudgetEmptyIcon />
-          </NoBudgets>
+          </NoData>
         ) : (
           <div className={"dashboard-card-grid"}>
             {map(budgets, (budget: Model.Budget, index: number) => {

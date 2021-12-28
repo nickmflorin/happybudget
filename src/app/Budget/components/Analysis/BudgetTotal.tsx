@@ -1,11 +1,13 @@
 import { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 import { find, reduce, filter, includes, map, isNil } from "lodash";
 
 import { redux, budgeting, hooks, tabling, util, ui } from "lib";
 import { DEFAULT_COLOR_SCHEME, Colors } from "style/constants";
 
 import { BudgetTotalChart } from "components/charts";
+import { NoData } from "components/empty";
 import { BudgetTotalChartForm, BudgetTotalChartFormValues } from "components/forms";
 import { Tile } from "components/layout";
 
@@ -15,6 +17,8 @@ const selectGroups = redux.selectors.simpleDeepEqualSelector(
 const selectAccounts = redux.selectors.simpleDeepEqualSelector(
   (state: Application.AuthenticatedStore) => state.budget.analysis.accounts.data
 );
+
+const selectResponseWasReceived = (state: Application.AuthenticatedStore) => state.budget.analysis.responseWasReceived;
 
 type M = Model.Group | Model.Account;
 type Datum = Charts.Datum & { readonly type: "account" | "group" };
@@ -96,9 +100,11 @@ const generateData = (
 
 interface BudgetTotalProps extends StandardComponentProps {
   readonly budget: Model.Budget | null;
+  readonly budgetId: number;
 }
 
-const BudgetTotal = ({ budget, ...props }: BudgetTotalProps): JSX.Element => {
+const BudgetTotal = ({ budget, budgetId, ...props }: BudgetTotalProps): JSX.Element => {
+  const history = useHistory();
   const [metric, setMetric] = useState<Charts.BudgetTotal.MetricId>("estimated");
   const [grouped, setGrouped] = useState(true);
 
@@ -106,6 +112,7 @@ const BudgetTotal = ({ budget, ...props }: BudgetTotalProps): JSX.Element => {
 
   const groups = useSelector(selectGroups);
   const accounts = useSelector(selectAccounts);
+  const responseWasReceived = useSelector(selectResponseWasReceived);
 
   const data = useMemo(
     () => generateData(metric, groups, accounts, grouped),
@@ -140,21 +147,35 @@ const BudgetTotal = ({ budget, ...props }: BudgetTotalProps): JSX.Element => {
       contentProps={{ style: { height: 250 } }}
       style={props.style}
     >
-      <BudgetTotalChartForm
-        initialValues={{ grouped: true, metric: "estimated" }}
-        form={form}
-        style={{ position: "absolute", top: 10, right: 10, maxWidth: 150 }}
-        metrics={Metrics}
-        onValuesChange={(changedValues: Partial<BudgetTotalChartFormValues>) => {
-          if (changedValues.grouped !== undefined) {
-            setGrouped(changedValues.grouped);
-          }
-          if (changedValues.metric !== undefined) {
-            setMetric(changedValues.metric);
-          }
-        }}
-      />
-      <BudgetTotalChart<Datum> data={data} />
+      {accounts.length !== 0 && responseWasReceived ? (
+        <>
+          <BudgetTotalChartForm
+            initialValues={{ grouped: true, metric: "estimated" }}
+            form={form}
+            style={{ position: "absolute", top: 10, right: 10, maxWidth: 150 }}
+            metrics={Metrics}
+            onValuesChange={(changedValues: Partial<BudgetTotalChartFormValues>) => {
+              if (changedValues.grouped !== undefined) {
+                setGrouped(changedValues.grouped);
+              }
+              if (changedValues.metric !== undefined) {
+                setMetric(changedValues.metric);
+              }
+            }}
+          />
+          <BudgetTotalChart<Datum> data={data} />
+        </>
+      ) : (
+        <NoData
+          subTitle={"Your budget does not have any data. Add data to see analysis."}
+          button={{
+            onClick: () => history.push(`/budgets/${budgetId}/accounts`),
+            text: "Go to Budget"
+          }}
+        >
+          {/* add small icon once it is designed */}
+        </NoData>
+      )}
     </Tile>
   );
 };

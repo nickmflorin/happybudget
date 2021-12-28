@@ -2,29 +2,29 @@ import React from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
-import { Icon } from "components";
 import { Button } from "components/buttons";
 
-import "./NoBudgets.scss";
+import "./NoData.scss";
 
-interface NoBudgetsProps extends StandardComponentWithChildrenProps {
-  readonly title: string;
+interface NoDataProps extends StandardComponentWithChildrenProps {
+  readonly title?: string;
   readonly subTitle?: string;
   readonly button?: { readonly onClick?: () => void; readonly text: string };
+  readonly icon?: IconOrElement;
 }
 
-const NoBudgets = ({ title, subTitle, button, children, ...props }: NoBudgetsProps): JSX.Element => {
+const NoData = ({ title, subTitle, button, icon, children, ...props }: NoDataProps): JSX.Element => {
   return (
-    <div {...props} className={classNames("no-budgets", props.className)}>
-      <div className={"no-budgets-content"}>
+    <div {...props} className={classNames("no-data", props.className)}>
+      <div className={"no-data-content"}>
         {children}
-        <h1>{title}</h1>
+        {!isNil(title) && <h1>{title}</h1>}
         {!isNil(subTitle) && <p>{subTitle}</p>}
         {!isNil(button) && (
           <Button
             style={{ marginTop: 20 }}
             className={"btn btn--primary"}
-            icon={<Icon icon={"plus"} weight={"light"} />}
+            icon={icon}
             onClick={() => button.onClick?.()}
           >
             {button.text}
@@ -35,4 +35,4 @@ const NoBudgets = ({ title, subTitle, button, children, ...props }: NoBudgetsPro
   );
 };
 
-export default React.memo(NoBudgets);
+export default React.memo(NoData);

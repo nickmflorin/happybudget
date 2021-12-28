@@ -12,7 +12,7 @@ import { ShowHide, Icon } from "components";
 import { PrimaryButtonIconToggle, OrderingButtonIconToggle } from "components/buttons";
 import { TemplateCard, EmptyCard } from "components/cards";
 import { OrderingDropdown } from "components/dropdowns";
-import { NoBudgets } from "components/empty";
+import { NoData } from "components/empty";
 import { SearchInput } from "components/fields";
 import { Page } from "components/layout";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
@@ -106,16 +106,17 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
         contentScrollable={true}
       >
         {templates.length === 0 && responseWasReceived ? (
-          <NoBudgets
+          <NoData
             title={"You don't have any templates yet!"}
             subTitle={"Create your own templates or choose one we curated in Discover."}
             button={{
               onClick: () => setCreateTempateModalOpen(true),
               text: "Create a Template"
             }}
+            icon={<Icon icon={"plus"} weight={"light"} />}
           >
             <TemplateEmptyIcon />
-          </NoBudgets>
+          </NoData>
         ) : (
           <div className={"dashboard-card-grid"}>
             {map(templates, (template: Model.Template, index: number) => {

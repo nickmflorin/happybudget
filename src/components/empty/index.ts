@@ -1,1 +1,1 @@
-export { default as NoBudgets } from "./NoBudgets";
+export { default as NoData } from "./NoData";

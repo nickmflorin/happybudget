@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { AnalysisPage } from "app/Pages";
 
 import { actions } from "../../store";
+
 import BudgetTotal from "./BudgetTotal";
 import ActualsByDate from "./ActualsByDate";
 
@@ -25,8 +26,8 @@ const Analysis = ({ budget, budgetId }: AnalysisProps): JSX.Element => {
     <AnalysisPage budget={budget}>
       <div style={{ overflowY: "scroll" }}>
         <div className={"analysis-charts"}>
-          <BudgetTotal className={"analysis-chart"} budget={budget} />
-          <ActualsByDate className={"analysis-chart"} />
+          <BudgetTotal className={"analysis-chart"} budget={budget} budgetId={budgetId} />
+          <ActualsByDate className={"analysis-chart"} budgetId={budgetId} />
         </div>
       </div>
     </AnalysisPage>
