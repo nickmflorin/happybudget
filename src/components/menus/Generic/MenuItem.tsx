@@ -43,7 +43,7 @@ const PrivateCommonMenuItem = <
               props.closeParentDropdown?.();
             }
           } else {
-            if (props.keepDropdownOpenOnClick !== false) {
+            if (props.keepDropdownOpenOnClick !== true) {
               props.closeParentDropdown?.();
             }
           }
