@@ -105,6 +105,15 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     field: "attachments",
     width: 120,
     minWidth: 120
+  }),
+  columns.BodyColumn<R, M>({
+    field: "notes",
+    nullValue: null,
+    headerName: "Notes",
+    width: 100,
+    minWidth: 100,
+    flex: 1,
+    dataType: "longText"
   })
 ];
 

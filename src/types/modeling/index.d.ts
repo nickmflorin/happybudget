@@ -283,6 +283,7 @@ declare namespace Model {
       readonly position: string | null;
       readonly rate: number | null;
       readonly city: string | null;
+      readonly notes: string | null;
       readonly email: string | null;
       readonly phone_number: string | null;
       readonly attachments: SimpleAttachment[];

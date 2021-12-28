@@ -119,6 +119,7 @@ declare namespace Http {
     readonly date?: Model.Actual["date"];
     readonly payment_id?: Model.Actual["payment_id"];
     readonly value?: Model.Actual["value"];
+    readonly notes?: Model.Actual["notes"];
     readonly actual_type?: number | null;
     readonly attachments?: number[];
     readonly owner: Model.GenericHttpModel<"subaccount"> | Model.GenericHttpModel<"markup"> | null;
@@ -137,6 +138,7 @@ declare namespace Http {
 
   type ContactPayload = {
     readonly company?: Model.Contact["company"];
+    readonly notes?: Model.Contact["notes"];
     readonly position?: Model.Contact["position"];
     readonly rate?: Model.Contact["rate"];
     readonly city?: Model.Contact["city"];

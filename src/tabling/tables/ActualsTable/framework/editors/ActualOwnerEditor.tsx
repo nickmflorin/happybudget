@@ -6,26 +6,21 @@ import { ActualOwnersMenu } from "components/menus";
 import { framework } from "tabling/generic";
 
 interface ActualOwnerEditorProps
-  extends Table.EditorParams<
-    Tables.ActualRowData,
-    Model.Actual,
-    Tables.ActualTableStore,
-    Model.SimpleSubAccount | Model.SimpleMarkup | null
-  > {
+  extends Table.EditorParams<Tables.ActualRowData, Model.Actual, Tables.ActualTableStore, Model.ActualOwner | null> {
   readonly setSearch: (value: string) => void;
 }
 
 const ActualOwnerEditor = (
   { setSearch, ...props }: ActualOwnerEditorProps,
-  ref: ForwardedRef<Table.AgEditorRef<Model.SimpleSubAccount | Model.SimpleMarkup | null>>
+  ref: ForwardedRef<Table.AgEditorRef<Model.ActualOwner | null>>
 ) => {
   const owners = useSelector((state: Application.AuthenticatedStore) => props.selector(state).owners.data);
   const search = useSelector((state: Application.AuthenticatedStore) => props.selector(state).owners.search);
   const loading = useSelector((state: Application.AuthenticatedStore) => props.selector(state).owners.loading);
 
   const [editor] = framework.editors.useModelMenuEditor<
-    Model.SimpleSubAccount | Model.SimpleMarkup | null,
-    Model.SimpleSubAccount | Model.SimpleMarkup,
+    Model.ActualOwner | null,
+    Model.ActualOwner,
     Tables.ActualRowData,
     Model.Actual,
     Tables.ActualTableStore
@@ -43,7 +38,7 @@ const ActualOwnerEditor = (
       selected={!isNil(editor.value) ? `${editor.value.type}-${editor.value.id}` : null}
       models={owners}
       includeSearch={true}
-      onChange={(m: Model.SimpleSubAccount | Model.SimpleMarkup, e: Table.CellDoneEditingEvent) => {
+      onChange={(m: Model.ActualOwner, e: Table.CellDoneEditingEvent) => {
         editor.onChange(m, e);
       }}
       menu={editor.menu as NonNullRef<IMenuRef<MenuItemSelectedState, Model.ActualOwner>>}
