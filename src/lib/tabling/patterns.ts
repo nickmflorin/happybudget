@@ -188,8 +188,8 @@ const getSourceIndex = <R extends Table.RowData>(source: AGSource | Omit<ReduxSo
   if (!isNil(source.newIndex)) {
     if (source.newIndex > numRows) {
       console.warn(
-        `New index ${source.newIndex} exceeds the number of rows (${numRows}).
-        Defaulting to the end of the table/store at ${numRows}.`
+        `New index ${source.newIndex} exceeds the number of rows (${numRows}). ` +
+          `Defaulting to the end of the table/store at ${numRows}.`
       );
       return numRows;
     }
@@ -329,14 +329,14 @@ const detectPatternFromPreviousRows = <R extends Table.RowData>(
       columnSupportsSmartInference = false;
       if (v === undefined) {
         console.warn(
-          `Cannot perform smart inference as an undefined value was detected
-          for column ${field}.  This most likely means there is an inconstency
-          with how the new row data is being generated between any two given rows.`
+          "Cannot perform smart inference as an undefined value was detected " +
+            `for column ${field}.  This most likely means there is an inconstency ` +
+            "with how the new row data is being generated between any two given rows."
         );
       } else {
         console.warn(
-          `Smart inference is being used on column ${field} that has a
-          data type (${typeof v}) that does not support smart inference.`
+          `Smart inference is being used on column ${field} that has a ` +
+            `data type (${typeof v}) that does not support smart inference.`
         );
       }
       break;
