@@ -81,8 +81,8 @@ const identifyRequired = (id: PluginId, user: Model.User): boolean => {
 
 const postIdentify = (id: PluginId, user: Model.User) => {
   const plugin = getPlugin(id);
-  cookies.set(plugin.keys.user, user.id, { path: "/" });
-  cookies.set(plugin.keys.time, moment().toISOString(), { path: "/" });
+  cookies.set(plugin.keys.user, user.id);
+  cookies.set(plugin.keys.time, moment().toISOString());
 };
 
 export const identifySegment = (user: Model.User) => {

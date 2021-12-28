@@ -108,7 +108,7 @@ const getLastVisitedCookies = (designation: Designation): Record<string, unknown
   const cookies = new Cookies();
   const lastVisited = cookies.get(`${designation}-last-visited`);
   if (typeof lastVisited !== "object") {
-    cookies.set(`${designation}-last-visited`, {}, { path: "/" });
+    cookies.remove(`${designation}-last-visited`);
     return {};
   }
   return lastVisited;
@@ -138,5 +138,5 @@ export const setLastVisited = (
   const url = getUrl(budget, entity);
   urlCookies[budget.id] = url;
   const cookies = new Cookies();
-  cookies.set(`${designation}-last-visited`, urlCookies, { path: "/" });
+  cookies.set(`${designation}-last-visited`, urlCookies);
 };
