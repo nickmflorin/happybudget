@@ -164,7 +164,7 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
       </ShowHide>
       <ShowHide show={showTopSheet}>
         <Page
-          header={<PageHeader header={options.header} />}
+          header={<PageHeader header={options.header} date={options.date} />}
           footer={options.includeNotes === true ? <Notes nodes={options.notes || []} /> : null}
         >
           <AccountsTable

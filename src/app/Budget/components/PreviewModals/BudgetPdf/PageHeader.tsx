@@ -1,8 +1,9 @@
+import React from "react";
 import { useMemo } from "react";
 import { isNil } from "lodash";
 import { SourceObject } from "@react-pdf/types";
 
-import { View, RichText, Image } from "components/pdf";
+import { View, Text, RichText, Image } from "components/pdf";
 
 type SubHeaderItemImage = {
   readonly image: string;
@@ -29,6 +30,7 @@ const subHeaderItemHasInfo = (item: SubHeaderItem): item is SubHeaderImageAndInf
 
 interface PageHeaderProps {
   readonly header: PdfBudgetTable.Options["header"];
+  readonly date: PdfBudgetTable.Options["date"];
 }
 
 const PageHeader = (props: PageHeaderProps): JSX.Element => {
@@ -85,9 +87,10 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
   );
 
   return (
-    <View className={"page-header"}>
-      <View className={"page-primary-header"}>
+    <React.Fragment>
+      <View className={"budget-page-primary-header"}>
         <RichText nodes={props.header.header} />
+        <Text className={"budget-page-date"}>{props.date}</Text>
       </View>
       {(!isNil(subHeaderLeft) || !isNil(subHeaderRight)) && (
         <View className={"budget-page-sub-header"}>
@@ -113,7 +116,7 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
           )}
         </View>
       )}
-    </View>
+    </React.Fragment>
   );
 };
 

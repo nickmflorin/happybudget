@@ -38,6 +38,7 @@ declare type HeaderTemplateFormData = {
 declare type ExportPdfFormOptions = {
   readonly columns: string[];
   readonly excludeZeroTotals: boolean;
+  readonly date: string;
 };
 
 declare type IExportFormRef<O extends ExportPdfFormOptions = ExportPdfFormOptions> = {

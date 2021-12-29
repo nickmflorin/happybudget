@@ -3,7 +3,7 @@ import { isNil, map, filter } from "lodash";
 import classNames from "classnames";
 
 import * as api from "api";
-import { ui, tabling, pdf, contacts } from "lib";
+import { ui, tabling, pdf, util, contacts } from "lib";
 
 import { ExportActualsPdfForm } from "components/forms";
 import { PreviewModal } from "components/modals";
@@ -22,6 +22,7 @@ const ActualColumns = filter(
 
 const DEFAULT_OPTIONS: ExportActualsPdfFormOptions = {
   excludeZeroTotals: false,
+  date: util.dates.toDisplayDate(Date()) as string,
   columns: filter(
     map(ActualColumns, (column: C) => tabling.columns.normalizedField<R, M>(column)),
     (field: string | undefined) => !isNil(field)

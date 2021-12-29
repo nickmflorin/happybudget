@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 import { Switch } from "antd";
 
 import { Form } from "components";
-import { ColumnSelect } from "components/fields";
+import { ColumnSelect, Input } from "components/fields";
 import { CKEditor } from "components/richtext";
 
 type NonFormFields = "header";
@@ -75,6 +75,10 @@ const ExportActualsPdfForm = (
         labelClassName={"label label--section"}
         labelStyle={{ marginBottom: "5px !important" }}
       >
+        <Form.Item name={"date"} label={"Budget Date"}>
+          <Input />
+        </Form.Item>
+
         <Form.Item label={"Columns"} name={"columns"}>
           <ColumnSelect<Tables.ActualRowData, Model.Actual>
             getLabel={(c: Table.DataColumn<Tables.ActualRowData, Model.Actual>) =>

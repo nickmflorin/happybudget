@@ -113,6 +113,9 @@ const LayoutStyles: Pdf.ExtensionStyles = {
     backgroundColor: "white",
     padding: 25
   },
+  "page-date": {
+    marginBottom: 20
+  },
   "page-header": {
     marginBottom: 20
   },
@@ -296,10 +299,14 @@ const TableStyles: Pdf.ExtensionStyles = {
 };
 
 const ExportStyles: Pdf.ExtensionStyles = {
-  "page-header": {
-    marginBottom: 10
+  "budget-page-primary-header": {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between"
   },
-  "page-primary-header": {},
+  "budget-page-date": {
+    fontSize: 10
+  },
   "budget-page-sub-header": {
     display: "flex",
     minHeight: 70,

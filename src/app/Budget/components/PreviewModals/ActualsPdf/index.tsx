@@ -85,7 +85,7 @@ const ActualsPdf = ({ budget, actuals, contacts, options }: ActualsPdfProps): JS
 
   return (
     <Document>
-      <Page header={<PageHeader header={options.header} />}>
+      <Page header={<PageHeader header={options.header} date={options.date} />}>
         <ActualsTable data={filteredActuals} columns={actualColumns} options={options} />
       </Page>
     </Document>

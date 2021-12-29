@@ -4,7 +4,7 @@ import { isNil, map, filter } from "lodash";
 import classNames from "classnames";
 
 import * as api from "api";
-import { redux, ui, tabling, pdf, contacts } from "lib";
+import { redux, ui, tabling, pdf, util, contacts } from "lib";
 
 import { ExportBudgetPdfForm } from "components/forms";
 import { PreviewModal } from "components/modals";
@@ -25,6 +25,7 @@ const SubAccountColumns = filter(
 ) as C[];
 
 const DEFAULT_OPTIONS: ExportBudgetPdfFormOptions = {
+  date: util.dates.toDisplayDate(Date()) as string,
   excludeZeroTotals: false,
   header: {
     header: `<h2>Sample Budget ${new Date().getFullYear()}</h2><p>Cost Summary</p>`,

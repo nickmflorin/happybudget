@@ -9,7 +9,7 @@ import * as api from "api";
 import { typeguards } from "lib";
 
 import { Icon, Form, ShowHide, Separator } from "components";
-import { ColumnSelect } from "components/fields";
+import { ColumnSelect, Input } from "components/fields";
 import { UploadPdfImage } from "components/uploaders";
 import { EntityText } from "components/typography";
 import { CKEditor } from "components/richtext";
@@ -405,6 +405,10 @@ const ExportForm = (
         labelClassName={"label label--section"}
         labelStyle={{ marginBottom: "5px !important" }}
       >
+        <Form.Item name={"date"} label={"Budget Date"}>
+          <Input />
+        </Form.Item>
+
         <Form.Item label={"Columns"} name={"columns"}>
           <ColumnSelect<R, M, C> getLabel={(c: C) => c.pdfHeaderName || c.headerName || ""} columns={columns} />
         </Form.Item>

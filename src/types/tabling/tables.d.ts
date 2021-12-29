@@ -83,6 +83,7 @@ declare namespace PdfBudgetTable {
   };
 
   type Options = {
+    readonly date: string;
     readonly header: HeaderOptions;
     readonly columns: string[];
     readonly tables?: TableOption[] | null | undefined;
@@ -94,6 +95,7 @@ declare namespace PdfBudgetTable {
 
 declare namespace PdfActualsTable {
   type Options = {
+    readonly date: string;
     readonly header: Pdf.HTMLNode[];
     readonly columns: string[];
     readonly excludeZeroTotals: boolean;

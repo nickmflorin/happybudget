@@ -146,7 +146,7 @@ const RootBudget = (): JSX.Element => {
           open={previewModalVisible}
           onCancel={() => setPreviewModalVisible(false)}
           budgetId={parseInt(budgetId)}
-          budgetName={!isNil(budget) ? `${budget.name}` : `Sample Budget ${new Date().getFullYear()}`}
+          budgetName={!isNil(budget) ? budget.name : `Sample Budget ${new Date().getFullYear()}`}
           filename={!isNil(budget) ? `${budget.name}.pdf` : "budget.pdf"}
         />
       </RenderIfValidId>
