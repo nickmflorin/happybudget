@@ -22,6 +22,9 @@ const ActualsByDateChart = <D extends Charts.Datum = Charts.Datum>(props: Budget
       borderWidth={1}
       borderRadius={6}
       borderColor={{ from: "color" }}
+      axisLeft={{
+        tickValues: 6
+      }}
       axisBottom={{
         tickSize: 5,
         tickPadding: 5,
@@ -43,6 +46,8 @@ const ActualsByDateChart = <D extends Charts.Datum = Charts.Datum>(props: Budget
         );
       }}
       enableLabel={false}
+      minValue={0}
+      maxValue={1200}
     />
   );
 };
