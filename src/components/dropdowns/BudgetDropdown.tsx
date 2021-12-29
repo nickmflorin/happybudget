@@ -25,7 +25,7 @@ const BudgetDropdown: React.FC<BudgetDropdownProps> = ({ children, onNewBudget }
           id: "start-from-template",
           label: "Start from Template ",
           icon: <Icon icon={"image"} weight={"light"} />,
-          onClick: () => history.push("/templates")
+          onClick: () => history.push("/discover")
         }
       ]}
       placement={"bottomLeft"}
