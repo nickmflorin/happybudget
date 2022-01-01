@@ -128,7 +128,7 @@ const Login = (): JSX.Element => {
   return (
     <LandingFormContainer title={"Sign In"} subTitle={"Cloud based budgeting at your fingertips."}>
       <LoginForm
-        className={"mb--20 mt--20"}
+        className={"mt--20"}
         form={form}
         loading={loading}
         onGoogleSuccess={(token: string) => {

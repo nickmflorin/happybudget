@@ -41,7 +41,7 @@ const ResetPassword = (): JSX.Element => {
   return (
     <LandingFormContainer title={"Reset password"}>
       <ResetPasswordForm
-        className={"mb--20 mt--20"}
+        className={"mt--20"}
         form={form}
         loading={loading}
         onSubmit={(values: IResetPasswordFormValues) => {
