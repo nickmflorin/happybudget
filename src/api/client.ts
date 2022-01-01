@@ -27,7 +27,10 @@ export const getRequestHeaders = (): { [key: string]: string } => {
   /* The CSRF Token needs to be set as a header for POST/PATCH/PUT requests
      with Django - unfortunately, we cannot include it as a cookie only
      because their middleware looks for it in the headers. */
-  const csrfToken: string = cookies.get("greenbudgetcsrftoken");
+  let csrfToken: string = cookies.get("greenbudgetcsrftoken");
+  if (process.env.REACT_APP_PRODUCTION_ENV === "local") {
+    csrfToken = cookies.get("localgreenbudgetcsrftoken");
+  }
   if (!isNil(csrfToken)) {
     headers["X-CSRFToken"] = csrfToken;
   }
