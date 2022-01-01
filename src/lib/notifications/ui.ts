@@ -11,12 +11,12 @@ import * as internal from "./internal";
 
 type AddNotificationsDetail<N extends UINotificationType = UINotificationType> = {
   readonly notifications: SingleOrArray<N>;
-  readonly opts?: Omit<UINotificationOptions, "behavior" | "defaultMessage" | "defaultMessageOrDetail">;
+  readonly opts?: Omit<UINotificationOptions, "behavior">;
 };
 type ClearNotificationsDetail = SingleOrArray<UINotification["id"]> | undefined;
 type RequestErrorDetail = {
   readonly error: Error;
-  readonly opts?: Omit<UINotificationOptions, "behavior" | "defaultMessage" | "defaultMessageOrDetail">;
+  readonly opts?: Omit<UINotificationOptions, "behavior">;
 };
 
 type AddNotificationsReducerDetail = Omit<AddNotificationsDetail<UINotification>, "opts"> & {
@@ -166,7 +166,7 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
   );
 
   const handleRequestError = useMemo(
-    () => (e: Error, opts?: Omit<UINotificationOptions, "defaultMessage" | "defaultMessageOrDetail">) => {
+    () => (e: Error, opts?: UINotificationOptions) => {
       if (!axios.isCancel(e) && !(e instanceof api.ForceLogout)) {
         /* Dispatch the notification to the internal handler so we can, if
            appropriate, send notifications to Sentry or the console. */
@@ -174,7 +174,11 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
         if (e instanceof api.ClientError) {
           return notify(e.errors, { message: "There was a problem with your request.", ...opts });
         } else if (e instanceof api.NetworkError || e instanceof api.ServerError) {
-          return notify(e, { defaultMessageOrDetail: "There was a problem communicating with the server.", ...opts });
+          return notify(e, {
+            message: "There was an error with your request.",
+            detail: "There was a problem communicating with the server.",
+            ...opts
+          });
         } else {
           throw e;
         }
@@ -210,11 +214,7 @@ export const clear = (destinationId: string, ids: SingleOrArray<UINotification["
   document.dispatchEvent(evt);
 };
 
-export const handleRequestError = (
-  destinationId: string,
-  e: Error,
-  opts?: Omit<UINotificationOptions, "defaultMessage" | "defaultMessageOrDetail">
-) => {
+export const handleRequestError = (destinationId: string, e: Error, opts?: UINotificationOptions) => {
   const evt = new CustomEvent<RequestErrorDetail>(`notifications:${destinationId}:requestError`, {
     detail: { error: e, opts }
   });
@@ -226,10 +226,8 @@ export const notifyBanner = (notifications: SingleOrArray<UINotificationType>, o
 
 export const clearBanner = (ids: SingleOrArray<UINotification["id"]> | undefined) => clear("banner", ids);
 
-export const handleBannerRequestError = (
-  e: Error,
-  opts?: Omit<UINotificationOptions, "defaultMessage" | "defaultMessageOrDetail">
-) => handleRequestError("banner", e, opts);
+export const handleBannerRequestError = (e: Error, opts?: UINotificationOptions) =>
+  handleRequestError("banner", e, opts);
 
 type UseNotificationsEventListenerConfig = UseNotificationsConfig & {
   readonly destinationId: string;

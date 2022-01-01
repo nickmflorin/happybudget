@@ -26,12 +26,12 @@ declare type UINotificationOptions = {
   /* We allow the message to be provided as an option in the case that the
      notification object itself is an Error or Http.Error. */
   readonly message?: string;
+  /* We allow the detail to be provided as an option in the case that the
+     notification object itself is an Error or Http.Error. */
+  readonly detail?: string;
   /* We allow the duration to be provided as an option in the case that we want
 	   to apply the same duration to several dispatched notifications. */
   readonly duration?: number;
-  /* Will be used first as the message if the message is not provided, and
-	   second as the detail if the detail is not provided. */
-  readonly defaultMessageOrDetail?: string;
   /* We allow the closable behavior to be provided as an option in the case that
 		 we want to apply the same behavior to several dispatched notifications. */
   readonly closable?: boolean;

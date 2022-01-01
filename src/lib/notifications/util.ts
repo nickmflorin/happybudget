@@ -8,25 +8,18 @@ export const notificationDetailToString = (e: NotificationDetail) => {
 };
 
 const CentralStandardizer = (n: UINotificationData, opts?: Omit<UINotificationOptions, "behavior">) => {
-  n = { ...n, closable: opts?.closable !== undefined ? opts.closable : n.closable };
-  if (n.message === undefined) {
-    return { ...n, message: opts?.defaultMessageOrDetail };
-  } else if (n.detail === undefined) {
-    return { ...n, detail: opts?.defaultMessageOrDetail };
-  }
-  return n;
+  return {
+    ...n,
+    message: n.message === undefined ? opts?.message : n.message,
+    detail: n.detail === undefined ? opts?.detail : n.detail,
+    closable: opts?.closable !== undefined ? opts.closable : n.closable
+  };
 };
 
 export const ErrorStandard: UINotificationStandard<Error> = {
   typeguard: typeguards.isError,
   func: (e: Error, opts?: Omit<UINotificationOptions, "behavior">) =>
-    CentralStandardizer(
-      {
-        message: opts?.message,
-        level: "error"
-      },
-      opts
-    )
+    CentralStandardizer({ level: "error", message: "There was an error.", detail: e.message, ...opts }, opts)
 };
 
 export const StringStandard: UINotificationStandard<string> = {
@@ -46,12 +39,11 @@ export const HttpErrorStandard: UINotificationStandard<Http.Error> = {
   func: (e: Http.Error, opts?: Omit<UINotificationOptions, "behavior">) =>
     CentralStandardizer(
       {
-        message: opts?.message || opts?.defaultMessageOrDetail || api.standardizeError(e).message,
-        /* If there is an explicit message provided, we use the API error as the
-           detail and the more general, explicitly provided message as the
-					 message. */
+        message: opts?.message || api.standardizeError(e).message,
         detail:
-          opts?.message !== undefined || opts?.defaultMessageOrDetail !== undefined
+          opts?.detail !== undefined
+            ? opts?.detail
+            : opts?.message !== undefined
             ? api.standardizeError(e).message
             : undefined,
         level: "warning"
@@ -66,7 +58,7 @@ export const UIFieldNotificationStandard: UINotificationStandard<UIFieldNotifica
     CentralStandardizer(
       {
         message: opts?.message || `There was an error related to field ${e.field}.`,
-        detail: e.message,
+        detail: opts?.detail || e.message,
         level: "warning"
       },
       opts
