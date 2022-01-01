@@ -25,8 +25,9 @@ type AddNotificationsReducerDetail = Omit<AddNotificationsDetail<UINotification>
 };
 
 const isAddNotificationsDetail = (
-  action: AddNotificationsReducerDetail | ClearNotificationsDetail
-): action is AddNotificationsReducerDetail => (action as AddNotificationsReducerDetail).notifications !== undefined;
+  action: AddNotificationsReducerDetail | ClearNotificationsDetail | undefined
+): action is AddNotificationsReducerDetail =>
+  action !== undefined && (action as AddNotificationsReducerDetail).notifications !== undefined;
 
 const UINotificationReducer = (
   state: UINotification[] = [],
