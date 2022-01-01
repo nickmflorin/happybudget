@@ -27,12 +27,12 @@ $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bas
 ```
 
 Use `nvm` to establish the version of Node that you will use with this project.
-Typically, version 8.17.0 is a safe bet, as anything lower than 8.0.0 is likely
+Typically, version 16.0.0 is a safe bet, but anything lower than 12.0.0 is likely
 a candidate to cause a problem.
 
 ```bash
-$ nvm install 10.12.0
-$ nvm use 10.12.0
+$ nvm install 16.0.0
+$ nvm use 16.0.0
 ```
 
 Confirm that `nvm` is pointing at the correct Node version:
@@ -66,24 +66,46 @@ This will install the project dependencies in the `package.json` file.
 
 Finally, we need to create and edit a `.env.local` file in the project root to
 include the configuration that the frontend application relies on. This
-file is not version tracked, and you should ask a team member for the values that
-are needed to populate the `.env.local` file.
+file is not version tracked, and contains some sensitive information.  As such,
+you will need to request the configuration parameters outside the ones shown below 
+from a team member.
+
+At a bare minimum, the `.env.local` file must contain the following configuration:
+
+```bash
+REACT_APP_API_DOMAIN=http://local.greenbudget.io:8000
+REACT_APP_PRODUCTION_ENV=local
+```
 
 ## Development
 
 ### Running Locally
 
 Once the dependencies are installed via `yarn` and the `.env.local` file is
-present, all you need to do to start the development server is the following
+present, we need to setup our `/etc/hosts` file such that we can use `local.greenbudget.io`
+as a valid domain for the local development server.
+
+Edit your `/etc/hosts` file as follows:
 
 ```bash
-$ yarn start
+$ sudo nano /etc/hosts
 ```
 
-#### Local Domain Caveat
+Add the following configuration to the file:
 
-Our authentication protocols rely on the ability to set cookies in the response that dictate user sessions and
-information.  Recent Google Chrome security improvements have introduced the caveat that the browser no longer
-considers `localhost` a valid domain, so setting cookies in the backend for the frontend application no longer
-works when running the application on `localhost`.  For this reason, the application is configured locally to
-**only** work on `127.0.0.1:3000`, not `localhost:3000`.
+```bash
+127.0.0.1       local.greenbudget.io
+```
+
+Now, when we start the development server, we will be able to access the application at
+`local.greenbudget.io`.
+
+To start the development server, run the following command:
+
+```bash
+$ sudo yarn start
+```
+
+`sudo` is required to run the application on port `80`, so we can access the application
+locally at `local.greenbudget.io` instead of `local.greenbudget.io:3000`.
+
