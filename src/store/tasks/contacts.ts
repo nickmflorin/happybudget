@@ -69,8 +69,7 @@ export const createTableTaskSet = (
       const response: Http.ListResponse<M> = yield api.request(api.getContacts, {});
       yield put(config.actions.response({ models: response.data }));
     } catch (e: unknown) {
-      notifications.requestError(e as Error);
-      config.table.notify({ message: "There was an error retrieving the contacts.", level: "error" });
+      config.table.handleRequestError(e as Error, { message: "There was an error retrieving the contacts." });
       yield put(config.actions.response({ models: [] }));
     } finally {
       yield put(config.actions.loading(false));
@@ -102,8 +101,7 @@ export const createTableTaskSet = (
     try {
       yield api.request(api.bulkUpdateContacts, requestPayload);
     } catch (err: unknown) {
-      notifications.requestError(err as Error);
-      config.table.notify({ message: errorMessage, level: "error" });
+      config.table.handleRequestError(err as Error, { message: errorMessage });
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -114,8 +112,7 @@ export const createTableTaskSet = (
     try {
       yield api.request(api.bulkDeleteContacts, ids);
     } catch (err: unknown) {
-      notifications.requestError(err as Error);
-      config.table.notify({ message: errorMessage, level: "error" });
+      config.table.handleRequestError(err as Error, { message: errorMessage });
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -138,8 +135,7 @@ export const createTableTaskSet = (
         )
       );
     } catch (err: unknown) {
-      notifications.requestError(err as Error);
-      config.table.notify({ message: "There was an error adding the rows.", level: "error" });
+      config.table.handleRequestError(err as Error, { message: "There was an error adding the rows." });
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -161,8 +157,7 @@ export const createTableTaskSet = (
         )
       );
     } catch (err: unknown) {
-      notifications.requestError(err as Error);
-      config.table.notify({ message: "There was an error moving the rows.", level: "error" });
+      config.table.handleRequestError(err as Error, { message: "There was an error moving the rows." });
     } finally {
       yield put(config.actions.saving(false));
     }

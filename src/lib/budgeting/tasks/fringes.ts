@@ -4,7 +4,7 @@ import { map, filter, intersection, reduce } from "lodash";
 import { createSelector } from "reselect";
 
 import * as api from "api";
-import { tabling, budgeting, notifications } from "lib";
+import { tabling, budgeting } from "lib";
 import { initialFringesState, initialSubAccountsTableState } from "app/Budget/store/initialState";
 
 type R = Tables.FringeRowData;
@@ -178,8 +178,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         }
       }
     } catch (err: unknown) {
-      config.table.notify({ message: errorMessage, level: "error" });
-      notifications.requestError(err as Error);
+      config.table.handleRequestError(err as Error, { message: errorMessage });
     } finally {
       if (!tabling.typeguards.isGroupEvent(e)) {
         yield put(config.actions.loadingBudget(false));
@@ -195,8 +194,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       const response: Http.BulkDeleteResponse<B> = yield api.request(config.services.bulkDelete, budgetId, ids);
       yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
     } catch (err: unknown) {
-      config.table.notify({ message: errorMessage, level: "error" });
-      notifications.requestError(err as Error);
+      config.table.handleRequestError(err as Error, { message: errorMessage });
     } finally {
       yield put(config.actions.saving(false));
       yield put(config.actions.loadingBudget(false));
@@ -220,8 +218,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         )
       );
     } catch (err: unknown) {
-      config.table.notify({ message: "There was an error adding the table rows.", level: "error" });
-      notifications.requestError(err as Error);
+      config.table.handleRequestError(err as Error, { message: "There was an error adding the table rows." });
     } finally {
       yield put(config.actions.saving(false));
     }
@@ -246,8 +243,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         )
       );
     } catch (err: unknown) {
-      config.table.notify({ message: "There was an error moving the table rows.", level: "error" });
-      notifications.requestError(err as Error);
+      config.table.handleRequestError(err as Error, { message: "There was an error moving the table rows." });
     } finally {
       yield put(config.actions.saving(false));
     }

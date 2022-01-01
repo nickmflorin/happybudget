@@ -14,7 +14,7 @@ interface AttachmentListItemProps extends StandardComponentProps {
   readonly attachment: Model.Attachment;
   readonly deleting?: boolean;
   readonly onClick?: () => void;
-  readonly onError: (notification: UINotification) => void;
+  readonly onError: (notification: UINotificationData) => void;
 }
 
 const AttachmentListItem = ({ attachment, deleting, onClick, onError, ...props }: AttachmentListItemProps) => {

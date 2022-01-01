@@ -92,7 +92,7 @@ const AttachmentsCell = <
 
     const handleDrop = (e: DragEvent) => {
       const error = (message: string) => {
-        // TODO: Display error in banner.
+        notifications.ui.notifyBanner({ level: "error", message });
         notifications.notify({ message, level: "error", dispatchToSentry: true });
         progressCancel();
       };

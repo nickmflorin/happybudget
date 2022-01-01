@@ -12,7 +12,7 @@ interface AttachmentsListProps extends StandardComponentProps {
   readonly loading?: boolean;
   readonly onDelete?: (m: Model.Attachment) => void;
   readonly isDeleting?: (id: number) => void;
-  readonly onError: (notification: UINotification) => void;
+  readonly onError: (notification: UINotificationData) => void;
 }
 
 const AttachmentsList = ({ attachments, loading, onDelete, isDeleting, onError, ...props }: AttachmentsListProps) => {

@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { Form as RootForm, Input } from "antd";
 
 import { RenderWithSpinner } from "components";
-import { Notification } from "components/feedback";
+import { Notifications } from "components/notifications";
 import { ui } from "lib";
 
 import FieldError from "./FieldError";
@@ -231,13 +231,7 @@ const PrivateForm = <T extends Record<string, unknown> = any>(
             <React.Fragment key={index}>{element}</React.Fragment>
           )
         )}
-        {props.form.notifications.length !== 0 && (
-          <div className={"form-alert-wrapper"}>
-            {map(props.form.notifications, (n: UINotification, index: number) => {
-              return <Notification key={index} {...n} />;
-            })}
-          </div>
-        )}
+        <Notifications notifications={props.form.notifications} />
         {!isNil(footer) && footer}
       </RenderWithSpinner>
     </RootForm>

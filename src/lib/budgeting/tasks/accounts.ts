@@ -128,8 +128,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
           yield put(config.actions.response({ models: models.data, groups: groups.data, markups: markups?.data }));
         }
       } catch (e: unknown) {
-        config.table.notify({ message: "There was an error retrieving the table data.", level: "error" });
-        notifications.requestError(e as Error);
+        config.table.handleRequestError(e as Error, { message: "There was an error retrieving the table data." });
         yield put(config.actions.response({ models: [], groups: [], markups: [] }));
       } finally {
         yield put(config.actions.loading(false));
@@ -181,8 +180,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         const response: Http.BulkResponse<B, C> = yield api.request(config.services.bulkUpdate, objId, requestPayload);
         yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
       } catch (err: unknown) {
-        config.table.notify({ message: errorMessage, level: "error" });
-        notifications.requestError(err as Error);
+        config.table.handleRequestError(err as Error, { message: errorMessage });
       } finally {
         yield put(config.actions.saving(false));
         if (isGroupEvent !== true) {
@@ -217,8 +215,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         */
         yield all(validEffects);
       } catch (err: unknown) {
-        config.table.notify({ message: "There was an error updating the table rows.", level: "error" });
-        notifications.requestError(err as Error);
+        config.table.handleRequestError(err as Error, { message: "There was an error updating the table rows." });
       } finally {
         yield put(config.actions.saving(false));
       }
@@ -315,8 +312,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
             call(bulkDeleteRows, context.budgetId, modelRowIds, markupRowIds)
           ]);
         } catch (err: unknown) {
-          config.table.notify({ message: "There was an error removing the table rows.", level: "error" });
-          notifications.requestError(err as Error);
+          config.table.handleRequestError(err as Error, { message: "There was an error removing the table rows." });
         } finally {
           yield put(config.actions.saving(false));
           yield put(config.actions.loadingBudget(false));
@@ -350,7 +346,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
           )
         );
       } catch (err: unknown) {
-        config.table.notify({ message: "There was an error adding the table rows.", level: "error" });
+        config.table.handleRequestError(err as Error, { message: "There was an error adding the table rows." });
         notifications.requestError(err as Error);
       } finally {
         yield put(config.actions.saving(false));
@@ -385,8 +381,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
           )
         );
       } catch (err: unknown) {
-        config.table.notify({ message: "There was an error moving the table rows.", level: "error" });
-        notifications.requestError(err as Error);
+        config.table.handleRequestError(err as Error, { message: "There was an error moving the table rows." });
       } finally {
         yield put(config.actions.saving(false));
       }

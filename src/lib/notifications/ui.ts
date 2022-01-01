@@ -1,112 +1,184 @@
-import { useReducer, useMemo } from "react";
+import { useReducer, useMemo, useRef, useEffect } from "react";
 import axios from "axios";
-import { isNil, reduce, filter } from "lodash";
+import { isNil, filter, includes, map } from "lodash";
 
 import * as api from "api";
+import { util, hooks } from "lib";
 
-import * as internal from "./internal";
 import * as typeguards from "./typeguards";
+import { UIFieldNotificationStandard, combineFieldNotifications, standardizeNotification } from "./util";
+import * as internal from "./internal";
 
-const isNotificationObj = (n: UINotification | NotificationDetail): n is UINotification =>
-  typeof n !== "string" && !(n instanceof Error) && !api.typeguards.isHttpError(n);
-
-const isFieldNotification = (e: UINotification | NotificationDetail): e is Http.FieldError | UIFieldNotification =>
-  (api.typeguards.isHttpError(e) && e.error_type === "field") || (isNotificationObj(e) && e.field !== undefined);
-
-const isError = (n: InternalNotification | NotificationDetail): n is Error =>
-  typeof n !== "string" && n instanceof Error;
-
-export const uiNotificationMessage = (e: UINotification | NotificationDetail) => {
-  return isNotificationObj(e)
-    ? e.message
-    : api.typeguards.isHttpError(e)
-    ? api.standardizeError(e).message
-    : isError(e)
-    ? e.message
-    : e;
+type AddNotificationsDetail<N extends UINotificationType = UINotificationType> = {
+  readonly notifications: SingleOrArray<N>;
+  readonly opts?: Omit<UINotificationOptions, "behavior" | "defaultMessage" | "defaultMessageOrDetail">;
+};
+type ClearNotificationsDetail = SingleOrArray<UINotification["id"]> | undefined;
+type RequestErrorDetail = {
+  readonly error: Error;
+  readonly opts?: Omit<UINotificationOptions, "behavior" | "defaultMessage" | "defaultMessageOrDetail">;
 };
 
-type UINotifyAction = {
-  readonly notifications: SingleOrArray<UINotification | Error | string>;
-  readonly append?: boolean;
+type AddNotificationsReducerDetail = Omit<AddNotificationsDetail<UINotification>, "opts"> & {
+  // For the reducer, the behavior (append or replace) must be provided.
+  readonly opts: Omit<UINotificationOptions, "behavior"> & { readonly behavior: UINotificationOptions["behavior"] };
 };
 
-const UINotificationReducer = (state: UINotification[] = [], action: UINotifyAction | undefined): UINotification[] => {
-  if (!isNil(action)) {
+const isAddNotificationsDetail = (
+  action: AddNotificationsReducerDetail | ClearNotificationsDetail
+): action is AddNotificationsReducerDetail => (action as AddNotificationsReducerDetail).notifications !== undefined;
+
+const UINotificationReducer = (
+  state: UINotification[] = [],
+  action: AddNotificationsReducerDetail | ClearNotificationsDetail | undefined
+): UINotification[] => {
+  if (isAddNotificationsDetail(action)) {
     const ns = Array.isArray(action.notifications) ? action.notifications : [];
-    return reduce(
-      ns,
-      (curr: UINotification[], n: UINotification | NotificationDetail): UINotification[] => {
-        if (typeguards.isNotificationDetail(n)) {
-          return [
-            ...curr,
-            {
-              message: uiNotificationMessage(n),
-              level: isFieldNotification(n) ? "warning" : "error"
-            }
-          ];
-        }
-        return [...curr, n];
-      },
-      action.append === true ? state : []
-    );
+    return action.opts.behavior === "append" ? [...state, ...ns] : ns;
   } else {
-    return [];
+    if (action === undefined) {
+      return [];
+    }
+    const ids = Array.isArray(action) ? action : [action];
+    return filter(state, (n: UINotification) => !includes(ids, n.id));
   }
 };
 
 type UseNotificationsConfig = {
+  readonly defaultBehavior: UINotificationBehavior;
+  readonly defaultClosable?: boolean;
   readonly handleFieldErrors?: (errors: UIFieldNotification[]) => void;
 };
 
-export const useNotifications = (config?: UseNotificationsConfig): UINotificationsHandler => {
+export const useNotifications = (config: UseNotificationsConfig): UINotificationsHandler => {
   const [ns, dispatchNotification] = useReducer(UINotificationReducer, []);
+  const timeouts = useRef<NodeJS.Timeout[]>([]);
 
-  const clearNotifications = useMemo(() => () => dispatchNotification(undefined), []);
+  const clearNotifications = useMemo(() => (id?: SingleOrArray<UINotification["id"]>) => dispatchNotification(id), []);
+
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const doTimeout = hooks.useDynamicCallback((fn: () => any, ms: number) => {
+    const timeout = setTimeout(fn, ms);
+    timeouts.current = [...timeouts.current, timeout];
+  });
+
+  useEffect(() => {
+    for (let i = 0; i < timeouts.current.length; i++) {
+      clearTimeout(timeouts.current[i]);
+    }
+  }, []);
+
+  const notifications = useMemo(() => {
+    return map(ns, (n: Omit<UINotification, "remove">) => ({ ...n, remove: () => clearNotifications(n.id) }));
+  }, [clearNotifications, ns]);
 
   const notify = useMemo(
-    /* eslint-disable-next-line max-len */
-    () => (notes: SingleOrArray<UINotification | Http.Error | Error | string>, opts?: UINotificationOptions) => {
-      const notices = Array.isArray(notes) ? notes : [notes];
-      /* For the notification sources that pertain to field type errors, either
-			   allow the UI elemenet to render them next to the individual fields or
-				 include them in the same scope as non-field errors. */
-      const fieldRelatedErrors: (Http.FieldError | UIFieldNotification)[] = filter(notices, (n: UINotification) =>
-        isFieldNotification(n)
+    () => (notes: SingleOrArray<UINotificationType>, opts?: UINotificationOptions) => {
+      let notices = Array.isArray(notes) ? notes : [notes];
+
+      const fieldRelatedErrors: (Http.FieldError | UIFieldNotification)[] = filter(notices, (n: UINotificationType) =>
+        /* UIFieldNotification is assignable to Http.FieldError, so we only need
+					 to use the typeguard from one of the standards. */
+        UIFieldNotificationStandard.typeguard(n)
       ) as (Http.FieldError | UIFieldNotification)[];
+
+      /* For the notification sources that pertain to field type errors, a
+				 callback can be provided that allows for more granular handling of
+				 each error pertinent to an individual field.  This is primarily used
+				 for Forms, where the field-related errors need to be rendered next
+				 to the individual FormItem(s) that are associated with the fields for
+				 which an error occurred.  If this callback is not provided, the
+				 field-related errors are included in the same scope as the non-field
+				 errors.
+				 */
       const fieldHandler = config?.handleFieldErrors;
       if (!isNil(fieldHandler)) {
         fieldHandler(fieldRelatedErrors);
         /* Filter out the notifications that do not pertain to individual fields
-				 of the form and dispatch them to the notifications store. */
-        dispatchNotification({
-          notifications: filter(notices, (n: UINotification) => !isFieldNotification(n)) as UINotification[],
-          append: opts?.append
-        });
-      } else {
-        dispatchNotification({
-          notifications: notices,
-          append: opts?.append
-        });
+				   of the form and dispatch them to the notifications store. */
+        notices = filter(
+          notices,
+          (n: UINotificationType) => !typeguards.isUIFieldNotification(n)
+        ) as UINonFieldNotificationType[];
       }
+
+      /* If the fieldHandler is not defined, field related errors will still be
+			   in the set of notifications.  If field related errors are submitted in
+				 a single batch, we want to group them together into a single
+				 notification.
+
+				 The purpose of this is to prevent the dispatching of several UI
+				 notifications for a single request error - as a single request error
+				 can contain children errors, each of which is an error related to a
+				 single field.
+
+				 Note that regardless of the location (index) of the first (or any)
+				 field related errors in the array of notifications provided, the field
+				 related errors will always come last - at least by the current logic.
+				 This should be improved, as the location of the final grouped field
+				 related error can be determined from the location of the first child
+				 field related error in the array.
+				 */
+      if (fieldRelatedErrors.length !== 0) {
+        notices = [
+          ...notices,
+          combineFieldNotifications(fieldRelatedErrors, { behavior: config.defaultBehavior, ...opts })
+        ];
+      }
+      const addedNotifications = map(notices, (n: UINotificationType) => {
+        const id = util.generateRandomNumericId();
+        const standardized = standardizeNotification(n, {
+          behavior: config.defaultBehavior,
+          ...opts
+        });
+        return {
+          ...standardized,
+          /* All notifications will default to being closable unless the
+             `defaultClosable` configuration is provided or the notification
+             or options indicate the closability of the notification itself. */
+          closable:
+            standardized.closable !== undefined
+              ? standardized.closable
+              : config.defaultClosable !== undefined
+              ? config.defaultClosable
+              : true,
+          id,
+          remove: () => clearNotifications(id)
+        };
+      });
+      dispatchNotification({
+        notifications: addedNotifications,
+        opts: { behavior: config.defaultBehavior, ...opts }
+      });
+      if (!isNil(opts?.duration)) {
+        doTimeout(() => clearNotifications(map(addedNotifications, (n: UINotification) => n.id)), opts?.duration);
+      } else {
+        for (let i = 0; i < addedNotifications.length; i++) {
+          if (addedNotifications[i].duration !== undefined) {
+            doTimeout(() => clearNotifications(addedNotifications[i].id), addedNotifications[i].duration);
+          }
+        }
+      }
+      return addedNotifications;
     },
-    [config?.handleFieldErrors]
+    [config?.handleFieldErrors, clearNotifications]
   );
 
   const handleRequestError = useMemo(
-    () => (e: Error, opts?: UINotificationOptions) => {
+    () => (e: Error, opts?: Omit<UINotificationOptions, "defaultMessage" | "defaultMessageOrDetail">) => {
       if (!axios.isCancel(e) && !(e instanceof api.ForceLogout)) {
+        /* Dispatch the notification to the internal handler so we can, if
+           appropriate, send notifications to Sentry or the console. */
         internal.requestError(e);
         if (e instanceof api.ClientError) {
-          notify(e.errors, opts);
-        } else if (e instanceof api.NetworkError) {
-          notify("There was a problem communicating with the server.", opts);
-        } else if (e instanceof api.ServerError) {
-          notify("There was a problem communicating with the server.", opts);
+          return notify(e.errors, { message: "There was a problem with your request.", ...opts });
+        } else if (e instanceof api.NetworkError || e instanceof api.ServerError) {
+          return notify(e, { defaultMessageOrDetail: "There was a problem communicating with the server.", ...opts });
         } else {
           throw e;
         }
       }
+      return [];
     },
     []
   );
@@ -115,6 +187,79 @@ export const useNotifications = (config?: UseNotificationsConfig): UINotificatio
     handleRequestError,
     notify,
     clearNotifications,
-    notifications: ns
+    notifications
   };
+};
+
+export const notify = (
+  destinationId: string,
+  notifications: SingleOrArray<UINotificationType>,
+  opts?: UINotificationOptions
+) => {
+  const evt = new CustomEvent<AddNotificationsDetail>(`notifications:${destinationId}:add`, {
+    detail: { notifications, opts }
+  });
+  document.dispatchEvent(evt);
+};
+
+export const clear = (destinationId: string, ids: SingleOrArray<UINotification["id"]> | undefined) => {
+  const evt = new CustomEvent<ClearNotificationsDetail>(`notifications:${destinationId}:clear`, {
+    detail: ids
+  });
+  document.dispatchEvent(evt);
+};
+
+export const handleRequestError = (
+  destinationId: string,
+  e: Error,
+  opts?: Omit<UINotificationOptions, "defaultMessage" | "defaultMessageOrDetail">
+) => {
+  const evt = new CustomEvent<RequestErrorDetail>(`notifications:${destinationId}:requestError`, {
+    detail: { error: e, opts }
+  });
+  document.dispatchEvent(evt);
+};
+
+export const notifyBanner = (notifications: SingleOrArray<UINotificationType>, opts?: UINotificationOptions) =>
+  notify("banner", notifications, opts);
+
+export const clearBanner = (ids: SingleOrArray<UINotification["id"]> | undefined) => clear("banner", ids);
+
+export const handleBannerRequestError = (
+  e: Error,
+  opts?: Omit<UINotificationOptions, "defaultMessage" | "defaultMessageOrDetail">
+) => handleRequestError("banner", e, opts);
+
+type UseNotificationsEventListenerConfig = UseNotificationsConfig & {
+  readonly destinationId: string;
+};
+
+export const useNotificationsEventListener = (config: UseNotificationsEventListenerConfig): UINotificationsHandler => {
+  const NotificationsHandler = useNotifications(config);
+
+  useEffect(() => {
+    const listener = ((evt: CustomEvent<AddNotificationsDetail>) => {
+      NotificationsHandler.notify(evt.detail.notifications, evt.detail.opts);
+    }) as EventListener;
+    document.addEventListener(`notifications:${config.destinationId}:add`, listener);
+    return () => document.removeEventListener(`notifications:${config.destinationId}:add`, listener);
+  }, []);
+
+  useEffect(() => {
+    const listener = ((evt: CustomEvent<RequestErrorDetail>) => {
+      NotificationsHandler.handleRequestError(evt.detail.error, evt.detail.opts);
+    }) as EventListener;
+    document.addEventListener(`notifications:${config.destinationId}:requestError`, listener);
+    return () => document.removeEventListener(`notifications:${config.destinationId}:requestError`, listener);
+  }, []);
+
+  useEffect(() => {
+    const listener = ((evt: CustomEvent<AddNotificationsDetail>) => {
+      NotificationsHandler.notify(evt.detail.notifications, evt.detail.opts);
+    }) as EventListener;
+    document.addEventListener(`notifications:${config.destinationId}:clear`, listener);
+    return () => document.removeEventListener(`notifications:${config.destinationId}:clear`, listener);
+  }, []);
+
+  return NotificationsHandler;
 };

@@ -62,8 +62,6 @@
         width: $width !important;
       }
       .content {
-        margin-top: $header-h;
-        height: calc(100vh - #{$header-h});
         overflow-y: hidden;
       }
     }
@@ -145,13 +143,13 @@
       display: flex;
       flex-direction: column;
       overflow-y: hidden;
+			height: 100vh;
 
       @include transition(margin-left 0.2s ease-out);
 
       .header {
-        margin-top: auto;
+        margin-top: 0;
         line-height: unset !important;
-        position: fixed !important;
         top: 0 !important;
         padding-left: 15px;
         padding-right: 20px;

@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { ui, typeguards } from "lib";
+import { ui, typeguards, notifications } from "lib";
 import { hooks, actions } from "store";
 
 import { UserProfileForm } from "components/forms";
@@ -74,7 +74,10 @@ const Profile = (): JSX.Element => {
             api
               .updateActiveUser(payload)
               .then((response: Model.User) => {
-                // TODO: Display success notification in banner.
+                notifications.ui.notifyBanner({
+                  level: "success",
+                  message: "Your information was successfully saved."
+                });
                 dispatch(actions.authenticated.updateLoggedInUserAction(response));
               })
               .catch((e: Error) => {

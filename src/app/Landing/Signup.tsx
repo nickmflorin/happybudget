@@ -77,15 +77,12 @@ const Signup = (): JSX.Element => {
                   detail: `Successfully registered.  An email was sent to ${user.email} to verify the
 								email address on the account.  Didn't receive it?`,
                   onSuccess: () =>
-                    form.notify(
-                      {
-                        level: "success",
-                        message: "Confirmation email successfully sent.",
-                        detail: "Please check your inbox.",
-                        closable: true
-                      },
-                      { append: true }
-                    ),
+                    form.notify({
+                      level: "success",
+                      message: "Confirmation email successfully sent.",
+                      detail: "Please check your inbox.",
+                      closable: true
+                    }),
                   onError: (err: Error) => form.handleRequestError(err)
                 })
               );

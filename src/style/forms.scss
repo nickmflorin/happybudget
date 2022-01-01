@@ -16,15 +16,9 @@ form {
 }
 
 .form {
-  .form-alert-wrapper {
+  .notifications {
     margin-top: 15px;
     width: 100%;
-
-    > .alert {
-      &:not(:last-child) {
-        margin-bottom: 8px;
-      }
-    }
   }
 
   .form-header {

@@ -18,8 +18,7 @@ function* getAccount(action: Redux.Action<number>): SagaIterator {
     const response: Model.Account = yield api.request(api.getAccount, action.payload);
     yield put(actions.responseAccountAction(response));
   } catch (e: unknown) {
-    // TODO: We need to build in banner notifications for this event.
-    notifications.requestError(e as Error);
+    notifications.ui.handleBannerRequestError(e as Error);
     yield put(actions.responseAccountAction(null));
   }
 }

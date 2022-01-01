@@ -1,0 +1,158 @@
+.notification {
+  padding: 8px;
+  border-radius: 6px;
+  display: flex;
+
+  .notification-left {
+    width: 22px;
+    height: 22px;
+    padding: 3px;
+    margin-right: 6px;
+
+    .icon {
+      font-size: 16px;
+    }
+  }
+
+  .notification-middle {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 100;
+
+    .notification-message {
+      font-weight: 500;
+      font-size: 13px;
+      line-height: 22px;
+      color: $text-primary;
+      font-family: $avenir;
+    }
+
+    .notification-detail {
+      margin-top: 2px;
+      font-size: 12px;
+      line-height: 16px;
+      font-family: $avenir;
+      font-weight: 400;
+      color: $text-secondary;
+
+      .link,
+      .btn {
+        line-height: 16px;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .notification-right {
+    width: 22px;
+    height: 22px;
+    padding: 3px;
+    margin-left: 6px;
+
+    .icon {
+      font-size: 16px;
+    }
+  }
+
+  &.warning {
+    background-color: $warning-background-color;
+    border: 1px solid $warning-border-color;
+    .notification-left {
+      .icon {
+        color: darken($warning-border-color, 30%);
+      }
+    }
+  }
+
+  &.error {
+    background-color: $error-background-color;
+    border: 1px solid $error-border-color;
+    .notification-left {
+      .icon {
+        color: darken($error-border-color, 30%);
+      }
+    }
+  }
+
+  &.info {
+    background-color: $info-background-color;
+    border: 1px solid $info-border-color;
+    .notification-left {
+      .icon {
+        color: darken($info-border-color, 30%);
+      }
+    }
+  }
+
+  &.success {
+    background-color: $success-background-color;
+    border: 1px solid $success-border-color;
+    .notification-left {
+      .icon {
+        color: darken($success-border-color, 30%);
+      }
+    }
+  }
+}
+
+.notifications {
+  width: 100%;
+
+  > .notification {
+    &:not(:last-child) {
+      margin-bottom: 8px;
+    }
+  }
+}
+
+.banner-notifications {
+  .notification {
+    border-radius: 0px;
+    padding: 4px;
+
+    .notification-middle {
+      flex-direction: row;
+
+      .notification-detail {
+        margin-left: 6px;
+        // Add 1px more than 22px to get it to align to the baseline of the
+        // message.
+        line-height: 23px;
+        margin-top: 0px;
+      }
+    }
+  }
+}
+
+.table-notifications {
+  width: auto;
+  z-index: 10000;
+  position: absolute;
+  left: 30px;
+  bottom: 30px;
+
+  .notification {
+    background-color: rgba(0, 0, 0, 0.6);
+    max-width: 320px;
+    padding: 6px 10px;
+		border: none !important;
+
+		.icon {
+			color: $white !important;
+		}
+
+    .notification-message {
+      font-size: 13px;
+      font-weight: 500;
+      font-family: $avenir;
+			color: $white;
+    }
+
+    .notification-detail {
+      font-size: 11px;
+      font-weight: 400;
+			color: $white;
+      font-family: $avenir;
+    }
+  }
+}

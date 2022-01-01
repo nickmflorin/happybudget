@@ -4,7 +4,7 @@ import { isNil, map, filter } from "lodash";
 import { createSelector } from "reselect";
 
 import * as api from "api";
-import { tabling, notifications } from "lib";
+import { tabling } from "lib";
 import * as typeguards from "./typeguards";
 
 export const createChangeEventHandler = <
@@ -97,8 +97,7 @@ export const createBulkTask = <
       const response: RSP = yield api.request(...config.bulkCreate(...args), requestPayload);
       yield all(map(config.responseActions(response, e), (action: Redux.Action) => put(action)));
     } catch (err: unknown) {
-      config.table.notify({ message: errorMessage, level: "error" });
-      notifications.requestError(err as Error);
+      config.table.handleRequestError(err as Error, { message: errorMessage });
     } finally {
       yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean>) => put(action(false))));
     }

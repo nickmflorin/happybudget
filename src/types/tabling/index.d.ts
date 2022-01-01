@@ -996,17 +996,16 @@ declare namespace Table {
     readonly getCSVData: (fields?: string[]) => CSVData;
   };
 
-  type TableInstance<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = DataGridInstance & {
-    readonly removeNotification: () => void;
-    readonly notify: (notification: TableNotification) => void;
-    readonly getColumns: () => ModelColumn<R, M>[];
-    readonly getFocusedRow: () => BodyRow<R> | null;
-    readonly getRow: (id: BodyRowId) => BodyRow<R> | null;
-    readonly getRows: () => BodyRow<R>[];
-    readonly getRowsAboveAndIncludingFocusedRow: () => BodyRow<R>[];
-    readonly applyTableChange: (event: SingleOrArray<ChangeEvent<R, M>>) => void;
-    readonly changeColumnVisibility: (changes: SingleOrArray<ColumnVisibilityChange>, sizeToFit?: boolean) => void;
-  };
+  type TableInstance<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = DataGridInstance &
+    UINotificationsHandler & {
+      readonly getColumns: () => ModelColumn<R, M>[];
+      readonly getFocusedRow: () => BodyRow<R> | null;
+      readonly getRow: (id: BodyRowId) => BodyRow<R> | null;
+      readonly getRows: () => BodyRow<R>[];
+      readonly getRowsAboveAndIncludingFocusedRow: () => BodyRow<R>[];
+      readonly applyTableChange: (event: SingleOrArray<ChangeEvent<R, M>>) => void;
+      readonly changeColumnVisibility: (changes: SingleOrArray<ColumnVisibilityChange>, sizeToFit?: boolean) => void;
+    };
 
   type MenuActionObj = {
     readonly index?: number;

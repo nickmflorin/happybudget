@@ -38,8 +38,7 @@ function* getBudgetTask(action: Redux.Action<number>): SagaIterator {
     const response: Model.Budget = yield api.request(api.getBudget, action.payload);
     yield put(actions.responseBudgetAction(response));
   } catch (e: unknown) {
-    // TODO: We need to build in banner notifications for this event.
-    notifications.requestError(e as Error);
+    notifications.ui.handleBannerRequestError(e as Error);
     yield put(actions.responseBudgetAction(null));
   } finally {
     yield put(actions.loadingBudgetAction(false));

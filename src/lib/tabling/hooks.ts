@@ -12,15 +12,19 @@ export const useDataGrid = (): NonNullRef<Table.DataGridInstance> => {
 
 export const InitialTableRef: Table.TableInstance<Table.RowData, Model.RowHttpModel> = {
   ...InitialGridRef,
-  notify: (notification: TableNotification) => {
+  notifications: [],
+  notify: (notifications: SingleOrArray<UINotificationType>) => {
     console.warn(
-      `Cannot dispatch notification ${JSON.stringify(
-        notification
+      `Cannot dispatch notifications ${JSON.stringify(
+        notifications
       )} to table because table ref has not been attached yet.`
     );
+    return [];
   },
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-  removeNotification: () => {},
+  clearNotifications: () => {},
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+  handleRequestError: () => [],
   getColumns: () => [],
   getFocusedRow: () => null,
   getRow: () => null,

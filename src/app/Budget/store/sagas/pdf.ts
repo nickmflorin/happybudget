@@ -13,9 +13,8 @@ function* loadHeaderTemplateTask(id: number): SagaIterator {
     const response: Model.HeaderTemplate = yield api.request(api.getHeaderTemplate, id);
     yield put(actions.displayHeaderTemplateAction(response));
   } catch (e: unknown) {
-    /* TODO: We need to build in banner notifications for this event, or display
-       the notification in the modal. */
-    notifications.requestError(e as Error);
+    // TODO: It would be more appropriate to show the error in the Modal.
+    notifications.ui.handleBannerRequestError(e as Error);
   } finally {
     yield put(actions.setLoadingHeaderTemplateDetailAction(false));
   }
@@ -38,9 +37,8 @@ function* getHeaderTemplatesTask(): SagaIterator {
     const response: Http.ListResponse<Model.SimpleHeaderTemplate> = yield api.request(api.getHeaderTemplates, {});
     yield put(actions.responseHeaderTemplatesAction(response));
   } catch (e: unknown) {
-    /* TODO: We need to build in banner notifications for this event, or display
-       the notification in the modal. */
-    notifications.requestError(e as Error);
+    // TODO: It would be more appropriate to show the error in the Modal.
+    notifications.ui.handleBannerRequestError(e as Error);
     yield put(actions.responseHeaderTemplatesAction({ data: [], count: 0 }));
   } finally {
     yield put(actions.loadingHeaderTemplatesAction(false));

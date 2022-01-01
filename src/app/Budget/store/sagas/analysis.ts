@@ -27,8 +27,7 @@ function* request(action: Redux.Action<number>): SagaIterator {
       })
     );
   } catch (e: unknown) {
-    // TODO: We need to build in banner notifications for this event.
-    notifications.requestError(e as Error);
+    notifications.ui.handleBannerRequestError(e as Error);
     yield put(
       actions.analysis.responseAction({
         accounts: { count: 0, data: [] },

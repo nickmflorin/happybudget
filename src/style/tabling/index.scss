@@ -82,37 +82,6 @@
 
 	@include grid_borders($table-border-color);
 
-	.table-notification {
-		background-color: rgba(0, 0, 0, 0.6);
-		color: $white;
-		max-width: 320px;
-		padding: 6px 10px;
-		border-radius: 6px;
-		display: flex;
-		flex-direction: column;
-
-		.table-notification-header {
-			display: flex;
-			flex-direction: row;
-
-			.message {
-				font-size: 13px;
-				font-weight: 500;
-				font-family: $avenir;
-			}
-		}
-
-		.table-notification-content {
-			margin-top: 8px;
-
-			.detail {
-				font-size: 11px;
-				font-weight: 400;
-				font-family: $avenir;
-			}
-		}
-	}
-
 	.ag-header {
 		border: none;
 		border-top-left-radius: 8px;

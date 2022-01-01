@@ -65,17 +65,19 @@ export const useMenuIfNotDefined = <
 
 export const InitialModalRef: ModalInstance = {
   notifications: [],
-  /* eslint-disable @typescript-eslint/no-empty-function */
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   clearNotifications: () => {},
-  /* eslint-disable @typescript-eslint/no-empty-function */
-  notify: () => {},
+  notify: () => [],
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   setLoading: () => {},
-  handleRequestError: () => {},
+  handleRequestError: () => [],
   loading: false
 };
 
 export const useModal = (): NonNullRef<ModalInstance> => {
-  return useRef<ModalInstance>(InitialModalRef);
+  const ref = useRef<ModalInstance>(InitialModalRef);
+
+  return ref;
 };
 
 export const useModalIfNotDefined = (modal?: NonNullRef<ModalInstance>): NonNullRef<ModalInstance> => {
@@ -129,7 +131,9 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
   );
 
   const NotificationsHandler = notifications.ui.useNotifications({
-    handleFieldErrors
+    handleFieldErrors,
+    defaultBehavior: "replace",
+    defaultClosable: false
   });
 
   const wrapForm = useMemo<FormInstance<T>>(() => {

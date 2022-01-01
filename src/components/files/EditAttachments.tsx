@@ -10,7 +10,7 @@ import AttachmentsFilePond from "./AttachmentsFilePond";
 export interface EditAttachmentsProps {
   readonly id: number;
   readonly path: string;
-  readonly onError: (notification: UINotification) => void;
+  readonly onError: (notification: UINotificationData) => void;
   readonly onAttachmentRemoved?: (id: number) => void;
   readonly onAttachmentAdded?: (m: Model.Attachment) => void;
   readonly listAttachments: (

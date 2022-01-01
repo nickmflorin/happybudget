@@ -1,8 +1,9 @@
 import React, { useImperativeHandle, useState, useMemo } from "react";
 import { forEach, isNil, uniq, map, filter, includes, reduce } from "lodash";
 
-import { tabling, util, hooks } from "lib";
+import { tabling, util, hooks, notifications } from "lib";
 import { Config } from "config";
+import { TableNotifications } from "components/notifications";
 import { DeleteRowsModal } from "components/modals";
 import { AuthenticatedGrid } from "tabling/generic";
 
@@ -20,7 +21,6 @@ import {
   configureTable
 } from "../hocs";
 import TableWrapper from "./TableWrapper";
-import useNotifications from "./useNotifications";
 
 export type AuthenticatedTableDataGridProps<
   R extends Table.RowData,
@@ -96,7 +96,10 @@ const AuthenticatedTable = <
   const grid = tabling.hooks.useDataGrid();
   const [selectedRows, setSelectedRows] = useState<Table.EditableRow<R>[]>([]);
   const [deleteRows, setDeleteRows] = useState<Table.EditableRow<R>[] | undefined>(undefined);
-  const [removeNotification, notify] = useNotifications(props.tableId, props.rendered);
+  const NotificationsHandler = notifications.ui.useNotifications({
+    defaultBehavior: "append",
+    defaultClosable: true
+  });
 
   /**
    * Note: Ideally, we would be including the selector in the mechanics of the
@@ -257,8 +260,7 @@ const AuthenticatedTable = <
   useImperativeHandle(props.table, () => {
     return {
       ...grid.current,
-      notify,
-      removeNotification,
+      ...NotificationsHandler,
       changeColumnVisibility: props.changeColumnVisibility,
       getColumns: () => tabling.columns.filterModelColumns(columns),
       applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R, M>>) =>
@@ -377,6 +379,7 @@ const AuthenticatedTable = <
           onChangeEvent: _onChangeEvent,
           rowHasCheckboxSelection: props.rowHasCheckboxSelection
         })}
+        <TableNotifications notifications={NotificationsHandler.notifications} tableId={props.tableId} />
         <TableFooterGrid
           tableId={props.tableId}
           apis={props.tableApis.get("footer")}

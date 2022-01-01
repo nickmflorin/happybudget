@@ -1,4 +1,4 @@
-import { Notification } from "components/feedback";
+import { Notification } from "components/notifications";
 import { DeleteModal } from "./generic";
 
 interface DeleteBudgetModalProps extends ModalProps {

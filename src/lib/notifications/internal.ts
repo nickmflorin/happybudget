@@ -51,8 +51,15 @@ const notificationLevel = (
   return opts?.level !== undefined ? opts?.level : "warning";
 };
 
-const consoleMessage = (e: InternalNotification | NotificationDetail): string | Error =>
-  isNotificationObj(e) ? e.message || e.error || "" : api.typeguards.isHttpError(e) ? e.message : e;
+const consoleMessage = (e: InternalNotification | NotificationDetail): string | Error => {
+  if (isNotificationObj(e)) {
+    if (!isNil(e.message) && !isNil(e.error)) {
+      return `${e.message}\nError: ${e.error.message}`;
+    }
+    return e.message || e.error || "";
+  }
+  return api.typeguards.isHttpError(e) ? e.message : e;
+};
 
 export const notify = (e: InternalNotification | NotificationDetail, opts?: InternalNotificationOptions): void => {
   /* Note: Issuing a console.warn or console.error will automatically dispatch
@@ -146,9 +153,8 @@ export const inconsistentStateError = <P extends Redux.ActionPayload = Redux.Act
 export const requestError = (e: Error, opts?: InternalNotificationOptions) => {
   if (e instanceof api.ClientError) {
     notify({
-      dispatchToSentry: false,
-      level: "warning",
-      message: "There was a problem with your request.",
+      dispatchToSentry: true,
+      level: "error",
       ...opts,
       error: e
     });
@@ -156,7 +162,6 @@ export const requestError = (e: Error, opts?: InternalNotificationOptions) => {
     notify({
       dispatchToSentry: true,
       level: "error",
-      message: "There was a problem communicating with the server.",
       ...opts,
       error: e
     });

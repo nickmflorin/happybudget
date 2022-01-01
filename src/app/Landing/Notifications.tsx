@@ -32,7 +32,7 @@ interface TokenNotificationProps {
   readonly onSuccess?: () => void;
 }
 
-export const TokenNotification = (props: TokenNotificationProps): UINotification => {
+export const TokenNotification = (props: TokenNotificationProps): UINotificationData => {
   const detail = TOKEN_NOTIFICATION_DETAILS[props.code];
   return {
     level: TOKEN_NOTIFICATION_TYPES[props.code],
@@ -65,7 +65,7 @@ interface UnverifiedEmailNotificationProps {
   readonly onSuccess?: () => void;
 }
 
-export const UnverifiedEmailNotification = (props: UnverifiedEmailNotificationProps): UINotification => ({
+export const UnverifiedEmailNotification = (props: UnverifiedEmailNotificationProps): UINotificationData => ({
   level: "warning",
   message: props.message,
 
@@ -89,7 +89,7 @@ export const UnverifiedEmailNotification = (props: UnverifiedEmailNotificationPr
     : undefined
 });
 
-export const UserNotOnWaitlistNotification = (): UINotification => ({
+export const UserNotOnWaitlistNotification = (): UINotificationData => ({
   level: "warning",
   message: "Your email is not on the waitlist.",
   detail: `Currently, this software is open to those who are on the waitlist.  Please
@@ -101,7 +101,7 @@ interface UnapprovedUserNotificationProps {
   readonly level?: AppNotificationLevel;
 }
 
-export const UnapprovedUserNotification = (props: UnapprovedUserNotificationProps): UINotification => ({
+export const UnapprovedUserNotification = (props: UnapprovedUserNotificationProps): UINotificationData => ({
   level: props.level || "warning",
   message: props.message || "Your account has not been approved for access.",
   detail: "Your account has been successfully verified, but has not yet been approved. Please contact support."

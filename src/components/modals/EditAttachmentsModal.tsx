@@ -34,7 +34,7 @@ const EditAttachmentsModal = ({
         onAttachmentRemoved={onAttachmentRemoved}
         listAttachments={listAttachments}
         deleteAttachment={deleteAttachment}
-        onError={(notification: UINotification) => modal.current.notify(notification)}
+        onError={(notification: UINotificationData) => modal.current.notify(notification)}
       />
     </Modal>
   );

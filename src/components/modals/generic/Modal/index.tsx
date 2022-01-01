@@ -1,12 +1,12 @@
 import React, { ReactNode, useImperativeHandle, useState } from "react";
-import { isNil, map } from "lodash";
+import { isNil } from "lodash";
 import classNames from "classnames";
 
 import { Modal as RootModal } from "antd";
 
 import { notifications } from "lib";
 import { RenderWithSpinner } from "components";
-import { Notification } from "components/feedback";
+import { Notifications } from "components/notifications";
 
 import ModalTitle from "./ModalTitle";
 
@@ -22,7 +22,7 @@ const Modal = ({
   ...props
 }: ModalProps & { readonly children: ReactNode }): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const notificationsHandler = notifications.ui.useNotifications();
+  const notificationsHandler = notifications.ui.useNotifications({ defaultBehavior: "append", defaultClosable: false });
 
   useImperativeHandle(modal, () => ({ ...notificationsHandler, loading, setLoading }));
 
@@ -48,13 +48,7 @@ const Modal = ({
       }
     >
       <RenderWithSpinner loading={buttonSpinnerOnLoad === false && loading}>
-        {notificationsHandler.notifications.length !== 0 && (
-          <div className={"modal-alert-wrapper"}>
-            {map(notificationsHandler.notifications, (n: UINotification, index: number) => {
-              return <Notification key={index} {...n} />;
-            })}
-          </div>
-        )}
+        <Notifications notifications={notificationsHandler.notifications} />
         <React.Fragment>{children}</React.Fragment>
       </RenderWithSpinner>
     </RootModal>

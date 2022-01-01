@@ -18,8 +18,7 @@ function* getSubAccount(action: Redux.Action<number>): SagaIterator {
     const response: Model.SubAccount = yield api.request(api.getSubAccount, action.payload);
     yield put(actions.responseSubAccountAction(response));
   } catch (e: unknown) {
-    // TODO: We need to build in banner notifications for this event.
-    notifications.requestError(e as Error);
+    notifications.ui.handleBannerRequestError(e as Error);
     yield put(actions.responseSubAccountAction(null));
   }
 }

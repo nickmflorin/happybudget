@@ -1,5 +1,5 @@
 import * as api from "api";
-import { ui } from "lib";
+import { ui, notifications } from "lib";
 
 import { ChangePasswordForm } from "components/forms";
 import { Page, Tile } from "components/layout";
@@ -21,16 +21,15 @@ const Security = (): JSX.Element => {
             };
             api
               .changeUserPassword(payload)
-              .then(() => {
-                // TODO: Display success notification in banner.
-                form.notify({ message: "Password changed successfully", level: "success" });
-              })
-              .catch((e: Error) => {
-                form.handleRequestError(e);
-              })
-              .finally(() => {
-                form.setLoading(false);
-              });
+              .then(() =>
+                notifications.ui.notifyBanner({
+                  level: "success",
+                  message: "Your password was successfully changed.",
+                  duration: 5000
+                })
+              )
+              .catch((e: Error) => form.handleRequestError(e))
+              .finally(() => form.setLoading(false));
           }}
         />
       </Tile>

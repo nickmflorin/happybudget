@@ -17,7 +17,7 @@ const Login = (): JSX.Element => {
   const history = useHistory();
   const location = useLocation<{
     readonly error?: Error | undefined;
-    readonly notification?: UINotification | string | undefined;
+    readonly notification?: UINotificationData | string | undefined;
     readonly tokenType?: "email-confirmation" | "password-recovery" | undefined;
   }>();
 
@@ -44,15 +44,12 @@ const Login = (): JSX.Element => {
             userId,
             code: e.code,
             onSuccess: () =>
-              form.notify(
-                {
-                  level: "success",
-                  message: "Confirmation email successfully sent.",
-                  detail: "Please check your inbox.",
-                  closable: true
-                },
-                { append: true }
-              ),
+              form.notify({
+                level: "success",
+                message: "Confirmation email successfully sent.",
+                detail: "Please check your inbox.",
+                closable: true
+              }),
             onError: (err: Error) => form.handleRequestError(err)
           })
         );
@@ -83,15 +80,12 @@ const Login = (): JSX.Element => {
           UnverifiedEmailNotification({
             userId,
             onSuccess: () =>
-              form.notify(
-                {
-                  level: "success",
-                  message: "Confirmation email successfully sent.",
-                  detail: "Please check your inbox.",
-                  closable: true
-                },
-                { append: true }
-              ),
+              form.notify({
+                level: "success",
+                message: "Confirmation email successfully sent.",
+                detail: "Please check your inbox.",
+                closable: true
+              }),
             onError: (err: Error) => form.handleRequestError(err)
           })
         );

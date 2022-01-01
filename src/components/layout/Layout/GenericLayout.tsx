@@ -2,7 +2,8 @@ import { useState, useEffect, useImperativeHandle } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { ui } from "lib";
+import { ui, notifications } from "lib";
+import { BannerNotifications } from "components/notifications";
 
 import Content from "./Content";
 import Header from "./Header";
@@ -20,6 +21,11 @@ export interface GenericLayoutProps extends StandardComponentWithChildrenProps {
 const GenericLayout = (props: GenericLayoutProps): JSX.Element => {
   const isMobile = ui.hooks.useLessThanBreakpoint("medium");
   const [sidebarVisible, setSidebarVisible] = useState(false);
+  const NotificationsHandler = notifications.ui.useNotificationsEventListener({
+    destinationId: "banner",
+    defaultBehavior: "append",
+    defaultClosable: true
+  });
 
   useEffect(() => {
     /* We want to hide the sidebar by default on mobile devices but show it by
@@ -41,6 +47,7 @@ const GenericLayout = (props: GenericLayoutProps): JSX.Element => {
     <div className={classNames("layout", props.className, { "sidebar-visible": sidebarVisible })} style={props.style}>
       {!isNil(props.sidebar) && <div className={classNames("sidebar-container")}>{props.sidebar}</div>}
       <div className={"layout-content"}>
+        <BannerNotifications notifications={NotificationsHandler.notifications} />
         <Header
           {...props.headerProps}
           saving={props.saving}
