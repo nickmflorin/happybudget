@@ -186,26 +186,11 @@ type GetRowValue<R extends Table.RowData, M extends Model.RowHttpModel, V extend
   original: (ci: Table.DataColumn<R, M>, mi: M) => V | undefined
 ) => V | undefined;
 
-type CreateModelRowFromModelConfig<R extends Table.RowData, M extends Model.RowHttpModel> = {
+type CreateModelRowConfig<R extends Table.RowData, M extends Model.RowHttpModel> = {
   readonly model: M;
   // Used solely for PDF purposes.
   readonly getRowValue?: GetRowValue<R, M, Table.RawRowValue> | undefined;
 };
-
-type CreateModelRowFromDataConfig<R extends Table.RowData> = {
-  readonly id: Table.ModelRowId;
-  readonly data: R;
-  readonly order: string;
-  readonly children: number[];
-};
-
-type CreateModelRowConfig<R extends Table.RowData, M extends Model.RowHttpModel> =
-  | CreateModelRowFromModelConfig<R, M>
-  | CreateModelRowFromDataConfig<R>;
-
-const isModelRowConfigWithModel = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  config: CreateModelRowConfig<R, M>
-): config is CreateModelRowFromModelConfig<R, M> => (config as CreateModelRowFromModelConfig<R, M>).model !== undefined;
 
 type ModelRowManagerConfig<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
   readonly columns: Table.Column<R, M>[];
@@ -246,49 +231,25 @@ export class ModelRowManager<
   }
 
   create(config: CreateModelRowConfig<R, M>): Table.ModelRow<R> {
-    if (isModelRowConfigWithModel(config)) {
-      return {
-        order: config.model.order,
-        children: this.getRowChildren?.(config.model) || [],
-        ...this.createBasic(
-          {
-            ...config,
-            id: config.model.id
-          },
-          config.model,
-          config.getRowValue
-        )
-      };
-    }
     return {
-      order: config.order,
-      children: config.children,
-      ...this.createBasic({
-        ...config,
-        id: config.id,
-        data: config.data
-      })
+      order: config.model.order,
+      modelType: config.model.type,
+      children: this.getRowChildren?.(config.model) || [],
+      ...this.createBasic(
+        {
+          ...config,
+          id: config.model.id
+        },
+        config.model,
+        config.getRowValue
+      )
     };
   }
 }
 
-type CreateMarkupRowFromModelConfig = {
+type CreateMarkupRowConfig = {
   readonly model: Model.Markup;
 };
-
-type CreateMarkupRowFromDataConfig<R extends Table.RowData> = {
-  readonly id: Table.MarkupRowId;
-  readonly data: Pick<R, keyof Model.Markup>;
-  readonly children?: number[];
-  readonly unit: Model.Markup["unit"];
-  readonly rate: Model.Markup["rate"];
-};
-
-type CreateMarkupRowConfig<R extends Table.RowData> = CreateMarkupRowFromModelConfig | CreateMarkupRowFromDataConfig<R>;
-
-const isMarkupRowConfigWithModel = <R extends Table.RowData>(
-  config: CreateMarkupRowConfig<R>
-): config is CreateMarkupRowFromModelConfig => (config as CreateMarkupRowFromModelConfig).model !== undefined;
 
 type MarkupRowManagerConfig<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
   readonly columns: Table.Column<R, M>[];
@@ -318,64 +279,33 @@ export class MarkupRowManager<
 
   removeChildren(row: Table.MarkupRow<R>, ids: SingleOrArray<number>): Table.MarkupRow<R> {
     const IDs: number[] = Array.isArray(ids) ? ids : [ids];
-    return this.create({
-      unit: row.markupData.unit,
-      rate: row.markupData.rate,
-      id: row.id,
-      children: filter(row.children, (child: number) => !includes(IDs, child)),
-      data: row.data
-    });
+    return {
+      ...row,
+      children: filter(row.children, (child: number) => !includes(IDs, child))
+    };
   }
 
-  create(config: CreateMarkupRowConfig<R>): Table.MarkupRow<R> {
-    if (isMarkupRowConfigWithModel(config)) {
-      return {
-        ...this.createBasic(
-          {
-            ...config,
-            id: markupRowId(config.model.id)
-          },
-          config.model
-        ),
-        children: budgeting.typeguards.isPercentMarkup(config.model) ? config.model.children : [],
-        markupData: {
-          unit: config.model.unit,
-          rate: config.model.rate
-        }
-      };
-    }
+  create(config: CreateMarkupRowConfig): Table.MarkupRow<R> {
     return {
-      ...this.createBasic({
-        ...config,
-        id: config.id,
-        data: config.data
-      }),
-      children: config.children || [],
+      ...this.createBasic(
+        {
+          ...config,
+          id: markupRowId(config.model.id)
+        },
+        config.model
+      ),
+      children: budgeting.typeguards.isPercentMarkup(config.model) ? config.model.children : [],
       markupData: {
-        unit: config.unit,
-        rate: config.rate
+        unit: config.model.unit,
+        rate: config.model.rate
       }
     };
   }
 }
 
-type CreateGroupRowFromModelConfig = {
+type CreateGroupRowConfig = {
   readonly model: Model.Group;
 };
-
-type CreateGroupRowFromDataConfig<R extends Table.RowData> = {
-  readonly id: Table.GroupRowId;
-  readonly data: Pick<R, keyof Model.Group>;
-  readonly children?: number[];
-  readonly name: Model.Group["name"];
-  readonly color: Model.Group["color"];
-};
-
-type CreateGroupRowConfig<R extends Table.RowData> = CreateGroupRowFromModelConfig | CreateGroupRowFromDataConfig<R>;
-
-const isGroupRowConfigWithModel = <R extends Table.RowData>(
-  config: CreateGroupRowConfig<R>
-): config is CreateGroupRowFromModelConfig => (config as CreateGroupRowFromModelConfig).model !== undefined;
 
 type GroupRowManagerConfig<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
   readonly columns: Table.Column<R, M>[];
@@ -405,42 +335,25 @@ export class GroupRowManager<
 
   removeChildren(row: Table.GroupRow<R>, ids: SingleOrArray<number>): Table.GroupRow<R> {
     const IDs: number[] = Array.isArray(ids) ? ids : [ids];
-    return this.create({
-      name: row.groupData.name,
-      color: row.groupData.color,
-      id: row.id,
-      children: filter(row.children, (child: number) => !includes(IDs, child)),
-      data: row.data
-    });
+    return {
+      ...row,
+      children: filter(row.children, (child: number) => !includes(IDs, child))
+    };
   }
 
-  create(config: CreateGroupRowConfig<R>): Table.GroupRow<R> {
-    if (isGroupRowConfigWithModel(config)) {
-      return {
-        ...this.createBasic(
-          {
-            ...config,
-            id: groupRowId(config.model.id)
-          },
-          config.model
-        ),
-        children: config.model.children,
-        groupData: {
-          name: config.model.name,
-          color: config.model.color
-        }
-      };
-    }
+  create(config: CreateGroupRowConfig): Table.GroupRow<R> {
     return {
-      ...this.createBasic({
-        ...config,
-        id: config.id,
-        data: config.data
-      }),
-      children: config.children || [],
+      ...this.createBasic(
+        {
+          ...config,
+          id: groupRowId(config.model.id)
+        },
+        config.model
+      ),
+      children: config.model.children,
       groupData: {
-        name: config.name,
-        color: config.color
+        name: config.model.name,
+        color: config.model.color
       }
     };
   }

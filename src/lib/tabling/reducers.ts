@@ -545,6 +545,11 @@ export const createAuthenticatedTableReducer = <
   const tableEventReducer = config.eventReducer || createTableChangeEventReducer<R, M, S, C, A>(config);
   const generic = createTableReducer<R, M, S, C, A>(config);
 
+  const modelRowManager = new managers.ModelRowManager<R, M>({
+    getRowChildren: config.getModelRowChildren,
+    columns: config.columns
+  });
+
   return (state: S | undefined = config.initialState, action: Redux.Action): S => {
     const newState = generic(state, action);
     if (action.type === config.actions.tableChanged.toString()) {
@@ -566,12 +571,11 @@ export const createAuthenticatedTableReducer = <
           if (!isNil(r)) {
             return {
               ...newState,
-              data: util.replaceInArray<Table.BodyRow<R>>(s.data, { id: r.id }, {
-                ...r,
-                rowType: "model",
-                id: payload.models[index].id,
-                order: payload.models[index].order
-              } as Table.ModelRow<R>)
+              data: util.replaceInArray<Table.BodyRow<R>>(
+                s.data,
+                { id: r.id },
+                modelRowManager.create({ model: payload.models[index] })
+              )
             };
           }
           return s;

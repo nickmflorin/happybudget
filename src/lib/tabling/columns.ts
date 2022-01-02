@@ -37,10 +37,18 @@ export const getColumnRowValue = <
 ): V => {
   const returnNullWithWarning = (fld: string) => {
     // The row managers should prevent this, but you never know.
-    console.error(
-      `Undefined value for row ${row.id} (type = ${row.rowType}) ` +
-        `encountered for field ${fld}! Returning ${col.nullValue}.`
-    );
+    if (typeguards.isModelRow(row)) {
+      console.error(
+        `Undefined value for row ${row.id} (type = ${row.rowType}, ` +
+          `modelType = ${row.modelType}) encountered for field ${fld}! ` +
+          `Returning ${col.nullValue}.`
+      );
+    } else {
+      console.error(
+        `Undefined value for row ${row.id} (type = ${row.rowType}) ` +
+          `encountered for field ${fld}! Returning ${col.nullValue}.`
+      );
+    }
     return col.nullValue;
   };
 

@@ -900,6 +900,8 @@ declare namespace Table {
   type ModelRow<R extends RowData> = IBodyRow<ModelRowId, "model", R> & {
     readonly children: number[];
     readonly order: string;
+    // This field is primarily used for logging purposes.
+    readonly modelType: Model.RowHttpModelType;
   };
 
   type PlaceholderRow<R extends RowData> = IBodyRow<PlaceholderRowId, "placeholder", R> & {
