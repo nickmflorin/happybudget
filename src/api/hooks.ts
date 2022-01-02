@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback, useState } from "react";
+import { useRef, useEffect, useCallback, useState, useMemo } from "react";
 import axios, { CancelTokenSource, CancelToken, Canceler } from "axios";
 import { isNil } from "lodash";
 
@@ -35,106 +35,113 @@ export const useCancelToken = (config?: UseCancelTokenConfig): [() => CancelToke
   return [newCancelToken];
 };
 
-export type ModelHookOptions<M extends Model.Model> = {
-  readonly onModelLoaded?: (m: M) => void;
-  readonly conditional?: () => boolean;
+export type ApiHookOptions<RSP> = {
+  readonly onLoading?: (v: boolean) => void;
+  readonly onError?: (e: Error | null) => void;
   readonly getToken?: null | (() => CancelToken);
+  readonly conditional?: () => boolean;
+  readonly onResponse?: (r: RSP) => void;
+  readonly request: (token: CancelToken | undefined) => Promise<RSP>;
 };
 
-export const useModel = <M extends Model.Model>(
-  id: number,
-  options: ModelHookOptions<M> & {
-    readonly request: (i: number, opts?: Http.RequestOptions) => Promise<M>;
-  }
-): [M | null, boolean, Error | null] => {
-  const [error, setError] = useState<Error | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [model, setModel] = useState<M | null>(null);
+export const useApiHook = <RSP>(options: ApiHookOptions<RSP>): [RSP | null, boolean, Error | null] => {
+  const [error, _setError] = useState<Error | null>(null);
+  const [loading, _setLoading] = useState(false);
+  const [response, _setResponse] = useState<RSP | null>(null);
+
+  const setLoading = useMemo(
+    () => (v: boolean) => {
+      _setLoading(v);
+      options.onLoading?.(v);
+    },
+    []
+  );
+
+  const setError = useMemo(
+    () => (e: Error | null) => {
+      _setError(e);
+      options.onError?.(e);
+    },
+    []
+  );
+
+  const setResponse = useMemo(
+    () => (r: RSP) => {
+      _setResponse(r);
+      options.onResponse?.(r);
+    },
+    []
+  );
 
   useEffect(() => {
     if (isNil(options?.conditional) || options?.conditional() === true) {
       setLoading(true);
+      setError(null);
       options
-        .request(id, { cancelToken: options.getToken?.() })
-        .then((response: M) => {
-          setModel(response);
-          options?.onModelLoaded?.(response);
-        })
-        .catch((e: Error) => {
-          setError(e);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+        .request(options.getToken?.())
+        .then((r: RSP) => setResponse(r))
+        .catch((e: Error) => setError(e))
+        .finally(() => setLoading(false));
     }
   }, []);
 
-  return [model, loading, error];
+  return [response, loading, error];
+};
+
+type ModelHookOptions<M extends Model.Model> = Omit<ApiHookOptions<M>, "request"> & {
+  readonly request: (i: number, opts?: Http.RequestOptions) => Promise<M>;
+};
+
+export const useModel = <M extends Model.Model>(
+  id: number,
+  options: ModelHookOptions<M>
+): [M | null, boolean, Error | null] => {
+  return useApiHook<M>({
+    ...options,
+    request: (token: CancelToken | undefined) => {
+      const response = options.request(id, { cancelToken: token });
+      return response;
+    }
+  });
 };
 
 export const useMarkup = (
   id: number,
-  options?: ModelHookOptions<Model.Markup>
+  options?: Omit<ModelHookOptions<Model.Markup>, "request">
 ): [Model.Markup | null, boolean, Error | null] => {
   return useModel(id, { ...options, request: services.getMarkup });
 };
 
 export const useGroup = (
   id: number,
-  options?: ModelHookOptions<Model.Group>
+  options?: Omit<ModelHookOptions<Model.Group>, "request">
 ): [Model.Group | null, boolean, Error | null] => {
   return useModel(id, { ...options, request: services.getGroup });
 };
 
 export const useContact = (
   id: number,
-  options?: ModelHookOptions<Model.Contact>
+  options?: Omit<ModelHookOptions<Model.Contact>, "request">
 ): [Model.Contact | null, boolean, Error | null] => {
   return useModel(id, { ...options, request: services.getContact });
 };
 
-export const useGroupColors = (): [string[], boolean, Error | null] => {
-  const [error, setError] = useState<Error | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [colors, setColors] = useState<string[]>([]);
-
-  useEffect(() => {
-    setLoading(true);
-    services
-      .getGroupColors()
-      .then((response: Http.ListResponse<string>) => {
-        setColors(response.data);
-      })
-      .catch((e: Error) => {
-        setError(e);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
-
-  return [colors, loading, error];
+export const useGroupColors = (
+  options?: Omit<ApiHookOptions<Http.ListResponse<string>>, "request">
+): [string[], boolean, Error | null] => {
+  const [response, error, loading] = useApiHook({
+    ...options,
+    request: (token: CancelToken | undefined) => services.getGroupColors({ cancelToken: token })
+  });
+  return [response !== null ? response.data : [], error, loading];
 };
 
-export const useFringeColors = (): [string[], boolean, Error | null] => {
-  const [error, setError] = useState<Error | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [colors, setColors] = useState<string[]>([]);
-
-  useEffect(() => {
-    setLoading(true);
-    services
-      .getFringeColors()
-      .then((response: Http.ListResponse<string>) => {
-        setColors(response.data);
-      })
-      .catch((e: Error) => {
-        setError(e);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
-
-  return [colors, loading, error];
+export const useFringeColors = (
+  options?: Omit<ApiHookOptions<Http.ListResponse<string>>, "request">
+): [string[], boolean, Error | null] => {
+  const [response, error, loading] = useApiHook({
+    ...options,
+    request: (token: CancelToken | undefined) => services.getFringeColors({ cancelToken: token })
+  });
+  return [response !== null ? response.data : [], error, loading];
 };
