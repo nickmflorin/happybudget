@@ -47,7 +47,10 @@ const AuthenticatedBudgetSubAccountsTable = (
     });
 
   const processUnitCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
-    models.inferModelFromName<Model.Tag>(props.subAccountUnits, name, { getName: (m: Model.Tag) => m.title })
+    models.inferModelFromName<Model.Tag>(props.subAccountUnits, name, {
+      getName: (m: Model.Tag) => m.title,
+      warnOnMissing: false
+    })
   );
 
   const processFringesCellForClipboard = hooks.useDynamicCallback((row: R) => {

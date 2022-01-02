@@ -44,7 +44,10 @@ const ActualsTable = ({
     });
 
   const processActualTypeCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
-    models.inferModelFromName<Model.Tag>(props.actualTypes, name, { getName: (m: Model.Tag) => m.title })
+    models.inferModelFromName<Model.Tag>(props.actualTypes, name, {
+      getName: (m: Model.Tag) => m.title,
+      warnOnMissing: false
+    })
   );
 
   const processOwnerCellFromClipboard = hooks.useDynamicCallback((value: string) => {

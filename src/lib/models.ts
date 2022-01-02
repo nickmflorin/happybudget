@@ -19,23 +19,24 @@ export const ContactTypes = Object.values(ContactTypeModels);
 export const contactName = (contact: Model.Contact): string | null =>
   contact.contact_type?.id === ContactTypeModels.VENDOR.id ? contact.company : contact.full_name;
 
-export const findChoiceForName = <M extends Model.Choice = Model.Choice>(
-  ms: M[],
-  name: string,
-  caseSensitive = true
-): M | null => {
-  return caseSensitive
-    ? (find(ms, { name }) as M | undefined) || null
-    : (find(ms, (model: M) => model.name.toLowerCase() === name.toLowerCase()) as M | undefined) || null;
+type GetModelOptions = {
+  readonly modelName?: string;
+  readonly warnOnMissing?: boolean;
 };
 
-export const findChoiceForId = (ms: Model.Choice[], id: number): Model.Choice | null => {
-  return find(ms, { id }) || null;
-};
-
-type InferModelFromNameParams<M extends Model.Model> = {
+type InferModelFromNameParams<M extends Model.Model> = GetModelOptions & {
   readonly getName?: (m: M) => string | null | undefined;
-  readonly reference?: string;
+  readonly caseInsensitive?: boolean;
+};
+
+const getModelReference = <M extends Model.Model>(ms: M[], options?: GetModelOptions, m?: M): string => {
+  const optionName =
+    options?.modelName !== undefined
+      ? options?.modelName
+      : ms.length !== 0 && isHttpModelWithType(ms[0])
+      ? ms[0].type
+      : "model";
+  return !isNil(m) ? `${optionName} ${m.id}` : optionName;
 };
 
 /**
@@ -48,11 +49,10 @@ type InferModelFromNameParams<M extends Model.Model> = {
  * The method accounts for case insensitivity by first determining if a unique
  * result can be determined from the case insensitive filter.  In the case that
  * it cannot, it tries the case sensitive filter.  If this still does not produce
- * a single result, it will either raise an Error or issue a warning and assume
- * the first value.
+ * a single result, it will issue a warning and assume the first value.
  *
  * @param models    M[]  List of models that should be filtered.
- * @param value          The value of the name field that we are searching for.
+ * @param value     The value of the name field that we are searching for.
  * @param options   InferModelFromNameParams
  */
 export const inferModelFromName = <M extends Model.Model>(
@@ -60,42 +60,107 @@ export const inferModelFromName = <M extends Model.Model>(
   value: string,
   options?: InferModelFromNameParams<M>
 ): M | null => {
-  options = !isNil(options) ? options : {};
-  const getName = options?.getName || ((m: M) => (m as M & { readonly name: string | null | undefined }).name);
-  const reference = options?.reference || "model";
+  let undefinedNameWarningIssued = false;
+
+  const getName = (m: M): string | null => {
+    /* We do not want to flood Sentry with errors for each individual model in
+		   the array if there is a configuration problem. */
+    const warn = (msg: string) => {
+      if (undefinedNameWarningIssued === false) {
+        console.warn(msg);
+        undefinedNameWarningIssued = true;
+      }
+    };
+    if (!isNil(options?.getName)) {
+      const name = options?.getName(m);
+      if (name === undefined) {
+        warn(
+          `Cannot infer model ${getModelReference(ms, options, m)} from name ` +
+            "because the callback 'getName' returned an undefined value."
+        );
+        return null;
+      } else if (name === null || typeof name === "string") {
+        return name;
+      } else {
+        warn(
+          `Cannot infer model ${getModelReference(ms, options, m)} from name ` +
+            "because the callback 'getName' returned a value of type " +
+            `${typeof name} value, not string.`
+        );
+        return null;
+      }
+    } else {
+      const name = (m as M & { readonly name: string | null }).name;
+      if (name === undefined) {
+        warn(
+          `Cannot infer model ${getModelReference(ms, options, m)} from name ` +
+            "because the 'name' attribute returned an undefined value."
+        );
+        return null;
+      } else if (name === null || typeof name === "string") {
+        return name;
+      } else {
+        warn(
+          `Cannot infer model ${getModelReference(ms, options, m)} from name ` +
+            "because the 'name' attribute returned a value of type " +
+            `${typeof name} value, not string.`
+        );
+        return null;
+      }
+    }
+  };
 
   const performFilter = (caseSensitive: boolean): M[] => {
     return filter(ms, (m: M) => {
       const nameValue = getName(m);
-      if (!isNil(nameValue) && typeof nameValue === "string") {
+      if (!isNil(nameValue)) {
         return caseSensitive === false
           ? String(nameValue).trim().toLocaleLowerCase() === String(value).trim().toLocaleLowerCase()
           : String(nameValue).trim() === String(value).trim().toLocaleLowerCase();
       }
       return false;
-    });
+    }) as M[];
+  };
+
+  const returnAndWarn = (m: M | null): M | null => {
+    if (options?.warnOnMissing !== false && m === null) {
+      console.warn(`Cannot infer ${getModelReference(ms, options)} from name ${value} in ` + "provided models!");
+      return null;
+    }
+    return m;
   };
 
   const filtered = performFilter(false);
   if (filtered.length === 0) {
     /* If there are no matches when case is insensitive, there will also be no
        matches when case is sensitive. */
-    return null;
+    return returnAndWarn(null);
   } else if (filtered.length === 1) {
-    return filtered[0];
+    return returnAndWarn(filtered[0]);
+  } else if (options?.caseInsensitive === false) {
+    console.warn(`Multiple ${getModelReference(ms, options)}s exist for name - assuming the first.`);
+    return returnAndWarn(filtered[0]);
   } else {
     /* If there are multiple matches, we need to restrict base on case
        sensitivity. */
     const msCaseSensitive = performFilter(true);
     if (msCaseSensitive.length === 0) {
-      return null;
+      return returnAndWarn(null);
     } else if (msCaseSensitive.length === 1) {
-      return msCaseSensitive[0];
+      return returnAndWarn(msCaseSensitive[0]);
     } else {
-      console.warn(`Multiple ${reference}s exist for name value=${value} - assuming the first.`);
-      return msCaseSensitive[0];
+      console.warn(`Multiple ${getModelReference(ms, options)}s exist for name - assuming the first.`);
+      return returnAndWarn(msCaseSensitive[0]);
     }
   }
+};
+
+export const findChoiceForName = <M extends Model.Choice = Model.Choice>(
+  ms: M[],
+  name: string,
+  options?: Omit<InferModelFromNameParams<M>, "getName">
+): M | null => {
+  return inferModelFromName(ms, name, { caseInsensitive: false, ...options });
 };
 
 /**
@@ -140,29 +205,11 @@ export const parseIdsFromDeliminatedString = (value: string, delimiter = ","): n
   );
 };
 
-type GetModelsByIdOptions = {
-  readonly warnOnMissing?: boolean;
-  readonly modelName?: string;
-};
-
-export const getModelById = <M extends Model.Model>(
-  ms: M[],
-  id: M["id"],
-  options: GetModelsByIdOptions = { warnOnMissing: true }
-): M | null => {
-  options = {
-    ...options,
-    modelName:
-      options.modelName !== undefined
-        ? options.modelName
-        : ms.length !== 0 && isHttpModelWithType(ms[0])
-        ? ms[0].type
-        : undefined
-  };
+export const getModelById = <M extends Model.Model>(ms: M[], id: M["id"], options?: GetModelOptions): M | null => {
   const model: M | undefined = find(ms, { id }) as M | undefined;
   if (isNil(model)) {
-    if (options.warnOnMissing !== false) {
-      console.warn(`Cannot find ${options.modelName || "model"} with ID ${id} in provided models!`);
+    if (options?.warnOnMissing !== false) {
+      console.warn(`Cannot find ${getModelReference(ms, options)} with ID ${id} in provided models!`);
     }
     return null;
   } else {
@@ -170,11 +217,10 @@ export const getModelById = <M extends Model.Model>(
   }
 };
 
-export const getModelsByIds = <M extends Model.Model>(
-  ms: M[],
-  ids: ID[],
-  options: GetModelsByIdOptions = { warnOnMissing: true }
-): M[] => {
+export const findChoiceForId = (ms: Model.Choice[], id: number): Model.Choice | null =>
+  getModelById(ms, id, { warnOnMissing: true });
+
+export const getModelsByIds = <M extends Model.Model>(ms: M[], ids: ID[], options?: GetModelOptions): M[] => {
   return filter(
     map(ids, (id: ID) => getModelById(ms, id, options)),
     (m: M | null) => !isNil(m)
