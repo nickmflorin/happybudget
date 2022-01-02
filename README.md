@@ -98,14 +98,11 @@ Add the following configuration to the file:
 ```
 
 Now, when we start the development server, we will be able to access the application at
-`local.greenbudget.io`.
+`local.greenbudget.io:3000`.
 
 To start the development server, run the following command:
 
 ```bash
-$ sudo yarn start
+$ yarn start
 ```
-
-`sudo` is required to run the application on port `80`, so we can access the application
-locally at `local.greenbudget.io` instead of `local.greenbudget.io:3000`.
 
