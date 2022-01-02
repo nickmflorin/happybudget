@@ -78,6 +78,11 @@ export const notify = (e: InternalNotification | NotificationDetail, opts?: Inte
       consoler?.(consoleMessage(e));
     });
   } else if (dispatchToSentry === true && isError(e)) {
+    /* In local development, we do not use Sentry - so we still have to issue
+       the message to the console. */
+    if (process.env.REACT_APP_PRODUCTION_ENV === "local") {
+      consoler(consoleMessage(e));
+    }
     /* If this is an error or warning but we have the actual Error object, we\
        want to send that to Sentry - not via the console because we will lose
        the error trace in the console. */
