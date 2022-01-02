@@ -10,7 +10,7 @@
 	}
 }
 
-.dashboard-card-grid-base {
+.dashboard-card-grid {
   margin-bottom: 15px;
   display: grid;
   grid-template-columns: repeat(1fr);
@@ -33,10 +33,6 @@
   @include media(">=xxxl") {
     grid-template-columns: repeat(5, 1fr) !important;
   }
-}
-
-.dashboard-card-grid {
-  @extend .dashboard-card-grid-base;
 }
 
 .sidebar-visible {
