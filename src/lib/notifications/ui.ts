@@ -328,8 +328,8 @@ export const useNotificationsEventListener = (config: UseNotificationsEventListe
   }, []);
 
   useEffect(() => {
-    const listener = ((evt: CustomEvent<AddNotificationsDetail>) => {
-      NotificationsHandler.notify(evt.detail.notifications, evt.detail.opts);
+    const listener = ((evt: CustomEvent<ClearNotificationsDetail>) => {
+      NotificationsHandler.clearNotifications(evt.detail);
     }) as EventListener;
     document.addEventListener(`notifications:${config.destinationId}:clear`, listener);
     return () => document.removeEventListener(`notifications:${config.destinationId}:clear`, listener);
