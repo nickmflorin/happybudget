@@ -73,7 +73,7 @@
     "web-vitals": "^1.1.0"
   },
   "scripts": {
-    "start": "HOST=local.greenbudget.io PORT=80 react-scripts start",
+    "start": "HOST=local.greenbudget.io PORT=3000 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
