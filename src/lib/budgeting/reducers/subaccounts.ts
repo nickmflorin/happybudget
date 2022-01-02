@@ -26,8 +26,7 @@ const recalculateSubAccountRow = (
     const fringes: Table.ModelRow<Tables.FringeRowData>[] = redux.reducers.findModelsInData(
       action,
       filter(st.fringes.data, (r: Table.BodyRow<Tables.FringeRowData>) => tabling.typeguards.isModelRow(r)),
-      row.data.fringes,
-      { name: "Fringe" }
+      row.data.fringes
     ) as Table.ModelRow<Tables.FringeRowData>[];
     if (!isNil(row.data.quantity) && !isNil(row.data.rate)) {
       const multiplier = row.data.multiplier || 1.0;

@@ -25,7 +25,7 @@ const UnauthenticatedBudgetSubAccountsTable = (
   const table = tabling.hooks.useTableIfNotDefined(props.table);
 
   const processFringesCellForClipboard = hooks.useDynamicCallback((row: R) => {
-    const fringes = models.getModelsByIds<Tables.FringeRow>(props.fringes, row.fringes, { modelName: "fringe" });
+    const fringes = models.getModels<Tables.FringeRow>(props.fringes, row.fringes, { modelName: "fringe" });
     return map(fringes, (fringe: Tables.FringeRow) => fringe.data.name).join(", ");
   });
 

@@ -17,6 +17,24 @@ declare namespace Model {
     readonly type: T;
   };
 
+  type ModelLookup<M extends Model.Model> = M["id"] | ((m: M) => boolean);
+
+  type OnModelMissingCallbackParams<M extends Model.Model> = {
+    readonly ref: string;
+    readonly lookup: ModelLookup<M>;
+  };
+
+  type GetModelOptions<M extends Model.Model> = {
+    readonly modelName?: string;
+    readonly warnOnMissing?: boolean;
+    readonly onMissing?: (params: OnModelMissingCallbackParams<M>) => void;
+  };
+
+  type InferModelFromNameParams<M extends Model.Model> = Omit<GetModelOptions<M>, "onMissing"> & {
+    readonly getName?: (m: M) => string | null | undefined;
+    readonly caseInsensitive?: boolean;
+  };
+
   type RowHttpModel<T extends RowHttpModelType = RowHttpModelType> = GenericHttpModel<T> & {
     readonly order: string;
   };

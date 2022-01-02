@@ -13,9 +13,9 @@ export const groupRowFromState = <R extends Table.RowData, S extends Redux.Table
   st: S,
   id: Table.GroupRowId,
   rowId?: Table.ModelRowId,
-  options: Redux.FindModelOptions = { name: "Group", warnIfMissing: true }
+  options?: Model.GetModelOptions<Table.GroupRow<R>>
 ): Table.GroupRow<R> | null => {
-  let predicate: Redux.ModelLookup<Table.GroupRow<R>> = id;
+  let predicate: Model.ModelLookup<Table.GroupRow<R>> = id;
   if (!isNil(rowId)) {
     predicate = (g: Table.GroupRow<R>) => g.id === id && includes(g.children, rowId);
   }
@@ -31,14 +31,14 @@ export const rowGroupRowFromState = <R extends Table.RowData, S extends Redux.Ta
   action: Redux.Action,
   st: S,
   rowId: Table.ModelRowId,
-  options: Redux.FindModelOptions = { warnIfMissing: true }
+  options?: Model.GetModelOptions<Table.GroupRow<R>>
 ): Table.GroupRow<R> | null => {
   const predicate = (g: Table.GroupRow<R>) => includes(g.children, rowId);
   return redux.reducers.modelFromState<Table.GroupRow<R>>(
     action,
     filter(st.data, (r: Table.BodyRow<R>) => typeguards.isGroupRow(r)) as Table.GroupRow<R>[],
     predicate,
-    { ...options, name: "Group" }
+    options
   );
 };
 
@@ -73,7 +73,7 @@ const removeRowsFromTheirGroupsIfTheyExist = <
         r = rowId;
       }
       if (!isNil(r)) {
-        const groupRow = rowGroupRowFromState<R, S>(action, st, r.id, { warnIfMissing: false });
+        const groupRow = rowGroupRowFromState<R, S>(action, st, r.id, { warnOnMissing: false });
         if (!isNil(groupRow)) {
           /* This will be overwrittten if a group belongs to multiple rows
 						 associated with the provided IDS - but that is what we want, because
@@ -168,8 +168,7 @@ export const createTableChangeEventReducer = <
       action: Redux.Action<Table.ChangeEvent<R, M>>,
       row: Table.DataRow<R>
     ) => Partial<R>;
-  },
-  options?: Pick<Redux.FindModelOptions, "name">
+  }
 ): Redux.Reducer<S, Redux.Action<Table.ChangeEvent<R, M>>> => {
   const modelRowManager = new managers.ModelRowManager<R, M>({
     getRowChildren: config.getModelRowChildren,
@@ -194,8 +193,7 @@ export const createTableChangeEventReducer = <
           const r: Table.EditableRow<R> | null = redux.reducers.findModelInData<Table.EditableRow<R>>(
             action,
             filter(state.data, (ri: Table.BodyRow<R>) => typeguards.isEditableRow(ri)) as Table.EditableRow<R>[],
-            consolidated[i].id,
-            options
+            consolidated[i].id
           );
           // We do not apply manual updates via the reducer for Group row data.
           if (!isNil(r)) {
@@ -296,7 +294,7 @@ export const createTableChangeEventReducer = <
                   action,
                   st,
                   payload.model.id,
-                  { warnIfMissing: false }
+                  { warnOnMissing: false }
                 );
                 const previousGroupRowId = !isNil(previousGroupRow) ? previousGroupRow.id : null;
                 // Make sure the Group actually changed before proceeding.

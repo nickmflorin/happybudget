@@ -7,13 +7,12 @@ import { redux, tabling, util, budgeting } from "lib";
  * is also provided, it will only return the MarkupRow if that MarkupRow also
  * pertains to the specific rowId.
  */
-
 export const markupRowFromState = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
   action: Redux.Action,
   st: S,
   id: Table.MarkupRowId,
   rowId?: Table.ModelRowId,
-  options: Redux.FindModelOptions = { name: "Group", warnIfMissing: true }
+  options?: Model.GetModelOptions<Table.MarkupRow<R>>
 ): Table.MarkupRow<R> | null => {
   let predicate = (mrk: Table.MarkupRow<R>) => mrk.id === id;
   if (!isNil(rowId)) {

@@ -54,7 +54,7 @@ const AuthenticatedBudgetSubAccountsTable = (
   );
 
   const processFringesCellForClipboard = hooks.useDynamicCallback((row: R) => {
-    const fringes = models.getModelsByIds<Tables.FringeRow>(props.fringes, row.fringes, { modelName: "fringe" });
+    const fringes = models.getModels<Tables.FringeRow>(props.fringes, row.fringes, { modelName: "fringe" });
     return map(fringes, (fringe: Tables.FringeRow) => fringe.id).join(", ");
   });
 
@@ -62,7 +62,7 @@ const AuthenticatedBudgetSubAccountsTable = (
     /* Here, we convert from IDs to Rows then back to IDs to ensure that the
        IDs are valid. */
     return map(
-      models.getModelsByIds<Tables.FringeRow>(props.fringes, models.parseIdsFromDeliminatedString(value), {
+      models.getModels<Tables.FringeRow>(props.fringes, models.parseIdsFromDeliminatedString(value), {
         warnOnMissing: false,
         modelName: "fringe"
       }),

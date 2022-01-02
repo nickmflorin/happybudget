@@ -141,13 +141,6 @@ declare namespace Redux {
 
   type UnauthenticatedAction<P extends ActionPayload = ActionPayload> = Action<P> & { readonly isAuthenticated: false };
 
-  type ModelLookup<M extends Model.Model> = ID | ((m: M) => boolean);
-
-  type FindModelOptions = {
-    readonly warnIfMissing?: boolean;
-    readonly name?: string;
-  };
-
   type TaskConfig<A extends ActionMap> = {
     readonly actions: Omit<A, "request">;
   };

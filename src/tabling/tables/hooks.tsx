@@ -48,7 +48,7 @@ export const useAttachments = <
       (curr: Model.SimpleAttachment[], r: Table.ModelRow<R>) => uniq([...curr, ...(r.data.attachments || [])]),
       []
     );
-    return models.getModelsByIds<Model.SimpleAttachment>(attachments, models.parseIdsFromDeliminatedString(value), {
+    return models.getModels<Model.SimpleAttachment>(attachments, models.parseIdsFromDeliminatedString(value), {
       warnOnMissing: false,
       modelName: "attachment"
     });

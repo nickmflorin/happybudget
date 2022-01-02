@@ -53,13 +53,13 @@ const withContacts =
         if (isNil(id)) {
           return "";
         }
-        const m = models.getModelById(props.contacts, id, { modelName: "contact" });
+        const m = models.getModel(props.contacts, id, { modelName: "contact" });
         return m?.full_name || "";
       });
 
       const processCellForCSV = hooks.useDynamicCallback((row: R) => {
         if (!isNil(row.contact)) {
-          const m: Model.Contact | null = models.getModelById(props.contacts, row.contact);
+          const m: Model.Contact | null = models.getModel(props.contacts, row.contact);
           return (!isNil(m) && models.contactName(m)) || "";
         }
         return "";

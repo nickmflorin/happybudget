@@ -1,5 +1,6 @@
 import { find, filter, isNil, forEach, reduce, map } from "lodash";
 
+import { tabling } from "lib";
 import { isHttpModelWithType } from "./typeguards";
 
 export enum ContactTypeNames {
@@ -19,24 +20,28 @@ export const ContactTypes = Object.values(ContactTypeModels);
 export const contactName = (contact: Model.Contact): string | null =>
   contact.contact_type?.id === ContactTypeModels.VENDOR.id ? contact.company : contact.full_name;
 
-type GetModelOptions = {
-  readonly modelName?: string;
-  readonly warnOnMissing?: boolean;
+export const getRowGeneralReference = <R extends Table.RowData>(row: Table.Row<R>) => {
+  if (tabling.typeguards.isModelRow(row)) {
+    return `row (type = ${row.rowType}, modelType = ${row.modelType})`;
+  }
+  return `row (type = ${row.rowType})`;
 };
 
-type InferModelFromNameParams<M extends Model.Model> = GetModelOptions & {
-  readonly getName?: (m: M) => string | null | undefined;
-  readonly caseInsensitive?: boolean;
+export const getModelGeneralReference = <M extends Model.Model>(m: M): string => {
+  return tabling.typeguards.isRow(m) ? getRowGeneralReference(m) : isHttpModelWithType(m) ? `${m.type}` : "model";
 };
 
-const getModelReference = <M extends Model.Model>(ms: M[], options?: GetModelOptions, m?: M): string => {
+const getModelReferenceFn = <M extends Model.Model>(
+  ms: M[],
+  options?: Pick<Model.GetModelOptions<M>, "modelName">,
+  m?: M | string | number
+): string => {
+  const mIsModel = (mi: M | string | number): mi is M => typeof m !== "string" && typeof m !== "number";
+
   const optionName =
-    options?.modelName !== undefined
-      ? options?.modelName
-      : ms.length !== 0 && isHttpModelWithType(ms[0])
-      ? ms[0].type
-      : "model";
-  return !isNil(m) ? `${optionName} ${m.id}` : optionName;
+    options?.modelName !== undefined ? options?.modelName : ms.length !== 0 ? getModelGeneralReference(ms[0]) : "model";
+
+  return !isNil(m) ? `${optionName} ${mIsModel(m) ? m.id : m}` : optionName;
 };
 
 /**
@@ -58,7 +63,7 @@ const getModelReference = <M extends Model.Model>(ms: M[], options?: GetModelOpt
 export const inferModelFromName = <M extends Model.Model>(
   ms: M[],
   value: string,
-  options?: InferModelFromNameParams<M>
+  options?: Model.InferModelFromNameParams<M>
 ): M | null => {
   let undefinedNameWarningIssued = false;
 
@@ -75,7 +80,7 @@ export const inferModelFromName = <M extends Model.Model>(
       const name = options?.getName(m);
       if (name === undefined) {
         warn(
-          `Cannot infer model ${getModelReference(ms, options, m)} from name ` +
+          `Cannot infer model ${getModelReferenceFn(ms, options, m)} from name ` +
             "because the callback 'getName' returned an undefined value."
         );
         return null;
@@ -83,7 +88,7 @@ export const inferModelFromName = <M extends Model.Model>(
         return name;
       } else {
         warn(
-          `Cannot infer model ${getModelReference(ms, options, m)} from name ` +
+          `Cannot infer model ${getModelReferenceFn(ms, options, m)} from name ` +
             "because the callback 'getName' returned a value of type " +
             `${typeof name} value, not string.`
         );
@@ -93,7 +98,7 @@ export const inferModelFromName = <M extends Model.Model>(
       const name = (m as M & { readonly name: string | null }).name;
       if (name === undefined) {
         warn(
-          `Cannot infer model ${getModelReference(ms, options, m)} from name ` +
+          `Cannot infer model ${getModelReferenceFn(ms, options, m)} from name ` +
             "because the 'name' attribute returned an undefined value."
         );
         return null;
@@ -101,7 +106,7 @@ export const inferModelFromName = <M extends Model.Model>(
         return name;
       } else {
         warn(
-          `Cannot infer model ${getModelReference(ms, options, m)} from name ` +
+          `Cannot infer model ${getModelReferenceFn(ms, options, m)} from name ` +
             "because the 'name' attribute returned a value of type " +
             `${typeof name} value, not string.`
         );
@@ -124,7 +129,7 @@ export const inferModelFromName = <M extends Model.Model>(
 
   const returnAndWarn = (m: M | null): M | null => {
     if (options?.warnOnMissing !== false && m === null) {
-      console.warn(`Cannot infer ${getModelReference(ms, options)} from name ${value} in ` + "provided models!");
+      console.warn(`Cannot infer ${getModelReferenceFn(ms, options)} from name ${value} in ` + "provided models!");
       return null;
     }
     return m;
@@ -138,7 +143,7 @@ export const inferModelFromName = <M extends Model.Model>(
   } else if (filtered.length === 1) {
     return returnAndWarn(filtered[0]);
   } else if (options?.caseInsensitive === false) {
-    console.warn(`Multiple ${getModelReference(ms, options)}s exist for name - assuming the first.`);
+    console.warn(`Multiple ${getModelReferenceFn(ms, options)}s exist for name - assuming the first.`);
     return returnAndWarn(filtered[0]);
   } else {
     /* If there are multiple matches, we need to restrict base on case
@@ -149,7 +154,7 @@ export const inferModelFromName = <M extends Model.Model>(
     } else if (msCaseSensitive.length === 1) {
       return returnAndWarn(msCaseSensitive[0]);
     } else {
-      console.warn(`Multiple ${getModelReference(ms, options)}s exist for name - assuming the first.`);
+      console.warn(`Multiple ${getModelReferenceFn(ms, options)}s exist for name - assuming the first.`);
       return returnAndWarn(msCaseSensitive[0]);
     }
   }
@@ -158,7 +163,7 @@ export const inferModelFromName = <M extends Model.Model>(
 export const findChoiceForName = <M extends Model.Choice = Model.Choice>(
   ms: M[],
   name: string,
-  options?: Omit<InferModelFromNameParams<M>, "getName">
+  options?: Omit<Model.InferModelFromNameParams<M>, "getName">
 ): M | null => {
   return inferModelFromName(ms, name, { caseInsensitive: false, ...options });
 };
@@ -205,11 +210,23 @@ export const parseIdsFromDeliminatedString = (value: string, delimiter = ","): n
   );
 };
 
-export const getModelById = <M extends Model.Model>(ms: M[], id: M["id"], options?: GetModelOptions): M | null => {
-  const model: M | undefined = find(ms, { id }) as M | undefined;
+export const getModel = <M extends Model.Model>(
+  ms: M[],
+  id: Model.ModelLookup<M>,
+  options?: Model.GetModelOptions<M>
+): M | null => {
+  const predicate = typeof id === "function" ? id : (m: M) => m.id === id;
+  const model: M | undefined = find(ms, predicate) as M | undefined;
   if (isNil(model)) {
-    if (options?.warnOnMissing !== false) {
-      console.warn(`Cannot find ${getModelReference(ms, options)} with ID ${id} in provided models!`);
+    if (!isNil(options?.onMissing) && options?.warnOnMissing !== false) {
+      options?.onMissing({
+        ref: getModelReferenceFn(ms, options, typeof id === "function" ? undefined : id),
+        lookup: id
+      });
+    } else if (options?.warnOnMissing !== false) {
+      console.warn(
+        `Cannot find ${getModelReferenceFn(ms, options, typeof id === "function" ? undefined : id)} in provided models!`
+      );
     }
     return null;
   } else {
@@ -218,11 +235,15 @@ export const getModelById = <M extends Model.Model>(ms: M[], id: M["id"], option
 };
 
 export const findChoiceForId = (ms: Model.Choice[], id: number): Model.Choice | null =>
-  getModelById(ms, id, { warnOnMissing: true });
+  getModel(ms, id, { warnOnMissing: true });
 
-export const getModelsByIds = <M extends Model.Model>(ms: M[], ids: ID[], options?: GetModelOptions): M[] => {
+export const getModels = <M extends Model.Model>(
+  ms: M[],
+  ids: Model.ModelLookup<M>[],
+  options?: Model.GetModelOptions<M>
+): M[] => {
   return filter(
-    map(ids, (id: ID) => getModelById(ms, id, options)),
+    map(ids, (id: Model.ModelLookup<M>) => getModel(ms, id, options)),
     (m: M | null) => !isNil(m)
   ) as M[];
 };
