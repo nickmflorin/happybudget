@@ -51,14 +51,19 @@ type UseNotificationsConfig = {
   readonly handleFieldErrors?: (errors: UIFieldNotification[]) => void;
 };
 
+/**
+ * Manages notifications for a component.
+ *
+ * @param config UseNotificationsConfig
+ * @returns UINotificationsHandler
+ */
 export const useNotifications = (config: UseNotificationsConfig): UINotificationsHandler => {
   const [ns, dispatchNotification] = useReducer(UINotificationReducer, []);
   const timeouts = useRef<NodeJS.Timeout[]>([]);
 
   const clearNotifications = useMemo(() => (id?: SingleOrArray<UINotification["id"]>) => dispatchNotification(id), []);
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  const doTimeout = hooks.useDynamicCallback((fn: () => any, ms: number) => {
+  const doTimeout = hooks.useDynamicCallback((fn: () => void, ms: number) => {
     const timeout = setTimeout(fn, ms);
     timeouts.current = [...timeouts.current, timeout];
   });
@@ -73,6 +78,12 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
     return map(ns, (n: Omit<UINotification, "remove">) => ({ ...n, remove: () => clearNotifications(n.id) }));
   }, [clearNotifications, ns]);
 
+  /**
+   * Dispatches a single notification or a series of notifications to state.
+   * Each notification (of type UINotificationType) is standardized to the
+   * consistent UINotification object form and then added to the notifications
+   * in state so they can be easily rendered by components using this hook.
+   */
   const notify = useMemo(
     () => (notes: SingleOrArray<UINotificationType>, opts?: UINotificationOptions) => {
       let notices = Array.isArray(notes) ? notes : [notes];
@@ -165,6 +176,15 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
     [config?.handleFieldErrors, clearNotifications]
   );
 
+  /**
+   * Handles the dispatching of notifications when there is an HTTP request
+   * error.  Note that unlike the `notify` method, this will throw the Error
+   * if it is not associated with an HTTP error.
+   *
+   * For convenience, the method will also dispatch an internal notification
+   * to the internal notifications handler in order to provide context to
+   * Sentry and/or the console.
+   */
   const handleRequestError = useMemo(
     () => (e: Error, opts?: UINotificationOptions) => {
       if (!axios.isCancel(e) && !(e instanceof api.ForceLogout)) {
@@ -196,6 +216,18 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
   };
 };
 
+/**
+ * Dispatches an Event instructing any listeners to add the notification to the
+ * managed notifications in state for the specific destination.
+ *
+ * @param destinationId  The specific destination that the notification is for.
+ *                       This is used so that we can use event listeners for
+ *                       different notification destinations without having their
+ *                       wires get crossed.
+ * @param notifications  The single notification or multiple notifications that
+ *                       should be dispatched.
+ * @param opts           Options for the dispatching of the notification(s).
+ */
 export const notify = (
   destinationId: string,
   notifications: SingleOrArray<UINotificationType>,
@@ -207,6 +239,17 @@ export const notify = (
   document.dispatchEvent(evt);
 };
 
+/**
+ * Dispatches an Event instructing any listeners to clear the notifications in
+ * the managed notifications state for the specific destination.
+ *
+ * @param destinationId  The specific destination that the notification is for.
+ *                       This is used so that we can use event listeners for
+ *                       different notification destinations without having their
+ *                       wires get crossed.
+ * @param ids            The IDs of the notification that should be removed.  If
+ *                       not provided, all notifications will be removed.
+ */
 export const clear = (destinationId: string, ids: SingleOrArray<UINotification["id"]> | undefined) => {
   const evt = new CustomEvent<ClearNotificationsDetail>(`notifications:${destinationId}:clear`, {
     detail: ids
@@ -214,6 +257,18 @@ export const clear = (destinationId: string, ids: SingleOrArray<UINotification["
   document.dispatchEvent(evt);
 };
 
+/**
+ * Dispatches an Event instructing any listeners to handle an HTTP request error
+ * and dispatch notifications (if appropriate) to the managed notifications in
+ * state for the specific destination.
+ *
+ * @param destinationId  The specific destination that the notification is for.
+ *                       This is used so that we can use event listeners for
+ *                       different notification destinations without having their
+ *                       wires get crossed.
+ * @param e              The HTTP request error that occurred.
+ * @param opts           Options for the dispatching of the notification(s).
+ */
 export const handleRequestError = (destinationId: string, e: Error, opts?: UINotificationOptions) => {
   const evt = new CustomEvent<RequestErrorDetail>(`notifications:${destinationId}:requestError`, {
     detail: { error: e, opts }
@@ -221,11 +276,24 @@ export const handleRequestError = (destinationId: string, e: Error, opts?: UINot
   document.dispatchEvent(evt);
 };
 
+/**
+ * Dispatches an Event instructing any listeners to add the notification to the
+ * managed notifications in state for the 'banner' destination.
+ */
 export const notifyBanner = (notifications: SingleOrArray<UINotificationType>, opts?: UINotificationOptions) =>
   notify("banner", notifications, opts);
 
+/**
+ * Dispatches an Event instructing any listeners to clear the managed
+ * notifications in state for the 'banner' destination.
+ */
 export const clearBanner = (ids: SingleOrArray<UINotification["id"]> | undefined) => clear("banner", ids);
 
+/**
+ * Dispatches an Event instructing any listeners to handle an HTTP request error
+ * and dispatch notifications (if appropriate) to the managed notifications in
+ * state for the 'banner' destination.
+ */
 export const handleBannerRequestError = (e: Error, opts?: UINotificationOptions) =>
   handleRequestError("banner", e, opts);
 
@@ -233,6 +301,13 @@ type UseNotificationsEventListenerConfig = UseNotificationsConfig & {
   readonly destinationId: string;
 };
 
+/**
+ * Manages notifications for a component via event listeners on the global
+ * document object.
+ *
+ * @param config UseNotificationsEventListenerConfig
+ * @returns UINotificationsHandler
+ */
 export const useNotificationsEventListener = (config: UseNotificationsEventListenerConfig): UINotificationsHandler => {
   const NotificationsHandler = useNotifications(config);
 
