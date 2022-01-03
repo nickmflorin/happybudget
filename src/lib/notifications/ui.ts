@@ -6,7 +6,7 @@ import * as api from "api";
 import { util, hooks } from "lib";
 
 import * as typeguards from "./typeguards";
-import { UIFieldNotificationStandard, combineFieldNotifications, standardizeNotification } from "./util";
+import { combineFieldNotifications, standardizeNotification } from "./util";
 import * as internal from "./internal";
 
 type AddNotificationsDetail<N extends UINotificationType = UINotificationType> = {
