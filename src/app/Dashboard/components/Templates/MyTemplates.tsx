@@ -175,19 +175,13 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
         {templates.length !== 0 && responseWasReceived && (
           <Page.Footer>
             <Pagination
-              hideOnSinglePage={false}
-              showSizeChanger={true}
-              defaultPageSize={10}
-              defaultCurrent={1}
+              hideOnSinglePage={true}
+              defaultPageSize={100}
               pageSize={pageSize}
               current={page}
               total={count}
-              onChange={(pg: number, pgSize: number | undefined) => {
-                dispatch(
-                  actions.setTemplatesPaginationAction(
-                    pageSize === undefined ? { page: pg } : { page: pg, pageSize: pgSize }
-                  )
-                );
+              onChange={(pg: number) => {
+                dispatch(actions.setTemplatesPaginationAction({ page: pg }));
               }}
             />
           </Page.Footer>

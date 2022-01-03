@@ -191,19 +191,14 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
         </div>
         <Page.Footer>
           <Pagination
-            hideOnSinglePage={false}
-            showSizeChanger={true}
-            defaultPageSize={10}
-            current={page}
+            hideOnSinglePage={true}
+            defaultPageSize={100}
             pageSize={pageSize}
+            current={page}
             total={count}
-            onChange={(pg: number, pgSize: number | undefined) =>
-              dispatch(
-                actions.setCommunityTemplatesPaginationAction(
-                  pageSize === undefined ? { page: pg } : { page: pg, pageSize: pgSize }
-                )
-              )
-            }
+            onChange={(pg: number) => {
+              dispatch(actions.setCommunityTemplatesPaginationAction({ page: pg }));
+            }}
           />
         </Page.Footer>
       </Page>

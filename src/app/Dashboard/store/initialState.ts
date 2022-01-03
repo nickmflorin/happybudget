@@ -3,6 +3,7 @@ import { redux } from "lib";
 const initialState: Modules.Dashboard.Store = {
   budgets: {
     ...redux.initialState.initialAuthenticatedModelListResponseState,
+    pageSize: 100,
     ordering: [
       { field: "created_at", order: 0 },
       { field: "updated_at", order: -1 },
@@ -11,6 +12,7 @@ const initialState: Modules.Dashboard.Store = {
   },
   templates: {
     ...redux.initialState.initialAuthenticatedModelListResponseState,
+    pageSize: 100,
     ordering: [
       { field: "created_at", order: 0 },
       { field: "updated_at", order: -1 },
@@ -19,6 +21,7 @@ const initialState: Modules.Dashboard.Store = {
   },
   community: {
     ...redux.initialState.initialAuthenticatedModelListResponseState,
+    pageSize: 100,
     ordering: [
       { field: "created_at", order: 0 },
       { field: "updated_at", order: -1 },
