@@ -109,6 +109,7 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
 
   const handleFieldErrors = useMemo(
     () => (errors: UIFieldNotification[]) => {
+      console.log(errors);
       const fieldsWithErrors = reduce(
         errors,
         (curr: FieldWithErrors[], e: UIFieldNotification): FieldWithErrors[] => {

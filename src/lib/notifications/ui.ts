@@ -88,10 +88,9 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
     () => (notes: SingleOrArray<UINotificationType>, opts?: UINotificationOptions) => {
       let notices = Array.isArray(notes) ? notes : [notes];
 
-      const fieldRelatedErrors: (Http.FieldError | UIFieldNotification)[] = filter(notices, (n: UINotificationType) =>
-        /* UIFieldNotification is assignable to Http.FieldError, so we only need
-					 to use the typeguard from one of the standards. */
-        UIFieldNotificationStandard.typeguard(n)
+      const fieldRelatedErrors: (Http.FieldError | UIFieldNotification)[] = filter(
+        notices,
+        (n: UINotificationType) => typeguards.isUIFieldNotification(n) || api.typeguards.isHttpError(n)
       ) as (Http.FieldError | UIFieldNotification)[];
 
       /* For the notification sources that pertain to field type errors, a
@@ -110,28 +109,25 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
 				   of the form and dispatch them to the notifications store. */
         notices = filter(
           notices,
-          (n: UINotificationType) => !typeguards.isUIFieldNotification(n)
+          (n: UINotificationType) => !(typeguards.isUIFieldNotification(n) || api.typeguards.isHttpError(n))
         ) as UINonFieldNotificationType[];
-      }
+      } else if (fieldRelatedErrors.length !== 0) {
+        /* If the fieldHandler is not defined, field related errors will still be
+				   in the set of notifications.  If field related errors are submitted in
+					 a single batch, we want to group them together into a single
+					 notification.
 
-      /* If the fieldHandler is not defined, field related errors will still be
-			   in the set of notifications.  If field related errors are submitted in
-				 a single batch, we want to group them together into a single
-				 notification.
+					 The purpose of this is to prevent the dispatching of several UI
+					 notifications for a single request error - as a single request error
+					 can contain children errors, each of which is an error related to a
+					 single field.
 
-				 The purpose of this is to prevent the dispatching of several UI
-				 notifications for a single request error - as a single request error
-				 can contain children errors, each of which is an error related to a
-				 single field.
-
-				 Note that regardless of the location (index) of the first (or any)
-				 field related errors in the array of notifications provided, the field
-				 related errors will always come last - at least by the current logic.
-				 This should be improved, as the location of the final grouped field
-				 related error can be determined from the location of the first child
-				 field related error in the array.
-				 */
-      if (fieldRelatedErrors.length !== 0) {
+					 Note that regardless of the location (index) of the first (or any)
+					 field related errors in the array of notifications provided, the field
+					 related errors will always come last - at least by the current logic.
+					 This should be improved, as the location of the final grouped field
+					 related error can be determined from the location of the first child
+					 field related error in the array. */
         notices = [
           ...notices,
           combineFieldNotifications(fieldRelatedErrors, { behavior: config.defaultBehavior, ...opts })
