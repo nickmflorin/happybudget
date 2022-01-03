@@ -15,6 +15,10 @@ form {
   height: 26px !important;
 }
 
+.ant-form-item-explain-error {
+	color: $red;
+}
+
 .form {
   .notifications {
     margin-top: 15px;
@@ -149,6 +153,7 @@ form {
     .ant-form-item-explain {
       min-height: 12px;
       div[role="alert"] {
+				font-weight: 500;
         margin-top: 5px;
         font-size: 11px;
         line-height: 12px;
