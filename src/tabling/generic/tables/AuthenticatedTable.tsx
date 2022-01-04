@@ -240,13 +240,19 @@ const AuthenticatedTable = <
                 const rows = filter((apis?.grid.getSelectedRows() || []) as Table.BodyRow<R>[], (r: Table.BodyRow<R>) =>
                   tabling.typeguards.isEditableRow(r)
                 ) as Table.EditableRow<R>[];
-                if (rows.length === 1 || props.confirmRowDelete === false) {
-                  props.onChangeEvent({
-                    payload: { rows: map(rows, (r: Table.EditableRow<R>) => r.id) },
-                    type: "rowDelete"
-                  });
-                } else if (rows.length !== 0) {
-                  setDeleteRows(rows);
+                if (rows.length !== 0) {
+                  if (
+                    rows.length === 1 ||
+                    props.confirmRowDelete === false ||
+                    tabling.cookies.deleteModalConfirmationIsSuppressed()
+                  ) {
+                    props.onChangeEvent({
+                      payload: { rows: map(rows, (r: Table.EditableRow<R>) => r.id) },
+                      type: "rowDelete"
+                    });
+                  } else {
+                    setDeleteRows(rows);
+                  }
                 }
               }
             }
