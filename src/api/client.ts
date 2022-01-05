@@ -31,7 +31,7 @@ export const getRequestHeaders = (): { [key: string]: string } => {
   if (process.env.REACT_APP_PRODUCTION_ENV === "local") {
     csrfToken = cookies.get("localgreenbudgetcsrftoken");
   }
-  if (!isNil(csrfToken)) {
+  if (!isNil(csrfToken) && typeof csrfToken === "string") {
     headers["X-CSRFToken"] = csrfToken;
   }
   return headers;
