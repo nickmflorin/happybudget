@@ -7,7 +7,7 @@ import * as config from "config";
 
 const Profile = config.lazyWithRetry(() => import("./Profile"));
 const Security = config.lazyWithRetry(() => import("./Security"));
-const Billing = config.lazyWithRetry(() => import("./Billing"));
+// const Billing = config.lazyWithRetry(() => import("./Billing"));
 
 const Settings = (): JSX.Element => {
   const history = useHistory();
@@ -29,20 +29,20 @@ const Settings = (): JSX.Element => {
           activeIcon: <Icon icon={"shield-check"} weight={"solid"} />,
           onClick: () => history.push("/security"),
           active: location.pathname.startsWith("/security")
-        },
-        {
-          label: "Billing",
-          icon: <Icon icon={"wallet"} weight={"light"} />,
-          activeIcon: <Icon icon={"wallet"} weight={"solid"} />,
-          onClick: () => history.push("/billing"),
-          active: location.pathname.startsWith("/billing")
         }
+        /* {
+             label: "Billing",
+             icon: <Icon icon={"wallet"} weight={"light"} />,
+             activeIcon: <Icon icon={"wallet"} weight={"solid"} />,
+             onClick: () => history.push("/billing"),
+             active: location.pathname.startsWith("/billing")
+           } */
       ]}
     >
       <Switch>
         <PrivateRoute exact path={"/profile"} component={Profile} />
         <PrivateRoute exact path={"/security"} component={Security} />
-        <PrivateRoute path={"/billing"} component={Billing} />
+        {/* <PrivateRoute path={"/billing"} component={Billing} /> */}
       </Switch>
     </ExpandedLayout>
   );
