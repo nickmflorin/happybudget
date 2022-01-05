@@ -78,7 +78,7 @@ declare namespace Model {
     readonly color: Style.HexColor | null;
   };
 
-  type BillingStatus = "active" | "expired" | "canceled";
+  type BillingStatus = "active" | "expired" | "canceled" | null;
   type ProductId = "greenbudget_standard" | "greenbudget_premium";
   type StripeSubscriptionStatus =
     | "active"
@@ -107,7 +107,8 @@ declare namespace Model {
     readonly current_period_end: string | null;
     readonly start_date: string;
     readonly cancel_at: string | null;
-    readonly status: StripeSubscriptionStatus;
+    readonly status: BillingStatus;
+    readonly stripe_status: StripeSubscriptionStatus;
   };
 
   type SimpleUser = HttpModel & {

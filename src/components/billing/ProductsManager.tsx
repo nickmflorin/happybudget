@@ -56,6 +56,45 @@ const ProductsManager = ({
       : null;
   }, [products, user]);
 
+  const subscriptionDetail = useMemo(
+    () => (sub: Model.Subscription) => {
+      if (sub.stripe_status === "canceled" || sub.cancel_at !== null) {
+        /* I am not 100% sure that these two fields can be inconsistent in this
+           way, but for now it is safer to provide the warning unless we start
+           seeing it occur in practice. */
+        if (sub.stripe_status !== "canceled") {
+          console.warn(
+            `Subscription ${sub.id} for user ${user.id} has a 'cancel_at' date, but does not have a 'canceled' status.`
+          );
+        } else if (sub.cancel_at === null) {
+          console.warn(
+            `Subscription ${sub.id} for user ${user.id} has a 'canceled' status, but does not have a 'cancel_at' date.`
+          );
+        }
+        return (
+          <React.Fragment>
+            <Tag className={"tag--product"} text={"Canceled"} />
+            {!isNil(sub.cancel_at) && (
+              <div className={"tag-text"}>{`Valid through ${util.dates.toDisplayDate(sub.cancel_at)}.`}</div>
+            )}
+          </React.Fragment>
+        );
+      } else if (sub.status === "expired") {
+        return (
+          <React.Fragment>
+            <Tag className={"tag--product"} text={"Expired"} />
+            {!isNil(sub.cancel_at) && (
+              <div className={"tag-text"}>{`Expired on ${util.dates.toDisplayDate(sub.current_period_end)}.`}</div>
+            )}
+          </React.Fragment>
+        );
+      } else {
+        return <Tag className={"tag--product"} text={"Active"} />;
+      }
+    },
+    []
+  );
+
   return (
     <RenderOrSpinner loading={loading}>
       <div className={classNames("products-manager", props.className)} style={props.style}>
@@ -88,18 +127,7 @@ const ProductsManager = ({
               hoverBehavior={false}
               extra={
                 <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", height: "100%" }}>
-                  {!isNil(subscription) && (subscription.status === "canceled" || subscription.cancel_at !== null) ? (
-                    <React.Fragment>
-                      <Tag className={"tag--product"} text={"Canceled"} />
-                      {!isNil(subscription.cancel_at) && (
-                        <div className={"cancelling-text"}>{`Valid through ${util.dates.toDisplayDate(
-                          subscription.cancel_at
-                        )}.`}</div>
-                      )}
-                    </React.Fragment>
-                  ) : (
-                    <Tag className={"tag--product"} text={"Active"} />
-                  )}
+                  {!isNil(subscription) && subscriptionDetail(subscription)}
                 </div>
               }
             />
