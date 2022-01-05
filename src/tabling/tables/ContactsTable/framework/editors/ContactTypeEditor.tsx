@@ -1,5 +1,5 @@
 import { forwardRef, ForwardedRef } from "react";
-import { models } from "lib";
+import { contacts } from "lib";
 import { framework } from "tabling/generic";
 import { ChoiceSelectEditor } from "tabling/generic/framework/editors";
 
@@ -18,7 +18,7 @@ const ContactTypeEditor = (
   return (
     <ChoiceSelectEditor<Model.ContactType, Tables.ContactRowData, Model.Contact, Tables.ContactTableStore>
       searchIndices={["name"]}
-      models={models.ContactTypes}
+      models={contacts.models.ContactTypes}
       ref={ref}
       {...props}
     />

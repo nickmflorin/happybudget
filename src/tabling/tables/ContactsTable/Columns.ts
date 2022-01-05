@@ -1,7 +1,7 @@
 import { isNil } from "lodash";
 import { ValueSetterParams } from "@ag-grid-community/core";
 
-import { models, tabling, util } from "lib";
+import { contacts, models, tabling, util } from "lib";
 import { columns } from "../../generic";
 
 type R = Tables.ContactRowData;
@@ -98,7 +98,8 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     defaultHidden: true,
     cellRenderer: { data: "ContactTypeCell" },
     cellEditor: "ContactTypeEditor",
-    processCellFromClipboard: (name: string) => models.findChoiceForName<Model.ContactType>(models.ContactTypes, name),
+    processCellFromClipboard: (name: string) =>
+      models.findChoiceForName<Model.ContactType>(contacts.models.ContactTypes, name),
     width: 100,
     minWidth: 100
   }),

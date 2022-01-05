@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { isNil, find } from "lodash";
 import hoistNonReactStatics from "hoist-non-react-statics";
 
-import { tabling, hooks, models } from "lib";
+import { tabling, hooks, contacts, models } from "lib";
 
 interface InjectedContactsProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
@@ -60,7 +60,7 @@ const withContacts =
       const processCellForCSV = hooks.useDynamicCallback((row: R) => {
         if (!isNil(row.contact)) {
           const m: Model.Contact | null = models.getModel(props.contacts, row.contact);
-          return (!isNil(m) && models.contactName(m)) || "";
+          return (!isNil(m) && contacts.models.contactName(m)) || "";
         }
         return "";
       });
