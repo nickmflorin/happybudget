@@ -6,6 +6,7 @@ const MAX_IMAGE_SIZE = 2; // In MB
 
 const ConfigOptions: Application.ConfigOption[] = [
   { name: "tableDebug", default: false, prodEnv: "local" },
+  { name: "billingEnabled", default: false, prodEnv: ["local", "dev"] },
   { name: "tableRowOrdering", default: true },
   { name: "reportWebVitals", default: false, prodEnv: "local" },
   { name: "whyDidYouRender", default: false, prodEnv: "local" }

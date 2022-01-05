@@ -1,6 +1,7 @@
 declare namespace Application {
   type Config = {
     readonly reportWebVitals: boolean;
+    readonly billingEnabled: boolean;
     readonly tableDebug: boolean;
     readonly whyDidYouRender: boolean;
     readonly tableRowOrdering: boolean;
