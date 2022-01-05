@@ -1,12 +1,10 @@
 import classNames from "classnames";
 import Button, { ButtonProps } from "./Button";
 
-export interface DefaultIconButtonProps extends Omit<ButtonProps, "icon" | "children"> {
-  readonly icon: IconOrElement | ((params: ClickableIconCallbackParams) => IconOrElement);
-}
+export type DefaultIconButtonProps = Omit<ButtonProps, "children">;
 
-const DefaultIconButton = ({ icon, ...props }: DefaultIconButtonProps): JSX.Element => (
-  <Button {...props} icon={icon} className={classNames("btn--default-icon-only", props.className)} />
+const DefaultIconButton = (props: DefaultIconButtonProps): JSX.Element => (
+  <Button {...props} className={classNames("btn--default-icon-only", props.className)} />
 );
 
 export default DefaultIconButton;

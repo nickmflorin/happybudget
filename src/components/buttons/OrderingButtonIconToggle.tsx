@@ -25,23 +25,23 @@ const OrderingButtonIconToggle = ({ ordering, labelMap, ...props }: OrderingButt
   const sortIcon = useMemo(() => {
     if (order !== undefined) {
       if (order.order === 1) {
-        return <Icon style={{ margin: "0 0 0 8px" }} icon={"arrow-up"} weight={"light"} />;
+        return <Icon style={{ width: "10px" }} icon={"arrow-up"} weight={"light"} />;
       } else if (order.order === -1) {
-        return <Icon style={{ margin: "0 0 0 8px" }} icon={"arrow-down"} weight={"light"} />;
+        return <Icon style={{ width: "10px" }} icon={"arrow-down"} weight={"light"} />;
       }
       return <Icon style={{ opacity: 0 }} icon={"arrow-down"} weight={"light"} />;
     }
+    return <Icon icon={"bars-filter"} weight={"light"} />;
   }, [ordering]);
 
   return (
     <DefaultButtonIconToggle
       {...props}
       style={{ ...props.style, width: isMobile ? "auto" : "160px" }}
-      icon={<Icon icon={"bars-filter"} weight={"light"} />}
+      icon={sortIcon}
       breakpoint={"medium"}
     >
       {label}
-      {sortIcon}
     </DefaultButtonIconToggle>
   );
 };

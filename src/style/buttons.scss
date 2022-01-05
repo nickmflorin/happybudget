@@ -125,7 +125,7 @@
   @include color_on_disabled($d);
   @include color_on_hover($h);
 
-	.spinner {
+  .spinner {
     color: $c;
   }
 }
@@ -179,17 +179,17 @@
 }
 
 @mixin variant_icon_only() {
-	height: 36px;
-	width: 42px;
-	min-width: 0px;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	padding: 6px 9px;
+  height: 36px;
+  width: 42px;
+  min-width: 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6px 9px;
 
-	.icon {
-		margin-right: 0px;
-	}
+  .icon {
+    margin-right: 0px;
+  }
 }
 
 .link {
@@ -305,7 +305,7 @@
 
   .icon {
     height: 100% !important;
-    width: auto !important;
+    width: auto;
     color: inherit;
   }
 
@@ -354,22 +354,22 @@
     @include default();
   }
 
-	&--default-icon-only {
-		@extend .btn;
+  &--default-icon-only {
+    @extend .btn;
     @include default();
-		@include variant_icon_only();
-	}
+    @include variant_icon_only();
+  }
 
   &--primary {
     @extend .btn;
     @include primary();
   }
 
-	&--primary-icon-only {
-		@extend .btn;
+  &--primary-icon-only {
+    @extend .btn;
     @include primary();
-		@include variant_icon_only();
-	}
+    @include variant_icon_only();
+  }
 
   &--over {
     @extend .btn;
@@ -481,13 +481,13 @@
       @include green_on_hover();
     }
 
-		// Indicates that the icon button should take up the full size of it's
-		// container and not include padding around the icon.
-		&.fill {
-			height: 100%;
-			width: 100%;
-			padding: 0px;
-		}
+    // Indicates that the icon button should take up the full size of it's
+    // container and not include padding around the icon.
+    &.fill {
+      height: 100%;
+      width: 100%;
+      padding: 0px;
+    }
   }
 
   &--new-row {

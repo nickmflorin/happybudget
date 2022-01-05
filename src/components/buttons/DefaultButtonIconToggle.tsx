@@ -4,21 +4,16 @@ import { ButtonProps } from "./Button";
 import DefaultButton from "./DefaultButton";
 import DefaultIconButton from "./DefaultIconButton";
 
-export interface DefaultButtonIconToggleProps extends Omit<ButtonProps, "icon"> {
-  readonly icon: IconOrElement | ((params: ClickableIconCallbackParams) => IconOrElement);
+export interface DefaultButtonIconToggleProps extends ButtonProps {
   readonly breakpoint: Style.BreakpointId;
 }
 
-const DefaultButtonIconToggle = ({ icon, breakpoint, ...props }: DefaultButtonIconToggleProps): JSX.Element => {
+const DefaultButtonIconToggle = ({ breakpoint, ...props }: DefaultButtonIconToggleProps): JSX.Element => {
   const isLessThan = ui.hooks.useLessThanBreakpoint(breakpoint);
   if (isLessThan) {
-    return <DefaultIconButton icon={icon} {...props} />;
+    return <DefaultIconButton {...props} />;
   }
-  return (
-    <DefaultButton icon={icon} {...props}>
-      {props.children}
-    </DefaultButton>
-  );
+  return <DefaultButton {...props}>{props.children}</DefaultButton>;
 };
 
 export default DefaultButtonIconToggle;
