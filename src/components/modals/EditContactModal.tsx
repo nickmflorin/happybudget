@@ -74,7 +74,8 @@ const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: 
           { name: "position", value: contact.position },
           { name: "rate", value: contact.rate },
           { name: "city", value: contact.city },
-          { name: "phone_number", value: contact.phone_number }
+          { name: "phone_number", value: contact.phone_number },
+          { name: "notes", value: contact.notes }
         ])
       }
     >

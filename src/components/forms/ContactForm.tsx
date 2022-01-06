@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { contacts } from "lib";
 
 import { Form, Icon } from "components";
-import { Input, Select, InputOnFocus } from "components/fields";
+import { Input, Select, InputOnFocus, TextArea } from "components/fields";
 import { EditAttachments, EditAttachmentsProps } from "components/files";
 import { Link } from "components/links";
 import { isNil } from "lodash";
@@ -58,6 +58,9 @@ const ContactForm: React.FC<ContactFormProps> = ({ form, initialValues, attachme
       </Form.Item>
       <Form.Item name={"rate"} label={"Rate"} dataType={"currency"}>
         <Input />
+      </Form.Item>
+      <Form.Item name={"notes"} label={"Notes"} dataType={"longText"}>
+        <TextArea />
       </Form.Item>
       {!isNil(attachmentsProps) ? (
         <Form.ItemStyle label={"Attachments"} dataType={"file"}>
