@@ -24,7 +24,7 @@ import {
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
-import { tabling, hooks, util } from "lib";
+import { tabling, hooks, util, notifications } from "lib";
 import { useCellNavigation, useAuthenticatedClipboard, useContextMenu, UseContextMenuParams } from "../hooks";
 
 interface InjectedAuthenticatedDataGridProps {
@@ -320,7 +320,7 @@ const authenticateDataGrid =
                   console.error(
                     `Value setter for column ${tabling.columns.normalizedField(
                       col
-                    )} returned an undefined value, params=${JSON.stringify(params)}`
+                    )} returned an undefined value, params=${notifications.objToJson(params)}`
                   );
                 }
                 if (params.newValue === undefined || params.newValue === "") {

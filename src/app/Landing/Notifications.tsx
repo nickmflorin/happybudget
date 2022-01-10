@@ -38,7 +38,6 @@ export const TokenNotification = (props: TokenNotificationProps): UINotification
     level: TOKEN_NOTIFICATION_TYPES[props.code],
     detail: typeof detail === "function" ? detail(props.userId) : detail,
     message: TOKEN_NOTIFICATION_MESSAGES[props.tokenType],
-
     includeLink:
       !isNil(props.userId) && props.tokenType === "email-confirmation"
         ? ({ setLoading }) => ({

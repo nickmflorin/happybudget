@@ -1,8 +1,9 @@
 import { isNil } from "lodash";
 import { ActualFileObject } from "filepond/types";
 
-import { setRequestHeaders } from "./client";
-import { parseFieldError, parseGlobalError } from "./util";
+import { notifications } from "lib";
+
+import { parseFieldError, parseGlobalError, setRequestHeaders } from "./util";
 
 type UploadAttachmentFileOptions = {
   readonly progress?: (computable: boolean, percent: number, total: number) => void;
@@ -53,21 +54,22 @@ export const uploadAttachmentFile = (
       const responseData: { data: Model.Attachment[] } = JSON.parse(request.response);
       options?.success?.(responseData.data);
     } else {
-      let errorData: Http.ErrorResponse | null = null;
-      try {
-        errorData = JSON.parse(request.response);
-      } catch (err) {
-        if (err instanceof SyntaxError) {
-          console.warn("Could not parse error data from response while uploading attachment.");
-          options?.error?.("There was an error processing the attachment.");
-        } else {
-          throw err;
+      if (request.status === 401) {
+        // It is safe to assume that this is not the token validation endpoint.
+        window.location.href = "/login";
+      } else {
+        let errorData: Http.ErrorResponse | null = null;
+        try {
+          errorData = JSON.parse(request.response);
+        } catch (err) {
+          if (err instanceof SyntaxError) {
+            console.warn("Could not parse error data from response while uploading attachment.");
+            options?.error?.("There was an error processing the attachment.");
+          } else {
+            throw err;
+          }
         }
-      }
-      if (!isNil(errorData)) {
-        if (errorData.force_logout === true) {
-          window.location.href = "/login";
-        } else {
+        if (!isNil(errorData)) {
           const fieldError = parseFieldError(errorData.errors, "file");
           const globalError = parseGlobalError(errorData.errors);
           if (!isNil(globalError)) {
@@ -75,12 +77,14 @@ export const uploadAttachmentFile = (
           } else if (!isNil(fieldError)) {
             options?.error?.(fieldError.message);
           } else {
-            console.warn("Unexpected error returned when uploading attachment. \n" + JSON.stringify(errorData));
+            console.warn(
+              "Unexpected error returned when uploading attachment. \n" + notifications.objToJson(errorData)
+            );
             options?.error?.("There was an error processing the attachment.");
           }
+        } else {
+          options?.error?.("There was an error processing the attachment.");
         }
-      } else {
-        options?.error?.("There was an error processing the attachment.");
       }
     }
   };

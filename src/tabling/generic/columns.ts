@@ -1,7 +1,7 @@
 import { isNil, map, findIndex, includes, filter } from "lodash";
 import { SuppressKeyboardEventParams, CellClassParams } from "@ag-grid-community/core";
 
-import { util, tabling, budgeting } from "lib";
+import { util, tabling, budgeting, notifications } from "lib";
 
 export const ActionColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
   col: Table.PartialActionColumn<R, M> & { readonly colId: Table.ActionColumnId }
@@ -171,7 +171,7 @@ export const TagSelectColumn = <R extends Table.RowData, M extends Model.RowHttp
       if (m === undefined) {
         console.error(
           `Could not parse choice select column ${col.field} for clipboard,
-					row = ${JSON.stringify(row)}.`
+					row = ${notifications.objToJson(row)}.`
         );
         return "";
       }
@@ -195,7 +195,7 @@ export const ChoiceSelectColumn = <
       if (m === undefined) {
         console.error(
           `Could not parse choice select column ${col.field} for clipboard,
-					row = ${JSON.stringify(row)}.`
+					row = ${notifications.objToJson(row)}.`
         );
         return "";
       }

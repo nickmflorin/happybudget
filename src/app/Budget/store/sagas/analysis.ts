@@ -27,7 +27,7 @@ function* request(action: Redux.Action<number>): SagaIterator {
       })
     );
   } catch (e: unknown) {
-    notifications.ui.handleBannerRequestError(e as Error);
+    notifications.ui.banner.handleRequestError(e as Error);
     yield put(
       actions.analysis.responseAction({
         accounts: { count: 0, data: [] },

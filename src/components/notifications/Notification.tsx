@@ -43,14 +43,14 @@ const Notification = ({ style, className, ...props }: _NotificationProps): JSX.E
       const linkObj: AppNotificationLink = props.includeLink({ setLoading: setLinkLoading });
       return (
         <span>
-          {detail !== undefined && notifications.notificationDetailToString(detail)}
+          {detail !== undefined && notifications.ui.notificationDetailToString(detail)}
           <ButtonLink loading={linkLoading} style={{ marginLeft: 6 }} onClick={() => linkObj.onClick?.()}>
             {linkObj.text}
           </ButtonLink>
         </span>
       );
     } else {
-      return detail !== undefined ? notifications.notificationDetailToString(detail) : undefined;
+      return detail !== undefined ? notifications.ui.notificationDetailToString(detail) : undefined;
     }
   }, [detail, props.includeLink, linkLoading]);
 

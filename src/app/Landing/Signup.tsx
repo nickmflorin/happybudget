@@ -62,7 +62,7 @@ const Signup = (): JSX.Element => {
             .finally(() => setLoading(false));
         }}
         onGoogleError={(error: Record<string, unknown>) => {
-          notifications.notify({ level: "error", dispatchToSentry: true, message: JSON.stringify(error) });
+          notifications.notify({ level: "error", dispatchToSentry: true, message: notifications.objToJson(error) });
           form.notify("There was an error authenticating with Google.");
         }}
         onSubmit={(values: ISignupFormValues) => {

@@ -2,12 +2,6 @@ declare namespace Http {
   type RawResponseValue = string | number | null;
   type Response = { [key: string]: RawResponseValue | Response | Response[] };
 
-  type ErrorResponse = {
-    readonly errors: Error[];
-    readonly user_id?: number;
-    readonly force_logout?: true;
-  };
-
   type ListResponse<T> = {
     readonly count: number;
     readonly data: T[];

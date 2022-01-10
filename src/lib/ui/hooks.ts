@@ -68,6 +68,7 @@ export const InitialModalRef: ModalInstance = {
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   clearNotifications: () => {},
   notify: () => [],
+  lookupAndNotify: () => [],
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   setLoading: () => {},
   handleRequestError: () => [],

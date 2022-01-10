@@ -22,7 +22,7 @@ const Billing = (): JSX.Element => {
               window.location.href = response.redirect_url;
             })
             .catch((e: Error) =>
-              notifications.ui.handleBannerRequestError(e, {
+              notifications.ui.banner.handleRequestError(e, {
                 message: "There was an error connecting you to the customer portal."
               })
             )
@@ -36,7 +36,7 @@ const Billing = (): JSX.Element => {
               window.location.href = response.redirect_url;
             })
             .catch((e: Error) =>
-              notifications.ui.handleBannerRequestError(e, { message: "There was an error during checkout." })
+              notifications.ui.banner.handleRequestError(e, { message: "There was an error during checkout." })
             )
             .finally(() => setSubscribing(false));
         }}

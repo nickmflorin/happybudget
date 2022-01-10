@@ -7,7 +7,7 @@ import Card from "./Card";
 import { isNil } from "lodash";
 
 interface BudgetCardProps {
-  readonly budget: Model.Budget;
+  readonly budget: Model.SimpleBudget;
   readonly loading?: boolean;
   readonly disabled: boolean;
   readonly duplicating: boolean;
@@ -53,7 +53,7 @@ const BudgetCard = ({
       title={budget.name}
       subTitle={subTitle}
       loading={loading}
-      disabled={disabled}
+      disabled={disabled || budget.is_permissioned}
       image={budget.image}
       dropdown={[
         {

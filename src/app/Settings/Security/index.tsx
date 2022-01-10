@@ -22,7 +22,7 @@ const Security = (): JSX.Element => {
             api
               .changeUserPassword(payload)
               .then(() =>
-                notifications.ui.notifyBanner({
+                notifications.ui.banner.notify({
                   level: "success",
                   message: "Your password was successfully changed.",
                   duration: 5000

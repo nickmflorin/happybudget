@@ -22,6 +22,10 @@ interface PrivateEditModelModalProps<M extends Model.Model, P extends Http.Paylo
   readonly update: (id: number, payload: P, options: Http.RequestOptions) => Promise<R>;
   readonly children: (m: M | null, form: FormInstance<V>) => JSX.Element;
   readonly interceptPayload?: (p: V) => P;
+  /* Conditionally handle the request error.  Returns True if it was handled
+     otherwise returns False, which indicates that the default handling should
+     be used. */
+  readonly interceptError?: (form: FormInstance<V>, e: Error) => boolean;
   readonly convertEmptyStringsToNull?: (keyof P)[] | boolean;
 }
 
@@ -35,6 +39,7 @@ const EditModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = P,
   update,
   children,
   interceptPayload,
+  interceptError,
   setFormData,
   convertEmptyStringsToNull,
   ...props
@@ -112,7 +117,9 @@ const EditModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = P,
               onSuccess(response);
             })
             .catch((e: Error) => {
-              Form.handleRequestError(e);
+              if (interceptError?.(Form, e) !== true) {
+                Form.handleRequestError(e);
+              }
             })
             .finally(() => {
               if (isMounted.current) {

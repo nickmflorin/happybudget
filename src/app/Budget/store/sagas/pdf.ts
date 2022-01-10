@@ -14,7 +14,7 @@ function* loadHeaderTemplateTask(id: number): SagaIterator {
     yield put(actions.displayHeaderTemplateAction(response));
   } catch (e: unknown) {
     // TODO: It would be more appropriate to show the error in the Modal.
-    notifications.ui.handleBannerRequestError(e as Error);
+    notifications.ui.banner.handleRequestError(e as Error);
   } finally {
     yield put(actions.setLoadingHeaderTemplateDetailAction(false));
   }
@@ -38,7 +38,7 @@ function* getHeaderTemplatesTask(): SagaIterator {
     yield put(actions.responseHeaderTemplatesAction(response));
   } catch (e: unknown) {
     // TODO: It would be more appropriate to show the error in the Modal.
-    notifications.ui.handleBannerRequestError(e as Error);
+    notifications.ui.banner.handleRequestError(e as Error);
     yield put(actions.responseHeaderTemplatesAction({ data: [], count: 0 }));
   } finally {
     yield put(actions.loadingHeaderTemplatesAction(false));

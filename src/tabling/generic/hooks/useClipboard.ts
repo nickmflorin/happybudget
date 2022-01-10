@@ -2,7 +2,7 @@ import { isNil, filter, map, includes, reduce } from "lodash";
 
 import { ProcessCellForExportParams } from "@ag-grid-community/core";
 
-import { hooks, tabling } from "lib";
+import { hooks, tabling, notifications } from "lib";
 
 export type UseClipboardReturnType = [(params: ProcessCellForExportParams) => string, (fields?: string[]) => CSVData];
 
@@ -24,7 +24,9 @@ const processCellValueForClipboard = <R extends Table.RowData, M extends Model.R
     // The value should never be undefined at this point.
     if (value === undefined) {
       console.warn(
-        `Encountered undefined value for field ${column.field} when it was not expected, row=${JSON.stringify(row)}.`
+        `Encountered undefined value for field ${column.field} when it was not expected, row=${notifications.objToJson(
+          row
+        )}.`
       );
       return "";
     } else if (tabling.typeguards.isBodyColumn(column) && column.nullValue === value) {

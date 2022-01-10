@@ -2,7 +2,6 @@ declare namespace Http {
   type Method = "POST" | "PATCH" | "GET" | "DELETE";
 
   type RequestOptions = {
-    readonly retries?: number;
     readonly headers?: { [key: string]: string };
     readonly cancelToken?: import("axios").CancelToken | undefined;
   };

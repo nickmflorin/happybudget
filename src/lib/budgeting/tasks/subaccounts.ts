@@ -3,7 +3,7 @@ import { StrictEffect, call, put, fork, all } from "redux-saga/effects";
 import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
-import { tabling, redux, contacts } from "lib";
+import { tabling, redux, contacts, notifications } from "lib";
 
 type R = Tables.SubAccountRowData;
 type C = Model.SubAccount;
@@ -191,7 +191,16 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
           yield put(config.actions.response({ models: models.data, groups: groups.data, markups: markups?.data }));
         }
       } catch (e: unknown) {
-        config.table.handleRequestError(e as Error, { message: "There was an error updating the table rows." });
+        const err = e as Error;
+        if (
+          err instanceof api.ClientError &&
+          !isNil(err.permissionError) &&
+          err.permissionError.code === "subscription_permission_error"
+        ) {
+          notifications.ui.banner.lookupAndNotify("budgetSubscriptionPermissionError");
+        } else {
+          config.table.handleRequestError(e as Error, { message: "There was an error retrieving the table data." });
+        }
         yield put(config.actions.response({ models: [], markups: [], groups: [] }));
       } finally {
         yield put(config.actions.loading(false));

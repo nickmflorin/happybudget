@@ -22,54 +22,55 @@ const Login = (): JSX.Element => {
   }>();
 
   const handleTokenError = useMemo(
-    () => (e: Http.IApiError<"auth", Http.TokenErrorCode>, tokenType: Http.TokenType, userId?: number | undefined) => {
-      if (e.code === api.ErrorCodes.TOKEN_EXPIRED && isNil(userId)) {
-        console.error(
-          `The token of type ${location.state.tokenType} has expired, but we cannot
+    () =>
+      (e: Http.IApiError<"auth", Http.TokenErrorCode> & { readonly user_id?: number }, tokenType: Http.TokenType) => {
+        if (e.code === api.ErrorCodes.TOKEN_EXPIRED && isNil(e.user_id)) {
+          console.error(
+            `The token of type ${location.state.tokenType} has expired, but we cannot
               resend the email because the response did not include the user's ID.`
-        );
-      }
-      if (isNil(userId) || e.code === api.ErrorCodes.TOKEN_INVALID) {
-        form.notify(
-          TokenNotification({
-            tokenType,
-            userId,
-            code: e.code
-          })
-        );
-      } else {
-        form.notify(
-          TokenNotification({
-            tokenType,
-            userId,
-            code: e.code,
-            onSuccess: () =>
-              form.notify({
-                level: "success",
-                message: "Confirmation email successfully sent.",
-                detail: "Please check your inbox.",
-                closable: true
-              }),
-            onError: (err: Error) => form.handleRequestError(err)
-          })
-        );
-      }
-    },
+          );
+        }
+        if (isNil(e.user_id) || e.code === api.ErrorCodes.TOKEN_INVALID) {
+          form.notify(
+            TokenNotification({
+              tokenType,
+              userId: e.user_id,
+              code: e.code
+            })
+          );
+        } else {
+          form.notify(
+            TokenNotification({
+              tokenType,
+              userId: e.user_id,
+              code: e.code,
+              onSuccess: () =>
+                form.notify({
+                  level: "success",
+                  message: "Confirmation email successfully sent.",
+                  detail: "Please check your inbox.",
+                  closable: true
+                }),
+              onError: (err: Error) => form.handleRequestError(err)
+            })
+          );
+        }
+      },
     [form.handleRequestError, form.notify]
   );
 
   const handleAuthError = useMemo(
-    () => (e: Http.AuthError, userId?: number | undefined, tokenType?: Http.TokenType) => {
+    () => (e: Http.AuthError, tokenType?: Http.TokenType) => {
       if (includes([api.ErrorCodes.TOKEN_EXPIRED, api.ErrorCodes.TOKEN_INVALID], e.code)) {
         if (!isNil(tokenType)) {
-          handleTokenError(e as Http.IApiError<"auth", Http.TokenErrorCode>, tokenType, userId);
+          handleTokenError(e as Http.IApiError<"auth", Http.TokenErrorCode>, tokenType);
           return true;
         }
       } else if (e.code === api.ErrorCodes.ACCOUNT_NOT_APPROVED) {
         form.notify(UnapprovedUserNotification({}));
         return true;
       } else if (e.code === api.ErrorCodes.ACCOUNT_NOT_VERIFIED) {
-        if (isNil(userId)) {
+        if (isNil(e.user_id)) {
           console.error(
             `The user's email confirmation token has expired, but we cannot
               resend the verification email because the response did not include
@@ -78,7 +79,7 @@ const Login = (): JSX.Element => {
         }
         form.notify(
           UnverifiedEmailNotification({
-            userId,
+            userId: e.user_id,
             onSuccess: () =>
               form.notify({
                 level: "success",
@@ -100,7 +101,7 @@ const Login = (): JSX.Element => {
   const handleError = useMemo(
     () => (e: Error) => {
       if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
-        const handled = handleAuthError(e.authenticationError, e.userId, location.state?.tokenType);
+        const handled = handleAuthError(e.authenticationError, location.state?.tokenType);
         if (!handled) {
           form.handleRequestError(e);
         }
@@ -146,7 +147,7 @@ const Login = (): JSX.Element => {
             .finally(() => setLoading(false));
         }}
         onGoogleError={(error: Record<string, unknown>) => {
-          notifications.notify({ level: "error", dispatchToSentry: true, message: JSON.stringify(error) });
+          notifications.notify({ level: "error", dispatchToSentry: true, message: notifications.objToJson(error) });
           form.notify("There was an error authenticating with Google.");
         }}
         onSubmit={(values: ILoginFormValues) => {

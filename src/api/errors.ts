@@ -15,7 +15,8 @@ export enum ApiErrorTypes {
   HTTP = "http",
   FIELD = "field",
   GLOBAL = "global",
-  BILLING = "billing"
+  BILLING = "billing",
+  PERMISSION = "permission"
 }
 
 /**
@@ -97,7 +98,6 @@ export class ClientError extends HttpError implements Http.IHttpClientError {
   public url: string;
   public response: AxiosResponse<Http.ErrorResponse>;
   public errors: Http.Error[];
-  public userId: number | undefined;
 
   constructor(
     config: Omit<
@@ -110,13 +110,13 @@ export class ClientError extends HttpError implements Http.IHttpClientError {
       | "globalError"
       | "unknownError"
       | "billingError"
+      | "permissionError"
     >
   ) {
     super(
       `[${config.status}] There was an error making a request to ${config.url}: ${stringifyErrors(config.errors)}`,
       "ClientError"
     );
-    this.userId = config.userId;
     this.url = config.url;
     this.response = config.response;
     this.status = config.status;
@@ -133,6 +133,10 @@ export class ClientError extends HttpError implements Http.IHttpClientError {
 
   public get billingError(): Http.BillingError | null {
     return util.parseBillingError(this);
+  }
+
+  public get permissionError(): Http.PermissionError | null {
+    return util.parsePermissionError(this);
   }
 
   public get fieldErrors(): Http.FieldError[] {

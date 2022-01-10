@@ -74,7 +74,7 @@ const Profile = (): JSX.Element => {
             api
               .updateActiveUser(payload)
               .then((response: Model.User) => {
-                notifications.ui.notifyBanner({
+                notifications.ui.banner.notify({
                   level: "success",
                   message: "Your information was successfully saved."
                 });

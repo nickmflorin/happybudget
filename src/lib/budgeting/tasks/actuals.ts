@@ -1,9 +1,9 @@
 import { SagaIterator } from "redux-saga";
 import { put, call, fork, select, all } from "redux-saga/effects";
-import { filter } from "lodash";
+import { filter, isNil } from "lodash";
 
 import * as api from "api";
-import { tabling, contacts } from "lib";
+import { tabling, contacts, notifications } from "lib";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;
@@ -77,7 +77,16 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
         call(contactsTasks.request, action as Redux.Action<null>)
       ]);
     } catch (e: unknown) {
-      config.table.handleRequestError(e as Error, { message: "There was an error retrieving the table data." });
+      const err = e as Error;
+      if (
+        err instanceof api.ClientError &&
+        !isNil(err.permissionError) &&
+        err.permissionError.code === "subscription_permission_error"
+      ) {
+        notifications.ui.banner.lookupAndNotify("budgetSubscriptionPermissionError");
+      } else {
+        config.table.handleRequestError(e as Error, { message: "There was an error retrieving the table data." });
+      }
       yield put(config.actions.response({ models: [] }));
     } finally {
       yield put(config.actions.loading(false));

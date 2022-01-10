@@ -1,12 +1,10 @@
-import axios, { AxiosError, AxiosInstance, AxiosResponse, AxiosRequestConfig } from "axios";
-import axiosRetry from "axios-retry";
-import Cookies from "universal-cookie";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { isNil } from "lodash";
 
-import { util, notifications } from "lib";
+import { util } from "lib";
 
-import * as codes from "./codes";
-import * as errors from "./errors";
+import * as apiUtil from "./util";
+import * as middleware from "./middleware";
 
 export enum HttpRequestMethods {
   GET = "GET",
@@ -16,138 +14,44 @@ export enum HttpRequestMethods {
   PATCH = "PATCH"
 }
 
-export const instance = axios.create({
+export const authenticatedInstance = axios.create({
   baseURL: process.env.REACT_APP_API_DOMAIN,
   withCredentials: true
 });
 
-export const getRequestHeaders = (): { [key: string]: string } => {
-  const headers: { [key: string]: string } = {};
-  const cookies = new Cookies();
-  /* The CSRF Token needs to be set as a header for POST/PATCH/PUT requests
-     with Django - unfortunately, we cannot include it as a cookie only
-     because their middleware looks for it in the headers. */
-  let csrfToken: string = cookies.get("greenbudgetcsrftoken");
-  if (process.env.REACT_APP_PRODUCTION_ENV === "local") {
-    csrfToken = cookies.get("localgreenbudgetcsrftoken");
-  }
-  if (!isNil(csrfToken) && typeof csrfToken === "string") {
-    headers["X-CSRFToken"] = csrfToken;
-  }
-  return headers;
-};
-
-export const setRequestHeaders = (request: XMLHttpRequest) => {
-  const headers = getRequestHeaders();
-  const keys = Object.keys(headers);
-  for (let i = 0; i < keys.length; i++) {
-    request.setRequestHeader(keys[i], headers[keys[i]]);
-  }
-};
-
-instance.interceptors.request.use((config: AxiosRequestConfig): AxiosRequestConfig => {
-  config = config || {};
-  config.headers = { ...config.headers, ...getRequestHeaders() };
-  return config;
+export const tokenValidationInstance = axios.create({
+  baseURL: process.env.REACT_APP_API_DOMAIN,
+  withCredentials: true
 });
 
-export const filterPayload = <T extends Http.PayloadObj = Http.PayloadObj>(payload: T): T => {
-  const newPayload: T = {} as T;
-  Object.keys(payload).forEach((key: string) => {
-    if (typeof payload === "object" && payload[key as keyof T] !== undefined) {
-      newPayload[key as keyof T] = payload[key as keyof T];
-    }
-  });
-  return newPayload;
-};
+export const unauthenticatedInstance = axios.create({
+  baseURL: process.env.REACT_APP_API_DOMAIN
+});
 
-/**
- * Parses the error information from the response embedded in an AxiosError
- * and returns an appropriate ClientError to be handled.
- *
- * @param error The AxiosError that was raised.
- */
-const throwClientError = (error: AxiosError<Http.ErrorResponse>) => {
-  if (isNil(error.response) || isNil(error.response.data)) {
-    return;
-  }
-  const response = error.response;
-  const url = !isNil(error.response.config.url) ? error.response.config.url : "";
-  if (!isNil(response.data.force_logout)) {
-    window.location.href = "/login";
-    /* We throw an error because the mechanics making the API request are
-			 expecting a defined response or an Error to be thrown.  If we to return
-			 nothing, we may get misleading errors dispatched to Sentry that occur
-			 between the time this method returns and the time the redirect actually
-			 takes place. */
-    throw new errors.ForceLogout("User is not authenticated.");
-  } else {
-    if (error.response.status === 404) {
-      /* On 404's Django will sometimes bypass DRF exception handling and
-         return a 404.html template response.  We should bypass this in the
-         backend, but for the time being we can manually raise a ClientError. */
-      throw new errors.ClientError({
-        response,
-        errors: [
-          {
-            message: "The requested resource could not be found.",
-            code: codes.ErrorCodes.NOT_FOUND,
-            error_type: errors.ApiErrorTypes.HTTP
-          } as Http.Error
-        ],
-        status: response.status,
-        url
-      });
-    } else if (!isNil(response.data.errors)) {
-      throw new errors.ClientError({
-        response,
-        errors: response.data.errors,
-        status: response.status,
-        url,
-        userId: response.data.user_id
-      });
-    } else {
-      notifications.notify({
-        level: "error",
-        dispatchToSentry: true,
-        message: `
-          The response body from the backend does not conform to a standard convention for indicating
-          a client error - the specific type of error cannot be determined.
-      `
-      });
-      throw new errors.ClientError({
-        response,
-        errors: [
-          {
-            message: "Unknown client error.",
-            error_type: errors.ApiErrorTypes.UNKNOWN,
-            code: codes.ErrorCodes.UNKNOWN
-          } as Http.Error
-        ],
-        status: response.status,
-        url
-      });
-    }
-  }
-};
+/* CSRF Tokens must be included for both authenticated and unauthenticated
+   requests, but not token validation requests. */
+authenticatedInstance.interceptors.request.use(middleware.HttpHeaderRequestMiddleware);
+unauthenticatedInstance.interceptors.request.use(middleware.HttpHeaderRequestMiddleware);
 
-instance.interceptors.response.use(
+/* The authenticated AxiosInstance should forcefully log out users on a 401
+   response. */
+authenticatedInstance.interceptors.response.use(
   (response: AxiosResponse<Http.Response>): AxiosResponse<Http.Response> => response,
-  (error: AxiosError<Http.ErrorResponse>) => {
-    if (!isNil(error.response)) {
-      const response = error.response;
-      if (response.status >= 400 && response.status < 500) {
-        throwClientError(error);
-      } else {
-        const url = !isNil(error.request.config) ? error.request.config.url : undefined;
-        throw new errors.ServerError({ status: error.response.status, url });
-      }
-    } else if (!isNil(error.request)) {
-      throw new errors.NetworkError({ url: !isNil(error.request.config) ? error.request.conf.url : undefined });
-    } else {
-      throw error;
-    }
-  }
+  middleware.HttpErrorResponseMiddlware(true)
+);
+
+/* The token validation AxiosInstance should not forcefully log out users on a
+	 401 response, because this is done in the route components. */
+tokenValidationInstance.interceptors.response.use(
+  (response: AxiosResponse<Http.Response>): AxiosResponse<Http.Response> => response,
+  middleware.HttpErrorResponseMiddlware(false)
+);
+
+/* The unauthenticated AxiosInstance should not forcefully log out users on a 401
+   response. */
+unauthenticatedInstance.interceptors.response.use(
+  (response: AxiosResponse<Http.Response>): AxiosResponse<Http.Response> => response,
+  middleware.HttpErrorResponseMiddlware(false)
 );
 
 export class ApiClient {
@@ -204,8 +108,6 @@ export class ApiClient {
     payload: Partial<Http.Payload> = {},
     options: Http.RequestOptions
   ): Promise<T> => {
-    axiosRetry(this.instance, { retries: options.retries });
-
     const lookup = {
       [HttpRequestMethods.POST]: this.instance.post,
       [HttpRequestMethods.GET]: this.instance.get,
@@ -218,7 +120,7 @@ export class ApiClient {
     if (method === HttpRequestMethods.GET || method === HttpRequestMethods.DELETE) {
       response = await lookup[method](url, { cancelToken: options.cancelToken });
     } else {
-      response = await lookup[method](url, filterPayload(payload as Http.PayloadObj), {
+      response = await lookup[method](url, apiUtil.filterPayload(payload as Http.PayloadObj), {
         cancelToken: options.cancelToken
       });
     }
@@ -327,5 +229,8 @@ export class ApiClient {
   };
 }
 
-export const client = new ApiClient(instance);
+export const client = new ApiClient(authenticatedInstance);
+export const unauthenticatedClient = new ApiClient(unauthenticatedInstance);
+export const tokenClient = new ApiClient(tokenValidationInstance);
+
 export default client;

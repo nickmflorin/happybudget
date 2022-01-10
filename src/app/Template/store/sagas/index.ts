@@ -35,7 +35,7 @@ function* getBudgetTask(action: Redux.Action<number>): SagaIterator {
     const response: Model.Template = yield api.request(api.getTemplate, action.payload);
     yield put(actions.responseBudgetAction(response));
   } catch (e: unknown) {
-    notifications.ui.handleBannerRequestError(e as Error);
+    notifications.ui.banner.handleRequestError(e as Error);
     yield put(actions.responseBudgetAction(null));
   } finally {
     yield put(actions.loadingBudgetAction(false));

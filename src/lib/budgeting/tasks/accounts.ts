@@ -128,7 +128,16 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
           yield put(config.actions.response({ models: models.data, groups: groups.data, markups: markups?.data }));
         }
       } catch (e: unknown) {
-        config.table.handleRequestError(e as Error, { message: "There was an error retrieving the table data." });
+        const err = e as Error;
+        if (
+          err instanceof api.ClientError &&
+          !isNil(err.permissionError) &&
+          err.permissionError.code === "subscription_permission_error"
+        ) {
+          notifications.ui.banner.lookupAndNotify("budgetSubscriptionPermissionError");
+        } else {
+          config.table.handleRequestError(e as Error, { message: "There was an error retrieving the table data." });
+        }
         yield put(config.actions.response({ models: [], groups: [], markups: [] }));
       } finally {
         yield put(config.actions.loading(false));

@@ -1,49 +1,16 @@
 import { useReducer, useMemo, useRef, useEffect } from "react";
 import axios from "axios";
-import { isNil, filter, includes, map } from "lodash";
+import { isNil, filter, map, reduce } from "lodash";
 
 import * as api from "api";
 import { util, hooks } from "lib";
 
+import * as internal from "../internal";
 import * as typeguards from "./typeguards";
 import { combineFieldNotifications, standardizeNotification } from "./util";
-import * as internal from "./internal";
-
-type AddNotificationsDetail<N extends UINotificationType = UINotificationType> = {
-  readonly notifications: SingleOrArray<N>;
-  readonly opts?: Omit<UINotificationOptions, "behavior">;
-};
-type ClearNotificationsDetail = SingleOrArray<UINotification["id"]> | undefined;
-type RequestErrorDetail = {
-  readonly error: Error;
-  readonly opts?: Omit<UINotificationOptions, "behavior">;
-};
-
-type AddNotificationsReducerDetail = Omit<AddNotificationsDetail<UINotification>, "opts"> & {
-  // For the reducer, the behavior (append or replace) must be provided.
-  readonly opts: Omit<UINotificationOptions, "behavior"> & { readonly behavior: UINotificationOptions["behavior"] };
-};
-
-const isAddNotificationsDetail = (
-  action: AddNotificationsReducerDetail | ClearNotificationsDetail | undefined
-): action is AddNotificationsReducerDetail =>
-  action !== undefined && (action as AddNotificationsReducerDetail).notifications !== undefined;
-
-const UINotificationReducer = (
-  state: UINotification[] = [],
-  action: AddNotificationsReducerDetail | ClearNotificationsDetail | undefined
-): UINotification[] => {
-  if (isAddNotificationsDetail(action)) {
-    const ns = Array.isArray(action.notifications) ? action.notifications : [];
-    return action.opts.behavior === "append" ? [...state, ...ns] : ns;
-  } else {
-    if (action === undefined) {
-      return [];
-    }
-    const ids = Array.isArray(action) ? action : [action];
-    return filter(state, (n: UINotification) => !includes(ids, n.id));
-  }
-};
+import { UINotificationReducer } from "./reducers";
+import existingNotifications from "./notifications";
+import { AddNotificationsDetail, RequestErrorDetail, ClearNotificationsDetail, LookupAndNotifyDetail } from ".";
 
 type UseNotificationsConfig = {
   readonly defaultBehavior: UINotificationBehavior;
@@ -90,13 +57,15 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
 
       const fieldRelatedErrors: (Http.FieldError | UIFieldNotification)[] = filter(
         notices,
-        (n: UINotificationType) => typeguards.isUIFieldNotification(n) || api.typeguards.isHttpError(n)
+        (n: UINotificationType) =>
+          typeguards.isUIFieldNotification(n) || (api.typeguards.isHttpError(n) && api.typeguards.isFieldError(n))
       ) as (Http.FieldError | UIFieldNotification)[];
 
       // Filter out the notifications that do not pertain to individual fields.
       notices = filter(
         notices,
-        (n: UINotificationType) => !(typeguards.isUIFieldNotification(n) || api.typeguards.isHttpError(n))
+        (n: UINotificationType) =>
+          !(typeguards.isUIFieldNotification(n) || (api.typeguards.isHttpError(n) && api.typeguards.isFieldError(n)))
       ) as UINonFieldNotificationType[];
 
       /* For the notification sources that pertain to field type errors, a
@@ -128,32 +97,44 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
 					 This should be improved, as the location of the final grouped field
 					 related error can be determined from the location of the first child
 					 field related error in the array. */
-        notices = [
-          ...notices,
-          combineFieldNotifications(fieldRelatedErrors, { behavior: config.defaultBehavior, ...opts })
-        ];
+        const combined = combineFieldNotifications(fieldRelatedErrors, { behavior: config.defaultBehavior, ...opts });
+        if (combined !== null) {
+          notices = [...notices, combined];
+        }
       }
-      const addedNotifications = map(notices, (n: UINotificationType) => {
-        const id = util.generateRandomNumericId();
-        const standardized = standardizeNotification(n, {
-          behavior: config.defaultBehavior,
-          ...opts
-        });
-        return {
-          ...standardized,
-          /* All notifications will default to being closable unless the
-             `defaultClosable` configuration is provided or the notification
-             or options indicate the closability of the notification itself. */
-          closable:
-            standardized.closable !== undefined
-              ? standardized.closable
-              : config.defaultClosable !== undefined
-              ? config.defaultClosable
-              : true,
-          id,
-          remove: () => clearNotifications(id)
-        };
-      });
+      const addedNotifications = reduce(
+        notices,
+        (curr: UINotification[], n: UINotificationType) => {
+          const id = util.generateRandomNumericId();
+          const standardized = standardizeNotification(n, {
+            behavior: config.defaultBehavior,
+            ...opts
+          });
+          if (standardized !== null) {
+            /* All notifications will default to being closable unless the
+							`defaultClosable` configuration is provided or the
+							 notification or options indicate the closability of the
+							 notification itself. */
+            const closable =
+              standardized.closable !== undefined
+                ? standardized.closable
+                : config.defaultClosable !== undefined
+                ? config.defaultClosable
+                : true;
+            return [
+              ...curr,
+              {
+                ...standardized,
+                closable,
+                id,
+                remove: () => clearNotifications(id)
+              }
+            ];
+          }
+          return curr;
+        },
+        []
+      );
       dispatchNotification({
         notifications: addedNotifications,
         opts: { behavior: config.defaultBehavior, ...opts }
@@ -170,6 +151,20 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
       return addedNotifications;
     },
     [config?.handleFieldErrors, clearNotifications]
+  );
+
+  const lookupAndNotify = useMemo(
+    () =>
+      <K extends UIExistingNotificationId>(
+        id: K,
+        params: InferExistingNotificationParams<
+          typeof existingNotifications[K]
+        > = {} as InferExistingNotificationParams<typeof existingNotifications[K]>
+      ) => {
+        const notificationData = existingNotifications[id](params);
+        return notify(notificationData, { ignoreIfDuplicate: true });
+      },
+    [notify]
   );
 
   /**
@@ -208,90 +203,10 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
     handleRequestError,
     notify,
     clearNotifications,
+    lookupAndNotify,
     notifications
   };
 };
-
-/**
- * Dispatches an Event instructing any listeners to add the notification to the
- * managed notifications in state for the specific destination.
- *
- * @param destinationId  The specific destination that the notification is for.
- *                       This is used so that we can use event listeners for
- *                       different notification destinations without having their
- *                       wires get crossed.
- * @param notifications  The single notification or multiple notifications that
- *                       should be dispatched.
- * @param opts           Options for the dispatching of the notification(s).
- */
-export const notify = (
-  destinationId: string,
-  notifications: SingleOrArray<UINotificationType>,
-  opts?: UINotificationOptions
-) => {
-  const evt = new CustomEvent<AddNotificationsDetail>(`notifications:${destinationId}:add`, {
-    detail: { notifications, opts }
-  });
-  document.dispatchEvent(evt);
-};
-
-/**
- * Dispatches an Event instructing any listeners to clear the notifications in
- * the managed notifications state for the specific destination.
- *
- * @param destinationId  The specific destination that the notification is for.
- *                       This is used so that we can use event listeners for
- *                       different notification destinations without having their
- *                       wires get crossed.
- * @param ids            The IDs of the notification that should be removed.  If
- *                       not provided, all notifications will be removed.
- */
-export const clear = (destinationId: string, ids: SingleOrArray<UINotification["id"]> | undefined) => {
-  const evt = new CustomEvent<ClearNotificationsDetail>(`notifications:${destinationId}:clear`, {
-    detail: ids
-  });
-  document.dispatchEvent(evt);
-};
-
-/**
- * Dispatches an Event instructing any listeners to handle an HTTP request error
- * and dispatch notifications (if appropriate) to the managed notifications in
- * state for the specific destination.
- *
- * @param destinationId  The specific destination that the notification is for.
- *                       This is used so that we can use event listeners for
- *                       different notification destinations without having their
- *                       wires get crossed.
- * @param e              The HTTP request error that occurred.
- * @param opts           Options for the dispatching of the notification(s).
- */
-export const handleRequestError = (destinationId: string, e: Error, opts?: UINotificationOptions) => {
-  const evt = new CustomEvent<RequestErrorDetail>(`notifications:${destinationId}:requestError`, {
-    detail: { error: e, opts }
-  });
-  document.dispatchEvent(evt);
-};
-
-/**
- * Dispatches an Event instructing any listeners to add the notification to the
- * managed notifications in state for the 'banner' destination.
- */
-export const notifyBanner = (notifications: SingleOrArray<UINotificationType>, opts?: UINotificationOptions) =>
-  notify("banner", notifications, opts);
-
-/**
- * Dispatches an Event instructing any listeners to clear the managed
- * notifications in state for the 'banner' destination.
- */
-export const clearBanner = (ids: SingleOrArray<UINotification["id"]> | undefined) => clear("banner", ids);
-
-/**
- * Dispatches an Event instructing any listeners to handle an HTTP request error
- * and dispatch notifications (if appropriate) to the managed notifications in
- * state for the 'banner' destination.
- */
-export const handleBannerRequestError = (e: Error, opts?: UINotificationOptions) =>
-  handleRequestError("banner", e, opts);
 
 type UseNotificationsEventListenerConfig = UseNotificationsConfig & {
   readonly destinationId: string;
@@ -329,6 +244,14 @@ export const useNotificationsEventListener = (config: UseNotificationsEventListe
     }) as EventListener;
     document.addEventListener(`notifications:${config.destinationId}:clear`, listener);
     return () => document.removeEventListener(`notifications:${config.destinationId}:clear`, listener);
+  }, []);
+
+  useEffect(() => {
+    const listener = (<K extends UIExistingNotificationId>(evt: CustomEvent<LookupAndNotifyDetail<K>>) => {
+      NotificationsHandler.lookupAndNotify(evt.detail.id, evt.detail.params);
+    }) as EventListener;
+    document.addEventListener(`notifications:${config.destinationId}:lookupAndNotify`, listener);
+    return () => document.removeEventListener(`notifications:${config.destinationId}:lookupAndNotify`, listener);
   }, []);
 
   return NotificationsHandler;

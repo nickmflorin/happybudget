@@ -39,7 +39,7 @@ const ProductsManager = ({
     api
       .getProducts()
       .then((response: Http.ListResponse<Model.Product>) => setProducts(response.data))
-      .catch((e: Error) => notifications.ui.handleBannerRequestError(e))
+      .catch((e: Error) => notifications.ui.banner.handleRequestError(e))
       .finally(() => setLoading(false));
   }, []);
 
@@ -47,7 +47,7 @@ const ProductsManager = ({
     api
       .getSubscription()
       .then((response: { subscription: Model.Subscription | null }) => setSubscription(response.subscription))
-      .catch((e: Error) => notifications.ui.handleBannerRequestError(e));
+      .catch((e: Error) => notifications.ui.banner.handleRequestError(e));
   }, []);
 
   const userProduct = useMemo(() => {

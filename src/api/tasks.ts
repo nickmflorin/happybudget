@@ -5,18 +5,12 @@ import * as Sentry from "@sentry/react";
 
 import * as api from "api";
 
-type ProvidedRequestOptions =
-  | {
-      readonly retries: number;
-    }
-  | {
-      readonly headers: { [key: string]: string };
-    };
+type ProvidedRequestOptions = {
+  readonly headers: { [key: string]: string };
+};
 
 export const isProvidedRequestConfig = <T>(arg: Parameters<Http.Service<T>>[number]): arg is ProvidedRequestOptions =>
-  typeof arg === "object" &&
-  ((arg as { readonly retries: number }).retries !== undefined ||
-    (arg as { readonly headers: { [key: string]: string } }).headers !== undefined);
+  typeof arg === "object" && (arg as { readonly headers: { [key: string]: string } }).headers !== undefined;
 
 export const request = <T>(service: Http.Service<T>, ...args: Parameters<typeof service>) =>
   call(function* (): SagaIterator {

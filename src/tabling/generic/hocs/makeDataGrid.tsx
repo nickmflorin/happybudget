@@ -6,7 +6,7 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 
 import { CellMouseOverEvent, CellFocusedEvent } from "@ag-grid-community/core";
 
-import { tabling, hooks, budgeting } from "lib";
+import { tabling, hooks, budgeting, notifications } from "lib";
 
 interface InjectedDataGridProps {
   readonly id: Table.GridId;
@@ -207,9 +207,8 @@ const DataGrid =
           if (props.hasEditColumn) {
             if (e.colDef.colId === undefined && e.colDef.field === undefined) {
               console.error(
-                `Encountered a colDef with both the 'field' and 'colId' attributes undefined, colDef=${JSON.stringify(
-                  e.colDef
-                )}`
+                "Encountered a colDef with both the 'field' and 'colId' attributes " +
+                  `undefined, colDef=${notifications.objToJson(e.colDef)}`
               );
             } else if (
               includes(

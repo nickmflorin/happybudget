@@ -35,6 +35,9 @@ declare type UINotificationOptions = {
   /* We allow the closable behavior to be provided as an option in the case that
 		 we want to apply the same behavior to several dispatched notifications. */
   readonly closable?: boolean;
+  /* If set to True, a notification will not be dispatched if it is deemed a
+	   duplicate of a notification already in state. */
+  readonly ignoreIfDuplicate?: boolean;
 };
 
 declare type AppNotification<L extends AppNotificationLevel = AppNotificationLevel> = {
@@ -62,7 +65,21 @@ declare type UIFieldNotification = {
   readonly message: string;
 };
 
-type FieldWithErrors = { readonly name: string; readonly errors: string[] };
+declare type UIExistingNotificationId = "budgetSubscriptionPermissionError";
+
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+type DefaultExistingNotificationParams = Record<string, never>;
+type ExistingNotificationParams = Record<string, unknown>;
+
+declare type UIExistingNotification<T extends ExistingNotificationParams = DefaultExistingNotificationParams> = (
+  props: T
+) => UINotificationData;
+
+declare type UIExistingNotifications = { [key in UIExistingNotificationId]: UIPresetNotification };
+
+declare type InferExistingNotificationParams<T> = T extends UIExistingNotification<infer P> ? P : never;
+
+declare type FieldWithErrors = { readonly name: string; readonly errors: string[] };
 
 declare type UINotification<L extends AppNotificationLevel = AppNotificationLevel> =
   | TableNotification<L>
@@ -75,15 +92,25 @@ declare type InternalNotification = AppNotification<"error" | "warning"> & {
 
 declare type UINotificationsHandler = {
   readonly notify: (notifications: SingleOrArray<UINotificationType>, opts?: UINotificationOptions) => UINotification[];
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  readonly lookupAndNotify: (id: UIExistingNotificationId, params: any) => UINotification[];
   readonly clearNotifications: (ids?: SingleOrArray<number>) => void;
   readonly handleRequestError: (e: Error, opts?: UINotificationOptions) => UINotification[];
   readonly notifications: UINotification[];
 };
 
 type UINonFieldNotificationType = UINotificationData | NotificationDetail;
+
 type UINotificationType = UINonFieldNotificationType | UIFieldNotification;
 
 type UINotificationStandard<N> = {
   readonly typeguard: (n: UINotificationType) => n is N;
-  readonly func: (n: N, opts?: Omit<UINotificationOptions, "behavior">) => Omit<UINotification, "id" | "remove">;
+  /* Null is returned if for whatever reason, the notification cannot be
+     standardized and must be ignored. */
+  readonly func: (n: N, opts: Omit<UINotificationOptions, "behavior">) => UINotificationData | null;
+};
+
+type UINotificationEquality<N> = {
+  readonly typeguard: (n: UINotificationType) => n is N;
+  readonly func: (n1: N, n2: N) => boolean;
 };

@@ -1,14 +1,14 @@
-import { client } from "api";
+import { client, unauthenticatedClient, tokenClient } from "api";
 import * as services from "./services";
 
 export const login = async (email: string, password: string, options?: Http.RequestOptions): Promise<Model.User> => {
   const url = services.URL.v1("auth", "login");
-  return client.post<Model.User>(url, { email, password }, options);
+  return unauthenticatedClient.post<Model.User>(url, { email, password }, options);
 };
 
 export const socialLogin = async (payload: Http.SocialPayload, options?: Http.RequestOptions): Promise<Model.User> => {
   const url = services.URL.v1("auth", "social-login");
-  return client.post<Model.User>(url, payload, options);
+  return unauthenticatedClient.post<Model.User>(url, payload, options);
 };
 
 export const logout = async (): Promise<null> => {
@@ -21,7 +21,7 @@ export const validateAuthToken = async (
   options?: Http.RequestOptions
 ): Promise<Model.User> => {
   const url = services.URL.v1("auth", "validate");
-  return client.post<Model.User>(url, payload || {}, options);
+  return tokenClient.post<Model.User>(url, payload || {}, options);
 };
 
 export const validateEmailConfirmationToken = async (
@@ -29,7 +29,7 @@ export const validateEmailConfirmationToken = async (
   options?: Http.RequestOptions
 ): Promise<Model.User> => {
   const url = services.URL.v1("auth", "validate-email-verification-token");
-  return client.post<Model.User>(url, { token }, options);
+  return unauthenticatedClient.post<Model.User>(url, { token }, options);
 };
 
 export const validatePasswordRecoveryToken = async (
@@ -37,17 +37,17 @@ export const validatePasswordRecoveryToken = async (
   options?: Http.RequestOptions
 ): Promise<Model.User> => {
   const url = services.URL.v1("auth", "validate-password-recovery-token");
-  return client.post<Model.User>(url, { token }, options);
+  return unauthenticatedClient.post<Model.User>(url, { token }, options);
 };
 
 export const verifyEmail = async (id: number, options?: Http.RequestOptions): Promise<null> => {
   const url = services.URL.v1("auth", "verify-email");
-  return client.post<null>(url, { user: id }, options);
+  return unauthenticatedClient.post<null>(url, { user: id }, options);
 };
 
 export const recoverPassword = async (email: string, options?: Http.RequestOptions): Promise<null> => {
   const url = services.URL.v1("auth", "recover-password");
-  return client.post<null>(url, { email }, options);
+  return unauthenticatedClient.post<null>(url, { email }, options);
 };
 
 export const resetPassword = async (
@@ -55,5 +55,5 @@ export const resetPassword = async (
   options?: Http.RequestOptions
 ): Promise<Model.User> => {
   const url = services.URL.v1("auth", "reset-password");
-  return client.post<Model.User>(url, payload, options);
+  return unauthenticatedClient.post<Model.User>(url, payload, options);
 };

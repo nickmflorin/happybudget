@@ -1,5 +1,6 @@
 import { useRef } from "react";
 
+import { notifications } from "lib";
 import * as hooks from "../hooks";
 
 export const InitialGridRef: Table.DataGridInstance = {
@@ -13,9 +14,9 @@ export const useDataGrid = (): NonNullRef<Table.DataGridInstance> => {
 export const InitialTableRef: Table.TableInstance<Table.RowData, Model.RowHttpModel> = {
   ...InitialGridRef,
   notifications: [],
-  notify: (notifications: SingleOrArray<UINotificationType>) => {
+  notify: () => {
     console.warn(
-      `Cannot dispatch notifications ${JSON.stringify(
+      `Cannot dispatch notifications ${notifications.objToJson(
         notifications
       )} to table because table ref has not been attached yet.`
     );
@@ -23,6 +24,7 @@ export const InitialTableRef: Table.TableInstance<Table.RowData, Model.RowHttpMo
   },
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   clearNotifications: () => {},
+  lookupAndNotify: () => [],
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   handleRequestError: () => [],
   getColumns: () => [],
