@@ -25,7 +25,8 @@ export const tokenValidationInstance = axios.create({
 });
 
 export const unauthenticatedInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_DOMAIN
+  baseURL: process.env.REACT_APP_API_DOMAIN,
+  withCredentials: true
 });
 
 /* CSRF Tokens must be included for both authenticated and unauthenticated
