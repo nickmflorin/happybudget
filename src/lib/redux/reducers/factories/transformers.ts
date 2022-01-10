@@ -1,4 +1,4 @@
-import { isNil, find, filter, includes, reduce } from "lodash";
+import { isNil, filter, includes, reduce, find } from "lodash";
 import { redux, util, notifications } from "lib";
 
 export const listResponseReducerTransformers = <M, S extends Redux.ListResponseStore<M> = Redux.ListResponseStore<M>>(
@@ -58,14 +58,10 @@ export const authenticatedModelListResponseReducerTransformers = <
     selected: [],
     responseWasReceived: false
   }),
-  removeFromState: (st: S = initialState, action: Redux.Action<ID>) => {
+  removeFromState: (st: S = initialState, action: Redux.Action<number>) => {
     if (action.isAuthenticated === true) {
-      const existing = find(st.data, { id: action.payload });
+      const existing = redux.reducers.findModelInData(action, st.data, action.payload);
       if (isNil(existing)) {
-        notifications.inconsistentStateError({
-          action: action,
-          reason: "Instance does not exist in state when it is expected to."
-        });
         return st;
       } else {
         const partial = {
@@ -84,12 +80,8 @@ export const authenticatedModelListResponseReducerTransformers = <
   },
   updateInState: (st: S = initialState, action: Redux.Action<Redux.UpdateActionPayload<M>>) => {
     if (action.isAuthenticated === true) {
-      const existing: M | undefined = find(st.data, { id: action.payload.id }) as M | undefined;
+      const existing = redux.reducers.findModelInData(action, st.data, action.payload.id);
       if (isNil(existing)) {
-        notifications.inconsistentStateError({
-          action: action,
-          reason: "Instance does not exist in state when it is expected to."
-        });
         return st;
       }
       /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -119,7 +111,7 @@ export const authenticatedModelListResponseReducerTransformers = <
       : st,
   addToState: (st: S = initialState, action: Redux.Action<M>) => {
     if (action.isAuthenticated === true) {
-      const existing = find(st.data, { id: action.payload.id });
+      const existing = redux.reducers.findModelInData(action, st.data, action.payload.id, { warnOnMissing: false });
       if (!isNil(existing)) {
         notifications.inconsistentStateError({
           action: action,

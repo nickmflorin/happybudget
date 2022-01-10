@@ -13,6 +13,10 @@ function* watchForBudgetsRefreshSaga(): SagaIterator {
   );
 }
 
+function* watchForBudgetsPermissioningRefreshSaga(): SagaIterator {
+  yield takeLatest([actions.requestPermissioningBudgetsAction.toString()], tasks.getBudgetsPermissioningTask);
+}
+
 function* watchForTemplatesRefreshSaga(): SagaIterator {
   yield takeLatest(
     [actions.requestTemplatesAction.toString(), actions.setTemplatesPaginationAction.toString()],
@@ -77,6 +81,7 @@ export const createContactsTableSaga = (table: Table.TableInstance<Tables.Contac
   });
 
 export default function* rootSaga(): SagaIterator {
+  yield spawn(watchForBudgetsPermissioningRefreshSaga);
   yield spawn(watchForTemplatesRefreshSaga);
   yield spawn(watchForSearchTemplatesSaga);
   yield spawn(watchForBudgetsRefreshSaga);

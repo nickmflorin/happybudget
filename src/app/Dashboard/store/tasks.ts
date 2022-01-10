@@ -24,6 +24,19 @@ export function* getBudgetsTask(): SagaIterator {
   }
 }
 
+export function* getBudgetsPermissioningTask(): SagaIterator {
+  yield put(actions.loadingBudgetsAction(true));
+  try {
+    const response: Http.ListResponse<Model.SimpleBudget> = yield api.request(api.getBudgets);
+    yield put(actions.responsePermissionedBudgetsAction(response));
+  } catch (e: unknown) {
+    notifications.ui.banner.handleRequestError(e as Error);
+    yield put(actions.responseBudgetsAction({ count: 0, data: [] }));
+  } finally {
+    yield put(actions.loadingBudgetsAction(false));
+  }
+}
+
 export function* getTemplatesTask(): SagaIterator {
   const query = yield select((state: Application.AuthenticatedStore) => {
     return {

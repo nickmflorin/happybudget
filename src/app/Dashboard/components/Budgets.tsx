@@ -205,6 +205,7 @@ const Budgets = (): JSX.Element => {
               .deleteBudget(budgetToDelete.id)
               .then(() => {
                 dispatch(actions.removeBudgetFromStateAction(budgetToDelete.id));
+                dispatch(actions.requestPermissioningBudgetsAction(null));
               })
               .catch((err: Error) => notifications.requestError(err))
               .finally(() => {
