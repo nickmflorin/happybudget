@@ -133,7 +133,17 @@ const Budgets = (): JSX.Element => {
                         e.closeParentDropdown?.();
                         dispatch(actions.addBudgetToStateAction(response));
                       })
-                      .catch((err: Error) => notifications.requestError(err))
+                      .catch((err: Error) => {
+                        if (
+                          err instanceof api.ClientError &&
+                          !isNil(err.permissionError) &&
+                          err.permissionError.code === "subscription_permission_error"
+                        ) {
+                          notifications.ui.banner.lookupAndNotify("budgetCountPermissionError", {});
+                        } else {
+                          notifications.ui.banner.handleRequestError(err);
+                        }
+                      })
                       .finally(() => setDuplicated(budget.id));
                   }}
                 />

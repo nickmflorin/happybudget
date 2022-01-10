@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { isNil, uniqueId } from "lodash";
 import classNames from "classnames";
 
@@ -21,6 +22,7 @@ const isNotificationComponentProps = (p: _NotificationProps): p is NoticationCom
 
 const Notification = ({ style, className, ...props }: _NotificationProps): JSX.Element => {
   const id = useMemo(() => (props.id !== undefined ? String(props.id) : uniqueId()), [props.id]);
+  const history = useHistory();
   const [linkLoading, setLinkLoading] = useState(false);
 
   const IconLevelMap: { [key in AppNotificationLevel]: IconOrElement } = useMemo(
@@ -40,11 +42,24 @@ const Notification = ({ style, className, ...props }: _NotificationProps): JSX.E
 
   const detailWithLink = useMemo(() => {
     if (!isNil(props.includeLink)) {
-      const linkObj: AppNotificationLink = props.includeLink({ setLoading: setLinkLoading });
+      const linkObj: AppNotificationLink =
+        typeof props.includeLink === "function"
+          ? props.includeLink({ setLoading: setLinkLoading, history })
+          : props.includeLink;
       return (
         <span>
           {detail !== undefined && notifications.ui.notificationDetailToString(detail)}
-          <ButtonLink loading={linkLoading} style={{ marginLeft: 6 }} onClick={() => linkObj.onClick?.()}>
+          <ButtonLink
+            loading={linkLoading}
+            style={{ marginLeft: 6 }}
+            onClick={() => {
+              if (!isNil(linkObj.to)) {
+                history.push(linkObj.to);
+              } else {
+                linkObj.onClick?.();
+              }
+            }}
+          >
             {linkObj.text}
           </ButtonLink>
         </span>
@@ -52,7 +67,7 @@ const Notification = ({ style, className, ...props }: _NotificationProps): JSX.E
     } else {
       return detail !== undefined ? notifications.ui.notificationDetailToString(detail) : undefined;
     }
-  }, [detail, props.includeLink, linkLoading]);
+  }, [detail, props.includeLink, linkLoading, history]);
 
   const level = useMemo(() => props.level || "warning", [props.level]);
   const icon = useMemo(() => IconLevelMap[level], [level]);

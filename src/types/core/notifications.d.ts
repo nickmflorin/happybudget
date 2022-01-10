@@ -5,14 +5,17 @@ declare type NotificationDetail = Error | Http.Error | string;
 
 declare type AppNotificationLink = {
   readonly text?: string;
+  readonly to?: string;
   readonly onClick?: () => void;
 };
 
 declare type IncludeLinkParams = {
   readonly setLoading: (v: boolean) => void;
+  readonly history: import("history").History<unknown>;
 };
 
-declare type IncludeLink = (p: IncludeLinkParams) => AppNotificationLink;
+declare type IncludeLinkFn = (p: IncludeLinkParams) => AppNotificationLink;
+declare type IncludeLink = IncludeLinkFn | AppNotificationLink;
 
 declare type UINotificationBehavior = "append" | "replace";
 
@@ -65,7 +68,7 @@ declare type UIFieldNotification = {
   readonly message: string;
 };
 
-declare type UIExistingNotificationId = "budgetSubscriptionPermissionError";
+declare type UIExistingNotificationId = "budgetSubscriptionPermissionError" | "budgetCountPermissionError";
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 type DefaultExistingNotificationParams = Record<string, never>;

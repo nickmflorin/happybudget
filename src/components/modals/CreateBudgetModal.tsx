@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useHistory } from "react-router-dom";
 import { isNil } from "lodash";
 
 import * as api from "api";
@@ -13,7 +12,6 @@ interface CreateBudgetModalProps extends CreateModelModalProps<Model.Budget> {
 
 const CreateBudgetModal = ({ templateId, ...props }: CreateBudgetModalProps): JSX.Element => {
   const [file, setFile] = useState<UploadedImage | null>(null);
-  const history = useHistory();
 
   return (
     <CreateModelModal<Model.Budget, Http.BudgetPayload>
@@ -26,14 +24,7 @@ const CreateBudgetModal = ({ templateId, ...props }: CreateBudgetModalProps): JS
           !isNil(e.permissionError) &&
           e.permissionError.code === "subscription_permission_error"
         ) {
-          f.notify({
-            message: "Subscription Error",
-            detail: "You are not subscribed to the correct products to create an additional budget.",
-            includeLink: () => ({
-              text: "Click here to subscribe.",
-              onClick: () => history.push("/billing")
-            })
-          });
+          f.lookupAndNotify("budgetCountPermissionError", {});
           return true;
         }
         return false;

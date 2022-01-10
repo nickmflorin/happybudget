@@ -1,7 +1,7 @@
 import { Middleware, createStore, applyMiddleware, compose, PreloadedState } from "redux";
 import createSagaMiddleware, { Saga, SagaMiddlewareOptions } from "redux-saga";
 import { routerMiddleware } from "connected-react-router";
-import { createBrowserHistory } from "history";
+import { createBrowserHistory, History } from "history";
 import * as Sentry from "@sentry/react";
 
 import { isAuthenticatedStore } from "lib/redux/typeguards";
@@ -13,7 +13,7 @@ import { createStaticAuthenticatedReducers, createStaticUnauthenticatedReducers 
 import { createAuthenticatedRootSaga, createUnauthenticatedRootSaga } from "./sagas";
 import { createAuthenticatedInitialState, createUnauthenticatedInitialState } from "./initialState";
 
-export const history = createBrowserHistory();
+export const history: History<unknown> = createBrowserHistory();
 
 type MD = Middleware<Record<string, unknown>, Application.Store>;
 
