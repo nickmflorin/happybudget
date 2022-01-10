@@ -202,7 +202,6 @@ declare namespace Model {
     readonly domain: "budget";
     readonly image: SavedImage | null;
     readonly updated_at: string;
-    readonly created_at: string;
     readonly is_permissioned: boolean;
   };
 
