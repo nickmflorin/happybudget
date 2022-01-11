@@ -37,7 +37,7 @@ const OrderingButtonIconToggle = ({ ordering, labelMap, ...props }: OrderingButt
   return (
     <DefaultButtonIconToggle
       {...props}
-      style={{ ...props.style, width: isMobile ? "auto" : "160px" }}
+      style={{ ...props.style, width: isMobile ? "auto" : "120px" }}
       icon={sortIcon}
       breakpoint={"medium"}
     >
