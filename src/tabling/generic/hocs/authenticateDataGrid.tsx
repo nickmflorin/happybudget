@@ -24,7 +24,7 @@ import {
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
-import { tabling, hooks, util, notifications } from "lib";
+import { tabling, hooks, util } from "lib";
 import { useCellNavigation, useAuthenticatedClipboard, useContextMenu, UseContextMenuParams } from "../hooks";
 
 interface InjectedAuthenticatedDataGridProps {
@@ -344,18 +344,17 @@ const authenticateDataGrid =
                 if (!isNil(col.suppressKeyboardEvent) && col.suppressKeyboardEvent(params) === true) {
                   return true;
                 } else if (params.editing && includes(["Tab"], params.event.code)) {
-                  /*
-									Our custom cell editors have built in functionality that when
-									editing is terminated via a TAB key, we move one cell to the
-									right without continuing in edit mode.  This however does not
-									work for the bland text cells, where we do not have cell editors
-									controlling the edit behavior.  So we need to suppress the TAB
-									behavior when editing, and manually move the cell over.
-									*/
+                  /* Our custom cell editors have built in functionality that
+									   when editing is terminated via a TAB key, we move one cell
+										 to the right without continuing in edit mode.  This however
+										 does not work for the bland text cells, where we do not
+										 have cell editors controlling the edit behavior.  So we need
+										 to suppress the TAB behavior when editing, and manually move
+										 the cell over. */
                   return true;
                 } else if (!params.editing && includes(["Backspace", "Delete"], params.event.code)) {
                   /* Suppress Backspace/Delete events when multiple cells are
-                   selected in a range. */
+                     selected in a range. */
                   const ranges = params.api.getCellRanges();
                   if (
                     !isNil(ranges) &&
@@ -380,12 +379,11 @@ const authenticateDataGrid =
                     return true;
                   } else {
                     /*
-                  For custom Cell Editor(s) with a Pop-Up, we do not want
-									Backspace/Delete to go into edit mode but instead want to clear
-									the values of the cells - so we prevent those key presses from
-									triggering edit mode in the Cell Editor and clear the value at
-									this level.
-                  */
+										For custom Cell Editor(s) with a Pop-Up, we do not want
+									  Backspace/Delete to go into edit mode but instead want to
+										clear the values of the cells - so we prevent those key
+										presses from triggering edit mode in the Cell Editor and
+										clear the value at this level. */
                     const row: Table.BodyRow<R> = params.node.data;
                     if (tabling.typeguards.isEditableRow(row) && col.cellEditorPopup === true) {
                       const change = getCellChangeForClear(row, col);
