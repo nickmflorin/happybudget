@@ -1,24 +1,23 @@
 import React, { useEffect } from "react";
 import { isNil } from "lodash";
+import classNames from "classnames";
 
 import { Icon } from "components";
 import { users } from "lib";
 
-import Card from "./Card";
+import Card, { CardProps } from "./Card";
 
-interface CommunityTemplateCardProps {
+type CommunityTemplateCardProps = Pick<CardProps, "disabled" | "loading" | "onClick" | "className" | "style"> & {
   template: Model.Template;
-  loading?: boolean;
   duplicating: boolean;
   hidingOrShowing: boolean;
   deleting: boolean;
   onEdit: () => void;
   onEditNameImage: () => void;
-  onClick: () => void;
   onDuplicate: (e: MenuItemModelClickEvent) => void;
   onToggleVisibility: (e: MenuItemModelClickEvent) => void;
   onDelete: (e: MenuItemModelClickEvent) => void;
-}
+};
 
 const CommunityTemplateCard = ({
   template,
@@ -28,10 +27,10 @@ const CommunityTemplateCard = ({
   hidingOrShowing,
   onToggleVisibility,
   onDuplicate,
-  onClick,
   onEditNameImage,
   onEdit,
-  onDelete
+  onDelete,
+  ...props
 }: CommunityTemplateCardProps): JSX.Element => {
   const user = users.hooks.useLoggedInUser();
 
@@ -46,8 +45,8 @@ const CommunityTemplateCard = ({
 
   return (
     <Card
-      className={"template-card"}
-      onClick={() => onClick()}
+      {...props}
+      className={classNames("template-card", props.className)}
       title={template.name}
       loading={loading}
       image={template.image}
