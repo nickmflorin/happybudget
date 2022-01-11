@@ -1,0 +1,153 @@
+
+
+.display {
+  &--none {
+    display: none !important;
+  }
+  &--inline {
+    display: inline !important;
+  }
+  &--flex {
+    display: flex !important;
+  }
+  &--block {
+    display: block !important;
+  }
+  &--inline-block {
+    display: inline-block !important;
+  }
+}
+
+.float {
+  &--left {
+    float: left !important;
+  }
+  &--right {
+    float: right !important;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.full-height {
+  height: 100%;
+}
+
+.mb {
+  &--0 {
+    margin-bottom: 0px !important;
+  }
+  &--5 {
+    margin-bottom: 5px !important;
+  }
+  &--10 {
+    margin-bottom: 10px !important;
+  }
+  &--15 {
+    margin-bottom: 15px !important;
+  }
+  &--20 {
+    margin-bottom: 20px !important;
+  }
+  &--25 {
+    margin-bottom: 25px !important;
+  }
+  &--30 {
+    margin-bottom: 30px !important;
+  }
+}
+
+.mt {
+  &--0 {
+    margin-top: 0px !important;
+  }
+  &--3 {
+    margin-top: 3rem !important;
+  }
+  &--5 {
+    margin-top: 5px !important;
+  }
+  &--10 {
+    margin-top: 10px !important;
+  }
+  &--15 {
+    margin-top: 15px !important;
+  }
+  &--20 {
+    margin-top: 20px !important;
+  }
+  &--25 {
+    margin-top: 25px !important;
+  }
+  &--30 {
+    margin-top: 30px !important;
+  }
+}
+
+.ml {
+  &--0 {
+    margin-left: 0px !important;
+  }
+  &--3 {
+    margin-left: 3px !important;
+  }
+  &--5 {
+    margin-left: 5px !important;
+  }
+  &--6 {
+    margin-left: 6px !important;
+  }
+  &--8 {
+    margin-left: 8px !important;
+  }
+  &--10 {
+    margin-left: 10px !important;
+  }
+  &--15 {
+    margin-left: 15px !important;
+  }
+  &--20 {
+    margin-left: 20px !important;
+  }
+  &--25 {
+    margin-left: 25px !important;
+  }
+  &--30 {
+    margin-left: 30px !important;
+  }
+}
+
+.mr {
+  &--0 {
+    margin-right: 0px !important;
+  }
+  &--3 {
+    margin-right: 3px !important;
+  }
+  &--5 {
+    margin-right: 5px !important;
+  }
+  &--6 {
+    margin-right: 6px !important;
+  }
+  &--8 {
+    margin-right: 8px !important;
+  }
+  &--10 {
+    margin-right: 10px !important;
+  }
+  &--15 {
+    margin-right: 15px !important;
+  }
+  &--20 {
+    margin-right: 20px !important;
+  }
+  &--25 {
+    margin-right: 25px !important;
+  }
+  &--30 {
+    margin-right: 30px !important;
+  }
+}

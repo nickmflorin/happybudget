@@ -1,37 +1,36 @@
 import React, { useEffect } from "react";
+import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { Icon } from "components";
 import { users } from "lib";
 
-import Card from "./Card";
+import Card, { CardProps } from "./Card";
+import "./TemplateCard.scss";
 
-interface TemplateCardProps {
-  template: Model.Template;
-  loading?: boolean;
-  duplicating: boolean;
-  moving: boolean;
-  deleting: boolean;
-  onEdit: () => void;
-  onEditNameImage: () => void;
-  onClick: () => void;
-  onDelete: (e: MenuItemModelClickEvent) => void;
-  onMoveToCommunity: (e: MenuItemModelClickEvent) => void;
-  onDuplicate: (e: MenuItemModelClickEvent) => void;
-}
+type TemplateCardProps = Pick<CardProps, "disabled" | "loading" | "onClick" | "className" | "style"> & {
+  readonly template: Model.Template;
+  readonly duplicating: boolean;
+  readonly moving: boolean;
+  readonly deleting: boolean;
+  readonly onEdit: () => void;
+  readonly onEditNameImage: () => void;
+  readonly onDelete: (e: MenuItemModelClickEvent) => void;
+  readonly onMoveToCommunity: (e: MenuItemModelClickEvent) => void;
+  readonly onDuplicate: (e: MenuItemModelClickEvent) => void;
+};
 
 const TemplateCard = ({
   template,
-  loading,
   duplicating,
   deleting,
   moving,
   onDuplicate,
-  onClick,
   onEditNameImage,
   onEdit,
   onDelete,
-  onMoveToCommunity
+  onMoveToCommunity,
+  ...props
 }: TemplateCardProps): JSX.Element => {
   const user = users.hooks.useLoggedInUser();
 
@@ -46,10 +45,9 @@ const TemplateCard = ({
 
   return (
     <Card
-      className={"template-card"}
-      onClick={() => onClick()}
+      {...props}
+      className={classNames("template-card", props.className)}
       title={template.name}
-      loading={loading}
       image={template.image}
       dropdown={[
         {

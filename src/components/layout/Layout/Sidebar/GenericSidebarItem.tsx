@@ -4,7 +4,8 @@ import { isNil } from "lodash";
 import classNames from "classnames";
 
 import { ui } from "lib";
-import { ShowHide, TooltipWrapper, Separator } from "components";
+import { ShowHide, Separator } from "components";
+import { TooltipWrapper } from "components/tooltips";
 
 const GenericSidebarItem = <T extends ISidebarItem>(
   props: Omit<T, "children"> & StandardComponentProps & { readonly children?: ReactNode }

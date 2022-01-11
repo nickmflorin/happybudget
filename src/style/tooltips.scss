@@ -1,29 +1,64 @@
-.ant-tooltip {
-  color: $green !important;
-  .ant-tooltip-arrow-content {
-    background-color: transparent !important;
-  }
-  .ant-tooltip-content {
-    .ant-tooltip-inner {
-      background-color: $green !important;
-      color: $white !important;
-      border-radius: 8px;
-    }
-  }
-  &.disabled {
-    color: $disabled-color !important;
-    .ant-tooltip-arrow-content {
-      background-color: $disabled-color !important;
-    }
-    .ant-tooltip-content {
-      .ant-tooltip-inner {
-        background-color: $disabled-color !important;
-        color: $text-secondary !important;
-        border-radius: 8px;
-      }
-    }
-  }
-  &.tooltip-lower {
-    padding-top: 10px;
-  }
+@mixin _include_tooltip_color(
+	$background,
+	$color,
+	$border: null,
+) {
+	$border-color: $border;
+	@if ($border-color == null) {
+		$border-color: $background;
+	}
+	.ant-tooltip-arrow-content {
+		background-color: transparent !important;
+	}
+	.ant-tooltip-content {
+		.ant-tooltip-inner {
+			border: 1px solid $border-color;
+			background-color: $background !important;
+			color: $color !important;
+		}
+	}
 }
+
+@mixin include_tooltip_color(
+	$background,
+	$color,
+	$border: null,
+	$disabled-background: $disabled-color,
+	$disabled-color: $text-secondary,
+	$disabled-border: null
+) {
+	@include _include_tooltip_color($background, $color, $border);
+
+	&.disabled {
+		@include _include_tooltip_color($disabled-background, $disabled-color, $disabled-border);
+	}
+}
+
+.ant-tooltip {
+	.ant-tooltip-content {
+		.ant-tooltip-inner {
+			border-radius: 8px;
+			font-family: $avenir;
+		}
+	}
+	&.tooltip-lower {
+		padding-top: 10px;
+	}
+}
+
+.tooltip {
+	@extend .ant-tooltip;
+
+	&--action {
+		@include include_tooltip_color($green, $white, $green);
+	}
+
+	&--info {
+		@include include_tooltip_color($white, $text-secondary, $menu-border-color);
+		.ant-tooltip-content {
+			font-weight: 500;
+			font-size: 13px;
+		}
+	}
+}
+

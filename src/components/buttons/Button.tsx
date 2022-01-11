@@ -6,7 +6,8 @@ import { ButtonProps as AntDButtonProps } from "antd/lib/button";
 import { isNil } from "lodash";
 
 import { ui } from "lib";
-import { TooltipWrapper, Spinner, ShowHide, Icon, VerticalFlexCenter } from "components";
+import { Spinner, ShowHide, Icon, VerticalFlexCenter } from "components";
+import { TooltipWrapper } from "components/tooltips";
 import { SpinnerProps } from "components/loading/Spinner";
 
 export interface ButtonProps

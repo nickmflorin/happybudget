@@ -15,3 +15,4 @@ export { default as DefaultButton } from "./DefaultButton";
 export { default as DefaultIconButton } from "./DefaultIconButton";
 export { default as DefaultButtonIconToggle } from "./DefaultButtonIconToggle";
 export { default as OrderingButtonIconToggle } from "./OrderingButtonIconToggle";
+export { default as IncludeButtonLink } from "./IncludeButtonLink";

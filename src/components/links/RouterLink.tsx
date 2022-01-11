@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { ui } from "lib";
-import { TooltipWrapper } from "components";
+import { TooltipWrapper } from "components/tooltips";
 
 export type RouterLinkProps = LinkProps & StandardComponentProps & ClickableProps;
 

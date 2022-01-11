@@ -3,20 +3,6 @@ declare type AppNotificationLevel = AppNotificationConsoleLevel | "success";
 
 declare type NotificationDetail = Error | Http.Error | string;
 
-declare type AppNotificationLink = {
-  readonly text?: string;
-  readonly to?: string;
-  readonly onClick?: () => void;
-};
-
-declare type IncludeLinkParams = {
-  readonly setLoading: (v: boolean) => void;
-  readonly history: import("history").History<unknown>;
-};
-
-declare type IncludeLinkFn = (p: IncludeLinkParams) => AppNotificationLink;
-declare type IncludeLink = IncludeLinkFn | AppNotificationLink;
-
 declare type UINotificationBehavior = "append" | "replace";
 
 declare type UINotificationOptions = {

@@ -1,91 +1,107 @@
-@import "style/_imports";
+@import 'style/_imports';
 
-.card-base {
-  border-radius: 14px;
-  position: relative;
-  height: 214px;
-  cursor: pointer;
+.card-icon {
+	color: $white !important;
+
+	svg {
+		color: $white !important;
+	}
+
+	&.dark {
+		color: #8a8a8a !important;
+		svg {
+			color: #8a8a8a !important;
+		}
+	}
 }
 
 .card {
-  @extend .card-base;
+	border-radius: 14px;
+	position: relative;
+	height: 214px;
+	cursor: pointer;
 
-  &.template-card {
-    height: 194px;
-  }
+	// The card info icon must be outside of the inner card, so that we can disable
+	// the inner card while still keeping the tooltip from the card info icon
+	// hoverable.
+	.icon--card-info {
+		@extend .card-icon;
+		position: absolute;
+		z-index: 10000;
+		top: 12px;
+		left: 12px;
+		height: 16px;
 
-  &.hidden {
-    opacity: 0.6;
-  }
+		// If there is also a hidden icon, we should move this to the right.
+		&.with-hidden {
+			left: 25px;
+		}
+	}
 
-  &.disabled {
-    opacity: 0.6;
-  }
+	.card-inner {
+		&.hidden {
+			opacity: 0.6;
+		}
 
-  .icon--hidden {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    z-index: 10000;
-  }
+		&.disabled {
+			opacity: 0.6;
+		}
 
-  .dropdown-ellipsis {
-    position: absolute;
-    top: 10px;
-    right: 5px;
-    z-index: 1000;
+		.icon--hidden {
+			@extend .card-icon;
+			top: 12px;
+			left: 12px;
+			height: 26px;
+		}
 
-    svg {
-      height: 26px !important;
-      color: $white !important;
-    }
+		.dropdown-ellipsis {
+			@extend .card-icon;
+			position: absolute;
+			z-index: 10000;
+			top: 10px;
+			right: 5px;
+		}
 
-    &.dark {
-      svg {
-        color: #8a8a8a !important;
-      }
-    }
-  }
+		.card-footer {
+			position: absolute;
+			top: 150px;
+			min-height: 44px;
+			width: 100%;
+			padding-top: 12px;
+			padding-bottom: 12px;
+			padding-left: 16px;
+			padding-right: 16px;
+			background-color: #404151;
+			color: $white;
+			border-bottom-left-radius: 14px;
+			border-bottom-right-radius: 14px;
 
-  .card-footer {
-    position: absolute;
-    top: 150px;
-    min-height: 44px;
-    width: 100%;
-    padding-top: 12px;
-    padding-bottom: 12px;
-    padding-left: 16px;
-    padding-right: 16px;
-    background-color: #404151;
-    color: $white;
-    border-bottom-left-radius: 14px;
-    border-bottom-right-radius: 14px;
+			.title {
+				font-size: 18px;
+				font-family: $roboto;
+				font-weight: 600;
+				line-height: 20px;
+				margin-bottom: 4px;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
 
-    .title {
-      font-size: 18px;
-      font-family: $roboto;
-      font-weight: 600;
-      line-height: 20px;
-      margin-bottom: 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+			.sub-title {
+				font-size: 10px;
+				font-family: $roboto;
+				font-weight: 400;
+				line-height: 16px;
+			}
 
-    .sub-title {
-      font-size: 10px;
-      font-family: $roboto;
-      font-weight: 400;
-      line-height: 16px;
-    }
+			&.title-only {
+				height: 44px;
+				top: 150px;
+			}
+		}
 
-    &.title-only {
-      height: 44px;
-      top: 150px;
-    }
-  }
-
-  &:hover {
-    filter: brightness(0.9);
-  }
+		&:hover {
+			filter: brightness(0.9);
+		}
+	}
 }

@@ -4,8 +4,6 @@ import { isNil } from "lodash";
 
 import { typeguards } from "lib";
 
-import "./EntityText.scss";
-
 export interface EntityTextProps extends StandardComponentProps {
   readonly children: Model.HttpModel;
   readonly fillEmpty?: boolean | string;

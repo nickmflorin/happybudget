@@ -43,9 +43,34 @@ declare type PropsOf<T> = T extends React.ComponentType<infer Props> ? Props : n
 
 declare type RenderFunc = () => JSX.Element;
 
-declare type Tooltip =
-  | (Omit<Partial<import("antd/lib/tooltip").TooltipPropsWithTitle>, "title"> & { readonly title: string })
-  | string;
+declare type TooltipType = "info" | "action";
+
+/* For Tooltips, the className and style will wind up being attributed to the
+   children components.  We need to use overlayClassName and overlayStyle. */
+declare type TooltipProps = Omit<
+  Partial<import("antd/lib/tooltip").TooltipPropsWithTitle>,
+  "title" | "className" | "style"
+> & {
+  readonly title: string | JSX.Element;
+  readonly includeLink?: IncludeLink;
+  readonly type?: TooltipType;
+};
+
+declare type Tooltip = string | Omit<TooltipProps, "children">;
+
+declare type LinkObj = {
+  readonly text?: string;
+  readonly to?: string;
+  readonly onClick?: () => void;
+};
+
+declare type IncludeLinkParams = {
+  readonly setLoading: (v: boolean) => void;
+  readonly history: import("history").History<unknown>;
+};
+
+declare type IncludeLinkFn = (p: IncludeLinkParams) => LinkObj;
+declare type IncludeLink = IncludeLinkFn | LinkObj;
 
 declare type ClickableIconCallbackParams = {
   readonly isHovered: boolean;

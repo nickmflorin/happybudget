@@ -1,5 +1,5 @@
-.budget-card-image-wrapper,
-.budget-card-image-placeholder {
+.card-image-wrapper,
+.card-image-placeholder {
   height: 150px;
   width: 100%;
   position: relative;
@@ -17,7 +17,7 @@
   }
 }
 
-.budget-card-image-wrapper {
+.card-image-wrapper {
   .image-tint {
     border-top-left-radius: 14px;
     border-top-right-radius: 14px;
@@ -28,7 +28,7 @@
   }
 }
 
-.budget-card-image-placeholder {
+.card-image-placeholder {
   background-color: #f9f9f9;
   svg {
     height: 40px !important;

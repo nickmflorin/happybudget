@@ -3,9 +3,9 @@ import { useHistory } from "react-router-dom";
 import { map, isNil, orderBy, reduce } from "lodash";
 import classNames from "classnames";
 
-import { TooltipWrapper } from "components";
 import { Button } from "components/buttons";
 import { DropdownMenu } from "components/dropdowns";
+import { TooltipWrapper } from "components/tooltips";
 
 import "./BreadCrumbs.scss";
 

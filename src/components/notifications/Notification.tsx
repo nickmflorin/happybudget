@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useHistory } from "react-router-dom";
 import { isNil, uniqueId } from "lodash";
 import classNames from "classnames";
 
 import { notifications } from "lib";
 import { Icon } from "components";
-import { ButtonLink, IconButton } from "components/buttons";
+import { IconButton } from "components/buttons";
+import { TextWithIncludedLink } from "components/typography";
 
 export type NotificationProps = Omit<StandardComponentProps, "id"> & {
   readonly includeIcon?: boolean;
@@ -23,7 +24,6 @@ const isNotificationComponentProps = (p: _NotificationProps): p is NoticationCom
 const Notification = ({ style, className, ...props }: _NotificationProps): JSX.Element => {
   const id = useMemo(() => (props.id !== undefined ? String(props.id) : uniqueId()), [props.id]);
   const history = useHistory();
-  const [linkLoading, setLinkLoading] = useState(false);
 
   const IconLevelMap: { [key in AppNotificationLevel]: IconOrElement } = useMemo(
     () => ({
@@ -42,32 +42,14 @@ const Notification = ({ style, className, ...props }: _NotificationProps): JSX.E
 
   const detailWithLink = useMemo(() => {
     if (!isNil(props.includeLink)) {
-      const linkObj: AppNotificationLink =
-        typeof props.includeLink === "function"
-          ? props.includeLink({ setLoading: setLinkLoading, history })
-          : props.includeLink;
       return (
-        <span>
-          {detail !== undefined && notifications.ui.notificationDetailToString(detail)}
-          <ButtonLink
-            loading={linkLoading}
-            style={{ marginLeft: 6 }}
-            onClick={() => {
-              if (!isNil(linkObj.to)) {
-                history.push(linkObj.to);
-              } else {
-                linkObj.onClick?.();
-              }
-            }}
-          >
-            {linkObj.text}
-          </ButtonLink>
-        </span>
+        <TextWithIncludedLink includeLink={props.includeLink}>
+          {detail !== undefined ? notifications.ui.notificationDetailToString(detail) : undefined}
+        </TextWithIncludedLink>
       );
-    } else {
-      return detail !== undefined ? notifications.ui.notificationDetailToString(detail) : undefined;
     }
-  }, [detail, props.includeLink, linkLoading, history]);
+    return detail !== undefined ? notifications.ui.notificationDetailToString(detail) : undefined;
+  }, [detail, props.includeLink, history]);
 
   const level = useMemo(() => props.level || "warning", [props.level]);
   const icon = useMemo(() => IconLevelMap[level], [level]);

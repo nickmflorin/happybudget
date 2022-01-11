@@ -2,7 +2,7 @@ import { Notification } from "components/notifications";
 import { DeleteModal } from "./generic";
 
 interface DeleteBudgetModalProps extends ModalProps {
-  readonly budget: Model.Budget;
+  readonly budget: Model.Budget | Model.SimpleBudget;
 }
 
 function DeleteBudgetModal({ budget, ...props }: DeleteBudgetModalProps): JSX.Element {

@@ -34,7 +34,7 @@ const Budgets = (): JSX.Element => {
   const [isDuplicating, setDuplicating, setDuplicated] = redux.hooks.useTrackModelActions([]);
 
   const [budgetToEdit, setBudgetToEdit] = useState<number | null>(null);
-  const [budgetToDelete, setBudgetToDelete] = useState<Model.Budget | null>(null);
+  const [budgetToDelete, setBudgetToDelete] = useState<Model.SimpleBudget | null>(null);
   const [createBudgetModalOpen, setCreateBudgetModalOpen] = useState(false);
   const history = useHistory();
 
@@ -115,7 +115,7 @@ const Budgets = (): JSX.Element => {
           </NoData>
         ) : (
           <div className={"dashboard-card-grid"}>
-            {map(budgets, (budget: Model.Budget, index: number) => {
+            {map(budgets, (budget: Model.SimpleBudget, index: number) => {
               return (
                 <BudgetCard
                   key={index}

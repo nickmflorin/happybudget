@@ -6,20 +6,22 @@ import classNames from "classnames";
 import { Icon, ShowHide, RenderWithSpinner } from "components";
 import { IconButton } from "components/buttons";
 import { DropdownMenu } from "components/dropdowns";
-import { BudgetCardImage } from "components/images";
+import { CardImage } from "components/images";
+import { TooltipOrTitle } from "components/tooltips";
 
 import "./Card.scss";
 
-interface CardProps extends StandardComponentProps {
+export type CardProps = StandardComponentProps & {
   readonly dropdown?: MenuItemModel[];
   readonly title: string;
   readonly subTitle?: string;
   readonly image: SavedImage | null;
   readonly loading?: boolean;
   readonly disabled?: boolean;
-  readonly onClick?: () => void;
   readonly hidden?: boolean;
-}
+  readonly info?: Tooltip;
+  readonly onClick?: () => void;
+};
 
 const Card = ({
   title,
@@ -30,12 +32,12 @@ const Card = ({
   disabled,
   image,
   hidden = false,
-  style = {},
-  className
+  info,
+  ...props
 }: CardProps): JSX.Element => {
   const [imageError, setImageError] = useState(false);
 
-  const dropdownEllipsisClassName = useMemo(() => {
+  const iconClassName = useMemo(() => {
     if (isNil(image) || imageError === true) {
       return "dark";
     }
@@ -43,36 +45,47 @@ const Card = ({
   }, [image, imageError]);
 
   return (
-    <div className={classNames("card", className, { hidden, disabled })} style={style}>
-      <RenderWithSpinner size={18} loading={loading} toggleOpacity={true}>
-        <ShowHide show={hidden}>
-          <Icon className={"icon--hidden"} icon={"eye-slash"} weight={"solid"} />
-        </ShowHide>
-        {!isNil(dropdown) && (
-          <DropdownMenu models={dropdown} placement={"bottomRight"}>
-            <IconButton
-              className={classNames("dropdown-ellipsis", dropdownEllipsisClassName)}
-              icon={<Icon icon={"ellipsis-v"} weight={"light"} />}
-            />
-          </DropdownMenu>
-        )}
-        <BudgetCardImage
-          image={image}
-          onClick={disabled ? undefined : onClick}
-          titleOnly={isNil(subTitle)}
-          onError={() => setImageError(true)}
-          onLoad={() => setImageError(false)}
-        />
-        <div
-          className={classNames("card-footer", { "title-only": isNil(subTitle) })}
-          onClick={disabled ? undefined : onClick}
-        >
-          <div className={"title"}>{title}</div>
-          <ShowHide show={!isNil(subTitle)}>
-            <div className={"sub-title truncate"}>{subTitle}</div>
+    <div {...props} className={classNames("card", props.className)}>
+      {!isNil(info) && (
+        <TooltipOrTitle type={"info"} tooltip={info}>
+          <Icon
+            className={classNames("icon--card-info", iconClassName, { "with-hidden": hidden })}
+            icon={"question-circle"}
+            weight={"solid"}
+          />
+        </TooltipOrTitle>
+      )}
+      <div className={classNames("card-inner", { hidden, disabled })}>
+        <RenderWithSpinner size={18} loading={loading} toggleOpacity={true}>
+          <ShowHide show={hidden}>
+            <Icon className={"icon--hidden"} icon={"eye-slash"} weight={"solid"} />
           </ShowHide>
-        </div>
-      </RenderWithSpinner>
+          {!isNil(dropdown) && (
+            <DropdownMenu models={dropdown} placement={"bottomRight"}>
+              <IconButton
+                className={classNames("dropdown-ellipsis", iconClassName)}
+                icon={<Icon icon={"ellipsis-v"} weight={"light"} />}
+              />
+            </DropdownMenu>
+          )}
+          <CardImage
+            image={image}
+            onClick={disabled ? undefined : onClick}
+            titleOnly={isNil(subTitle)}
+            onError={() => setImageError(true)}
+            onLoad={() => setImageError(false)}
+          />
+          <div
+            className={classNames("card-footer", { "title-only": isNil(subTitle) })}
+            onClick={disabled ? undefined : onClick}
+          >
+            <div className={"title"}>{title}</div>
+            <ShowHide show={!isNil(subTitle)}>
+              <div className={"sub-title truncate"}>{subTitle}</div>
+            </ShowHide>
+          </div>
+        </RenderWithSpinner>
+      </div>
     </div>
   );
 };

@@ -1,21 +1,20 @@
 import React, { useEffect, useMemo } from "react";
-
-import { Icon } from "components";
-import { util, users } from "lib";
-
-import Card from "./Card";
+import classNames from "classnames";
 import { isNil } from "lodash";
 
-interface BudgetCardProps {
+import { Icon } from "components";
+import { IncludeButtonLink } from "components/buttons";
+import { util, users } from "lib";
+
+import Card, { CardProps } from "./Card";
+
+type BudgetCardProps = Pick<CardProps, "disabled" | "loading" | "onClick" | "className" | "style"> & {
   readonly budget: Model.SimpleBudget;
-  readonly loading?: boolean;
-  readonly disabled: boolean;
   readonly duplicating: boolean;
   readonly onEdit: () => void;
-  readonly onClick: () => void;
   readonly onDelete: (e: MenuItemModelClickEvent) => void;
   readonly onDuplicate: (e: MenuItemModelClickEvent) => void;
-}
+};
 
 const BudgetCard = ({
   budget,
@@ -24,8 +23,8 @@ const BudgetCard = ({
   duplicating,
   onEdit,
   onDelete,
-  onClick,
-  onDuplicate
+  onDuplicate,
+  ...props
 }: BudgetCardProps): JSX.Element => {
   const user = users.hooks.useLoggedInUser();
   const tz = users.hooks.useTimezone();
@@ -48,8 +47,26 @@ const BudgetCard = ({
 
   return (
     <Card
-      className={"budget-card"}
-      onClick={() => onClick()}
+      {...props}
+      info={
+        budget.is_permissioned === true
+          ? {
+              title: (
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  {"You are not subscribed to the correct products to access this budget."}
+                  <IncludeButtonLink
+                    style={{ marginTop: 4 }}
+                    includeLink={{
+                      text: "Click here to subscribe.",
+                      to: "/billing"
+                    }}
+                  />
+                </div>
+              )
+            }
+          : undefined
+      }
+      className={classNames("budget-card", props.className)}
       title={budget.name}
       subTitle={subTitle}
       loading={loading}

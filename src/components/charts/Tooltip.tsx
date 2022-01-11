@@ -37,7 +37,7 @@ interface TooltipProps<D extends Charts.Datum = Charts.Datum> {
 
 const Tooltip = <D extends Charts.Datum = Charts.Datum>(props: TooltipProps<D>): JSX.Element => {
   return (
-    <div className={"tooltip"}>
+    <div className={"chart-tooltip"}>
       <TooltipLine
         labelPrefix={props.labelPrefix}
         valueFormatter={props.valueFormatter}
