@@ -313,16 +313,10 @@ const authenticateDataGrid =
                 return col.editable === undefined ? true : tabling.columns.isEditable<R, M>(col, params.row);
               },
               valueSetter: (params: ValueSetterParams) => {
-                /* By default, AG Grid treats Backspace clearing the cell as
-								 setting the value to undefined - but we have to set it to the
-								 null value associated with the column. */
-                if (params.newValue === undefined) {
-                  console.error(
-                    `Value setter for column ${tabling.columns.normalizedField(
-                      col
-                    )} returned an undefined value, params=${notifications.objToJson(params)}`
-                  );
-                }
+                /* By default, AG Grid treats clearing the cell via the Backspace
+								   key as setting the value to undefined - for god knows what
+									 reason.  Since we do not allow values to take on undefined,
+									 we need to set it to the nullValue of the column. */
                 if (params.newValue === undefined || params.newValue === "") {
                   params.newValue = col.nullValue;
                 }
