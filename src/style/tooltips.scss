@@ -11,6 +11,9 @@
 		background-color: transparent !important;
 	}
 	.ant-tooltip-content {
+		font-weight: 500;
+		font-size: 13px;
+
 		.ant-tooltip-inner {
 			border: 1px solid $border-color;
 			background-color: $background !important;
@@ -55,10 +58,6 @@
 
 	&--info {
 		@include include_tooltip_color($white, $text-secondary, $menu-border-color);
-		.ant-tooltip-content {
-			font-weight: 500;
-			font-size: 13px;
-		}
 	}
 }
 
