@@ -8,7 +8,7 @@ import { ui, notifications } from "lib";
 import { LoginForm } from "components/forms";
 import { ILoginFormValues } from "components/forms/LoginForm";
 
-import { TokenNotification, UnverifiedEmailNotification, UnapprovedUserNotification } from "./Notifications";
+import { TokenNotification, UnverifiedEmailNotification } from "./Notifications";
 import LandingFormContainer from "./LandingFormContainer";
 
 const Login = (): JSX.Element => {
@@ -66,9 +66,6 @@ const Login = (): JSX.Element => {
           handleTokenError(e as Http.IApiError<"auth", Http.TokenErrorCode>, tokenType);
           return true;
         }
-      } else if (e.code === api.ErrorCodes.ACCOUNT_NOT_APPROVED) {
-        form.notify(UnapprovedUserNotification({}));
-        return true;
       } else if (e.code === api.ErrorCodes.ACCOUNT_NOT_VERIFIED) {
         if (isNil(e.user_id)) {
           console.error(

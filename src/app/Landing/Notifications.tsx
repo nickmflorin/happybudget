@@ -94,14 +94,3 @@ export const UserNotOnWaitlistNotification = (): UINotificationData => ({
   detail: `Currently, this software is open to those who are on the waitlist.  Please
 	contact support if you would like more information.`
 });
-
-interface UnapprovedUserNotificationProps {
-  readonly message?: string;
-  readonly level?: AppNotificationLevel;
-}
-
-export const UnapprovedUserNotification = (props: UnapprovedUserNotificationProps): UINotificationData => ({
-  level: props.level || "warning",
-  message: props.message || "Your account has not been approved for access.",
-  detail: "Your account has been successfully verified, but has not yet been approved. Please contact support."
-});

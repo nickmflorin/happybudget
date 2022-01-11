@@ -26,7 +26,6 @@ declare namespace Http {
     | TokenErrorCode
     | "account_not_on_waitlist"
     | "account_not_verified"
-    | "account_not_approved"
     | "account_disabled"
     | "account_not_authenticated"
     | "invalid_social_token"

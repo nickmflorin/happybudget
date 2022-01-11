@@ -9,7 +9,6 @@ export const AuthErrorCodes: { [key: string]: Http.AuthErrorCode } = {
   INVALID_SOCIAL_PROVIDER: "invalid_social_provider",
   ACCOUNT_NOT_VERIFIED: "account_not_verified",
   ACCOUNT_DISABLED: "account_disabled",
-  ACCOUNT_NOT_APPROVED: "account_not_approved",
   ACCOUNT_NOT_ON_WAITLIST: "account_not_on_waitlist",
   NOT_AUTHENTICATED: "account_not_authenticated"
 };
