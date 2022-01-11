@@ -57,7 +57,7 @@
 		.dropdown-ellipsis {
 			@extend .card-icon;
 			position: absolute;
-			z-index: 10000;
+			z-index: 1000;
 			top: 10px;
 			right: 5px;
 		}
