@@ -73,21 +73,21 @@ h6 {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-}
 
-.entity-text-identifier {
-	font-family: $avenir;
-	font-weight: 600;
-	color: #b5b5b5;
-}
+	.entity-text-identifier {
+		font-family: $avenir;
+		font-weight: 600;
+		color: #b5b5b5;
+	}
 
-.entity-text-description {
-	font-family: $avenir;
-	font-weight: 600;
-	color: $text-secondary;
+	.entity-text-description {
+		font-family: $avenir;
+		font-weight: 600;
+		color: $text-secondary;
 
-	&.with-identifier {
-		margin-left: 5px;
+		&.with-identifier {
+			margin-left: 5px;
+		}
 	}
 }
 

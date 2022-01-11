@@ -9,47 +9,34 @@ export interface EntityTextProps extends StandardComponentProps {
   readonly fillEmpty?: boolean | string;
 }
 
-interface TextProps extends StandardComponentProps {
+type EntiyTextPartProps = StandardComponentProps & {
   readonly children?: string | undefined | null;
   readonly fillEmpty?: boolean | string;
-}
-
-export const EntityTextDescription = ({ className, style, ...props }: TextProps): JSX.Element => {
-  const children = useMemo(() => {
-    if (!isNil(props.children)) {
-      return props.children;
-    } else if (props.fillEmpty === false) {
-      return "";
-    } else {
-      return props.fillEmpty === true ? "----" : props.fillEmpty;
-    }
-  }, [props.children, props.fillEmpty]);
-
-  return (
-    <span className={classNames("entity-text-description", className)} style={style}>
-      {children}
-    </span>
-  );
 };
 
-export const EntityTextIdentifier = ({ className, style, ...props }: TextProps): JSX.Element => {
-  const children = useMemo(() => {
-    if (!isNil(props.children)) {
-      return props.children;
-    } else if (props.fillEmpty === false) {
+export const EntityTextPart = ({ children, fillEmpty, ...props }: EntiyTextPartProps): JSX.Element => {
+  const _children = useMemo(() => {
+    if (!isNil(children)) {
+      return children;
+    } else if (fillEmpty === false) {
       return "";
     } else {
-      return props.fillEmpty === true ? "----" : props.fillEmpty;
+      return fillEmpty === true ? "----" : fillEmpty;
     }
-  }, [props.children, props.fillEmpty]);
-  return (
-    <span className={classNames("entity-text-identifier", className)} style={style}>
-      {children}
-    </span>
-  );
+  }, [children, fillEmpty]);
+
+  return <span {...props}>{_children}</span>;
 };
 
-const EntityText: React.FC<EntityTextProps> = ({ children, className, fillEmpty, style = {} }) => {
+export const EntityTextDescription = (props: EntiyTextPartProps): JSX.Element => (
+  <EntityTextPart {...props} className={classNames("entity-text-description", props.className)} />
+);
+
+export const EntityTextIdentifier = (props: EntiyTextPartProps): JSX.Element => (
+  <EntityTextPart {...props} className={classNames("entity-text-identifier", props.className)} />
+);
+
+const EntityText: React.FC<EntityTextProps> = ({ children, fillEmpty, ...props }) => {
   const identifier = useMemo(
     () =>
       typeguards.isModelWithIdentifier(children)
@@ -65,7 +52,7 @@ const EntityText: React.FC<EntityTextProps> = ({ children, className, fillEmpty,
   );
 
   return (
-    <span className={classNames("entity-text", className)} style={style}>
+    <span {...props} className={classNames("entity-text", props.className)}>
       {(!isNil(identifier) || !isNil(fillEmpty)) && (
         <EntityTextIdentifier fillEmpty={fillEmpty}>{identifier}</EntityTextIdentifier>
       )}
