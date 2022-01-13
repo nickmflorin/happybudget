@@ -21,9 +21,17 @@ interface SignupFormProps extends FormProps<ISignupFormValues> {
   readonly onSubmit: (values: ISignupFormValues) => void;
   readonly onGoogleSuccess: (tokenId: string) => void;
   readonly onGoogleError: (error: Record<string, unknown>) => void;
+  readonly onGoogleScriptLoadFailure: (error: Record<string, unknown>) => void;
 }
 
-const SignupForm = ({ loading, onSubmit, onGoogleSuccess, onGoogleError, ...props }: SignupFormProps): JSX.Element => {
+const SignupForm = ({
+  loading,
+  onSubmit,
+  onGoogleSuccess,
+  onGoogleScriptLoadFailure,
+  onGoogleError,
+  ...props
+}: SignupFormProps): JSX.Element => {
   return (
     <Form.Form<ISignupFormValues>
       {...props}
@@ -93,6 +101,7 @@ const SignupForm = ({ loading, onSubmit, onGoogleSuccess, onGoogleError, ...prop
           provider={"google"}
           onGoogleSuccess={onGoogleSuccess}
           onGoogleError={onGoogleError}
+          onGoogleScriptLoadFailure={onGoogleScriptLoadFailure}
         />
         <div className={"alt-link-text"}>
           {"By signing up, you agree to our"}

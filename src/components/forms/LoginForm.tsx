@@ -18,6 +18,7 @@ interface LoginFormProps extends FormProps<ILoginFormValues> {
   readonly loading: boolean;
   readonly onSubmit: (values: ILoginFormValues) => void;
   readonly onGoogleSuccess: (tokenId: string) => void;
+  readonly onGoogleScriptLoadFailure: (error: Record<string, unknown>) => void;
   readonly onGoogleError: (error: Record<string, unknown>) => void;
 }
 
@@ -26,6 +27,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   onSubmit,
   onGoogleSuccess,
   onGoogleError,
+  onGoogleScriptLoadFailure,
   ...props
 }: LoginFormProps): JSX.Element => {
   return (
@@ -72,6 +74,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           provider={"google"}
           onGoogleSuccess={onGoogleSuccess}
           onGoogleError={onGoogleError}
+          onGoogleScriptLoadFailure={onGoogleScriptLoadFailure}
         />
         <div className={"switch-text"}>
           {"Don't have an account yet?"}

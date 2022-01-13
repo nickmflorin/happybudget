@@ -143,6 +143,9 @@ const Login = (): JSX.Element => {
             .catch((e: Error) => handleError(e))
             .finally(() => setLoading(false));
         }}
+        onGoogleScriptLoadFailure={(error: Record<string, unknown>) => {
+          notifications.notify({ level: "error", dispatchToSentry: true, message: notifications.objToJson(error) });
+        }}
         onGoogleError={(error: Record<string, unknown>) => {
           notifications.notify({ level: "error", dispatchToSentry: true, message: notifications.objToJson(error) });
           form.notify("There was an error authenticating with Google.");

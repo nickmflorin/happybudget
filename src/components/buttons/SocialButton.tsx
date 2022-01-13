@@ -3,11 +3,12 @@ import { isNil } from "lodash";
 import { GoogleAuthButton } from "components/buttons";
 
 interface SocialButtonProps {
-  provider: "google";
-  text: string;
-  onGoogleSuccess: (tokenId: string) => void;
+  readonly provider: "google";
+  readonly text: string;
+  readonly onGoogleSuccess: (tokenId: string) => void;
   // TODO: Come up with interface for Google structured error.
-  onGoogleError: (error: Record<string, unknown>) => void;
+  readonly onGoogleError: (error: Record<string, unknown>) => void;
+  readonly onGoogleScriptLoadFailure: (error: Record<string, unknown>) => void;
 }
 
 const isOfflineResponse = (
@@ -19,16 +20,17 @@ const isOfflineResponse = (
   );
 };
 
-const SocialButton = ({ provider, text, onGoogleSuccess, onGoogleError }: SocialButtonProps): JSX.Element => {
-  if (provider === "google") {
+const SocialButton = (props: SocialButtonProps): JSX.Element => {
+  if (props.provider === "google") {
     if (isNil(process.env.REACT_APP_GOOGLE_CLIENT_KEY)) {
+      console.warn("Cannot establish Google Login as `REACT_APP_GOOGLE_CLIENT_KEY` is not defined in environment.");
       return <></>;
     }
     return (
       <GoogleLogin
         clientId={process.env.REACT_APP_GOOGLE_CLIENT_KEY}
-        render={(props: { onClick: () => void; disabled?: boolean }) => (
-          <GoogleAuthButton text={text} onClick={props.onClick} disabled={props.disabled} />
+        render={(p: { onClick: () => void; disabled?: boolean }) => (
+          <GoogleAuthButton text={props.text} onClick={p.onClick} disabled={p.disabled} />
         )}
         onSuccess={(response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
           /* In the case that the response is GoogleLoginResponseOffline, the
@@ -38,14 +40,16 @@ const SocialButton = ({ provider, text, onGoogleSuccess, onGoogleError }: Social
           if (isOfflineResponse(response)) {
             console.error(`Received offline response with code ${response.code}.`);
           } else {
-            onGoogleSuccess(response.tokenId);
+            props.onGoogleSuccess(response.tokenId);
           }
         }}
-        onFailure={(response: Record<string, unknown>) => onGoogleError(response)}
+        onFailure={(response: Record<string, unknown>) => props.onGoogleError(response)}
+        onScriptLoadFailure={(error: Record<string, unknown>) => props.onGoogleScriptLoadFailure(error)}
         cookiePolicy={"single_host_origin"}
       />
     );
   }
+  console.warn(`Unsupported social login provider ${props.provider}.`);
   return <></>;
 };
 
