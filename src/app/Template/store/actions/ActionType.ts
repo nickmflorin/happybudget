@@ -5,7 +5,6 @@ const ActionType = {
   UpdateInState: "template.UpdateInState",
   Accounts: {
     TableChanged: "template.accounts.TableChanged",
-    Saving: "template.accounts.Saving",
     SetSearch: "template.accounts.SetSearch",
     Loading: "template.accounts.Loading",
     Response: "template.accounts.Response",
@@ -14,7 +13,6 @@ const ActionType = {
   },
   Fringes: {
     TableChanged: "template.fringes.TableChanged",
-    Saving: "template.fringes.Saving",
     Loading: "template.fringes.Loading",
     Response: "template.fringes.Response",
     Request: "template.fringes.Request",
@@ -35,7 +33,6 @@ const ActionType = {
     SubAccounts: {
       Request: "template.subaccount.subaccounts.Request",
       TableChanged: "template.subaccount.subaccounts.TableChanged",
-      Saving: "template.subaccount.subaccounts.Saving",
       SetSearch: "template.subaccount.subaccounts.SetSearch",
       Loading: "template.subaccount.subaccounts.Loading",
       Response: "template.subaccount.subaccounts.Response",
@@ -52,7 +49,6 @@ const ActionType = {
       TableChanged: "template.account.subaccounts.TableChanged",
       Loading: "template.account.subaccounts.Loading",
       Response: "template.account.subaccounts.Response",
-      Saving: "template.account.subaccounts.Saving",
       SetSearch: "template.account.subaccounts.SetSearch",
       AddToState: "template.account.subaccounts.AddToState"
     }

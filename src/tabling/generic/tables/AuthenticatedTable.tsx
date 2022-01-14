@@ -94,6 +94,7 @@ const AuthenticatedTable = <
   >
 ): JSX.Element => {
   const grid = tabling.hooks.useDataGrid();
+  const [saving, setSaving] = useState(false);
   const [selectedRows, setSelectedRows] = useState<Table.EditableRow<R>[]>([]);
   const [deleteRows, setDeleteRows] = useState<Table.EditableRow<R>[] | undefined>(undefined);
   const NotificationsHandler = notifications.ui.useNotifications({
@@ -267,6 +268,9 @@ const AuthenticatedTable = <
     return {
       ...grid.current,
       ...NotificationsHandler,
+      saving: (v: boolean) => {
+        setSaving(v);
+      },
       changeColumnVisibility: props.changeColumnVisibility,
       getColumns: () => tabling.columns.filterModelColumns(columns),
       applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R, M>>) =>
@@ -363,6 +367,7 @@ const AuthenticatedTable = <
       <React.Fragment>
         <AuthenticatedMenu<R, M>
           {...props}
+          saving={saving}
           apis={props.tableApis.get("data")}
           actions={actions}
           columns={tabling.columns.filterDataColumns(columns)}

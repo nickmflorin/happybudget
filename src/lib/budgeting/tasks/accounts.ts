@@ -157,7 +157,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       >({
         table: config.table,
         selectStore: config.selectStore,
-        loadingActions: [config.actions.saving, config.actions.loadingBudget],
+        loadingActions: [config.actions.loadingBudget],
         /*
           Note: We also have access to the updated Account from the response
           (as response.data) so we could use this to update the overall Account
@@ -181,7 +181,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
     isGroupEvent = false
   ): SagaIterator {
     if (isAuthenticatedConfig(config)) {
-      yield put(config.actions.saving(true));
+      config.table.saving(true);
       if (isGroupEvent !== true) {
         yield put(config.actions.loadingBudget(true));
       }
@@ -191,7 +191,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       } catch (err: unknown) {
         config.table.handleRequestError(err as Error, { message: errorMessage });
       } finally {
-        yield put(config.actions.saving(false));
+        config.table.saving(false);
         if (isGroupEvent !== true) {
           yield put(config.actions.loadingBudget(false));
         }
@@ -213,7 +213,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         (eff: StrictEffect | null) => eff !== null
       ) as StrictEffect[];
 
-      yield put(config.actions.saving(true));
+      config.table.saving(true);
       try {
         /*
         Note: We will have access to the updated parent and budget for each
@@ -226,7 +226,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       } catch (err: unknown) {
         config.table.handleRequestError(err as Error, { message: "There was an error updating the table rows." });
       } finally {
-        yield put(config.actions.saving(false));
+        config.table.saving(false);
       }
     }
   }
@@ -301,7 +301,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
       if (ids.length !== 0) {
         yield put(config.actions.loadingBudget(true));
-        yield put(config.actions.saving(true));
+        config.table.saving(true);
 
         const modelRowIds = filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[];
 
@@ -323,7 +323,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         } catch (err: unknown) {
           config.table.handleRequestError(err as Error, { message: "There was an error removing the table rows." });
         } finally {
-          yield put(config.actions.saving(false));
+          config.table.saving(false);
           yield put(config.actions.loadingBudget(false));
         }
       }
@@ -332,7 +332,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
 
   function* handleRowInsertEvent(e: Table.RowInsertEvent<R>, context: Tables.AccountTableContext): SagaIterator {
     if (isAuthenticatedConfig(config)) {
-      yield put(config.actions.saving(true));
+      config.table.saving(true);
       try {
         const response: C = yield api.request(config.services.create, context.budgetId, {
           previous: e.payload.previous,
@@ -358,7 +358,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         config.table.handleRequestError(err as Error, { message: "There was an error adding the table rows." });
         notifications.requestError(err as Error);
       } finally {
-        yield put(config.actions.saving(false));
+        config.table.saving(false);
       }
     }
   }
@@ -368,7 +368,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
     context: Tables.AccountTableContext
   ): SagaIterator {
     if (isAuthenticatedConfig(config)) {
-      yield put(config.actions.saving(true));
+      config.table.saving(true);
       try {
         const response: C = yield api.request(api.updateAccount, e.payload.id, {
           previous: e.payload.previous,
@@ -392,7 +392,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       } catch (err: unknown) {
         config.table.handleRequestError(err as Error, { message: "There was an error moving the table rows." });
       } finally {
-        yield put(config.actions.saving(false));
+        config.table.saving(false);
       }
     }
   }

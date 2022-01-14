@@ -19,7 +19,6 @@ const ConnectedFringesTable = connectTableToStore<
     tableChanged: actions.handleFringesTableChangeEventAction,
     loading: actions.loadingFringesAction,
     response: actions.responseFringesAction,
-    saving: actions.savingFringesTableAction,
     addModelsToState: actions.addFringeModelsToStateAction,
     setSearch: actions.setFringesSearchAction
   },

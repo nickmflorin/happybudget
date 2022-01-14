@@ -269,7 +269,6 @@ declare namespace Redux {
     C extends Table.Context = Table.Context
   > = TableActionMap<M, C> & {
     readonly tableChanged: ContextActionCreator<Table.ChangeEvent<R, M>, C>;
-    readonly saving: ActionCreator<boolean>;
     readonly addModelsToState: ActionCreator<AddModelsToTablePayload<M>>;
     readonly updateRowsInState?: ActionCreator<UpdateRowsInTablePayload<R>>;
   };
@@ -278,7 +277,6 @@ declare namespace Redux {
     readonly data: Table.BodyRow<D>[];
     readonly search: string;
     readonly loading: boolean;
-    readonly saving: boolean;
   };
 
   type AddModelsToTablePayload<M extends Model.RowHttpModel> = {

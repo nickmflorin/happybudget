@@ -24,7 +24,6 @@ const ConnectedTable = connectTableToStore<
     tableChanged: actions.accounts.handleTableChangeEventAction,
     loading: actions.accounts.loadingAction,
     response: actions.accounts.responseAction,
-    saving: actions.accounts.savingTableAction,
     addModelsToState: actions.accounts.addModelsToStateAction,
     setSearch: actions.accounts.setSearchAction
   },

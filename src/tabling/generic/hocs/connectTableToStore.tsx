@@ -12,7 +12,6 @@ type ProvidedProps<
   readonly search: string;
   readonly data: Table.BodyRow<R>[];
   readonly loading: boolean;
-  readonly saving: boolean;
   readonly table: NonNullRef<Table.TableInstance<R, M>>;
   readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
   readonly selector: (state: Application.Store) => S;
@@ -57,7 +56,6 @@ const connectTableToStore =
     }
     const selectData = (state: Application.Store) => selector(state)?.data || [];
     const selectSearch = (state: Application.Store) => selector(state)?.search || "";
-    const selectSaving = (state: Application.Store) => selector(state)?.saving || false;
     const selectLoading = (state: Application.Store) => selector(state)?.loading || false;
 
     const WithStoreConfigured = (props: T) => {
@@ -65,7 +63,6 @@ const connectTableToStore =
       const data = useSelector(selectData);
       const search = useSelector(selectSearch);
       const loading = useSelector(selectLoading);
-      const saving = useSelector(selectSaving);
       const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
 
       const [ready, setReady] = useState(false);
@@ -122,7 +119,6 @@ const connectTableToStore =
           loading={loading}
           selector={selector}
           footerRowSelectors={config.footerRowSelectors}
-          saving={saving}
           onChangeEvent={(e: Table.ChangeEvent<R, M>) => {
             if ((config.actions as Redux.AuthenticatedTableActionMap<R, M, C>).tableChanged !== undefined) {
               dispatch(

@@ -1,11 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import classNames from "classnames";
-import { isNil } from "lodash";
 
 import { Layout } from "antd";
 
-import { Icon, ShowHide, SavingChanges } from "components";
+import { Icon, ShowHide } from "components";
 import { IconButton } from "components/buttons";
 import { HelpDropdownMenu, UserDropdownMenu } from "components/dropdowns";
 import { SidebarLogo } from "components/svgs";
@@ -15,7 +14,6 @@ import "./index.scss";
 export interface HeaderProps extends StandardComponentProps {
   readonly showHeaderSidebarToggle?: boolean | undefined;
   readonly showHeaderLogo?: boolean | undefined;
-  readonly saving?: boolean;
   readonly sidebarVisible: boolean;
   readonly toggleSidebar: () => void;
 }
@@ -25,14 +23,12 @@ const Header = ({
   toggleSidebar,
   showHeaderLogo,
   showHeaderSidebarToggle,
-  saving,
   ...props
 }: HeaderProps): JSX.Element => (
   <Layout.Header
     {...props}
     className={classNames("header", props.className, {
-      "with-logo": showHeaderLogo,
-      "with-saving-changes": saving !== undefined
+      "with-logo": showHeaderLogo
     })}
   >
     <div className={"primary-header"}>
@@ -62,7 +58,7 @@ const Header = ({
       </div>
 
       <div className={"primary-header-right"}>
-        <div id={"saving-changes"}>{!isNil(saving) && <SavingChanges saving={saving} />}</div>
+        <div id={"saving-changes"}></div>
         <HelpDropdownMenu />
         <UserDropdownMenu />
       </div>

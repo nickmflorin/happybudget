@@ -14,6 +14,8 @@ export const useDataGrid = (): NonNullRef<Table.DataGridInstance> => {
 export const InitialTableRef: Table.TableInstance<Table.RowData, Model.RowHttpModel> = {
   ...InitialGridRef,
   notifications: [],
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+  saving: () => {},
   notify: () => {
     console.warn(
       `Cannot dispatch notifications ${notifications.objToJson(

@@ -85,7 +85,6 @@ export const createTableTaskSet = (
   >({
     table: config.table,
     selectStore: config.selectStore,
-    loadingActions: [config.actions.saving],
     responseActions: (r: Http.BulkModelResponse<M>, e: Table.RowAddEvent<R>) => [
       config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.data })
     ],
@@ -97,29 +96,29 @@ export const createTableTaskSet = (
     requestPayload: Http.BulkUpdatePayload<P>,
     errorMessage: string
   ): SagaIterator {
-    yield put(config.actions.saving(true));
+    config.table.saving(true);
     try {
       yield api.request(api.bulkUpdateContacts, requestPayload);
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, { message: errorMessage });
     } finally {
-      yield put(config.actions.saving(false));
+      config.table.saving(false);
     }
   }
 
   function* bulkDeleteTask(ids: number[], errorMessage: string): SagaIterator {
-    yield put(config.actions.saving(true));
+    config.table.saving(true);
     try {
       yield api.request(api.bulkDeleteContacts, ids);
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, { message: errorMessage });
     } finally {
-      yield put(config.actions.saving(false));
+      config.table.saving(false);
     }
   }
 
   function* handleRowInsertEvent(e: Table.RowInsertEvent<R>): SagaIterator {
-    yield put(config.actions.saving(true));
+    config.table.saving(true);
     try {
       const response: M = yield api.request(api.createContact, {
         previous: e.payload.previous,
@@ -137,12 +136,12 @@ export const createTableTaskSet = (
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, { message: "There was an error adding the rows." });
     } finally {
-      yield put(config.actions.saving(false));
+      config.table.saving(false);
     }
   }
 
   function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent): SagaIterator {
-    yield put(config.actions.saving(true));
+    config.table.saving(true);
     try {
       const response: M = yield api.request(api.updateContact, e.payload.id, {
         previous: e.payload.previous
@@ -159,7 +158,7 @@ export const createTableTaskSet = (
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, { message: "There was an error moving the rows." });
     } finally {
-      yield put(config.actions.saving(false));
+      config.table.saving(false);
     }
   }
 

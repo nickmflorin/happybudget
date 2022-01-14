@@ -40,7 +40,7 @@ type CreateBulkTaskConfig<
   ARGS extends any[]
 > = {
   readonly table: Table.TableInstance<R, M>;
-  readonly loadingActions: Redux.ActionCreator<boolean>[];
+  readonly loadingActions?: Redux.ActionCreator<boolean>[];
   readonly responseActions: (r: RSP, e: Table.RowAddEvent<R>) => Redux.Action[];
   readonly selectStore: (state: Application.AuthenticatedStore) => S;
   readonly bulkCreate: BulkCreate<RSP, ARGS>;
@@ -92,14 +92,20 @@ export const createBulkTask = <
         M
       >[]
     );
-    yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean>) => put(action(true))));
+    if (!isNil(config.loadingActions)) {
+      yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean>) => put(action(true))));
+    }
+    config.table.saving(true);
     try {
       const response: RSP = yield api.request(...config.bulkCreate(...args), requestPayload);
       yield all(map(config.responseActions(response, e), (action: Redux.Action) => put(action)));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, { message: errorMessage });
     } finally {
-      yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean>) => put(action(false))));
+      if (!isNil(config.loadingActions)) {
+        yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean>) => put(action(false))));
+      }
+      config.table.saving(false);
     }
   }
 

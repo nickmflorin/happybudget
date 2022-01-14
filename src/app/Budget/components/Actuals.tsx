@@ -32,7 +32,6 @@ const ConnectedActualsTable = connectTableToStore<
     tableChanged: actions.actuals.handleTableChangeEventAction,
     loading: actions.actuals.loadingAction,
     response: actions.actuals.responseAction,
-    saving: actions.actuals.savingTableAction,
     addModelsToState: actions.actuals.addModelsToStateAction,
     setSearch: actions.actuals.setSearchAction
   },

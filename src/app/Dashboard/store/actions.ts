@@ -38,7 +38,6 @@ export const ActionType = {
   },
   Contacts: {
     TableChanged: "dashboard.contacts.TableChanged",
-    Saving: "dashboard.contacts.Saving",
     Request: "dashboard.contacts.Request",
     Loading: "dashboard.contacts.Loading",
     Response: "dashboard.contacts.Response",
@@ -123,7 +122,6 @@ export const handleContactsTableChangeEventAction = redux.actions.createContextA
   Tables.ContactTableContext
 >(ActionType.Contacts.TableChanged);
 
-export const savingContactsTableAction = redux.actions.createAction<boolean>(ActionType.Contacts.Saving);
 export const setContactsSearchAction = redux.actions.createContextAction<string, Tables.ContactTableContext>(
   ActionType.Contacts.SetSearch
 );

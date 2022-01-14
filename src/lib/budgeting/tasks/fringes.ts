@@ -102,7 +102,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   >({
     table: config.table,
     selectStore: selectTableStore,
-    loadingActions: [config.actions.saving, config.actions.loadingBudget],
+    loadingActions: [config.actions.loadingBudget],
     responseActions: (r: Http.BulkResponse<B, M>, e: Table.RowAddEvent<R>) => [
       config.actions.updateBudgetInState({ id: r.data.id, data: r.data }),
       config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children })
@@ -116,7 +116,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     context: Tables.FringeTableContext,
     errorMessage: string
   ): SagaIterator {
-    yield put(config.actions.saving(true));
+    config.table.saving(true);
     if (!tabling.typeguards.isGroupEvent(e)) {
       yield put(config.actions.loadingBudget(true));
     }
@@ -183,12 +183,12 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       if (!tabling.typeguards.isGroupEvent(e)) {
         yield put(config.actions.loadingBudget(false));
       }
-      yield put(config.actions.saving(false));
+      config.table.saving(false);
     }
   }
 
   function* bulkDeleteTask(budgetId: number, ids: number[], errorMessage: string): SagaIterator {
-    yield put(config.actions.saving(true));
+    config.table.saving(true);
     yield put(config.actions.loadingBudget(true));
     try {
       const response: Http.BulkDeleteResponse<B> = yield api.request(config.services.bulkDelete, budgetId, ids);
@@ -196,13 +196,13 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, { message: errorMessage });
     } finally {
-      yield put(config.actions.saving(false));
+      config.table.saving(false);
       yield put(config.actions.loadingBudget(false));
     }
   }
 
   function* handleRowInsertEvent(e: Table.RowInsertEvent<R>, context: Tables.FringeTableContext): SagaIterator {
-    yield put(config.actions.saving(true));
+    config.table.saving(true);
     try {
       const response: M = yield api.request(config.services.create, context.budgetId, {
         previous: e.payload.previous,
@@ -220,7 +220,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, { message: "There was an error adding the table rows." });
     } finally {
-      yield put(config.actions.saving(false));
+      config.table.saving(false);
     }
   }
 
@@ -228,7 +228,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     e: Table.RowPositionChangedEvent,
     context: Tables.FringeTableContext
   ): SagaIterator {
-    yield put(config.actions.saving(true));
+    config.table.saving(true);
     try {
       const response: M = yield api.request(api.updateFringe, e.payload.id, {
         previous: e.payload.previous
@@ -245,7 +245,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, { message: "There was an error moving the table rows." });
     } finally {
-      yield put(config.actions.saving(false));
+      config.table.saving(false);
     }
   }
 

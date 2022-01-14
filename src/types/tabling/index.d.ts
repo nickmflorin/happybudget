@@ -1000,6 +1000,7 @@ declare namespace Table {
 
   type TableInstance<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = DataGridInstance &
     UINotificationsHandler & {
+      readonly saving: (v: boolean) => void;
       readonly getColumns: () => ModelColumn<R, M>[];
       readonly getFocusedRow: () => BodyRow<R> | null;
       readonly getRow: (id: BodyRowId) => BodyRow<R> | null;

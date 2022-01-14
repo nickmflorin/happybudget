@@ -120,6 +120,8 @@ const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpMo
     props.table,
     () => ({
       ...grid.current,
+      /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+      saving: () => {},
       notify: () => [],
       lookupAndNotify: () => [],
       /* eslint-disable-next-line @typescript-eslint/no-empty-function */

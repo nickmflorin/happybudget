@@ -552,8 +552,6 @@ export const createAuthenticatedTableReducer = <
     const newState = generic(state, action);
     if (action.type === config.actions.tableChanged.toString()) {
       return tableEventReducer(newState, action);
-    } else if (action.type === config.actions.saving.toString()) {
-      return { ...newState, saving: action.payload };
     } else if (action.type === config.actions.addModelsToState.toString()) {
       const payload: Redux.AddModelsToTablePayload<M> = action.payload;
       return reduce(

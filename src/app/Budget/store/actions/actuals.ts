@@ -17,7 +17,6 @@ export const handleTableChangeEventAction = redux.actions.createContextAction<
 export const updateRowsInStateAction = redux.actions.createAction<Redux.UpdateRowsInTablePayload<Tables.ActualRowData>>(
   ActionType.Actuals.UpdateRowsInState
 );
-export const savingTableAction = redux.actions.createAction<boolean>(ActionType.Actuals.Saving);
 export const requestAction = redux.actions.createContextAction<Redux.TableRequestPayload, Tables.ActualTableContext>(
   ActionType.Actuals.Request
 );

@@ -1,6 +1,6 @@
 @import "style/_imports";
 
-@mixin primary_header_layout($include_logo: false, $include_saving_changes: false) {
+@mixin primary_header_layout($include_logo: false) {
   .primary-header {
     .primary-header-left {
       @if $include_logo {
@@ -25,32 +25,15 @@
       @if $include_logo {
         flex: 1;
       }
-      @if $include_saving_changes {
-        .saving-changes {
-          display: flex;
-        }
-        // If we are including the logo in the header, the saving-changes component
-        // takes up too much space so we must hide.
-        @if $include_logo {
-          .saving-changes {
-            display: none;
-          }
-        }
-      }
     }
   }
 }
 
 .header {
-  @include primary_header_layout(false, false);
-  &.with-saving-changes {
-    @include primary_header_layout(false, true);
-  }
+  @include primary_header_layout(false);
+
   &.with-logo {
     @include primary_header_layout(true);
-    &.with-saving-changes {
-      @include primary_header_layout(true, true);
-    }
   }
 
   .primary-header {

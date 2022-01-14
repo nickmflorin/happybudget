@@ -103,7 +103,6 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
   >({
     table: config.table,
     selectStore: config.selectStore,
-    loadingActions: [config.actions.saving],
     responseActions: (r: Http.BulkResponse<Model.Budget, M>, e: Table.RowAddEvent<R>) => [
       config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children }),
       config.actions.updateBudgetInState({ id: r.data.id, data: r.data })
@@ -117,7 +116,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     requestPayload: Http.BulkUpdatePayload<P>,
     errorMessage: string
   ): SagaIterator {
-    yield put(config.actions.saving(true));
+    config.table.saving(true);
     try {
       const r: Http.BulkResponse<Model.Budget, M> = yield api.request(
         api.bulkUpdateBudgetActuals,
@@ -128,19 +127,19 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, { message: errorMessage });
     } finally {
-      yield put(config.actions.saving(false));
+      config.table.saving(false);
     }
   }
 
   function* bulkDeleteTask(budgetId: number, ids: number[], errorMessage: string): SagaIterator {
-    yield put(config.actions.saving(true));
+    config.table.saving(true);
     try {
       const r: Http.BulkDeleteResponse<Model.Budget> = yield api.request(api.bulkDeleteBudgetActuals, budgetId, ids);
       yield put(config.actions.updateBudgetInState({ id: r.data.id, data: r.data }));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, { message: errorMessage });
     } finally {
-      yield put(config.actions.saving(false));
+      config.table.saving(false);
     }
   }
 
@@ -148,7 +147,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     e: Table.RowPositionChangedEvent,
     context: Tables.ActualTableContext
   ): SagaIterator {
-    yield put(config.actions.saving(true));
+    config.table.saving(true);
     try {
       const response: M = yield api.request(api.updateActual, e.payload.id, {
         previous: e.payload.previous
@@ -165,12 +164,12 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, { message: "There was an error moving the table rows." });
     } finally {
-      yield put(config.actions.saving(false));
+      config.table.saving(false);
     }
   }
 
   function* handleRowInsertEvent(e: Table.RowInsertEvent<R>, context: Tables.ActualTableContext): SagaIterator {
-    yield put(config.actions.saving(true));
+    config.table.saving(true);
     try {
       const response: M = yield api.request(api.createActual, context.budgetId, {
         previous: e.payload.previous,
@@ -188,7 +187,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, { message: "There was an error adding the table rows." });
     } finally {
-      yield put(config.actions.saving(false));
+      config.table.saving(false);
     }
   }
 

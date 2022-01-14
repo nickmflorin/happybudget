@@ -38,7 +38,6 @@ const ActionMap = {
   tableChanged: actions.handleTableChangeEventAction,
   loading: actions.loadingAction,
   response: actions.responseAction,
-  saving: actions.savingTableAction,
   addModelsToState: actions.addModelsToStateAction,
   loadingBudget: loadingBudgetAction,
   updateBudgetInState: updateBudgetInStateAction,

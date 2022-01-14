@@ -6,7 +6,6 @@ export const handleTableChangeEventAction = redux.actions.createContextAction<
   Tables.AccountTableContext
 >(ActionType.Accounts.TableChanged);
 
-export const savingTableAction = redux.actions.createAction<boolean>(ActionType.Accounts.Saving);
 export const requestAction = redux.actions.createContextAction<Redux.TableRequestPayload, Tables.AccountTableContext>(
   ActionType.Accounts.Request
 );

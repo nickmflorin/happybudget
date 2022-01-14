@@ -97,7 +97,6 @@ const genericReducer = combineReducers({
           loading: actions.account.loadingAction,
           response: actions.account.responseAction,
           responseSubAccountUnits: actions.responseSubAccountUnitsAction,
-          saving: actions.account.savingTableAction,
           addModelsToState: actions.account.addModelsToStateAction,
           updateRowsInState: actions.account.updateRowsInStateAction,
           setSearch: actions.account.setSearchAction
@@ -113,7 +112,6 @@ const genericReducer = combineReducers({
             tableChanged: actions.handleFringesTableChangeEventAction,
             loading: actions.loadingFringesAction,
             response: actions.responseFringesAction,
-            saving: actions.savingFringesTableAction,
             addModelsToState: actions.addFringeModelsToStateAction,
             setSearch: actions.setFringesSearchAction
           }
@@ -134,7 +132,6 @@ const genericReducer = combineReducers({
       tableChanged: actions.accounts.handleTableChangeEventAction,
       loading: actions.accounts.loadingAction,
       response: actions.accounts.responseAction,
-      saving: actions.accounts.savingTableAction,
       addModelsToState: actions.accounts.addModelsToStateAction,
       setSearch: actions.accounts.setSearchAction
     },
@@ -162,7 +159,6 @@ const genericReducer = combineReducers({
           responseSubAccountUnits: actions.responseSubAccountUnitsAction,
           loading: actions.subAccount.loadingAction,
           response: actions.subAccount.responseAction,
-          saving: actions.subAccount.savingTableAction,
           addModelsToState: actions.subAccount.addModelsToStateAction,
           updateRowsInState: actions.subAccount.updateRowsInStateAction,
           setSearch: actions.subAccount.setSearchAction
@@ -178,7 +174,6 @@ const genericReducer = combineReducers({
             tableChanged: actions.handleFringesTableChangeEventAction,
             loading: actions.loadingFringesAction,
             response: actions.responseFringesAction,
-            saving: actions.savingFringesTableAction,
             addModelsToState: actions.addFringeModelsToStateAction,
             setSearch: actions.setFringesSearchAction
           }
@@ -193,7 +188,6 @@ const genericReducer = combineReducers({
       tableChanged: actions.actuals.handleTableChangeEventAction,
       loading: actions.actuals.loadingAction,
       response: actions.actuals.responseAction,
-      saving: actions.actuals.savingTableAction,
       addModelsToState: actions.actuals.addModelsToStateAction,
       setSearch: actions.actuals.setSearchAction,
       responseActualTypes: actions.actuals.responseActualTypesAction,

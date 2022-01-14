@@ -21,7 +21,6 @@ const ActionType = {
   },
   Fringes: {
     TableChanged: "budget.fringes.TableChanged",
-    Saving: "budget.fringes.Saving",
     Loading: "budget.fringes.Loading",
     Request: "budget.fringes.Request",
     Response: "budget.fringes.Response",
@@ -39,7 +38,6 @@ const ActionType = {
   },
   Accounts: {
     TableChanged: "budget.accounts.TableChanged",
-    Saving: "budget.accounts.Saving",
     SetSearch: "budget.accounts.SetSearch",
     Loading: "budget.accounts.Loading",
     Response: "budget.accounts.Response",
@@ -54,7 +52,6 @@ const ActionType = {
     SubAccounts: {
       Request: "budget.subaccount.subaccounts.Request",
       TableChanged: "budget.subaccount.subaccounts.TableChanged",
-      Saving: "budget.subaccount.subaccounts.Saving",
       SetSearch: "budget.subaccount.subaccounts.SetSearch",
       Loading: "budget.subaccount.subaccounts.Loading",
       Response: "budget.subaccount.subaccounts.Response",
@@ -70,7 +67,6 @@ const ActionType = {
     SubAccounts: {
       Request: "budget.account.subaccounts.Request",
       TableChanged: "budget.account.subaccounts.TableChanged",
-      Saving: "budget.account.subaccounts.Saving",
       Loading: "budget.account.subaccounts.Loading",
       Response: "budget.account.subaccounts.Response",
       SetSearch: "budget.account.subaccounts.SetSearch",
@@ -85,7 +81,6 @@ const ActionType = {
   },
   Actuals: {
     TableChanged: "budget.actuals.TableChanged",
-    Saving: "budget.actuals.Saving",
     Loading: "budget.actuals.Loading",
     SetSearch: "budget.actuals.SetSearch",
     Response: "budget.actuals.Response",

@@ -16,7 +16,6 @@ export const handleTableChangeEventAction = redux.actions.createContextAction<
   Tables.SubAccountTableContext
 >(ActionType.SubAccount.SubAccounts.TableChanged);
 
-export const savingTableAction = redux.actions.createAction<boolean>(ActionType.SubAccount.SubAccounts.Saving);
 export const loadingAction = redux.actions.createAction<boolean>(ActionType.SubAccount.SubAccounts.Loading);
 
 export const requestAction = redux.actions.createContextAction<
