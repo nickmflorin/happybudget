@@ -1,4 +1,4 @@
-import { forEach, findIndex, find, isNil, reduce } from "lodash";
+import { findIndex, find, isNil, reduce } from "lodash";
 import { sumChars } from "./string";
 
 export * as colors from "./colors";
@@ -53,21 +53,6 @@ export const generateRandomNumericId = (): number => {
 
 export const sumArray = (values: number[]): number => {
   return reduce(values, (sum: number, val: number) => sum + val, 0);
-};
-
-/**
- * Merges an object with a default object by looking at the keys of the
- * default object and merging the value if and only if the key did not exist
- * in the original object.
- */
-export const mergeWithDefaults = <T extends Record<string, unknown>>(obj: Partial<T>, defaults: T): T => {
-  let merged = { ...obj };
-  forEach(defaults, (value: T[keyof T], key: string) => {
-    if (!Object.prototype.hasOwnProperty.call(obj, key)) {
-      merged = { ...merged, [key]: value };
-    }
-  });
-  return merged as T;
 };
 
 export const getKeyValue =

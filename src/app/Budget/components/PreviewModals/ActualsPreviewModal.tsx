@@ -22,7 +22,7 @@ const ActualColumns = filter(
 
 const DEFAULT_OPTIONS: ExportActualsPdfFormOptions = {
   excludeZeroTotals: false,
-  date: util.dates.toDisplayDate(Date()) as string,
+  date: util.dates.toDisplayDate() as string,
   columns: filter(
     map(ActualColumns, (column: C) => tabling.columns.normalizedField<R, M>(column)),
     (field: string | undefined) => !isNil(field)

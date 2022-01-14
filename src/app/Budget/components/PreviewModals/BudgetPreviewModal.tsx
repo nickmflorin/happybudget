@@ -25,7 +25,7 @@ const SubAccountColumns = filter(
 ) as C[];
 
 const DEFAULT_OPTIONS: ExportBudgetPdfFormOptions = {
-  date: util.dates.toDisplayDate(Date()) as string,
+  date: util.dates.toDisplayDate() as string,
   excludeZeroTotals: false,
   header: {
     header: `<h2>Sample Budget ${new Date().getFullYear()}</h2><p>Cost Summary</p>`,
