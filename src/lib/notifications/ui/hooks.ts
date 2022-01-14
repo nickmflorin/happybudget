@@ -179,12 +179,12 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
   const handleRequestError = useMemo(
     () => (e: Error, opts?: UINotificationOptions) => {
       if (!axios.isCancel(e) && !(e instanceof api.ForceLogout)) {
-        /* Dispatch the notification to the internal handler so we can, if
-           appropriate, send notifications to Sentry or the console. */
-        internal.requestError(e);
         if (e instanceof api.ClientError) {
           return notify(e.errors, { message: "There was a problem with your request.", ...opts });
         } else if (e instanceof api.NetworkError || e instanceof api.ServerError) {
+          /* Dispatch the notification to the internal handler so we can, if
+           appropriate, send notifications to Sentry or the console. */
+          internal.requestError(e);
           return notify(e, {
             message: "There was an error with your request.",
             detail: "There was a problem communicating with the server.",

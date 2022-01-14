@@ -68,6 +68,11 @@ type ErrorStandard<T extends Http.Error> = {
 const ErrorStandards: ErrorStandard<any>[] = [
   {
     typeguard: typeguards.isFieldError,
+    filter: (e: Http.FieldError) => e.code === FieldErrorCodes.UNIQUE && e.field === "email",
+    func: (e: Http.FieldError) => ({ ...e, message: "A user already exists with the provided email." })
+  },
+  {
+    typeguard: typeguards.isFieldError,
     code: FieldErrorCodes.UNIQUE,
     func: (e: Http.FieldError) => ({ ...e, message: `The field ${e.field} must be unique.` })
   },
