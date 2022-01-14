@@ -59,5 +59,9 @@
 	&--info {
 		@include include_tooltip_color($white, $text-secondary, $menu-border-color);
 	}
+
+	&--entity {
+		@include include_tooltip_color($white, $text-secondary, $menu-border-color);
+	}
 }
 

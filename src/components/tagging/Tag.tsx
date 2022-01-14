@@ -4,37 +4,60 @@ import { isNil } from "lodash";
 
 import { DEFAULT_COLOR_SCHEME, Colors } from "style/constants";
 import { typeguards, util, tabling } from "lib";
+import { TooltipWrapper } from "components/tooltips";
 
-const TagRenderer = <S extends React.CSSProperties | Pdf.Style = React.CSSProperties>(
-  params: ITagRenderParams<S>
-): JSX.Element => {
-  const { contentRender, ...rest } = params;
-
+const TagRenderer = <S extends React.CSSProperties | Pdf.Style = React.CSSProperties>({
+  textColor,
+  color,
+  uppercase,
+  fillWidth,
+  disabled,
+  contentRender,
+  textClassName,
+  textStyle,
+  text,
+  ...params
+}: ITagRenderParams<S>): JSX.Element => {
   const style = useMemo(() => {
-    const st = { ...params.style, color: params.textColor };
-    if (params.color !== null) {
-      return { ...st, backgroundColor: params.color };
+    const st = { ...params.style, color: textColor };
+    if (color !== null) {
+      return { ...st, backgroundColor: color };
     }
     return st;
-  }, [params.style, params.color, params.textColor]);
+  }, [params.style, color, textColor]);
 
   return (
     <div
+      /* We must destruct the known props and spread the unknown props that are
+         passed directly into the div because AntD's Tooltip component expects
+				 that the child components excepts mouse related event handlers (like
+         onMouseEnter, onMouseLeave, etc.). */
+      {...params}
       className={classNames(
         "tag",
-        { uppercase: params.uppercase },
-        { "fill-width": params.fillWidth },
-        { disabled: params.disabled },
+        { uppercase },
+        { "fill-width": fillWidth },
+        { disabled: disabled },
         params.className
       )}
       style={style as React.CSSProperties}
-      onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => !params.disabled && params.onClick?.(e)}
+      onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => !disabled && params.onClick?.(e)}
     >
       {!isNil(contentRender) ? (
-        contentRender(rest)
+        contentRender({
+          textColor,
+          color,
+          uppercase,
+          fillWidth,
+          disabled,
+          textClassName,
+          textStyle,
+          text,
+          ...params
+        })
       ) : (
-        <span className={params.textClassName} style={params.textStyle as React.CSSProperties}>
-          {params.text}
+        <span className={textClassName} style={textStyle as React.CSSProperties}>
+          {text}
         </span>
       )}
     </div>
@@ -188,9 +211,13 @@ const Tag = <M extends Model.Model = Model.Model, S extends React.CSSProperties 
   ]);
 
   if (!isNil(props.render)) {
-    return props.render(renderParams);
+    return <TooltipWrapper tooltip={props.tooltip}>{props.render(renderParams)}</TooltipWrapper>;
   }
-  return <TagRenderer<S> {...renderParams} />;
+  return (
+    <TooltipWrapper tooltip={props.tooltip}>
+      <TagRenderer<S> {...renderParams} />
+    </TooltipWrapper>
+  );
 };
 
 type MemoizedTagType = {

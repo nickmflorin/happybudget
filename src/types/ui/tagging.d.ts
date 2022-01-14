@@ -46,6 +46,7 @@ declare type TagProps<
   readonly pluralText?: string | null;
   readonly textColor?: Style.HexColor;
   readonly color?: Style.HexColor | null;
+  readonly tooltip?: Tooltip;
   readonly model?: M | null;
   readonly isPlural?: boolean;
   readonly modelTextField?: keyof M;

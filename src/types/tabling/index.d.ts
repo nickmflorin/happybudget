@@ -1013,7 +1013,7 @@ declare namespace Table {
   type MenuActionObj = {
     readonly index?: number;
     readonly icon: IconOrElement;
-    readonly tooltip?: Tooltip;
+    readonly tooltip?: DeterministicTooltip;
     readonly disabled?: boolean;
     readonly label?: string;
     readonly isWriteOnly?: boolean;

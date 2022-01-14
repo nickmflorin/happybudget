@@ -7,7 +7,9 @@ interface TooltipOrTitleProps extends Omit<TooltipProps, "title"> {
 }
 
 const TooltipOrTitle = ({ tooltip, children, ...props }: TooltipOrTitleProps): JSX.Element => {
-  if (typeof tooltip === "string") {
+  if (typeof tooltip === "function") {
+    return tooltip({ children });
+  } else if (typeof tooltip === "string") {
     return (
       <Tooltip {...props} title={tooltip}>
         {children}

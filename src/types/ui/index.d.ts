@@ -56,7 +56,9 @@ declare type TooltipProps = Omit<
   readonly type?: TooltipType;
 };
 
-declare type Tooltip = string | Omit<TooltipProps, "children">;
+declare type DeterministicTooltip = string | Omit<TooltipProps, "children">;
+
+declare type Tooltip = DeterministicTooltip | RenderPropChild<{ children: import("react").ReactNode }>;
 
 declare type LinkObj = {
   readonly text?: string;

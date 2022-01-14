@@ -1,8 +1,9 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { isNil } from "lodash";
 
 import { Cell } from "tabling/generic/framework/cells";
 import { Tag } from "components/tagging";
+import { EntityTooltip } from "components/tooltips";
 
 type ActualOwnerCellProps = Table.CellProps<
   Tables.ActualRowData,
@@ -14,7 +15,15 @@ type ActualOwnerCellProps = Table.CellProps<
 const ActualOwnerCell = ({ value, ...props }: ActualOwnerCellProps): JSX.Element => {
   return (
     <Cell {...props}>
-      {!isNil(value) && <Tag className={"tag--account"} text={value.description || value.identifier} />}
+      {!isNil(value) && (
+        <Tag
+          className={"tag--account"}
+          tooltip={({ children }: { readonly children: ReactNode }) => (
+            <EntityTooltip entity={value}>{children}</EntityTooltip>
+          )}
+          text={value.description || value.identifier}
+        />
+      )}
     </Cell>
   );
 };
