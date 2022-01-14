@@ -7,7 +7,7 @@
 
 ## Getting Started
 
-#### Step 1: Repository
+### Step 1: Repository
 
 Clone this repository locally and `cd` into the directory.
 
@@ -15,9 +15,9 @@ Clone this repository locally and `cd` into the directory.
 $ git clone https://github.com/Saturation-IO/greenbudget-frontend.git
 ```
 
-#### Step 2: Environment
+### Step 2: Environment
 
-##### Node Version
+#### Node Version
 
 Install [`nvm`](https://github.com/nvm-sh/nvm) first. This will
 allow you to manage your Node version on a project basis.
@@ -48,7 +48,7 @@ Next, we need to install `yarn`:
 npm install --global yarn
 ```
 
-##### Dependencies
+#### Dependencies
 
 Now we need to setup the dependencies. We use [`yarn`](https://yarnpkg.com/)
 as a package management system. This should be included as a part of the
@@ -62,19 +62,54 @@ $ yarn install
 
 This will install the project dependencies in the `package.json` file.
 
-##### ENV File
+#### ENV File
 
 Finally, we need to create and edit a `.env.local` file in the project root to
 include the configuration that the frontend application relies on. This
-file is not version tracked, and contains some sensitive information.  As such,
-you will need to request the configuration parameters outside the ones shown below 
-from a team member.
+file is not version tracked, and contains some sensitive information.
 
-At a bare minimum, the `.env.local` file must contain the following configuration:
+For the configuration parameters that are sensitive, you will need to request the
+configuration from a team member when setting up.
+
+For the non-sensitive configuration, you can reference the `base_env` file in the
+project root for the configuration you will need to start the app locally:
+
+```
+REACT_APP_API_DOMAIN=http://local.greenbudget.io:8000
+REACT_APP_DOMAIN=http://local.greenbudget.io:3000
+REACT_APP_PRODUCTION_ENV=local
+```
+
+Note that these 3 parameters are the only configuration parameters that are required
+to start the application - however, the other sensitive configuration parameters are
+needed to authenticate our licenses for things like AG Grid and FontAwesome - so the
+application will not behave as expected until those configurations are present in
+the `.env.local` file.
+
+##### FontAwesome Caveat
+
+For whatever reason, the geniuses at FontAwesome decided that the only way to authenticate
+your license is to include the authentication token in your OS's environment.  This means
+that storing the token in your `.env.local` file will not authenticate our FontAwesome
+license.
+
+To do this, simply edit your `~/.zshrc` (or `~/.bash_profile`, or whatever your default shell
+profile is):
 
 ```bash
-REACT_APP_API_DOMAIN=http://local.greenbudget.io:8000
-REACT_APP_PRODUCTION_ENV=local
+$ nano ~/.zshrc
+```
+
+Then, simply add the line:
+
+```bash
+export FONTAWESOME_NPM_AUTH_TOKEN=37B2CABC-2FBC-4340-B5BD-0375475CF95D
+```
+
+Source your shell profile and then the FontAwesome token should be available to the application.
+
+```bash
+$ . ~/.zshrc
 ```
 
 ## Development
