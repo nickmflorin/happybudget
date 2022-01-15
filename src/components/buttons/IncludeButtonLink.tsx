@@ -4,12 +4,14 @@ import { isNil } from "lodash";
 
 import ButtonLink from "./ButtonLink";
 
-const IncludeButtonLink = (props: StandardComponentProps & { readonly includeLink: IncludeLink }): JSX.Element => {
+const IncludeButtonLink = ({
+  includeLink,
+  ...props
+}: StandardComponentProps & { readonly includeLink: IncludeLink }): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const history = useHistory();
 
-  const linkObj: LinkObj =
-    typeof props.includeLink === "function" ? props.includeLink({ setLoading, history }) : props.includeLink;
+  const linkObj: LinkObj = typeof includeLink === "function" ? includeLink({ setLoading, history }) : includeLink;
   return (
     <ButtonLink
       {...props}
