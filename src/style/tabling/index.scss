@@ -293,6 +293,20 @@
 				border-bottom: none !important;
 			}
 
+			.ag-center-cols-container {
+				.row--group {
+					> .cell {
+						// We have to make sure to do this only inside of .ag-center-colors-container
+						// because we need to not apply this to the .ag-cell-range-right of
+						// the pinned columns container on the left.
+						&:last-child {
+							border-bottom-right-radius: 8px;
+							border-top-right-radius: 8px;
+						}
+					}
+				}
+			}
+
 			.row {
 				> .cell {
 					.icon-wrapper {
@@ -372,14 +386,12 @@
 						border: none !important;
 						background-color: inherit !important;
 
+						// Note: We cannot simply do &:first-child because the first child
+						// will be different between the pinned cols container and the
+						// center cols container.
 						&[aria-colindex='1'] {
 							border-bottom-left-radius: 8px;
 							border-top-left-radius: 8px;
-						}
-
-						&.ag-cell-range-right {
-							border-bottom-right-radius: 8px;
-							border-top-right-radius: 8px;
 						}
 
 						&.ag-cell-last-left-pinned {
