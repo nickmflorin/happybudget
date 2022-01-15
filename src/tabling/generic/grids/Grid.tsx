@@ -145,18 +145,9 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
 
   const colDefs = useMemo(
     () =>
-      map(localColumns, (col: Table.RealColumn<R, M>): ColDef => {
-        const cellRenderer: string | undefined =
-          typeof col.cellRenderer === "string"
-            ? col.cellRenderer
-            : !isNil(col.cellRenderer)
-            ? col.cellRenderer[id]
-            : undefined;
-        /*
-        	While AG Grid will not break if we include extra properties on the
-					ColDef(s) (properties from our own custom Table.Column model) - they
-					will complain a lot. So we need to try to remove them. */
-        return {
+      map(
+        localColumns,
+        (col: Table.RealColumn<R, M>): ColDef => ({
           ...tabling.columns.parseBaseColumn<R, M, typeof col>(col),
           suppressMenu: true,
           valueGetter: tabling.typeguards.isDataColumn(col)
@@ -175,15 +166,18 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
                 return col.nullValue;
               }
             : undefined,
-          cellRenderer,
+          cellRenderer:
+            typeof col.cellRenderer === "string"
+              ? col.cellRenderer
+              : !isNil(col.cellRenderer)
+              ? col.cellRenderer[id]
+              : undefined,
           colSpan: (params: ColSpanParams) =>
-            tabling.typeguards.isRealColumn(col)
-              ? !isNil(col.colSpan)
-                ? col.colSpan({
-                    ...params,
-                    columns: localColumns
-                  })
-                : 1
+            !isNil(col.colSpan)
+              ? col.colSpan({
+                  ...params,
+                  columns: localColumns
+                })
               : 1,
           editable: (params: EditableCallbackParams) => {
             const row: Table.Row<R> = params.node.data;
@@ -210,8 +204,8 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
               "cell--not-selectable": true
             });
           }
-        };
-      }),
+        })
+      ),
     [hooks.useDeepEqualMemo(localColumns)]
   );
 
