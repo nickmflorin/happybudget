@@ -172,9 +172,7 @@ const BudgetTotal = ({ budget, budgetId, ...props }: BudgetTotalProps): JSX.Elem
             onClick: () => history.push(`/budgets/${budgetId}/accounts`),
             text: "Go to Budget"
           }}
-        >
-          {/* add small icon once it is designed */}
-        </NoData>
+        />
       )}
     </Tile>
   );

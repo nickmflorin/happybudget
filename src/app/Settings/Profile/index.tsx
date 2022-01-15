@@ -55,7 +55,7 @@ const Profile = (): JSX.Element => {
               value={image}
               ref={headerRef}
               onChange={(f: UploadedImage | null) => setImage(f)}
-              onError={(error: Error | string) => form.notify(typeof error === "string" ? error : error.message)}
+              onError={(error: Error | string) => form.notify(error)}
             />
           }
           initialValues={{
@@ -80,12 +80,8 @@ const Profile = (): JSX.Element => {
                 });
                 dispatch(actions.authenticated.updateLoggedInUserAction(response));
               })
-              .catch((e: Error) => {
-                form.handleRequestError(e);
-              })
-              .finally(() => {
-                form.setLoading(false);
-              });
+              .catch((e: Error) => form.handleRequestError(e))
+              .finally(() => form.setLoading(false));
           }}
         />
       </Tile>

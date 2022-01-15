@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
@@ -6,7 +6,8 @@ import { Button } from "components/buttons";
 
 import "./NoData.scss";
 
-interface NoDataProps extends StandardComponentWithChildrenProps {
+interface NoDataProps extends StandardComponentProps {
+  readonly children?: ReactNode;
   readonly title?: string;
   readonly subTitle?: string;
   readonly button?: { readonly onClick?: () => void; readonly text: string };

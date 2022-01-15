@@ -229,7 +229,7 @@ const configureTable = <
         ),
         ...cols
       ];
-      if (props.hasDragColumn !== false && Config.tableRowOrdering) {
+      if (props.hasDragColumn !== false) {
         cols = [
           genericColumns.DragColumn({ pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined }),
           ...cols

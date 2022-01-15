@@ -30,7 +30,7 @@ const Billing = (): JSX.Element => {
       if (!isSuperficialError) {
         console.error(
           `FATAL Error: Could not sync the checkout session with ID ${sessionId} for user ${user.id}.` +
-            "This either means that the user is subscribed to products in Stripe but has not " +
+            "This means that the user is subscribed to products in Stripe but has not " +
             "been associated with that subscription in our database.  This needs to be done manually." +
             `\nOriginal Error: ${e}`
         );

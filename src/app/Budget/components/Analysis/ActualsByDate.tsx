@@ -75,9 +75,7 @@ const ActualsByDate = ({ budgetId, ...props }: ActualsByDateProps): JSX.Element 
             onClick: () => history.push(`/budgets/${budgetId}/actuals`),
             text: "Go to Actuals"
           }}
-        >
-          {/* add small icon once it is designed */}
-        </NoData>
+        />
       )}
     </Tile>
   );

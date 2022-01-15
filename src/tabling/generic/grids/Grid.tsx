@@ -291,7 +291,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
         valueCache={true}
         rowBuffer={50}
         {...props}
-        rowDragManaged={Config.tableRowOrdering === true ? false : undefined}
+        rowDragManaged={false}
         reactUi={false}
         rowHeight={props.rowHeight === undefined ? 36 : props.rowHeight}
         navigateToNextCell={navigateToNextCell}

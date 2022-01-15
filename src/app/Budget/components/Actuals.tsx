@@ -83,7 +83,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
         if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
           const rowChange: Table.RowChange<R> = {
             id: row.id,
-            data: { contact: { oldValue: row.data.contact || null, newValue: m.id } }
+            data: { contact: { oldValue: row.data.contact, newValue: m.id } }
           };
           table.current.applyTableChange({
             type: "dataChange",

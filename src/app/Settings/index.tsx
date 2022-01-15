@@ -35,15 +35,14 @@ const Settings = (): JSX.Element => {
           icon: <Icon icon={"wallet"} weight={"light"} />,
           activeIcon: <Icon icon={"wallet"} weight={"solid"} />,
           onClick: () => history.push("/billing"),
-          active: location.pathname.startsWith("/billing"),
-          hidden: config.Config.billingEnabled === false
+          active: location.pathname.startsWith("/billing")
         }
       ]}
     >
       <Switch>
         <PrivateRoute exact path={"/profile"} component={Profile} />
         <PrivateRoute exact path={"/security"} component={Security} />
-        {config.Config.billingEnabled && <PrivateRoute path={"/billing"} component={Billing} />}
+        <PrivateRoute path={"/billing"} component={Billing} />
       </Switch>
     </ExpandedLayout>
   );

@@ -5,10 +5,7 @@ import classNames from "classnames";
 import { Checkbox, Tooltip } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
-import { RowNode } from "@ag-grid-community/core";
-
 import { tabling } from "lib";
-import { Config } from "config";
 
 import { ShowHide, SavingChanges } from "components";
 import { SearchInput } from "components/fields";
@@ -48,7 +45,7 @@ const AuthenticatedMenu = <R extends Table.RowData, M extends Model.RowHttpModel
       "table-action-menu",
       { detached: props.detached },
       { "has-expand-column": props.hasEditColumn },
-      { "has-drag-column": props.hasDragColumn && Config.tableRowOrdering }
+      { "has-drag-column": props.hasDragColumn }
     )}
   >
     <Portal id={props.savingChangesPortalId}>
@@ -58,7 +55,7 @@ const AuthenticatedMenu = <R extends Table.RowData, M extends Model.RowHttpModel
       <Tooltip title={"Select All"} placement={"bottom"}>
         <Checkbox
           onChange={(e: CheckboxChangeEvent) => {
-            props.apis?.grid.forEachNode((node: RowNode) => {
+            props.apis?.grid.forEachNode((node: Table.RowNode) => {
               const row: Table.BodyRow<R> = node.data;
               if (
                 tabling.typeguards.isEditableRow(row) &&
