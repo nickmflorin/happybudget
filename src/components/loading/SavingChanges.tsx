@@ -24,7 +24,7 @@ const SavingChanges = ({ saving }: SavingChangesProps): JSX.Element => {
         </ShowHide>
         <ShowHide show={!saving}>
           <div className={"check-wrapper"}>
-            <Icon icon={"check-circle"} weight={"light"} />
+            <Icon icon={"check-circle"} weight={"solid"} />
           </div>
         </ShowHide>
       </VerticalFlexCenter>

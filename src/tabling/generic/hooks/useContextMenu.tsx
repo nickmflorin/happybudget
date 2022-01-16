@@ -7,6 +7,7 @@ import { tabling, hooks, util } from "lib";
 export type UseContextMenuParams<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
   readonly apis: Table.GridApis | null;
   readonly data: Table.BodyRow<R>[];
+  readonly editColumnConfig?: Table.EditColumnRowConfig<R>[];
   readonly getModelRowLabel?: Table.RowStringGetter<Table.DataRow<R>>;
   readonly getModelRowName?: Table.RowStringGetter<Table.DataRow<R>>;
   readonly getGroupRowLabel?: Table.RowStringGetter<Table.GroupRow<R>>;
@@ -20,7 +21,6 @@ export type UseContextMenuParams<R extends Table.RowData, M extends Model.RowHtt
   readonly rowCanDelete?: (row: Table.ModelRow<R> | Table.MarkupRow<R>) => boolean;
   readonly onGroupRows?: (rows: Table.ModelRow<R>[]) => void;
   readonly onMarkupRows?: (rows?: Table.ModelRow<R>[]) => void;
-  readonly editColumnConfig?: Table.EditColumnRowConfig<R>[];
 };
 
 const evaluateRowStringGetter = <R extends Table.RowData, RW extends Table.BodyRow<R>>(

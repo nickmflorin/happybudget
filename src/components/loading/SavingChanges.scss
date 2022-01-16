@@ -2,18 +2,21 @@
 
 .saving-changes {
   display: flex;
-  width: 129px;
+	// We want to keep the width of the component constant such that when it
+	// shifts between "Saving Changes" and "Changes Saved" it does not reposition
+	// other elements it is adjacent to.
+  width: 136px;
   height: 36px;
 
   .spinner-wrapper {
     height: 22px;
     width: 22px;
-    margin-right: 2px;
     position: relative;
+		margin-right: 4px;
 
     .saving-changes-spinner {
       height: 22px;
-      width: 22px;
+      width: auto;
       color: $text-tertiary;
     }
   }
@@ -22,7 +25,7 @@
     height: 22px;
     width: 22px;
     padding: 3px;
-    margin-right: 2px;
+    margin-right: 4px;
 
     svg {
       height: auto;

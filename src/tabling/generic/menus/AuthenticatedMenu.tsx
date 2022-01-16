@@ -22,6 +22,7 @@ export interface AuthenticatedMenuProps<R extends Table.RowData, M extends Model
   readonly actions?: Table.AuthenticatedMenuActions<R, M>;
   readonly savingChangesPortalId?: string;
   readonly saving?: boolean;
+  readonly savingVisible?: boolean;
   readonly onSearch: (v: string) => void;
 }
 
@@ -32,9 +33,9 @@ type InternalAuthenticatedMenuProps<
   readonly apis: Table.GridApis | null;
   readonly hiddenColumns?: Table.HiddenColumns;
   readonly selectedRows: Table.EditableRow<R>[];
-  readonly rowHasCheckboxSelection?: (row: Table.EditableRow<R>) => boolean;
   readonly hasEditColumn: boolean;
   readonly hasDragColumn: boolean;
+  readonly rowHasCheckboxSelection?: (row: Table.EditableRow<R>) => boolean;
 };
 
 const AuthenticatedMenu = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
@@ -49,7 +50,7 @@ const AuthenticatedMenu = <R extends Table.RowData, M extends Model.RowHttpModel
     )}
   >
     <Portal id={props.savingChangesPortalId}>
-      <SavingChanges saving={props.saving} />
+      {props.savingVisible !== false && <SavingChanges saving={props.saving} />}
     </Portal>
     <div className={"table-menu-left"}>
       <Tooltip title={"Select All"} placement={"bottom"}>

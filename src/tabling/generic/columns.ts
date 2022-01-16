@@ -260,7 +260,7 @@ export const IdentifierColumn = <
             ) as Table.CalculatedColumn<R, M>[],
             (c: Table.CalculatedColumn<R, M>) => tabling.columns.normalizedField<R, M>(c)
           );
-          const indexOfIdentifierColumn = findIndex(agColumns, (c: Table.AgColumn) => c.getColId() === "identifier");
+          const indexOfIdentifierColumn = findIndex(agColumns, (c: Table.AgColumn) => c.getColId() === col.field);
           const indexOfFirstCalculatedColumn = findIndex(agColumns, (c: Table.AgColumn) =>
             includes(originalCalculatedColumns, c.getColId())
           );

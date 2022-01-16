@@ -1,4 +1,4 @@
-import React, { useImperativeHandle, useState, useMemo } from "react";
+import React, { useImperativeHandle, useState, useMemo, useRef } from "react";
 import { forEach, isNil, uniq, map, filter, includes, reduce } from "lodash";
 
 import { tabling, util, hooks, notifications } from "lib";
@@ -94,7 +94,14 @@ const AuthenticatedTable = <
   >
 ): JSX.Element => {
   const grid = tabling.hooks.useDataGrid();
-  const [saving, setSaving] = useState(false);
+  const [savingVisible, setSavingVisible] = useState(false);
+  const [saving, _setSaving] = useState(false);
+  /* After any changes finish saving, we display "Changes Saved" for a short
+     duration before hiding the component.  We need to keep track of the timeout
+     that is used to hide the component after the delay such that if additional
+     changes start saving before the timeout delay finishes, the original timeout
+     can be cancelled. */
+  const hideSavingChangesTimout = useRef<NodeJS.Timeout | null>(null);
   const [selectedRows, setSelectedRows] = useState<Table.EditableRow<R>[]>([]);
   const [deleteRows, setDeleteRows] = useState<Table.EditableRow<R>[] | undefined>(undefined);
   const NotificationsHandler = notifications.ui.useNotifications({
@@ -224,6 +231,35 @@ const AuthenticatedTable = <
       props.onChangeEvent(event);
     },
     [props.onChangeEvent, hooks.useDeepEqualMemo(props.columns)]
+  );
+
+  const setSaving = useMemo(
+    () => (value: boolean) => {
+      if (value === true) {
+        /* Set the saving state to True before setting visibility to True so the
+           <SavingChanges> component first appears in the "Saving Changes" state
+           without a flash. */
+        _setSaving(true);
+        setSavingVisible(true);
+        /* If changes start saving and there is already a timeout set that is
+           instructed to hide the <SavingChanges> component after a delay, we
+					 need to cancel it, since the new "Saving Changes" should be visible
+					 for the remainder of the saving time and the previously set timeout
+					 will hide it while changes are potentially still saving. */
+        if (!isNil(hideSavingChangesTimout.current)) {
+          clearTimeout(hideSavingChangesTimout.current);
+        }
+      } else {
+        /* Set a timeout that will hide the <SavingChanges> component (which will
+           now be in the "Changes Saved" state) after a delay of 2 seconds. */
+        const timeout = setTimeout(() => {
+          setSavingVisible(false);
+        }, 2000);
+        hideSavingChangesTimout.current = timeout;
+        _setSaving(false);
+      }
+    },
+    [saving, hideSavingChangesTimout.current]
   );
 
   const actions = useMemo<Table.AuthenticatedMenuActions<R, M>>(
@@ -368,6 +404,7 @@ const AuthenticatedTable = <
         <AuthenticatedMenu<R, M>
           {...props}
           saving={saving}
+          savingVisible={savingVisible}
           apis={props.tableApis.get("data")}
           actions={actions}
           columns={tabling.columns.filterDataColumns(columns)}

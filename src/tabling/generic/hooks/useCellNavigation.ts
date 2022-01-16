@@ -148,12 +148,7 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
           if (!isNil(agColumns)) {
             const actionColumns = filter(agColumns, (c: Table.AgColumn) =>
               includes(
-                map(
-                  filter(params.columns, (ci: Table.Column<R, M>) =>
-                    tabling.typeguards.isActionColumn(ci)
-                  ) as Table.ActionColumn<R, M>[],
-                  (ci: Table.ActionColumn<R, M>) => ci.colId
-                ),
+                map(tabling.columns.filterActionColumns(params.columns), (ci: Table.ActionColumn<R, M>) => ci.colId),
                 c.getColId()
               )
             );

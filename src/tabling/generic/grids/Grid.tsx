@@ -5,7 +5,6 @@ import classNames from "classnames";
 import { AgGridReact } from "@ag-grid-community/react";
 import { AllModules, ColSpanParams } from "@ag-grid-enterprise/all-modules";
 import {
-  ColDef,
   EditableCallbackParams,
   CellClassParams,
   RowClassParams,
@@ -18,9 +17,7 @@ import {
   CellPosition,
   CellKeyDownEvent,
   CellDoubleClickedEvent,
-  FirstDataRenderedEvent,
   SelectionChangedEvent,
-  GridReadyEvent,
   CellValueChangedEvent,
   CellEditingStartedEvent,
   PasteEndEvent,
@@ -64,8 +61,8 @@ type UseAgProps<R extends Table.RowData> = Omit<Table.AgGridProps, OverriddenAgP
   readonly onCellMouseOver?: (e: CellMouseOverEvent) => void;
   readonly onCellKeyDown?: (event: CellKeyDownEvent) => void;
   readonly onSelectionChanged?: (e: SelectionChangedEvent) => void;
-  readonly onGridReady: (e: GridReadyEvent) => void;
-  readonly onFirstDataRendered: (e: FirstDataRenderedEvent) => void;
+  readonly onGridReady: (e: Table.GridReadyEvent) => void;
+  readonly onFirstDataRendered: (e: Table.FirstDataRenderedEvent) => void;
   readonly onCellDoubleClicked?: (e: CellDoubleClickedEvent) => void;
   readonly processDataFromClipboard?: (params: ProcessDataFromClipboardParams) => string[][];
   readonly processCellFromClipboard?: (params: ProcessCellForExportParams) => Table.RawRowValue;
@@ -90,6 +87,7 @@ export interface GridProps<R extends Table.RowData, M extends Model.RowHttpModel
   readonly style?: React.CSSProperties;
   readonly rowClass?: Table.RowClassName;
   readonly rowHeight?: number;
+  readonly localizePopupParent?: boolean;
   readonly onCellDoubleClicked?: (e: CellDoubleClickedEvent) => void;
   readonly getContextMenuItems?: (row: Table.BodyRow<R>, node: Table.RowNode) => Table.MenuItemDef[];
   readonly navigateToNextCell?: (params: NavigateToNextCellParams) => Table.CellPosition;
@@ -100,7 +98,6 @@ export interface GridProps<R extends Table.RowData, M extends Model.RowHttpModel
   readonly onCellKeyDown?: (event: CellKeyDownEvent) => void;
   readonly onGridReady: (e: Table.GridReadyEvent) => void;
   readonly onFirstDataRendered: (e: Table.FirstDataRenderedEvent) => void;
-  readonly localizePopupParent?: boolean;
 }
 
 const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
@@ -147,7 +144,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
     () =>
       map(
         localColumns,
-        (col: Table.RealColumn<R, M>): ColDef => ({
+        (col: Table.RealColumn<R, M>): Table.ColDef => ({
           ...tabling.columns.parseBaseColumn<R, M, typeof col>(col),
           suppressMenu: true,
           valueGetter: tabling.typeguards.isDataColumn(col)

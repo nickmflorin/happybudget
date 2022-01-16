@@ -229,9 +229,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
             (curr: Table.RawRowValue[][], rowData: string[]) => {
               const processed = processArrayFromClipboard<R, M>(
                 apis.column,
-                filter(params.columns, (ci: Table.Column<R, M>) =>
-                  tabling.typeguards.isDataColumn(ci)
-                ) as Table.DataColumn<R, M>[],
+                tabling.columns.filterDataColumns(params.columns),
                 focusedCell.column,
                 rowData
               );
@@ -249,10 +247,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
 						 with the data provided. */
           const cols = getWritableColumnsAfter<R, M>(
             apis.column,
-            filter(params.columns, (ci: Table.Column<R, M>) => tabling.typeguards.isDataColumn(ci)) as Table.DataColumn<
-              R,
-              M
-            >[],
+            tabling.columns.filterDataColumns(params.columns),
             focusedCell.column
           );
           const payload = reduce(
@@ -288,19 +283,16 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
                           {} as Partial<R>
                         )
                       };
-                    } else if (!isNil(ci.field)) {
-                      /* Note: We do not use the colId for creating the RowData
-											   object - the colId is used for cases where the Column
-												 is not associated with a field of the Row Data. */
-                      if (rowData[index] === "") {
-                        return {
-                          ...currD,
-                          [ci.field]: ci.nullValue
-                        };
-                      }
-                      return { ...currD, [ci.field]: rowData[index] };
+                    } else if (rowData[index] === "") {
+                      return {
+                        ...currD,
+                        /* Note: We do not use the colId for BodyColumns(s), only
+												 the `field`, since the `field` is used to populate the
+												 rows from the models. */
+                        [ci.field]: ci.nullValue
+                      };
                     }
-                    return currD;
+                    return { ...currD, [ci.field]: rowData[index] };
                   },
                   {} as Partial<R>
                 )
