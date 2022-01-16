@@ -9,6 +9,7 @@ import { util, hooks } from "lib";
 import { registerFonts } from "style/pdf";
 
 import { Button } from "components/buttons";
+import EmptyDocument from "./EmptyDocument";
 import { RenderDocument } from "./primitive";
 
 import "./Previewer.scss";
@@ -121,7 +122,12 @@ const Previewer = ({
     render,
     debouncedRender,
     refreshRequired: () => setRefreshRequired(true),
-    export: exportPdf
+    export: exportPdf,
+    renderEmptyDocument: (props?: Pdf.NoDataDocumentProps) => {
+      const PdfFunc = (): JSX.Element => <EmptyDocument {...props} />;
+      const pdfComponent = PdfFunc();
+      render(pdfComponent);
+    }
   }));
 
   return (

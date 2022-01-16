@@ -59,16 +59,23 @@ declare namespace Pdf {
     readonly loadingOnNoFile?: boolean;
   };
 
-  export interface IPreviewerExportParams {
+  type IPreviewerExportParams = {
     readonly filename?: string;
     readonly component?: JSX.Element;
     readonly onSuccess?: () => void;
-  }
+  };
 
-  export interface IPreviewerRef {
+  type NoDataDocumentProps = StandardPdfComponentProps & {
+    readonly size?: import("@react-pdf/types").PageSize;
+    readonly debug?: boolean;
+    readonly text?: string | boolean;
+  };
+
+  type IPreviewerRef = {
     readonly render: (component?: JSX.Element) => void;
+    readonly renderEmptyDocument: (props?: NoDataDocumentProps) => void;
     readonly debouncedRender: () => void;
     readonly export: (params: IPreviewerExportParams) => void;
     readonly refreshRequired: () => void;
-  }
+  };
 }

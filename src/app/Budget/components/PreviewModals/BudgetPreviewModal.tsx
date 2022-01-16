@@ -50,10 +50,11 @@ interface BudgetPdfFuncProps {
 const BudgetPdfFunc = (props: BudgetPdfFuncProps): JSX.Element => <BudgetPdf {...props} />;
 
 interface PreviewModalProps extends ModalProps {
-  readonly onSuccess?: () => void;
   readonly budgetId: number;
   readonly budgetName: string;
   readonly filename: string;
+  readonly initiallyRender?: boolean;
+  readonly onSuccess?: () => void;
 }
 
 const selectHeaderTemplatesLoading = redux.selectors.simpleShallowEqualSelector(
@@ -73,6 +74,7 @@ const BudgetPreviewModal = ({
   budgetId,
   budgetName,
   filename,
+  initiallyRender,
   onSuccess,
   ...props
 }: PreviewModalProps): JSX.Element => {
@@ -126,17 +128,26 @@ const BudgetPreviewModal = ({
         .getBudgetPdf(budgetId, { cancelToken: getToken() })
         .then((response: Model.PdfBudget) => {
           setBudget(response);
-          const pdfComponent = BudgetPdfFunc({
-            budget: response,
-            contacts: cs,
-            options: convertOptions(options)
-          });
-          previewer.current?.render(pdfComponent);
+          /* Since @react-pdf blocks the entire UI thread (which is ridiculous),
+						 this is usually not desirable as rendering large PDF's once the
+						 modal is open will prevent the form from being edited until the
+						 PDF finishes rendering. */
+          if (initiallyRender === true) {
+            const pdfComponent = BudgetPdfFunc({
+              budget: response,
+              contacts: cs,
+              options: convertOptions(options)
+            });
+            previewer.current?.render(pdfComponent);
+          } else {
+            previewer.current?.renderEmptyDocument({ text: false });
+            previewer.current?.refreshRequired();
+          }
         })
         .catch((e: Error) => modal.current.handleRequestError(e))
         .finally(() => setLoadingData(false));
     }
-  }, [props.open]);
+  }, [props.open, initiallyRender]);
 
   const renderComponent = useMemo(
     () => () => {

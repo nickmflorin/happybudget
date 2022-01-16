@@ -6,3 +6,4 @@ export * from "./primitive";
 export * from "./text";
 export { default as Previewer } from "./Previewer";
 export * from "./Previewer";
+export { default as EmptyDocument } from "./EmptyDocument";

@@ -40,16 +40,18 @@ interface ActualsPdfFuncProps {
 const ActualsPdfFunc = (props: ActualsPdfFuncProps): JSX.Element => <ActualsPdf {...props} />;
 
 interface ActualsPreviewModalProps extends ModalProps {
-  readonly onSuccess?: () => void;
   readonly filename: string;
   readonly budgetId: number;
+  readonly initiallyRender?: boolean;
   readonly budget: Model.Budget;
+  readonly onSuccess?: () => void;
 }
 
 const ActualsPreviewModal = ({
   budget,
   budgetId,
   filename,
+  initiallyRender,
   onSuccess,
   ...props
 }: ActualsPreviewModalProps): JSX.Element => {
@@ -87,16 +89,23 @@ const ActualsPreviewModal = ({
         .getActuals(budgetId, {}, { cancelToken: getToken() })
         .then((response: Http.ListResponse<M>) => {
           setActuals(response.data);
-          const pdfComponent = ActualsPdfFunc({
-            budget,
-            contacts: cs,
-            actuals: response.data,
-            options: convertOptions(options)
-          });
-          previewer.current?.render(pdfComponent);
-        }) /* TODO: We should probably display the error in the modal and not let
-							the default toast package display it in the top right of the
-							window. */
+          /* Since @react-pdf blocks the entire UI thread (which is ridiculous),
+						 this is usually not desirable as rendering large PDF's once the
+						 modal is open will prevent the form from being edited until the
+						 PDF finishes rendering. */
+          if (initiallyRender === true) {
+            const pdfComponent = ActualsPdfFunc({
+              budget,
+              contacts: cs,
+              actuals: response.data,
+              options: convertOptions(options)
+            });
+            previewer.current?.render(pdfComponent);
+          } else {
+            previewer.current?.renderEmptyDocument({ text: false });
+            previewer.current?.refreshRequired();
+          }
+        })
         .catch((e: Error) => modal.current.handleRequestError(e))
         .finally(() => setLoadingData(false));
     }
