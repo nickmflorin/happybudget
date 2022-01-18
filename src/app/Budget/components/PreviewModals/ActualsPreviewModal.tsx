@@ -62,7 +62,6 @@ const ActualsPreviewModal = ({
 
   const [options, setOptions] = useState<ExportActualsPdfFormOptions>(DEFAULT_OPTIONS);
   const [actuals, setActuals] = useState<M[] | null>(null);
-  const [loadingData, setLoadingData] = useState(false);
 
   const form = ui.hooks.useForm<ExportActualsPdfFormOptions>({ isInModal: true });
   const modal = ui.hooks.useModal();
@@ -106,8 +105,7 @@ const ActualsPreviewModal = ({
             previewer.current?.refreshRequired();
           }
         })
-        .catch((e: Error) => modal.current.handleRequestError(e))
-        .finally(() => setLoadingData(false));
+        .catch((e: Error) => modal.current.handleRequestError(e));
     }
   }, [props.open]);
 
@@ -130,7 +128,6 @@ const ActualsPreviewModal = ({
       {...props}
       modal={modal}
       previewer={previewer}
-      loadingData={loadingData}
       renderComponent={renderComponent}
       filename={filename}
       onExportSuccess={onSuccess}

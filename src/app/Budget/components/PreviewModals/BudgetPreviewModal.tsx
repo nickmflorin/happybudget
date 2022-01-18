@@ -166,7 +166,6 @@ const BudgetPreviewModal = ({
     <PreviewModal
       {...props}
       previewer={previewer}
-      loadingData={loadingData}
       renderComponent={renderComponent}
       filename={filename}
       modal={modal}

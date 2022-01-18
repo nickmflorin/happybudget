@@ -151,7 +151,7 @@ const Previewer = ({
       <div className={"preview-content"}>
         <RenderDocument
           file={file}
-          loadingOnNoFile={true}
+          loadingOnNoFile={false}
           loading={generatingPdf}
           onLoadSuccess={(p: Pdf.DocumentLoadedParams) => {
             setNumPages(p.numPages);
