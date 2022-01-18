@@ -237,13 +237,13 @@ declare namespace Model {
     readonly accumulated_markup_contribution: number;
   };
 
-  type SimpleAccount = RowHttpModel<"account"> & {
+  type SimpleAccount = Omit<RowHttpModel<"account">, "order"> & {
     readonly identifier: string | null;
     readonly description: string | null;
     readonly domain: BudgetDomain;
   };
 
-  type SimpleSubAccount = RowHttpModel<"subaccount"> & {
+  type SimpleSubAccount = Omit<RowHttpModel<"subaccount">, "order"> & {
     readonly identifier: string | null;
     readonly description: string | null;
     readonly domain: BudgetDomain;
@@ -251,9 +251,10 @@ declare namespace Model {
 
   type Account = LineMetrics &
     SimpleAccount & {
+      readonly order: string;
       readonly children: number[];
       // Only included for detail endpoints.
-      readonly siblings?: SimpleAccount[];
+      readonly table?: SimpleAccount[];
       // Only included for detail endpoints.
       readonly ancestors?: [SimpleBudget | SimpleTemplate];
     };
@@ -269,6 +270,7 @@ declare namespace Model {
     };
 
   type SubAccountMixin = LineMetrics & {
+    readonly order: string;
     readonly fringe_contribution: number;
     readonly quantity: number | null;
     readonly rate: number | null;
@@ -287,7 +289,7 @@ declare namespace Model {
       // Only applicable for non-Template cases.
       readonly attachments?: SimpleAttachment[];
       // Only included for detail endpoints.
-      readonly siblings?: SimpleSubAccount[];
+      readonly table?: SimpleSubAccount[];
       // Only included for detail endpoints.
       readonly ancestors?: [
         SimpleBudget | SimpleTemplate,

@@ -1,6 +1,6 @@
 import React, { ReactNode, useMemo } from "react";
 import { useHistory } from "react-router-dom";
-import { map, isNil, orderBy, reduce } from "lodash";
+import { map, isNil, reduce } from "lodash";
 import classNames from "classnames";
 
 import { Button } from "components/buttons";
@@ -24,59 +24,68 @@ interface BreadCrumbGenericItemProps extends StandardComponentProps {
   readonly onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
-const BreadCrumbGenericItem = ({
-  className,
-  style = {},
-  tooltip,
-  primary,
-  children,
-  onClick,
-  suppressClickBehavior,
-  url
-}: BreadCrumbGenericItemProps): JSX.Element => {
-  const history = useHistory();
-  return (
-    <div
-      className={classNames("bread-crumb-item", className, { primary })}
-      style={style}
-      onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-        if (!suppressClickBehavior) {
-          if (!isNil(onClick)) {
-            onClick(e);
-          } else if (!isNil(url)) {
-            history.push(url);
+const BreadCrumbGenericItem = React.memo(
+  ({
+    className,
+    style = {},
+    tooltip,
+    primary,
+    children,
+    onClick,
+    suppressClickBehavior,
+    url
+  }: BreadCrumbGenericItemProps): JSX.Element => {
+    const history = useHistory();
+    return (
+      <div
+        className={classNames("bread-crumb-item", className, { primary })}
+        style={style}
+        onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+          if (!suppressClickBehavior) {
+            if (!isNil(onClick)) {
+              onClick(e);
+            } else if (!isNil(url)) {
+              history.push(url);
+            }
           }
-        }
-      }}
-    >
-      <TooltipWrapper tooltip={tooltip}>{children}</TooltipWrapper>
-    </div>
-  );
-};
+        }}
+      >
+        <TooltipWrapper tooltip={tooltip}>{children}</TooltipWrapper>
+      </div>
+    );
+  }
+);
 
 interface BreadCrumbItemProps extends StandardComponentProps {
   readonly item: IBreadCrumbItem;
   readonly primary?: boolean;
 }
 
-const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element => {
-  const renderItem = (i: IBreadCrumbItem) => {
-    if (!isNil(i.label)) {
-      return i.label;
-    } else if (!isNil(i.renderContent)) {
-      return i.renderContent();
-    }
-    return <></>;
-  };
+const BreadCrumbItem = React.memo(({ item, ...props }: BreadCrumbItemProps): JSX.Element => {
+  const renderItem = useMemo(
+    () => (i: IBreadCrumbItem) => {
+      if (!isNil(i.label)) {
+        return i.label;
+      } else if (!isNil(i.renderContent)) {
+        return i.renderContent();
+      }
+      return <></>;
+    },
+    []
+  );
 
-  const renderDropdownButton = (i: IBreadCrumbItem): React.ReactChild => {
-    if (!isNil(i.label)) {
-      return <Button>{i.label}</Button>;
-    } else if (!isNil(i.renderContent)) {
-      return i.renderContent();
-    }
-    return <></>;
-  };
+  const renderDropdownButton = useMemo(
+    () =>
+      (i: IBreadCrumbItem): React.ReactChild => {
+        if (!isNil(i.label)) {
+          return <Button>{i.label}</Button>;
+        } else if (!isNil(i.renderContent)) {
+          return i.renderContent();
+        }
+        return <></>;
+      },
+    []
+  );
 
   return (
     <BreadCrumbGenericItem
@@ -87,11 +96,7 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
       suppressClickBehavior={!isNil(item.options) && item.options.length !== 0}
     >
       {!isNil(item.options) && item.options.length !== 0 ? (
-        <DropdownMenu
-          menuClassName={"bread-crumb-dropdown"}
-          defaultSelected={[item.id]}
-          models={orderBy(item.options, (obj: MenuItemModel) => obj.id)}
-        >
+        <DropdownMenu menuClassName={"bread-crumb-dropdown"} defaultSelected={[item.id]} models={item.options}>
           {renderDropdownButton(item)}
         </DropdownMenu>
       ) : (
@@ -99,13 +104,13 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
       )}
     </BreadCrumbGenericItem>
   );
-};
+});
 
 interface BreadCrumbItemsProps {
   readonly children: JSX.Element[];
 }
 
-const BreadCrumbItems = ({ children }: BreadCrumbItemsProps): JSX.Element => {
+const BreadCrumbItems = React.memo(({ children }: BreadCrumbItemsProps): JSX.Element => {
   if (children.length === 0) {
     return <></>;
   } else {
@@ -126,7 +131,7 @@ const BreadCrumbItems = ({ children }: BreadCrumbItemsProps): JSX.Element => {
       </React.Fragment>
     );
   }
-};
+});
 
 interface BreadCrumbsProps<P extends Record<string, unknown> = Record<string, unknown>> extends StandardComponentProps {
   readonly items?: (IBreadCrumbItem | ILazyBreadCrumbItem<P>)[];
@@ -213,4 +218,4 @@ const BreadCrumbs = <P extends Record<string, unknown> = Record<string, unknown>
   }
 };
 
-export default BreadCrumbs;
+export default React.memo(BreadCrumbs) as typeof BreadCrumbs;

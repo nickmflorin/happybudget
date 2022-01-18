@@ -196,6 +196,9 @@
 					justify-content: center;
 				}
 
+				// Used currently just for the AttachmentsCell, where we want the upload
+				// indicators to highlight the entire cell just up to it's borders, and
+				// the padding to be applied inside of that highlighting/dashed border.
 				&--full-size {
 					padding: 0px !important;
 

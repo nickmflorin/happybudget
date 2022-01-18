@@ -24,23 +24,6 @@
       overflow-x: hidden;
     }
 
-    .select-wrapper {
-      padding-top: 3px;
-      padding-bottom: 3px;
-
-      .select {
-        &--siblings {
-          min-width: 200px;
-          .ant-select-selector {
-            padding: 0px !important;
-          }
-          .ant-select-arrow {
-            right: 24px;
-          }
-        }
-      }
-    }
-
     .text-wrapper {
       padding-top: 10px;
       padding-bottom: 10px;

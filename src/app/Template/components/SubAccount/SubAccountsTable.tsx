@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
-import { isNil, map, findIndex, orderBy } from "lodash";
+import { isNil, map, findIndex } from "lodash";
 
 import { redux, tabling, budgeting, util } from "lib";
 import { useGrouping, useMarkup } from "components/hooks";
@@ -124,28 +124,26 @@ const SubAccountsTable = ({ budgetId, budget, subaccountId }: SubAccountsTablePr
           }
         }}
         onLeft={() => {
-          if (!isNil(subaccount)) {
-            const siblings = orderBy([...(subaccount.siblings || []), subaccount], "order");
-            const index = findIndex(siblings, (sib: Model.SimpleSubAccount) => sib.id === subaccount.id);
-            if (index !== -1 && siblings[index - 1] !== undefined) {
+          if (!isNil(subaccount) && !isNil(subaccount.table)) {
+            const index = findIndex(subaccount.table, (sib: Model.SimpleSubAccount) => sib.id === subaccount.id);
+            if (index !== -1 && subaccount.table[index - 1] !== undefined) {
               history.push(
                 budgeting.urls.getUrl(
                   { type: "budget", id: budgetId, domain: "template" },
-                  { type: "subaccount", id: siblings[index - 1].id }
+                  { type: "subaccount", id: subaccount.table[index - 1].id }
                 )
               );
             }
           }
         }}
         onRight={() => {
-          if (!isNil(subaccount)) {
-            const siblings = orderBy([...(subaccount.siblings || []), subaccount], "order");
-            const index = findIndex(siblings, (sib: Model.SimpleSubAccount) => sib.id === subaccount.id);
-            if (index !== -1 && siblings[index + 1] !== undefined) {
+          if (!isNil(subaccount) && !isNil(subaccount.table)) {
+            const index = findIndex(subaccount.table, (sib: Model.SimpleSubAccount) => sib.id === subaccount.id);
+            if (index !== -1 && subaccount.table[index + 1] !== undefined) {
               history.push(
                 budgeting.urls.getUrl(
                   { type: "budget", id: budgetId, domain: "template" },
-                  { type: "subaccount", id: siblings[index + 1].id }
+                  { type: "subaccount", id: subaccount.table[index + 1].id }
                 )
               );
             }

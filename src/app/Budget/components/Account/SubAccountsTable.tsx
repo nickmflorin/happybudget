@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { isNil, map, filter, orderBy, findIndex } from "lodash";
+import { isNil, map, filter, findIndex } from "lodash";
 import { createSelector } from "reselect";
 
 import { redux, tabling, budgeting, util } from "lib";
@@ -152,28 +152,26 @@ const SubAccountsTable = ({
           )
         }
         onLeft={() => {
-          if (!isNil(account)) {
-            const siblings = orderBy([...(account.siblings || []), account], "order");
-            const index = findIndex(siblings, (sib: Model.SimpleAccount) => sib.id === account.id);
-            if (index !== -1 && siblings[index - 1] !== undefined) {
+          if (!isNil(account) && !isNil(account.table)) {
+            const index = findIndex(account.table || [], (sib: Model.SimpleAccount) => sib.id === account.id);
+            if (index !== -1 && account.table[index - 1] !== undefined) {
               history.push(
                 budgeting.urls.getUrl(
                   { type: "budget", id: budgetId, domain: "budget" },
-                  { type: "account", id: siblings[index - 1].id }
+                  { type: "account", id: account.table[index - 1].id }
                 )
               );
             }
           }
         }}
         onRight={() => {
-          if (!isNil(account)) {
-            const siblings = orderBy([...(account.siblings || []), account], "order");
-            const index = findIndex(siblings, (sib: Model.SimpleAccount) => sib.id === account.id);
-            if (index !== -1 && siblings[index + 1] !== undefined) {
+          if (!isNil(account) && !isNil(account.table)) {
+            const index = findIndex(account.table, (sib: Model.SimpleAccount) => sib.id === account.id);
+            if (index !== -1 && account.table[index + 1] !== undefined) {
               history.push(
                 budgeting.urls.getUrl(
                   { type: "budget", id: budgetId, domain: "budget" },
-                  { type: "account", id: siblings[index + 1].id }
+                  { type: "account", id: account.table[index + 1].id }
                 )
               );
             }
