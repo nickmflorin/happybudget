@@ -76,11 +76,13 @@ const hyphenationCallback = (word: string): string[] => {
     return map(
       reduce(
         word,
-        (curr: string[][], char: string) => {
+        (curr: string[][], char: string, i: number) => {
           currentPart = [...currentPart, char];
-          if (running === NumericStringHyphenationBatch) {
+          if (running === NumericStringHyphenationBatch || i === word.length - 1) {
             running = 0;
-            return [...curr, currentPart];
+            const r = [...curr, currentPart];
+            currentPart = [];
+            return r;
           } else {
             running = running + 1;
             return curr;
