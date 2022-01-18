@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { isNil, filter, find, includes } from "lodash";
 
-import { tabling } from "lib";
+import { tabling, contacts as cs } from "lib";
 import { Colors } from "style/constants";
 
 import { Document, Page, Tag, Text } from "components/pdf";
@@ -45,7 +45,7 @@ const ActualsPdf = ({ budget, actuals, contacts, options }: ActualsPdfProps): JS
                   className={"tag tag--contact"}
                   color={"#EFEFEF"}
                   textColor={"#2182e4"}
-                  text={contact.full_name}
+                  text={cs.models.contactName(contact)}
                 />
               );
             }
