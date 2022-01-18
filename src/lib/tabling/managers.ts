@@ -1,5 +1,5 @@
 import { reduce, filter, isNil, includes } from "lodash";
-import { util, budgeting } from "lib";
+import { util, budgeting, notifications } from "lib";
 
 import * as typeguards from "./typeguards";
 import * as columnFns from "./columns";
@@ -107,7 +107,7 @@ abstract class BodyRowManager<
             if (typeguards.isDataColumn(c) && c.isRead === false) {
               return obj;
             }
-            console.error(`Could not obtain row value for field ${c.field}, ${JSON.stringify(args)}!`);
+            console.error(`Could not obtain row value for field ${c.field}, ${notifications.objToJson(args)}!`);
             return { ...obj, [c.field]: c.nullValue };
           }
           return { ...obj, [c.field]: value };

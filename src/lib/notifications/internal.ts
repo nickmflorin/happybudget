@@ -3,6 +3,7 @@ import { isNil } from "lodash";
 
 import * as api from "api";
 import { toTitleCase } from "lib/util/formatters";
+import { objToJson } from "./util";
 
 type InternalNotificationOptions = Pick<InternalNotification, "dispatchToSentry" | "level">;
 
@@ -127,9 +128,9 @@ export const inconsistentStateError = <P extends Redux.ActionPayload = Redux.Act
     : action;
 
   const payloadString: string | null | undefined = !isNil(payload)
-    ? JSON.stringify(payload)
+    ? objToJson(payload)
     : !isNil(action) && typeof action !== "string"
-    ? JSON.stringify(action.payload)
+    ? objToJson(action.payload)
     : payload;
 
   const addParamValue = (message: string, paramName: string, value: ParamV<P>) =>

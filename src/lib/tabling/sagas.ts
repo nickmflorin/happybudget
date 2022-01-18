@@ -2,7 +2,7 @@ import { Saga, SagaIterator } from "redux-saga";
 import { spawn, take, call, cancel, actionChannel, delay, flush, fork } from "redux-saga/effects";
 import { isNil, map, isEqual } from "lodash";
 
-import { tabling } from "lib";
+import { tabling, notifications } from "lib";
 
 export const createTableSaga = <
   R extends Table.RowData,
@@ -117,9 +117,9 @@ export const createAuthenticatedTableSaga = <
       } else {
         if (!isEqual(c, batch.context)) {
           throw new Error(
-            `Contexts for batched events of type ${e.type} are not equal! ${JSON.stringify(
+            `Contexts for batched events of type ${e.type} are not equal! ${notifications.objToJson(
               batch.context
-            )} != ${JSON.stringify(c)}`
+            )} != ${notifications.objToJson(c)}`
           );
         }
         return { ...batch, events: [...batch.events, e] };

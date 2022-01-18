@@ -24,13 +24,13 @@ const onMissing =
     const warningData = {
       action: action,
       reason: `${params.ref} does not exist in state when it is expected to.`,
-      ids: JSON.stringify(map(data, (mi: M) => mi.id))
+      ids: notifications.objToJson(map(data, (mi: M) => mi.id))
     };
     const lookup = params.lookup;
     if (typeof lookup === "function") {
       notifications.inconsistentStateError({
         ...warningData,
-        evaluatedCallback: JSON.stringify(map(data, (mi: M) => lookup(mi)))
+        evaluatedCallback: notifications.objToJson(map(data, (mi: M) => lookup(mi)))
       });
     } else {
       notifications.inconsistentStateError({ ...warningData, id: params.lookup });
