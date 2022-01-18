@@ -42,10 +42,65 @@ export const registerFontFace = (fontFace: Style.FontFace, modules: Record<strin
   });
 };
 
-export const registerFonts = (): Promise<void> => {
-  return importFontModules().then((modules: Record<string, unknown>) => {
-    map(SupportedFontFaces, (fontFace: Style.FontFace) => registerFontFace(fontFace, modules));
-  });
+const NumericStringHyphenationBatch = 4;
+
+const wordContainsIntegers = (word: string): boolean => {
+  for (let i = 0; i < word.length; i++) {
+    if (!isNaN(parseInt(word[i]))) {
+      return true;
+    }
+  }
+  return false;
+};
+
+/**
+ * Hyphenation refers to the automated process of breaking words between lines
+ * to create a better visual consistency across a text block. This is a complex
+ * problem. It involves knowing about the language of the text, available space,
+ * ligatures, among other things.
+ *
+ * React-pdf internally implements the Knuth and Plass line breaking algorithm
+ * that produces the minimum amount of lines without compromising text
+ * legibility. By default it's setup to hyphenate english words.
+ *
+ * But, apparently these clowns forgot to account for strings with numeric
+ * digits in them... this causes problems for us, as it is preventing numbers
+ * or strings with numbers in them from properly truncating overflow text in
+ * the table.  To fix this, we implement our own hyphenationCallback, which
+ * batches strings with integers in them so that they can truncate.
+ */
+const hyphenationCallback = (word: string): string[] => {
+  if (wordContainsIntegers(word)) {
+    let running = 0;
+    let currentPart: string[] = [];
+    return map(
+      reduce(
+        word,
+        (curr: string[][], char: string) => {
+          currentPart = [...currentPart, char];
+          if (running === NumericStringHyphenationBatch) {
+            running = 0;
+            return [...curr, currentPart];
+          } else {
+            running = running + 1;
+            return curr;
+          }
+        },
+        [] as string[][]
+      ),
+      (a: string[]) => a.join("")
+    );
+  }
+  /* Return just the word so that @react-pdf can use the default hyphenation
+     algorithm. */
+  return [word];
+};
+
+Font.registerHyphenationCallback(hyphenationCallback);
+
+export const registerFonts = async (): Promise<void> => {
+  const modules = await importFontModules();
+  map(SupportedFontFaces, (fontFace: Style.FontFace) => registerFontFace(fontFace, modules));
 };
 
 // TODO: It would be nice to reference constants from SCSS files.
@@ -59,42 +114,42 @@ const TextStyles: Pdf.ExtensionStyles = {
   h1: {
     ext: ["header"],
     fontWeight: 700,
-    fontSize: 20,
+    fontSize: 16,
     lineHeight: "1.5pt",
     marginBottom: 2
   },
   h2: {
     ext: ["header"],
     fontWeight: 700,
-    fontSize: 18,
+    fontSize: 14,
     lineHeight: "1.5pt",
     marginBottom: 2
   },
   h3: {
     ext: ["header"],
     fontWeight: 600,
-    fontSize: 18,
+    fontSize: 14,
     lineHeight: "1.5pt",
     marginBottom: 2
   },
   h4: {
     ext: ["header"],
     fontWeight: 600,
-    fontSize: 16,
+    fontSize: 12,
     lineHeight: "1.5pt",
     marginBottom: 2
   },
   h5: {
     ext: ["header"],
     fontWeight: 500,
-    fontSize: 14,
+    fontSize: 12,
     lineHeight: "1.5pt",
     marginBottom: 2
   },
   h6: {
     ext: ["header"],
     fontWeight: 500,
-    fontSize: 12,
+    fontSize: 10,
     lineHeight: "1.5pt",
     marginBottom: 2
   },
