@@ -19,9 +19,13 @@ const ColorCell = <
   value,
   ...props
 }: ColorCellProps<R, M, S, C>): JSX.Element => {
+  /* If the value is null (i.e. no color is selected for the row) then we want
+     to show the default color.  However, when selecting the default color in
+     the editor, the color will not be treated as the default but will instead
+     be treated as null, because that color may not exist in the BE. */
   return (
     <Cell {...props}>
-      <Color color={value} />
+      <Color color={value} size={20} useDefault={true} />
     </Cell>
   );
 };

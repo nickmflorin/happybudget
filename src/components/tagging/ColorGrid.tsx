@@ -9,20 +9,41 @@ import "./ColorGrid.scss";
 interface ColorGridProps extends StandardComponentProps {
   readonly colors: string[];
   readonly value?: string | null;
-  readonly onChange?: (value: string, e: React.MouseEvent<HTMLDivElement>) => void;
+  readonly colorSize?: number;
+  readonly useDefault?: boolean | string;
+  readonly colorsPerRow?: number;
+  /* Whether or not selecting the default color should be treated as a null
+     selection.  Defaults to false. */
+  readonly treatDefaultAsNull?: boolean;
+  readonly onChange?: (value: string | null, e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
-const COLORS_PER_ROW = 4;
+const ColorGrid = ({
+  colors,
+  value,
+  useDefault,
+  colorsPerRow = 4,
+  colorSize = 16,
+  treatDefaultAsNull,
+  onChange,
+  ...props
+}: ColorGridProps): JSX.Element => {
+  const defaultColor = useMemo(() => {
+    return typeof useDefault === "string" ? useDefault : Colors.COLOR_NO_COLOR;
+  }, [useDefault]);
 
-const ColorGrid = ({ colors, value, onChange, ...props }: ColorGridProps): JSX.Element => {
-  const cs = useMemo(() => {
-    if (!includes(colors, Colors.COLOR_NO_COLOR)) {
-      return [Colors.COLOR_NO_COLOR, ...colors];
+  const [cs, defaultUsed] = useMemo(() => {
+    /* We have to configure the color accounting for a potential default here
+       instead of in the Color component (and we cannot pass in useDefault to
+       the Color component) because we have to make sure that the useDefault
+       color is not already in the grid. */
+    if ((useDefault === true || typeof useDefault === "string") && !includes(colors, defaultColor)) {
+      return [[defaultColor, ...colors], true];
     }
-    return colors;
-  }, [colors]);
+    return [colors, false];
+  }, [colors, useDefault]);
 
-  const colorGroups = useMemo(() => chunk(cs, Math.ceil(cs.length / COLORS_PER_ROW)), [cs]);
+  const colorGroups = useMemo(() => chunk(cs, Math.ceil(cs.length / colorsPerRow)), [cs]);
 
   return (
     <div {...props} className={classNames("color-grid", props.className)}>
@@ -32,8 +53,17 @@ const ColorGrid = ({ colors, value, onChange, ...props }: ColorGridProps): JSX.E
             <Color
               key={j}
               color={c}
+              style={{ maxWidth: `${colorSize}px` }}
+              size={colorSize}
+              useDefault={false}
               selected={value === c || (value === null && c === Colors.COLOR_NO_COLOR)}
-              onClick={(e: React.MouseEvent<HTMLDivElement>) => onChange?.(c, e)}
+              onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                if (defaultUsed === true && treatDefaultAsNull === true && c === defaultColor) {
+                  onChange?.(null, e);
+                } else {
+                  onChange?.(c, e);
+                }
+              }}
             />
           ))}
         </div>

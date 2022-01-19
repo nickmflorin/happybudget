@@ -37,7 +37,16 @@ const FringesColorEditor = (props: FringesColorEditorProps, ref: ForwardedRef<Ta
     };
   });
 
-  return <ColorGrid colors={colors} value={value} onChange={(v: string) => setValue(v)} />;
+  return (
+    <ColorGrid
+      useDefault={true}
+      colors={colors}
+      colorSize={24}
+      value={value}
+      treatDefaultAsNull={true}
+      onChange={(v: string | null) => setValue(v)}
+    />
+  );
 };
 
 export default forwardRef(FringesColorEditor);

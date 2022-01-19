@@ -83,19 +83,19 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  height: 16px;
-  width: 16px;
+  // height: 16px;
+  // width: 16px;
 
-  svg {
-    height: 100% !important;
-    width: 100% !important;
-  }
+  // svg {
+  //   height: 100% !important;
+  //   width: 100% !important;
+  // }
 
   &.selectable {
     height: 24px;
     width: 24px;
 
-    .icon-border {
+    .selected-color-border {
       border-radius: 100%;
       border: 2px solid $white;
       height: 24px;
@@ -106,7 +106,7 @@
 
     &:hover,
     &.selected {
-      .icon-border {
+      .selected-color-border {
         box-shadow: none !important;
         border: 2px solid #6eb6ff !important;
       }
