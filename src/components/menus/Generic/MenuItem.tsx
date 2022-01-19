@@ -7,11 +7,42 @@ import { Checkbox } from "antd";
 
 import { IconOrSpinner, Spinner } from "components";
 
+interface MenuItemContentProps {
+  readonly loading?: boolean;
+  readonly icon?: IconOrElement;
+  readonly children: ReactNode;
+  readonly iconAfterLabel?: IconOrElement;
+  readonly checkbox?: boolean;
+  readonly checked?: boolean;
+}
+
+const MenuItemContent = (props: MenuItemContentProps): JSX.Element => {
+  return (
+    <React.Fragment>
+      {props.checkbox && <Checkbox checked={props.checked} />}
+      <div className={"menu-item-content"}>
+        {!isNil(props.icon) && (
+          <div className={"icon-wrapper-left"}>
+            <IconOrSpinner size={14} loading={props.loading} icon={props.icon} />
+          </div>
+        )}
+        {isNil(props.icon) && props.loading && (
+          <div className={"icon-wrapper-left"}>
+            <Spinner size={14} />
+          </div>
+        )}
+        <div className={"menu-item-inner-content"}>{props.children}</div>
+        {!isNil(props.iconAfterLabel) && <div className={"icon-wrapper-right"}>{props.iconAfterLabel}</div>}
+      </div>
+    </React.Fragment>
+  );
+};
+
 const PrivateCommonMenuItem = <
   S extends Record<string, unknown> = MenuItemSelectedState,
   M extends MenuItemModel<S> = MenuItemModel<S>
 >(
-  props: ICommonMenuItem<S, M> & { readonly isExtra: boolean; readonly children: JSX.Element }
+  props: ICommonMenuItem<S, M> & { readonly isExtra: boolean; readonly children: JSX.Element } & MenuItemContentProps
 ): JSX.Element => {
   const history = useHistory();
 
@@ -50,38 +81,12 @@ const PrivateCommonMenuItem = <
         }
       }}
     >
-      {props.children}
+      <MenuItemContent {...props}>{props.children}</MenuItemContent>
     </li>
   );
 };
 
 const CommonMenuItem = React.memo(PrivateCommonMenuItem) as typeof PrivateCommonMenuItem;
-
-interface ContentWrapperProps {
-  readonly loading?: boolean;
-  readonly icon?: IconOrElement;
-  readonly children: ReactNode;
-  readonly iconAfterLabel?: IconOrElement;
-}
-
-const ContentWrapper = (props: ContentWrapperProps): JSX.Element => {
-  return (
-    <React.Fragment>
-      {!isNil(props.icon) && (
-        <div className={"icon-wrapper-left"}>
-          <IconOrSpinner size={14} loading={props.loading} icon={props.icon} />
-        </div>
-      )}
-      {isNil(props.icon) && props.loading && (
-        <div className={"icon-wrapper-left"}>
-          <Spinner size={14} />
-        </div>
-      )}
-      {props.children}
-      {!isNil(props.iconAfterLabel) && <div className={"icon-wrapper-right"}>{props.iconAfterLabel}</div>}
-    </React.Fragment>
-  );
-};
 
 export const ExtraMenuItem = <S extends Record<string, unknown> = MenuItemSelectedState>(
   props: IExtraMenuItem
@@ -93,6 +98,8 @@ export const ExtraMenuItem = <S extends Record<string, unknown> = MenuItemSelect
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     <CommonMenuItem<S, any>
       {...props}
+      icon={props.model.icon}
+      loading={props.model.loading}
       onClick={(e: Table.CellDoneEditingEvent) => {
         props.onClick?.({
           event: e,
@@ -101,9 +108,7 @@ export const ExtraMenuItem = <S extends Record<string, unknown> = MenuItemSelect
       }}
       isExtra={true}
     >
-      <ContentWrapper icon={props.model.icon} loading={props.model.loading}>
-        <div className={"text-wrapper"}>{props.model.label}</div>
-      </ContentWrapper>
+      <div className={"text-wrapper"}>{props.model.label}</div>
     </CommonMenuItem>
   );
 };
@@ -137,6 +142,11 @@ const PrivateMenuItem = <
     <CommonMenuItem<S, M>
       {...props}
       isExtra={false}
+      icon={props.model.icon}
+      loading={props.model.loading}
+      iconAfterLabel={props.iconAfterLabel?.(m, props.state)}
+      checkbox={props.checkbox && isSelectedState(props.state)}
+      checked={isSelectedState(props.state) && props.state.selected}
       onClick={(e: Table.CellDoneEditingEvent) => {
         props.onClick?.({
           event: e,
@@ -146,20 +156,11 @@ const PrivateMenuItem = <
         });
       }}
     >
-      <React.Fragment>
-        {props.checkbox && isSelectedState(props.state) && <Checkbox checked={props.state.selected} />}
-        <ContentWrapper
-          icon={props.model.icon}
-          loading={props.model.loading}
-          iconAfterLabel={props.iconAfterLabel?.(m, props.state)}
-        >
-          {!isNil(props.renderContent) ? (
-            props.renderContent(m, props.state)
-          ) : (
-            <div className={"text-wrapper"}>{m.label}</div>
-          )}
-        </ContentWrapper>
-      </React.Fragment>
+      {!isNil(props.renderContent) ? (
+        props.renderContent(m, props.state)
+      ) : (
+        <div className={"text-wrapper"}>{m.label}</div>
+      )}
     </CommonMenuItem>
   );
 };
