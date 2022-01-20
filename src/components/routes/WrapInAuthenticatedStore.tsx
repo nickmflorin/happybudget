@@ -7,7 +7,7 @@ import axios from "axios";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { ui, notifications, plugins } from "lib";
+import { ui, notifications, users } from "lib";
 import { ApplicationSpinner } from "components";
 import { history, configureAuthenticatedStore } from "store/configureStore";
 
@@ -32,7 +32,7 @@ const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): 
         const store = configureAuthenticatedStore(response);
         setReduxStore(store);
 
-        plugins.identify(response);
+        users.plugins.identify(response);
       })
       .catch((e: Error) => {
         if (!axios.isCancel(e)) {

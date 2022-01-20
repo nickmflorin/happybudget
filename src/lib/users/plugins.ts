@@ -2,6 +2,8 @@ import moment from "moment-timezone";
 import Cookies from "universal-cookie";
 import { isNil, find } from "lodash";
 
+import { util } from "lib";
+
 const cookies = new Cookies();
 
 type KeyType = "time" | "user";
@@ -57,18 +59,15 @@ const parseDurationSinceLastIdentify = (id: PluginId, user: Model.User): number 
   const plugin = getPlugin(id);
   const lastIdentifiedTime = cookies.get(plugin.keys.time);
   const now = moment();
-  try {
-    new Date(lastIdentifiedTime).toISOString();
-  } catch (e: unknown) {
-    if (e instanceof RangeError) {
-      return null;
-    }
-    throw e;
-  }
-  const mmt = moment.tz(lastIdentifiedTime, user.timezone);
-  if (mmt.isValid()) {
-    const duration = moment.duration(now.diff(mmt));
-    return duration.minutes();
+
+  /* Do not log a warning if the date is invalid because it is stored in cookies,
+     it can be anything. */
+  const lastIdentifiedMmt = util.dates.toLocalizedMoment(lastIdentifiedTime, {
+    warnOnInvalid: false,
+    tz: user.timezone
+  });
+  if (!isNil(lastIdentifiedMmt)) {
+    return moment.duration(now.diff(lastIdentifiedMmt)).minutes();
   }
   return null;
 };
@@ -110,16 +109,31 @@ export const identifyCanny = (user: Model.User) => {
     /* We do not want to makes calls to Canny's API in local development by
        default. */
     if (!isNil(process.env.REACT_APP_CANNY_APP_ID)) {
-      window.Canny("identify", {
-        appID: process.env.REACT_APP_CANNY_APP_ID,
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.full_name,
-          avatarURL: user.profile_image?.url,
-          created: new Date(user.date_joined).toISOString()
-        }
+      const userJoined = util.dates.toLocalizedMoment(user.date_joined, {
+        warnOnInvalid: false,
+        tz: user.timezone
       });
+      if (userJoined === undefined) {
+        console.warn(
+          `Cannot perform canny identification process for user ${user.id} as ` +
+            `'date_joined' field (value = '${user.date_joined}') cannot be parsed ` +
+            "to a date."
+        );
+      } else {
+        window.Canny("identify", {
+          appID: process.env.REACT_APP_CANNY_APP_ID,
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.full_name,
+            avatarURL: user.profile_image?.url,
+            created: userJoined.toISOString()
+          }
+        });
+      }
+      /* Perform the post identification process regardless of whether or not
+         the date was valid in order to not flood Sentry with the same warning
+         over and over again. */
       postIdentify("canny", user);
     } else if (process.env.NODE_ENV === "production") {
       console.warn(

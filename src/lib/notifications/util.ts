@@ -7,5 +7,9 @@ import { inspect } from "util";
  */
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const objToJson = (e: any) => {
-  return JSON.stringify(inspect(e));
+  try {
+    return JSON.stringify(inspect(e));
+  } catch (err: unknown) {
+    return "Error converting to JSON.";
+  }
 };

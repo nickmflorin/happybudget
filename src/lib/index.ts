@@ -5,7 +5,6 @@ export * as redux from "./redux";
 export * as pdf from "./pdf";
 export * as budgeting from "./budgeting";
 export * as ui from "./ui";
-export * as plugins from "./plugins";
 export * as models from "./models";
 export * as typeguards from "./typeguards";
 export * as users from "./users";
