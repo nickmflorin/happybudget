@@ -1,7 +1,6 @@
 import { redux } from "lib";
 
 export const updateLoggedInUserAction = redux.actions.createAction<Model.User>("user.UpdateInState");
-
 export const removeContactFromStateAction = redux.actions.createAction<number>("user.contacts.RemoveFromState");
 export const updateContactInStateAction =
   redux.actions.createAction<Redux.UpdateActionPayload<Model.Contact>>("user.contacts.UpdateInState");

@@ -5,7 +5,8 @@ import { isNil, map } from "lodash";
 import { Pagination } from "antd";
 
 import * as api from "api";
-import { redux, notifications } from "lib";
+import * as store from "store";
+import { redux, notifications, users } from "lib";
 
 import { Icon } from "components";
 import { PrimaryButtonIconToggle, OrderingButtonIconToggle } from "components/buttons";
@@ -30,6 +31,7 @@ const selectBudgetsSearch = (state: Application.AuthenticatedStore) => state.das
 const selectBudgetsOrdering = (state: Application.AuthenticatedStore) => state.dashboard.budgets.ordering;
 
 const Budgets = (): JSX.Element => {
+  const user = users.hooks.useLoggedInUser();
   const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
   const [isDuplicating, setDuplicating, setDuplicated] = redux.hooks.useTrackModelActions([]);
 
@@ -71,7 +73,25 @@ const Budgets = (): JSX.Element => {
               dispatch(actions.setBudgetsSearchAction(event.target.value, {}))
             }
           />,
-          <BudgetDropdown onNewBudget={() => setCreateBudgetModalOpen(true)} key={1}>
+          <BudgetDropdown
+            onNewBudget={() => {
+              /* Note: Normally we would want to rely on a request to the backend
+                 as the source of truth for a user permission related action, but
+                 since the CreateBudgetModal protects against users without the
+                 proper permissions creating multiple budgets during the API
+                 request anyways, this is okay. */
+              if (
+                responseWasReceived &&
+                budgets.length !== 0 &&
+                !users.permissions.userHasPermission(user, users.permissions.Permissions.MULTIPLE_BUDGETS)
+              ) {
+                dispatch(store.actions.authenticated.setSubscriptionPermissionModalOpenAction(true));
+              } else if (responseWasReceived) {
+                setCreateBudgetModalOpen(true);
+              }
+            }}
+            key={1}
+          >
             <PrimaryButtonIconToggle
               breakpoint={"medium"}
               icon={<Icon icon={"plus"} weight={"light"} />}
@@ -126,25 +146,43 @@ const Budgets = (): JSX.Element => {
                   onEdit={() => setBudgetToEdit(budget.id)}
                   onDelete={() => setBudgetToDelete(budget)}
                   onDuplicate={(e: MenuItemModelClickEvent) => {
-                    setDuplicating(budget.id);
-                    api
-                      .duplicateBudget(budget.id)
-                      .then((response: Model.Budget) => {
-                        e.closeParentDropdown?.();
-                        dispatch(actions.addBudgetToStateAction(response));
-                      })
-                      .catch((err: Error) => {
-                        if (
-                          err instanceof api.ClientError &&
-                          !isNil(err.permissionError) &&
-                          err.permissionError.code === api.ErrorCodes.PRODUCT_PERMISSION_ERROR
-                        ) {
-                          notifications.ui.banner.lookupAndNotify("budgetCountPermissionError", {});
-                        } else {
-                          notifications.ui.banner.handleRequestError(err);
-                        }
-                      })
-                      .finally(() => setDuplicated(budget.id));
+                    /* Note: Normally we would want to rely on a request to the
+										   backend as the source of truth for a user permission
+											 related action, but since the request to duplicate a
+											 Budget is itself protected against incompatible
+											 permissions, this is okay. */
+                    if (
+                      responseWasReceived &&
+                      budgets.length !== 0 &&
+                      !users.permissions.userHasPermission(user, users.permissions.Permissions.MULTIPLE_BUDGETS)
+                    ) {
+                      dispatch(store.actions.authenticated.setSubscriptionPermissionModalOpenAction(true));
+                      /* Edge case, since a response would have to had been
+											   received if there is a card there. */
+                    } else if (responseWasReceived) {
+                      setDuplicating(budget.id);
+                      api
+                        .duplicateBudget(budget.id)
+                        .then((response: Model.Budget) => {
+                          e.closeParentDropdown?.();
+                          dispatch(actions.addBudgetToStateAction(response));
+                        })
+                        .catch((err: Error) => {
+                          if (
+                            err instanceof api.ClientError &&
+                            !isNil(err.permissionError) &&
+                            err.permissionError.code === api.ErrorCodes.PRODUCT_PERMISSION_ERROR
+                          ) {
+                            /* Edge case, since we would prevent this action
+                               if this were the case before submitting the
+															 request. */
+                            notifications.ui.banner.lookupAndNotify("budgetCountPermissionError", {});
+                          } else {
+                            notifications.ui.banner.handleRequestError(err);
+                          }
+                        })
+                        .finally(() => setDuplicated(budget.id));
+                    }
                   }}
                 />
               );

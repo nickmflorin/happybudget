@@ -1,4 +1,12 @@
-import { includes } from "lodash";
+import { includes, map, filter } from "lodash";
+
+export enum Permissions {
+  MULTIPLE_BUDGETS = "multiple_budgets"
+}
+
+export const ProductPermissions: { [key in Model.PermissionId]: Array<Model.ProductId> } = {
+  multiple_budgets: ["greenbudget_standard", "greenbudget_premium"]
+};
 
 export enum ProductPermissionIds {
   MULTIPLE_BUDGETS = "multiple_budgets"
@@ -37,3 +45,9 @@ export const userHasProduct = (user: Model.User, product?: SingleOrArray<Model.P
   const product_ids = Array.isArray(product) ? product : [product];
   return includes(product_ids, user.product_id);
 };
+
+export const userHasPermission = (user: Model.User, permission: Model.PermissionId) =>
+  filter(
+    map(ProductPermissions[permission], (p: Model.ProductId) => userHasProduct(user, p)),
+    (v: boolean) => v === true
+  ).length !== 0;
