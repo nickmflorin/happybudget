@@ -107,7 +107,10 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       const response: Http.ListResponse<Model.Fringe> = yield api.request(config.services.requestFringes, objId, {});
       yield put(config.actions.responseFringes({ models: response.data }));
     } catch (e: unknown) {
-      config.table.handleRequestError(e as Error, { message: "There was an error retrieving the table data." });
+      config.table.handleRequestError(e as Error, {
+        message: "There was an error retrieving the table data.",
+        dispatchClientErrorToSentry: true
+      });
       yield put(config.actions.responseFringes({ models: [] }));
     }
   }
@@ -117,7 +120,10 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       const response = yield api.request(api.getFringeColors);
       yield put(config.actions.responseFringeColors(response));
     } catch (e: unknown) {
-      config.table.handleRequestError(e as Error, { message: "There was an error retrieving the table data." });
+      config.table.handleRequestError(e as Error, {
+        message: "There was an error retrieving the table data.",
+        dispatchClientErrorToSentry: true
+      });
       yield put(config.actions.responseFringeColors({ data: [], count: 0 }));
     }
   }
@@ -127,7 +133,10 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       const response = yield api.request(api.getSubAccountUnits);
       yield put(config.actions.responseSubAccountUnits(response));
     } catch (e: unknown) {
-      config.table.handleRequestError(e as Error, { message: "There was an error retrieving the table data." });
+      config.table.handleRequestError(e as Error, {
+        message: "There was an error retrieving the table data.",
+        dispatchClientErrorToSentry: true
+      });
       yield put(config.actions.responseSubAccountUnits({ data: [], count: 0 }));
     }
   }
@@ -199,7 +208,10 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         ) {
           notifications.ui.banner.lookupAndNotify("budgetSubscriptionPermissionError");
         } else {
-          config.table.handleRequestError(e as Error, { message: "There was an error retrieving the table data." });
+          config.table.handleRequestError(e as Error, {
+            message: "There was an error retrieving the table data.",
+            dispatchClientErrorToSentry: true
+          });
         }
         yield put(config.actions.response({ models: [], markups: [], groups: [] }));
       } finally {
@@ -249,7 +261,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
         yield put(config.actions.updateParentInState({ id: response.data.id, data: response.data }));
       } catch (err: unknown) {
-        config.table.handleRequestError(err as Error, { message: errorMessage });
+        config.table.handleRequestError(err as Error, { message: errorMessage, dispatchClientErrorToSentry: true });
       } finally {
         yield put(config.actions.loadingBudget(false));
         config.table.saving(false);
@@ -282,7 +294,10 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         */
         yield all(validEffects);
       } catch (err: unknown) {
-        config.table.handleRequestError(err as Error, { message: "There was an error updating the table rows." });
+        config.table.handleRequestError(err as Error, {
+          message: "There was an error updating the table rows.",
+          dispatchClientErrorToSentry: true
+        });
       } finally {
         config.table.saving(false);
       }
@@ -365,7 +380,10 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
           )
         );
       } catch (err: unknown) {
-        config.table.handleRequestError(err as Error, { message: "There was an error adding the table rows." });
+        config.table.handleRequestError(err as Error, {
+          message: "There was an error adding the table rows.",
+          dispatchClientErrorToSentry: true
+        });
       } finally {
         config.table.saving(false);
       }
@@ -399,7 +417,10 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
           )
         );
       } catch (err: unknown) {
-        config.table.handleRequestError(err as Error, { message: "There was an error moving the table rows." });
+        config.table.handleRequestError(err as Error, {
+          message: "There was an error moving the table rows.",
+          dispatchClientErrorToSentry: true
+        });
       } finally {
         config.table.saving(false);
       }
@@ -434,7 +455,10 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         try {
           yield all([call(deleteGroups, groupRowIds), call(bulkDeleteRows, context.id, modelRowIds, markupRowIds)]);
         } catch (err: unknown) {
-          config.table.handleRequestError(err as Error, { message: "There was an error removing the table rows." });
+          config.table.handleRequestError(err as Error, {
+            message: "There was an error removing the table rows.",
+            dispatchClientErrorToSentry: true
+          });
         } finally {
           config.table.saving(false);
           yield put(config.actions.loadingBudget(false));

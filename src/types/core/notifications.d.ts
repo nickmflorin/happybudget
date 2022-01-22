@@ -84,7 +84,10 @@ declare type UINotificationsHandler = {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   readonly lookupAndNotify: (id: UIExistingNotificationId, params: any) => UINotification[];
   readonly clearNotifications: (ids?: SingleOrArray<number>) => void;
-  readonly handleRequestError: (e: Error, opts?: UINotificationOptions) => UINotification[];
+  readonly handleRequestError: (
+    e: Error,
+    opts?: UINotificationOptions & { readonly dispatchClientErrorToSentry?: boolean }
+  ) => UINotification[];
   readonly notifications: UINotification[];
 };
 

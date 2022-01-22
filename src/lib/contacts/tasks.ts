@@ -69,7 +69,10 @@ export const createTableTaskSet = (
       const response: Http.ListResponse<M> = yield api.request(api.getContacts, {});
       yield put(config.actions.response({ models: response.data }));
     } catch (e: unknown) {
-      config.table.handleRequestError(e as Error, { message: "There was an error retrieving the contacts." });
+      config.table.handleRequestError(e as Error, {
+        message: "There was an error retrieving the contacts.",
+        dispatchClientErrorToSentry: true
+      });
       yield put(config.actions.response({ models: [] }));
     } finally {
       yield put(config.actions.loading(false));
@@ -100,7 +103,7 @@ export const createTableTaskSet = (
     try {
       yield api.request(api.bulkUpdateContacts, requestPayload);
     } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, { message: errorMessage });
+      config.table.handleRequestError(err as Error, { message: errorMessage, dispatchClientErrorToSentry: true });
     } finally {
       config.table.saving(false);
     }
@@ -111,7 +114,7 @@ export const createTableTaskSet = (
     try {
       yield api.request(api.bulkDeleteContacts, ids);
     } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, { message: errorMessage });
+      config.table.handleRequestError(err as Error, { message: errorMessage, dispatchClientErrorToSentry: true });
     } finally {
       config.table.saving(false);
     }
@@ -134,7 +137,10 @@ export const createTableTaskSet = (
         )
       );
     } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, { message: "There was an error adding the rows." });
+      config.table.handleRequestError(err as Error, {
+        message: "There was an error adding the rows.",
+        dispatchClientErrorToSentry: true
+      });
     } finally {
       config.table.saving(false);
     }
@@ -156,7 +162,10 @@ export const createTableTaskSet = (
         )
       );
     } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, { message: "There was an error moving the rows." });
+      config.table.handleRequestError(err as Error, {
+        message: "There was an error moving the rows.",
+        dispatchClientErrorToSentry: true
+      });
     } finally {
       config.table.saving(false);
     }

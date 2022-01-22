@@ -177,9 +177,17 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
    * Sentry and/or the console.
    */
   const handleRequestError = useMemo(
-    () => (e: Error, opts?: UINotificationOptions) => {
+    () => (e: Error, opts?: UINotificationOptions & { readonly dispatchClientErrorToSentry?: boolean }) => {
       if (!axios.isCancel(e) && !(e instanceof api.ForceLogout)) {
         if (e instanceof api.ClientError) {
+          /* By default, we do not want to dispatch ClientError(s) to Sentry,
+             because these are mostly used for control flow and are raised in
+             expected cases.  However, there are times that we know we should
+             not be getting a ClientError, in which case we should dispatch to
+             Sentry. */
+          if (opts?.dispatchClientErrorToSentry === true) {
+            internal.requestError(e);
+          }
           return notify(e.errors, { message: "There was a problem with your request.", ...opts });
         } else if (e instanceof api.NetworkError || e instanceof api.ServerError) {
           /* Dispatch the notification to the internal handler so we can, if

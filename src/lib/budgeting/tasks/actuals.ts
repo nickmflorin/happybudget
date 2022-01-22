@@ -58,7 +58,10 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
       /* Note: This is not ideal, as we might wind up with multiple table
          table notifications from this request and the requet to get the actuals.
 				 */
-      config.table.handleRequestError(e as Error, { message: "There was an error retrieving the table data." });
+      config.table.handleRequestError(e as Error, {
+        message: "There was an error retrieving the table data.",
+        dispatchClientErrorToSentry: true
+      });
       yield put(config.actions.responseActualOwners({ count: 0, data: [] }));
     } finally {
       yield put(config.actions.loadingActualOwners(false));
@@ -85,7 +88,10 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
       ) {
         notifications.ui.banner.lookupAndNotify("budgetSubscriptionPermissionError");
       } else {
-        config.table.handleRequestError(e as Error, { message: "There was an error retrieving the table data." });
+        config.table.handleRequestError(e as Error, {
+          message: "There was an error retrieving the table data.",
+          dispatchClientErrorToSentry: true
+        });
       }
       yield put(config.actions.response({ models: [] }));
     } finally {
@@ -125,7 +131,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
       );
       yield put(config.actions.updateBudgetInState({ id: r.data.id, data: r.data }));
     } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, { message: errorMessage });
+      config.table.handleRequestError(err as Error, { message: errorMessage, dispatchClientErrorToSentry: true });
     } finally {
       config.table.saving(false);
     }
@@ -137,7 +143,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
       const r: Http.BulkDeleteResponse<Model.Budget> = yield api.request(api.bulkDeleteBudgetActuals, budgetId, ids);
       yield put(config.actions.updateBudgetInState({ id: r.data.id, data: r.data }));
     } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, { message: errorMessage });
+      config.table.handleRequestError(err as Error, { message: errorMessage, dispatchClientErrorToSentry: true });
     } finally {
       config.table.saving(false);
     }
@@ -162,7 +168,10 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
         )
       );
     } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, { message: "There was an error moving the table rows." });
+      config.table.handleRequestError(err as Error, {
+        message: "There was an error moving the table rows.",
+        dispatchClientErrorToSentry: true
+      });
     } finally {
       config.table.saving(false);
     }
@@ -185,7 +194,10 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
         )
       );
     } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, { message: "There was an error adding the table rows." });
+      config.table.handleRequestError(err as Error, {
+        message: "There was an error adding the table rows.",
+        dispatchClientErrorToSentry: true
+      });
     } finally {
       config.table.saving(false);
     }

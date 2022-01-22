@@ -178,7 +178,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         }
       }
     } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, { message: errorMessage });
+      config.table.handleRequestError(err as Error, { message: errorMessage, dispatchClientErrorToSentry: true });
     } finally {
       if (!tabling.typeguards.isGroupEvent(e)) {
         yield put(config.actions.loadingBudget(false));
@@ -194,7 +194,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       const response: Http.BulkDeleteResponse<B> = yield api.request(config.services.bulkDelete, budgetId, ids);
       yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
     } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, { message: errorMessage });
+      config.table.handleRequestError(err as Error, { message: errorMessage, dispatchClientErrorToSentry: true });
     } finally {
       config.table.saving(false);
       yield put(config.actions.loadingBudget(false));
@@ -218,7 +218,10 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         )
       );
     } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, { message: "There was an error adding the table rows." });
+      config.table.handleRequestError(err as Error, {
+        message: "There was an error adding the table rows.",
+        dispatchClientErrorToSentry: true
+      });
     } finally {
       config.table.saving(false);
     }
@@ -243,7 +246,10 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         )
       );
     } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, { message: "There was an error moving the table rows." });
+      config.table.handleRequestError(err as Error, {
+        message: "There was an error moving the table rows.",
+        dispatchClientErrorToSentry: true
+      });
     } finally {
       config.table.saving(false);
     }

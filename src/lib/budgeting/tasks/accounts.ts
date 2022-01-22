@@ -136,7 +136,10 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         ) {
           notifications.ui.banner.lookupAndNotify("budgetSubscriptionPermissionError");
         } else {
-          config.table.handleRequestError(e as Error, { message: "There was an error retrieving the table data." });
+          config.table.handleRequestError(e as Error, {
+            message: "There was an error retrieving the table data.",
+            dispatchClientErrorToSentry: true
+          });
         }
         yield put(config.actions.response({ models: [], groups: [], markups: [] }));
       } finally {
@@ -224,7 +227,10 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         */
         yield all(validEffects);
       } catch (err: unknown) {
-        config.table.handleRequestError(err as Error, { message: "There was an error updating the table rows." });
+        config.table.handleRequestError(err as Error, {
+          message: "There was an error updating the table rows.",
+          dispatchClientErrorToSentry: true
+        });
       } finally {
         config.table.saving(false);
       }
@@ -321,7 +327,10 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
             call(bulkDeleteRows, context.budgetId, modelRowIds, markupRowIds)
           ]);
         } catch (err: unknown) {
-          config.table.handleRequestError(err as Error, { message: "There was an error removing the table rows." });
+          config.table.handleRequestError(err as Error, {
+            message: "There was an error removing the table rows.",
+            dispatchClientErrorToSentry: true
+          });
         } finally {
           config.table.saving(false);
           yield put(config.actions.loadingBudget(false));
@@ -355,7 +364,10 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
           )
         );
       } catch (err: unknown) {
-        config.table.handleRequestError(err as Error, { message: "There was an error adding the table rows." });
+        config.table.handleRequestError(err as Error, {
+          message: "There was an error adding the table rows.",
+          dispatchClientErrorToSentry: true
+        });
         notifications.requestError(err as Error);
       } finally {
         config.table.saving(false);
@@ -390,7 +402,10 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
           )
         );
       } catch (err: unknown) {
-        config.table.handleRequestError(err as Error, { message: "There was an error moving the table rows." });
+        config.table.handleRequestError(err as Error, {
+          message: "There was an error moving the table rows.",
+          dispatchClientErrorToSentry: true
+        });
       } finally {
         config.table.saving(false);
       }
