@@ -27,8 +27,7 @@ const getColor = (obj: M, index: number) =>
   budgeting.typeguards.isGroup(obj)
     ? obj.color || Colors.COLOR_NO_COLOR
     : util.colors.getLoopedColorInScheme(DEFAULT_COLOR_SCHEME, index);
-const getLabel = (obj: M) =>
-  budgeting.typeguards.isGroup(obj) ? `Group ${obj.name}` : `Account ${obj.description || obj.identifier || ""}`;
+const getLabel = (obj: M) => (budgeting.typeguards.isGroup(obj) ? obj.name : obj.description || obj.identifier || "");
 const getId = (obj: M) => `${obj.type}-${obj.id}`;
 
 const Metrics: Charts.BudgetTotal.Metric[] = [
