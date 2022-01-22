@@ -204,7 +204,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         if (
           err instanceof api.ClientError &&
           !isNil(err.permissionError) &&
-          err.permissionError.code === "subscription_permission_error"
+          err.permissionError.code === api.ErrorCodes.PRODUCT_PERMISSION_ERROR
         ) {
           notifications.ui.banner.lookupAndNotify("budgetSubscriptionPermissionError");
         } else {

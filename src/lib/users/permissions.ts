@@ -1,5 +1,9 @@
 import { includes } from "lodash";
 
+export enum ProductPermissionIds {
+  MULTIPLE_BUDGETS = "multiple_budgets"
+}
+
 export const userHasProduct = (user: Model.User, product?: SingleOrArray<Model.ProductId> | null): boolean => {
   if (user.billing_status === null || user.product_id === null) {
     if (user.product_id !== null) {

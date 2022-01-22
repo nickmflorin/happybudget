@@ -1,5 +1,3 @@
-import classNames from "classnames";
-
 import { ui } from "lib";
 import { EditAttachments, EditAttachmentsProps } from "components/files";
 
@@ -19,14 +17,7 @@ const EditAttachmentsModal = ({
   const modal = ui.hooks.useModalIfNotDefined(props.modal);
 
   return (
-    <Modal
-      {...props}
-      className={classNames("modal--no-footer", props.className)}
-      modal={modal}
-      title={"Attachments"}
-      titleIcon={"paperclip"}
-      footer={null}
-    >
+    <Modal {...props} modal={modal} title={"Attachments"} titleIcon={"paperclip"} footer={null}>
       <EditAttachments
         path={path}
         id={id}

@@ -22,7 +22,7 @@ const CreateBudgetModal = ({ templateId, ...props }: CreateBudgetModalProps): JS
         if (
           e instanceof api.ClientError &&
           !isNil(e.permissionError) &&
-          e.permissionError.code === "subscription_permission_error"
+          e.permissionError.code === api.ErrorCodes.PRODUCT_PERMISSION_ERROR
         ) {
           f.lookupAndNotify("budgetCountPermissionError", {});
           return true;

@@ -42,7 +42,7 @@ function* getBudgetTask(action: Redux.Action<number>): SagaIterator {
     if (
       err instanceof api.ClientError &&
       !isNil(err.permissionError) &&
-      err.permissionError.code === "subscription_permission_error"
+      err.permissionError.code === api.ErrorCodes.PRODUCT_PERMISSION_ERROR
     ) {
       notifications.ui.banner.lookupAndNotify("budgetSubscriptionPermissionError");
     } else {

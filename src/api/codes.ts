@@ -15,7 +15,7 @@ export const AuthErrorCodes: { [key: string]: Http.AuthErrorCode } = {
 
 export const PermissionErrorCodes: { [key: string]: Http.PermissionErrorCode } = {
   PERMISSION_ERROR: "permission_error",
-  SUBSCRIPTION_PERMISSION_ERROR: "subscription_permission_error"
+  PRODUCT_PERMISSION_ERROR: "product_permission_error"
 };
 
 export const BillingErrorCodes: { [key: string]: Http.BillingErrorCode } = {

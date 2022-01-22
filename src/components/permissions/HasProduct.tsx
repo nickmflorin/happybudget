@@ -11,7 +11,7 @@ interface HasProductProps {
 const HasProduct: React.FC<HasProductProps> = ({ product, children }) => {
   const user = users.hooks.useLoggedInUser();
   const visible = useMemo(
-    () => users.models.userHasProduct(user, product),
+    () => users.permissions.userHasProduct(user, product),
     [product, user.product_id, user.billing_status]
   );
   return <ShowHide show={visible}>{children}</ShowHide>;

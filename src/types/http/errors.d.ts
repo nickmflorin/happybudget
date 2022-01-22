@@ -9,7 +9,7 @@ declare namespace Http {
 
   type GlobalErrorCode = "pdf_error" | "rate_limited" | "email_error";
 
-  type PermissionErrorCode = "permission_error" | "subscription_permission_error";
+  type PermissionErrorCode = "permission_error" | "product_permission_error";
   type BillingErrorCode = "stripe_request_error" | "checkout_error" | "checkout_session_inactive";
 
   type FieldErrorCode =

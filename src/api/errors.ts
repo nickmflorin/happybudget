@@ -65,32 +65,6 @@ const stringifyErrors = (errors: Http.Error[]): string => {
  * A ClientError refers to an HTTP request error where there is a response
  * and the response status code is between 400 and 499.  In this case, Django
  * REST Framework will include an error in the response body.
- *
- * If the errors are related to validation of the fields of the serializer,
- * the response will be of the form:
- *
- * {
- *   errors: {
- *     field_1: [{message: ..., code: ...}, {message: ..., code: ...}],
- *     field_2: [{message: ..., code: ...}, {message: ..., code: ...}]
- *     ...
- *   }
- * }
- *
- * The object { message: ..., code: ... } is referred to as the error detail.
- *
- * If the errors are not related to the validation of specific fields but are
- * general, the response will be of the form:
- *
- * {
- *   errors: {
- *     __all__: [{message: ..., code: ...}],
- *   }
- * }
- *
- * 99.9% of the time, errors["__all__"] will only contain 1 detail, where as
- * the errors for individual fields have the potential to contain more than 1
- * detail.
  */
 export class ClientError extends HttpError implements Http.IHttpClientError {
   public static type = HttpErrorTypes.CLIENT;
