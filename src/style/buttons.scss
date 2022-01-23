@@ -216,51 +216,6 @@
   &--inline {
     font-size: inherit !important;
   }
-
-  // Links that are displayed immediately under a FormItem.  This is used in
-  // the login/reset password pages.
-  &--form-supplementary {
-    color: #868686;
-    font-family: $avenir;
-    font-weight: 400;
-    font-size: 14px;
-    text-transform: unset !important;
-    padding-left: 4px;
-
-    &:hover,
-    &:focus,
-    &.disabled,
-    &.fake-disabled,
-    &:disabled {
-      color: #cacaca !important;
-    }
-  }
-}
-
-.text-with-link {
-  @extend .link;
-  font-size: 12px;
-  line-height: 14px;
-  font-family: $roboto;
-  font-weight: 400;
-  transition: none;
-  background-color: transparent;
-  padding: 0;
-  border: none !important;
-  color: $text-secondary;
-
-  .text-embedded-link {
-    margin-left: 3px;
-    color: $blue;
-
-    &:hover,
-    &:focus,
-    &:disabled,
-    &.fake-disabled,
-    &.disabled {
-      color: rgba($blue, 0.6);
-    }
-  }
 }
 
 .btn,
