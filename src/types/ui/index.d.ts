@@ -94,3 +94,7 @@ declare type Pagination = {
   readonly page: number;
   readonly pageSize?: number;
 };
+
+declare type UseSizeProps<T extends string = string> = {
+  size?: T;
+} & { [key in T]?: boolean };

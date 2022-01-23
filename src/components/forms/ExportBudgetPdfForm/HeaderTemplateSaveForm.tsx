@@ -84,7 +84,7 @@ const HeaderTemplateSaveForm = (
             }}
           />
           <Button
-            className={"btn btn--default btn--small"}
+            className={"btn btn--default btn small"}
             disabled={disabled || saving}
             loading={saving}
             style={{ marginRight: !isNil(existing) || requestNameInput ? 6 : 0 }}
@@ -110,7 +110,7 @@ const HeaderTemplateSaveForm = (
 
           <ShowHide show={existing && saveAsMode === false}>
             <Button
-              className={"btn btn--default btn--small"}
+              className={"btn btn--default btn small"}
               style={{ marginRight: requestNameInput ? 6 : 0 }}
               disabled={disabled || saving || saveAsMode === true}
               onClick={() => {

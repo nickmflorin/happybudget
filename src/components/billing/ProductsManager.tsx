@@ -17,21 +17,20 @@ import "./ProductsManager.scss";
 type ProductsManagerProps = StandardComponentProps & {
   readonly onSubscribe: (p: Model.Product) => void;
   readonly onManage: () => void;
-  readonly subscribing: boolean;
+  readonly subscribing: Model.ProductId | null;
   readonly managing: boolean;
 };
 
 const ProductsManager = ({
   onSubscribe,
   onManage,
-  subscribing,
   managing,
+  subscribing,
   ...props
 }: ProductsManagerProps): JSX.Element => {
   const [products, setProducts] = useState<Model.Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [subscription, setSubscription] = useState<Model.Subscription | null>(null);
-  const [selectedProduct, setSelectedProduct] = useState<Model.Product | null>(null);
   const user = users.hooks.useLoggedInUser();
 
   useEffect(() => {
@@ -97,29 +96,18 @@ const ProductsManager = ({
 
   return (
     <RenderOrSpinner loading={loading}>
-      <div className={classNames("products-manager", props.className)} style={props.style}>
+      <div {...props} className={classNames("products-manager", props.className)}>
         <h4>{userProduct === null ? "Plans" : "Plan"}</h4>
         <Separator />
         {userProduct === null ? (
-          <React.Fragment>
-            <ProductsList
-              selectedProduct={selectedProduct === null ? null : selectedProduct.id}
-              products={products}
-              onChange={(p: Model.Product) => setSelectedProduct(p)}
-            />
-            <PrimaryButton
-              style={{ marginTop: 15 }}
-              disabled={selectedProduct === null}
-              loading={subscribing}
-              onClick={() => {
-                if (!isNil(selectedProduct)) {
-                  onSubscribe(selectedProduct);
-                }
-              }}
-            >
-              {"Subscribe"}
-            </PrimaryButton>
-          </React.Fragment>
+          <ProductsList
+            products={products}
+            extra={(p: Model.Product) => (
+              <PrimaryButton small={true} loading={subscribing === p.id} onClick={() => onSubscribe(p)}>
+                {"Subscribe"}
+              </PrimaryButton>
+            )}
+          />
         ) : (
           <React.Fragment>
             <Product

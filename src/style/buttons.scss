@@ -198,7 +198,6 @@
   font-family: $roboto;
   font-weight: 400;
   transition: none;
-  box-shadow: none;
   background-color: transparent;
   padding: 0;
   border: none !important;
@@ -245,7 +244,6 @@
   font-family: $roboto;
   font-weight: 400;
   transition: none;
-  box-shadow: none;
   background-color: transparent;
   padding: 0;
   border: none !important;
@@ -284,7 +282,7 @@
   border-width: 1px;
   color: $text-secondary;
   box-sizing: border-box;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: none !important;
 
   -moz-appearance: none;
   -webkit-appearance: none;
@@ -309,8 +307,7 @@
     color: inherit;
   }
 
-  &--large {
-    @extend .btn;
+  &.large:not(.btn--icon-only) {
     font-size: 20px;
     line-height: 20px;
     padding-top: 12px;
@@ -322,8 +319,7 @@
     font-weight: 600;
   }
 
-  &--small {
-    @extend .btn;
+  &.small:not(.btn--icon-only) {
     font-size: 11px;
     line-height: 18px;
     padding: 6px 12px;
@@ -426,15 +422,19 @@
     &.xxsmall {
       padding: 10px;
     }
+
     &.xsmall {
       padding: 9px;
     }
+
     &.small {
       padding: 8px;
     }
+
     &.medium {
       padding: 7px;
     }
+
     &.large {
       padding: 6px;
     }
@@ -543,7 +543,7 @@
 
   &--login,
   &--reset {
-    @extend .btn--large;
+    @extend .large;
     border: 1px solid transparent;
     font-family: $avenir;
     font-weight: 600;
@@ -570,7 +570,7 @@
   }
 
   &--google {
-    @extend .btn--large;
+    @extend .large;
     border-radius: 4px !important;
     width: 230px !important;
     text-transform: unset !important;
@@ -618,7 +618,6 @@
 
   &--bare {
     font-weight: 600;
-    box-shadow: none !important;
     min-width: 0px;
     padding: 10px 12px;
     line-height: 16px;

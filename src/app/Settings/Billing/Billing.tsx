@@ -8,7 +8,7 @@ import { notifications, users } from "lib";
 import { ProductsManager } from "components/billing";
 
 const Billing = (): JSX.Element => {
-  const [subscribing, setSubscribing] = useState(false);
+  const [subscribing, setSubscribing] = useState<Model.ProductId | null>(null);
   const [managing, setManaging] = useState(false);
   const user = users.hooks.useLoggedInUser();
   const history = useHistory();
@@ -76,7 +76,7 @@ const Billing = (): JSX.Element => {
             .finally(() => setManaging(false));
         }}
         onSubscribe={(p: Model.Product) => {
-          setSubscribing(true);
+          setSubscribing(p.id);
           api
             .createCheckoutSession({ price_id: p.price_id })
             .then((response: { redirect_url: string }) => {
@@ -85,7 +85,7 @@ const Billing = (): JSX.Element => {
             .catch((e: Error) =>
               notifications.ui.banner.handleRequestError(e, { message: "There was an error during checkout." })
             )
-            .finally(() => setSubscribing(false));
+            .finally(() => setSubscribing(null));
         }}
       />
     </div>

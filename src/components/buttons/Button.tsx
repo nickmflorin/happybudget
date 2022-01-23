@@ -11,9 +11,10 @@ import { TooltipWrapper } from "components/tooltips";
 import { SpinnerProps } from "components/loading/Spinner";
 
 export interface ButtonProps
-  extends Omit<AntDButtonProps, "disabled" | "icon" | StandardComponentPropNames>,
+  extends Omit<AntDButtonProps, "disabled" | "icon" | "size" | StandardComponentPropNames>,
     ClickableProps,
-    StandardComponentProps {
+    StandardComponentProps,
+    UseSizeProps<"small" | "medium" | "large"> {
   readonly loading?: boolean;
   readonly showLoadingIndicatorOverIcon?: boolean;
   readonly withDropdownCaret?: boolean;
@@ -35,7 +36,12 @@ const Button = (
     className,
     tooltip,
     withDropdownCaret,
+    dropdownCaretState,
     spinnerProps,
+    size,
+    small,
+    medium,
+    large,
     ...props
   }: ButtonProps,
   ref: ForwardedRef<HTMLButtonElement>
@@ -49,6 +55,7 @@ const Button = (
   const [isHovered, setIsHovered] = useState(false);
 
   const iC = ui.hooks.useClickableIcon(icon, { isHovered });
+  const _size = ui.hooks.useSize({ options: ["small", "medium", "large"] }, { size, small, medium, large });
 
   const prefix = useMemo(() => {
     if (isNil(iC)) {
@@ -87,7 +94,7 @@ const Button = (
         {...props}
         ref={ref}
         onClick={(e: React.MouseEvent<HTMLButtonElement>) => !isFakeDisabled && props.onClick?.(e)}
-        className={classNames("btn", className, {
+        className={classNames("btn", className, _size, {
           disabled: isDisabled,
           "fake-disabled": isFakeDisabled
         })}
@@ -98,11 +105,7 @@ const Button = (
         {prefix}
         {children}
         <ShowHide show={withDropdownCaret}>
-          <Icon
-            className={"caret"}
-            icon={props.dropdownCaretState === "open" ? "caret-up" : "caret-down"}
-            weight={"solid"}
-          />
+          <Icon className={"caret"} icon={dropdownCaretState === "open" ? "caret-up" : "caret-down"} weight={"solid"} />
         </ShowHide>
       </AntDButton>
     </TooltipWrapper>

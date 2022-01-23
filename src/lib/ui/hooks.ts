@@ -10,6 +10,28 @@ import { util, hooks, notifications } from "lib";
 
 export * from "./tsxHooks";
 
+type UseSizeConfig<T extends string = string> = {
+  readonly options: T[];
+  readonly default?: T;
+};
+
+export const useSize = <T extends string = string, P extends UseSizeProps<T> = UseSizeProps<T>>(
+  config: UseSizeConfig<T>,
+  props: P
+) =>
+  useMemo(() => {
+    if (props.size !== undefined) {
+      return props.size;
+    } else {
+      for (let i = 0; i < config.options.length; i++) {
+        if (props[config.options[i]] === true) {
+          return config.options[i];
+        }
+      }
+    }
+    return config.default;
+  }, [config.options, config.default, props]);
+
 export const InitialLayoutRef: ILayoutRef = {
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   setSidebarVisible: () => {},
