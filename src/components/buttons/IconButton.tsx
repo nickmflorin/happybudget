@@ -29,9 +29,7 @@ const IconButton = ({
     { options: ["small", "medium", "large", "xsmall", "xxsmall"] },
     { size, small, medium, large, xsmall, xxsmall }
   );
-  return (
-    <Button {...props} icon={icon} className={classNames("btn btn--icon-only", props.className, { fill }, _size)} />
-  );
+  return <Button {...props} icon={icon} className={classNames("btn--icon-only", props.className, { fill }, _size)} />;
 };
 
 export default React.memo(IconButton);

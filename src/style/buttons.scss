@@ -46,7 +46,6 @@
 }
 
 .icon-wrapper {
-  height: 100%;
   width: auto;
   position: relative;
   display: flex;
@@ -128,6 +127,10 @@
   .spinner {
     color: $c;
   }
+
+	.anticon-loading {
+		color: $c !important;
+	}
 }
 
 @mixin bare_color_set($c, $h: lighten($c, 20%), $d: $disabled-color) {
@@ -260,25 +263,6 @@
     height: 100% !important;
     width: auto;
     color: inherit;
-  }
-
-  &.large:not(.btn--icon-only) {
-    font-size: 20px;
-    line-height: 20px;
-    padding-top: 12px;
-    padding-bottom: 12px;
-    height: auto;
-    width: 230px;
-    font-family: $avenir;
-    text-transform: unset;
-    font-weight: 600;
-  }
-
-  &.small:not(.btn--icon-only) {
-    font-size: 11px;
-    line-height: 18px;
-    padding: 6px 12px;
-    height: 30px;
   }
 
   // A Button That Looks Like a <a> Link
@@ -497,18 +481,9 @@
   }
 
   &--login,
-  &--reset {
-    @extend .large;
-    border: 1px solid transparent;
-    font-family: $avenir;
+  &--reset,
+	&--register {
     font-weight: 600;
-
-    .anticon-loading {
-      color: $white !important;
-    }
-
-    @include primary();
-    @include solid_color($white);
   }
 
   &--clear,
@@ -525,7 +500,6 @@
   }
 
   &--google {
-    @extend .large;
     border-radius: 4px !important;
     width: 230px !important;
     text-transform: unset !important;
@@ -533,7 +507,7 @@
     padding-top: 2px !important;
     padding-bottom: 2px !important;
     height: 48px;
-    font-size: 14px;
+    font-size: 14px !important;
     font-family: $avenir;
 
     @include bg_color_set($white, $white, $white);
@@ -589,5 +563,30 @@
   &--entity-text {
     padding-left: 0px !important;
     padding-right: 0px !important;
+  }
+
+  &.large:not(.btn--icon-only) {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    height: auto;
+    width: 230px;
+		line-height: 20px;
+
+    > span {
+      font-size: 20px;
+      font-weight: 600;
+      font-family: $avenir;
+      text-transform: unset;
+    }
+  }
+
+  &.small:not(.btn--icon-only) {
+    padding: 6px 12px;
+    height: 30px;
+		line-height: 18px;
+
+		> span {
+			font-size: 11px;
+		}
   }
 }

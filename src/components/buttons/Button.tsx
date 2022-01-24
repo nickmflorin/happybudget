@@ -94,7 +94,7 @@ const Button = (
         {...props}
         ref={ref}
         onClick={(e: React.MouseEvent<HTMLButtonElement>) => !isFakeDisabled && props.onClick?.(e)}
-        className={classNames("btn", className, _size, {
+        className={classNames("btn", _size, className, {
           disabled: isDisabled,
           "fake-disabled": isFakeDisabled
         })}

@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames";
 
 import { Form } from "components";
-import { Button } from "components/buttons";
+import { PrimaryButton } from "components/buttons";
 import { PasswordInput } from "components/fields";
 import { RouterLink } from "components/links";
 
@@ -70,9 +70,9 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
         <PasswordInput size={"large"} placeholder={"Confirm"} hasValidator={true} />
       </Form.Item>
       <Form.Footer>
-        <Button loading={loading} className={"btn btn--login"} htmlType={"submit"}>
+        <PrimaryButton large={true} loading={loading} className={"btn--reset"} htmlType={"submit"}>
           {"Reset"}
-        </Button>
+        </PrimaryButton>
         <div className={"switch-text"}>
           {"Back to"}
           <RouterLink to={"/login"}>{"Log In"}</RouterLink>

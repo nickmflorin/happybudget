@@ -3,7 +3,7 @@ import classNames from "classnames";
 
 import { Form } from "components";
 import { PasswordInput, EmailInput } from "components/fields";
-import { Button, SocialButton } from "components/buttons";
+import { PrimaryButton, SocialButton } from "components/buttons";
 import { RouterLink } from "components/links";
 import { util } from "lib";
 
@@ -66,16 +66,17 @@ const LoginForm: React.FC<LoginFormProps> = ({
         </RouterLink>
       </div>
       <Form.Footer>
-        <Button loading={loading} className={"btn btn--login"} htmlType={"submit"}>
+        <PrimaryButton loading={loading} large={true} className={"btn--login"} htmlType={"submit"}>
           {"Login"}
-        </Button>
+        </PrimaryButton>
         <SocialButton
-          text={"Login with Google"}
           provider={"google"}
           onGoogleSuccess={onGoogleSuccess}
           onGoogleError={onGoogleError}
           onGoogleScriptLoadFailure={onGoogleScriptLoadFailure}
-        />
+        >
+          {"Login with Google"}
+        </SocialButton>
         <div className={"switch-text"}>
           {"Don't have an account yet?"}
           <RouterLink to={"/signup"}>{"Sign Up"}</RouterLink>

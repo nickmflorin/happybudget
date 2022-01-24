@@ -539,7 +539,7 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
             return (
               <Button
                 key={index}
-                className={classNames("btn btn--menu", btn.className)}
+                className={classNames("btn--menu", btn.className)}
                 style={btn.style}
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   btn.onClick?.({ event: e, menuState: getModelAttributedState(selected) });

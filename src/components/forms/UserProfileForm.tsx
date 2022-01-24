@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames";
 
 import { Form } from "components";
-import { Button } from "components/buttons";
+import { PrimaryButton } from "components/buttons";
 import { Input } from "components/fields";
 import { TimezoneSelect } from "../fields";
 
@@ -43,9 +43,9 @@ const UserProfileForm: React.FC<FormProps<Http.UserPayload>> = (props): JSX.Elem
         <TimezoneSelect />
       </Form.Item>
       <Form.Footer>
-        <Button className={"btn btn--primary"} htmlType={"submit"} style={{ width: "100%" }}>
+        <PrimaryButton htmlType={"submit"} style={{ width: "100%" }}>
           {"Save"}
-        </Button>
+        </PrimaryButton>
       </Form.Footer>
     </Form.Form>
   );

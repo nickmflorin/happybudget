@@ -6,7 +6,7 @@ const ClearButton = (props: Omit<IconButtonProps, "icon">): JSX.Element => {
     <IconButton
       size={"xsmall"}
       {...props}
-      className={"btn btn--clear"}
+      className={"btn--clear"}
       icon={<Icon icon={"times-circle"} weight={"solid"} />}
     />
   );

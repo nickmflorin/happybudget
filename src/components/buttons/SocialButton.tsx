@@ -1,10 +1,11 @@
+import { ReactNode } from "react";
 import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
 import { isNil } from "lodash";
 import { GoogleAuthButton } from "components/buttons";
 
 interface SocialButtonProps {
   readonly provider: "google";
-  readonly text: string;
+  readonly children: ReactNode;
   readonly onGoogleSuccess: (tokenId: string) => void;
   // TODO: Come up with interface for Google structured error.
   readonly onGoogleError: (error: Record<string, unknown>) => void;
@@ -30,7 +31,9 @@ const SocialButton = (props: SocialButtonProps): JSX.Element => {
       <GoogleLogin
         clientId={process.env.REACT_APP_GOOGLE_CLIENT_KEY}
         render={(p: { onClick: () => void; disabled?: boolean }) => (
-          <GoogleAuthButton text={props.text} onClick={p.onClick} disabled={p.disabled} />
+          <GoogleAuthButton onClick={p.onClick} disabled={p.disabled}>
+            {props.children}
+          </GoogleAuthButton>
         )}
         onSuccess={(response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
           /* In the case that the response is GoogleLoginResponseOffline, the

@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames";
 
 import { Form } from "components";
-import { Button } from "components/buttons";
+import { PrimaryButton } from "components/buttons";
 import { EmailInput } from "components/fields";
 import { RouterLink } from "components/links";
 
@@ -48,9 +48,9 @@ const RecoverPasswordForm: React.FC<RecoverPasswordFormProps> = ({
         <EmailInput size={"large"} />
       </Form.Item>
       <Form.Footer>
-        <Button loading={loading} className={"btn btn--login"} htmlType={"submit"}>
+        <PrimaryButton loading={loading} large={true} className={"btn--login"} htmlType={"submit"}>
           {"Submit"}
-        </Button>
+        </PrimaryButton>
         <div className={"switch-text"}>
           {"Back to"}
           <RouterLink to={"/login"}>{"Log In"}</RouterLink>

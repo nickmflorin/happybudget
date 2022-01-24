@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
-import { Button } from "components/buttons";
+import { PrimaryButton } from "components/buttons";
 
 import "./NoData.scss";
 
@@ -22,14 +22,9 @@ const NoData = ({ title, subTitle, button, icon, children, ...props }: NoDataPro
         {!isNil(title) && <h1>{title}</h1>}
         {!isNil(subTitle) && <p>{subTitle}</p>}
         {!isNil(button) && (
-          <Button
-            style={{ marginTop: 20 }}
-            className={"btn btn--primary"}
-            icon={icon}
-            onClick={() => button.onClick?.()}
-          >
+          <PrimaryButton style={{ marginTop: 20 }} icon={icon} onClick={() => button.onClick?.()}>
             {button.text}
-          </Button>
+          </PrimaryButton>
         )}
       </div>
     </div>

@@ -2,7 +2,7 @@ import classNames from "classnames";
 
 import { Form } from "components";
 import { PasswordInput, EmailInput, UserInput } from "components/fields";
-import { Button, SocialButton } from "components/buttons";
+import { PrimaryButton, SocialButton } from "components/buttons";
 import { RouterLink, Link } from "components/links";
 import { util } from "lib";
 
@@ -93,16 +93,17 @@ const SignupForm = ({
         <PasswordInput size={"large"} placeholder={"Confirm"} />
       </Form.Item>
       <Form.Footer style={{ marginTop: 20 }}>
-        <Button loading={loading} className={"btn btn--login"} htmlType={"submit"}>
+        <PrimaryButton large={true} loading={loading} className={"btn--register"} htmlType={"submit"}>
           {"Register"}
-        </Button>
+        </PrimaryButton>
         <SocialButton
-          text={"Signup with Google"}
           provider={"google"}
           onGoogleSuccess={onGoogleSuccess}
           onGoogleError={onGoogleError}
           onGoogleScriptLoadFailure={onGoogleScriptLoadFailure}
-        />
+        >
+          {"Signup with Google"}
+        </SocialButton>
         <div className={"alt-link-text"}>
           {"By signing up, you agree to our"}
           <Link href={`${process.env.REACT_APP_TERMS_AND_CONDITIONS_URL}`}>{"Terms and Conditions."}</Link>

@@ -1,24 +1,21 @@
-import { Button } from "antd";
+import classNames from "classnames";
 import { GoogleIcon } from "components/svgs";
+import Button, { ButtonProps } from "./Button";
 
-interface GoogleAuthButtonProps {
+interface GoogleAuthButtonProps extends ButtonProps {
   onClick?: () => void;
   disabled?: boolean;
   text?: string;
 }
 
-const GoogleAuthButton = ({
-  onClick,
-  text = "Login with Google",
-  disabled = false
-}: GoogleAuthButtonProps): JSX.Element => {
+const GoogleAuthButton = ({ children, ...props }: GoogleAuthButtonProps): JSX.Element => {
   return (
-    <Button className={"btn btn--google"} onClick={onClick} disabled={disabled}>
+    <Button large={true} {...props} className={classNames("btn--google", props.className)}>
       <div className={"content-wrapper"}>
         <div className={"icon-wrapper"}>
           <GoogleIcon />
         </div>
-        <span className={"text-wrapper"}>{text}</span>
+        <span className={"text-wrapper"}>{children}</span>
       </div>
     </Button>
   );

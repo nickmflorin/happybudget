@@ -8,7 +8,7 @@ import { Pagination } from "antd";
 import { util, hooks } from "lib";
 import { registerFonts } from "style/pdf";
 
-import { Button } from "components/buttons";
+import { Button, PrimaryButton } from "components/buttons";
 import EmptyDocument from "./EmptyDocument";
 import { RenderDocument } from "./primitive";
 
@@ -143,7 +143,7 @@ const Previewer = ({
             await render();
           }}
         >
-          <Button className={"btn btn--over"} disabled={generatingPdf || loadingData}>
+          <Button className={"btn--over"} disabled={generatingPdf || loadingData}>
             {"Refresh"}
           </Button>
         </div>
@@ -165,15 +165,14 @@ const Previewer = ({
       </div>
       <div className={"preview-footer"}>
         <Pagination total={numPages} pageSize={1} current={page} size={"small"} onChange={(p: number) => setPage(p)} />
-        <Button
-          className={"btn btn--primary"}
+        <PrimaryButton
           htmlType={"submit"}
           disabled={generatingPdf || loadingData || exporting}
           loading={exporting}
           onClick={() => exportPdf({})}
         >
           {"Export"}
-        </Button>
+        </PrimaryButton>
       </div>
     </div>
   );

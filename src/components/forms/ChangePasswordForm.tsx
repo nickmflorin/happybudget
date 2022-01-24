@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames";
 
 import { Form } from "components";
-import { Button } from "components/buttons";
+import { PrimaryButton } from "components/buttons";
 import { PasswordInput } from "components/fields";
 
 export type ChangePasswordFormValues = {
@@ -48,9 +48,9 @@ const ChangePasswordForm: React.FC<FormProps<ChangePasswordFormValues>> = (props
       </Form.Item>
 
       <Form.Footer>
-        <Button className={"btn btn--primary"} htmlType={"submit"} style={{ width: "100%" }}>
+        <PrimaryButton htmlType={"submit"} style={{ width: "100%" }}>
           {"Save"}
-        </Button>
+        </PrimaryButton>
       </Form.Footer>
     </Form.Form>
   );

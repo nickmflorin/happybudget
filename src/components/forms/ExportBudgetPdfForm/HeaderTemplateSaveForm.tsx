@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 import * as api from "api";
 
 import { ShowHide, Form } from "components";
-import { Button, ClearButton } from "components/buttons";
+import { DefaultButton, ClearButton } from "components/buttons";
 import { Input } from "components/fields";
 
 import HeaderTemplateSelect from "./HeaderTemplateSelect";
@@ -83,9 +83,9 @@ const HeaderTemplateSaveForm = (
                 .finally(() => setDeleting(null));
             }}
           />
-          <Button
-            className={"btn btn--default btn small"}
+          <DefaultButton
             disabled={disabled || saving}
+            size={"small"}
             loading={saving}
             style={{ marginRight: !isNil(existing) || requestNameInput ? 6 : 0 }}
             onClick={() => {
@@ -106,11 +106,11 @@ const HeaderTemplateSaveForm = (
             }}
           >
             {"Save"}
-          </Button>
+          </DefaultButton>
 
           <ShowHide show={existing && saveAsMode === false}>
-            <Button
-              className={"btn btn--default btn small"}
+            <DefaultButton
+              size={"small"}
               style={{ marginRight: requestNameInput ? 6 : 0 }}
               disabled={disabled || saving || saveAsMode === true}
               onClick={() => {
@@ -119,7 +119,7 @@ const HeaderTemplateSaveForm = (
               }}
             >
               {"Save As..."}
-            </Button>
+            </DefaultButton>
           </ShowHide>
 
           <ShowHide show={requestNameInput}>

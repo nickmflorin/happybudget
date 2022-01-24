@@ -2,7 +2,7 @@
 
 .landing-form {
   button[type="submit"] {
-    width: 100%;
+    width: 100% !important;
     &:not(:last-child) {
       margin-bottom: 12px;
     }
