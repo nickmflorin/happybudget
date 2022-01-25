@@ -4,18 +4,18 @@ import classNames from "classnames";
 import { Modal } from "components";
 import { PrimaryButton } from "components/buttons";
 
-function SubscriptionPermissionModal(props: Omit<ModalProps, "title" | "footer">): JSX.Element {
+function MultipleBudgetProductPermissionModal(props: Omit<ModalProps, "title" | "footer">): JSX.Element {
   const history = useHistory();
 
   return (
     <Modal
       {...props}
       footer={null}
-      className={classNames("subscription-pemrission-modal", props.className)}
-      title={"Subscription"}
+      className={classNames("multiple-budget-product-pemrission-modal", props.className)}
+      title={"You've Reached the Free Tier Limit"}
     >
-      <p>{"You need to subscribe in order to create multiple budgets."}</p>
-      <div style={{ display: "flex", justifyContent: "center", flexDirection: "row", marginTop: 12 }}>
+      <p className={"modal-text"}>{"Not to worry! You can upgrade your plan here."}</p>
+      <div style={{ display: "flex", justifyContent: "center", flexDirection: "row", marginTop: 18 }}>
         <PrimaryButton
           onClick={() => {
             props.onCancel?.();
@@ -30,4 +30,4 @@ function SubscriptionPermissionModal(props: Omit<ModalProps, "title" | "footer">
   );
 }
 
-export default SubscriptionPermissionModal;
+export default MultipleBudgetProductPermissionModal;

@@ -30,7 +30,7 @@ declare namespace Application {
     readonly user: Model.User;
     readonly contacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
     readonly filteredContacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
-    readonly subscriptionPermissionModalOpen: boolean;
+    readonly productPermissionModalOpen: boolean;
   };
 
   type AuthenticatedStaticReducers = Redux.ReducersMapObject<StaticStores>;

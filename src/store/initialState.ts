@@ -54,6 +54,6 @@ export const createAuthenticatedInitialState = (
     user: createInitialUserState(user),
     loading: false,
     contacts: redux.initialState.initialModelListResponseState,
-    subscriptionPermissionModalOpen: false
+    productPermissionModalOpen: false
   } as Application.AuthenticatedStore;
 };

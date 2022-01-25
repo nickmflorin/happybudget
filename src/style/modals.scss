@@ -27,6 +27,13 @@
     margin-top: 15px;
   }
 
+	.modal-text {
+		font-family: $avenir;
+		font-weight: 500;
+		color: $text-secondary;
+		font-size: 14px;
+	}
+
   .ant-modal-header {
     padding-top: 36px;
     padding-bottom: 12px;
@@ -59,8 +66,15 @@
   }
 
   .ant-modal-close {
+		// Temporarily trying the modals out without the close button.  In the case
+		// that we keep it this way, we can remove the styling in this block.
+		display: none !important;
+
     .ant-modal-close-x {
-      padding: 28px !important;
+      padding-left: 28px !important;
+			padding-right: 28px !important;
+			padding-top: 32px !important;
+			padding-bottom: 24px !important;
       height: 72px;
       width: 72px;
       position: relative;

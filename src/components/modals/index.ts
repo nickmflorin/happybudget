@@ -13,4 +13,4 @@ export { default as DeleteRowsModal } from "./DeleteRowsModal";
 export { default as EditAttachmentsModal } from "./EditAttachmentsModal";
 export { default as DeleteBudgetModal } from "./DeleteBudgetModal";
 export { default as PreviewModal } from "./PreviewModal";
-export { default as SubscriptionPermissionModal } from "./SubscriptionPermissionModal";
+export { default as MultipleBudgetProductPermissionModal } from "./MultipleBudgetProductPermissionModal";

@@ -103,8 +103,8 @@ export const createStaticAuthenticatedReducers = (
     }),
     loading: loadingReducer,
     user: createUserReducer(user),
-    subscriptionPermissionModalOpen: redux.reducers.createSimpleBooleanReducer({
-      actions: { set: actions.authenticated.setSubscriptionPermissionModalOpenAction }
+    productPermissionModalOpen: redux.reducers.createSimpleBooleanReducer({
+      actions: { set: actions.authenticated.setProductPermissionModalOpenAction }
     })
   };
 };

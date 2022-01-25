@@ -4,8 +4,8 @@ export enum Permissions {
   MULTIPLE_BUDGETS = "multiple_budgets"
 }
 
-export const ProductPermissions: { [key in Model.PermissionId]: Array<Model.ProductId> } = {
-  multiple_budgets: ["greenbudget_standard", "greenbudget_premium"]
+export const ProductPermissions: { [key in Model.ProductPermissionId]: Array<Model.ProductId> } = {
+  multiple_budgets: ["greenbudget_standard"]
 };
 
 export enum ProductPermissionIds {
@@ -46,7 +46,7 @@ export const userHasProduct = (user: Model.User, product?: SingleOrArray<Model.P
   return includes(product_ids, user.product_id);
 };
 
-export const userHasPermission = (user: Model.User, permission: Model.PermissionId) =>
+export const userHasPermission = (user: Model.User, permission: Model.ProductPermissionId) =>
   filter(
     map(ProductPermissions[permission], (p: Model.ProductId) => userHasProduct(user, p)),
     (v: boolean) => v === true

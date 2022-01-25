@@ -85,7 +85,7 @@ const Budgets = (): JSX.Element => {
                 budgets.length !== 0 &&
                 !users.permissions.userHasPermission(user, users.permissions.Permissions.MULTIPLE_BUDGETS)
               ) {
-                dispatch(store.actions.authenticated.setSubscriptionPermissionModalOpenAction(true));
+                dispatch(store.actions.authenticated.setProductPermissionModalOpenAction(true));
               } else if (responseWasReceived) {
                 setCreateBudgetModalOpen(true);
               }
@@ -156,7 +156,7 @@ const Budgets = (): JSX.Element => {
                       budgets.length !== 0 &&
                       !users.permissions.userHasPermission(user, users.permissions.Permissions.MULTIPLE_BUDGETS)
                     ) {
-                      dispatch(store.actions.authenticated.setSubscriptionPermissionModalOpenAction(true));
+                      dispatch(store.actions.authenticated.setProductPermissionModalOpenAction(true));
                       /* Edge case, since a response would have to had been
 											   received if there is a card there. */
                     } else if (responseWasReceived) {

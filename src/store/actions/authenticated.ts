@@ -13,6 +13,4 @@ export const loadingFilteredContactsAction = redux.actions.createAction<boolean>
 export const responseFilteredContactsAction = redux.actions.createAction<Http.ListResponse<Model.Contact>>(
   "user.contacts.ResponseFiltered"
 );
-export const setSubscriptionPermissionModalOpenAction = redux.actions.createAction<boolean>(
-  "SetSubscriptionPermissionModalOpen"
-);
+export const setProductPermissionModalOpenAction = redux.actions.createAction<boolean>("SetProductPermissionModalOpen");

@@ -6,7 +6,7 @@ import { Dispatch } from "redux";
 import { actions } from "store";
 
 import { ConnectedApplicationSpinner } from "components";
-import { SubscriptionPermissionModal } from "components/modals";
+import { MultipleBudgetProductPermissionModal } from "components/modals";
 import { NotFoundRoute, PrivateRoute } from "components/routes";
 
 import Budget from "./Budget";
@@ -15,10 +15,10 @@ import Dashboard from "./Dashboard";
 import Settings from "./Settings";
 import Logout from "./Logout";
 
-const selectPermissionModalOpen = (state: Application.AuthenticatedStore) => state.subscriptionPermissionModalOpen;
+const selectProductPermissionModalOpen = (state: Application.AuthenticatedStore) => state.productPermissionModalOpen;
 
 const Application = (): JSX.Element => {
-  const subscriptionPermissionModalOpen = useSelector(selectPermissionModalOpen);
+  const ProductPermissionModalOpen = useSelector(selectProductPermissionModalOpen);
   const dispatch: Dispatch = useDispatch();
 
   return (
@@ -33,9 +33,9 @@ const Application = (): JSX.Element => {
         <Route exact path={"/logout"} component={Logout} />
         <NotFoundRoute />
       </Switch>
-      <SubscriptionPermissionModal
-        open={subscriptionPermissionModalOpen}
-        onCancel={() => dispatch(actions.authenticated.setSubscriptionPermissionModalOpenAction(false))}
+      <MultipleBudgetProductPermissionModal
+        open={ProductPermissionModalOpen}
+        onCancel={() => dispatch(actions.authenticated.setProductPermissionModalOpenAction(false))}
       />
     </React.Fragment>
   );

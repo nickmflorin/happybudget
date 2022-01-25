@@ -1,7 +1,7 @@
 declare namespace Model {
   type BillingStatus = "active" | "expired" | "canceled" | null;
 
-  type ProductId = "greenbudget_standard" | "greenbudget_premium";
+  type ProductId = "greenbudget_standard";
   type ProductPermissionId = "multiple_budgets";
 
   type StripeSubscriptionStatus =
