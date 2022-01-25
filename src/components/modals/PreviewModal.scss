@@ -1,6 +1,6 @@
 @import "style/_imports";
 
-$modal-header-height: 82px;
+$modal-header-height: 72px;
 $modal-width: 90vw;
 
 /*
@@ -135,12 +135,6 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
 
     .ant-modal-header {
       height: $modal-header-height;
-      padding-bottom: 12px;
-
-      .ant-modal-title {
-        font-size: 32px;
-        line-height: 34px;
-      }
     }
 
     .ant-modal-body {
