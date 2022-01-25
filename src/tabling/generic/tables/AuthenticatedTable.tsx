@@ -423,7 +423,13 @@ const AuthenticatedTable = <
           onChangeEvent: _onChangeEvent,
           rowHasCheckboxSelection: props.rowHasCheckboxSelection
         })}
-        <TableNotifications notifications={NotificationsHandler.notifications} tableId={props.tableId} />
+        <TableNotifications
+          notifications={NotificationsHandler.notifications}
+          tableId={props.tableId}
+          /* If there is no data in the table, we want to render the notification
+             under the table - otherwise, it will be hard to read. */
+          offset={props.data.length === 0 ? -10 : 90}
+        />
         <TableFooterGrid
           tableId={props.tableId}
           apis={props.tableApis.get("footer")}
