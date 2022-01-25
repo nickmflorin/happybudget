@@ -38,7 +38,7 @@ const Modal = ({
       }}
       cancelButtonProps={{ ...cancelButtonProps, className: "btn btn--default" }}
       {...props}
-      className={classNames("modal", { "modal--no-footer": props.footer === null })}
+      className={classNames("modal", props.className, { "modal--no-footer": props.footer === null })}
       visible={open}
       title={
         typeof props.title === "string" && !isNil(titleIcon) ? (
