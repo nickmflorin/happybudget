@@ -66,36 +66,7 @@
   }
 
   .ant-modal-close {
-		// Temporarily trying the modals out without the close button.  In the case
-		// that we keep it this way, we can remove the styling in this block.
 		display: none !important;
-
-    .ant-modal-close-x {
-      padding-left: 28px !important;
-			padding-right: 28px !important;
-			padding-top: 32px !important;
-			padding-bottom: 24px !important;
-      height: 72px;
-      width: 72px;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-
-      > * {
-        display: block;
-      }
-      .ant-modal-close-icon {
-        height: 16px;
-        width: 16px;
-
-        svg {
-          height: 16px;
-          width: 16px;
-          color: $text-secondary !important;
-        }
-      }
-    }
   }
 
   .ant-modal-body {
