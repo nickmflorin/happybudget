@@ -124,9 +124,9 @@ export const createAuthenticatedTableSaga = <
       const c = contexts[i];
       if (tabling.typeguards.isDataChangeEvent(e)) {
         /* Queue the data change events when they are happening very close
-				   together in the time dimension, but flush the row add event batch.
-					 If an event comes in that has a different context than the currently
-					 queued batch, flush the batch and start a new batch. */
+				   together in the time dimension.  If an event comes in that has a
+					 different context than the currently queued batch, flush the batch
+					 and start a new batch. */
         if (runningDataChangeBatch === null) {
           runningDataChangeBatch = { events: [e], context: c };
         } else if (!isEqual(c, runningDataChangeBatch.context)) {
@@ -139,16 +139,11 @@ export const createAuthenticatedTableSaga = <
         } else {
           runningDataChangeBatch = addEventToBatch(runningDataChangeBatch, e, c);
         }
-        yield fork(flushRowAddBatch, runningRowAddBatch);
-        runningRowAddBatch = {
-          events: [],
-          context: {} as C
-        };
       } else if (tabling.typeguards.isRowAddEvent(e) && tabling.typeguards.isRowAddDataEvent(e)) {
         /* Queue the row add events when they are happening very close together
-           in the time dimension, but flush the data change event batch.  If an
-					 event comes in that has a different context than the currently queued
-					 batch, flush the batch and start a new batch. */
+           in the time dimension.  If an event comes in that has a different
+					 context than the currently queued batch, flush the batch and start a
+					 new batch. */
         if (runningRowAddBatch === null) {
           runningRowAddBatch = { events: [e], context: c };
         } else if (!isEqual(c, runningRowAddBatch.context)) {
@@ -161,11 +156,6 @@ export const createAuthenticatedTableSaga = <
         } else {
           runningRowAddBatch = addEventToBatch(runningRowAddBatch, e, c);
         }
-        yield fork(flushDataBatch, runningDataChangeBatch);
-        runningDataChangeBatch = {
-          events: [],
-          context: {} as C
-        };
       } else {
         /* If the event was anything other than a row add event or a data change
            event, we need to flush the batches for both the queued row add and
