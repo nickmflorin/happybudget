@@ -178,6 +178,10 @@
 					display: flex;
 					flex-direction: column;
 					justify-content: center;
+
+					.icon-wrapper {
+						height: 100%;
+					}
 				}
 
 				&--action {
