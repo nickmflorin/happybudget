@@ -1,8 +1,6 @@
 import { useMemo } from "react";
 import { find } from "lodash";
 
-import { ui } from "lib";
-
 import { Icon } from "components";
 
 import DefaultButtonIconToggle, { DefaultButtonIconToggleProps } from "./DefaultButtonIconToggle";
