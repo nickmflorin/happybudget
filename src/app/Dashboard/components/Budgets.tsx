@@ -94,7 +94,7 @@ const Budgets = (): JSX.Element => {
           >
             <PrimaryButtonIconToggle
               breakpoint={"medium"}
-              icon={<Icon icon={"plus"} weight={"light"} />}
+              icon={<Icon icon={"plus"} weight={"regular"} />}
               text={"Create Budget"}
             />
           </BudgetDropdown>,
@@ -111,7 +111,7 @@ const Budgets = (): JSX.Element => {
             ]}
           >
             <OrderingButtonIconToggle
-              key={3}
+              breakpoint={"medium"}
               ordering={ordering}
               labelMap={{
                 created_at: "Created",

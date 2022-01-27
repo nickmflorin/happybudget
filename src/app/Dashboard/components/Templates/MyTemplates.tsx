@@ -76,7 +76,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
           />,
           <PrimaryButtonIconToggle
             key={2}
-            icon={<Icon icon={"plus"} weight={"light"} />}
+            icon={<Icon icon={"plus"} weight={"regular"} />}
             onClick={() => setCreateBudgetModalOpen(true)}
             text={"New Blank Budget"}
             breakpoint={"medium"}
@@ -94,6 +94,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
             ]}
           >
             <OrderingButtonIconToggle
+              breakpoint={"medium"}
               ordering={ordering}
               labelMap={{
                 created_at: "Created",

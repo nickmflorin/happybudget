@@ -7,15 +7,12 @@ import { Icon } from "components";
 
 import DefaultButtonIconToggle, { DefaultButtonIconToggleProps } from "./DefaultButtonIconToggle";
 
-export interface OrderingButtonIconToggleProps
-  extends Omit<DefaultButtonIconToggleProps, "icon" | "breakpoint" | "children"> {
+export interface OrderingButtonIconToggleProps extends Omit<DefaultButtonIconToggleProps, "icon" | "children"> {
   readonly ordering: Http.Ordering;
   readonly labelMap: { [key: string]: string };
 }
 
 const OrderingButtonIconToggle = ({ ordering, labelMap, ...props }: OrderingButtonIconToggleProps): JSX.Element => {
-  const isMobile = ui.hooks.useLessThanBreakpoint("medium");
-
   const order = useMemo(() => find(ordering, (o: Http.FieldOrder) => o.order !== 0), [ordering]);
 
   const label = useMemo(() => {
@@ -37,9 +34,10 @@ const OrderingButtonIconToggle = ({ ordering, labelMap, ...props }: OrderingButt
   return (
     <DefaultButtonIconToggle
       {...props}
-      style={{ ...props.style, width: isMobile ? "auto" : "120px" }}
+      style={{ ...props.style, width: "auto" }}
+      breakpointStyle={props.style}
       icon={sortIcon}
-      breakpoint={"medium"}
+      breakpointIcon={<Icon icon={"sort-amount-down"} weight={"regular"} />}
     >
       {label}
     </DefaultButtonIconToggle>
