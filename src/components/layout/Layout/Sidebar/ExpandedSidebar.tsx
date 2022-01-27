@@ -24,7 +24,9 @@ const ExpandedSidebar = ({ toggle, ...props }: ExpandedSidebarProps): JSX.Elemen
     <GenericSidebar<IExpandedSidebarItem>
       {...props}
       className={classNames("sidebar--expanded", props.className)}
-      renderItem={(item: IExpandedSidebarItem) => <ExpandedSidebarItem {...item} />}
+      renderItem={(item: IExpandedSidebarItem) => (
+        <ExpandedSidebarItem {...item} closeSidebarOnClick={isMobile ? toggle : undefined} />
+      )}
     >
       <ShowHide show={isMobile}>
         <IconButton

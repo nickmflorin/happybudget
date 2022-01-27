@@ -8,7 +8,8 @@ import { ShowHide, Separator } from "components";
 import { TooltipWrapper } from "components/tooltips";
 
 const GenericSidebarItem = <T extends ISidebarItem>(
-  props: Omit<T, "children"> & StandardComponentProps & { readonly children?: ReactNode }
+  props: Omit<T, "children"> &
+    StandardComponentProps & { readonly children?: ReactNode; readonly closeSidebarOnClick?: () => void }
 ): JSX.Element => {
   const history = useHistory();
   const location = useLocation();

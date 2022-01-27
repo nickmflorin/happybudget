@@ -8,12 +8,14 @@ import { ShowHide } from "components";
 import GenericSidebarItem from "./GenericSidebarItem";
 import ExpandedSidebarItem from "./ExpandedSidebarItem";
 
-const ParentSidebarItem = (props: IExpandedParentSidebarItem): JSX.Element => {
+const ParentSidebarItem = (
+  props: IExpandedParentSidebarItem & { readonly closeSidebarOnClick?: () => void }
+): JSX.Element => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const history = useHistory();
 
-  const { submenu, ...item } = props;
+  const { submenu, closeSidebarOnClick, ...item } = props;
   const isActive = useMemo(() => ui.util.itemIsActive(props, location), [props, location]);
 
   useEffect(() => {
@@ -45,7 +47,6 @@ const ParentSidebarItem = (props: IExpandedParentSidebarItem): JSX.Element => {
                 defaultItem = submenu[0];
               }
               if (defaultItem !== undefined) {
-                defaultItem.closeSidebarOnClick?.();
                 if (!isNil(defaultItem.to)) {
                   history.push(defaultItem.to);
                 } else if (!isNil(defaultItem.onClick)) {
@@ -64,7 +65,11 @@ const ParentSidebarItem = (props: IExpandedParentSidebarItem): JSX.Element => {
         <div className={"sidebar-sub-menu"}>
           {map(submenu, (subItem: IExpandedSingleSidebarItem, i: number) => {
             return (
-              <GenericSidebarItem<IExpandedSingleSidebarItem> key={i} {...subItem}>
+              <GenericSidebarItem<IExpandedSingleSidebarItem>
+                key={i}
+                {...subItem}
+                closeSidebarOnClick={closeSidebarOnClick}
+              >
                 <span className={"text-container"}>{subItem.label}</span>
               </GenericSidebarItem>
             );
