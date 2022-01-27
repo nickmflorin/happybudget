@@ -25,7 +25,6 @@ declare interface ISidebarItem {
   readonly activePathRegexes?: RegExp[];
   readonly separatorAfter?: boolean;
   readonly tooltip?: Tooltip;
-  readonly closeSidebarOnClick?: () => void;
   readonly onClick?: () => void;
 }
 
@@ -36,10 +35,7 @@ declare type IExpandedSingleSidebarItem = ISidebarItem & {
   readonly default?: boolean;
 };
 
-declare type IExpandedParentSidebarItem = Omit<
-  ISidebarItem,
-  "to" | "closeSidebarOnClick" | "active" | "activePathRegexes" | "tooltip"
-> & {
+declare type IExpandedParentSidebarItem = Omit<ISidebarItem, "to" | "active" | "activePathRegexes" | "tooltip"> & {
   readonly submenu: IExpandedSingleSidebarItem[];
   readonly label: string;
 };

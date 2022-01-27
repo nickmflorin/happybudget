@@ -5,7 +5,9 @@ import { ui } from "lib";
 import GenericSidebarItem from "./GenericSidebarItem";
 import ParentSidebarItem from "./ParentSidebarItem";
 
-const ExpandedSidebarItem = (props: IExpandedSidebarItem & StandardComponentProps): JSX.Element => {
+const ExpandedSidebarItem = (
+  props: IExpandedSidebarItem & StandardComponentProps & { readonly closeSidebarOnClick?: () => void }
+): JSX.Element => {
   if (ui.typeguards.isParentSidebarItem(props)) {
     return <ParentSidebarItem {...props} />;
   }
