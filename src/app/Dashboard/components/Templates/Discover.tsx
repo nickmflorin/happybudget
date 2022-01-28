@@ -122,6 +122,8 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
                 hidingOrShowing={isTogglingVisibility(template.id)}
                 duplicating={isDuplicating(template.id)}
                 deleting={isDeleting(template.id)}
+                disabled={isDeleting(template.id) || isDuplicating(template.id)}
+                loading={isDeleting(template.id)}
                 onToggleVisibility={(e: MenuItemModelClickEvent) => {
                   if (user.is_staff === false) {
                     throw new Error("Behavior prohibited for non-staff users.");

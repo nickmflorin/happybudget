@@ -128,6 +128,8 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
                   duplicating={isDuplicating(template.id)}
                   moving={isMoving(template.id)}
                   deleting={isDeleting(template.id)}
+                  loading={isDeleting(template.id)}
+                  disabled={isDeleting(template.id) || isMoving(template.id) || isDuplicating(template.id)}
                   onEdit={() => history.push(`/templates/${template.id}/accounts`)}
                   onEditNameImage={() => setTemplateToEdit(template.id)}
                   onDelete={(e: MenuItemModelClickEvent) => {
