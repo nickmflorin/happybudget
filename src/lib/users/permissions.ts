@@ -5,7 +5,7 @@ export enum Permissions {
 }
 
 export const ProductPermissions: { [key in Model.ProductPermissionId]: Array<Model.ProductId> } = {
-  multiple_budgets: ["greenbudget_standard"]
+  multiple_budgets: ["standard"]
 };
 
 export enum ProductPermissionIds {
