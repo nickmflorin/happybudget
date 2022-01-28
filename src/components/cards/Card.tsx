@@ -45,7 +45,7 @@ const Card = ({
   }, [image, imageError]);
 
   return (
-    <div {...props} className={classNames("card", props.className)}>
+    <div {...props} className={classNames("card", props.className, { hidden, disabled: loading || disabled, loading })}>
       {!isNil(info) && (
         <TooltipOrTitle type={"info"} tooltip={info}>
           <Icon
@@ -55,8 +55,9 @@ const Card = ({
           />
         </TooltipOrTitle>
       )}
-      <div className={classNames("card-inner", { hidden, disabled })}>
-        <RenderWithSpinner size={18} loading={loading} toggleOpacity={true}>
+
+      <div className={"card-inner"}>
+        <RenderWithSpinner size={18} loading={loading}>
           <ShowHide show={hidden}>
             <Icon className={"icon--hidden"} icon={"eye-slash"} weight={"solid"} />
           </ShowHide>

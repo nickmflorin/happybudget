@@ -140,7 +140,8 @@ const Budgets = (): JSX.Element => {
                 <BudgetCard
                   key={index}
                   budget={budget}
-                  disabled={isDeleting(budget.id)}
+                  disabled={isDeleting(budget.id) || isDuplicating(budget.id)}
+                  loading={isDeleting(budget.id)}
                   duplicating={isDuplicating(budget.id)}
                   onClick={() => history.push(`/budgets/${budget.id}`)}
                   onEdit={() => setBudgetToEdit(budget.id)}

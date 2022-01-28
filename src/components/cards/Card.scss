@@ -39,14 +39,6 @@
 	}
 
 	.card-inner {
-		&.hidden {
-			opacity: 0.6;
-		}
-
-		&.disabled {
-			opacity: 0.6;
-		}
-
 		.icon--hidden {
 			@extend .card-icon;
 			top: 12px;
@@ -102,6 +94,24 @@
 
 		&:hover {
 			filter: brightness(0.9);
+		}
+	}
+
+	&.hidden,
+	&.disabled,
+	&.loading {
+		.card-inner {
+			opacity: 0.6;
+		}
+	}
+
+	&.disabled,
+	&.loading {
+		pointer-events: none !important;
+		.card-inner {
+			&:hover {
+				filter: none !important;
+			}
 		}
 	}
 }
