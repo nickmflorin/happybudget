@@ -26,6 +26,8 @@ export type AuthenticatedTemplateProps = Omit<AuthenticatedBudgetTableProps<R, M
 const AuthenticatedTemplateSubAccountsTable = (
   props: WithSubAccountsTableProps<AuthenticatedTemplateProps>
 ): JSX.Element => {
+  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
+
   const processUnitCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
     models.inferModelFromName<Model.Tag>(props.subAccountUnits, name, {
       getName: (m: Model.Tag) => m.title,
@@ -48,6 +50,7 @@ const AuthenticatedTemplateSubAccountsTable = (
   return (
     <AuthenticatedBudgetTable<R, M>
       {...props}
+      table={table}
       excludeColumns={["actual", "contact", "variance", "attachments"]}
       columns={columns}
       actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
@@ -56,7 +59,7 @@ const AuthenticatedTemplateSubAccountsTable = (
           label: "Subtotal",
           isWriteOnly: true,
           onClick: () => {
-            const rows: Table.BodyRow<R>[] = props.table.current.getRowsAboveAndIncludingFocusedRow();
+            const rows: Table.BodyRow<R>[] = table.current.getRowsAboveAndIncludingFocusedRow();
             const modelRows: Table.ModelRow<R>[] = filter(rows, (r: Table.BodyRow<R>) =>
               tabling.typeguards.isModelRow(r)
             ) as Table.ModelRow<R>[];
@@ -79,7 +82,7 @@ const AuthenticatedTemplateSubAccountsTable = (
             if (selectedRows.length !== 0) {
               props.onMarkupRows?.(selectedRows);
             } else {
-              const rows: Table.ModelRow<R>[] = filter(props.table.current.getRows(), (r: Table.BodyRow<R>) =>
+              const rows: Table.ModelRow<R>[] = filter(table.current.getRows(), (r: Table.BodyRow<R>) =>
                 tabling.typeguards.isModelRow(r)
               ) as Table.ModelRow<R>[];
               if (rows.length !== 0) {
@@ -89,8 +92,8 @@ const AuthenticatedTemplateSubAccountsTable = (
           }
         },
         ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
-        framework.actions.ToggleColumnAction<R, M>(props.table.current, params),
-        framework.actions.ExportCSVAction<R, M>(props.table.current, params, props.exportFileName)
+        framework.actions.ToggleColumnAction<R, M>(table.current, params),
+        framework.actions.ExportCSVAction<R, M>(table.current, params, props.exportFileName)
       ]}
     />
   );

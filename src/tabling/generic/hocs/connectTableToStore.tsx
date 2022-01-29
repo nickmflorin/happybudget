@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useStore, useSelector, useDispatch } from "react-redux";
 import hoistNonReactStatics from "hoist-non-react-statics";
 import { isNil } from "lodash";
-import { redux } from "lib";
+import { redux, tabling } from "lib";
 
 type ProvidedProps<
   R extends Table.RowData,
@@ -30,7 +30,7 @@ const connectTableToStore =
   <
     T extends {
       readonly tableId: string;
-      readonly table: NonNullRef<Table.TableInstance<R, M>>;
+      readonly table?: NonNullRef<Table.TableInstance<R, M>>;
       readonly actionContext: C;
     },
     R extends Table.RowData,
@@ -63,6 +63,7 @@ const connectTableToStore =
       const data = useSelector(selectData);
       const search = useSelector(selectSearch);
       const loading = useSelector(selectLoading);
+      const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
 
       const [ready, setReady] = useState(false);
       const sagaInjected = useRef<boolean>(false);
@@ -90,7 +91,7 @@ const connectTableToStore =
         if (!isNil(config.createSaga)) {
           if (sagaInjected.current === false) {
             if (!store.hasSaga(`${props.tableId}-saga`)) {
-              const saga = config.createSaga(props.table.current);
+              const saga = config.createSaga(table.current);
               store.injectSaga(`${props.tableId}-saga`, saga);
             }
             sagaInjected.current = true;
@@ -102,7 +103,7 @@ const connectTableToStore =
         } else {
           setReady(true);
         }
-      }, [props.tableId, props.table.current]);
+      }, [props.tableId, table.current]);
 
       return (
         <Component
@@ -114,6 +115,7 @@ const connectTableToStore =
 						 data is visible in the table is the time that it takes to inject
 						 the Saga. */
           data={ready === true ? data : []}
+          table={table}
           loading={loading}
           selector={selector}
           footerRowSelectors={config.footerRowSelectors}

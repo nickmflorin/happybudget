@@ -19,16 +19,19 @@ export type AuthenticatedBudgetProps = AccountsTableProps &
   };
 
 const AuthenticatedBudgetAccountsTable = (props: AuthenticatedBudgetProps): JSX.Element => {
+  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
+
   return (
     <AuthenticatedBudgetTable<R, M>
       {...props}
+      table={table}
       actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
         {
           icon: "folder",
           label: "Subtotal",
           isWriteOnly: true,
           onClick: () => {
-            const rows: Table.BodyRow<R>[] = props.table.current.getRowsAboveAndIncludingFocusedRow();
+            const rows: Table.BodyRow<R>[] = table.current.getRowsAboveAndIncludingFocusedRow();
             const modelRows: Table.ModelRow<R>[] = filter(rows, (r: Table.BodyRow<R>) =>
               tabling.typeguards.isModelRow(r)
             ) as Table.ModelRow<R>[];
@@ -49,7 +52,7 @@ const AuthenticatedBudgetAccountsTable = (props: AuthenticatedBudgetProps): JSX.
             const rows: Table.ModelRow<R>[] =
               selectedRows.length !== 0
                 ? selectedRows
-                : (filter(props.table.current.getRows(), (r: Table.BodyRow<R>) =>
+                : (filter(table.current.getRows(), (r: Table.BodyRow<R>) =>
                     tabling.typeguards.isModelRow(r)
                   ) as Table.ModelRow<R>[]);
             if (rows.length !== 0) {
@@ -58,10 +61,10 @@ const AuthenticatedBudgetAccountsTable = (props: AuthenticatedBudgetProps): JSX.
           }
         },
         ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
-        framework.actions.ToggleColumnAction<R, M>(props.table.current, params),
+        framework.actions.ToggleColumnAction<R, M>(table.current, params),
         framework.actions.ExportPdfAction(props.onExportPdf),
         framework.actions.ExportCSVAction<R, M>(
-          props.table.current,
+          table.current,
           params,
           !isNil(props.budget) ? `${props.budget.type}_${props.budget.name}_accounts` : ""
         )

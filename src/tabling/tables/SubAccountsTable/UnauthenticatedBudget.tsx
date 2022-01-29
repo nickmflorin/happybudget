@@ -22,6 +22,8 @@ export type UnauthenticatedBudgetProps = Omit<UnauthenticatedBudgetTableProps<R,
 const UnauthenticatedBudgetSubAccountsTable = (
   props: WithSubAccountsTableProps<UnauthenticatedBudgetProps>
 ): JSX.Element => {
+  const table = tabling.hooks.useTableIfNotDefined(props.table);
+
   const processFringesCellForClipboard = hooks.useDynamicCallback((row: R) => {
     const fringes = models.getModels<Tables.FringeRow>(props.fringes, row.fringes, { modelName: "fringe" });
     return map(fringes, (fringe: Tables.FringeRow) => fringe.data.name).join(", ");
@@ -45,11 +47,12 @@ const UnauthenticatedBudgetSubAccountsTable = (
   return (
     <UnauthenticatedBudgetTable<R, M>
       {...props}
+      table={table}
       columns={columns}
       actions={(params: Table.UnauthenticatedMenuActionParams<R, M>) => [
         ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
-        framework.actions.ToggleColumnAction<R, M>(props.table.current, params),
-        framework.actions.ExportCSVAction<R, M>(props.table.current, params, props.exportFileName)
+        framework.actions.ToggleColumnAction<R, M>(table.current, params),
+        framework.actions.ExportCSVAction<R, M>(table.current, params, props.exportFileName)
       ]}
     />
   );

@@ -35,9 +35,10 @@ export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>,
 const AuthenticatedBudgetSubAccountsTable = (
   props: WithWithContactsProps<WithSubAccountsTableProps<AuthenticatedBudgetProps>, R, M>
 ): JSX.Element => {
+  const table = tabling.hooks.useTableIfNotDefined(props.table);
   const [processAttachmentsCellForClipboard, processAttachmentsCellFromClipboard, setEditAttachments, modal] =
     useAttachments({
-      table: props.table.current,
+      table: table.current,
       onAttachmentRemoved: props.onAttachmentRemoved,
       onAttachmentAdded: props.onAttachmentAdded,
       listAttachments: api.getSubAccountAttachments,
@@ -101,11 +102,11 @@ const AuthenticatedBudgetSubAccountsTable = (
 						 we populate the `rate` value based on the selected Contact
 						 (if non-null). */
           if (change.newValue !== null) {
-            const row = props.table.current.getRow(id);
+            const row = table.current.getRow(id);
             if (!isNil(row) && tabling.typeguards.isModelRow(row) && row.data.rate === null) {
               const contact: Model.Contact | undefined = find(props.contacts, { id: change.newValue });
               if (!isNil(contact) && !isNil(contact.rate)) {
-                props.table.current.applyTableChange({
+                table.current.applyTableChange({
                   type: "dataChange",
                   payload: { id: row.id, data: { rate: { oldValue: row.data.rate, newValue: contact.rate } } }
                 });
@@ -129,6 +130,7 @@ const AuthenticatedBudgetSubAccountsTable = (
     <React.Fragment>
       <AuthenticatedBudgetTable<R, M>
         {...props}
+        table={table}
         columns={columns}
         actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
           {
@@ -140,7 +142,7 @@ const AuthenticatedBudgetSubAccountsTable = (
                 tabling.typeguards.isModelRow(r)
               ) as Table.ModelRow<R>[];
               if (rows.length === 0) {
-                const focusedRow = props.table.current.getFocusedRow();
+                const focusedRow = table.current.getFocusedRow();
                 if (!isNil(focusedRow) && tabling.typeguards.isModelRow(focusedRow)) {
                   rows = [focusedRow];
                 }
@@ -164,7 +166,7 @@ const AuthenticatedBudgetSubAccountsTable = (
               if (selectedRows.length !== 0) {
                 props.onMarkupRows?.(selectedRows);
               } else {
-                const rows: Table.ModelRow<R>[] = filter(props.table.current.getRows(), (r: Table.BodyRow<R>) =>
+                const rows: Table.ModelRow<R>[] = filter(table.current.getRows(), (r: Table.BodyRow<R>) =>
                   tabling.typeguards.isModelRow(r)
                 ) as Table.ModelRow<R>[];
                 if (rows.length !== 0) {
@@ -174,9 +176,9 @@ const AuthenticatedBudgetSubAccountsTable = (
             }
           },
           ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
-          framework.actions.ToggleColumnAction<R, M>(props.table.current, params),
+          framework.actions.ToggleColumnAction<R, M>(table.current, params),
           framework.actions.ExportPdfAction(props.onExportPdf),
-          framework.actions.ExportCSVAction<R, M>(props.table.current, params, props.exportFileName)
+          framework.actions.ExportCSVAction<R, M>(table.current, params, props.exportFileName)
         ]}
       />
       {modal}

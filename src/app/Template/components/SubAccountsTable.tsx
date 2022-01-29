@@ -8,6 +8,9 @@ import { SubAccountsTable as GenericSubAccountsTable } from "tabling";
 import { selectFringes, selectSubAccountUnits } from "../store/selectors";
 import FringesModal from "./FringesModal";
 
+type R = Tables.SubAccountRowData;
+type M = Model.SubAccount;
+
 type OmitTableProps = "menuPortalId" | "columns" | "fringes" | "subAccountUnits" | "onEditFringes" | "onAddFringes";
 
 export interface TemplateSubAccountsTableProps
@@ -19,14 +22,15 @@ export interface TemplateSubAccountsTableProps
 
 const SubAccountsTable = ({ id, budget, budgetId, ...props }: TemplateSubAccountsTableProps): JSX.Element => {
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
+  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
   const fringes = useSelector(selectFringes);
   const subaccountUnits = useSelector(selectSubAccountUnits);
-  const fringesTable = tabling.hooks.useTable<Tables.FringeRowData, Model.Fringe>();
 
   return (
     <React.Fragment>
       <GenericSubAccountsTable.AuthenticatedTemplate
         {...props}
+        table={table}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
         subAccountUnits={subaccountUnits}
@@ -41,7 +45,6 @@ const SubAccountsTable = ({ id, budget, budgetId, ...props }: TemplateSubAccount
       <FringesModal
         id={id}
         budget={budget}
-        table={fringesTable}
         budgetId={budgetId}
         open={fringesModalVisible}
         onCancel={() => setFringesModalVisible(false)}
