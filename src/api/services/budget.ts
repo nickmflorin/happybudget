@@ -4,17 +4,9 @@ import * as services from "./services";
 export const getBudget = services.retrieveService<Model.Budget>((id: number) => ["budgets", id]);
 export const getBudgetPdf = services.retrieveService<Model.PdfBudget>((id: number) => ["budgets", id, "pdf"]);
 export const getBudgets = services.listService<Model.SimpleBudget>(["budgets"]);
-export const getBudgetAccounts = services.detailListService<Model.Account>((id: number) => ["budgets", id, "accounts"]);
-export const getBudgetAccountMarkups = services.detailListService<Model.Markup>((id: number) => [
-  "budgets",
-  id,
-  "markups"
-]);
-export const getBudgetAccountGroups = services.detailListService<Model.Group>((id: number) => [
-  "budgets",
-  id,
-  "groups"
-]);
+export const getBudgetChildren = services.detailListService<Model.Account>((id: number) => ["budgets", id, "children"]);
+export const getBudgetMarkups = services.detailListService<Model.Markup>((id: number) => ["budgets", id, "markups"]);
+export const getBudgetGroups = services.detailListService<Model.Group>((id: number) => ["budgets", id, "groups"]);
 export const getBudgetActualOwners = services.detailListService<Model.ActualOwner>((id: number) => [
   "budgets",
   id,
@@ -34,13 +26,13 @@ export const updateBudget = services.detailPatchService<Http.BudgetPayload, Mode
 ]);
 export const createBudget = services.postService<Http.BudgetPayload, Model.Budget>(["budgets"]);
 
-export const createBudgetAccount = services.detailPostService<Http.AccountPayload, Model.Account>((id: number) => [
+export const createBudgetChild = services.detailPostService<Http.AccountPayload, Model.Account>((id: number) => [
   "budgets",
   id,
-  "accounts"
+  "children"
 ]);
 
-export const createBudgetAccountGroup = services.detailPostService<Http.GroupPayload, Model.Group>((id: number) => [
+export const createBudgetGroup = services.detailPostService<Http.GroupPayload, Model.Group>((id: number) => [
   "budgets",
   id,
   "groups"
@@ -57,7 +49,7 @@ export const duplicateBudget = async (id: number, options: Http.RequestOptions =
   return client.post<Model.Budget>(url, {}, options);
 };
 
-export const createBudgetAccountMarkup = services.detailPostService<
+export const createBudgetMarkup = services.detailPostService<
   Http.MarkupPayload,
   Http.BudgetContextDetailResponse<Model.Markup>
 >((id: number) => ["budgets", id, "markups"]);
@@ -71,30 +63,30 @@ export const bulkDeleteBudgetMarkups = async (
   return client.patch<Http.BulkDeleteResponse<Model.Budget>>(url, { ids }, options);
 };
 
-export const bulkUpdateBudgetAccounts = async (
+export const bulkUpdateBudgetChildren = async (
   id: number,
   data: Http.BulkUpdatePayload<Http.AccountPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkResponse<Model.Budget, Model.Account>> => {
-  const url = services.URL.v1("budgets", id, "bulk-update-accounts");
+  const url = services.URL.v1("budgets", id, "bulk-update-children");
   return client.patch<Http.BulkResponse<Model.Budget, Model.Account>>(url, data, options);
 };
 
-export const bulkDeleteBudgetAccounts = async (
+export const bulkDeleteBudgetChildren = async (
   id: number,
   ids: number[],
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkDeleteResponse<Model.Budget>> => {
-  const url = services.URL.v1("budgets", id, "bulk-delete-accounts");
+  const url = services.URL.v1("budgets", id, "bulk-delete-children");
   return client.patch<Http.BulkDeleteResponse<Model.Budget>>(url, { ids }, options);
 };
 
-export const bulkCreateBudgetAccounts = async (
+export const bulkCreateBudgetChildren = async (
   id: number,
   payload: Http.BulkCreatePayload<Http.AccountPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkResponse<Model.Budget, Model.Account>> => {
-  const url = services.URL.v1("budgets", id, "bulk-create-accounts");
+  const url = services.URL.v1("budgets", id, "bulk-create-children");
   return client.patch<Http.BulkResponse<Model.Budget, Model.Account>>(url, payload, options);
 };
 

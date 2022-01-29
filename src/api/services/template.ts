@@ -4,21 +4,17 @@ import * as services from "./services";
 export const getTemplate = services.retrieveService<Model.Template>((id: number) => ["templates", id]);
 export const getTemplates = services.listService<Model.SimpleTemplate>(["templates"]);
 export const getCommunityTemplates = services.listService<Model.SimpleTemplate>(["templates", "community"]);
-export const getTemplateAccounts = services.detailListService<Model.Account>((id: number) => [
+export const getTemplateChildren = services.detailListService<Model.Account>((id: number) => [
   "templates",
   id,
-  "accounts"
+  "children"
 ]);
-export const getTemplateAccountMarkups = services.detailListService<Model.Markup>((id: number) => [
+export const getTemplateMarkups = services.detailListService<Model.Markup>((id: number) => [
   "templates",
   id,
   "markups"
 ]);
-export const getTemplateAccountGroups = services.detailListService<Model.Group>((id: number) => [
-  "templates",
-  id,
-  "groups"
-]);
+export const getTemplateGroups = services.detailListService<Model.Group>((id: number) => ["templates", id, "groups"]);
 export const getTemplateFringes = services.detailListService<Model.Fringe>((id: number) => [
   "templates",
   id,
@@ -34,12 +30,12 @@ export const createCommunityTemplate = services.postService<Http.TemplatePayload
   "templates",
   "community"
 ]);
-export const createTemplateAccount = services.detailPostService<Http.AccountPayload, Model.Account>((id: number) => [
+export const createTemplateChild = services.detailPostService<Http.AccountPayload, Model.Account>((id: number) => [
   "templates",
   id,
-  "accounts"
+  "children"
 ]);
-export const createTemplateAccountGroup = services.detailPostService<Http.GroupPayload, Model.Group>((id: number) => [
+export const createTemplateGroup = services.detailPostService<Http.GroupPayload, Model.Group>((id: number) => [
   "templates",
   id,
   "groups"
@@ -49,7 +45,7 @@ export const createTemplateFringe = services.detailPostService<Http.FringePayloa
   id,
   "fringes"
 ]);
-export const createTemplateAccountMarkup = services.detailPostService<
+export const createTemplateMarkup = services.detailPostService<
   Http.MarkupPayload,
   Http.BudgetContextDetailResponse<Model.Markup>
 >((id: number) => ["templates", id, "markups"]);
@@ -77,30 +73,30 @@ export const bulkDeleteTemplateMarkups = async (
   return client.patch<Http.BulkDeleteResponse<Model.Template>>(url, { ids }, options);
 };
 
-export const bulkUpdateTemplateAccounts = async (
+export const bulkUpdateTemplateChildren = async (
   id: number,
   data: Http.BulkUpdatePayload<Http.AccountPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkResponse<Model.Template, Model.Account>> => {
-  const url = services.URL.v1("templates", id, "bulk-update-accounts");
+  const url = services.URL.v1("templates", id, "bulk-update-children");
   return client.patch<Http.BulkResponse<Model.Template, Model.Account>>(url, data, options);
 };
 
-export const bulkDeleteTemplateAccounts = async (
+export const bulkDeleteTemplateChildren = async (
   id: number,
   ids: number[],
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkDeleteResponse<Model.Template>> => {
-  const url = services.URL.v1("templates", id, "bulk-delete-accounts");
+  const url = services.URL.v1("templates", id, "bulk-delete-children");
   return client.patch<Http.BulkDeleteResponse<Model.Template>>(url, { ids }, options);
 };
 
-export const bulkCreateTemplateAccounts = async (
+export const bulkCreateTemplateChildren = async (
   id: number,
   payload: Http.BulkCreatePayload<Http.AccountPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkResponse<Model.Template, Model.Account>> => {
-  const url = services.URL.v1("templates", id, "bulk-create-accounts");
+  const url = services.URL.v1("templates", id, "bulk-create-children");
   return client.patch<Http.BulkResponse<Model.Template, Model.Account>>(url, payload, options);
 };
 

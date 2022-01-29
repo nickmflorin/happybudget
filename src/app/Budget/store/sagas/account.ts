@@ -60,14 +60,14 @@ export const createTableSaga = (table: Table.TableInstance<Tables.SubAccountRowD
       selectStore: (state: Application.AuthenticatedStore) => state.budget.account.table,
       actions: ActionMap,
       services: {
-        create: api.createAccountSubAccount,
-        request: api.getAccountSubAccounts,
-        requestGroups: api.getAccountSubAccountGroups,
-        requestMarkups: api.getAccountSubAccountMarkups,
+        create: api.createAccountChild,
+        request: api.getAccountChildren,
+        requestGroups: api.getAccountGroups,
+        requestMarkups: api.getAccountMarkups,
         requestFringes: api.getBudgetFringes,
-        bulkCreate: api.bulkCreateAccountSubAccounts,
-        bulkDelete: api.bulkDeleteAccountSubAccounts,
-        bulkUpdate: api.bulkUpdateAccountSubAccounts,
+        bulkCreate: api.bulkCreateAccountChildren,
+        bulkDelete: api.bulkDeleteAccountChildren,
+        bulkUpdate: api.bulkUpdateAccountChildren,
         bulkDeleteMarkups: api.bulkDeleteAccountMarkups
       }
     })

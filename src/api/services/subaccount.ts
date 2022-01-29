@@ -2,12 +2,12 @@ import { client } from "api";
 import * as services from "./services";
 
 export const getSubAccount = services.retrieveService<Model.SubAccount>((id: number) => ["subaccounts", id]);
-export const getSubAccountSubAccountMarkups = services.detailListService<Model.Markup>((id: number) => [
+export const getSubAccountMarkups = services.detailListService<Model.Markup>((id: number) => [
   "subaccounts",
   id,
   "markups"
 ]);
-export const getSubAccountSubAccountGroups = services.detailListService<Model.Group>((id: number) => [
+export const getSubAccountGroups = services.detailListService<Model.Group>((id: number) => [
   "subaccounts",
   id,
   "groups"
@@ -17,23 +17,26 @@ export const updateSubAccount = services.detailPatchService<Http.SubAccountPaylo
   "subaccounts",
   id
 ]);
-export const createSubAccountSubAccount = services.detailPostService<Http.SubAccountPayload, Model.SubAccount>(
-  (id: number) => ["subaccounts", id, "subaccounts"]
+export const createSubAccountChild = services.detailPostService<Http.SubAccountPayload, Model.SubAccount>(
+  (id: number) => ["subaccounts", id, "children"]
 );
-export const createSubAccountSubAccountMarkup = services.detailPostService<
+export const createSubAccountMarkup = services.detailPostService<
   Http.MarkupPayload,
   Http.BudgetParentContextDetailResponse<Model.Markup, Model.Account>
 >((id: number) => ["subaccounts", id, "markups"]);
-export const createSubAccountSubAccountGroup = services.detailPostService<Http.GroupPayload, Model.Group>(
-  (id: number) => ["subaccounts", id, "groups"]
-);
 
-export const getSubAccountSubAccounts = async <M extends Model.SubAccount | Model.SimpleSubAccount = Model.SubAccount>(
+export const createSubAccountGroup = services.detailPostService<Http.GroupPayload, Model.Group>((id: number) => [
+  "subaccounts",
+  id,
+  "groups"
+]);
+
+export const getSubAccountChildren = async <M extends Model.SubAccount | Model.SimpleSubAccount = Model.SubAccount>(
   subaccountId: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<M>> => {
-  const url = services.URL.v1("subaccounts", subaccountId, "subaccounts");
+  const url = services.URL.v1("subaccounts", subaccountId, "children");
   return client.list<M>(url, query, options);
 };
 
@@ -57,21 +60,21 @@ export const uploadSubAccountAttachment = services.detailPostService<FormData, {
   (id: number) => ["subaccounts", id, "attachments"]
 );
 
-export const bulkUpdateSubAccountSubAccounts = async <B extends Model.Budget | Model.Template>(
+export const bulkUpdateSubAccountChildren = async <B extends Model.Budget | Model.Template>(
   id: number,
   data: Http.BulkUpdatePayload<Http.SubAccountPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BudgetBulkResponse<B, Model.SubAccount, Model.SubAccount>> => {
-  const url = services.URL.v1("subaccounts", id, "bulk-update-subaccounts");
+  const url = services.URL.v1("subaccounts", id, "bulk-update-children");
   return client.patch<Http.BudgetBulkResponse<B, Model.SubAccount, Model.SubAccount>>(url, data, options);
 };
 
-export const bulkDeleteSubAccountSubAccounts = async <B extends Model.Budget | Model.Template>(
+export const bulkDeleteSubAccountChildren = async <B extends Model.Budget | Model.Template>(
   id: number,
   ids: number[],
   options: Http.RequestOptions = {}
 ): Promise<Http.BudgetBulkDeleteResponse<B, Model.SubAccount>> => {
-  const url = services.URL.v1("subaccounts", id, "bulk-delete-subaccounts");
+  const url = services.URL.v1("subaccounts", id, "bulk-delete-children");
   return client.patch<Http.BudgetBulkDeleteResponse<B, Model.SubAccount>>(url, { ids }, options);
 };
 
@@ -84,11 +87,11 @@ export const bulkDeleteSubAccountMarkups = async <B extends Model.Budget | Model
   return client.patch<Http.BudgetBulkDeleteResponse<B, Model.SubAccount>>(url, { ids }, options);
 };
 
-export const bulkCreateSubAccountSubAccounts = async <B extends Model.Budget | Model.Template>(
+export const bulkCreateSubAccountChildren = async <B extends Model.Budget | Model.Template>(
   id: number,
   payload: Http.BulkCreatePayload<Http.SubAccountPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BudgetBulkResponse<B, Model.SubAccount, Model.SubAccount>> => {
-  const url = services.URL.v1("subaccounts", id, "bulk-create-subaccounts");
+  const url = services.URL.v1("subaccounts", id, "bulk-create-children");
   return client.patch<Http.BudgetBulkResponse<B, Model.SubAccount, Model.SubAccount>>(url, payload, options);
 };

@@ -9,8 +9,8 @@ import * as actions from "../actions";
 function* request(action: Redux.Action<number>): SagaIterator {
   yield put(actions.analysis.loadingAction(true));
   const effects = [
-    api.request(api.getBudgetAccounts, action.payload, {}),
-    api.request(api.getBudgetAccountGroups, action.payload, {}),
+    api.request(api.getBudgetChildren, action.payload, {}),
+    api.request(api.getBudgetGroups, action.payload, {}),
     api.request(api.getActuals, action.payload, {})
   ];
   try {

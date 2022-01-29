@@ -24,10 +24,10 @@ export const getTableChildren = <
   const serviceMap: {
     [key in Model.ParentType | "template"]: TableChildrenService<ParentTypeModelMap[key]>;
   } = {
-    budget: api.getBudgetAccounts,
-    template: api.getTemplateAccounts,
-    account: api.getAccountSubAccounts,
-    subaccount: api.getSubAccountSubAccounts
+    budget: api.getBudgetChildren,
+    template: api.getTemplateChildren,
+    account: api.getAccountChildren,
+    subaccount: api.getSubAccountChildren
   };
   return serviceMap[parentType](parentId, query, options) as Promise<Http.ListResponse<M>>;
 };
@@ -53,10 +53,10 @@ export const createTableMarkup = <
       o?: Http.RequestOptions
     ) => Promise<ResponseTypes>;
   } = {
-    budget: api.createBudgetAccountMarkup,
-    template: api.createTemplateAccountMarkup,
-    account: api.createAccountSubAccountMarkup,
-    subaccount: api.createSubAccountSubAccountMarkup
+    budget: api.createBudgetMarkup,
+    template: api.createTemplateMarkup,
+    account: api.createAccountMarkup,
+    subaccount: api.createSubAccountMarkup
   };
   return serviceMap[parentType](parentId, payload, options) as Promise<R>;
 };
@@ -74,10 +74,10 @@ export const getTableGroups = (
       o?: Http.RequestOptions
     ) => Promise<Http.ListResponse<Model.Group>>;
   } = {
-    budget: api.getBudgetAccountGroups,
-    template: api.getTemplateAccountGroups,
-    account: api.getAccountSubAccountGroups,
-    subaccount: api.getSubAccountSubAccountGroups
+    budget: api.getBudgetGroups,
+    template: api.getTemplateGroups,
+    account: api.getAccountGroups,
+    subaccount: api.getSubAccountGroups
   };
   return serviceMap[parentType](parentId, query, options);
 };
@@ -95,10 +95,10 @@ export const createTableGroup = (
       o?: Http.RequestOptions
     ) => Promise<Model.Group>;
   } = {
-    budget: api.createBudgetAccountGroup,
-    template: api.createTemplateAccountGroup,
-    account: api.createAccountSubAccountGroup,
-    subaccount: api.createSubAccountSubAccountGroup
+    budget: api.createBudgetGroup,
+    template: api.createTemplateGroup,
+    account: api.createAccountGroup,
+    subaccount: api.createSubAccountGroup
   };
   return serviceMap[parentType](parentId, payload, options);
 };

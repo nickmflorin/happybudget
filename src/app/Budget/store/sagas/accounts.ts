@@ -30,13 +30,13 @@ export const createTableSaga = (table: Table.TableInstance<Tables.AccountRowData
       selectStore: (state: Application.AuthenticatedStore) => state.budget.accounts,
       actions: ActionMap,
       services: {
-        create: api.createBudgetAccount,
-        request: api.getBudgetAccounts,
-        requestGroups: api.getBudgetAccountGroups,
-        requestMarkups: api.getBudgetAccountMarkups,
-        bulkCreate: api.bulkCreateBudgetAccounts,
-        bulkDelete: api.bulkDeleteBudgetAccounts,
-        bulkUpdate: api.bulkUpdateBudgetAccounts,
+        create: api.createBudgetChild,
+        request: api.getBudgetChildren,
+        requestGroups: api.getBudgetGroups,
+        requestMarkups: api.getBudgetMarkups,
+        bulkCreate: api.bulkCreateBudgetChildren,
+        bulkDelete: api.bulkDeleteBudgetChildren,
+        bulkUpdate: api.bulkUpdateBudgetChildren,
         bulkDeleteMarkups: api.bulkDeleteBudgetMarkups
       }
     })
