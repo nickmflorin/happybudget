@@ -1,15 +1,24 @@
 import React, { useMemo, useState } from "react";
 
-import { isNil } from "lodash";
+import { isNil, map } from "lodash";
 import classNames from "classnames";
 
 import { Icon, ShowHide, RenderWithSpinner } from "components";
 import { IconButton } from "components/buttons";
 import { DropdownMenu } from "components/dropdowns";
 import { CardImage } from "components/images";
-import { TooltipOrTitle } from "components/tooltips";
 
 import "./Card.scss";
+
+type CardCornerActionRenderer = {
+  readonly render: () => JSX.Element;
+  readonly visible: boolean;
+};
+
+type CardCornerAction = JSX.Element | CardCornerActionRenderer;
+
+const isCornerActionRender = (action: CardCornerAction): action is CardCornerActionRenderer =>
+  typeof action === "object";
 
 export type CardProps = StandardComponentProps & {
   readonly dropdown?: MenuItemModel[];
@@ -18,8 +27,7 @@ export type CardProps = StandardComponentProps & {
   readonly image: SavedImage | null;
   readonly loading?: boolean;
   readonly disabled?: boolean;
-  readonly hidden?: boolean;
-  readonly info?: Tooltip;
+  readonly cornerActions?: (iconClassName: string) => CardCornerAction[];
   readonly onClick?: () => void;
 };
 
@@ -31,8 +39,7 @@ const Card = ({
   loading,
   disabled,
   image,
-  hidden = false,
-  info,
+  cornerActions,
   ...props
 }: CardProps): JSX.Element => {
   const [imageError, setImageError] = useState(false);
@@ -45,22 +52,19 @@ const Card = ({
   }, [image, imageError]);
 
   return (
-    <div {...props} className={classNames("card", props.className, { hidden, disabled: loading || disabled, loading })}>
-      {!isNil(info) && (
-        <TooltipOrTitle type={"info"} tooltip={info}>
-          <Icon
-            className={classNames("icon--card-info", iconClassName, { "with-hidden": hidden })}
-            icon={"question-circle"}
-            weight={"solid"}
-          />
-        </TooltipOrTitle>
+    <div {...props} className={classNames("card", props.className, { disabled: loading || disabled, loading })}>
+      {!isNil(cornerActions) && (
+        <div className={"card-corner-actions"}>
+          {map(cornerActions(iconClassName), (action: CardCornerAction, index: number) => {
+            if (isCornerActionRender(action)) {
+              return <React.Fragment key={index}>{action.visible === true ? action.render() : <></>}</React.Fragment>;
+            }
+            return <React.Fragment key={index}>{action}</React.Fragment>;
+          })}
+        </div>
       )}
-
       <div className={"card-inner"}>
         <RenderWithSpinner size={18} loading={loading}>
-          <ShowHide show={hidden}>
-            <Icon className={"icon--hidden"} icon={"eye-slash"} weight={"solid"} />
-          </ShowHide>
           {!isNil(dropdown) && (
             <DropdownMenu models={dropdown} placement={"bottomRight"}>
               <IconButton

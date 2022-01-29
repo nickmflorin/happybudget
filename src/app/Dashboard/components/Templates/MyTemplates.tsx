@@ -171,7 +171,11 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
               );
             })}
             <ShowHide show={templates.length !== 0}>
-              <EmptyCard title={"New Template"} icon={"plus"} onClick={() => setCreateTempateModalOpen(true)} />
+              <EmptyCard
+                className={"template-empty-card"}
+                icon={"plus"}
+                onClick={() => setCreateTempateModalOpen(true)}
+              />
             </ShowHide>
           </div>
         )}

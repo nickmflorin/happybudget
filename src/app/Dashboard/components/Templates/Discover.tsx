@@ -10,7 +10,7 @@ import { redux, notifications, users } from "lib";
 
 import { ShowHide, Icon } from "components";
 import { PrimaryButtonIconToggle, OrderingButtonIconToggle } from "components/buttons";
-import { CommunityTemplateCard, EmptyCard } from "components/cards";
+import { CommunityTemplateCard, CommunityTemplateStaffCard, EmptyCard } from "components/cards";
 import { OrderingDropdown } from "components/dropdowns";
 import { SearchInput } from "components/fields";
 import { Page } from "components/layout";
@@ -116,9 +116,9 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
                 "The API is returning hidden community templates for non-staff users!  This is a security problem!"
               );
             }
-            const card = (
-              <CommunityTemplateCard
-                template={template}
+            let card: JSX.Element = (
+              <CommunityTemplateStaffCard
+                budget={template}
                 hidingOrShowing={isTogglingVisibility(template.id)}
                 duplicating={isDuplicating(template.id)}
                 deleting={isDeleting(template.id)}
@@ -177,6 +177,9 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
                 }}
               />
             );
+            if (user.is_staff !== true) {
+              card = <CommunityTemplateCard budget={template} />;
+            }
             if (template.hidden === true) {
               return <IsStaff key={index}>{card}</IsStaff>;
             }
@@ -184,11 +187,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
           })}
           <IsStaff>
             <ShowHide show={responseWasReceived}>
-              <EmptyCard
-                title={"New Community Template"}
-                icon={"plus"}
-                onClick={() => setCreateTempateModalOpen(true)}
-              />
+              <EmptyCard icon={"plus"} onClick={() => setCreateTempateModalOpen(true)} />
             </ShowHide>
           </IsStaff>
         </div>

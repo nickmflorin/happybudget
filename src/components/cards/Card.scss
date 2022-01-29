@@ -1,7 +1,8 @@
 @import 'style/_imports';
 
-.card-icon {
+.base-card-icon {
 	color: $white !important;
+	z-index: 1000;
 
 	svg {
 		color: $white !important;
@@ -15,39 +16,36 @@
 	}
 }
 
+.icon--card-corner-action {
+	@extend .base-card-icon;
+	height: 16px;
+}
+
 .card {
 	border-radius: 14px;
 	position: relative;
 	height: 214px;
 	cursor: pointer;
 
-	// The card info icon must be outside of the inner card, so that we can disable
-	// the inner card while still keeping the tooltip from the card info icon
+	// Card corner actions must be outside of the inner card, so that we can
+	// disable the inner card while still keeping tooltips on the actions
 	// hoverable.
-	.icon--card-info {
-		@extend .card-icon;
-		position: absolute;
+	.card-corner-actions {
 		z-index: 1000;
+		position: absolute;
 		top: 12px;
 		left: 12px;
-		height: 16px;
 
-		// If there is also a hidden icon, we should move this to the right.
-		&.with-hidden {
-			left: 25px;
+		> * {
+			&:not(:last-child) {
+				margin-right: 8px;
+			}
 		}
 	}
 
 	.card-inner {
-		.icon--hidden {
-			@extend .card-icon;
-			top: 12px;
-			left: 12px;
-			height: 26px;
-		}
-
 		.dropdown-ellipsis {
-			@extend .card-icon;
+			@extend .base-card-icon;
 			position: absolute;
 			z-index: 1000;
 			top: 10px;

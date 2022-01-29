@@ -4,11 +4,13 @@ import { isNil } from "lodash";
 
 import { Icon } from "components";
 import { IncludeButtonLink } from "components/buttons";
+import { InfoTooltip } from "components/tooltips";
+
 import { util, users } from "lib";
 
 import Card, { CardProps } from "./Card";
 
-type BudgetCardProps = Pick<CardProps, "disabled" | "loading" | "onClick" | "className" | "style"> & {
+type BudgetCardProps = Pick<CardProps, "disabled" | "loading" | "onClick" | "className" | "style" | "cornerActions"> & {
   readonly budget: Model.SimpleBudget;
   readonly duplicating: boolean;
   readonly onEdit: () => void;
@@ -48,10 +50,11 @@ const BudgetCard = ({
   return (
     <Card
       {...props}
-      info={
-        budget.is_permissioned === true
-          ? {
-              title: (
+      cornerActions={(iconClassName: string) => [
+        {
+          render: () => (
+            <InfoTooltip
+              title={
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   {"You are not subscribed to the correct products to access this budget."}
                   <IncludeButtonLink
@@ -62,10 +65,18 @@ const BudgetCard = ({
                     }}
                   />
                 </div>
-              )
-            }
-          : undefined
-      }
+              }
+            >
+              <Icon
+                className={classNames("icon--card-corner-action", iconClassName)}
+                icon={"question-circle"}
+                weight={"solid"}
+              />
+            </InfoTooltip>
+          ),
+          visible: budget.is_permissioned
+        }
+      ]}
       className={classNames("budget-card", props.className)}
       title={budget.name}
       subTitle={subTitle}
