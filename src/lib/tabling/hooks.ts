@@ -1,7 +1,6 @@
 import { useRef } from "react";
 
 import { notifications } from "lib";
-import * as hooks from "../hooks";
 
 export const InitialGridRef: Table.DataGridInstance = {
   getCSVData: () => []
@@ -45,7 +44,3 @@ export const useTable = <R extends Table.RowData, M extends Model.RowHttpModel =
 > => {
   return useRef<Table.TableInstance<R, M>>(InitialTableRef as Table.TableInstance<R, M>);
 };
-
-export const useTableIfNotDefined = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  table?: NonNullRef<Table.TableInstance<R, M>>
-): NonNullRef<Table.TableInstance<R, M>> => hooks.useRefIfNotDefined<Table.TableInstance<R, M>>(useTable, table);

@@ -37,7 +37,7 @@ export type AuthenticatedTableProps<
     "onChangeEvent" | "columns" | "data" | "apis" | "onRowSelectionChanged" | "rowHasCheckboxSelection" | "grid"
   > & {
     readonly actionContext: C;
-    readonly table?: NonNullRef<Table.TableInstance<R, M>>;
+    readonly table: NonNullRef<Table.TableInstance<R, M>>;
     readonly actions?: Table.AuthenticatedMenuActions<R, M>;
     readonly constrainTableFooterHorizontally?: boolean;
     readonly constrainPageFooterHorizontally?: boolean;

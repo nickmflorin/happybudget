@@ -31,11 +31,9 @@ const ActualsTable = ({
   onOwnersSearch,
   ...props
 }: WithWithContactsProps<WithConnectedTableProps<ActualsTableProps, R, M>, R, M>): JSX.Element => {
-  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
-
   const [processAttachmentsCellForClipboard, processAttachmentsCellFromClipboard, setEditAttachments, modal] =
     useAttachments({
-      table: table.current,
+      table: props.table.current,
       onAttachmentRemoved: props.onAttachmentRemoved,
       onAttachmentAdded: props.onAttachmentAdded,
       listAttachments: api.getActualAttachments,
@@ -110,7 +108,6 @@ const ActualsTable = ({
     <React.Fragment>
       <AuthenticatedModelTable<R, M>
         {...props}
-        table={table}
         showPageFooter={false}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
@@ -119,8 +116,8 @@ const ActualsTable = ({
         getModelRowLabel={"Sub Account"}
         framework={Framework}
         actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
-          framework.actions.ToggleColumnAction(table.current, params),
-          framework.actions.ExportCSVAction(table.current, params, exportFileName),
+          framework.actions.ToggleColumnAction(props.table.current, params),
+          framework.actions.ExportCSVAction(props.table.current, params, exportFileName),
           framework.actions.ExportPdfAction(props.onExportPdf)
         ]}
         columns={tabling.columns.normalizeColumns(props.columns, {

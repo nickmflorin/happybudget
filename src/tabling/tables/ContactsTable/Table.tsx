@@ -19,11 +19,9 @@ export type Props = Omit<AuthenticatedModelTableProps<R, M>, "columns"> & {
 };
 
 const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Props, R, M>): JSX.Element => {
-  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
-
   const [processAttachmentsCellForClipboard, processAttachmentsCellFromClipboard, setEditAttachments, modal] =
     useAttachments({
-      table: table.current,
+      table: props.table.current,
       onAttachmentRemoved: props.onAttachmentRemoved,
       onAttachmentAdded: props.onAttachmentAdded,
       listAttachments: api.getContactAttachments,
@@ -35,7 +33,6 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
     <React.Fragment>
       <AuthenticatedModelTable<R, M>
         {...props}
-        table={table}
         showPageFooter={false}
         minimal={true}
         cookieNames={{ hiddenColumns: "contacts-table-hidden-columns" }}
@@ -46,8 +43,8 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
         getModelRowLabel={"Contact"}
         framework={Framework}
         actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
-          framework.actions.ToggleColumnAction<R, M>(table.current, params),
-          framework.actions.ExportCSVAction<R, M>(table.current, params, exportFileName)
+          framework.actions.ToggleColumnAction<R, M>(props.table.current, params),
+          framework.actions.ExportCSVAction<R, M>(props.table.current, params, exportFileName)
         ]}
         columns={tabling.columns.normalizeColumns(Columns, {
           attachments: (col: Table.Column<R, M>) => ({

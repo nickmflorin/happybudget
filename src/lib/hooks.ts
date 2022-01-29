@@ -20,7 +20,7 @@ export const useRefIfNotDefined = <T extends Record<string, unknown>>(
   prop?: { current: T }
 ): { current: T } => {
   const ref = hook();
-  const returnRef = useMemo(() => (!isNil(prop) ? prop : ref), [prop, ref]);
+  const returnRef = useMemo(() => (!isNil(prop) ? prop : ref), [ref]);
   return returnRef;
 };
 
@@ -80,6 +80,6 @@ export function usePrevious<T>(value: T) {
   const ref = useRef<T>();
   useEffect(() => {
     ref.current = value;
-  });
+  }, []);
   return ref.current;
 }
