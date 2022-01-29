@@ -3,6 +3,7 @@ import { Store } from "redux";
 import { Provider } from "react-redux";
 import { Redirect } from "react-router-dom";
 import { ConnectedRouter } from "connected-react-router";
+import * as Sentry from "@sentry/browser";
 import axios from "axios";
 import { isNil } from "lodash";
 
@@ -32,6 +33,7 @@ const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): 
         const store = configureAuthenticatedStore(response);
         setReduxStore(store);
 
+        Sentry.setUser({ email: response.email, id: String(response.id) });
         users.plugins.identify(response);
       })
       .catch((e: Error) => {

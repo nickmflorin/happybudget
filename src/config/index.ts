@@ -57,7 +57,6 @@ const configureApplication = async (history: History) => {
 		 method, because it must be done at the top of the src/index.tsx file before
 		 any other imports are performed. */
   if (process.env.NODE_ENV === "development" && Config.whyDidYouRender) {
-    console.info("Registering WYDR");
     /* eslint-disable-next-line @typescript-eslint/no-var-requires */
     const whyDidYouRender = require("@welldone-software/why-did-you-render");
     whyDidYouRender(React, {
