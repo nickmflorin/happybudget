@@ -42,6 +42,7 @@ const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.RowHttpM
       {...props}
       mode={"multiple"}
       includeSearch={true}
+      setFocusedFromSelectedState={false}
       searchIndices={["label"]}
       clientSearching={true}
       checkbox={true}

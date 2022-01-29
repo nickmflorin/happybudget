@@ -92,4 +92,4 @@ const Billing = (): JSX.Element => {
   );
 };
 
-export default React.memo(Billing);
+export default Billing;
