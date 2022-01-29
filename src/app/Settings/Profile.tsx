@@ -12,7 +12,7 @@ import { Tile } from "components/layout";
 import { IImageAndNameRef } from "components/fields/ImageAndName";
 import { Page } from "components/layout";
 
-import "./index.scss";
+import "./Profile.scss";
 
 const Profile = (): JSX.Element => {
   const form = ui.hooks.useForm<Http.UserPayload>();
