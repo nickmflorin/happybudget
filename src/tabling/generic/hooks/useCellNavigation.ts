@@ -54,7 +54,7 @@ const findNextNavigatableNodes = <R extends Table.RowData>(
     let runningAllNodeIndex = 0;
 
     let nextRowNode: Table.RowNode | undefined = api.getDisplayedRowAtIndex(startingIndex);
-    if (!isNil(nextRowNode)) {
+    if (!isNil(nextRowNode) && isNavigatableNode(nextRowNode)) {
       nodesAfterNavigatable = [nextRowNode];
     }
     while (!isNil(nextRowNode)) {
