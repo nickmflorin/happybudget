@@ -27,7 +27,7 @@ export type UnauthenticatedTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
 > = TableConfigurationProps<R, M> & {
-  readonly table?: NonNullRef<Table.TableInstance<R, M>>;
+  readonly table: NonNullRef<Table.TableInstance<R, M>>;
   readonly actions?: Table.UnauthenticatedMenuActions<R, M>;
   readonly constrainTableFooterHorizontally?: boolean;
   readonly constrainPageFooterHorizontally?: boolean;

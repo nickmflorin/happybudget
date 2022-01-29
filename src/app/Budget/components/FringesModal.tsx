@@ -27,14 +27,16 @@ interface FringesModalProps extends Pick<ModalProps, "open" | "onCancel"> {
   readonly budgetId: number;
   readonly budget: Model.Budget | null;
   readonly id: number; // ID of Account or SubAccount
+  readonly table: NonNullRef<Table.TableInstance<Tables.FringeRowData, Model.Fringe>>;
 }
 
-const FringesModal: React.FC<FringesModalProps> = ({ id, budget, budgetId, open, onCancel }) => {
+const FringesModal: React.FC<FringesModalProps> = ({ id, budget, budgetId, open, table, onCancel }) => {
   return (
     <GenericFringesModal open={open} onCancel={onCancel}>
       <ConnectedFringesTable
         tableId={"budget-fringes"}
         actionContext={{ budgetId, id }}
+        table={table}
         exportFileName={!isNil(budget) ? `${budget.name}_fringes` : "fringes"}
       />
     </GenericFringesModal>

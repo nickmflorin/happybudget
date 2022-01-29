@@ -12,7 +12,6 @@ import { selectFringes, selectSubAccountUnits } from "../store/selectors";
 import FringesModal from "./FringesModal";
 
 type R = Tables.SubAccountRowData;
-type M = Model.SubAccount;
 
 type OmitTableProps =
   | "contacts"
@@ -45,10 +44,10 @@ const SubAccountsTable = ({
   ...props
 }: BudgetSubAccountsTableProps): JSX.Element => {
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
+  const fringesTable = tabling.hooks.useTable<Tables.FringeRowData, Model.Fringe>();
 
   const dispatch = useDispatch();
   const cs = contacts.hooks.useContacts();
-  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
   const fringes = useSelector(selectFringes);
   const subaccountUnits = useSelector(selectSubAccountUnits);
 
@@ -60,7 +59,7 @@ const SubAccountsTable = ({
 				 perform a table update, showing the created contact in the new cell. */
       const rowId = params?.rowId;
       if (!isNil(rowId)) {
-        const row: Table.BodyRow<R> | null = table.current.getRow(rowId);
+        const row: Table.BodyRow<R> | null = props.table.current.getRow(rowId);
         if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
           let rowChange: Table.RowChange<R, Table.ModelRow<R>> = {
             id: row.id,
@@ -74,14 +73,14 @@ const SubAccountsTable = ({
               data: { ...rowChange.data, rate: { oldValue: row.data.rate, newValue: m.rate } }
             };
           }
-          table.current.applyTableChange({
+          props.table.current.applyTableChange({
             type: "dataChange",
             payload: rowChange
           });
         }
       }
     },
-    [table.current]
+    [props.table.current]
   );
 
   const onContactUpdated = useMemo(
@@ -89,9 +88,9 @@ const SubAccountsTable = ({
       dispatch(actions.authenticated.updateContactInStateAction({ id: m.id, data: m }));
       const rowId = params.rowId;
       if (!isNil(rowId)) {
-        const row: Table.BodyRow<R> | null = table.current.getRow(rowId);
+        const row: Table.BodyRow<R> | null = props.table.current.getRow(rowId);
         if (!isNil(row) && tabling.typeguards.isModelRow(row) && row.data.rate === null && m.rate !== null) {
-          table.current.applyTableChange({
+          props.table.current.applyTableChange({
             type: "dataChange",
             payload: {
               id: row.id,
@@ -101,7 +100,7 @@ const SubAccountsTable = ({
         }
       }
     },
-    [table.current]
+    [props.table.current]
   );
 
   const [createContactModal, editContactModal, editContact, createContact] = useContacts({
@@ -113,7 +112,6 @@ const SubAccountsTable = ({
     <React.Fragment>
       <GenericSubAccountsTable.AuthenticatedBudget
         {...props}
-        table={table}
         contacts={cs}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
@@ -136,6 +134,7 @@ const SubAccountsTable = ({
       {editContactModal}
       <FringesModal
         budgetId={budgetId}
+        table={fringesTable}
         id={id}
         budget={budget}
         open={fringesModalVisible}
