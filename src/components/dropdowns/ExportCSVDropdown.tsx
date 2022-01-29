@@ -35,6 +35,7 @@ const ExportCSVDropdown = <R extends Table.RowData, M extends Model.RowHttpModel
       keepDropdownOpenOnClick={true}
       clientSearching={true}
       searchIndices={["label"]}
+      setFocusedFromSelectedState={false}
       onChange={(e: MenuChangeEvent) => {
         const selectedIds: string[] = reduce(
           e.menuState,

@@ -40,14 +40,21 @@ const DropdownMenu = <
         setVisible(false);
       }
     };
-    menu.current.focus(visible);
     if (visible === true) {
       window.addEventListener("keydown", keyListener);
     } else {
       window.removeEventListener("keydown", keyListener);
     }
-    return () => window.removeEventListener("keydown", keyListener);
+    return () => {
+      window.removeEventListener("keydown", keyListener);
+    };
   }, [visible]);
+
+  useEffect(() => {
+    if (visible === true && !isNil(menu.current)) {
+      menu.current.focus(true);
+    }
+  }, [visible, menu.current]);
 
   return (
     <Dropdown
@@ -56,6 +63,7 @@ const DropdownMenu = <
       placement={placement}
       visible={visible}
       setVisible={setVisible}
+      destroyPopupOnHide={true}
       overlay={
         <Menu<S, M>
           {...props}

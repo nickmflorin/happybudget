@@ -267,7 +267,7 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
         }
       } else {
         let setIndexFromSelectedState = false;
-        if (search === "") {
+        if (search === "" && props.setFocusedFromSelectedState !== false) {
           const indexFromSelectedState = getIndexFromSelectedState(selected);
           if (!isNil(indexFromSelectedState)) {
             dispatchMenuState({ type: "SET", payload: indexFromSelectedState });
@@ -282,7 +282,16 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
         }
       }
     }
-  }, [noData, noSearchResults, focused, search, selected, props.extra, menuState.availableItems]);
+  }, [
+    noData,
+    noSearchResults,
+    focused,
+    search,
+    selected,
+    props.extra,
+    menuState.availableItems,
+    props.setFocusedFromSelectedState
+  ]);
 
   useEffect(() => {
     const scrollIndexIntoView = (index: number) => {

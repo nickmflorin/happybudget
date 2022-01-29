@@ -145,6 +145,7 @@ declare type IMenu<
   readonly extra?: ExtraMenuItemModel[];
   readonly keepDropdownOpenOnClick?: boolean;
   readonly menu?: NonNullRef<IMenuRef<S, M>>;
+  readonly setFocusedFromSelectedState?: boolean;
   readonly getModelIdentifier?: (m: M) => ID;
   readonly getItemState?: (m: M) => S;
   readonly getItemLabel?: (m: M, s: S) => string;
