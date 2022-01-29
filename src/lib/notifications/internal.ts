@@ -157,7 +157,7 @@ export const inconsistentStateError = <P extends Redux.ActionPayload = Redux.Act
 };
 
 export const requestError = (e: Error, opts?: InternalNotificationOptions) => {
-  if (e instanceof api.ClientError) {
+  if (e instanceof api.ClientError || e instanceof api.ServerError) {
     notify({
       dispatchToSentry: true,
       level: "error",
@@ -166,7 +166,7 @@ export const requestError = (e: Error, opts?: InternalNotificationOptions) => {
     });
   } else if (e instanceof api.NetworkError) {
     notify({
-      dispatchToSentry: true,
+      dispatchToSentry: false,
       level: "error",
       ...opts,
       error: e

@@ -6,7 +6,6 @@ import { fab } from "@fortawesome/free-brands-svg-icons";
 import { IconPack } from "@fortawesome/fontawesome-common-types";
 
 const configureFontAwesome = () => {
-  console.info("Configuring Font Awesome");
   library.add(fas, far, fal, fab as IconPack);
 };
 
