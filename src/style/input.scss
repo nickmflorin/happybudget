@@ -249,6 +249,10 @@ textarea {
     background-color: $white !important;
     border-color: #ebebeb !important;
     border: 1px solid #ebebeb !important;
+
+		.ant-select-selection-item {
+			font-weight: 500;
+		}
   }
 
   &.ant-select-open .ant-select-arrow svg {
