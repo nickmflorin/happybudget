@@ -3,11 +3,10 @@ import { Page } from "react-pdf/dist/esm/entry.webpack";
 import { pdf as PDF } from "@react-pdf/renderer";
 import { debounce, isNil } from "lodash";
 
-import { Pagination } from "antd";
-
 import { util, hooks } from "lib";
 import { registerFonts } from "style/pdf";
 
+import { Pagination } from "components";
 import { Button, PrimaryButton } from "components/buttons";
 import EmptyDocument from "./EmptyDocument";
 import { RenderDocument } from "./primitive";

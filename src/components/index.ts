@@ -5,3 +5,4 @@ export * from "./loading";
 export * from "./util";
 export { default as Separator } from "./Separator";
 export { default as Icon } from "./Icon";
+export { default as Pagination } from "./Pagination";

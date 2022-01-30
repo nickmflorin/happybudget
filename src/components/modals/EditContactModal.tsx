@@ -3,6 +3,8 @@ import { isNil } from "lodash";
 
 import * as api from "api";
 
+import { Separator } from "components";
+import { TaggedActuals } from "components/contacts";
 import { ContactForm } from "components/forms";
 import { ImageAndName } from "components/fields";
 import { IImageAndNameRef } from "components/fields/ImageAndName";
@@ -98,6 +100,8 @@ const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: 
                 : undefined
             }
           />
+          <Separator />
+          <TaggedActuals contactId={props.id} title={"History"} onError={(e: Error) => form.handleRequestError(e)} />
         </React.Fragment>
       )}
     </EditModelModal>

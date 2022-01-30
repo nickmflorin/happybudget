@@ -3,12 +3,10 @@ import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { map, isNil } from "lodash";
 
-import { Pagination } from "antd";
-
 import * as api from "api";
 import { redux, notifications } from "lib";
 
-import { ShowHide, Icon } from "components";
+import { ShowHide, Icon, Pagination } from "components";
 import { PrimaryButtonIconToggle, OrderingButtonIconToggle } from "components/buttons";
 import { TemplateCard, EmptyCard } from "components/cards";
 import { OrderingDropdown } from "components/dropdowns";

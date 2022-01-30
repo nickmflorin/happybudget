@@ -279,6 +279,14 @@ declare namespace Model {
 
   type ActualOwner = SimpleMarkup | Omit<SimpleSubAccount, "order" | "domain">;
 
+  type TaggedActual = GenericHttpModel<"actual"> & {
+    readonly name: string | null;
+    readonly date: string | null;
+    readonly value: number | null;
+    readonly owner: ActualOwner | null;
+    readonly budget: Model.SimpleBudget;
+  };
+
   type Actual = RowHttpModel<"actual"> & {
     readonly contact: number | null;
     readonly name: string | null;

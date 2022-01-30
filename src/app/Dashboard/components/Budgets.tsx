@@ -2,13 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil, map } from "lodash";
-import { Pagination } from "antd";
 
 import * as api from "api";
 import * as store from "store";
 import { redux, notifications, users } from "lib";
 
-import { Icon } from "components";
+import { Icon, Pagination } from "components";
 import { PrimaryButtonIconToggle, OrderingButtonIconToggle } from "components/buttons";
 import { BudgetCard } from "components/cards";
 import { BudgetDropdown, OrderingDropdown } from "components/dropdowns";
