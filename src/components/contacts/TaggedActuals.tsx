@@ -41,7 +41,7 @@ const TaggedActuals = ({ contactId, title, onError, ...props }: TaggedActualsPro
       <div className={"tagged-actuals-header"}>
         <h3 className={"tagged-actuals-title"}>{title}</h3>
         <Pagination
-          hideOnSinglePage={false}
+          hideOnSinglePage={true}
           small={true}
           subtle={true}
           defaultPageSize={5}
