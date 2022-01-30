@@ -19,7 +19,7 @@ const ContactNameCell = (props: ContactNameCellProps): JSX.Element => {
           src={!isNil(row.data.image) ? row.data.image.url : null}
           firstName={row.data.first_name}
           lastName={row.data.last_name}
-          initialsStyle={{ width: 28, height: 28, marginRight: 8 }}
+          initialsStyle={{ width: 28, height: 28, marginRight: 8, minWidth: 28 }}
           imageProps={{ wrapperStyle: { minWidth: 28, width: 28, height: 28, marginRight: 8 } }}
           hideOnNoInitials={true}
         />
