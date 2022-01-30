@@ -4,18 +4,18 @@
   display: flex;
 
   .icon {
-    color: $text-tertiary;
+    color: $icon-color;
     height: 16px;
     width: 16px;
     margin-right: 6px;
   }
 
   .text-container {
+		color: $text-secondary;
     display: none;
     font-family: $roboto;
     font-size: 12px;
     font-weight: 500;
-    color: $text-tertiary;
     line-height: 36px;
     text-transform: uppercase;
 
