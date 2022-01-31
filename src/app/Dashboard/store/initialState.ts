@@ -15,8 +15,8 @@ const initialState: Modules.Dashboard.Store = {
     pageSize: 100,
     ordering: [
       { field: "created_at", order: 0 },
-      { field: "updated_at", order: -1 },
-      { field: "name", order: 0 }
+      { field: "updated_at", order: 0 },
+      { field: "name", order: -1 }
     ]
   },
   community: {
@@ -24,8 +24,8 @@ const initialState: Modules.Dashboard.Store = {
     pageSize: 100,
     ordering: [
       { field: "created_at", order: 0 },
-      { field: "updated_at", order: -1 },
-      { field: "name", order: 0 }
+      { field: "updated_at", order: 0 },
+      { field: "name", order: -1 }
     ]
   },
   contacts: redux.initialState.initialTableState

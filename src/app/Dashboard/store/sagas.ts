@@ -8,7 +8,11 @@ import * as tasks from "./tasks";
 
 function* watchForBudgetsRefreshSaga(): SagaIterator {
   yield takeLatest(
-    [actions.requestBudgetsAction.toString(), actions.setBudgetsPaginationAction.toString()],
+    [
+      actions.requestBudgetsAction.toString(),
+      actions.setBudgetsPaginationAction.toString(),
+      actions.updateBudgetsOrderingAction.toString()
+    ],
     tasks.getBudgetsTask
   );
 }
@@ -19,14 +23,22 @@ function* watchForBudgetsPermissioningRefreshSaga(): SagaIterator {
 
 function* watchForTemplatesRefreshSaga(): SagaIterator {
   yield takeLatest(
-    [actions.requestTemplatesAction.toString(), actions.setTemplatesPaginationAction.toString()],
+    [
+      actions.requestTemplatesAction.toString(),
+      actions.setTemplatesPaginationAction.toString(),
+      actions.updateTemplatesOrderingAction.toString()
+    ],
     tasks.getTemplatesTask
   );
 }
 
 function* watchForCommunityTemplatesRefreshSaga(): SagaIterator {
   yield takeLatest(
-    [actions.requestCommunityTemplatesAction.toString(), actions.setCommunityTemplatesPaginationAction.toString()],
+    [
+      actions.requestCommunityTemplatesAction.toString(),
+      actions.setCommunityTemplatesPaginationAction.toString(),
+      actions.updateCommunityTemplatesOrderingAction.toString()
+    ],
     tasks.getCommunityTemplatesTask
   );
 }
@@ -35,24 +47,12 @@ function* watchForSearchBudgetsSaga(): SagaIterator {
   yield debounce(250, actions.setBudgetsSearchAction.toString(), tasks.getBudgetsTask);
 }
 
-function* watchForUpdateBudgetsOrdering(): SagaIterator {
-  yield takeLatest(actions.updateBudgetsOrderingAction.toString(), tasks.getBudgetsTask);
-}
-
 function* watchForSearchTemplatesSaga(): SagaIterator {
   yield debounce(250, actions.setTemplatesSearchAction.toString(), tasks.getTemplatesTask);
 }
 
-function* watchForUpdateTemplatesOrdering(): SagaIterator {
-  yield takeLatest(actions.updateTemplatesOrderingAction.toString(), tasks.getTemplatesTask);
-}
-
 function* watchForSearchCommunityTemplatesSaga(): SagaIterator {
   yield debounce(250, actions.setCommunityTemplatesSearchAction.toString(), tasks.getCommunityTemplatesTask);
-}
-
-function* watchForUpdateCommunityTemplatesOrdering(): SagaIterator {
-  yield takeLatest(actions.updateCommunityTemplatesOrderingAction.toString(), tasks.getCommunityTemplatesTask);
 }
 
 const ActionMap = {
@@ -84,9 +84,6 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForTemplatesRefreshSaga);
   yield spawn(watchForSearchTemplatesSaga);
   yield spawn(watchForBudgetsRefreshSaga);
-  yield spawn(watchForUpdateBudgetsOrdering);
-  yield spawn(watchForUpdateTemplatesOrdering);
-  yield spawn(watchForUpdateCommunityTemplatesOrdering);
   yield spawn(watchForSearchBudgetsSaga);
   yield spawn(watchForCommunityTemplatesRefreshSaga);
   yield spawn(watchForSearchCommunityTemplatesSaga);

@@ -43,7 +43,7 @@ export function* getTemplatesTask(): SagaIterator {
       search: state.dashboard.templates.search,
       page: state.dashboard.templates.page,
       page_size: state.dashboard.templates.pageSize,
-      ordering: state.dashboard.budgets.ordering
+      ordering: state.dashboard.templates.ordering
     };
   });
   yield put(actions.loadingTemplatesAction(true));
@@ -64,7 +64,7 @@ export function* getCommunityTemplatesTask(): SagaIterator {
       search: state.dashboard.community.search,
       page: state.dashboard.community.page,
       page_size: state.dashboard.community.pageSize,
-      ordering: state.dashboard.budgets.ordering
+      ordering: state.dashboard.community.ordering
     };
   });
   yield put(actions.loadingCommunityTemplatesAction(true));
