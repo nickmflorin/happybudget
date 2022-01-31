@@ -1,55 +1,56 @@
-@mixin pagination_theme($color, $active-color, $text-color: null) {
-	$textcolor: $color;
-  @if $text-color != null {
-    $textcolor: $text-color
-  }
-
-	.ant-pagination-prev, .ant-pagination-next, .ant-pagination-jump-prev, .ant-pagination-jump-next {
-		border-color: $color;
-	}
-
-	.ant-pagination-item {
-		border-color: $color;
-		a {
-			color: $textcolor;
-		}
-	}
-
-	.ant-pagination-item-active {
-    border-color: $active-color;
-
-    a {
-      color: $active-color;
-    }
-  }
-
-  .ant-pagination-item {
-    &:focus-visible,
-    &:hover,
-    &:focus {
-      border-color: $active-color;
-      a {
-        color: $active-color;
-      }
-    }
-  }
-
-	.ant-pagination-prev:focus-visible .ant-pagination-item-link,
-  .ant-pagination-next:focus-visible .ant-pagination-item-link,
-  .ant-pagination-prev:hover .ant-pagination-item-link,
-  .ant-pagination-next:hover .ant-pagination-item-link {
-    color: $active-color;
-    border-color: $active-color;
-  }
-}
-
-.ant-pagination {
-	@include pagination_theme(#EFEFEF, $green);
+.ant-pagination-disabled .ant-pagination-item-link,
+.ant-pagination-disabled:hover .ant-pagination-item-link,
+.ant-pagination-disabled:focus-visible .ant-pagination-item-link {
+	color: $disabled-color !important;
+	border-color: $disabled-color !important;
+	cursor: not-allowed;
 }
 
 .pagination {
+	.ant-pagination-prev, .ant-pagination-next {
+		.ant-pagination-item-link {
+			color: $gray;
+			border-color: $gray;
+			border: 1px solid $gray;
+			a {
+				color: $gray;
+			}
+			&:focus-visible,
+			&:hover,
+			&:focus {
+				color: $gray;
+				border-color: $gray-dark;
+				border: 1px solid $gray;
+				a {
+					color: $gray-dark;
+				}
+			}
+		}
+	}
+
+	.ant-pagination-item {
+		border-color: $gray;
+		border: 1px solid $gray;
+		a {
+			color: $gray;
+		}
+		&.ant-pagination-item-active,
+		&:focus-visible,
+		&:hover,
+		&:focus {
+			border-color: $gray-dark;
+			border: 1px solid $gray-dark;
+			a {
+				color: $gray-dark;
+			}
+		}
+	}
+
 	&.small {
-		.ant-pagination-prev, .ant-pagination-next, .ant-pagination-jump-prev, .ant-pagination-jump-next {
+		.ant-pagination-prev,
+		.ant-pagination-next,
+		.ant-pagination-jump-prev,
+		.ant-pagination-jump-next {
 			height: 24px;
 			min-width: 24px;
 		}
@@ -61,8 +62,5 @@
 		.ant-pagination-item-link {
 			line-height: 24px;
 		}
-	}
-	&.subtle {
-		@include pagination_theme($field-border-color, $gray-dark, $gray-light);
 	}
 }

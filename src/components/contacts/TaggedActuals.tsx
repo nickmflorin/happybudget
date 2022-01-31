@@ -5,6 +5,7 @@ import { map } from "lodash";
 import * as api from "api";
 
 import { Pagination } from "components";
+import { NoData } from "components/empty";
 import { RenderOrSpinner } from "components/loading";
 import TaggedActual from "./TaggedActual";
 
@@ -21,16 +22,18 @@ const TaggedActuals = ({ contactId, title, onError, ...props }: TaggedActualsPro
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [count, setCount] = useState(0);
+  const [responseWasReceived, setResponseWasReceived] = useState(false);
   const [getToken] = api.useCancelToken();
 
   useEffect(() => {
     setLoading(true);
-    // TODO: We need to build in pagination here.
+    setResponseWasReceived(false);
     api
       .getContactTaggedActuals(contactId, { page_size: 5, page }, { cancelToken: getToken() })
       .then((response: Http.ListResponse<Model.TaggedActual>) => {
         setTaggedActuals(response.data);
         setCount(response.count);
+        setResponseWasReceived(true);
       })
       .catch((e: Error) => onError(e))
       .finally(() => setLoading(false));
@@ -52,9 +55,15 @@ const TaggedActuals = ({ contactId, title, onError, ...props }: TaggedActualsPro
         />
       </div>
       <RenderOrSpinner loading={loading}>
-        {map(taggedActuals, (a: Model.TaggedActual, i: number) => (
-          <TaggedActual taggedActual={a} key={i} />
-        ))}
+        {responseWasReceived && taggedActuals.length === 0 ? (
+          <NoData subTitle={"No history"} />
+        ) : (
+          <React.Fragment>
+            {map(taggedActuals, (a: Model.TaggedActual, i: number) => (
+              <TaggedActual taggedActual={a} key={i} />
+            ))}
+          </React.Fragment>
+        )}
       </RenderOrSpinner>
     </div>
   );

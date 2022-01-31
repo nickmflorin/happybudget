@@ -197,7 +197,6 @@
 
 .link {
   @extend .btn-link-base;
-  color: $blue;
   font-family: $roboto;
   font-weight: 400;
   transition: none;
@@ -211,9 +210,22 @@
     color: inherit;
   }
 
-  &--black {
+	color: $blue;
+	&:hover {
+		color: lighten($blue, 10%);
+	}
+
+	&.avenir {
+		font-family: $avenir;
+	}
+
+  &--dark {
     color: $text-primary;
     text-transform: none !important;
+
+		&:hover {
+			color: lighten($text-primary, 10%);
+		}
   }
 
   &--inline {

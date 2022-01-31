@@ -7,13 +7,15 @@ import { TooltipWrapper } from "components/tooltips";
 
 export type LinkProps = StandardComponentWithChildrenProps &
   ClickableProps &
-  Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "onMouseEnter" | "onMouseLeave">;
+  Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "onMouseEnter" | "onMouseLeave"> & {
+    readonly dark?: boolean;
+  };
 
 /**
  * A consistently styled <a> component with functionality allowing the link to
  * include icons, be disabled and other features.
  */
-const Link = ({ className, children, tooltip, icon, disabled, ...props }: LinkProps): JSX.Element => {
+const Link = ({ className, children, tooltip, icon, disabled, dark, ...props }: LinkProps): JSX.Element => {
   const [isHovered, setIsHovered] = useState(false);
   const prefix = ui.hooks.useClickableIcon(icon, { isHovered });
 
@@ -23,6 +25,7 @@ const Link = ({ className, children, tooltip, icon, disabled, ...props }: LinkPr
         {...props}
         className={classNames("link", className, {
           disabled: disabled === true && isNil(tooltip),
+          "link--dark": dark,
           "fake-disabled": disabled === true && !isNil(tooltip)
         })}
         onMouseEnter={() => setIsHovered(!isHovered)}

@@ -6,13 +6,17 @@ import { isNil } from "lodash";
 import { ui } from "lib";
 import { TooltipWrapper } from "components/tooltips";
 
-export type RouterLinkProps = LinkProps & StandardComponentProps & ClickableProps;
+export type RouterLinkProps = LinkProps &
+  StandardComponentProps &
+  ClickableProps & {
+    readonly dark?: boolean;
+  };
 
 /**
  * A consistently styled react-router Link component that provides additional
  * functionality, like disabling, tooltips and icon inclusion.
  */
-const RouterLink = ({ className, children, tooltip, icon, disabled, ...props }: RouterLinkProps): JSX.Element => {
+const RouterLink = ({ className, children, tooltip, icon, disabled, dark, ...props }: RouterLinkProps): JSX.Element => {
   const [isHovered, setIsHovered] = useState(false);
   const prefix = ui.hooks.useClickableIcon(icon, { isHovered });
 
@@ -22,6 +26,7 @@ const RouterLink = ({ className, children, tooltip, icon, disabled, ...props }: 
         {...props}
         className={classNames("link", className, {
           disabled: disabled === true && isNil(tooltip),
+          "link--dark": dark,
           "fake-disabled": disabled === true && !isNil(tooltip)
         })}
         onMouseEnter={() => setIsHovered(!isHovered)}

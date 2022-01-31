@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { util } from "lib";
+import { RouterLink } from "components/links";
 import { EntityText } from "components/typography";
 
 import "./TaggedActual.scss";
@@ -28,7 +29,9 @@ type TaggedActualProps = StandardComponentProps & {
 const TaggedActual = ({ taggedActual, ...props }: TaggedActualProps): JSX.Element => {
   return (
     <div {...props} className={classNames("tagged-actual", props.className)}>
-      <div className={"tagged-actual-title"}>{taggedActual.budget.name}</div>
+      <RouterLink className={"tagged-actual-title avenir"} dark={true} to={`/budgets/${taggedActual.budget.id}`}>
+        {taggedActual.budget.name}
+      </RouterLink>
       <div className={"tagged-actual-details"}>
         <TaggedActualDetail field={"Account"} style={{ flexGrow: 100 }}>
           {!isNil(taggedActual.owner) && <EntityText>{taggedActual.owner}</EntityText>}
