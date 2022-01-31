@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { find, isNil } from "lodash";
 import classNames from "classnames";
 
-import { Icon } from "components";
+import { OrderingArrowIcon } from "components";
 import DropdownMenu from "./DropdownMenu";
 
 export interface OrderingDropdownProps<F extends string = string>
@@ -48,14 +48,7 @@ const OrderingDropdown = <F extends string = string>({
           onChange(e.model.id, currentOrder.order === 0 ? -1 : currentOrder.order === -1 ? 1 : 0);
         }
       }}
-      itemIconAfterLabel={(m: OrderingMenuModel<F>, s: OrderingMenuItemState) => {
-        if (s.order === 1) {
-          return <Icon icon={"arrow-up"} />;
-        } else if (s.order === -1) {
-          return <Icon icon={"arrow-down"} />;
-        }
-        return <Icon style={{ opacity: 0 }} icon={"arrow-down"} />;
-      }}
+      itemIconAfterLabel={(m: OrderingMenuModel<F>, s: OrderingMenuItemState) => <OrderingArrowIcon order={s.order} />}
     />
   );
 };

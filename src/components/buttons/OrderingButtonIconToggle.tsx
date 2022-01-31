@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { find } from "lodash";
 
-import { Icon } from "components";
+import { Icon, OrderingArrowIcon } from "components";
 
 import DefaultButtonIconToggle, { DefaultButtonIconToggleProps } from "./DefaultButtonIconToggle";
 
@@ -19,12 +19,7 @@ const OrderingButtonIconToggle = ({ ordering, labelMap, ...props }: OrderingButt
 
   const sortIcon = useMemo(() => {
     if (order !== undefined) {
-      if (order.order === 1) {
-        return <Icon style={{ width: "10px" }} icon={"arrow-up"} weight={"light"} />;
-      } else if (order.order === -1) {
-        return <Icon style={{ width: "10px" }} icon={"arrow-down"} weight={"light"} />;
-      }
-      return <Icon style={{ opacity: 0 }} icon={"arrow-down"} weight={"light"} />;
+      return <OrderingArrowIcon style={{ width: "10px" }} order={order.order} />;
     }
     return <Icon icon={"bars-filter"} weight={"light"} />;
   }, [ordering]);
