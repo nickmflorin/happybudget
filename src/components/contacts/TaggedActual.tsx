@@ -36,10 +36,12 @@ const TaggedActual = ({ taggedActual, ...props }: TaggedActualProps): JSX.Elemen
         <TaggedActualDetail field={"Account"} style={{ flexGrow: 100 }}>
           {!isNil(taggedActual.owner) && <EntityText>{taggedActual.owner}</EntityText>}
         </TaggedActualDetail>
-        <TaggedActualDetail field={"Date"}>
-          {!isNil(taggedActual.date) && util.dates.toDisplayDateTime(taggedActual.date)}
+        <TaggedActualDetail field={"Date"} style={{ width: "30%" }}>
+          {!isNil(taggedActual.date) && util.dates.toAbbvDisplayDateTime(taggedActual.date)}
         </TaggedActualDetail>
-        <TaggedActualDetail field={"Paid"}>{taggedActual.value}</TaggedActualDetail>
+        <TaggedActualDetail field={"Paid"} style={{ width: "15%" }}>
+          {util.formatters.formatAsCurrency(taggedActual.value)}
+        </TaggedActualDetail>
       </div>
     </div>
   );
