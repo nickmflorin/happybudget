@@ -57,6 +57,7 @@ const ExportForm = (
   }: ExportFormProps,
   ref: ForwardedRef<IExportFormRef<ExportBudgetPdfFormOptions>>
 ): JSX.Element => {
+  const suppressValueChangeTrigger = useRef(false);
   const leftInfoEditor = useRef<IEditor>(null);
   const rightInfoEditor = useRef<IEditor>(null);
   const headerEditor = useRef<IEditor>(null);
@@ -105,83 +106,121 @@ const ExportForm = (
     };
   }, [_formDataWithoutHeader, getHeaderTemplateData]);
 
-  useEffect(() => {
-    if (!isNil(displayedHeaderTemplate)) {
-      headerEditor.current?.setData(displayedHeaderTemplate.header || "");
-      leftInfoEditor.current?.setData(displayedHeaderTemplate.left_info || "");
-      rightInfoEditor.current?.setData(displayedHeaderTemplate.right_info || "");
+  const _setHeader = useMemo(
+    () => (header: HeaderTemplateFormData) => {
+      headerEditor.current?.setData(header.header || "");
+      leftInfoEditor.current?.setData(header.left_info || "");
+      rightInfoEditor.current?.setData(header.right_info || "");
+      _setRightImage(header.right_image);
+      _setLeftImage(header.left_image);
+    },
+    []
+  );
 
+  useEffect(() => {
+    suppressValueChangeTrigger.current = true;
+    if (!isNil(displayedHeaderTemplate)) {
+      _setHeader(displayedHeaderTemplate);
       const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
-      _setRightImage(displayedHeaderTemplate.right_image);
-      _setLeftImage(displayedHeaderTemplate.left_image);
       props.onValuesChange?.(
         { header: displayedHeaderTemplate },
         { ..._formDataWithoutHeader(values), header: displayedHeaderTemplate }
       );
     } else {
-      headerEditor.current?.setData(props.initialValues?.header?.header || "");
-      leftInfoEditor.current?.setData(props.initialValues?.header?.left_info || "");
-      rightInfoEditor.current?.setData(props.initialValues?.header?.right_info || "");
-      _setLeftImage(props.initialValues?.header?.left_image || null);
-      _setRightImage(props.initialValues?.header?.right_image || null);
+      const header = props.initialValues?.header || {
+        header: "",
+        left_image: null,
+        right_image: null,
+        left_info: "",
+        right_info: ""
+      };
+      _setHeader(header);
+      const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
+      props.onValuesChange?.({ header }, { ..._formDataWithoutHeader(values), header });
     }
+    suppressValueChangeTrigger.current = false;
   }, [displayedHeaderTemplate]);
 
   const setLeftImage = useMemo(
     () => (img: UploadedImage | SavedImage | null) => {
       _setLeftImage(img);
-      const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
-      props.onValuesChange?.(
-        { header: { ...getHeaderTemplateData(), left_image: img } },
-        { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), left_image: img } }
-      );
+      /* If changing multiple fields at the same time, which happens when the
+         displayed header template changes, we do not want to submit value change
+         callbacks for every single one - just one single callback at the end. */
+      if (suppressValueChangeTrigger.current !== true) {
+        const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
+        props.onValuesChange?.(
+          { header: { ...getHeaderTemplateData(), left_image: img } },
+          { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), left_image: img } }
+        );
+      }
     },
-    [_formDataWithoutHeader, getHeaderTemplateData]
+    [_formDataWithoutHeader, getHeaderTemplateData, suppressValueChangeTrigger.current]
   );
 
   const setRightImage = useMemo(
     () => (img: UploadedImage | SavedImage | null) => {
       _setRightImage(img);
-      const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
-      props.onValuesChange?.(
-        { header: { ...getHeaderTemplateData(), right_image: img } },
-        { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), right_image: img } }
-      );
+      /* If changing multiple fields at the same time, which happens when the
+         displayed header template changes, we do not want to submit value change
+         callbacks for every single one - just one single callback at the end. */
+      if (suppressValueChangeTrigger.current !== true) {
+        const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
+        props.onValuesChange?.(
+          { header: { ...getHeaderTemplateData(), right_image: img } },
+          { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), right_image: img } }
+        );
+      }
     },
-    [_formDataWithoutHeader, getHeaderTemplateData]
+    [_formDataWithoutHeader, getHeaderTemplateData, suppressValueChangeTrigger.current]
   );
 
   const setHeader = useMemo(
     () => (html: string) => {
-      const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
-      props.onValuesChange?.(
-        { header: { ...getHeaderTemplateData(), header: html } },
-        { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), header: html } }
-      );
+      /* If changing multiple fields at the same time, which happens when the
+         displayed header template changes, we do not want to submit value change
+         callbacks for every single one - just one single callback at the end. */
+      if (suppressValueChangeTrigger.current !== true) {
+        const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
+        props.onValuesChange?.(
+          { header: { ...getHeaderTemplateData(), header: html } },
+          { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), header: html } }
+        );
+      }
     },
-    [_formDataWithoutHeader, getHeaderTemplateData]
+    [_formDataWithoutHeader, getHeaderTemplateData, suppressValueChangeTrigger.current]
   );
 
   const setLeftInfo = useMemo(
     () => (html: string) => {
-      const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
-      props.onValuesChange?.(
-        { header: { ...getHeaderTemplateData(), left_info: html } },
-        { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), left_info: html } }
-      );
+      /* If changing multiple fields at the same time, which happens when the
+         displayed header template changes, we do not want to submit value change
+         callbacks for every single one - just one single callback at the end. */
+      if (suppressValueChangeTrigger.current !== true) {
+        const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
+        props.onValuesChange?.(
+          { header: { ...getHeaderTemplateData(), left_info: html } },
+          { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), left_info: html } }
+        );
+      }
     },
-    [_formDataWithoutHeader, getHeaderTemplateData]
+    [_formDataWithoutHeader, getHeaderTemplateData, suppressValueChangeTrigger.current]
   );
 
   const setRightInfo = useMemo(
     () => (html: string) => {
-      const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
-      props.onValuesChange?.(
-        { header: { ...getHeaderTemplateData(), right_info: html } },
-        { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), right_info: html } }
-      );
+      /* If changing multiple fields at the same time, which happens when the
+         displayed header template changes, we do not want to submit value change
+         callbacks for every single one - just one single callback at the end. */
+      if (suppressValueChangeTrigger.current !== true) {
+        const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
+        props.onValuesChange?.(
+          { header: { ...getHeaderTemplateData(), right_info: html } },
+          { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), right_info: html } }
+        );
+      }
     },
-    [_formDataWithoutHeader, getHeaderTemplateData]
+    [_formDataWithoutHeader, getHeaderTemplateData, suppressValueChangeTrigger.current]
   );
 
   useImperativeHandle(ref, () => ({
@@ -359,7 +398,7 @@ const ExportForm = (
         <div className={"export-header-sides"}>
           <Form.ItemStyle label={"Left Side"} className={"export-header-side-item"}>
             <UploadPdfImage
-              value={!isNil(displayedHeaderTemplate) ? displayedHeaderTemplate.left_image : null}
+              value={leftImage}
               onChange={(left_image: UploadedImage | null) => setLeftImage(left_image)}
               onError={(error: Error | string) => props.form.notify(error)}
             />
@@ -372,6 +411,7 @@ const ExportForm = (
 
           <Form.ItemStyle className={"export-header-side-item"} label={"Right Side"}>
             <UploadPdfImage
+              value={rightImage}
               onChange={(right_image: UploadedImage | null) => setRightImage(right_image)}
               onError={(error: Error | string) => props.form.notify(error)}
             />
