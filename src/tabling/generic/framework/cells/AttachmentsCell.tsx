@@ -101,13 +101,11 @@ const AttachmentsCell = <
       e.stopPropagation();
       dispatchDragState({ type: "SET_DRAG", payload: false });
       if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
-        for (let i = 0; i < e.dataTransfer.files.length; i++) {
-          api.xhr.uploadAttachmentFile(e.dataTransfer.files, props.uploadAttachmentsPath(row.id), {
-            error,
-            progress: (computable: boolean, percent: number, total: number) => progressUpdate(percent, total),
-            success: (ms: Model.Attachment[]) => map(ms, (m: Model.Attachment) => props.onAttachmentAdded(row, m))
-          });
-        }
+        api.xhr.uploadAttachmentFile(e.dataTransfer.files, props.uploadAttachmentsPath(row.id), {
+          error,
+          progress: (computable: boolean, percent: number, total: number) => progressUpdate(percent, total),
+          success: (ms: Model.Attachment[]) => map(ms, (m: Model.Attachment) => props.onAttachmentAdded(row, m))
+        });
         e.dataTransfer.clearData();
         dispatchDragState({ type: "CLEAR" });
       }

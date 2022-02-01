@@ -36,7 +36,7 @@ export const uploadAttachmentFile = (
       formData.append("files", file[i], file[i].name);
     }
   } else {
-    Object.entries(file).forEach((v: [string, File]) => formData.append("file", v[1], v[1].name));
+    Object.entries(file).forEach((v: [string, File]) => formData.append("files", v[1], v[1].name));
   }
 
   const request = new XMLHttpRequest();
