@@ -176,7 +176,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
               />
             );
             if (user.is_staff !== true) {
-              card = <CommunityTemplateCard budget={template} />;
+              card = <CommunityTemplateCard budget={template} onClick={() => setTemplateToDerive(template.id)} />;
             }
             if (template.hidden === true) {
               return <IsStaff key={index}>{card}</IsStaff>;
