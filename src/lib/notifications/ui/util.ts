@@ -144,9 +144,9 @@ const UIFieldNotificationStandard: UINotificationStandard<UIFieldNotification> =
     )
 };
 
-const UINotificationStandard: UINotificationStandard<UINotification> = {
+const UINotificationDataStandard: UINotificationStandard<UINotificationData> = {
   typeguard: typeguards.isUiNotification,
-  func: (e: UINotification) => e
+  func: (e: UINotificationData) => e
 };
 
 const NotificationStandards: [
@@ -154,7 +154,7 @@ const NotificationStandards: [
   UINotificationStandard<string>,
   UINotificationStandard<Http.Error>,
   UINotificationStandard<UIFieldNotification>,
-  UINotificationStandard<UINotification>
+  UINotificationStandard<UINotificationData>
 ] = [
   ErrorStandard,
   StringStandard,
@@ -162,20 +162,20 @@ const NotificationStandards: [
      standardizer must come before `UIFieldNotificationStandard`. */
   HttpErrorStandard,
   UIFieldNotificationStandard,
-  UINotificationStandard
+  UINotificationDataStandard
 ];
 
-export const standardizeNotification = (
+export const standardizeNotificationData = (
   n: UINotificationType,
   opts?: Omit<UINotificationOptions, "behavior">
-): UINotification | null => {
+): UINotificationData | null => {
   for (let i = 0; i < NotificationStandards.length; i++) {
     const standard = NotificationStandards[i];
     if (standard.typeguard(n)) {
       const func = standard.func as (
         e: typeof n,
         opts?: Omit<UINotificationOptions, "behavior">
-      ) => UINotification | null;
+      ) => UINotificationData | null;
       return func(n, opts);
     }
   }
@@ -190,12 +190,12 @@ export const combineFieldNotifications = (
   /* If there is only a single field related error, just treat it as we would
      without assembling them together. */
   if (ns.length === 1) {
-    return standardizeNotification(ns[0]);
+    return standardizeNotificationData(ns[0]);
   }
   const detailLines = reduce(
     ns,
     (curr: string[], n: UIFieldNotification | Http.FieldError, index: number) => {
-      const standardized = standardizeNotification(n);
+      const standardized = standardizeNotificationData(n);
       if (standardized !== null) {
         return [...curr, `(${index + 1}) <b>${n.field}</b>: ${standardized.message}`];
       }

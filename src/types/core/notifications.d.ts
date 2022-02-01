@@ -80,6 +80,17 @@ declare type InternalNotification = AppNotification<"error" | "warning"> & {
 };
 
 declare type UINotificationsHandler = {
+  readonly getNotifications: (
+    notifications: SingleOrArray<UINotificationType>,
+    opts?: UINotificationOptions
+  ) => UINotificationData[];
+  readonly getRequestErrorNotifications: (
+    e: Error,
+    opts?: UINotificationOptions & { readonly dispatchClientErrorToSentry?: boolean }
+  ) => UINotificationData[];
+};
+
+declare type UINotificationsManager = {
   readonly notify: (notifications: SingleOrArray<UINotificationType>, opts?: UINotificationOptions) => UINotification[];
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   readonly lookupAndNotify: (id: UIExistingNotificationId, params: any) => UINotification[];

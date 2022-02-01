@@ -10,49 +10,101 @@ const TOKEN_NOTIFICATION_MESSAGES: { [key in Http.TokenType]: string } = {
   "password-recovery": PASSWORD_RECOVERY_ERROR_MESSAGE
 };
 
-const TOKEN_NOTIFICATION_DETAILS: { [key in Http.TokenErrorCode]: string | ((userId: number | undefined) => string) } =
-  {
-    token_expired: (userId: number | undefined) =>
-      !isNil(userId)
-        ? "The previously created token has expired."
-        : "The previously created token has expired. Please contact support.",
-    token_not_valid: "The token is malformed or corrupted.  Please contact support."
-  };
-
 const TOKEN_NOTIFICATION_TYPES: { [key in Http.TokenErrorCode]: AppNotificationLevel } = {
   token_expired: "warning",
   token_not_valid: "error"
 };
 
-interface TokenNotificationProps {
+export type UITokenNotificationRedirectData = {
   readonly userId: number | undefined;
   readonly tokenType: Http.TokenType;
   readonly code: Http.TokenErrorCode;
-  readonly onError?: (e: Error) => void;
-  readonly onSuccess?: () => void;
+};
+
+interface TokenNotificationProps {
+  readonly tokenType: Http.TokenType;
+  readonly code: Http.TokenErrorCode;
+  readonly detail: string;
+  readonly includeLink?: UINotificationData["includeLink"];
 }
 
-export const TokenNotification = (props: TokenNotificationProps): UINotificationData => {
-  const detail = TOKEN_NOTIFICATION_DETAILS[props.code];
-  return {
-    level: TOKEN_NOTIFICATION_TYPES[props.code],
-    detail: typeof detail === "function" ? detail(props.userId) : detail,
-    message: TOKEN_NOTIFICATION_MESSAGES[props.tokenType],
-    includeLink:
-      !isNil(props.userId) && props.tokenType === "email-confirmation"
-        ? ({ setLoading }) => ({
-            text: "Resend Email",
-            onClick: () => {
-              setLoading(true);
-              api
-                .verifyEmail(props.userId as number)
-                .then(() => props.onSuccess?.())
-                .catch((e: Error) => props.onError?.(e))
-                .finally(() => setLoading(false));
-            }
-          })
-        : undefined
-  };
+export const TokenNotification = (props: TokenNotificationProps): UINotificationData => ({
+  level: TOKEN_NOTIFICATION_TYPES[props.code],
+  detail: props.detail,
+  message: TOKEN_NOTIFICATION_MESSAGES[props.tokenType],
+  includeLink: props.includeLink
+});
+
+export const TokenInvalidNotification = (
+  props: Omit<TokenNotificationProps, "code" | "detail" | "includeLink">
+): UINotificationData => {
+  return TokenNotification({
+    ...props,
+    code: "token_expired",
+    detail: "The token is malformed or corrupted.  Please contact support."
+  });
+};
+
+export const EmailTokenInvalidNotification = (): UINotificationData => {
+  return TokenInvalidNotification({
+    tokenType: "email-confirmation"
+  });
+};
+
+export const PasswordTokenInvalidNotification = (): UINotificationData => {
+  return TokenInvalidNotification({
+    tokenType: "password-recovery"
+  });
+};
+
+export const TokenExpiredNotification = ({
+  userId,
+  ...props
+}: Omit<TokenNotificationProps, "code" | "detail"> & {
+  readonly userId: number | undefined;
+}): UINotificationData => {
+  return TokenNotification({
+    ...props,
+    code: "token_expired",
+    detail: !isNil(userId)
+      ? "The previously created token has expired."
+      : "The previously created token has expired. Please contact support."
+  });
+};
+
+export const PasswordTokenExpiredNotification = (): UINotificationData => {
+  return TokenExpiredNotification({
+    userId: undefined,
+    tokenType: "password-recovery"
+  });
+};
+
+export const EmailTokenExpiredNotification = ({
+  onError,
+  onSuccess,
+  ...props
+}: Omit<TokenNotificationProps, "tokenType" | "includeLink" | "code" | "detail"> & {
+  readonly onError?: (e: Error) => void;
+  readonly onSuccess?: () => void;
+  readonly userId: number | undefined;
+}): UINotificationData => {
+  return TokenExpiredNotification({
+    ...props,
+    tokenType: "email-confirmation",
+    includeLink: !isNil(props.userId)
+      ? ({ setLoading }) => ({
+          text: "Resend Email",
+          onClick: () => {
+            setLoading(true);
+            api
+              .verifyEmail(props.userId as number)
+              .then(() => onSuccess?.())
+              .catch((e: Error) => onError?.(e))
+              .finally(() => setLoading(false));
+          }
+        })
+      : undefined
+  });
 };
 
 interface UnverifiedEmailNotificationProps {

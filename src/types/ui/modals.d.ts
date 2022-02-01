@@ -1,6 +1,6 @@
 declare type RootModalProps = import("antd/lib/modal").ModalProps;
 
-declare interface ModalInstance extends UINotificationsHandler {
+declare interface ModalInstance extends UINotificationsManager {
   readonly setLoading: (value: boolean) => void;
   readonly loading: boolean | undefined;
 }

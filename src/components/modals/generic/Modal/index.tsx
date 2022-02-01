@@ -22,7 +22,10 @@ const Modal = ({
   ...props
 }: ModalProps & { readonly children: ReactNode }): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const notificationsHandler = notifications.ui.useNotifications({ defaultBehavior: "append", defaultClosable: false });
+  const notificationsHandler = notifications.ui.useNotificationsManager({
+    defaultBehavior: "append",
+    defaultClosable: false
+  });
 
   useImperativeHandle(modal, () => ({ ...notificationsHandler, loading, setLoading }));
 

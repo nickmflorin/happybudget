@@ -104,7 +104,7 @@ const AuthenticatedTable = <
   const hideSavingChangesTimout = useRef<NodeJS.Timeout | null>(null);
   const [selectedRows, setSelectedRows] = useState<Table.EditableRow<R>[]>([]);
   const [deleteRows, setDeleteRows] = useState<Table.EditableRow<R>[] | undefined>(undefined);
-  const NotificationsHandler = notifications.ui.useNotifications({
+  const NotificationsHandler = notifications.ui.useNotificationsManager({
     defaultBehavior: "append",
     defaultClosable: true
   });

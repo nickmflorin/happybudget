@@ -153,7 +153,7 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
     [antdForm.setFields]
   );
 
-  const NotificationsHandler = notifications.ui.useNotifications({
+  const NotificationsHandler = notifications.ui.useNotificationsManager({
     handleFieldErrors,
     defaultBehavior: "replace",
     defaultClosable: false

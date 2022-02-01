@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Redirect, useLocation } from "react-router-dom";
-import { isNil } from "lodash";
+import { isNil, includes } from "lodash";
 
 import * as api from "api";
 import { ui } from "lib";
@@ -9,15 +9,15 @@ import { ResetPasswordForm } from "components/forms";
 import { IResetPasswordFormValues } from "components/forms/ResetPasswordForm";
 
 import LandingFormContainer from "./LandingFormContainer";
+import { UITokenNotificationRedirectData } from "./Notifications";
 
 type Destination = "/login";
 
 type IRedirect = {
   readonly pathname: Destination;
   readonly state?: {
-    readonly error?: Error | undefined;
-    readonly tokenType: Http.TokenType | undefined;
-    readonly notification?: UINotificationData | string | undefined;
+    readonly notifications?: UINotificationData[];
+    readonly tokenNotification?: UITokenNotificationRedirectData;
   };
 };
 
@@ -55,12 +55,13 @@ const ResetPassword = (): JSX.Element => {
                 setRedirect({
                   pathname: "/login",
                   state: {
-                    notification: {
-                      closable: true,
-                      level: "success",
-                      message: "Your password was successfully changed."
-                    },
-                    tokenType: "password-recovery"
+                    notifications: [
+                      {
+                        closable: true,
+                        level: "success",
+                        message: "Your password was successfully changed."
+                      }
+                    ]
                   }
                 });
               })
@@ -72,8 +73,21 @@ const ResetPassword = (): JSX.Element => {
 								 If however we do get that error, we just redirect back to the
                  login page and display the error for simplicity case (versus
 								 duplicating all the error handling code here). */
-                if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
-                  setRedirect({ pathname: "/login", state: { error: e, tokenType: "password-recovery" } });
+                if (
+                  e instanceof api.ClientError &&
+                  !isNil(e.authenticationError) &&
+                  includes([api.ErrorCodes.TOKEN_EXPIRED, api.ErrorCodes.TOKEN_INVALID], e.authenticationError.code)
+                ) {
+                  setRedirect({
+                    pathname: "/login",
+                    state: {
+                      tokenNotification: {
+                        tokenType: "password-recovery",
+                        userId: e.authenticationError.user_id,
+                        code: e.authenticationError.code as Http.TokenErrorCode
+                      }
+                    }
+                  });
                 } else {
                   form.handleRequestError(e);
                 }

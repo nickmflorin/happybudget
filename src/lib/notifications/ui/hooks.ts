@@ -7,51 +7,25 @@ import { util, hooks } from "lib";
 
 import * as internal from "../internal";
 import * as typeguards from "./typeguards";
-import { combineFieldNotifications, standardizeNotification } from "./util";
+import { combineFieldNotifications, standardizeNotificationData } from "./util";
 import { UINotificationReducer } from "./reducers";
 import existingNotifications from "./notifications";
 import { AddNotificationsDetail, RequestErrorDetail, ClearNotificationsDetail, LookupAndNotifyDetail } from ".";
 
 type UseNotificationsConfig = {
-  readonly defaultBehavior: UINotificationBehavior;
   readonly defaultClosable?: boolean;
   readonly handleFieldErrors?: (errors: UIFieldNotification[]) => void;
 };
 
 /**
- * Manages notifications for a component.
+ * Manages the conversion of notification related objects to notification data
+ * for a component.
  *
  * @param config UseNotificationsConfig
  * @returns UINotificationsHandler
  */
 export const useNotifications = (config: UseNotificationsConfig): UINotificationsHandler => {
-  const [ns, dispatchNotification] = useReducer(UINotificationReducer, []);
-  const timeouts = useRef<NodeJS.Timeout[]>([]);
-
-  const clearNotifications = useMemo(() => (id?: SingleOrArray<UINotification["id"]>) => dispatchNotification(id), []);
-
-  const doTimeout = hooks.useDynamicCallback((fn: () => void, ms: number) => {
-    const timeout = setTimeout(fn, ms);
-    timeouts.current = [...timeouts.current, timeout];
-  });
-
-  useEffect(() => {
-    for (let i = 0; i < timeouts.current.length; i++) {
-      clearTimeout(timeouts.current[i]);
-    }
-  }, []);
-
-  const notifications = useMemo(() => {
-    return map(ns, (n: Omit<UINotification, "remove">) => ({ ...n, remove: () => clearNotifications(n.id) }));
-  }, [clearNotifications, ns]);
-
-  /**
-   * Dispatches a single notification or a series of notifications to state.
-   * Each notification (of type UINotificationType) is standardized to the
-   * consistent UINotification object form and then added to the notifications
-   * in state so they can be easily rendered by components using this hook.
-   */
-  const notify = useMemo(
+  const getNotifications = useMemo(
     () => (notes: SingleOrArray<UINotificationType>, opts?: UINotificationOptions) => {
       let notices = Array.isArray(notes) ? notes : [notes];
 
@@ -97,19 +71,15 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
 					 This should be improved, as the location of the final grouped field
 					 related error can be determined from the location of the first child
 					 field related error in the array. */
-        const combined = combineFieldNotifications(fieldRelatedErrors, { behavior: config.defaultBehavior, ...opts });
+        const combined = combineFieldNotifications(fieldRelatedErrors, opts);
         if (combined !== null) {
           notices = [...notices, combined];
         }
       }
-      const addedNotifications = reduce(
+      return reduce(
         notices,
-        (curr: UINotification[], n: UINotificationType) => {
-          const id = util.generateRandomNumericId();
-          const standardized = standardizeNotification(n, {
-            behavior: config.defaultBehavior,
-            ...opts
-          });
+        (curr: UINotificationData[], n: UINotificationType) => {
+          const standardized = standardizeNotificationData(n, opts);
           if (standardized !== null) {
             /* All notifications will default to being closable unless the
 							`defaultClosable` configuration is provided or the
@@ -121,34 +91,114 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
                 : config.defaultClosable !== undefined
                 ? config.defaultClosable
                 : true;
-            return [
-              ...curr,
-              {
-                ...standardized,
-                closable,
-                id,
-                remove: () => clearNotifications(id)
-              }
-            ];
+            return [...curr, { ...standardized, closable }];
           }
           return curr;
         },
         []
       );
+    },
+    [config?.handleFieldErrors]
+  );
+
+  const getRequestErrorNotifications = useMemo(
+    () =>
+      (
+        e: api.ClientError | api.NetworkError | api.ServerError,
+        opts?: UINotificationOptions & { readonly dispatchClientErrorToSentry?: boolean }
+      ) => {
+        if (e instanceof api.ClientError) {
+          /* By default, we do not want to dispatch ClientError(s) to Sentry,
+             because these are mostly used for control flow and are raised in
+             expected cases.  However, there are times that we know we should
+             not be getting a ClientError, in which case we should dispatch to
+             Sentry. */
+          if (opts?.dispatchClientErrorToSentry === true) {
+            internal.requestError(e);
+          }
+          return getNotifications(e.errors, { message: "There was a problem with your request.", ...opts });
+        } else {
+          /* Dispatch the notification to the internal handler so we can, if
+           appropriate, send notifications to Sentry or the console. */
+          internal.requestError(e);
+          return getNotifications(e, {
+            message: "There was an error with your request.",
+            detail: "There was a problem communicating with the server.",
+            ...opts
+          });
+        }
+      },
+    []
+  );
+
+  return {
+    getRequestErrorNotifications,
+    getNotifications
+  };
+};
+
+type UseNotificationsManagerConfig = UseNotificationsConfig & {
+  readonly defaultBehavior: UINotificationBehavior;
+};
+
+/**
+ * Manages notifications for a component.
+ *
+ * @param config UseNotificationsManagerConfig
+ * @returns UINotificationsManager
+ */
+export const useNotificationsManager = (config: UseNotificationsManagerConfig): UINotificationsManager => {
+  const handler = useNotifications(config);
+  const [ns, dispatchNotification] = useReducer(UINotificationReducer, []);
+  const timeouts = useRef<NodeJS.Timeout[]>([]);
+
+  const clearNotifications = useMemo(() => (id?: SingleOrArray<UINotification["id"]>) => dispatchNotification(id), []);
+
+  const doTimeout = hooks.useDynamicCallback((fn: () => void, ms: number) => {
+    const timeout = setTimeout(fn, ms);
+    timeouts.current = [...timeouts.current, timeout];
+  });
+
+  useEffect(() => {
+    for (let i = 0; i < timeouts.current.length; i++) {
+      clearTimeout(timeouts.current[i]);
+    }
+  }, []);
+
+  const notifications = useMemo(() => {
+    return map(ns, (n: Omit<UINotification, "remove">) => ({ ...n, remove: () => clearNotifications(n.id) }));
+  }, [clearNotifications, ns]);
+
+  /**
+   * Dispatches a single notification or a series of notifications to state.
+   * Each notification (of type UINotificationType) is standardized to the
+   * consistent UINotification object form and then added to the notifications
+   * in state so they can be easily rendered by components using this hook.
+   */
+  const notify = useMemo(
+    () => (notes: SingleOrArray<UINotificationType>, opts?: UINotificationOptions) => {
+      const notificationsToAdd = map(handler.getNotifications(notes, opts), (d: UINotificationData) => {
+        const id = util.generateRandomNumericId();
+        return {
+          ...d,
+          id,
+          remove: () => clearNotifications(id)
+        };
+      });
       dispatchNotification({
-        notifications: addedNotifications,
+        notifications: notificationsToAdd,
         opts: { behavior: config.defaultBehavior, ...opts }
       });
       if (!isNil(opts?.duration)) {
-        doTimeout(() => clearNotifications(map(addedNotifications, (n: UINotification) => n.id)), opts?.duration);
+        doTimeout(() => clearNotifications(map(notificationsToAdd, (n: UINotification) => n.id)), opts?.duration);
       } else {
-        for (let i = 0; i < addedNotifications.length; i++) {
-          if (addedNotifications[i].duration !== undefined) {
-            doTimeout(() => clearNotifications(addedNotifications[i].id), addedNotifications[i].duration);
+        for (let i = 0; i < notificationsToAdd.length; i++) {
+          if (notificationsToAdd[i].duration !== undefined) {
+            doTimeout(() => clearNotifications(notificationsToAdd[i].id), notificationsToAdd[i].duration);
           }
         }
       }
-      return addedNotifications;
+      return notificationsToAdd;
     },
     [config?.handleFieldErrors, clearNotifications]
   );
@@ -179,25 +229,8 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
   const handleRequestError = useMemo(
     () => (e: Error, opts?: UINotificationOptions & { readonly dispatchClientErrorToSentry?: boolean }) => {
       if (!axios.isCancel(e) && !(e instanceof api.ForceLogout)) {
-        if (e instanceof api.ClientError) {
-          /* By default, we do not want to dispatch ClientError(s) to Sentry,
-             because these are mostly used for control flow and are raised in
-             expected cases.  However, there are times that we know we should
-             not be getting a ClientError, in which case we should dispatch to
-             Sentry. */
-          if (opts?.dispatchClientErrorToSentry === true) {
-            internal.requestError(e);
-          }
-          return notify(e.errors, { message: "There was a problem with your request.", ...opts });
-        } else if (e instanceof api.NetworkError || e instanceof api.ServerError) {
-          /* Dispatch the notification to the internal handler so we can, if
-           appropriate, send notifications to Sentry or the console. */
-          internal.requestError(e);
-          return notify(e, {
-            message: "There was an error with your request.",
-            detail: "There was a problem communicating with the server.",
-            ...opts
-          });
+        if (e instanceof api.ClientError || e instanceof api.NetworkError || e instanceof api.ServerError) {
+          return notify(handler.getRequestErrorNotifications(e, opts));
         } else {
           throw e;
         }
@@ -216,7 +249,7 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
   };
 };
 
-type UseNotificationsEventListenerConfig = UseNotificationsConfig & {
+type UseNotificationsEventListenerConfig = UseNotificationsManagerConfig & {
   readonly destinationId: string;
 };
 
@@ -225,10 +258,10 @@ type UseNotificationsEventListenerConfig = UseNotificationsConfig & {
  * document object.
  *
  * @param config UseNotificationsEventListenerConfig
- * @returns UINotificationsHandler
+ * @returns UINotificationsManager
  */
-export const useNotificationsEventListener = (config: UseNotificationsEventListenerConfig): UINotificationsHandler => {
-  const NotificationsHandler = useNotifications(config);
+export const useNotificationsEventListener = (config: UseNotificationsEventListenerConfig): UINotificationsManager => {
+  const NotificationsHandler = useNotificationsManager(config);
 
   useEffect(() => {
     const listener = ((evt: CustomEvent<AddNotificationsDetail>) => {

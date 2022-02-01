@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useHistory, useLocation } from "react-router-dom";
-import { isNil, includes } from "lodash";
+import { isNil } from "lodash";
 
 import * as api from "api";
 import { ui, notifications } from "lib";
@@ -8,7 +8,14 @@ import { ui, notifications } from "lib";
 import { LoginForm } from "components/forms";
 import { ILoginFormValues } from "components/forms/LoginForm";
 
-import { TokenNotification, UnverifiedEmailNotification } from "./Notifications";
+import {
+  EmailTokenExpiredNotification,
+  EmailTokenInvalidNotification,
+  UnverifiedEmailNotification,
+  PasswordTokenExpiredNotification,
+  PasswordTokenInvalidNotification,
+  UITokenNotificationRedirectData
+} from "./Notifications";
 import LandingFormContainer from "./LandingFormContainer";
 
 const Login = (): JSX.Element => {
@@ -16,34 +23,24 @@ const Login = (): JSX.Element => {
   const form = ui.hooks.useForm<ILoginFormValues>();
   const history = useHistory();
   const location = useLocation<{
-    readonly error?: Error | undefined;
-    readonly notification?: UINotificationData | string | undefined;
-    readonly tokenType?: "email-confirmation" | "password-recovery" | undefined;
+    readonly notifications?: UINotificationData[];
+    readonly tokenNotification?: UITokenNotificationRedirectData;
   }>();
 
-  const handleTokenError = useMemo(
-    () =>
-      (e: Http.IApiError<"auth", Http.TokenErrorCode> & { readonly user_id?: number }, tokenType: Http.TokenType) => {
-        if (e.code === api.ErrorCodes.TOKEN_EXPIRED && isNil(e.user_id)) {
-          console.error(
-            `The token of type ${location.state.tokenType} has expired, but we cannot
-              resend the email because the response did not include the user's ID.`
-          );
-        }
-        if (isNil(e.user_id) || e.code === api.ErrorCodes.TOKEN_INVALID) {
+  const handleLoginError = useMemo(
+    () => (e: Error) => {
+      if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
+        if (e.authenticationError.code === api.ErrorCodes.ACCOUNT_NOT_VERIFIED) {
+          if (isNil(e.authenticationError.user_id)) {
+            console.error(
+              `The user's email confirmation token has expired, but we cannot
+								resend the verification email because the response did not include
+								the user's ID.`
+            );
+          }
           form.notify(
-            TokenNotification({
-              tokenType,
-              userId: e.user_id,
-              code: e.code
-            })
-          );
-        } else {
-          form.notify(
-            TokenNotification({
-              tokenType,
-              userId: e.user_id,
-              code: e.code,
+            UnverifiedEmailNotification({
+              userId: e.authenticationError.user_id,
               onSuccess: () =>
                 form.notify({
                   level: "success",
@@ -54,72 +51,63 @@ const Login = (): JSX.Element => {
               onError: (err: Error) => form.handleRequestError(err)
             })
           );
-        }
-      },
-    [form.handleRequestError, form.notify]
-  );
-
-  const handleAuthError = useMemo(
-    () => (e: Http.AuthError, tokenType?: Http.TokenType) => {
-      if (includes([api.ErrorCodes.TOKEN_EXPIRED, api.ErrorCodes.TOKEN_INVALID], e.code)) {
-        if (!isNil(tokenType)) {
-          handleTokenError(e as Http.IApiError<"auth", Http.TokenErrorCode>, tokenType);
-          return true;
-        }
-      } else if (e.code === api.ErrorCodes.ACCOUNT_NOT_VERIFIED) {
-        if (isNil(e.user_id)) {
-          console.error(
-            `The user's email confirmation token has expired, but we cannot
-              resend the verification email because the response did not include
-              the user's ID.`
-          );
-        }
-        form.notify(
-          UnverifiedEmailNotification({
-            userId: e.user_id,
-            onSuccess: () =>
-              form.notify({
-                level: "success",
-                message: "Confirmation email successfully sent.",
-                detail: "Please check your inbox.",
-                closable: true
-              }),
-            onError: (err: Error) => form.handleRequestError(err)
-          })
-        );
-
-        return true;
-      }
-      return false;
-    },
-    [form.handleRequestError, handleTokenError, form.notify]
-  );
-
-  const handleError = useMemo(
-    () => (e: Error) => {
-      if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
-        const handled = handleAuthError(e.authenticationError, location.state?.tokenType);
-        if (!handled) {
+        } else {
           form.handleRequestError(e);
         }
       } else {
         form.handleRequestError(e);
       }
     },
-    [form.handleRequestError, handleAuthError]
+    [form.handleRequestError]
   );
 
   useEffect(() => {
-    if (!isNil(location.state?.error)) {
-      const e = location.state.error;
+    if (!isNil(location.state?.tokenNotification)) {
+      const n = location.state.tokenNotification;
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
       const { state, ...statelessLocation } = location;
       history.replace(statelessLocation);
-      handleError(e);
+      if (n.tokenType === "email-confirmation") {
+        if (n.code === api.ErrorCodes.TOKEN_EXPIRED) {
+          if (isNil(n.userId)) {
+            console.error(
+              `Email confirmation token has expired, but we cannot
+								resend the email because the response did not include the user's ID.`
+            );
+          }
+          form.notify(
+            EmailTokenExpiredNotification({
+              userId: n.userId,
+              onSuccess: () =>
+                form.notify({
+                  level: "success",
+                  message: "Confirmation email successfully sent.",
+                  detail: "Please check your inbox.",
+                  closable: true
+                }),
+              onError: (err: Error) => form.handleRequestError(err)
+            })
+          );
+        } else {
+          form.notify(EmailTokenInvalidNotification());
+        }
+      } else {
+        if (n.code === api.ErrorCodes.TOKEN_EXPIRED) {
+          if (isNil(n.userId)) {
+            console.error(
+              `Password recovery token has expired, but we cannot
+								resend the email because the response did not include the user's ID.`
+            );
+          }
+          form.notify(PasswordTokenExpiredNotification());
+        } else {
+          form.notify(PasswordTokenInvalidNotification());
+        }
+      }
     }
-    const notification = location.state?.notification;
-    if (!isNil(notification)) {
-      form.notify(notification);
+    const notices = location.state?.notifications;
+    if (!isNil(notices)) {
+      form.notify(notices);
     }
   }, [location.state]);
 
@@ -140,7 +128,7 @@ const Login = (): JSX.Element => {
                 history.push("/");
               }
             })
-            .catch((e: Error) => handleError(e))
+            .catch((e: Error) => handleLoginError(e))
             .finally(() => setLoading(false));
         }}
         onGoogleScriptLoadFailure={(error: Record<string, unknown>) => {
@@ -162,7 +150,7 @@ const Login = (): JSX.Element => {
                   history.push("/");
                 }
               })
-              .catch((e: Error) => handleError(e))
+              .catch((e: Error) => handleLoginError(e))
               .finally(() => setLoading(false));
           }
         }}

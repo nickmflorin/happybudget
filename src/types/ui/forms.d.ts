@@ -1,7 +1,7 @@
 declare type RootFormInstance<T> = import("antd/lib/form").FormInstance<T>;
 declare type RootFormProps = import("antd/lib/form").FormProps;
 
-declare interface FormInstance<T> extends RootFormInstance<T>, UINotificationsHandler {
+declare interface FormInstance<T> extends RootFormInstance<T>, UINotificationsManager {
   readonly setLoading: (value: boolean) => void;
   readonly loading: boolean | undefined;
   readonly isInModal?: boolean;
