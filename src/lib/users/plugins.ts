@@ -147,14 +147,26 @@ export const identifyCanny = (user: Model.User) => {
 export const identifyIntercom = (user: Model.User) => {
   if (identifyRequired("intercom", user)) {
     if (!isNil(process.env.REACT_APP_INTERCOM_APP_ID)) {
-      window.Intercom("boot", {
-        app_id: process.env.REACT_APP_INTERCOM_APP_ID,
-        user_id: user.id,
-        email: user.email,
-        name: user.full_name,
-        created_at: new Date(user.date_joined).toISOString(),
-        custom_launcher_selector: "#support-menu-item-intercom-chat"
+      const userJoined = util.dates.toLocalizedMoment(user.date_joined, {
+        warnOnInvalid: false,
+        tz: user.timezone
       });
+      if (userJoined === undefined) {
+        console.warn(
+          `Cannot perform intercom identification process for user ${user.id} as ` +
+            `'date_joined' field (value = '${user.date_joined}') cannot be parsed ` +
+            "to a date."
+        );
+      } else {
+        window.Intercom("boot", {
+          app_id: process.env.REACT_APP_INTERCOM_APP_ID,
+          user_id: user.id,
+          email: user.email,
+          name: user.full_name,
+          created_at: userJoined,
+          custom_launcher_selector: "#support-menu-item-intercom-chat"
+        });
+      }
     } else if (process.env.NODE_ENV === "production") {
       console.warn(
         `Could not identify Intercom user as ENV variable 'REACT_APP_INTERCOM_APP_ID'
