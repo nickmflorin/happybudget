@@ -163,7 +163,7 @@ const Previewer = ({
         </RenderDocument>
       </div>
       <div className={"preview-footer"}>
-        <Pagination total={numPages} pageSize={1} current={page} size={"small"} onChange={(p: number) => setPage(p)} />
+        <Pagination total={numPages} pageSize={1} current={page} small={true} onChange={(p: number) => setPage(p)} />
         <PrimaryButton
           htmlType={"submit"}
           disabled={generatingPdf || loadingData || exporting}

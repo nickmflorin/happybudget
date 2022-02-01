@@ -46,7 +46,6 @@ const TaggedActuals = ({ contactId, title, onError, ...props }: TaggedActualsPro
         <Pagination
           hideOnSinglePage={true}
           small={true}
-          subtle={true}
           defaultPageSize={5}
           pageSize={5}
           current={page}
