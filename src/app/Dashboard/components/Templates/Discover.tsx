@@ -104,7 +104,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
         contentScrollable={true}
       >
         <div className={"dashboard-card-grid"}>
-          {map(templates, (template: Model.Template, index: number) => {
+          {map(templates, (template: Model.SimpleTemplate, index: number) => {
             /* The API will exclude hidden community templates for non-staff
 							 users by design.  However, just in case we will also make sure
 							 that we are not showing those templates to the user in the

@@ -54,8 +54,8 @@ const EditTemplateModal = (props: EditModelModalProps<Model.Template>): JSX.Elem
         }
         return p;
       }}
-      setFormData={(contact: Model.Template, form: FormInstance<Http.TemplatePayload>) =>
-        form.setFields([{ name: "name", value: contact.type }])
+      setFormData={(template: Model.Template, form: FormInstance<Http.TemplatePayload>) =>
+        form.setFields([{ name: "name", value: template.name }])
       }
     >
       {(m: Model.Template | null, form: FormInstance<Http.TemplatePayload>) => (

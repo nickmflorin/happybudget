@@ -118,7 +118,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
           </NoData>
         ) : (
           <div className={"dashboard-card-grid"}>
-            {map(templates, (template: Model.Template, index: number) => {
+            {map(templates, (template: Model.SimpleTemplate, index: number) => {
               return (
                 <TemplateCard
                   key={index}

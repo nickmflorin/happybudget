@@ -9,7 +9,7 @@ import Card, { CardProps } from "./Card";
 import "./TemplateCard.scss";
 
 type TemplateCardProps = Pick<CardProps, "disabled" | "loading" | "onClick" | "className" | "style"> & {
-  readonly template: Model.Template;
+  readonly template: Model.SimpleTemplate;
   readonly duplicating: boolean;
   readonly moving: boolean;
   readonly deleting: boolean;
