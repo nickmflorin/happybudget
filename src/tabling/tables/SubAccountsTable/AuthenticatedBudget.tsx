@@ -27,7 +27,7 @@ export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>,
     readonly onGroupRows: (rows: Table.ModelRow<R>[]) => void;
     readonly onExportPdf: () => void;
     readonly onEditMarkup: (row: Table.MarkupRow<R>) => void;
-    readonly onMarkupRows?: (rows?: Table.ModelRow<R>[]) => void;
+    readonly onMarkupRows: (rows?: Table.ModelRow<R>[]) => void;
     readonly onAddFringes: () => void;
     readonly onEditFringes: () => void;
   };

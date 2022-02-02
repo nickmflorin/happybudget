@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { isNil, filter } from "lodash";
+import { isNil, filter, map } from "lodash";
 
 import { tabling, hooks, models } from "lib";
 import { framework } from "tabling/generic";
@@ -14,10 +14,12 @@ type M = Model.SubAccount;
 export type AuthenticatedTemplateProps = Omit<AuthenticatedBudgetTableProps<R, M>, "columns"> & {
   readonly actionContext: Tables.SubAccountTableContext;
   readonly subAccountUnits: Model.Tag[];
-  readonly fringes: Table.BodyRow<Tables.FringeRowData>[];
+  readonly fringes: Tables.FringeRow[];
   readonly categoryName: "Sub Account" | "Detail";
   readonly identifierFieldHeader: "Account" | "Line";
   readonly exportFileName: string;
+  readonly onEditMarkup: (row: Table.MarkupRow<R>) => void;
+  readonly onMarkupRows: (rows?: Table.ModelRow<R>[]) => void;
   readonly onGroupRows: (rows: Table.ModelRow<R>[]) => void;
   readonly onAddFringes: () => void;
   readonly onEditFringes: () => void;
@@ -33,6 +35,23 @@ const AuthenticatedTemplateSubAccountsTable = (
     })
   );
 
+  const processFringesCellForClipboard = hooks.useDynamicCallback((row: R) => {
+    const fringes = models.getModels<Tables.FringeRow>(props.fringes, row.fringes, { modelName: "fringe" });
+    return map(fringes, (fringe: Tables.FringeRow) => fringe.id).join(", ");
+  });
+
+  const processFringesCellFromClipboard = hooks.useDynamicCallback((value: string) => {
+    /* Here, we convert from IDs to Rows then back to IDs to ensure that the
+       IDs are valid. */
+    return map(
+      models.getModels<Tables.FringeRow>(props.fringes, models.parseIdsFromDeliminatedString(value), {
+        warnOnMissing: false,
+        modelName: "fringe"
+      }),
+      (m: Tables.FringeRow) => m.id
+    );
+  });
+
   const columns = useMemo(
     () =>
       tabling.columns.normalizeColumns(Columns, {
@@ -40,7 +59,14 @@ const AuthenticatedTemplateSubAccountsTable = (
           headerName: props.identifierFieldHeader
         },
         description: { headerName: `${props.categoryName} Description` },
-        unit: { processCellFromClipboard: processUnitCellFromClipboard }
+        unit: { processCellFromClipboard: processUnitCellFromClipboard },
+        fringes: {
+          cellEditor: "FringesEditor",
+          cellEditorParams: { onAddFringes: props.onAddFringes },
+          headerComponentParams: { onEdit: () => props.onEditFringes() },
+          processCellFromClipboard: processFringesCellFromClipboard,
+          processCellForClipboard: processFringesCellForClipboard
+        }
       }),
     [props.identifierFieldHeader, hooks.useDeepEqualMemo(props.subAccountUnits)]
   );
@@ -61,7 +87,7 @@ const AuthenticatedTemplateSubAccountsTable = (
               tabling.typeguards.isModelRow(r)
             ) as Table.ModelRow<R>[];
             if (modelRows.length !== 0) {
-              props.onGroupRows?.(modelRows);
+              props.onGroupRows(modelRows);
             }
           }
         },
@@ -77,13 +103,13 @@ const AuthenticatedTemplateSubAccountsTable = (
 							 include them as the default children for the Markup in the modal,
 							 which will default the unit in the modal to PERCENT. */
             if (selectedRows.length !== 0) {
-              props.onMarkupRows?.(selectedRows);
+              props.onMarkupRows(selectedRows);
             } else {
               const rows: Table.ModelRow<R>[] = filter(props.table.current.getRows(), (r: Table.BodyRow<R>) =>
                 tabling.typeguards.isModelRow(r)
               ) as Table.ModelRow<R>[];
               if (rows.length !== 0) {
-                props.onMarkupRows?.();
+                props.onMarkupRows();
               }
             }
           }

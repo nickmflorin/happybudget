@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { isNil } from "lodash";
 
 import { FringesTable, connectTableToStore } from "tabling";
@@ -14,7 +12,6 @@ const ConnectedFringesTable = connectTableToStore<
   Tables.FringeTableStore,
   Tables.FringeTableContext
 >({
-  createSaga: (table: Table.TableInstance<Tables.FringeRowData, Model.Fringe>) => sagas.createFringesTableSaga(table),
   actions: {
     tableChanged: actions.handleFringesTableChangeEventAction,
     loading: actions.loadingFringesAction,
@@ -22,6 +19,7 @@ const ConnectedFringesTable = connectTableToStore<
     addModelsToState: actions.addFringeModelsToStateAction,
     setSearch: actions.setFringesSearchAction
   },
+  createSaga: (table: Table.TableInstance<Tables.FringeRowData, Model.Fringe>) => sagas.createFringesTableSaga(table),
   selector: selectors.selectFringesStore
 })(FringesTable.Table);
 
@@ -32,23 +30,15 @@ interface FringesModalProps extends Pick<ModalProps, "open" | "onCancel"> {
   readonly table: NonNullRef<Table.TableInstance<Tables.FringeRowData, Model.Fringe>>;
 }
 
-const FringesModal: React.FC<FringesModalProps> = ({ id, budget, budgetId, table, open, onCancel }) => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(actions.requestFringesAction(null, { id, budgetId }));
-  }, [budgetId]);
-
-  return (
-    <GenericFringesModal open={open} onCancel={onCancel}>
-      <ConnectedFringesTable
-        table={table}
-        actionContext={{ budgetId, id }}
-        tableId={"template-fringes"}
-        exportFileName={!isNil(budget) ? `${budget.name}_fringes` : "fringes"}
-      />
-    </GenericFringesModal>
-  );
-};
+const FringesModal: React.FC<FringesModalProps> = ({ id, budget, budgetId, table, open, onCancel }) => (
+  <GenericFringesModal open={open} onCancel={onCancel}>
+    <ConnectedFringesTable
+      table={table}
+      actionContext={{ budgetId, id }}
+      tableId={"template-fringes"}
+      exportFileName={!isNil(budget) ? `${budget.name}_fringes` : "fringes"}
+    />
+  </GenericFringesModal>
+);
 
 export default FringesModal;

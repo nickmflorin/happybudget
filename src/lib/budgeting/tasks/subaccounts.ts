@@ -53,6 +53,11 @@ export type AuthenticatedSubAccountsTableServiceSet<
     p: Http.BulkCreatePayload<P>,
     options: Http.RequestOptions
   ) => Promise<Http.BudgetBulkResponse<B, M, C>>;
+  readonly bulkCreateFringes: (
+    id: number,
+    p: Http.BulkCreatePayload<Http.FringePayload>,
+    options: Http.RequestOptions
+  ) => Promise<Http.BulkResponse<B, Model.Fringe>>;
 };
 
 export type SubAccountsTableActionMap = Redux.TableActionMap<C, Tables.SubAccountTableContext> & {
@@ -105,10 +110,32 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
   function* requestFringes(objId: number): SagaIterator {
     try {
       const response: Http.ListResponse<Model.Fringe> = yield api.request(config.services.requestFringes, objId, {});
-      yield put(config.actions.responseFringes({ models: response.data }));
+      if (response.data.length === 0 && isAuthenticatedConfig(config)) {
+        // If there is no table data, we want to default create two rows.
+        try {
+          const bulkCreateResponse: Http.BulkResponse<B, Model.Fringe> = yield api.request(
+            config.services.bulkCreateFringes,
+            objId,
+            { data: [{}, {}] }
+          );
+          yield put(config.actions.responseFringes({ models: bulkCreateResponse.children }));
+          yield put(config.actions.updateBudgetInState({ id: objId, data: bulkCreateResponse.data }));
+        } catch (e: unknown) {
+          /* TODO: It would be nice if we can show this in the Fringes table
+             instead (if it is open). */
+          config.table.handleRequestError(e as Error, {
+            message: "There was an error retrieving the fringes table data.",
+            dispatchClientErrorToSentry: true
+          });
+        }
+      } else {
+        yield put(config.actions.responseFringes({ models: response.data }));
+      }
     } catch (e: unknown) {
+      /* TODO: It would be nice if we can show this in the Fringes table
+         instead (if it is open). */
       config.table.handleRequestError(e as Error, {
-        message: "There was an error retrieving the table data.",
+        message: "There was an error retrieving the fringes table data.",
         dispatchClientErrorToSentry: true
       });
       yield put(config.actions.responseFringes({ models: [] }));
@@ -149,9 +176,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         const response: Http.ListResponse<Model.SubAccount> = yield api.request(
           config.services.request,
           action.context.id,
-          {
-            ids: action.payload.ids
-          }
+          { ids: action.payload.ids }
         );
         yield put(
           config.actions.tableChanged(
@@ -172,7 +197,6 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       if (!isNil(config.services.requestMarkups)) {
         effects = [...effects, api.request(config.services.requestMarkups, action.context.id, {})];
       }
-
       try {
         yield fork(contactsTasks.request, action as Redux.Action);
         yield fork(requestSubAccountUnits);
@@ -186,16 +210,21 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
 
         if (models.data.length === 0 && isAuthenticatedConfig(config)) {
           // If there is no table data, we want to default create two rows.
-          const response: Http.BudgetBulkResponse<B, M, C> = yield api.request(
-            config.services.bulkCreate,
-            action.context.id,
-            {
-              data: [{}, {}]
-            }
-          );
-          yield put(
-            config.actions.response({ models: response.children, groups: groups.data, markups: markups?.data })
-          );
+          try {
+            const response: Http.BudgetBulkResponse<B, M, C> = yield api.request(
+              config.services.bulkCreate,
+              action.context.id,
+              { data: [{}, {}] }
+            );
+            yield put(
+              config.actions.response({ models: response.children, groups: groups.data, markups: markups?.data })
+            );
+          } catch (e: unknown) {
+            config.table.handleRequestError(e as Error, {
+              message: "There was an error retrieving the table data.",
+              dispatchClientErrorToSentry: true
+            });
+          }
         } else {
           yield put(config.actions.response({ models: models.data, groups: groups.data, markups: markups?.data }));
         }
