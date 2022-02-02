@@ -80,12 +80,11 @@ const Budgets = (): JSX.Element => {
                  proper permissions creating multiple budgets during the API
                  request anyways, this is okay. */
               if (
-                responseWasReceived &&
-                budgets.length !== 0 &&
+                user.num_budgets !== 0 &&
                 !users.permissions.userHasPermission(user, users.permissions.Permissions.MULTIPLE_BUDGETS)
               ) {
                 dispatch(store.actions.authenticated.setProductPermissionModalOpenAction(true));
-              } else if (responseWasReceived) {
+              } else {
                 setCreateBudgetModalOpen(true);
               }
             }}
@@ -152,14 +151,11 @@ const Budgets = (): JSX.Element => {
 											 Budget is itself protected against incompatible
 											 permissions, this is okay. */
                     if (
-                      responseWasReceived &&
-                      budgets.length !== 0 &&
+                      user.num_budgets !== 0 &&
                       !users.permissions.userHasPermission(user, users.permissions.Permissions.MULTIPLE_BUDGETS)
                     ) {
                       dispatch(store.actions.authenticated.setProductPermissionModalOpenAction(true));
-                      /* Edge case, since a response would have to had been
-											   received if there is a card there. */
-                    } else if (responseWasReceived) {
+                    } else {
                       setDuplicating(budget.id);
                       api
                         .duplicateBudget(budget.id)
@@ -221,6 +217,9 @@ const Budgets = (): JSX.Element => {
           onCancel={() => setCreateBudgetModalOpen(false)}
           onSuccess={(budget: Model.Budget) => {
             dispatch(actions.addBudgetToStateAction(budget));
+            dispatch(
+              store.actions.authenticated.updateLoggedInUserAction({ ...user, num_budgets: user.num_budgets + 1 })
+            );
             setCreateBudgetModalOpen(false);
             history.push(`/budgets/${budget.id}/accounts`);
           }}
@@ -238,6 +237,12 @@ const Budgets = (): JSX.Element => {
               .then(() => {
                 dispatch(actions.removeBudgetFromStateAction(budgetToDelete.id));
                 dispatch(actions.requestPermissioningBudgetsAction(null));
+                dispatch(
+                  store.actions.authenticated.updateLoggedInUserAction({
+                    ...user,
+                    num_budgets: Math.max(user.num_budgets - 1, 0)
+                  })
+                );
               })
               .catch((err: Error) => notifications.requestError(err))
               .finally(() => {

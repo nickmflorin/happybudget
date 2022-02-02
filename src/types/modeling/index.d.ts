@@ -101,6 +101,7 @@ declare namespace Model {
     readonly phone_number: number | null;
     readonly product_id: ProductId | null;
     readonly billing_status: BillingStatus | null;
+    readonly num_budgets: number;
   };
 
   type SimpleAttachment = HttpModel & {
