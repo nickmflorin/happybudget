@@ -9,7 +9,7 @@ export const orderActions = (actions: Table.MenuActionObj[]): Table.MenuActionOb
 export const evaluateActions = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  T extends Table.MenuActionParams<R, M> = Table.MenuActionParams<R, M>
+  T extends Table.PublicMenuActionParams<R, M> = Table.PublicMenuActionParams<R, M>
 >(
   actions: Table.MenuActions<R, M, T>,
   params: T
@@ -26,7 +26,7 @@ export const evaluateActions = <
 };
 
 export const combineMenuActions = <
-  P extends Table.MenuActionParams<R, M>,
+  P extends Table.PublicMenuActionParams<R, M>,
   R extends Table.RowData,
   M extends Model.RowHttpModel
 >(

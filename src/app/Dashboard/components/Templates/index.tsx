@@ -77,7 +77,9 @@ const Templates = (): JSX.Element => {
           title={"Create Budget from Template"}
           onSuccess={(budget: Model.Budget) => {
             setTemplateToDerive(undefined);
-            dispatch(actions.addBudgetToStateAction(budget));
+            /* It is safe to coerce to an Budget because the User must be
+						   logged in at this point. */
+            dispatch(actions.addBudgetToStateAction(budget as Model.AuthenticatedBudget));
             dispatch(
               store.actions.authenticated.updateLoggedInUserAction({ ...user, num_budgets: user.num_budgets + 1 })
             );
@@ -91,7 +93,9 @@ const Templates = (): JSX.Element => {
           onCancel={() => setCreateBudgetModalOpen(false)}
           onSuccess={(budget: Model.Budget) => {
             setCreateBudgetModalOpen(false);
-            dispatch(actions.addBudgetToStateAction(budget));
+            /* It is safe to coerce to an Budget because the User must be logged
+						   in at this point. */
+            dispatch(actions.addBudgetToStateAction(budget as Model.AuthenticatedBudget));
             dispatch(
               store.actions.authenticated.updateLoggedInUserAction({ ...user, num_budgets: user.num_budgets + 1 })
             );

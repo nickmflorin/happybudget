@@ -134,13 +134,13 @@ export const isDataChangeEvent = <
   return (e as Table.DataChangeEvent<R, RW>).type === "dataChange";
 };
 
-export const isActionWithDataChangeEvent = <
+export const isDataChangeEventAction = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  RW extends Table.EditableRow<R> = Table.EditableRow<R>
+  C extends Table.Context = Table.Context
 >(
-  a: Redux.Action<Table.ChangeEvent<R, M, RW>>
-): a is Redux.Action<Table.DataChangeEvent<R, RW>> => {
+  a: Redux.TableAction<Table.ChangeEvent<R, M>, C>
+): a is Redux.TableAction<Table.DataChangeEvent<R>, C> => {
   return isDataChangeEvent(a.payload);
 };
 
@@ -180,6 +180,22 @@ export const isRowAddDataPayload = <R extends Table.RowData>(
 export const isRowAddDataEvent = <R extends Table.RowData>(
   e: Table.RowAddEvent<R>
 ): e is Table.RowAddEvent<R, Table.RowAddDataPayload<R>> => !isNil(e.payload) && isRowAddDataPayload(e.payload);
+
+export const isRowAddDataEventAction = <R extends Table.RowData, C extends Table.Context = Table.Context>(
+  a: Redux.TableAction<Table.RowAddEvent<R>, C>
+): a is Redux.TableAction<Table.RowAddEvent<R, Table.RowAddDataPayload<R>>, C> => {
+  return isRowAddDataEvent(a.payload);
+};
+
+export const isRowAddEventAction = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context
+>(
+  a: Redux.TableAction<Table.ChangeEvent<R, M>, C>
+): a is Redux.TableAction<Table.RowAddEvent<R>, C> => {
+  return isRowAddEvent(a.payload);
+};
 
 export const isRowDeleteEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   e: Table.ChangeEvent<R, M>

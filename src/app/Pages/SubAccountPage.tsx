@@ -3,26 +3,23 @@ import { map, isNil } from "lodash";
 
 import { budgeting } from "lib";
 
-import { RenderIfValidId } from "components";
 import { Portal, BreadCrumbs } from "components/layout";
 import { EntityTextButton } from "components/buttons";
 import { EntityText } from "components/typography";
 
 interface SubAccountPageProps<B extends Model.Budget | Model.Template> {
   readonly budget: B | null;
-  readonly subaccountId: string;
   readonly detail: Model.SubAccount | null;
   readonly children: React.ReactChild | React.ReactChild[];
 }
 
 const SubAccountPage = <B extends Model.Budget | Model.Template>({
   budget,
-  subaccountId,
   detail,
   children
 }: SubAccountPageProps<B>): JSX.Element => {
   return (
-    <RenderIfValidId id={[subaccountId]}>
+    <React.Fragment>
       <Portal id={"breadcrumbs"}>
         <BreadCrumbs<{ b: B; subaccount: Model.SubAccount }>
           params={{ b: budget, subaccount: detail }}
@@ -75,7 +72,7 @@ const SubAccountPage = <B extends Model.Budget | Model.Template>({
         />
       </Portal>
       {children}
-    </RenderIfValidId>
+    </React.Fragment>
   );
 };
 

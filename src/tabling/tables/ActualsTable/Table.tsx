@@ -1,37 +1,57 @@
-import React from "react";
-import { map, filter } from "lodash";
+import React, { useMemo } from "react";
+import { useDispatch } from "react-redux";
+import { Dispatch } from "redux";
+import { map, filter, isNil } from "lodash";
 
 import * as api from "api";
 import { models, tabling, hooks } from "lib";
+import { actions } from "store";
 
-import { framework, WithConnectedTableProps } from "tabling/generic";
-import { AuthenticatedModelTable, AuthenticatedModelTableProps } from "../ModelTable";
-import { withContacts, WithWithContactsProps, WithContactsProps } from "../hocs";
-import { useAttachments } from "../hooks";
+import { CreateContactParams } from "components/hooks";
+import { framework } from "tabling/generic";
+import { AuthenticatedTable, AuthenticatedTableProps } from "tabling/generic/tables";
+import { useAttachments, useContacts } from "../hooks";
 
 import Framework from "./framework";
 import Columns from "./Columns";
+
+type OmitProps =
+  | "showPageFooter"
+  | "pinFirstColumn"
+  | "tableId"
+  | "menuPortalId"
+  | "savingChangesPortalId"
+  | "cookieNames"
+  | "framework"
+  | "getModelRowName"
+  | "getMarkupRowName"
+  | "getModelRowLabel"
+  | "getMarkupRowLabel"
+  | "onGroupRows"
+  | "onMarkupRows"
+  | "onEditMarkup"
+  | "onEditGroup"
+  | "onCellFocusChanged"
+  | "columns";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;
 type S = Tables.ActualTableStore;
 
-export type ActualsTableProps = Omit<AuthenticatedModelTableProps<R, M, S>, "columns"> &
-  WithContactsProps & {
-    readonly actionContext: Tables.ActualTableContext;
-    readonly exportFileName: string;
-    readonly actualTypes: Model.Tag[];
-    readonly onAttachmentRemoved: (row: Table.ModelRow<R>, id: number) => void;
-    readonly onAttachmentAdded: (row: Table.ModelRow<R>, attachment: Model.Attachment) => void;
-    readonly onOwnersSearch: (value: string) => void;
-    readonly onExportPdf: () => void;
-  };
+export type Props = Omit<AuthenticatedTableProps<R, M, S>, OmitProps> & {
+  readonly parent: Model.Budget | null;
+  readonly data: Table.BodyRow<R>[];
+  readonly actionContext: Tables.ActualTableContext;
+  readonly actualTypes: Model.Tag[];
+  readonly onAttachmentRemoved: (row: Table.ModelRow<R>, id: number) => void;
+  readonly onAttachmentAdded: (row: Table.ModelRow<R>, attachment: Model.Attachment) => void;
+  readonly onOwnersSearch: (value: string) => void;
+  readonly onExportPdf: () => void;
+};
 
-const ActualsTable = ({
-  exportFileName,
-  onOwnersSearch,
-  ...props
-}: WithWithContactsProps<WithConnectedTableProps<ActualsTableProps, R, M>, R, M>): JSX.Element => {
+const ActualsTable = ({ parent, onOwnersSearch, ...props }: Props): JSX.Element => {
+  const dispatch: Dispatch = useDispatch();
+
   const [processAttachmentsCellForClipboard, processAttachmentsCellFromClipboard, setEditAttachments, modal] =
     useAttachments({
       table: props.table.current,
@@ -105,56 +125,103 @@ const ActualsTable = ({
     }
   });
 
+  const onContactCreated = useMemo(
+    () => (m: Model.Contact, params?: CreateContactParams) => {
+      dispatch(actions.authenticated.addContactToStateAction(m));
+      /* If we have enough information from before the contact was created in
+				 the specific cell, combine that information with the new value to
+				 perform a table update, showing the created contact in the new cell. */
+      const rowId = params?.rowId;
+      if (!isNil(rowId)) {
+        const row: Table.BodyRow<R> | null = props.table.current.getRow(rowId);
+        if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
+          const rowChange: Table.RowChange<R> = {
+            id: row.id,
+            data: { contact: { oldValue: row.data.contact, newValue: m.id } }
+          };
+          props.table.current.applyTableChange({
+            type: "dataChange",
+            payload: rowChange
+          });
+        }
+      }
+    },
+    [props.table.current]
+  );
+
+  const {
+    modals: contactModals,
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    data: contacts,
+    columns: columnsWithContacts,
+    onCellFocusChanged
+  } = useContacts({
+    table: props.table,
+    columns: Columns,
+    onCreated: onContactCreated
+  });
+
+  const columns = useMemo(
+    () =>
+      tabling.columns.normalizeColumns(columnsWithContacts, {
+        owner: (col: Table.Column<R, M>) => ({
+          processCellFromClipboard: processOwnerCellFromClipboard,
+          cellEditorParams: {
+            ...col.cellEditorParams,
+            setSearch: (value: string) => onOwnersSearch(value)
+          }
+        }),
+        attachments: (col: Table.Column<R, M>) => ({
+          onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditAttachments(row.id),
+          processCellFromClipboard: processAttachmentsCellFromClipboard,
+          processCellForClipboard: processAttachmentsCellForClipboard,
+          cellRendererParams: {
+            ...col.cellRendererParams,
+            onAttachmentAdded: props.onAttachmentAdded,
+            uploadAttachmentsPath: (id: number) => `/v1/actuals/${id}/attachments/`
+          }
+        }),
+        actual_type: {
+          processCellFromClipboard: processActualTypeCellFromClipboard
+        }
+      }),
+    [
+      hooks.useDeepEqualMemo(columnsWithContacts),
+      processActualTypeCellFromClipboard,
+      props.onAttachmentAdded,
+      processAttachmentsCellForClipboard,
+      processActualTypeCellFromClipboard
+    ]
+  );
+
   return (
     <React.Fragment>
-      <AuthenticatedModelTable<R, M, S>
+      <AuthenticatedTable
         {...props}
+        tableId={"budget-actuals"}
+        columns={columns}
+        onCellFocusChanged={onCellFocusChanged}
         showPageFooter={false}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
         cookieNames={{ hiddenColumns: "actuals-table-hidden-columns" }}
         getModelRowName={(r: Table.DataRow<R>) => r.data.name}
-        getModelRowLabel={"Sub Account"}
+        getModelRowLabel={"Actual"}
         framework={Framework}
         actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
           framework.actions.ToggleColumnAction(props.table.current, params),
-          framework.actions.ExportCSVAction(props.table.current, params, exportFileName),
+          framework.actions.ExportCSVAction(
+            props.table.current,
+            params,
+            !isNil(parent) ? `${parent.name}_actuals` : "actuals"
+          ),
           framework.actions.ExportPdfAction(props.onExportPdf)
         ]}
-        columns={tabling.columns.normalizeColumns(props.columns, {
-          owner: (col: Table.Column<R, M>) => ({
-            processCellFromClipboard: processOwnerCellFromClipboard,
-            cellEditorParams: {
-              ...col.cellEditorParams,
-              setSearch: (value: string) => onOwnersSearch(value)
-            }
-          }),
-          attachments: (col: Table.Column<R, M>) => ({
-            onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditAttachments(row.id),
-            processCellFromClipboard: processAttachmentsCellFromClipboard,
-            processCellForClipboard: processAttachmentsCellForClipboard,
-            cellRendererParams: {
-              ...col.cellRendererParams,
-              onAttachmentAdded: props.onAttachmentAdded,
-              uploadAttachmentsPath: (id: number) => `/v1/actuals/${id}/attachments/`
-            }
-          }),
-          actual_type: {
-            processCellFromClipboard: processActualTypeCellFromClipboard
-          }
-        })}
       />
       {modal}
+      {contactModals}
     </React.Fragment>
   );
 };
 
-type ActualsTableType = {
-  (props: WithConnectedTableProps<ActualsTableProps, R, M>): JSX.Element;
-};
-
-export default React.memo(
-  withContacts<R, M, WithConnectedTableProps<ActualsTableProps, R, M>>(tabling.columns.filterRealColumns(Columns))(
-    ActualsTable
-  )
-) as ActualsTableType;
+export default React.memo(ActualsTable);

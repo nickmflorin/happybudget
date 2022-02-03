@@ -2,7 +2,7 @@ import React from "react";
 import { isNil } from "lodash";
 
 type RowTypeRender<T extends { node: Table.RowNode } = { node: Table.RowNode }> = Partial<{
-  [key in Table.RowType | "default"]: React.ComponentClass<T, Record<string, unknown>> | React.FunctionComponent<T>;
+  [key in Table.RowType | "default"]: React.FunctionComponent<T>;
 }>;
 
 const renderOnRowType = <
@@ -13,8 +13,7 @@ const renderOnRowType = <
 ) => {
   const WithRowsOfType = (props: T) => {
     const row: Table.BodyRow<R> = props.node.data;
-    let Component: React.ComponentClass<T, Record<string, unknown>> | React.FunctionComponent<T> | undefined =
-      lookup[row.rowType];
+    let Component: React.FunctionComponent<T> | undefined = lookup[row.rowType];
     if (isNil(Component)) {
       Component = lookup["default"];
     }

@@ -13,7 +13,11 @@ declare namespace Model {
     readonly id: number;
   };
 
-  type GenericHttpModel<T extends HttpModelType> = HttpModel & {
+  type PublicHttpModel = HttpModel & {
+    readonly public_token: PublicToken | null;
+  };
+
+  type GenericHttpModel<T extends HttpModelType = HttpModelType> = HttpModel & {
     readonly type: T;
   };
 
@@ -76,6 +80,13 @@ declare namespace Model {
     readonly plural_title: string | null;
     readonly order: number;
     readonly color: Style.HexColor | null;
+  };
+
+  type PublicToken = HttpModel & {
+    readonly public_id: string;
+    readonly is_expired: boolean;
+    readonly expires_at: string | null;
+    readonly created_at: string;
   };
 
   type SimpleUser = HttpModel & {
@@ -145,12 +156,12 @@ declare namespace Model {
 
   type Markup = FlatMarkup | PercentMarkup;
 
-  type BaseBudget = GenericHttpModel<"budget"> & {
+  type AbstractBudget = GenericHttpModel<"budget"> & {
     readonly name: string;
     readonly domain: BudgetDomain;
   };
 
-  type SimpleTemplate = BaseBudget & {
+  type SimpleTemplate = AbstractBudget & {
     readonly domain: "template";
     readonly image: SavedImage | null;
     // The hidden attribute will not be present for non-community templates.
@@ -165,19 +176,29 @@ declare namespace Model {
     readonly accumulated_markup_contribution: number;
   };
 
-  type SimpleBudget = BaseBudget & {
+  type SimpleBudget = AbstractBudget & {
     readonly domain: "budget";
     readonly image: SavedImage | null;
     readonly updated_at: string;
     readonly is_permissioned: boolean;
   };
 
-  type Budget = SimpleBudget & {
-    readonly nominal_value: number;
-    readonly actual: number;
-    readonly accumulated_fringe_contribution: number;
-    readonly accumulated_markup_contribution: number;
+  type Budget = Omit<SimpleBudget, "is_permissioned"> &
+    PublicHttpModel & {
+      readonly nominal_value: number;
+      readonly actual: number;
+      readonly accumulated_fringe_contribution: number;
+      readonly accumulated_markup_contribution: number;
+      /* This field will not be included when the User is not authenticated, which
+       is only applicable for the Budget model - since we never retrieve a list
+       of Budget(s) in the public case. */
+      readonly is_permissioned?: boolean;
+    };
+
+  type AuthenticatedBudget = Omit<Budget, "is_permissioned"> & {
+    readonly is_permissioned: boolean;
   };
+  type PublicBudget = Omit<Budget, "is_permissioned">;
 
   type BaseBudget = Budget | Template;
 

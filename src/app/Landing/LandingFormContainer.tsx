@@ -1,3 +1,4 @@
+import React from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
@@ -22,4 +23,4 @@ const LandingFormContainer = (props: LandingFormContainerProps): JSX.Element => 
   </div>
 );
 
-export default LandingFormContainer;
+export default React.memo(LandingFormContainer);

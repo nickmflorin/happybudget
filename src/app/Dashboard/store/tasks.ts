@@ -5,8 +5,8 @@ import * as api from "api";
 import { notifications } from "lib";
 import * as actions from "./actions";
 
-export function* getBudgetsTask(): SagaIterator {
-  const query = yield select((state: Application.AuthenticatedStore) => ({
+export function* getBudgetsTask(action: Redux.Action<null>): SagaIterator {
+  const query = yield select((state: Application.Store) => ({
     search: state.dashboard.budgets.search,
     page: state.dashboard.budgets.page,
     page_size: state.dashboard.budgets.pageSize,
@@ -14,7 +14,7 @@ export function* getBudgetsTask(): SagaIterator {
   }));
   yield put(actions.loadingBudgetsAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleBudget> = yield api.request(api.getBudgets, query);
+    const response: Http.ListResponse<Model.SimpleBudget> = yield api.request(api.getBudgets, action.context, query);
     yield put(actions.responseBudgetsAction(response));
   } catch (e: unknown) {
     notifications.ui.banner.handleRequestError(e as Error);
@@ -24,10 +24,10 @@ export function* getBudgetsTask(): SagaIterator {
   }
 }
 
-export function* getBudgetsPermissioningTask(): SagaIterator {
+export function* getBudgetsPermissioningTask(action: Redux.Action<null>): SagaIterator {
   yield put(actions.loadingBudgetsAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleBudget> = yield api.request(api.getBudgets);
+    const response: Http.ListResponse<Model.SimpleBudget> = yield api.request(api.getBudgets, action.context, {});
     yield put(actions.responsePermissionedBudgetsAction(response));
   } catch (e: unknown) {
     notifications.ui.banner.handleRequestError(e as Error);
@@ -37,8 +37,8 @@ export function* getBudgetsPermissioningTask(): SagaIterator {
   }
 }
 
-export function* getTemplatesTask(): SagaIterator {
-  const query = yield select((state: Application.AuthenticatedStore) => {
+export function* getTemplatesTask(action: Redux.Action<null>): SagaIterator {
+  const query = yield select((state: Application.Store) => {
     return {
       search: state.dashboard.templates.search,
       page: state.dashboard.templates.page,
@@ -48,7 +48,11 @@ export function* getTemplatesTask(): SagaIterator {
   });
   yield put(actions.loadingTemplatesAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleTemplate> = yield api.request(api.getTemplates, query);
+    const response: Http.ListResponse<Model.SimpleTemplate> = yield api.request(
+      api.getTemplates,
+      action.context,
+      query
+    );
     yield put(actions.responseTemplatesAction(response));
   } catch (e: unknown) {
     notifications.ui.banner.handleRequestError(e as Error);
@@ -58,8 +62,8 @@ export function* getTemplatesTask(): SagaIterator {
   }
 }
 
-export function* getCommunityTemplatesTask(): SagaIterator {
-  const query = yield select((state: Application.AuthenticatedStore) => {
+export function* getCommunityTemplatesTask(action: Redux.Action<null>): SagaIterator {
+  const query = yield select((state: Application.Store) => {
     return {
       search: state.dashboard.community.search,
       page: state.dashboard.community.page,
@@ -69,7 +73,11 @@ export function* getCommunityTemplatesTask(): SagaIterator {
   });
   yield put(actions.loadingCommunityTemplatesAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleTemplate> = yield api.request(api.getCommunityTemplates, query);
+    const response: Http.ListResponse<Model.SimpleTemplate> = yield api.request(
+      api.getCommunityTemplates,
+      action.context,
+      query
+    );
     yield put(actions.responseCommunityTemplatesAction(response));
   } catch (e: unknown) {
     notifications.ui.banner.handleRequestError(e as Error);

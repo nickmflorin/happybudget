@@ -8,7 +8,7 @@ interface UseContactsProps {
   readonly onAttachmentRemoved?: (id: number, attachmentId: number) => void;
   readonly onAttachmentAdded?: (id: number, m: Model.Attachment) => void;
   readonly onCreated?: (m: Model.Contact, params?: CreateContactParams) => void;
-  readonly onUpdated: (m: Model.Contact, params: EditContactParams) => void;
+  readonly onUpdated?: (m: Model.Contact, params: EditContactParams) => void;
 }
 
 type UseContactsReturnType = [
@@ -66,7 +66,7 @@ const useContacts = (props: UseContactsProps): UseContactsReturnType => {
           onAttachmentAdded={(m: Model.Attachment) => props.onAttachmentAdded?.(params.id, m)}
           onSuccess={(m: Model.Contact) => {
             setEditContactModal(null);
-            props.onUpdated(m, params);
+            props.onUpdated?.(m, params);
           }}
           open={true}
         />

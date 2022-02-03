@@ -31,7 +31,7 @@ const ActualsPage = ({ budget, children }: ActualsPageProps): JSX.Element => {
               func: ({ b }: { b: Model.Budget }) => ({
                 id: b.id,
                 label: "Actuals Log",
-                url: `${budgeting.urls.getUrl(b, "base")}/actuals`
+                url: `/budgets/${b.id}/actuals`
               })
             }
           ]}

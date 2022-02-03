@@ -17,8 +17,8 @@ export const getTableChildren = <
 >(
   parentId: number,
   parentType: Model.ParentType,
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
+  query?: Http.ListQuery,
+  options?: Http.RequestOptions
 ): Promise<Http.ListResponse<M>> => {
   const serviceMap: {
     [key in Model.ParentType]: TableChildrenService<ParentTypeModelMap[key]>;
@@ -32,12 +32,13 @@ export const getTableChildren = <
 
 export const createTableMarkup = <
   B extends Model.Budget | Model.Template,
-  R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
+  P extends Model.Account | Model.SubAccount,
+  R extends Http.MarkupResponseTypes<B, P> = Http.MarkupResponseTypes<B, P>
 >(
   parentId: number,
   parentType: Model.ParentType,
   payload: Http.MarkupPayload,
-  options: Http.RequestOptions = {}
+  options?: Http.RequestOptions
 ): Promise<R> => {
   const serviceMap: {
     [key in Model.ParentType]: api.CreateSubAccountMarkup | api.CreateAccountMarkup | api.CreateBudgetMarkup;
@@ -53,8 +54,8 @@ export const createTableMarkup = <
 export const getTableGroups = (
   parentId: number,
   parentType: Model.ParentType,
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
+  query?: Http.ListQuery,
+  options?: Http.RequestOptions
 ): Promise<Http.ListResponse<Model.Group>> => {
   const serviceMap: {
     [key in Model.ParentType]: (
@@ -74,7 +75,7 @@ export const createTableGroup = (
   parentId: number,
   parentType: Model.ParentType,
   payload: Http.GroupPayload,
-  options: Http.RequestOptions = {}
+  options?: Http.RequestOptions
 ): Promise<Model.Group> => {
   const serviceMap: {
     [key in Model.ParentType]: (id: number, p: Http.GroupPayload, o?: Http.RequestOptions) => Promise<Model.Group>;

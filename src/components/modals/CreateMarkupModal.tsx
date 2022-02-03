@@ -9,11 +9,12 @@ import { CreateModelModal, CreateModelModalProps } from "./generic";
 
 interface CreateMarkupModalProps<
   B extends Model.Budget | Model.Template,
-  R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
+  PARENT extends Model.Account | Model.SubAccount,
+  R extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>
 > extends Omit<CreateModelModalProps<Model.Markup, R>, "children"> {
-  readonly id: number;
+  readonly id: PARENT["id"];
   readonly children?: number[];
-  readonly parentType: Model.ParentType;
+  readonly parentType: PARENT["type"] | "budget";
 }
 
 type MarkupFormValues = Omit<Http.MarkupPayload, "rate"> & { readonly rate: string };
@@ -21,13 +22,14 @@ type MarkupFormValues = Omit<Http.MarkupPayload, "rate"> & { readonly rate: stri
 const CreateMarkupModal = <
   M extends Model.SimpleAccount | Model.SimpleSubAccount,
   B extends Model.Budget | Model.Template,
-  R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
+  PARENT extends Model.Account | Model.SubAccount,
+  R extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>
 >({
   id,
   parentType,
   children,
   ...props
-}: CreateMarkupModalProps<B, R>): JSX.Element => {
+}: CreateMarkupModalProps<B, PARENT, R>): JSX.Element => {
   const form = ui.hooks.useForm<MarkupFormValues>();
   const [cancelToken] = api.useCancelToken();
 

@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useReducer } from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
 import { map, isNil, filter, reduce } from "lodash";
-import { GridOptions } from "@ag-grid-community/core";
+import { Subtract } from "utility-types";
 
 import { Config } from "config";
 import { tabling, hooks, util } from "lib";
@@ -9,7 +9,7 @@ import { tabling, hooks, util } from "lib";
 import * as genericColumns from "../columns";
 import { useHiddenColumns } from "../hooks";
 
-export const DefaultDataGridOptions: GridOptions = {
+export const DefaultDataGridOptions: Table.GridOptions = {
   defaultColDef: {
     resizable: true,
     sortable: false,
@@ -26,7 +26,7 @@ export const DefaultDataGridOptions: GridOptions = {
   fillHandleDirection: "y"
 };
 
-export const DefaultFooterGridOptions: GridOptions = {
+export const DefaultFooterGridOptions: Table.GridOptions = {
   defaultColDef: {
     resizable: false,
     sortable: false,
@@ -38,17 +38,12 @@ export const DefaultFooterGridOptions: GridOptions = {
   suppressHorizontalScroll: true
 };
 
-type TableConfigurationProvidedProps<R extends Table.RowData> = {
+export type ConfiguredTableInjectedProps = {
   readonly rendered: Table.GridSet<boolean>;
   readonly tableApis: Table.ITableApis;
   readonly hiddenColumns?: Table.HiddenColumns;
   readonly tableGridOptions: Table.TableOptionsSet;
   readonly hasEditColumn: boolean;
-  readonly minimal?: boolean;
-  readonly rowHeight?: number;
-  readonly menuPortalId?: string;
-  readonly showPageFooter?: boolean;
-  readonly rowCanExpand?: boolean | ((row: Table.ModelRow<R>) => boolean);
   readonly onDataGridReady: (event: Table.GridReadyEvent) => void;
   readonly onFooterGridReady: (event: Table.GridReadyEvent) => void;
   readonly onPageGridReady: (event: Table.GridReadyEvent) => void;
@@ -59,30 +54,16 @@ type TableConfigurationProvidedProps<R extends Table.RowData> = {
 export type TableConfigurationProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
   readonly tableId: string;
   readonly cookieNames?: Table.CookieNames;
-  readonly calculatedColumnWidth?: number;
-  readonly hasDragColumn?: boolean;
-  readonly checkboxColumn?: Table.PartialActionColumn<R, M>;
-  readonly checkboxColumnWidth?: number;
   readonly hideEditColumn?: boolean;
   readonly editColumn?: Table.PartialActionColumn<R, M>;
   readonly editColumnWidth?: number;
   readonly editColumnConfig?: Table.EditColumnRowConfig<R>[];
-  readonly showPageFooter?: boolean;
-  readonly minimal?: boolean;
-  readonly rowHeight?: number;
-  readonly menuPortalId?: string;
   readonly pinFirstColumn?: boolean;
   readonly pinActionColumns?: boolean;
   readonly sizeToFit?: boolean;
-  // TODO: We should restrict this to authenticated cases only.
-  readonly savingChangesPortalId?: string;
   readonly framework?: Table.Framework;
-  readonly className?: Table.GeneralClassName;
   readonly columns: Table.Column<R, M>[];
-  readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
 };
-
-export type WithConfiguredTableProps<T, R extends Table.RowData> = T & TableConfigurationProvidedProps<R>;
 
 const InitialAPIs = new tabling.TableApis({});
 
@@ -117,15 +98,13 @@ const useTrackGridDataRender = (): [Table.GridSet<boolean>, (gridId: Table.GridI
 };
 
 const configureTable = <
+  T extends ConfiguredTableInjectedProps,
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
-  T extends TableConfigurationProps<R, M> = TableConfigurationProps<R, M>
+  M extends Model.RowHttpModel = Model.RowHttpModel
 >(
-  Component:
-    | React.FunctionComponent<WithConfiguredTableProps<T, R>>
-    | React.MemoExoticComponent<React.FunctionComponent>
-): React.FunctionComponent<T> => {
-  function WithConfigureTable(props: T) {
+  Component: React.FunctionComponent<T>
+): React.FunctionComponent<Subtract<T, ConfiguredTableInjectedProps> & TableConfigurationProps<R, M>> => {
+  function WithConfigureTable(props: Subtract<T, ConfiguredTableInjectedProps> & TableConfigurationProps<R, M>) {
     const [_apis, dispatchApis] = useReducer(apisReducer, InitialAPIs);
     const [rendered, gridDataRendered] = useTrackGridDataRender();
 
@@ -172,9 +151,9 @@ const configureTable = <
     );
 
     const tableGridOptions = useMemo((): Table.TableOptionsSet => {
-      let page: GridOptions = { ...DefaultFooterGridOptions, alignedGrids: [] };
-      let footer: GridOptions = { ...DefaultFooterGridOptions, alignedGrids: [] };
-      const data: GridOptions = { ...DefaultDataGridOptions, alignedGrids: [page, footer] };
+      let page: Table.GridOptions = { ...DefaultFooterGridOptions, alignedGrids: [] };
+      let footer: Table.GridOptions = { ...DefaultFooterGridOptions, alignedGrids: [] };
+      const data: Table.GridOptions = { ...DefaultDataGridOptions, alignedGrids: [page, footer] };
       footer = { ...footer, alignedGrids: [page, data] };
       page = { ...footer, alignedGrids: [footer, data] };
       return { data, footer, page };
@@ -204,7 +183,7 @@ const configureTable = <
       cols = props.pinFirstColumn ? pinFirstColumn(cols) : cols;
 
       if (hasEditColumn === true) {
-        cols = [
+        return [
           genericColumns.EditColumn<R, M>(
             {
               pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined,
@@ -221,38 +200,13 @@ const configureTable = <
           ...cols
         ];
       }
-      cols = [
-        genericColumns.CheckboxColumn<R, M>(
-          { ...props.checkboxColumn, pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined },
-          hasEditColumn || false,
-          props.checkboxColumnWidth
-        ),
-        ...cols
-      ];
-      if (props.hasDragColumn !== false) {
-        cols = [
-          genericColumns.DragColumn({ pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined }),
-          ...cols
-        ];
-      }
       return cols;
-    }, [
-      hooks.useDeepEqualMemo(props.columns),
-      props.pinFirstColumn,
-      hasEditColumn,
-      props.editColumnConfig,
-      props.hasDragColumn
-    ]);
+    }, [hooks.useDeepEqualMemo(props.columns), props.pinFirstColumn, hasEditColumn, props.editColumnConfig]);
 
     return (
       <Component
-        {...props}
+        {...(props as T & TableConfigurationProps<R, M>)}
         rendered={rendered}
-        minimal={props.minimal}
-        rowHeight={props.rowHeight}
-        menuPortalId={props.menuPortalId}
-        savingChangesPortalId={props.savingChangesPortalId}
-        showPageFooter={props.showPageFooter}
         columns={columns}
         tableApis={_apis}
         hasEditColumn={hasEditColumn}

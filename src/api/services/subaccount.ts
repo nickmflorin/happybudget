@@ -1,4 +1,3 @@
-import { client } from "api";
 import * as services from "./services";
 
 export const getSubAccount = services.retrieveService<Model.SubAccount>((id: number) => ["subaccounts", id]);
@@ -40,19 +39,21 @@ export const createSubAccountMarkup = services.detailPostService((id: number) =>
   "markups"
 ]) as CreateSubAccountMarkup;
 
-export const getSubAccountChildren = async <M extends Model.SubAccount | Model.SimpleSubAccount = Model.SubAccount>(
-  subaccountId: number,
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<M>> => {
-  const url = services.URL.v1("subaccounts", subaccountId, "children");
-  return client.list<M>(url, query, options);
+type GetSubAccountChildren = {
+  <M extends Model.SubAccount | Model.SimpleSubAccount = Model.SubAccount>(
+    id: number,
+    query?: Http.ListQuery,
+    options?: Http.RequestOptions
+  ): Promise<Http.ListResponse<M>>;
 };
 
-export const getSubAccountUnits = async (options: Http.RequestOptions = {}): Promise<Http.ListResponse<Model.Tag>> => {
-  const url = services.URL.v1("subaccounts", "units");
-  return client.list<Model.Tag>(url, {}, options);
-};
+export const getSubAccountChildren = services.detailListService((id: number) => [
+  "subaccounts",
+  id,
+  "children"
+]) as GetSubAccountChildren;
+
+export const getSubAccountUnits = services.listService<Model.Tag>(["subaccounts", "units"]);
 
 export const getSubAccountAttachments = services.detailListService<Model.Attachment>((id: number) => [
   "subaccounts",

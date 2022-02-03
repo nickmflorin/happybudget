@@ -12,7 +12,7 @@ export type PublicMenuProps<R extends Table.RowData, M extends Model.RowHttpMode
 
 type InternalUnathenticatedMenuProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = Omit<
   InternalMenuProps<Table.PublicMenuActionParams<R, M>, R, M>,
-  "menuActionParams" | "toolbar"
+  "menuActionParams" | "toolbar" | "hasDragColumn"
 > & {
   readonly apis: Table.GridApis | null;
   readonly hiddenColumns?: Table.HiddenColumns;
@@ -26,6 +26,7 @@ const UnathenticatedMenu = <R extends Table.RowData, M extends Model.RowHttpMode
     <Menu<Table.PublicMenuActionParams<R, M>, R, M>
       {...props}
       toolbar={PublicToolbar}
+      hasDragColumn={false}
       menuActionParams={{
         apis: props.apis,
         hiddenColumns: props.hiddenColumns,

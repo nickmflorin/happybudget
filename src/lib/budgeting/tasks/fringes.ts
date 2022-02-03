@@ -5,11 +5,12 @@ import { createSelector } from "reselect";
 
 import * as api from "api";
 import { tabling, budgeting } from "lib";
-import { initialFringesState, initialSubAccountsTableState } from "app/Budget/store/initialState";
+import { initialFringesState, initialSubAccountsTableState } from "app/Budgeting/store/initialState";
 
 type R = Tables.FringeRowData;
 type M = Model.Fringe;
 type P = Http.FringePayload;
+type CTX = Redux.WithActionContext<Tables.FringeTableContext>;
 
 export type FringesTableActionMap<B extends Model.Template | Model.Budget> = Redux.AuthenticatedTableActionMap<
   R,
@@ -18,11 +19,10 @@ export type FringesTableActionMap<B extends Model.Template | Model.Budget> = Red
 > & {
   readonly loadingBudget: Redux.ActionCreator<boolean>;
   readonly requestAccount: Redux.ActionCreator<number>;
-  readonly requestAccountTableData: Redux.ContextActionCreator<Redux.TableRequestPayload, Tables.FringeTableContext>;
+  readonly requestAccountTableData: Redux.TableActionCreator<Redux.TableRequestPayload, Tables.FringeTableContext>;
   readonly requestSubAccount: Redux.ActionCreator<number>;
-  readonly requestSubAccountTableData: Redux.ContextActionCreator<Redux.TableRequestPayload, Tables.FringeTableContext>;
+  readonly requestSubAccountTableData: Redux.TableActionCreator<Redux.TableRequestPayload, Tables.FringeTableContext>;
   readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateActionPayload<B>>;
-  readonly responseFringeColors: Redux.ActionCreator<Http.ListResponse<string>>;
 };
 
 export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Table.TaskConfig<
@@ -31,14 +31,14 @@ export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Ta
   Tables.FringeTableContext,
   FringesTableActionMap<B>
 > & {
-  readonly selectAccountTableStore: (state: Application.AuthenticatedStore) => Tables.SubAccountTableStore;
-  readonly selectSubAccountTableStore: (state: Application.AuthenticatedStore) => Tables.SubAccountTableStore;
+  readonly selectAccountTableStore: (state: Application.Store) => Tables.SubAccountTableStore;
+  readonly selectSubAccountTableStore: (state: Application.Store) => Tables.SubAccountTableStore;
 };
 
 export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   config: FringesTableTaskConfig<B>
-): Redux.TableTaskMap<R, M, Tables.FringeTableContext> => {
-  const selectPath = (s: Application.AuthenticatedStore) => s.router.location.pathname;
+): Omit<Redux.AuthenticatedTableTaskMap<R, M, Tables.FringeTableContext>, "request"> => {
+  const selectPath = (s: Application.Store) => s.router.location.pathname;
 
   const selectTableStore = createSelector(
     [selectPath, config.selectAccountTableStore, config.selectSubAccountTableStore],
@@ -72,29 +72,24 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     }
   );
 
-  const bulkCreateTask: Redux.TableBulkCreateTask<R, [number]> = tabling.tasks.createBulkTask<
-    R,
-    M,
-    Tables.FringeTableStore,
-    Http.FringePayload,
-    Http.ParentChildListResponse<B, M>,
-    [number]
-  >({
+  const bulkCreateTask: (e: Table.RowAddEvent<R>, ctx: CTX) => SagaIterator = tabling.tasks.createBulkTask({
     table: config.table,
+    service: api.bulkCreateFringes,
     selectStore: selectTableStore,
-    loadingActions: [config.actions.loadingBudget],
-    responseActions: (r: Http.ParentChildListResponse<B, M>, e: Table.RowAddEvent<R>) => [
-      config.actions.updateBudgetInState({ id: r.parent.id, data: r.parent }),
-      config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children })
+    responseActions: (r: Http.ParentChildListResponse<Model.BaseBudget, M>, e: Table.RowAddEvent<R>) => [
+      config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children }),
+      config.actions.updateBudgetInState({ id: r.parent.id, data: r.parent as B })
     ],
-    bulkCreate: (objId: number) => [api.bulkCreateFringes, objId]
+    performCreate: (
+      ctx: CTX,
+      p: Http.BulkCreatePayload<Http.FringePayload>
+    ): [number, Http.BulkCreatePayload<Http.FringePayload>] => [ctx.budgetId, p]
   });
 
   function* bulkUpdateTask(
+    ctx: CTX,
     e: Table.ChangeEvent<R, M>,
-    requestPayload: Http.BulkUpdatePayload<P>,
-    context: Tables.FringeTableContext,
-    errorMessage: string
+    requestPayload: Http.BulkUpdatePayload<P>
   ): SagaIterator {
     config.table.saving(true);
     if (!tabling.typeguards.isGroupEvent(e)) {
@@ -103,11 +98,12 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     try {
       const response: Http.ServiceResponse<typeof api.bulkUpdateFringes> = yield api.request(
         api.bulkUpdateFringes,
-        context.budgetId,
+        ctx,
+        ctx.budgetId,
         requestPayload
       );
       yield put(config.actions.updateBudgetInState({ id: response.parent.id, data: response.parent as B }));
-      const path = yield select((s: Application.AuthenticatedStore) => s.router.location.pathname);
+      const path = yield select((s: Application.Store) => s.router.location.pathname);
 
       const FRINGE_QUANTITATIVE_FIELDS: (keyof Http.FringePayload)[] = ["cutoff", "rate", "unit"];
 
@@ -140,25 +136,28 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
             yield put(
               config.actions.requestAccountTableData(
                 { ids: map(subaccountsWithFringesChanged, (r: Table.ModelRow<Tables.SubAccountRowData>) => r.id) },
-                context
+                ctx
               )
             );
             // We also need to update the overall Account or SubAccount.
-            yield put(config.actions.requestAccount(context.id));
+            yield put(config.actions.requestAccount(ctx.id));
           } else if (budgeting.urls.isSubAccountUrl(path)) {
             yield put(
               config.actions.requestSubAccountTableData(
                 { ids: map(subaccountsWithFringesChanged, (r: Table.ModelRow<Tables.SubAccountRowData>) => r.id) },
-                context
+                ctx
               )
             );
             // We also need to update the overall Account or SubAccount.
-            yield put(config.actions.requestSubAccount(context.id));
+            yield put(config.actions.requestSubAccount(ctx.id));
           }
         }
       }
     } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, { message: errorMessage, dispatchClientErrorToSentry: true });
+      config.table.handleRequestError(err as Error, {
+        message: ctx.errorMessage || "There was an error updating the rows.",
+        dispatchClientErrorToSentry: true
+      });
     } finally {
       if (!tabling.typeguards.isGroupEvent(e)) {
         yield put(config.actions.loadingBudget(false));
@@ -167,43 +166,39 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     }
   }
 
-  function* bulkDeleteTask(budgetId: number, ids: number[], errorMessage: string): SagaIterator {
+  function* bulkDeleteTask(ctx: CTX, ids: number[]): SagaIterator {
     config.table.saving(true);
     yield put(config.actions.loadingBudget(true));
     try {
       const response: Http.ServiceResponse<typeof api.bulkDeleteFringes> = yield api.request(
         api.bulkDeleteFringes,
-        budgetId,
+        ctx,
+        ctx.budgetId,
         { ids }
       );
       yield put(config.actions.updateBudgetInState({ id: response.parent.id, data: response.parent as B }));
     } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, { message: errorMessage, dispatchClientErrorToSentry: true });
+      config.table.handleRequestError(err as Error, {
+        message: ctx.errorMessage || "There was an error deleting the rows.",
+        dispatchClientErrorToSentry: true
+      });
     } finally {
       config.table.saving(false);
       yield put(config.actions.loadingBudget(false));
     }
   }
 
-  function* handleRowInsertEvent(e: Table.RowInsertEvent<R>, context: Tables.FringeTableContext): SagaIterator {
+  function* handleRowInsertEvent(e: Table.RowInsertEvent<R>, ctx: CTX): SagaIterator {
     config.table.saving(true);
     try {
-      const response: M = yield api.request(api.createFringe, context.budgetId, {
+      const response: M = yield api.request(api.createFringe, ctx, ctx.budgetId, {
         previous: e.payload.previous,
         ...tabling.http.postPayload<R, M, P>(e.payload.data, config.table.getColumns())
       });
-      yield put(
-        config.actions.tableChanged(
-          {
-            type: "modelAdded",
-            payload: { model: response }
-          },
-          context
-        )
-      );
+      yield put(config.actions.tableChanged({ type: "modelAdded", payload: { model: response } }, ctx));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, {
-        message: "There was an error adding the table rows.",
+        message: ctx.errorMessage || "There was an error adding the table rows.",
         dispatchClientErrorToSentry: true
       });
     } finally {
@@ -211,27 +206,16 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     }
   }
 
-  function* handleRowPositionChangedEvent(
-    e: Table.RowPositionChangedEvent,
-    context: Tables.FringeTableContext
-  ): SagaIterator {
+  function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent, ctx: CTX): SagaIterator {
     config.table.saving(true);
     try {
-      const response: M = yield api.request(api.updateFringe, e.payload.id, {
+      const response: M = yield api.request(api.updateFringe, ctx, e.payload.id, {
         previous: e.payload.previous
       });
-      yield put(
-        config.actions.tableChanged(
-          {
-            type: "modelUpdated",
-            payload: { model: response }
-          },
-          context
-        )
-      );
+      yield put(config.actions.tableChanged({ type: "modelUpdated", payload: { model: response } }, ctx));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, {
-        message: "There was an error moving the table rows.",
+        message: ctx.errorMessage || "There was an error moving the table rows.",
         dispatchClientErrorToSentry: true
       });
     } finally {
@@ -239,27 +223,24 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     }
   }
 
-  function* handleRowAddEvent(e: Table.RowAddEvent<R>, context: Tables.FringeTableContext): SagaIterator {
-    yield fork(bulkCreateTask, e, "There was an error creating the fringes.", context.budgetId);
+  function* handleRowAddEvent(e: Table.RowAddEvent<R>, ctx: CTX): SagaIterator {
+    yield fork(bulkCreateTask, e, ctx);
   }
 
-  function* handleRowDeleteEvent(e: Table.RowDeleteEvent, context: Tables.FringeTableContext): SagaIterator {
+  function* handleRowDeleteEvent(e: Table.RowDeleteEvent, ctx: CTX): SagaIterator {
     const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
     const modelRowIds = filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[];
     if (modelRowIds.length !== 0) {
-      yield fork(bulkDeleteTask, context.budgetId, modelRowIds, "There was an error deleting the rows.");
+      yield fork(bulkDeleteTask, ctx, modelRowIds);
     }
   }
 
-  function* handleDataChangeEvent(
-    e: Table.DataChangeEvent<R, Table.ModelRow<R>>,
-    context: Tables.FringeTableContext
-  ): SagaIterator {
+  function* handleDataChangeEvent(e: Table.DataChangeEvent<R, Table.ModelRow<R>>, ctx: CTX): SagaIterator {
     const merged = tabling.events.consolidateRowChanges<R, Table.ModelRow<R>>(e.payload);
     if (merged.length !== 0) {
       const requestPayload = tabling.http.createBulkUpdatePayload<R, M, P>(merged, config.table.getColumns());
       if (requestPayload.data.length !== 0) {
-        yield fork(bulkUpdateTask, e, requestPayload, context, "There was an error updating the rows.");
+        yield fork(bulkUpdateTask, ctx, e, requestPayload);
       }
     }
   }

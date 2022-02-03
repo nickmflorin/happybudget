@@ -19,15 +19,14 @@ import { BudgetEmptyIcon } from "components/svgs";
 
 import { actions } from "../store";
 
-const selectBudgets = (state: Application.AuthenticatedStore) => state.dashboard.budgets.data;
-const selectBudgetsResponseReceived = (state: Application.AuthenticatedStore) =>
-  state.dashboard.budgets.responseWasReceived;
-const selectLoadingBudgets = (state: Application.AuthenticatedStore) => state.dashboard.budgets.loading;
-const selectBudgetPage = (state: Application.AuthenticatedStore) => state.dashboard.budgets.page;
-const selectBudgetPageSize = (state: Application.AuthenticatedStore) => state.dashboard.budgets.pageSize;
-const selectBudgetsCount = (state: Application.AuthenticatedStore) => state.dashboard.budgets.count;
-const selectBudgetsSearch = (state: Application.AuthenticatedStore) => state.dashboard.budgets.search;
-const selectBudgetsOrdering = (state: Application.AuthenticatedStore) => state.dashboard.budgets.ordering;
+const selectBudgets = (state: Application.Store) => state.dashboard.budgets.data;
+const selectBudgetsResponseReceived = (state: Application.Store) => state.dashboard.budgets.responseWasReceived;
+const selectLoadingBudgets = (state: Application.Store) => state.dashboard.budgets.loading;
+const selectBudgetPage = (state: Application.Store) => state.dashboard.budgets.page;
+const selectBudgetPageSize = (state: Application.Store) => state.dashboard.budgets.pageSize;
+const selectBudgetsCount = (state: Application.Store) => state.dashboard.budgets.count;
+const selectBudgetsSearch = (state: Application.Store) => state.dashboard.budgets.search;
+const selectBudgetsOrdering = (state: Application.Store) => state.dashboard.budgets.ordering;
 
 const Budgets = (): JSX.Element => {
   const user = users.hooks.useLoggedInUser();
@@ -163,7 +162,9 @@ const Budgets = (): JSX.Element => {
                         .duplicateBudget<Model.Budget>(budget.id, { timeout: 120 * 1000 })
                         .then((response: Model.Budget) => {
                           e.closeParentDropdown?.();
-                          dispatch(actions.addBudgetToStateAction(response));
+                          /* It is safe to coerce to an Budget
+                             because the User must be logged in at this point. */
+                          dispatch(actions.addBudgetToStateAction(response as Model.AuthenticatedBudget));
                         })
                         .catch((err: Error) => {
                           if (
@@ -218,7 +219,9 @@ const Budgets = (): JSX.Element => {
           open={true}
           onCancel={() => setCreateBudgetModalOpen(false)}
           onSuccess={(budget: Model.Budget) => {
-            dispatch(actions.addBudgetToStateAction(budget));
+            /* It is safe to coerce to an Budget because the User must be logged
+						   in at this point. */
+            dispatch(actions.addBudgetToStateAction(budget as Model.AuthenticatedBudget));
             dispatch(
               store.actions.authenticated.updateLoggedInUserAction({ ...user, num_budgets: user.num_budgets + 1 })
             );

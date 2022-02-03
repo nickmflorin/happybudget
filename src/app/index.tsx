@@ -1,41 +1,39 @@
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import { Router, Switch, Route } from "react-router-dom";
 import { History } from "history";
 import "style/index.scss";
 
 import { ApplicationSpinner } from "components";
-import { AuthenticatedReduxRoute, PublicReduxRoute } from "components/routes";
+import { ReduxRoute, NotFoundRoute } from "components/routes";
 
 import * as config from "config";
 
-const Landing = config.lazyWithRetry(() => import("./Landing"));
+const PublicApplication = config.lazyWithRetry(() => import("./PublicApplication"));
 const Application = config.lazyWithRetry(() => import("./Application"));
+const Landing = config.lazyWithRetry(() => import("./Landing"));
 const EmailVerification = config.lazyWithRetry(() => import("./Landing/EmailVerification"));
 const PasswordRecovery = config.lazyWithRetry(() => import("./Landing/PasswordRecovery"));
 
-interface AppProps {
+type AppProps = {
   readonly history: History;
-}
+};
 
-function App(props: AppProps): JSX.Element {
-  return (
-    <Router history={props.history}>
-      <div className={"root"}>
-        <div id={"application-spinner-container"}></div>
-        <Suspense fallback={<ApplicationSpinner visible={true} />}>
-          <Switch>
-            <Route exact path={"/verify"} component={EmailVerification} />
-            <Route exact path={"/recovery"} component={PasswordRecovery} />
-            <PublicReduxRoute
-              path={["/login", "/signup", "/reset-password", "/recover-password"]}
-              component={Landing}
-            />
-            <AuthenticatedReduxRoute path={["/"]} component={Application} />
-          </Switch>
-        </Suspense>
-      </div>
-    </Router>
-  );
-}
+const App = (props: AppProps): JSX.Element => (
+  <Router history={props.history}>
+    <div className={"root"}>
+      <div id={"application-spinner-container"}></div>
+      <Suspense fallback={<ApplicationSpinner visible={true} />}>
+        <Switch>
+          <Route exact path={"/verify"} component={EmailVerification} />
+          <Route exact path={"/recovery"} component={PasswordRecovery} />
+          <Route path={["/login", "/signup", "/reset-password", "/recover-password"]} component={Landing} />
+          <Route path={"/pub/:tokenId"} component={PublicApplication} />
+          <ReduxRoute config={{ isPublic: false }} path={["/"]} component={Application} />
+          <NotFoundRoute auto={false} />
+        </Switch>
+      </Suspense>
+    </div>
+  </Router>
+);
 
-export default App;
+export default React.memo(App);

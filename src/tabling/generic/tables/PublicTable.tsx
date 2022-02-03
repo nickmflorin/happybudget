@@ -1,22 +1,23 @@
 import React, { useImperativeHandle, useMemo } from "react";
 import { map, isNil, filter, includes } from "lodash";
+import { Subtract } from "utility-types";
 
 import { hooks, tabling } from "lib";
 
-import { PublicGrid, PublicGridProps } from "../grids";
+import { PublicGrid, PublicGridProps, PublicDataGrid } from "../grids";
 import { PublicMenu } from "../menus";
 import {
   FooterGrid,
   PublicFooterGridProps,
-  TableConfigurationProps,
-  WithConfiguredTableProps,
-  WithConnectedTableProps,
-  WithPublicDataGridProps,
+  ConfiguredTableInjectedProps,
+  ConnectedPublicTableInjectedProps,
   DataGridProps,
   PublicizeDataGridProps,
+  ConnectPublicTableProps,
   configureTable
 } from "../hocs";
 import TableWrapper from "./TableWrapper";
+import { BaseTableProps } from "./AuthenticatedTable";
 
 export type PublicTableDataGridProps<
   R extends Table.RowData,
@@ -27,24 +28,17 @@ export type PublicTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
-> = TableConfigurationProps<R, M> & {
-  readonly table: NonNullRef<Table.TableInstance<R, M>>;
-  readonly actions?: Table.PublicMenuActions<R, M>;
-  readonly constrainTableFooterHorizontally?: boolean;
-  readonly constrainPageFooterHorizontally?: boolean;
-  readonly excludeColumns?:
-    | SingleOrArray<string | ((col: Table.DataColumn<R, M>) => boolean)>
-    | ((col: Table.DataColumn<R, M>) => boolean);
-  readonly selector?: (state: Application.Store) => S;
-};
+> = BaseTableProps<R, M> &
+  ConnectedPublicTableInjectedProps<R, S> &
+  Omit<ConnectPublicTableProps<R, M, S>, "actionContext"> & {
+    readonly actions?: Table.PublicMenuActions<R, M>;
+  };
 
 type _PublicTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
-> = PublicTableProps<R, M, S> & {
-  readonly children: RenderPropChild<PublicTableDataGridProps<R, M>>;
-};
+> = PublicTableProps<R, M, S> & ConfiguredTableInjectedProps;
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const TableFooterGrid = FooterGrid<any, any, PublicFooterGridProps<any>>({
@@ -78,7 +72,7 @@ const PublicTable = <
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
-  props: WithPublicDataGridProps<WithConnectedTableProps<WithConfiguredTableProps<_PublicTableProps<R, M, S>, R>, R, M>>
+  props: _PublicTableProps<R, M, S>
 ): JSX.Element => {
   const grid = tabling.hooks.useDataGrid();
   /**
@@ -104,7 +98,13 @@ const PublicTable = <
     };
     return map(
       filter(
-        props.columns,
+        filter(
+          props.columns,
+          (c: Table.Column<R, M>) =>
+            tabling.typeguards.isActionColumn(c) ||
+            tabling.typeguards.isFakeColumn(c) ||
+            c.requiresAuthentication !== true
+        ),
         (c: Table.Column<R, M>) =>
           (tabling.typeguards.isDataColumn(c) && !evaluateColumnExclusionProp(c)) ||
           tabling.typeguards.isActionColumn(c)
@@ -220,14 +220,14 @@ const PublicTable = <
           columns={tabling.columns.filterDataColumns(columns)}
           apis={props.tableApis.get("data")}
         />
-        {props.children({
-          ...props,
-          apis: props.tableApis.get("data"),
-          columns: columns,
-          grid,
-          gridOptions: props.tableGridOptions.data,
-          onGridReady: props.onDataGridReady
-        })}
+        <PublicDataGrid
+          {...props}
+          apis={props.tableApis.get("data")}
+          columns={columns}
+          gridOptions={props.tableGridOptions.data}
+          grid={grid}
+          onGridReady={props.onDataGridReady}
+        />
         <TableFooterGrid
           tableId={props.tableId}
           onGridReady={props.onFooterGridReady}
@@ -243,20 +243,13 @@ const PublicTable = <
   );
 };
 
-type Props = WithPublicDataGridProps<
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  WithConnectedTableProps<WithConfiguredTableProps<_PublicTableProps<any>, any>, any>
->;
-
-const Memoized = React.memo(PublicTable) as typeof PublicTable;
-
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export default configureTable<any, any, Props>(Memoized) as {
+export default configureTable<_PublicTableProps<any, any, any>, any, any>(PublicTable) as {
   <
     R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>
   >(
-    props: _PublicTableProps<R, M, S>
+    props: Subtract<_PublicTableProps<R, M, S>, ConfiguredTableInjectedProps>
   ): JSX.Element;
 };

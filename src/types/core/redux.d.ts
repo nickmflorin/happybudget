@@ -1,32 +1,23 @@
 declare namespace Redux {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type GenericSelectorFunc<S, T = any> = (state: S) => T;
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type AuthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Application.AuthenticatedStore, T>;
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type PublicSelectorFunc<T = any> = GenericSelectorFunc<Application.PublicStore, T>;
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type SwitchSelectorFunc<AUTH extends boolean = true, T = any> = AUTH extends true
-    ? AuthenticatedSelectorFunc<T>
-    : PublicSelectorFunc<T>;
+  type SelectorFunc<T = any> = GenericSelectorFunc<Application.Store, T>;
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type SelectorFunc<T = any> = AuthenticatedSelectorFunc<T> | PublicSelectorFunc<T>;
-
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type ActionMap<C extends Table.Context = any> = Record<string, ActionCreator<any> | ContextActionCreator<any, C>>;
+  type ActionMap<C extends Table.Context = any> = Record<string, ActionCreator<any> | TableActionCreator<any, C>>;
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type InferActionPayload<A> = A extends Action<infer P, any>
     ? P
     : /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    A extends ActionWithContext<infer P, any>
+    A extends TableAction<infer P, any>
     ? P
     : never;
 
-  type InferAction<CREATOR> = CREATOR extends ContextActionCreator<infer P, infer C>
-    ? ActionWithContext<P, C>
+  type InferAction<CREATOR> = CREATOR extends TableActionCreator<infer P, infer C>
+    ? TableAction<P, C>
     : CREATOR extends ActionCreator<infer P>
     ? Action<P>
     : never;
@@ -40,21 +31,22 @@ declare namespace Redux {
 
   type Task<P extends ActionPayload = ActionPayload> = (action: Action<P>) => import("@redux-saga/types").SagaIterator;
   type ContextTask<P extends ActionPayload = ActionPayload, C extends Table.Context = Table.Context> = (
-    action: ActionWithContext<P, C>
+    action: TableAction<P, C>
   ) => import("@redux-saga/types").SagaIterator;
+
+  type ActionContext = {
+    readonly publicTokenId?: string;
+    readonly errorMessage?: string;
+  };
+
+  type WithActionContext<C extends Record<string, uknown>> = C & ActionContext;
 
   type TableEventTask<
     E extends Table.ChangeEvent<R, M>,
     R extends Table.RowData,
     M extends Model.RowHttpModel,
     C extends Table.Context = Table.Context
-  > = (e: E, context: C) => import("@redux-saga/types").SagaIterator;
-
-  type TableBulkCreateTask<R extends Table.RowData, ARGS extends Array<unknown> = []> = (
-    e: Table.RowAddEvent<R>,
-    errorMessage: string,
-    ...args: ARGS
-  ) => import("redux-saga").SagaIterator;
+  > = (e: E, context: WithActionContext<C>) => import("@redux-saga/types").SagaIterator;
 
   type TableEventTaskMapObject<
     R extends Table.RowData,
@@ -93,36 +85,37 @@ declare namespace Redux {
   type Dispatch = import("redux").Dispatch<Action>;
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type Action<P extends ActionPayload = any, T extends string = string> = {
+  type BasicAction<P extends ActionPayload = any> = {
     readonly payload: P;
-    readonly type: T;
-    readonly isAuthenticated?: boolean | undefined;
+    readonly type: string;
   };
 
-  type ActionWithContext<
-    P extends ActionPayload = ActionPayload,
-    C extends Table.Context = Table.Context
-  > = Action<P> & {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type Action<P extends ActionPayload = any, C extends ActionContext = ActionContext> = BasicAction<P> & {
     readonly context: C;
   };
 
-  type ActionCreator<P extends ActionPayload> = {
+  type TableActionContext<C extends Table.Context = Table.Context> = WithActionContext<C>;
+
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type TableAction<P extends ActionPayload = any, C extends Table.Context = Table.Context> = Action<
+    P,
+    WithActionContext<C>
+  >;
+
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type ActionCreator<P extends ActionPayload = any> = {
     type: string;
     toString: () => string;
-    (p: P): Action<P>;
+    (p: P, ctx?: Pick<ActionContext, "errorMessage">): Action<P>;
   };
 
-  interface ContextActionCreator<P extends ActionPayload, C extends Table.Context> {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type TableActionCreator<P extends ActionPayload = any, C extends Table.Context = Table.Context> = {
     type: string;
     toString: () => string;
-    (p: P, ctx: C): ActionWithContext<P, C>;
-  }
-
-  type AuthenticatedAction<P extends ActionPayload = ActionPayload> = Action<P> & {
-    readonly isAuthenticated?: true | undefined;
+    (p: P, ctx: Omit<WithActionContext<C>, "publicTokenId">): Action<P, WithActionContext<C>>;
   };
-
-  type PublicAction<P extends ActionPayload = ActionPayload> = Action<P> & { readonly isAuthenticated: false };
 
   type TaskConfig<A extends ActionMap> = {
     readonly actions: Omit<A, "request">;
@@ -155,13 +148,13 @@ declare namespace Redux {
   type UpdateOrderingPayload<F extends string = string> = { field: F; order: Http.Order };
 
   type ClearOnDetail<T extends ActionPayload, C extends Table.Context = Table.Context> = {
-    readonly action: ActionCreator<T> | ContextActionCreator<T, C>;
+    readonly action: ActionCreator<T> | TableActionCreator<T, C>;
     readonly payload: (payload: T) => boolean;
   };
 
   type ClearOn<T extends ActionPayload, C extends Table.Context = Table.Context> =
     | ActionCreator<T>
-    | ContextActionCreator<T, C>
+    | TableActionCreator<T, C>
     | ClearOnDetail<T, C>;
 
   type ModelDetailResponseStore<T extends Model.HttpModel> = {
@@ -221,7 +214,7 @@ declare namespace Redux {
     readonly deleting?: ActionCreator<ModelListActionPayload>;
     readonly addToState: ActionCreator<M>;
     readonly updateInState: ActionCreator<UpdateActionPayload<M>>;
-    readonly setSearch?: ContextActionCreator<string, C>;
+    readonly setSearch?: TableActionCreator<string, C>;
     readonly setPagination: ActionCreator<Pagination>;
     readonly updateOrdering?: ActionCreator<UpdateOrderingPayload<string>>;
   };
@@ -230,20 +223,32 @@ declare namespace Redux {
     readonly request: Task<P>;
   };
 
-  type TableTaskMap<
+  type TableTaskMap<C extends Table.Context = Table.Context> = {
+    readonly request: ContextTask<TableRequestPayload, C>;
+  };
+
+  type AuthenticatedTableTaskMap<
     R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     C extends Table.Context = Table.Context
-  > = {
-    readonly request?: ContextTask<TableRequestPayload, C>;
+  > = TableTaskMap<C> & {
     readonly handleChangeEvent: TableEventTask<Table.ChangeEvent<R, M>, R, M, C>;
   };
 
+  type TableTaskMapWithRequest<C extends Table.Context = Table.Context> = {
+    readonly request: ContextTask<TableRequestPayload, C>;
+  };
+
+  type TableTaskMapWithRequestOptional<
+    T extends TableTaskMapWithRequest<C>,
+    C extends Table.Context = Table.Context
+  > = Omit<T, "request"> & { readonly request?: T["request"] };
+
   type TableActionMap<M extends Model.RowHttpModel = Model.RowHttpModel, C extends Table.Context = Table.Context> = {
-    readonly request: ContextActionCreator<TableRequestPayload, C>;
+    readonly request: TableActionCreator<TableRequestPayload, C>;
     readonly loading: ActionCreator<boolean>;
     readonly response: ActionCreator<Http.TableResponse<M>>;
-    readonly setSearch: ContextActionCreator<string, C>;
+    readonly setSearch: TableActionCreator<string, C>;
   };
 
   type AuthenticatedTableActionMap<
@@ -251,10 +256,19 @@ declare namespace Redux {
     M extends Model.RowHttpModel = Model.RowHttpModel,
     C extends Table.Context = Table.Context
   > = TableActionMap<M, C> & {
-    readonly tableChanged: ContextActionCreator<Table.ChangeEvent<R, M>, C>;
+    readonly tableChanged: TableActionCreator<Table.ChangeEvent<R, M>, C>;
     readonly addModelsToState: ActionCreator<AddModelsToTablePayload<M>>;
     readonly updateRowsInState?: ActionCreator<UpdateRowsInTablePayload<R>>;
   };
+
+  type TableActionMapWithRequest<C extends Table.Context = Table.Context> = {
+    readonly request: Redux.TableActionCreator<Redux.TableRequestPayload, C>;
+  };
+
+  type TableActionMapWithRequestOptional<
+    T extends TableActionMapWithRequest<C>,
+    C extends Table.Context = Table.Context
+  > = Omit<T, "request"> & { readonly request?: T["request"] };
 
   type TableStore<D extends Table.RowData> = {
     readonly data: Table.BodyRow<D>[];

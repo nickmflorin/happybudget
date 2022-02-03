@@ -7,7 +7,6 @@ import { hooks, tabling } from "lib";
 export interface UseCellNavigationParams<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
-  readonly includeRowInNavigation?: (row: Table.EditableRow<R>) => boolean;
   readonly onNewRowRequired?: (newRowIndex: number) => void;
 }
 
@@ -18,15 +17,14 @@ type UseCellNavigationReturnType = [
   (loc: Table.CellPosition) => void
 ];
 
-type FindNavigatableRowOptions<R extends Table.RowData> = {
+type FindNavigatableRowOptions = {
   readonly direction?: "asc" | "desc";
-  readonly includeRowInNavigation?: (row: Table.EditableRow<R>) => boolean;
 };
 
 const findNextNavigatableNodes = <R extends Table.RowData>(
   api: Table.GridApi,
   startingIndex: number,
-  opts?: FindNavigatableRowOptions<R>
+  opts?: FindNavigatableRowOptions
 ): [Table.RowNode[], number, number] => {
   const d = opts?.direction !== undefined ? opts.direction : "asc";
   const indexIsValid = (index: number) => {
@@ -41,10 +39,7 @@ const findNextNavigatableNodes = <R extends Table.RowData>(
 
   const isNavigatableNode = (node: Table.RowNode) => {
     const row: Table.BodyRow<R> = node.data;
-    const includeRowInNavigation = opts?.includeRowInNavigation;
-    return (
-      tabling.typeguards.isEditableRow(row) && (isNil(includeRowInNavigation) || includeRowInNavigation(row) !== false)
-    );
+    return tabling.typeguards.isEditableRow(row);
   };
 
   let nodesAfterNavigatable: Table.RowNode[] = [];
@@ -101,8 +96,7 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
             const direction: "asc" | "desc" = verticalAscend === true ? "asc" : "desc";
             /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
             const [rowNodes, _, additionalIndex] = findNextNavigatableNodes(p.api, p.nextCellPosition.rowIndex, {
-              direction,
-              includeRowInNavigation: params.includeRowInNavigation
+              direction
             });
             if (rowNodes.length !== 0) {
               return {
@@ -135,9 +129,7 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
         if (!isNil(column) && column.cType === "action") {
           let nextCellPosition = { ...p.nextCellPosition };
           /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-          const [rowNodes, _, additionalIndex] = findNextNavigatableNodes(p.api, p.nextCellPosition.rowIndex, {
-            includeRowInNavigation: params.includeRowInNavigation
-          });
+          const [rowNodes, _, additionalIndex] = findNextNavigatableNodes(p.api, p.nextCellPosition.rowIndex);
           if (rowNodes.length !== 0) {
             nextCellPosition = {
               ...p.nextCellPosition,
@@ -176,7 +168,6 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
         const row: Table.BodyRow<R> = node.data;
         /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
         const [nodes, rowIndex, _] = findNextNavigatableNodes(params.apis.grid, loc.rowIndex + 1, {
-          includeRowInNavigation: params.includeRowInNavigation,
           direction: "asc"
         });
 

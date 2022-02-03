@@ -23,7 +23,7 @@ const throwClientError = (response: AxiosResponse<Http.ErrorResponse>, forceLogo
   const url = !isNil(response.config.url) ? response.config.url : "";
 
   if (forceLogout === true && response.status == 401) {
-    window.location.href = "/login";
+    window.location.href = "/logout";
     /* We throw an error because the mechanics making the API request are
 			 expecting a defined response or an Error to be thrown.  If we to return
 			 nothing, we may get misleading errors dispatched to Sentry that occur

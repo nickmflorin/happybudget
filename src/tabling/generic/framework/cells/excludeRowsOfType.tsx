@@ -7,7 +7,7 @@ const excludeRowsOfType =
     types: Table.RowType[] | Table.RowType
   ) =>
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  (Component: React.ComponentClass<any, any> | React.FunctionComponent<any>) => {
+  (Component: React.FunctionComponent<any>) => {
     const typesToExclude = Array.isArray(types) ? types : [types];
     const WithExcludeRowsOfType = (props: T): JSX.Element => {
       const row: Table.BodyRow<R> = props.node.data;

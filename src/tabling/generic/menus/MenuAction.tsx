@@ -10,14 +10,22 @@ import { IconButton, BareButton } from "components/buttons";
 interface TableMenuActionProps extends StandardComponentProps {
   readonly action: Table.MenuActionObj;
   /* For the buttons to properly work when included in a Dropdown, we need to
-		 expose the onClick prop such that AntD can automatically set this prop on
-		 the action. */
+		 expose both the onClick and id prop such that AntD can control the dropdown
+		 visibility via the button and the dropdown will close when clicked outside
+		 of the overlay. */
   readonly onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.Element => {
   if (!isNil(action.render)) {
-    return action.render();
+    /* For the buttons to properly work when included in a Dropdown, we need to
+		   expose both the onClick and id prop such that AntD can control the dropdown
+		   visibility via the button and the dropdown will close when clicked outside
+		   of the overlay. */
+    return action.render({
+      id: props.id,
+      onClick: isNil(action.wrapInDropdown) ? () => !isNil(action.onClick) && action.onClick() : props.onClick
+    });
   } else if (!isNil(action.label)) {
     return (
       <BareButton

@@ -18,6 +18,7 @@ declare namespace Tables {
 
   type SubAccountRow = Table.ModelRow<SubAccountRowData>;
   type SubAccountTableContext = { readonly id: number; readonly budgetId: number };
+
   type SubAccountTableStore = Redux.BudgetTableStore<SubAccountRowData> & {
     readonly fringes: FringeTableStore;
     readonly subaccountUnits: Model.Tag[];

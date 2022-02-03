@@ -17,14 +17,14 @@ import { IsStaff } from "components/permissions";
 
 import { actions } from "../../store";
 
-const selectTemplates = (state: Application.AuthenticatedStore) => state.dashboard.community.data;
-const selectResponseReceived = (state: Application.AuthenticatedStore) => state.dashboard.community.responseWasReceived;
-const selectLoading = (state: Application.AuthenticatedStore) => state.dashboard.community.loading;
-const selectPage = (state: Application.AuthenticatedStore) => state.dashboard.community.page;
-const selectPageSize = (state: Application.AuthenticatedStore) => state.dashboard.community.pageSize;
-const selectCount = (state: Application.AuthenticatedStore) => state.dashboard.community.count;
-const selectSearch = (state: Application.AuthenticatedStore) => state.dashboard.community.search;
-const selectOrdering = (state: Application.AuthenticatedStore) => state.dashboard.community.ordering;
+const selectTemplates = (state: Application.Store) => state.dashboard.community.data;
+const selectResponseReceived = (state: Application.Store) => state.dashboard.community.responseWasReceived;
+const selectLoading = (state: Application.Store) => state.dashboard.community.loading;
+const selectPage = (state: Application.Store) => state.dashboard.community.page;
+const selectPageSize = (state: Application.Store) => state.dashboard.community.pageSize;
+const selectCount = (state: Application.Store) => state.dashboard.community.count;
+const selectSearch = (state: Application.Store) => state.dashboard.community.search;
+const selectOrdering = (state: Application.Store) => state.dashboard.community.ordering;
 
 interface DiscoverProps {
   readonly setTemplateToDerive: (template: number) => void;

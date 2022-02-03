@@ -32,7 +32,7 @@ const AnalysisPage = ({ budget, children }: AnalysisPageProps): JSX.Element => {
                 return {
                   id: b.id,
                   label: "Analysis",
-                  url: `${budgeting.urls.getUrl(b, "base")}/analysis`
+                  url: `/budgets/${b.id}/analysis`
                 };
               }
             }

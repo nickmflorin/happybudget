@@ -4,7 +4,11 @@ export const getMarkup = services.retrieveService<Model.Markup>((id: number) => 
 export const deleteMarkup = services.deleteService((id: number) => ["markups", id]);
 
 type UpdateMarkup = {
-  <B extends Model.Budget | Model.Template, R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>>(
+  <
+    B extends Model.Budget | Model.Template,
+    P extends Model.Account | Model.SubAccount,
+    R extends Http.MarkupResponseTypes<B, P> = Http.MarkupResponseTypes<B, P>
+  >(
     id: number,
     p: Partial<Http.MarkupPayload>,
     options?: Http.RequestOptions

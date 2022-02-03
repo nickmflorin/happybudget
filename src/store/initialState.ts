@@ -1,55 +1,43 @@
 import { reduce, filter } from "lodash";
+import { RouterState } from "connected-react-router";
+
 import { redux } from "lib";
 
-export const createInitialUserState = (user: Model.User): Model.User => {
-  return { ...user };
-};
-
-function createModularApplicationState(
-  config: Application.AuthenticatedModuleConfig[]
-): Application.AuthenticatedModuleStores;
-
-function createModularApplicationState(config: Application.PublicModuleConfig[]): Application.PublicModuleStores;
-
-function createModularApplicationState(config: Application.AnyModuleConfig[]): Application.ModuleStores {
-  return reduce(
+const createModularApplicationState = <
+  S extends Application.AuthenticatedModuleStores | Application.PublicModuleStores
+>(
+  config: Application.ModuleConfig[]
+): S =>
+  reduce(
     config,
-    (prev: Application.ModuleStores, moduleConfig: Application.AnyModuleConfig) => {
+    (prev: S, moduleConfig: Application.ModuleConfig) => {
       if (typeof moduleConfig.initialState === "function") {
         return { ...prev, [moduleConfig.label]: moduleConfig.initialState() };
       }
       return { ...prev, [moduleConfig.label]: moduleConfig.initialState };
     },
-    {} as Application.ModuleStores
+    {} as S
   );
-}
 
-export const createPublicInitialState = (config: Application.AnyModuleConfig[]): Application.PublicStore => {
+const createPublicInitialState = (config: Application.StoreConfig): Application.PublicStore => {
   return {
-    ...createModularApplicationState(
-      filter(config, (c: Application.AnyModuleConfig) =>
-        redux.typeguards.isPublicModuleConfig(c)
-      ) as Application.PublicModuleConfig[]
-    ),
-    loading: false,
-    contacts: redux.initialState.initialListResponseState
-  } as Application.PublicStore;
+    ...createModularApplicationState(filter(config.modules, (c: Application.ModuleConfig) => c.isPublic === true)),
+    tokenId: config.tokenId
+  };
 };
 
-export const createAuthenticatedInitialState = (
-  config: Application.AnyModuleConfig[],
-  user: Model.User
-): Application.AuthenticatedStore => {
-  return {
-    ...createModularApplicationState(
-      filter(
-        config,
-        (c: Application.AnyModuleConfig) => !redux.typeguards.isPublicModuleConfig(c)
-      ) as Application.AuthenticatedModuleConfig[]
-    ),
-    user: createInitialUserState(user),
-    loading: false,
-    contacts: redux.initialState.initialModelListResponseState,
-    productPermissionModalOpen: false
-  } as Application.AuthenticatedStore;
-};
+const createApplicationInitialState = (config: Application.StoreConfig): Application.Store => ({
+  ...createModularApplicationState(filter(config.modules, (c: Application.ModuleConfig) => c.isPublic !== true)),
+  user: config.user,
+  loading: false,
+  contacts: redux.initialState.initialAuthenticatedModelListResponseState,
+  filteredContacts: redux.initialState.initialAuthenticatedModelListResponseState,
+  productPermissionModalOpen: false,
+  public: createPublicInitialState(config),
+  router: {
+    location: config.history.location,
+    action: config.history.action
+  } as RouterState
+});
+
+export default createApplicationInitialState;

@@ -1,13 +1,12 @@
-import BudgetReduxConfig from "app/Budget/config";
-import TemplateReduxConfig from "app/Template/config";
+import { BudgetReduxConfig, TemplateReduxConfig, PublicBudgetReduxConfig } from "app/Budgeting/config";
 import DashboardReduxConfig from "app/Dashboard/config";
-import ShareReduxConfig from "app/Share/config";
 
-const GlobalReduxConfig: Application.AnyModuleConfig[] = [
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+const ModuleConfig: Application.ModuleConfig<any>[] = [
   DashboardReduxConfig,
   BudgetReduxConfig,
   TemplateReduxConfig,
-  ShareReduxConfig
+  PublicBudgetReduxConfig
 ];
 
-export default GlobalReduxConfig;
+export default ModuleConfig;

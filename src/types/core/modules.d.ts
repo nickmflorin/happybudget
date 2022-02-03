@@ -1,17 +1,17 @@
 declare namespace Modules {
+  type AccountOrSubAccountStore<D extends Model.HttpModel> = {
+    readonly detail: Redux.ModelDetailResponseStore<D>;
+  };
+
+  type SubAccountStore = AccountOrSubAccountStore<Model.SubAccount> & {
+    readonly table: Tables.SubAccountTableStore;
+  };
+
+  type AccountStore = AccountOrSubAccountStore<Model.Account> & {
+    readonly table: Tables.SubAccountTableStore;
+  };
+
   declare namespace Template {
-    type AccountOrSubAccountStore<D extends Model.HttpModel> = {
-      readonly detail: Redux.ModelDetailResponseStore<D>;
-    };
-
-    type SubAccountStore = AccountOrSubAccountStore<Model.SubAccount> & {
-      readonly table: Tables.SubAccountTableStore;
-    };
-
-    type AccountStore = AccountOrSubAccountStore<Model.Account> & {
-      readonly table: Tables.SubAccountTableStore;
-    };
-
     interface Store {
       readonly detail: Redux.ModelDetailResponseStore<Model.Template>;
       readonly subaccount: SubAccountStore;
@@ -25,18 +25,6 @@ declare namespace Modules {
       readonly displayedTemplate: Model.HeaderTemplate | null;
       readonly loadingDetail: boolean;
     }
-
-    type AccountOrSubAccountStore<D extends Model.HttpModel> = {
-      readonly detail: Redux.ModelDetailResponseStore<D>;
-    };
-
-    type SubAccountStore = AccountOrSubAccountStore<Model.SubAccount> & {
-      readonly table: Tables.SubAccountTableStore;
-    };
-
-    type AccountStore = AccountOrSubAccountStore<Model.Account> & {
-      readonly table: Tables.SubAccountTableStore;
-    };
 
     type AnalysisStore = {
       readonly accounts: Omit<Redux.ModelListResponseStore<Model.Account>, "loading" | "responseWasReceived">;
@@ -66,23 +54,12 @@ declare namespace Modules {
     }
   }
 
-  declare namespace Share {
-    type AccountOrSubAccountStore<D extends Model.HttpModel> = {
-      readonly detail: Redux.ModelDetailResponseStore<D>;
-    };
-
-    type SubAccountStore = AccountOrSubAccountStore<Model.SubAccount> & {
-      readonly table: Tables.SubAccountTableStore;
-    };
-
-    type AccountStore = AccountOrSubAccountStore<Model.Account> & {
-      readonly table: Tables.SubAccountTableStore;
-    };
-
+  declare namespace PublicBudget {
     interface Store {
       readonly detail: Redux.ModelDetailResponseStore<Model.Budget>;
       readonly subaccount: SubAccountStore;
       readonly account: AccountStore;
+      readonly accounts: Tables.AccountTableStore;
     }
   }
 }

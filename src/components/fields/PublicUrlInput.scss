@@ -1,0 +1,8 @@
+.public-url-input-div {
+	display: flex;
+	flex-direction: row;
+
+	> .input {
+		margin-right: 8px;
+	}
+}

@@ -19,10 +19,9 @@ declare namespace Http {
     readonly fileUrl: string;
   };
 
-  type MarkupResponseTypes<B extends Model.BaseBudget> =
+  type MarkupResponseTypes<B extends Model.BaseBudget, PARENT extends Model.Account | Model.SubAccount> =
     | ParentChildResponse<B, Model.Markup>
-    | AncestryResponse<B, Model.Account, Model.Markup>
-    | AncestryResponse<B, Model.SubAccount, Model.Markup>;
+    | AncestryResponse<B, PARENT, Model.Markup>;
 
   type ReorderResponse = { data: number[] };
 

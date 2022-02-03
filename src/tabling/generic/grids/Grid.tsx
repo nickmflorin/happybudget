@@ -55,7 +55,7 @@ type UseAgProps<R extends Table.RowData> = Omit<Table.AgGridProps, OverriddenAgP
   readonly cellStyle?: React.CSSProperties;
   readonly getRowStyle?: Table.GetRowStyle;
   readonly navigateToNextCell?: (params: NavigateToNextCellParams) => Table.CellPosition;
-  readonly processCellForClipboard?: (params: ProcessCellForExportParams) => void;
+  readonly processCellForClipboard?: (params: ProcessCellForExportParams) => string;
   readonly tabToNextCell?: (params: TabToNextCellParams) => Table.CellPosition;
   readonly onCellFocused?: (e: CellFocusedEvent) => void;
   readonly onCellMouseOver?: (e: CellMouseOverEvent) => void;
@@ -88,16 +88,6 @@ export interface GridProps<R extends Table.RowData, M extends Model.RowHttpModel
   readonly rowClass?: Table.RowClassName;
   readonly rowHeight?: number;
   readonly localizePopupParent?: boolean;
-  readonly onCellDoubleClicked?: (e: CellDoubleClickedEvent) => void;
-  readonly getContextMenuItems?: (row: Table.BodyRow<R>, node: Table.RowNode) => Table.MenuItemDef[];
-  readonly navigateToNextCell?: (params: NavigateToNextCellParams) => Table.CellPosition;
-  readonly processCellForClipboard?: (params: ProcessCellForExportParams) => string;
-  readonly tabToNextCell?: (params: TabToNextCellParams) => Table.CellPosition;
-  readonly onCellFocused?: (e: CellFocusedEvent) => void;
-  readonly onCellMouseOver?: (e: CellMouseOverEvent) => void;
-  readonly onCellKeyDown?: (event: CellKeyDownEvent) => void;
-  readonly onGridReady: (e: Table.GridReadyEvent) => void;
-  readonly onFirstDataRendered: (e: Table.FirstDataRenderedEvent) => void;
 }
 
 const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({

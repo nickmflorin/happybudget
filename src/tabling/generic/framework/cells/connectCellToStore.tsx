@@ -11,7 +11,7 @@ const connectCellToStore = <
   V extends string | number | null = string | number | null,
   C extends Table.DataColumn<R, M, V> = Table.BodyColumn<R, M, V>
 >(
-  Component: React.ComponentClass<T, Record<string, unknown>> | React.FunctionComponent<T>
+  Component: React.FunctionComponent<T>
 ) => {
   const WithConnectedCell = (
     props: T & { readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>> }

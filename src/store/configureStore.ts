@@ -1,34 +1,31 @@
-import { Middleware, createStore, applyMiddleware, compose, PreloadedState, combineReducers } from "redux";
-import createSagaMiddleware, { Saga, SagaMiddlewareOptions } from "redux-saga";
+import { Middleware, createStore, applyMiddleware, compose, PreloadedState } from "redux";
+import createSagaMiddleware, { SagaMiddlewareOptions } from "redux-saga";
 import { routerMiddleware } from "connected-react-router";
 import { createBrowserHistory, History } from "history";
 import * as Sentry from "@sentry/react";
 
-import { isAuthenticatedStore } from "lib/redux/typeguards";
-
-import GlobalReduxConfig from "./config";
+import ModuleConfig from "./config";
 import createSagaManager from "./createSagaManager";
-import { createStaticAuthenticatedReducers, createStaticPublicReducers } from "./reducer";
-import { createAuthenticatedRootSaga, createPublicRootSaga } from "./sagas";
-import { createAuthenticatedInitialState, createPublicInitialState } from "./initialState";
+import createApplicationReducer from "./reducer";
+import createApplicationSaga from "./sagas";
+import createApplicationInitialState from "./initialState";
 
 export const history: History<unknown> = createBrowserHistory();
 
 type MD = Middleware<Record<string, unknown>, Application.Store>;
 
-const authenticatedActionMiddleware: MD = api => next => action => {
+const publicActionMiddleware: MD = api => next => (action: Redux.Action) => {
   const state = api.getState();
-  if (isAuthenticatedStore(state)) {
-    return next({ ...action, isAuthenticated: true });
-  }
-  return next({ ...action, isAuthenticated: false });
+  return next({ ...action, context: { ...action.context, publicTokenId: state.public.tokenId } });
 };
 
-const configureGenericStore = <S extends Application.Store>(
-  initialState: S,
-  reducers: Redux.ReducersMapObject<S>,
-  rootSaga: Saga
-): Redux.Store<S> => {
+const configureStore = (
+  config: Omit<Application.StoreConfig, "history" | "modules">
+): Redux.Store<Application.Store> => {
+  const initialState = createApplicationInitialState({ ...config, modules: ModuleConfig, history });
+  const applicationReducer = createApplicationReducer({ ...config, modules: ModuleConfig, history });
+  const applicationSaga = createApplicationSaga({ ...config, modules: ModuleConfig, history });
+
   /* Create the redux-saga middleware that allows the sagas to run as side-effects
      in the application.  If in a production environment, instruct the middleware
      to funnel errors through to Sentry. */
@@ -38,14 +35,12 @@ const configureGenericStore = <S extends Application.Store>(
   }
   const sagaMiddleware = createSagaMiddleware(sagaMiddlewareOptions);
 
-  let baseMiddleware: MD[] = [sagaMiddleware, authenticatedActionMiddleware];
+  let baseMiddleware: MD[] = [publicActionMiddleware, sagaMiddleware];
   baseMiddleware =
     process.env.NODE_ENV !== "production"
       ? /* eslint-disable-next-line @typescript-eslint/no-var-requires */
         [require("redux-immutable-state-invariant").default(), ...baseMiddleware]
       : baseMiddleware;
-
-  const reducer = combineReducers<S, Redux.Action>(reducers);
 
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
   let enhancers = composeEnhancers(applyMiddleware(...baseMiddleware, routerMiddleware(history)));
@@ -54,34 +49,18 @@ const configureGenericStore = <S extends Application.Store>(
     enhancers = composeEnhancers(applyMiddleware(...baseMiddleware, routerMiddleware(history)), sentryReduxEnhancer);
   }
 
-  const store: Omit<Redux.Store<S>, "injectSaga" | "ejectSaga"> = createStore<
-    S,
+  const store: Omit<Redux.Store<Application.Store>, "injectSaga" | "ejectSaga"> = createStore<
+    Application.Store,
     Redux.Action,
     typeof composeEnhancers,
     never
-  >(reducer, initialState as PreloadedState<S>, enhancers);
+  >(applicationReducer, initialState as PreloadedState<Application.Store>, enhancers);
 
   /* Start the application saga and establish the saga injector.  We must do this
      after we create the store, because the SagaMiddleware must be mounted to
      run the root saga. */
-  const [injectSaga, ejectSaga, hasSaga] = createSagaManager(sagaMiddleware.run, rootSaga);
+  const [injectSaga, ejectSaga, hasSaga] = createSagaManager(sagaMiddleware.run, applicationSaga);
   return { ...store, injectSaga, ejectSaga, hasSaga };
 };
 
-export const configureAuthenticatedStore = (user: Model.User): Redux.Store<Application.AuthenticatedStore> => {
-  const initialState = createAuthenticatedInitialState(GlobalReduxConfig, user);
-  const applicationReducers = createStaticAuthenticatedReducers(GlobalReduxConfig, user, history);
-  const applicationSaga = createAuthenticatedRootSaga(GlobalReduxConfig);
-  return configureGenericStore<Application.AuthenticatedStore>(
-    initialState,
-    applicationReducers as Redux.ReducersMapObject<Application.AuthenticatedStore>,
-    applicationSaga
-  );
-};
-
-export const configurePublicStore = (): Redux.Store<Application.PublicStore> => {
-  const initialState = createPublicInitialState(GlobalReduxConfig);
-  const applicationReducers = createStaticPublicReducers(GlobalReduxConfig);
-  const applicationSaga = createPublicRootSaga(GlobalReduxConfig);
-  return configureGenericStore<Application.PublicStore>(initialState, applicationReducers, applicationSaga);
-};
+export default configureStore;

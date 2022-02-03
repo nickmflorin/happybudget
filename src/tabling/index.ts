@@ -1,3 +1,4 @@
 export * from "./tables";
 export * as generic from "./generic";
-export { default as connectTableToStore } from "./generic/hocs/connectTableToStore";
+export { default as connectTableToPublicStore } from "./generic/hocs/connectTableToPublicStore";
+export { default as connectTableToAuthenticatedStore } from "./generic/hocs/connectTableToAuthenticatedStore";

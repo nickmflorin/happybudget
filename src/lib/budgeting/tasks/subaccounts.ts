@@ -8,8 +8,9 @@ import { tabling, redux, contacts, notifications } from "lib";
 type R = Tables.SubAccountRowData;
 type C = Model.SubAccount;
 type P = Http.SubAccountPayload;
+type CTX = Redux.WithActionContext<Tables.SubAccountTableContext>;
 
-export type SubAccountsTableServiceSet = {
+export type PublicSubAccountsTableServiceSet = {
   readonly request: Http.DetailListService<C>;
   readonly requestGroups: Http.DetailListService<Model.Group>;
   readonly requestMarkups: Http.DetailListService<Model.Markup>;
@@ -18,7 +19,7 @@ export type SubAccountsTableServiceSet = {
 export type AuthenticatedSubAccountsTableServiceSet<
   M extends Model.Account | Model.SubAccount,
   B extends Model.Template | Model.Budget
-> = SubAccountsTableServiceSet & {
+> = PublicSubAccountsTableServiceSet & {
   readonly create: Http.DetailPostService<C, P>;
   readonly bulkDelete: Http.TreeBulkDeleteService<B, M>;
   readonly bulkDeleteMarkups: Http.TreeBulkDeleteService<B, M>;
@@ -26,7 +27,7 @@ export type AuthenticatedSubAccountsTableServiceSet<
   readonly bulkCreate: Http.TreeBulkCreateService<B, M, C, P>;
 };
 
-export type SubAccountsTableActionMap = Redux.TableActionMap<C, Tables.SubAccountTableContext> & {
+export type PublicSubAccountsTableActionMap = Redux.TableActionMap<C, Tables.SubAccountTableContext> & {
   readonly loadingBudget: Redux.ActionCreator<boolean>;
   readonly responseSubAccountUnits: Redux.ActionCreator<Http.ListResponse<Model.Tag>>;
   readonly responseFringes: Redux.ActionCreator<Http.TableResponse<Model.Fringe>>;
@@ -45,13 +46,13 @@ export type AuthenticatedSubAccountsTableActionMap<
   readonly responseFringeColors: Redux.ActionCreator<Http.ListResponse<string>>;
 };
 
-export type SubAccountsTableTaskConfig = Table.TaskConfig<
+export type PublicSubAccountsTableTaskConfig = Table.TaskConfig<
   R,
   C,
   Tables.SubAccountTableContext,
-  SubAccountsTableActionMap
+  PublicSubAccountsTableActionMap
 > & {
-  readonly services: SubAccountsTableServiceSet;
+  readonly services: PublicSubAccountsTableServiceSet;
 };
 
 export type AuthenticatedSubAccountsTableTaskConfig<
@@ -59,38 +60,110 @@ export type AuthenticatedSubAccountsTableTaskConfig<
   B extends Model.Template | Model.Budget
 > = Table.TaskConfig<R, C, Tables.SubAccountTableContext, AuthenticatedSubAccountsTableActionMap<M, B>> & {
   readonly services: AuthenticatedSubAccountsTableServiceSet<M, B>;
-  readonly selectStore: (state: Application.AuthenticatedStore) => Tables.SubAccountTableStore;
+  readonly selectStore: (state: Application.Store) => Tables.SubAccountTableStore;
 };
 
-const isAuthenticatedConfig = <M extends Model.Account | Model.SubAccount, B extends Model.Template | Model.Budget>(
-  c: SubAccountsTableTaskConfig | AuthenticatedSubAccountsTableTaskConfig<M, B>
-): c is AuthenticatedSubAccountsTableTaskConfig<M, B> => {
-  return (c as AuthenticatedSubAccountsTableTaskConfig<M, B>).services.bulkCreate !== undefined;
-};
-
-export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B extends Model.Budget | Model.Template>(
-  config: SubAccountsTableTaskConfig | AuthenticatedSubAccountsTableTaskConfig<M, B>
-): Redux.TableTaskMap<R, C, Tables.SubAccountTableContext> => {
-  const contactsTasks = contacts.tasks.createTaskSet({ authenticated: isAuthenticatedConfig(config) });
-
-  function* requestFringes(objId: number): SagaIterator {
+export const createPublicTableTaskSet = (
+  config: PublicSubAccountsTableTaskConfig
+): Redux.TableTaskMap<Tables.SubAccountTableContext> => {
+  function* requestFringes(ctx: CTX): SagaIterator {
     try {
-      const response: Http.ListResponse<Model.Fringe> = yield api.request(api.getFringes, objId, {});
-      if (response.data.length === 0 && isAuthenticatedConfig(config)) {
+      const response: Http.ListResponse<Model.Fringe> = yield api.request(api.getFringes, ctx, ctx.budgetId);
+      yield put(config.actions.responseFringes({ models: response.data }));
+    } catch (e: unknown) {
+      /* TODO: It would be nice if we can show this in the Fringes table
+         instead (if it is open). */
+      config.table.handleRequestError(e as Error, {
+        message: ctx.errorMessage || "There was an error retrieving the table data.",
+        dispatchClientErrorToSentry: true
+      });
+      yield put(config.actions.responseFringes({ models: [] }));
+    }
+  }
+
+  function* requestFringesColors(ctx: CTX): SagaIterator {
+    try {
+      const response = yield api.request(api.getFringeColors, ctx);
+      yield put(config.actions.responseFringeColors(response));
+    } catch (e: unknown) {
+      config.table.handleRequestError(e as Error, {
+        message: ctx.errorMessage || "There was an error retrieving the table data.",
+        dispatchClientErrorToSentry: true
+      });
+      yield put(config.actions.responseFringeColors({ data: [], count: 0 }));
+    }
+  }
+
+  function* requestSubAccountUnits(ctx: CTX): SagaIterator {
+    try {
+      const response = yield api.request(api.getSubAccountUnits, ctx);
+      yield put(config.actions.responseSubAccountUnits(response));
+    } catch (e: unknown) {
+      config.table.handleRequestError(e as Error, {
+        message: ctx.errorMessage || "There was an error retrieving the table data.",
+        dispatchClientErrorToSentry: true
+      });
+      yield put(config.actions.responseSubAccountUnits({ data: [], count: 0 }));
+    }
+  }
+
+  function* request(action: Redux.TableAction<Redux.TableRequestPayload, Tables.SubAccountTableContext>): SagaIterator {
+    yield put(config.actions.loading(true));
+    const effects = [
+      api.request(config.services.request, action.context, action.context.id),
+      api.request(config.services.requestGroups, action.context, action.context.id),
+      api.request(config.services.requestMarkups, action.context, action.context.id)
+    ];
+    try {
+      yield fork(requestSubAccountUnits, action.context);
+      yield fork(requestFringes, action.context);
+      yield fork(requestFringesColors, action.context);
+      const [models, groups, markups]: [
+        Http.ListResponse<C>,
+        Http.ListResponse<Model.Group>,
+        Http.ListResponse<Model.Markup>
+      ] = yield all(effects);
+      yield put(config.actions.response({ models: models.data, groups: groups.data, markups: markups.data }));
+    } catch (e: unknown) {
+      config.table.handleRequestError(e as Error, {
+        message: action.context.errorMessage || "There was an error retrieving the table data.",
+        dispatchClientErrorToSentry: true
+      });
+      yield put(config.actions.response({ models: [], markups: [], groups: [] }));
+    } finally {
+      yield put(config.actions.loading(false));
+    }
+  }
+  return { request };
+};
+
+export const createAuthenticatedTableTaskSet = <
+  M extends Model.Account | Model.SubAccount,
+  B extends Model.Budget | Model.Template
+>(
+  config: AuthenticatedSubAccountsTableTaskConfig<M, B>
+): Redux.AuthenticatedTableTaskMap<R, C, Tables.SubAccountTableContext> => {
+  const contactsTasks = contacts.tasks.createTaskSet();
+
+  function* requestFringes(ctx: CTX): SagaIterator {
+    try {
+      const response: Http.ListResponse<Model.Fringe> = yield api.request(api.getFringes, ctx, ctx.budgetId);
+      if (response.data.length === 0) {
         // If there is no table data, we want to default create two rows.
         try {
           const bulkCreateResponse: Http.ServiceResponse<typeof api.bulkCreateFringes> = yield api.request(
             api.bulkCreateFringes,
-            objId,
+            ctx,
+            ctx.budgetId,
             { data: [{}, {}] }
           );
           yield put(config.actions.responseFringes({ models: bulkCreateResponse.children }));
-          yield put(config.actions.updateBudgetInState({ id: objId, data: bulkCreateResponse.parent as B }));
+          yield put(config.actions.updateBudgetInState({ id: ctx.budgetId, data: bulkCreateResponse.parent as B }));
         } catch (e: unknown) {
           /* TODO: It would be nice if we can show this in the Fringes table
              instead (if it is open). */
           config.table.handleRequestError(e as Error, {
-            message: "There was an error retrieving the fringes table data.",
+            message: ctx.errorMessage || "There was an error retrieving the fringes table data.",
             dispatchClientErrorToSentry: true
           });
         }
@@ -101,95 +174,93 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       /* TODO: It would be nice if we can show this in the Fringes table
          instead (if it is open). */
       config.table.handleRequestError(e as Error, {
-        message: "There was an error retrieving the fringes table data.",
+        message: ctx.errorMessage || "There was an error retrieving the fringes table data.",
         dispatchClientErrorToSentry: true
       });
       yield put(config.actions.responseFringes({ models: [] }));
     }
   }
 
-  function* requestFringesColors(): SagaIterator {
+  function* requestFringesColors(ctx: CTX): SagaIterator {
     try {
-      const response = yield api.request(api.getFringeColors);
+      const response = yield api.request(api.getFringeColors, ctx, {});
       yield put(config.actions.responseFringeColors(response));
     } catch (e: unknown) {
       config.table.handleRequestError(e as Error, {
-        message: "There was an error retrieving the table data.",
+        message: ctx.errorMessage || "There was an error retrieving the table data.",
         dispatchClientErrorToSentry: true
       });
       yield put(config.actions.responseFringeColors({ data: [], count: 0 }));
     }
   }
 
-  function* requestSubAccountUnits(): SagaIterator {
+  function* requestSubAccountUnits(ctx: CTX): SagaIterator {
     try {
-      const response = yield api.request(api.getSubAccountUnits);
+      const response = yield api.request(api.getSubAccountUnits, ctx);
       yield put(config.actions.responseSubAccountUnits(response));
     } catch (e: unknown) {
       config.table.handleRequestError(e as Error, {
-        message: "There was an error retrieving the table data.",
+        message: ctx.errorMessage || "There was an error retrieving the table data.",
         dispatchClientErrorToSentry: true
       });
       yield put(config.actions.responseSubAccountUnits({ data: [], count: 0 }));
     }
   }
 
-  function* request(
-    action: Redux.ActionWithContext<Redux.TableRequestPayload, Tables.SubAccountTableContext>
-  ): SagaIterator {
+  function* request(action: Redux.TableAction<Redux.TableRequestPayload, Tables.SubAccountTableContext>): SagaIterator {
     if (redux.typeguards.isListRequestIdsAction(action)) {
-      if (isAuthenticatedConfig(config)) {
-        const response: Http.ListResponse<Model.SubAccount> = yield api.request(
-          config.services.request,
-          action.context.id,
-          { ids: action.payload.ids }
-        );
-        yield put(
-          config.actions.tableChanged(
-            {
-              type: "modelUpdated",
-              payload: map(response.data, (m: Model.SubAccount) => ({ model: m }))
-            },
-            action.context
-          )
-        );
-      }
+      const response: Http.ListResponse<Model.SubAccount> = yield api.request(
+        config.services.request,
+        action.context,
+        action.context.id,
+        { ids: action.payload.ids }
+      );
+      yield put(
+        config.actions.tableChanged(
+          {
+            type: "modelUpdated",
+            payload: map(response.data, (m: Model.SubAccount) => ({ model: m }))
+          },
+          action.context
+        )
+      );
     } else {
       yield put(config.actions.loading(true));
       const effects = [
-        api.request(config.services.request, action.context.id, {}),
-        api.request(config.services.requestGroups, action.context.id, {}),
-        api.request(config.services.requestMarkups, action.context.id, {})
+        api.request(config.services.request, action.context, action.context.id),
+        api.request(config.services.requestGroups, action.context, action.context.id),
+        api.request(config.services.requestMarkups, action.context, action.context.id)
       ];
       try {
         yield fork(contactsTasks.request, action as Redux.Action);
-        yield fork(requestSubAccountUnits);
-        yield fork(requestFringes, action.context.budgetId);
-        yield fork(requestFringesColors);
+        yield fork(requestSubAccountUnits, action.context);
+        yield fork(requestFringes, action.context);
+        yield fork(requestFringesColors, action.context);
         const [models, groups, markups]: [
           Http.ListResponse<C>,
           Http.ListResponse<Model.Group>,
-          Http.ListResponse<Model.Markup> | undefined
+          Http.ListResponse<Model.Markup>
         ] = yield all(effects);
-        if (models.data.length === 0 && isAuthenticatedConfig(config)) {
+        if (models.data.length === 0) {
           // If there is no table data, we want to default create two rows.
           try {
             const response: Http.ServiceResponse<typeof config.services.bulkCreate> = yield api.request(
               config.services.bulkCreate,
+              action.context,
               action.context.id,
               { data: [{}, {}] }
             );
             yield put(
-              config.actions.response({ models: response.children, groups: groups.data, markups: markups?.data })
+              config.actions.response({ models: response.children, groups: groups.data, markups: markups.data })
             );
           } catch (e: unknown) {
             config.table.handleRequestError(e as Error, {
-              message: "There was an error retrieving the table data.",
+              message: action.context.errorMessage || "There was an error retrieving the table data.",
               dispatchClientErrorToSentry: true
             });
           }
         } else {
-          yield put(config.actions.response({ models: models.data, groups: groups.data, markups: markups?.data }));
+          yield put(config.actions.response({ models: models.data, groups: groups.data, markups: markups.data }));
         }
       } catch (e: unknown) {
         const err = e as Error;
@@ -201,7 +272,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
           notifications.ui.banner.lookupAndNotify("budgetSubscriptionPermissionError");
         } else {
           config.table.handleRequestError(e as Error, {
-            message: "There was an error retrieving the table data.",
+            message: action.context.errorMessage || "There was an error retrieving the table data.",
             dispatchClientErrorToSentry: true
           });
         }
@@ -212,63 +283,56 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     }
   }
 
-  const bulkCreateTask: Redux.TableBulkCreateTask<R, [number]> | null = !isAuthenticatedConfig(config)
-    ? null
-    : tabling.tasks.createBulkTask<
-        R,
-        C,
-        Tables.SubAccountTableStore,
-        Http.SubAccountPayload,
-        Http.AncestryListResponse<B, M, C>,
-        [number]
-      >({
-        table: config.table,
-        selectStore: config.selectStore,
-        loadingActions: [config.actions.loadingBudget],
-        responseActions: (r: Http.AncestryListResponse<B, M, C>, e: Table.RowAddEvent<R>) => [
-          config.actions.updateBudgetInState({ id: r.budget.id, data: r.budget }),
-          config.actions.updateParentInState({ id: r.parent.id, data: r.parent }),
-          config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children })
-        ],
-        bulkCreate: (objId: number) => [config.services.bulkCreate, objId]
-      });
+  const bulkCreateTask: (e: Table.RowAddEvent<R>, ctx: CTX) => SagaIterator = tabling.tasks.createBulkTask({
+    table: config.table,
+    service: config.services.bulkCreate,
+    selectStore: config.selectStore,
+    responseActions: (r: Http.AncestryListResponse<B, M, C>, e: Table.RowAddEvent<R>) => [
+      config.actions.updateBudgetInState({ id: r.budget.id, data: r.budget }),
+      config.actions.updateParentInState({ id: r.parent.id, data: r.parent }),
+      config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children })
+    ],
+    performCreate: (
+      ctx: CTX,
+      p: Http.BulkCreatePayload<Http.SubAccountPayload>
+    ): [number, Http.BulkCreatePayload<Http.SubAccountPayload>] => [ctx.budgetId, p]
+  });
 
   function* bulkUpdateTask(
-    objId: number,
+    ctx: CTX,
     requestPayload: Http.BulkUpdatePayload<Http.AccountPayload>,
-    errorMessage: string,
     isGroupEvent = false
   ): SagaIterator {
-    if (isAuthenticatedConfig(config)) {
-      config.table.saving(true);
-      if (!isGroupEvent) {
-        yield put(config.actions.loadingBudget(true));
-      }
-      try {
-        const response: Http.ServiceResponse<typeof config.services.bulkUpdate> = yield api.request(
-          config.services.bulkUpdate,
-          objId,
-          requestPayload
-        );
-        /* Note: We do not need to update the models in the state because the
-           reducer already handled this on the change event. */
-        yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
-        yield put(config.actions.updateParentInState({ id: response.parent.id, data: response.parent }));
-      } catch (err: unknown) {
-        config.table.handleRequestError(err as Error, { message: errorMessage, dispatchClientErrorToSentry: true });
-      } finally {
-        yield put(config.actions.loadingBudget(false));
-        config.table.saving(false);
-      }
+    config.table.saving(true);
+    if (!isGroupEvent) {
+      yield put(config.actions.loadingBudget(true));
+    }
+    try {
+      const response: Http.ServiceResponse<typeof config.services.bulkUpdate> = yield api.request(
+        config.services.bulkUpdate,
+        ctx,
+        ctx.id,
+        requestPayload
+      );
+      yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
+      yield put(config.actions.updateParentInState({ id: response.parent.id, data: response.parent }));
+    } catch (err: unknown) {
+      config.table.handleRequestError(err as Error, {
+        message: ctx.errorMessage || "There was an error updating the table rows.",
+        dispatchClientErrorToSentry: true
+      });
+    } finally {
+      yield put(config.actions.loadingBudget(false));
+      config.table.saving(false);
     }
   }
 
-  function* updateMarkupTask(changes: Table.RowChange<R, Table.MarkupRow<R>>[]): SagaIterator {
-    if (isAuthenticatedConfig(config) && changes.length !== 0) {
+  function* updateMarkupTask(ctx: CTX, changes: Table.RowChange<R, Table.MarkupRow<R>>[]): SagaIterator {
+    if (changes.length !== 0) {
       const effects: (StrictEffect | null)[] = map(changes, (ch: Table.RowChange<R, Table.MarkupRow<R>>) => {
         const payload = tabling.http.patchPayload<R, C, Http.MarkupPayload>(ch, config.table.getColumns());
         if (!isNil(payload)) {
-          return api.request(api.updateMarkup, tabling.managers.markupId(ch.id), payload);
+          return api.request(api.updateMarkup, ctx, tabling.managers.markupId(ch.id), payload);
         }
         return null;
       });
@@ -289,7 +353,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         yield all(validEffects);
       } catch (err: unknown) {
         config.table.handleRequestError(err as Error, {
-          message: "There was an error updating the table rows.",
+          message: ctx.errorMessage || "There was an error updating the table rows.",
           dispatchClientErrorToSentry: true
         });
       } finally {
@@ -298,33 +362,28 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     }
   }
 
-  function* deleteGroups(ids: number[]): SagaIterator {
-    yield all(map(ids, (id: number) => api.request(api.deleteGroup, id)));
+  function* deleteGroups(ctx: CTX, ids: number[]): SagaIterator {
+    yield all(map(ids, (id: number) => api.request(api.deleteGroup, ctx, id)));
   }
 
-  function* bulkDeleteRows(objId: number, ids: number[], markupIds?: number[]): SagaIterator {
+  function* bulkDeleteRows(ctx: CTX, ids: number[], markupIds?: number[]): SagaIterator {
     /* Note: We have do these operations sequentially, since they will both
 			 update the Budget in state and we cannot risk running into race
 			 conditions. */
-    if (isAuthenticatedConfig(config)) {
-      let response: Http.ServiceResponse<typeof config.services.bulkDelete> | null = null;
-      if (ids.length !== 0) {
-        response = yield api.request(config.services.bulkDelete, objId, { ids });
-      }
-      if (!isNil(markupIds) && markupIds.length !== 0 && !isNil(config.services.bulkDeleteMarkups)) {
-        response = yield api.request(config.services.bulkDeleteMarkups, objId, { ids: markupIds });
-      }
-      if (!isNil(response)) {
-        yield put(config.actions.updateParentInState({ id: response.parent.id, data: response.parent }));
-        yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
-      }
+    let response: Http.ServiceResponse<typeof config.services.bulkDelete> | null = null;
+    if (ids.length !== 0) {
+      response = yield api.request(config.services.bulkDelete, ctx, ctx.id, { ids });
+    }
+    if (!isNil(markupIds) && markupIds.length !== 0 && !isNil(config.services.bulkDeleteMarkups)) {
+      response = yield api.request(config.services.bulkDeleteMarkups, ctx, ctx.id, { ids: markupIds });
+    }
+    if (!isNil(response)) {
+      yield put(config.actions.updateParentInState({ id: response.parent.id, data: response.parent }));
+      yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
     }
   }
 
-  function* handleRemoveRowFromGroupEvent(
-    e: Table.RowRemoveFromGroupEvent,
-    context: Tables.SubAccountTableContext
-  ): SagaIterator {
+  function* handleRemoveRowFromGroupEvent(e: Table.RowRemoveFromGroupEvent, ctx: CTX): SagaIterator {
     const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
     const requestPayload: Http.BulkUpdatePayload<P> = {
       data: map(ids, (id: Table.ModelRowId) => ({
@@ -332,13 +391,15 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         group: null
       }))
     };
-    yield fork(bulkUpdateTask, context.id, requestPayload, "There was an error removing the row from the group.", true);
+    yield fork(
+      bulkUpdateTask,
+      { errorMessage: "There was an error removing the row from the group.", ...ctx },
+      requestPayload,
+      true
+    );
   }
 
-  function* handleAddRowToGroupEvent(
-    e: Table.RowAddToGroupEvent,
-    context: Tables.SubAccountTableContext
-  ): SagaIterator {
+  function* handleAddRowToGroupEvent(e: Table.RowAddToGroupEvent, ctx: CTX): SagaIterator {
     const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
     const requestPayload: Http.BulkUpdatePayload<P> = {
       data: map(ids, (id: Table.ModelRowId) => ({
@@ -346,138 +407,132 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         group: tabling.managers.groupId(e.payload.group)
       }))
     };
-    yield fork(bulkUpdateTask, context.id, requestPayload, "There was an error adding the row to the group.", true);
+    yield fork(
+      bulkUpdateTask,
+      { errorMessage: "There was an error adding the row to the group.", ...ctx },
+      requestPayload,
+      true
+    );
   }
 
-  function* handleRowInsertEvent(e: Table.RowInsertEvent<R>, context: Tables.SubAccountTableContext): SagaIterator {
-    if (isAuthenticatedConfig(config)) {
-      config.table.saving(true);
-      try {
-        const response: C = yield api.request(config.services.create, context.id, {
-          previous: e.payload.previous,
-          group: isNil(e.payload.group) ? null : tabling.managers.groupId(e.payload.group),
-          ...tabling.http.postPayload<R, C, P>(e.payload.data, config.table.getColumns())
-        });
-        /* The Group is not attributed to the Model in a detail response, so
-					 if the group did change we have to use the value from the event
-					 payload. */
-        yield put(
-          config.actions.tableChanged(
-            {
-              type: "modelAdded",
-              payload: {
-                model: response,
-                group: !isNil(e.payload.group) ? tabling.managers.groupId(e.payload.group) : null
-              }
-            },
-            context
-          )
-        );
-      } catch (err: unknown) {
-        config.table.handleRequestError(err as Error, {
-          message: "There was an error adding the table rows.",
-          dispatchClientErrorToSentry: true
-        });
-      } finally {
-        config.table.saving(false);
-      }
+  function* handleRowInsertEvent(e: Table.RowInsertEvent<R>, ctx: CTX): SagaIterator {
+    config.table.saving(true);
+    try {
+      const response: C = yield api.request(config.services.create, ctx, ctx.id, {
+        previous: e.payload.previous,
+        group: isNil(e.payload.group) ? null : tabling.managers.groupId(e.payload.group),
+        ...tabling.http.postPayload<R, C, P>(e.payload.data, config.table.getColumns())
+      });
+      /* The Group is not attributed to the Model in a detail response, so
+				 if the group did change we have to use the value from the event
+				 payload. */
+      yield put(
+        config.actions.tableChanged(
+          {
+            type: "modelAdded",
+            payload: {
+              model: response,
+              group: !isNil(e.payload.group) ? tabling.managers.groupId(e.payload.group) : null
+            }
+          },
+          ctx
+        )
+      );
+    } catch (err: unknown) {
+      config.table.handleRequestError(err as Error, {
+        message: ctx.errorMessage || "There was an error adding the table rows.",
+        dispatchClientErrorToSentry: true
+      });
+    } finally {
+      config.table.saving(false);
     }
   }
 
-  function* handleRowPositionChangedEvent(
-    e: Table.RowPositionChangedEvent,
-    context: Tables.SubAccountTableContext
-  ): SagaIterator {
-    if (isAuthenticatedConfig(config)) {
-      config.table.saving(true);
-      try {
-        const response: C = yield api.request(api.updateSubAccount, e.payload.id, {
-          previous: e.payload.previous,
-          group: isNil(e.payload.newGroup) ? null : tabling.managers.groupId(e.payload.newGroup)
-        });
-        /* The Group is not attributed to the Model in a detail response, so if
-					 the group did change we have to use the value from the event
-					 payload. */
-        yield put(
-          config.actions.tableChanged(
-            {
-              type: "modelUpdated",
-              payload: {
-                model: response,
-                group: !isNil(e.payload.newGroup) ? tabling.managers.groupId(e.payload.newGroup) : null
-              }
-            },
-            context
-          )
-        );
-      } catch (err: unknown) {
-        config.table.handleRequestError(err as Error, {
-          message: "There was an error moving the table rows.",
-          dispatchClientErrorToSentry: true
-        });
-      } finally {
-        config.table.saving(false);
-      }
+  function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent, ctx: CTX): SagaIterator {
+    config.table.saving(true);
+    try {
+      const response: C = yield api.request(api.updateSubAccount, ctx, e.payload.id, {
+        previous: e.payload.previous,
+        group: isNil(e.payload.newGroup) ? null : tabling.managers.groupId(e.payload.newGroup)
+      });
+      /* The Group is not attributed to the Model in a detail response, so if
+				 the group did change we have to use the value from the event
+				 payload. */
+      yield put(
+        config.actions.tableChanged(
+          {
+            type: "modelUpdated",
+            payload: {
+              model: response,
+              group: !isNil(e.payload.newGroup) ? tabling.managers.groupId(e.payload.newGroup) : null
+            }
+          },
+          ctx
+        )
+      );
+    } catch (err: unknown) {
+      config.table.handleRequestError(err as Error, {
+        message: ctx.errorMessage || "There was an error moving the table rows.",
+        dispatchClientErrorToSentry: true
+      });
+    } finally {
+      config.table.saving(false);
     }
   }
 
-  function* handleRowAddEvent(e: Table.RowAddEvent<R>, context: Tables.SubAccountTableContext): SagaIterator {
+  function* handleRowAddEvent(e: Table.RowAddEvent<R>, ctx: CTX): SagaIterator {
     if (!isNil(bulkCreateTask)) {
-      yield fork(bulkCreateTask, e, "There was an error creating the rows.", context.id);
+      yield fork(bulkCreateTask, e, ctx);
     }
   }
 
-  function* handleRowDeleteEvent(e: Table.RowDeleteEvent, context: Tables.SubAccountTableContext): SagaIterator {
-    if (isAuthenticatedConfig(config)) {
-      const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
-      if (ids.length !== 0) {
-        yield put(config.actions.loadingBudget(true));
-        config.table.saving(true);
+  function* handleRowDeleteEvent(e: Table.RowDeleteEvent, ctx: CTX): SagaIterator {
+    const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
+    if (ids.length !== 0) {
+      yield put(config.actions.loadingBudget(true));
+      config.table.saving(true);
 
-        const modelRowIds = filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[];
+      const modelRowIds = filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[];
 
-        const markupRowIds = map(
-          filter(ids, (id: Table.RowId) => tabling.typeguards.isMarkupRowId(id)) as Table.MarkupRowId[],
-          (id: Table.MarkupRowId) => tabling.managers.markupId(id)
-        ) as number[];
+      const markupRowIds = map(
+        filter(ids, (id: Table.RowId) => tabling.typeguards.isMarkupRowId(id)) as Table.MarkupRowId[],
+        (id: Table.MarkupRowId) => tabling.managers.markupId(id)
+      ) as number[];
 
-        const groupRowIds = map(
-          filter(ids, (id: Table.RowId) => tabling.typeguards.isGroupRowId(id)) as Table.GroupRowId[],
-          (id: Table.GroupRowId) => tabling.managers.groupId(id)
-        );
+      const groupRowIds = map(
+        filter(ids, (id: Table.RowId) => tabling.typeguards.isGroupRowId(id)) as Table.GroupRowId[],
+        (id: Table.GroupRowId) => tabling.managers.groupId(id)
+      );
 
-        try {
-          yield all([call(deleteGroups, groupRowIds), call(bulkDeleteRows, context.id, modelRowIds, markupRowIds)]);
-        } catch (err: unknown) {
-          config.table.handleRequestError(err as Error, {
-            message: "There was an error removing the table rows.",
-            dispatchClientErrorToSentry: true
-          });
-        } finally {
-          config.table.saving(false);
-          yield put(config.actions.loadingBudget(false));
-        }
+      try {
+        yield all([call(deleteGroups, ctx, groupRowIds), call(bulkDeleteRows, ctx, modelRowIds, markupRowIds)]);
+      } catch (err: unknown) {
+        config.table.handleRequestError(err as Error, {
+          message: ctx.errorMessage || "There was an error removing the table rows.",
+          dispatchClientErrorToSentry: true
+        });
+      } finally {
+        config.table.saving(false);
+        yield put(config.actions.loadingBudget(false));
       }
     }
   }
 
-  function* handleDataChangeEvent(e: Table.DataChangeEvent<R>, context: Tables.SubAccountTableContext): SagaIterator {
-    if (isAuthenticatedConfig(config)) {
-      const merged = tabling.events.consolidateRowChanges<R>(e.payload);
+  function* handleDataChangeEvent(e: Table.DataChangeEvent<R>, ctx: CTX): SagaIterator {
+    const merged = tabling.events.consolidateRowChanges<R>(e.payload);
 
-      const markupChanges: Table.RowChange<R, Table.MarkupRow<R>>[] = filter(merged, (value: Table.RowChange<R>) =>
-        tabling.typeguards.isMarkupRowId(value.id)
-      ) as Table.RowChange<R, Table.MarkupRow<R>>[];
+    const markupChanges: Table.RowChange<R, Table.MarkupRow<R>>[] = filter(merged, (value: Table.RowChange<R>) =>
+      tabling.typeguards.isMarkupRowId(value.id)
+    ) as Table.RowChange<R, Table.MarkupRow<R>>[];
 
-      const dataChanges: Table.RowChange<R, Table.ModelRow<R>>[] = filter(merged, (value: Table.RowChange<R>) =>
-        tabling.typeguards.isModelRowId(value.id)
-      ) as Table.RowChange<R, Table.ModelRow<R>>[];
-      yield fork(updateMarkupTask, markupChanges);
-      if (dataChanges.length !== 0) {
-        const requestPayload = tabling.http.createBulkUpdatePayload<R, C, P>(dataChanges, config.table.getColumns());
-        if (requestPayload.data.length !== 0) {
-          yield call(bulkUpdateTask, context.id, requestPayload, "There was an error updating the rows.");
-        }
+    const dataChanges: Table.RowChange<R, Table.ModelRow<R>>[] = filter(merged, (value: Table.RowChange<R>) =>
+      tabling.typeguards.isModelRowId(value.id)
+    ) as Table.RowChange<R, Table.ModelRow<R>>[];
+    yield fork(updateMarkupTask, ctx, markupChanges);
+    if (dataChanges.length !== 0) {
+      const requestPayload = tabling.http.createBulkUpdatePayload<R, C, P>(dataChanges, config.table.getColumns());
+      if (requestPayload.data.length !== 0) {
+        yield call(bulkUpdateTask, ctx, requestPayload);
       }
     }
   }

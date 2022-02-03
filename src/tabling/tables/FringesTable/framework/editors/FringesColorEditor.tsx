@@ -15,7 +15,7 @@ interface FringesColorEditorProps
 const FringesColorEditor = (props: FringesColorEditorProps, ref: ForwardedRef<Table.AgEditorRef<string | null>>) => {
   const isFirstRender = ui.hooks.useTrackFirstRender();
   const [value, setValue] = useState<string | null>(props.value);
-  const colors = useSelector((state: Application.AuthenticatedStore) => props.selector(state).fringeColors);
+  const colors = useSelector((state: Application.Store) => props.selector(state).fringeColors);
 
   useEffect(() => {
     if (!isFirstRender) {

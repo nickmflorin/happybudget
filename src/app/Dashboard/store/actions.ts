@@ -10,7 +10,7 @@ export const responsePermissionedBudgetsAction = redux.actions.createAction<Http
 );
 export const responseBudgetsAction =
   redux.actions.createAction<Http.ListResponse<Model.SimpleBudget>>("dashboard.budgets.Response");
-export const setBudgetsSearchAction = redux.actions.createContextAction<string, Table.Context>(
+export const setBudgetsSearchAction = redux.actions.createTableAction<string, Table.Context>(
   "dashboard.budgets.SetSearch"
 );
 export const setBudgetsPaginationAction = redux.actions.createAction<Pagination>("dashboard.budgets.SetPagination");
@@ -27,7 +27,7 @@ export const requestTemplatesAction = redux.actions.createAction<null>("dashboar
 export const loadingTemplatesAction = redux.actions.createAction<boolean>("dashboard.templates.Loading");
 export const responseTemplatesAction =
   redux.actions.createAction<Http.ListResponse<Model.SimpleTemplate>>("dashboard.templates.Response");
-export const setTemplatesSearchAction = redux.actions.createContextAction<string, Table.Context>(
+export const setTemplatesSearchAction = redux.actions.createTableAction<string, Table.Context>(
   "dashboard.templates.SetSearch"
 );
 export const setTemplatesPaginationAction = redux.actions.createAction<Pagination>("dashboard.templates.SetPagination");
@@ -46,7 +46,7 @@ export const requestCommunityTemplatesAction = redux.actions.createAction<null>(
 export const loadingCommunityTemplatesAction = redux.actions.createAction<boolean>("dashboard.community.Loading");
 export const responseCommunityTemplatesAction =
   redux.actions.createAction<Http.ListResponse<Model.SimpleTemplate>>("dashboard.community.Response");
-export const setCommunityTemplatesSearchAction = redux.actions.createContextAction<string, Table.Context>(
+export const setCommunityTemplatesSearchAction = redux.actions.createTableAction<string, Table.Context>(
   "dashboard.community.SetSearch"
 );
 export const setCommunityTemplatesPaginationAction = redux.actions.createAction<Pagination>(
@@ -65,16 +65,16 @@ export const removeCommunityTemplateFromStateAction = redux.actions.createAction
   "dashboard.community.RemoveFromState"
 );
 
-export const handleContactsTableChangeEventAction = redux.actions.createContextAction<
+export const handleContactsTableChangeEventAction = redux.actions.createTableAction<
   Table.ChangeEvent<Tables.ContactRowData, Model.Contact>,
   Tables.ContactTableContext
 >("dashboard.contacts.TableChanged");
 
-export const setContactsSearchAction = redux.actions.createContextAction<string, Tables.ContactTableContext>(
+export const setContactsSearchAction = redux.actions.createTableAction<string, Tables.ContactTableContext>(
   "dashboard.contacts.SetSearch"
 );
 
-export const requestContactsAction = redux.actions.createContextAction<
+export const requestContactsAction = redux.actions.createTableAction<
   Redux.TableRequestPayload,
   Tables.ContactTableContext
 >("dashboard.contacts.Request");

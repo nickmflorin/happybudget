@@ -15,73 +15,56 @@ declare namespace Application {
     readonly prodEnv?: SingleOrArray<NodeJS.ProcessEnv["PRODUCTION_ENV"]>;
   };
 
-  type AuthenticatedModuleLabel = "dashboard" | "budget" | "template";
-  type AuthenticatedAnyModuleStore = Modules.Budget.Store | Modules.Dashboard.Store | Modules.Template.Store;
+  type ModuleLabel = "dashboard" | "budget" | "template";
+
+  type AnyModuleStore =
+    | Modules.Budget.Store
+    | Modules.Dashboard.Store
+    | Modules.Template.Store
+    | Modules.PublicBudget.Store;
+
+  type PublicModuleStores = {
+    readonly budget: Modules.PublicBudget.Store;
+  };
+
   type AuthenticatedModuleStores = {
     readonly dashboard: Modules.Dashboard.Store;
     readonly budget: Modules.Budget.Store;
     readonly template: Modules.Template.Store;
   };
+
+  type PublicModuleReducers = Redux.ReducersMapObject<PublicModuleStores>;
   type AuthenticatedModuleReducers = Redux.ReducersMapObject<AuthenticatedModuleStores>;
 
-  type AuthenticatedStore = AuthenticatedModuleStores & {
-    readonly router: import("connected-react-router").RouterState<import("history").LocationState>;
+  type PublicStore = PublicModuleStores & {
+    readonly tokenId: string | null;
+  };
+
+  type Store = AuthenticatedModuleStores & {
     readonly loading: boolean;
-    readonly user: Model.User;
+    readonly router: import("connected-react-router").RouterState<import("history").LocationState>;
+    readonly user: Model.User | null;
     readonly contacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
     readonly filteredContacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
     readonly productPermissionModalOpen: boolean;
+    readonly public: PublicStore;
   };
 
-  type AuthenticatedReducers = Redux.ReducersMapObject<AuthenticatedStore>;
-
-  type AuthenticatedModuleConfig<S extends AuthenticatedAnyModuleStore = AuthenticatedAnyModuleStore> = Omit<
-    ModuleConfig<AuthenticatedModuleLabel, S>,
-    "isPublic"
-  > & {
-    readonly isPublic?: false;
-  };
-
-  type PublicModuleLabel = "share";
-  type PublicAnycModuleStore = Modules.Share.Store;
-  type PublicModuleStores = {
-    readonly share: Modules.Share.Store;
-  };
-
-  type PublicModuleReducers = Redux.ReducersMapObject<PublicModuleStores>;
-
-  type PublicStore = PublicModuleStores & {
-    readonly loading: boolean;
-    readonly contacts: Redux.ListResponseStore<Model.Contact>;
-  };
-
-  type PublicReducers = Redux.ReducersMapObject<PublicStore>;
-
-  type PublicModuleConfig<S extends Modules.Share.Store = Modules.Share.Store> = Omit<
-    ModuleConfig<PublicModuleLabel, S>,
-    "isPublic"
-  > & {
-    readonly isPublic: true;
-  };
-
-  type AnyModuleLabel = AuthenticatedModuleLabel | PublicModuleLabel;
-
-  interface ModuleConfig<L extends AnyModuleLabel, S> {
+  interface ModuleConfig<
+    S extends AuthenticatedAnyModuleStore | PublicAnyModuleStore = AuthenticatedAnyModuleStore | PublicAnyModuleStore
+  > {
     readonly rootSaga?: import("redux-saga").Saga;
     readonly rootReducer: Redux.Reducer<S>;
     readonly initialState: S | (() => S);
-    readonly label: L;
+    readonly label: ModuleLabel;
     readonly isPublic?: boolean;
   }
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type AnyModuleConfig = AuthenticatedModuleConfig<any> | PublicModuleConfig<any>;
-
-  type ModuleStores = AuthenticatedModuleStores | PublicModuleStores;
-
-  type ModuleReducers = AuthenticatedModuleReducers | PublicModuleReducers;
-
-  type Store = AuthenticatedStore | PublicStore;
-
-  type Reducers = AuthenticatedReducers | PublicReducers;
+  type StoreConfig = {
+    readonly tokenId: string | null;
+    readonly user: Model.User | null;
+    readonly history: import("history").History;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    readonly modules: ModuleConfig<any>[];
+  };
 }

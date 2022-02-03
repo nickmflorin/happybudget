@@ -16,12 +16,3 @@ export const isListRequestIdsPayload = (obj: Redux.TableRequestPayload): obj is 
 
 export const isListRequestIdsAction = (obj: Redux.Action): obj is Redux.Action<{ ids: number[] }> =>
   isListRequestIdsPayload(obj.payload);
-
-export const isAuthenticatedStore = (obj: Application.Store): obj is Application.AuthenticatedStore =>
-  (obj as Application.AuthenticatedStore).user !== undefined;
-
-export const isPublicModuleConfig = (config: Application.AnyModuleConfig): config is Application.PublicModuleConfig =>
-  (config as Application.PublicModuleConfig).isPublic === true;
-
-export const isAuthenticatedAction = (action: Redux.Action): action is Redux.AuthenticatedAction =>
-  (action as Redux.AuthenticatedAction).isAuthenticated === true;

@@ -70,11 +70,15 @@ export const createFringe = services.detailPostService<Http.FringePayload, Model
 
 export const duplicateBudget = async <B extends Model.BaseBudget>(
   id: number,
-  options: Http.RequestOptions = {}
+  options?: Http.RequestOptions
 ): Promise<B> => {
   const url = services.URL.v1("budgets", id, "duplicate");
   return client.post<B>(url, {}, options);
 };
+
+export const createBudgetPublicToken = services.detailPostService<Http.PublicTokenPayload, Model.PublicToken>(
+  (id: number) => ["budgets", id, "public-token"]
+);
 
 export type CreateBudgetMarkup = {
   <B extends Model.BaseBudget>(id: number, payload: Http.MarkupPayload, options?: Http.RequestOptions): Promise<

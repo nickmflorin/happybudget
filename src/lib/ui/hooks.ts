@@ -10,12 +10,24 @@ import { util, hooks, notifications } from "lib";
 
 export * from "./tsxHooks";
 
+export const useIsMounted = (): RefObject<boolean> => {
+  const _isMounted = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      _isMounted.current = false;
+    };
+  }, []);
+
+  return _isMounted;
+};
+
+export const useId = (prefix: string) => useMemo(() => uniqueId(prefix), []);
+
 type UseSizeConfig<T extends string = string> = {
   readonly options: T[];
   readonly default?: T;
 };
-
-export const useId = (prefix: string) => useMemo(() => uniqueId(prefix), []);
 
 export const useSize = <T extends string = string, P extends UseSizeProps<T> = UseSizeProps<T>>(
   config: UseSizeConfig<T>,
@@ -152,6 +164,7 @@ export const useDropdownIfNotDefined = (dropdown?: NonNullRef<IDropdownRef>): No
 export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormInstance<T> => {
   const _useAntdForm = RootForm.useForm();
   const antdForm = _useAntdForm[0];
+  const isMounted = useIsMounted();
 
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
 
@@ -197,7 +210,15 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
         NotificationsHandler.clearNotifications();
         antdForm.resetFields();
       },
-      setLoading,
+      setLoading: (v: boolean) => {
+        /* Only change the state if the Form is still mounted - otherwise we
+           introduce a memory leak.  This can happen often in Modals where
+           the onSuccess callback is triggered and the modal is closed before
+           form.setLoading(false) is called. */
+        if (isMounted.current) {
+          setLoading(v);
+        }
+      },
       loading,
       ...form
     };
@@ -351,16 +372,4 @@ export const useTrackFirstRender = (): boolean => {
     isFirstRender.current = false;
   }, []);
   return isFirstRender.current;
-};
-
-export const useIsMounted = (): RefObject<boolean> => {
-  const _isMounted = useRef(true);
-
-  useEffect(() => {
-    return () => {
-      _isMounted.current = false;
-    };
-  }, []);
-
-  return _isMounted;
 };

@@ -11,12 +11,16 @@ import { Portal } from "components/layout";
 import "./index.scss";
 
 export type Toolbar<
-  T extends Table.MenuActionParams<R, M>,
+  T extends Table.PublicMenuActionParams<R, M>,
   R extends Table.RowData,
   M extends Model.RowHttpModel
 > = React.ComponentType<T & { readonly actions: Table.MenuActions<R, M, T> }>;
 
-export type MenuProps<T extends Table.MenuActionParams<R, M>, R extends Table.RowData, M extends Model.RowHttpModel> = {
+export type MenuProps<
+  T extends Table.PublicMenuActionParams<R, M>,
+  R extends Table.RowData,
+  M extends Model.RowHttpModel
+> = {
   readonly search?: string;
   readonly menuPortalId?: string;
   readonly prefixLeft?: JSX.Element[];
@@ -28,7 +32,7 @@ export type MenuProps<T extends Table.MenuActionParams<R, M>, R extends Table.Ro
 };
 
 export type InternalMenuProps<
-  T extends Table.MenuActionParams<R, M>,
+  T extends Table.PublicMenuActionParams<R, M>,
   R extends Table.RowData,
   M extends Model.RowHttpModel
 > = MenuProps<T, R, M> & {
@@ -39,7 +43,7 @@ export type InternalMenuProps<
 };
 
 const TableMenu = <
-  T extends Table.MenuActionParams<R, M>,
+  T extends Table.PublicMenuActionParams<R, M>,
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
 >(
@@ -105,7 +109,7 @@ const TableMenu = <
 };
 
 const Menu = <
-  T extends Table.MenuActionParams<R, M>,
+  T extends Table.PublicMenuActionParams<R, M>,
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
 >({

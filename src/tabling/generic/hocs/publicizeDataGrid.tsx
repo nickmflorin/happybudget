@@ -1,6 +1,7 @@
 import React, { useMemo, useImperativeHandle } from "react";
 import { isNil, map } from "lodash";
 import hoistNonReactStatics from "hoist-non-react-statics";
+import { Subtract } from "utility-types";
 
 import {
   ProcessCellForExportParams,
@@ -12,81 +13,84 @@ import {
 import { hooks } from "lib";
 
 import { useClipboard, useCellNavigation } from "../hooks";
+import makeDataGrid, { InjectedDataGridProps, DataGridProps, InternalDataGridProps } from "./makeDataGrid";
 
-type InjectedPublicDataGridProps = {
-  readonly getCSVData: (fields?: string[]) => CSVData;
+type InjectedPublicDataGridProps = InjectedDataGridProps & {
   readonly processCellForClipboard: (params: ProcessCellForExportParams) => string;
   readonly onCellKeyDown: (event: CellKeyDownEvent) => void;
   readonly navigateToNextCell: (params: NavigateToNextCellParams) => Table.CellPosition;
   readonly tabToNextCell: (params: TabToNextCellParams) => Table.CellPosition;
 };
 
-export interface PublicizeDataGridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
-  readonly apis: Table.GridApis | null;
-  readonly columns: Table.Column<R, M>[];
-  readonly grid: NonNullRef<Table.DataGridInstance>;
-}
+export type PublicizeDataGridProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel
+> = DataGridProps<R, M>;
 
-export type WithPublicDataGridProps<T> = T & InjectedPublicDataGridProps;
-
-const publicizeDataGrid =
-  <
-    R extends Table.RowData,
-    M extends Model.RowHttpModel = Model.RowHttpModel,
-    T extends PublicizeDataGridProps<R, M> = PublicizeDataGridProps<R, M>
-  >(
-    config?: Table.PublicDataGridConfig<R>
-  ) =>
-  (
-    Component:
-      | React.ComponentClass<WithPublicDataGridProps<T>, Record<string, unknown>>
-      | React.FunctionComponent<WithPublicDataGridProps<T>>
-  ): React.FunctionComponent<T> => {
-    function WithPublicDataGrid(props: T) {
-      const [processCellForClipboard, getCSVData] = useClipboard<R, M>({
-        columns: props.columns,
-        apis: props.apis
-      });
-      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      const [navigateToNextCell, tabToNextCell, _, moveToNextRow] = useCellNavigation<R, M>({
-        apis: props.apis,
-        columns: props.columns,
-        includeRowInNavigation: config?.includeRowInNavigation
-      });
-
-      const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-        return map(props.columns, (col: Table.Column<R, M>) => ({
-          ...col,
-          editable: false
-        }));
-      }, [hooks.useDeepEqualMemo(props.columns)]);
-
-      const onCellKeyDown: (e: Table.CellKeyDownEvent) => void = hooks.useDynamicCallback(
-        (e: Table.CellKeyDownEvent) => {
-          const ev = e.event as KeyboardEvent | null | undefined; // AG Grid's Event Object is Wrong
-          if (!isNil(ev) && ev.code === "Enter" && !isNil(e.rowIndex)) {
-            moveToNextRow({ rowIndex: e.rowIndex, column: e.column });
-          }
-        }
-      );
-
-      useImperativeHandle(props.grid, () => ({
-        getCSVData
-      }));
-
-      return (
-        <Component
-          {...props}
-          columns={columns}
-          processCellForClipboard={processCellForClipboard}
-          getCSVData={getCSVData}
-          onCellKeyDown={onCellKeyDown}
-          navigateToNextCell={navigateToNextCell}
-          tabToNextCell={tabToNextCell}
-        />
-      );
-    }
-    return hoistNonReactStatics(WithPublicDataGrid, React.memo(Component));
+export type InternalPublicizeDataGridProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel
+> = PublicizeDataGridProps<R, M> &
+  InternalDataGridProps<R, M> & {
+    readonly grid: NonNullRef<Table.DataGridInstance>;
+    readonly columns: Table.Column<R, M>[];
   };
+
+/* We have to use the Partial form of the injected props because these props
+   are all optional in the <Grid> component, with the exception of the ID. */
+type HOCProps = Partial<Omit<InjectedPublicDataGridProps, "id">> & Pick<InjectedPublicDataGridProps, "id">;
+
+const publicizeDataGrid = <
+  T extends HOCProps,
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel
+>(
+  Component: React.FunctionComponent<T>
+): React.FunctionComponent<Subtract<T, HOCProps> & InternalPublicizeDataGridProps<R, M>> => {
+  const DG = makeDataGrid<T, R, M>(Component);
+
+  function WithPublicDataGrid(props: Subtract<T, HOCProps> & InternalPublicizeDataGridProps<R, M>) {
+    const [processCellForClipboard, getCSVData] = useClipboard<R, M>({
+      columns: props.columns,
+      apis: props.apis
+    });
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    const [navigateToNextCell, tabToNextCell, _, moveToNextRow] = useCellNavigation<R, M>({
+      apis: props.apis,
+      columns: props.columns
+    });
+
+    const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
+      return map(props.columns, (col: Table.Column<R, M>) => ({
+        ...col,
+        editable: false
+      }));
+    }, [hooks.useDeepEqualMemo(props.columns)]);
+
+    const onCellKeyDown: (e: Table.CellKeyDownEvent) => void = hooks.useDynamicCallback((e: Table.CellKeyDownEvent) => {
+      const ev = e.event as KeyboardEvent | null | undefined; // AG Grid's Event Object is Wrong
+      if (!isNil(ev) && ev.code === "Enter" && !isNil(e.rowIndex)) {
+        moveToNextRow({ rowIndex: e.rowIndex, column: e.column });
+      }
+    });
+
+    useImperativeHandle(props.grid, () => ({
+      getCSVData
+    }));
+
+    return (
+      <DG
+        {...(props as T & InternalPublicizeDataGridProps<R, M>)}
+        columns={columns}
+        processCellForClipboard={processCellForClipboard}
+        getCSVData={getCSVData}
+        onCellKeyDown={onCellKeyDown}
+        navigateToNextCell={navigateToNextCell}
+        tabToNextCell={tabToNextCell}
+      />
+    );
+  }
+  return hoistNonReactStatics(WithPublicDataGrid, React.memo(Component));
+};
 
 export default publicizeDataGrid;

@@ -7,6 +7,7 @@ import { Layout } from "antd";
 import { Icon, ShowHide } from "components";
 import { IconButton } from "components/buttons";
 import { HelpDropdownMenu, UserDropdownMenu } from "components/dropdowns";
+import { IsAuthenticated } from "components/permissions";
 import { SidebarLogo } from "components/svgs";
 
 import "./index.scss";
@@ -57,11 +58,13 @@ const Header = ({
         </Link>
       </div>
 
-      <div className={"primary-header-right"}>
-        <div id={"saving-changes"}></div>
-        <HelpDropdownMenu />
-        <UserDropdownMenu />
-      </div>
+      <IsAuthenticated>
+        <div className={"primary-header-right"}>
+          <div id={"saving-changes"}></div>
+          <HelpDropdownMenu />
+          <UserDropdownMenu />
+        </div>
+      </IsAuthenticated>
     </div>
     <div id={"supplementary-header"}></div>
   </Layout.Header>

@@ -13,4 +13,5 @@ export { default as PercentInput } from "./PercentInput";
 export { default as ColumnSelect } from "./ColumnSelect";
 export { default as GroupSelect } from "./GroupSelect";
 export { default as ImageAndName } from "./ImageAndName";
+export { default as PublicUrlInput } from "./PublicUrlInput";
 export { default as DatePicker } from "./DatePicker";

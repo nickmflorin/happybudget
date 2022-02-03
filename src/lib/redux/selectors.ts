@@ -1,7 +1,6 @@
 import { shallowEqual } from "react-redux";
 import { createSelector, createSelectorCreator, defaultMemoize } from "reselect";
 import { isEqual, filter, map } from "lodash";
-import { isAuthenticatedStore } from "./typeguards";
 
 export const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual);
 export const createShallowEqualSelector = createSelectorCreator(defaultMemoize, shallowEqual);
@@ -14,14 +13,6 @@ export const simpleDeepEqualSelector = <T = any>(func: Redux.GenericSelectorFunc
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const simpleShallowEqualSelector = <T = any>(func: Redux.GenericSelectorFunc<any, T>) => {
   return createShallowEqualSelector(func, (data: T) => data);
-};
-
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export const createGlobalSelector = <T = any>(
-  authenticatedFunc: Redux.AuthenticatedSelectorFunc<T>,
-  publicFunc: Redux.PublicSelectorFunc<T>
-) => {
-  return (state: Application.Store) => (isAuthenticatedStore(state) ? authenticatedFunc(state) : publicFunc(state));
 };
 
 type LoadingSelector<S extends Application.Store> = (s: S) => boolean | Redux.ModelListActionInstance[] | undefined;

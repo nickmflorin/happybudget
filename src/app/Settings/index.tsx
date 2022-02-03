@@ -2,7 +2,7 @@ import { Switch, useHistory, useLocation } from "react-router-dom";
 
 import { Icon } from "components";
 import { ExpandedLayout } from "components/layout";
-import { PrivateRoute } from "components/routes";
+import { Route } from "components/routes";
 import * as config from "config";
 
 const Profile = config.lazyWithRetry(() => import("./Profile"));
@@ -40,9 +40,9 @@ const Settings = (): JSX.Element => {
       ]}
     >
       <Switch>
-        <PrivateRoute exact path={"/profile"} component={Profile} />
-        <PrivateRoute exact path={"/security"} component={Security} />
-        <PrivateRoute path={"/billing"} component={Billing} />
+        <Route exact path={"/profile"} component={Profile} />
+        <Route exact path={"/security"} component={Security} />
+        <Route path={"/billing"} component={Billing} forceReloadFromStripe={true} />
       </Switch>
     </ExpandedLayout>
   );

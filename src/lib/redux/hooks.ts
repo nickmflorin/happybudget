@@ -10,8 +10,8 @@ export const useTrackModelActions = (
   /* The reducer does not care about the action TYPE - just the payload.  So we
 		 can put jibberish here, and it wouldn't matter.  But we need to include it
 		 for TS to compile, because all of our actions expect a TYPE. */
-  const addToState = (id: ID) => dispatch({ type: "NONE", payload: { id, value: true } });
-  const removeFromState = (id: ID) => dispatch({ type: "NONE", payload: { id, value: false } });
+  const addToState = (id: ID) => dispatch({ type: "NONE", payload: { id, value: true }, context: {} });
+  const removeFromState = (id: ID) => dispatch({ type: "NONE", payload: { id, value: false }, context: {} });
 
   const isDeleting = useMemo(
     () => (id: ID) =>

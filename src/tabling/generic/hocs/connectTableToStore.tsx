@@ -1,71 +1,75 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useStore, useSelector, useDispatch } from "react-redux";
+import { useStore, useSelector } from "react-redux";
+import { Subtract } from "utility-types";
 import hoistNonReactStatics from "hoist-non-react-statics";
 import { isNil } from "lodash";
 import { redux } from "lib";
 
-type ProvidedProps<
-  R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
-> = {
+export type ConnectedTableInjectedProps<R extends Table.RowData, S extends Redux.TableStore<R>> = {
+  /* TODO: Figure out how to inject the tableId from the config into props so
+     we do not have to specify it both as a part of the config and the props.
+     readonly tableId: string; */
   readonly search: string;
   readonly data: Table.BodyRow<R>[];
   readonly loading: boolean;
-  readonly table: NonNullRef<Table.TableInstance<R, M>>;
   readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
-  readonly selector: (state: Application.Store) => S;
-  readonly onSearch: (v: string) => void;
-  readonly onChangeEvent: (e: Table.ChangeEvent<R, M>) => void;
+  readonly selector: (s: Application.Store) => S;
 };
 
-export type WithConnectedTableProps<
-  T,
+export type ConnectTableProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
-> = T & ProvidedProps<R, M, S>;
+  M extends Model.RowHttpModel,
+  S extends Redux.TableStore<R>,
+  C extends Table.Context = Table.Context
+> = {
+  readonly actionContext: C;
+  readonly table: NonNullRef<Table.TableInstance<R, M>>;
+  readonly selector?: (s: Application.Store) => S;
+};
+
+export type StoreConfig<R extends Table.RowData, M extends Model.RowHttpModel, S extends Redux.TableStore<R>> = {
+  readonly tableId: string;
+  readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
+  readonly reducer?: Redux.Reducer<S>;
+  /* The table store selector can either be passed in as a configuration or
+		 in the props.  The preference is as a configuration, but there are cases
+		 where the selector depends on props of the parent component and needs
+		 to be passed in as a prop to the connected component. */
+  readonly selector?: (s: Application.Store) => S;
+  readonly createSaga?: (t: Table.TableInstance<R, M>) => import("redux-saga").Saga;
+};
+
+type HOCProps<
+  T extends ConnectedTableInjectedProps<R, S>,
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+  S extends Redux.TableStore<R>,
+  C extends Table.Context = Table.Context
+> = Subtract<T, ConnectedTableInjectedProps<R, S>> & ConnectTableProps<R, M, S, C>;
 
 const connectTableToStore =
   <
-    T extends {
-      readonly tableId: string;
-      readonly table: NonNullRef<Table.TableInstance<R, M>>;
-      readonly actionContext: C;
-      readonly search?: string;
-      readonly data?: Table.BodyRow<R>[];
-      readonly loading?: boolean;
-      /* The table store selector can either be passed in as a configuration or
-         in the props.  The preference is as a configuration, but there are cases
-         where the selector depends on props of the parent component and needs
-         to be passed in as a prop to the connected component. */
-      readonly selector?: (state: Application.Store) => S;
-    },
+    T extends ConnectedTableInjectedProps<R, S>,
     R extends Table.RowData,
-    M extends Model.RowHttpModel = Model.RowHttpModel,
-    S extends Redux.TableStore<R> = Redux.TableStore<R>,
+    M extends Model.RowHttpModel,
+    S extends Redux.TableStore<R>,
     C extends Table.Context = Table.Context
   >(
-    config:
-      | Table.StoreConfig<R, M, S, C, Redux.TableActionMap<M, C>>
-      | Table.StoreConfig<R, M, S, C, Redux.AuthenticatedTableActionMap<R, M, C>>
+    config: StoreConfig<R, M, S>
   ) =>
-  (
-    Component:
-      | React.ComponentClass<WithConnectedTableProps<T, R, M, S>, Record<string, unknown>>
-      | React.FunctionComponent<WithConnectedTableProps<T, R, M, S>>
-  ): React.FunctionComponent<T> => {
-    let selector: (state: Application.Store) => S = () => redux.initialState.initialTableState as S;
+  (Component: React.FunctionComponent<T>): React.FunctionComponent<HOCProps<T, R, M, S, C>> => {
+    let configuredSelector: (state: Application.Store) => S = () => redux.initialState.initialTableState as S;
     if (!isNil(config.selector)) {
-      selector = config.selector;
+      configuredSelector = config.selector;
     }
-    const selectData = (state: Application.Store) => selector(state)?.data || [];
-    const selectSearch = (state: Application.Store) => selector(state)?.search || "";
-    const selectLoading = (state: Application.Store) => selector(state)?.loading || false;
+    const selectData = (state: Application.Store) => configuredSelector(state)?.data || [];
+    const selectSearch = (state: Application.Store) => configuredSelector(state)?.search || "";
+    const selectLoading = (state: Application.Store) => configuredSelector(state)?.loading || false;
 
-    const _selectData = (s: Application.Store, p: T) => (isNil(p.selector) ? selectData(s) : p.selector(s).data);
+    const _selectData = (s: Application.Store, p: HOCProps<T, R, M, S, C>) =>
+      isNil(p.selector) ? selectData(s) : p.selector(s).data;
 
-    const WithStoreConfigured = (props: T) => {
+    const WithStoreConfigured = (props: HOCProps<T, R, M, S, C>) => {
       const store: Redux.Store<Application.Store> = useStore() as Redux.Store<Application.Store>;
       const data = useSelector((s: Application.Store) => _selectData(s, props));
       const search = useSelector(selectSearch);
@@ -74,32 +78,32 @@ const connectTableToStore =
       const [ready, setReady] = useState(false);
       const sagaInjected = useRef<boolean>(false);
 
-      const dispatch = useDispatch();
-
       /* It is extremely important that the ONLY dependency to this Saga is
-				 the `tableId` - if additional dependencies are added, it can lead to
+				 the `table` - if additional dependencies are added, it can lead to
 				 multiple Sagas being created for a given table... which means every
 				 action will make multiple requests to the backend API. */
       useEffect(() => {
         if (!isNil(config.createSaga)) {
           if (sagaInjected.current === false) {
-            if (!store.hasSaga(`${props.tableId}-saga`)) {
+            if (!store.hasSaga(`${config.tableId}-saga`)) {
               const saga = config.createSaga(props.table.current);
-              store.injectSaga(`${props.tableId}-saga`, saga);
+              store.injectSaga(`${config.tableId}-saga`, saga);
             }
             sagaInjected.current = true;
             setReady(true);
             return () => {
-              store.ejectSaga(`${props.tableId}-saga`);
+              store.ejectSaga(`${config.tableId}-saga`);
             };
           }
         } else {
           setReady(true);
         }
-      }, [props.tableId, props.table.current]);
+      }, [props.table.current]);
 
       return (
         <Component
+          {...(props as T & ConnectTableProps<R, M, S, C>)}
+          tableId={config.tableId}
           search={search}
           /* This is necessary in order to not show stale data in a "flash" when
 					 the page initially loads and before the data in the store is
@@ -108,17 +112,8 @@ const connectTableToStore =
 					 the Saga. */
           data={ready === true ? data : []}
           loading={loading}
-          selector={selector}
-          {...props}
+          selector={configuredSelector}
           footerRowSelectors={config.footerRowSelectors}
-          onChangeEvent={(e: Table.ChangeEvent<R, M>) => {
-            if ((config.actions as Redux.AuthenticatedTableActionMap<R, M, C>).tableChanged !== undefined) {
-              dispatch(
-                (config.actions as Redux.AuthenticatedTableActionMap<R, M, C>).tableChanged(e, props.actionContext)
-              );
-            }
-          }}
-          onSearch={(v: string) => dispatch(config.actions.setSearch(v, props.actionContext))}
         />
       );
     };

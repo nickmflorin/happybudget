@@ -1,5 +1,6 @@
 import React, { useImperativeHandle, useState, useMemo, useRef } from "react";
 import { forEach, isNil, uniq, map, filter, includes, reduce } from "lodash";
+import { Subtract } from "utility-types";
 
 import { tabling, util, hooks, notifications } from "lib";
 
@@ -7,17 +8,19 @@ import { TableNotifications } from "components/notifications";
 import { DeleteRowsModal } from "components/modals";
 import { AuthenticatedGrid } from "tabling/generic";
 
-import { AuthenticatedGridProps } from "../grids";
+import * as genericColumns from "../columns";
+import { AuthenticatedGridProps, AuthenticatedDataGrid } from "../grids";
 import { AuthenticatedMenu } from "../menus";
 import {
   FooterGrid,
   AuthenticatedFooterGridProps,
   TableConfigurationProps,
-  WithConfiguredTableProps,
-  WithAuthenticatedDataGridProps,
-  WithConnectedTableProps,
+  ConfiguredTableInjectedProps,
+  ConnectAuthenticatedTableProps,
   AuthenticateDataGridProps,
   DataGridProps,
+  ConnectedAuthenticatedTableInjectedProps,
+  InternalAuthenticateDataGridProps,
   configureTable
 } from "../hocs";
 import TableWrapper from "./TableWrapper";
@@ -25,40 +28,47 @@ import TableWrapper from "./TableWrapper";
 export type AuthenticatedTableDataGridProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
-> = AuthenticateDataGridProps<R, M> & DataGridProps<R, M> & Omit<AuthenticatedGridProps<R, M>, "id">;
+> = InternalAuthenticateDataGridProps<R, M> & DataGridProps<R, M> & Omit<AuthenticatedGridProps<R, M>, "id">;
 
-export type AuthenticatedTableProps<
+export type BaseTableProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Table.Context = Table.Context
+  M extends Model.RowHttpModel = Model.RowHttpModel
 > = TableConfigurationProps<R, M> &
-  Omit<
-    AuthenticateDataGridProps<R, M>,
-    "onChangeEvent" | "columns" | "data" | "apis" | "onRowSelectionChanged" | "rowHasCheckboxSelection" | "grid"
-  > & {
-    readonly actionContext: C;
-    readonly table: NonNullRef<Table.TableInstance<R, M>>;
-    readonly actions?: Table.AuthenticatedMenuActions<R, M>;
+  DataGridProps<R, M> & {
+    readonly minimal?: boolean;
+    readonly rowHeight?: number;
+    readonly menuPortalId?: string;
+    readonly showPageFooter?: boolean;
     readonly constrainTableFooterHorizontally?: boolean;
     readonly constrainPageFooterHorizontally?: boolean;
     readonly excludeColumns?:
       | SingleOrArray<string | ((col: Table.DataColumn<R, M>) => boolean)>
       | ((col: Table.DataColumn<R, M>) => boolean);
+  };
+
+export type AuthenticatedTableProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
+> = BaseTableProps<R, M> &
+  Omit<AuthenticateDataGridProps<R, M>, "apis"> &
+  Omit<ConnectAuthenticatedTableProps<R, M, S>, "actionContext"> &
+  ConnectedAuthenticatedTableInjectedProps<R, M> & {
+    readonly hasDragColumn?: boolean;
+    readonly checkboxColumn?: Table.PartialActionColumn<R, M>;
+    readonly checkboxColumnWidth?: number;
+    readonly savingChangesPortalId?: string;
+    readonly actions?: Table.AuthenticatedMenuActions<R, M>;
     readonly confirmRowDelete?: boolean;
     readonly localizePopupParent?: boolean;
-    readonly selector?: (state: Application.Store) => S;
     readonly rowHasCheckboxSelection?: (row: Table.EditableRow<R>) => boolean;
   };
 
 type _AuthenticatedTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Table.Context = Table.Context
-> = AuthenticatedTableProps<R, M, S, C> & {
-  readonly children: RenderPropChild<AuthenticatedTableDataGridProps<R, M>>;
-};
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
+> = AuthenticatedTableProps<R, M, S> & ConfiguredTableInjectedProps;
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const TableFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, any>>({
@@ -92,9 +102,7 @@ const AuthenticatedTable = <
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
-  props: WithAuthenticatedDataGridProps<
-    WithConnectedTableProps<WithConfiguredTableProps<_AuthenticatedTableProps<R, M, S>, R>, R, M, S>
-  >
+  props: _AuthenticatedTableProps<R, M, S>
 ): JSX.Element => {
   const grid = tabling.hooks.useDataGrid();
   const [savingVisible, setSavingVisible] = useState(false);
@@ -133,25 +141,42 @@ const AuthenticatedTable = <
       }
       return false;
     };
-    return map(
-      filter(
-        props.columns,
+    let cs = [
+      genericColumns.CheckboxColumn<R, M>(
+        { ...props.checkboxColumn, pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined },
+        props.hasEditColumn,
+        props.checkboxColumnWidth
+      ),
+      ...map(
+        filter(
+          props.columns,
+          (c: Table.Column<R, M>) =>
+            (tabling.typeguards.isDataColumn(c) && !evaluateColumnExclusionProp(c)) ||
+            !tabling.typeguards.isDataColumn(c)
+        ) as Table.Column<R, M>[],
         (c: Table.Column<R, M>) =>
-          (tabling.typeguards.isDataColumn(c) && !evaluateColumnExclusionProp(c)) || !tabling.typeguards.isDataColumn(c)
-      ) as Table.Column<R, M>[],
-      (c: Table.Column<R, M>) =>
-        tabling.typeguards.isRealColumn(c)
-          ? {
-              ...c,
-              cellRendererParams: {
-                ...c.cellRendererParams,
-                selector: props.selector,
-                footerRowSelectors: props.footerRowSelectors
-              },
-              cellEditorParams: { ...c.cellEditorParams, selector: props.selector }
-            }
-          : c
-    );
+          tabling.typeguards.isRealColumn(c)
+            ? ({
+                ...c,
+                cellRendererParams: {
+                  ...c.cellRendererParams,
+                  selector: props.selector,
+                  footerRowSelectors: props.footerRowSelectors
+                },
+                cellEditorParams: { ...c.cellEditorParams, selector: props.selector }
+              } as Table.RealColumn<R, M>)
+            : c
+      )
+    ];
+    if (props.hasDragColumn !== false) {
+      cs = [
+        genericColumns.DragColumn<R, M>({
+          pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined
+        }),
+        ...cs
+      ];
+    }
+    return cs;
   }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns]);
 
   /**
@@ -415,17 +440,17 @@ const AuthenticatedTable = <
           hasEditColumn={props.hasEditColumn}
           hasDragColumn={props.hasDragColumn === undefined ? true : props.hasDragColumn}
         />
-        {props.children({
-          ...props,
-          apis: props.tableApis.get("data"),
-          columns: columns,
-          gridOptions: props.tableGridOptions.data,
-          grid,
-          onGridReady: props.onDataGridReady,
-          onRowSelectionChanged: (rows: Table.EditableRow<R>[]) => setSelectedRows(rows),
-          onChangeEvent: _onChangeEvent,
-          rowHasCheckboxSelection: props.rowHasCheckboxSelection
-        })}
+        <AuthenticatedDataGrid
+          {...props}
+          apis={props.tableApis.get("data")}
+          columns={columns}
+          gridOptions={props.tableGridOptions.data}
+          grid={grid}
+          onGridReady={props.onDataGridReady}
+          onRowSelectionChanged={(rows: Table.EditableRow<R>[]) => setSelectedRows(rows)}
+          onChangeEvent={_onChangeEvent}
+          rowHasCheckboxSelection={props.rowHasCheckboxSelection}
+        />
         <TableNotifications
           notifications={NotificationsHandler.notifications}
           tableId={props.tableId}
@@ -470,20 +495,13 @@ const AuthenticatedTable = <
   );
 };
 
-type Props = WithAuthenticatedDataGridProps<
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  WithConnectedTableProps<WithConfiguredTableProps<_AuthenticatedTableProps<any>, any>, any>
->;
-
-const Memoized = React.memo(AuthenticatedTable) as typeof AuthenticatedTable;
-
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export default configureTable<any, any, Props>(Memoized) as {
+export default configureTable<_AuthenticatedTableProps<any, any, any>, any, any>(AuthenticatedTable) as {
   <
     R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>
   >(
-    props: _AuthenticatedTableProps<R, M, S>
+    props: Subtract<_AuthenticatedTableProps<R, M, S>, ConfiguredTableInjectedProps>
   ): JSX.Element;
 };

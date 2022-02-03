@@ -1,74 +1,54 @@
-import React from "react";
-import { isNil, filter } from "lodash";
+import React, { useMemo } from "react";
+import { useSelector } from "react-redux";
+import { isNil } from "lodash";
 
-import { tabling } from "lib";
+import * as api from "api";
 import { framework } from "tabling/generic";
 
-import { AuthenticatedBudgetTable, AuthenticatedBudgetTableProps } from "../BudgetTable";
-import AccountsTable, { AccountsTableProps } from "./AccountsTable";
+import { selectors } from "app/Budgeting/store";
+import AuthenticatedTable, { AuthenticatedTableProps } from "./AuthenticatedTable";
 import Columns from "./Columns";
 
 type R = Tables.AccountRowData;
 type M = Model.Account;
 
-export type AuthenticatedBudgetProps = AccountsTableProps &
-  Omit<AuthenticatedBudgetTableProps<R, M>, "columns" | "cookieNames"> & {
-    readonly budget: Model.Budget | null;
-    readonly cookieNames?: Table.CookieNames;
-    readonly onExportPdf: () => void;
-  };
-
-const AuthenticatedBudgetAccountsTable = (props: AuthenticatedBudgetProps): JSX.Element => {
-  return (
-    <AuthenticatedBudgetTable<R, M>
-      {...props}
-      actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
-        {
-          icon: "folder",
-          label: "Subtotal",
-          isWriteOnly: true,
-          onClick: () => {
-            const rows: Table.BodyRow<R>[] = props.table.current.getRowsAboveAndIncludingFocusedRow();
-            const modelRows: Table.ModelRow<R>[] = filter(rows, (r: Table.BodyRow<R>) =>
-              tabling.typeguards.isModelRow(r)
-            ) as Table.ModelRow<R>[];
-            if (modelRows.length !== 0) {
-              props.onGroupRows?.(modelRows);
-            }
-          }
-        },
-        {
-          icon: "badge-percent",
-          label: "Mark Up",
-          isWriteOnly: true,
-          onClick: () => {
-            const selectedRows = filter(params.selectedRows, (r: Table.BodyRow<R>) =>
-              tabling.typeguards.isModelRow(r)
-            ) as Table.ModelRow<R>[];
-
-            const rows: Table.ModelRow<R>[] =
-              selectedRows.length !== 0
-                ? selectedRows
-                : (filter(props.table.current.getRows(), (r: Table.BodyRow<R>) =>
-                    tabling.typeguards.isModelRow(r)
-                  ) as Table.ModelRow<R>[]);
-            if (rows.length !== 0) {
-              props.onMarkupRows?.(rows);
-            }
-          }
-        },
-        ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
-        framework.actions.ToggleColumnAction<R, M>(props.table.current, params),
-        framework.actions.ExportPdfAction(props.onExportPdf),
-        framework.actions.ExportCSVAction<R, M>(
-          props.table.current,
-          params,
-          !isNil(props.budget) ? `${props.budget.type}_${props.budget.name}_accounts` : ""
-        )
-      ]}
-      columns={tabling.columns.filterRealColumns(Columns)}
-    />
-  );
+export type AuthenticatedBudgetProps = Omit<AuthenticatedTableProps<Model.Budget>, "domain" | "columns"> & {
+  readonly onExportPdf: () => void;
+  readonly onShared: (token: Model.PublicToken) => void;
+  readonly onShareUpdated: (token: Model.PublicToken) => void;
+  readonly onUnshared: () => void;
+  readonly onParentUpdated: (p: Model.Budget) => void;
 };
 
-export default React.memo(AccountsTable<AuthenticatedBudgetProps>(AuthenticatedBudgetAccountsTable));
+const AuthenticatedBudget = (props: AuthenticatedBudgetProps): JSX.Element => {
+  const budget: Model.Budget | null = useSelector(
+    (s: Application.Store) => selectors.selectBudgetDetail(s, { domain: "budget" }) as Model.Budget | null
+  );
+
+  const tableActions = useMemo(
+    () => (params: Table.AuthenticatedMenuActionParams<R, M>) => {
+      let _actions: Table.AuthenticatedMenuActions<R, M> = [
+        ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
+        framework.actions.ExportPdfAction(props.onExportPdf)
+      ];
+      if (!isNil(budget)) {
+        _actions = [
+          ..._actions,
+          framework.actions.ShareAction<Model.Budget>({
+            instance: budget,
+            create: api.createBudgetPublicToken,
+            onCreated: (token: Model.PublicToken) => props.onShared(token),
+            onUpdated: (token: Model.PublicToken) => props.onShareUpdated(token),
+            onDeleted: () => props.onUnshared()
+          })
+        ];
+      }
+      return _actions;
+    },
+    [budget, props.actions, props.onShared]
+  );
+
+  return <AuthenticatedTable<Model.Budget> {...props} domain={"budget"} columns={Columns} actions={tableActions} />;
+};
+
+export default React.memo(AuthenticatedBudget);

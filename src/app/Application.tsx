@@ -5,17 +5,15 @@ import { Dispatch } from "redux";
 
 import { actions } from "store";
 
-import { ConnectedApplicationSpinner } from "components";
 import { MultipleBudgetProductPermissionModal } from "components/modals";
-import { NotFoundRoute, PrivateRoute } from "components/routes";
+import { NotFoundRoute, PathParamsRoute } from "components/routes";
 
-import Budget from "./Budget";
-import Template from "./Template";
+import { Budget, Template } from "./Budgeting";
 import Dashboard from "./Dashboard";
 import Settings from "./Settings";
 import Logout from "./Logout";
 
-const selectProductPermissionModalOpen = (state: Application.AuthenticatedStore) => state.productPermissionModalOpen;
+const selectProductPermissionModalOpen = (state: Application.Store) => state.productPermissionModalOpen;
 
 const Application = (): JSX.Element => {
   const ProductPermissionModalOpen = useSelector(selectProductPermissionModalOpen);
@@ -23,15 +21,24 @@ const Application = (): JSX.Element => {
 
   return (
     <React.Fragment>
-      <ConnectedApplicationSpinner />
       <Switch>
         <Redirect exact from={"/"} to={"/budgets"} />
-        <PrivateRoute path={"/budgets/:budgetId"} component={Budget} />
-        <PrivateRoute path={"/templates/:budgetId"} component={Template} />
-        <PrivateRoute path={["/budgets", "/contacts", "/templates", "/discover"]} component={Dashboard} />
-        <PrivateRoute path={["/profile", "/security", "/billing"]} component={Settings} />
+        <PathParamsRoute<{ budgetId: number }>
+          params={["budgetId"]}
+          path={"/budgets/:budgetId"}
+          component={Budget}
+          redux={false}
+        />
+        <PathParamsRoute<{ budgetId: number }>
+          params={["budgetId"]}
+          path={"/templates/:budgetId"}
+          component={Template}
+          redux={false}
+        />
+        <Route path={["/budgets", "/contacts", "/templates", "/discover"]} component={Dashboard} />
+        <Route path={["/profile", "/security", "/billing"]} component={Settings} />
         <Route exact path={"/logout"} component={Logout} />
-        <NotFoundRoute />
+        <NotFoundRoute auto={true} />
       </Switch>
       <MultipleBudgetProductPermissionModal
         open={ProductPermissionModalOpen}
@@ -41,4 +48,4 @@ const Application = (): JSX.Element => {
   );
 };
 
-export default Application;
+export default React.memo(Application);

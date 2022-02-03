@@ -123,9 +123,9 @@ const Login = (): JSX.Element => {
             .socialLogin({ token_id: token, provider: "google" })
             .then((user: Model.User) => {
               if (user.is_first_time === true) {
-                history.push("/discover");
+                history.push("/discover", { validatedUser: user });
               } else {
-                history.push("/");
+                history.push("/", { validatedUser: user });
               }
             })
             .catch((e: Error) => handleLoginError(e))
@@ -145,9 +145,9 @@ const Login = (): JSX.Element => {
               .login(email.toLowerCase(), values.password)
               .then((user: Model.User) => {
                 if (user.is_first_time === true) {
-                  history.push("/discover");
+                  history.push("/discover", { validatedUser: user });
                 } else {
-                  history.push("/");
+                  history.push("/", { validatedUser: user });
                 }
               })
               .catch((e: Error) => handleLoginError(e))

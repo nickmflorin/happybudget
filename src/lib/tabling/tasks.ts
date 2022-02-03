@@ -14,7 +14,7 @@ export const createChangeEventHandler = <
 >(
   handlers: Partial<Redux.TableEventTaskMapObject<R, M, C>>
 ): Redux.TableEventTask<Table.ChangeEvent<R, M>, R, M, C> => {
-  function* handleChangeEvent(e: Table.ChangeEvent<R, M>, context: C): SagaIterator {
+  function* handleChangeEvent(e: Table.ChangeEvent<R, M>, context: Redux.WithActionContext<C>): SagaIterator {
     if (e.type !== "modelAdded") {
       const handler = handlers[e.type] as Redux.TableEventTask<Table.ChangeEvent<R, M>, R, M, C> | undefined;
       /* Do not issue a warning/error if the event type does not have an
@@ -28,38 +28,37 @@ export const createChangeEventHandler = <
   return handleChangeEvent;
 };
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-type BulkCreate<RSP, ARGS extends any[]> = (...args: ARGS) => [Http.Service<RSP, any>, ...ARGS];
-
 type CreateBulkTaskConfig<
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  S extends Redux.TableStore<R>,
-  RSP,
+  P extends Http.PayloadObj,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  ARGS extends any[]
+  SERVICE extends (...args: any[]) => Promise<any>,
+  C extends Table.Context = Table.Context,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = {
   readonly table: Table.TableInstance<R, M>;
+  readonly service: SERVICE;
   readonly loadingActions?: Redux.ActionCreator<boolean>[];
-  readonly responseActions: (r: RSP, e: Table.RowAddEvent<R>) => Redux.Action[];
-  readonly selectStore: (state: Application.AuthenticatedStore) => S;
-  readonly bulkCreate: BulkCreate<RSP, ARGS>;
+  readonly responseActions: (r: Http.ServiceResponse<SERVICE>, e: Table.RowAddEvent<R>) => Redux.Action[];
+  readonly selectStore: (state: Application.Store) => S;
+  readonly performCreate: (ctx: Redux.WithActionContext<C>, p: Http.BulkCreatePayload<P>) => Parameters<SERVICE>;
 };
 
 export const createBulkTask = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  S extends Redux.TableStore<R>,
   P extends Http.PayloadObj,
-  RSP,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  ARGS extends any[] = []
+  SERVICE extends (...args: any[]) => Promise<any>,
+  C extends Table.Context = Table.Context,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
-  config: CreateBulkTaskConfig<R, M, S, RSP, ARGS>
-): Redux.TableBulkCreateTask<R, ARGS> => {
+  config: CreateBulkTaskConfig<R, M, P, SERVICE, C, S>
+) => {
   const selectData = createSelector(config.selectStore, (store: S) => store.data);
 
-  function* bulkCreateTask(e: Table.RowAddEvent<R>, errorMessage: string, ...args: ARGS): SagaIterator {
+  function* bulkCreateTask(e: Table.RowAddEvent<R>, ctx: Redux.WithActionContext<C>): SagaIterator {
     const payload: Partial<R>[] | Table.RowAddIndexPayload | Table.RowAddCountPayload = e.payload;
     const store: Table.BodyRow<R>[] = yield select(selectData);
 
@@ -67,8 +66,8 @@ export const createBulkTask = <
     if (tabling.typeguards.isRowAddCountPayload(payload) || tabling.typeguards.isRowAddIndexPayload(payload)) {
       data = tabling.patterns.generateNewRowData(
         { store, ...payload },
-        filter(config.table.getColumns(), (c: Table.DataColumn<R, M>) =>
-          typeguards.isBodyColumn(c)
+        filter(config.table.getColumns(), (cl: Table.DataColumn<R, M>) =>
+          typeguards.isBodyColumn(cl)
         ) as Table.BodyColumn<R, M>[]
       );
     } else {
@@ -96,11 +95,14 @@ export const createBulkTask = <
       yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean>) => put(action(true))));
     }
     config.table.saving(true);
+    const performCreate = config.performCreate(ctx, requestPayload);
     try {
-      const response: RSP = yield api.request(...config.bulkCreate(...args), requestPayload);
+      const response: Http.ServiceResponse<SERVICE> = yield api.request(config.service, ctx, ...performCreate);
       yield all(map(config.responseActions(response, e), (action: Redux.Action) => put(action)));
     } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, { message: errorMessage });
+      config.table.handleRequestError(err as Error, {
+        message: ctx.errorMessage || "There was an error creating the table rows."
+      });
     } finally {
       if (!isNil(config.loadingActions)) {
         yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean>) => put(action(false))));

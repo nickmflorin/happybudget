@@ -24,6 +24,14 @@ export const validateAuthToken = async (
   return tokenClient.post<Model.User>(url, payload || {}, options);
 };
 
+export const validatePublicToken = async (
+  payload?: Http.PublicTokenValidationPayload,
+  options?: Http.RequestOptions
+): Promise<{ readonly token_id: string }> => {
+  const url = services.URL.v1("auth", "validate-public");
+  return tokenClient.post<{ readonly token_id: string }>(url, payload || {}, options);
+};
+
 export const validateEmailConfirmationToken = async (
   token: string,
   options?: Http.RequestOptions
@@ -57,3 +65,15 @@ export const resetPassword = async (
   const url = services.URL.v1("auth", "reset-password");
   return unauthenticatedClient.post<Model.User>(url, payload, options);
 };
+
+export const updatePublicToken = services.detailPatchService<
+  Partial<Omit<Http.PublicTokenPayload, "public_id">>,
+  Model.PublicToken
+>((id: number) => ["auth", "public-tokens", id]);
+
+export const deletePublicToken = services.deleteService((id: number) => ["auth", "public-tokens", id]);
+export const getPublicToken = services.retrieveService<Model.PublicToken>((id: number) => [
+  "auth",
+  "public-tokens",
+  id
+]);

@@ -1,23 +1,30 @@
-import { History } from "history";
+import { combineReducers, CombinedState } from "redux";
 import { connectRouter } from "connected-react-router";
 
 import { isNil, reduce, filter } from "lodash";
 import { redux } from "lib";
 
 import * as actions from "./actions";
-import { createInitialUserState } from "./initialState";
 
-const createUserReducer = (user: Model.User): Redux.Reducer<Model.User, Redux.Action<Model.User>> => {
-  const initialUserState = createInitialUserState(user);
-
-  return (state: Model.User = initialUserState, action: Redux.Action<Model.User>): Model.User => {
-    let newState = { ...state };
+const createUserReducer =
+  (user: Model.User | null): Redux.Reducer<Model.User | null, Redux.Action<Model.User>> =>
+  (state: Model.User | null = user, action: Redux.Action<Model.User>): Model.User | null => {
+    /* We only allow the user to be updated in the store if the store was
+       initially configured with that user.  If the store was not configured with
+       that user or the store was configured with no user at all, we do not
+       permit the update. */
     if (action.type === actions.authenticated.updateLoggedInUserAction.toString()) {
-      newState = { ...newState, ...action.payload };
+      if (state !== null) {
+        if (state.id !== action.payload.id) {
+          throw new Error("Attempting to update the store with different user than the store was configured for.");
+        }
+        return { ...state, ...action.payload };
+      }
+    } else if (action.type === actions.authenticated.clearLoggedInUserAction.toString()) {
+      return null;
     }
-    return newState;
+    return state;
   };
-};
 
 const loadingReducer: Redux.Reducer<boolean, Redux.Action<boolean>> = (
   state = false,
@@ -29,43 +36,35 @@ const loadingReducer: Redux.Reducer<boolean, Redux.Action<boolean>> = (
   return state;
 };
 
-function createModularApplicationReducer(
-  config: Application.AuthenticatedModuleConfig[]
-): Application.AuthenticatedModuleReducers;
-
-function createModularApplicationReducer(config: Application.PublicModuleConfig[]): Application.PublicModuleReducers;
-
-function createModularApplicationReducer(config: Application.AnyModuleConfig[]): Application.ModuleReducers {
-  return reduce(
+const createModularApplicationReducer = <
+  S extends Application.AuthenticatedModuleReducers | Application.PublicModuleReducers
+>(
+  config: Application.ModuleConfig[]
+): S =>
+  reduce(
     config,
-    (prev: Application.ModuleReducers, moduleConfig: Application.AnyModuleConfig) => {
+    (prev: S, moduleConfig: Application.ModuleConfig) => {
       return { ...prev, [moduleConfig.label]: moduleConfig.rootReducer };
     },
-    {} as Application.ModuleReducers
+    {} as S
   );
-}
 
-/**
- * Creates the base application reducer for the authenticated user that bundles
- * up the reducers from the individual modules with other top level reducers.
- *
- * @param config  The application Redux configuration.
- * @param user   The User object returned from the JWT token validation.
- */
-export const createStaticAuthenticatedReducers = (
-  config: Application.AnyModuleConfig[],
-  user: Model.User,
-  history: History
-): Application.AuthenticatedReducers => {
-  const moduleReducers = createModularApplicationReducer(
-    filter(
-      config,
-      (c: Application.AnyModuleConfig) => !redux.typeguards.isPublicModuleConfig(c)
-    ) as Application.AuthenticatedModuleConfig[]
-  );
-  return {
-    ...moduleReducers,
-    router: connectRouter(history),
+const createPublicApplicationReducer = (
+  config: Application.StoreConfig
+): Redux.Reducer<CombinedState<Application.PublicStore>> =>
+  combineReducers({
+    ...createModularApplicationReducer(filter(config.modules, (c: Application.ModuleConfig) => c.isPublic === true)),
+    /* The store is configured with the tokenId, so the tokenId in the store
+       should never and change and should be prevented from changing.  Thus the
+       reducer is just the identity. */
+    tokenId: () => config.tokenId
+  });
+
+const createApplicationReducer = (config: Application.StoreConfig): Redux.Reducer<CombinedState<Application.Store>> =>
+  combineReducers({
+    ...createModularApplicationReducer(filter(config.modules, (c: Application.ModuleConfig) => c.isPublic !== true)),
+    router: connectRouter(config.history),
+    public: createPublicApplicationReducer(config),
     contacts: redux.reducers.createAuthenticatedModelListResponseReducer<
       Model.Contact,
       null,
@@ -100,35 +99,10 @@ export const createStaticAuthenticatedReducers = (
       }
     }),
     loading: loadingReducer,
-    user: createUserReducer(user),
+    user: createUserReducer(config.user),
     productPermissionModalOpen: redux.reducers.createSimpleBooleanReducer({
       actions: { set: actions.authenticated.setProductPermissionModalOpenAction }
     })
-  };
-};
+  });
 
-/**
- * Creates the base application reducer for the Public user that bundles
- * up the reducers from the individual modules with other top level reducers.
- *
- * @param config  The application Redux configuration.
- */
-export const createStaticPublicReducers = (config: Application.AnyModuleConfig[]): Application.PublicReducers => {
-  const moduleReducers = createModularApplicationReducer(
-    filter(config, (c: Application.AnyModuleConfig) =>
-      redux.typeguards.isPublicModuleConfig(c)
-    ) as Application.PublicModuleConfig[]
-  );
-  return {
-    ...moduleReducers,
-    contacts: redux.reducers.createListResponseReducer<Model.Contact>({
-      initialState: redux.initialState.initialModelListResponseState,
-      actions: {
-        request: actions.requestContactsAction,
-        response: actions.responseContactsAction,
-        loading: actions.loadingContactsAction
-      }
-    }),
-    loading: loadingReducer
-  };
-};
+export default createApplicationReducer;

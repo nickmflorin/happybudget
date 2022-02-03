@@ -13,21 +13,23 @@ type MarkupFormValues = Omit<Http.MarkupPayload, "rate"> & { readonly rate: stri
 
 interface EditMarkupModalProps<
   B extends Model.Budget | Model.Template,
-  R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
+  PARENT extends Model.Account | Model.SubAccount,
+  R extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>
 > extends EditModelModalProps<Model.Markup, R> {
-  readonly parentId: number;
-  readonly parentType: Model.ParentType;
+  readonly parentId: PARENT["id"];
+  readonly parentType: PARENT["type"] | "budget";
 }
 
 const EditMarkupModal = <
   M extends Model.SimpleAccount | Model.SimpleSubAccount,
   B extends Model.Budget | Model.Template,
-  R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
+  PARENT extends Model.Account | Model.SubAccount,
+  R extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>
 >({
   parentId,
   parentType,
   ...props
-}: EditMarkupModalProps<B, R>): JSX.Element => {
+}: EditMarkupModalProps<B, PARENT, R>): JSX.Element => {
   const form = ui.hooks.useFormIfNotDefined<MarkupFormValues>({ isInModal: true });
   const [cancelToken] = api.useCancelToken();
   const markupRef = useRef<IMarkupForm>(null);

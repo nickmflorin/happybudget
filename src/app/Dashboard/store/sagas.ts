@@ -65,16 +65,11 @@ const ActionMap = {
 };
 
 export const createContactsTableSaga = (table: Table.TableInstance<Tables.ContactRowData, Model.Contact>) =>
-  tabling.sagas.createAuthenticatedTableSaga<
-    Tables.ContactRowData,
-    Model.Contact,
-    Tables.ContactTableContext,
-    Redux.AuthenticatedTableActionMap<Tables.ContactRowData, Model.Contact, Tables.ContactTableContext>
-  >({
+  tabling.sagas.createAuthenticatedTableSaga<Tables.ContactRowData, Model.Contact, Tables.ContactTableContext>({
     actions: ActionMap,
     tasks: contacts.tasks.createTableTaskSet({
       table,
-      selectStore: (state: Application.AuthenticatedStore) => state.dashboard.contacts,
+      selectStore: (state: Application.Store) => state.dashboard.contacts,
       actions: ActionMap
     })
   });

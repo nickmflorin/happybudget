@@ -1,5 +1,11 @@
 export { default as PrivateRoute } from "./PrivateRoute";
-export { default as AuthenticatedReduxRoute } from "./AuthenticatedReduxRoute";
-export { default as PublicReduxRoute } from "./PublicReduxRoute";
+export { default as ReduxRoute } from "./ReduxRoute";
 export { default as LandingRoute } from "./LandingRoute";
 export { default as NotFoundRoute } from "./NotFoundRoute";
+export { default as NotFoundPage } from "./NotFoundPage";
+export { default as WrapInStore } from "./WrapInStore";
+export { default as PathParamsRoute } from "./PathParamsRoute";
+export * from "./PathParamsRoute";
+export * from "./WrapInStore";
+export { default as Route } from "./Route";
+export * from "./Route";

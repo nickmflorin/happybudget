@@ -3,7 +3,7 @@ declare namespace Http {
 
   type RequestOptions = {
     readonly timeout?: number;
-    readonly publicToken?: string;
+    readonly publicTokenId?: string;
     readonly headers?: { [key: string]: string };
     readonly cancelToken?: import("axios").CancelToken | undefined;
   };
@@ -115,7 +115,7 @@ declare namespace Http {
     P extends PayloadObj
   > = Service<AncestryListResponse<GP, PARENT, C>, ParentBulkCreateServiceArgs<P>>;
 
-  type Service<R, ARGS extends unknown[]> = (...args: ARGS) => Promise<R>;
+  type Service<R, ARGS extends unknown[] = unknown[]> = (...args: ARGS) => Promise<R>;
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type ServiceResponse<SERVICE> = SERVICE extends Service<infer R, any[]> ? Awaited<R> : never;

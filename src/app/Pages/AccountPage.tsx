@@ -3,26 +3,23 @@ import { map, isNil } from "lodash";
 
 import { budgeting } from "lib";
 
-import { RenderIfValidId } from "components";
 import { Portal, BreadCrumbs } from "components/layout";
 import { EntityTextButton } from "components/buttons";
 import { EntityText } from "components/typography";
 
 interface AccountPageProps<B extends Model.Budget | Model.Template> {
   readonly budget: B | null;
-  readonly accountId: string;
   readonly detail: Model.Account | null;
   readonly children: React.ReactChild | React.ReactChild[];
 }
 
 const AccountPage = <B extends Model.Budget | Model.Template>({
   budget,
-  accountId,
   detail,
   children
 }: AccountPageProps<B>): JSX.Element => {
   return (
-    <RenderIfValidId id={[accountId]}>
+    <React.Fragment>
       <Portal id={"breadcrumbs"}>
         <BreadCrumbs<{ b: B; account: Model.Account }>
           params={{ b: budget, account: detail }}
@@ -63,7 +60,7 @@ const AccountPage = <B extends Model.Budget | Model.Template>({
         />
       </Portal>
       {children}
-    </RenderIfValidId>
+    </React.Fragment>
   );
 };
 

@@ -934,6 +934,21 @@ declare namespace Table {
   type RowWithIdentifier<D extends RowData> = ModelRow<D & { identifier: string | null }> | MarkupRow<D>;
   /* ------------------------- Rows -------------------------------------- */
 
+  /* ------------------------- Multi-User ---------------------------------- */
+  type ShareConfig<T extends Model.HttpModel & { readonly public_token: Model.PublicToken | null }> = {
+    readonly instance: T;
+    readonly onCreated?: (token: Model.PublicToken) => void;
+    readonly onUpdated?: (token: Model.PublicToken) => void;
+    readonly onDeleted?: () => void;
+    readonly create: (
+      id: number,
+      payload: Http.PublicTokenPayload,
+      options: Http.RequestOptions
+    ) => Promise<Model.PublicToken>;
+  };
+
+  /* ------------------------- Multi-User ---------------------------------- */
+
   /* ------------------------- Redux -------------------------------------- */
   /* We need to allow any for RowDataSelector instead of Application.Store because
      there is a typing issue with reselect in regard to the footer row
@@ -941,7 +956,7 @@ declare namespace Table {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type RowDataSelector<R extends RowData> = (state: any) => Partial<R>;
 
-  type Context = Record<string, number>;
+  type Context = Record<string, number | string>;
 
   type TaskConfig<
     R extends RowData,
@@ -969,26 +984,24 @@ declare namespace Table {
     readonly clearOn: Redux.ClearOn<any, C>[];
   };
 
-  type SagaConfig<
-    R extends RowData,
+  type PublicSagaConfig<
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    C extends Context = Context,
-    A extends Omit<Redux.TableActionMap<M, C>, "request"> = Omit<Redux.TableActionMap<M, C>, "request">
-  > = Redux.SagaConfig<Redux.TableTaskMap<R, M, C>, A>;
-
-  type StoreConfig<
-    R extends RowData,
-    M extends Model.RowHttpModel = Model.RowHttpModel,
-    S extends Redux.TableStore<R> = Redux.TableStore<R>,
     C extends Context = Context,
     A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
-  > = {
-    readonly actions: Omit<A, "request">;
-    readonly footerRowSelectors?: Partial<FooterGridSet<RowDataSelector<R>>>;
-    readonly selector?: (state: Application.Store) => S;
-    readonly reducer?: Redux.Reducer<S>;
-    readonly createSaga?: (t: TableInstance<R, M>) => import("redux-saga").Saga;
-  };
+  > = Redux.SagaConfig<Redux.TableTaskMap<C>, A>;
+
+  type AuthenticatedSagaConfig<
+    R extends RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+    C extends Context = Context,
+    A extends Redux.TableActionMapWithRequestOptional<
+      Redux.AuthenticatedTableActionMap<R, M, C>
+    > = Redux.TableActionMapWithRequestOptional<Redux.AuthenticatedTableActionMap<R, M, C>>,
+    T extends Redux.TableTaskMapWithRequestOptional<
+      Redux.AuthenticatedTableTaskMap<R, M, C>
+    > = Redux.TableTaskMapWithRequestOptional<Redux.AuthenticatedTableTaskMap<R, M, C>>
+  > = Redux.SagaConfig<T, A>;
+
   /* ------------------------- Redux -------------------------------------- */
 
   /* ------------------------- UI -------------------------------------- */
@@ -1008,9 +1021,21 @@ declare namespace Table {
       readonly changeColumnVisibility: (changes: SingleOrArray<ColumnVisibilityChange>, sizeToFit?: boolean) => void;
     };
 
+  /* We have to allow the onClick prop and ID prop to pass through the entire
+		 component to the render method in the case that we are rendering a button
+		 and we also specify wrapInDropdown.  This is so that AntD can control the
+		 dropdown visibility via the button.and click aways can be properly
+		 detected with the button ID. */
+  type MenuActionRenderProps = {
+    readonly id?: string;
+    readonly onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  };
+
+  type MenuActionRenderFunc = (props: MenuActionRenderProps) => JSX.Element;
+
   type MenuActionObj = {
     readonly index?: number;
-    readonly icon: IconOrElement;
+    readonly icon?: IconOrElement;
     readonly tooltip?: DeterministicTooltip;
     readonly disabled?: boolean;
     readonly label?: string;
@@ -1019,24 +1044,24 @@ declare namespace Table {
     // If being wrapped in a Dropdown, the onClick prop will not be used.
     readonly onClick?: () => void;
     readonly wrapInDropdown?: (children: import("react").ReactChild | import("react").ReactChild[]) => JSX.Element;
-    readonly render?: RenderFunc;
+    /* We have to allow the onClick prop and ID prop to pass through the entire
+		   component to the render method in the case that we are rendering a button
+			 and we also specify wrapInDropdown.  This is so that AntD can control the
+			 dropdown visibility via the button.and click aways can be properly
+			 detected with the button ID. */
+    readonly render?: MenuActionRenderFunc;
   };
 
-  type MenuActionParams<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
+  type PublicMenuActionParams<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly apis: GridApis | null;
     readonly columns: DataColumn<R, M>[];
     readonly hiddenColumns?: HiddenColumns;
   };
 
-  type PublicMenuActionParams<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = MenuActionParams<
-    R,
-    M
-  >;
-
   type AuthenticatedMenuActionParams<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel
-  > = MenuActionParams<R, M> & {
+  > = PublicMenuActionParams<R, M> & {
     readonly selectedRows: EditableRow<R>[];
   };
 
@@ -1044,19 +1069,19 @@ declare namespace Table {
     V,
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    T extends MenuActionParams<R, M> = MenuActionParams<R, M>
+    T extends PublicMenuActionParams<R, M> = PublicMenuActionParams<R, M>
   > = (params: T) => V;
 
   type MenuAction<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    T extends MenuActionParams<R, M> = MenuActionParams<R, M>
+    T extends PublicMenuActionParams<R, M> = PublicMenuActionParams<R, M>
   > = MenuActionObj | MenuActionCallback<MenuActionObj, R, M, T>;
 
   type MenuActions<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    T extends MenuActionParams<R, M> = MenuActionParams<R, M>
+    T extends PublicMenuActionParams<R, M> = PublicMenuActionParams<R, M>
   > = Array<MenuAction<R, M, T>> | MenuActionCallback<MenuAction<R, M, T>[], R, M, T>;
 
   type PublicMenuAction<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = MenuAction<
@@ -1082,19 +1107,6 @@ declare namespace Table {
     M,
     AuthenticatedMenuActionParams<R, M>
   >;
-
-  interface DataGridConfig<R extends RowData> {
-    readonly refreshRowExpandColumnOnCellHover?: (row: Row<R>) => boolean;
-  }
-
-  type AuthenticatedDataGridConfig<R extends RowData> = DataGridConfig<R> & {
-    readonly rowCanDelete?: (row: EditableRow<R>) => boolean;
-    readonly includeRowInNavigation?: (row: EditableRow<R>) => boolean;
-  };
-
-  type PublicDataGridConfig<R extends RowData> = {
-    readonly includeRowInNavigation?: (row: EditableRow<R>) => boolean;
-  };
 
   type FooterGridConfig<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly id: "page" | "footer";

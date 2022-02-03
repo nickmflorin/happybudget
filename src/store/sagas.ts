@@ -6,31 +6,23 @@ import { redux, contacts } from "lib";
 
 import * as actions from "./actions";
 
-export const createPublicRootSaga = (config: Application.AnyModuleConfig[]): Saga => {
-  const contactsTasks = contacts.tasks.createTaskSet({
-    authenticated: false
-  });
-  const contactsSaga = redux.sagas.createModelListResponseSaga({
-    tasks: contactsTasks,
-    actions: { request: actions.requestContactsAction }
-  });
+export const createPublicRootSaga = (config: Application.StoreConfig): Saga => {
   function* applicationSaga(): SagaIterator {
-    const publicConfig = filter(config, (c: Application.AnyModuleConfig) =>
-      redux.typeguards.isPublicModuleConfig(c)
-    ) as Application.PublicModuleConfig[];
+    const publicConfig = filter(config.modules, (c: Application.ModuleConfig) => c.isPublic === true);
     for (let i = 0; i < publicConfig.length; i++) {
-      const moduleConfig: Application.PublicModuleConfig = publicConfig[i];
+      const moduleConfig: Application.ModuleConfig = publicConfig[i];
       if (!isNil(moduleConfig.rootSaga)) {
         yield spawn(moduleConfig.rootSaga);
       }
     }
-    yield spawn(contactsSaga);
   }
   return applicationSaga;
 };
 
-export const createAuthenticatedRootSaga = (config: Application.AnyModuleConfig[]): Saga => {
-  const contactsTasks = contacts.tasks.createTaskSet({ authenticated: true });
+const createApplicationSaga = (config: Application.StoreConfig): Saga => {
+  const publicSaga = createPublicRootSaga(config);
+
+  const contactsTasks = contacts.tasks.createTaskSet();
   const filteredContactsTasks = contacts.tasks.createFilteredTaskSet();
   const contactsSaga = redux.sagas.createAuthenticatedModelListResponseSaga({
     tasks: contactsTasks,
@@ -44,18 +36,18 @@ export const createAuthenticatedRootSaga = (config: Application.AnyModuleConfig[
     }
   });
   function* applicationSaga(): SagaIterator {
-    const authenticatedConfig = filter(
-      config,
-      (c: Application.AnyModuleConfig) => !redux.typeguards.isPublicModuleConfig(c)
-    ) as Application.AuthenticatedModuleConfig[];
+    const authenticatedConfig = filter(config.modules, (c: Application.ModuleConfig) => c.isPublic !== true);
     for (let i = 0; i < authenticatedConfig.length; i++) {
-      const moduleConfig: Application.AuthenticatedModuleConfig = authenticatedConfig[i];
+      const moduleConfig: Application.ModuleConfig = authenticatedConfig[i];
       if (!isNil(moduleConfig.rootSaga)) {
         yield spawn(moduleConfig.rootSaga);
       }
     }
     yield spawn(contactsSaga);
     yield spawn(filteredContactsSaga);
+    yield spawn(publicSaga);
   }
   return applicationSaga;
 };
+
+export default createApplicationSaga;

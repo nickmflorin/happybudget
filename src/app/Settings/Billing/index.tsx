@@ -1,7 +1,7 @@
 import { Switch } from "react-router-dom";
 
 import { Page } from "components/layout";
-import { PrivateRoute } from "components/routes";
+import { Route } from "components/routes";
 
 import Billing from "./Billing";
 import CheckoutSuccess from "./CheckoutSuccess";
@@ -11,9 +11,9 @@ const BillingRoot = (): JSX.Element => {
   return (
     <Page className={"billing"} title={"Billing"}>
       <Switch>
-        <PrivateRoute path={"/billing/checkout-success"} component={CheckoutSuccess} />
-        <PrivateRoute path={"/billing/checkout-cancel"} component={CheckoutCancelled} />
-        <PrivateRoute path={"/billing"} component={Billing} />
+        <Route path={"/billing/checkout-success"} component={CheckoutSuccess} />
+        <Route path={"/billing/checkout-cancel"} component={CheckoutCancelled} />
+        <Route path={"/billing"} component={Billing} />
       </Switch>
     </Page>
   );
