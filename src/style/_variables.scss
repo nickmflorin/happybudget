@@ -64,8 +64,10 @@ $success-background-color: #f6ffed;
 $success-border-color: #b7eb8f;
 
 $separator-color: #e6e6e6;
-
+$border-color: #efefef;
+$border: 1px solid $border-color;
 $table-border-color: #f8f8f8;
+$table-border: 1px solid $table-border-color;
 
 $roboto: "Roboto", sans-serif;
 $avenir: "AvenirNext", sans-serif;
@@ -75,14 +77,11 @@ $header-height: 50px;
 $header-background-color: $white;
 
 $app-background-color: $white;
-$sidebar-background-color: #fcfcfc;
+$app-alt-background-color: #fcfcfc;
 
 // Input Fields
 $input-border-radius: 6px;
 $input-small-border-radius: 4px;
 
-$menu-border-color: #efefef;
+$menu-border-color: $border-color;
 $menu-border: 1px solid $menu-border-color;
-
-$field-border-color: #efefef;
-$field-border: 1px solid $field-border-color;
