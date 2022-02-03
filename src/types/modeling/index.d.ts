@@ -93,7 +93,6 @@ declare namespace Model {
     readonly is_first_time: boolean;
     readonly is_active: boolean;
     readonly is_staff: boolean;
-    readonly is_admin: boolean;
     readonly is_superuser: boolean;
     readonly company: string | null;
     readonly position: string | null;
