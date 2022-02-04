@@ -119,8 +119,9 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
       (col: Table.RealColumn<R, M>, index: number): Table.RealColumn<R, M> => {
         const hidden =
           tabling.typeguards.isDataColumn(col) &&
-          col.canBeHidden === true &&
-          (isNil(hiddenColumns) || hiddenColumns[col.field] === true);
+          col.canBeHidden !== false &&
+          !isNil(hiddenColumns) &&
+          hiddenColumns[col.field] === true;
         return {
           ...col,
           headerComponentParams: { ...col.headerComponentParams, column: col },
@@ -138,7 +139,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
     return !isNil(checkboxColumn)
       ? util.updateInArray<Table.RealColumn<R, M>>(cs, { colId: "checkbox" }, checkboxColumn)
       : cs;
-  }, [hiddenColumns, hooks.useDeepEqualMemo(columns)]);
+  }, [hooks.useDeepEqualMemo(columns)]);
 
   const colDefs = useMemo(
     () =>
