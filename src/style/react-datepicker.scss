@@ -1,12 +1,11 @@
 @import "react-datepicker/dist/react-datepicker.css";
 
 .react-datepicker {
-  font-family: $avenir;
-  min-width: 270px;
-  padding: 5px 0;
-  border: none;
-  border-radius: 20px;
-  box-shadow: 0px 2px 10px #b3b3b3;
+	@extend .menu-base;
+	font-family: $avenir;
+  box-shadow: none !important;
+	border: $menu-border;
+	padding: 10px;
 
   &__month-container {
     float: none;
@@ -15,29 +14,37 @@
   &__header {
     background-color: $white;
     border-bottom: none;
-    padding-bottom: 0;
-    border-radius: 20px 20px 0 0 !important;
+		padding: 0 !important;
 
     .react-datepicker {
       &__current-month {
-        font-weight: 600;
+        font-weight: 500;
+				color: $text-primary;
+				font-size: 15px;
+				line-height: 16px;
       }
 
-      &__day-name {
-        color: $gray;
-        font-weight: 600;
-      }
+			&__day-names {
+				margin-bottom: 0;
+
+				.react-datepicker__day-name {
+					color: $gray;
+					font-weight: 500;
+					margin: 2px;
+					font-size: 13px;
+				}
+			}
     }
   }
 
   &__day-name,
   &__day,
   &__time-name {
-    margin: 4px;
+    margin: 2px;
   }
 
   &__navigation {
-    top: 10px;
+    top: -7px;
 
     .react-datepicker {
       &__year-read-view--down-arrow,
@@ -51,10 +58,10 @@
 
     &.react-datepicker {
       &__navigation--previous {
-        left: 10px;
+        left: 22px;
       }
       &__navigation--next {
-        right: 10px;
+        right: 22px;
       }
     }
   }
@@ -72,6 +79,11 @@
     }
   }
 
+	&__month {
+		margin: 0px;
+	}
+
+
   &__day,
   &__month-text,
   &__quarter-text,
@@ -83,7 +95,6 @@
     }
   }
 
-  // this fixes a bug/questionable styling choice where every month has today selected. See https://github.com/Hacker0x01/react-datepicker/issues/2930.
   &__day--keyboard-selected {
     background-color: inherit;
     color: inherit;
