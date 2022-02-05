@@ -491,7 +491,7 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
       <ShowHide show={props.includeSearch}>
         <div className={"search-container"}>
           <SearchInput
-            className={"input--small"}
+            small={true}
             placeholder={props.searchPlaceholder || "Search"}
             value={search}
             ref={searchRef}

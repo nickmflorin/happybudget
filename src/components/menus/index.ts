@@ -4,4 +4,5 @@ export * from "./ModelTagsMenu";
 export { default as ActualOwnersMenu } from "./ActualOwnersMenu";
 export * from "./ActualOwnersMenu";
 export { default as Menu } from "./Menu";
+export { default as ContentMenu } from "./ContentMenu";
 export { default as TableModelMenu } from "./TableModelMenu";

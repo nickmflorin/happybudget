@@ -165,3 +165,8 @@ type OrderingMenuModel<F extends string = string> = {
 type OrderingMenuItemState = {
   readonly order: Http.Order;
 };
+
+declare interface ContentMenuInstance extends UINotificationsManager {
+  readonly setLoading: (value: boolean) => void;
+  readonly loading: boolean | undefined;
+}

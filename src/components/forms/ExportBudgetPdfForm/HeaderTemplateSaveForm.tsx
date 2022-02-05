@@ -126,9 +126,8 @@ const HeaderTemplateSaveForm = (
             <div style={{ display: "flex" }}>
               <Input
                 placeholder={"Name"}
-                className={classNames("input input--small", {
-                  "with-error": !isNil(error)
-                })}
+                small={true}
+                className={classNames({ "with-error": !isNil(error) })}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
               />
               <ClearButton

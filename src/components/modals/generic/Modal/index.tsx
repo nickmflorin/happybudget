@@ -22,12 +22,12 @@ const Modal = ({
   ...props
 }: ModalProps & { readonly children: ReactNode }): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const notificationsHandler = notifications.ui.useNotificationsManager({
+  const notificationsManager = notifications.ui.useNotificationsManager({
     defaultBehavior: "append",
     defaultClosable: false
   });
 
-  useImperativeHandle(modal, () => ({ ...notificationsHandler, loading, setLoading }));
+  useImperativeHandle(modal, () => ({ ...notificationsManager, loading, setLoading }));
 
   return (
     <RootModal
@@ -52,7 +52,7 @@ const Modal = ({
       }
     >
       <RenderWithSpinner loading={buttonSpinnerOnLoad === false && loading}>
-        <Notifications notifications={notificationsHandler.notifications} />
+        <Notifications notifications={notificationsManager.notifications} />
         <React.Fragment>{children}</React.Fragment>
       </RenderWithSpinner>
     </RootModal>

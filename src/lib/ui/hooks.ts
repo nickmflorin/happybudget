@@ -85,15 +85,38 @@ export const useMenuIfNotDefined = <
   return returnRef;
 };
 
-export const InitialModalRef: ModalInstance = {
+export const InitialNotificationsManager: UINotificationsManager = {
   notifications: [],
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   clearNotifications: () => {},
   notify: () => [],
   lookupAndNotify: () => [],
+  handleRequestError: () => []
+};
+
+export const InitialContentMenuRef: ContentMenuInstance = {
+  ...InitialNotificationsManager,
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   setLoading: () => {},
-  handleRequestError: () => [],
+  loading: false
+};
+
+export const useContentMenu = (): NonNullRef<ContentMenuInstance> => {
+  const ref = useRef<ContentMenuInstance>(InitialContentMenuRef);
+
+  return ref;
+};
+
+export const useContentMenuIfNotDefined = (menu?: NonNullRef<ContentMenuInstance>): NonNullRef<ContentMenuInstance> => {
+  const ref = useRef<ContentMenuInstance>(InitialContentMenuRef);
+  const returnRef = useMemo(() => (!isNil(menu) ? menu : ref), [menu, ref.current]);
+  return returnRef;
+};
+
+export const InitialModalRef: ModalInstance = {
+  ...InitialNotificationsManager,
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+  setLoading: () => {},
   loading: false
 };
 

@@ -152,7 +152,9 @@
     }
   }
 
-  &.model-menu {
+  &--model {
+		@extend .menu;
+
     .menu-item {
       font-family: $avenir;
       font-weight: 400 !important;
@@ -165,7 +167,13 @@
     }
   }
 
-  &.table-menu {
+	&--content {
+		@extend .menu;
+		padding: 8px;
+	}
+
+  &--table {
+		@extend .menu;
     max-height: 220px;
 
     .ul-wrapper {

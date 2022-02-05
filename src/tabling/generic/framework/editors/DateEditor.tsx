@@ -1,6 +1,6 @@
 import { forwardRef, useState, useEffect, useImperativeHandle, ForwardedRef } from "react";
 import { isNil } from "lodash";
-import DatePicker from "react-datepicker";
+import { DatePicker } from "components/fields";
 
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
