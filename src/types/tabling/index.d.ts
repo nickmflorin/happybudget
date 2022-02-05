@@ -1017,6 +1017,7 @@ declare namespace Table {
     readonly disabled?: boolean;
     readonly label?: string;
     readonly isWriteOnly?: boolean;
+    readonly location?: "right" | "left";
     // If being wrapped in a Dropdown, the onClick prop will not be used.
     readonly onClick?: () => void;
     readonly wrapInDropdown?: (children: import("react").ReactChild | import("react").ReactChild[]) => JSX.Element;
@@ -1024,7 +1025,7 @@ declare namespace Table {
   };
 
   type MenuActionParams<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
-    readonly apis: GridApis;
+    readonly apis: GridApis | null;
     readonly columns: DataColumn<R, M>[];
     readonly hiddenColumns?: HiddenColumns;
   };

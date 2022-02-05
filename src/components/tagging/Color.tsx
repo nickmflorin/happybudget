@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import ColorIcon, { ColorIconProps } from "./ColorIcon";
+import { ColorIcon, ColorIconProps } from "components/icons";
 
 interface ColorProps extends StandardComponentProps, ColorIconProps {
   readonly onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;

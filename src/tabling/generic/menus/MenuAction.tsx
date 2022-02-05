@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { ui } from "lib";
 
 import { Icon } from "components";
-import { Button, IconButton } from "components/buttons";
+import { IconButton, BareButton } from "components/buttons";
 
 interface TableMenuActionProps extends StandardComponentProps {
   readonly action: Table.MenuActionObj;
@@ -20,15 +20,17 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
     return action.render();
   } else if (!isNil(action.label)) {
     return (
-      <Button
+      <BareButton
         {...props}
         /* If the button is being wrapped in a dropdown, we need to allow the
 					 onClick prop that AntD sets on the Button when it is nested in a
 					 Dropdown to persist. */
         onClick={isNil(action.wrapInDropdown) ? () => !isNil(action.onClick) && action.onClick() : props.onClick}
-        className={classNames("btn--bare budget-table-menu", props.className)}
+        className={classNames("budget-table-menu", props.className)}
         disabled={action.disabled}
-        icon={ui.typeguards.iconIsJSX(action.icon) ? action.icon : <Icon icon={action.icon} />}
+        icon={
+          !isNil(action.icon) ? ui.typeguards.iconIsJSX(action.icon) ? action.icon : <Icon icon={action.icon} /> : <></>
+        }
         tooltip={
           !isNil(action.tooltip)
             ? typeof action.tooltip === "string"
@@ -46,7 +48,7 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
         }
       >
         {action.label}
-      </Button>
+      </BareButton>
     );
   } else {
     return (
@@ -54,7 +56,9 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
         className={"green-hover budget-table-menu"}
         onClick={() => !isNil(action.onClick) && action.onClick()}
         disabled={action.disabled}
-        icon={ui.typeguards.iconIsJSX(action.icon) ? action.icon : <Icon icon={action.icon} />}
+        icon={
+          !isNil(action.icon) ? ui.typeguards.iconIsJSX(action.icon) ? action.icon : <Icon icon={action.icon} /> : <></>
+        }
         tooltip={
           !isNil(action.tooltip)
             ? typeof action.tooltip === "string"

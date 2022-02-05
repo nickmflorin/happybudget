@@ -2,15 +2,14 @@ import React from "react";
 import { map, isNil } from "lodash";
 
 import { tabling } from "lib";
-import TableMenuAction from "./MenuAction";
+import MenuAction from "./MenuAction";
 
-interface AuthenticatedToolbarProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
-  readonly apis: Table.GridApis | null;
-  readonly columns: Table.DataColumn<R, M>[];
+type AuthenticatedToolbarProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel
+> = Table.AuthenticatedMenuActionParams<R, M> & {
   readonly actions: Table.AuthenticatedMenuActions<R, M>;
-  readonly hiddenColumns?: Table.HiddenColumns;
-  readonly selectedRows: Table.EditableRow<R>[];
-}
+};
 
 const AuthenticatedToolbar = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   props: AuthenticatedToolbarProps<R, M>
@@ -25,7 +24,7 @@ const AuthenticatedToolbar = <R extends Table.RowData, M extends Model.RowHttpMo
             hiddenColumns: props.hiddenColumns,
             selectedRows: props.selectedRows
           }),
-          (action: Table.MenuActionObj, index: number) => <TableMenuAction key={index} action={action} />
+          (action: Table.MenuActionObj, index: number) => <MenuAction key={index} action={action} />
         )}
     </div>
   );

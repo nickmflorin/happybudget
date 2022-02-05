@@ -1,110 +1,64 @@
 import React from "react";
 import { isNil } from "lodash";
-import classNames from "classnames";
 
 import { Checkbox, Tooltip } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import { tabling } from "lib";
 
-import { ShowHide, SavingChanges } from "components";
-import { SearchInput } from "components/fields";
-import { Portal } from "components/layout";
-
 import AuthenticatedToolbar from "./AuthenticatedToolbar";
+import Menu, { InternalMenuProps, MenuProps } from "./Menu";
 
-import "./index.scss";
-
-export interface AuthenticatedMenuProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
+export type AuthenticatedMenuProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = Omit<
+  MenuProps<Table.AuthenticatedMenuActionParams<R, M>, R, M>,
+  "menuActionParams"
+> & {
   readonly columns: Table.DataColumn<R, M>[];
-  readonly search?: string;
-  readonly menuPortalId?: string;
-  readonly actions?: Table.AuthenticatedMenuActions<R, M>;
-  readonly savingChangesPortalId?: string;
-  readonly saving?: boolean;
-  readonly savingVisible?: boolean;
-  readonly onSearch: (v: string) => void;
-}
+};
 
-type InternalAuthenticatedMenuProps<
-  R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
-> = AuthenticatedMenuProps<R, M> & {
+type InternalAuthenticatedMenuProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = Omit<
+  InternalMenuProps<Table.AuthenticatedMenuActionParams<R, M>, R, M>,
+  "menuActionParams" | "toolbar"
+> & {
   readonly apis: Table.GridApis | null;
   readonly hiddenColumns?: Table.HiddenColumns;
+  readonly columns: Table.DataColumn<R, M>[];
   readonly selectedRows: Table.EditableRow<R>[];
-  readonly hasEditColumn: boolean;
-  readonly hasDragColumn: boolean;
   readonly rowHasCheckboxSelection?: (row: Table.EditableRow<R>) => boolean;
 };
 
 const AuthenticatedMenu = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  props: Omit<InternalAuthenticatedMenuProps<R, M>, "menuPortalId"> & { readonly detached: boolean }
-) => (
-  <div
-    className={classNames(
-      "table-action-menu",
-      { detached: props.detached },
-      { "has-expand-column": props.hasEditColumn },
-      { "has-drag-column": props.hasDragColumn }
-    )}
-  >
-    <Portal id={props.savingChangesPortalId}>
-      {props.savingVisible !== false && <SavingChanges saving={props.saving} />}
-    </Portal>
-    <div className={"table-menu-left"}>
-      <Tooltip title={"Select All"} placement={"bottom"}>
-        <Checkbox
-          onChange={(e: CheckboxChangeEvent) => {
-            props.apis?.grid.forEachNode((node: Table.RowNode) => {
-              const row: Table.BodyRow<R> = node.data;
-              if (
-                tabling.typeguards.isEditableRow(row) &&
-                (isNil(props.rowHasCheckboxSelection) || props.rowHasCheckboxSelection(row))
-              ) {
-                node.setSelected(e.target.checked);
-              }
-            });
-          }}
-        />
-      </Tooltip>
-      {!isNil(props.actions) && (
-        <AuthenticatedToolbar<R, M>
-          actions={props.actions}
-          columns={props.columns}
-          apis={props.apis}
-          selectedRows={props.selectedRows}
-          hiddenColumns={props.hiddenColumns}
-        />
-      )}
-    </div>
-    <div className={"table-menu-right"}>
-      {/* Reserved for cases where the table is not a full page table and thus
-				  the Saving Changes in the page header is not visible. */}
-      {!isNil(props.saving) && isNil(props.savingChangesPortalId) && <SavingChanges saving={props.saving} />}
-      <ShowHide show={!isNil(props.search)}>
-        <SearchInput
-          className={"input--small"}
-          placeholder={"Search Rows"}
-          value={props.search}
-          style={{ maxWidth: 300, minWidth: 100 }}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onSearch(event.target.value)}
-        />
-      </ShowHide>
-    </div>
-  </div>
-);
-
-const Menu = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
-  menuPortalId,
-  ...props
-}: InternalAuthenticatedMenuProps<R, M>) =>
-  !isNil(menuPortalId) ? (
-    <Portal id={menuPortalId}>
-      <AuthenticatedMenu {...props} detached={false} />
-    </Portal>
-  ) : (
-    <AuthenticatedMenu {...props} detached={true} />
+  props: Omit<InternalAuthenticatedMenuProps<R, M>, "menuPortalId">
+) => {
+  return (
+    <Menu<Table.AuthenticatedMenuActionParams<R, M>, R, M>
+      {...props}
+      toolbar={AuthenticatedToolbar}
+      menuActionParams={{
+        apis: props.apis,
+        hiddenColumns: props.hiddenColumns,
+        columns: props.columns,
+        selectedRows: props.selectedRows
+      }}
+      prefixLeft={[
+        <Tooltip key={"0"} title={"Select All"} placement={"bottom"}>
+          <Checkbox
+            onChange={(e: CheckboxChangeEvent) => {
+              props.apis?.grid.forEachNode((node: Table.RowNode) => {
+                const row: Table.BodyRow<R> = node.data;
+                if (
+                  tabling.typeguards.isEditableRow(row) &&
+                  (isNil(props.rowHasCheckboxSelection) || props.rowHasCheckboxSelection(row))
+                ) {
+                  node.setSelected(e.target.checked);
+                }
+              });
+            }}
+          />
+        </Tooltip>
+      ]}
+    />
   );
+};
 
-export default React.memo(Menu) as typeof Menu;
+export default React.memo(AuthenticatedMenu) as typeof AuthenticatedMenu;

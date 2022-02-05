@@ -28,7 +28,7 @@ const ColorIcon = ({
   }, [color, useDefault]);
   if (!isNil(c)) {
     return (
-      <svg width={size} height={size}>
+      <svg className={"icon"} width={size} height={size}>
         {(selectable || selected !== undefined) && (
           <rect
             height={size}
