@@ -449,7 +449,7 @@ const ExportForm = (
           <ColumnSelect<R, M, C> getLabel={(c: C) => c.pdfHeaderName || c.headerName || ""} columns={columns} />
         </Form.Item>
 
-        <Form.Item label={"Show All Tables"}>
+        <Form.Item label={"Show All Tables"} horizontalLayoutOverride={true}>
           <Checkbox
             defaultChecked={isNil(rawFormInitialValues?.tables)}
             checked={showAllTables}
