@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useImperativeHandle } from "react";
+import React, { useMemo, useState, useImperativeHandle, useEffect } from "react";
 import classNames from "classnames";
 import ClickAwayListener from "react-click-away-listener";
 import { uniqueId, isNil } from "lodash";
@@ -45,6 +45,23 @@ const Dropdown = ({
     setVisible: _setVisible
   }));
 
+  useEffect(() => {
+    const keyListener = (e: KeyboardEvent) => {
+      if (e.code === "Escape") {
+        e.stopPropagation();
+        setIsVisible(false);
+      }
+    };
+    if (isVisible === true) {
+      window.addEventListener("keydown", keyListener);
+    } else {
+      window.removeEventListener("keydown", keyListener);
+    }
+    return () => {
+      window.removeEventListener("keydown", keyListener);
+    };
+  }, [isVisible]);
+
   return (
     <AntdDropdown
       {...props}
@@ -71,7 +88,10 @@ const Dropdown = ({
                of the menu (where the ClickAway is detected), clicking the
                button will also trigger the ClickAway, so we need to avoid it. */
             const button = document.getElementById(buttonId);
-            if (!isNil(button) && !util.html.isNodeDescendantOf(button, e.target as Element | HTMLElement)) {
+            if (isNil(button)) {
+              console.warn(`Could not find button with ID ${buttonId} so the dropdown cannot be closed.`);
+              return;
+            } else if (!util.html.isNodeDescendantOf(button, e.target as Element | HTMLElement)) {
               setIsVisible(false);
               onClickAway?.(e);
             }

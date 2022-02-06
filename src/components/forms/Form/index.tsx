@@ -10,7 +10,6 @@ import { ui } from "lib";
 
 import FieldError from "./FieldError";
 import Footer from "./Footer";
-import FormItemStyle from "./FormItemStyle";
 import FormItemSection from "./FormItemSection";
 import FormItemComp from "./FormItem";
 import FormLabel from "./FormLabel";
@@ -245,7 +244,6 @@ const exportable = {
   FieldError: FieldError,
   Footer: Footer,
   Item: FormItemComp,
-  ItemStyle: FormItemStyle,
   ItemSection: FormItemSection,
   Label: FormLabel
 };

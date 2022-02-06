@@ -9,6 +9,7 @@ export { default as ImageClearButton } from "./ImageClearButton";
 export { default as AcceptButton } from "./AcceptButton";
 export { default as TrashButton } from "./TrashButton";
 export { default as PrimaryButton } from "./PrimaryButton";
+export { default as DangerButton } from "./DangerButton";
 export { default as PrimaryIconButton } from "./PrimaryIconButton";
 export { default as PrimaryButtonIconToggle } from "./PrimaryButtonIconToggle";
 export { default as DefaultButton } from "./DefaultButton";

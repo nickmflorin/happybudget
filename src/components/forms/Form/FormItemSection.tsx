@@ -1,16 +1,14 @@
 import classNames from "classnames";
 
-import FormItemStyle, { FormItemStyleProps } from "./FormItemStyle";
+import FormItem, { FormItemProps } from "./FormItem";
 
-const FormItemSection = (props: FormItemStyleProps): JSX.Element => {
+type FormItemSectionProps = StandardComponentProps & Pick<FormItemProps, "label" | "children">;
+
+const FormItemSection = (props: FormItemSectionProps): JSX.Element => {
   return (
-    <FormItemStyle
-      {...props}
-      className={classNames("form-item-section", props.className)}
-      labelClassName={classNames("label--section", props.labelClassName)}
-    >
+    <FormItem {...props} className={classNames("form-item-section", props.className)}>
       {props.children}
-    </FormItemStyle>
+    </FormItem>
   );
 };
 

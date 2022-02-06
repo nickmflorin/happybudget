@@ -34,23 +34,6 @@ const DropdownMenu = <
   const menu = ui.hooks.useMenuIfNotDefined<S, M>(props.menu);
 
   useEffect(() => {
-    const keyListener = (e: KeyboardEvent) => {
-      if (e.code === "Escape") {
-        e.stopPropagation();
-        setVisible(false);
-      }
-    };
-    if (visible === true) {
-      window.addEventListener("keydown", keyListener);
-    } else {
-      window.removeEventListener("keydown", keyListener);
-    }
-    return () => {
-      window.removeEventListener("keydown", keyListener);
-    };
-  }, [visible]);
-
-  useEffect(() => {
     if (visible === true && !isNil(menu.current)) {
       menu.current.focus(true);
     }

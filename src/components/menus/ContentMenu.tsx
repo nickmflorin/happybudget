@@ -1,14 +1,13 @@
 import React, { useImperativeHandle, useState } from "react";
 import classNames from "classnames";
 
-import { RenderWithSpinner } from "components/loading";
-
 import { notifications } from "lib";
 
+import { RenderWithSpinner } from "components/loading";
 import { Notifications } from "components/notifications";
 
 export type ContentMenuProps = StandardComponentWithChildrenProps & {
-  readonly menu: NonNullRef<ContentMenuInstance>;
+  readonly menu?: NonNullRef<ContentMenuInstance>;
 };
 
 const ContentMenu = ({ menu, children, ...props }: ContentMenuProps): JSX.Element => {

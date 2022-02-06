@@ -64,7 +64,7 @@ const HeaderTemplateSaveForm = (
 
   return (
     <div {...props} className={classNames("header-template-save-form", props.className)}>
-      <Form.ItemStyle label={"Header Template"}>
+      <Form.Item label={"Header Template"}>
         <div className={"header-template-save-form-content"}>
           <HeaderTemplateSelect
             loading={loading}
@@ -140,7 +140,7 @@ const HeaderTemplateSaveForm = (
             </div>
           </ShowHide>
         </div>
-      </Form.ItemStyle>
+      </Form.Item>
       <Form.FieldError>{error}</Form.FieldError>
     </div>
   );

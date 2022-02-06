@@ -387,16 +387,16 @@ const ExportForm = (
       layout={"vertical"}
     >
       <Form.ItemSection label={"Header"}>
-        <Form.ItemStyle label={"Title"}>
+        <Form.Item label={"Title"}>
           <CKEditor
             ref={headerEditor}
             initialValue={props.initialValues?.header?.header || ""}
             onChange={(html: string) => setHeader(html)}
           />
-        </Form.ItemStyle>
+        </Form.Item>
 
         <div className={"export-header-sides"}>
-          <Form.ItemStyle label={"Left Side"} className={"export-header-side-item"}>
+          <Form.Item label={"Left Side"} className={"export-header-side-item"}>
             <UploadPdfImage
               value={leftImage}
               onChange={(left_image: UploadedImage | null) => setLeftImage(left_image)}
@@ -407,9 +407,9 @@ const ExportForm = (
               initialValue={props.initialValues?.header?.left_info || ""}
               onChange={(html: string) => setLeftInfo(html)}
             />
-          </Form.ItemStyle>
+          </Form.Item>
 
-          <Form.ItemStyle className={"export-header-side-item"} label={"Right Side"}>
+          <Form.Item className={"export-header-side-item"} label={"Right Side"}>
             <UploadPdfImage
               value={rightImage}
               onChange={(right_image: UploadedImage | null) => setRightImage(right_image)}
@@ -420,7 +420,7 @@ const ExportForm = (
               initialValue={props.initialValues?.header?.right_info || ""}
               onChange={(html: string) => setRightInfo(html)}
             />
-          </Form.ItemStyle>
+          </Form.Item>
         </div>
 
         <HeaderTemplateSaveForm
@@ -440,11 +440,7 @@ const ExportForm = (
 
       <Separator style={{ margin: "2px auto" }} />
 
-      <Form.ItemSection
-        label={"Table Options"}
-        labelClassName={"label label--section"}
-        labelStyle={{ marginBottom: "5px !important" }}
-      >
+      <Form.ItemSection label={"Table Options"}>
         <Form.Item name={"date"} label={"Budget Date"}>
           <Input />
         </Form.Item>
@@ -453,7 +449,7 @@ const ExportForm = (
           <ColumnSelect<R, M, C> getLabel={(c: C) => c.pdfHeaderName || c.headerName || ""} columns={columns} />
         </Form.Item>
 
-        <Form.ItemStyle label={"Show All Tables"}>
+        <Form.Item label={"Show All Tables"}>
           <Checkbox
             defaultChecked={isNil(rawFormInitialValues?.tables)}
             checked={showAllTables}
@@ -469,7 +465,7 @@ const ExportForm = (
               }
             }}
           />
-        </Form.ItemStyle>
+        </Form.Item>
         <Form.Item label={"Tables"} name={"tables"} style={{ marginBottom: 5 }}>
           <Select
             suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
@@ -503,7 +499,7 @@ const ExportForm = (
 
       <Separator style={{ margin: "2px auto" }} />
 
-      <Form.ItemSection label={"Notes"} labelClassName={"label--section"}>
+      <Form.ItemSection label={"Notes"}>
         <Form.Item label={"Include Notes Section"}>
           <Switch
             checkedChildren={"ON"}
@@ -518,7 +514,7 @@ const ExportForm = (
         </Form.Item>
 
         <ShowHide show={includeNotes}>
-          <Form.ItemStyle>
+          <Form.Item>
             <CKEditor
               style={{ height: 140 }}
               initialValue={props.initialValues?.notes || ""}
@@ -528,7 +524,7 @@ const ExportForm = (
                 props.onValuesChange?.({ notes: html }, { ...formData(values), notes: html });
               }}
             />
-          </Form.ItemStyle>
+          </Form.Item>
         </ShowHide>
       </Form.ItemSection>
     </Form.Form>

@@ -62,19 +62,15 @@ const ExportActualsPdfForm = (
       className={classNames("export-form", props.className)}
       layout={"vertical"}
     >
-      <Form.ItemStyle label={"Header"}>
+      <Form.Item label={"Header"}>
         <CKEditor
           ref={headerEditor}
           initialValue={props.initialValues?.header || ""}
           onChange={(html: string) => setHeader(html)}
         />
-      </Form.ItemStyle>
+      </Form.Item>
 
-      <Form.ItemSection
-        label={"Table Options"}
-        labelClassName={"label label--section"}
-        labelStyle={{ marginBottom: "5px !important" }}
-      >
+      <Form.ItemSection label={"Table Options"}>
         <Form.Item name={"date"} label={"Budget Date"}>
           <Input />
         </Form.Item>

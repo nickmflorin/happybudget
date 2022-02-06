@@ -1,18 +1,18 @@
 form {
-  width: 100%;
+	width: 100%;
 
-  .ant-checkbox {
-    top: 0.3rem !important;
-  }
+	.ant-checkbox {
+		top: 0.3rem !important;
+	}
 }
 
 .label-base {
-  font-size: 12px;
-  line-height: 22px;
-  color: $text-secondary;
-  font-family: $avenir;
-  font-weight: 600 !important;
-  height: 26px !important;
+	font-size: 12px;
+	line-height: 22px;
+	color: $text-secondary;
+	font-family: $avenir;
+	font-weight: 600 !important;
+	height: 26px !important;
 }
 
 .ant-form-item-explain-error {
@@ -20,215 +20,238 @@ form {
 }
 
 .form {
-  .notifications {
-    margin-top: 15px;
-    width: 100%;
-  }
+	.notifications {
+		margin-top: 15px;
+		width: 100%;
+	}
 
-  .form-header {
-    background: $white !important;
-    padding-bottom: 12px;
-    height: auto;
-    font-size: 20px;
-    font-weight: 600;
+	.form-header {
+		background: $white !important;
+		padding-bottom: 12px;
+		height: auto;
+		font-size: 20px;
+		font-weight: 600;
 
-    .form-title {
-      display: flex;
-      align-items: center;
-      font-size: 24px;
-      line-height: 24px;
-      font-family: $avenir !important;
-      font-weight: 700 !important;
-      color: $text-secondary !important;
+		.form-title {
+			display: flex;
+			align-items: center;
+			font-size: 24px;
+			line-height: 24px;
+			font-family: $avenir !important;
+			font-weight: 700 !important;
+			color: $text-secondary !important;
 
-      .icon {
-        margin-right: 10px;
-        color: $text-secondary !important;
-      }
-    }
-  }
+			.icon {
+				margin-right: 10px;
+				color: $text-secondary !important;
+			}
+		}
+	}
 
-  .form-footer {
-    margin-top: 15px;
+	.form-footer {
+		margin-top: 15px;
 
-    > * {
-      &:first-child {
-        margin-top: 0px !important;
-      }
-      &:last-child {
-        margin-bottom: 0px !important;
-      }
-    }
-  }
+		> * {
+			&:first-child {
+				margin-top: 0px !important;
+			}
+			&:last-child {
+				margin-bottom: 0px !important;
+			}
+		}
+	}
 
-  .form-item {
-    margin-bottom: 10px;
+	&.ant-form-horizontal {
+		.form-item {
+			.ant-form-item-control {
+				width: auto !important;
+				flex-grow: 100;
+			}
+		}
+	}
 
-    &.form-item-section {
-      .form-item {
-        margin-bottom: 5px;
-      }
-    }
+	&.ant-form-vertical {
+		// On the vertical form layout, AntD removes the colon after the label,
+		// which removes the spacing between the checkbox and label. This keeps
+		// the label/chekcbox spacing consistent.
+		label.ant-checkbox-wrapper {
+			margin: 0 2px 0 8px;
+		}
 
-    label {
-      .icon-wrapper {
-        height: 26px;
-        padding: 7px;
-        padding-left: 0px;
-      }
-    }
+		.form-item {
+			.ant-form-item-control {
+				width: 100%;
+			}
+			&:last-child {
+				margin-bottom: 0px !important;
+			}
+		}
+	}
 
-    // When a text field in a form has an error, do not give the text field a
-    // red border and highlight the prefix icon red.
-    &.ant-form-item-has-error {
-      .input,
-      .ant-input-affix-wrapper {
-        border: none !important;
-        .ant-input-prefix {
-          color: unset !important;
-        }
-      }
-    }
+	.form-item {
+		margin-bottom: 10px;
 
-    > *:last-child {
-      margin-bottom: 0px;
-    }
+		&.horizontal-layout-override {
+			flex-direction: row !important;
 
-    .ant-form-item-extra {
-      margin-top: 4px;
-    }
+			.ant-form-item-control {
+				width: auto !important;
+				flex-grow: 100;
+			}
+		}
 
-    .ant-form-item-label {
-      font-family: $avenir !important;
-      font-weight: 400 !important;
-      color: $text-secondary !important;
-      padding-left: 2px;
-      padding-bottom: 0px !important;
+		&.vertical-layout-override {
+			flex-direction: column !important;
 
-      label,
-      .label {
-        @extend .label-base;
-        margin-bottom: 2px;
+			.ant-form-item-control {
+				width: 100%;
+			}
+		}
 
-        &.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
-          margin-left: 0px;
+		label {
+			.icon-wrapper {
+				height: 26px;
+				padding: 7px;
+				padding-left: 0px;
+			}
+		}
 
-          &:before {
-            content: none;
-          }
-        }
+		// When a text field in a form has an error, do not give the text field a
+		// red border and highlight the prefix icon red.
+		&.ant-form-item-has-error {
+			.input,
+			.ant-input-affix-wrapper {
+				border: none !important;
+				.ant-input-prefix {
+					color: unset !important;
+				}
+			}
+		}
 
-        &--section {
-          margin-bottom: 8px;
-          font-size: 13px;
-        }
-      }
+		> *:last-child {
+			margin-bottom: 0px;
+		}
 
-      & > label.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
-        margin-left: -3px;
+		.ant-form-item-extra {
+			margin-top: 4px;
+		}
 
-        &:before {
-          content: "";
-        }
-      }
-    }
+		.ant-form-item-label {
+			font-family: $avenir !important;
+			font-weight: 400 !important;
+			color: $text-secondary !important;
+			padding-left: 2px;
+			padding-bottom: 0px !important;
 
-    .ant-form-item-control {
-      width: 100%;
+			label,
+			.label {
+				@extend .label-base;
+				margin-bottom: 2px;
 
-      .ant-form-item-extra {
-        font-size: 12px;
-        line-height: 12px;
-        min-height: 12px;
-        margin-top: 6px;
-        font-family: $roboto;
-        font-weight: 400;
-      }
-      .ant-form-item-control-input {
-        min-height: 24px;
-      }
-    }
+				&.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
+					margin-left: 0px;
 
-    // Alerts/feedback that go underneath the form control.
-    .ant-form-item-explain {
-      min-height: 12px;
-      div[role="alert"] {
+					&:before {
+						content: none;
+					}
+				}
+			}
+
+			& > label.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
+				margin-left: -3px;
+
+				&:before {
+					content: '';
+				}
+			}
+		}
+
+		.ant-form-item-control {
+			.ant-form-item-extra {
+				font-size: 12px;
+				line-height: 12px;
+				min-height: 12px;
+				margin-top: 6px;
+				font-family: $roboto;
+				font-weight: 400;
+			}
+			.ant-form-item-control-input {
+				min-height: 24px;
+			}
+		}
+
+		// Alerts/feedback that go underneath the form control.
+		.ant-form-item-explain {
+			min-height: 12px;
+			div[role='alert'] {
 				font-weight: 500;
-        margin-top: 5px;
-        font-size: 11px;
-        line-height: 12px;
-        margin-left: 5px;
-      }
-    }
-  }
+				margin-top: 5px;
+				font-size: 11px;
+				line-height: 12px;
+				margin-left: 5px;
+			}
+		}
+	}
 
-  .ant-form-item-has-error {
-    .ant-form-item-control {
-      .ant-form-item-control-input {
-        .ant-form-item-control-input-content {
-          .ant-input,
-          .ant-input-affix-wrapper,
-          .ant-input:hover,
-          .ant-input-affix-wrapper:hover {
-            border: 1px solid $red;
-          }
-          .ant-input-affix-wrapper {
-            .ant-input,
-            .ant-input:hover {
-              border: none !important;
-            }
-          }
-        }
-      }
-      .ant-form-item-explain.ant-form-item-explain-error {
-        color: $red;
-      }
-    }
-  }
+	.ant-form-item-has-error {
+		.ant-form-item-control {
+			.ant-form-item-control-input {
+				.ant-form-item-control-input-content {
+					.ant-input,
+					.ant-input-affix-wrapper,
+					.ant-input:hover,
+					.ant-input-affix-wrapper:hover {
+						border: 1px solid $red;
+					}
+					.ant-input-affix-wrapper {
+						.ant-input,
+						.ant-input:hover {
+							border: none !important;
+						}
+					}
+				}
+			}
+			.ant-form-item-explain.ant-form-item-explain-error {
+				color: $red;
+			}
+		}
+	}
 
-  &.condensed {
-    .form-item {
-      margin-bottom: 5px;
-    }
-  }
+	&.condensed {
+		.form-item {
+			margin-bottom: 5px;
+		}
+	}
 }
 
 label,
 .label {
-  @extend .label-base;
-
-  &--section {
-    font-size: 13px;
-    color: $text-primary;
-  }
+	@extend .label-base;
 }
 
-.ant-form-vertical {
-  .ant-form-item:last-child {
-    margin-bottom: 0px !important;
-  }
-
-  // On the vertical form layout, AntD removes the colon after the label,
-  // which removes the spacing between the checkbox and label. This keeps
-  // the label/chekcbox spacing consistent.
-  label.ant-checkbox-wrapper {
-    margin: 0 2px 0 8px;
-  }
+.form-item-section {
+	> .ant-form-item-label {
+		> label,
+		.label {
+			font-size: 13px !important;
+		}
+	}
 }
 
 .ant-switch {
-  background-color: $gray-light;
-  .ant-switch-inner {
-    color: $black;
-    font-size: 8px;
-    font-weight: bold;
-  }
+	background-color: $gray-light;
 
-  &.ant-switch-checked {
-    background-color: $green;
+	.ant-switch-inner {
+		color: $text-primary;
+		font-size: 8px;
+		font-weight: bold;
+	}
 
-    .ant-switch-inner {
-      color: $white;
-    }
-  }
+	&.ant-switch-checked {
+		background-color: $green;
+
+		.ant-switch-inner {
+			color: $white;
+		}
+	}
 }

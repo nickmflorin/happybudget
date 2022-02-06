@@ -1,5 +1,5 @@
 import { RefObject, useRef, useEffect, useState, useMemo } from "react";
-import { forEach, isNil, debounce, find, reduce } from "lodash";
+import { forEach, isNil, debounce, find, reduce, uniqueId } from "lodash";
 import * as JsSearch from "js-search";
 import { useMediaQuery } from "react-responsive";
 import { Form as RootForm } from "antd";
@@ -14,6 +14,8 @@ type UseSizeConfig<T extends string = string> = {
   readonly options: T[];
   readonly default?: T;
 };
+
+export const useId = (prefix: string) => useMemo(() => uniqueId(prefix), []);
 
 export const useSize = <T extends string = string, P extends UseSizeProps<T> = UseSizeProps<T>>(
   config: UseSizeConfig<T>,

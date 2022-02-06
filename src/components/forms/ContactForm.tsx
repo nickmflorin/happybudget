@@ -63,9 +63,9 @@ const ContactForm: React.FC<ContactFormProps> = ({ form, initialValues, attachme
         <TextArea />
       </Form.Item>
       {!isNil(attachmentsProps) ? (
-        <Form.ItemStyle label={"Attachments"} dataType={"file"}>
+        <Form.Item label={"Attachments"} dataType={"file"}>
           <EditAttachments {...attachmentsProps} />
-        </Form.ItemStyle>
+        </Form.Item>
       ) : (
         <></>
       )}
