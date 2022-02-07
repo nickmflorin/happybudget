@@ -1,5 +1,4 @@
 import { redux } from "lib";
-import ActionType from "./ActionType";
 
 export * as account from "./account";
 export * as accounts from "./accounts";
@@ -8,38 +7,32 @@ export * as pdf from "./pdf";
 export * as subAccount from "./subAccount";
 export * as analysis from "./analysis";
 
-export { default as ActionType } from "./ActionType";
+export const loadingBudgetAction = redux.actions.createAction<boolean>("budget.Loading");
+export const responseBudgetAction = redux.actions.createAction<Model.Budget | null>("budget.Response");
+export const requestBudgetAction = redux.actions.createAction<number>("budget.Request");
 
-export const loadingBudgetAction = redux.actions.createAction<boolean>(ActionType.Loading);
-export const responseBudgetAction = redux.actions.createAction<Model.Budget | null>(ActionType.Response);
-export const requestBudgetAction = redux.actions.createAction<number>(ActionType.Request);
-
-export const updateBudgetInStateAction = redux.actions.createAction<Redux.UpdateActionPayload<Model.Budget>>(
-  ActionType.UpdateInState
-);
-export const loadingFringesAction = redux.actions.createAction<boolean>(ActionType.Fringes.Loading);
+export const updateBudgetInStateAction =
+  redux.actions.createAction<Redux.UpdateActionPayload<Model.Budget>>("budget.UpdateInState");
+export const loadingFringesAction = redux.actions.createAction<boolean>("budget.fringes.Loading");
 export const requestFringesAction = redux.actions.createContextAction<
   Redux.TableRequestPayload,
   Tables.FringeTableContext
->(ActionType.Fringes.Request);
-export const responseFringesAction = redux.actions.createAction<Http.TableResponse<Model.Fringe>>(
-  ActionType.Fringes.Response
-);
+>("budget.fringes.Request");
+export const responseFringesAction =
+  redux.actions.createAction<Http.TableResponse<Model.Fringe>>("budget.fringes.Response");
 export const handleFringesTableChangeEventAction = redux.actions.createContextAction<
   Table.ChangeEvent<Tables.FringeRowData, Model.Fringe>,
   Tables.FringeTableContext
->(ActionType.Fringes.TableChanged);
+>("budget.fringes.TableChanged");
 
 export const setFringesSearchAction = redux.actions.createContextAction<string, Tables.FringeTableContext>(
-  ActionType.Fringes.SetSearch
+  "budget.fringes.SetSearch"
 );
 export const addFringeModelsToStateAction = redux.actions.createAction<Redux.AddModelsToTablePayload<Model.Fringe>>(
-  ActionType.Fringes.AddToState
+  "budget.fringes.AddModelsToState"
 );
-
 export const responseSubAccountUnitsAction = redux.actions.createAction<Http.ListResponse<Model.Tag>>(
-  ActionType.SubAccountUnits.Response
+  "budget.subaccountunits.Response"
 );
-export const responseFringeColorsAction = redux.actions.createAction<Http.ListResponse<string>>(
-  ActionType.FringeColors.Response
-);
+export const responseFringeColorsAction =
+  redux.actions.createAction<Http.ListResponse<string>>("budget.fringecolors.Response");

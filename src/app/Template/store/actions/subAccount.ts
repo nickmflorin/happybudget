@@ -1,35 +1,32 @@
 import { redux } from "lib";
-import ActionType from "./ActionType";
 
 export const updateInStateAction = redux.actions.createAction<Redux.UpdateActionPayload<Model.SubAccount>>(
-  ActionType.SubAccount.UpdateInState
+  "template.subaccount.UpdateInState"
 );
-
-export const requestSubAccountAction = redux.actions.createAction<number>(ActionType.SubAccount.Request);
-export const loadingSubAccountAction = redux.actions.createAction<boolean>(ActionType.SubAccount.Loading);
+export const requestSubAccountAction = redux.actions.createAction<number>("template.subaccount.Request");
+export const loadingSubAccountAction = redux.actions.createAction<boolean>("template.subaccount.Loading");
 export const responseSubAccountAction = redux.actions.createAction<Model.SubAccount | null>(
-  ActionType.SubAccount.Response
+  "template.subaccount.Response"
 );
 
 export const handleTableChangeEventAction = redux.actions.createContextAction<
   Table.ChangeEvent<Tables.SubAccountRowData, Model.SubAccount>,
   Tables.SubAccountTableContext
->(ActionType.SubAccount.SubAccounts.TableChanged);
+>("template.subaccount.TableChanged");
 
-export const loadingAction = redux.actions.createAction<boolean>(ActionType.SubAccount.SubAccounts.Loading);
+export const loadingAction = redux.actions.createAction<boolean>("template.subaccount.TableLoading");
 
 export const requestAction = redux.actions.createContextAction<
   Redux.TableRequestPayload,
   Tables.SubAccountTableContext
->(ActionType.SubAccount.SubAccounts.Request);
+>("template.subaccount.TableRequest");
 
 export const responseAction = redux.actions.createAction<Http.TableResponse<Model.SubAccount>>(
-  ActionType.SubAccount.SubAccounts.Response
+  "template.subaccount.TableResponse"
 );
 export const addModelsToStateAction = redux.actions.createAction<Redux.AddModelsToTablePayload<Model.SubAccount>>(
-  ActionType.SubAccount.SubAccounts.AddToState
+  "template.subaccount.AddModelsToState"
 );
-
 export const setSearchAction = redux.actions.createContextAction<string, Tables.SubAccountTableContext>(
-  ActionType.SubAccount.SubAccounts.SetSearch
+  "template.subaccount.SetTableSearch"
 );

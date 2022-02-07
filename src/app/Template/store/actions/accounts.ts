@@ -1,21 +1,17 @@
 import { redux } from "lib";
-import ActionType from "./ActionType";
 
 export const handleTableChangeEventAction = redux.actions.createContextAction<
   Table.ChangeEvent<Tables.AccountRowData, Model.Account>,
   Tables.AccountTableContext
->(ActionType.Accounts.TableChanged);
+>("template.TableChanged");
 
 export const requestAction = redux.actions.createContextAction<Redux.TableRequestPayload, Tables.AccountTableContext>(
-  ActionType.Accounts.Request
+  "template.TableRequest"
 );
-export const loadingAction = redux.actions.createAction<boolean>(ActionType.Accounts.Loading);
-export const responseAction = redux.actions.createAction<Http.TableResponse<Model.Account>>(
-  ActionType.Accounts.Response
-);
+export const loadingAction = redux.actions.createAction<boolean>("template.TableLoading");
+export const responseAction = redux.actions.createAction<Http.TableResponse<Model.Account>>("template.TableResponse");
 export const setSearchAction = redux.actions.createContextAction<string, Tables.AccountTableContext>(
-  ActionType.Accounts.SetSearch
+  "template.SetTableSearch"
 );
-export const addModelsToStateAction = redux.actions.createAction<Redux.AddModelsToTablePayload<Model.Account>>(
-  ActionType.Accounts.AddToState
-);
+export const addModelsToStateAction =
+  redux.actions.createAction<Redux.AddModelsToTablePayload<Model.Account>>("template.AddModelsToState");

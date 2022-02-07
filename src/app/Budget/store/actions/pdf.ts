@@ -1,23 +1,22 @@
 import { redux } from "lib";
-import ActionType from "./ActionType";
 
-export const requestHeaderTemplatesAction = redux.actions.createAction<null>(ActionType.HeaderTemplates.Request);
-export const loadingHeaderTemplatesAction = redux.actions.createAction<boolean>(ActionType.HeaderTemplates.Loading);
+export const requestHeaderTemplatesAction = redux.actions.createAction<null>("budget.headertemplates.Request");
+export const loadingHeaderTemplatesAction = redux.actions.createAction<boolean>("budget.headertemplates.Loading");
 export const responseHeaderTemplatesAction = redux.actions.createAction<Http.ListResponse<Model.SimpleHeaderTemplate>>(
-  ActionType.HeaderTemplates.Response
+  "budget.headertemplates.Response"
 );
 export const addHeaderTemplateToStateAction = redux.actions.createAction<Model.SimpleHeaderTemplate>(
-  ActionType.HeaderTemplates.AddToState
+  "budget.headertemplates.AddToState"
 );
 export const removeHeaderTemplateFromStateAction = redux.actions.createAction<number>(
-  ActionType.HeaderTemplates.RemoveFromState
+  "budget.headertemplates.RemoveFromState"
 );
 
 export const setLoadingHeaderTemplateDetailAction = redux.actions.createAction<boolean>(
-  ActionType.HeaderTemplates.LoadingDetail
+  "budget.headertemplates.LoadingDetail"
 );
-export const loadHeaderTemplateAction = redux.actions.createAction<number>(ActionType.HeaderTemplates.Load);
-export const clearHeaderTemplateAction = redux.actions.createAction<null>(ActionType.HeaderTemplates.Clear);
+export const loadHeaderTemplateAction = redux.actions.createAction<number>("budget.headertemplates.Load");
+export const clearHeaderTemplateAction = redux.actions.createAction<null>("budget.headertemplates.Clear");
 export const displayHeaderTemplateAction = redux.actions.createAction<Model.HeaderTemplate>(
-  ActionType.HeaderTemplates.Display
+  "budget.headertemplates.Display"
 );

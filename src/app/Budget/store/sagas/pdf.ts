@@ -4,7 +4,6 @@ import { spawn, take, cancel, fork, put } from "redux-saga/effects";
 import * as api from "api";
 import { notifications } from "lib";
 
-import { ActionType } from "../actions";
 import * as actions from "../actions/pdf";
 
 function* loadHeaderTemplateTask(id: number): SagaIterator {
@@ -23,7 +22,7 @@ function* loadHeaderTemplateTask(id: number): SagaIterator {
 function* watchForLoadHeaderTemplateTask(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action: Redux.Action<number> = yield take(ActionType.HeaderTemplates.Load);
+    const action: Redux.Action<number> = yield take(actions.loadHeaderTemplateAction.toString());
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -48,7 +47,7 @@ function* getHeaderTemplatesTask(): SagaIterator {
 function* watchForRequestHeaderTemplatesSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    yield take(ActionType.HeaderTemplates.Request);
+    yield take(actions.requestHeaderTemplatesAction.toString());
     if (lastTasks) {
       yield cancel(lastTasks);
     }

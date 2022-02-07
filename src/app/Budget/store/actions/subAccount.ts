@@ -1,37 +1,35 @@
 import { redux } from "lib";
-import ActionType from "./ActionType";
 
 export const updateInStateAction = redux.actions.createAction<Redux.UpdateActionPayload<Model.SubAccount>>(
-  ActionType.SubAccount.UpdateInState
+  "budget.subaccount.UpdateInState"
 );
-
-export const requestSubAccountAction = redux.actions.createAction<number>(ActionType.SubAccount.Request);
-export const loadingSubAccountAction = redux.actions.createAction<boolean>(ActionType.SubAccount.Loading);
+export const requestSubAccountAction = redux.actions.createAction<number>("budget.subaccount.Request");
+export const loadingSubAccountAction = redux.actions.createAction<boolean>("budget.subaccount.Loading");
 export const responseSubAccountAction = redux.actions.createAction<Model.SubAccount | null>(
-  ActionType.SubAccount.Response
+  "budget.subaccount.Response"
 );
 
 export const handleTableChangeEventAction = redux.actions.createContextAction<
   Table.ChangeEvent<Tables.SubAccountRowData, Model.SubAccount>,
   Tables.SubAccountTableContext
->(ActionType.SubAccount.SubAccounts.TableChanged);
+>("budget.subaccount.TableChanged");
 
-export const loadingAction = redux.actions.createAction<boolean>(ActionType.SubAccount.SubAccounts.Loading);
+export const loadingAction = redux.actions.createAction<boolean>("budget.subaccount.TableLoading");
 
 export const requestAction = redux.actions.createContextAction<
   Redux.TableRequestPayload,
   Tables.SubAccountTableContext
->(ActionType.SubAccount.SubAccounts.Request);
+>("budget.subaccount.TableRequest");
 
 export const responseAction = redux.actions.createAction<Http.TableResponse<Model.SubAccount>>(
-  ActionType.SubAccount.SubAccounts.Response
+  "budget.subaccount.TableResponse"
 );
 export const addModelsToStateAction = redux.actions.createAction<Redux.AddModelsToTablePayload<Model.SubAccount>>(
-  ActionType.SubAccount.SubAccounts.AddToState
+  "budget.subaccount.AddModelsToState"
 );
 export const updateRowsInStateAction = redux.actions.createAction<
   Redux.UpdateRowsInTablePayload<Tables.SubAccountRowData>
->(ActionType.SubAccount.SubAccounts.UpdateRowsInState);
+>("budget.subaccount.UpdateRowsInState");
 export const setSearchAction = redux.actions.createContextAction<string, Tables.SubAccountTableContext>(
-  ActionType.SubAccount.SubAccounts.SetSearch
+  "budget.subaccount.SetTableSearch"
 );

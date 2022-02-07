@@ -1,33 +1,30 @@
 import { redux } from "lib";
-import ActionType from "./ActionType";
 
-export const responseActualOwnersAction = redux.actions.createAction<Http.ListResponse<Model.ActualOwner>>(
-  ActionType.ActualOwners.Response
-);
+export const responseActualOwnersAction =
+  redux.actions.createAction<Http.ListResponse<Model.ActualOwner>>("budget.actualowners.Response");
 export const setActualOwnersSearchAction = redux.actions.createContextAction<string, Tables.ActualTableContext>(
-  ActionType.ActualOwners.SetSearch
+  "budget.actualowners.SetSearch"
 );
-export const loadingActualOwnersAction = redux.actions.createAction<boolean>(ActionType.ActualOwners.Loading);
+export const loadingActualOwnersAction = redux.actions.createAction<boolean>("budget.actualowners.Loading");
 
 export const handleTableChangeEventAction = redux.actions.createContextAction<
   Table.ChangeEvent<Tables.ActualRowData, Model.Actual>,
   Tables.ActualTableContext
->(ActionType.Actuals.TableChanged);
+>("budget.actuals.TableChanged");
 
 export const updateRowsInStateAction = redux.actions.createAction<Redux.UpdateRowsInTablePayload<Tables.ActualRowData>>(
-  ActionType.Actuals.UpdateRowsInState
+  "budget.actuals.UpdateRowsInState"
 );
 export const requestAction = redux.actions.createContextAction<Redux.TableRequestPayload, Tables.ActualTableContext>(
-  ActionType.Actuals.Request
+  "budget.actuals.Request"
 );
-export const loadingAction = redux.actions.createAction<boolean>(ActionType.Actuals.Loading);
-export const responseAction = redux.actions.createAction<Http.TableResponse<Model.Actual>>(ActionType.Actuals.Response);
+export const loadingAction = redux.actions.createAction<boolean>("budget.actuals.Loading");
+export const responseAction = redux.actions.createAction<Http.TableResponse<Model.Actual>>("budget.actuals.Response");
 export const setSearchAction = redux.actions.createContextAction<string, Tables.ActualTableContext>(
-  ActionType.Actuals.SetSearch
+  "budget.actuals.SetSearch"
 );
 export const addModelsToStateAction = redux.actions.createAction<Redux.AddModelsToTablePayload<Model.Actual>>(
-  ActionType.Actuals.AddToState
+  "budget.actuals.AddModelsToState"
 );
-export const responseActualTypesAction = redux.actions.createAction<Http.ListResponse<Model.Tag>>(
-  ActionType.ActualTypes.Response
-);
+export const responseActualTypesAction =
+  redux.actions.createAction<Http.ListResponse<Model.Tag>>("budget.actualstypes.Response");
