@@ -15,6 +15,7 @@ interface PrivateCreateModelModalProps<M extends Model.Model, P extends Http.Pay
   readonly form?: FormInstance<V>;
   readonly title?: string | JSX.Element | ((form: FormInstance<V>) => JSX.Element | string);
   readonly autoFocusField?: number;
+  readonly requestOptions?: Omit<Http.RequestOptions, "cancelToken">;
   readonly create: (payload: P, options: Http.RequestOptions) => Promise<R>;
   readonly children: (form: FormInstance<V>) => JSX.Element;
   readonly interceptPayload?: (p: V) => P;
@@ -28,6 +29,7 @@ interface PrivateCreateModelModalProps<M extends Model.Model, P extends Http.Pay
 const CreateModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = P, R = M>({
   autoFocusField,
   form,
+  requestOptions,
   create,
   onSuccess,
   children,
@@ -65,7 +67,7 @@ const CreateModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = 
               payload
             );
             Form.setLoading(true);
-            create(payload, { cancelToken: cancelToken() })
+            create(payload, { ...requestOptions, cancelToken: cancelToken() })
               .then((response: R) => {
                 if (isMounted.current) {
                   Form.resetFields();

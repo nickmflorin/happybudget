@@ -158,7 +158,9 @@ const Budgets = (): JSX.Element => {
                     } else {
                       setDuplicating(budget.id);
                       api
-                        .duplicateBudget(budget.id)
+                        /* We have to use a large timeout because this is a
+												   request that sometimes takes a very long time. */
+                        .duplicateBudget(budget.id, { timeout: 120 * 1000 })
                         .then((response: Model.Budget) => {
                           e.closeParentDropdown?.();
                           dispatch(actions.addBudgetToStateAction(response));

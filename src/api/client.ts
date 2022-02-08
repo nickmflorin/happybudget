@@ -122,7 +122,8 @@ export class ApiClient {
       response = await lookup[method](url, { cancelToken: options.cancelToken });
     } else {
       response = await lookup[method](url, apiUtil.filterPayload(payload as Http.PayloadObj), {
-        cancelToken: options.cancelToken
+        cancelToken: options.cancelToken,
+        timeout: options.timeout
       });
     }
     /* We are getting sporadic errors where the response is not defined.  I am

@@ -157,7 +157,9 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
                   onDuplicate={(e: MenuItemModelClickEvent) => {
                     setDuplicating(template.id);
                     api
-                      .duplicateTemplate(template.id)
+                      /* We have to use a large timeout because this is a request
+                         that sometimes takes a very long time. */
+                      .duplicateTemplate(template.id, { timeout: 120 * 1000 })
                       .then((response: Model.Template) => {
                         e.closeParentDropdown?.();
                         dispatch(actions.addTemplateToStateAction(response));

@@ -18,6 +18,9 @@ const CreateBudgetModal = ({ templateId, ...props }: CreateBudgetModalProps): JS
       title={"Create Budget"}
       {...props}
       create={api.createBudget}
+      /* We have to use a large timeout because this is a request
+         that sometimes takes a very long time. */
+      requestOptions={{ timeout: 120 * 1000 }}
       interceptError={(f: FormInstance<Http.BudgetPayload>, e: Error) => {
         if (
           e instanceof api.ClientError &&
