@@ -1,4 +1,3 @@
-import * as api from "api";
 import { budgeting, tabling } from "lib";
 
 import { accounts as actions, loadingBudgetAction, updateBudgetInStateAction } from "../actions";
@@ -28,16 +27,6 @@ export const createTableSaga = (table: Table.TableInstance<Tables.AccountRowData
     tasks: budgeting.tasks.accounts.createTableTaskSet<Model.Budget>({
       table,
       selectStore: (state: Application.AuthenticatedStore) => state.budget.accounts,
-      actions: ActionMap,
-      services: {
-        create: api.createBudgetChild,
-        request: api.getBudgetChildren,
-        requestGroups: api.getBudgetGroups,
-        requestMarkups: api.getBudgetMarkups,
-        bulkCreate: api.bulkCreateBudgetChildren,
-        bulkDelete: api.bulkDeleteBudgetChildren,
-        bulkUpdate: api.bulkUpdateBudgetChildren,
-        bulkDeleteMarkups: api.bulkDeleteBudgetMarkups
-      }
+      actions: ActionMap
     })
   });

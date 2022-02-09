@@ -57,7 +57,7 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
 
   const [groupModals, onEditGroup, onCreateGroup] = useGrouping({
     parentId: budgetId,
-    parentType: "template",
+    parentType: "budget",
     table: table.current,
     onGroupUpdated: (group: Model.Group) =>
       table.current.applyTableChange({
@@ -68,7 +68,7 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
 
   const [markupModals, onEditMarkup, onCreateMarkup] = useMarkup({
     parentId: budgetId,
-    parentType: "template",
+    parentType: "budget",
     table: table.current,
     onResponse: (response: Http.BudgetContextDetailResponse<Model.Markup, Model.Template>) => {
       dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));

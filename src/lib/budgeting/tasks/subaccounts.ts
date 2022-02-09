@@ -16,11 +16,6 @@ export type SubAccountsTableServiceSet = {
     query: Http.ListQuery,
     options: Http.RequestOptions
   ) => Promise<Http.ListResponse<Model.Group>>;
-  readonly requestFringes: (
-    id: number,
-    query: Http.ListQuery,
-    options: Http.RequestOptions
-  ) => Promise<Http.ListResponse<Model.Fringe>>;
   readonly requestMarkups?: (
     id: number,
     query: Http.ListQuery,
@@ -53,11 +48,6 @@ export type AuthenticatedSubAccountsTableServiceSet<
     p: Http.BulkCreatePayload<P>,
     options: Http.RequestOptions
   ) => Promise<Http.BudgetBulkResponse<B, M, C>>;
-  readonly bulkCreateFringes: (
-    id: number,
-    p: Http.BulkCreatePayload<Http.FringePayload>,
-    options: Http.RequestOptions
-  ) => Promise<Http.BulkResponse<B, Model.Fringe>>;
 };
 
 export type SubAccountsTableActionMap = Redux.TableActionMap<C, Tables.SubAccountTableContext> & {
@@ -109,12 +99,12 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
 
   function* requestFringes(objId: number): SagaIterator {
     try {
-      const response: Http.ListResponse<Model.Fringe> = yield api.request(config.services.requestFringes, objId, {});
+      const response: Http.ListResponse<Model.Fringe> = yield api.request(api.getFringes, objId, {});
       if (response.data.length === 0 && isAuthenticatedConfig(config)) {
         // If there is no table data, we want to default create two rows.
         try {
           const bulkCreateResponse: Http.BulkResponse<B, Model.Fringe> = yield api.request(
-            config.services.bulkCreateFringes,
+            api.bulkCreateFringes,
             objId,
             { data: [{}, {}] }
           );

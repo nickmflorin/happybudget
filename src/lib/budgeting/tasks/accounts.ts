@@ -9,40 +9,6 @@ type R = Tables.AccountRowData;
 type C = Model.Account;
 type P = Http.AccountPayload;
 
-export type AccountsTableServiceSet = {
-  readonly request: (id: number, query: Http.ListQuery, options: Http.RequestOptions) => Promise<Http.ListResponse<C>>;
-  readonly requestGroups: (
-    id: number,
-    query: Http.ListQuery,
-    options: Http.RequestOptions
-  ) => Promise<Http.ListResponse<Model.Group>>;
-  readonly requestMarkups?: (
-    id: number,
-    query: Http.ListQuery,
-    options: Http.RequestOptions
-  ) => Promise<Http.ListResponse<Model.Markup>>;
-};
-
-export type AuthenticatedAccountsTableServiceSet<B extends Model.Template | Model.Budget> = AccountsTableServiceSet & {
-  readonly create: (id: number, payload: P, options?: Http.RequestOptions) => Promise<C>;
-  readonly bulkDelete: (id: number, ids: number[], options: Http.RequestOptions) => Promise<Http.BulkDeleteResponse<B>>;
-  readonly bulkDeleteMarkups?: (
-    id: number,
-    ids: number[],
-    options: Http.RequestOptions
-  ) => Promise<Http.BulkDeleteResponse<B>>;
-  readonly bulkUpdate: (
-    id: number,
-    data: Http.BulkUpdatePayload<P>,
-    options: Http.RequestOptions
-  ) => Promise<Http.BulkResponse<B, C>>;
-  readonly bulkCreate: (
-    id: number,
-    p: Http.BulkCreatePayload<P>,
-    options: Http.RequestOptions
-  ) => Promise<Http.BulkResponse<B, C>>;
-};
-
 export type AuthenticatedAccountsTableActionMap<B extends Model.Template | Model.Budget> =
   Redux.AuthenticatedTableActionMap<R, C, Tables.AccountTableContext> & {
     readonly tableChanged: Redux.ContextActionCreator<Table.ChangeEvent<R, C>, Tables.AccountTableContext>;
@@ -55,9 +21,7 @@ export type AccountsTableTaskConfig = Table.TaskConfig<
   C,
   Tables.AccountTableContext,
   Redux.TableActionMap<C, Tables.AccountTableContext>
-> & {
-  readonly services: AccountsTableServiceSet;
-};
+>;
 
 export type AuthenticatedAccountsTableTaskConfig<B extends Model.Template | Model.Budget> = Table.TaskConfig<
   R,
@@ -65,14 +29,13 @@ export type AuthenticatedAccountsTableTaskConfig<B extends Model.Template | Mode
   Tables.AccountTableContext,
   AuthenticatedAccountsTableActionMap<B>
 > & {
-  readonly services: AuthenticatedAccountsTableServiceSet<B>;
   readonly selectStore: (state: Application.AuthenticatedStore) => Tables.AccountTableStore;
 };
 
 const isAuthenticatedConfig = <B extends Model.Template | Model.Budget>(
   c: AccountsTableTaskConfig | AuthenticatedAccountsTableTaskConfig<B>
 ): c is AuthenticatedAccountsTableTaskConfig<B> => {
-  return (c as AuthenticatedAccountsTableTaskConfig<B>).services.bulkCreate !== undefined;
+  return (c as AuthenticatedAccountsTableTaskConfig<B>).selectStore !== undefined;
 };
 
 export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
@@ -85,7 +48,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
     if (redux.typeguards.isListRequestIdsAction(action)) {
       if (isAuthenticatedConfig(config)) {
         const response: Http.ListResponse<Model.Account> = yield api.request(
-          config.services.request,
+          api.getBudgetChildren,
           action.context.budgetId,
           { ids: action.payload.ids }
         );
@@ -101,13 +64,11 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
       }
     } else {
       yield put(config.actions.loading(true));
-      let effects = [
-        api.request(config.services.request, action.context.budgetId, {}),
-        api.request(config.services.requestGroups, action.context.budgetId, {})
+      const effects = [
+        api.request(api.getBudgetChildren, action.context.budgetId, {}),
+        api.request(api.getBudgetGroups, action.context.budgetId, {}),
+        api.request(api.getBudgetMarkups, action.context.budgetId, {})
       ];
-      if (!isNil(config.services.requestMarkups)) {
-        effects = [...effects, api.request(config.services.requestMarkups, action.context.budgetId, {})];
-      }
       try {
         const [models, groups, markups]: [
           Http.ListResponse<C>,
@@ -117,7 +78,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         if (models.data.length === 0 && isAuthenticatedConfig(config)) {
           // If there is no table data, we want to default create two rows.
           const response: Http.BulkResponse<B, C> = yield api.request(
-            config.services.bulkCreate,
+            api.bulkCreateBudgetChildren,
             action.context.budgetId,
             { data: [{}, {}] }
           );
@@ -174,7 +135,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
           config.actions.updateBudgetInState({ id: r.data.id, data: r.data }),
           config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children })
         ],
-        bulkCreate: (objId: number) => [config.services.bulkCreate, objId]
+        bulkCreate: (objId: number) => [api.bulkCreateBudgetChildren, objId]
       });
 
   function* bulkUpdateTask(
@@ -189,7 +150,11 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         yield put(config.actions.loadingBudget(true));
       }
       try {
-        const response: Http.BulkResponse<B, C> = yield api.request(config.services.bulkUpdate, objId, requestPayload);
+        const response: Http.BulkResponse<B, C> = yield api.request(
+          api.bulkUpdateBudgetChildren,
+          objId,
+          requestPayload
+        );
         yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
       } catch (err: unknown) {
         config.table.handleRequestError(err as Error, { message: errorMessage });
@@ -248,10 +213,10 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
     if (isAuthenticatedConfig(config)) {
       let response: Http.BulkDeleteResponse<B> | null = null;
       if (ids.length !== 0) {
-        response = yield api.request(config.services.bulkDelete, objId, ids);
+        response = yield api.request(api.bulkDeleteBudgetChildren, objId, ids);
       }
-      if (!isNil(markupIds) && markupIds.length !== 0 && !isNil(config.services.bulkDeleteMarkups)) {
-        response = yield api.request(config.services.bulkDeleteMarkups, objId, markupIds);
+      if (!isNil(markupIds) && markupIds.length !== 0) {
+        response = yield api.request(api.bulkDeleteBudgetMarkups, objId, markupIds);
       }
       if (!isNil(response)) {
         yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
@@ -343,7 +308,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
     if (isAuthenticatedConfig(config)) {
       config.table.saving(true);
       try {
-        const response: C = yield api.request(config.services.create, context.budgetId, {
+        const response: C = yield api.request(api.createBudgetChild, context.budgetId, {
           previous: e.payload.previous,
           group: isNil(e.payload.group) ? null : tabling.managers.groupId(e.payload.group),
           ...tabling.http.postPayload<R, C, P>(e.payload.data, config.table.getColumns())

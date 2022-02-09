@@ -54,8 +54,6 @@ export const createTableSaga = (table: Table.TableInstance<Tables.SubAccountRowD
         request: api.getAccountChildren,
         requestGroups: api.getAccountGroups,
         requestMarkups: api.getAccountMarkups,
-        requestFringes: api.getTemplateFringes,
-        bulkCreateFringes: api.bulkCreateTemplateFringes,
         bulkCreate: api.bulkCreateAccountChildren,
         bulkDelete: api.bulkDeleteAccountChildren,
         bulkUpdate: api.bulkUpdateAccountChildren,

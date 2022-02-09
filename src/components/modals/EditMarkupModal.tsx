@@ -16,7 +16,7 @@ interface EditMarkupModalProps<
   R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
 > extends EditModelModalProps<Model.Markup, R> {
   readonly parentId: number;
-  readonly parentType: Model.ParentType | "template";
+  readonly parentType: Model.ParentType;
 }
 
 const EditMarkupModal = <

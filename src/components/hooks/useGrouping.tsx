@@ -6,7 +6,7 @@ import { CreateGroupModal, EditGroupModal } from "components/modals";
 
 interface UseGroupingProps<R extends Tables.BudgetRowData, M extends Model.RowHttpModel> {
   readonly parentId: number;
-  readonly parentType: Model.ParentType | "template";
+  readonly parentType: Model.ParentType;
   readonly table: Table.TableInstance<R, M>;
   readonly onGroupUpdated: (group: Model.Group) => void;
 }

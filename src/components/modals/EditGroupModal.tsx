@@ -9,7 +9,7 @@ import { EditModelModal, EditModelModalProps } from "./generic";
 
 interface EditGroupModalProps extends EditModelModalProps<Model.Group> {
   readonly parentId: number;
-  readonly parentType: Model.ParentType | "template";
+  readonly parentType: Model.ParentType;
 }
 
 const EditGroupModal = <M extends Model.SimpleAccount | Model.SimpleSubAccount>({

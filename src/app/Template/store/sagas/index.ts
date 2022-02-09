@@ -31,7 +31,7 @@ const FringesActionMap = {
 function* getBudgetTask(action: Redux.Action<number>): SagaIterator {
   yield put(actions.loadingBudgetAction(true));
   try {
-    const response: Model.Template = yield api.request(api.getTemplate, action.payload);
+    const response: Model.Template = yield api.request(api.getBudget, action.payload);
     yield put(actions.responseBudgetAction(response));
   } catch (e: unknown) {
     notifications.ui.banner.handleRequestError(e as Error);
@@ -48,14 +48,7 @@ export const createFringesTableSaga = (table: Table.TableInstance<Tables.FringeR
       table,
       selectAccountTableStore: (state: Application.AuthenticatedStore) => state.template.account.table,
       selectSubAccountTableStore: (state: Application.AuthenticatedStore) => state.template.subaccount.table,
-      actions: FringesActionMap,
-      services: {
-        create: api.createTemplateFringe,
-        request: api.getTemplateFringes,
-        bulkCreate: api.bulkCreateTemplateFringes,
-        bulkDelete: api.bulkDeleteTemplateFringes,
-        bulkUpdate: api.bulkUpdateTemplateFringes
-      }
+      actions: FringesActionMap
     })
   });
 

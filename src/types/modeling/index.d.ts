@@ -179,6 +179,8 @@ declare namespace Model {
     readonly accumulated_markup_contribution: number;
   };
 
+  type BaseBudget = Budget | Template;
+
   type PdfBudget = GenericHttpModel<"pdf-budget"> & {
     readonly name: string;
     readonly nominal_value: number;

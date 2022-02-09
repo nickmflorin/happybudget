@@ -10,22 +10,20 @@ type ParentTypeModelMap = {
   account: Model.SubAccount;
   subaccount: Model.SubAccount;
   budget: Model.Account;
-  template: Model.Account;
 };
 
 export const getTableChildren = <
   M extends Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount
 >(
   parentId: number,
-  parentType: Model.ParentType | "template",
+  parentType: Model.ParentType,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<M>> => {
   const serviceMap: {
-    [key in Model.ParentType | "template"]: TableChildrenService<ParentTypeModelMap[key]>;
+    [key in Model.ParentType]: TableChildrenService<ParentTypeModelMap[key]>;
   } = {
     budget: api.getBudgetChildren,
-    template: api.getTemplateChildren,
     account: api.getAccountChildren,
     subaccount: api.getSubAccountChildren
   };
@@ -37,7 +35,7 @@ export const createTableMarkup = <
   R extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
 >(
   parentId: number,
-  parentType: Model.ParentType | "template",
+  parentType: Model.ParentType,
   payload: Http.MarkupPayload,
   options: Http.RequestOptions = {}
 ): Promise<R> => {
@@ -47,14 +45,9 @@ export const createTableMarkup = <
     | Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount>;
 
   const serviceMap: {
-    [key in Model.ParentType | "template"]: (
-      id: number,
-      p: Http.MarkupPayload,
-      o?: Http.RequestOptions
-    ) => Promise<ResponseTypes>;
+    [key in Model.ParentType]: (id: number, p: Http.MarkupPayload, o?: Http.RequestOptions) => Promise<ResponseTypes>;
   } = {
     budget: api.createBudgetMarkup,
-    template: api.createTemplateMarkup,
     account: api.createAccountMarkup,
     subaccount: api.createSubAccountMarkup
   };
@@ -63,19 +56,18 @@ export const createTableMarkup = <
 
 export const getTableGroups = (
   parentId: number,
-  parentType: Model.ParentType | "template",
+  parentType: Model.ParentType,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.Group>> => {
   const serviceMap: {
-    [key in Model.ParentType | "template"]: (
+    [key in Model.ParentType]: (
       id: number,
       q?: Http.ListQuery,
       o?: Http.RequestOptions
     ) => Promise<Http.ListResponse<Model.Group>>;
   } = {
     budget: api.getBudgetGroups,
-    template: api.getTemplateGroups,
     account: api.getAccountGroups,
     subaccount: api.getSubAccountGroups
   };
@@ -84,19 +76,14 @@ export const getTableGroups = (
 
 export const createTableGroup = (
   parentId: number,
-  parentType: Model.ParentType | "template",
+  parentType: Model.ParentType,
   payload: Http.GroupPayload,
   options: Http.RequestOptions = {}
 ): Promise<Model.Group> => {
   const serviceMap: {
-    [key in Model.ParentType | "template"]: (
-      id: number,
-      p: Http.GroupPayload,
-      o?: Http.RequestOptions
-    ) => Promise<Model.Group>;
+    [key in Model.ParentType]: (id: number, p: Http.GroupPayload, o?: Http.RequestOptions) => Promise<Model.Group>;
   } = {
     budget: api.createBudgetGroup,
-    template: api.createTemplateGroup,
     account: api.createAccountGroup,
     subaccount: api.createSubAccountGroup
   };

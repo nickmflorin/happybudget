@@ -9,7 +9,7 @@ import { CreateModelModal, CreateModelModalProps } from "./generic";
 interface CreateGroupModalProps extends CreateModelModalProps<Model.Group> {
   readonly id: number;
   readonly children: number[];
-  readonly parentType: Model.ParentType | "template";
+  readonly parentType: Model.ParentType;
 }
 
 const CreateGroupModal = <M extends Model.SimpleAccount | Model.SimpleSubAccount>({

@@ -17,8 +17,8 @@ const EditTemplateModal = (props: EditModelModalProps<Model.Template>): JSX.Elem
     <EditModelModal<Model.Template, Http.TemplatePayload>
       {...props}
       title={(m: Model.Template) => `Edit ${m.name}`}
-      update={api.updateTemplate}
-      request={api.getTemplate}
+      update={api.updateBudget}
+      request={api.getBudget}
       onModelLoaded={(m: Model.Template) => setFile(m.image)}
       interceptPayload={(p: Http.TemplatePayload) => {
         /*

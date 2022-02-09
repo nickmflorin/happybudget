@@ -61,14 +61,7 @@ export const createFringesTableSaga = (table: Table.TableInstance<Tables.FringeR
       table,
       selectAccountTableStore: (state: Application.AuthenticatedStore) => state.budget.account.table,
       selectSubAccountTableStore: (state: Application.AuthenticatedStore) => state.budget.subaccount.table,
-      actions: FringesActionMap,
-      services: {
-        create: api.createBudgetFringe,
-        request: api.getBudgetFringes,
-        bulkCreate: api.bulkCreateBudgetFringes,
-        bulkDelete: api.bulkDeleteBudgetFringes,
-        bulkUpdate: api.bulkUpdateBudgetFringes
-      }
+      actions: FringesActionMap
     })
   });
 

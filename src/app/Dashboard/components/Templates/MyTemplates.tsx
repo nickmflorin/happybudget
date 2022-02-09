@@ -133,7 +133,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
                   onDelete={(e: MenuItemModelClickEvent) => {
                     setDeleting(template.id);
                     api
-                      .deleteTemplate(template.id)
+                      .deleteBudget(template.id)
                       .then(() => {
                         e.closeParentDropdown?.();
                         dispatch(actions.removeTemplateFromStateAction(template.id));
@@ -145,7 +145,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
                   onMoveToCommunity={(e: MenuItemModelClickEvent) => {
                     setMoving(template.id);
                     api
-                      .updateTemplate(template.id, { community: true })
+                      .updateBudget<Model.Template>(template.id, { community: true })
                       .then((response: Model.Template) => {
                         e.closeParentDropdown?.();
                         dispatch(actions.removeTemplateFromStateAction(template.id));
@@ -159,7 +159,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
                     api
                       /* We have to use a large timeout because this is a request
                          that sometimes takes a very long time. */
-                      .duplicateTemplate(template.id, { timeout: 120 * 1000 })
+                      .duplicateBudget<Model.Template>(template.id, { timeout: 120 * 1000 })
                       .then((response: Model.Template) => {
                         e.closeParentDropdown?.();
                         dispatch(actions.addTemplateToStateAction(response));

@@ -129,7 +129,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
                   if (template.hidden === true) {
                     setTogglingVisibility(template.id);
                     api
-                      .updateTemplate(template.id, { hidden: false })
+                      .updateBudget<Model.Template>(template.id, { hidden: false })
                       .then((response: Model.Template) => {
                         dispatch(actions.updateCommunityTemplateInStateAction({ id: template.id, data: response }));
                         e.closeParentDropdown?.();
@@ -139,7 +139,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
                   } else {
                     setTogglingVisibility(template.id);
                     api
-                      .updateTemplate(template.id, { hidden: true })
+                      .updateBudget<Model.Template>(template.id, { hidden: true })
                       .then((response: Model.Template) => {
                         dispatch(actions.updateCommunityTemplateInStateAction({ id: template.id, data: response }));
                         e.closeParentDropdown?.();
@@ -153,7 +153,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
                 onDelete={(e: MenuItemModelClickEvent) => {
                   setDeleting(template.id);
                   api
-                    .deleteTemplate(template.id)
+                    .deleteBudget(template.id)
                     .then(() => {
                       e.closeParentDropdown?.();
                       dispatch(actions.removeCommunityTemplateFromStateAction(template.id));
@@ -167,7 +167,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
                   api
                     /* We have to use a large timeout because this is a request
                        that sometimes takes a very long time. */
-                    .duplicateTemplate(template.id, { timeout: 120 * 1000 })
+                    .duplicateBudget<Model.Template>(template.id, { timeout: 120 * 1000 })
                     .then((response: Model.Template) => {
                       e.closeParentDropdown?.();
                       dispatch(actions.addCommunityTemplateToStateAction(response));

@@ -11,10 +11,6 @@ type R = Tables.FringeRowData;
 type M = Model.Fringe;
 type P = Http.FringePayload;
 
-export interface FringeServiceSet {
-  request: (id: number, query: Http.ListQuery, options: Http.RequestOptions) => Promise<Http.ListResponse<M>>;
-}
-
 export type FringesTableActionMap<B extends Model.Template | Model.Budget> = Redux.AuthenticatedTableActionMap<
   R,
   M,
@@ -29,28 +25,12 @@ export type FringesTableActionMap<B extends Model.Template | Model.Budget> = Red
   readonly responseFringeColors: Redux.ActionCreator<Http.ListResponse<string>>;
 };
 
-export type FringeTableServiceSet<B extends Model.Template | Model.Budget> = FringeServiceSet & {
-  readonly create: (id: number, payload: P, options?: Http.RequestOptions) => Promise<M>;
-  readonly bulkDelete: (id: number, ids: number[], options: Http.RequestOptions) => Promise<Http.BulkDeleteResponse<B>>;
-  readonly bulkUpdate: (
-    id: number,
-    data: Http.BulkUpdatePayload<Http.FringePayload>,
-    options: Http.RequestOptions
-  ) => Promise<Http.BulkResponse<B, Model.Fringe>>;
-  readonly bulkCreate: (
-    id: number,
-    p: Http.BulkCreatePayload<P>,
-    options: Http.RequestOptions
-  ) => Promise<Http.BulkResponse<B, Model.Fringe>>;
-};
-
 export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Table.TaskConfig<
   R,
   M,
   Tables.FringeTableContext,
   FringesTableActionMap<B>
 > & {
-  readonly services: FringeTableServiceSet<B>;
   readonly selectAccountTableStore: (state: Application.AuthenticatedStore) => Tables.SubAccountTableStore;
   readonly selectSubAccountTableStore: (state: Application.AuthenticatedStore) => Tables.SubAccountTableStore;
 };
@@ -107,7 +87,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       config.actions.updateBudgetInState({ id: r.data.id, data: r.data }),
       config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children })
     ],
-    bulkCreate: (objId: number) => [config.services.bulkCreate, objId]
+    bulkCreate: (objId: number) => [api.bulkCreateFringes, objId]
   });
 
   function* bulkUpdateTask(
@@ -122,7 +102,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     }
     try {
       const response: Http.BulkResponse<B, M> = yield api.request(
-        config.services.bulkUpdate,
+        api.bulkUpdateFringes,
         context.budgetId,
         requestPayload
       );
@@ -191,7 +171,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     config.table.saving(true);
     yield put(config.actions.loadingBudget(true));
     try {
-      const response: Http.BulkDeleteResponse<B> = yield api.request(config.services.bulkDelete, budgetId, ids);
+      const response: Http.BulkDeleteResponse<B> = yield api.request(api.bulkDeleteFringes, budgetId, ids);
       yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, { message: errorMessage, dispatchClientErrorToSentry: true });
@@ -204,7 +184,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   function* handleRowInsertEvent(e: Table.RowInsertEvent<R>, context: Tables.FringeTableContext): SagaIterator {
     config.table.saving(true);
     try {
-      const response: M = yield api.request(config.services.create, context.budgetId, {
+      const response: M = yield api.request(api.createFringe, context.budgetId, {
         previous: e.payload.previous,
         ...tabling.http.postPayload<R, M, P>(e.payload.data, config.table.getColumns())
       });

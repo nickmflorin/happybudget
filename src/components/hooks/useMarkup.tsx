@@ -10,7 +10,7 @@ interface UseMarkupProps<
   RSP extends Http.MarkupResponseTypes<B> = Http.MarkupResponseTypes<B>
 > {
   readonly parentId: number;
-  readonly parentType: Model.ParentType | "template";
+  readonly parentType: Model.ParentType;
   readonly table: Table.TableInstance<R, M>;
   readonly onResponse: (response: RSP) => void;
 }

@@ -13,7 +13,7 @@ interface CreateMarkupModalProps<
 > extends Omit<CreateModelModalProps<Model.Markup, R>, "children"> {
   readonly id: number;
   readonly children?: number[];
-  readonly parentType: Model.ParentType | "template";
+  readonly parentType: Model.ParentType;
 }
 
 type MarkupFormValues = Omit<Http.MarkupPayload, "rate"> & { readonly rate: string };
