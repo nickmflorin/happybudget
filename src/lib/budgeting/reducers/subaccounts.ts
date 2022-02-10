@@ -54,7 +54,7 @@ export type SubAccountTableActionMap = Redux.TableActionMap<M, Tables.SubAccount
   readonly responseSubAccountUnits: Redux.ActionCreator<Http.ListResponse<Model.Tag>>;
 };
 
-export const createUnauthenticatedSubAccountsTableReducer = (
+export const createPublicSubAccountsTableReducer = (
   config: BudgetTableReducerConfig<R, M, S, Tables.SubAccountTableContext, SubAccountTableActionMap> & {
     readonly fringes: Redux.Reducer<Tables.FringeTableStore>;
   }

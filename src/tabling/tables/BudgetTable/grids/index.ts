@@ -1,4 +1,4 @@
-export { default as UnauthenticatedBudgetDataGrid } from "./UnauthenticatedDataGrid";
-export * from "./UnauthenticatedDataGrid";
+export { default as PublicBudgetDataGrid } from "./PublicDataGrid";
+export * from "./PublicDataGrid";
 export { default as AuthenticatedBudgetDataGrid } from "./AuthenticatedDataGrid";
 export * from "./AuthenticatedDataGrid";

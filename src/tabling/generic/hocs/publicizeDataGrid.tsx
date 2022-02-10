@@ -13,7 +13,7 @@ import { hooks } from "lib";
 
 import { useClipboard, useCellNavigation } from "../hooks";
 
-type InjectedUnauthenticatedDataGridProps = {
+type InjectedPublicDataGridProps = {
   readonly getCSVData: (fields?: string[]) => CSVData;
   readonly processCellForClipboard: (params: ProcessCellForExportParams) => string;
   readonly onCellKeyDown: (event: CellKeyDownEvent) => void;
@@ -21,31 +21,28 @@ type InjectedUnauthenticatedDataGridProps = {
   readonly tabToNextCell: (params: TabToNextCellParams) => Table.CellPosition;
 };
 
-export interface UnauthenticateDataGridProps<
-  R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
-> {
+export interface PublicizeDataGridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
   readonly grid: NonNullRef<Table.DataGridInstance>;
 }
 
-export type WithUnauthenticatedDataGridProps<T> = T & InjectedUnauthenticatedDataGridProps;
+export type WithPublicDataGridProps<T> = T & InjectedPublicDataGridProps;
 
-const unauthenticatedDataGrid =
+const publicizeDataGrid =
   <
     R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    T extends UnauthenticateDataGridProps<R, M> = UnauthenticateDataGridProps<R, M>
+    T extends PublicizeDataGridProps<R, M> = PublicizeDataGridProps<R, M>
   >(
-    config?: Table.UnauthenticatedDataGridConfig<R>
+    config?: Table.PublicDataGridConfig<R>
   ) =>
   (
     Component:
-      | React.ComponentClass<WithUnauthenticatedDataGridProps<T>, Record<string, unknown>>
-      | React.FunctionComponent<WithUnauthenticatedDataGridProps<T>>
+      | React.ComponentClass<WithPublicDataGridProps<T>, Record<string, unknown>>
+      | React.FunctionComponent<WithPublicDataGridProps<T>>
   ): React.FunctionComponent<T> => {
-    function WithUnauthenticatedDataGrid(props: T) {
+    function WithPublicDataGrid(props: T) {
       const [processCellForClipboard, getCSVData] = useClipboard<R, M>({
         columns: props.columns,
         apis: props.apis
@@ -89,7 +86,7 @@ const unauthenticatedDataGrid =
         />
       );
     }
-    return hoistNonReactStatics(WithUnauthenticatedDataGrid, React.memo(Component));
+    return hoistNonReactStatics(WithPublicDataGrid, React.memo(Component));
   };
 
-export default unauthenticatedDataGrid;
+export default publicizeDataGrid;

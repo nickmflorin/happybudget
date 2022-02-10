@@ -1,10 +1,10 @@
-export { default as UnauthenticatedGrid } from "./UnauthenticatedGrid";
-export * from "./UnauthenticatedGrid";
+export { default as PublicGrid } from "./PublicGrid";
+export * from "./PublicGrid";
 export { default as AuthenticatedGrid } from "./AuthenticatedGrid";
 export * from "./AuthenticatedGrid";
 export { default as Grid } from "./Grid";
 export * from "./Grid";
 export { default as AuthenticatedDataGrid } from "./AuthenticatedDataGrid";
 export * from "./AuthenticatedDataGrid";
-export { default as UnauthenticatedDataGrid } from "./UnauthenticatedDataGrid";
-export * from "./UnauthenticatedDataGrid";
+export { default as PublicDataGrid } from "./PublicDataGrid";
+export * from "./PublicDataGrid";

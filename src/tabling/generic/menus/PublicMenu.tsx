@@ -1,17 +1,17 @@
 import React from "react";
 
-import UnauthenticatedToolbar from "./UnauthenticatedToolbar";
+import PublicToolbar from "./PublicToolbar";
 import Menu, { InternalMenuProps, MenuProps } from "./Menu";
 
-export type UnauthenticatedMenuProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = Omit<
-  MenuProps<Table.UnauthenticatedMenuActionParams<R, M>, R, M>,
+export type PublicMenuProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = Omit<
+  MenuProps<Table.PublicMenuActionParams<R, M>, R, M>,
   "menuActionParams" | "savingChangesPortalId" | "saving" | "savingVisible"
 > & {
   readonly columns: Table.DataColumn<R, M>[];
 };
 
 type InternalUnathenticatedMenuProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = Omit<
-  InternalMenuProps<Table.UnauthenticatedMenuActionParams<R, M>, R, M>,
+  InternalMenuProps<Table.PublicMenuActionParams<R, M>, R, M>,
   "menuActionParams" | "toolbar"
 > & {
   readonly apis: Table.GridApis | null;
@@ -23,9 +23,9 @@ const UnathenticatedMenu = <R extends Table.RowData, M extends Model.RowHttpMode
   props: Omit<InternalUnathenticatedMenuProps<R, M>, "menuPortalId">
 ) => {
   return (
-    <Menu<Table.UnauthenticatedMenuActionParams<R, M>, R, M>
+    <Menu<Table.PublicMenuActionParams<R, M>, R, M>
       {...props}
-      toolbar={UnauthenticatedToolbar}
+      toolbar={PublicToolbar}
       menuActionParams={{
         apis: props.apis,
         hiddenColumns: props.hiddenColumns,

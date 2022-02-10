@@ -3,33 +3,33 @@ import { map, isNil, filter, includes } from "lodash";
 
 import { hooks, tabling } from "lib";
 
-import { UnauthenticatedGrid, UnauthenticatedGridProps } from "../grids";
-import { UnauthenticatedMenu } from "../menus";
+import { PublicGrid, PublicGridProps } from "../grids";
+import { PublicMenu } from "../menus";
 import {
   FooterGrid,
-  UnauthenticatedFooterGridProps,
+  PublicFooterGridProps,
   TableConfigurationProps,
   WithConfiguredTableProps,
   WithConnectedTableProps,
-  WithUnauthenticatedDataGridProps,
+  WithPublicDataGridProps,
   DataGridProps,
-  UnauthenticateDataGridProps,
+  PublicizeDataGridProps,
   configureTable
 } from "../hocs";
 import TableWrapper from "./TableWrapper";
 
-export type UnauthenticatedTableDataGridProps<
+export type PublicTableDataGridProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
-> = UnauthenticateDataGridProps<R, M> & DataGridProps<R, M> & Omit<UnauthenticatedGridProps<R, M>, "id">;
+> = PublicizeDataGridProps<R, M> & DataGridProps<R, M> & Omit<PublicGridProps<R, M>, "id">;
 
-export type UnauthenticatedTableProps<
+export type PublicTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = TableConfigurationProps<R, M> & {
   readonly table: NonNullRef<Table.TableInstance<R, M>>;
-  readonly actions?: Table.UnauthenticatedMenuActions<R, M>;
+  readonly actions?: Table.PublicMenuActions<R, M>;
   readonly constrainTableFooterHorizontally?: boolean;
   readonly constrainPageFooterHorizontally?: boolean;
   readonly excludeColumns?:
@@ -38,49 +38,47 @@ export type UnauthenticatedTableProps<
   readonly selector?: (state: Application.Store) => S;
 };
 
-type _UnauthenticatedTableProps<
+type _PublicTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
-> = UnauthenticatedTableProps<R, M, S> & {
-  readonly children: RenderPropChild<UnauthenticatedTableDataGridProps<R, M>>;
+> = PublicTableProps<R, M, S> & {
+  readonly children: RenderPropChild<PublicTableDataGridProps<R, M>>;
 };
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-const TableFooterGrid = FooterGrid<any, any, UnauthenticatedFooterGridProps<any>>({
+const TableFooterGrid = FooterGrid<any, any, PublicFooterGridProps<any>>({
   id: "footer",
   className: "grid--table-footer",
   rowClass: "row--table-footer",
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.footer || null
-})(UnauthenticatedGrid) as {
+})(PublicGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-    props: Omit<UnauthenticatedFooterGridProps<R, M>, "id">
+    props: Omit<PublicFooterGridProps<R, M>, "id">
   ): JSX.Element;
 };
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-const PageFooterGrid = FooterGrid<any, any, UnauthenticatedFooterGridProps<any>>({
+const PageFooterGrid = FooterGrid<any, any, PublicFooterGridProps<any>>({
   id: "page",
   className: "grid--page-footer",
   rowClass: "row--page-footer",
   rowHeight: 28,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.page || null
-})(UnauthenticatedGrid) as {
+})(PublicGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-    props: Omit<UnauthenticatedFooterGridProps<R, M>, "id" | "grid">
+    props: Omit<PublicFooterGridProps<R, M>, "id" | "grid">
   ): JSX.Element;
 };
 
-const UnauthenticatedTable = <
+const PublicTable = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
-  props: WithUnauthenticatedDataGridProps<
-    WithConnectedTableProps<WithConfiguredTableProps<_UnauthenticatedTableProps<R, M, S>, R>, R, M>
-  >
+  props: WithPublicDataGridProps<WithConnectedTableProps<WithConfiguredTableProps<_PublicTableProps<R, M, S>, R>, R, M>>
 ): JSX.Element => {
   const grid = tabling.hooks.useDataGrid();
   /**
@@ -217,7 +215,7 @@ const UnauthenticatedTable = <
       }
     >
       <React.Fragment>
-        <UnauthenticatedMenu<R, M>
+        <PublicMenu<R, M>
           {...props}
           columns={tabling.columns.filterDataColumns(columns)}
           apis={props.tableApis.get("data")}
@@ -245,12 +243,12 @@ const UnauthenticatedTable = <
   );
 };
 
-type Props = WithUnauthenticatedDataGridProps<
+type Props = WithPublicDataGridProps<
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  WithConnectedTableProps<WithConfiguredTableProps<_UnauthenticatedTableProps<any>, any>, any>
+  WithConnectedTableProps<WithConfiguredTableProps<_PublicTableProps<any>, any>, any>
 >;
 
-const Memoized = React.memo(UnauthenticatedTable) as typeof UnauthenticatedTable;
+const Memoized = React.memo(PublicTable) as typeof PublicTable;
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export default configureTable<any, any, Props>(Memoized) as {
@@ -259,6 +257,6 @@ export default configureTable<any, any, Props>(Memoized) as {
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>
   >(
-    props: _UnauthenticatedTableProps<R, M, S>
+    props: _PublicTableProps<R, M, S>
   ): JSX.Element;
 };

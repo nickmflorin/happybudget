@@ -31,7 +31,7 @@ export const createTableSaga = <
   return rootSaga;
 };
 
-export const createUnauthenticatedTableSaga = <
+export const createPublicTableSaga = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,

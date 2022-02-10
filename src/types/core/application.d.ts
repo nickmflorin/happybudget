@@ -37,51 +37,51 @@ declare namespace Application {
 
   type AuthenticatedModuleConfig<S extends AuthenticatedAnyModuleStore = AuthenticatedAnyModuleStore> = Omit<
     ModuleConfig<AuthenticatedModuleLabel, S>,
-    "isUnauthenticated"
+    "isPublic"
   > & {
-    readonly isUnauthenticated?: false;
+    readonly isPublic?: false;
   };
 
-  type UnauthenticatedModuleLabel = "share";
-  type UnauthenticatedAnycModuleStore = Modules.Share.Store;
-  type UnauthenticatedModuleStores = {
+  type PublicModuleLabel = "share";
+  type PublicAnycModuleStore = Modules.Share.Store;
+  type PublicModuleStores = {
     readonly share: Modules.Share.Store;
   };
 
-  type UnauthenticatedModuleReducers = Redux.ReducersMapObject<UnauthenticatedModuleStores>;
+  type PublicModuleReducers = Redux.ReducersMapObject<PublicModuleStores>;
 
-  type UnauthenticatedStore = UnauthenticatedModuleStores & {
+  type PublicStore = PublicModuleStores & {
     readonly loading: boolean;
     readonly contacts: Redux.ListResponseStore<Model.Contact>;
   };
 
-  type UnauthenticatedReducers = Redux.ReducersMapObject<UnauthenticatedStore>;
+  type PublicReducers = Redux.ReducersMapObject<PublicStore>;
 
-  type UnauthenticatedModuleConfig<S extends Modules.Share.Store = Modules.Share.Store> = Omit<
-    ModuleConfig<UnauthenticatedModuleLabel, S>,
-    "isUnauthenticated"
+  type PublicModuleConfig<S extends Modules.Share.Store = Modules.Share.Store> = Omit<
+    ModuleConfig<PublicModuleLabel, S>,
+    "isPublic"
   > & {
-    readonly isUnauthenticated: true;
+    readonly isPublic: true;
   };
 
-  type AnyModuleLabel = AuthenticatedModuleLabel | UnauthenticatedModuleLabel;
+  type AnyModuleLabel = AuthenticatedModuleLabel | PublicModuleLabel;
 
   interface ModuleConfig<L extends AnyModuleLabel, S> {
     readonly rootSaga?: import("redux-saga").Saga;
     readonly rootReducer: Redux.Reducer<S>;
     readonly initialState: S | (() => S);
     readonly label: L;
-    readonly isUnauthenticated?: boolean;
+    readonly isPublic?: boolean;
   }
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type AnyModuleConfig = AuthenticatedModuleConfig<any> | UnauthenticatedModuleConfig<any>;
+  type AnyModuleConfig = AuthenticatedModuleConfig<any> | PublicModuleConfig<any>;
 
-  type ModuleStores = AuthenticatedModuleStores | UnauthenticatedModuleStores;
+  type ModuleStores = AuthenticatedModuleStores | PublicModuleStores;
 
-  type ModuleReducers = AuthenticatedModuleReducers | UnauthenticatedModuleReducers;
+  type ModuleReducers = AuthenticatedModuleReducers | PublicModuleReducers;
 
-  type Store = AuthenticatedStore | UnauthenticatedStore;
+  type Store = AuthenticatedStore | PublicStore;
 
-  type Reducers = AuthenticatedReducers | UnauthenticatedReducers;
+  type Reducers = AuthenticatedReducers | PublicReducers;
 }

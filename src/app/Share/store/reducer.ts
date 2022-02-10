@@ -22,7 +22,7 @@ const genericReducer = combineReducers({
       response: actions.account.responseAccountAction
     },
     reducers: {
-      table: budgeting.reducers.createUnauthenticatedSubAccountsTableReducer({
+      table: budgeting.reducers.createPublicSubAccountsTableReducer({
         initialState: initialState.account.table,
         clearOn: [
           {
@@ -44,7 +44,7 @@ const genericReducer = combineReducers({
             ((!tabling.typeguards.isFakeColumn(c) && c.requiresAuthentication !== true) ||
               tabling.typeguards.isFakeColumn(c))
         ) as Table.ModelColumn<Tables.SubAccountRowData, Model.SubAccount>[],
-        fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
+        fringes: budgeting.reducers.createPublicFringesTableReducer({
           initialState: initialState.account.table.fringes,
           columns: filter(FringesTable.Columns, (c: Table.Column<Tables.FringeRowData, Model.Fringe>) =>
             tabling.typeguards.isModelColumn(c)
@@ -67,7 +67,7 @@ const genericReducer = combineReducers({
       response: actions.subAccount.responseSubAccountAction
     },
     reducers: {
-      table: budgeting.reducers.createUnauthenticatedSubAccountsTableReducer({
+      table: budgeting.reducers.createPublicSubAccountsTableReducer({
         initialState: initialState.account.table,
         clearOn: [
           {
@@ -89,7 +89,7 @@ const genericReducer = combineReducers({
             ((!tabling.typeguards.isFakeColumn(c) && c.requiresAuthentication !== true) ||
               tabling.typeguards.isFakeColumn(c))
         ) as Table.ModelColumn<Tables.SubAccountRowData, Model.SubAccount>[],
-        fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
+        fringes: budgeting.reducers.createPublicFringesTableReducer({
           initialState: initialState.subaccount.table.fringes,
           columns: filter(FringesTable.Columns, (c: Table.Column<Tables.FringeRowData, Model.Fringe>) =>
             tabling.typeguards.isModelColumn(c)

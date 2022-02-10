@@ -6,7 +6,7 @@ import { redux, contacts } from "lib";
 
 import * as actions from "./actions";
 
-export const createUnauthenticatedRootSaga = (config: Application.AnyModuleConfig[]): Saga => {
+export const createPublicRootSaga = (config: Application.AnyModuleConfig[]): Saga => {
   const contactsTasks = contacts.tasks.createTaskSet({
     authenticated: false
   });
@@ -15,11 +15,11 @@ export const createUnauthenticatedRootSaga = (config: Application.AnyModuleConfi
     actions: { request: actions.requestContactsAction }
   });
   function* applicationSaga(): SagaIterator {
-    const unauthenticatedConfig = filter(config, (c: Application.AnyModuleConfig) =>
-      redux.typeguards.isUnauthenticatedModuleConfig(c)
-    ) as Application.UnauthenticatedModuleConfig[];
-    for (let i = 0; i < unauthenticatedConfig.length; i++) {
-      const moduleConfig: Application.UnauthenticatedModuleConfig = unauthenticatedConfig[i];
+    const publicConfig = filter(config, (c: Application.AnyModuleConfig) =>
+      redux.typeguards.isPublicModuleConfig(c)
+    ) as Application.PublicModuleConfig[];
+    for (let i = 0; i < publicConfig.length; i++) {
+      const moduleConfig: Application.PublicModuleConfig = publicConfig[i];
       if (!isNil(moduleConfig.rootSaga)) {
         yield spawn(moduleConfig.rootSaga);
       }
@@ -46,7 +46,7 @@ export const createAuthenticatedRootSaga = (config: Application.AnyModuleConfig[
   function* applicationSaga(): SagaIterator {
     const authenticatedConfig = filter(
       config,
-      (c: Application.AnyModuleConfig) => !redux.typeguards.isUnauthenticatedModuleConfig(c)
+      (c: Application.AnyModuleConfig) => !redux.typeguards.isPublicModuleConfig(c)
     ) as Application.AuthenticatedModuleConfig[];
     for (let i = 0; i < authenticatedConfig.length; i++) {
       const moduleConfig: Application.AuthenticatedModuleConfig = authenticatedConfig[i];

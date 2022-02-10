@@ -5,7 +5,7 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 
 import { hooks, tabling } from "lib";
 
-import { GridProps, AuthenticatedGridProps, UnauthenticatedGridProps } from "../grids";
+import { GridProps, AuthenticatedGridProps, PublicGridProps } from "../grids";
 
 type WithFooterGridProps<T> = T & { readonly id: "page" | "footer" };
 
@@ -21,10 +21,8 @@ export interface AuthenticatedFooterGridProps<
   readonly constrainHorizontally?: boolean;
 }
 
-export interface UnauthenticatedFooterGridProps<
-  R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
-> extends UnauthenticatedGridProps<R, M> {
+export interface PublicFooterGridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
+  extends PublicGridProps<R, M> {
   readonly constrainHorizontally?: boolean;
 }
 

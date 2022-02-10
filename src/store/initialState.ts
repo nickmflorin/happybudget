@@ -9,9 +9,7 @@ function createModularApplicationState(
   config: Application.AuthenticatedModuleConfig[]
 ): Application.AuthenticatedModuleStores;
 
-function createModularApplicationState(
-  config: Application.UnauthenticatedModuleConfig[]
-): Application.UnauthenticatedModuleStores;
+function createModularApplicationState(config: Application.PublicModuleConfig[]): Application.PublicModuleStores;
 
 function createModularApplicationState(config: Application.AnyModuleConfig[]): Application.ModuleStores {
   return reduce(
@@ -26,18 +24,16 @@ function createModularApplicationState(config: Application.AnyModuleConfig[]): A
   );
 }
 
-export const createUnauthenticatedInitialState = (
-  config: Application.AnyModuleConfig[]
-): Application.UnauthenticatedStore => {
+export const createPublicInitialState = (config: Application.AnyModuleConfig[]): Application.PublicStore => {
   return {
     ...createModularApplicationState(
       filter(config, (c: Application.AnyModuleConfig) =>
-        redux.typeguards.isUnauthenticatedModuleConfig(c)
-      ) as Application.UnauthenticatedModuleConfig[]
+        redux.typeguards.isPublicModuleConfig(c)
+      ) as Application.PublicModuleConfig[]
     ),
     loading: false,
     contacts: redux.initialState.initialListResponseState
-  } as Application.UnauthenticatedStore;
+  } as Application.PublicStore;
 };
 
 export const createAuthenticatedInitialState = (
@@ -48,7 +44,7 @@ export const createAuthenticatedInitialState = (
     ...createModularApplicationState(
       filter(
         config,
-        (c: Application.AnyModuleConfig) => !redux.typeguards.isUnauthenticatedModuleConfig(c)
+        (c: Application.AnyModuleConfig) => !redux.typeguards.isPublicModuleConfig(c)
       ) as Application.AuthenticatedModuleConfig[]
     ),
     user: createInitialUserState(user),

@@ -1028,10 +1028,10 @@ declare namespace Table {
     readonly hiddenColumns?: HiddenColumns;
   };
 
-  type UnauthenticatedMenuActionParams<
-    R extends RowData,
-    M extends Model.RowHttpModel = Model.RowHttpModel
-  > = MenuActionParams<R, M>;
+  type PublicMenuActionParams<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = MenuActionParams<
+    R,
+    M
+  >;
 
   type AuthenticatedMenuActionParams<
     R extends RowData,
@@ -1059,10 +1059,10 @@ declare namespace Table {
     T extends MenuActionParams<R, M> = MenuActionParams<R, M>
   > = Array<MenuAction<R, M, T>> | MenuActionCallback<MenuAction<R, M, T>[], R, M, T>;
 
-  type UnauthenticatedMenuAction<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = MenuAction<
+  type PublicMenuAction<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = MenuAction<
     R,
     M,
-    UnauthenticatedMenuActionParams<R, M>
+    PublicMenuActionParams<R, M>
   >;
 
   type AuthenticatedMenuAction<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = MenuAction<
@@ -1071,10 +1071,10 @@ declare namespace Table {
     AuthenticatedMenuActionParams<R, M>
   >;
 
-  type UnauthenticatedMenuActions<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = MenuActions<
+  type PublicMenuActions<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = MenuActions<
     R,
     M,
-    UnauthenticatedMenuActionParams<R, M>
+    PublicMenuActionParams<R, M>
   >;
 
   type AuthenticatedMenuActions<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = MenuActions<
@@ -1092,7 +1092,7 @@ declare namespace Table {
     readonly includeRowInNavigation?: (row: EditableRow<R>) => boolean;
   };
 
-  type UnauthenticatedDataGridConfig<R extends RowData> = {
+  type PublicDataGridConfig<R extends RowData> = {
     readonly includeRowInNavigation?: (row: EditableRow<R>) => boolean;
   };
 

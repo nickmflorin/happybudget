@@ -19,10 +19,9 @@ export const simpleShallowEqualSelector = <T = any>(func: Redux.GenericSelectorF
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const createGlobalSelector = <T = any>(
   authenticatedFunc: Redux.AuthenticatedSelectorFunc<T>,
-  UnauthenticatedFunc: Redux.UnauthenticatedSelectorFunc<T>
+  publicFunc: Redux.PublicSelectorFunc<T>
 ) => {
-  return (state: Application.Store) =>
-    isAuthenticatedStore(state) ? authenticatedFunc(state) : UnauthenticatedFunc(state);
+  return (state: Application.Store) => (isAuthenticatedStore(state) ? authenticatedFunc(state) : publicFunc(state));
 };
 
 type LoadingSelector<S extends Application.Store> = (s: S) => boolean | Redux.ModelListActionInstance[] | undefined;

@@ -4,21 +4,21 @@ import { map, isNil } from "lodash";
 import { tabling } from "lib";
 import MenuAction from "./MenuAction";
 
-type UnauthenticatedToolbarProps<
+type PublicToolbarProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
-> = Table.UnauthenticatedMenuActionParams<R, M> & {
-  readonly actions: Table.UnauthenticatedMenuActions<R, M>;
+> = Table.PublicMenuActionParams<R, M> & {
+  readonly actions: Table.PublicMenuActions<R, M>;
 };
 
-const UnauthenticatedToolbar = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  props: UnauthenticatedToolbarProps<R, M>
+const PublicToolbar = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+  props: PublicToolbarProps<R, M>
 ): JSX.Element => {
   return (
     <div className={"toolbar-buttons"}>
       {!isNil(props.apis) &&
         map(
-          tabling.menu.evaluateActions<R, M, Table.UnauthenticatedMenuActionParams<R, M>>(props.actions, {
+          tabling.menu.evaluateActions<R, M, Table.PublicMenuActionParams<R, M>>(props.actions, {
             apis: props.apis,
             columns: props.columns,
             hiddenColumns: props.hiddenColumns
@@ -30,4 +30,4 @@ const UnauthenticatedToolbar = <R extends Table.RowData, M extends Model.RowHttp
   );
 };
 
-export default React.memo(UnauthenticatedToolbar) as typeof UnauthenticatedToolbar;
+export default React.memo(PublicToolbar) as typeof PublicToolbar;

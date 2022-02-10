@@ -8,9 +8,9 @@ import { isAuthenticatedStore } from "lib/redux/typeguards";
 
 import GlobalReduxConfig from "./config";
 import createSagaManager from "./createSagaManager";
-import { createStaticAuthenticatedReducers, createStaticUnauthenticatedReducers } from "./reducer";
-import { createAuthenticatedRootSaga, createUnauthenticatedRootSaga } from "./sagas";
-import { createAuthenticatedInitialState, createUnauthenticatedInitialState } from "./initialState";
+import { createStaticAuthenticatedReducers, createStaticPublicReducers } from "./reducer";
+import { createAuthenticatedRootSaga, createPublicRootSaga } from "./sagas";
+import { createAuthenticatedInitialState, createPublicInitialState } from "./initialState";
 
 export const history: History<unknown> = createBrowserHistory();
 
@@ -79,9 +79,9 @@ export const configureAuthenticatedStore = (user: Model.User): Redux.Store<Appli
   );
 };
 
-export const configureUnauthenticatedStore = (): Redux.Store<Application.UnauthenticatedStore> => {
-  const initialState = createUnauthenticatedInitialState(GlobalReduxConfig);
-  const applicationReducers = createStaticUnauthenticatedReducers(GlobalReduxConfig);
-  const applicationSaga = createUnauthenticatedRootSaga(GlobalReduxConfig);
-  return configureGenericStore<Application.UnauthenticatedStore>(initialState, applicationReducers, applicationSaga);
+export const configurePublicStore = (): Redux.Store<Application.PublicStore> => {
+  const initialState = createPublicInitialState(GlobalReduxConfig);
+  const applicationReducers = createStaticPublicReducers(GlobalReduxConfig);
+  const applicationSaga = createPublicRootSaga(GlobalReduxConfig);
+  return configureGenericStore<Application.PublicStore>(initialState, applicationReducers, applicationSaga);
 };

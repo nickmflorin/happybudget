@@ -1,8 +1,8 @@
 import { redux } from "lib";
 
 export const selectBudgetDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.UnauthenticatedStore) => state.share.detail.data
+  (state: Application.PublicStore) => state.share.detail.data
 );
 export const selectBudgetDetailLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Application.UnauthenticatedStore) => state.share.detail.loading
+  (state: Application.PublicStore) => state.share.detail.loading
 );

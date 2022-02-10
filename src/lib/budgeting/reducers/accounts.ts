@@ -8,7 +8,7 @@ type ReducerConfig<
   A extends Redux.TableActionMap<M, Tables.AccountTableContext> = Redux.TableActionMap<M, Tables.ActualTableContext>
 > = Table.ReducerConfig<R, M, S, Tables.AccountTableContext, A>;
 
-export const createUnauthenticatedAccountsTableReducer = (config: ReducerConfig): Redux.Reducer<S> => {
+export const createPublicAccountsTableReducer = (config: ReducerConfig): Redux.Reducer<S> => {
   return createBudgetTableReducer<R, M, S, Tables.AccountTableContext>(config);
 };
 

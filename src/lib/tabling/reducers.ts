@@ -516,7 +516,7 @@ export const createTableReducer = <
   };
 };
 
-export const createUnauthenticatedTableReducer = <
+export const createPublicTableReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,

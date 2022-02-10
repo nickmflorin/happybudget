@@ -4,23 +4,23 @@ import { isNil } from "lodash";
 import { tabling } from "lib";
 import { framework } from "tabling/generic";
 
-import { UnauthenticatedBudgetTable, UnauthenticatedBudgetTableProps } from "../BudgetTable";
+import { PublicBudgetTable, PublicBudgetTableProps } from "../BudgetTable";
 import AccountsTable, { AccountsTableProps } from "./AccountsTable";
 import Columns from "./Columns";
 
 type M = Model.Account;
 type R = Tables.AccountRowData;
 
-export type UnauthenticatedBudgetProps = AccountsTableProps &
-  Omit<UnauthenticatedBudgetTableProps<R, M>, "cookieNames" | "columns"> & {
+export type PublicBudgetProps = AccountsTableProps &
+  Omit<PublicBudgetTableProps<R, M>, "cookieNames" | "columns"> & {
     readonly budget: Model.Budget | null;
     readonly cookieNames?: Table.CookieNames;
   };
 
-const UnauthenticatedBudgetAccountsTable = (props: UnauthenticatedBudgetProps): JSX.Element => (
-  <UnauthenticatedBudgetTable<R, M>
+const PublicBudgetAccountsTable = (props: PublicBudgetProps): JSX.Element => (
+  <PublicBudgetTable<R, M>
     {...props}
-    actions={(params: Table.UnauthenticatedMenuActionParams<R, M>) => [
+    actions={(params: Table.PublicMenuActionParams<R, M>) => [
       ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
       framework.actions.ToggleColumnAction<R, M>(props.table.current, params),
       framework.actions.ExportCSVAction<R, M>(
@@ -33,4 +33,4 @@ const UnauthenticatedBudgetAccountsTable = (props: UnauthenticatedBudgetProps): 
   />
 );
 
-export default React.memo(AccountsTable<UnauthenticatedBudgetProps>(UnauthenticatedBudgetAccountsTable));
+export default React.memo(AccountsTable<PublicBudgetProps>(PublicBudgetAccountsTable));

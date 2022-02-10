@@ -4,15 +4,15 @@ declare namespace Redux {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type AuthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Application.AuthenticatedStore, T>;
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type UnauthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Application.UnauthenticatedStore, T>;
+  type PublicSelectorFunc<T = any> = GenericSelectorFunc<Application.PublicStore, T>;
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type SwitchSelectorFunc<AUTH extends boolean = true, T = any> = AUTH extends true
     ? AuthenticatedSelectorFunc<T>
-    : UnauthenticatedSelectorFunc<T>;
+    : PublicSelectorFunc<T>;
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type SelectorFunc<T = any> = AuthenticatedSelectorFunc<T> | UnauthenticatedSelectorFunc<T>;
+  type SelectorFunc<T = any> = AuthenticatedSelectorFunc<T> | PublicSelectorFunc<T>;
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type ActionMap<C extends Table.Context = any> = Record<string, ActionCreator<any> | ContextActionCreator<any, C>>;
@@ -122,7 +122,7 @@ declare namespace Redux {
     readonly isAuthenticated?: true | undefined;
   };
 
-  type UnauthenticatedAction<P extends ActionPayload = ActionPayload> = Action<P> & { readonly isAuthenticated: false };
+  type PublicAction<P extends ActionPayload = ActionPayload> = Action<P> & { readonly isAuthenticated: false };
 
   type TaskConfig<A extends ActionMap> = {
     readonly actions: Omit<A, "request">;

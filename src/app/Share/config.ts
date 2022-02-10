@@ -1,10 +1,10 @@
 import { initialState, rootReducer } from "./store";
 
-const Config: Application.UnauthenticatedModuleConfig = {
+const Config: Application.PublicModuleConfig = {
   rootReducer,
   initialState,
   label: "share",
-  isUnauthenticated: true
+  isPublic: true
 };
 
 export default Config;

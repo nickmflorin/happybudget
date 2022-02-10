@@ -1,5 +1,5 @@
-export { default as UnauthenticatedBudget } from "./UnauthenticatedBudget";
-export * from "./UnauthenticatedBudget";
+export { default as PublicBudget } from "./PublicBudget";
+export * from "./PublicBudget";
 export { default as AuthenticatedBudget } from "./AuthenticatedBudget";
 export * from "./AuthenticatedBudget";
 export { default as AuthenticatedTemplate } from "./AuthenticatedTemplate";

@@ -33,9 +33,7 @@ function createModularApplicationReducer(
   config: Application.AuthenticatedModuleConfig[]
 ): Application.AuthenticatedModuleReducers;
 
-function createModularApplicationReducer(
-  config: Application.UnauthenticatedModuleConfig[]
-): Application.UnauthenticatedModuleReducers;
+function createModularApplicationReducer(config: Application.PublicModuleConfig[]): Application.PublicModuleReducers;
 
 function createModularApplicationReducer(config: Application.AnyModuleConfig[]): Application.ModuleReducers {
   return reduce(
@@ -62,7 +60,7 @@ export const createStaticAuthenticatedReducers = (
   const moduleReducers = createModularApplicationReducer(
     filter(
       config,
-      (c: Application.AnyModuleConfig) => !redux.typeguards.isUnauthenticatedModuleConfig(c)
+      (c: Application.AnyModuleConfig) => !redux.typeguards.isPublicModuleConfig(c)
     ) as Application.AuthenticatedModuleConfig[]
   );
   return {
@@ -110,18 +108,16 @@ export const createStaticAuthenticatedReducers = (
 };
 
 /**
- * Creates the base application reducer for the Unauthenticated user that bundles
+ * Creates the base application reducer for the Public user that bundles
  * up the reducers from the individual modules with other top level reducers.
  *
  * @param config  The application Redux configuration.
  */
-export const createStaticUnauthenticatedReducers = (
-  config: Application.AnyModuleConfig[]
-): Application.UnauthenticatedReducers => {
+export const createStaticPublicReducers = (config: Application.AnyModuleConfig[]): Application.PublicReducers => {
   const moduleReducers = createModularApplicationReducer(
     filter(config, (c: Application.AnyModuleConfig) =>
-      redux.typeguards.isUnauthenticatedModuleConfig(c)
-    ) as Application.UnauthenticatedModuleConfig[]
+      redux.typeguards.isPublicModuleConfig(c)
+    ) as Application.PublicModuleConfig[]
   );
   return {
     ...moduleReducers,

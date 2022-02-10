@@ -4,7 +4,7 @@ import { History } from "history";
 import "style/index.scss";
 
 import { ApplicationSpinner } from "components";
-import { AuthenticatedReduxRoute, UnauthenticatedReduxRoute } from "components/routes";
+import { AuthenticatedReduxRoute, PublicReduxRoute } from "components/routes";
 
 import * as config from "config";
 
@@ -26,7 +26,7 @@ function App(props: AppProps): JSX.Element {
           <Switch>
             <Route exact path={"/verify"} component={EmailVerification} />
             <Route exact path={"/recovery"} component={PasswordRecovery} />
-            <UnauthenticatedReduxRoute
+            <PublicReduxRoute
               path={["/login", "/signup", "/reset-password", "/recover-password"]}
               component={Landing}
             />

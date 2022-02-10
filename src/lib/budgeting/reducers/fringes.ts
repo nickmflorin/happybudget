@@ -4,7 +4,7 @@ export type FringeTableActionMap = Redux.TableActionMap<Model.Fringe, Tables.Fri
   readonly responseFringeColors: Redux.ActionCreator<Http.ListResponse<string>>;
 };
 
-export const createUnauthenticatedFringesTableReducer = (
+export const createPublicFringesTableReducer = (
   config: Table.ReducerConfig<
     Tables.FringeRowData,
     Model.Fringe,
@@ -15,7 +15,7 @@ export const createUnauthenticatedFringesTableReducer = (
 ): Redux.Reducer<Tables.FringeTableStore> => {
   type S = Tables.FringeTableStore;
 
-  const generic = tabling.reducers.createUnauthenticatedTableReducer<
+  const generic = tabling.reducers.createPublicTableReducer<
     Tables.FringeRowData,
     Model.Fringe,
     Tables.FringeTableStore,

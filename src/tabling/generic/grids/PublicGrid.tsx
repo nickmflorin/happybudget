@@ -5,15 +5,15 @@ import { tabling, hooks } from "lib";
 import { framework as generic } from "tabling/generic";
 import Grid, { GridProps } from "./Grid";
 
-export interface UnauthenticatedGridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
+export interface PublicGridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
   extends GridProps<R, M> {
   readonly framework?: Table.Framework;
 }
 
-const UnauthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
+const PublicGrid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
   framework,
   ...props
-}: UnauthenticatedGridProps<R, M>): JSX.Element => {
+}: PublicGridProps<R, M>): JSX.Element => {
   const frameworkComponents = useMemo<Table.FrameworkGroup>((): Table.FrameworkGroup => {
     const combinedFramework = tabling.aggrid.combineFrameworks(generic.Framework, framework);
     return {
@@ -46,4 +46,4 @@ const UnauthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpMod
   return <Grid {...props} columns={columns} frameworkComponents={frameworkComponents} />;
 };
 
-export default React.memo(UnauthenticatedGrid) as typeof UnauthenticatedGrid;
+export default React.memo(PublicGrid) as typeof PublicGrid;
