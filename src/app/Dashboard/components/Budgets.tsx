@@ -122,7 +122,7 @@ const Budgets = (): JSX.Element => {
       >
         {budgets.length === 0 && responseWasReceived ? (
           <NoData
-            title={"You don't have any templates yet! Create a new budget."}
+            title={"You don't have any budgets yet! Create a new budget."}
             subTitle={
               // eslint-disable-next-line quotes
               'Tip: Click the "Create Budget" button above and create an empty budget or start one from a template.'
