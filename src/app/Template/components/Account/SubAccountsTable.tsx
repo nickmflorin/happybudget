@@ -33,7 +33,7 @@ const ConnectedTable = connectTableToStore<
     setSearch: actions.account.setSearchAction
   },
   createSaga: (table: Table.TableInstance<R, M>) => sagas.account.createTableSaga(table),
-  selector: selectors.selectSubAccountsTableStore,
+  selector: (s: Application.Store) => selectors.selectSubAccountsTableStore(s, "account"),
   footerRowSelectors: {
     page: createSelector(
       (state: Application.AuthenticatedStore) => state.template.detail.data,
@@ -102,6 +102,7 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
         budgetId={budgetId}
         actionContext={{ budgetId, id: accountId }}
         tableId={"template-account-subaccounts"}
+        parentType={"account"}
         table={table}
         exportFileName={!isNil(account) ? `account_${account.identifier}` : ""}
         categoryName={"Sub Account"}

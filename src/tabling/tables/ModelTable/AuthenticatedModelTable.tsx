@@ -8,14 +8,19 @@ import {
 
 export type AuthenticatedModelTableProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
-> = AuthenticatedTableProps<R, M>;
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
+> = AuthenticatedTableProps<R, M, S>;
 
-const AuthenticatedModelTable = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  props: AuthenticatedModelTableProps<R, M>
+const AuthenticatedModelTable = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
+>(
+  props: AuthenticatedModelTableProps<R, M, S>
 ): JSX.Element => {
   return (
-    <AuthenticatedTable<R, M> {...props}>
+    <AuthenticatedTable<R, M, S> {...props}>
       {(params: AuthenticatedTableDataGridProps<R, M>) => <AuthenticatedDataGrid<R, M> {...props} {...params} />}
     </AuthenticatedTable>
   );

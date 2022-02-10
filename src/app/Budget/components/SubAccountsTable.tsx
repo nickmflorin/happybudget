@@ -8,7 +8,7 @@ import { actions } from "store";
 import { useContacts, CreateContactParams, EditContactParams } from "components/hooks";
 import { SubAccountsTable as GenericSubAccountsTable } from "tabling";
 
-import { selectFringes, selectSubAccountUnits } from "../store/selectors";
+import { selectors } from "../store";
 import FringesModal from "./FringesModal";
 
 type R = Tables.SubAccountRowData;
@@ -32,6 +32,7 @@ export interface BudgetSubAccountsTableProps
   readonly actionContext: Tables.SubAccountTableContext;
   // The ID of either the Account or SubAccount.
   readonly id: number;
+  readonly parentType: "account" | "subaccount";
   readonly budget: Model.Budget | null;
   readonly setPreviewModalVisible: (v: boolean) => void;
 }
@@ -40,6 +41,7 @@ const SubAccountsTable = ({
   id,
   budget,
   budgetId,
+  parentType,
   setPreviewModalVisible,
   ...props
 }: BudgetSubAccountsTableProps): JSX.Element => {
@@ -48,8 +50,8 @@ const SubAccountsTable = ({
 
   const dispatch = useDispatch();
   const cs = contacts.hooks.useContacts();
-  const fringes = useSelector(selectFringes);
-  const subaccountUnits = useSelector(selectSubAccountUnits);
+  const fringes = useSelector((s: Application.Store) => selectors.selectFringes(s, parentType));
+  const subaccountUnits = useSelector((s: Application.Store) => selectors.selectSubAccountUnits(s, parentType));
 
   const onContactCreated = useMemo(
     () => (m: Model.Contact, params?: CreateContactParams) => {
@@ -138,6 +140,7 @@ const SubAccountsTable = ({
         id={id}
         budget={budget}
         open={fringesModalVisible}
+        parentType={parentType}
         onCancel={() => setFringesModalVisible(false)}
       />
     </React.Fragment>

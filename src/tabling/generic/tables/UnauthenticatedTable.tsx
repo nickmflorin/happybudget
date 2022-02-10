@@ -25,7 +25,8 @@ export type UnauthenticatedTableDataGridProps<
 
 export type UnauthenticatedTableProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = TableConfigurationProps<R, M> & {
   readonly table: NonNullRef<Table.TableInstance<R, M>>;
   readonly actions?: Table.UnauthenticatedMenuActions<R, M>;
@@ -34,12 +35,14 @@ export type UnauthenticatedTableProps<
   readonly excludeColumns?:
     | SingleOrArray<string | ((col: Table.DataColumn<R, M>) => boolean)>
     | ((col: Table.DataColumn<R, M>) => boolean);
+  readonly selector?: (state: Application.Store) => S;
 };
 
 type _UnauthenticatedTableProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
-> = UnauthenticatedTableProps<R, M> & {
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
+> = UnauthenticatedTableProps<R, M, S> & {
   readonly children: RenderPropChild<UnauthenticatedTableDataGridProps<R, M>>;
 };
 
@@ -70,9 +73,13 @@ const PageFooterGrid = FooterGrid<any, any, UnauthenticatedFooterGridProps<any>>
   ): JSX.Element;
 };
 
-const UnauthenticatedTable = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+const UnauthenticatedTable = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
+>(
   props: WithUnauthenticatedDataGridProps<
-    WithConnectedTableProps<WithConfiguredTableProps<_UnauthenticatedTableProps<R, M>, R>, R, M>
+    WithConnectedTableProps<WithConfiguredTableProps<_UnauthenticatedTableProps<R, M, S>, R>, R, M>
   >
 ): JSX.Element => {
   const grid = tabling.hooks.useDataGrid();
@@ -247,7 +254,11 @@ const Memoized = React.memo(UnauthenticatedTable) as typeof UnauthenticatedTable
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export default configureTable<any, any, Props>(Memoized) as {
-  <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-    props: _UnauthenticatedTableProps<R, M>
+  <
+    R extends Table.RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+    S extends Redux.TableStore<R> = Redux.TableStore<R>
+  >(
+    props: _UnauthenticatedTableProps<R, M, S>
   ): JSX.Element;
 };

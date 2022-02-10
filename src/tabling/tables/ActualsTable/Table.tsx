@@ -14,8 +14,9 @@ import Columns from "./Columns";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;
+type S = Tables.ActualTableStore;
 
-export type ActualsTableProps = Omit<AuthenticatedModelTableProps<R, M>, "columns"> &
+export type ActualsTableProps = Omit<AuthenticatedModelTableProps<R, M, S>, "columns"> &
   WithContactsProps & {
     readonly actionContext: Tables.ActualTableContext;
     readonly exportFileName: string;
@@ -106,7 +107,7 @@ const ActualsTable = ({
 
   return (
     <React.Fragment>
-      <AuthenticatedModelTable<R, M>
+      <AuthenticatedModelTable<R, M, S>
         {...props}
         showPageFooter={false}
         menuPortalId={"supplementary-header"}

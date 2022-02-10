@@ -33,7 +33,7 @@ const ConnectedTable = connectTableToStore<
     setSearch: actions.subAccount.setSearchAction
   },
   createSaga: (table: Table.TableInstance<R, M>) => sagas.subAccount.createTableSaga(table),
-  selector: selectors.selectSubAccountsTableStore,
+  selector: (s: Application.Store) => selectors.selectSubAccountsTableStore(s, "subaccount"),
   footerRowSelectors: {
     page: createSelector(
       (state: Application.AuthenticatedStore) => state.template.detail.data,
@@ -96,6 +96,7 @@ const SubAccountsTable = ({ budgetId, budget, subaccountId }: SubAccountsTablePr
         id={subaccountId}
         budget={budget}
         budgetId={budgetId}
+        parentType={"subaccount"}
         table={table}
         actionContext={{ id: subaccountId, budgetId }}
         /* Right now, the SubAccount recursion only goes 1 layer deep.

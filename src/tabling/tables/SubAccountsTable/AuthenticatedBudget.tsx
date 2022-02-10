@@ -13,8 +13,9 @@ import Columns from "./Columns";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
+type S = Tables.SubAccountTableStore;
 
-export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>, "columns"> &
+export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M, S>, "columns"> &
   WithContactsProps & {
     readonly actionContext: Tables.SubAccountTableContext;
     readonly subAccountUnits: Model.Tag[];

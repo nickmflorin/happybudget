@@ -1,6 +1,5 @@
 declare namespace Table {
   type Name = "account-subaccounts" | "accounts" | "subaccount-subaccounts" | "fringes" | "actuals" | "contacts";
-  type AsyncId = `async-${Name}-table`;
 
   type AgGridProps = import("@ag-grid-community/react/lib/interfaces").AgGridReactProps;
 
@@ -984,7 +983,6 @@ declare namespace Table {
     C extends Context = Context,
     A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
   > = {
-    readonly asyncId?: AsyncId;
     readonly actions: Omit<A, "request">;
     readonly footerRowSelectors?: Partial<FooterGridSet<RowDataSelector<R>>>;
     readonly selector?: (state: Application.Store) => S;

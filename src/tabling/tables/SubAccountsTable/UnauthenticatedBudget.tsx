@@ -10,8 +10,9 @@ import Columns from "./Columns";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
+type S = Tables.SubAccountTableStore;
 
-export type UnauthenticatedBudgetProps = Omit<UnauthenticatedBudgetTableProps<R, M>, "columns"> & {
+export type UnauthenticatedBudgetProps = Omit<UnauthenticatedBudgetTableProps<R, M, S>, "columns"> & {
   readonly subAccountUnits: Model.Tag[];
   readonly fringes: Tables.FringeRow[];
   readonly categoryName: "Sub Account" | "Detail";
@@ -43,7 +44,7 @@ const UnauthenticatedBudgetSubAccountsTable = (
   );
 
   return (
-    <UnauthenticatedBudgetTable<R, M>
+    <UnauthenticatedBudgetTable<R, M, S>
       {...props}
       columns={columns}
       actions={(params: Table.UnauthenticatedMenuActionParams<R, M>) => [

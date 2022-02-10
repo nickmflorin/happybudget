@@ -32,6 +32,14 @@ const connectTableToStore =
       readonly tableId: string;
       readonly table: NonNullRef<Table.TableInstance<R, M>>;
       readonly actionContext: C;
+      readonly search?: string;
+      readonly data?: Table.BodyRow<R>[];
+      readonly loading?: boolean;
+      /* The table store selector can either be passed in as a configuration or
+         in the props.  The preference is as a configuration, but there are cases
+         where the selector depends on props of the parent component and needs
+         to be passed in as a prop to the connected component. */
+      readonly selector?: (state: Application.Store) => S;
     },
     R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
@@ -48,19 +56,18 @@ const connectTableToStore =
       | React.FunctionComponent<WithConnectedTableProps<T, R, M, S>>
   ): React.FunctionComponent<T> => {
     let selector: (state: Application.Store) => S = () => redux.initialState.initialTableState as S;
-
-    if (!isNil(config.asyncId)) {
-      selector = (state: Application.Store) => state[config.asyncId as Table.AsyncId] as S;
-    } else if (!isNil(config.selector)) {
+    if (!isNil(config.selector)) {
       selector = config.selector;
     }
     const selectData = (state: Application.Store) => selector(state)?.data || [];
     const selectSearch = (state: Application.Store) => selector(state)?.search || "";
     const selectLoading = (state: Application.Store) => selector(state)?.loading || false;
 
+    const _selectData = (s: Application.Store, p: T) => (isNil(p.selector) ? selectData(s) : p.selector(s).data);
+
     const WithStoreConfigured = (props: T) => {
       const store: Redux.Store<Application.Store> = useStore() as Redux.Store<Application.Store>;
-      const data = useSelector(selectData);
+      const data = useSelector((s: Application.Store) => _selectData(s, props));
       const search = useSelector(selectSearch);
       const loading = useSelector(selectLoading);
 
@@ -68,19 +75,6 @@ const connectTableToStore =
       const sagaInjected = useRef<boolean>(false);
 
       const dispatch = useDispatch();
-
-      useEffect(() => {
-        const asyncId = config.asyncId;
-        if (!isNil(config.reducer) && isNil(asyncId)) {
-          console.warn("'asyncId' must be provided when offloading reducers to table.");
-        }
-        if (!isNil(asyncId) && !isNil(config.reducer)) {
-          store.reducerManager.injectReducer(asyncId, config.reducer);
-          return () => {
-            store.reducerManager.ejectReducer(asyncId);
-          };
-        }
-      }, []);
 
       /* It is extremely important that the ONLY dependency to this Saga is
 				 the `tableId` - if additional dependencies are added, it can lead to
@@ -106,16 +100,16 @@ const connectTableToStore =
 
       return (
         <Component
-          {...props}
           search={search}
           /* This is necessary in order to not show stale data in a "flash" when
-					   the page initially loads and before the data in the store is
-						 updated.  The time between the stale data "flash" and the updated
-						 data is visible in the table is the time that it takes to inject
-						 the Saga. */
+					 the page initially loads and before the data in the store is
+					 updated.  The time between the stale data "flash" and the updated
+					 data is visible in the table is the time that it takes to inject
+					 the Saga. */
           data={ready === true ? data : []}
           loading={loading}
           selector={selector}
+          {...props}
           footerRowSelectors={config.footerRowSelectors}
           onChangeEvent={(e: Table.ChangeEvent<R, M>) => {
             if ((config.actions as Redux.AuthenticatedTableActionMap<R, M, C>).tableChanged !== undefined) {

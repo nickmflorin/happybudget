@@ -58,7 +58,7 @@ export const createStaticAuthenticatedReducers = (
   config: Application.AnyModuleConfig[],
   user: Model.User,
   history: History
-): Application.AuthenticatedStaticReducers => {
+): Application.AuthenticatedReducers => {
   const moduleReducers = createModularApplicationReducer(
     filter(
       config,
@@ -117,7 +117,7 @@ export const createStaticAuthenticatedReducers = (
  */
 export const createStaticUnauthenticatedReducers = (
   config: Application.AnyModuleConfig[]
-): Application.UnauthenticatedStaticReducers => {
+): Application.UnauthenticatedReducers => {
   const moduleReducers = createModularApplicationReducer(
     filter(config, (c: Application.AnyModuleConfig) =>
       redux.typeguards.isUnauthenticatedModuleConfig(c)

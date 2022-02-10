@@ -4,19 +4,24 @@ import { UnauthenticatedTable, UnauthenticatedTableProps, UnauthenticatedTableDa
 import { UnauthenticatedBudgetDataGrid } from "../grids";
 
 export type UnauthenticatedBudgetTableProps<
-  R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
-> = UnauthenticatedTableProps<R, M> & {
+  R extends Tables.BudgetRowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
+> = UnauthenticatedTableProps<R, M, S> & {
   readonly onBack?: () => void;
   readonly onLeft?: () => void;
   readonly onRight?: () => void;
 };
 
-const UnauthenticatedBudgetTable = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  props: UnauthenticatedBudgetTableProps<R, M>
+const UnauthenticatedBudgetTable = <
+  R extends Tables.BudgetRowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
+>(
+  props: UnauthenticatedBudgetTableProps<R, M, S>
 ): JSX.Element => {
   return (
-    <UnauthenticatedTable<R, M> {...props}>
+    <UnauthenticatedTable<R, M, S> {...props}>
       {(params: UnauthenticatedTableDataGridProps<R, M>) => (
         <UnauthenticatedBudgetDataGrid<R, M> {...params} onBack={props.onBack} />
       )}

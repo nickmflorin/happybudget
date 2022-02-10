@@ -207,7 +207,6 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
           Http.ListResponse<Model.Group>,
           Http.ListResponse<Model.Markup> | undefined
         ] = yield all(effects);
-
         if (models.data.length === 0 && isAuthenticatedConfig(config)) {
           // If there is no table data, we want to default create two rows.
           try {

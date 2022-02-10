@@ -1,7 +1,10 @@
 import { createSelector } from "reselect";
 
-import { redux, budgeting } from "lib";
+import { redux } from "lib";
 import { initialSubAccountsTableState } from "./initialState";
+
+const getState = (s: Application.Store) => s;
+const getParentType = (_: unknown, p: "account" | "subaccount") => p;
 
 export const selectBudgetDetail = redux.selectors.simpleDeepEqualSelector(
   (state: Application.AuthenticatedStore) => state.budget.detail.data
@@ -17,17 +20,16 @@ export const selectAccountsTableStore = redux.selectors.simpleDeepEqualSelector(
   return redux.initialState.initialTableState;
 });
 
-export const selectSubAccountsTableStore = (store: Application.Store) => {
-  if (redux.typeguards.isAuthenticatedStore(store)) {
-    const path = store.router.location.pathname;
-    if (budgeting.urls.isAccountUrl(path)) {
-      return store.budget.account.table;
-    } else if (budgeting.urls.isSubAccountUrl(path)) {
-      return store.budget.subaccount.table;
+export const selectSubAccountsTableStore = createSelector(
+  getState,
+  getParentType,
+  (s: Application.Store, parentType: "account" | "subaccount") => {
+    if (redux.typeguards.isAuthenticatedStore(s)) {
+      return s.budget[parentType].table;
     }
+    return initialSubAccountsTableState;
   }
-  return initialSubAccountsTableState;
-};
+);
 
 export const selectFringesStore = createSelector(
   selectSubAccountsTableStore,

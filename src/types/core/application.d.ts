@@ -24,7 +24,7 @@ declare namespace Application {
   };
   type AuthenticatedModuleReducers = Redux.ReducersMapObject<AuthenticatedModuleStores>;
 
-  type AuthenticatedStaticStores = AuthenticatedModuleStores & {
+  type AuthenticatedStore = AuthenticatedModuleStores & {
     readonly router: import("connected-react-router").RouterState<import("history").LocationState>;
     readonly loading: boolean;
     readonly user: Model.User;
@@ -32,11 +32,6 @@ declare namespace Application {
     readonly filteredContacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
     readonly productPermissionModalOpen: boolean;
   };
-
-  type AuthenticatedStaticReducers = Redux.ReducersMapObject<StaticStores>;
-
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type AuthenticatedStore = AuthenticatedStaticStores & Redux.AsyncStores<Redux.TableStore<any>>;
 
   type AuthenticatedReducers = Redux.ReducersMapObject<AuthenticatedStore>;
 
@@ -55,15 +50,10 @@ declare namespace Application {
 
   type UnauthenticatedModuleReducers = Redux.ReducersMapObject<UnauthenticatedModuleStores>;
 
-  type UnauthenticatedStaticStores = UnauthenticatedModuleStores & {
+  type UnauthenticatedStore = UnauthenticatedModuleStores & {
     readonly loading: boolean;
     readonly contacts: Redux.ListResponseStore<Model.Contact>;
   };
-
-  type UnauthenticatedStaticReducers = Redux.ReducersMapObject<UnauthenticatedStaticStores>;
-
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type UnauthenticatedStore = UnauthenticatedStaticStores & Redux.AsyncStores<Redux.TableStore<any>>;
 
   type UnauthenticatedReducers = Redux.ReducersMapObject<UnauthenticatedStore>;
 
@@ -90,10 +80,6 @@ declare namespace Application {
   type ModuleStores = AuthenticatedModuleStores | UnauthenticatedModuleStores;
 
   type ModuleReducers = AuthenticatedModuleReducers | UnauthenticatedModuleReducers;
-
-  type StaticReducers = AuthenticatedStaticReducers | UnauthenticatedStaticReducers;
-
-  type StaticStores = AuthenticatedStaticStores | UnauthenticatedStaticStores;
 
   type Store = AuthenticatedStore | UnauthenticatedStore;
 

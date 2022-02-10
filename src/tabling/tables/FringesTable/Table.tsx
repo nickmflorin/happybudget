@@ -10,14 +10,14 @@ type S = Tables.FringeTableStore;
 type R = Tables.FringeRowData;
 type M = Model.Fringe;
 
-export interface Props extends Omit<AuthenticatedModelTableProps<R, M>, "columns" | "actions"> {
+export interface Props extends Omit<AuthenticatedModelTableProps<R, M, S>, "columns" | "actions"> {
   readonly exportFileName: string;
   readonly actionContext: Tables.FringeTableContext;
 }
 
 const FringesTable: React.FC<WithConnectedTableProps<Props, R, M, S>> = ({ exportFileName, ...props }): JSX.Element => {
   return (
-    <AuthenticatedModelTable<R, M>
+    <AuthenticatedModelTable<R, M, S>
       {...props}
       className={classNames("fringes-table", props.className)}
       actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [

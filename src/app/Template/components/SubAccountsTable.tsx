@@ -5,7 +5,7 @@ import { filter } from "lodash";
 import { tabling } from "lib";
 
 import { SubAccountsTable as GenericSubAccountsTable } from "tabling";
-import { selectFringes, selectSubAccountUnits } from "../store/selectors";
+import { selectors } from "../store";
 import FringesModal from "./FringesModal";
 
 type OmitTableProps = "menuPortalId" | "columns" | "fringes" | "subAccountUnits" | "onEditFringes" | "onAddFringes";
@@ -14,14 +14,21 @@ export interface TemplateSubAccountsTableProps
   extends Omit<GenericSubAccountsTable.AuthenticatedTemplateProps, OmitTableProps> {
   readonly id: number;
   readonly budgetId: number;
+  readonly parentType: "account" | "subaccount";
   readonly budget: Model.Template | null;
 }
 
-const SubAccountsTable = ({ id, budget, budgetId, ...props }: TemplateSubAccountsTableProps): JSX.Element => {
+const SubAccountsTable = ({
+  id,
+  budget,
+  budgetId,
+  parentType,
+  ...props
+}: TemplateSubAccountsTableProps): JSX.Element => {
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
-  const fringes = useSelector(selectFringes);
-  const subaccountUnits = useSelector(selectSubAccountUnits);
   const fringesTable = tabling.hooks.useTable<Tables.FringeRowData, Model.Fringe>();
+  const fringes = useSelector((s: Application.Store) => selectors.selectFringes(s, parentType));
+  const subaccountUnits = useSelector((s: Application.Store) => selectors.selectSubAccountUnits(s, parentType));
 
   return (
     <React.Fragment>
@@ -42,6 +49,7 @@ const SubAccountsTable = ({ id, budget, budgetId, ...props }: TemplateSubAccount
         id={id}
         budget={budget}
         table={fringesTable}
+        parentType={parentType}
         budgetId={budgetId}
         open={fringesModalVisible}
         onCancel={() => setFringesModalVisible(false)}

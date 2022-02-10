@@ -1,4 +1,4 @@
-import { Middleware, createStore, applyMiddleware, compose, PreloadedState } from "redux";
+import { Middleware, createStore, applyMiddleware, compose, PreloadedState, combineReducers } from "redux";
 import createSagaMiddleware, { Saga, SagaMiddlewareOptions } from "redux-saga";
 import { routerMiddleware } from "connected-react-router";
 import { createBrowserHistory, History } from "history";
@@ -7,7 +7,6 @@ import * as Sentry from "@sentry/react";
 import { isAuthenticatedStore } from "lib/redux/typeguards";
 
 import GlobalReduxConfig from "./config";
-import createReducerManager from "./createReducerManager";
 import createSagaManager from "./createSagaManager";
 import { createStaticAuthenticatedReducers, createStaticUnauthenticatedReducers } from "./reducer";
 import { createAuthenticatedRootSaga, createUnauthenticatedRootSaga } from "./sagas";
@@ -27,7 +26,7 @@ const authenticatedActionMiddleware: MD = api => next => action => {
 
 const configureGenericStore = <S extends Application.Store>(
   initialState: S,
-  staticReducers: Redux.ReducersMapObject<S>,
+  reducers: Redux.ReducersMapObject<S>,
   rootSaga: Saga
 ): Redux.Store<S> => {
   /* Create the redux-saga middleware that allows the sagas to run as side-effects
@@ -46,7 +45,7 @@ const configureGenericStore = <S extends Application.Store>(
         [require("redux-immutable-state-invariant").default(), ...baseMiddleware]
       : baseMiddleware;
 
-  const reducerManager = createReducerManager<S>(staticReducers, initialState);
+  const reducer = combineReducers<S, Redux.Action>(reducers);
 
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
   let enhancers = composeEnhancers(applyMiddleware(...baseMiddleware, routerMiddleware(history)));
@@ -55,14 +54,12 @@ const configureGenericStore = <S extends Application.Store>(
     enhancers = composeEnhancers(applyMiddleware(...baseMiddleware, routerMiddleware(history)), sentryReduxEnhancer);
   }
 
-  const store: Omit<Redux.Store<S>, "injectSaga" | "ejectSaga"> = {
-    reducerManager,
-    ...createStore<S, Redux.Action, typeof composeEnhancers, never>(
-      reducerManager.reduce,
-      initialState as PreloadedState<S>,
-      enhancers
-    )
-  };
+  const store: Omit<Redux.Store<S>, "injectSaga" | "ejectSaga"> = createStore<
+    S,
+    Redux.Action,
+    typeof composeEnhancers,
+    never
+  >(reducer, initialState as PreloadedState<S>, enhancers);
 
   /* Start the application saga and establish the saga injector.  We must do this
      after we create the store, because the SagaMiddleware must be mounted to

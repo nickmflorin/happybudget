@@ -8,9 +8,10 @@ import { AuthenticatedBudgetDataGrid } from "../grids";
 import { Framework } from "../framework";
 
 export type AuthenticatedBudgetTableProps<
-  R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
-> = AuthenticatedTableProps<R, M> & {
+  R extends Tables.BudgetRowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
+> = AuthenticatedTableProps<R, M, S> & {
   readonly onBack?: () => void;
   readonly onLeft?: () => void;
   readonly onRight?: () => void;
@@ -20,14 +21,18 @@ export type AuthenticatedBudgetTableProps<
   readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
 };
 
-const AuthenticatedBudgetTable = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
+const AuthenticatedBudgetTable = <
+  R extends Tables.BudgetRowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
+>({
   onEditMarkup,
   onEditGroup,
   onRowExpand,
   ...props
-}: AuthenticatedBudgetTableProps<R, M>): JSX.Element => {
+}: AuthenticatedBudgetTableProps<R, M, S>): JSX.Element => {
   return (
-    <AuthenticatedTable<R, M>
+    <AuthenticatedTable<R, M, S>
       {...props}
       editColumnConfig={[
         {

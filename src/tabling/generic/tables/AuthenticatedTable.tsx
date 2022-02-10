@@ -30,6 +30,7 @@ export type AuthenticatedTableDataGridProps<
 export type AuthenticatedTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Table.Context = Table.Context
 > = TableConfigurationProps<R, M> &
   Omit<
@@ -46,14 +47,16 @@ export type AuthenticatedTableProps<
       | ((col: Table.DataColumn<R, M>) => boolean);
     readonly confirmRowDelete?: boolean;
     readonly localizePopupParent?: boolean;
+    readonly selector?: (state: Application.Store) => S;
     readonly rowHasCheckboxSelection?: (row: Table.EditableRow<R>) => boolean;
   };
 
 type _AuthenticatedTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Table.Context = Table.Context
-> = AuthenticatedTableProps<R, M, C> & {
+> = AuthenticatedTableProps<R, M, S, C> & {
   readonly children: RenderPropChild<AuthenticatedTableDataGridProps<R, M>>;
 };
 
@@ -90,7 +93,7 @@ const AuthenticatedTable = <
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   props: WithAuthenticatedDataGridProps<
-    WithConnectedTableProps<WithConfiguredTableProps<_AuthenticatedTableProps<R, M>, R>, R, M, S>
+    WithConnectedTableProps<WithConfiguredTableProps<_AuthenticatedTableProps<R, M, S>, R>, R, M, S>
   >
 ): JSX.Element => {
   const grid = tabling.hooks.useDataGrid();
@@ -476,7 +479,11 @@ const Memoized = React.memo(AuthenticatedTable) as typeof AuthenticatedTable;
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export default configureTable<any, any, Props>(Memoized) as {
-  <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-    props: _AuthenticatedTableProps<R, M>
+  <
+    R extends Table.RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+    S extends Redux.TableStore<R> = Redux.TableStore<R>
+  >(
+    props: _AuthenticatedTableProps<R, M, S>
   ): JSX.Element;
 };

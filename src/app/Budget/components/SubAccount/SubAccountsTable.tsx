@@ -32,7 +32,7 @@ const ConnectedTable = connectTableToStore<
     addModelsToState: actions.subAccount.addModelsToStateAction,
     setSearch: actions.subAccount.setSearchAction
   },
-  selector: selectors.selectSubAccountsTableStore,
+  selector: (s: Application.Store) => selectors.selectSubAccountsTableStore(s, "account"),
   createSaga: (table: Table.TableInstance<R, M>) => sagas.subAccount.createTableSaga(table),
   footerRowSelectors: {
     page: createSelector(
@@ -105,6 +105,7 @@ const SubAccountsTable = ({
         budget={budget}
         budgetId={budgetId}
         id={subaccountId}
+        parentType={"subaccount"}
         actionContext={{ id: subaccountId, budgetId }}
         tableId={"budget-subaccount-subaccounts"}
         table={table}

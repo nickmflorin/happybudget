@@ -14,10 +14,6 @@ declare namespace Redux {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type SelectorFunc<T = any> = AuthenticatedSelectorFunc<T> | UnauthenticatedSelectorFunc<T>;
 
-  type AsyncId = `async-${string}`;
-
-  type AsyncStores<S> = { [key in AsyncId]: S };
-
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type ActionMap<C extends Table.Context = any> = Record<string, ActionCreator<any> | ContextActionCreator<any, C>>;
 
@@ -83,19 +79,6 @@ declare namespace Redux {
   type ReducersMapObject<S> = {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     [K in keyof S]-?: Reducer<S[K], Action<any>>;
-  };
-
-  type ReducersWithAsyncMapObject<S> = ReducersMapObject<S> & {
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    [K in AsyncId]: Reducer<S[K], Action<any>>;
-  };
-
-  type ReducerManager<S extends Application.Store> = {
-    readonly getReducerMap: () => ReducersWithAsyncMapObject<S>;
-    readonly reduce: (state: S | undefined, action: Action) => S;
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    readonly injectReducer: (key: Table.AsyncId, reducer: Reducer<any>) => void;
-    readonly ejectReducer: (key: Table.AsyncId) => void;
   };
 
   type StoreObj = Record<string, unknown> | boolean | number;
