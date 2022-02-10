@@ -32,7 +32,7 @@ const ConnectedTable = connectTableToStore<
     addModelsToState: actions.subAccount.addModelsToStateAction,
     setSearch: actions.subAccount.setSearchAction
   },
-  selector: (s: Application.Store) => selectors.selectSubAccountsTableStore(s, "account"),
+  selector: (s: Application.Store) => selectors.selectSubAccountsTableStore(s, "subaccount"),
   createSaga: (table: Table.TableInstance<R, M>) => sagas.subAccount.createTableSaga(table),
   footerRowSelectors: {
     page: createSelector(
