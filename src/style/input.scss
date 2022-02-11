@@ -1,3 +1,5 @@
+@import 'react-datepicker/dist/react-datepicker.css';
+
 // This is to get rid of the blue-background that Chrome sometimes sets on
 // auto-fill fields.
 button:-webkit-autofill,
@@ -28,303 +30,418 @@ textarea:focus,
 .ant-input-affix-wrapper:focus,
 .ant-input-affix-wrapper-focused,
 select:-webkit-autofill:focus {
-  box-shadow: 0 0 0px 1000px $gray-light inset !important;
-  -webkit-box-shadow: 0 0 0px 1000px $gray-light inset !important;
+	box-shadow: 0 0 0px 1000px $gray-light inset !important;
+	-webkit-box-shadow: 0 0 0px 1000px $gray-light inset !important;
 }
 
 input:-webkit-autofill::first-line {
-  font-size: 13px;
-  color: $text-primary !important;
-  font-family: $avenir;
-  font-weight: 500;
-  width: 100%;
-  line-height: 22px;
+	font-size: 13px;
+	color: $text-primary !important;
+	font-family: $avenir;
+	font-weight: 500;
+	width: 100%;
+	line-height: 22px;
 }
 
 input:focus-visible {
-  outline: none !important;
+	outline: none !important;
 }
 
 .ant-checkbox-checked::after {
-  border: none !important;
+	border: none !important;
 }
 
 .checkbox-wrapper {
-  padding: 10px;
-  .ant-checkbox-wrapper {
-    height: 16px;
-    width: 16px;
+	padding: 10px;
+	.ant-checkbox-wrapper {
+		height: 16px;
+		width: 16px;
 
-    .ant-checkbox {
-      font-size: 16px;
-      line-height: 1;
-      display: block;
-      top: 0;
-    }
-  }
+		.ant-checkbox {
+			font-size: 16px;
+			line-height: 1;
+			display: block;
+			top: 0;
+		}
+	}
 }
 
 // This class is not meant to be used in the components.
 .input-base {
-  transition: all 0.3s;
-  border: none;
-  background-color: $gray-light !important;
-  color: $text-primary !important;
-  cursor: text;
-  position: relative;
-  box-sizing: border-box;
-  align-items: center;
-  font-variant: tabular-nums;
-  list-style: none;
-  font-feature-settings: 'tnum';
-  font-family: $avenir;
-  font-weight: 500;
-  width: 100%;
-  line-height: 22px;
-  font-size: 13px;
+	transition: all 0.3s;
+	border: none;
+	background-color: $gray-light !important;
+	color: $text-primary !important;
+	cursor: text;
+	position: relative;
+	box-sizing: border-box;
+	align-items: center;
+	font-variant: tabular-nums;
+	list-style: none;
+	font-feature-settings: 'tnum';
+	font-family: $avenir;
+	font-weight: 500;
+	width: 100%;
+	line-height: 22px;
+	font-size: 13px;
 }
 
 .input-small-base {
-  line-height: 16px !important;
-  font-size: 12px !important;
+	line-height: 16px !important;
+	font-size: 12px !important;
 }
 
 // The generic `input` class is applied to the wrapping component.  The actual
 // HTML <input> element does not have this class applied and is a child of this
 // wrapping component.
 .input {
-  @extend .input-base;
-  border-radius: $input-border-radius;
-  // Padding with line-height must be 36px for our standard size.  7px + 7px + 22px = 36px
-  padding-top: 7px;
-  padding-bottom: 7px;
-  padding-left: 12px;
-  padding-right: 12px;
+	@extend .input-base;
+	border-radius: $input-border-radius;
+	// Padding with line-height must be 36px for our standard size.  7px + 7px + 22px = 36px
+	padding-top: 7px;
+	padding-bottom: 7px;
+	padding-left: 12px;
+	padding-right: 12px;
 
-  .ant-input-prefix {
-    margin-right: 12px;
-    font-size: 13px;
-  }
+	.ant-input-prefix {
+		margin-right: 12px;
+		font-size: 13px;
+	}
 
-  input {
-    @extend .input-base;
-  }
+	input {
+		@extend .input-base;
+	}
 
-  &--small {
-    @extend .input-small-base;
-    padding-top: 5px !important;
-    padding-bottom: 5px !important;
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-    border-radius: $input-small-border-radius !important;
+	&--small {
+		@extend .input-small-base;
+		padding-top: 5px !important;
+		padding-bottom: 5px !important;
+		padding-left: 8px !important;
+		padding-right: 8px !important;
+		border-radius: $input-small-border-radius !important;
 
-    input {
-      @extend .input-small-base;
-    }
-  }
+		input {
+			@extend .input-small-base;
+		}
+	}
 
-  &:hover,
-  &:focus {
-    border-color: transparent !important;
-    box-shadow: none !important;
-  }
+	&:hover,
+	&:focus {
+		border-color: transparent !important;
+		box-shadow: none !important;
+	}
 }
 
 // For purposes of wrapping a raw HTML <input> element and looking like a styled
 // <Input> component, when we cannot use the <Input> component.  Currently, this is
 // only used for the <InputOnFocus> component.
 .input-div {
-  @extend .input;
+	@extend .input;
 
-  input {
-    @extend .input-base;
-    height: 22px !important;
-  }
-  // Tightly wraps the component that is rendered on blur such that a click inside
-  // of `input-div-content` (i.e. the component that is rendered on blur) can have
-  // it's propogation stopped.  This is required to allow clickable elements to
-  // be rendered inside the `input-div`.
-  .input-div-content {
-    width: fit-content;
-    // Line height of input text.  This is required so that the "input" AKA div
-    // does not change height when the input is hidden.
-    height: 22px !important;
-    line-height: 22px !important;
+	input {
+		@extend .input-base;
+		height: 22px !important;
+	}
+	// Tightly wraps the component that is rendered on blur such that a click inside
+	// of `input-div-content` (i.e. the component that is rendered on blur) can have
+	// it's propogation stopped.  This is required to allow clickable elements to
+	// be rendered inside the `input-div`.
+	.input-div-content {
+		width: fit-content;
+		// Line height of input text.  This is required so that the "input" AKA div
+		// does not change height when the input is hidden.
+		height: 22px !important;
+		line-height: 22px !important;
 
-    > * {
-      line-height: 22px;
-      font-family: $avenir;
-      font-weight: 500;
-      font-size: 13px;
-      letter-spacing: normal;
-      padding-left: 2px;
-      vertical-align: unset !important;
-    }
-  }
+		> * {
+			line-height: 22px;
+			font-family: $avenir;
+			font-weight: 500;
+			font-size: 13px;
+			letter-spacing: normal;
+			padding-left: 2px;
+			vertical-align: unset !important;
+		}
+	}
 }
 
 textarea {
-  background-color: $gray-light !important;
-  color: $text-secondary !important;
-  font-family: $roboto !important;
-  font-weight: 400;
-  border-radius: 10px !important;
-  border: 1px solid transparent !important;
-  min-height: 36px !important;
-  font-size: 12px;
+	background-color: $gray-light !important;
+	color: $text-secondary !important;
+	font-family: $roboto !important;
+	font-weight: 400;
+	border-radius: 10px !important;
+	border: 1px solid transparent !important;
+	min-height: 36px !important;
+	font-size: 12px;
 }
 
 .ant-input-number {
-  .ant-input-number-handler-wrap {
-    display: none !important;
-  }
-  .ant-input-number-input-wrap {
-    height: 22px;
-    input {
-      height: 22px;
-      padding: 0 !important;
-    }
-  }
+	.ant-input-number-handler-wrap {
+		display: none !important;
+	}
+	.ant-input-number-input-wrap {
+		height: 22px;
+		input {
+			height: 22px;
+			padding: 0 !important;
+		}
+	}
 }
 
 .ant-select-multiple {
-  .ant-select-selection-item-remove > .anticon {
-    vertical-align: -0.1em;
-  }
-  .ant-select-selection-item-content {
-    font-size: 11px;
-    color: $text-primary;
-    font-family: $roboto;
-  }
+	.ant-select-selection-item-remove > .anticon {
+		vertical-align: -0.1em;
+	}
+	.ant-select-selection-item-content {
+		font-size: 11px;
+		color: $text-primary;
+		font-family: $roboto;
+	}
 }
 
 // Must be outside of select because it does not render inside of select component.
 .ant-select-item-option {
-  &.column-select-option {
-    .ant-select-item-option-content {
-      display: flex;
+	&.column-select-option {
+		.ant-select-item-option-content {
+			display: flex;
 
-      .icon-wrapper {
-        height: 22px;
-        width: 22px;
+			.icon-wrapper {
+				height: 22px;
+				width: 22px;
 
-        svg {
-          height: 12px;
-          width: 12px;
-        }
-      }
-    }
-  }
-  &.group-select-option {
-    .ant-select-item-option-content {
-      display: flex;
+				svg {
+					height: 12px;
+					width: 12px;
+				}
+			}
+		}
+	}
+	&.group-select-option {
+		.ant-select-item-option-content {
+			display: flex;
 
-      .icon-wrapper {
-        height: 22px;
-        width: 22px;
+			.icon-wrapper {
+				height: 22px;
+				width: 22px;
 
-        .color {
-          height: 16px;
-          width: 16px;
-        }
-      }
-    }
-  }
+				.color {
+					height: 16px;
+					width: 16px;
+				}
+			}
+		}
+	}
 }
 
 .select,
 .ant-select {
-  @extend .input-base;
-  box-shadow: none !important;
-  background-color: $white !important;
+	@extend .input-base;
+	box-shadow: none !important;
+	background-color: $white !important;
 
-  &:not(.ant-select-disabled):hover .ant-select-selector {
-    border-color: #ebebeb !important;
-    border: 1px solid #ebebeb !important;
-  }
+	&:not(.ant-select-disabled):hover .ant-select-selector {
+		border-color: #ebebeb !important;
+		border: 1px solid #ebebeb !important;
+	}
 
-  .ant-select-selector {
-    @extend .input-base;
-    box-shadow: none !important;
-    background-color: $white !important;
-    border-color: #ebebeb !important;
-    border: 1px solid #ebebeb !important;
+	.ant-select-selector {
+		@extend .input-base;
+		box-shadow: none !important;
+		background-color: $white !important;
+		border-color: #ebebeb !important;
+		border: 1px solid #ebebeb !important;
 
 		.ant-select-selection-item {
 			font-weight: 500;
 		}
-  }
+	}
 
-  &.ant-select-open .ant-select-arrow svg {
-    color: $black;
-  }
-  &.disabled {
-    background-color: $gray-light !important;
-    .ant-select-selector {
-      background-color: $gray-light !important;
-    }
-  }
+	&.ant-select-open .ant-select-arrow svg {
+		color: $black;
+	}
+	&.disabled {
+		background-color: $gray-light !important;
+		.ant-select-selector {
+			background-color: $gray-light !important;
+		}
+	}
 
-  &--group {
-    .group-select-tag {
-      display: flex;
-      line-height: 22px;
+	&--group {
+		.group-select-tag {
+			display: flex;
+			line-height: 22px;
 
-      .icon-wrapper {
-        height: 22px;
-        width: 22px;
-        margin-right: -4px;
+			.icon-wrapper {
+				height: 22px;
+				width: 22px;
+				margin-right: -4px;
 
-        .color {
-          height: 12px;
-          width: 12px;
-        }
-      }
+				.color {
+					height: 12px;
+					width: 12px;
+				}
+			}
 
-      .ant-tag-close-icon {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-    }
-  }
+			.ant-tag-close-icon {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+			}
+		}
+	}
 
-  &--column {
-    .column-select-tag {
-      display: flex;
-      line-height: 22px;
+	&--column {
+		.column-select-tag {
+			display: flex;
+			line-height: 22px;
 
-      .icon-wrapper {
-        height: 22px;
-        width: 22px;
-        margin-right: -4px;
+			.icon-wrapper {
+				height: 22px;
+				width: 22px;
+				margin-right: -4px;
 
-        svg {
-          height: 12px;
-          width: 12px;
-        }
-      }
+				svg {
+					height: 12px;
+					width: 12px;
+				}
+			}
 
-      .ant-tag-close-icon {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-    }
-  }
+			.ant-tag-close-icon {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+			}
+		}
+	}
 }
 
 .ant-select-item-option {
-  color: $text-secondary;
-  font-size: 13px;
-  font-weight: 500;
-  font-family: $avenir;
-  min-height: 32px;
-  height: 32px;
+	color: $text-secondary;
+	font-size: 13px;
+	font-weight: 500;
+	font-family: $avenir;
+	min-height: 32px;
+	height: 32px;
 
-  .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-    color: $text-secondary;
-    font-weight: 600;
-    background-color: #e6f7ff;
-  }
+	.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+		color: $text-secondary;
+		font-weight: 600;
+		background-color: #e6f7ff;
+	}
+}
+
+.date-picker {
+	&.disabled {
+		opacity: 0.3;
+		pointer-events: none !important;
+	}
+
+	.react-datepicker__input-container {
+		> input[type='text'] {
+			@extend .input;
+		}
+	}
+
+	.react-datepicker {
+		@extend .menu-base;
+		font-family: $avenir;
+		box-shadow: none !important;
+		border: $menu-border;
+		padding: 10px !important;
+
+		> .react-datepicker__triangle {
+			display: none;
+		}
+
+		.react-datepicker__month-container {
+			float: none;
+		}
+
+		.react-datepicker__header {
+			background-color: $white;
+			border-bottom: none;
+			padding: 0 !important;
+
+			.react-datepicker {
+				&__current-month {
+					font-weight: 500;
+					color: $text-primary;
+					font-size: 15px;
+					line-height: 16px;
+				}
+
+				&__day-names {
+					margin-bottom: 0;
+
+					.react-datepicker__day-name {
+						color: $gray;
+						font-weight: 500;
+						margin: 2px;
+						font-size: 13px;
+					}
+				}
+			}
+		}
+
+		.react-datepicker__day-name,
+		.react-datepicker__day,
+		.react-datepicker__time-name {
+			margin: 2px;
+		}
+
+		.react-datepicker__navigation {
+			top: -7px;
+
+			.react-datepicker__year-read-view--down-arrow,
+			.react-datepicker__month-read-view--down-arrow,
+			.react-datepicker__month-year-read-view--down-arrow,
+			.react-datepicker__navigation-icon::before {
+				border-width: 2px 2px 0 0;
+				border-color: $gray;
+			}
+
+			.react-datepicker__navigation--previous {
+				left: 22px;
+			}
+			.react-datepicker__navigation--next {
+				right: 22px;
+			}
+		}
+
+		.react-datepicker__day {
+			.react-datepicker__day--today {
+				font-weight: normal;
+			}
+			.react-datepicker__day--selected {
+				background-color: rgba($green, 0.2);
+				color: $green;
+				border-radius: 100%;
+			}
+		}
+
+		.react-datepicker__month {
+			margin: 0px;
+		}
+
+		.react-datepicker__day,
+		.react-datepicker__month-text,
+		.react-datepicker__quarter-text,
+		.react-datepicker__year-text {
+			border-radius: 100%;
+
+			&:hover {
+				border-radius: 100%;
+			}
+		}
+
+		.react-datepicker__day--keyboard-selected {
+			background-color: inherit;
+			color: inherit;
+
+			&:hover {
+				background-color: #f0f0f0;
+			}
+		}
+	}
 }

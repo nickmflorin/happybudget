@@ -1,4 +1,4 @@
-import { forwardRef, useState, useEffect, useImperativeHandle, ForwardedRef } from "react";
+import { forwardRef, useState, useEffect, useMemo, useImperativeHandle, ForwardedRef } from "react";
 import { isNil } from "lodash";
 import { DatePicker } from "components/fields";
 
@@ -32,10 +32,13 @@ const DateEditor = (props: DateEditorProps, ref: ForwardedRef<any>): JSX.Element
     };
   });
 
-  const onChange = (selectedDate: Date) => {
-    setDate(selectedDate);
-    setEditing(false);
-  };
+  const onChange = useMemo(
+    () => (selectedDate: Date | null) => {
+      setDate(selectedDate);
+      setEditing(false);
+    },
+    [setDate, setEditing]
+  );
 
   return <DatePicker selected={date} dateFormat={"dd/MM/yyyy"} onChange={onChange} inline />;
 };
