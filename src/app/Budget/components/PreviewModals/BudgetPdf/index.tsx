@@ -41,6 +41,9 @@ const SubAccountColumns = filter(
 const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element => {
   const accountColumns = useMemo<AC[]>(() => {
     const columns = tabling.columns.normalizeColumns(AccountColumns, {
+      description: {
+        pdfFooterValueGetter: `${budget.name} Total`
+      },
       estimated: {
         pdfFooterValueGetter: budgeting.businessLogic.estimatedValue(budget)
       },

@@ -1,4 +1,4 @@
-import { isNil, includes } from "lodash";
+import { isNil } from "lodash";
 import { tabling, budgeting } from "lib";
 
 import { Icon } from "components";
@@ -14,8 +14,7 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "Account",
     pdfHeaderName: "Acct #",
     pdfWidth: 0.1,
-    pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } },
-    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder", "markup"], r)
+    pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
   }),
   columns.BodyColumn<R, M, string | null>({
     field: "description",
