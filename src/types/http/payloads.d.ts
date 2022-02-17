@@ -1,21 +1,17 @@
 declare namespace Http {
-  type _RawPayloadValue =
-    | ArrayBuffer
-    | boolean
-    | string
-    | number
-    | null
-    | number[]
-    | Model.GenericHttpModel<Model.HttpModelType>;
-
-  type RawPayloadValue = _RawPayloadValue | Record<string, _RawPayloadValue>[];
-
-  type _PayloadObj = Record<string, RawPayloadValue>;
-  type PayloadObj = { readonly data: _PayloadObj[] } | _PayloadObj;
+  type PayloadObj = Record<string, unknown>;
   type Payload = FormData | PayloadObj;
 
   type AuthTokenValidationPayload = {
     readonly force_reload_from_stripe?: boolean;
+  };
+
+  type PublicTokenValidationPayload = {
+    readonly token: string;
+    readonly instance: {
+      readonly type: Model.HttpModelType;
+      readonly id: number;
+    };
   };
 
   type SocialPayload = {
@@ -49,6 +45,12 @@ declare namespace Http {
     readonly city?: string | null;
     readonly phone_number?: string | null;
     readonly timezone?: string;
+  };
+
+  type PublicTokenPayload = {
+    readonly expires_at?: string | null;
+    // PublicID is only included in POST requests, not PATCH requests.
+    readonly public_id?: string;
   };
 
   type FringePayload = {
@@ -158,6 +160,7 @@ declare namespace Http {
   type BulkCreatePayload<T extends PayloadObj> = { data: Partial<T>[] };
   type ModelBulkUpdatePayload<T extends PayloadObj> = Partial<T> & { readonly id: number };
   type BulkUpdatePayload<T extends PayloadObj> = { data: ModelBulkUpdatePayload<T>[] };
+  type BulkDeletePayload = { ids: number[] };
 
   type CheckoutSessionPayload = {
     readonly price_id: string;

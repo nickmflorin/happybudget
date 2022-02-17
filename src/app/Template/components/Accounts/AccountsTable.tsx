@@ -70,8 +70,8 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
     parentId: budgetId,
     parentType: "budget",
     table: table.current,
-    onResponse: (response: Http.BudgetContextDetailResponse<Model.Markup, Model.Template>) => {
-      dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
+    onResponse: (response: Http.ParentChildResponse<Model.Template, Model.Markup>) => {
+      dispatch(actions.updateBudgetInStateAction({ id: response.parent.id, data: response.parent }));
     }
   });
 

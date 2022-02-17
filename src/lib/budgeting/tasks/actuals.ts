@@ -37,9 +37,11 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     const response: Http.ListResponse<M> = yield api.request(api.getActuals, budgetId, {});
     if (response.data.length === 0) {
       // If there is no table data, we want to default create two rows.
-      const createResponse: Http.BulkResponse<Model.Budget, M> = yield api.request(api.bulkCreateActuals, budgetId, {
-        data: [{}, {}]
-      });
+      const createResponse: Http.ServiceResponse<typeof api.bulkCreateActuals> = yield api.request(
+        api.bulkCreateActuals,
+        budgetId,
+        { data: [{}, {}] }
+      );
       yield put(config.actions.response({ models: createResponse.children }));
     } else {
       yield put(config.actions.response({ models: response.data }));
@@ -102,14 +104,14 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
     M,
     Tables.ActualTableStore,
     P,
-    Http.BulkResponse<Model.Budget, M>,
+    Http.ParentChildListResponse<Model.Budget, M>,
     [number]
   >({
     table: config.table,
     selectStore: config.selectStore,
-    responseActions: (r: Http.BulkResponse<Model.Budget, M>, e: Table.RowAddEvent<R>) => [
+    responseActions: (r: Http.ParentChildListResponse<Model.Budget, M>, e: Table.RowAddEvent<R>) => [
       config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children }),
-      config.actions.updateBudgetInState({ id: r.data.id, data: r.data })
+      config.actions.updateBudgetInState({ id: r.parent.id, data: r.parent })
     ],
     bulkCreate: (objId: number) => [api.bulkCreateActuals, objId]
   });
@@ -122,8 +124,12 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
   ): SagaIterator {
     config.table.saving(true);
     try {
-      const r: Http.BulkResponse<Model.Budget, M> = yield api.request(api.bulkUpdateActuals, budgetId, requestPayload);
-      yield put(config.actions.updateBudgetInState({ id: r.data.id, data: r.data }));
+      const r: Http.ServiceResponse<typeof api.bulkUpdateActuals> = yield api.request(
+        api.bulkUpdateActuals,
+        budgetId,
+        requestPayload
+      );
+      yield put(config.actions.updateBudgetInState({ id: r.parent.id, data: r.parent }));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, { message: errorMessage, dispatchClientErrorToSentry: true });
     } finally {
@@ -134,8 +140,10 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsTable
   function* bulkDeleteTask(budgetId: number, ids: number[], errorMessage: string): SagaIterator {
     config.table.saving(true);
     try {
-      const r: Http.BulkDeleteResponse<Model.Budget> = yield api.request(api.bulkDeleteActuals, budgetId, ids);
-      yield put(config.actions.updateBudgetInState({ id: r.data.id, data: r.data }));
+      const r: Http.ServiceResponse<typeof api.bulkDeleteActuals> = yield api.request(api.bulkDeleteActuals, budgetId, {
+        ids
+      });
+      yield put(config.actions.updateBudgetInState({ id: r.parent.id, data: r.parent }));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, { message: errorMessage, dispatchClientErrorToSentry: true });
     } finally {

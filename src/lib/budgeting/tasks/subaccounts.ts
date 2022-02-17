@@ -10,44 +10,20 @@ type C = Model.SubAccount;
 type P = Http.SubAccountPayload;
 
 export type SubAccountsTableServiceSet = {
-  readonly request: (id: number, query: Http.ListQuery, options: Http.RequestOptions) => Promise<Http.ListResponse<C>>;
-  readonly requestGroups: (
-    id: number,
-    query: Http.ListQuery,
-    options: Http.RequestOptions
-  ) => Promise<Http.ListResponse<Model.Group>>;
-  readonly requestMarkups?: (
-    id: number,
-    query: Http.ListQuery,
-    options: Http.RequestOptions
-  ) => Promise<Http.ListResponse<Model.Markup>>;
+  readonly request: Http.DetailListService<C>;
+  readonly requestGroups: Http.DetailListService<Model.Group>;
+  readonly requestMarkups: Http.DetailListService<Model.Markup>;
 };
 
 export type AuthenticatedSubAccountsTableServiceSet<
   M extends Model.Account | Model.SubAccount,
   B extends Model.Template | Model.Budget
 > = SubAccountsTableServiceSet & {
-  readonly create: (id: number, payload: P, options?: Http.RequestOptions) => Promise<C>;
-  readonly bulkDelete: (
-    id: number,
-    ids: number[],
-    options: Http.RequestOptions
-  ) => Promise<Http.BudgetBulkDeleteResponse<B, M>>;
-  readonly bulkDeleteMarkups?: (
-    id: number,
-    ids: number[],
-    options: Http.RequestOptions
-  ) => Promise<Http.BudgetBulkDeleteResponse<B, M>>;
-  readonly bulkUpdate: (
-    id: number,
-    data: Http.BulkUpdatePayload<P>,
-    options: Http.RequestOptions
-  ) => Promise<Http.BudgetBulkResponse<B, M, C>>;
-  readonly bulkCreate: (
-    id: number,
-    p: Http.BulkCreatePayload<P>,
-    options: Http.RequestOptions
-  ) => Promise<Http.BudgetBulkResponse<B, M, C>>;
+  readonly create: Http.DetailPostService<C, P>;
+  readonly bulkDelete: Http.TreeBulkDeleteService<B, M>;
+  readonly bulkDeleteMarkups: Http.TreeBulkDeleteService<B, M>;
+  readonly bulkUpdate: Http.TreeBulkUpdateService<B, M, C, P>;
+  readonly bulkCreate: Http.TreeBulkCreateService<B, M, C, P>;
 };
 
 export type SubAccountsTableActionMap = Redux.TableActionMap<C, Tables.SubAccountTableContext> & {
@@ -103,13 +79,13 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       if (response.data.length === 0 && isAuthenticatedConfig(config)) {
         // If there is no table data, we want to default create two rows.
         try {
-          const bulkCreateResponse: Http.BulkResponse<B, Model.Fringe> = yield api.request(
+          const bulkCreateResponse: Http.ServiceResponse<typeof api.bulkCreateFringes> = yield api.request(
             api.bulkCreateFringes,
             objId,
             { data: [{}, {}] }
           );
           yield put(config.actions.responseFringes({ models: bulkCreateResponse.children }));
-          yield put(config.actions.updateBudgetInState({ id: objId, data: bulkCreateResponse.data }));
+          yield put(config.actions.updateBudgetInState({ id: objId, data: bulkCreateResponse.parent as B }));
         } catch (e: unknown) {
           /* TODO: It would be nice if we can show this in the Fringes table
              instead (if it is open). */
@@ -180,13 +156,11 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       }
     } else {
       yield put(config.actions.loading(true));
-      let effects = [
+      const effects = [
         api.request(config.services.request, action.context.id, {}),
-        api.request(config.services.requestGroups, action.context.id, {})
+        api.request(config.services.requestGroups, action.context.id, {}),
+        api.request(config.services.requestMarkups, action.context.id, {})
       ];
-      if (!isNil(config.services.requestMarkups)) {
-        effects = [...effects, api.request(config.services.requestMarkups, action.context.id, {})];
-      }
       try {
         yield fork(contactsTasks.request, action as Redux.Action);
         yield fork(requestSubAccountUnits);
@@ -200,7 +174,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         if (models.data.length === 0 && isAuthenticatedConfig(config)) {
           // If there is no table data, we want to default create two rows.
           try {
-            const response: Http.BudgetBulkResponse<B, M, C> = yield api.request(
+            const response: Http.ServiceResponse<typeof config.services.bulkCreate> = yield api.request(
               config.services.bulkCreate,
               action.context.id,
               { data: [{}, {}] }
@@ -245,15 +219,15 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         C,
         Tables.SubAccountTableStore,
         Http.SubAccountPayload,
-        Http.BudgetBulkResponse<B, M, C>,
+        Http.AncestryListResponse<B, M, C>,
         [number]
       >({
         table: config.table,
         selectStore: config.selectStore,
         loadingActions: [config.actions.loadingBudget],
-        responseActions: (r: Http.BudgetBulkResponse<B, M, C>, e: Table.RowAddEvent<R>) => [
+        responseActions: (r: Http.AncestryListResponse<B, M, C>, e: Table.RowAddEvent<R>) => [
           config.actions.updateBudgetInState({ id: r.budget.id, data: r.budget }),
-          config.actions.updateParentInState({ id: r.data.id, data: r.data }),
+          config.actions.updateParentInState({ id: r.parent.id, data: r.parent }),
           config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children })
         ],
         bulkCreate: (objId: number) => [config.services.bulkCreate, objId]
@@ -271,13 +245,15 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         yield put(config.actions.loadingBudget(true));
       }
       try {
-        const response: Http.BudgetBulkResponse<B, M, C> = yield api.request(
+        const response: Http.ServiceResponse<typeof config.services.bulkUpdate> = yield api.request(
           config.services.bulkUpdate,
           objId,
           requestPayload
         );
+        /* Note: We do not need to update the models in the state because the
+           reducer already handled this on the change event. */
         yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
-        yield put(config.actions.updateParentInState({ id: response.data.id, data: response.data }));
+        yield put(config.actions.updateParentInState({ id: response.parent.id, data: response.parent }));
       } catch (err: unknown) {
         config.table.handleRequestError(err as Error, { message: errorMessage, dispatchClientErrorToSentry: true });
       } finally {
@@ -331,15 +307,15 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
 			 update the Budget in state and we cannot risk running into race
 			 conditions. */
     if (isAuthenticatedConfig(config)) {
-      let response: Http.BudgetBulkDeleteResponse<B, M> | null = null;
+      let response: Http.ServiceResponse<typeof config.services.bulkDelete> | null = null;
       if (ids.length !== 0) {
-        response = yield api.request(config.services.bulkDelete, objId, ids);
+        response = yield api.request(config.services.bulkDelete, objId, { ids });
       }
       if (!isNil(markupIds) && markupIds.length !== 0 && !isNil(config.services.bulkDeleteMarkups)) {
-        response = yield api.request(config.services.bulkDeleteMarkups, objId, markupIds);
+        response = yield api.request(config.services.bulkDeleteMarkups, objId, { ids: markupIds });
       }
       if (!isNil(response)) {
-        yield put(config.actions.updateParentInState({ id: response.data.id, data: response.data }));
+        yield put(config.actions.updateParentInState({ id: response.parent.id, data: response.parent }));
         yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
       }
     }

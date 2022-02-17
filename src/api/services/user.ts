@@ -2,29 +2,17 @@ import { AxiosResponse } from "axios";
 import { client } from "api";
 import * as services from "./services";
 
-export const register = async (
-  payload: Http.RegistrationPayload,
-  options?: Http.RequestOptions
-): Promise<Model.User> => {
-  const url = services.URL.v1("users", "registration");
-  return client.post<Model.User>(url, payload, options);
-};
+export const register = services.postService<Http.RegistrationPayload, Model.User>(["users", "registration"]);
 
-export const updateActiveUser = async (
-  payload: Partial<Http.UserPayload> | FormData,
-  options?: Http.RequestOptions
-): Promise<Model.User> => {
-  const url = services.URL.v1("users", "user");
-  return client.patch<Model.User>(url, payload, options);
-};
+export const updateActiveUser = services.patchService<Partial<Http.UserPayload | FormData>, Model.User>([
+  "users",
+  "user"
+]);
 
-export const changeUserPassword = async (
-  payload: Http.ChangePasswordPayload,
-  options?: Http.RequestOptions
-): Promise<Model.User> => {
-  const url = services.URL.v1("users", "change-password");
-  return client.patch<Model.User>(url, payload, options);
-};
+export const changeUserPassword = services.patchService<Http.ChangePasswordPayload, Model.User>([
+  "users",
+  "change-password"
+]);
 
 export const tempUploadImage = async (
   data: FormData,

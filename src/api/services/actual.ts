@@ -1,9 +1,8 @@
-import { client } from "api";
 import * as services from "./services";
 
 export const getActual = services.retrieveService<Model.Actual>((id: number) => ["actuals", id]);
 export const deleteActual = services.deleteService((id: number) => ["actuals", id]);
-export const updateActual = services.detailPatchService<Http.ActualPayload, Model.Actual>((id: number) => [
+export const updateActual = services.detailPatchService<Partial<Http.ActualPayload>, Model.Actual>((id: number) => [
   "actuals",
   id
 ]);
@@ -21,7 +20,5 @@ export const deleteActualAttachment = services.detailDeleteService((id: number, 
 export const uploadActualAttachment = services.detailPostService<FormData, { data: Model.Attachment[] }>(
   (id: number) => ["actuals", id, "attachments"]
 );
-export const getActualTypes = async (options: Http.RequestOptions = {}): Promise<Http.ListResponse<Model.Tag>> => {
-  const url = services.URL.v1("actuals", "types");
-  return client.list<Model.Tag>(url, {}, options);
-};
+
+export const getActualTypes = services.listService<Model.Tag>(["actuals", "types"]);

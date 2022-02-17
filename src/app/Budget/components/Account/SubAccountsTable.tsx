@@ -94,7 +94,7 @@ const SubAccountsTable = ({
     parentId: accountId,
     parentType: "account",
     table: table.current,
-    onResponse: (response: Http.BudgetParentContextDetailResponse<Model.Markup, Model.Account, Model.Budget>) => {
+    onResponse: (response: Http.AncestryResponse<Model.Budget, Model.Account, Model.Markup>) => {
       dispatch(actions.account.updateInStateAction({ id: response.parent.id, data: response.parent }));
       dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
     }

@@ -19,56 +19,46 @@ declare namespace Http {
     readonly fileUrl: string;
   };
 
-  type MarkupResponseTypes<B extends Model.Budget | Model.Template> =
-    | BudgetContextDetailResponse<Model.Markup, B>
-    | BudgetParentContextDetailResponse<Model.Markup, Model.Account, B>
-    | BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount, B>;
+  type MarkupResponseTypes<B extends Model.BaseBudget> =
+    | ParentChildResponse<B, Model.Markup>
+    | AncestryResponse<B, Model.Account, Model.Markup>
+    | AncestryResponse<B, Model.SubAccount, Model.Markup>;
 
   type ReorderResponse = { data: number[] };
 
-  type BudgetContextDetailResponse<
-    M extends Model.HttpModel,
-    B extends Model.Budget | Model.Template = Model.Budget
-  > = {
-    readonly data: M;
-    readonly budget: B;
+  type ParentResponse<PARENT extends Model.HttpModel> = {
+    readonly parent: PARENT;
   };
 
-  type BudgetParentContextDetailResponse<
-    M extends Model.HttpModel,
-    P extends Model.Account | Model.SubAccount,
-    B extends Model.Budget | Model.Template = Model.Budget
-  > = {
-    readonly data: M;
-    readonly budget: B;
-    readonly parent: P;
+  type ParentChildResponse<PARENT extends Model.HttpModel, CHILD extends Model.HttpModel> = ParentResponse<PARENT> & {
+    readonly data: CHILD;
   };
 
-  type BulkDeleteResponse<M extends Model.HttpModel> = {
-    readonly data: M;
+  type AncestryResponse<
+    GP extends Model.HttpModel,
+    PARENT extends Model.HttpModel,
+    CHILD extends Model.HttpModel
+  > = ParentChildResponse<PARENT, CHILD> & {
+    readonly budget: GP;
   };
 
-  type BulkModelResponse<M extends Model.HttpModel> = {
-    readonly data: M[];
+  type ChildListResponse<CHILD extends Model.HttpModel> = {
+    readonly children: CHILD[];
   };
 
-  type BulkResponse<M extends Model.HttpModel, C extends Model.HttpModel> = {
-    readonly data: M;
-    readonly children: C[];
+  type ParentChildListResponse<PARENT extends Model.HttpModel, CHILD extends Model.HttpModel> = ParentResponse<PARENT> &
+    ChildListResponse<CHILD>;
+
+  type ParentsResponse<GP extends Model.HttpModel, PARENT extends Model.HttpModel> = {
+    readonly budget: GP;
+    readonly parent: PARENT;
   };
 
-  type BudgetBulkDeleteResponse<
-    B extends Model.Budget | Model.Template,
-    M extends Model.HttpModel
-  > = BulkDeleteResponse<M> & {
-    readonly budget: B;
-  };
-
-  type BudgetBulkResponse<
-    B extends Model.Budget | Model.Template,
-    M extends Model.HttpModel,
-    C extends Model.HttpModel
-  > = BulkResponse<M, C> & {
-    readonly budget: B;
+  type AncestryListResponse<
+    GP extends Model.HttpModel,
+    PARENT extends Model.HttpModel,
+    CHILD extends Model.HttpModel
+  > = ParentChildListResponse<PARENT, CHILD> & {
+    readonly budget: GP;
   };
 }

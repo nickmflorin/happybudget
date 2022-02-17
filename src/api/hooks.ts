@@ -131,7 +131,7 @@ export const useGroupColors = (
 ): [string[], boolean, Error | null] => {
   const [response, error, loading] = useApiHook({
     ...options,
-    request: (token: CancelToken | undefined) => services.getGroupColors({ cancelToken: token })
+    request: (token: CancelToken | undefined) => services.getGroupColors({}, { cancelToken: token })
   });
   return [response !== null ? response.data : [], error, loading];
 };
@@ -141,7 +141,7 @@ export const useFringeColors = (
 ): [string[], boolean, Error | null] => {
   const [response, error, loading] = useApiHook({
     ...options,
-    request: (token: CancelToken | undefined) => services.getFringeColors({ cancelToken: token })
+    request: (token: CancelToken | undefined) => services.getFringeColors({}, { cancelToken: token })
   });
   return [response !== null ? response.data : [], error, loading];
 };

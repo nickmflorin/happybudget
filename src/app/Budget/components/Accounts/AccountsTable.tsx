@@ -73,8 +73,8 @@ const AccountsTable = ({ budgetId, budget, setPreviewModalVisible }: AccountsTab
     parentId: budgetId,
     parentType: "budget",
     table: table.current,
-    onResponse: (response: Http.BudgetContextDetailResponse<Model.Markup, Model.Budget>) => {
-      dispatch(actions.updateBudgetInStateAction({ id: response.budget.id, data: response.budget }));
+    onResponse: (response: Http.ParentChildResponse<Model.Budget, Model.Markup>) => {
+      dispatch(actions.updateBudgetInStateAction({ id: response.parent.id, data: response.parent }));
     }
   });
 

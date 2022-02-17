@@ -29,7 +29,7 @@ export const createChangeEventHandler = <
 };
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-type BulkCreate<RSP, ARGS extends any[]> = (...args: ARGS) => [Http.Service<Promise<RSP>>, ...ARGS];
+type BulkCreate<RSP, ARGS extends any[]> = (...args: ARGS) => [Http.Service<RSP, any>, ...ARGS];
 
 type CreateBulkTaskConfig<
   R extends Table.RowData,

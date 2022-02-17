@@ -39,19 +39,15 @@ export const createTableMarkup = <
   payload: Http.MarkupPayload,
   options: Http.RequestOptions = {}
 ): Promise<R> => {
-  type ResponseTypes =
-    | Http.BudgetContextDetailResponse<Model.Markup>
-    | Http.BudgetParentContextDetailResponse<Model.Markup, Model.Account>
-    | Http.BudgetParentContextDetailResponse<Model.Markup, Model.SubAccount>;
-
   const serviceMap: {
-    [key in Model.ParentType]: (id: number, p: Http.MarkupPayload, o?: Http.RequestOptions) => Promise<ResponseTypes>;
+    [key in Model.ParentType]: api.CreateSubAccountMarkup | api.CreateAccountMarkup | api.CreateBudgetMarkup;
   } = {
     budget: api.createBudgetMarkup,
     account: api.createAccountMarkup,
     subaccount: api.createSubAccountMarkup
   };
-  return serviceMap[parentType](parentId, payload, options) as Promise<R>;
+  const service = serviceMap[parentType] as (id: number, p: Http.MarkupPayload, o?: Http.RequestOptions) => Promise<R>;
+  return service(parentId, payload, options);
 };
 
 export const getTableGroups = (

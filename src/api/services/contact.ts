@@ -1,16 +1,9 @@
-import { client } from "api";
 import * as services from "./services";
 
-export const getContacts = async (
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.Contact>> => {
-  const url = services.URL.v1("contacts");
-  return client.list<Model.Contact>(url, query, options);
-};
+export const getContacts = services.listService<Model.Contact>(["contacts"]);
 
 export const getContact = services.retrieveService<Model.Contact>((id: number) => ["contacts", id]);
-export const updateContact = services.detailPatchService<Http.ContactPayload, Model.Contact>((id: number) => [
+export const updateContact = services.detailPatchService<Partial<Http.ContactPayload>, Model.Contact>((id: number) => [
   "contacts",
   id
 ]);
@@ -37,23 +30,14 @@ export const getContactTaggedActuals = services.detailListService<Model.TaggedAc
   "tagged-actuals"
 ]);
 
-export const bulkUpdateContacts = async (
-  data: Http.BulkUpdatePayload<Http.ContactPayload>,
-  options: Http.RequestOptions = {}
-): Promise<Model.Contact> => {
-  const url = services.URL.v1("contacts", "bulk-update");
-  return client.patch<Model.Contact>(url, data, options);
-};
+export const bulkUpdateContacts = services.bulkUpdateService<
+  Http.ContactPayload,
+  Http.ChildListResponse<Model.Contact>
+>(["contacts", "bulk-update"]);
 
-export const bulkCreateContacts = async (
-  payload: Http.BulkCreatePayload<Http.ContactPayload>,
-  options: Http.RequestOptions = {}
-): Promise<Http.BulkModelResponse<Model.Contact>> => {
-  const url = services.URL.v1("contacts", "bulk-create");
-  return client.patch<Http.BulkModelResponse<Model.Contact>>(url, payload, options);
-};
+export const bulkCreateContacts = services.bulkCreateService<
+  Http.ContactPayload,
+  Http.ChildListResponse<Model.Contact>
+>(["contacts", "bulk-create"]);
 
-export const bulkDeleteContacts = async (ids: number[], options: Http.RequestOptions = {}): Promise<void> => {
-  const url = services.URL.v1("contacts", "bulk-delete");
-  return client.patch<void>(url, { ids }, options);
-};
+export const bulkDeleteContacts = services.bulkDeleteService<null>(["contacts", "bulk-delete"]);

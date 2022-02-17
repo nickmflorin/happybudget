@@ -118,8 +118,12 @@ export class ApiClient {
     };
     url = this._prepare_url(url, query, method);
     let response: AxiosResponse<T>;
+    let headers: { [key: string]: string } = {};
+    if (!isNil(options.publicToken)) {
+      headers = { ...headers, "HTTP-Public-Token": options.publicToken };
+    }
     if (method === HttpRequestMethods.GET || method === HttpRequestMethods.DELETE) {
-      response = await lookup[method](url, { cancelToken: options.cancelToken });
+      response = await lookup[method](url, { cancelToken: options.cancelToken, timeout: options.timeout, ...headers });
     } else {
       response = await lookup[method](url, apiUtil.filterPayload(payload as Http.PayloadObj), {
         cancelToken: options.cancelToken,
@@ -222,9 +226,9 @@ export class ApiClient {
    * @param payload    The JSON body of the request.
    * @param options    The options for the request (see IRequestOptions).
    */
-  patch = async <T, P extends Http.Payload = Http.Payload>(
+  patch = async <T, P extends Partial<Http.Payload> = Partial<Http.Payload>>(
     url: Http.V1Url,
-    payload: Partial<P> = {} as P,
+    payload: P = {} as P,
     options: Http.RequestOptions = {}
   ): Promise<T> => {
     return this.request(HttpRequestMethods.PATCH, url, {}, payload, options);

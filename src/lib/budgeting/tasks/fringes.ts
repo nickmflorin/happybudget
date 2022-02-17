@@ -77,14 +77,14 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     M,
     Tables.FringeTableStore,
     Http.FringePayload,
-    Http.BulkResponse<B, M>,
+    Http.ParentChildListResponse<B, M>,
     [number]
   >({
     table: config.table,
     selectStore: selectTableStore,
     loadingActions: [config.actions.loadingBudget],
-    responseActions: (r: Http.BulkResponse<B, M>, e: Table.RowAddEvent<R>) => [
-      config.actions.updateBudgetInState({ id: r.data.id, data: r.data }),
+    responseActions: (r: Http.ParentChildListResponse<B, M>, e: Table.RowAddEvent<R>) => [
+      config.actions.updateBudgetInState({ id: r.parent.id, data: r.parent }),
       config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children })
     ],
     bulkCreate: (objId: number) => [api.bulkCreateFringes, objId]
@@ -101,12 +101,12 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       yield put(config.actions.loadingBudget(true));
     }
     try {
-      const response: Http.BulkResponse<B, M> = yield api.request(
+      const response: Http.ServiceResponse<typeof api.bulkUpdateFringes> = yield api.request(
         api.bulkUpdateFringes,
         context.budgetId,
         requestPayload
       );
-      yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
+      yield put(config.actions.updateBudgetInState({ id: response.parent.id, data: response.parent as B }));
       const path = yield select((s: Application.AuthenticatedStore) => s.router.location.pathname);
 
       const FRINGE_QUANTITATIVE_FIELDS: (keyof Http.FringePayload)[] = ["cutoff", "rate", "unit"];
@@ -171,8 +171,12 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     config.table.saving(true);
     yield put(config.actions.loadingBudget(true));
     try {
-      const response: Http.BulkDeleteResponse<B> = yield api.request(api.bulkDeleteFringes, budgetId, ids);
-      yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
+      const response: Http.ServiceResponse<typeof api.bulkDeleteFringes> = yield api.request(
+        api.bulkDeleteFringes,
+        budgetId,
+        { ids }
+      );
+      yield put(config.actions.updateBudgetInState({ id: response.parent.id, data: response.parent as B }));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, { message: errorMessage, dispatchClientErrorToSentry: true });
     } finally {

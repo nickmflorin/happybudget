@@ -43,6 +43,9 @@ declare type NonNullRef<T> = {
   readonly current: T;
 };
 
+// We can use the built-in Awaited type once we upgrade to TS 4.5.
+declare type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
+
 declare type SetUndefined<T, W extends keyof T> = Omit<T, W> & Record<W, undefined>;
 declare type SetOptional<T, W extends keyof T> = Omit<T, W> & Partial<Pick<T, W>>;
 declare type SetRequired<T, W extends keyof T> = Omit<T, W> & Required<Pick<T, W>>;

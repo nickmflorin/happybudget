@@ -3,23 +3,25 @@ import { SagaIterator } from "redux-saga";
 import { call, cancelled } from "redux-saga/effects";
 import * as Sentry from "@sentry/react";
 
+import { isNil } from "lodash";
+
 import * as api from "api";
 
-type ProvidedRequestOptions = {
-  readonly headers: { [key: string]: string };
-};
+export const isProvidedRequestConfig = <ARGS extends unknown[]>(arg: ARGS[number]): arg is Http.RequestOptions =>
+  typeof arg === "object" &&
+  ((arg as Http.RequestOptions).headers !== undefined ||
+    (arg as Http.RequestOptions).publicToken !== undefined ||
+    (arg as Http.RequestOptions).timeout !== undefined);
 
-export const isProvidedRequestConfig = <T>(arg: Parameters<Http.Service<T>>[number]): arg is ProvidedRequestOptions =>
-  typeof arg === "object" && (arg as { readonly headers: { [key: string]: string } }).headers !== undefined;
-
-export const request = <T>(service: Http.Service<T>, ...args: Parameters<typeof service>) =>
-  call(function* (): SagaIterator {
+export const request = <R, ARGS extends unknown[]>(service: Http.Service<R, ARGS>, ...args: ARGS) =>
+  call<() => SagaIterator<R>>(function* (): SagaIterator {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
     let config: Http.RequestOptions = { cancelToken: source.token };
-    if (args.length !== 0 && isProvidedRequestConfig(args[args.length - 1])) {
-      config = { ...args[args.length - 1], ...config };
+    const opts = args[args.length - 1];
+    if (!isNil(opts) && isProvidedRequestConfig<ARGS>(opts)) {
+      config = { ...(opts as Http.RequestOptions), ...config };
     }
 
     const handleCancel = (e: Error) => {
@@ -32,9 +34,9 @@ export const request = <T>(service: Http.Service<T>, ...args: Parameters<typeof 
         throw e;
       });
     };
-
+    const callingArgs = [...(args.slice(0, args.length - 1) as ARGS), config] as ARGS;
     try {
-      return yield call(service, ...args, config);
+      return yield call(service, ...callingArgs);
     } catch (e: unknown) {
       const err = e as Error;
       if (!(err instanceof api.ForceLogout)) {

@@ -77,7 +77,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         ] = yield all(effects);
         if (models.data.length === 0 && isAuthenticatedConfig(config)) {
           // If there is no table data, we want to default create two rows.
-          const response: Http.BulkResponse<B, C> = yield api.request(
+          const response: Http.ServiceResponse<typeof api.bulkCreateBudgetChildren> = yield api.request(
             api.bulkCreateBudgetChildren,
             action.context.budgetId,
             { data: [{}, {}] }
@@ -116,7 +116,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         C,
         Tables.AccountTableStore,
         Http.AccountPayload,
-        Http.BulkResponse<B, C>,
+        Http.ParentChildListResponse<B, C>,
         [number]
       >({
         table: config.table,
@@ -131,8 +131,8 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
           in the future we may want to use the response data as the
 					fallback/source of truth.
           */
-        responseActions: (r: Http.BulkResponse<B, C>, e: Table.RowAddEvent<R>) => [
-          config.actions.updateBudgetInState({ id: r.data.id, data: r.data }),
+        responseActions: (r: Http.ParentChildListResponse<B, C>, e: Table.RowAddEvent<R>) => [
+          config.actions.updateBudgetInState({ id: r.parent.id, data: r.parent }),
           config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children })
         ],
         bulkCreate: (objId: number) => [api.bulkCreateBudgetChildren, objId]
@@ -150,12 +150,12 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         yield put(config.actions.loadingBudget(true));
       }
       try {
-        const response: Http.BulkResponse<B, C> = yield api.request(
+        const response: Http.ServiceResponse<typeof api.bulkUpdateBudgetChildren> = yield api.request(
           api.bulkUpdateBudgetChildren,
           objId,
           requestPayload
         );
-        yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
+        yield put(config.actions.updateBudgetInState({ id: response.parent.id, data: response.parent as B }));
       } catch (err: unknown) {
         config.table.handleRequestError(err as Error, { message: errorMessage });
       } finally {
@@ -211,15 +211,15 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
 			 update the Budget in state and we cannot risk running into race
 			 conditions. */
     if (isAuthenticatedConfig(config)) {
-      let response: Http.BulkDeleteResponse<B> | null = null;
+      let response: Http.ServiceResponse<typeof api.bulkDeleteBudgetChildren> | null = null;
       if (ids.length !== 0) {
-        response = yield api.request(api.bulkDeleteBudgetChildren, objId, ids);
+        response = yield api.request(api.bulkDeleteBudgetChildren, objId, { ids });
       }
       if (!isNil(markupIds) && markupIds.length !== 0) {
-        response = yield api.request(api.bulkDeleteBudgetMarkups, objId, markupIds);
+        response = yield api.request(api.bulkDeleteBudgetMarkups, objId, { ids: markupIds });
       }
       if (!isNil(response)) {
-        yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
+        yield put(config.actions.updateBudgetInState({ id: response.parent.id, data: response.parent as B }));
       }
     }
   }

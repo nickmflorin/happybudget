@@ -84,12 +84,12 @@ export const createTableTaskSet = (
     M,
     Tables.ContactTableStore,
     P,
-    Http.BulkModelResponse<M>
+    Http.ChildListResponse<M>
   >({
     table: config.table,
     selectStore: config.selectStore,
-    responseActions: (r: Http.BulkModelResponse<M>, e: Table.RowAddEvent<R>) => [
-      config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.data })
+    responseActions: (r: Http.ChildListResponse<M>, e: Table.RowAddEvent<R>) => [
+      config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children })
     ],
     bulkCreate: () => [api.bulkCreateContacts]
   });
@@ -112,7 +112,7 @@ export const createTableTaskSet = (
   function* bulkDeleteTask(ids: number[], errorMessage: string): SagaIterator {
     config.table.saving(true);
     try {
-      yield api.request(api.bulkDeleteContacts, ids);
+      yield api.request(api.bulkDeleteContacts, { ids });
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, { message: errorMessage, dispatchClientErrorToSentry: true });
     } finally {
