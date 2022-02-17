@@ -18,10 +18,14 @@ export const request = <R, ARGS extends unknown[]>(service: Http.Service<R, ARGS
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
-    let config: Http.RequestOptions = { cancelToken: source.token };
+    const config: Http.RequestOptions = { cancelToken: source.token };
+    let callingArgs: ARGS = args;
     const opts = args[args.length - 1];
     if (!isNil(opts) && isProvidedRequestConfig<ARGS>(opts)) {
-      config = { ...(opts as Http.RequestOptions), ...config };
+      callingArgs = [
+        ...callingArgs.slice(0, callingArgs.length - 1),
+        { ...(opts as Http.RequestOptions), ...config }
+      ] as ARGS;
     }
 
     const handleCancel = (e: Error) => {
@@ -34,7 +38,6 @@ export const request = <R, ARGS extends unknown[]>(service: Http.Service<R, ARGS
         throw e;
       });
     };
-    const callingArgs = [...(args.slice(0, args.length - 1) as ARGS), config] as ARGS;
     try {
       return yield call(service, ...callingArgs);
     } catch (e: unknown) {
