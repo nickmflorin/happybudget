@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 
 import { budgeting } from "lib";
 
-import { AccountPage } from "app/Pages";
+import { AccountPage } from "app/Budgeting/Pages";
 
 import { selectors, actions } from "../../store";
 import SubAccountsTable from "./SubAccountsTable";
@@ -16,25 +16,25 @@ interface AccountProps {
   readonly budget: Model.Budget | null;
 }
 
-const Account = ({ id, budgetId, budget, tokenId }: AccountProps): JSX.Element => {
+const Account = (props: AccountProps): JSX.Element => {
   const dispatch = useDispatch();
   const detail = useSelector((s: Application.Store) =>
     selectors.selectAccountDetail(s, { domain: "budget", public: true })
   );
 
   useEffect(() => {
-    dispatch(actions.budget.account.requestAccountAction(id));
-  }, [id]);
+    dispatch(actions.budget.account.requestAccountAction(props.id));
+  }, [props.id]);
 
   useEffect(() => {
-    if (!isNil(budget) && !isNil(detail)) {
-      budgeting.urls.setLastVisited(budget, detail, tokenId);
+    if (!isNil(props.budget) && !isNil(detail)) {
+      budgeting.urls.setLastVisited(props.budget, detail, props.tokenId);
     }
-  }, [budget, detail]);
+  }, [props.budget, detail]);
 
   return (
-    <AccountPage budget={budget} detail={detail}>
-      <SubAccountsTable id={id} budget={budget} budgetId={budgetId} tokenId={tokenId} />
+    <AccountPage detail={detail} {...props}>
+      <SubAccountsTable {...props} />
     </AccountPage>
   );
 };

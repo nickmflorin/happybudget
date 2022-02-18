@@ -9,6 +9,7 @@ import { EntityText } from "components/typography";
 
 interface SubAccountPageProps<B extends Model.Budget | Model.Template> {
   readonly budget: B | null;
+  readonly tokenId?: string;
   readonly detail: Model.SubAccount | null;
   readonly children: React.ReactChild | React.ReactChild[];
 }
@@ -16,7 +17,8 @@ interface SubAccountPageProps<B extends Model.Budget | Model.Template> {
 const SubAccountPage = <B extends Model.Budget | Model.Template>({
   budget,
   detail,
-  children
+  children,
+  tokenId
 }: SubAccountPageProps<B>): JSX.Element => {
   return (
     <React.Fragment>
@@ -31,7 +33,7 @@ const SubAccountPage = <B extends Model.Budget | Model.Template>({
                 primary: true,
                 label: b.name,
                 tooltip: { title: "Top Sheet", placement: "bottom" },
-                url: budgeting.urls.getUrl(b)
+                url: budgeting.urls.getUrl(b, undefined, tokenId)
               })
             },
             {
@@ -46,12 +48,12 @@ const SubAccountPage = <B extends Model.Budget | Model.Template>({
                     return {
                       id: ancestor.id,
                       renderContent: () => <EntityText fillEmpty={"---------"}>{ancestor}</EntityText>,
-                      url: budgeting.urls.getUrl(b, ancestor)
+                      url: budgeting.urls.getUrl(b, ancestor, tokenId)
                     };
                   }),
                   {
                     id: subaccount.id,
-                    url: budgeting.urls.getUrl(b, subaccount),
+                    url: budgeting.urls.getUrl(b, subaccount, tokenId),
                     renderContent: () => {
                       if (!isNil(subaccount.table) && subaccount.table.length !== 0) {
                         return <EntityTextButton fillEmpty={"---------"}>{subaccount}</EntityTextButton>;

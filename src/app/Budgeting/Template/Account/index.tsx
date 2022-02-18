@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { isNil } from "lodash";
 
 import { budgeting } from "lib";
-import { AccountPage } from "app/Pages";
+import { AccountPage } from "app/Budgeting/Pages";
 
 import { actions, selectors } from "../../store";
 import SubAccountsTable from "./SubAccountsTable";

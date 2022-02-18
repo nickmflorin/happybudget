@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { isNil } from "lodash";
 
 import { budgeting } from "lib";
-import { AccountsPage } from "app/Pages";
+import { AccountsPage } from "app/Budgeting/Pages";
 import AccountsTable from "./AccountsTable";
 
 interface AccountsProps {
@@ -11,16 +11,16 @@ interface AccountsProps {
   readonly budget: Model.Budget | null;
 }
 
-const Accounts = ({ budget, budgetId, tokenId }: AccountsProps): JSX.Element => {
+const Accounts = (props: AccountsProps): JSX.Element => {
   useEffect(() => {
-    if (!isNil(budget)) {
-      budgeting.urls.setLastVisited(budget, undefined, tokenId);
+    if (!isNil(props.budget)) {
+      budgeting.urls.setLastVisited(props.budget, undefined, props.tokenId);
     }
-  }, [budget]);
+  }, [props.budget]);
 
   return (
-    <AccountsPage budget={budget}>
-      <AccountsTable budget={budget} budgetId={budgetId} tokenId={tokenId} />
+    <AccountsPage {...props}>
+      <AccountsTable {...props} />
     </AccountsPage>
   );
 };

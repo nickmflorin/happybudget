@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 
 import { budgeting } from "lib";
 
-import { AccountPage } from "app/Pages";
+import { AccountPage } from "app/Budgeting/Pages";
 
 import { selectors, actions } from "../../store";
 import SubAccountsTable from "./SubAccountsTable";

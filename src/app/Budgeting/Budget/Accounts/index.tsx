@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { isNil } from "lodash";
 
 import { budgeting } from "lib";
-import { AccountsPage } from "app/Pages";
+import { AccountsPage } from "app/Budgeting/Pages";
 import AccountsTable from "./AccountsTable";
 
 interface AccountsProps {

@@ -6,7 +6,7 @@ import { isNil, filter, reduce } from "lodash";
 import { redux, tabling } from "lib";
 import { ActualsTable, connectTableToAuthenticatedStore } from "tabling";
 
-import { ActualsPage } from "app/Pages";
+import { ActualsPage } from "app/Budgeting/Pages";
 import { actions, sagas } from "app/Budgeting/store";
 import { ActualsPreviewModal } from "app/Budgeting/Budget/PreviewModals";
 

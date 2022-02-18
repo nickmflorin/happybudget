@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
-import { AnalysisPage } from "app/Pages";
+import { AnalysisPage } from "app/Budgeting/Pages";
 
 import { actions } from "../../store";
 

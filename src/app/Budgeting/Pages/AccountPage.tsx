@@ -10,13 +10,15 @@ import { EntityText } from "components/typography";
 interface AccountPageProps<B extends Model.Budget | Model.Template> {
   readonly budget: B | null;
   readonly detail: Model.Account | null;
+  readonly tokenId?: string;
   readonly children: React.ReactChild | React.ReactChild[];
 }
 
 const AccountPage = <B extends Model.Budget | Model.Template>({
   budget,
   detail,
-  children
+  children,
+  tokenId
 }: AccountPageProps<B>): JSX.Element => {
   return (
     <React.Fragment>
@@ -31,7 +33,7 @@ const AccountPage = <B extends Model.Budget | Model.Template>({
                 primary: true,
                 label: b.name,
                 tooltip: { title: "Top Sheet", placement: "bottom" },
-                url: budgeting.urls.getUrl(b)
+                url: budgeting.urls.getUrl(b, undefined, tokenId)
               })
             },
             {
@@ -40,7 +42,7 @@ const AccountPage = <B extends Model.Budget | Model.Template>({
                 return {
                   id: account.id,
                   primary: true,
-                  url: budgeting.urls.getUrl(b, account),
+                  url: budgeting.urls.getUrl(b, account, tokenId),
                   renderContent: () => {
                     if (!isNil(account.table) && account.table.length !== 0) {
                       return <EntityTextButton fillEmpty={"---------"}>{account}</EntityTextButton>;
