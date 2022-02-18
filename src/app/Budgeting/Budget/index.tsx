@@ -84,7 +84,7 @@ const Budget = (props: BudgetProps): JSX.Element => {
           icon: <Icon weight={"light"} icon={"file-spreadsheet"} />,
           activeIcon: <Icon weight={"solid"} icon={"file-spreadsheet"} />,
           onClick: () => {
-            if (!budgeting.urls.isBudgetRelatedUrl(location.pathname)) {
+            if (!budgeting.urls.isBudgetRelatedUrl(location.pathname, props.budgetId)) {
               const budgetLastVisited = budgeting.urls.getLastVisited("budget", props.budgetId);
               if (!isNil(budgetLastVisited)) {
                 history.push(budgetLastVisited);
@@ -93,7 +93,7 @@ const Budget = (props: BudgetProps): JSX.Element => {
               }
             }
           },
-          active: budgeting.urls.isBudgetRelatedUrl(location.pathname),
+          active: budgeting.urls.isBudgetRelatedUrl(location.pathname, props.budgetId),
           tooltip: {
             title: "Budget",
             placement: "right"
