@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 import { Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
-import { Form } from "components";
+import { Form, ShowHide } from "components";
 import { PrimaryButton, DangerButton } from "components/buttons";
 import { PublicUrlInput, DatePicker } from "components/fields";
 
@@ -43,9 +43,11 @@ const EditPublicTokenForm = ({ onDelete, urlFormatter, disabled, ...props }: Edi
           onChange={(e: CheckboxChangeEvent) => setAutoExpire(e.target.checked)}
         />
       </Form.Item>
-      <Form.Item name={"expires_at"} horizontalLayoutOverride={true}>
-        <DatePicker disabled={!autoExpire} dateFormat={"dd/MM/yyyy"} />
-      </Form.Item>
+      <ShowHide show={autoExpire}>
+        <Form.Item name={"expires_at"} horizontalLayoutOverride={true}>
+          <DatePicker disabled={!autoExpire} dateFormat={"dd/MM/yyyy"} />
+        </Form.Item>
+      </ShowHide>
       <Form.Footer>
         <PrimaryButton
           size={"small"}
