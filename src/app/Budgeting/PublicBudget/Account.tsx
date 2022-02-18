@@ -6,8 +6,9 @@ import { createSelector } from "reselect";
 import { tabling, budgeting } from "lib";
 import { connectTableToPublicStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
 
-import { actions, selectors, sagas } from "../../store";
-import FringesModal from "../FringesModal";
+import { AccountPage } from "../Pages";
+import { actions, selectors, sagas } from "../store";
+import FringesModal from "./FringesModal";
 
 type M = Model.SubAccount;
 type R = Tables.SubAccountRowData;
@@ -50,14 +51,14 @@ const ConnectedTable = connectTableToPublicStore<
   }
 })(GenericSubAccountsTable.PublicBudget);
 
-interface SubAccountsTableProps {
+interface AccountProps {
   readonly id: number;
   readonly budgetId: number;
   readonly tokenId: string;
   readonly budget: Model.Budget | null;
 }
 
-const SubAccountsTable = (props: SubAccountsTableProps): JSX.Element => {
+const Account = (props: AccountProps): JSX.Element => {
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
   const fringesTable = tabling.hooks.useTable<Tables.FringeRowData, Model.Fringe>();
 
@@ -69,11 +70,21 @@ const SubAccountsTable = (props: SubAccountsTableProps): JSX.Element => {
   const table = tabling.hooks.useTable<Tables.SubAccountRowData, Model.SubAccount>();
 
   useEffect(() => {
+    dispatch(actions.budget.account.requestAccountAction(props.id));
+  }, [props.id]);
+
+  useEffect(() => {
+    if (!isNil(props.budget) && !isNil(account)) {
+      budgeting.urls.setLastVisited(props.budget, account, props.tokenId);
+    }
+  }, [props.budget, account]);
+
+  useEffect(() => {
     dispatch(actions.pub.account.requestAction(null, { id: props.id, budgetId: props.budgetId }));
   }, [props.id, props.budgetId]);
 
   return (
-    <React.Fragment>
+    <AccountPage detail={account} {...props}>
       <ConnectedTable
         {...props}
         parent={account}
@@ -89,8 +100,8 @@ const SubAccountsTable = (props: SubAccountsTableProps): JSX.Element => {
         parentType={"account"}
         onCancel={() => setFringesModalVisible(false)}
       />
-    </React.Fragment>
+    </AccountPage>
   );
 };
 
-export default SubAccountsTable;
+export default Account;

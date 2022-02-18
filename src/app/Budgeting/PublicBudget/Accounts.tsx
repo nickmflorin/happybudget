@@ -6,7 +6,8 @@ import { isNil } from "lodash";
 import { budgeting, tabling } from "lib";
 import { AccountsTable as GenericAccountsTable, connectTableToPublicStore } from "tabling";
 
-import { actions, selectors, sagas } from "../../store";
+import { AccountsPage } from "../Pages";
+import { actions, selectors, sagas } from "../store";
 
 type R = Tables.AccountRowData;
 type M = Model.Account;
@@ -39,21 +40,37 @@ const ConnectedTable = connectTableToPublicStore<
   }
 })(GenericAccountsTable.PublicBudget);
 
-interface AccountsTableProps {
+interface AccountsProps {
   readonly budgetId: number;
   readonly tokenId: string;
   readonly budget: Model.Budget | null;
 }
 
-const AccountsTable = ({ budgetId, budget, tokenId }: AccountsTableProps): JSX.Element => {
+const Accounts = (props: AccountsProps): JSX.Element => {
   const dispatch = useDispatch();
   const table = tabling.hooks.useTable<R, M>();
 
   useEffect(() => {
-    dispatch(actions.budget.accounts.requestAction(null, { budgetId }));
-  }, [budgetId]);
+    if (!isNil(props.budget)) {
+      budgeting.urls.setLastVisited(props.budget, undefined, props.tokenId);
+    }
+  }, [props.budget]);
 
-  return <ConnectedTable id={budgetId} parent={budget} actionContext={{ budgetId }} table={table} tokenId={tokenId} />;
+  useEffect(() => {
+    dispatch(actions.budget.accounts.requestAction(null, { budgetId: props.budgetId }));
+  }, [props.budgetId]);
+
+  return (
+    <AccountsPage {...props}>
+      <ConnectedTable
+        id={props.budgetId}
+        parent={props.budget}
+        actionContext={{ budgetId: props.budgetId }}
+        table={table}
+        tokenId={props.tokenId}
+      />
+    </AccountsPage>
+  );
 };
 
-export default AccountsTable;
+export default Accounts;
