@@ -1,3 +1,4 @@
+import React from "react";
 import { ui } from "lib";
 
 import { ButtonProps } from "./Button";
@@ -24,4 +25,4 @@ const DefaultButtonIconToggle = ({
   return <DefaultButton {...props}>{children}</DefaultButton>;
 };
 
-export default DefaultButtonIconToggle;
+export default React.memo(DefaultButtonIconToggle);

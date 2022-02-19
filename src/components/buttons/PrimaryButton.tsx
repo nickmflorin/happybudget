@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 import Button, { ButtonProps } from "./Button";
 
@@ -7,4 +8,4 @@ const PrimaryButton = (props: PrimaryButtonProps): JSX.Element => (
   <Button {...props} className={classNames("btn--primary", props.className)} />
 );
 
-export default PrimaryButton;
+export default React.memo(PrimaryButton);

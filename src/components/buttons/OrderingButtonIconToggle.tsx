@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { find } from "lodash";
 
 import { Icon, OrderingArrowIcon } from "components";
@@ -37,4 +37,4 @@ const OrderingButtonIconToggle = ({ ordering, labelMap, ...props }: OrderingButt
   );
 };
 
-export default OrderingButtonIconToggle;
+export default React.memo(OrderingButtonIconToggle);

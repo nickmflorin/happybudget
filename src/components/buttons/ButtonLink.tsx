@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 import Button, { ButtonProps } from "./Button";
 
@@ -14,4 +15,4 @@ const ButtonLink = ({ className, children, spinnerProps, ...props }: ButtonProps
   </Button>
 );
 
-export default ButtonLink;
+export default React.memo(ButtonLink);

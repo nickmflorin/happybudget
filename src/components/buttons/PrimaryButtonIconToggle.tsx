@@ -1,3 +1,4 @@
+import React from "react";
 import { ui } from "lib";
 
 import { ButtonProps } from "./Button";
@@ -22,4 +23,4 @@ const PrimaryButtonIconToggle = ({ icon, breakpoint, text, ...props }: PrimaryBu
   );
 };
 
-export default PrimaryButtonIconToggle;
+export default React.memo(PrimaryButtonIconToggle);

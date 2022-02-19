@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 import Button, { ButtonProps } from "./Button";
 
@@ -7,4 +8,4 @@ const BareButton = (props: BareButtonProps): JSX.Element => (
   <Button {...props} className={classNames("btn--bare", props.className)} />
 );
 
-export default BareButton;
+export default React.memo(BareButton);

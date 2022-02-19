@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 import Button, { ButtonProps } from "./Button";
 
@@ -7,4 +8,4 @@ const DefaultIconButton = (props: DefaultIconButtonProps): JSX.Element => (
   <Button {...props} className={classNames("btn--default-icon-only", props.className)} />
 );
 
-export default DefaultIconButton;
+export default React.memo(DefaultIconButton);

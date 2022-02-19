@@ -1,3 +1,4 @@
+import React from "react";
 import { Icon } from "components";
 import IconButton, { IconButtonProps } from "./IconButton";
 
@@ -12,4 +13,4 @@ const ImageClearButton = (props: Omit<IconButtonProps, "size" | "icon">): JSX.El
   );
 };
 
-export default ImageClearButton;
+export default React.memo(ImageClearButton);

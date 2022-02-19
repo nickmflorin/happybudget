@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
 import { isNil } from "lodash";
 import { GoogleAuthButton } from "components/buttons";
@@ -56,4 +56,4 @@ const SocialButton = (props: SocialButtonProps): JSX.Element => {
   return <></>;
 };
 
-export default SocialButton;
+export default React.memo(SocialButton);

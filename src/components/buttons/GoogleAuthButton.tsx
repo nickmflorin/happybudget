@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 import { GoogleIcon } from "components/svgs";
 import Button, { ButtonProps } from "./Button";
@@ -21,4 +22,4 @@ const GoogleAuthButton = ({ children, ...props }: GoogleAuthButtonProps): JSX.El
   );
 };
 
-export default GoogleAuthButton;
+export default React.memo(GoogleAuthButton);
