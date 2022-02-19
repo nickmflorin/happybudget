@@ -26,6 +26,7 @@ const CommunityTemplateCard = ({ budget, loading, ...props }: CommunityTemplateC
       {...props}
       className={classNames("community-template-card", props.className)}
       title={budget.name}
+      tourId={budget.name.replace(" ", "").toLowerCase()}
       loading={loading}
       image={budget.image}
     />

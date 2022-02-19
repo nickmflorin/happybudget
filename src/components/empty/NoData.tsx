@@ -14,21 +14,19 @@ interface NoDataProps extends StandardComponentProps {
   readonly icon?: IconOrElement;
 }
 
-const NoData = ({ title, subTitle, button, icon, children, ...props }: NoDataProps): JSX.Element => {
-  return (
-    <div {...props} className={classNames("no-data", props.className)}>
-      <div className={"no-data-content"}>
-        {children}
-        {!isNil(title) && <h1>{title}</h1>}
-        {!isNil(subTitle) && <p>{subTitle}</p>}
-        {!isNil(button) && (
-          <PrimaryButton style={{ marginTop: 20 }} icon={icon} onClick={() => button.onClick?.()}>
-            {button.text}
-          </PrimaryButton>
-        )}
-      </div>
+const NoData = ({ title, subTitle, button, icon, children, ...props }: NoDataProps): JSX.Element => (
+  <div {...props} className={classNames("no-data", props.className)}>
+    <div className={"no-data-content"}>
+      {children}
+      {!isNil(title) && <h1>{title}</h1>}
+      {!isNil(subTitle) && <p>{subTitle}</p>}
+      {!isNil(button) && (
+        <PrimaryButton style={{ marginTop: 20 }} icon={icon} onClick={() => button.onClick?.()}>
+          {button.text}
+        </PrimaryButton>
+      )}
     </div>
-  );
-};
+  </div>
+);
 
 export default React.memo(NoData);

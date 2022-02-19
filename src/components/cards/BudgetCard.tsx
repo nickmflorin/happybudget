@@ -50,6 +50,7 @@ const BudgetCard = ({
   return (
     <Card
       {...props}
+      tourId={budget.name}
       cornerActions={(iconClassName: string) => [
         {
           render: () => (

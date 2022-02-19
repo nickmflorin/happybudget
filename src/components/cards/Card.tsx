@@ -27,6 +27,12 @@ export type CardProps = StandardComponentProps & {
   readonly image: SavedImage | null;
   readonly loading?: boolean;
   readonly disabled?: boolean;
+  /* When providing users with a tour, we often need to link directly to the
+     card based on the entity it is showing.  This attribute is attributed to
+     the <div> element such that the `tour-id` attribute can be accessed via
+     the touring software. Note that it is not necessarily guaranteed to be
+		 unique. */
+  readonly tourId?: string;
   readonly cornerActions?: (iconClassName: string) => CardCornerAction[];
   readonly onClick?: () => void;
 };
@@ -35,11 +41,12 @@ const Card = ({
   title,
   subTitle,
   dropdown,
-  onClick,
   loading,
   disabled,
   image,
+  tourId,
   cornerActions,
+  onClick,
   ...props
 }: CardProps): JSX.Element => {
   const [imageError, setImageError] = useState(false);
@@ -51,8 +58,20 @@ const Card = ({
     return "";
   }, [image, imageError]);
 
+  const divProps = useMemo(() => {
+    const Props = {
+      ...props,
+      "data-tour-id": tourId,
+      className: classNames("card", props.className, { disabled: loading || disabled, loading })
+    };
+    if (!isNil(tourId)) {
+      return { ...Props, "data-tour-id": tourId.replace(" ", "").toLowerCase() };
+    }
+    return Props;
+  }, [props, tourId]);
+
   return (
-    <div {...props} className={classNames("card", props.className, { disabled: loading || disabled, loading })}>
+    <div {...divProps}>
       {!isNil(cornerActions) && (
         <div className={"card-corner-actions"}>
           {map(cornerActions(iconClassName), (action: CardCornerAction, index: number) => {

@@ -54,6 +54,7 @@ const CommunityTemplateStaffCard = ({
   return (
     <Card
       {...props}
+      tourId={budget.name}
       className={classNames("community-template-admin-card", props.className, { hidden: budget.hidden })}
       cornerActions={(iconClassName: string) => [
         {

@@ -48,6 +48,7 @@ const TemplateCard = ({
       {...props}
       className={classNames("template-card", props.className)}
       title={template.name}
+      tourId={template.name}
       image={template.image}
       dropdown={[
         {
