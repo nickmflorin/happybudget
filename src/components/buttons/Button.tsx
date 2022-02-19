@@ -1,26 +1,30 @@
 import React, { useState, useMemo, forwardRef, ForwardedRef } from "react";
 import classNames from "classnames";
+import { isNil } from "lodash";
+
 import { Button as AntDButton } from "antd";
 import { ButtonProps as AntDButtonProps } from "antd/lib/button";
 
-import { isNil } from "lodash";
-
 import { ui } from "lib";
+
 import { Spinner, ShowHide, Icon, VerticalFlexCenter } from "components";
+import { withSize } from "components/hocs";
 import { TooltipWrapper } from "components/tooltips";
 import { SpinnerProps } from "components/loading/Spinner";
 
-export interface ButtonProps
-  extends Omit<AntDButtonProps, "disabled" | "icon" | "size" | StandardComponentPropNames>,
-    ClickableProps,
-    StandardComponentProps,
-    UseSizeProps<"small" | "medium" | "large"> {
-  readonly loading?: boolean;
-  readonly showLoadingIndicatorOverIcon?: boolean;
-  readonly withDropdownCaret?: boolean;
-  readonly dropdownCaretState?: "open" | "closed" | undefined;
-  readonly spinnerProps?: SpinnerProps;
-}
+type ButtonSize = "small" | "medium" | "large";
+
+type PrivateButtonProps = Omit<AntDButtonProps, "disabled" | "icon" | "size" | keyof StandardComponentProps> &
+  ClickableProps &
+  StandardComponentProps & {
+    readonly loading?: boolean;
+    readonly showLoadingIndicatorOverIcon?: boolean;
+    readonly withDropdownCaret?: boolean;
+    readonly dropdownCaretState?: "open" | "closed" | undefined;
+    readonly spinnerProps?: SpinnerProps;
+  };
+
+export type ButtonProps = PrivateButtonProps & UseSizeProps<ButtonSize>;
 
 /**
  * A consistently styled Button component for consistently styled and themed
@@ -38,12 +42,8 @@ const Button = (
     withDropdownCaret,
     dropdownCaretState,
     spinnerProps,
-    size,
-    small,
-    medium,
-    large,
     ...props
-  }: ButtonProps,
+  }: PrivateButtonProps,
   ref: ForwardedRef<HTMLButtonElement>
 ): JSX.Element => {
   const isDisabled = useMemo(() => disabled === true && isNil(tooltip), [disabled, tooltip]);
@@ -55,7 +55,6 @@ const Button = (
   const [isHovered, setIsHovered] = useState(false);
 
   const iC = ui.hooks.useClickableIcon(icon, { isHovered });
-  const _size = ui.hooks.useSize({ options: ["small", "medium", "large"] }, { size, small, medium, large });
 
   const prefix = useMemo(() => {
     if (isNil(iC)) {
@@ -94,7 +93,7 @@ const Button = (
         {...props}
         ref={ref}
         onClick={(e: React.MouseEvent<HTMLButtonElement>) => !isFakeDisabled && props.onClick?.(e)}
-        className={classNames("btn", _size, className, {
+        className={classNames("btn", className, {
           disabled: isDisabled,
           "fake-disabled": isFakeDisabled
         })}
@@ -112,4 +111,4 @@ const Button = (
   );
 };
 
-export default React.memo(forwardRef(Button));
+export default withSize<ButtonProps, ButtonSize>(["small", "medium", "large"])(React.memo(forwardRef(Button)));

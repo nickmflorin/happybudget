@@ -96,7 +96,7 @@ const TableMenu = <
         {rightActions.length !== 0 && <ToolbarComponent actions={rightActions} {...props.menuActionParams} />}
         <ShowHide show={!isNil(props.search)}>
           <SearchInput
-            small={true}
+            size={"medium"}
             placeholder={"Search Rows"}
             value={props.search}
             style={{ maxWidth: 350, minWidth: 220 }}

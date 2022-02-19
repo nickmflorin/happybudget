@@ -1,31 +1,19 @@
-import { forwardRef, ForwardedRef } from "react";
+import React from "react";
 import classNames from "classnames";
 
 import { EntityText } from "components/typography";
 import { EntityTextProps } from "components/typography/EntityText";
 import Button, { ButtonProps } from "./Button";
 
-export interface EntityTextButtonProps
-  extends Omit<EntityTextProps, "className" | "style">,
-    Omit<ButtonProps, "children"> {
-  fillEmpty?: string;
-  onClick?: () => void;
-}
+export type EntityTextButtonProps = Omit<EntityTextProps, "className" | "style"> &
+  Omit<ButtonProps, "children"> & {
+    readonly fillEmpty?: string;
+  };
 
-const EntityTextButton = (
-  { children, fillEmpty, ...props }: EntityTextButtonProps,
-  ref: ForwardedRef<HTMLButtonElement>
-): JSX.Element => {
-  return (
-    <Button
-      {...props}
-      ref={ref}
-      className={classNames("btn--bare btn--entity-text", props.className)}
-      withDropdownCaret={true}
-    >
-      <EntityText fillEmpty={fillEmpty}>{children}</EntityText>
-    </Button>
-  );
-};
+const EntityTextButton = ({ children, fillEmpty, ...props }: EntityTextButtonProps): JSX.Element => (
+  <Button {...props} className={classNames("btn--bare btn--entity-text", props.className)} withDropdownCaret={true}>
+    <EntityText fillEmpty={fillEmpty}>{children}</EntityText>
+  </Button>
+);
 
-export default forwardRef(EntityTextButton);
+export default React.memo(EntityTextButton);

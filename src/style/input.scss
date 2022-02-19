@@ -86,6 +86,11 @@ input:focus-visible {
 	font-size: 13px;
 }
 
+.input-medium-base {
+	line-height: 18px !important;
+	font-size: 13px !important;
+}
+
 .input-small-base {
 	line-height: 16px !important;
 	font-size: 12px !important;
@@ -110,6 +115,20 @@ input:focus-visible {
 
 	input {
 		@extend .input-base;
+	}
+
+	&--medium {
+		@extend .input-medium-base;
+		padding-top: 7px !important;
+		padding-bottom: 7px !important;
+		padding-left: 8px !important;
+		padding-right: 8px !important;
+		border-radius: $input-small-border-radius !important;
+		height: 30px;
+
+		input {
+			@extend .input-medium-base;
+		}
 	}
 
 	&--small {
