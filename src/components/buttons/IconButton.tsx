@@ -30,5 +30,6 @@ const IconButton = ({ icon, fill, outersize, ...props }: PrivateIconButtonProps)
 );
 
 export default withSize<IconButtonProps, IconButtonSize>(["small", "medium", "large", "xsmall", "xxsmall"], {
-  default: "large"
+  default: "large",
+  hasRef: false
 })(React.memo(IconButton));

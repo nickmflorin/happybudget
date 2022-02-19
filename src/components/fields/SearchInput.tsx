@@ -17,5 +17,4 @@ const SearchInput = (props: SearchInputProps, ref: React.ForwardedRef<AntDInput>
   />
 );
 
-const ForwardRefInput = forwardRef(SearchInput);
-export default React.memo(ForwardRefInput);
+export default forwardRef(SearchInput);

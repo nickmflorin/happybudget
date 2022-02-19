@@ -1,5 +1,4 @@
-import React from "react";
-import hoistNonReactStatics from "hoist-non-react-statics";
+import React, { forwardRef, ForwardedRef, ReactNode } from "react";
 import classNames from "classnames";
 
 import { ui } from "lib";
@@ -8,15 +7,26 @@ import { isNil } from "lodash";
 type WithSizeConfig<S extends string> = {
   readonly default?: S;
   readonly classNamePrefix?: string;
+  readonly hasRef?: boolean;
 };
 
 export const withSize =
-  <T extends { readonly className?: string }, S extends string, CT extends T & UseSizeProps<S> = T & UseSizeProps<S>>(
+  <
+    T extends { readonly className?: string; readonly children?: ReactNode; readonly ref?: ForwardedRef<REF> },
+    S extends string,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    REF = any,
+    CT extends T & UseSizeProps<S> = T & UseSizeProps<S>
+  >(
     options: S[],
     conf?: WithSizeConfig<S>
   ) =>
-  (Component: React.FunctionComponent<T>): React.FunctionComponent<CT> => {
-    const WithSize = (props: CT): JSX.Element => {
+  (
+    Component: React.FunctionComponent<T>
+  ): typeof conf extends { readonly hasRef: true }
+    ? React.ForwardRefRenderFunction<REF, CT & { readonly ref?: ForwardedRef<REF> }>
+    : React.FunctionComponent<CT> => {
+    const WithSize = (props: CT & { readonly forwardedRef?: ForwardedRef<REF> }): JSX.Element => {
       const _size = ui.hooks.useSize({ options, default: conf?.default }, props);
 
       let injectedProps = { ...props };
@@ -30,7 +40,16 @@ export const withSize =
         : undefined;
       injectedProps = { ...injectedProps, className: classNames(props.className, sizeClassName) };
 
-      return <Component {...injectedProps} />;
+      const { forwardedRef, ...rest } = injectedProps;
+      if (!isNil(forwardedRef)) {
+        return <Component ref={forwardedRef} {...(rest as CT)} />;
+      }
+      return <Component {...(rest as CT)} />;
     };
-    return hoistNonReactStatics(WithSize, Component);
+    if (conf?.hasRef === true) {
+      return forwardRef((props: CT, ref: ForwardedRef<REF>) => (
+        <WithSize {...props} forwardedRef={ref} />
+      )) as React.ForwardRefRenderFunction<REF, CT & { readonly ref?: ForwardedRef<REF> }>;
+    }
+    return WithSize;
   };

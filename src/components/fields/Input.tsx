@@ -16,6 +16,10 @@ const Input = (props: PrivateInputProps, ref: React.ForwardedRef<AntDInput>): JS
   <AntDInput {...props} ref={ref} className={classNames("input", props.className)} />
 );
 
-export default withSize<InputProps, "small" | "medium" | "large">(["small", "medium", "large"], {
-  classNamePrefix: "input--"
-})(React.memo(forwardRef(Input)));
+export default withSize<InputProps, "small" | "medium" | "large", AntDInput>(["small", "medium", "large"], {
+  classNamePrefix: "input--",
+  hasRef: true
+})(forwardRef(Input)) as React.ForwardRefRenderFunction<
+  AntDInput,
+  PrivateInputProps & { readonly ref?: React.ForwardedRef<AntDInput> }
+>;

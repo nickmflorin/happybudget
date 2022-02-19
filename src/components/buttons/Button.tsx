@@ -111,4 +111,4 @@ const Button = (
   );
 };
 
-export default withSize<ButtonProps, ButtonSize>(["small", "medium", "large"])(React.memo(forwardRef(Button)));
+export default withSize<ButtonProps, ButtonSize>(["small", "medium", "large"], { hasRef: true })(forwardRef(Button));
