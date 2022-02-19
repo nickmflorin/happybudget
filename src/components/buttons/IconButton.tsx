@@ -7,7 +7,7 @@ import Button, { ButtonProps } from "./Button";
 
 type IconButtonSize = "small" | "medium" | "large" | "xsmall" | "xxsmall";
 
-type PrivateIconButtonProps = Omit<ButtonProps, "icon" | "children"> & {
+type PrivateIconButtonProps = Omit<ButtonProps, "icon" | "children" | "size"> & {
   readonly icon: IconOrElement | ((params: ClickableIconCallbackParams) => IconOrElement);
   readonly fill?: boolean;
   readonly outersize?: number;
@@ -18,7 +18,7 @@ export type IconButtonProps = PrivateIconButtonProps & UseSizeProps<IconButtonSi
 /**
  * A consistently styled Button component for buttons that contain just an Icon.
  */
-const IconButton = ({ icon, fill, outersize, ...props }: IconButtonProps): JSX.Element => (
+const IconButton = ({ icon, fill, outersize, ...props }: PrivateIconButtonProps): JSX.Element => (
   <Button
     {...props}
     icon={icon}
