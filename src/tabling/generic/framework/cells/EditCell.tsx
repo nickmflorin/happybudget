@@ -12,7 +12,7 @@ export interface EditCellProps<
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > extends Table.CellProps<R, M, S, null, Table.ActionColumn<R, M>> {
-  readonly editColumnConfig: Table.EditColumnRowConfig<R>[];
+  readonly editColumnConfig: Table.EditColumnRowConfig<R, Table.NonPlaceholderBodyRow<R>>[];
   readonly alwaysShow?: (row: Table.BodyRow<R>) => boolean;
 }
 
@@ -20,7 +20,7 @@ const Action = <
   R extends Table.RowData,
   RW extends Table.NonPlaceholderBodyRow<R> = Table.NonPlaceholderBodyRow<R>
 >(props: {
-  readonly config: Table.EditColumnRowConfig<R>;
+  readonly config: Table.EditColumnRowConfig<R, RW>;
   readonly hovered: boolean;
   readonly row: RW;
   readonly iconStyle?: React.CSSProperties;
@@ -42,15 +42,6 @@ const Action = <
     return false;
   }, [props.config.disabled, props.row]);
 
-  const hidden = useMemo(() => {
-    if (!isNil(props.config.hidden)) {
-      return typeof props.config.hidden === "function"
-        ? props.config.hidden(props.row, props.hovered)
-        : props.config.hidden;
-    }
-    return false;
-  }, [props.config.hidden, props.row]);
-
   const tooltip = useMemo(() => {
     if (!isNil(props.config.tooltip)) {
       return typeof props.config.tooltip === "function"
@@ -64,9 +55,6 @@ const Action = <
     return defaultTooltipMap[props.config.behavior];
   }, [props.config.behavior, props.config.tooltip, disabled, props.row]);
 
-  if (hidden) {
-    return <span></span>;
-  }
   return (
     <IconButton
       className={classNames("ag-grid-action-button", {
@@ -93,15 +81,8 @@ const EditCell = <
   // This cell renderer will only be allowed if the row is of type model.
   const row: Table.EditableRow<R> = node.data;
 
-  const config: Table.EditColumnRowConfig<R> | null = useMemo(() => {
-    let cfg: Table.EditColumnRowConfig<R> | null = null;
-    for (let i = 0; i < editColumnConfig.length; i++) {
-      if (editColumnConfig[i].conditional(row)) {
-        cfg = editColumnConfig[i];
-        break;
-      }
-    }
-    return cfg;
+  const config: Table.EditColumnRowConfig<R, Table.NonPlaceholderBodyRow<R>> | null = useMemo(() => {
+    return tabling.columns.getEditColumnRowConfig<R, Table.NonPlaceholderBodyRow<R>>(editColumnConfig, row);
   }, [row.rowType]);
 
   const rowIsHovered = () => {

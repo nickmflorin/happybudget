@@ -4,18 +4,33 @@ import { find, isNil, reduce, filter, orderBy, map } from "lodash";
 import * as Models from "./models";
 import * as typeguards from "./typeguards";
 
+export const editColumnRowConfigIsApplicable = <R extends Table.RowData, RW extends Table.NonPlaceholderBodyRow<R>>(
+  c: Table.EditColumnRowConfig<R, RW>,
+  row: Table.NonPlaceholderBodyRow<R>,
+  behavior?: Table.EditRowActionBehavior
+): boolean => {
+  let condition = c.typeguard(row);
+  if (!isNil(behavior)) {
+    condition = condition && c.behavior === behavior;
+  }
+  if (!isNil(c.conditional)) {
+    condition = condition && c.conditional(row as RW);
+  }
+  return condition;
+};
+
 export const getEditColumnRowConfig = <
   R extends Table.RowData,
   RW extends Table.NonPlaceholderBodyRow<R> = Table.NonPlaceholderBodyRow<R>
 >(
-  config: Table.EditColumnRowConfig<R, RW>[],
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  config: Table.EditColumnRowConfig<R, any>[],
   row: RW,
   behavior?: Table.EditRowActionBehavior
 ): Table.EditColumnRowConfig<R, RW> | null => {
-  const filt = !isNil(behavior)
-    ? (c: Table.EditColumnRowConfig<R, RW>) => c.conditional(row) && c.behavior === behavior
-    : (c: Table.EditColumnRowConfig<R, RW>) => c.conditional(row);
-  const filtered = filter(config, filt);
+  const filtered = filter(config, (c: Table.EditColumnRowConfig<R, any>) =>
+    editColumnRowConfigIsApplicable(c, row, behavior)
+  );
   return filtered.length !== 0 ? filtered[0] : null;
 };
 

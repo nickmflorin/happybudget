@@ -7,7 +7,8 @@ import { tabling, hooks, util } from "lib";
 export type UseContextMenuParams<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
   readonly apis: Table.GridApis | null;
   readonly data: Table.BodyRow<R>[];
-  readonly editColumnConfig?: Table.EditColumnRowConfig<R>[];
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  readonly editColumnConfig?: Table.EditColumnRowConfig<R, any>[];
   readonly getModelRowLabel?: Table.RowStringGetter<Table.DataRow<R>>;
   readonly getModelRowName?: Table.RowStringGetter<Table.DataRow<R>>;
   readonly getGroupRowLabel?: Table.RowStringGetter<Table.GroupRow<R>>;

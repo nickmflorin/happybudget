@@ -25,23 +25,29 @@ const AuthenticatedBudgetTable = <
 }: AuthenticatedBudgetTableProps<R, M, S>): JSX.Element => (
   <AuthenticatedTable
     {...props}
-    editColumnConfig={[
-      {
-        conditional: (r: Table.NonPlaceholderBodyRow<R>) => tabling.typeguards.isMarkupRow(r),
-        action: (r: Table.MarkupRow<R>) => onEditMarkup?.(r),
-        behavior: "edit"
-      },
-      {
-        conditional: (r: Table.NonPlaceholderBodyRow<R>) => tabling.typeguards.isGroupRow(r),
-        action: (r: Table.GroupRow<R>) => onEditGroup?.(r),
-        behavior: "edit"
-      },
-      {
-        conditional: (r: Table.NonPlaceholderBodyRow<R>) => tabling.typeguards.isModelRow(r),
-        action: (r: Table.ModelRow<R>) => onRowExpand?.(r),
-        behavior: "expand"
-      }
-    ]}
+    editColumnConfig={
+      [
+        {
+          typeguard: tabling.typeguards.isMarkupRow,
+          action: (r: Table.MarkupRow<R>) => onEditMarkup?.(r),
+          behavior: "edit"
+        },
+        {
+          typeguard: tabling.typeguards.isGroupRow,
+          action: (r: Table.GroupRow<R>) => onEditGroup?.(r),
+          behavior: "edit"
+        },
+        {
+          typeguard: tabling.typeguards.isModelRow,
+          action: (r: Table.ModelRow<R>) => onRowExpand?.(r),
+          behavior: "expand"
+        }
+      ] as [
+        Table.EditColumnRowConfig<R, Table.MarkupRow<R>>,
+        Table.EditColumnRowConfig<R, Table.GroupRow<R>>,
+        Table.EditColumnRowConfig<R, Table.ModelRow<R>>
+      ]
+    }
     framework={tabling.aggrid.combineFrameworks(Framework, props.framework)}
   />
 );

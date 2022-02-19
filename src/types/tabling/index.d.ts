@@ -441,12 +441,11 @@ declare namespace Table {
 
   type HiddenColumns = { [key: string]: boolean };
 
-  type EditColumnRowConfig<R extends RowData, RW extends NonPlaceholderBodyRow<R> = NonPlaceholderBodyRow<R>> = {
-    readonly conditional: (row: RW) => boolean;
-    readonly hidden?: (row: RW, hovered: boolean) => boolean;
+  type EditColumnRowConfig<R extends RowData = RowData, RW extends NonPlaceholderBodyRow<R>> = {
+    readonly typeguard: (row: NonPlaceholderBodyRow<R>) => row is RW;
+    readonly conditional?: (row: RW) => boolean;
     readonly behavior: EditRowActionBehavior;
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    readonly action: (row: any, hovered: boolean) => void;
+    readonly action: (row: RW, hovered: boolean) => void;
     readonly tooltip?: string | ((row: RW, params: { hovered: boolean; disabled: boolean }) => string);
     readonly disabled?: boolean | ((row: RW, hovered: boolean) => boolean);
   };

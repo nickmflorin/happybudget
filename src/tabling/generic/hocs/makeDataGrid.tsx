@@ -23,7 +23,8 @@ export type DataGridProps<
   readonly rowClass?: Table.RowClassName;
   readonly columns: Table.Column<R, M>[];
   readonly search?: string;
-  readonly editColumnConfig?: Table.EditColumnRowConfig<R>[];
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  readonly editColumnConfig?: Table.EditColumnRowConfig<R, any>[];
   readonly onBack?: () => void;
   readonly onLeft?: () => void;
   readonly onRight?: () => void;
@@ -266,6 +267,9 @@ const DataGrid = <
       if (e.key === "ArrowDown" && ctrlCmdPressed) {
         const focusedRow = tabling.aggrid.getFocusedRow<R>(localApi);
         if (!isNil(focusedRow) && !isNil(props.editColumnConfig) && !tabling.typeguards.isPlaceholderRow(focusedRow)) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          e.stopPropagation();
           const expandConfig = tabling.columns.getEditColumnRowConfig<R>(props.editColumnConfig, focusedRow, "expand");
           if (!isNil(expandConfig)) {
             expandConfig.action(focusedRow, false);
@@ -277,6 +281,7 @@ const DataGrid = <
     const moveUpKeyListener = hooks.useDynamicCallback((localApi: Table.GridApi, e: KeyboardEvent) => {
       const ctrlCmdPressed = e.ctrlKey || e.metaKey;
       if (e.key === "ArrowUp" && ctrlCmdPressed) {
+        e.preventDefault();
         props.onBack?.();
       }
     });

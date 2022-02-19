@@ -21,13 +21,16 @@ const PublicBudgetTable = <
 }: PublicBudgetTableProps<R, M, S>): JSX.Element => (
   <PublicTable<R, M, S>
     {...props}
-    editColumnConfig={[
-      {
-        conditional: (r: Table.NonPlaceholderBodyRow<R>) => tabling.typeguards.isModelRow(r),
-        action: (r: Table.ModelRow<R>) => onRowExpand?.(r),
-        behavior: "expand"
-      }
-    ]}
+    editColumnConfig={
+      [
+        {
+          typeguard: tabling.typeguards.isModelRow,
+          action: (r: Table.ModelRow<R>) => onRowExpand?.(r),
+          behavior: "expand",
+          conditional: (r: Table.ModelRow<R>) => r.children.length !== 0
+        }
+      ] as [Table.EditColumnRowConfig<R, Table.ModelRow<R>>]
+    }
     framework={tabling.aggrid.combineFrameworks(Framework, props.framework)}
   />
 );

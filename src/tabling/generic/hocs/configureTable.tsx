@@ -56,7 +56,8 @@ export type TableConfigurationProps<R extends Table.RowData, M extends Model.Row
   readonly hideEditColumn?: boolean;
   readonly editColumn?: Table.PartialActionColumn<R, M>;
   readonly editColumnWidth?: number;
-  readonly editColumnConfig?: Table.EditColumnRowConfig<R>[];
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  readonly editColumnConfig?: Table.EditColumnRowConfig<R, any>[];
   readonly pinFirstColumn?: boolean;
   readonly pinActionColumns?: boolean;
   readonly sizeToFit?: boolean;

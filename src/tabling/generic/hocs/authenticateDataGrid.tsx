@@ -403,8 +403,8 @@ const authenticateDataGrid = <
                 }
               } else if (
                 /* We need to suppress CMD + Arrow KeyboardEvent(s) because this
-                     is how we navigate through the nested/sibling tables in the
-                     BudgetTable case. */
+                   is how we navigate through the nested/sibling tables in the
+                   BudgetTable case. */
                 includes(["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"], params.event.key) &&
                 (params.event.ctrlKey || params.event.metaKey)
               ) {

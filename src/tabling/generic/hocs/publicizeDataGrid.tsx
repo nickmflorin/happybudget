@@ -1,5 +1,5 @@
 import React, { useMemo, useImperativeHandle } from "react";
-import { isNil, map } from "lodash";
+import { isNil, map, includes } from "lodash";
 import hoistNonReactStatics from "hoist-non-react-statics";
 import { Subtract } from "utility-types";
 
@@ -7,10 +7,11 @@ import {
   ProcessCellForExportParams,
   CellKeyDownEvent,
   NavigateToNextCellParams,
-  TabToNextCellParams
+  TabToNextCellParams,
+  SuppressKeyboardEventParams
 } from "@ag-grid-community/core";
 
-import { hooks } from "lib";
+import { hooks, tabling } from "lib";
 
 import { useClipboard, useCellNavigation } from "../hooks";
 import makeDataGrid, { InjectedDataGridProps, DataGridProps, InternalDataGridProps } from "./makeDataGrid";
@@ -60,12 +61,35 @@ const publicizeDataGrid = <
       columns: props.columns
     });
 
-    const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-      return map(props.columns, (col: Table.Column<R, M>) => ({
-        ...col,
-        editable: false
-      }));
-    }, [hooks.useDeepEqualMemo(props.columns)]);
+    const columns = useMemo<Table.Column<R, M>[]>(
+      (): Table.Column<R, M>[] =>
+        tabling.columns.normalizeColumns(
+          map(props.columns, (col: Table.Column<R, M>) => ({
+            ...col,
+            editable: false
+          })),
+          {},
+          {
+            body: (col: Table.BodyColumn<R, M>) => ({
+              suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
+                if (!isNil(col.suppressKeyboardEvent) && col.suppressKeyboardEvent(params) === true) {
+                  return true;
+                } else if (
+                  /* We need to suppress CMD + Arrow KeyboardEvent(s) because this
+                     is how we navigate through the nested/sibling tables in the
+                     BudgetTable case. */
+                  includes(["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"], params.event.key) &&
+                  (params.event.ctrlKey || params.event.metaKey)
+                ) {
+                  return true;
+                }
+                return false;
+              }
+            })
+          }
+        ),
+      [hooks.useDeepEqualMemo(props.columns)]
+    );
 
     const onCellKeyDown: (e: Table.CellKeyDownEvent) => void = hooks.useDynamicCallback((e: Table.CellKeyDownEvent) => {
       const ev = e.event as KeyboardEvent | null | undefined; // AG Grid's Event Object is Wrong

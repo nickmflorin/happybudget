@@ -112,14 +112,16 @@ const ContactsTable = (props: Props): JSX.Element => {
         getModelRowName={(r: Table.DataRow<R>) => util.conditionalJoinString(r.data.first_name, r.data.last_name)}
         getModelRowLabel={"Contact"}
         framework={Framework}
-        editColumnConfig={[
-          {
-            conditional: (r: Table.NonPlaceholderBodyRow<R>) => tabling.typeguards.isModelRow(r),
-            action: (r: Table.ModelRow<R>) => editContact({ id: r.id, rowId: r.id }),
-            behavior: "expand",
-            tooltip: "Edit"
-          }
-        ]}
+        editColumnConfig={
+          [
+            {
+              typeguard: tabling.typeguards.isModelRow,
+              action: (r: Table.ModelRow<R>) => editContact({ id: r.id, rowId: r.id }),
+              behavior: "expand",
+              tooltip: "Edit"
+            }
+          ] as [Table.EditColumnRowConfig<R, Table.ModelRow<R>>]
+        }
         actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
           framework.actions.ToggleColumnAction<R, M>(props.table.current, params),
           framework.actions.ExportCSVAction<R, M>(props.table.current, params, "contacts")
