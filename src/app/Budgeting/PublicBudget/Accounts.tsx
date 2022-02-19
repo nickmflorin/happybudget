@@ -6,7 +6,7 @@ import { isNil } from "lodash";
 import { budgeting, tabling } from "lib";
 import { AccountsTable as GenericAccountsTable, connectTableToPublicStore } from "tabling";
 
-import { AccountsPage } from "../Pages";
+import { BudgetPage } from "../Pages";
 import { actions, selectors, sagas } from "../store";
 
 type R = Tables.AccountRowData;
@@ -61,7 +61,7 @@ const Accounts = (props: AccountsProps): JSX.Element => {
   }, [props.budgetId]);
 
   return (
-    <AccountsPage {...props}>
+    <BudgetPage {...props}>
       <ConnectedTable
         id={props.budgetId}
         parent={props.budget}
@@ -69,7 +69,7 @@ const Accounts = (props: AccountsProps): JSX.Element => {
         table={table}
         tokenId={props.tokenId}
       />
-    </AccountsPage>
+    </BudgetPage>
   );
 };
 

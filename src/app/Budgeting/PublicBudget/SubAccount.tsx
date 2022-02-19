@@ -6,7 +6,7 @@ import { isNil } from "lodash";
 import { budgeting, tabling } from "lib";
 import { connectTableToPublicStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
 
-import { SubAccountPage } from "../Pages";
+import { BudgetPage } from "../Pages";
 import { actions, selectors, sagas } from "../store";
 import FringesModal from "./FringesModal";
 
@@ -80,7 +80,7 @@ const SubAccount = (props: SubAccountProps): JSX.Element => {
   }, [props.budget, subaccount]);
 
   return (
-    <SubAccountPage detail={subaccount} {...props}>
+    <BudgetPage parent={subaccount} {...props}>
       <ConnectedTable
         {...props}
         parent={subaccount}
@@ -96,7 +96,7 @@ const SubAccount = (props: SubAccountProps): JSX.Element => {
         parentType={"subaccount"}
         onCancel={() => setFringesModalVisible(false)}
       />
-    </SubAccountPage>
+    </BudgetPage>
   );
 };
 

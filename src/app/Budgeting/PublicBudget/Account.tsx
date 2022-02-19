@@ -6,7 +6,7 @@ import { createSelector } from "reselect";
 import { tabling, budgeting } from "lib";
 import { connectTableToPublicStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
 
-import { AccountPage } from "../Pages";
+import { BudgetPage } from "../Pages";
 import { actions, selectors, sagas } from "../store";
 import FringesModal from "./FringesModal";
 
@@ -84,7 +84,7 @@ const Account = (props: AccountProps): JSX.Element => {
   }, [props.id, props.budgetId]);
 
   return (
-    <AccountPage detail={account} {...props}>
+    <BudgetPage parent={account} {...props}>
       <ConnectedTable
         {...props}
         parent={account}
@@ -100,7 +100,7 @@ const Account = (props: AccountProps): JSX.Element => {
         parentType={"account"}
         onCancel={() => setFringesModalVisible(false)}
       />
-    </AccountPage>
+    </BudgetPage>
   );
 };
 

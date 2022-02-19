@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { isNil, filter } from "lodash";
@@ -7,7 +7,7 @@ import { tabling, budgeting } from "lib";
 
 import { connectTableToAuthenticatedStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
 
-import { SubAccountPage } from "../Pages";
+import { BudgetPage } from "../Pages";
 import { actions, selectors, sagas } from "../store";
 import FringesModal from "./FringesModal";
 
@@ -85,7 +85,7 @@ const SubAccount = ({ setPreviewModalVisible, ...props }: SubAccountProps): JSX.
   }, [props.id, props.budgetId]);
 
   return (
-    <SubAccountPage detail={subaccount} budget={props.budget}>
+    <BudgetPage parent={subaccount} budget={props.budget}>
       <ConnectedTable
         {...props}
         parent={subaccount}
@@ -142,7 +142,7 @@ const SubAccount = ({ setPreviewModalVisible, ...props }: SubAccountProps): JSX.
         parentType={"subaccount"}
         onCancel={() => setFringesModalVisible(false)}
       />
-    </SubAccountPage>
+    </BudgetPage>
   );
 };
 

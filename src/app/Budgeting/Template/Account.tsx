@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { isNil } from "lodash";
 import { createSelector } from "reselect";
@@ -6,7 +6,7 @@ import { createSelector } from "reselect";
 import { tabling, budgeting } from "lib";
 import { connectTableToAuthenticatedStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
 
-import { AccountPage } from "../Pages";
+import { BudgetPage } from "../Pages";
 import { actions, selectors, sagas } from "../store";
 import FringesModal from "./FringesModal";
 
@@ -79,7 +79,7 @@ const Account = (props: AccountProps): JSX.Element => {
   }, [props.id, props.budgetId]);
 
   return (
-    <AccountPage budget={props.budget} detail={account}>
+    <BudgetPage budget={props.budget} parent={account}>
       <ConnectedTable
         {...props}
         parent={account}
@@ -101,7 +101,7 @@ const Account = (props: AccountProps): JSX.Element => {
         parentType={"account"}
         onCancel={() => setFringesModalVisible(false)}
       />
-    </AccountPage>
+    </BudgetPage>
   );
 };
 
