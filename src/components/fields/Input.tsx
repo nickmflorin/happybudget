@@ -21,5 +21,5 @@ export default withSize<InputProps, "small" | "medium" | "large", AntDInput>(["s
   hasRef: true
 })(forwardRef(Input)) as React.ForwardRefRenderFunction<
   AntDInput,
-  PrivateInputProps & { readonly ref?: React.ForwardedRef<AntDInput> }
+  InputProps & { readonly ref?: React.ForwardedRef<AntDInput> }
 >;
