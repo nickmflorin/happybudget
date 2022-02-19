@@ -2,6 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import classNames from "classnames";
 
+import { users } from "lib";
+
 import { Icon } from "components";
 import { IconButton } from "components/buttons";
 import { LeafLogo } from "components/svgs";
@@ -17,6 +19,8 @@ export interface CollapsedSidebarProps
 }
 
 const CollapsedSidebar = ({ toggle, ...props }: CollapsedSidebarProps): JSX.Element => {
+  const user = users.hooks.useUser();
+
   return (
     <GenericSidebar<ICollapsedSidebarItem>
       {...props}
@@ -35,7 +39,7 @@ const CollapsedSidebar = ({ toggle, ...props }: CollapsedSidebarProps): JSX.Elem
         onClick={() => toggle()}
       />
       <div className={"logo-container"}>
-        <Link className={"logo-link"} to={"/"}>
+        <Link className={"logo-link"} to={user === null ? "/login" : "/"}>
           <LeafLogo />
         </Link>
       </div>
@@ -43,4 +47,4 @@ const CollapsedSidebar = ({ toggle, ...props }: CollapsedSidebarProps): JSX.Elem
   );
 };
 
-export default React.memo(CollapsedSidebar);
+export default CollapsedSidebar;
