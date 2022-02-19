@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { isNil } from "lodash";
 import { createSelector } from "reselect";
@@ -6,8 +6,9 @@ import { createSelector } from "reselect";
 import { tabling, budgeting } from "lib";
 import { connectTableToAuthenticatedStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
 
-import { actions, selectors, sagas } from "../../store";
-import FringesModal from "../FringesModal";
+import { SubAccountPage } from "../Pages";
+import { actions, selectors, sagas } from "../store";
+import FringesModal from "./FringesModal";
 
 type M = Model.SubAccount;
 type R = Tables.SubAccountRowData;
@@ -48,13 +49,13 @@ const ConnectedTable = connectTableToAuthenticatedStore<
   }
 })(GenericSubAccountsTable.AuthenticatedTemplate);
 
-interface SubAccountsTableProps {
+interface SubAccountProps {
   readonly id: number;
   readonly budgetId: number;
   readonly budget: Model.Template | null;
 }
 
-const SubAccountsTable = (props: SubAccountsTableProps): JSX.Element => {
+const SubAccount = (props: SubAccountProps): JSX.Element => {
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
   const fringesTable = tabling.hooks.useTable<Tables.FringeRowData, Model.Fringe>();
 
@@ -64,11 +65,21 @@ const SubAccountsTable = (props: SubAccountsTableProps): JSX.Element => {
   const table = tabling.hooks.useTable<Tables.SubAccountRowData, Model.SubAccount>();
 
   useEffect(() => {
+    dispatch(actions.template.subAccount.requestSubAccountAction(props.id));
+  }, [props.id]);
+
+  useEffect(() => {
+    if (!isNil(props.budget) && !isNil(subaccount)) {
+      budgeting.urls.setLastVisited(props.budget, subaccount);
+    }
+  }, [props.budget, subaccount]);
+
+  useEffect(() => {
     dispatch(actions.template.subAccount.requestAction(null, { id: props.id, budgetId: props.budgetId }));
   }, [props.id, props.budgetId]);
 
   return (
-    <React.Fragment>
+    <SubAccountPage detail={subaccount} budget={props.budget}>
       <ConnectedTable
         {...props}
         parent={subaccount}
@@ -90,8 +101,8 @@ const SubAccountsTable = (props: SubAccountsTableProps): JSX.Element => {
         parentType={"account"}
         onCancel={() => setFringesModalVisible(false)}
       />
-    </React.Fragment>
+    </SubAccountPage>
   );
 };
 
-export default SubAccountsTable;
+export default SubAccount;

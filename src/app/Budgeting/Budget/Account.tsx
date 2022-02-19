@@ -1,36 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createSelector } from "reselect";
 import { isNil, filter } from "lodash";
+import { createSelector } from "reselect";
 
 import { tabling, budgeting } from "lib";
-
 import { connectTableToAuthenticatedStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
 
-import { actions, selectors, sagas } from "../../store";
-import FringesModal from "../FringesModal";
+import { AccountPage } from "../Pages";
+import { actions, selectors, sagas } from "../store";
+import FringesModal from "./FringesModal";
 
 type M = Model.SubAccount;
 type R = Tables.SubAccountRowData;
 
 const ConnectedTable = connectTableToAuthenticatedStore<
-  GenericSubAccountsTable.AuthenticatedBudgetProps<Model.SubAccount>,
+  GenericSubAccountsTable.AuthenticatedBudgetProps<Model.Account>,
   R,
   M,
   Tables.SubAccountTableStore,
   Tables.SubAccountTableContext
 >({
   actions: {
-    tableChanged: actions.budget.subAccount.handleTableChangeEventAction,
-    loading: actions.budget.subAccount.loadingAction,
-    response: actions.budget.subAccount.responseAction,
-    addModelsToState: actions.budget.subAccount.addModelsToStateAction,
-    setSearch: actions.budget.subAccount.setSearchAction
+    tableChanged: actions.budget.account.handleTableChangeEventAction,
+    loading: actions.budget.account.loadingAction,
+    response: actions.budget.account.responseAction,
+    addModelsToState: actions.budget.account.addModelsToStateAction,
+    setSearch: actions.budget.account.setSearchAction
   },
-  tableId: "budget-subaccount-subaccounts-table",
+  tableId: "budget-account-subaccounts-table",
   selector: (s: Application.Store) =>
-    selectors.selectSubAccountsTableStore(s, { parentType: "subaccount", domain: "budget" }),
-  createSaga: (table: Table.TableInstance<R, M>) => sagas.budget.subAccount.createTableSaga(table),
+    selectors.selectSubAccountsTableStore(s, { parentType: "account", domain: "budget" }),
+  createSaga: (table: Table.TableInstance<R, M>) => sagas.budget.account.createTableSaga(table),
   footerRowSelectors: {
     page: createSelector(
       (state: Application.Store) => state.budget.detail.data,
@@ -42,8 +42,8 @@ const ConnectedTable = connectTableToAuthenticatedStore<
       })
     ),
     footer: createSelector(
-      (state: Application.Store) => state.budget.subaccount.detail.data,
-      (detail: Model.SubAccount | null) => ({
+      (state: Application.Store) => state.budget.account.detail.data,
+      (detail: Model.Account | null) => ({
         identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
         estimated: !isNil(detail) ? budgeting.businessLogic.estimatedValue(detail) : 0.0,
         variance: !isNil(detail) ? budgeting.businessLogic.varianceValue(detail) : 0.0,
@@ -53,37 +53,48 @@ const ConnectedTable = connectTableToAuthenticatedStore<
   }
 })(GenericSubAccountsTable.AuthenticatedBudget);
 
-interface SubAccountsTableProps {
+interface AccountProps {
   readonly id: number;
   readonly budgetId: number;
   readonly budget: Model.Budget | null;
   readonly setPreviewModalVisible: (v: boolean) => void;
 }
 
-const SubAccountsTable = ({ setPreviewModalVisible, ...props }: SubAccountsTableProps): JSX.Element => {
+const Account = ({ setPreviewModalVisible, ...props }: AccountProps): JSX.Element => {
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
   const fringesTable = tabling.hooks.useTable<Tables.FringeRowData, Model.Fringe>();
 
   const dispatch = useDispatch();
-  const subaccount = useSelector((s: Application.Store) => selectors.selectSubAccountDetail(s, { domain: "budget" }));
+
+  const account = useSelector((s: Application.Store) => selectors.selectAccountDetail(s, { domain: "budget" }));
   const table = tabling.hooks.useTable<Tables.SubAccountRowData, Model.SubAccount>();
 
   useEffect(() => {
-    dispatch(actions.budget.subAccount.requestAction(null, { id: props.id, budgetId: props.budgetId }));
+    dispatch(actions.budget.account.requestAccountAction(props.id));
+  }, [props.id]);
+
+  useEffect(() => {
+    if (!isNil(props.budget) && !isNil(account)) {
+      budgeting.urls.setLastVisited(props.budget, account);
+    }
+  }, [props.budget, account]);
+
+  useEffect(() => {
+    dispatch(actions.budget.account.requestAction(null, { id: props.id, budgetId: props.budgetId }));
   }, [props.id, props.budgetId]);
 
   return (
-    <React.Fragment>
+    <AccountPage budget={props.budget} detail={account}>
       <ConnectedTable
         {...props}
-        parent={subaccount}
+        parent={account}
         actionContext={{ budgetId: props.budgetId, id: props.id }}
-        parentType={"subaccount"}
+        parentType={"account"}
         onExportPdf={() => setPreviewModalVisible(true)}
         onOpenFringesModal={() => setFringesModalVisible(true)}
         table={table}
-        onParentUpdated={(p: Model.SubAccount) =>
-          dispatch(actions.budget.subAccount.updateInStateAction({ id: p.id, data: p }))
+        onParentUpdated={(p: Model.Account) =>
+          dispatch(actions.budget.account.updateInStateAction({ id: p.id, data: p }))
         }
         onBudgetUpdated={(b: Model.Budget) => dispatch(actions.budget.updateBudgetInStateAction({ id: b.id, data: b }))}
         onShared={(publicToken: Model.PublicToken) =>
@@ -101,7 +112,7 @@ const SubAccountsTable = ({ setPreviewModalVisible, ...props }: SubAccountsTable
         }
         onAttachmentRemoved={(row: Table.ModelRow<R>, rowId: number) =>
           dispatch(
-            actions.budget.subAccount.updateRowsInStateAction({
+            actions.budget.account.updateRowsInStateAction({
               id: row.id,
               data: {
                 attachments: filter(row.data.attachments, (a: Model.SimpleAttachment) => a.id !== rowId)
@@ -111,7 +122,7 @@ const SubAccountsTable = ({ setPreviewModalVisible, ...props }: SubAccountsTable
         }
         onAttachmentAdded={(row: Table.ModelRow<R>, attachment: Model.Attachment) =>
           dispatch(
-            actions.budget.subAccount.updateRowsInStateAction({
+            actions.budget.account.updateRowsInStateAction({
               id: row.id,
               data: {
                 attachments: [
@@ -127,11 +138,11 @@ const SubAccountsTable = ({ setPreviewModalVisible, ...props }: SubAccountsTable
         {...props}
         table={fringesTable}
         open={fringesModalVisible}
-        parentType={"subaccount"}
+        parentType={"account"}
         onCancel={() => setFringesModalVisible(false)}
       />
-    </React.Fragment>
+    </AccountPage>
   );
 };
 
-export default SubAccountsTable;
+export default Account;
