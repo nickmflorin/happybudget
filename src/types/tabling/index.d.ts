@@ -721,10 +721,6 @@ declare namespace Table {
     readonly cellStyle?: CellStyle;
   }
 
-  interface CookieNames {
-    readonly hiddenColumns?: string;
-  }
-
   type EditRowActionBehavior = "expand" | "edit";
 
   type ColumnVisibilityChange = {

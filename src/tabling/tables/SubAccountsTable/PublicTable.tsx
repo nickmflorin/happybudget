@@ -20,7 +20,6 @@ type OmitProps =
   | "pinFirstColumn"
   | "tableId"
   | "menuPortalId"
-  | "cookieNames"
   | "framework";
 
 export type PublicTableProps<B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount> = Omit<
@@ -34,7 +33,6 @@ export type PublicTableProps<B extends Model.BaseBudget, P extends Model.Account
   readonly parentType: P["type"];
   readonly tokenId: string;
   readonly actionContext: Tables.SubAccountTableContext;
-  readonly cookieNames?: Omit<Table.CookieNames, "hiddenColumns">;
   readonly onOpenFringesModal: () => void;
 };
 
@@ -69,14 +67,7 @@ const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model
     () => (params: Table.PublicMenuActionParams<R, M>) =>
       [
         ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
-        framework.actions.ToggleColumnAction<R, M>(props.table.current, params),
-        framework.actions.ExportCSVAction<R, M>(
-          props.table.current,
-          params,
-          !isNil(props.parent)
-            ? `${props.parent.type}-${props.parent.identifier || props.parent.description || ""}`
-            : ""
-        )
+        framework.actions.ToggleColumnAction<R, M>(props.table.current, params)
       ],
     [props.actions, props.table.current]
   );
@@ -89,7 +80,6 @@ const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model
       showPageFooter={true}
       pinFirstColumn={true}
       tableId={`public-${props.domain}-${props.parentType}-subaccounts`}
-      cookieNames={{ ...props.cookieNames, hiddenColumns: "subaccount-table-hidden-columns" }}
       framework={Framework}
       actions={actions}
       onBack={onBack}

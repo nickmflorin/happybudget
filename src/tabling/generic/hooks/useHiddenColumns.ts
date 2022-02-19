@@ -4,7 +4,7 @@ import { isNil, filter, map, reduce, find } from "lodash";
 import { tabling } from "lib";
 
 type UseHiddenColumnsParams<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
-  readonly cookie?: string;
+  readonly tableId: string;
   readonly columns: Table.DataColumn<R, M>[];
   readonly apis: tabling.TableApis;
 };
@@ -21,7 +21,7 @@ type SetHiddenColumnsAction = Omit<Redux.Action<Table.HiddenColumns>, "context">
 
 type ChangeHiddenColumnsAction = Omit<Redux.Action<SingleOrArray<Table.ColumnVisibilityChange>>, "context"> & {
   readonly type: "TOGGLE";
-  readonly cookie?: string | undefined;
+  readonly tableId: string;
 };
 
 type HiddenColumnsAction = SetHiddenColumnsAction | ChangeHiddenColumnsAction;
@@ -41,9 +41,7 @@ const hiddenColumnsReducer = (state: Table.HiddenColumns = {}, action: HiddenCol
       },
       state
     );
-    if (!isNil(action.cookie)) {
-      tabling.cookies.setHiddenColumns(action.cookie, newState);
-    }
+    tabling.cookies.setHiddenColumns(action.tableId, newState);
     return newState;
   }
 };
@@ -55,18 +53,16 @@ const useHiddenColumns = <R extends Table.RowData, M extends Model.RowHttpModel 
 
   useEffect(() => {
     let hiddenColumnsInCookies: Table.HiddenColumns = {};
-    if (!isNil(params.cookie)) {
-      hiddenColumnsInCookies = tabling.cookies.getHiddenColumns(
-        params.cookie,
-        filter(
-          map(
-            filter(params.columns, (c: Table.DataColumn<R, M>) => c.canBeHidden !== false),
-            (c: Table.DataColumn<R, M>) => c.field
-          ),
-          (f: string | undefined) => !isNil(f)
-        ) as string[]
-      );
-    }
+    hiddenColumnsInCookies = tabling.cookies.getHiddenColumns(
+      params.tableId,
+      filter(
+        map(
+          filter(params.columns, (c: Table.DataColumn<R, M>) => c.canBeHidden !== false),
+          (c: Table.DataColumn<R, M>) => c.field
+        ),
+        (f: string | undefined) => !isNil(f)
+      ) as string[]
+    );
     const hidden: Table.HiddenColumns = reduce(
       params.columns,
       (curr: Table.HiddenColumns, c: Table.DataColumn<R, M>) => {
@@ -82,8 +78,8 @@ const useHiddenColumns = <R extends Table.RowData, M extends Model.RowHttpModel 
       },
       {}
     );
-    dispatch({ type: "SET", cookie: params.cookie, payload: hidden });
-  }, [params.cookie]);
+    dispatch({ type: "SET", cookie: params.tableId, payload: hidden });
+  }, [params.tableId]);
 
   useEffect(() => {
     const api = params.apis.get("data");
@@ -107,9 +103,9 @@ const useHiddenColumns = <R extends Table.RowData, M extends Model.RowHttpModel 
 
   const changeColumnVisibility = useMemo(
     () => (changes: SingleOrArray<Table.ColumnVisibilityChange>) => {
-      dispatch({ type: "TOGGLE", cookie: params.cookie, payload: changes });
+      dispatch({ type: "TOGGLE", tableId: params.tableId, payload: changes });
     },
-    [params.cookie]
+    [params.tableId]
   );
 
   return [hiddenColumns, changeColumnVisibility];

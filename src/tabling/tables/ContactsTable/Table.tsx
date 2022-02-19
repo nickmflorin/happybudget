@@ -24,7 +24,6 @@ type OmitProps =
   | "tableId"
   | "menuPortalId"
   | "savingChangesPortalId"
-  | "cookieNames"
   | "framework"
   | "getModelRowName"
   | "getMarkupRowName"
@@ -107,7 +106,6 @@ const ContactsTable = (props: Props): JSX.Element => {
         tableId={"contacts"}
         showPageFooter={false}
         minimal={true}
-        cookieNames={{ hiddenColumns: "contacts-table-hidden-columns" }}
         rowHeight={40}
         sizeToFit={true}
         constrainTableFooterHorizontally={true}

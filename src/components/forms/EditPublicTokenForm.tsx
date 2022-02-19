@@ -34,7 +34,7 @@ const EditPublicTokenForm = ({ onDelete, urlFormatter, disabled, ...props }: Edi
       }}
     >
       <Form.Item name={"public_id"} label={"Public URL"}>
-        <PublicUrlInput allowRefresh={false} urlFormatter={urlFormatter} />
+        <PublicUrlInput urlFormatter={urlFormatter} actions={["copy", "visit"]} />
       </Form.Item>
       <Form.Item label={"Auto Expire"} horizontalLayoutOverride={true}>
         <Checkbox

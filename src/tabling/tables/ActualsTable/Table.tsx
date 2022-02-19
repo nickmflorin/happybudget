@@ -21,7 +21,6 @@ type OmitProps =
   | "tableId"
   | "menuPortalId"
   | "savingChangesPortalId"
-  | "cookieNames"
   | "framework"
   | "getModelRowName"
   | "getMarkupRowName"
@@ -204,7 +203,6 @@ const ActualsTable = ({ parent, onOwnersSearch, ...props }: Props): JSX.Element 
         showPageFooter={false}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
-        cookieNames={{ hiddenColumns: "actuals-table-hidden-columns" }}
         getModelRowName={(r: Table.DataRow<R>) => r.data.name}
         getModelRowLabel={"Actual"}
         framework={Framework}

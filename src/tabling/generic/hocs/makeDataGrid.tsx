@@ -23,7 +23,6 @@ export type DataGridProps<
   readonly rowClass?: Table.RowClassName;
   readonly columns: Table.Column<R, M>[];
   readonly search?: string;
-  readonly cookieNames?: Table.CookieNames;
   readonly editColumnConfig?: Table.EditColumnRowConfig<R>[];
   readonly onBack?: () => void;
   readonly onLeft?: () => void;

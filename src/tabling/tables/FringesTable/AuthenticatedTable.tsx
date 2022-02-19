@@ -18,7 +18,6 @@ type OmitProps =
   | "tableId"
   | "menuPortalId"
   | "savingChangesPortalId"
-  | "cookieNames"
   | "framework"
   | "getModelRowName"
   | "getMarkupRowName"
@@ -50,7 +49,6 @@ const AuthenticatedFringesTable = <B extends Model.BaseBudget>({
     getModelRowLabel={"Fringe"}
     showPageFooter={false}
     framework={Framework}
-    cookieNames={{ hiddenColumns: "fringes-table-hidden-columns" }}
     columns={Columns}
     confirmRowDelete={false}
     localizePopupParent

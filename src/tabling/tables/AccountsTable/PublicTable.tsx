@@ -10,7 +10,7 @@ type R = Tables.AccountRowData;
 type M = Model.Account;
 type S = Tables.AccountTableStore;
 
-type OmitProps = "onRowExpand" | "showPageFooter" | "pinFirstColumn" | "tableId" | "menuPortalId" | "cookieNames";
+type OmitProps = "onRowExpand" | "showPageFooter" | "pinFirstColumn" | "tableId" | "menuPortalId";
 
 export type PublicTableProps<B extends Model.BaseBudget> = Omit<PublicBudgetTableProps<R, M, S>, OmitProps> & {
   readonly id: B["id"];
@@ -18,7 +18,6 @@ export type PublicTableProps<B extends Model.BaseBudget> = Omit<PublicBudgetTabl
   readonly domain: B["domain"];
   readonly tokenId: string;
   readonly actionContext: Tables.AccountTableContext;
-  readonly cookieNames?: Omit<Table.CookieNames, "hiddenColumns">;
 };
 
 const PublicTable = <B extends Model.BaseBudget>(props: PublicTableProps<B>): JSX.Element => {
@@ -28,12 +27,7 @@ const PublicTable = <B extends Model.BaseBudget>(props: PublicTableProps<B>): JS
     () => (params: Table.PublicMenuActionParams<R, M>) =>
       [
         ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
-        framework.actions.ToggleColumnAction<R, M>(props.table.current, params),
-        framework.actions.ExportCSVAction<R, M>(
-          props.table.current,
-          params,
-          !isNil(props.parent) ? `${props.parent.type}-${props.parent.name}` : ""
-        )
+        framework.actions.ToggleColumnAction<R, M>(props.table.current, params)
       ],
     [props.actions, props.table.current]
   );
@@ -43,7 +37,6 @@ const PublicTable = <B extends Model.BaseBudget>(props: PublicTableProps<B>): JS
       {...props}
       showPageFooter={false}
       pinFirstColumn={true}
-      cookieNames={{ ...props.cookieNames, hiddenColumns: "account-table-hidden-columns" }}
       tableId={`public-${props.domain}-accounts`}
       menuPortalId={"supplementary-header"}
       actions={actions}

@@ -53,7 +53,6 @@ export type ConfiguredTableInjectedProps = {
 
 export type TableConfigurationProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
   readonly tableId: string;
-  readonly cookieNames?: Table.CookieNames;
   readonly hideEditColumn?: boolean;
   readonly editColumn?: Table.PartialActionColumn<R, M>;
   readonly editColumnWidth?: number;
@@ -109,7 +108,7 @@ const configureTable = <
     const [rendered, gridDataRendered] = useTrackGridDataRender();
 
     const [hiddenColumns, changeColumnVisibility] = useHiddenColumns<R, M>({
-      cookie: props.cookieNames?.hiddenColumns,
+      tableId: props.tableId,
       columns: map(
         filter(
           props.columns,

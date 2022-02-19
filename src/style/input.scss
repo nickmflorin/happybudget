@@ -119,6 +119,7 @@ input:focus-visible {
 		padding-left: 8px !important;
 		padding-right: 8px !important;
 		border-radius: $input-small-border-radius !important;
+		height: 26px;
 
 		input {
 			@extend .input-small-base;

@@ -17,7 +17,6 @@ type OmitProps =
   | "tableId"
   | "menuPortalId"
   | "savingChangesPortalId"
-  | "cookieNames"
   | "framework"
   | "getModelRowName"
   | "getMarkupRowName"
@@ -44,7 +43,6 @@ const PublicFringesTable = <B extends Model.BaseBudget>({
     className={classNames("fringes-table", props.className)}
     showPageFooter={false}
     framework={Framework}
-    cookieNames={{ hiddenColumns: "fringes-table-hidden-columns" }}
     columns={Columns}
     actions={(params: Table.PublicMenuActionParams<R, M>) => [
       framework.actions.ExportCSVAction<R, M>(

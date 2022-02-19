@@ -19,7 +19,6 @@ type OmitProps =
   | "tableId"
   | "menuPortalId"
   | "savingChangesPortalId"
-  | "cookieNames"
   | "framework"
   | "getModelRowName"
   | "getMarkupRowName"
@@ -38,7 +37,6 @@ export type AuthenticatedTableProps<B extends Model.BaseBudget> = Omit<
   readonly parent: B | null;
   readonly domain: B["domain"];
   readonly actionContext: Tables.AccountTableContext;
-  readonly cookieNames?: Omit<Table.CookieNames, "hiddenColumns">;
   readonly onParentUpdated: (m: B) => void;
 };
 
@@ -125,7 +123,6 @@ const AuthenticatedTable = <B extends Model.BaseBudget>(props: AuthenticatedTabl
         {...props}
         showPageFooter={false}
         pinFirstColumn={true}
-        cookieNames={{ ...props.cookieNames, hiddenColumns: "account-table-hidden-columns" }}
         getModelRowName={(r: Table.DataRow<R>) => r.data.identifier || r.data.description}
         getMarkupRowName={(r: Table.MarkupRow<R>) => r.data.identifier}
         getMarkupRowLabel={"Markup"}

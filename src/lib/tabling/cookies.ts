@@ -39,15 +39,15 @@ export const parseHiddenColumns = (
   return {};
 };
 
-export const getHiddenColumns = (cookieName: string, validateAgainst?: string[]): Table.HiddenColumns => {
+export const getHiddenColumns = (tableId: string, validateAgainst?: string[]): Table.HiddenColumns => {
   const cookiesObj = new Cookies();
-  const cookiesHiddenColumns = cookiesObj.get(cookieName);
+  const cookiesHiddenColumns = cookiesObj.get(`hidden-columns-${tableId}`);
   return parseHiddenColumns(cookiesHiddenColumns, validateAgainst);
 };
 
-export const setHiddenColumns = (cookieName: string, fields: Table.HiddenColumns) => {
+export const setHiddenColumns = (tableId: string, fields: Table.HiddenColumns) => {
   const cookiesObj = new Cookies();
-  cookiesObj.set(cookieName, fields);
+  cookiesObj.set(`hidden-columns-${tableId}`, fields);
 };
 
 export const setDeleteModalConfirmationSuppression = (value: boolean) => {

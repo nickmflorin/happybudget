@@ -2,6 +2,7 @@ import { findIndex, find, isNil, reduce } from "lodash";
 import { sumChars } from "./string";
 
 export * as colors from "./colors";
+export * as clipboard from "./clipboard";
 export * as dates from "./dates";
 export * as events from "./events";
 export * as files from "./files";

@@ -34,7 +34,7 @@ const CreatePublicTokenForm = ({ urlFormatter, ...props }: CreatePublicTokenForm
       }}
     >
       <Form.Item name={"public_id"} label={"Public URL"}>
-        <PublicUrlInput urlFormatter={urlFormatter} />
+        <PublicUrlInput urlFormatter={urlFormatter} actions={["refresh"]} />
       </Form.Item>
       <Form.Item label={"Auto Expire"} horizontalLayoutOverride={true}>
         <Checkbox
