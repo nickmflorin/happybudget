@@ -14,7 +14,7 @@
       font-weight: 700;
       font-family: $avenir;
       font-size: 28px;
-      line-height: 36px;
+      line-height: $large-size;
 
       &.with-sub-menu {
         margin-bottom: 14px;

@@ -1,8 +1,7 @@
 @import "style/_imports";
 
 .cell--attachments {
-
-	.selected {
+  .selected {
     display: none;
     color: $text-secondary;
 
@@ -27,7 +26,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 2px dashed $text-secondary;
+    border: 2px dashed $border-color;
     color: $text-secondary;
     z-index: 3;
 

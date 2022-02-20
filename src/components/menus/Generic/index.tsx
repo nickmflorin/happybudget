@@ -503,7 +503,7 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
         </div>
       </ShowHide>
       <div className={"ul-wrapper"} id={menuId}>
-        <RenderWithSpinner loading={props.loading} size={22}>
+        <RenderWithSpinner loading={props.loading} spinnerProps={{ size: "small" }}>
           <ul>
             <React.Fragment>
               {map(availableModelItems, (item: GenericModelItem<S, M>, index: number) => (

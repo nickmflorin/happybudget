@@ -1,7 +1,7 @@
 @import "style/_imports";
 
 .pdf-image-uploader {
-  border: 1px dashed $gray-light;
+  border: $dashed-border;
   border-radius: $input-border-radius;
   max-width: 100%;
   min-width: 200px;

@@ -12,24 +12,23 @@ import { withSize } from "components/hocs";
 import { TooltipWrapper } from "components/tooltips";
 import { SpinnerProps } from "components/loading/Spinner";
 
-type ButtonSize = "small" | "medium" | "large";
-
 type PrivateButtonProps = Omit<AntDButtonProps, "disabled" | "icon" | "size" | keyof StandardComponentProps> &
   ClickableProps &
   StandardComponentProps & {
     readonly loading?: boolean;
+    readonly iconProps?: IconProps;
     readonly showLoadingIndicatorOverIcon?: boolean;
     readonly withDropdownCaret?: boolean;
     readonly dropdownCaretState?: "open" | "closed" | undefined;
     readonly spinnerProps?: SpinnerProps;
   };
 
-export type ButtonProps = PrivateButtonProps & UseSizeProps<ButtonSize>;
+/* These are the props that should be extended by components extending Button.
+   The props dictated by UseSizeProps are not actually passed into the Button
+   component, because the withSize HOC does not pass them through but instead
+   just passes the className that the size determines into the component. */
+export type ButtonProps = PrivateButtonProps & UseSizeProps;
 
-/**
- * A consistently styled Button component for consistently styled and themed
- * buttons wrapped around AntD's Button class.
- */
 const Button = (
   {
     children,
@@ -37,6 +36,7 @@ const Button = (
     loading,
     showLoadingIndicatorOverIcon,
     icon,
+    iconProps,
     className,
     tooltip,
     withDropdownCaret,
@@ -54,7 +54,7 @@ const Button = (
   const isFakeDisabled = useMemo(() => disabled === true && !isNil(tooltip), [disabled, tooltip]);
   const [isHovered, setIsHovered] = useState(false);
 
-  const iC = ui.hooks.useClickableIcon(icon, { isHovered });
+  const iC = ui.hooks.useClickableIcon(icon, { isHovered, iconProps });
 
   const prefix = useMemo(() => {
     if (isNil(iC)) {
@@ -111,4 +111,4 @@ const Button = (
   );
 };
 
-export default withSize<ButtonProps, ButtonSize>(["small", "medium", "large"], { hasRef: true })(forwardRef(Button));
+export default withSize<ButtonProps>({ hasRef: true })(forwardRef(Button));

@@ -11,12 +11,12 @@
   }
 
   .text-container {
-		color: $text-secondary;
+    color: $text-secondary;
     display: none;
     font-family: $roboto;
     font-size: 12px;
     font-weight: 500;
-    line-height: 36px;
+    line-height: $standard-size;
     text-transform: uppercase;
 
     @include media(">=large") {

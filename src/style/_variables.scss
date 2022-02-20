@@ -65,14 +65,23 @@ $success-border-color: #b7eb8f;
 
 $separator-color: #e6e6e6;
 $border-color: #efefef;
-$border: 1px solid $border-color;
 $table-border-color: #f8f8f8;
+
+$border: 1px solid $border-color;
+$dashed-border: 1px dashed $border-color;
 $table-border: 1px solid $table-border-color;
 
 $roboto: "Roboto", sans-serif;
 $avenir: "AvenirNext", sans-serif;
 
 // Layout
+$xlarge-size: 40px;
+$large-size: 36px;
+$standard-size: 32px;
+$medium-size: 30px;
+$small-size: 28px;
+$xsmall-size: 24px;
+
 $header-height: 50px;
 $header-background-color: $white;
 

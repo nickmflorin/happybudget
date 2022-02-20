@@ -3,39 +3,44 @@ import { isNil } from "lodash";
 import classNames from "classnames";
 
 import { ui } from "lib";
-import { Spinner, Icon } from "components";
+import { Icon } from "components";
+import { withSize } from "components/hocs";
+
+import Spinner, { SpinnerProps } from "./Spinner";
 
 import "./IconOrSpinner.scss";
 
-interface IconOrSpinnerProps extends StandardComponentProps {
+interface IconOrSpinnerProps extends UseSizeProps {
   readonly loading?: boolean;
   readonly icon?: IconOrElement;
-  readonly size?: number;
+  readonly spinnerProps?: SpinnerProps;
+  readonly style?: React.CSSProperties;
+  readonly className?: string;
 }
 
-const IconOrSpinner = ({ loading, icon, className, size = 14, style = {} }: IconOrSpinnerProps): JSX.Element => {
-  style.height = `${size}px`;
-  style.width = `${size}px`;
-
+/**
+ * @deprecated
+ */
+const IconOrSpinner = ({ loading, icon, spinnerProps, ...props }: IconOrSpinnerProps): JSX.Element => {
   if (loading === true) {
     return (
-      <div className={classNames("icon-or-spinner", className)} style={style}>
+      <div {...props} className={classNames("icon-or-spinner", props.className)}>
         <div className={"spinner-wrapper"}>
-          <Spinner size={size} />
+          <Spinner {...spinnerProps} />
         </div>
       </div>
     );
   } else if (!isNil(icon)) {
     return (
-      <div className={classNames("icon-or-spinner", className)} style={style}>
+      <div {...props} className={classNames("icon-or-spinner", props.className)}>
         <div className={"icon-wrapper"}>{ui.typeguards.iconIsJSX(icon) ? icon : <Icon icon={icon} />}</div>
       </div>
     );
   } else {
     /* We allow the icon to be null just in case we want to use this component
        as a smaller spinner to the left of text. */
-    return <div className={classNames("icon-or-spinner", className)} style={style}></div>;
+    return <div {...props} className={classNames("icon-or-spinner", props.className)}></div>;
   }
 };
 
-export default React.memo(IconOrSpinner);
+export default withSize<IconOrSpinnerProps>()(React.memo(IconOrSpinner));

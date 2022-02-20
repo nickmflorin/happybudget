@@ -60,7 +60,8 @@ const Action = <
       className={classNames("ag-grid-action-button", {
         "fake-disabled": disabled
       })}
-      size={"small"}
+      iconSize={"small"}
+      size={"xsmall"}
       icon={<Icon icon={icon} weight={"regular"} style={props.iconStyle} />}
       onClick={() => props.config.action(props.row, props.hovered)}
       tooltip={{ title: tooltip, placement: "bottom", overlayClassName: "tooltip-lower" }}

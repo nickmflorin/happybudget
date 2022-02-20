@@ -50,7 +50,7 @@ const HeaderTemplateSelect = (props: HeaderTemplateSelectProps): JSX.Element => 
                 ) : (
                   <IconButton
                     icon={<Icon icon={"trash"} weight={"regular"} />}
-                    size={"xxsmall"}
+                    iconSize={"xsmall"}
                     onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
                       event.stopPropagation();
                       event.preventDefault();

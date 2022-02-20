@@ -1,0 +1,32 @@
+$loading-size-standards: (
+  "large": 30px,
+  "standard": 25px,
+  "medium": 20px,
+  "small": 15px
+);
+
+.ant-spin {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.spinner {
+  z-index: 1000;
+  position: absolute;
+  color: $green;
+
+  @include standard_size_variants($loading-size-standards);
+
+  .anticon {
+    height: 100%;
+    width: 100%;
+    color: inherit;
+
+    svg {
+      height: 100%;
+      width: auto;
+      color: inherit;
+    }
+  }
+}

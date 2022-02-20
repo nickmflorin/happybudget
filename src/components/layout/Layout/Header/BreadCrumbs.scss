@@ -2,7 +2,7 @@
 
 .bread-crumbs {
   display: flex;
-  height: 36px;
+  height: $large-size;
   overflow-x: hidden;
 
   .slash {
@@ -30,10 +30,10 @@
       line-height: 16px;
       overflow: hidden;
       white-space: nowrap;
-			font-size: 13px;
-			font-weight: 600;
-			color: $text-secondary;
-			font-family: $avenir;
+      font-size: 13px;
+      font-weight: 600;
+      color: $text-secondary;
+      font-family: $avenir;
     }
 
     &:hover {
@@ -56,7 +56,7 @@
         font-size: 15px;
         font-family: $avenir;
         font-weight: 600;
-				line-height: 14px;
+        line-height: 14px;
       }
       &:hover {
         .text-wrapper {

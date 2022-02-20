@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 
 import { Checkbox } from "antd";
 
-import { IconOrSpinner, Spinner } from "components";
+import { IconOrSpinner } from "components";
 
 interface MenuItemContentProps {
   readonly loading?: boolean;
@@ -23,12 +23,12 @@ const MenuItemContent = (props: MenuItemContentProps): JSX.Element => {
       <div className={"menu-item-content"}>
         {!isNil(props.icon) && (
           <div className={"icon-wrapper-left"}>
-            <IconOrSpinner size={14} loading={props.loading} icon={props.icon} />
+            <IconOrSpinner loading={props.loading} icon={props.icon} />
           </div>
         )}
         {isNil(props.icon) && props.loading && (
           <div className={"icon-wrapper-left"}>
-            <Spinner size={14} />
+            <IconOrSpinner loading={props.loading} />
           </div>
         )}
         <div className={"menu-item-inner-content"}>{props.children}</div>

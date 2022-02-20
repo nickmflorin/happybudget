@@ -24,27 +24,33 @@ export const useIsMounted = (): RefObject<boolean> => {
 
 export const useId = (prefix: string) => useMemo(() => uniqueId(prefix), []);
 
-type UseSizeConfig<T extends string = string> = {
-  readonly options: T[];
+export type UseSizeConfig<
+  T extends string = StandardSize,
+  P extends UseSizeProps<T, string> = UseSizeProps<T, "size">
+> = {
+  readonly options?: T[];
   readonly default?: T;
+  readonly sizeProp?: keyof P;
 };
 
-export const useSize = <T extends string = string, P extends UseSizeProps<T> = UseSizeProps<T>>(
-  config: UseSizeConfig<T>,
-  props: P
-) =>
-  useMemo(() => {
-    if (props.size !== undefined) {
-      return props.size;
+export const useSize = <T extends string = StandardSize, P extends UseSizeProps<T, string> = UseSizeProps<T, "size">>(
+  props: P,
+  config?: UseSizeConfig<T, P>
+): T | undefined =>
+  useMemo<T | undefined>((): T | undefined => {
+    const sizeProp = config?.sizeProp || "size";
+    if (props[sizeProp as keyof P] !== undefined) {
+      return props[sizeProp as keyof P] as unknown as T;
     } else {
-      for (let i = 0; i < config.options.length; i++) {
-        if (props[config.options[i]] === true) {
-          return config.options[i];
+      const options = config?.options || (["xsmall", "small", "medium", "standard", "large", "xlarge"] as T[]);
+      for (let i = 0; i < options.length; i++) {
+        if (props[options[i]] === true) {
+          return options[i];
         }
       }
     }
-    return config.default;
-  }, [config.options, config.default, props]);
+    return config?.default || ("standard" as T);
+  }, [config, props]);
 
 export const InitialLayoutRef: ILayoutRef = {
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */

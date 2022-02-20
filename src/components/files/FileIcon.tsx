@@ -64,7 +64,7 @@ const getFileIcon = (name: string | undefined, ext: string | undefined): IconPro
   return mapping?.icon || "file";
 };
 
-type FileIconProps = Omit<IIcon, "icon"> & {
+type FileIconProps = Omit<IconProps, "icon"> & {
   readonly name?: string | undefined;
   readonly ext?: string | undefined;
 };

@@ -1,35 +1,44 @@
-import React, { forwardRef, ForwardedRef, ReactNode } from "react";
+import React, { forwardRef, ForwardedRef } from "react";
 import classNames from "classnames";
 
 import { ui } from "lib";
 import { isNil } from "lodash";
 
-type WithSizeConfig<S extends string> = {
-  readonly default?: S;
+import { UseSizeConfig } from "lib/ui/hooks";
+
+type WithSizeConfig<
+  T extends string = StandardSize,
+  P extends UseSizeProps<T, string> = UseSizeProps<T, "size">
+> = Omit<UseSizeConfig<T, P>, "options"> & {
   readonly classNamePrefix?: string;
   readonly hasRef?: boolean;
+  readonly options?: T[];
 };
 
 export const withSize =
   <
-    T extends { readonly className?: string; readonly children?: ReactNode; readonly ref?: ForwardedRef<REF> },
-    S extends string,
+    PROPS extends { readonly className?: string; readonly ref?: ForwardedRef<REF> },
+    T extends string = StandardSize,
+    SP extends string = "size",
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     REF = any,
-    CT extends T & UseSizeProps<S> = T & UseSizeProps<S>
+    P extends UseSizeProps<T, string> = UseSizeProps<T, SP>,
+    CT extends PROPS & P = PROPS & P
   >(
-    options: S[],
-    conf?: WithSizeConfig<S>
+    conf?: WithSizeConfig<T, P>
   ) =>
   (
-    Component: React.FunctionComponent<T>
+    Component: React.FunctionComponent<PROPS>
   ): typeof conf extends { readonly hasRef: true }
     ? React.ForwardRefRenderFunction<REF, CT & { readonly ref?: ForwardedRef<REF> }>
     : React.FunctionComponent<CT> => {
     const WithSize = (props: CT & { readonly forwardedRef?: ForwardedRef<REF> }): JSX.Element => {
-      const _size = ui.hooks.useSize({ options, default: conf?.default }, props);
+      const _size = ui.hooks.useSize(props, conf);
 
       let injectedProps = { ...props };
+
+      const options = conf?.options || (["small", "medium", "standard", "large"] as T[]);
+      delete injectedProps[conf?.sizeProp || "size"];
       for (let i = 0; i < options.length; i++) {
         delete injectedProps[options[i]];
       }

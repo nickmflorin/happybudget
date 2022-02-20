@@ -48,7 +48,7 @@ const RecoverPasswordForm: React.FC<RecoverPasswordFormProps> = ({
         <EmailInput size={"large"} />
       </Form.Item>
       <Form.Footer>
-        <PrimaryButton loading={loading} large={true} className={"btn--login"} htmlType={"submit"}>
+        <PrimaryButton loading={loading} xlarge={true} className={"btn--landing"} htmlType={"submit"}>
           {"Submit"}
         </PrimaryButton>
         <div className={"switch-text"}>

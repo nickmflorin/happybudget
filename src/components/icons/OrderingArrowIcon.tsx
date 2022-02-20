@@ -2,7 +2,7 @@ import React from "react";
 
 import Icon from "./Icon";
 
-type OrderingArrowIconProps = Omit<IIcon, "icon"> & {
+type OrderingArrowIconProps = Omit<IconProps, "icon"> & {
   readonly order: Http.Order;
 };
 

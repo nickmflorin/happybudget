@@ -1,4 +1,4 @@
-@import './imports';
+@import "./imports";
 
 @mixin fface($family, $type: "Regular", $weight: 400, $style: normal) {
   $src: null;
@@ -50,101 +50,105 @@
 @include fface("Roboto", "Bold", 700);
 
 .header-base {
-	color: $text-primary;
-	margin-top: 0;
-	margin-bottom: 0;
-	font-family: $avenir;
-	font-weight: 600;
+  color: $text-primary;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-family: $avenir;
+  font-weight: 600;
 }
 
 p {
-	margin-bottom: 0;
-	color: $text-secondary;
-	margin-top: 0;
-	font-family: $avenir;
-	font-weight: 400;
+  margin-bottom: 0;
+  color: $text-secondary;
+  margin-top: 0;
+  font-family: $avenir;
+  font-weight: 400;
 }
 
 h1 {
-	@extend .header-base;
-	font-weight: 700;
+  @extend .header-base;
+  font-weight: 700;
 
-	&.ant-typography {
-		font-size: 28px;
-	}
+  &.ant-typography {
+    font-size: 28px;
+  }
 }
 
 h2 {
-	@extend .header-base;
+  @extend .header-base;
 }
 
 h3 {
-	@extend .header-base;
+  @extend .header-base;
 }
 
 h4 {
-	@extend .header-base;
+  @extend .header-base;
 
-	&.ant-typography {
-		color: $text-secondary;
-		font-size: 16px;
-		font-weight: 400;
-		line-height: 20px;
-	}
+  &.ant-typography {
+    color: $text-secondary;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 20px;
+  }
 }
 
 h5 {
-	@extend .header-base;
+  @extend .header-base;
 }
 
 h6 {
-	@extend .header-base;
+  @extend .header-base;
+}
+
+.avenir {
+  font-family: $avenir !important;
 }
 
 .truncate {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
-	&.link {
-		text-align: left;
-	}
+  &.link {
+    text-align: left;
+  }
 }
 
 .strikethrough {
-	text-decoration: line-through;
-	color: $gray;
+  text-decoration: line-through;
+  color: $gray;
 }
 
 .entity-text {
-	font-size: 12px;
-	width: 100%;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+  font-size: 12px;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
-	.entity-text-identifier {
-		font-family: $avenir;
-		font-weight: 600;
-		color: #b5b5b5;
-	}
+  .entity-text-identifier {
+    font-family: $avenir;
+    font-weight: 600;
+    color: #b5b5b5;
+  }
 
-	.entity-text-description {
-		font-family: $avenir;
-		font-weight: 600;
-		color: $text-secondary;
+  .entity-text-description {
+    font-family: $avenir;
+    font-weight: 600;
+    color: $text-secondary;
 
-		&.with-identifier {
-			margin-left: 5px;
-		}
-	}
+    &.with-identifier {
+      margin-left: 5px;
+    }
+  }
 }
 
 .text-with-included-link {
-	.link,
-	.btn {
-		line-height: 16px;
-		font-size: 12px;
-		vertical-align: 0.225rem;
-	}
+  .link,
+  .btn {
+    line-height: 16px;
+    font-size: 12px;
+    vertical-align: 0.225rem;
+  }
 }

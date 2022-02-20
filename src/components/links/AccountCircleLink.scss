@@ -1,9 +1,8 @@
 @import "style/_imports";
 
 .account-circle-link {
+  @include standard_size("large");
   display: block;
-  width: 36px !important;
-  height: 36px !important;
   border-radius: 100%;
   overflow: hidden;
   text-align: center;

@@ -39,8 +39,7 @@ const UploadPdfImage = (props: UploaderProps): JSX.Element => {
                   : `Saved ${params.image.extension} Image`}
               </div>
               <ClearButton
-                size={"xxsmall"}
-                style={{ height: 28, width: 28, padding: 6 }}
+                size={"small"}
                 onClick={(e: React.MouseEvent<HTMLInputElement>) => {
                   e.preventDefault();
                   e.stopPropagation();

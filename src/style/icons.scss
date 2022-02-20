@@ -1,0 +1,20 @@
+.icon {
+  color: $icon-color;
+
+  &--green {
+    color: $green !important;
+  }
+}
+
+.icon-wrapper {
+  width: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .icon {
+    height: 100%;
+    width: auto;
+  }
+}

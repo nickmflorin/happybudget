@@ -3,7 +3,6 @@
 @import "./typography";
 @import "./layout";
 @import "./buttons";
-@import "./input";
 @import "./forms";
 @import "./tooltips";
 @import "./popovers";
@@ -18,6 +17,8 @@
 @import "./pagination";
 @import "./util";
 @import "./fancybox";
+@import "./icons";
+@import "./loading";
 
 @import "~antd/dist/antd.css";
 @import "filepond/dist/filepond.min.css";
@@ -76,21 +77,6 @@ code {
   top: 0rem !important;
 }
 
-.ant-spin {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
 svg {
   vertical-align: 0 !important;
-}
-
-.color {
-  &--green {
-    color: $green !important;
-  }
-  &--red {
-    color: $red !important;
-  }
 }

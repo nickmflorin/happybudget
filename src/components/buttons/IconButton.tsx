@@ -1,35 +1,29 @@
 import React from "react";
 import classNames from "classnames";
-import { isNil } from "lodash";
 
 import { withSize } from "components/hocs";
 import Button, { ButtonProps } from "./Button";
 
-type IconButtonSize = "small" | "medium" | "large" | "xsmall" | "xxsmall";
+/* With the IconButton, the "IconButtonIconSize" does not determine the size
+   attributes of the Icon directly, but instead determines the size of the
+   padding around the Icon - which indirectly determines the size. */
+type IconButtonIconSize = StandardSize | "xsmall";
 
-type PrivateIconButtonProps = Omit<ButtonProps, "icon" | "children" | "size"> & {
+type PrivateIconButtonProps = Omit<ButtonProps, "icon" | "children"> & {
   readonly icon: IconOrElement | ((params: ClickableIconCallbackParams) => IconOrElement);
   readonly fill?: boolean;
-  readonly outersize?: number;
+  /* If the iconDimension is provided, this is the value that will be used for
+     the height and the width - not the `iconSize` prop. */
+  readonly iconDimension?: number;
 };
 
-export type IconButtonProps = PrivateIconButtonProps & UseSizeProps<IconButtonSize>;
+export type IconButtonProps = PrivateIconButtonProps & UseSizeProps<IconButtonIconSize, "iconSize">;
 
-/**
- * A consistently styled Button component for buttons that contain just an Icon.
- */
-const IconButton = ({ icon, fill, outersize, ...props }: PrivateIconButtonProps): JSX.Element => (
-  <Button
-    {...props}
-    icon={icon}
-    className={classNames("btn--icon-only", props.className, { fill })}
-    style={
-      !isNil(outersize) ? { height: outersize, width: outersize, minWidth: outersize, ...props.style } : props.style
-    }
-  />
+const IconButton = ({ fill, ...props }: PrivateIconButtonProps): JSX.Element => (
+  <Button {...props} className={classNames("btn--icon-only", props.className, { fill })} />
 );
 
-export default withSize<IconButtonProps, IconButtonSize>(["small", "medium", "large", "xsmall", "xxsmall"], {
-  default: "large",
-  hasRef: false
+export default withSize<IconButtonProps, IconButtonIconSize, "iconSize">({
+  classNamePrefix: "icon-",
+  sizeProp: "iconSize"
 })(React.memo(IconButton));

@@ -9,7 +9,7 @@ const PrefixMap: { [key in IconWeight]: IconPrefix } = { light: "fal", regular: 
 
 const Icon = forwardRef(
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  ({ icon, green, prefix, weight, light, regular, solid, ...props }: IIcon, ref: ForwardedRef<any>) => {
+  ({ icon, green, prefix, weight, light, regular, solid, dimension, ...props }: IconProps, ref: ForwardedRef<any>) => {
     const derivedPrefix = useMemo(() => {
       if (!isNil(prefix)) {
         return prefix;
@@ -27,6 +27,7 @@ const Icon = forwardRef(
       return (
         <FontAwesomeIcon
           {...props}
+          style={{ ...props.style, ...dimension }}
           forwardedRef={ref}
           className={classNames("icon", { "icon--green": green }, props.className)}
           icon={typeof icon === "string" ? [derivedPrefix, icon] : icon}

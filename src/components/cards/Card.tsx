@@ -83,31 +83,33 @@ const Card = ({
         </div>
       )}
       <div className={"card-inner"}>
-        <RenderWithSpinner size={18} loading={loading}>
-          {!isNil(dropdown) && (
-            <DropdownMenu models={dropdown} placement={"bottomRight"}>
-              <IconButton
-                className={classNames("dropdown-ellipsis", iconClassName)}
-                icon={<Icon icon={"ellipsis-v"} weight={"light"} />}
-              />
-            </DropdownMenu>
-          )}
-          <CardImage
-            image={image}
-            onClick={disabled ? undefined : onClick}
-            titleOnly={isNil(subTitle)}
-            onError={() => setImageError(true)}
-            onLoad={() => setImageError(false)}
-          />
-          <div
-            className={classNames("card-footer", { "title-only": isNil(subTitle) })}
-            onClick={disabled ? undefined : onClick}
-          >
-            <div className={"title"}>{title}</div>
-            <ShowHide show={!isNil(subTitle)}>
-              <div className={"sub-title truncate"}>{subTitle}</div>
-            </ShowHide>
-          </div>
+        <RenderWithSpinner spinnerProps={{ size: "small" }} loading={loading}>
+          <React.Fragment>
+            {!isNil(dropdown) && (
+              <DropdownMenu models={dropdown} placement={"bottomRight"}>
+                <IconButton
+                  className={classNames("dropdown-ellipsis", iconClassName)}
+                  icon={<Icon icon={"ellipsis-v"} weight={"light"} dimension={{ height: 26 }} />}
+                />
+              </DropdownMenu>
+            )}
+            <CardImage
+              image={image}
+              onClick={disabled ? undefined : onClick}
+              titleOnly={isNil(subTitle)}
+              onError={() => setImageError(true)}
+              onLoad={() => setImageError(false)}
+            />
+            <div
+              className={classNames("card-footer", { "title-only": isNil(subTitle) })}
+              onClick={disabled ? undefined : onClick}
+            >
+              <div className={"title"}>{title}</div>
+              <ShowHide show={!isNil(subTitle)}>
+                <div className={"sub-title truncate"}>{subTitle}</div>
+              </ShowHide>
+            </div>
+          </React.Fragment>
         </RenderWithSpinner>
       </div>
     </div>

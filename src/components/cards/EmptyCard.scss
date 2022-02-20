@@ -5,7 +5,7 @@
 
   .empty-card {
     position: relative;
-		height: 214px;
+    height: 214px;
     cursor: pointer;
     box-sizing: border-box;
     display: flex;
@@ -14,23 +14,23 @@
     text-align: center;
     margin-bottom: 10px;
 
-		// This makes the card behave somewhat like the upload image cards.
-		border: 1px dashed #d9d9d9;
+    // This makes the card behave somewhat like the upload image cards.
+    border: $dashed-border;
     border-radius: 14px;
 
-		&.template-empty-card {
-			height: 194px;
-		}
+    &.template-empty-card {
+      height: 194px;
+    }
 
-		&:hover {
-			// This makes the card behave somewhat like the upload image cards.
-			border-color: #1890ff;
-			background-color: #fdfdfd;
-		}
+    &:hover {
+      // This makes the card behave somewhat like the upload image cards.
+      border-color: #1890ff;
+      background-color: #fdfdfd;
+    }
 
     svg {
-      height: 36px !important;
-      width: 36px !important;
+      height: $large-size !important;
+      width: $large-size !important;
       color: $text-primary;
     }
   }

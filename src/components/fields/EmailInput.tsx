@@ -8,7 +8,7 @@ export type EmailInputProps = InputProps;
 const EmailInput = (props: EmailInputProps): JSX.Element => (
   <Input
     placeholder={"Email"}
-    prefix={<Icon icon={"envelope"} />}
+    prefix={<Icon icon={"envelope"} weight={"solid"} />}
     {...props}
     className={classNames("input", "input--email", props.className)}
   />

@@ -10,14 +10,13 @@ import { withSize } from "components/hocs";
    the HOC. */
 type PrivateInputProps = Omit<AntDInputProps, "size">;
 
-export type InputProps = PrivateInputProps & UseSizeProps<"small" | "medium" | "large">;
+export type InputProps = PrivateInputProps & UseSizeProps;
 
 const Input = (props: PrivateInputProps, ref: React.ForwardedRef<AntDInput>): JSX.Element => (
   <AntDInput {...props} ref={ref} className={classNames("input", props.className)} />
 );
 
-export default withSize<InputProps, "small" | "medium" | "large", AntDInput>(["small", "medium", "large"], {
-  classNamePrefix: "input--",
+export default withSize<InputProps, StandardSize, "size", AntDInput>({
   hasRef: true
 })(forwardRef(Input)) as React.ForwardRefRenderFunction<
   AntDInput,

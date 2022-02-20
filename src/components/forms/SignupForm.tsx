@@ -93,11 +93,13 @@ const SignupForm = ({
         <PasswordInput size={"large"} placeholder={"Confirm"} />
       </Form.Item>
       <Form.Footer style={{ marginTop: 20 }}>
-        <PrimaryButton large={true} loading={loading} className={"btn--register"} htmlType={"submit"}>
+        <PrimaryButton xlarge={true} loading={loading} className={"btn--landing"} htmlType={"submit"}>
           {"Register"}
         </PrimaryButton>
         <SocialButton
+          className={"btn--landing"}
           provider={"google"}
+          xlarge={true}
           onGoogleSuccess={onGoogleSuccess}
           onGoogleError={onGoogleError}
           onGoogleScriptLoadFailure={onGoogleScriptLoadFailure}

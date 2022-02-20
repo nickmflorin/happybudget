@@ -1,7 +1,7 @@
 // This class is not meant to be used in the components.
 .btn-link-base {
   font-size: 12px;
-  letter-spacing: 0.028em;
+  letter-spacing: 0.01em;
   font-stretch: normal;
   text-align: center;
   text-decoration: none;
@@ -11,6 +11,18 @@
   vertical-align: middle;
   justify-content: center;
   border-color: $transparent;
+  background-color: $transparent;
+  border-width: 1px;
+  box-sizing: border-box;
+  box-shadow: none !important;
+  outline: 0;
+  margin: 0;
+
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+
+  @include transition(none);
 
   &:disabled,
   &.disabled,
@@ -19,10 +31,6 @@
   &:focus:not(:disabled):not(.disabled):not(.fake-disabled),
   &.hovered:not(:disabled):not(.disabled):not(.fake-disabled) {
     border-color: $transparent;
-  }
-
-  &.no-transform {
-    text-transform: unset;
   }
 
   .icon {
@@ -37,26 +45,21 @@
   }
 }
 
-.icon {
-  color: $icon-color;
-
-  &--green {
-    color: $green !important;
-  }
+@mixin focus_border_color($c) {
+	&:hover,
+	&:focus {
+		border-color: $border-color !important;
+	}
 }
 
-.icon-wrapper {
-  width: auto;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  .icon {
-    height: 100%;
-    width: auto;
-  }
+@mixin disabled_border_color($c) {
+	&:disabled,
+	&.fake-disabled,
+	&.disabled {
+		border-color: $c !important;
+	}
 }
+
 
 @mixin color_on_hover($c) {
   &:hover:not(:disabled):not(.disabled):not(.fake-disabled),
@@ -128,9 +131,9 @@
     color: $c;
   }
 
-	.anticon-loading {
-		color: $c !important;
-	}
+  .anticon-loading {
+    color: $c !important;
+  }
 }
 
 @mixin bare_color_set($c, $h: lighten($c, 20%), $d: $disabled-color) {
@@ -160,39 +163,21 @@
 @mixin primary() {
   @include bg_color_set($green, $green-darker, $green-darker);
   @include solid_color($white);
-  border-color: $transparent !important;
 }
 
 @mixin over() {
   @include bg_color_set(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2));
   @include solid_color($white);
-  border-color: $transparent !important;
 }
 
 @mixin danger() {
   @include bg_color_set($red, $red-darker, $red-darker);
   @include solid_color($white);
-  border-color: $transparent !important;
 }
 
 @mixin default() {
   @include bg_color_set(#ececec, darken(#ececec, 10%), darken(#ececec, 10%));
   @include solid_color($text-secondary);
-  border-color: $transparent !important;
-}
-
-@mixin variant_icon_only() {
-  height: 36px;
-  width: 42px;
-  min-width: 0px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 6px 9px;
-
-  .icon {
-    margin-right: 0px;
-  }
 }
 
 .link {
@@ -200,7 +185,7 @@
   font-family: $roboto;
   font-weight: 400;
   transition: none;
-  background-color: transparent;
+  background-color: $transparent;
   padding: 0;
   border: none !important;
 
@@ -210,22 +195,18 @@
     color: inherit;
   }
 
-	color: $blue;
-	&:hover {
-		color: lighten($blue, 10%);
-	}
-
-	&.avenir {
-		font-family: $avenir;
-	}
+  color: $blue;
+  &:hover {
+    color: lighten($blue, 10%);
+  }
 
   &--dark {
     color: $text-primary;
     text-transform: none !important;
 
-		&:hover {
-			color: lighten($text-primary, 10%);
-		}
+    &:hover {
+      color: lighten($text-primary, 10%);
+    }
   }
 
   &--inline {
@@ -233,30 +214,83 @@
   }
 }
 
+@mixin button_size_standard() {
+  @include standard_height_variants();
+
+	&.xlarge {
+    padding: 10px 12px;
+    line-height: 20px;
+		font-size: 16px;
+  }
+
+  &.large {
+    padding: 10px 10px;
+    line-height: 16px;
+  }
+
+  &.standard {
+    padding: 8px 7px;
+    line-height: 16px;
+  }
+
+  &.medium {
+    padding: 7px 6px;
+    line-height: 16px;
+  }
+
+  &.small {
+    padding: 6px 5px;
+    line-height: 16px;
+  }
+}
+
+@mixin variant_icon_only() {
+  min-width: 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  &.large {
+    width: 42px;
+    padding: 7px 10px;
+  }
+
+  &.standard {
+    width: 38px;
+    padding: 6px 9px;
+  }
+
+  &.medium {
+    width: 36px;
+    padding: 5px 8px;
+  }
+
+  &.small {
+    width: 32px;
+    padding: 4px 7px;
+  }
+
+  .icon {
+    margin-right: 0px;
+  }
+}
+
+.btn-base {
+  @extend .btn-link-base;
+	@include button_size_standard();
+  font-family: $avenir;
+  font-weight: 600;
+  border-width: 1px;
+  border: 1px solid $transparent;
+  border-radius: 4px;
+  display: inline-flex;
+  color: $text-secondary;
+  min-width: 0px;
+}
+
 .btn,
 .ant-btn {
-  @extend .btn-link-base;
-  font-family: $avenir;
-  letter-spacing: 0.01em;
-  font-weight: 600;
-  padding: 8px 12px;
-  min-width: 80px;
-  height: 36px;
-  line-height: 20px;
-  border-radius: 4px;
-  margin: 0;
-  display: inline-flex;
-  outline: 0;
-  background: $white;
-  border-color: #d9d9d9;
-  border-width: 1px;
-  color: $text-secondary;
-  box-sizing: border-box;
-  box-shadow: none !important;
-
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  -webkit-tap-highlight-color: transparent;
+  @extend .btn-base;
 
   .spinner {
     height: 16px !important;
@@ -272,7 +306,7 @@
   }
 
   .icon {
-    height: 100% !important;
+    height: 100%;
     width: auto;
     color: inherit;
   }
@@ -281,11 +315,7 @@
   &--link {
     @extend .btn;
     color: $blue;
-    transition: none;
-    box-shadow: none;
-    background-color: transparent;
     padding: 0;
-    min-width: 0;
     text-decoration: none !important;
     height: auto;
     border: none !important;
@@ -293,6 +323,11 @@
     &:hover,
     &:focus {
       background-color: transparent;
+    }
+
+    .spinner {
+      @include size(14px);
+      color: $blue !important;
     }
   }
 
@@ -321,10 +356,6 @@
   &--over {
     @extend .btn;
     @include over();
-    padding: 4px 10px;
-    height: 28px;
-    line-height: 20px;
-    min-width: 0px;
     z-index: 10000;
   }
 
@@ -334,19 +365,13 @@
   }
 
   &--icon-only {
+    @extend .btn;
+		padding: 0 !important;
     min-width: 0px;
-    box-shadow: none !important;
     border-radius: 100px;
-    border: 1px solid $transparent;
-    background-color: $transparent;
-    height: 36px;
-    width: 36px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding: 6px;
     color: $icon-color;
-    cursor: pointer;
 
     .icon {
       margin-right: 0px;
@@ -356,11 +381,6 @@
       height: 100% !important;
       width: 100% !important;
       margin-right: 0px;
-
-      svg {
-        height: 100% !important;
-        width: auto !important;
-      }
     }
 
     .vertical-flex-c {
@@ -369,38 +389,41 @@
     }
 
     @include bare_color_set($icon-color);
+    @include standard_size_variants();
 
-    &.xxsmall {
-      padding: 10px;
-    }
-
-    &.xsmall {
-      padding: 9px;
-    }
-
-    &.small {
-      padding: 8px;
-    }
-
-    &.medium {
-      padding: 7px;
-    }
-
-    &.large {
-      padding: 6px;
-    }
+		&.icon-xsmall {
+			.icon {
+				height: 12px;
+				width: auto;
+			}
+		}
+		&.icon-small {
+			.icon {
+				height: 14px;
+				width: auto;
+			}
+		}
+		&.icon-medium {
+			.icon {
+				height: 16px;
+				width: auto;
+			}
+		}
+		&.icon-standard {
+			.icon {
+				height: 16px;
+				width: auto;
+			}
+		}
+		&.icon-large {
+			.icon {
+				height: 18px;
+				width: auto;
+			}
+		}
 
     &.ag-grid-action-button {
-      height: 26px;
-      width: 26px;
-      padding: 6px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-
       .icon {
-        height: 16px;
-        width: auto !important;
         color: $green;
       }
 
@@ -473,7 +496,6 @@
 
   &--clear-image {
     flex-direction: column;
-    justify-content: center;
     @include bare_color_set($text-primary);
 
     .icon {
@@ -492,17 +514,21 @@
     }
   }
 
+  &--landing {
+    @extend .btn;
+    width: 230px !important;
+  }
+
   &--login,
   &--reset,
-	&--register {
-    font-weight: 600;
+  &--register {
+    font-size: 18px;
   }
 
   &--clear,
   &--accept {
     @extend .btn;
     flex-direction: column;
-    justify-content: center;
     @include bare_color_set(#d2d2d2, #a5a5a5);
 
     .icon {
@@ -512,34 +538,24 @@
   }
 
   &--google {
-    border-radius: 4px !important;
-    width: 230px !important;
-    text-transform: unset !important;
-    font-weight: 600 !important;
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
-    height: 48px;
-    font-size: 14px !important;
-    font-family: $avenir;
-
-    @include bg_color_set($white, $white, $white);
+    @extend .btn;
+		@include bg_color_set($white, $white, $white);
     @include solid_color($text-secondary);
-    border-color: #e5e5e5 !important;
+    border-color: $border-color;
 
-    &:hover,
-    &:focus,
-    &:disabled,
-    &.fake-disabled,
-    &.disabled {
-      box-shadow: none !important;
-      border-color: #e5e5e5 !important;
-    }
+    text-transform: unset;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    line-height: 32px !important;
+		font-size: 14px !important;
+
+		@include focus_border_color($border-color);
+		@include disabled_border_color($border-color);
 
     .content-wrapper {
       display: flex;
       margin: 0 auto;
       position: relative;
-      height: 100%;
 
       .icon-wrapper {
         margin-right: 8px;
@@ -550,24 +566,15 @@
           width: 18px;
         }
       }
-
-      .text-wrapper {
-        line-height: 42px;
-      }
     }
   }
 
   &--bare {
-    font-weight: 600;
+    @extend .btn;
     min-width: 0px;
-    padding: 10px 12px;
-    line-height: 16px;
     @include bare_color_set($text-secondary);
 
     &.budget-table-menu {
-      padding: 7px 6px;
-      line-height: 16px;
-      height: 30px;
       @include bare_color_set($text-secondary, $green);
     }
   }
@@ -575,30 +582,5 @@
   &--entity-text {
     padding-left: 0px !important;
     padding-right: 0px !important;
-  }
-
-  &.large:not(.btn--icon-only) {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    height: auto;
-    width: 230px;
-		line-height: 20px;
-
-    > span {
-      font-size: 20px;
-      font-weight: 600;
-      font-family: $avenir;
-      text-transform: unset;
-    }
-  }
-
-  &.small:not(.btn--icon-only) {
-    padding: 6px 12px;
-    height: 30px;
-		line-height: 18px;
-
-		> span {
-			font-size: 11px;
-		}
   }
 }

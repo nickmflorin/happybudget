@@ -27,10 +27,17 @@ const PublicUrlInput = ({ urlFormatter, value, actions, onChange, ...props }: Pu
 
   return (
     <div className={"public-url-input-div"}>
-      <Input {...props} small={true} disabled={true} value={`${process.env.REACT_APP_DOMAIN}${urlFormatter(val)}`} />
+      <Input
+        {...props}
+        small={true}
+        disabled={true}
+        size={"small"}
+        value={`${process.env.REACT_APP_DOMAIN}${urlFormatter(val)}`}
+      />
       <div className={"public-url-actions"}>
         <ShowHide show={includes(actions, "refresh")}>
           <IconButton
+            size={"small"}
             icon={"refresh"}
             onClick={() => {
               const newV = uuidv4();
@@ -41,6 +48,7 @@ const PublicUrlInput = ({ urlFormatter, value, actions, onChange, ...props }: Pu
         </ShowHide>
         <ShowHide show={includes(actions, "copy")}>
           <IconButton
+            size={"small"}
             icon={"clipboard"}
             onClick={() =>
               util.clipboard.copyTextToClipboard(
@@ -54,7 +62,7 @@ const PublicUrlInput = ({ urlFormatter, value, actions, onChange, ...props }: Pu
           />
         </ShowHide>
         <ShowHide show={includes(actions, "visit")}>
-          <IconButton icon={"square-arrow-up-right"} onClick={() => history.push(urlFormatter(val))} />
+          <IconButton size={"small"} icon={"square-arrow-up-right"} onClick={() => history.push(urlFormatter(val))} />
         </ShowHide>
       </div>
     </div>

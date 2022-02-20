@@ -211,7 +211,7 @@ const Uploader = (
             .catch((e: Error) => options.onError?.(e));
         }}
       >
-        <RenderWithSpinner size={24} loading={loading && showLoadingIndicator}>
+        <RenderWithSpinner spinnerProps={{ size: "medium" }} loading={loading && showLoadingIndicator}>
           <ShowHide show={!isNil(image) && showClear === true}>
             <ImageClearButton
               {...imageClearButtonProps}

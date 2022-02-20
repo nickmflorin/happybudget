@@ -29,15 +29,16 @@ declare type IconProp =
 declare type IconWeight = "light" | "regular" | "solid";
 declare type IconOrElement = IconProp | JSX.Element;
 
-declare interface IIcon extends Omit<import("@fortawesome/react-fontawesome").FontAwesomeIconProps, "icon"> {
+declare type IconProps = Omit<import("@fortawesome/react-fontawesome").FontAwesomeIconProps, "icon"> & {
   readonly icon?: IconProp | undefined | null;
+  readonly dimension?: Dimension;
   readonly prefix?: import("@fortawesome/fontawesome-svg-core").IconPrefix;
   readonly green?: boolean;
   readonly weight?: IconWeight;
   readonly light?: boolean;
   readonly regular?: boolean;
   readonly solid?: boolean;
-}
+};
 
 declare type PropsOf<T> = T extends React.ComponentType<infer Props> ? Props : never;
 
@@ -76,7 +77,9 @@ declare type IncludeLink = IncludeLinkFn | LinkObj;
 
 declare type ClickableIconCallbackParams = {
   readonly isHovered: boolean;
+  readonly iconProps?: Omit<IconProps, "icon">;
 };
+
 declare type ClickableIconCallback = (params: ClickableIconCallbackParams) => IconOrElement;
 declare type ClickableIconOrElement = IconOrElement | ClickableIconCallback;
 
@@ -95,6 +98,19 @@ declare type Pagination = {
   readonly pageSize?: number;
 };
 
-declare type UseSizeProps<T extends string = string> = {
-  size?: T;
+declare type Dimension = { readonly width?: number; readonly height?: number };
+
+declare type StandardSize = "xsmall" | "small" | "medium" | "standard" | "large" | "xlarge";
+
+/**
+ * The props that are used to dictate size in a flexible manner.  The generic
+ * type T defines the different size options dictated as boolean values and the
+ * generic type S defines the prop that can be supplied to dictate the size as
+ * a string.
+ *
+ * Ex) UseSizeProps<"small" | "medium", "size">
+ *     >>> { size: "small" } or { size: "medium" } or { medium: true } or ...
+ */
+declare type UseSizeProps<T extends string = StandardSize, S extends string = "size"> = {
+  [key in S]?: T;
 } & { [key in T]?: boolean };

@@ -66,10 +66,12 @@ const LoginForm: React.FC<LoginFormProps> = ({
         </RouterLink>
       </div>
       <Form.Footer>
-        <PrimaryButton loading={loading} large={true} className={"btn--login"} htmlType={"submit"}>
+        <PrimaryButton loading={loading} xlarge={true} className={"btn--landing"} htmlType={"submit"}>
           {"Login"}
         </PrimaryButton>
         <SocialButton
+          className={"btn--landing"}
+          xlarge={true}
           provider={"google"}
           onGoogleSuccess={onGoogleSuccess}
           onGoogleError={onGoogleError}

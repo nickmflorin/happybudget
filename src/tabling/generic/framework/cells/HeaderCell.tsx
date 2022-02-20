@@ -63,8 +63,9 @@ const HeaderCell = <R extends Table.RowData, M extends Model.RowHttpModel = Mode
       {!isNil(onEdit) && tabling.typeguards.isBodyColumn(column) && (
         <VerticalFlexCenter>
           <IconButton
-            className={"btn--table-header-edit"}
-            size={"small"}
+            iconSize={"xsmall"}
+            style={{ float: "right", width: 12 }}
+            size={"xsmall"}
             icon={<Icon icon={"edit"} weight={"solid"} />}
             onClick={() => !isNil(column.field) && onEdit(column.field, column)}
           />

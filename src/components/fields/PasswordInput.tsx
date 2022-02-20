@@ -60,7 +60,7 @@ const PasswordInput = ({ hasValidator, ...props }: PasswordInputProps): JSX.Elem
     return (
       <AntDInput.Password
         placeholder={"Password"}
-        prefix={<Icon icon={"lock"} />}
+        prefix={<Icon icon={"lock"} weight={"solid"} />}
         {...props}
         className={classNames("input", "input--password", props.className)}
         onChange={handleValidation}

@@ -19,7 +19,7 @@
       font-family: $avenir;
       font-weight: 500;
       color: $text-secondary;
-      line-height: 36px;
+      line-height: $standard-size;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -32,17 +32,17 @@
     }
 
     .link {
-      line-height: 36px;
+      line-height: $standard-size;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-		.file-action-wrapper {
-      height: 36px;
+    .file-action-wrapper {
+      height: $standard-size;
       width: 18px;
       padding: 10px 3px;
-			margin-right: 3px;
+      margin-right: 3px;
 
       > .icon {
         height: 16px;
@@ -51,7 +51,7 @@
     }
 
     .button-action-wrapper {
-      height: 36px;
+      height: $standard-size;
       width: 28px;
       padding: 7px 3px;
 

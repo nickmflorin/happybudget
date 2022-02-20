@@ -35,12 +35,12 @@ select:-webkit-autofill:focus {
 }
 
 input:-webkit-autofill::first-line {
-	font-size: 13px;
+	font-size: 12px;
 	color: $text-primary !important;
 	font-family: $avenir;
 	font-weight: 500;
 	width: 100%;
-	line-height: 22px;
+	line-height: 16px;
 }
 
 input:focus-visible {
@@ -66,9 +66,79 @@ input:focus-visible {
 	}
 }
 
+@mixin input_size_standard() {
+	@include standard_height_variants();
+
+	line-height: 16px !important;
+	border-radius: $input-border-radius !important;
+
+	> input {
+		line-height: 16px !important;
+		border-radius: $input-border-radius !important;
+	}
+
+	&.large {
+		line-height: 20px !important;
+		border-radius: $input-border-radius !important;
+		> input {
+			line-height: 20px !important;
+			border-radius: $input-border-radius !important;
+		}
+	}
+
+	&.standard {
+		line-height: 16px !important;
+		border-radius: $input-border-radius !important;
+		> input {
+			line-height: 16px !important;
+			border-radius: $input-border-radius !important;
+		}
+	}
+
+	&.medium {
+		line-height: 16px !important;
+		border-radius: $input-small-border-radius !important;
+		> input {
+			line-height: 16px !important;
+			border-radius: $input-small-border-radius !important;
+		}
+	}
+
+	&.small {
+		line-height: 14px !important;
+		> input {
+			line-height: 14px !important;
+			border-radius: $input-small-border-radius !important;
+		}
+	}
+}
+
+@mixin input_size_padding_standard() {
+	padding-top: 8px;
+	padding-bottom: 8px;
+	padding-left: 12px;
+	padding-right: 12px;
+
+	&.large {
+		padding: 8px 12px;
+	}
+
+	&.standard {
+		padding: 8px 12px;
+	}
+
+	&.medium {
+		padding: 7px 8px;
+	}
+
+	&.small {
+		padding: 7px 8px;
+	}
+}
+
 // This class is not meant to be used in the components.
 .input-base {
-	transition: all 0.3s;
+	@include transition(none);
 	border: none;
 	background-color: $gray-light !important;
 	color: $text-primary !important;
@@ -82,18 +152,8 @@ input:focus-visible {
 	font-family: $avenir;
 	font-weight: 500;
 	width: 100%;
-	line-height: 22px;
-	font-size: 13px;
-}
-
-.input-medium-base {
-	line-height: 18px !important;
-	font-size: 13px !important;
-}
-
-.input-small-base {
-	line-height: 16px !important;
-	font-size: 12px !important;
+	box-shadow: none !important;
+	font-size: 12px;
 }
 
 // The generic `input` class is applied to the wrapping component.  The actual
@@ -101,48 +161,22 @@ input:focus-visible {
 // wrapping component.
 .input {
 	@extend .input-base;
-	border-radius: $input-border-radius;
-	// Padding with line-height must be 36px for our standard size.  7px + 7px + 22px = 36px
-	padding-top: 7px;
-	padding-bottom: 7px;
-	padding-left: 12px;
-	padding-right: 12px;
+	@include input_size_padding_standard();
+	@include input_size_standard();
 
 	.ant-input-prefix {
 		margin-right: 12px;
-		font-size: 13px;
+		font-size: 12px;
+
+		svg {
+			height: 0.7rem;
+			color: #adadad;
+		}
 	}
 
 	input {
 		@extend .input-base;
-	}
-
-	&--medium {
-		@extend .input-medium-base;
-		padding-top: 7px !important;
-		padding-bottom: 7px !important;
-		padding-left: 8px !important;
-		padding-right: 8px !important;
-		border-radius: $input-small-border-radius !important;
-		height: 30px;
-
-		input {
-			@extend .input-medium-base;
-		}
-	}
-
-	&--small {
-		@extend .input-small-base;
-		padding-top: 5px !important;
-		padding-bottom: 5px !important;
-		padding-left: 8px !important;
-		padding-right: 8px !important;
-		border-radius: $input-small-border-radius !important;
-		height: 26px;
-
-		input {
-			@extend .input-small-base;
-		}
+		height: 100%;
 	}
 
 	&:hover,
@@ -160,8 +194,9 @@ input:focus-visible {
 
 	input {
 		@extend .input-base;
-		height: 22px !important;
+		height: 100%;
 	}
+
 	// Tightly wraps the component that is rendered on blur such that a click inside
 	// of `input-div-content` (i.e. the component that is rendered on blur) can have
 	// it's propogation stopped.  This is required to allow clickable elements to
@@ -188,11 +223,11 @@ input:focus-visible {
 textarea {
 	background-color: $gray-light !important;
 	color: $text-secondary !important;
-	font-family: $roboto !important;
+	font-family: $avenir !important;
 	font-weight: 400;
 	border-radius: 10px !important;
 	border: 1px solid transparent !important;
-	min-height: 36px !important;
+	min-height: $standard-size !important;
 	font-size: 12px;
 }
 
@@ -210,6 +245,10 @@ textarea {
 }
 
 .ant-select-multiple {
+	.ant-select-selection-item {
+		margin-top: 1px;
+		margin-bottom: 1px;
+	}
 	.ant-select-selection-item-remove > .anticon {
 		vertical-align: -0.1em;
 	}
@@ -227,12 +266,10 @@ textarea {
 			display: flex;
 
 			.icon-wrapper {
-				height: 22px;
-				width: 22px;
+				@include size(22px);
 
 				svg {
-					height: 12px;
-					width: 12px;
+					@include size(12px);
 				}
 			}
 		}
@@ -242,12 +279,10 @@ textarea {
 			display: flex;
 
 			.icon-wrapper {
-				height: 22px;
-				width: 22px;
+				@include size(22px);
 
 				.color {
-					height: 16px;
-					width: 16px;
+					@include size(16px);
 				}
 			}
 		}
@@ -257,7 +292,6 @@ textarea {
 .select,
 .ant-select {
 	@extend .input-base;
-	box-shadow: none !important;
 	background-color: $white !important;
 
 	&:not(.ant-select-disabled):hover .ant-select-selector {
@@ -267,10 +301,10 @@ textarea {
 
 	.ant-select-selector {
 		@extend .input-base;
-		box-shadow: none !important;
+		@include input_size_standard();
 		background-color: $white !important;
-		border-color: #ebebeb !important;
-		border: 1px solid #ebebeb !important;
+		border-color: $border-color !important;
+		border: $border !important;
 
 		.ant-select-selection-item {
 			font-weight: 500;
@@ -341,8 +375,8 @@ textarea {
 	font-size: 13px;
 	font-weight: 500;
 	font-family: $avenir;
-	min-height: 32px;
-	height: 32px;
+	min-height: $medium-size;
+	height: $medium-size;
 
 	.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
 		color: $text-secondary;

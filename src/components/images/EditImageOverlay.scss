@@ -1,3 +1,5 @@
+@import "style/_imports";
+
 .img-overlay--edit-image {
   display: flex;
   align-items: center;
@@ -12,8 +14,8 @@
 
   .icon-wrapper--plus,
   .icon-wrapper--edit {
-    height: 36px;
-    width: 36px;
+    height: $standard-size;
+    width: $standard-size;
     padding: 5px;
   }
 

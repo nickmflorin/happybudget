@@ -16,7 +16,7 @@ export const useClickableIcon = (
       } else {
         ic = icon;
       }
-      return iconIsJSX(ic) ? ic : <Icon icon={ic} />;
+      return iconIsJSX(ic) ? ic : <Icon {...params.iconProps} icon={ic} />;
     }
     return null;
   }, [icon, params]);

@@ -19,14 +19,14 @@ const ChangePasswordForm: React.FC<FormProps<ChangePasswordFormValues>> = (props
         label={"Current Password"}
         rules={[{ required: true, message: "Please enter a valid password." }]}
       >
-        <PasswordInput size={"large"} />
+        <PasswordInput />
       </Form.Item>
       <Form.Item
         name={"new_password"}
         label={"New Password"}
         rules={[{ required: true, message: "Please enter a valid password." }]}
       >
-        <PasswordInput size={"large"} hasValidator={true} />
+        <PasswordInput hasValidator={true} />
       </Form.Item>
 
       <Form.Item
@@ -44,7 +44,7 @@ const ChangePasswordForm: React.FC<FormProps<ChangePasswordFormValues>> = (props
           })
         ]}
       >
-        <PasswordInput size={"large"} placeholder={"Confirm"} />
+        <PasswordInput placeholder={"Confirm"} />
       </Form.Item>
 
       <Form.Footer>

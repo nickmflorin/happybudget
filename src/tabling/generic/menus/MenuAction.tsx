@@ -35,6 +35,7 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
 					 Dropdown to persist. */
         onClick={isNil(action.wrapInDropdown) ? () => !isNil(action.onClick) && action.onClick() : props.onClick}
         className={classNames("budget-table-menu", props.className)}
+        size={"medium"}
         disabled={action.disabled}
         icon={
           !isNil(action.icon) ? ui.typeguards.iconIsJSX(action.icon) ? action.icon : <Icon icon={action.icon} /> : <></>
@@ -62,6 +63,8 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
     return (
       <IconButton
         className={"green-hover budget-table-menu"}
+        size={"medium"}
+        iconSize={"medium"}
         onClick={() => !isNil(action.onClick) && action.onClick()}
         disabled={action.disabled}
         icon={

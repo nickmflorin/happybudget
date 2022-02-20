@@ -13,7 +13,6 @@ const PhoneNumberInput = ({ onChange, ...props }: PhoneNumberInputProps): JSX.El
 
   return (
     <Input
-      size={"large"}
       {...props}
       value={
         !isNil(props.value)

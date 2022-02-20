@@ -13,15 +13,5 @@
 	.public-url-actions {
 		display: flex;
 		flex-direction: row;
-
-		> * {
-			height: 26px;
-			width: auto;
-			padding: 4px;
-
-			&:not(:last-child) {
-				margin-right: 4px;
-			}
-		}
 	}
 }

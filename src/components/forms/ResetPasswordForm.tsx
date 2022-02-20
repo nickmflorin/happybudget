@@ -70,7 +70,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
         <PasswordInput size={"large"} placeholder={"Confirm"} hasValidator={true} />
       </Form.Item>
       <Form.Footer>
-        <PrimaryButton large={true} loading={loading} className={"btn--reset"} htmlType={"submit"}>
+        <PrimaryButton xlarge={true} loading={loading} className={"btn--landing"} htmlType={"submit"}>
           {"Reset"}
         </PrimaryButton>
         <div className={"switch-text"}>
