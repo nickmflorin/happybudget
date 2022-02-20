@@ -37,7 +37,7 @@ export const withSize =
 
       let injectedProps = { ...props };
 
-      const options = conf?.options || (["small", "medium", "standard", "large"] as T[]);
+      const options = conf?.options || (["xsmall", "small", "medium", "standard", "large", "xlarge"] as T[]);
       delete injectedProps[conf?.sizeProp || "size"];
       for (let i = 0; i < options.length; i++) {
         delete injectedProps[options[i]];
