@@ -13,5 +13,3 @@ export const responseAction = redux.actions.createAction<Http.TableResponse<Mode
 export const setSearchAction = redux.actions.createTableAction<string, Tables.AccountTableContext>(
   "budget.SetTableSearch"
 );
-export const addModelsToStateAction =
-  redux.actions.createAction<Redux.AddModelsToTablePayload<Model.Account>>("budget.AddModelsToState");

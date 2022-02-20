@@ -15,7 +15,15 @@ export const createChangeEventHandler = <
   handlers: Partial<Redux.TableEventTaskMapObject<R, M, C>>
 ): Redux.TableEventTask<Table.ChangeEvent<R, M>, R, M, C> => {
   function* handleChangeEvent(e: Table.ChangeEvent<R, M>, context: Redux.WithActionContext<C>): SagaIterator {
-    if (e.type !== "modelAdded") {
+    /* The events that we are excluding here are events that are dispatched
+       after sagas handle the table changes, they are not events that instruct
+       the sagas how to persist a table change via the API. */
+    if (
+      e.type !== "modelsAdded" &&
+      e.type !== "modelsUpdated" &&
+      e.type !== "updateRows" &&
+      e.type !== "placeholdersActivated"
+    ) {
       const handler = handlers[e.type] as Redux.TableEventTask<Table.ChangeEvent<R, M>, R, M, C> | undefined;
       /* Do not issue a warning/error if the event type does not have an
 				 associated handler because there are event types that correspond to
@@ -40,7 +48,11 @@ type CreateBulkTaskConfig<
   readonly table: Table.TableInstance<R, M>;
   readonly service: SERVICE;
   readonly loadingActions?: Redux.ActionCreator<boolean>[];
-  readonly responseActions: (r: Http.ServiceResponse<SERVICE>, e: Table.RowAddEvent<R>) => Redux.Action[];
+  readonly responseActions: (
+    ctx: Redux.WithActionContext<C>,
+    r: Http.ServiceResponse<SERVICE>,
+    e: Table.RowAddEvent<R>
+  ) => Redux.Action[];
   readonly selectStore: (state: Application.Store) => S;
   readonly performCreate: (ctx: Redux.WithActionContext<C>, p: Http.BulkCreatePayload<P>) => Parameters<SERVICE>;
 };
@@ -98,7 +110,7 @@ export const createBulkTask = <
     const performCreate = config.performCreate(ctx, requestPayload);
     try {
       const response: Http.ServiceResponse<SERVICE> = yield api.request(config.service, ctx, ...performCreate);
-      yield all(map(config.responseActions(response, e), (action: Redux.Action) => put(action)));
+      yield all(map(config.responseActions(ctx, response, e), (action: Redux.Action) => put(action)));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, {
         message: ctx.errorMessage || "There was an error creating the table rows."

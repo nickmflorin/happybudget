@@ -22,7 +22,8 @@ declare namespace Redux {
     ? Action<P>
     : never;
 
-  type Transformers<S, A extends ActionMap<C>> = {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  type Transformers<S, A extends ActionMap<any>> = {
     [K in keyof A]-?: Reducer<S, InferAction<A[K]>>;
   };
 
@@ -39,7 +40,7 @@ declare namespace Redux {
     readonly errorMessage?: string;
   };
 
-  type WithActionContext<C extends Record<string, uknown>> = C & ActionContext;
+  type WithActionContext<C extends Record<string, unknown>> = C & ActionContext;
 
   type TableEventTask<
     E extends Table.ChangeEvent<R, M>,
@@ -62,7 +63,6 @@ declare namespace Redux {
     readonly rowAddToGroup: TableEventTask<Table.RowAddToGroupEvent, R, M, C>;
     readonly groupAdded: TableEventTask<Table.GroupAddedEvent, R, M, C>;
     readonly groupUpdated: TableEventTask<Table.GroupUpdatedEvent, R, M, C>;
-    readonly modelUpdated: TableEventTask<Table.ModelUpdatedEvent<M>, R, M, C>;
     readonly markupAdded: TableEventTask<Table.MarkupAddedEvent, R, M, C>;
     readonly markupUpdated: TableEventTask<Table.MarkupUpdatedEvent, R, M, C>;
   };
@@ -76,7 +76,6 @@ declare namespace Redux {
   type StoreObj = Record<string, unknown> | boolean | number;
 
   type Store<S extends Application.Store> = import("redux").Store<S, Action> & {
-    readonly reducerManager: ReducerManager<S>;
     readonly injectSaga: (key: string, saga: import("redux-saga").Saga) => boolean;
     readonly ejectSaga: (key: string) => boolean;
     readonly hasSaga: (key: string) => boolean;
@@ -257,12 +256,10 @@ declare namespace Redux {
     C extends Table.Context = Table.Context
   > = TableActionMap<M, C> & {
     readonly tableChanged: TableActionCreator<Table.ChangeEvent<R, M>, C>;
-    readonly addModelsToState: ActionCreator<AddModelsToTablePayload<M>>;
-    readonly updateRowsInState?: ActionCreator<UpdateRowsInTablePayload<R>>;
   };
 
   type TableActionMapWithRequest<C extends Table.Context = Table.Context> = {
-    readonly request: Redux.TableActionCreator<Redux.TableRequestPayload, C>;
+    readonly request: TableActionCreator<TableRequestPayload, C>;
   };
 
   type TableActionMapWithRequestOptional<
@@ -275,18 +272,6 @@ declare namespace Redux {
     readonly search: string;
     readonly loading: boolean;
   };
-
-  type AddModelsToTablePayload<M extends Model.RowHttpModel> = {
-    readonly placeholderIds: Table.PlaceholderRowId[];
-    readonly models: M[];
-  };
-
-  type UpdateRowPayload<R extends Table.RowData> = {
-    readonly data: Partial<R>;
-    readonly id: Table.ModelRowId;
-  };
-
-  type UpdateRowsInTablePayload<R extends Table.RowData> = SingleOrArray<UpdateRowPayload<R>>;
 
   type BudgetTableStore<R extends Tables.BudgetRowData> = TableStore<R>;
 }

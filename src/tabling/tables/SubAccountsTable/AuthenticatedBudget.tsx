@@ -21,8 +21,6 @@ export type AuthenticatedBudgetProps<P extends Model.Account | Model.SubAccount>
   AuthenticatedTableProps<Model.Budget, P>,
   "domain" | "onCellFocusChanged" | "columns"
 > & {
-  readonly onAttachmentRemoved: (row: Table.ModelRow<R>, id: number) => void;
-  readonly onAttachmentAdded: (row: Table.ModelRow<R>, attachment: Model.Attachment) => void;
   readonly onExportPdf: () => void;
   readonly onShared: (token: Model.PublicToken) => void;
   readonly onShareUpdated: (token: Model.PublicToken) => void;
@@ -46,11 +44,12 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
     processAttachmentsCellForClipboard,
     processAttachmentsCellFromClipboard,
     setEditAttachments,
-    attachmentsModal
+    attachmentsModal,
+    addAttachment,
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    removeAttachment
   ] = useAttachments({
     table: props.table.current,
-    onAttachmentRemoved: props.onAttachmentRemoved,
-    onAttachmentAdded: props.onAttachmentAdded,
     listAttachments: api.getSubAccountAttachments,
     deleteAttachment: api.deleteSubAccountAttachment,
     path: (id: number) => `/v1/subaccounts/${id}/attachments/`
@@ -129,7 +128,7 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
           processCellForClipboard: processAttachmentsCellForClipboard,
           cellRendererParams: {
             ...col.cellRendererParams,
-            onAttachmentAdded: props.onAttachmentAdded,
+            onAttachmentAdded: addAttachment,
             uploadAttachmentsPath: (id: number) => `/v1/subaccounts/${id}/attachments/`
           }
         }),
@@ -155,7 +154,7 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
       }),
     [
       hooks.useDeepEqualMemo(columnsWithContacts),
-      props.onAttachmentAdded,
+      addAttachment,
       processAttachmentsCellFromClipboard,
       processAttachmentsCellForClipboard
     ]

@@ -23,7 +23,6 @@ const ConnectedTable = connectTableToAuthenticatedStore<
     tableChanged: actions.template.accounts.handleTableChangeEventAction,
     loading: actions.template.accounts.loadingAction,
     response: actions.template.accounts.responseAction,
-    addModelsToState: actions.template.accounts.addModelsToStateAction,
     setSearch: actions.template.accounts.setSearchAction
   },
   tableId: "template-accounts",

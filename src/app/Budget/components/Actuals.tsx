@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
-import { isNil, filter, reduce } from "lodash";
+import { isNil, reduce } from "lodash";
 
 import { redux, tabling } from "lib";
 import { ActualsTable, connectTableToAuthenticatedStore } from "tabling";
@@ -28,7 +28,6 @@ const ConnectedActualsTable = connectTableToAuthenticatedStore<
     tableChanged: actions.budget.actuals.handleTableChangeEventAction,
     loading: actions.budget.actuals.loadingAction,
     response: actions.budget.actuals.responseAction,
-    addModelsToState: actions.budget.actuals.addModelsToStateAction,
     setSearch: actions.budget.actuals.setSearchAction
   },
   tableId: "budget-actuals",
@@ -79,29 +78,6 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
             dispatch(actions.budget.actuals.setActualOwnersSearchAction(value, { budgetId }))
           }
           onExportPdf={() => setPreviewModalVisible(true)}
-          onAttachmentRemoved={(row: Table.ModelRow<R>, id: number) =>
-            dispatch(
-              actions.budget.actuals.updateRowsInStateAction({
-                id: row.id,
-                data: {
-                  attachments: filter(row.data.attachments, (a: Model.SimpleAttachment) => a.id !== id)
-                }
-              })
-            )
-          }
-          onAttachmentAdded={(row: Table.ModelRow<R>, attachment: Model.Attachment) =>
-            dispatch(
-              actions.budget.actuals.updateRowsInStateAction({
-                id: row.id,
-                data: {
-                  attachments: [
-                    ...row.data.attachments,
-                    { id: attachment.id, name: attachment.name, extension: attachment.extension, url: attachment.url }
-                  ]
-                }
-              })
-            )
-          }
         />
         {!isNil(budget) && (
           <ActualsPreviewModal

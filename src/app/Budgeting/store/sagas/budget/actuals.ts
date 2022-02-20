@@ -14,7 +14,6 @@ const ActionMap: budgeting.tasks.actuals.ActualsTableActionMap & {
   loading: actions.loadingAction,
   request: actions.requestAction,
   response: actions.responseAction,
-  addModelsToState: actions.addModelsToStateAction,
   setSearch: actions.setSearchAction,
   responseActualOwners: actions.responseActualOwnersAction,
   loadingActualOwners: actions.loadingActualOwnersAction,

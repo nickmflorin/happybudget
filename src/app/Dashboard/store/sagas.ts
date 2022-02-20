@@ -60,7 +60,6 @@ const ActionMap = {
   tableChanged: actions.handleContactsTableChangeEventAction,
   loading: actions.loadingContactsAction,
   response: actions.responseContactsAction,
-  addModelsToState: actions.addContactModelsToStateAction,
   setSearch: actions.setContactsSearchAction
 };
 

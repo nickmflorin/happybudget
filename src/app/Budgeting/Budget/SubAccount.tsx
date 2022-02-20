@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
-import { isNil, filter } from "lodash";
+import { isNil } from "lodash";
 
 import { tabling, budgeting } from "lib";
 
@@ -25,7 +25,6 @@ const ConnectedTable = connectTableToAuthenticatedStore<
     tableChanged: actions.budget.subAccount.handleTableChangeEventAction,
     loading: actions.budget.subAccount.loadingAction,
     response: actions.budget.subAccount.responseAction,
-    addModelsToState: actions.budget.subAccount.addModelsToStateAction,
     setSearch: actions.budget.subAccount.setSearchAction
   },
   tableId: "budget-subaccount-subaccounts-table",
@@ -110,29 +109,6 @@ const SubAccount = ({ setPreviewModalVisible, ...props }: SubAccountProps): JSX.
         }
         onUnshared={() =>
           dispatch(actions.budget.updateBudgetInStateAction({ id: props.budgetId, data: { public_token: null } }))
-        }
-        onAttachmentRemoved={(row: Table.ModelRow<R>, rowId: number) =>
-          dispatch(
-            actions.budget.subAccount.updateRowsInStateAction({
-              id: row.id,
-              data: {
-                attachments: filter(row.data.attachments, (a: Model.SimpleAttachment) => a.id !== rowId)
-              }
-            })
-          )
-        }
-        onAttachmentAdded={(row: Table.ModelRow<R>, attachment: Model.Attachment) =>
-          dispatch(
-            actions.budget.subAccount.updateRowsInStateAction({
-              id: row.id,
-              data: {
-                attachments: [
-                  ...(row.data.attachments || []),
-                  { id: attachment.id, name: attachment.name, extension: attachment.extension, url: attachment.url }
-                ]
-              }
-            })
-          )
         }
       />
       <FringesModal

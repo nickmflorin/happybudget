@@ -23,7 +23,6 @@ const ConnectedTable = connectTableToAuthenticatedStore<
     tableChanged: actions.budget.accounts.handleTableChangeEventAction,
     loading: actions.budget.accounts.loadingAction,
     response: actions.budget.accounts.responseAction,
-    addModelsToState: actions.budget.accounts.addModelsToStateAction,
     setSearch: actions.budget.accounts.setSearchAction
   },
   tableId: "budget-accounts",

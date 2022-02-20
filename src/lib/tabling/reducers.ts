@@ -227,34 +227,81 @@ export const createTableChangeEventReducer = <
         },
         state
       );
-    } else if (typeguards.isModelAddedEvent(e)) {
-      const payloads: Table.ModelAddedPayload<M>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
+    } else if (typeguards.isPlaceholdersActivatedEvent<R, M>(e)) {
+      const payload: Table.PlaceholdersActivatedPayload<M> = e.payload;
+      return reduce(
+        payload.placeholderIds,
+        (s: S, id: Table.PlaceholderRowId, index: number) => {
+          const r: Table.PlaceholderRow<R> | null = redux.reducers.findModelInData<Table.PlaceholderRow<R>>(
+            action,
+            filter(s.data, (ri: Table.BodyRow<R>) => typeguards.isPlaceholderRow(ri)) as Table.PlaceholderRow<R>[],
+            id
+          );
+          if (!isNil(r)) {
+            return {
+              ...s,
+              data: util.replaceInArray<Table.BodyRow<R>>(
+                s.data,
+                { id: r.id },
+                modelRowManager.create({ model: payload.models[index] })
+              )
+            };
+          }
+          return s;
+        },
+        state
+      );
+    } else if (typeguards.isModelsAddedEvent<R, M>(e)) {
+      const payloads: Table.ModelChangeEventPayload<M>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
       return reorderRows(
         reduce(
           payloads,
-          (st: S, payload: Table.ModelAddedPayload<M>) => {
-            const modelRow: Table.ModelRow<R> = modelRowManager.create({ model: payload.model });
-            st = { ...st, data: [...st.data, modelRow] };
+          (s: S, p: Table.ModelChangeEventPayload<M>) => {
+            const modelRow: Table.ModelRow<R> = modelRowManager.create({ model: p.model });
+            s = { ...s, data: [...s.data, modelRow] };
             /*
 						The payload's group will only be defined and non-null if the newly
 						created row belongs to a group.  If the newly created row does not
 						belong to a group, the group will not be included in the payload.
-
 						Unlike the modelUpdatedEvent, we do not need to be concerned with
 						null values for group, since null values here are not used to indicate
 						that the group was removed - as the group cannot "change" for a
 						newly created model.
 						*/
-            if (!isNil(payload.group)) {
-              st = updateRowGroup(st, action, [modelRow.id], managers.groupRowId(payload.group));
+            if (!isNil(p.group)) {
+              s = updateRowGroup(s, action, [modelRow.id], managers.groupRowId(p.group));
             }
-            return st;
+            return s;
           },
           state
         )
       );
-    } else if (typeguards.isModelUpdatedEvent(e)) {
-      const payloads: Table.ModelUpdatedPayload<M>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
+    } else if (typeguards.isUpdateRowsEvent(e)) {
+      const updates: Table.UpdateRowPayload<R>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
+      return reduce(
+        updates,
+        (s: S, update: Table.UpdateRowPayload<R>) => {
+          const r: Table.ModelRow<R> | null = redux.reducers.findModelInData(
+            action,
+            filter(s.data, (ri: Table.BodyRow<R>) => typeguards.isModelRow(ri)),
+            update.id
+          ) as Table.ModelRow<R> | null;
+          if (!isNil(r)) {
+            return reorderRows({
+              ...s,
+              data: util.replaceInArray<Table.BodyRow<R>>(
+                s.data,
+                { id: r.id },
+                { ...r, data: { ...r.data, ...update.data } }
+              )
+            });
+          }
+          return s;
+        },
+        state
+      );
+    } else if (typeguards.isModelsUpdatedEvent<R, M>(e)) {
+      const payloads: Table.ModelChangeEventPayload<M>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
       /*
 			Note: Even though the rows are already reordered via AG Grid, if we do not
 			apply the reordering redundantly to the state, the rows will revert back
@@ -269,7 +316,7 @@ export const createTableChangeEventReducer = <
       return reorderRows(
         reduce(
           payloads,
-          (st: S, payload: Table.ModelUpdatedPayload<M>) => {
+          (st: S, payload: Table.ModelChangeEventPayload<M>) => {
             const modelRow: Table.ModelRow<R> | null = redux.reducers.modelFromState<Table.ModelRow<R>>(
               action,
               filter(st.data, (ri: Table.BodyRow<R>) => typeguards.isModelRow(ri)) as Table.ModelRow<R>[],
@@ -285,9 +332,8 @@ export const createTableChangeEventReducer = <
                 )
               };
               /* If the `group` on the event payload is undefined, it means
-								 there was no change to the
-                 model's group.  A `null` group means that the group was
-								 removed. */
+								 there was no change to the model's group.  A `null` group means
+								 that the group was removed. */
               if (payload.group !== undefined) {
                 const groupRowId = payload.group !== null ? managers.groupRowId(payload.group) : null;
                 const previousGroupRow: Table.GroupRow<R> | null = rowGroupRowFromState<R, S>(
@@ -325,8 +371,8 @@ export const createTableChangeEventReducer = <
           state
         )
       );
-    } else if (typeguards.isRowAddEvent(e)) {
-      const p: Partial<R>[] | Table.RowAddIndexPayload | Table.RowAddCountPayload = e.payload;
+    } else if (typeguards.isRowAddEvent<R, M>(e)) {
+      const p: Table.RowAddPayload<R> = e.payload;
       let d: Partial<R>[];
       if (typeguards.isRowAddCountPayload(p) || typeguards.isRowAddIndexPayload(p)) {
         d = patterns.generateNewRowData(
@@ -543,68 +589,10 @@ export const createAuthenticatedTableReducer = <
   const tableEventReducer = config.eventReducer || createTableChangeEventReducer<R, M, S, C, A>(config);
   const generic = createTableReducer<R, M, S, C, A>(config);
 
-  const modelRowManager = new managers.ModelRowManager<R, M>({
-    getRowChildren: config.getModelRowChildren,
-    columns: config.columns
-  });
-
   return (state: S | undefined = config.initialState, action: Redux.Action): S => {
     const newState = generic(state, action);
     if (action.type === config.actions.tableChanged.toString()) {
       return tableEventReducer(newState, action);
-    } else if (action.type === config.actions.addModelsToState.toString()) {
-      const payload: Redux.AddModelsToTablePayload<M> = action.payload;
-      return reduce(
-        payload.placeholderIds,
-        (s: S, id: Table.PlaceholderRowId, index: number) => {
-          const r: Table.PlaceholderRow<R> | null = redux.reducers.findModelInData<Table.PlaceholderRow<R>>(
-            action,
-            filter(newState.data, (ri: Table.BodyRow<R>) =>
-              typeguards.isPlaceholderRow(ri)
-            ) as Table.PlaceholderRow<R>[],
-            id
-          );
-          if (!isNil(r)) {
-            return {
-              ...newState,
-              data: util.replaceInArray<Table.BodyRow<R>>(
-                s.data,
-                { id: r.id },
-                modelRowManager.create({ model: payload.models[index] })
-              )
-            };
-          }
-          return s;
-        },
-        newState
-      );
-    } else if (
-      !isNil(config.actions.updateRowsInState) &&
-      action.type === config.actions.updateRowsInState.toString()
-    ) {
-      const updates: Redux.UpdateRowPayload<R>[] = Array.isArray(action.payload) ? action.payload : [action.payload];
-      return reduce(
-        updates,
-        (s: S, update: Redux.UpdateRowPayload<R>) => {
-          const r: Table.ModelRow<R> | null = redux.reducers.findModelInData(
-            action,
-            filter(newState.data, (ri: Table.BodyRow<R>) => typeguards.isModelRow(ri)),
-            update.id
-          ) as Table.ModelRow<R> | null;
-          if (!isNil(r)) {
-            return reorderRows({
-              ...s,
-              data: util.replaceInArray<Table.BodyRow<R>>(
-                s.data,
-                { id: r.id },
-                { ...r, data: { ...r.data, ...update.data } }
-              )
-            });
-          }
-          return s;
-        },
-        newState
-      );
     }
     return newState;
   };

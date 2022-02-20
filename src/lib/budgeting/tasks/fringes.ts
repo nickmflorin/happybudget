@@ -76,8 +76,14 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     table: config.table,
     service: api.bulkCreateFringes,
     selectStore: selectTableStore,
-    responseActions: (r: Http.ParentChildListResponse<Model.BaseBudget, M>, e: Table.RowAddEvent<R>) => [
-      config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children }),
+    responseActions: (ctx: CTX, r: Http.ParentChildListResponse<Model.BaseBudget, M>, e: Table.RowAddEvent<R>) => [
+      config.actions.tableChanged(
+        {
+          type: "placeholdersActivated",
+          payload: { placeholderIds: e.placeholderIds, models: r.children }
+        },
+        ctx
+      ),
       config.actions.updateBudgetInState({ id: r.parent.id, data: r.parent as B })
     ],
     performCreate: (
@@ -195,7 +201,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         previous: e.payload.previous,
         ...tabling.http.postPayload<R, M, P>(e.payload.data, config.table.getColumns())
       });
-      yield put(config.actions.tableChanged({ type: "modelAdded", payload: { model: response } }, ctx));
+      yield put(config.actions.tableChanged({ type: "modelsAdded", payload: { model: response } }, ctx));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, {
         message: ctx.errorMessage || "There was an error adding the table rows.",
@@ -212,7 +218,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       const response: M = yield api.request(api.updateFringe, ctx, e.payload.id, {
         previous: e.payload.previous
       });
-      yield put(config.actions.tableChanged({ type: "modelUpdated", payload: { model: response } }, ctx));
+      yield put(config.actions.tableChanged({ type: "modelsUpdated", payload: { model: response } }, ctx));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, {
         message: ctx.errorMessage || "There was an error moving the table rows.",

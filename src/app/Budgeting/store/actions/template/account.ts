@@ -17,15 +17,9 @@ export const loadingAction = redux.actions.createAction<boolean>("template.accou
 export const requestAction = redux.actions.createTableAction<Redux.TableRequestPayload, Tables.SubAccountTableContext>(
   "template.account.TableRequest"
 );
-
 export const responseAction = redux.actions.createAction<Http.TableResponse<Model.SubAccount>>(
   "template.account.TableResponse"
 );
-
-export const addModelsToStateAction = redux.actions.createAction<Redux.AddModelsToTablePayload<Model.SubAccount>>(
-  "template.account.AddModelsToState"
-);
-
 export const setSearchAction = redux.actions.createTableAction<string, Tables.SubAccountTableContext>(
   "template.account.SetTableSearch"
 );

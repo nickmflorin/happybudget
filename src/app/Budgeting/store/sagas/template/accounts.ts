@@ -10,7 +10,6 @@ const ActionMap: Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.
   tableChanged: actions.handleTableChangeEventAction,
   loading: actions.loadingAction,
   response: actions.responseAction,
-  addModelsToState: actions.addModelsToStateAction,
   loadingBudget: loadingBudgetAction,
   updateBudgetInState: updateBudgetInStateAction,
   setSearch: actions.setSearchAction

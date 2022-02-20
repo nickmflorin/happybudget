@@ -218,7 +218,7 @@ export const createAuthenticatedTableTaskSet = <
       yield put(
         config.actions.tableChanged(
           {
-            type: "modelUpdated",
+            type: "modelsUpdated",
             payload: map(response.data, (m: Model.SubAccount) => ({ model: m }))
           },
           action.context
@@ -287,10 +287,16 @@ export const createAuthenticatedTableTaskSet = <
     table: config.table,
     service: config.services.bulkCreate,
     selectStore: config.selectStore,
-    responseActions: (r: Http.AncestryListResponse<B, M, C>, e: Table.RowAddEvent<R>) => [
+    responseActions: (ctx: CTX, r: Http.AncestryListResponse<B, M, C>, e: Table.RowAddEvent<R>) => [
       config.actions.updateBudgetInState({ id: r.budget.id, data: r.budget }),
       config.actions.updateParentInState({ id: r.parent.id, data: r.parent }),
-      config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children })
+      config.actions.tableChanged(
+        {
+          type: "placeholdersActivated",
+          payload: { placeholderIds: e.placeholderIds, models: r.children }
+        },
+        ctx
+      )
     ],
     performCreate: (
       ctx: CTX,
@@ -429,7 +435,7 @@ export const createAuthenticatedTableTaskSet = <
       yield put(
         config.actions.tableChanged(
           {
-            type: "modelAdded",
+            type: "modelsAdded",
             payload: {
               model: response,
               group: !isNil(e.payload.group) ? tabling.managers.groupId(e.payload.group) : null
@@ -461,7 +467,7 @@ export const createAuthenticatedTableTaskSet = <
       yield put(
         config.actions.tableChanged(
           {
-            type: "modelUpdated",
+            type: "modelsUpdated",
             payload: {
               model: response,
               group: !isNil(e.payload.newGroup) ? tabling.managers.groupId(e.payload.newGroup) : null

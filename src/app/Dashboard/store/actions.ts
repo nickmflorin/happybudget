@@ -79,9 +79,6 @@ export const requestContactsAction = redux.actions.createTableAction<
   Tables.ContactTableContext
 >("dashboard.contacts.Request");
 
-export const addContactModelsToStateAction = redux.actions.createAction<Redux.AddModelsToTablePayload<Model.Contact>>(
-  "dashboard.contacts.AddToState"
-);
 export const loadingContactsAction = redux.actions.createAction<boolean>("dashboard.contacts.Loading");
 export const responseContactsAction =
   redux.actions.createAction<Http.TableResponse<Model.Contact>>("dashboard.contacts.Response");
@@ -89,6 +86,3 @@ export const removeContactFromStateAction = redux.actions.createAction<number>("
 export const updateContactInStateAction = redux.actions.createAction<Redux.UpdateActionPayload<Model.Contact>>(
   "dashboard.contacts.UpdateInState"
 );
-export const updateContactRowsInStateAction = redux.actions.createAction<
-  Redux.UpdateRowsInTablePayload<Tables.ContactRowData>
->("dashboard.contacts.UpdateRowsInState");

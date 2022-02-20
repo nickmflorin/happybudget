@@ -28,9 +28,6 @@ export const handleFringesTableChangeEventAction = redux.actions.createTableActi
 export const setFringesSearchAction = redux.actions.createTableAction<string, Tables.FringeTableContext>(
   "budget.fringes.SetSearch"
 );
-export const addFringeModelsToStateAction = redux.actions.createAction<Redux.AddModelsToTablePayload<Model.Fringe>>(
-  "budget.fringes.AddModelsToState"
-);
 export const responseSubAccountUnitsAction = redux.actions.createAction<Http.ListResponse<Model.Tag>>(
   "budget.subaccountunits.Response"
 );

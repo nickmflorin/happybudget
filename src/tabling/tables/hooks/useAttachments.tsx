@@ -12,8 +12,6 @@ interface UseAttachmentsProps<
 > {
   readonly table: Table.TableInstance<R, M>;
   readonly path: (id: number) => string;
-  readonly onAttachmentRemoved: (row: Table.ModelRow<R>, id: number) => void;
-  readonly onAttachmentAdded: (row: Table.ModelRow<R>, attachment: Model.Attachment) => void;
   readonly listAttachments: (
     id: number,
     query?: Http.ListQuery,
@@ -26,7 +24,9 @@ type UseAttachmentsReturnType<R extends Tables.ActualRowData | Tables.SubAccount
   (row: R) => string,
   (value: string) => Model.SimpleAttachment[],
   (id: number) => void,
-  JSX.Element | null
+  JSX.Element | null,
+  (row: Table.ModelRow<R>, attachment: Model.Attachment) => void,
+  (row: Table.ModelRow<R>, id: number) => void
 ];
 
 const useAttachments = <
@@ -36,6 +36,39 @@ const useAttachments = <
   props: UseAttachmentsProps<R, M>
 ): UseAttachmentsReturnType<R> => {
   const [editAttachments, setEditAttachments] = useState<number | null>(null);
+
+  const removeAttachment = useMemo(
+    () => (row: Table.ModelRow<R>, rowId: number) => {
+      props.table.applyTableChange({
+        type: "updateRows",
+        payload: {
+          id: row.id,
+          data: {
+            attachments: filter(row.data.attachments, (a: Model.SimpleAttachment) => a.id !== rowId)
+          } as Partial<R>
+        }
+      });
+    },
+    [props.table]
+  );
+
+  const addAttachment = useMemo(
+    () => (row: Table.ModelRow<R>, attachment: Model.Attachment) => {
+      props.table.applyTableChange({
+        type: "updateRows",
+        payload: {
+          id: row.id,
+          data: {
+            attachments: [
+              ...(row.data.attachments || []),
+              { id: attachment.id, name: attachment.name, extension: attachment.extension, url: attachment.url }
+            ]
+          } as Partial<R>
+        }
+      });
+    },
+    [props.table]
+  );
 
   const processAttachmentsCellForClipboard = usePublicAttachments();
 
@@ -70,7 +103,7 @@ const useAttachments = <
           const row = props.table.getRow(editAttachments);
           if (!isNil(row)) {
             if (tabling.typeguards.isModelRow(row)) {
-              props.onAttachmentRemoved(row, id);
+              removeAttachment(row, id);
             } else {
               console.warn(
                 `Suspicous Behavior: After attachment was added, row with ID
@@ -88,7 +121,7 @@ const useAttachments = <
           const row = props.table.getRow(editAttachments);
           if (!isNil(row)) {
             if (tabling.typeguards.isModelRow(row)) {
-              props.onAttachmentAdded(row, m);
+              addAttachment(row, m);
             } else {
               console.warn(
                 `Suspicous Behavior: After attachment was added, row with ID
@@ -104,9 +137,16 @@ const useAttachments = <
         }}
       />
     );
-  }, [editAttachments, props.table, props.onAttachmentAdded, props.onAttachmentRemoved]);
+  }, [editAttachments, props.table, addAttachment, removeAttachment]);
 
-  return [processAttachmentsCellForClipboard, processAttachmentsCellFromClipboard, setEditAttachments, modal];
+  return [
+    processAttachmentsCellForClipboard,
+    processAttachmentsCellFromClipboard,
+    setEditAttachments,
+    modal,
+    addAttachment,
+    removeAttachment
+  ];
 };
 
 export default useAttachments;

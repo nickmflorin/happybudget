@@ -144,25 +144,44 @@ export const isDataChangeEventAction = <
   return isDataChangeEvent(a.payload);
 };
 
-export const isModelUpdatedEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+export const isModelsUpdatedEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   e: Table.ChangeEvent<R, M>
-): e is Table.ModelUpdatedEvent<M> => {
-  return (e as Table.ModelUpdatedEvent<M>).type === "modelUpdated";
+): e is Table.ModelsUpdatedEvent<M> => {
+  return (e as Table.ModelsUpdatedEvent<M>).type === "modelsUpdated";
 };
 
-export const isModelAddedEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+export const isPlaceholdersActivatedEvent = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel
+>(
   e: Table.ChangeEvent<R, M>
-): e is Table.ModelAddedEvent<M> => {
-  return (e as Table.ModelAddedEvent<M>).type === "modelAdded";
+): e is Table.PlaceholdersActivatedEvent<M> => {
+  return (e as Table.PlaceholdersActivatedEvent<M>).type === "placeholdersActivated";
+};
+
+export const isUpdateRowsEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.UpdateRowsEvent<R> => {
+  return (e as Table.UpdateRowsEvent<R>).type === "updateRows";
+};
+
+export const isModelsAddedEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.ModelsAddedEvent<M> => {
+  return (e as Table.ModelsAddedEvent<M>).type === "modelsAdded";
 };
 
 export const isRowInsertEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   e: Table.ChangeEvent<R, M>
 ): e is Table.RowInsertEvent<R> => (e as Table.RowInsertEvent<R>).type === "rowInsert";
 
-export const isRowAddEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+export const isRowAddEvent = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  P extends Table.RowAddPayload<R> = Table.RowAddPayload<R>
+>(
   e: Table.ChangeEvent<R, M>
-): e is Table.RowAddEvent<R> => (e as Table.RowAddEvent<R>).type === "rowAdd";
+): e is Table.RowAddEvent<R, P> => (e as Table.RowAddEvent<R, P>).type === "rowAdd";
 
 export const isRowAddIndexPayload = <R extends Table.RowData>(
   p: Table.RowAddPayload<R>

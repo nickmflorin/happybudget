@@ -44,7 +44,6 @@ const genericReducer = combineReducers({
       tableChanged: actions.accounts.handleTableChangeEventAction,
       loading: actions.accounts.loadingAction,
       response: actions.accounts.responseAction,
-      addModelsToState: actions.accounts.addModelsToStateAction,
       setSearch: actions.accounts.setSearchAction
     },
     columns: AccountColumns,
@@ -71,7 +70,6 @@ const genericReducer = combineReducers({
           loading: actions.account.loadingAction,
           response: actions.account.responseAction,
           responseSubAccountUnits: actions.responseSubAccountUnitsAction,
-          addModelsToState: actions.account.addModelsToStateAction,
           setSearch: actions.account.setSearchAction
         },
         getModelRowChildren: (m: Model.SubAccount) => m.children,
@@ -85,7 +83,6 @@ const genericReducer = combineReducers({
             tableChanged: actions.handleFringesTableChangeEventAction,
             loading: actions.loadingFringesAction,
             response: actions.responseFringesAction,
-            addModelsToState: actions.addFringeModelsToStateAction,
             setSearch: actions.setFringesSearchAction
           }
         })
@@ -113,7 +110,6 @@ const genericReducer = combineReducers({
           responseSubAccountUnits: actions.responseSubAccountUnitsAction,
           loading: actions.subAccount.loadingAction,
           response: actions.subAccount.responseAction,
-          addModelsToState: actions.subAccount.addModelsToStateAction,
           setSearch: actions.subAccount.setSearchAction
         },
         columns: SubAccountColumns,
@@ -127,7 +123,6 @@ const genericReducer = combineReducers({
             tableChanged: actions.handleFringesTableChangeEventAction,
             loading: actions.loadingFringesAction,
             response: actions.responseFringesAction,
-            addModelsToState: actions.addFringeModelsToStateAction,
             setSearch: actions.setFringesSearchAction
           }
         })

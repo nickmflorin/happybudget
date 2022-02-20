@@ -106,8 +106,14 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsAuthe
     table: config.table,
     service: api.bulkCreateActuals,
     selectStore: config.selectStore,
-    responseActions: (r: Http.ParentChildListResponse<Model.Budget, M>, e: Table.RowAddEvent<R>) => [
-      config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children }),
+    responseActions: (ctx: CTX, r: Http.ParentChildListResponse<Model.Budget, M>, e: Table.RowAddEvent<R>) => [
+      config.actions.tableChanged(
+        {
+          type: "placeholdersActivated",
+          payload: { placeholderIds: e.placeholderIds, models: r.children }
+        },
+        ctx
+      ),
       config.actions.updateBudgetInState({ id: r.parent.id, data: r.parent })
     ],
     performCreate: (
@@ -165,7 +171,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsAuthe
       yield put(
         config.actions.tableChanged(
           {
-            type: "modelUpdated",
+            type: "modelsUpdated",
             payload: { model: response }
           },
           ctx
@@ -191,7 +197,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsAuthe
       yield put(
         config.actions.tableChanged(
           {
-            type: "modelAdded",
+            type: "modelsAdded",
             payload: { model: response }
           },
           ctx

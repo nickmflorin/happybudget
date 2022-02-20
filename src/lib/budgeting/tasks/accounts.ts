@@ -77,7 +77,7 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
       yield put(
         config.actions.tableChanged(
           {
-            type: "modelUpdated",
+            type: "modelsUpdated",
             payload: map(response.data, (m: Model.Account) => ({ model: m }))
           },
           action.context
@@ -144,9 +144,15 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
 		in the future we may want to use the response data as the
 		fallback/source of truth.
 		*/
-    responseActions: (r: Http.ParentChildListResponse<Model.BaseBudget, C>, e: Table.RowAddEvent<R>) => [
+    responseActions: (ctx: CTX, r: Http.ParentChildListResponse<Model.BaseBudget, C>, e: Table.RowAddEvent<R>) => [
       config.actions.updateBudgetInState({ id: r.parent.id, data: r.parent as B }),
-      config.actions.addModelsToState({ placeholderIds: e.placeholderIds, models: r.children })
+      config.actions.tableChanged(
+        {
+          type: "placeholdersActivated",
+          payload: { placeholderIds: e.placeholderIds, models: r.children }
+        },
+        ctx
+      )
     ],
     performCreate: (
       ctx: CTX,
@@ -333,12 +339,12 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
         ...tabling.http.postPayload<R, C, P>(e.payload.data, config.table.getColumns())
       });
       /* The Group is not attributed to the Model in a detail response, so
-					 if the group did change we have to use the value from the event
-					 payload. */
+				 if the group did change we have to use the value from the event
+				 payload. */
       yield put(
         config.actions.tableChanged(
           {
-            type: "modelAdded",
+            type: "modelsAdded",
             payload: {
               model: response,
               group: !isNil(e.payload.group) ? tabling.managers.groupId(e.payload.group) : null
@@ -371,7 +377,7 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
       yield put(
         config.actions.tableChanged(
           {
-            type: "modelUpdated",
+            type: "modelsUpdated",
             payload: {
               model: response,
               group: !isNil(e.payload.newGroup) ? tabling.managers.groupId(e.payload.newGroup) : null

@@ -68,9 +68,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
       tableChanged: actions.handleContactsTableChangeEventAction,
       loading: actions.loadingContactsAction,
       response: actions.responseContactsAction,
-      addModelsToState: actions.addContactModelsToStateAction,
-      setSearch: actions.setContactsSearchAction,
-      updateRowsInState: actions.updateContactRowsInStateAction
+      setSearch: actions.setContactsSearchAction
     },
     initialState: redux.initialState.initialTableState
   }),

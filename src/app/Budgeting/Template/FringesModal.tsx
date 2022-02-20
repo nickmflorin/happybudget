@@ -14,7 +14,6 @@ const ConnectedFringesTable = connectTableToAuthenticatedStore<
     tableChanged: actions.template.handleFringesTableChangeEventAction,
     loading: actions.template.loadingFringesAction,
     response: actions.template.responseFringesAction,
-    addModelsToState: actions.template.addFringeModelsToStateAction,
     setSearch: actions.template.setFringesSearchAction
   },
   tableId: "template-fringes",

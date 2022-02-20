@@ -42,8 +42,6 @@ export type Props = Omit<AuthenticatedTableProps<R, M, S>, OmitProps> & {
   readonly data: Table.BodyRow<R>[];
   readonly actionContext: Tables.ActualTableContext;
   readonly actualTypes: Model.Tag[];
-  readonly onAttachmentRemoved: (row: Table.ModelRow<R>, id: number) => void;
-  readonly onAttachmentAdded: (row: Table.ModelRow<R>, attachment: Model.Attachment) => void;
   readonly onOwnersSearch: (value: string) => void;
   readonly onExportPdf: () => void;
 };
@@ -51,15 +49,20 @@ export type Props = Omit<AuthenticatedTableProps<R, M, S>, OmitProps> & {
 const ActualsTable = ({ parent, onOwnersSearch, ...props }: Props): JSX.Element => {
   const dispatch: Dispatch = useDispatch();
 
-  const [processAttachmentsCellForClipboard, processAttachmentsCellFromClipboard, setEditAttachments, modal] =
-    useAttachments({
-      table: props.table.current,
-      onAttachmentRemoved: props.onAttachmentRemoved,
-      onAttachmentAdded: props.onAttachmentAdded,
-      listAttachments: api.getActualAttachments,
-      deleteAttachment: api.deleteActualAttachment,
-      path: (id: number) => `/v1/actuals/${id}/attachments/`
-    });
+  const [
+    processAttachmentsCellForClipboard,
+    processAttachmentsCellFromClipboard,
+    setEditAttachments,
+    modal,
+    addAttachment,
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    removeAttachment
+  ] = useAttachments({
+    table: props.table.current,
+    listAttachments: api.getActualAttachments,
+    deleteAttachment: api.deleteActualAttachment,
+    path: (id: number) => `/v1/actuals/${id}/attachments/`
+  });
 
   const processActualTypeCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
     models.inferModelFromName<Model.Tag>(props.actualTypes, name, {
@@ -176,7 +179,7 @@ const ActualsTable = ({ parent, onOwnersSearch, ...props }: Props): JSX.Element 
           processCellForClipboard: processAttachmentsCellForClipboard,
           cellRendererParams: {
             ...col.cellRendererParams,
-            onAttachmentAdded: props.onAttachmentAdded,
+            onAttachmentAdded: addAttachment,
             uploadAttachmentsPath: (id: number) => `/v1/actuals/${id}/attachments/`
           }
         }),
@@ -187,7 +190,7 @@ const ActualsTable = ({ parent, onOwnersSearch, ...props }: Props): JSX.Element 
     [
       hooks.useDeepEqualMemo(columnsWithContacts),
       processActualTypeCellFromClipboard,
-      props.onAttachmentAdded,
+      addAttachment,
       processAttachmentsCellForClipboard,
       processActualTypeCellFromClipboard
     ]

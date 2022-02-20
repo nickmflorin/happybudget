@@ -8,7 +8,6 @@ export const loadingSubAccountAction = redux.actions.createAction<boolean>("budg
 export const responseSubAccountAction = redux.actions.createAction<Model.SubAccount | null>(
   "budget.subaccount.Response"
 );
-
 export const handleTableChangeEventAction = redux.actions.createTableAction<
   Table.ChangeEvent<Tables.SubAccountRowData, Model.SubAccount>,
   Tables.SubAccountTableContext
@@ -19,16 +18,9 @@ export const loadingAction = redux.actions.createAction<boolean>("budget.subacco
 export const requestAction = redux.actions.createTableAction<Redux.TableRequestPayload, Tables.SubAccountTableContext>(
   "budget.subaccount.TableRequest"
 );
-
 export const responseAction = redux.actions.createAction<Http.TableResponse<Model.SubAccount>>(
   "budget.subaccount.TableResponse"
 );
-export const addModelsToStateAction = redux.actions.createAction<Redux.AddModelsToTablePayload<Model.SubAccount>>(
-  "budget.subaccount.AddModelsToState"
-);
-export const updateRowsInStateAction = redux.actions.createAction<
-  Redux.UpdateRowsInTablePayload<Tables.SubAccountRowData>
->("budget.subaccount.UpdateRowsInState");
 export const setSearchAction = redux.actions.createTableAction<string, Tables.SubAccountTableContext>(
   "budget.subaccount.SetTableSearch"
 );

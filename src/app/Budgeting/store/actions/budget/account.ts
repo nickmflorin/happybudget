@@ -20,14 +20,6 @@ export const requestAction = redux.actions.createTableAction<Redux.TableRequestP
 export const responseAction =
   redux.actions.createAction<Http.TableResponse<Model.SubAccount>>("budget.account.TableResponse");
 
-export const addModelsToStateAction = redux.actions.createAction<Redux.AddModelsToTablePayload<Model.SubAccount>>(
-  "budget.account.AddModelsToState"
-);
-
-export const updateRowsInStateAction = redux.actions.createAction<
-  Redux.UpdateRowsInTablePayload<Tables.SubAccountRowData>
->("budget.account.UpdateRowsInState");
-
 export const setSearchAction = redux.actions.createTableAction<string, Tables.SubAccountTableContext>(
   "budget.account.SetTableSearch"
 );

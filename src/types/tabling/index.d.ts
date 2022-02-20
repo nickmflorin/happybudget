@@ -176,10 +176,12 @@ declare namespace Table {
   /* ------------------------- Events --------------------------------------- */
   type ChangeEventId =
     | "dataChange"
-    | "modelUpdated"
+    | "modelsUpdated"
     | "rowAdd"
     | "rowInsert"
-    | "modelAdded"
+    | "updateRows"
+    | "modelsAdded"
+    | "placeholdersActivated"
     | "rowPositionChanged"
     | "rowDelete"
     | "rowRemoveFromGroup"
@@ -188,6 +190,14 @@ declare namespace Table {
     | "groupAdded"
     | "markupAdded"
     | "markupUpdated";
+
+  type BaseEvent<
+    T extends ChangeEventId = ChangeEventId,
+    P extends Record<string, unknown> | Record<string, unknown>[] = Record<string, unknown> | Record<string, unknown>[]
+  > = {
+    readonly type: T;
+    readonly payload: P;
+  };
 
   type BaseChangeEvent = {
     readonly type: ChangeEventId;
@@ -227,10 +237,10 @@ declare namespace Table {
     RW
   >[];
 
-  type DataChangeEvent<R extends RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>> = {
-    readonly type: "dataChange";
-    readonly payload: DataChangePayload<R, RW>;
-  };
+  type DataChangeEvent<R extends RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>> = BaseEvent<
+    "dataChange",
+    DataChangePayload<R, RW>
+  >;
 
   type RowInsertPayload<R extends RowData> = {
     readonly previous: number;
@@ -244,19 +254,14 @@ declare namespace Table {
 		 the RowInsertEvent, we cannot add placeholders until there is an API
 		 response - as we need the order of the inserted row from the API response
 		 before it is inserted into the table. */
-  type RowInsertEvent<R extends RowData> = {
-    readonly type: "rowInsert";
-    readonly payload: RowInsertPayload<R>;
-  };
+  type RowInsertEvent<R extends RowData> = BaseEvent<"rowInsert", RowInsertPayload<R>>;
 
   type RowAddCountPayload = { readonly count: number };
   type RowAddIndexPayload = { readonly newIndex: number; readonly count?: number };
   type RowAddDataPayload<R extends RowData> = Partial<R>[];
   type RowAddPayload<R extends RowData> = RowAddCountPayload | RowAddIndexPayload | RowAddDataPayload<R>;
 
-  type RowAddEvent<R extends RowData, P extends RowAddPayload<R> = RowAddPayload<R>> = {
-    readonly type: "rowAdd";
-    readonly payload: P;
+  type RowAddEvent<R extends RowData, P extends RowAddPayload<R> = RowAddPayload<R>> = BaseEvent<"rowAdd", P> & {
     /* Placeholder IDs must be provided ahead of time so that the IDs are
 			 consistent between the sagas and the reducer. */
     readonly placeholderIds: PlaceholderRowId[];
@@ -270,78 +275,68 @@ declare namespace Table {
     readonly id: ModelRowId;
   };
 
-  type RowPositionChangedEvent = {
-    readonly type: "rowPositionChanged";
-    readonly payload: RowPositionChangedPayload;
-  };
+  type RowPositionChangedEvent = BaseEvent<"rowPositionChanged", RowPositionChangedPayload>;
 
   type RowDeletePayload = {
     readonly rows: SingleOrArray<ModelRowId | MarkupRowId | GroupRowId | PlaceholderRowId>;
   };
-  type RowDeleteEvent = {
-    readonly type: "rowDelete";
-    readonly payload: RowDeletePayload;
-  };
+  type RowDeleteEvent = BaseEvent<"rowDelete", RowDeletePayload>;
 
   type RowRemoveFromGroupPayload = {
     readonly rows: SingleOrArray<ModelRowId>;
     readonly group: GroupRowId;
   };
-  type RowRemoveFromGroupEvent = {
-    readonly type: "rowRemoveFromGroup";
-    readonly payload: RowRemoveFromGroupPayload;
-  };
+  type RowRemoveFromGroupEvent = BaseEvent<"rowRemoveFromGroup", RowRemoveFromGroupPayload>;
 
   type RowAddToGroupPayload = {
     readonly group: GroupRowId;
     readonly rows: SingleOrArray<ModelRowId>;
   };
-  type RowAddToGroupEvent = {
-    readonly type: "rowAddToGroup";
-    readonly payload: RowAddToGroupPayload;
-  };
+  type RowAddToGroupEvent = BaseEvent<"rowAddToGroup", RowAddToGroupPayload>;
 
   type GroupAddedPayload = Model.Group;
-  type GroupAddedEvent = {
-    readonly type: "groupAdded";
-    readonly payload: GroupAddedPayload;
-  };
+  type GroupAddedEvent = BaseEvent<"groupAdded", GroupAddedPayload>;
 
   type MarkupAddedPayload = Model.Markup;
-  type MarkupAddedEvent = {
-    readonly type: "markupAdded";
-    readonly payload: MarkupAddedPayload;
-  };
+  type MarkupAddedEvent = BaseEvent<"markupAdded", MarkupAddedPayload>;
 
-  type ModelUpdatedPayload<M extends Model.RowHttpModel = Model.RowHttpModel> = {
+  /* The Group is not attributed to a model in a detail response so we sometimes
+     have to use the value from the original event. */
+  type ModelChangeEventPayload<M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly model: M;
     readonly group?: number | null;
   };
+  type ModelsAddedEvent<M extends Model.RowHttpModel = Model.RowHttpModel> = BaseEvent<
+    "modelsAdded",
+    SingleOrArray<ModelChangeEventPayload<M>>
+  >;
 
-  type ModelUpdatedEvent<M extends Model.RowHttpModel = Model.RowHttpModel> = {
-    readonly type: "modelUpdated";
-    readonly payload: SingleOrArray<ModelUpdatedPayload<M>>;
+  type ModelsUpdatedEvent<M extends Model.RowHttpModel = Model.RowHttpModel> = BaseEvent<
+    "modelsUpdated",
+    SingleOrArray<ModelChangeEventPayload<M>>
+  >;
+
+  type PlaceholdersActivatedPayload<M extends Model.RowHttpModel> = {
+    readonly placeholderIds: Table.PlaceholderRowId[];
+    readonly models: M[];
   };
 
-  type ModelAddedPayload<M extends Model.RowHttpModel = Model.RowHttpModel> = {
-    readonly model: M;
-    readonly group?: number | null;
+  type PlaceholdersActivatedEvent<M extends Model.RowHttpModel = Model.RowHttpModel> = BaseEvent<
+    "placeholdersActivated",
+    PlaceholdersActivatedPayload<M>
+  >;
+
+  type UpdateRowPayload<R extends Table.RowData> = {
+    readonly data: Partial<R>;
+    readonly id: Table.ModelRowId;
   };
 
-  type ModelAddedEvent<M extends Model.RowHttpModel = Model.RowHttpModel> = {
-    readonly type: "modelAdded";
-    readonly payload: SingleOrArray<ModelAddedPayload<M>>;
-  };
+  type UpdateRowsEventPayload<R extends Table.RowData> = SingleOrArray<UpdateRowPayload<R>>;
 
-  type GroupUpdatedEvent = {
-    readonly type: "groupUpdated";
-    readonly payload: Model.Group;
-  };
+  type UpdateRowsEvent<R extends Table.RowData> = BaseEvent<"updateRows", UpdateRowsEventPayload<R>>;
 
-  type MarkupUpdatedEvent = {
-    readonly type: "markupUpdated";
-    readonly payload: Model.Markup;
-  };
+  type GroupUpdatedEvent = BaseEvent<"groupUpdated", Model.Group>;
+  type MarkupUpdatedEvent = BaseEvent<"markupUpdated", Model.Markup>;
 
   type FullRowEvent = RowDeleteEvent | RowRemoveFromGroupEvent | RowAddToGroupEvent;
 
@@ -355,7 +350,10 @@ declare namespace Table {
     | DataChangeEvent<R, RW>
     | RowAddEvent<R>
     | RowInsertEvent<R>
-    | ModelAddedEvent<M>
+    | UpdateRowsEvent<R>
+    | PlaceholdersActivatedEvent<M>
+    | ModelsAddedEvent<M>
+    | ModelsUpdatedEvent<M>
     | RowDeleteEvent
     | RowPositionChangedEvent
     | RowRemoveFromGroupEvent
@@ -363,8 +361,7 @@ declare namespace Table {
     | GroupAddedEvent
     | GroupUpdatedEvent
     | MarkupAddedEvent
-    | MarkupUpdatedEvent
-    | ModelUpdatedEvent<M>;
+    | MarkupUpdatedEvent;
 
   type CellDoneEditingEvent = import("react").SyntheticEvent | KeyboardEvent;
   /* ------------------------- Events --------------------------------------- */
@@ -441,7 +438,10 @@ declare namespace Table {
 
   type HiddenColumns = { [key: string]: boolean };
 
-  type EditColumnRowConfig<R extends RowData = RowData, RW extends NonPlaceholderBodyRow<R>> = {
+  type EditColumnRowConfig<
+    R extends RowData = RowData,
+    RW extends NonPlaceholderBodyRow<R> = NonPlaceholderBodyRow<R>
+  > = {
     readonly typeguard: (row: NonPlaceholderBodyRow<R>) => row is RW;
     readonly conditional?: (row: RW) => boolean;
     readonly behavior: EditRowActionBehavior;
@@ -600,7 +600,8 @@ declare namespace Table {
 			 the Column's field in it's data. */
     readonly isApplicableForRowType?: (rt: RowType) => boolean;
     readonly valueGetter?: (row: BodyRow<R>, rows: BodyRow<R>[]) => V;
-    readonly getHttpValue?: (value: V) => Http.RawPayloadValue;
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    readonly getHttpValue?: (value: V) => any;
     readonly processCellForCSV?: (row: R) => string | number;
     readonly processCellForClipboard?: (row: R) => string | number;
     readonly pdfWidth?: number;
@@ -990,11 +991,13 @@ declare namespace Table {
     M extends Model.RowHttpModel = Model.RowHttpModel,
     C extends Context = Context,
     A extends Redux.TableActionMapWithRequestOptional<
-      Redux.AuthenticatedTableActionMap<R, M, C>
-    > = Redux.TableActionMapWithRequestOptional<Redux.AuthenticatedTableActionMap<R, M, C>>,
+      Redux.AuthenticatedTableActionMap<R, M, C>,
+      C
+    > = Redux.TableActionMapWithRequestOptional<Redux.AuthenticatedTableActionMap<R, M, C>, C>,
     T extends Redux.TableTaskMapWithRequestOptional<
-      Redux.AuthenticatedTableTaskMap<R, M, C>
-    > = Redux.TableTaskMapWithRequestOptional<Redux.AuthenticatedTableTaskMap<R, M, C>>
+      Redux.AuthenticatedTableTaskMap<R, M, C>,
+      C
+    > = Redux.TableTaskMapWithRequestOptional<Redux.AuthenticatedTableTaskMap<R, M, C>, C>
   > = Redux.SagaConfig<T, A>;
 
   /* ------------------------- Redux -------------------------------------- */

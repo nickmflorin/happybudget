@@ -35,37 +35,38 @@ type OmitProps =
   | "onEditGroup"
   | "columns";
 
-export type Props = Omit<AuthenticatedTableProps<R, M>, OmitProps> & {
-  readonly onAttachmentRemoved: (row: Table.ModelRow<R>, id: number) => void;
-  readonly onAttachmentAdded: (row: Table.ModelRow<R>, attachment: Model.Attachment) => void;
-};
+export type Props = Omit<AuthenticatedTableProps<R, M>, OmitProps>;
 
 const ContactsTable = (props: Props): JSX.Element => {
   const dispatch: Dispatch = useDispatch();
 
-  const [processAttachmentsCellForClipboard, processAttachmentsCellFromClipboard, setEditAttachments, modal] =
-    useAttachments({
-      table: props.table.current,
-      onAttachmentRemoved: props.onAttachmentRemoved,
-      onAttachmentAdded: props.onAttachmentAdded,
-      listAttachments: api.getContactAttachments,
-      deleteAttachment: api.deleteContactAttachment,
-      path: (id: number) => `/v1/contacts/${id}/attachments/`
-    });
+  const [
+    processAttachmentsCellForClipboard,
+    processAttachmentsCellFromClipboard,
+    setEditAttachments,
+    modal,
+    addAttachment,
+    removeAttachment
+  ] = useAttachments({
+    table: props.table.current,
+    listAttachments: api.getContactAttachments,
+    deleteAttachment: api.deleteContactAttachment,
+    path: (id: number) => `/v1/contacts/${id}/attachments/`
+  });
 
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   const [__, editContactModal, editContact, _] = useContacts({
     onCreated: (m: Model.Contact) => dispatch(actions.authenticated.addContactToStateAction(m)),
     onUpdated: (m: Model.Contact) =>
       props.table.current.applyTableChange({
-        type: "modelUpdated",
+        type: "modelsUpdated",
         payload: { model: m }
       }),
     onAttachmentRemoved: (id: number, attachmentId: number) => {
       const row = props.table.current.getRow(id);
       if (!isNil(row)) {
         if (tabling.typeguards.isModelRow(row)) {
-          props.onAttachmentRemoved(row, attachmentId);
+          removeAttachment(row, attachmentId);
         } else {
           console.warn(
             `Suspicous Behavior: After attachment was added, row with ID
@@ -83,7 +84,7 @@ const ContactsTable = (props: Props): JSX.Element => {
       const row = props.table.current.getRow(id);
       if (!isNil(row)) {
         if (tabling.typeguards.isModelRow(row)) {
-          props.onAttachmentAdded(row, m);
+          addAttachment(row, m);
         } else {
           console.warn(
             `Suspicous Behavior: After attachment was added, row with ID
@@ -133,7 +134,7 @@ const ContactsTable = (props: Props): JSX.Element => {
             processCellForClipboard: processAttachmentsCellForClipboard,
             cellRendererParams: {
               ...col.cellRendererParams,
-              onAttachmentAdded: props.onAttachmentAdded,
+              onAttachmentAdded: addAttachment,
               uploadAttachmentsPath: (id: number) => `/v1/contacts/${id}/attachments/`
             }
           })
