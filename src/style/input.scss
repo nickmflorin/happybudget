@@ -63,7 +63,7 @@ select:-webkit-autofill:focus {
 ) {
   line-height: ($size - 2 * $vertical-padding) !important;
   font-size: $font-size !important;
-  padding: $vertical-padding $horizontal-padding;
+  padding: $vertical-padding $horizontal-padding !important;
   border-radius: $radius !important;
   .ant-input-prefix {
     font-size: $font-size;
@@ -288,27 +288,14 @@ textarea {
     @extend .input-base;
     @include input_framework(8px, 0.8rem, 12px, $standard-size, $input-border-radius, 1px);
     @include transition(none !important);
-    height: 100%;
+    height: 100% !important;
     background-color: $white !important;
     border-color: $border-color !important;
     border: $border !important;
 
-    .ant-select-selection-overflow {
-      height: 100%;
-
-      .ant-select-selection-overflow-item {
-        height: 100%;
-      }
-    }
-
     .ant-select-selection-item {
       font-weight: 500;
       height: 100%;
-      margin-top: 0;
-      margin-bottom: 0;
-      padding-top: 1px;
-      padding-bottom: 1px;
-      line-height: 24px;
     }
   }
 
@@ -319,6 +306,44 @@ textarea {
     background-color: $gray-light !important;
     .ant-select-selector {
       background-color: $gray-light !important;
+    }
+  }
+}
+
+.select,
+.ant-select-single {
+  .ant-select-selector {
+    .ant-select-selection-item {
+      font-weight: 500;
+      height: 100%;
+      line-height: inherit !important;
+    }
+  }
+}
+
+// For now, our select-multiple is just configured for the standard height.
+// We will need to customize this CSS more to allow for other height/size
+// variants.
+.select,
+.ant-select-multiple {
+  min-height: 32px !important;
+  height: auto !important;
+
+  .ant-select-selector {
+    padding: 1px 8px !important;
+    line-height: 26px !important;
+
+    .ant-select-selection-overflow {
+      padding: 0 !important;
+      line-height: unset !important;
+
+      .ant-select-selection-overflow-item {
+        .ant-select-selection-item {
+          font-weight: 500;
+          height: 24px;
+          line-height: 24px !important;
+        }
+      }
     }
   }
 

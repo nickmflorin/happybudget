@@ -15,8 +15,8 @@ form {
 }
 
 .form-label-base {
-	@extend .label-base;
-	height: 26px !important;
+  @extend .label-base;
+  height: 22px !important;
 }
 
 .ant-form-item-explain-error {
