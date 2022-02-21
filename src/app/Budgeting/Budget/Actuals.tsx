@@ -6,9 +6,9 @@ import { isNil, reduce } from "lodash";
 import { redux, tabling } from "lib";
 import { ActualsTable, connectTableToAuthenticatedStore } from "tabling";
 
-import { ActualsPage } from "app/Budgeting/Pages";
-import { actions, sagas } from "app/Budgeting/store";
-import { ActualsPreviewModal } from "app/Budgeting/Budget/PreviewModals";
+import { ActualsPage } from "../Pages";
+import { actions, sagas } from "../store";
+import { ActualsPreviewModal } from "./PreviewModals";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;

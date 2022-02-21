@@ -20,7 +20,6 @@ const BudgetTotalChartForm = ({ metrics, ...props }: BudgetTotalChartFormProps) 
       <Form.Item name={"grouped"} label={"Grouped"} valuePropName={"checked"}>
         <Checkbox defaultChecked={props.initialValues?.grouped} />
       </Form.Item>
-
       <Form.Item name={"metric"}>
         <Select suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}>
           {map(metrics, (metric: Charts.BudgetTotal.Metric, index: number) => (

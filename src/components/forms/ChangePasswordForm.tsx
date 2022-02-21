@@ -28,7 +28,6 @@ const ChangePasswordForm: React.FC<FormProps<ChangePasswordFormValues>> = (props
       >
         <PasswordInput hasValidator={true} />
       </Form.Item>
-
       <Form.Item
         name={"confirm"}
         label={"Confirm Password"}
@@ -46,7 +45,6 @@ const ChangePasswordForm: React.FC<FormProps<ChangePasswordFormValues>> = (props
       >
         <PasswordInput placeholder={"Confirm"} />
       </Form.Item>
-
       <Form.Footer>
         <PrimaryButton htmlType={"submit"} style={{ width: "100%" }}>
           {"Save"}

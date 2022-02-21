@@ -10,11 +10,9 @@ import { Route, PathParamsRoute } from "components/routes";
 
 import { actions, selectors } from "../store";
 
-// Will be moved into this directory after Plaid importing done.
-import { Actuals } from "../../Budget/components";
-
 import Account from "./Account";
 import Accounts from "./Accounts";
+import Actuals from "./Actuals";
 import Analysis from "./Analysis";
 import SubAccount from "./SubAccount";
 import { BudgetPreviewModal } from "./PreviewModals";
