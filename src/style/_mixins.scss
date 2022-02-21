@@ -7,18 +7,24 @@
   transition: $value;
 }
 
+@mixin vertical-flex-c() {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 @mixin size($value) {
   height: $value;
   width: $value;
 }
 
 $standards: (
-	"xlarge": $xlarge-size,
+  "xlarge": $xlarge-size,
   "large": $large-size,
   "standard": $standard-size,
   "medium": $medium-size,
   "small": $small-size,
-	"xsmall": $xsmall-size
+  "xsmall": $xsmall-size
 );
 
 @function standard($metric: "standard", $map: $standards) {
@@ -41,7 +47,7 @@ $standards: (
 @mixin standard_height_variants($map: $standards) {
   @include standard_height("standard", $map);
 
-	&.xlarge {
+  &.xlarge {
     @include standard_height("xlarge", $map);
   }
 
@@ -61,7 +67,7 @@ $standards: (
     @include standard_height("small", $map);
   }
 
-	&.xsmall {
+  &.xsmall {
     @include standard_height("xsmall", $map);
   }
 }
@@ -69,7 +75,7 @@ $standards: (
 @mixin standard_width_variants($map: $standards) {
   @include standard_width("standard", $map);
 
-	&.xlarge {
+  &.xlarge {
     @include standard_width("xlarge", $map);
   }
 
@@ -89,7 +95,7 @@ $standards: (
     @include standard_width("small", $map);
   }
 
-	&.xsmall {
+  &.xsmall {
     @include standard_width("xsmall", $map);
   }
 }

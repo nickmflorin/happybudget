@@ -45,9 +45,7 @@
 
     &:hover {
       .header-template-select-option-icon-wrapper {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        @include vertical-flex-c();
       }
     }
   }

@@ -9,9 +9,7 @@
   .landing-page-left {
     flex-grow: 1;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    @include vertical-flex-c();
     -webkit-box-pack: center;
     -webkit-box-align: center;
     width: 100%;

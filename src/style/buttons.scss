@@ -46,20 +46,19 @@
 }
 
 @mixin focus_border_color($c) {
-	&:hover,
-	&:focus {
-		border-color: $border-color !important;
-	}
+  &:hover,
+  &:focus {
+    border-color: $border-color !important;
+  }
 }
 
 @mixin disabled_border_color($c) {
-	&:disabled,
-	&.fake-disabled,
-	&.disabled {
-		border-color: $c !important;
-	}
+  &:disabled,
+  &.fake-disabled,
+  &.disabled {
+    border-color: $c !important;
+  }
 }
-
 
 @mixin color_on_hover($c) {
   &:hover:not(:disabled):not(.disabled):not(.fake-disabled),
@@ -217,10 +216,10 @@
 @mixin button_size_standard() {
   @include standard_height_variants();
 
-	&.xlarge {
+  &.xlarge {
     padding: 10px 12px;
     line-height: 20px;
-		font-size: 16px;
+    font-size: 16px;
   }
 
   &.large {
@@ -246,9 +245,7 @@
 
 @mixin variant_icon_only() {
   min-width: 0px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  @include vertical-flex-c();
 
   &.large {
     width: 42px;
@@ -277,7 +274,7 @@
 
 .btn-base {
   @extend .btn-link-base;
-	@include button_size_standard();
+  @include button_size_standard();
   font-family: $avenir;
   font-weight: 600;
   border-width: 1px;
@@ -366,11 +363,10 @@
 
   &--icon-only {
     @extend .btn;
-		padding: 0 !important;
+    padding: 0 !important;
     min-width: 0px;
     border-radius: 100px;
-    display: flex;
-    flex-direction: column;
+    @include vertical-flex-c();
     color: $icon-color;
 
     .icon {
@@ -391,36 +387,36 @@
     @include bare_color_set($icon-color);
     @include standard_size_variants();
 
-		&.icon-xsmall {
-			.icon {
-				height: 12px;
-				width: auto;
-			}
-		}
-		&.icon-small {
-			.icon {
-				height: 14px;
-				width: auto;
-			}
-		}
-		&.icon-medium {
-			.icon {
-				height: 16px;
-				width: auto;
-			}
-		}
-		&.icon-standard {
-			.icon {
-				height: 16px;
-				width: auto;
-			}
-		}
-		&.icon-large {
-			.icon {
-				height: 18px;
-				width: auto;
-			}
-		}
+    &.icon-xsmall {
+      .icon {
+        height: 12px;
+        width: auto;
+      }
+    }
+    &.icon-small {
+      .icon {
+        height: 14px;
+        width: auto;
+      }
+    }
+    &.icon-medium {
+      .icon {
+        height: 16px;
+        width: auto;
+      }
+    }
+    &.icon-standard {
+      .icon {
+        height: 16px;
+        width: auto;
+      }
+    }
+    &.icon-large {
+      .icon {
+        height: 18px;
+        width: auto;
+      }
+    }
 
     &.ag-grid-action-button {
       .icon {
@@ -539,7 +535,7 @@
 
   &--google {
     @extend .btn;
-		@include bg_color_set($white, $white, $white);
+    @include bg_color_set($white, $white, $white);
     @include solid_color($text-secondary);
     border-color: $border-color;
 
@@ -547,10 +543,10 @@
     padding-top: 4px !important;
     padding-bottom: 4px !important;
     line-height: 32px !important;
-		font-size: 14px !important;
+    font-size: 14px !important;
 
-		@include focus_border_color($border-color);
-		@include disabled_border_color($border-color);
+    @include focus_border_color($border-color);
+    @include disabled_border_color($border-color);
 
     .content-wrapper {
       display: flex;

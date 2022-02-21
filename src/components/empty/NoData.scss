@@ -1,9 +1,7 @@
 @import "style/_imports";
 
 .no-data {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  @include vertical-flex-c();
   align-items: center;
   max-width: 500px;
   text-align: center;

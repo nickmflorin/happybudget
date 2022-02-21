@@ -1,24 +1,25 @@
 @import "./_imports";
-@import "./input";
-@import "./typography";
-@import "./layout";
+
 @import "./buttons";
-@import "./forms";
-@import "./tooltips";
-@import "./popovers";
 @import "./dropdowns";
+@import "./fancybox";
+@import "./filepond";
+@import "./forms";
+@import "./icons";
+@import "./image";
+@import "./input";
+@import "./layout";
+@import "./loading";
+@import "./menus";
 @import "./modals";
 @import "./notifications";
-@import "./menus";
-@import "./tagging";
-@import "./image";
-@import "./filepond";
-@import "./tabling/index";
 @import "./pagination";
+@import "./popovers";
+@import "./tabling/index";
+@import "./tagging";
+@import "./tooltips";
+@import "./typography";
 @import "./util";
-@import "./fancybox";
-@import "./icons";
-@import "./loading";
 
 @import "~antd/dist/antd.css";
 @import "filepond/dist/filepond.min.css";
@@ -40,9 +41,7 @@ code {
   margin: 0 auto;
   margin-top: 15px;
   margin-bottom: 15px;
-  justify-content: center;
-  display: flex;
-  flex-direction: column;
+  @include vertical-flex-c();
 
   .ant-empty-image {
     height: 50px;

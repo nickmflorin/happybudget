@@ -1,7 +1,7 @@
+@import "style/_imports";
+
 .not-found-page {
-  display: flex;
-  flex-direction: column;
+  @include vertical-flex-c();
   align-items: center;
-  justify-content: center;
   height: 100vh;
 }

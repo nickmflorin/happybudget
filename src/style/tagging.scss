@@ -80,16 +80,14 @@
 
 .color {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  // height: 16px;
-  // width: 16px;
+  @include vertical-flex-c();
+  height: 16px;
+  width: 16px;
 
-  // svg {
-  //   height: 100% !important;
-  //   width: 100% !important;
-  // }
+  svg {
+    height: 100% !important;
+    width: 100% !important;
+  }
 
   &.selectable {
     height: 24px;

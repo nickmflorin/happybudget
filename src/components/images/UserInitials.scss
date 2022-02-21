@@ -1,10 +1,10 @@
+@import "style/_imports";
+
 .user-initials {
+  @include vertical-flex-c();
   height: 100%;
   width: 100%;
   background-color: #eee;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   border-radius: 100%;
 
   .img-overlay {

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, forwardRef } from "react";
 import { map } from "lodash";
 import classNames from "classnames";
 
@@ -6,10 +6,7 @@ import { Input as AntDInput, Popover as AntDPopover } from "antd";
 import { InputProps as AntDInputProps } from "antd/lib/input";
 
 import { Icon } from "components";
-
-export type PasswordInputProps = AntDInputProps & {
-  readonly hasValidator?: boolean;
-};
+import { withSize } from "components/hocs";
 
 const validationNames: PasswordValidationName[] = [
   { id: "lowercase", name: "One lowercase letter" },
@@ -39,7 +36,16 @@ const ValidationItems = (props: { validationState: PasswordValidationState }) =>
 
 const MemoizedValidationItems = React.memo(ValidationItems);
 
-const PasswordInput = ({ hasValidator, ...props }: PasswordInputProps): JSX.Element => {
+/* The size related props are exposed outside of this component but not inside
+   the component, because they are automatically wrapped into the className by
+   the HOC. */
+type PrivatePasswordInputProps = Omit<AntDInputProps, "size"> & {
+  readonly hasValidator?: boolean;
+};
+
+export type PasswordInputProps = PrivatePasswordInputProps & UseSizeProps;
+
+const PasswordInput = ({ hasValidator, ...props }: PrivatePasswordInputProps): JSX.Element => {
   const [validationState, setValidationState] = useState<PasswordValidationState>(initialValidationState);
 
   const handleValidation = useMemo(
@@ -83,4 +89,9 @@ const PasswordInput = ({ hasValidator, ...props }: PasswordInputProps): JSX.Elem
   return children;
 };
 
-export default React.memo(PasswordInput);
+export default withSize<PasswordInputProps, StandardSize, "size", AntDInput>({
+  hasRef: true
+})(forwardRef(PasswordInput)) as React.ForwardRefRenderFunction<
+  AntDInput,
+  PasswordInputProps & { readonly ref?: React.ForwardedRef<AntDInput> }
+>;

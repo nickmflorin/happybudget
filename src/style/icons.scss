@@ -9,9 +9,7 @@
 .icon-wrapper {
   width: auto;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  @include vertical-flex-c();
 
   .icon {
     height: 100%;

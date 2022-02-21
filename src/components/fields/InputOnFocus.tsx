@@ -1,7 +1,7 @@
-import React, { useState, useRef, useImperativeHandle, ForwardedRef, forwardRef } from "react";
+import React, { useState, useEffect, useRef, useImperativeHandle, ForwardedRef, forwardRef } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
-import { useEffect } from "react";
+import { Input as AntDInput } from "antd";
 
 interface InputOnFocusProps extends React.HTMLProps<HTMLInputElement> {
   /* When unfocused, the <input> will be hidden and other content will be shown.
@@ -12,15 +12,9 @@ interface InputOnFocusProps extends React.HTMLProps<HTMLInputElement> {
   readonly children: (value: string) => JSX.Element;
 }
 
-// TODO: Is there anyway we can find this in AntD?
-type IInputRef = {
-  readonly focus: () => void;
-  readonly blur: () => void;
-};
-
 const InputOnFocus = (
   { children, renderBlurredContent, renderBlurredContentOnNoValue = false, ...props }: InputOnFocusProps,
-  ref: ForwardedRef<IInputRef>
+  ref: ForwardedRef<Pick<AntDInput, "focus" | "blur">>
 ): JSX.Element => {
   const innerRef = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
