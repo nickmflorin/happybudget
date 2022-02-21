@@ -45,7 +45,10 @@ type PrivatePasswordInputProps = Omit<AntDInputProps, "size"> & {
 
 export type PasswordInputProps = PrivatePasswordInputProps & UseSizeProps;
 
-const PasswordInput = ({ hasValidator, ...props }: PrivatePasswordInputProps): JSX.Element => {
+const PasswordInput = (
+  { hasValidator, ...props }: PrivatePasswordInputProps,
+  ref: React.ForwardedRef<AntDInput>
+): JSX.Element => {
   const [validationState, setValidationState] = useState<PasswordValidationState>(initialValidationState);
 
   const handleValidation = useMemo(
@@ -67,6 +70,7 @@ const PasswordInput = ({ hasValidator, ...props }: PrivatePasswordInputProps): J
       <AntDInput.Password
         placeholder={"Password"}
         prefix={<Icon icon={"lock"} weight={"solid"} />}
+        ref={ref}
         {...props}
         className={classNames("input", "input--password", props.className)}
         onChange={handleValidation}
