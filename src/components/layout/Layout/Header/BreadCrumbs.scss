@@ -17,7 +17,7 @@
   }
 
   .bread-crumb-item {
-    display: flex;
+    @include vertical-flex-c();
     cursor: pointer;
 
     &:last-child {
