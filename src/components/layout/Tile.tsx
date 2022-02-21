@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
@@ -19,4 +20,4 @@ const Tile = ({ children, title, subTitle, contentProps, ...props }: TileProps) 
   );
 };
 
-export default Tile;
+export default React.memo(Tile);
