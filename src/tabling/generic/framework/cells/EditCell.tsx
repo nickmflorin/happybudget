@@ -60,7 +60,7 @@ const Action = <
       className={classNames("ag-grid-action-button", {
         "fake-disabled": disabled
       })}
-      iconSize={"small"}
+      iconSize={"xsmall"}
       size={"xsmall"}
       icon={<Icon icon={icon} weight={"regular"} style={props.iconStyle} />}
       onClick={() => props.config.action(props.row, props.hovered)}

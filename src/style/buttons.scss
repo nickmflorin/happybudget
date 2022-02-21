@@ -243,6 +243,28 @@
   }
 }
 
+@mixin budget_bare_padding() {
+  &.xlarge {
+    padding: 10px 10px;
+  }
+
+  &.large {
+    padding: 10px 10px;
+  }
+
+  &.standard {
+    padding: 8px 8px;
+  }
+
+  &.medium {
+    padding: 7px 7px;
+  }
+
+  &.small {
+    padding: 6px 6px;
+  }
+}
+
 @mixin variant_icon_only() {
   min-width: 0px;
   @include vertical-flex-c();
@@ -359,6 +381,17 @@
   &--danger {
     @extend .btn;
     @include danger();
+  }
+
+  &--bare {
+    @extend .btn;
+    min-width: 0px;
+    @include bare_color_set($text-secondary);
+    @include budget_bare_padding();
+
+    &.budget-table-menu {
+      @include bare_color_set($text-secondary, $green);
+    }
   }
 
   &--icon-only {
@@ -562,16 +595,6 @@
           width: 18px;
         }
       }
-    }
-  }
-
-  &--bare {
-    @extend .btn;
-    min-width: 0px;
-    @include bare_color_set($text-secondary);
-
-    &.budget-table-menu {
-      @include bare_color_set($text-secondary, $green);
     }
   }
 
