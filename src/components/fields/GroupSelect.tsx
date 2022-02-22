@@ -21,41 +21,39 @@ export interface GroupSelectProps extends SelectProps<number> {
   readonly groups: Model.Group[];
 }
 
-const GroupSelect = (props: GroupSelectProps): JSX.Element => {
-  return (
-    <Select
-      suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
-      {...props}
-      className={classNames("select--group", props.className)}
-      mode={"multiple"}
-      showArrow
-      tagRender={(params: CustomTagProps) => {
-        const group = find(props.groups, { id: params.value });
-        if (!isNil(group)) {
-          return (
-            <Tag className={"group-select-tag"} style={{ marginRight: 3 }} {...params}>
-              <div className={"icon-wrapper"}>
-                <Color color={group.color} />
-              </div>
-              {group.name}
-            </Tag>
-          );
-        }
-        return <></>;
-      }}
-    >
-      {map(props.groups, (group: Model.Group, index: number) => {
+const GroupSelect = (props: GroupSelectProps): JSX.Element => (
+  <Select
+    suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
+    {...props}
+    className={classNames("select--group", props.className)}
+    mode={"multiple"}
+    showArrow
+    tagRender={(params: CustomTagProps) => {
+      const group = find(props.groups, { id: params.value });
+      if (!isNil(group)) {
         return (
-          <Select.Option className={"group-select-option"} key={index + 1} value={group.id}>
+          <Tag className={"group-select-tag"} style={{ marginRight: 3 }} {...params}>
             <div className={"icon-wrapper"}>
-              <Color color={group.color} style={{ marginRight: 6 }} />
+              <Color color={group.color} />
             </div>
             {group.name}
-          </Select.Option>
+          </Tag>
         );
-      })}
-    </Select>
-  );
-};
+      }
+      return <></>;
+    }}
+  >
+    {map(props.groups, (group: Model.Group, index: number) => {
+      return (
+        <Select.Option className={"group-select-option"} key={index + 1} value={group.id}>
+          <div className={"icon-wrapper"}>
+            <Color color={group.color} style={{ marginRight: 6 }} />
+          </div>
+          {group.name}
+        </Select.Option>
+      );
+    })}
+  </Select>
+);
 
 export default GroupSelect;

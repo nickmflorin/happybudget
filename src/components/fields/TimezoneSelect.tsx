@@ -35,27 +35,25 @@ export interface OptionGroupData {
   [prop: string]: any;
 }
 
-const TimezoneSelect: React.FC<SelectProps<string>> = ({ placeholder = "Time Zone", ...props }) => {
-  return (
-    <Select
-      placeholder={placeholder}
-      suffixIcon={<Icon icon={"clock"} weight={"solid"} />}
-      showArrow
-      showSearch
-      filterOption={(input: string, option?: OptionData | OptionGroupData) =>
-        !isNil(option) && !isNil(option.children)
-          ? (option.children as string).toLowerCase().indexOf(input.toLowerCase()) >= 0
-          : false
-      }
-      {...props}
-    >
-      {moment.tz.names().map((tz: string, index: number) => (
-        <Select.Option key={index} value={tz}>
-          {tz}
-        </Select.Option>
-      ))}
-    </Select>
-  );
-};
+const TimezoneSelect: React.FC<SelectProps<string>> = ({ placeholder = "Time Zone", ...props }) => (
+  <Select
+    placeholder={placeholder}
+    suffixIcon={<Icon icon={"clock"} weight={"solid"} />}
+    showArrow
+    showSearch
+    filterOption={(input: string, option?: OptionData | OptionGroupData) =>
+      !isNil(option) && !isNil(option.children)
+        ? (option.children as string).toLowerCase().indexOf(input.toLowerCase()) >= 0
+        : false
+    }
+    {...props}
+  >
+    {moment.tz.names().map((tz: string, index: number) => (
+      <Select.Option key={index} value={tz}>
+        {tz}
+      </Select.Option>
+    ))}
+  </Select>
+);
 
 export default React.memo(TimezoneSelect);

@@ -78,5 +78,4 @@ const InputOnFocus = (
   );
 };
 
-const ForwardRefInput = forwardRef(InputOnFocus);
-export default React.memo(ForwardRefInput);
+export default React.memo(forwardRef(InputOnFocus));

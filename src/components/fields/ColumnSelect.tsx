@@ -45,54 +45,52 @@ const ColumnSelect = <
   columns,
   getLabel,
   ...props
-}: ColumnSelectProps<R, M, C>): JSX.Element => {
-  return (
-    <Select
-      suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
-      {...props}
-      className={classNames("select--column", props.className)}
-      mode={"multiple"}
-      showArrow
-      tagRender={(params: CustomTagProps) => {
-        const column = tabling.columns.getColumn(columns, params.value as string);
-        if (!isNil(column)) {
-          const colType: Table.ColumnDataType | undefined = !isNil(column.dataType)
-            ? find(tabling.models.ColumnTypes, { id: column.dataType })
-            : undefined;
-          return (
-            <Tag
-              className={"column-select-tag"}
-              style={{ marginRight: 3 }}
-              onMouseDown={e => e.stopPropagation()}
-              {...params}
-            >
-              {!isNil(colType) && !isNil(colType.icon) && (
-                <div className={"icon-wrapper"}>
-                  {ui.typeguards.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}
-                </div>
-              )}
-              {getLabel(column)}
-            </Tag>
-          );
-        }
-        return <></>;
-      }}
-    >
-      {map(columns, (column: C, index: number) => {
-        const colType = find(tabling.models.ColumnTypes, { id: column.dataType });
+}: ColumnSelectProps<R, M, C>): JSX.Element => (
+  <Select
+    suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
+    {...props}
+    className={classNames("select--column", props.className)}
+    mode={"multiple"}
+    showArrow
+    tagRender={(params: CustomTagProps) => {
+      const column = tabling.columns.getColumn(columns, params.value as string);
+      if (!isNil(column)) {
+        const colType: Table.ColumnDataType | undefined = !isNil(column.dataType)
+          ? find(tabling.models.ColumnTypes, { id: column.dataType })
+          : undefined;
         return (
-          <Select.Option className={"column-select-option"} key={index + 1} value={column.field}>
+          <Tag
+            className={"column-select-tag"}
+            style={{ marginRight: 3 }}
+            onMouseDown={e => e.stopPropagation()}
+            {...params}
+          >
             {!isNil(colType) && !isNil(colType.icon) && (
               <div className={"icon-wrapper"}>
                 {ui.typeguards.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}
               </div>
             )}
             {getLabel(column)}
-          </Select.Option>
+          </Tag>
         );
-      })}
-    </Select>
-  );
-};
+      }
+      return <></>;
+    }}
+  >
+    {map(columns, (column: C, index: number) => {
+      const colType = find(tabling.models.ColumnTypes, { id: column.dataType });
+      return (
+        <Select.Option className={"column-select-option"} key={index + 1} value={column.field}>
+          {!isNil(colType) && !isNil(colType.icon) && (
+            <div className={"icon-wrapper"}>
+              {ui.typeguards.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}
+            </div>
+          )}
+          {getLabel(column)}
+        </Select.Option>
+      );
+    })}
+  </Select>
+);
 
 export default ColumnSelect;

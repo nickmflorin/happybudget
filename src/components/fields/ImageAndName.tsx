@@ -37,5 +37,4 @@ const ImageAndName = (
   );
 };
 
-const Forwarded = forwardRef(ImageAndName);
-export default React.memo(Forwarded);
+export default React.memo(forwardRef(ImageAndName));
