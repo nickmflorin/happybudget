@@ -2,13 +2,12 @@ import React from "react";
 
 import { Form } from "components";
 import { Input } from "components/fields";
-import { UploadBudgetImage } from "components/uploaders";
-import "./TemplateForm.scss";
+import { BudgetImageUploader } from "components/fields/uploaders";
 
-interface TemplateFormProps extends FormProps<Http.TemplatePayload> {
-  originalImage?: SavedImage | null;
-  onImageChange?: (f: UploadedImage | null) => void;
-}
+type TemplateFormProps = FormProps<Http.TemplatePayload> & {
+  readonly originalImage?: SavedImage | null;
+  readonly onImageChange?: (f: UploadedImage | null) => void;
+};
 
 const TemplateForm: React.FC<TemplateFormProps> = ({ originalImage, onImageChange, ...props }) => {
   return (
@@ -17,7 +16,8 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ originalImage, onImageChang
         <Input placeholder={"Name"} />
       </Form.Item>
       <Form.Item label={"Avatar"} rules={[{ required: false }]}>
-        <UploadBudgetImage
+        <BudgetImageUploader
+          style={{ height: 215 }}
           value={originalImage}
           onChange={(f: UploadedImage | null) => onImageChange?.(f)}
           onError={(error: Error | string) => props.form.notify(typeof error === "string" ? error : error.message)}

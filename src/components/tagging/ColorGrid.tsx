@@ -4,7 +4,6 @@ import { chunk, map, includes } from "lodash";
 
 import { Colors } from "style/constants";
 import Color from "./Color";
-import "./ColorGrid.scss";
 
 interface ColorGridProps extends StandardComponentProps {
   readonly colors: string[];

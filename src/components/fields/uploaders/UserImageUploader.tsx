@@ -7,7 +7,6 @@ import { Icon, FullSize, VerticalFlexCenter } from "components";
 import { UserImageOrInitials, EditImageOverlay } from "components/images";
 
 import Uploader, { UploaderProps } from "./Uploader";
-import "./UploadUserImage.scss";
 
 export interface UploadUserImageProps extends UploaderProps {
   readonly firstName: string | null;

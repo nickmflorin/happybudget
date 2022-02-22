@@ -3,13 +3,12 @@ import { isNil } from "lodash";
 
 import { Form } from "components";
 import { Input } from "components/fields";
-import { UploadBudgetImage } from "components/uploaders";
-import "./BudgetForm.scss";
+import { BudgetImageUploader } from "components/fields/uploaders";
 
-interface BudgetFormProps extends FormProps<Http.BudgetPayload> {
-  originalImage?: SavedImage | null;
-  onImageChange?: (f: UploadedImage | null) => void;
-}
+type BudgetFormProps = FormProps<Http.BudgetPayload> & {
+  readonly originalImage?: SavedImage | null;
+  readonly onImageChange?: (f: UploadedImage | null) => void;
+};
 
 const BudgetForm: React.FC<BudgetFormProps> = ({ originalImage, onImageChange, ...props }) => {
   return (
@@ -35,8 +34,9 @@ const BudgetForm: React.FC<BudgetFormProps> = ({ originalImage, onImageChange, .
       <Form.Item name={"name"} rules={[{ required: true, message: "Please provide a valid name for the budget." }]}>
         <Input placeholder={"Name"} />
       </Form.Item>
-      <Form.Item label={"Avatar"} rules={[{ required: false }]}>
-        <UploadBudgetImage
+      <Form.Item label={"Image"} rules={[{ required: false }]}>
+        <BudgetImageUploader
+          style={{ height: 215 }}
           value={originalImage}
           onChange={(f: UploadedImage | null) => onImageChange?.(f)}
           onError={(error: Error | string) => props.form.notify(typeof error === "string" ? error : error.message)}

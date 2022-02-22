@@ -1,0 +1,27 @@
+// This class is not meant to be used in the components.
+.input-base {
+  @include transition(none);
+  border: none;
+  background-color: $gray-light !important;
+  color: $text-primary !important;
+  cursor: text;
+  position: relative;
+  box-sizing: border-box;
+  align-items: center;
+  font-variant: tabular-nums;
+  list-style: none;
+  font-feature-settings: "tnum";
+  font-family: $avenir;
+  font-weight: 500;
+  width: 100%;
+  box-shadow: none !important;
+  margin: 0;
+  min-width: 0;
+  background-image: none !important;
+
+  &:hover,
+  &:focus {
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+}

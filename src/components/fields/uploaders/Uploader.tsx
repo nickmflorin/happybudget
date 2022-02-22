@@ -15,8 +15,6 @@ import { Config } from "config";
 import { Icon, RenderWithSpinner, Image, ShowHide } from "components";
 import { ImageClearButton } from "components/buttons";
 
-import "./Uploader.scss";
-
 interface UploaderImageProps extends StandardComponentProps {
   readonly image: UploadedImage | SavedImage;
 }

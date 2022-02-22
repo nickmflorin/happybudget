@@ -1,7 +1,6 @@
 import React, { useState, useImperativeHandle, forwardRef, ForwardedRef } from "react";
 
-import { UploadUserImage } from "components/uploaders";
-import { UploadUserImageProps } from "components/uploaders/UploadUserImage";
+import { UserImageUploader, UploadUserImageProps } from "components/fields/uploaders";
 
 import "./ImageAndName.scss";
 
@@ -28,7 +27,7 @@ const ImageAndName = (
 
   return (
     <div className={"image-and-name"}>
-      <UploadUserImage {...props} firstName={firstName} lastName={lastName} />
+      <UserImageUploader {...props} firstName={firstName} lastName={lastName} />
       <div className={"name-wrapper"}>
         <div className={"name"}>{firstName}</div>
         <div className={"name"}>{lastName}</div>

@@ -1,0 +1,43 @@
+@mixin input_framework(
+  $horizontal-padding: 12px,
+  $svg-height: 0.8rem,
+  $font-size: 12px,
+  $size: $standard-size,
+  $radius: $input-border-radius,
+  $vertical-padding: 4px
+) {
+  line-height: ($size - 2 * $vertical-padding) !important;
+  font-size: $font-size !important;
+  padding: $vertical-padding $horizontal-padding !important;
+  border-radius: $radius !important;
+  .ant-input-prefix {
+    font-size: $font-size;
+
+    svg {
+      height: $svg-height;
+    }
+  }
+}
+
+@mixin input_size_standard() {
+  @include input_framework();
+  @include standard_height_variants();
+
+  &.large,
+  &.xlarge {
+    @include input_framework(12px, 0.9rem, 13px, $large-size, $input-border-radius);
+  }
+
+  &.standard {
+    @include input_framework();
+  }
+
+  &.medium {
+    @include input_framework(8px, 0.7rem, 12px, $medium-size, $input-small-border-radius);
+  }
+
+  &.small,
+  &.xsmall {
+    @include input_framework(8px, 0.7rem, 12px, $small-size, $input-small-border-radius);
+  }
+}

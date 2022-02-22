@@ -10,7 +10,7 @@ import { typeguards } from "lib";
 
 import { Icon, Form, ShowHide, Separator } from "components";
 import { ColumnSelect, Input } from "components/fields";
-import { UploadPdfImage } from "components/uploaders";
+import { PdfImageUploader } from "components/fields/uploaders";
 import { EntityText } from "components/typography";
 import { CKEditor } from "components/richtext";
 import { EntityTextDescription } from "components/typography/EntityText";
@@ -397,7 +397,7 @@ const ExportForm = (
 
         <div className={"export-header-sides"}>
           <Form.Item label={"Left Side"} className={"export-header-side-item"}>
-            <UploadPdfImage
+            <PdfImageUploader
               value={leftImage}
               onChange={(left_image: UploadedImage | null) => setLeftImage(left_image)}
               onError={(error: Error | string) => props.form.notify(error)}
@@ -410,7 +410,7 @@ const ExportForm = (
           </Form.Item>
 
           <Form.Item className={"export-header-side-item"} label={"Right Side"}>
-            <UploadPdfImage
+            <PdfImageUploader
               value={rightImage}
               onChange={(right_image: UploadedImage | null) => setRightImage(right_image)}
               onError={(error: Error | string) => props.form.notify(error)}

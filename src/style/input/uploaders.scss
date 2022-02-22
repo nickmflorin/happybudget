@@ -1,0 +1,96 @@
+.image-uploader {
+  .image-uploader-upload {
+    height: 100% !important;
+    width: 100% !important;
+
+    &.with-image {
+      border: 1px solid $gray-light;
+      .ant-upload-select-picture-card {
+        border: none !important;
+      }
+    }
+
+    .ant-upload-select-picture-card {
+      height: 100% !important;
+      width: 100% !important;
+      margin: 0 !important;
+      position: relative;
+      background-color: $white;
+
+      .uploader-image-wrapper {
+        height: 100%;
+        width: 100%;
+        padding: 8px;
+      }
+
+      img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover !important;
+      }
+    }
+
+    .btn--clear-image {
+      z-index: 10000;
+    }
+
+    .upload-indicator {
+      .icon {
+        height: 25px;
+        width: 25px;
+      }
+    }
+  }
+
+  &.pdf-image-uploader {
+    border: $dashed-border;
+    border-radius: $input-border-radius;
+    max-width: 100%;
+    min-width: 200px;
+    height: 32px;
+    width: 50%;
+    display: flex;
+
+    .ant-upload {
+      justify-content: left !important;
+      text-align: left !important;
+    }
+
+    .upload-text {
+      font-family: $roboto;
+      font-size: 12px;
+      margin-left: 10px;
+      flex-grow: 100;
+    }
+  }
+
+  &.user-image-uploader {
+    .image-uploader-upload {
+      border: none !important;
+      .ant-upload-select-picture-card {
+        border: none !important;
+      }
+    }
+    .no-initials {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+
+      .no-initials-icon-wrapper {
+        &:not(:first-child) {
+          margin-left: 4px;
+        }
+        .icon {
+          color: $text-secondary !important;
+          &.fa-camera {
+            height: 26px;
+            width: 26px;
+          }
+          svg {
+            color: $text-secondary !important;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,179 @@
+@import "./base";
+@import "./mixins";
+
+.ant-select-multiple {
+  .ant-select-selection-item {
+    margin-top: 1px;
+    margin-bottom: 1px;
+  }
+  .ant-select-selection-item-remove > .anticon {
+    vertical-align: -0.1em;
+  }
+  .ant-select-selection-item-content {
+    font-size: 11px;
+    color: $text-primary;
+    font-family: $roboto;
+  }
+}
+
+// Must be outside of select because it does not render inside of select component.
+.ant-select-item-option {
+  &.column-select-option {
+    .ant-select-item-option-content {
+      display: flex;
+
+      .icon-wrapper {
+        @include size(22px);
+
+        svg {
+          @include size(12px);
+        }
+      }
+    }
+  }
+  &.group-select-option {
+    .ant-select-item-option-content {
+      display: flex;
+
+      .icon-wrapper {
+        @include size(22px);
+
+        .color {
+          @include size(16px);
+        }
+      }
+    }
+  }
+}
+
+.select,
+.ant-select {
+  @extend .input-base;
+  background-color: $white !important;
+  @include standard_height("standard");
+
+  &:not(.ant-select-disabled):hover .ant-select-selector {
+    border-color: #ebebeb !important;
+    border: 1px solid #ebebeb !important;
+  }
+
+  .ant-select-selector {
+    @extend .input-base;
+    @include input_framework(8px, 0.8rem, 12px, $standard-size, $input-border-radius, 1px);
+    @include transition(none !important);
+    height: 100% !important;
+    background-color: $white !important;
+    border-color: $border-color !important;
+    border: $border !important;
+
+    .ant-select-selection-item {
+      font-weight: 500;
+      height: 100%;
+    }
+  }
+
+  &.ant-select-open .ant-select-arrow svg {
+    color: $black;
+  }
+  &.disabled {
+    background-color: $gray-light !important;
+    .ant-select-selector {
+      background-color: $gray-light !important;
+    }
+  }
+}
+
+.select,
+.ant-select-single {
+  .ant-select-selector {
+    .ant-select-selection-item {
+      font-weight: 500;
+      height: 100%;
+      line-height: inherit !important;
+    }
+  }
+}
+
+// For now, our select-multiple is just configured for the standard height.
+// We will need to customize this CSS more to allow for other height/size
+// variants.
+.select,
+.ant-select-multiple {
+  min-height: 32px !important;
+  height: auto !important;
+
+  .ant-select-selector {
+    padding: 1px 8px !important;
+    line-height: 26px !important;
+
+    .ant-select-selection-overflow {
+      padding: 0 !important;
+      line-height: unset !important;
+
+      .ant-select-selection-overflow-item {
+        .ant-select-selection-item {
+          font-weight: 500;
+          height: 24px;
+          line-height: 24px !important;
+        }
+      }
+    }
+  }
+
+  &--group {
+    .group-select-tag {
+      display: flex;
+      line-height: 22px;
+
+      .icon-wrapper {
+        height: 22px;
+        width: 22px;
+        margin-right: -4px;
+
+        .color {
+          height: 12px;
+          width: 12px;
+        }
+      }
+
+      .ant-tag-close-icon {
+        @include vertical-flex-c();
+      }
+    }
+  }
+
+  &--column {
+    .column-select-tag {
+      display: flex;
+      line-height: 22px;
+
+      .icon-wrapper {
+        @include size(22px);
+        margin-right: -4px;
+
+        svg {
+          @include size(12px);
+        }
+      }
+
+      .ant-tag-close-icon {
+        @include vertical-flex-c();
+      }
+    }
+  }
+}
+
+.ant-select-item-option {
+  color: $text-secondary;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: $avenir;
+  min-height: $medium-size;
+  height: $medium-size;
+
+  .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+    color: $text-secondary;
+    font-weight: 600;
+    background-color: #e6f7ff;
+  }
+}
