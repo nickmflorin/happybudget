@@ -5,8 +5,8 @@ export type PaginationProps = RootPaginationProps & {
   readonly small?: boolean;
 };
 
-const Pagination = ({ small, ...props }: PaginationProps): JSX.Element => {
-  return <RootPagination {...props} className={classNames("pagination", props.className, { small })} />;
-};
+const Pagination = ({ small, ...props }: PaginationProps): JSX.Element => (
+  <RootPagination {...props} className={classNames("pagination", props.className, { small })} />
+);
 
 export default Pagination;

@@ -1,24 +1,10 @@
 @import "./_imports";
 
-@import "./buttons";
-@import "./dropdowns";
-@import "./fancybox";
-@import "./forms";
-@import "./icons";
-@import "./image";
-@import "./input";
+@import "./components";
 @import "./layout";
-@import "./loading";
-@import "./menus";
-@import "./modals";
-@import "./notifications";
-@import "./pagination";
-@import "./popovers";
-@import "./tabling/index";
-@import "./tagging";
-@import "./tooltips";
+@import "./pages";
+@import "./tabling";
 @import "./typography";
-@import "./util";
 
 @import "~antd/dist/antd.css";
 @import "filepond/dist/filepond.min.css";

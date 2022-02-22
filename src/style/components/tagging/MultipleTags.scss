@@ -1,0 +1,14 @@
+.multiple-tags-wrapper {
+  display: flex;
+
+  > .tag {
+    &:hover {
+      z-index: 1000;
+    }
+    // This needs to be applied more systematically, by looking at the overall width
+    // of each tag.  It should also be done programatically.
+    &:not(:first-child) {
+      margin-left: -10px;
+    }
+  }
+}

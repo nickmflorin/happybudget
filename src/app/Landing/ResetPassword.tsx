@@ -5,10 +5,10 @@ import { isNil, includes } from "lodash";
 import * as api from "api";
 import { ui } from "lib";
 
+import { LandingFormContainer } from "components/containers";
 import { ResetPasswordForm } from "components/forms";
 import { IResetPasswordFormValues } from "components/forms/ResetPasswordForm";
 
-import LandingFormContainer from "./LandingFormContainer";
 import { UITokenNotificationRedirectData } from "./Notifications";
 
 type Destination = "/login";
@@ -41,7 +41,7 @@ const ResetPassword = (): JSX.Element => {
   return (
     <LandingFormContainer title={"Reset password"}>
       <ResetPasswordForm
-        className={"mt--20"}
+        style={{ marginTop: 20 }}
         form={form}
         loading={loading}
         onSubmit={(values: IResetPasswordFormValues) => {

@@ -1,8 +1,11 @@
+import React from "react";
+
 import * as api from "api";
 import { ui, notifications } from "lib";
 
+import { Tile } from "components/containers";
 import { ChangePasswordForm } from "components/forms";
-import { Page, Tile } from "components/layout";
+import { Page } from "components/layout";
 import { ChangePasswordFormValues } from "components/forms/ChangePasswordForm";
 
 const Security = (): JSX.Element => {
@@ -37,4 +40,4 @@ const Security = (): JSX.Element => {
   );
 };
 
-export default Security;
+export default React.memo(Security);

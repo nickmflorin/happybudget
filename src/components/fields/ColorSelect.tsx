@@ -5,16 +5,14 @@ import classNames from "classnames";
 import { RenderOrSpinner } from "components";
 import { Color } from "components/tagging";
 
-import "./ColorSelect.scss";
-
-interface ColorSelectProps extends StandardComponentProps {
-  colors: string[];
-  value?: string | null;
-  itemClassName?: string;
-  itemStyle?: React.CSSProperties;
-  loading?: boolean;
-  onChange?: (value: string, e: React.MouseEvent<HTMLDivElement>) => void;
-}
+type ColorSelectProps = StandardComponentProps & {
+  readonly colors: string[];
+  readonly value?: string | null;
+  readonly itemClassName?: string;
+  readonly itemStyle?: React.CSSProperties;
+  readonly loading?: boolean;
+  readonly onChange?: (value: string, e: React.MouseEvent<HTMLDivElement>) => void;
+};
 
 const ColorSelect: React.FC<ColorSelectProps> = ({
   className,

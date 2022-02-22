@@ -4,14 +4,12 @@ import { isNil } from "lodash";
 
 import { ProductImage } from "components/images";
 
-import "./Product.scss";
-
-interface ProductProps extends StandardComponentProps {
+type ProductProps = StandardComponentProps & {
   readonly product: Model.Product;
   readonly extra?: ReactNode;
   readonly hoverBehavior?: boolean;
   readonly onClick?: () => void;
-}
+};
 
 const Product = ({ onClick, product, extra, hoverBehavior, ...props }: ProductProps): JSX.Element => {
   return (

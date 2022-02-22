@@ -1,9 +1,9 @@
 import React from "react";
 import classNames from "classnames";
 
-export interface ImageOverlayProps extends StandardComponentWithChildrenProps {
+export type ImageOverlayProps = StandardComponentWithChildrenProps & {
   readonly visible?: boolean;
-}
+};
 
 const ImageOverlay = (props: ImageOverlayProps): JSX.Element => {
   if (props.visible === false) {

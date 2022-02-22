@@ -6,7 +6,7 @@ import * as api from "api";
 import { ui, notifications } from "lib";
 
 import { Icon } from "components";
-import { AttachmentText } from "components/files";
+import { AttachmentText } from "components/typography";
 
 import { Cell } from "./generic";
 

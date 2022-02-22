@@ -15,9 +15,9 @@ import { Config } from "config";
 import { Icon, RenderWithSpinner, Image, ShowHide } from "components";
 import { ImageClearButton } from "components/buttons";
 
-interface UploaderImageProps extends StandardComponentProps {
+type UploaderImageProps = StandardComponentProps & {
   readonly image: UploadedImage | SavedImage;
-}
+};
 
 const UploaderImage = (props: UploaderImageProps): JSX.Element => {
   return (
@@ -27,7 +27,7 @@ const UploaderImage = (props: UploaderImageProps): JSX.Element => {
   );
 };
 
-interface UploaderContentProps extends Omit<StandardComponentProps, "id"> {
+type UploaderContentProps = Omit<StandardComponentProps, "id"> & {
   readonly imageStyle?: React.CSSProperties;
   readonly imageClassName?: string;
   readonly error: UploadError | null;
@@ -39,7 +39,7 @@ interface UploaderContentProps extends Omit<StandardComponentProps, "id"> {
   readonly renderImage?: (params: UploadImageParams) => JSX.Element;
   readonly renderNoImage?: (params: UploadImageParamsNoImage) => JSX.Element;
   readonly renderError?: (params: UploadImageParams) => JSX.Element;
-}
+};
 
 const UploaderContent = (props: UploaderContentProps): JSX.Element => {
   const params: UploadImageParamsNoImage = {

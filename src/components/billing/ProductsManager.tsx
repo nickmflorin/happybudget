@@ -12,8 +12,6 @@ import { Tag } from "components/tagging";
 import ProductsList from "./ProductsList";
 import Product from "./Product";
 
-import "./ProductsManager.scss";
-
 type ProductsManagerProps = StandardComponentProps & {
   readonly onSubscribe: (p: Model.Product) => void;
   readonly onManage: () => void;

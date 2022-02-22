@@ -25,6 +25,7 @@ declare interface FormProps<T> extends Omit<RootFormProps, "style" | "id" | "cla
   readonly title?: string | JSX.Element;
   readonly condensed?: boolean;
   readonly initialValues?: Partial<T>;
+  readonly formHeaderProps?: StandardComponentProps;
 }
 
 declare type HeaderTemplateFormData = {

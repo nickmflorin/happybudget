@@ -3,7 +3,7 @@ import classNames from "classnames";
 
 import { notifications } from "lib";
 
-import { RenderWithSpinner } from "components/loading";
+import { RenderWithSpinner } from "components";
 import { Notifications } from "components/notifications";
 
 export type ContentMenuProps = StandardComponentWithChildrenProps & {

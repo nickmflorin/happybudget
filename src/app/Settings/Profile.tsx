@@ -6,13 +6,11 @@ import * as api from "api";
 import { ui, typeguards, notifications, users } from "lib";
 import { actions } from "store";
 
+import { Tile } from "components/containers";
 import { UserProfileForm } from "components/forms";
 import { ImageAndName } from "components/fields";
-import { Tile } from "components/layout";
 import { IImageAndNameRef } from "components/fields/ImageAndName";
 import { Page } from "components/layout";
-
-import "./Profile.scss";
 
 const Profile = (): JSX.Element => {
   const form = ui.hooks.useForm<Http.UserPayload>();
@@ -50,6 +48,7 @@ const Profile = (): JSX.Element => {
         <UserProfileForm
           form={form}
           onValuesChange={onValuesChange}
+          formHeaderProps={{ style: { height: 108 } }}
           title={
             <ImageAndName
               value={image}

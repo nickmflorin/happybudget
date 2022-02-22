@@ -126,7 +126,7 @@
     @include expanded_layout_dimensions();
     &--collapsed {
       @include collapsed_layout_dimensions();
-			.sidebar-container {
+      .sidebar-container {
         // This is important to align the sidebar toggle button in the header.
         padding-top: 8px;
       }
@@ -143,7 +143,7 @@
       display: flex;
       flex-direction: column;
       overflow-y: hidden;
-			height: 100vh;
+      height: 100vh;
 
       @include transition(margin-left 0.2s ease-out);
 
@@ -198,32 +198,4 @@
       }
     }
   }
-}
-
-// Panels, Tiles and Cards
-.tile {
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  background-color: $white;
-  border: 1px solid $gray-light;
-  padding: 20px;
-	position: relative;
-
-	.title {
-		color: $text-tertiary;
-		font-size: 14px;
-		font-weight: 500;
-	}
-
-	.sub-title {
-		color: $text-primary;
-		font-size: 22px;
-		font-weight: 500;
-	}
-
-	.tile-content {
-		flex-grow: 100;
-	}
 }

@@ -68,13 +68,12 @@ const EditAttachments = (props: EditAttachmentsProps): JSX.Element => {
     <div className={"edit-attachments"}>
       {attachments.length !== 0 && (
         <AttachmentsList
-          className={"mb--15"}
           attachments={attachments}
           loading={loadingAttachments}
           onError={props.onError}
           isDeleting={isDeleting}
           onDelete={onDelete}
-          style={{ maxHeight: 400, overflowY: "scroll" }}
+          style={{ maxHeight: 400, overflowY: "scroll", marginBottom: 15 }}
         />
       )}
       <AttachmentsFilePond

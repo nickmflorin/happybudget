@@ -4,10 +4,10 @@ import { map } from "lodash";
 
 import Product from "./Product";
 
-interface ProductsListProps extends StandardComponentProps {
+type ProductsListProps = StandardComponentProps & {
   readonly products: Model.Product[];
   readonly extra?: (p: Model.Product) => JSX.Element;
-}
+};
 
 const ProductsList = ({ products, extra, ...props }: ProductsListProps) => {
   return (

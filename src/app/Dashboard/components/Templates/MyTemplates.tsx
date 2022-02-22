@@ -6,11 +6,10 @@ import { map, isNil } from "lodash";
 import * as api from "api";
 import { redux, notifications } from "lib";
 
-import { ShowHide, Icon, Pagination } from "components";
+import { ShowHide, Icon, Pagination, NoData } from "components";
 import { PrimaryButtonIconToggle, OrderingButtonIconToggle } from "components/buttons";
-import { TemplateCard, EmptyCard } from "components/cards";
+import { TemplateCard, EmptyCard } from "components/containers";
 import { OrderingDropdown } from "components/dropdowns";
-import { NoData } from "components/empty";
 import { SearchInput } from "components/fields";
 import { Page } from "components/layout";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";

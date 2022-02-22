@@ -11,10 +11,6 @@ export type LinkProps = StandardComponentWithChildrenProps &
     readonly dark?: boolean;
   };
 
-/**
- * A consistently styled <a> component with functionality allowing the link to
- * include icons, be disabled and other features.
- */
 const Link = ({ className, children, tooltip, icon, disabled, dark, ...props }: LinkProps): JSX.Element => {
   const [isHovered, setIsHovered] = useState(false);
   const prefix = ui.hooks.useClickableIcon(icon, { isHovered });

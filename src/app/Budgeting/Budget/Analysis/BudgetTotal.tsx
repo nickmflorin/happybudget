@@ -6,10 +6,10 @@ import { find, reduce, filter, includes, map, isNil } from "lodash";
 import { redux, budgeting, hooks, tabling, util, ui } from "lib";
 import { DEFAULT_COLOR_SCHEME, Colors } from "style/constants";
 
+import { NoData } from "components";
 import { BudgetTotalChart } from "components/charts";
-import { NoData } from "components/empty";
+import { Tile } from "components/containers";
 import { BudgetTotalChartForm, BudgetTotalChartFormValues } from "components/forms";
-import { Tile } from "components/layout";
 
 const selectGroups = redux.selectors.simpleDeepEqualSelector(
   (state: Application.Store) => state.budget.analysis.groups.data

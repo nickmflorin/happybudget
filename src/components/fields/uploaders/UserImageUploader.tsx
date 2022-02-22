@@ -8,12 +8,12 @@ import { UserImageOrInitials, EditImageOverlay } from "components/images";
 
 import Uploader, { UploaderProps } from "./Uploader";
 
-export interface UploadUserImageProps extends UploaderProps {
+export type UploadUserImageProps = UploaderProps & {
   readonly firstName: string | null;
   readonly lastName: string | null;
-}
+};
 
-const UploadUserImageNoInitials = (): JSX.Element => {
+const UploadUserImageNoInitials = React.memo((): JSX.Element => {
   return (
     <div className={"no-initials"}>
       <VerticalFlexCenter className={"no-initials-icon-wrapper"}>
@@ -21,32 +21,28 @@ const UploadUserImageNoInitials = (): JSX.Element => {
       </VerticalFlexCenter>
     </div>
   );
-};
+});
 
-const MemoizedUploadUserImageNoInitials = React.memo(UploadUserImageNoInitials);
-
-const UploadUserImage = ({ firstName, lastName, ...props }: UploadUserImageProps): JSX.Element => {
-  return (
-    <Uploader
-      {...props}
-      className={classNames("user-image-uploader", props.className)}
-      renderContentNoError={(params: UploadImageParams) => {
-        return (
-          <FullSize>
-            <UserImageOrInitials
-              circle={true}
-              src={typeguards.isUploadParamsWithImage(params) ? params.image.url : null}
-              firstName={firstName}
-              lastName={lastName}
-              imageOverlay={() => <EditImageOverlay visible={true} onClear={params.onClear} isImage={true} />}
-              initialsOverlay={() => <EditImageOverlay visible={true} />}
-              renderNoInitials={<MemoizedUploadUserImageNoInitials />}
-            />
-          </FullSize>
-        );
-      }}
-    />
-  );
-};
+const UploadUserImage = ({ firstName, lastName, ...props }: UploadUserImageProps): JSX.Element => (
+  <Uploader
+    {...props}
+    className={classNames("user-image-uploader", props.className)}
+    renderContentNoError={(params: UploadImageParams) => {
+      return (
+        <FullSize>
+          <UserImageOrInitials
+            circle={true}
+            src={typeguards.isUploadParamsWithImage(params) ? params.image.url : null}
+            firstName={firstName}
+            lastName={lastName}
+            imageOverlay={() => <EditImageOverlay visible={true} onClear={params.onClear} isImage={true} />}
+            initialsOverlay={() => <EditImageOverlay visible={true} />}
+            renderNoInitials={<UploadUserImageNoInitials />}
+          />
+        </FullSize>
+      );
+    }}
+  />
+);
 
 export default React.memo(UploadUserImage);

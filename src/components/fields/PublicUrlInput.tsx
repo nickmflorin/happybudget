@@ -9,8 +9,6 @@ import { ShowHide } from "components";
 import { IconButton } from "components/buttons";
 import Input, { InputProps } from "./Input";
 
-import "./PublicUrlInput.scss";
-
 type PublicUrlAction = "refresh" | "copy" | "visit";
 
 type PublicUrlInputProps = Omit<InputProps, "disabled" | "small" | "onChange"> & {
@@ -26,7 +24,7 @@ const PublicUrlInput = ({ urlFormatter, value, actions, onChange, ...props }: Pu
   const val = useMemo(() => (!isNil(value) ? value : _value), [value, _value]);
 
   return (
-    <div className={"public-url-input-div"}>
+    <div className={"public-url-input"}>
       <Input
         {...props}
         small={true}

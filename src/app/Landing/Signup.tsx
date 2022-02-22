@@ -5,9 +5,9 @@ import { isNil } from "lodash";
 import * as api from "api";
 import { ui, notifications } from "lib";
 
+import { LandingFormContainer } from "components/containers";
 import SignupForm, { ISignupFormValues } from "components/forms/SignupForm";
 import { UnverifiedEmailNotification, UserNotOnWaitlistNotification } from "./Notifications";
-import LandingFormContainer from "./LandingFormContainer";
 
 const Signup = (): JSX.Element => {
   const [loading, setLoading] = useState(false);

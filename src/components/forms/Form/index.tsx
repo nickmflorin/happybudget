@@ -135,7 +135,7 @@ const withFormItemFirstInputFocused = <
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const PrivateForm = <T extends Record<string, unknown> = any>(
-  { loading, condensed, children, autoFocusField, title, titleIcon, ...props }: PrivateFormProps<T>,
+  { loading, condensed, children, autoFocusField, title, titleIcon, formHeaderProps, ...props }: PrivateFormProps<T>,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   ref: ForwardedRef<any>
 ): JSX.Element => {
@@ -217,11 +217,13 @@ const PrivateForm = <T extends Record<string, unknown> = any>(
     >
       {!isNil(title) &&
         (typeof title === "string" && !isNil(titleIcon) ? (
-          <div className={"form-header"}>
+          <div {...formHeaderProps} className={classNames("form-header", formHeaderProps?.className)}>
             <FormTitle icon={titleIcon} title={title} />
           </div>
         ) : (
-          <div className={"form-header"}>{title}</div>
+          <div {...formHeaderProps} className={classNames("form-header", formHeaderProps?.className)}>
+            {title}
+          </div>
         ))}
       <RenderWithSpinner loading={!isNil(props.form.loading) ? props.form.loading : loading}>
         {map(

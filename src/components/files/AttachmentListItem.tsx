@@ -5,17 +5,17 @@ import { util, notifications } from "lib";
 
 import { Icon } from "components";
 import { IconButton, TrashButton } from "components/buttons";
+import { FileIcon } from "components/icons";
 import { Link } from "components/links";
 
 import Fancybox from "./Fancybox";
-import FileIcon from "./FileIcon";
 
-interface AttachmentListItemProps extends StandardComponentProps {
+type AttachmentListItemProps = StandardComponentProps & {
   readonly attachment: Model.Attachment;
   readonly deleting?: boolean;
   readonly onClick?: () => void;
   readonly onError: (notification: UINotificationData) => void;
-}
+};
 
 const AttachmentListItem = ({ attachment, deleting, onClick, onError, ...props }: AttachmentListItemProps) => {
   const [downloading, setDownloading] = useState(false);

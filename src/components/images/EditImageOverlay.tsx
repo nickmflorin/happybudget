@@ -5,12 +5,11 @@ import { Icon } from "components";
 import { ImageClearButton } from "components/buttons";
 
 import ImageOverlay, { ImageOverlayProps } from "./ImageOverlay";
-import "./EditImageOverlay.scss";
 
-interface EditImageOverlayProps extends Omit<ImageOverlayProps, "children"> {
+type EditImageOverlayProps = Omit<ImageOverlayProps, "children"> & {
   readonly onClear?: () => void;
   readonly isImage?: boolean;
-}
+};
 
 const EditImageOverlay = ({ onClear, isImage, ...props }: EditImageOverlayProps): JSX.Element => {
   return (

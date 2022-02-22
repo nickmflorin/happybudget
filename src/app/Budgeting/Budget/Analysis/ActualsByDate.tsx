@@ -8,9 +8,9 @@ import { Moment } from "moment";
 import { redux, hooks } from "lib";
 import { Colors } from "style/constants";
 
+import { NoData } from "components";
 import { ActualsByDateChart } from "components/charts";
-import { NoData } from "components/empty";
-import { Tile } from "components/layout";
+import { Tile } from "components/containers";
 
 const selectActuals = redux.selectors.simpleDeepEqualSelector(
   (state: Application.Store) => state.budget.analysis.actuals.data

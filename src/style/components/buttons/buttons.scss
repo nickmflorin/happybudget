@@ -1,0 +1,346 @@
+@import "./base";
+@import "./mixins";
+
+@mixin budget_bare_padding() {
+  &.xlarge {
+    padding: 10px 10px;
+  }
+
+  &.large {
+    padding: 10px 10px;
+  }
+
+  &.standard {
+    padding: 8px 8px;
+  }
+
+  &.medium {
+    padding: 7px 7px;
+  }
+
+  &.small {
+    padding: 6px 6px;
+  }
+}
+
+@mixin variant_icon_only() {
+  min-width: 0px;
+  @include vertical-flex-c();
+
+  &.large {
+    width: 42px;
+    padding: 7px 10px;
+  }
+
+  &.standard {
+    width: 38px;
+    padding: 6px 9px;
+  }
+
+  &.medium {
+    width: 36px;
+    padding: 5px 8px;
+  }
+
+  &.small {
+    width: 32px;
+    padding: 4px 7px;
+  }
+
+  .icon {
+    margin-right: 0px;
+  }
+}
+
+@mixin btn-base {
+  @include btn-link-base() {
+    @include button_size_standard();
+    font-family: $avenir;
+    font-weight: 600;
+    border-width: 1px;
+    border: 1px solid $transparent;
+    border-radius: 4px;
+    display: inline-flex;
+    color: $text-secondary;
+    min-width: 0px;
+    @content;
+  }
+}
+
+.btn,
+.ant-btn {
+  @include btn-base();
+
+  // A Button That Looks Like a <a> Link
+  &--link {
+    @extend .btn;
+    color: $blue;
+    padding: 0;
+    text-decoration: none !important;
+    height: auto;
+    border: none !important;
+
+    &:hover,
+    &:focus {
+      background-color: transparent;
+    }
+
+    .spinner {
+      @include size(14px);
+      color: $blue !important;
+    }
+  }
+
+  &--default {
+    @extend .btn;
+    @include default();
+  }
+
+  &--default-icon-only {
+    @extend .btn;
+    @include default();
+    @include variant_icon_only();
+  }
+
+  &--primary {
+    @extend .btn;
+    @include primary();
+  }
+
+  &--primary-icon-only {
+    @extend .btn;
+    @include primary();
+    @include variant_icon_only();
+  }
+
+  &--over {
+    @extend .btn;
+    @include over();
+    z-index: 10000;
+  }
+
+  &--danger {
+    @extend .btn;
+    @include danger();
+  }
+
+  &--bare {
+    @extend .btn;
+    min-width: 0px;
+    @include bare_color_set($text-secondary);
+    @include budget_bare_padding();
+
+    &.budget-table-menu {
+      @include bare_color_set($text-secondary, $green);
+    }
+  }
+
+  &--icon-only {
+    @extend .btn;
+    padding: 0 !important;
+    min-width: 0px;
+    border-radius: 100px;
+    @include vertical-flex-c();
+    color: $icon-color;
+
+    .icon {
+      margin-right: 0px;
+    }
+
+    .spinner {
+      height: 100% !important;
+      width: 100% !important;
+      margin-right: 0px;
+    }
+
+    .vertical-flex-c {
+      height: 100%;
+      width: auto;
+    }
+
+    @include bare_color_set($icon-color);
+    @include standard_size_variants();
+
+    &.icon-xsmall {
+      .icon {
+        height: 12px;
+        width: auto;
+      }
+    }
+    &.icon-small {
+      .icon {
+        height: 14px;
+        width: auto;
+      }
+    }
+    &.icon-medium {
+      .icon {
+        height: 16px;
+        width: auto;
+      }
+    }
+    &.icon-standard {
+      .icon {
+        height: 16px;
+        width: auto;
+      }
+    }
+    &.icon-large {
+      .icon {
+        height: 18px;
+        width: auto;
+      }
+    }
+
+    &.ag-grid-action-button {
+      .icon {
+        color: $green;
+      }
+
+      &:hover {
+        background-color: rgba($green, 0.3);
+      }
+
+      &.disabled,
+      &:disabled,
+      &.fake-disabled {
+        .icon {
+          color: $disabled-color !important;
+        }
+        &:hover {
+          background-color: transparent !important;
+        }
+      }
+    }
+
+    &.budget-table-menu {
+      @include bare_color_set($text-secondary);
+    }
+
+    &.green {
+      @include color_set($green, $green-darker);
+    }
+
+    &.green-hover {
+      @include green_on_hover();
+    }
+
+    // Indicates that the icon button should take up the full size of it's
+    // container and not include padding around the icon.
+    &.fill {
+      height: 100%;
+      width: 100%;
+      padding: 0px;
+    }
+  }
+
+  &--new-row {
+    @include color_set($green, $green-darker);
+    padding: 0px !important;
+    height: 18px !important;
+    width: 18px !important;
+
+    .icon {
+      height: 18px !important;
+      width: 18px !important;
+    }
+  }
+
+  // The color of the button is set dynamically based on the group color.
+  &--edit-group {
+    &:hover {
+      filter: brightness(95%);
+      .icon {
+        filter: brightness(95%);
+      }
+    }
+  }
+
+  &--square {
+    border-radius: 0px !important;
+  }
+
+  &--rounded {
+    border-radius: 50px !important;
+  }
+
+  &--clear-image {
+    flex-direction: column;
+    @include bare_color_set($text-primary);
+
+    .icon {
+      height: 14px;
+      width: 14px;
+    }
+
+    svg {
+      color: $white !important;
+    }
+
+    &:hover {
+      svg {
+        color: $white !important;
+      }
+    }
+  }
+
+  &--landing {
+    @extend .btn;
+    width: 230px !important;
+  }
+
+  &--login,
+  &--reset,
+  &--register {
+    font-size: 18px;
+  }
+
+  &--clear,
+  &--accept {
+    @extend .btn;
+    flex-direction: column;
+    @include bare_color_set(#d2d2d2, #a5a5a5);
+
+    .icon {
+      height: 14px;
+      width: 14px;
+    }
+  }
+
+  &--google {
+    @extend .btn;
+    @include bg_color_set($white, $white, $white);
+    @include solid_color($text-secondary);
+    border-color: $border-color;
+
+    text-transform: unset;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    line-height: 32px !important;
+    font-size: 14px !important;
+
+    @include focus_border_color($border-color);
+    @include disabled_border_color($border-color);
+
+    .content-wrapper {
+      display: flex;
+      margin: 0 auto;
+      position: relative;
+
+      .icon-wrapper {
+        margin-right: 8px;
+
+        .icon {
+          position: relative;
+          height: 18px;
+          width: 18px;
+        }
+      }
+    }
+  }
+
+  &--entity-text {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+}

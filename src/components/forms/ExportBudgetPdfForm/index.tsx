@@ -9,10 +9,9 @@ import * as api from "api";
 import { typeguards } from "lib";
 
 import { Icon, Form, ShowHide, Separator } from "components";
-import { ColumnSelect, Input } from "components/fields";
+import { ColumnSelect, Input, CKEditor } from "components/fields";
 import { PdfImageUploader } from "components/fields/uploaders";
 import { EntityText } from "components/typography";
-import { CKEditor } from "components/richtext";
 import { EntityTextDescription } from "components/typography/EntityText";
 
 import HeaderTemplateSaveForm, { IHeaderTemplateSaveFormRef } from "./HeaderTemplateSaveForm";

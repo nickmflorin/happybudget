@@ -5,6 +5,7 @@ import { isNil } from "lodash";
 import * as api from "api";
 import { ui, notifications } from "lib";
 
+import { LandingFormContainer } from "components/containers";
 import { LoginForm } from "components/forms";
 import { ILoginFormValues } from "components/forms/LoginForm";
 
@@ -16,7 +17,6 @@ import {
   PasswordTokenInvalidNotification,
   UITokenNotificationRedirectData
 } from "./Notifications";
-import LandingFormContainer from "./LandingFormContainer";
 
 const Login = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
@@ -114,9 +114,9 @@ const Login = (): JSX.Element => {
   return (
     <LandingFormContainer title={"Sign In"} subTitle={"Cloud based budgeting at your fingertips."}>
       <LoginForm
-        className={"mt--20"}
         form={form}
         loading={loading}
+        style={{ marginTop: 20 }}
         onGoogleSuccess={(token: string) => {
           setLoading(true);
           api

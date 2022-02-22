@@ -3,10 +3,9 @@ import { useState } from "react";
 import * as api from "api";
 import { ui } from "lib";
 
+import { LandingFormContainer } from "components/containers";
 import { RecoverPasswordForm } from "components/forms";
 import { IRecoverPasswordFormValues } from "components/forms/RecoverPasswordForm";
-
-import LandingFormContainer from "./LandingFormContainer";
 
 const RecoverPassword = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
@@ -15,7 +14,7 @@ const RecoverPassword = (): JSX.Element => {
   return (
     <LandingFormContainer title={"Reset password"}>
       <RecoverPasswordForm
-        className={"mt--20"}
+        style={{ marginTop: 20 }}
         form={form}
         loading={loading}
         onSubmit={(values: IRecoverPasswordFormValues) => {

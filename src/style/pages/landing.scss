@@ -1,0 +1,100 @@
+.landing-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+
+  .landing-page-left {
+    flex-grow: 1;
+    display: flex;
+    @include vertical-flex-c();
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+    width: 100%;
+    height: 100vh;
+    box-shadow: 10px 0px 99px #777777;
+    z-index: 1;
+
+    @include media(">=xl") {
+      width: 550px;
+    }
+
+    .logo {
+      display: inline-block;
+
+      @include media("<=xl") {
+        width: 75%;
+      }
+
+      @include media(">=xl") {
+        display: none;
+      }
+    }
+
+    .landing-form-container {
+      margin-top: 40px;
+      width: 100%;
+      max-width: 550px;
+      padding: 20px 60px;
+
+      @include media(">=medium") {
+        padding: 20px 100px;
+      }
+
+      @include media(">=xl") {
+        margin-top: 0px;
+      }
+
+      .title {
+        font-size: 28px;
+        font-family: $avenir;
+        font-weight: 700;
+        text-align: center;
+
+        @include media("<=xl") {
+          display: none;
+        }
+      }
+
+      .sub-title {
+        font-size: 16px;
+        font-family: $avenir;
+        font-weight: 600;
+        color: $text-secondary;
+        text-align: center;
+        margin-bottom: 32px;
+
+        @include media("<=xl") {
+          display: none;
+        }
+      }
+
+      .landing-form {
+        margin-top: 20px;
+
+        @include media("<=xl") {
+          margin-bottom: 45px;
+        }
+      }
+    }
+  }
+
+  .landing-page-right {
+    display: none;
+    flex-grow: 100;
+    height: 100vh;
+    background: transparent linear-gradient(133deg, $green 0%, $green-darker 100%) 0% 0% no-repeat padding-box;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+
+    @include media(">=xl") {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .logo-container {
+    text-align: center;
+  }
+}

@@ -5,32 +5,29 @@ import { map } from "lodash";
 import { RenderWithSpinner } from "components";
 
 import AttachmentListItem from "./AttachmentListItem";
-import "./AttachmentsList.scss";
 
-interface AttachmentsListProps extends StandardComponentProps {
+type AttachmentsListProps = StandardComponentProps & {
   readonly attachments: Model.Attachment[];
   readonly loading?: boolean;
   readonly onDelete?: (m: Model.Attachment) => void;
   readonly isDeleting?: (id: number) => void;
   readonly onError: (notification: UINotificationData) => void;
-}
-
-const AttachmentsList = ({ attachments, loading, onDelete, isDeleting, onError, ...props }: AttachmentsListProps) => {
-  return (
-    <RenderWithSpinner loading={loading}>
-      <div {...props} className={classNames("attachments-list", props.className)}>
-        {map(attachments, (attachment: Model.Attachment, index: number) => (
-          <AttachmentListItem
-            key={index}
-            attachment={attachment}
-            onClick={() => onDelete?.(attachment)}
-            deleting={isDeleting?.(attachment.id) || false}
-            onError={onError}
-          />
-        ))}
-      </div>
-    </RenderWithSpinner>
-  );
 };
+
+const AttachmentsList = ({ attachments, loading, onDelete, isDeleting, onError, ...props }: AttachmentsListProps) => (
+  <RenderWithSpinner loading={loading}>
+    <div {...props} className={classNames("attachments-list", props.className)}>
+      {map(attachments, (attachment: Model.Attachment, index: number) => (
+        <AttachmentListItem
+          key={index}
+          attachment={attachment}
+          onClick={() => onDelete?.(attachment)}
+          deleting={isDeleting?.(attachment.id) || false}
+          onError={onError}
+        />
+      ))}
+    </div>
+  </RenderWithSpinner>
+);
 
 export default React.memo(AttachmentsList);

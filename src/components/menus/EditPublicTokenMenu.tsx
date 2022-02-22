@@ -9,7 +9,6 @@ import * as api from "api";
 import { ui } from "lib";
 
 import ContentMenu from "./ContentMenu";
-import "./PublicTokenMenu.scss";
 
 export type EditPublicTokenMenuProps = StandardComponentProps & {
   readonly publicTokenId: number;
@@ -45,7 +44,11 @@ const EditPublicTokenMenu = ({
   }, [publicTokenId]);
 
   return (
-    <ContentMenu {...props} className={classNames("public-token-menu", props.className)}>
+    <ContentMenu
+      {...props}
+      className={classNames("public-token-menu", props.className)}
+      style={{ ...props.style, minWidth: 400 }}
+    >
       <EditPublicTokenForm
         form={form}
         urlFormatter={urlFormatter}

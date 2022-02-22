@@ -94,7 +94,7 @@
         display: flex;
       }
 
-      .help-link {
+      .link--help {
         @include media(">=large") {
           margin-right: 10px;
         }

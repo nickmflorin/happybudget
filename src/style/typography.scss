@@ -119,36 +119,3 @@ h6 {
   text-decoration: line-through;
   color: $gray;
 }
-
-.entity-text {
-  font-size: 12px;
-  width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-
-  .entity-text-identifier {
-    font-family: $avenir;
-    font-weight: 600;
-    color: #b5b5b5;
-  }
-
-  .entity-text-description {
-    font-family: $avenir;
-    font-weight: 600;
-    color: $text-secondary;
-
-    &.with-identifier {
-      margin-left: 5px;
-    }
-  }
-}
-
-.text-with-included-link {
-  .link,
-  .btn {
-    line-height: 16px;
-    font-size: 12px;
-    vertical-align: 0.225rem;
-  }
-}

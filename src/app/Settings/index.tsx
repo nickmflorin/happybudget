@@ -1,3 +1,4 @@
+import React from "react";
 import { Switch, useHistory, useLocation } from "react-router-dom";
 
 import { Icon } from "components";
@@ -48,4 +49,4 @@ const Settings = (): JSX.Element => {
   );
 };
 
-export default Settings;
+export default React.memo(Settings);

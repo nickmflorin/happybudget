@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { find, isNil } from "lodash";
 import classNames from "classnames";
 
-import { OrderingArrowIcon } from "components";
+import { OrderingArrowIcon } from "components/icons";
 import DropdownMenu from "./DropdownMenu";
 
 export interface OrderingDropdownProps<F extends string = string>

@@ -4,12 +4,8 @@ import { map } from "lodash";
 
 import * as api from "api";
 
-import { Pagination } from "components";
-import { NoData } from "components/empty";
-import { RenderOrSpinner } from "components/loading";
+import { Pagination, RenderOrSpinner, NoData } from "components";
 import TaggedActual from "./TaggedActual";
-
-import "./TaggedActuals.scss";
 
 type TaggedActualsProps = StandardComponentProps & {
   readonly contactId: number;

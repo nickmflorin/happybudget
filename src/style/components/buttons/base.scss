@@ -1,0 +1,63 @@
+@mixin btn-link-base {
+  font-size: 12px;
+  letter-spacing: 0.01em;
+  font-stretch: normal;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  align-items: center;
+  user-select: none;
+  vertical-align: middle;
+  justify-content: center;
+  border-color: $transparent;
+  background-color: $transparent;
+  border-width: 1px;
+  box-sizing: border-box;
+  box-shadow: none !important;
+  outline: 0;
+  margin: 0;
+
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+
+  @include transition(none);
+
+  &:disabled,
+  &.disabled,
+  &.fake-disabled,
+  &:hover:not(:disabled):not(.disabled):not(.fake-disabled),
+  &:focus:not(:disabled):not(.disabled):not(.fake-disabled),
+  &.hovered:not(:disabled):not(.disabled):not(.fake-disabled) {
+    border-color: $transparent;
+  }
+
+  .spinner {
+    height: 16px !important;
+    width: 16px !important;
+    aspect-ratio: 1;
+    position: initial;
+    margin-right: 8px;
+
+    svg {
+      height: 100% !important;
+      width: auto !important;
+    }
+  }
+
+  .icon {
+    cursor: pointer;
+    margin-right: 8px;
+    height: 100%;
+    width: auto;
+    color: inherit;
+
+    &.caret {
+      margin-left: 6px;
+      padding-top: 1px;
+      padding-bottom: 1px;
+    }
+  }
+
+  @content;
+}

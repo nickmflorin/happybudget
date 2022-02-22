@@ -1,6 +1,7 @@
 export { default as TimezoneSelect } from "./TimezoneSelect";
 export { default as PhoneNumberInput } from "./PhoneNumberInput";
 export { default as ColorSelect } from "./ColorSelect";
+export { default as CKEditor } from "./CKEditor";
 export { default as InputOnFocus } from "./InputOnFocus";
 export { default as Input } from "./Input";
 export { default as TextArea } from "./TextArea";

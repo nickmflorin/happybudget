@@ -2,16 +2,15 @@ import React, { useState, useImperativeHandle, forwardRef, ForwardedRef } from "
 
 import { UserImageUploader, UploadUserImageProps } from "components/fields/uploaders";
 
-import "./ImageAndName.scss";
+type ImageAndNameProps = StandardComponentProps &
+  Omit<UploadUserImageProps, "firstName" | "lastName"> & {
+    readonly initialValues?: { first_name: string | null; last_name: string | null };
+  };
 
-interface ImageAndNameProps extends StandardComponentProps, Omit<UploadUserImageProps, "firstName" | "lastName"> {
-  readonly initialValues?: { first_name: string | null; last_name: string | null };
-}
-
-export interface IImageAndNameRef {
+export type IImageAndNameRef = {
   readonly setFirstName: (v: string | null) => void;
   readonly setLastName: (v: string | null) => void;
-}
+};
 
 const ImageAndName = (
   { initialValues, ...props }: ImageAndNameProps,

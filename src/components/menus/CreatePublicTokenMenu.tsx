@@ -8,7 +8,6 @@ import * as api from "api";
 import { ui } from "lib";
 
 import ContentMenu from "./ContentMenu";
-import "./PublicTokenMenu.scss";
 
 export type CreatePublicTokenMenuProps<M extends Model.PublicHttpModel> = StandardComponentProps & {
   readonly instance: M;
@@ -34,7 +33,11 @@ const CreatePublicTokenMenu = <M extends Model.PublicHttpModel>({
   const [cancelToken] = api.useCancelToken();
 
   return (
-    <ContentMenu {...props} className={classNames("public-token-menu", props.className)}>
+    <ContentMenu
+      {...props}
+      className={classNames("public-token-menu", props.className)}
+      style={{ ...props.style, minWidth: 400 }}
+    >
       <CreatePublicTokenForm
         form={form}
         urlFormatter={urlFormatter}

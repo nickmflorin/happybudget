@@ -4,8 +4,6 @@ import { Icon } from "components";
 import { ExpandedLayout } from "components/layout";
 import { Contacts, Templates, Budgets } from "./components";
 
-import "./index.scss";
-
 const Dashboard = (): JSX.Element => {
   const history = useHistory();
   const location = useLocation();

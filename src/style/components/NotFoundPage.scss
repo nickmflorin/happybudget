@@ -1,0 +1,5 @@
+.not-found-page {
+  @include vertical-flex-c();
+  align-items: center;
+  height: 100vh;
+}

@@ -1,25 +1,25 @@
-import React from "react";
+import React, { useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
-import "./Separator.scss";
 
-interface SeparatorProps extends StandardComponentProps {
-  margin?: string | number;
-  color?: string;
-}
+type SeparatorProps = StandardComponentProps & {
+  readonly margin?: string | number;
+  readonly color?: string;
+};
 
-const Separator: React.FC<SeparatorProps> = ({ className, style, margin, color }) => {
-  if (!isNil(margin) || !isNil(color)) {
-    style = style || {};
+const Separator: React.FC<SeparatorProps> = ({ style, margin, color, ...props }) => {
+  const _style = useMemo(() => {
+    let mutatedStyle = { ...style };
     if (!isNil(margin)) {
-      style.marginTop = margin;
-      style.marginBottom = margin;
+      mutatedStyle = { ...mutatedStyle, marginTop: margin, marginBottom: margin };
     }
     if (!isNil(color)) {
-      style.borderBottom = `1px solid ${color}`;
+      mutatedStyle = { ...mutatedStyle, borderBottom: `1px solid ${color}` };
     }
-  }
-  return <div className={classNames("separator", className)} style={style}></div>;
+    return mutatedStyle;
+  }, [style, margin, color]);
+
+  return <div {...props} className={classNames("separator", props.className)} style={_style}></div>;
 };
 
 export default React.memo(Separator);

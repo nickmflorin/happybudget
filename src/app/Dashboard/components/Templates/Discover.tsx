@@ -8,7 +8,7 @@ import { redux, notifications, users } from "lib";
 
 import { ShowHide, Icon, Pagination } from "components";
 import { PrimaryButtonIconToggle, OrderingButtonIconToggle } from "components/buttons";
-import { CommunityTemplateCard, CommunityTemplateStaffCard, EmptyCard } from "components/cards";
+import { CommunityTemplateCard, CommunityTemplateStaffCard, EmptyCard } from "components/containers";
 import { OrderingDropdown } from "components/dropdowns";
 import { SearchInput } from "components/fields";
 import { Page } from "components/layout";

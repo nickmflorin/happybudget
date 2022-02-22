@@ -4,8 +4,6 @@ import { Switch, Route } from "react-router-dom";
 import { Logo } from "components/svgs";
 import * as config from "config";
 
-import "./index.scss";
-
 const Login = config.lazyWithRetry(() => import("./Login"));
 const Signup = config.lazyWithRetry(() => import("./Signup"));
 const ResetPassword = config.lazyWithRetry(() => import("./ResetPassword"));

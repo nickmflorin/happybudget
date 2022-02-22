@@ -6,7 +6,7 @@ import { ShowHide } from "components";
 
 import "./UserInitials.scss";
 
-export interface UserInitialsProps extends StandardComponentProps {
+export type UserInitialsProps = StandardComponentProps & {
   readonly user?: Model.User | Model.SimpleUser | Model.Contact;
   readonly circle?: boolean;
   readonly initials?: string | null;
@@ -15,7 +15,7 @@ export interface UserInitialsProps extends StandardComponentProps {
   readonly renderNoInitials?: JSX.Element;
   readonly hideOnNoInitials?: boolean;
   readonly overlay?: () => JSX.Element;
-}
+};
 
 const UserInitials = ({
   user,

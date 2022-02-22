@@ -1,7 +1,7 @@
+import React from "react";
+
 import { RouterLink } from "components/links";
 import { NotFoundPageIcon } from "components/svgs";
-
-import "./NotFoundPage.scss";
 
 const NotFoundPage = () => (
   <div className={"not-found-page"}>
@@ -11,4 +11,4 @@ const NotFoundPage = () => (
   </div>
 );
 
-export default NotFoundPage;
+export default React.memo(NotFoundPage);

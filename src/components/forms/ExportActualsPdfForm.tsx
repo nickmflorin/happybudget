@@ -5,8 +5,7 @@ import { isNil } from "lodash";
 import { Switch } from "antd";
 
 import { Form } from "components";
-import { ColumnSelect, Input } from "components/fields";
-import { CKEditor } from "components/richtext";
+import { ColumnSelect, Input, CKEditor } from "components/fields";
 
 type NonFormFields = "header";
 type RichTextFields = "header";

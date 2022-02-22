@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { find } from "lodash";
 
-import { Icon, OrderingArrowIcon } from "components";
+import { Icon, OrderingArrowIcon } from "components/icons";
 
 import DefaultButtonIconToggle, { DefaultButtonIconToggleProps } from "./DefaultButtonIconToggle";
 
