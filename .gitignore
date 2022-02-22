@@ -15,7 +15,6 @@ tsconfig.tsbuildinfo
 .env.test.local
 .env.production.local
 .env.production
-.env.azure
 .env.development
 
 npm-debug.log*
