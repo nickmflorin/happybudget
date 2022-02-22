@@ -9,7 +9,7 @@
     ],
     "typeRoots": [
       "./src/types/",
-      "node_modules/@types",
+      "node_modules/@types"
     ],
     "noEmitOnError": true,
     "allowJs": false,
@@ -29,12 +29,14 @@
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "inlineSources": true,
-    "sourceRoot": "/",
+    "sourceRoot": "/"
   },
   "include": [
-    "src"
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
   ],
   "exclude": [
-    "node_modules/**"
+    "node_modules"
   ]
 }
