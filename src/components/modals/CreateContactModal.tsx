@@ -9,8 +9,6 @@ import { IImageAndNameRef } from "components/fields/ImageAndName";
 
 import { CreateModelModal, CreateModelModalProps } from "./generic";
 
-import "./ContactModal.scss";
-
 interface CreateContactModalProps extends CreateModelModalProps<Model.Contact> {
   readonly initialValues?: Partial<Http.ContactPayload>;
 }

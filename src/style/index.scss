@@ -8,7 +8,6 @@
 
 @import "~antd/dist/antd.css";
 @import "filepond/dist/filepond.min.css";
-@import "@fancyapps/ui/dist/fancybox.css";
 
 body {
   margin: 0;
@@ -55,10 +54,6 @@ code {
 .fake-disabled {
   box-shadow: none !important;
   cursor: pointer !important;
-}
-
-.ant-checkbox {
-  top: 0rem !important;
 }
 
 svg {

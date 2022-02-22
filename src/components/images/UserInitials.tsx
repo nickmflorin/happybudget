@@ -4,8 +4,6 @@ import classNames from "classnames";
 
 import { ShowHide } from "components";
 
-import "./UserInitials.scss";
-
 export type UserInitialsProps = StandardComponentProps & {
   readonly user?: Model.User | Model.SimpleUser | Model.Contact;
   readonly circle?: boolean;

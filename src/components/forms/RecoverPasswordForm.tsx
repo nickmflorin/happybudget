@@ -8,8 +8,6 @@ import { RouterLink } from "components/links";
 
 import { util } from "lib";
 
-import "./LandingForm.scss";
-
 export type IRecoverPasswordFormValues = {
   readonly email: string;
 };

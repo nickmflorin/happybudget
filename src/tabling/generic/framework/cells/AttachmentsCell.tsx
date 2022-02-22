@@ -10,8 +10,6 @@ import { AttachmentText } from "components/typography";
 
 import { Cell } from "./generic";
 
-import "./AttachmentsCell.scss";
-
 type DragCountAction = { type: "INCREMENT_COUNT" | "DECREMENT_COUNT" | "SET_DRAG" | "CLEAR"; payload?: boolean };
 type DragState = { count: number; drag: boolean };
 const InitialDragState: DragState = { count: 0, drag: false };

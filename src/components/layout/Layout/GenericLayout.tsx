@@ -1,4 +1,4 @@
-import { useState, useEffect, useImperativeHandle } from "react";
+import React, { useState, useEffect, useImperativeHandle } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
@@ -63,4 +63,4 @@ const GenericLayout = (props: GenericLayoutProps): JSX.Element => {
   );
 };
 
-export default GenericLayout;
+export default React.memo(GenericLayout);

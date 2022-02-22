@@ -6,9 +6,7 @@ import { WrapInApplicationSpinner } from "components";
 import PageHeader from "./PageHeader";
 import PageFooter from "./PageFooter";
 
-import "./index.scss";
-
-interface PageProps extends StandardComponentProps {
+type PageProps = StandardComponentProps & {
   /* Required for pages that do not have a full page table in them to get the
      content area scrollable. */
   readonly contentScrollable?: boolean;
@@ -18,7 +16,7 @@ interface PageProps extends StandardComponentProps {
   readonly title: string;
   readonly footer?: JSX.Element;
   readonly subMenu?: JSX.Element[];
-}
+};
 
 const Page = (props: PageProps): JSX.Element => {
   const footer = useMemo<JSX.Element | undefined>(() => {
@@ -55,6 +53,12 @@ const Page = (props: PageProps): JSX.Element => {
   );
 };
 
-Page.Footer = PageFooter;
-Page.Header = PageHeader;
-export default Page;
+const Memoized = React.memo(Page) as React.MemoExoticComponent<(props: PageProps) => JSX.Element> & {
+  Footer: typeof PageFooter;
+  Header: typeof PageHeader;
+};
+
+Memoized.Footer = PageFooter;
+Memoized.Header = PageHeader;
+
+export default Memoized;

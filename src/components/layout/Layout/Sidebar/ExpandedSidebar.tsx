@@ -10,7 +10,6 @@ import { SidebarLogo } from "components/svgs";
 
 import GenericSidebar, { GenericSidebarProps } from "./GenericSidebar";
 import ExpandedSidebarItem from "./ExpandedSidebarItem";
-import "./index.scss";
 
 export interface ExpandedSidebarProps
   extends Omit<GenericSidebarProps<IExpandedSidebarItem>, "renderItem" | "children"> {

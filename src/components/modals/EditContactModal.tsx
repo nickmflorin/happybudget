@@ -10,7 +10,6 @@ import { ImageAndName } from "components/fields";
 import { IImageAndNameRef } from "components/fields/ImageAndName";
 
 import { EditModelModal, EditModelModalProps } from "./generic";
-import "./ContactModal.scss";
 
 interface EditContactModalProps extends EditModelModalProps<Model.Contact> {
   readonly onAttachmentRemoved?: (id: number) => void;

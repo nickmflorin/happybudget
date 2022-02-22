@@ -1,12 +1,10 @@
+import React from "react";
 import { Modal } from "components";
-import "./FringesModal.scss";
 
-const GenericFringesModal = (props: ModalProps & { readonly children: JSX.Element }): JSX.Element => {
-  return (
-    <Modal className={"fringes-modal"} title={"Fringes"} {...props} footer={null}>
-      {props.children}
-    </Modal>
-  );
-};
+const FringesModal = (props: ModalProps & { readonly children: JSX.Element }): JSX.Element => (
+  <Modal className={"fringes-modal"} title={"Fringes"} {...props} footer={null}>
+    {props.children}
+  </Modal>
+);
 
-export default GenericFringesModal;
+export default React.memo(FringesModal);

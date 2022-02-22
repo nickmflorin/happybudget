@@ -6,8 +6,6 @@ import { Icon } from "components";
 
 import { Cell } from "./generic";
 
-import "./DragCell.scss";
-
 const DragCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,

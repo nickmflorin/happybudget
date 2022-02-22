@@ -8,12 +8,10 @@ import { actions } from "../../store";
 import BudgetTotal from "./BudgetTotal";
 import ActualsByDate from "./ActualsByDate";
 
-import "./index.scss";
-
-interface AnalysisProps {
+type AnalysisProps = {
   readonly budget: Model.Budget | null;
   readonly budgetId: number;
-}
+};
 
 const Analysis = ({ budget, budgetId }: AnalysisProps): JSX.Element => {
   const dispatch = useDispatch();

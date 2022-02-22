@@ -1,25 +1,30 @@
-@import "./NoData";
-@import "./NotFoundPage";
-@import "./Separator";
-
 @import "./billing";
 @import "./buttons";
 @import "./charts";
 @import "./contacts";
 @import "./containers";
 @import "./dropdowns";
+@import "./empty";
 @import "./fancybox";
 @import "./files";
 @import "./forms";
 @import "./icons";
 @import "./image";
 @import "./input";
+@import "./layout";
 @import "./loading";
 @import "./menus";
 @import "./modals";
 @import "./notifications";
 @import "./pagination";
+@import "./pdf";
 @import "./popovers";
 @import "./tagging";
 @import "./tooltips";
 @import "./typography";
+
+.separator {
+  width: 100%;
+  border-bottom: 1px solid $separator-color;
+  margin: 10px auto;
+}

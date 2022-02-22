@@ -7,50 +7,39 @@ import { Button } from "components/buttons";
 import { DropdownMenu } from "components/dropdowns";
 import { TooltipWrapper } from "components/tooltips";
 
-import "./BreadCrumbs.scss";
-
 const isLazyBreadCrumbItem = <P extends Record<string, unknown> = Record<string, unknown>>(
   item: IBreadCrumbItem | ILazyBreadCrumbItem<P>
 ): item is ILazyBreadCrumbItem<P> => {
   return (item as ILazyBreadCrumbItem<P>).func !== undefined;
 };
 
-interface BreadCrumbGenericItemProps extends StandardComponentProps {
+type BreadCrumbGenericItemProps = StandardComponentProps & {
   readonly url?: string;
   readonly children: ReactNode;
   readonly tooltip?: Tooltip;
   readonly primary?: boolean;
   readonly suppressClickBehavior?: boolean;
   readonly onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
-}
+};
 
 const BreadCrumbGenericItem = React.memo(
-  ({
-    className,
-    style = {},
-    tooltip,
-    primary,
-    children,
-    onClick,
-    suppressClickBehavior,
-    url
-  }: BreadCrumbGenericItemProps): JSX.Element => {
+  ({ tooltip, primary, suppressClickBehavior, url, ...props }: BreadCrumbGenericItemProps): JSX.Element => {
     const history = useHistory();
     return (
       <div
-        className={classNames("bread-crumb-item", className, { primary })}
-        style={style}
+        {...props}
+        className={classNames("bread-crumb-item", props.className, { primary })}
         onClick={(e: React.MouseEvent<HTMLDivElement>) => {
           if (!suppressClickBehavior) {
-            if (!isNil(onClick)) {
-              onClick(e);
+            if (!isNil(props.onClick)) {
+              props.onClick(e);
             } else if (!isNil(url)) {
               history.push(url);
             }
           }
         }}
       >
-        <TooltipWrapper tooltip={tooltip}>{children}</TooltipWrapper>
+        <TooltipWrapper tooltip={tooltip}>{props.children}</TooltipWrapper>
       </div>
     );
   }

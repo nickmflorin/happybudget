@@ -16,8 +16,6 @@ import { EntityTextDescription } from "components/typography/EntityText";
 
 import HeaderTemplateSaveForm, { IHeaderTemplateSaveFormRef } from "./HeaderTemplateSaveForm";
 
-import "./index.scss";
-
 type NonFormFields = "includeNotes" | "notes" | "header";
 type RichTextFields = "notes" | "header";
 

@@ -4,8 +4,6 @@ import classNames from "classnames";
 
 import { ShowHide } from "components";
 
-import "./index.scss";
-
 export interface GenericSidebarProps<I extends ISidebarItem> extends StandardComponentWithChildrenProps {
   readonly sidebar: I[];
   readonly renderItem: (i: I) => JSX.Element;

@@ -16,3 +16,15 @@
     width: auto;
   }
 }
+
+.icon--row-drag {
+  color: $icon-color;
+
+  &:hover {
+    color: lighten($icon-color, 20%);
+  }
+
+  &:active {
+    color: lighten($icon-color, 20%);
+  }
+}

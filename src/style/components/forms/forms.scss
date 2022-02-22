@@ -6,14 +6,6 @@ form {
   }
 }
 
-.label-base {
-  font-size: 12px;
-  line-height: 22px;
-  color: $text-secondary;
-  font-family: $avenir;
-  font-weight: 600 !important;
-}
-
 .form-label-base {
   @extend .label-base;
   height: 22px !important;
@@ -228,34 +220,11 @@ form {
   }
 }
 
-label,
-.label {
-  @extend .label-base;
-}
-
 .form-item-section {
   > .ant-form-item-label {
     > label,
     .label {
       font-size: 13px !important;
-    }
-  }
-}
-
-.ant-switch {
-  background-color: $gray-light;
-
-  .ant-switch-inner {
-    color: $text-primary;
-    font-size: 8px;
-    font-weight: bold;
-  }
-
-  &.ant-switch-checked {
-    background-color: $green;
-
-    .ant-switch-inner {
-      color: $white;
     }
   }
 }

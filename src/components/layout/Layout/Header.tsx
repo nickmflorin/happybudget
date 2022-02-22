@@ -10,14 +10,12 @@ import { HelpDropdownMenu, UserDropdownMenu } from "components/dropdowns";
 import { IsAuthenticated } from "components/permissions";
 import { SidebarLogo } from "components/svgs";
 
-import "./index.scss";
-
-export interface HeaderProps extends StandardComponentProps {
+export type HeaderProps = StandardComponentProps & {
   readonly showHeaderSidebarToggle?: boolean | undefined;
   readonly showHeaderLogo?: boolean | undefined;
   readonly sidebarVisible: boolean;
   readonly toggleSidebar: () => void;
-}
+};
 
 const Header = ({
   sidebarVisible,

@@ -6,8 +6,6 @@ import { PrimaryButton, SocialButton } from "components/buttons";
 import { RouterLink, Link } from "components/links";
 import { util } from "lib";
 
-import "./LandingForm.scss";
-
 export type ISignupFormValues = {
   readonly email: string;
   readonly password: string;

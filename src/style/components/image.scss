@@ -1,0 +1,169 @@
+.img-wrapper {
+  height: 100%;
+  aspect-ratio: 1;
+  width: 100%;
+  position: relative;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .img-overlay {
+    display: none;
+  }
+
+  &.circle {
+    clip-path: circle(50%);
+  }
+
+  &.with-icon-fallback {
+    background-color: #efefef;
+  }
+
+  &:hover {
+    .img-overlay {
+      display: flex;
+    }
+  }
+
+  .icon-wrapper {
+    padding: 8px;
+  }
+
+  .img {
+    height: 100%;
+    width: auto;
+
+    &.circle {
+      border-radius: 100%;
+    }
+
+    .image-tint {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(15, 15, 15, 0.04);
+    }
+
+    &--user {
+      @extend .img;
+      position: absolute;
+      top: 0;
+      left: 0;
+      object-fit: contain;
+      text-align: center;
+    }
+  }
+}
+
+.card-image-wrapper,
+.card-image-placeholder {
+  height: 150px;
+  width: 100%;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-box-pack: center;
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+  overflow: hidden;
+
+  &.title-only {
+    height: 150px;
+  }
+}
+
+.card-image-wrapper {
+  .image-tint {
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+  }
+  .img {
+    object-fit: cover;
+    width: 100%;
+  }
+}
+
+.card-image-placeholder {
+  background-color: #f9f9f9;
+  svg {
+    height: 40px !important;
+    width: 40px !important;
+    color: #cacaca;
+  }
+}
+
+.img-overlay {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  text-align: center;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  color: $white;
+
+  svg {
+    color: $white;
+  }
+
+  &--edit-image {
+    display: flex;
+    align-items: center;
+
+    svg {
+      &.icon.plus,
+      &.icon.edit {
+        height: 24px !important;
+        width: 24px !important;
+      }
+    }
+
+    .icon-wrapper--plus,
+    .icon-wrapper--edit {
+      height: $standard-size;
+      width: $standard-size;
+      padding: 5px;
+    }
+
+    .btn--clear-image {
+      padding: 5px;
+    }
+  }
+}
+
+.user-initials {
+  @include vertical-flex-c();
+  height: 100%;
+  width: 100%;
+  background-color: #eee;
+  border-radius: 100%;
+
+  .img-overlay {
+    display: none;
+  }
+  &.circle {
+    clip-path: circle(50%);
+  }
+  &:hover {
+    .img-overlay {
+      display: flex;
+    }
+  }
+
+  .user-initials-text {
+    color: #111;
+    line-height: 1;
+    font-weight: 600;
+    text-align: center;
+  }
+}

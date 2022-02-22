@@ -8,19 +8,14 @@ import { withSize } from "components/hocs";
 
 import Spinner, { SpinnerProps } from "./Spinner";
 
-import "./IconOrSpinner.scss";
-
-interface IconOrSpinnerProps extends UseSizeProps {
+type IconOrSpinnerProps = UseSizeProps & {
   readonly loading?: boolean;
   readonly icon?: IconOrElement;
   readonly spinnerProps?: SpinnerProps;
   readonly style?: React.CSSProperties;
   readonly className?: string;
-}
+};
 
-/**
- * @deprecated
- */
 const IconOrSpinner = ({ loading, icon, spinnerProps, ...props }: IconOrSpinnerProps): JSX.Element => {
   if (loading === true) {
     return (

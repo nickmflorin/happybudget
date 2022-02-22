@@ -3,7 +3,6 @@ import { pdfjs, Document as ReactPdfDoc } from "react-pdf/dist/esm/entry.webpack
 import { isNil } from "lodash";
 
 import { WrappedSpinner, RenderOrSpinner } from "components";
-import "./RenderDocument.scss";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 

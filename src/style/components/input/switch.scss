@@ -1,0 +1,17 @@
+.ant-switch {
+  background-color: $gray-light;
+
+  .ant-switch-inner {
+    color: $text-primary;
+    font-size: 8px;
+    font-weight: bold;
+  }
+
+  &.ant-switch-checked {
+    background-color: $green;
+
+    .ant-switch-inner {
+      color: $white;
+    }
+  }
+}

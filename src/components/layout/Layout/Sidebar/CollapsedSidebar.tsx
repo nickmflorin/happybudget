@@ -11,8 +11,6 @@ import { LeafLogo } from "components/svgs";
 import GenericSidebar, { GenericSidebarProps } from "./GenericSidebar";
 import GenericSidebarItem from "./GenericSidebarItem";
 
-import "./index.scss";
-
 export interface CollapsedSidebarProps
   extends Omit<GenericSidebarProps<ICollapsedSidebarItem>, "renderItem" | "children"> {
   readonly toggle: () => void;

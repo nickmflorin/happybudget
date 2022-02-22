@@ -6,8 +6,6 @@ import { ui, notifications } from "lib";
 import { Modal } from "components";
 import { Previewer, PreviewerProps } from "components/pdf";
 
-import "./PreviewModal.scss";
-
 interface PreviewModalProps
   extends Omit<PreviewerProps, "onRenderError">,
     StandardComponentProps,

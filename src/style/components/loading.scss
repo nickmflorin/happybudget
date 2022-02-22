@@ -28,3 +28,84 @@ $loading-size-standards: (
     }
   }
 }
+
+.spinner-wrapper {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-box-pack: center;
+}
+
+.icon-or-spinner {
+  position: relative;
+  height: 14px;
+  width: 14px;
+
+  .spinner-wrapper {
+    height: 100% !important;
+    width: 100% !important;
+    position: relative !important;
+
+    .spinner {
+      position: absolute !important;
+      top: 0;
+      left: 0;
+
+      .anticon-loading {
+        height: 100% !important;
+        width: 100% !important;
+      }
+    }
+  }
+}
+
+.saving-changes {
+  display: flex;
+  // We want to keep the width of the component constant such that when it
+  // shifts between "Saving Changes" and "Changes Saved" it does not reposition
+  // other elements it is adjacent to.
+  width: 136px;
+  height: $large-size;
+
+  .spinner-wrapper {
+    height: 22px;
+    width: 22px;
+    position: relative;
+    margin-right: 4px;
+
+    .saving-changes-spinner {
+      height: 22px;
+      width: auto;
+      color: $text-tertiary;
+    }
+  }
+
+  .check-wrapper {
+    height: 22px;
+    width: 22px;
+    padding: 3px;
+    margin-right: 4px;
+
+    svg {
+      height: auto;
+      width: 16px;
+      color: $green;
+    }
+  }
+
+  .text-container {
+    font-family: $roboto;
+    font-size: 12px;
+    font-weight: 500;
+    color: $text-tertiary;
+    line-height: $large-size;
+    width: 105px;
+    text-transform: uppercase;
+  }
+}

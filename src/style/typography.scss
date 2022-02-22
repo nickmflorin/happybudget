@@ -119,3 +119,16 @@ h6 {
   text-decoration: line-through;
   color: $gray;
 }
+
+.label-base {
+  font-size: 12px;
+  line-height: 22px;
+  color: $text-secondary;
+  font-family: $avenir;
+  font-weight: 600 !important;
+}
+
+label,
+.label {
+  @extend .label-base;
+}

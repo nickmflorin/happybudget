@@ -8,8 +8,6 @@ import { ShowHide, SavingChanges } from "components";
 import { SearchInput } from "components/fields";
 import { Portal } from "components/layout";
 
-import "./index.scss";
-
 export type Toolbar<
   T extends Table.PublicMenuActionParams<R, M>,
   R extends Table.RowData,

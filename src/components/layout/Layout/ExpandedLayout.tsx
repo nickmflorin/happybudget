@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 
 import { ui } from "lib";
@@ -25,4 +26,4 @@ const ExpandedLayout = (props: ExpandedLayoutProps): JSX.Element => {
   );
 };
 
-export default ExpandedLayout;
+export default React.memo(ExpandedLayout);

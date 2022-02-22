@@ -6,10 +6,7 @@ import * as api from "api";
 
 import { ShowHide, Form } from "components";
 import { DefaultButton, ClearButton } from "components/buttons";
-import { Input } from "components/fields";
-
-import HeaderTemplateSelect from "./HeaderTemplateSelect";
-import "./HeaderTemplateSaveForm.scss";
+import { Input, HeaderTemplateSelect } from "components/fields";
 
 export type IHeaderTemplateSaveFormRef = {
   readonly setRequestNameInput: (value: boolean) => void;

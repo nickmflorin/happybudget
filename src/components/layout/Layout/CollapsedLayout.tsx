@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 
 import { ui } from "lib";
@@ -24,4 +25,4 @@ const CollapsedLayout = (props: CollapsedLayoutProps): JSX.Element => {
   );
 };
 
-export default CollapsedLayout;
+export default React.memo(CollapsedLayout);

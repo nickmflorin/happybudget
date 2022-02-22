@@ -4,17 +4,14 @@ import { LoadingOutlined } from "@ant-design/icons";
 
 import { Icon, ShowHide, VerticalFlexCenter } from "components";
 
-import "./SavingChanges.scss";
-
-interface SavingChangesProps {
+type SavingChangesProps = {
   readonly saving?: boolean | undefined;
-}
+};
 
-const SavingChanges = ({ saving }: SavingChangesProps): JSX.Element => {
-  if (saving === undefined) {
-    return <></>;
-  }
-  return (
+const SavingChanges = ({ saving }: SavingChangesProps): JSX.Element =>
+  saving === undefined ? (
+    <></>
+  ) : (
     <div className={"saving-changes"}>
       <VerticalFlexCenter>
         <ShowHide show={saving}>
@@ -31,6 +28,5 @@ const SavingChanges = ({ saving }: SavingChangesProps): JSX.Element => {
       <div className={"text-container"}>{saving ? "Saving Changes" : "Changes Saved"}</div>
     </div>
   );
-};
 
 export default React.memo(SavingChanges);
