@@ -132,6 +132,13 @@ declare namespace Http {
     readonly previous?: number | null;
   };
 
+  type BulkImportActualsPayload = {
+    readonly start_date?: string | null;
+    readonly end_date?: string | null;
+    readonly source: number;
+    readonly public_token: string;
+  };
+
   type HeaderTemplatePayload = {
     readonly name?: Model.HeaderTemplate["name"];
     readonly header?: Model.HeaderTemplate["header"];
@@ -184,4 +191,13 @@ declare namespace Http {
   type ModelPayload<M extends Model.GenericHttpModel> = M["type"] extends keyof ModelPayloadMap
     ? ModelPayloadMap[M["type"]]
     : never;
+
+  type PlaidTokenExchangePayload = {
+    readonly public_token: string;
+  };
+
+  type PlaidTransactionsPayload = {
+    readonly start_date: string;
+    readonly end_date: string;
+  };
 }

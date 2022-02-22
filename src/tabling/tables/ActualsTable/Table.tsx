@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 import { map, filter, isNil } from "lodash";
@@ -8,12 +8,16 @@ import { model, tabling, hooks } from "lib";
 import * as store from "store";
 
 import { CreateContactParams } from "components/model/hooks";
+import { ImportActualsPlaidModal } from "components/modals";
+import { PlaidConnect } from "components/integrations";
+
 import { framework } from "tabling/generic";
 import { AuthenticatedTable, AuthenticatedTableProps } from "tabling/generic/tables";
 import { useAttachments, useContacts } from "../hooks";
 
 import Framework from "./framework";
 import Columns from "./Columns";
+import { setOptions } from "filepond";
 
 type OmitProps =
   | "showPageFooter"
@@ -44,10 +48,14 @@ export type Props = Omit<AuthenticatedTableProps<R, M, S>, OmitProps> & {
   readonly actualTypes: Model.Tag[];
   readonly onOwnersSearch: (value: string) => void;
   readonly onExportPdf: () => void;
+  readonly onImport: (b: Model.Budget, ms: Model.Actual[]) => void;
 };
 
-const ActualsTable = ({ parent, onOwnersSearch, ...props }: Props): JSX.Element => {
+const ActualsTable = ({ parent, onOwnersSearch, onImport, ...props }: Props): JSX.Element => {
   const dispatch: Dispatch = useDispatch();
+  const [importPlaidModalVisible, setImportPlaidModalVisible] = useState(false);
+  const [plaidLinkToken, setPlaidLinkToken] = useState("");
+  const [plaidPublicToken, setPlaidPublicToken] = useState("");
 
   const [
     processAttachmentsCellForClipboard,
@@ -211,6 +219,19 @@ const ActualsTable = ({ parent, onOwnersSearch, ...props }: Props): JSX.Element 
         framework={Framework}
         actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
           framework.actions.ToggleColumnAction(props.table.current, params),
+          framework.actions.ImportActualsAction((source: Model.ActualImportSourceId) => {
+            switch (source) {
+              case 0: // 0 - id for Plaid
+                if (plaidPublicToken !== "") {
+                  setImportPlaidModalVisible(true);
+                } else {
+                  api.createPlaidLinkToken().then((ret: { link_token: string }) => {
+                    setPlaidLinkToken(ret.link_token);
+                  });
+                }
+                break;
+            }
+          }),
           framework.actions.ExportCSVAction(
             props.table.current,
             params,
@@ -221,6 +242,26 @@ const ActualsTable = ({ parent, onOwnersSearch, ...props }: Props): JSX.Element 
       />
       {modal}
       {contactModals}
+      {!isNil(parent) && (
+        <ImportActualsPlaidModal
+          open={importPlaidModalVisible}
+          onCancel={() => setImportPlaidModalVisible(false)}
+          publicToken={plaidPublicToken}
+          budgetId={parent.id}
+          onSuccess={(b: Model.Budget, ms: Model.Actual[]) => {
+            setImportPlaidModalVisible(false);
+            onImport(b, ms);
+          }}
+        />
+      )}
+      {plaidLinkToken !== "" && plaidPublicToken === "" && (
+        // TODO - Hook-ify this component
+        <PlaidConnect
+          token={plaidLinkToken}
+          setPlaidPublicToken={setPlaidPublicToken}
+          updatePlaidModalVisibility={setImportPlaidModalVisible}
+        />
+      )}
     </React.Fragment>
   );
 };

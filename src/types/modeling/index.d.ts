@@ -325,6 +325,10 @@ declare namespace Model {
     readonly budget: SimpleBudget;
   };
 
+  type ActualImportSourceId = 0;
+  type ActualImportSourceName = "plaid";
+  type ActualImportSource = Choice<ActualImportSourceId, ActualImportSourceName>;
+
   type Actual = RowHttpModel<"actual"> & {
     readonly contact: number | null;
     readonly name: string | null;

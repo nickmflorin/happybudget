@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
-import { isNil, reduce } from "lodash";
+import { isNil, map, reduce } from "lodash";
 
 import { redux, tabling } from "lib";
 import { ActualsTable, connectTableToAuthenticatedStore } from "tabling";
@@ -72,6 +72,13 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
           table={table}
           actionContext={{ budgetId }}
           actualTypes={actualTypes}
+          onImport={(b: Model.Budget, ms: Model.Actual[]) => {
+            dispatch(actions.budget.updateBudgetInStateAction({ id: b.id, data: b }));
+            table.current.applyTableChange({
+              type: "modelsAdded",
+              payload: map(ms, (m: Model.Actual) => ({ model: m }))
+            });
+          }}
           onOwnersSearch={(value: string) =>
             dispatch(actions.budget.actuals.setActualOwnersSearchAction(value, { budgetId }))
           }

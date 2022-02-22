@@ -2,7 +2,12 @@ import { isNil } from "lodash";
 
 import { util } from "lib";
 
-import { ExportCSVDropdownMenu, ToggleColumnsDropdownMenu, ShareDropdownMenu } from "components/dropdowns";
+import {
+  ExportCSVDropdownMenu,
+  ToggleColumnsDropdownMenu,
+  ShareDropdownMenu,
+  ImportActualsDropdownMenu
+} from "components/dropdowns";
 import { ShareDropdownMenuProps } from "components/dropdowns/ShareDropdownMenu";
 
 export const ExportPdfAction = (onExport: () => void): Table.MenuActionObj => ({
@@ -53,6 +58,14 @@ export const ToggleColumnAction = <R extends Table.RowData, M extends Model.RowH
     >
       {children}
     </ToggleColumnsDropdownMenu>
+  )
+});
+
+export const ImportActualsAction = (onImport: (source: Model.ActualImportSourceId) => void): Table.MenuActionObj => ({
+  label: "Sources",
+  icon: "file-import", // TODO: temp icon, replace with
+  wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => (
+    <ImportActualsDropdownMenu onChange={onImport}>{children}</ImportActualsDropdownMenu>
   )
 });
 

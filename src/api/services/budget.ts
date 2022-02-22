@@ -155,6 +155,11 @@ export const bulkDeleteActuals = services.detailBulkDeleteService<Http.ParentRes
   "bulk-delete-actuals"
 ]);
 
+export const bulkImportActuals = services.detailPatchService<
+  Http.BulkImportActualsPayload,
+  Http.ParentChildListResponse<Model.Budget, Model.Actual>
+>((id: number) => ["budgets", id, "bulk-import-actuals"]);
+
 export const bulkCreateActuals = services.detailBulkCreateService<
   Http.ActualPayload,
   Http.ParentChildListResponse<Model.Budget, Model.Actual>

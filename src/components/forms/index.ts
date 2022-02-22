@@ -15,3 +15,4 @@ export { default as BudgetTotalChartForm } from "./BudgetTotalChartForm";
 export * from "./BudgetTotalChartForm";
 export { default as ExportActualsPdfForm } from "./ExportActualsPdfForm";
 export { default as EditPublicTokenForm } from "./EditPublicTokenForm";
+export { default as ImportActualsPlaidForm } from "./ImportActualsPlaidForm";
