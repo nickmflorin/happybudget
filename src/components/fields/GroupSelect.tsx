@@ -34,7 +34,7 @@ const GroupSelect = (props: GroupSelectProps): JSX.Element => (
         return (
           <Tag className={"group-select-tag"} style={{ marginRight: 3 }} {...params}>
             <div className={"icon-wrapper"}>
-              <Color color={group.color} />
+              <Color size={16} color={group.color} />
             </div>
             {group.name}
           </Tag>
@@ -47,7 +47,7 @@ const GroupSelect = (props: GroupSelectProps): JSX.Element => (
       return (
         <Select.Option className={"group-select-option"} key={index + 1} value={group.id}>
           <div className={"icon-wrapper"}>
-            <Color color={group.color} style={{ marginRight: 6 }} />
+            <Color size={16} color={group.color} style={{ marginRight: 6 }} />
           </div>
           {group.name}
         </Select.Option>

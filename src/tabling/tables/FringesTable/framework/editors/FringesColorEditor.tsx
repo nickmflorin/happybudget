@@ -41,7 +41,8 @@ const FringesColorEditor = (props: FringesColorEditorProps, ref: ForwardedRef<Ta
     <ColorGrid
       useDefault={true}
       colors={colors}
-      colorSize={24}
+      colorSize={20}
+      selectable={true}
       value={value}
       treatDefaultAsNull={true}
       onChange={(v: string | null) => setValue(v)}

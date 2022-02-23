@@ -175,6 +175,8 @@
   &--table {
 		@extend .menu;
     max-height: 220px;
+		// The border gets set on the ag-popup-editor.
+		border: none !important;
 
     .ul-wrapper {
       overflow-y: scroll;
@@ -210,6 +212,11 @@
 }
 
 .ag-theme-alpine .ag-popup-editor {
-  @extend .dropdown-base;
+  background: $white !important;
+	background-color: $white !important;
+  outline: none !important;
+  box-shadow: none !important;
+	border: $menu-border !important;
   background-clip: unset !important;
+	border-radius: 0px !important;
 }

@@ -14,7 +14,7 @@ const ShareButton = ({ sharing, ...props }: ShareButtonProps): JSX.Element => (
   <BareButton
     {...props}
     className={classNames("btn--share", props.className)}
-    icon={<ColorIcon size={14} color={sharing ? Colors.GREEN : Colors.COLOR_NO_COLOR} />}
+    icon={<ColorIcon size={12} color={sharing ? Colors.GREEN : Colors.COLOR_NO_COLOR} />}
   >
     {sharing ? "Sharing" : "Not Sharing"}
   </BareButton>

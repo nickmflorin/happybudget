@@ -1,11 +1,12 @@
 import { useMemo } from "react";
+import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { Colors } from "style/constants";
 
-export type ColorIconProps = {
+export type ColorIconProps = StandardComponentProps & {
   readonly color?: string | null | undefined;
-  readonly size?: number;
+  readonly size: number;
   readonly selected?: boolean;
   readonly selectable?: boolean;
   readonly selectedColor?: Style.HexColor;
@@ -18,7 +19,8 @@ const ColorIcon = ({
   selectedColor = "#6eb6ff",
   selectable,
   selected,
-  size = 16
+  size,
+  ...props
 }: ColorIconProps) => {
   const c = useMemo(() => {
     if (isNil(color) && (useDefault === true || typeof useDefault === "string")) {
@@ -26,9 +28,14 @@ const ColorIcon = ({
     }
     return color;
   }, [color, useDefault]);
+
   if (!isNil(c)) {
     return (
-      <svg className={"icon"} width={size} height={size}>
+      <svg
+        {...props}
+        className={classNames("icon icon--color", props.className)}
+        style={{ ...props.style, height: `${size}px`, width: `${size}px` }}
+      >
         {(selectable || selected !== undefined) && (
           <rect
             height={size}

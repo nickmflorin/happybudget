@@ -36,6 +36,7 @@ const ColorSelect: React.FC<ColorSelectProps> = ({
               selected={!isNil(value) ? value === c : color === c}
               className={classNames("color-select-color", itemClassName)}
               style={itemStyle}
+              size={16}
               onClick={(e: React.MouseEvent<HTMLDivElement>) => {
                 setColor(c);
                 onChange?.(c, e);

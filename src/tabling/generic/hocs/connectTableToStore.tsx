@@ -62,6 +62,7 @@ const connectTableToStore =
     if (!isNil(config.selector)) {
       configuredSelector = config.selector;
     }
+
     const selectData = (state: Application.Store) => configuredSelector(state)?.data || [];
     const selectSearch = (state: Application.Store) => configuredSelector(state)?.search || "";
     const selectLoading = (state: Application.Store) => configuredSelector(state)?.loading || false;
@@ -69,11 +70,17 @@ const connectTableToStore =
     const _selectData = (s: Application.Store, p: HOCProps<T, R, M, S, C>) =>
       isNil(p.selector) ? selectData(s) : p.selector(s).data;
 
+    const _selectLoading = (s: Application.Store, p: HOCProps<T, R, M, S, C>) =>
+      isNil(p.selector) ? selectLoading(s) : p.selector(s).loading;
+
+    const _selectSearch = (s: Application.Store, p: HOCProps<T, R, M, S, C>) =>
+      isNil(p.selector) ? selectSearch(s) : p.selector(s).search;
+
     const WithStoreConfigured = (props: HOCProps<T, R, M, S, C>) => {
       const store: Redux.Store<Application.Store> = useStore() as Redux.Store<Application.Store>;
       const data = useSelector((s: Application.Store) => _selectData(s, props));
-      const search = useSelector(selectSearch);
-      const loading = useSelector(selectLoading);
+      const search = useSelector((s: Application.Store) => _selectSearch(s, props));
+      const loading = useSelector((s: Application.Store) => _selectLoading(s, props));
 
       const [ready, setReady] = useState(false);
       const sagaInjected = useRef<boolean>(false);
@@ -112,7 +119,7 @@ const connectTableToStore =
 					 the Saga. */
           data={ready === true ? data : []}
           loading={loading}
-          selector={configuredSelector}
+          selector={props.selector || configuredSelector}
           footerRowSelectors={config.footerRowSelectors}
         />
       );

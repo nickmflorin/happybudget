@@ -149,3 +149,59 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
     }
   }
 }
+
+@mixin budget_export_preview_landscape_modal_sizing() {
+  .export-header-sides {
+    @include media("<=xl") {
+      flex-direction: column;
+      .export-header-side-item {
+        width: 100%;
+        margin-left: 0px !important;
+      }
+    }
+  }
+}
+
+@mixin budget_export_preview_portrait_modal_sizing() {
+  .export-header-sides {
+    flex-direction: column;
+    .export-header-side-item {
+      width: 100%;
+      margin-left: 0px !important;
+
+      .pdf-image-uploader {
+        width: 100%;
+      }
+    }
+  }
+
+  .header-template-save-form {
+    flex-direction: column;
+    .header-template-save-form-content {
+      flex-direction: column;
+
+      > * {
+        margin-right: 0px;
+        width: 100%;
+      }
+
+      > *:not(:last-child) {
+        margin-bottom: 8px;
+      }
+    }
+  }
+}
+
+.budget-preview-modal {
+  @include media("<=xxl") {
+    @include budget_export_preview_landscape_modal_sizing();
+  }
+
+  @include media("<=medium") {
+    @include budget_export_preview_portrait_modal_sizing();
+  }
+
+  @include media(">=xxl") {
+    @include budget_export_preview_landscape_modal_sizing();
+  }
+}

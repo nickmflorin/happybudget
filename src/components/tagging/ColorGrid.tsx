@@ -8,12 +8,13 @@ import Color from "./Color";
 interface ColorGridProps extends StandardComponentProps {
   readonly colors: string[];
   readonly value?: string | null;
-  readonly colorSize?: number;
   readonly useDefault?: boolean | string;
   readonly colorsPerRow?: number;
   /* Whether or not selecting the default color should be treated as a null
      selection.  Defaults to false. */
   readonly treatDefaultAsNull?: boolean;
+  readonly selectable?: boolean;
+  readonly colorSize: number;
   readonly onChange?: (value: string | null, e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
@@ -22,8 +23,9 @@ const ColorGrid = ({
   value,
   useDefault,
   colorsPerRow = 4,
-  colorSize = 16,
   treatDefaultAsNull,
+  colorSize,
+  selectable,
   onChange,
   ...props
 }: ColorGridProps): JSX.Element => {
@@ -52,10 +54,11 @@ const ColorGrid = ({
             <Color
               key={j}
               color={c}
-              style={{ maxWidth: `${colorSize}px` }}
               size={colorSize}
+              style={{ maxWidth: `${colorSize}px` }}
               useDefault={false}
               selected={value === c || (value === null && c === Colors.COLOR_NO_COLOR)}
+              selectable={selectable}
               onClick={(e: React.MouseEvent<HTMLDivElement>) => {
                 if (defaultUsed === true && treatDefaultAsNull === true && c === defaultColor) {
                   onChange?.(null, e);

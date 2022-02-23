@@ -11,9 +11,7 @@ import { Button, PrimaryButton } from "components/buttons";
 import EmptyDocument from "./EmptyDocument";
 import { RenderDocument } from "./primitive";
 
-import "./Previewer.scss";
-
-export interface PreviewerProps {
+export type PreviewerProps = {
   readonly filename: string;
   readonly previewer?: RefObject<Pdf.IPreviewerRef>;
   readonly loadingData?: boolean;
@@ -21,7 +19,7 @@ export interface PreviewerProps {
   readonly renderComponent: () => JSX.Element | undefined;
   readonly onExportSuccess?: () => void;
   readonly onRenderError: (e: Error) => void;
-}
+};
 
 const generateFile = async (component: JSX.Element): Promise<string | ArrayBuffer> =>
   new Promise<ArrayBuffer | string>((resolve, reject) => {

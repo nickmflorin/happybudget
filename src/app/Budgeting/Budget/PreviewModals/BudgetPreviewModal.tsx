@@ -13,8 +13,6 @@ import { SubAccountsTable } from "tabling";
 import { actions } from "../../store";
 import BudgetPdf from "./BudgetPdf";
 
-import "./BudgetPreviewModal.scss";
-
 type R = Tables.SubAccountRowData;
 type M = Model.PdfSubAccount;
 type C = Table.DataColumn<R, M>;
