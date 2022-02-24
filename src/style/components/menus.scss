@@ -7,7 +7,7 @@
   margin-bottom: 0;
   padding-left: 0;
   color: $text-secondary;
-  font-size: 14px;
+  font-size: $large-text-size;;
   line-height: 0;
   text-align: left;
   list-style: none;
@@ -26,7 +26,7 @@
   font-weight: 400;
   min-width: 100px;
   padding: 4px 10px;
-  font-size: 13px;
+  font-size: $standard-text-size;;
   line-height: 24px;
   height: 32px;
   margin-bottom: 0px !important;
@@ -61,7 +61,7 @@
 
 			.text-wrapper {
 				font-family: $roboto;
-				font-size: 13px;
+				font-size: $standard-text-size;;
 				color: $text-secondary !important;
 				line-height: 24px;
 				flex-grow: 100;
@@ -94,13 +94,13 @@
   }
 
   &--extra {
-    font-size: 12px;
+    font-size: $medium-text-size;;
     font-weight: 500 !important;
     color: rgba(70, 70, 70, 0.85) !important;
     text-transform: uppercase;
 
     .text-wrapper {
-      font-size: 12px;
+      font-size: $medium-text-size;;
     }
 
     &:hover,

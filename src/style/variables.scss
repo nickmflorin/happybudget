@@ -71,8 +71,15 @@ $border: 1px solid $border-color;
 $dashed-border: 1px dashed $border-color;
 $table-border: 1px solid $table-border-color;
 
+// Typography
 $roboto: "Roboto", sans-serif;
 $avenir: "AvenirNext", sans-serif;
+
+$xlarge-text-size: 16px;
+$large-text-size: 14px;
+$standard-text-size: 13px;
+$medium-text-size: 12px;
+$small-text-size: 11px;
 
 // Layout
 $xlarge-size: 40px;

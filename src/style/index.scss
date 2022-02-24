@@ -34,7 +34,7 @@ code {
   }
 
   .ant-empty-description {
-    font-size: 13px;
+    font-size: $standard-text-size;;
     color: $text-secondary;
     font-family: $avenir;
     font-weight: 400;
@@ -42,8 +42,7 @@ code {
 }
 
 .full-size {
-  height: 100% !important;
-  width: 100% !important;
+	@include size(100% !important);
 }
 
 .disabled {

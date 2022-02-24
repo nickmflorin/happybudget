@@ -123,8 +123,7 @@
 
     .icon-wrapper--plus,
     .icon-wrapper--edit {
-      height: $standard-size;
-      width: $standard-size;
+			@include size($standard-size);
       padding: 5px;
     }
 
@@ -153,7 +152,7 @@
   }
 
   .user-initials-text {
-    color: #111;
+    color: $text-primary;
     line-height: 1;
     font-weight: 600;
     text-align: center;

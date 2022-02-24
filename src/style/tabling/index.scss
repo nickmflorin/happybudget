@@ -94,7 +94,7 @@
         padding-left: 10px;
         padding-right: 10px;
         letter-spacing: 0.045em;
-        font-size: 12px;
+        font-size: $medium-text-size;;
         font-weight: 400;
         font-family: $roboto;
 
@@ -143,7 +143,7 @@
       > .cell {
         padding-left: 6px;
         padding-right: 6px;
-        font-size: 13px;
+        font-size: $standard-text-size;;
         font-family: $roboto;
         font-weight: 400;
         overflow: hidden;

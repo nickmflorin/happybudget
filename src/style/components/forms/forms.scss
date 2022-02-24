@@ -164,7 +164,7 @@ form {
 
     .ant-form-item-control {
       .ant-form-item-extra {
-        font-size: 12px;
+        font-size: $medium-text-size;;
         line-height: 12px;
         min-height: 12px;
         margin-top: 6px;
@@ -182,7 +182,7 @@ form {
       div[role="alert"] {
         font-weight: 500;
         margin-top: 5px;
-        font-size: 11px;
+        font-size: $small-text-size;;
         line-height: 12px;
         margin-left: 5px;
       }
@@ -224,7 +224,7 @@ form {
   > .ant-form-item-label {
     > label,
     .label {
-      font-size: 13px !important;
+      font-size: $standard-text-size !important;
     }
   }
 }

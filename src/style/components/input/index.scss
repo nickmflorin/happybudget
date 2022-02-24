@@ -43,7 +43,7 @@ select:-webkit-autofill:focus {
 }
 
 input:-webkit-autofill::first-line {
-  font-size: 12px;
+  font-size: $medium-text-size;;
   color: $text-primary !important;
   font-family: $avenir;
   font-weight: 500;
@@ -113,7 +113,7 @@ span.input {
       line-height: 22px;
       font-family: $avenir;
       font-weight: 500;
-      font-size: 13px;
+      font-size: $standard-text-size;;
       letter-spacing: normal;
       padding-left: 2px;
       vertical-align: unset !important;

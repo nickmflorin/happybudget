@@ -2,7 +2,7 @@
   height: 20px;
   text-align: center;
   line-height: 20.5px;
-  font-size: 12px;
+  font-size: $medium-text-size;;
   padding-top: 0px !important;
   padding-bottom: 0px !important;
   padding-left: 8px;
@@ -12,12 +12,12 @@
   width: -moz-fit-content;
   width: fit-content;
   margin-right: 0.2rem;
-  color: #ffffff;
+  color: $white;
   border-radius: 20px;
 
   &.uppercase {
     text-transform: uppercase;
-    font-size: 11px;
+    font-size: $small-text-size;;
   }
 
   &.fill-width {
@@ -51,7 +51,7 @@
     display: block;
     font-family: $avenir;
     line-height: 20.5px;
-    font-size: 12px;
+    font-size: $medium-text-size;;
     font-weight: 400;
     color: $blue !important;
     height: 20px;

@@ -94,7 +94,7 @@ $loading-size-standards: (
 
   .text-container {
     font-family: $roboto;
-    font-size: 12px;
+    font-size: $medium-text-size;;
     font-weight: 500;
     color: $text-tertiary;
     line-height: $large-size;

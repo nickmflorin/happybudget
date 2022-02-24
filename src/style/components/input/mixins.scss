@@ -1,7 +1,7 @@
 @mixin input_framework(
   $horizontal-padding: 12px,
   $svg-height: 0.8rem,
-  $font-size: 12px,
+  $font-size: $medium-text-size,
   $size: $standard-size,
   $radius: $input-border-radius,
   $vertical-padding: 4px

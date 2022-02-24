@@ -10,7 +10,7 @@
 
   .title {
     color: $text-tertiary;
-    font-size: 14px;
+    font-size: $large-text-size;;
     font-weight: 500;
   }
 
@@ -175,7 +175,7 @@
   }
 
   .title {
-    font-size: 16px;
+    font-size: $xlarge-text-size;;
     font-family: $roboto;
     font-weight: 500;
     color: $text-primary;
