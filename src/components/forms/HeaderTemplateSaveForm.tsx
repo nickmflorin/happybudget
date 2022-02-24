@@ -82,9 +82,8 @@ const HeaderTemplateSaveForm = (
           />
           <DefaultButton
             disabled={disabled || saving}
-            size={"small"}
             loading={saving}
-            style={{ marginRight: !isNil(existing) || requestNameInput ? 6 : 0 }}
+            style={{ marginRight: !isNil(existing) || requestNameInput ? 6 : 0, fontSize: "11px" }}
             onClick={() => {
               if (requestNameInput === true) {
                 if (name.trim() !== "") {
@@ -107,8 +106,7 @@ const HeaderTemplateSaveForm = (
 
           <ShowHide show={existing && saveAsMode === false}>
             <DefaultButton
-              size={"small"}
-              style={{ marginRight: requestNameInput ? 6 : 0 }}
+              style={{ marginRight: requestNameInput ? 6 : 0, fontSize: "11px" }}
               disabled={disabled || saving || saveAsMode === true}
               onClick={() => {
                 setRequestNameInput(true);
@@ -123,7 +121,6 @@ const HeaderTemplateSaveForm = (
             <div style={{ display: "flex" }}>
               <Input
                 placeholder={"Name"}
-                small={true}
                 className={classNames({ "with-error": !isNil(error) })}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
               />

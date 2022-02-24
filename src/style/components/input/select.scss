@@ -1,21 +1,6 @@
 @import "./base";
 @import "./mixins";
 
-.ant-select-multiple {
-  .ant-select-selection-item {
-    margin-top: 1px;
-    margin-bottom: 1px;
-  }
-  .ant-select-selection-item-remove > .anticon {
-    vertical-align: -0.1em;
-  }
-  .ant-select-selection-item-content {
-    font-size: 11px;
-    color: $text-primary;
-    font-family: $roboto;
-  }
-}
-
 // Must be outside of select because it does not render inside of select component.
 .ant-select-item-option {
   &.column-select-option {
@@ -50,16 +35,9 @@
 .ant-select {
   @extend .input-base;
   background-color: $white !important;
-  @include standard_height("standard");
-
-  &:not(.ant-select-disabled):hover .ant-select-selector {
-    border-color: #ebebeb !important;
-    border: 1px solid #ebebeb !important;
-  }
 
   .ant-select-selector {
     @extend .input-base;
-    @include input_framework(8px, 0.8rem, 12px, $standard-size, $input-border-radius, 1px);
     @include transition(none !important);
     height: 100% !important;
     background-color: $white !important;
@@ -69,6 +47,13 @@
     .ant-select-selection-item {
       font-weight: 500;
       height: 100%;
+    }
+  }
+
+  &:not(.ant-select-disabled):hover {
+    .ant-select-selector {
+      border-color: $border-color !important;
+      border: $border !important;
     }
   }
 
@@ -83,9 +68,15 @@
   }
 }
 
-.select,
-.ant-select-single {
+.select.ant-select-single {
+  @include standard_height("standard");
+
   .ant-select-selector {
+    @include input_framework(8px, 0.8rem, 12px, $standard-size, $input-border-radius, 1px);
+    // Instead of the 30px line-height, the 28px seems to do a better job
+    // vertically centering the text.
+    line-height: 28px !important;
+
     .ant-select-selection-item {
       font-weight: 500;
       height: 100%;
@@ -97,13 +88,12 @@
 // For now, our select-multiple is just configured for the standard height.
 // We will need to customize this CSS more to allow for other height/size
 // variants.
-.select,
-.ant-select-multiple {
+.select.ant-select-multiple {
   min-height: 32px !important;
-  height: auto !important;
 
   .ant-select-selector {
-    padding: 1px 8px !important;
+		@include input_framework(8px, 0.8rem, 12px, $standard-size, $input-border-radius, 1px);
+    padding: 2px 4px !important;
     line-height: 26px !important;
 
     .ant-select-selection-overflow {
@@ -119,46 +109,48 @@
       }
     }
   }
+}
 
-  &--group {
-    .group-select-tag {
-      display: flex;
-      line-height: 22px;
+.group-select {
+  .group-select-tag {
+    display: flex;
+    line-height: 22px;
 
-      .icon-wrapper {
-        height: 22px;
-        width: 22px;
-        margin-right: -4px;
+    .icon-wrapper {
+      height: 22px;
+      width: 22px;
+      margin-right: -4px;
 
-        .color {
-          height: 12px;
-          width: 12px;
-        }
-      }
-
-      .ant-tag-close-icon {
-        @include vertical-flex-c();
+      .color {
+        height: 12px;
+        width: 12px;
       }
     }
+
+    .ant-tag-close-icon {
+      @include vertical-flex-c();
+    }
   }
+}
 
-  &--column {
-    .column-select-tag {
-      display: flex;
-      line-height: 22px;
+.column-select {
+  .column-select-tag {
+    display: flex;
+    flex-direction: row;
+    line-height: 22px;
 
-      .icon-wrapper {
-        @include size(22px);
-        margin-right: -4px;
+    .icon-wrapper {
+      height: 22px;
+      width: 22px;
+      margin-right: -4px;
 
-        svg {
-          @include size(12px);
-        }
+      svg {
+        @include size(12px);
       }
+    }
 
-      .ant-tag-close-icon {
-        @include vertical-flex-c();
-      }
+    .ant-tag-close-icon {
+      @include vertical-flex-c();
     }
   }
 }

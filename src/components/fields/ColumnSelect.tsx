@@ -49,7 +49,7 @@ const ColumnSelect = <
   <Select
     suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
     {...props}
-    className={classNames("select--column", props.className)}
+    className={classNames("column-select", props.className)}
     mode={"multiple"}
     showArrow
     tagRender={(params: CustomTagProps) => {

@@ -25,7 +25,7 @@ const GroupSelect = (props: GroupSelectProps): JSX.Element => (
   <Select
     suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
     {...props}
-    className={classNames("select--group", props.className)}
+    className={classNames("group-select", props.className)}
     mode={"multiple"}
     showArrow
     tagRender={(params: CustomTagProps) => {

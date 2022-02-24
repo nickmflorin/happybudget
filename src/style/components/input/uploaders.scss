@@ -51,6 +51,10 @@
     width: 50%;
     display: flex;
 
+		.ant-upload-select-picture-card {
+			border: none !important;
+		}
+
     .ant-upload {
       justify-content: left !important;
       text-align: left !important;
