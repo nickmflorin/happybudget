@@ -14,7 +14,12 @@ export type NotificationProps = Omit<StandardComponentProps, "id"> & {
 
 export type NotificationObjectProps = UINotification & Omit<NotificationProps, "id">;
 export type NoticationComponentProps = UINotificationData &
-  NotificationProps & { readonly children?: string; readonly remove?: () => void; readonly id?: string | number };
+  NotificationProps & {
+    readonly children?: string;
+    readonly remove?: () => void;
+    readonly id?: string | number;
+    readonly bare?: boolean;
+  };
 
 type _NotificationProps = NotificationObjectProps | NoticationComponentProps;
 
@@ -58,7 +63,9 @@ const Notification = ({ style, className, ...props }: _NotificationProps): JSX.E
     <div
       style={style}
       id={id === undefined ? undefined : String(id)}
-      className={classNames("notification", level, className)}
+      className={classNames("notification", level, className, {
+        bare: (props as NoticationComponentProps).bare === true
+      })}
     >
       {props.includeIcon !== false && <div className={"notification-left"}>{icon}</div>}
       <div className={"notification-middle"}>

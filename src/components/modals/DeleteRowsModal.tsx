@@ -15,7 +15,7 @@ function DeleteRowsModal({ rows, ...props }: DeleteRowsModalProps): JSX.Element 
   return (
     <DeleteModal {...props} className={"delete-rows-modal"} title={"Delete Rows"}>
       <>
-        <Notification level={"warning"} message={`You are about to delete ${rows.length} rows.`}>
+        <Notification bare={true} level={"warning"} message={`You are about to delete ${rows.length} rows.`}>
           {"This action is not recoverable, the data will be permanently erased"}
         </Notification>
         <Checkbox

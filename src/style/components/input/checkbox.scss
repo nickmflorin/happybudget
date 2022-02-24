@@ -6,8 +6,16 @@
   border: none !important;
 }
 
+.ant-checkbox-wrapper {
+	color: $text-secondary;
+	font-family: $avenir;
+	font-size: $medium-text-size;
+	font-weight: 500 !important;
+}
+
 .checkbox-wrapper {
   padding: 10px;
+
   .ant-checkbox-wrapper {
 		@include size(16px);
 
