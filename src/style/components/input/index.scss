@@ -121,15 +121,11 @@ span.input {
   }
 }
 
-textarea {
-  background-color: $gray-light !important;
-  color: $text-secondary !important;
-  font-family: $avenir !important;
-  font-weight: 400;
-  border-radius: 10px !important;
-  border: 1px solid transparent !important;
+// The textarea element only supports one size for now, the standard size.
+textarea.text-area {
+	@extend .input-base;
+	@include input_framework();
   min-height: $standard-size !important;
-  font-size: 12px;
 }
 
 .image-and-name {

@@ -38,7 +38,7 @@ const TaggedActuals = ({ contactId, title, onError, ...props }: TaggedActualsPro
   return (
     <div {...props} className={classNames("tagged-actuals", props.className)}>
       <div className={"tagged-actuals-header"}>
-        <h3 className={"tagged-actuals-title"}>{title}</h3>
+        <h4 className={"tagged-actuals-title"}>{title}</h4>
         <Pagination
           hideOnSinglePage={true}
           small={true}

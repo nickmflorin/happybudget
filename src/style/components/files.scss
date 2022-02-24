@@ -4,7 +4,7 @@
 
   .attachment-list-item {
     display: flex;
-    height: 41px;
+    height: 37px;
     padding-top: 4px;
     border-top: 1px solid #efefef;
 
@@ -38,9 +38,10 @@
 
     .file-action-wrapper {
       height: $standard-size;
-      width: 18px;
-      padding: 10px 3px;
-      margin-right: 3px;
+      display: flex;
+			flex-direction: column;
+			justify-content: center;
+      margin-right: 6px;
 
       > .icon {
         height: 16px;
@@ -50,8 +51,10 @@
 
     .button-action-wrapper {
       height: $standard-size;
-      width: 28px;
-      padding: 7px 3px;
+      display: flex;
+			flex-direction: column;
+			justify-content: center;
+			margin-left: 4px;
 
       .btn {
         height: 22px;
