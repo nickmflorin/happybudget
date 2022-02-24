@@ -1,7 +1,6 @@
 .image-uploader {
   .image-uploader-upload {
-    height: 100% !important;
-    width: 100% !important;
+    @include size(100% !important);
 
     &.with-image {
       border: 1px solid $gray-light;
@@ -11,8 +10,7 @@
     }
 
     .ant-upload-select-picture-card {
-      height: 100% !important;
-      width: 100% !important;
+			@include size(100% !important);
       margin: 0 !important;
       position: relative;
       background-color: $white;
@@ -24,8 +22,7 @@
       }
 
       img {
-        height: 100%;
-        width: 100%;
+				@include size(100%);
         object-fit: cover !important;
       }
     }
@@ -36,8 +33,7 @@
 
     .upload-indicator {
       .icon {
-        height: 25px;
-        width: 25px;
+				@include size(25px);
       }
     }
   }
@@ -87,8 +83,7 @@
         .icon {
           color: $text-secondary !important;
           &.fa-camera {
-            height: 26px;
-            width: 26px;
+						@include size(26px);
           }
           svg {
             color: $text-secondary !important;
