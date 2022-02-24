@@ -43,9 +43,7 @@
     display: flex;
 
     > .icon-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+			@include vertical-flex-c();
 
       svg {
         color: $text-secondary;

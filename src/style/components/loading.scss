@@ -17,8 +17,7 @@ $loading-size-standards: (
   @include standard_size_variants($loading-size-standards);
 
   .anticon {
-    height: 100%;
-    width: 100%;
+		@include size(100%);
     color: inherit;
 
     svg {
@@ -30,8 +29,7 @@ $loading-size-standards: (
 }
 
 .spinner-wrapper {
-  height: 100%;
-  width: 100%;
+	@include size(100%);
   position: absolute;
   top: 0;
   left: 0;

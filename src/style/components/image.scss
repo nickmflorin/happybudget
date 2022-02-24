@@ -4,9 +4,7 @@
   width: 100%;
   position: relative;
   text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  @include vertical-flex-c();
 
   .img-overlay {
     display: none;

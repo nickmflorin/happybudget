@@ -9,20 +9,17 @@
 
   #application-spinner-container {
     z-index: 1000;
-    height: 30px;
-    width: 30px;
+    @include size(30px);
     position: fixed;
     top: calc(50vh - 15px);
     left: calc(50vw - 15px);
 
     .application-spinner {
       z-index: 1000;
-      height: 30px;
-      width: 30px;
+			@include size(30px);
 
       .anticon {
-        height: 100%;
-        width: 100%;
+        @include size(100%);
 
         svg {
           height: 100%;

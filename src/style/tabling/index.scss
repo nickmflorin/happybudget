@@ -303,8 +303,7 @@
             float: right;
 
             .icon {
-              height: 16px;
-              width: 16px;
+							@include size(16px);
             }
           }
 

@@ -9,8 +9,7 @@
 .checkbox-wrapper {
   padding: 10px;
   .ant-checkbox-wrapper {
-    height: 16px;
-    width: 16px;
+		@include size(16px);
 
     .ant-checkbox {
       font-size: 16px;

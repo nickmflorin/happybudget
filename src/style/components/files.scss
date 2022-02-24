@@ -37,10 +37,8 @@
     }
 
     .file-action-wrapper {
+			@include vertical-flex-c();
       height: $standard-size;
-      display: flex;
-			flex-direction: column;
-			justify-content: center;
       margin-right: 6px;
 
       > .icon {
@@ -50,10 +48,8 @@
     }
 
     .button-action-wrapper {
+			@include vertical-flex-c();
       height: $standard-size;
-      display: flex;
-			flex-direction: column;
-			justify-content: center;
 			margin-left: 4px;
 
       .btn {

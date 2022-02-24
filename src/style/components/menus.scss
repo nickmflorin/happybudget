@@ -52,16 +52,12 @@
   	flex-direction: row;
 
 		.icon-wrapper-left {
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
+			@include vertical-flex-c();
 			margin-right: 6px;
 		}
 
 		.menu-item-inner-content {
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
+			@include vertical-flex-c();
 
 			.text-wrapper {
 				font-family: $roboto;
@@ -73,9 +69,7 @@
 		}
 
 		.icon-wrapper-right {
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
+			@include vertical-flex-c();
 			margin-left: 6px;
 		}
 	}
@@ -195,14 +189,12 @@
       display: flex;
 
       .icon-wrapper {
-        height: 24px;
-        width: 24px;
+				@include size(24px);
         padding-top: 4px;
         padding-bottom: 4px;
 
         svg {
-          height: 16px;
-          width: 16px;
+					@include size(16px);
           margin-left: -5px;
           margin-right: 10px;
         }

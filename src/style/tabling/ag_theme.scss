@@ -101,9 +101,7 @@
         }
 
         .ag-menu-option-popup-pointer {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
+          @include vertical-flex-c();
           line-height: 24px;
           margin-left: auto;
           padding-right: 0px;
