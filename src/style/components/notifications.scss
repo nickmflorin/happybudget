@@ -4,8 +4,7 @@
   display: flex;
 
   .notification-left {
-    width: 22px;
-    height: 22px;
+		@include size(22px);
     padding: 3px;
     margin-right: 6px;
 
@@ -38,8 +37,7 @@
   }
 
   .notification-right {
-    width: 22px;
-    height: 22px;
+    @include size(22px);
     padding: 3px;
     margin-left: 6px;
 

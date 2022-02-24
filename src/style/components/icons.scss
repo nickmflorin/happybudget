@@ -29,35 +29,3 @@
   }
 }
 
-// .icon--color {
-//   height: 16px;
-//   width: 16px;
-
-//   &.contained {
-//     height: 100% !important;
-//     width: 100% !important;
-//   }
-
-// 	// The rect SVG component is used for the selected border color of the icon
-// 	// in the case that the icon is selectable.
-// 	// rect {
-// 	// 	height: 100%;
-// 	// 	width: 100%;
-// 	// 	rx: calc(100% / 2);
-// 	// 	ry: calc(100% / 2);
-// 	// }
-
-//   // circle {
-//   //   cx: 50%;
-//   //   cy: 50%;
-//   //   r: 50%;
-//   // }
-
-// 	&.selectable {
-// 		circle {
-// 			// We subtract 1 here so that the circle can be bordered with the rect
-// 			// element in the case that the circle is selectable.
-// 			r: calc(50% - 1px);
-// 		}
-// 	}
-// }

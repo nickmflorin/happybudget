@@ -42,8 +42,7 @@
       position: absolute;
       top: 0;
       left: 0;
-      height: 100%;
-      width: 100%;
+			@include size(100%);
       background-color: rgba(15, 15, 15, 0.04);
     }
 
@@ -98,15 +97,12 @@
 }
 
 .img-overlay {
-  display: flex;
-  height: 100%;
-  width: 100%;
+  @include size(100%);
+	@include vertical-flex-c();
   position: absolute;
   top: 0;
   left: 0;
   text-align: center;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.8);
   z-index: 1000;
@@ -123,8 +119,7 @@
     svg {
       &.icon.plus,
       &.icon.edit {
-        height: 24px !important;
-        width: 24px !important;
+				@include size(24px !important);
       }
     }
 
@@ -143,8 +138,7 @@
 
 .user-initials {
   @include vertical-flex-c();
-  height: 100%;
-  width: 100%;
+	@include size(100%);
   background-color: #eee;
   border-radius: 100%;
 
