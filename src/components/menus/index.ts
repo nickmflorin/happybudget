@@ -6,5 +6,4 @@ export * from "./ActualOwnersMenu";
 export { default as Menu } from "./Menu";
 export { default as ContentMenu } from "./ContentMenu";
 export { default as TableModelMenu } from "./TableModelMenu";
-export { default as CreatePublicTokenMenu } from "./CreatePublicTokenMenu";
 export { default as EditPublicTokenMenu } from "./EditPublicTokenMenu";
