@@ -6,6 +6,11 @@
   border: none !important;
 }
 
+.ant-checkbox-checked .ant-checkbox-inner {
+	background-color: $blue;
+	border-color: $blue;
+}
+
 .ant-checkbox-wrapper {
 	color: $text-secondary;
 	font-family: $avenir;
