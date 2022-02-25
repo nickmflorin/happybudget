@@ -169,8 +169,9 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
       if (!isNil(budget)) {
         _actions = [
           ..._actions,
-          framework.actions.ShareAction<Model.Budget>({
+          framework.actions.ShareAction<Model.Budget, R, M>({
             instance: budget,
+            table: props.table.current,
             create: api.createBudgetPublicToken,
             onCreated: (token: Model.PublicToken) => props.onShared(token),
             onUpdated: (token: Model.PublicToken) => props.onShareUpdated(token),

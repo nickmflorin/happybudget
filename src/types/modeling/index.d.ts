@@ -13,12 +13,12 @@ declare namespace Model {
     readonly id: number;
   };
 
-  type PublicHttpModel = HttpModel & {
-    readonly public_token: PublicToken | null;
-  };
-
   type GenericHttpModel<T extends HttpModelType = HttpModelType> = HttpModel & {
     readonly type: T;
+  };
+
+  type PublicHttpModel<T extends HttpModelType = HttpModelType> = GenericHttpModel<T> & {
+    readonly public_token: PublicToken | null;
   };
 
   type ModelLookup<M extends Model> = M["id"] | ((m: M) => boolean);

@@ -931,8 +931,9 @@ declare namespace Table {
   /* ------------------------- Rows -------------------------------------- */
 
   /* ------------------------- Multi-User ---------------------------------- */
-  type ShareConfig<T extends Model.HttpModel & { readonly public_token: Model.PublicToken | null }> = {
+  type ShareConfig<T extends Model.PublicHttpModel, R extends RowData, M extends Model.RowHttpModel> = {
     readonly instance: T;
+    readonly table: TableInstance<R, M>;
     readonly onCreated?: (token: Model.PublicToken) => void;
     readonly onUpdated?: (token: Model.PublicToken) => void;
     readonly onDeleted?: () => void;

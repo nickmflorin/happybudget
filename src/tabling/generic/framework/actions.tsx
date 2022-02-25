@@ -1,13 +1,10 @@
 import { isNil } from "lodash";
 
 import { util } from "lib";
+
 import { ShareButton } from "components/buttons";
-import {
-  ExportCSVDropdownMenu,
-  ToggleColumnsDropdownMenu,
-  CreatePublicTokenDropdown,
-  EditPublicTokenDropdown
-} from "components/dropdowns";
+import { ExportCSVDropdownMenu, ToggleColumnsDropdownMenu, ShareDropdownMenu } from "components/dropdowns";
+import { ShareDropdownMenuProps } from "components/dropdowns/ShareDropdownMenu";
 
 export const ExportPdfAction = (onExport: () => void): Table.MenuActionObj => ({
   icon: "print",
@@ -60,43 +57,36 @@ export const ToggleColumnAction = <R extends Table.RowData, M extends Model.RowH
   )
 });
 
-export const ShareAction = <B extends Model.PublicHttpModel>(config: Table.ShareConfig<B>): Table.MenuActionObj => {
+export const ShareAction = <B extends Model.PublicHttpModel, R extends Table.RowData, M extends Model.RowHttpModel>(
+  config: Table.ShareConfig<B, R, M>
+): Table.MenuActionObj => {
   const instance: B = config.instance;
+
+  let props: Omit<ShareDropdownMenuProps<B, R, M>, "children"> = {
+    urlFormatter: (tokenId: string) => `/pub/${tokenId}/budgets/${config.instance.id}`,
+    instance: config.instance,
+    onCreateTokenSuccess: config.onCreated,
+    onEditTokenSuccess: config.onUpdated,
+    onTokenDeleted: config.onDeleted,
+    table: config.table,
+    placement: "bottomRight",
+    services: { create: config.create }
+  };
+
   const publicToken = instance.public_token;
-  if (isNil(publicToken) || publicToken.is_expired) {
-    return {
-      location: "right",
-      render: (props: Table.MenuActionRenderProps) => (
-        <ShareButton {...props} className={"budget-table-menu"} sharing={false} />
-      ),
-      wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => (
-        <CreatePublicTokenDropdown
-          urlFormatter={(tokenId: string) => `/pub/${tokenId}/budgets/${config.instance.id}`}
-          instance={config.instance}
-          onSuccess={config.onCreated}
-          services={{ create: config.create }}
-          placement={"bottomRight"}
-        >
-          {children}
-        </CreatePublicTokenDropdown>
-      )
-    };
+  if (!isNil(publicToken) && !publicToken.is_expired) {
+    props = { ...props, publicToken };
   }
   return {
     location: "right",
-    render: (props: Table.MenuActionRenderProps) => (
-      <ShareButton {...props} className={"budget-table-menu"} sharing={true} />
-    ),
-    wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => (
-      <EditPublicTokenDropdown
-        urlFormatter={(tokenId: string) => `/pub/${tokenId}/budgets/${config.instance.id}`}
-        placement={"bottomRight"}
-        publicTokenId={publicToken.id}
-        onSuccess={config.onUpdated}
-        onDeleted={config.onDeleted}
-      >
-        {children}
-      </EditPublicTokenDropdown>
+    render: (params: Table.MenuActionRenderProps) => (
+      <ShareDropdownMenu {...props}>
+        <ShareButton
+          {...params}
+          className={"budget-table-menu"}
+          sharing={!isNil(publicToken) && !publicToken.is_expired}
+        />
+      </ShareDropdownMenu>
     )
   };
 };

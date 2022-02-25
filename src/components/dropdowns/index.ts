@@ -7,3 +7,4 @@ export { default as UserDropdownMenu } from "./UserDropdownMenu";
 export { default as HelpDropdownMenu } from "./HelpDropdownMenu";
 export { default as CreatePublicTokenDropdown } from "./CreatePublicTokenDropdown";
 export { default as EditPublicTokenDropdown } from "./EditPublicTokenDropdown";
+export { default as ShareDropdownMenu } from "./ShareDropdownMenu";
