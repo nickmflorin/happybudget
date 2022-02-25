@@ -2,11 +2,18 @@
   "compilerOptions": {
     "target": "es5",
     "baseUrl": "src",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "typeRoots": ["./src/types/", "node_modules/@types"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "typeRoots": [
+      "./src/types/",
+      "node_modules/@types"
+    ],
     "noEmitOnError": true,
     "allowJs": false,
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
@@ -15,7 +22,7 @@
     "moduleResolution": "node",
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "skipDefaultLibCheck": true,
     "resolveJsonModule": true,
     "incremental": true,
@@ -24,6 +31,12 @@
     "inlineSources": true,
     "sourceRoot": "/"
   },
-  "include": ["./src/react-app-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "include": [
+    "./src/react-app-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

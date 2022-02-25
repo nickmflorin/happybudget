@@ -5,18 +5,20 @@ import classNames from "classnames";
 import { OrderingArrowIcon } from "components/icons";
 import DropdownMenu from "./DropdownMenu";
 
-export interface OrderingDropdownProps<F extends string = string>
-  extends Omit<IMenu<OrderingMenuItemState, OrderingMenuModel<F>>, "onChange"> {
+export type OrderingDropdownMenuProps<F extends string = string> = Omit<
+  IMenu<OrderingMenuItemState, OrderingMenuModel<F>>,
+  "onChange"
+> & {
   readonly ordering: Http.Ordering<F>;
   readonly onChange: (field: F, order: Http.Order) => void;
   readonly children: React.ReactChild | React.ReactChild[];
-}
+};
 
-const OrderingDropdown = <F extends string = string>({
+const OrderingDropdownMenu = <F extends string = string>({
   ordering,
   onChange,
   ...props
-}: OrderingDropdownProps<F>): JSX.Element => {
+}: OrderingDropdownMenuProps<F>): JSX.Element => {
   const getItemState = useMemo(
     () =>
       (m: OrderingMenuModel<F>): OrderingMenuItemState => {
@@ -53,4 +55,4 @@ const OrderingDropdown = <F extends string = string>({
   );
 };
 
-export default React.memo(OrderingDropdown) as typeof OrderingDropdown;
+export default React.memo(OrderingDropdownMenu) as typeof OrderingDropdownMenu;

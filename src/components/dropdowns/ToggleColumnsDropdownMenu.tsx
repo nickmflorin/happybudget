@@ -10,15 +10,17 @@ type ColumnMenuModel = {
   readonly label: string;
 };
 
-export interface ToggleColumnsDropdownProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
-  extends Omit<DropdownMenuProps<MenuItemSelectedState, ColumnMenuModel>, OmitDropdownProps> {
+export type ToggleColumnsDropdownMenuProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel
+> = Omit<DropdownMenuProps<MenuItemSelectedState, ColumnMenuModel>, OmitDropdownProps> & {
   readonly columns: Table.DataColumn<R, M>[];
   readonly hiddenColumns?: Table.HiddenColumns;
   readonly onChange?: (field: string, visible: boolean) => void;
-}
+};
 
-const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  props: ToggleColumnsDropdownProps<R, M>
+const ToggleColumnsDropdownMenu = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+  props: ToggleColumnsDropdownMenuProps<R, M>
 ): JSX.Element => {
   const hideableColumns = useMemo<Table.DataColumn<R, M>[]>(
     () => filter(props.columns, (col: Table.DataColumn<R, M>) => col.canBeHidden !== false),
@@ -59,4 +61,4 @@ const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.RowHttpM
   );
 };
 
-export default React.memo(ToggleColumnsDropdown) as typeof ToggleColumnsDropdown;
+export default React.memo(ToggleColumnsDropdownMenu) as typeof ToggleColumnsDropdownMenu;

@@ -9,7 +9,7 @@ import { redux, notifications, users } from "lib";
 import { ShowHide, Icon, Pagination } from "components";
 import { PrimaryButtonIconToggle, OrderingButtonIconToggle } from "components/buttons";
 import { CommunityTemplateCard, CommunityTemplateStaffCard, EmptyCard } from "components/containers";
-import { OrderingDropdown } from "components/dropdowns";
+import { OrderingDropdownMenu } from "components/dropdowns";
 import { SearchInput } from "components/fields";
 import { Page } from "components/layout";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
@@ -78,7 +78,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
             text={"New Blank Budget"}
             breakpoint={"medium"}
           />,
-          <OrderingDropdown
+          <OrderingDropdownMenu
             key={3}
             ordering={ordering}
             onChange={(field: string, order: Http.Order) =>
@@ -99,7 +99,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
                 name: "Name"
               }}
             />
-          </OrderingDropdown>
+          </OrderingDropdownMenu>
         ]}
         contentScrollable={true}
       >

@@ -4,12 +4,12 @@ import { useHistory } from "react-router-dom";
 import { Icon } from "components";
 import { DropdownMenu } from "components/dropdowns";
 
-interface BudgetDropdownProps {
+interface BudgetDropdownMenuProps {
   readonly children: JSX.Element;
   readonly onNewBudget: () => void;
 }
 
-const BudgetDropdown: React.FC<BudgetDropdownProps> = ({ children, onNewBudget }): JSX.Element => {
+const BudgetDropdownMenu: React.FC<BudgetDropdownMenuProps> = ({ children, onNewBudget }): JSX.Element => {
   const history = useHistory();
 
   return (
@@ -35,4 +35,4 @@ const BudgetDropdown: React.FC<BudgetDropdownProps> = ({ children, onNewBudget }
   );
 };
 
-export default React.memo(BudgetDropdown);
+export default React.memo(BudgetDropdownMenu);

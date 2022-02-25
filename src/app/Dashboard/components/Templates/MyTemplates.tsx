@@ -9,7 +9,7 @@ import { redux, notifications } from "lib";
 import { ShowHide, Icon, Pagination, NoData } from "components";
 import { PrimaryButtonIconToggle, OrderingButtonIconToggle } from "components/buttons";
 import { TemplateCard, EmptyCard } from "components/containers";
-import { OrderingDropdown } from "components/dropdowns";
+import { OrderingDropdownMenu } from "components/dropdowns";
 import { SearchInput } from "components/fields";
 import { Page } from "components/layout";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
@@ -77,7 +77,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
             text={"New Blank Budget"}
             breakpoint={"medium"}
           />,
-          <OrderingDropdown
+          <OrderingDropdownMenu
             key={3}
             ordering={ordering}
             onChange={(field: string, order: Http.Order) =>
@@ -98,7 +98,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
                 name: "Name"
               }}
             />
-          </OrderingDropdown>
+          </OrderingDropdownMenu>
         ]}
         contentScrollable={true}
       >

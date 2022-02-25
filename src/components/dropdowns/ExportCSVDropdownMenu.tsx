@@ -3,15 +3,18 @@ import { filter, map, isNil, reduce } from "lodash";
 
 import DropdownMenu from "./DropdownMenu";
 
-export interface ExportCSVDropdownProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
+export interface ExportCSVDropdownMenuProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel
+> {
   readonly children: React.ReactChild | React.ReactChild[];
   readonly columns: Table.DataColumn<R, M>[];
   readonly onDownload: (ids: string[]) => void;
   readonly hiddenColumns?: Table.HiddenColumns;
 }
 
-const ExportCSVDropdown = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  props: ExportCSVDropdownProps<R, M>
+const ExportCSVDropdownMenu = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+  props: ExportCSVDropdownMenuProps<R, M>
 ): JSX.Element => {
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -79,4 +82,4 @@ const ExportCSVDropdown = <R extends Table.RowData, M extends Model.RowHttpModel
   );
 };
 
-export default React.memo(ExportCSVDropdown) as typeof ExportCSVDropdown;
+export default React.memo(ExportCSVDropdownMenu) as typeof ExportCSVDropdownMenu;

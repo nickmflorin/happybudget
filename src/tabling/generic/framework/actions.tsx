@@ -3,8 +3,8 @@ import { isNil } from "lodash";
 import { util } from "lib";
 import { ShareButton } from "components/buttons";
 import {
-  ExportCSVDropdown,
-  ToggleColumnsDropdown,
+  ExportCSVDropdownMenu,
+  ToggleColumnsDropdownMenu,
   CreatePublicTokenDropdown,
   EditPublicTokenDropdown
 } from "components/dropdowns";
@@ -22,22 +22,20 @@ export const ExportCSVAction = <R extends Table.RowData, M extends Model.RowHttp
 ): Table.MenuActionObj => ({
   label: "Export CSV",
   icon: "file-csv",
-  wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => {
-    return (
-      <ExportCSVDropdown<R, M>
-        columns={params.columns}
-        hiddenColumns={params.hiddenColumns}
-        onDownload={(ids: string[]) => {
-          if (ids.length !== 0) {
-            const csvData = table.getCSVData(ids);
-            util.files.downloadAsCsvFile(exportFileName, csvData);
-          }
-        }}
-      >
-        {children}
-      </ExportCSVDropdown>
-    );
-  }
+  wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => (
+    <ExportCSVDropdownMenu<R, M>
+      columns={params.columns}
+      hiddenColumns={params.hiddenColumns}
+      onDownload={(ids: string[]) => {
+        if (ids.length !== 0) {
+          const csvData = table.getCSVData(ids);
+          util.files.downloadAsCsvFile(exportFileName, csvData);
+        }
+      }}
+    >
+      {children}
+    </ExportCSVDropdownMenu>
+  )
 });
 
 export const ToggleColumnAction = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
@@ -46,22 +44,20 @@ export const ToggleColumnAction = <R extends Table.RowData, M extends Model.RowH
 ): Table.MenuActionObj => ({
   label: "Columns",
   icon: "line-columns",
-  wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => {
-    return (
-      <ToggleColumnsDropdown
-        hiddenColumns={params.hiddenColumns}
-        columns={params.columns}
-        onChange={(field: string, visible: boolean) => {
-          table.changeColumnVisibility({
-            field,
-            visible
-          });
-        }}
-      >
-        {children}
-      </ToggleColumnsDropdown>
-    );
-  }
+  wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => (
+    <ToggleColumnsDropdownMenu
+      hiddenColumns={params.hiddenColumns}
+      columns={params.columns}
+      onChange={(field: string, visible: boolean) => {
+        table.changeColumnVisibility({
+          field,
+          visible
+        });
+      }}
+    >
+      {children}
+    </ToggleColumnsDropdownMenu>
+  )
 });
 
 export const ShareAction = <B extends Model.PublicHttpModel>(config: Table.ShareConfig<B>): Table.MenuActionObj => {

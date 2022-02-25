@@ -10,7 +10,7 @@ import { redux, notifications, users } from "lib";
 import { Icon, Pagination, NoData } from "components";
 import { PrimaryButtonIconToggle, OrderingButtonIconToggle } from "components/buttons";
 import { BudgetCard } from "components/containers";
-import { BudgetDropdown, OrderingDropdown } from "components/dropdowns";
+import { BudgetDropdownMenu, OrderingDropdownMenu } from "components/dropdowns";
 import { Input } from "components/fields";
 import { Page } from "components/layout";
 import { EditBudgetModal, DeleteBudgetModal, CreateBudgetModal } from "components/modals";
@@ -70,7 +70,7 @@ const Budgets = (): JSX.Element => {
               dispatch(actions.setBudgetsSearchAction(event.target.value, {}))
             }
           />,
-          <BudgetDropdown
+          <BudgetDropdownMenu
             onNewBudget={() => {
               /* Note: Normally we would want to rely on a request to the backend
                  as the source of truth for a user permission related action, but
@@ -93,8 +93,8 @@ const Budgets = (): JSX.Element => {
               icon={<Icon icon={"plus"} weight={"regular"} />}
               text={"Create Budget"}
             />
-          </BudgetDropdown>,
-          <OrderingDropdown
+          </BudgetDropdownMenu>,
+          <OrderingDropdownMenu
             key={2}
             ordering={ordering}
             onChange={(field: string, order: Http.Order) =>
@@ -115,7 +115,7 @@ const Budgets = (): JSX.Element => {
                 name: "Name"
               }}
             />
-          </OrderingDropdown>
+          </OrderingDropdownMenu>
         ]}
       >
         {budgets.length === 0 && responseWasReceived ? (
