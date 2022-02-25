@@ -38,6 +38,7 @@ const PdfImageUploader = (props: UploaderProps): JSX.Element => (
             </div>
             <ClearButton
               size={"small"}
+              iconSize={"small"}
               onClick={(e: React.MouseEvent<HTMLInputElement>) => {
                 e.preventDefault();
                 e.stopPropagation();

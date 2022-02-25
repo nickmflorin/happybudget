@@ -146,6 +146,7 @@ const Budget = (props: BudgetProps): JSX.Element => {
       </Switch>
       <BudgetPreviewModal
         open={previewModalVisible}
+        destroyOnClose={false}
         onCancel={() => setPreviewModalVisible(false)}
         budgetId={props.budgetId}
         budgetName={!isNil(budget) ? budget.name : `Sample Budget ${new Date().getFullYear()}`}

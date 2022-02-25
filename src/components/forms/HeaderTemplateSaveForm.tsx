@@ -126,6 +126,7 @@ const HeaderTemplateSaveForm = (
               />
               <ClearButton
                 size={"small"}
+                iconSize={"small"}
                 onClick={() => {
                   setError(null);
                   setRequestNameInput(false);
