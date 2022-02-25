@@ -34,7 +34,7 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
 					 onClick prop that AntD sets on the Button when it is nested in a
 					 Dropdown to persist. */
         onClick={isNil(action.wrapInDropdown) ? () => !isNil(action.onClick) && action.onClick() : props.onClick}
-        className={classNames("budget-table-menu", props.className)}
+        className={classNames("budget-table-menu", props.className, { active: action.active })}
         size={"medium"}
         disabled={action.disabled}
         icon={
@@ -62,7 +62,7 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
   } else {
     return (
       <IconButton
-        className={"green-hover budget-table-menu"}
+        className={classNames("green-hover budget-table-menu", { active: action.active })}
         size={"medium"}
         iconSize={"medium"}
         onClick={() => !isNil(action.onClick) && action.onClick()}

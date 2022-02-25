@@ -1040,6 +1040,7 @@ declare namespace Table {
     readonly label?: string;
     readonly isWriteOnly?: boolean;
     readonly location?: "right" | "left";
+    readonly active?: boolean;
     // If being wrapped in a Dropdown, the onClick prop will not be used.
     readonly onClick?: () => void;
     readonly wrapInDropdown?: (children: import("react").ReactChild | import("react").ReactChild[]) => JSX.Element;

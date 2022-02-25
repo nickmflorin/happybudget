@@ -2,7 +2,6 @@ import { isNil } from "lodash";
 
 import { util } from "lib";
 
-import { ShareButton } from "components/buttons";
 import { ExportCSVDropdownMenu, ToggleColumnsDropdownMenu, ShareDropdownMenu } from "components/dropdowns";
 import { ShareDropdownMenuProps } from "components/dropdowns/ShareDropdownMenu";
 
@@ -78,15 +77,11 @@ export const ShareAction = <B extends Model.PublicHttpModel, R extends Table.Row
     props = { ...props, publicToken };
   }
   return {
-    location: "right",
-    render: (params: Table.MenuActionRenderProps) => (
-      <ShareDropdownMenu {...props}>
-        <ShareButton
-          {...params}
-          className={"budget-table-menu"}
-          sharing={!isNil(publicToken) && !publicToken.is_expired}
-        />
-      </ShareDropdownMenu>
+    label: "Share",
+    icon: "cloud",
+    active: !isNil(publicToken) && !publicToken.is_expired,
+    wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => (
+      <ShareDropdownMenu {...props}>{children}</ShareDropdownMenu>
     )
   };
 };

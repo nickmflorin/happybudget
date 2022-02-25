@@ -17,4 +17,3 @@ export { default as DefaultButtonIconToggle } from "./DefaultButtonIconToggle";
 export { default as OrderingButtonIconToggle } from "./OrderingButtonIconToggle";
 export { default as IncludeButtonLink } from "./IncludeButtonLink";
 export { default as BareButton } from "./BareButton";
-export { default as ShareButton } from "./ShareButton";

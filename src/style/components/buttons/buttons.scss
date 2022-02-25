@@ -132,6 +132,11 @@
 
     &.budget-table-menu {
       @include bare_color_set($text-secondary, $green);
+
+			&.active {
+				@include color_set($white);
+				@include bg_color_set(lighten($green, 5%), $green);
+			}
     }
   }
 
