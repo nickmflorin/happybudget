@@ -107,11 +107,9 @@
   overflow-x: hidden;
 
   .slash {
-    padding-top: 10px;
-    padding-bottom: 10px;
     margin-left: 8px;
     margin-right: 8px;
-    line-height: 16px;
+    line-height: $large-size;
     font-family: $avenir;
     font-weight: 600;
     color: $text-primary;
@@ -126,9 +124,7 @@
     }
 
     .text-wrapper {
-      padding-top: 10px;
-      padding-bottom: 10px;
-      line-height: 16px;
+      line-height: $large-size;
       overflow: hidden;
       white-space: nowrap;
       font-size: $standard-text-size;;
@@ -155,9 +151,6 @@
       .text-wrapper {
         color: $green;
         font-size: 15px;
-        font-family: $avenir;
-        font-weight: 600;
-        line-height: 14px;
       }
       &:hover {
         .text-wrapper {
