@@ -1,4 +1,4 @@
-$modal-header-height: 72px;
+$modal-header-height: 64px;
 $modal-width: 90vw;
 
 /*
@@ -18,7 +18,7 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
 @mixin export_preview_landscape_modal_sizing($canvas-width) {
   $pdf-canvas-height: calc(1 / 0.70749 * #{$canvas-width});
 
-  $modal-height: calc(#{$pdf-canvas-height} + 6px + 36px + 10px + 70px + #{$modal-header-height});
+  $modal-height: calc(#{$pdf-canvas-height} + 6px + $standard-size + 10px + 70px + #{$modal-header-height});
   height: $modal-height !important;
 
   .ant-modal-header {
@@ -27,10 +27,10 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
 
   .ant-modal-content {
     .ant-modal-body {
-      padding: 36px;
+      padding: $standard-size;
       overflow-y: hidden;
       flex-direction: row;
-      height: calc(#{$pdf-canvas-height} + 6px + 36px + 10px + 70px) !important;
+      height: calc(#{$pdf-canvas-height} + 6px + $standard-size + 10px + 70px) !important;
 
       .export-form-container {
         overflow-y: scroll;
@@ -63,7 +63,7 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
       padding: 18px;
       overflow-y: scroll;
       flex-direction: column;
-      height: calc(#{$pdf-canvas-height} + 6px + 36px + 10px + 70px) !important;
+      height: calc(#{$pdf-canvas-height} + 6px + $standard-size + 10px + 70px) !important;
 
       .export-form-container {
         overflow-y: unset;

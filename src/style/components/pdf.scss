@@ -9,9 +9,9 @@
     width: 100%;
     // previewer-refresh needs to be a sibling of preview-content
     // in order to prevent scrolling when a pdf refresh is needed.
-    // The height would normally be calc(100% - 72px) but 82px is needed
+    // The height would normally be calc(100% - 64px) but 74px is needed
     // to account for the preview-content margin-bottom.
-    height: calc(100% - 82px);
+    height: calc(100% - 74px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -30,7 +30,7 @@
     border: 1px solid $gray-light;
     margin-bottom: 10px;
     overflow-y: scroll;
-    height: calc(100% - 72px);
+    height: calc(100% - 64px);
     width: 100% !important;
 
     .react-pdf__Document {
@@ -49,10 +49,10 @@
   }
 
   .preview-footer {
-    height: 72px;
+    height: 64px;
 
     .ant-pagination {
-      height: $large-size !important;
+      height: $standard-size !important;
       width: auto;
       text-align: center;
     }
