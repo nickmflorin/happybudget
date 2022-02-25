@@ -1,3 +1,4 @@
+import React from "react";
 import { FringesTable, connectTableToPublicStore } from "tabling";
 import GenericFringesModal from "components/modals/FringesModal";
 
@@ -26,20 +27,18 @@ interface FringesModalProps extends Pick<ModalProps, "open" | "onCancel"> {
   readonly table: NonNullRef<Table.TableInstance<Tables.FringeRowData, Model.Fringe>>;
 }
 
-const FringesModal: React.FC<FringesModalProps> = ({ id, budget, budgetId, open, parentType, table, onCancel }) => {
-  return (
-    <GenericFringesModal open={open} onCancel={onCancel}>
-      <ConnectedFringesTable
-        budget={budget}
-        domain={"budget"}
-        actionContext={{ budgetId, id }}
-        table={table}
-        selector={(si: Application.Store) =>
-          selectors.selectFringesStore(si, { parentType, domain: "budget", public: true })
-        }
-      />
-    </GenericFringesModal>
-  );
-};
+const FringesModal: React.FC<FringesModalProps> = ({ id, budget, budgetId, open, parentType, table, onCancel }) => (
+  <GenericFringesModal open={open} onCancel={onCancel}>
+    <ConnectedFringesTable
+      budget={budget}
+      domain={"budget"}
+      actionContext={{ budgetId, id }}
+      table={table}
+      selector={(si: Application.Store) =>
+        selectors.selectFringesStore(si, { parentType, domain: "budget", public: true })
+      }
+    />
+  </GenericFringesModal>
+);
 
-export default FringesModal;
+export default React.memo(FringesModal);
