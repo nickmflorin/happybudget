@@ -4,7 +4,7 @@ import { map } from "lodash";
 
 import { View } from "components/pdf";
 
-interface TableProps extends StandardPdfComponentProps {
+interface TableProps extends Pdf.StandardComponentProps {
   readonly generateRows: () => JSX.Element[];
 }
 

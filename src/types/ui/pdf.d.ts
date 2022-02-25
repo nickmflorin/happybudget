@@ -3,7 +3,20 @@ declare namespace Pdf {
 
   type Styles = import("@react-pdf/renderer").default.Styles;
 
-  type ExtensionStyle = ReactPdfStyle & { ext?: SingleOrArray<string>; fontFamily?: FontFamily };
+  type StandardComponentProps = {
+    readonly className?: string;
+    readonly style?: Pdf.Style | Pdf.Style[];
+    readonly debug?: boolean;
+    readonly children?: import("react").ReactNode;
+    readonly fixed?: boolean;
+    readonly wrap?: boolean;
+  };
+
+  type StandardTextComponentProps = Omit<StandardComponentProps, "style"> & {
+    readonly style?: Pdf.Style | Pdf.Style[] | import("@react-pdf/types").SVGPresentationAttributes;
+  };
+
+  type ExtensionStyle = Style & { ext?: SingleOrArray<string>; fontFamily?: Style.FontFamily };
 
   type ExtensionStyles = { [key: string]: ExtensionStyle };
 
@@ -34,7 +47,7 @@ declare namespace Pdf {
 
   type Font = {
     readonly src: string;
-    readonly fontWeight: FontWeight;
+    readonly fontWeight: Style.FontWeight;
     readonly fontStyle?: "italic";
   };
 
@@ -65,7 +78,7 @@ declare namespace Pdf {
     readonly onSuccess?: () => void;
   };
 
-  type NoDataDocumentProps = StandardPdfComponentProps & {
+  type NoDataDocumentProps = Pdf.StandardComponentProps & {
     readonly size?: import("@react-pdf/types").PageSize;
     readonly debug?: boolean;
     readonly text?: string | boolean;

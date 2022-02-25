@@ -4,16 +4,16 @@ declare type ILayoutRef = {
   readonly toggleSidebar: () => void;
 };
 
-declare interface ILazyBreadCrumbItem<P extends Record<string, unknown> = Record<string, unknown>> {
+declare type ILazyBreadCrumbItem<P extends Record<string, unknown> = Record<string, unknown>> = {
   readonly requiredParams: (keyof P)[];
   readonly func: (params: P) => IBreadCrumbItem | IBreadCrumbItem[];
-}
+};
 
 declare interface IBreadCrumbItem extends Omit<MenuItemModel, "render"> {
   readonly tooltip?: Tooltip;
   readonly options?: MenuItemModel[];
   readonly primary?: boolean;
-  readonly renderContent?: () => React.ReactChild;
+  readonly renderContent?: () => JSX.Element;
 }
 
 declare interface ISidebarItem {

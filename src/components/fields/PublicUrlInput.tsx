@@ -36,6 +36,7 @@ const PublicUrlInput = ({ urlFormatter, value, actions, onChange, ...props }: Pu
         <ShowHide show={includes(actions, "refresh")}>
           <IconButton
             size={"small"}
+            iconSize={"small"}
             icon={"refresh"}
             onClick={() => {
               const newV = uuidv4();
@@ -47,6 +48,7 @@ const PublicUrlInput = ({ urlFormatter, value, actions, onChange, ...props }: Pu
         <ShowHide show={includes(actions, "copy")}>
           <IconButton
             size={"small"}
+            iconSize={"small"}
             icon={"clipboard"}
             onClick={() =>
               util.clipboard.copyTextToClipboard(
@@ -60,7 +62,12 @@ const PublicUrlInput = ({ urlFormatter, value, actions, onChange, ...props }: Pu
           />
         </ShowHide>
         <ShowHide show={includes(actions, "visit")}>
-          <IconButton size={"small"} icon={"square-arrow-up-right"} onClick={() => history.push(urlFormatter(val))} />
+          <IconButton
+            size={"small"}
+            iconSize={"small"}
+            icon={"square-arrow-up-right"}
+            onClick={() => history.push(urlFormatter(val))}
+          />
         </ShowHide>
       </div>
     </div>

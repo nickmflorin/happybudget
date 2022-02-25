@@ -1,5 +1,5 @@
 declare type RootFormInstance<T> = import("antd/lib/form").FormInstance<T>;
-declare type RootFormProps = import("antd/lib/form").FormProps;
+declare type RootFormProps<T> = import("antd/lib/form").FormProps<T>;
 
 declare interface FormInstance<T> extends RootFormInstance<T>, UINotificationsManager {
   readonly setLoading: (value: boolean) => void;
@@ -14,7 +14,9 @@ declare interface FormInstance<T> extends RootFormInstance<T>, UINotificationsMa
 // The type of iterable passed to AntD's form.setFields([...])
 declare type FormField<M> = { readonly name: keyof M; readonly value: M[keyof M] };
 
-declare interface FormProps<T> extends Omit<RootFormProps, "style" | "id" | "className">, StandardComponentProps {
+declare interface FormProps<T>
+  extends Omit<RootFormProps<T>, "style" | "id" | "className" | "title">,
+    StandardComponentProps {
   readonly loading?: boolean;
   readonly form: FormInstance<T>;
   /* If it is a boolean, it will automatically focus the first field based on
@@ -48,7 +50,7 @@ declare type IExportFormRef<O extends ExportPdfFormOptions = ExportPdfFormOption
 
 declare type ExportBudgetPdfFormOptions = ExportPdfFormOptions & {
   readonly header: HeaderTemplateFormData;
-  readonly tables?: TableOption[] | null | undefined;
+  readonly tables?: PdfBudgetTable.TableOption[] | null | undefined;
   readonly notes?: string | null;
   readonly includeNotes: boolean;
 };

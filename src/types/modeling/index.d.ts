@@ -21,20 +21,20 @@ declare namespace Model {
     readonly type: T;
   };
 
-  type ModelLookup<M extends Model.Model> = M["id"] | ((m: M) => boolean);
+  type ModelLookup<M extends Model> = M["id"] | ((m: M) => boolean);
 
-  type OnModelMissingCallbackParams<M extends Model.Model> = {
+  type OnModelMissingCallbackParams<M extends Model> = {
     readonly ref: string;
     readonly lookup: ModelLookup<M>;
   };
 
-  type GetModelOptions<M extends Model.Model> = {
+  type GetModelOptions<M extends Model> = {
     readonly modelName?: string;
     readonly warnOnMissing?: boolean;
     readonly onMissing?: (params: OnModelMissingCallbackParams<M>) => void;
   };
 
-  type InferModelFromNameParams<M extends Model.Model> = Omit<GetModelOptions<M>, "onMissing"> & {
+  type InferModelFromNameParams<M extends Model> = Omit<GetModelOptions<M>, "onMissing"> & {
     readonly getName?: (m: M) => string | null | undefined;
     readonly caseInsensitive?: boolean;
   };
@@ -307,7 +307,7 @@ declare namespace Model {
     readonly date: string | null;
     readonly value: number | null;
     readonly owner: ActualOwner | null;
-    readonly budget: Model.SimpleBudget;
+    readonly budget: SimpleBudget;
   };
 
   type Actual = RowHttpModel<"actual"> & {

@@ -7,7 +7,7 @@ export type RowProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   V extends Table.RawRowValue = Table.RawRowValue
-> = StandardPdfComponentProps & {
+> = Pdf.StandardComponentProps & {
   readonly columns: Table.DataColumn<R, M, V>[];
   readonly columnIndent?: number;
   readonly columnIsVisible?: (c: Table.DataColumn<R, M, V>) => boolean;

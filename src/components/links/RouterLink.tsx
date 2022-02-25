@@ -12,10 +12,6 @@ export type RouterLinkProps = LinkProps &
     readonly dark?: boolean;
   };
 
-/**
- * A consistently styled react-router Link component that provides additional
- * functionality, like disabling, tooltips and icon inclusion.
- */
 const RouterLink = ({ className, children, tooltip, icon, disabled, dark, ...props }: RouterLinkProps): JSX.Element => {
   const [isHovered, setIsHovered] = useState(false);
   const prefix = ui.hooks.useClickableIcon(icon, { isHovered });

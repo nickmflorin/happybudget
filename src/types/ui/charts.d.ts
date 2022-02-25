@@ -8,10 +8,11 @@ declare namespace Charts {
 
   type ComputedDatum<D extends Datum> = import("@nivo/pie/dist/types").ComputedDatum<D>;
 
-  declare namespace BudgetTotal {
+  namespace BudgetTotal {
     type MetricId = "estimated" | "actual" | "variance";
 
-    type Metric = {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    type Metric<M = any> = {
       readonly label: string;
       readonly id: MetricId;
       readonly getValue: (obj: M, objs: Model.Account[]) => number;

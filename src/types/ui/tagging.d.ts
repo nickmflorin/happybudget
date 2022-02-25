@@ -6,19 +6,19 @@
  *
  * <MultipleTags tags={[{ text: "foo", color: "red" }]} />
  */
-declare interface ITag {
+declare type ITag = {
   readonly color?: Style.HexColor | undefined | null;
   readonly textColor?: Style.HexColor | undefined | null;
   readonly uppercase?: boolean;
   readonly text: string;
-}
+};
 
 declare type PluralityWithModel<M extends Model.Model = Model.Model> = {
   readonly isPlural?: boolean;
   readonly model: M;
 };
 
-declare interface ITagRenderParams<S extends React.CSSProperties | Pdf.Style = React.CSSProperties> {
+declare type ITagRenderParams<S extends React.CSSProperties | Pdf.Style = React.CSSProperties> = {
   readonly className: string | undefined;
   readonly textClassName: string | undefined;
   readonly style: S | undefined;
@@ -31,7 +31,7 @@ declare interface ITagRenderParams<S extends React.CSSProperties | Pdf.Style = R
   readonly contentRender: ((params: Omit<ITagRenderParams<S>, "contentRender">) => JSX.Element) | undefined;
   readonly onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   readonly disabled?: boolean;
-}
+};
 
 declare type TagProps<
   M extends Model.Model = Model.Model,
@@ -83,13 +83,13 @@ declare type MultipleTagsProps<M extends Model.Model = Model.Model> = StandardCo
   readonly onMissing?: JSX.Element | EmptyTagProps;
 };
 
-declare interface VisibleEmptyTagProps extends StandardComponentProps {
+declare type VisibleEmptyTagProps = StandardComponentProps & {
   readonly visible?: true;
   readonly text: string;
-}
+};
 
-declare interface InvisibleEmptyTagProps extends StandardComponentProps {
+declare type InvisibleEmptyTagProps = StandardComponentProps & {
   readonly visible: false;
-}
+};
 
 declare type EmptyTagProps = VisibleEmptyTagProps | InvisibleEmptyTagProps;

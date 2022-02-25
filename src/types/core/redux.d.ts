@@ -8,14 +8,6 @@ declare namespace Redux {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type ActionMap<C extends Table.Context = any> = Record<string, ActionCreator<any> | TableActionCreator<any, C>>;
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type InferActionPayload<A> = A extends Action<infer P, any>
-    ? P
-    : /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    A extends TableAction<infer P, any>
-    ? P
-    : never;
-
   type InferAction<CREATOR> = CREATOR extends TableActionCreator<infer P, infer C>
     ? TableAction<P, C>
     : CREATOR extends ActionCreator<infer P>

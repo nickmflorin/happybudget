@@ -136,7 +136,7 @@ declare namespace Http {
     readonly name?: Model.HeaderTemplate["name"];
     readonly header?: Model.HeaderTemplate["header"];
     readonly left_info?: Model.HeaderTemplate["left_info"];
-    readonly right_info?: PModel.HeaderTemplate["right_info"];
+    readonly right_info?: Model.HeaderTemplate["right_info"];
     readonly left_image?: string | ArrayBuffer | null;
     readonly right_image?: string | ArrayBuffer | null;
     readonly original?: number;

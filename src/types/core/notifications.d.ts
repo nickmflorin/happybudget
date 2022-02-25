@@ -64,15 +64,11 @@ declare type UIExistingNotification<T extends ExistingNotificationParams = Defau
   props: T
 ) => UINotificationData;
 
-declare type UIExistingNotifications = { [key in UIExistingNotificationId]: UIPresetNotification };
+declare type UIExistingNotifications = { [key in UIExistingNotificationId]: UIExistingNotification };
 
 declare type InferExistingNotificationParams<T> = T extends UIExistingNotification<infer P> ? P : never;
 
 declare type FieldWithErrors = { readonly name: string; readonly errors: string[] };
-
-declare type UINotification<L extends AppNotificationLevel = AppNotificationLevel> =
-  | TableNotification<L>
-  | FormNotification<L>;
 
 declare type InternalNotification = AppNotification<"error" | "warning"> & {
   readonly dispatchToSentry?: boolean;

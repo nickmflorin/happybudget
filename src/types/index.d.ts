@@ -12,7 +12,7 @@ declare module "@ckeditor/ckeditor5-react" {
   import { EditorConfig } from "@ckeditor/ckeditor5-core/src/editor/editorconfig";
   import * as React from "react";
 
-  declare type CKEditorProps = {
+  type CKEditorProps = {
     disabled?: boolean;
     editor: typeof BalloonEditor;
     data?: string;
@@ -30,14 +30,10 @@ declare module "@ckeditor/ckeditor5-react" {
 
 declare type ID = string | number;
 
-declare type FnWithTypedArgs<T, ARGS extends Array> = (...args: ARGS) => T;
-
-declare type NonNullable<T> = Exclude<T, null | undefined>;
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+declare type FnWithTypedArgs<T, ARGS extends any[]> = (...args: ARGS) => T;
 
 declare type SingleOrArray<T> = T | T[];
-
-declare type FlattenIfArray<T> = T extends (infer R)[] ? R : T;
-declare type ArrayIfSingle<T> = T extends Array ? T : T[];
 
 declare type NonNullRef<T> = {
   readonly current: T;

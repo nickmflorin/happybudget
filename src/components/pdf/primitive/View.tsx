@@ -1,11 +1,9 @@
-import { ReactNode } from "react";
+import { ComponentProps } from "react";
 import { View as ReactPDFView } from "@react-pdf/renderer";
 import createPdfComponent from "./createPdfComponent";
 
-export interface ViewProps extends StandardPdfComponentProps {
-  readonly render?: (params: { pageNumber: number; subPageNumber: number }) => ReactNode;
-}
+export type ViewProps = ComponentProps<typeof ReactPDFView> & { readonly className?: string };
 
-const View = createPdfComponent<ViewProps>(ReactPDFView);
+const View = createPdfComponent(ReactPDFView);
 
 export default View;

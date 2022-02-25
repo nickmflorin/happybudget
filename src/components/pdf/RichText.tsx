@@ -5,7 +5,7 @@ import { pdf } from "lib";
 import { View } from "./primitive";
 import { Text, Paragraph, Heading } from "./text";
 
-interface RichTextNodeProps extends StandardPdfComponentProps {
+interface RichTextNodeProps extends Pdf.StandardComponentProps {
   readonly node: Pdf.HTMLNode;
   readonly styles?: Pdf.FontStyleName[];
 }
@@ -64,7 +64,7 @@ const RichTextNode = ({ node, ...props }: RichTextNodeProps): JSX.Element => {
   }
 };
 
-interface RichTextProps extends StandardPdfComponentProps {
+interface RichTextProps extends Pdf.StandardComponentProps {
   readonly nodes: Pdf.HTMLNode[] | Pdf.HTMLNode;
 }
 

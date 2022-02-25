@@ -173,27 +173,29 @@ const Cell = <
               ),
               evaluateClassName<R, M, V>(props.textClassName, callbackParams)
             )}
-            style={{
-              /* NOTE: We do not differentiate between the text style and
+            style={
+              {
+                /* NOTE: We do not differentiate between the text style and
 								 overall style for column types, since these are also used for
 								 the AG Grid tables.  We need to figure out a way to
 								 differentiate between the two, because here - we are just
 								 assuming that the column type styling only applies to the
 								 text. */
-              ...(!isNil(props.column.dataType)
-                ? tabling.columns.getColumnTypeCSSStyle(props.column.dataType, {
-                    header: props.isHeader || false,
-                    pdf: true
-                  })
-                : ({} as Pdf.Style)),
-              ...evaluateOptionalCallbackProp<Pdf.Style, R, M, V>(
-                props.isHeader === true
-                  ? props.column.pdfHeaderCellProps?.textStyle
-                  : props.column.pdfCellProps?.textStyle,
-                callbackParams
-              ),
-              ...evaluateCellStyle<R, M, V>(props.textStyle, callbackParams)
-            }}
+                ...(!isNil(props.column.dataType)
+                  ? tabling.columns.getColumnTypeCSSStyle(props.column.dataType, {
+                      header: props.isHeader || false,
+                      pdf: true
+                    })
+                  : ({} as Pdf.Style)),
+                ...evaluateOptionalCallbackProp<Pdf.Style, R, M, V>(
+                  props.isHeader === true
+                    ? props.column.pdfHeaderCellProps?.textStyle
+                    : props.column.pdfCellProps?.textStyle,
+                  callbackParams
+                ),
+                ...evaluateCellStyle<R, M, V>(props.textStyle, callbackParams)
+              } as Pdf.Style
+            }
           >
             {props.value || ""}
           </Text>

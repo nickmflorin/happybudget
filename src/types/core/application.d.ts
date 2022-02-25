@@ -50,7 +50,10 @@ declare namespace Application {
   };
 
   interface ModuleConfig<
-    S extends AuthenticatedAnyModuleStore | PublicAnyModuleStore = AuthenticatedAnyModuleStore | PublicAnyModuleStore
+    S extends
+      | PublicModuleStores[keyof PublicModuleStores]
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      | AuthenticatedModuleStores[keyof AuthenticatedModuleStores] = any
   > {
     readonly rootSaga?: import("redux-saga").Saga;
     readonly rootReducer: Redux.Reducer<S>;

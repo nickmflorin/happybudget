@@ -18,12 +18,10 @@ const createModularApplicationState = <
     {} as S
   );
 
-const createPublicInitialState = (config: Application.StoreConfig): Application.PublicStore => {
-  return {
-    ...createModularApplicationState(filter(config.modules, (c: Application.ModuleConfig) => c.isPublic === true)),
-    tokenId: config.tokenId
-  };
-};
+const createPublicInitialState = (config: Application.StoreConfig): Application.PublicStore => ({
+  ...createModularApplicationState(filter(config.modules, (c: Application.ModuleConfig) => c.isPublic === true)),
+  tokenId: config.tokenId
+});
 
 const createApplicationInitialState = (config: Application.StoreConfig): Application.Store => ({
   ...createModularApplicationState(filter(config.modules, (c: Application.ModuleConfig) => c.isPublic !== true)),

@@ -3,9 +3,9 @@ import { isNil, includes } from "lodash";
 import { PrimitiveText } from "../primitive";
 import { TextProps as PrimitiveTextProps } from "../primitive/Text";
 
-export interface TextProps extends PrimitiveTextProps {
+export type TextProps = PrimitiveTextProps & {
   readonly styles?: Pdf.FontStyleName[];
-}
+};
 
 const Text = ({ styles, ...props }: TextProps): JSX.Element => (
   <PrimitiveText

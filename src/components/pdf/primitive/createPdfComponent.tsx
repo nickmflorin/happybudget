@@ -12,13 +12,15 @@ import { mergeStylesFromClassName } from "style/pdf";
  *     based on the present classNames.
  */
 export const createPdfComponent =
-  <P extends StandardPdfComponentProps = StandardPdfComponentProps>(
-    Component: React.ComponentType<Omit<P, "className">>
-  ): React.FC<P> =>
-  ({ className, ...props }: P): JSX.Element =>
+  <P extends Omit<Pdf.StandardComponentProps | Pdf.StandardTextComponentProps, "className">>(
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    Component: React.FunctionComponent<P> | React.ComponentClass<P, any>
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  ): React.FunctionComponent<P & { readonly className?: string }> =>
+  ({ className, ...props }: P & { readonly className?: string }): JSX.Element =>
     (
       <Component
-        {...(props as Omit<P, "className">)}
+        {...(props as P)}
         debug={props.debug}
         style={{ ...mergeStylesFromClassName(className), ...props.style }}
       />

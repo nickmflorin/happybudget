@@ -30,7 +30,7 @@ const getColor = (obj: M, index: number) =>
 const getLabel = (obj: M) => (budgeting.typeguards.isGroup(obj) ? obj.name : obj.description || obj.identifier || "");
 const getId = (obj: M) => `${obj.type}-${obj.id}`;
 
-const Metrics: Charts.BudgetTotal.Metric[] = [
+const Metrics: Charts.BudgetTotal.Metric<M>[] = [
   {
     label: "Estimated",
     id: "estimated",
@@ -49,7 +49,7 @@ const Metrics: Charts.BudgetTotal.Metric[] = [
 ];
 
 const getMetricValue = (id: Charts.BudgetTotal.MetricId, obj: M, objs: Model.Account[]): number => {
-  const metric = find(Metrics, { id }) as Charts.BudgetTotal.Metric;
+  const metric = find(Metrics, { id }) as Charts.BudgetTotal.Metric<M>;
   return metric.getValue(obj, objs);
 };
 

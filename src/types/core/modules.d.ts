@@ -11,7 +11,7 @@ declare namespace Modules {
     readonly table: Tables.SubAccountTableStore;
   };
 
-  declare namespace Template {
+  namespace Template {
     interface Store {
       readonly detail: Redux.ModelDetailResponseStore<Model.Template>;
       readonly subaccount: SubAccountStore;
@@ -20,7 +20,7 @@ declare namespace Modules {
     }
   }
 
-  declare namespace Budget {
+  namespace Budget {
     interface HeaderTemplatesStore extends Redux.AuthenticatedModelListResponseStore<Model.HeaderTemplate> {
       readonly displayedTemplate: Model.HeaderTemplate | null;
       readonly loadingDetail: boolean;
@@ -45,7 +45,7 @@ declare namespace Modules {
     }
   }
 
-  declare namespace Dashboard {
+  namespace Dashboard {
     interface Store {
       readonly budgets: Redux.AuthenticatedModelListResponseStore<Model.SimpleBudget>;
       readonly templates: Redux.AuthenticatedModelListResponseStore<Model.SimpleTemplate>;
@@ -54,7 +54,7 @@ declare namespace Modules {
     }
   }
 
-  declare namespace PublicBudget {
+  namespace PublicBudget {
     interface Store {
       readonly detail: Redux.ModelDetailResponseStore<Model.Budget>;
       readonly subaccount: SubAccountStore;

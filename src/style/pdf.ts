@@ -210,6 +210,7 @@ const TableStyles: Pdf.ExtensionStyles = {
   table: {
     /* Note: react-pdf does not "support" display: table, even though it works
 			 fine, their TS bindings disallow it. */
+    /* @ts-ignore-next-line */
     display: "table",
     width: "auto",
     backgroundColor: "white",
