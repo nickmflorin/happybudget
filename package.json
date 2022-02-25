@@ -6,9 +6,7 @@
     "@ag-grid-community/core": "~26.1.0",
     "@ag-grid-community/react": "~26.1.0",
     "@ag-grid-enterprise/all-modules": "~26.1.0",
-    "@ag-grid-enterprise/charts": "~26.1.0",
     "@ag-grid-enterprise/clipboard": "~26.1.0",
-    "@ag-grid-enterprise/excel-export": "~26.1.0",
     "@ag-grid-enterprise/menu": "~26.1.0",
     "@ag-grid-enterprise/range-selection": "~26.1.0",
     "@ckeditor/ckeditor5-build-balloon": "^30.0.0",
@@ -32,8 +30,6 @@
     "@sentry/react": "^6.13.3",
     "@sentry/rrweb": "^0.3.1",
     "@sentry/tracing": "^6.13.3",
-    "@stripe/react-stripe-js": "^1.6.0",
-    "@stripe/stripe-js": "^1.21.1",
     "ag-grid-community": "~26.1.0",
     "ag-grid-enterprise": "~26.1.0",
     "ag-grid-react": "~26.1.0",
@@ -50,7 +46,6 @@
     "lodash": "^4.17.21",
     "mime": "^2.5.2",
     "moment-timezone": "^0.5.33",
-    "node-html-parser": "^5.0.0",
     "react": "^17.0.1",
     "react-click-away-listener": "^2.0.0",
     "react-datepicker": "^4.2.1",
@@ -72,7 +67,6 @@
     "sass": "^1.32.8",
     "universal-cookie": "^4.0.4",
     "url-join": "^4.0.1",
-    "utility-types": "^3.10.0",
     "uuid": "^8.3.2",
     "web-vitals": "^1.1.0"
   },
@@ -122,7 +116,8 @@
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "prettier": "^2.5.1",
-    "typescript": "4.5.5"
+    "typescript": "4.5.5",
+    "utility-types": "^3.10.0"
   },
   "typings": "./src/types/index.d.ts",
   "resolutions": {
