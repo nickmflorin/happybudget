@@ -5,14 +5,12 @@ interface DeleteBudgetModalProps extends ModalProps {
   readonly budget: Model.Budget | Model.SimpleBudget;
 }
 
-function DeleteBudgetModal({ budget, ...props }: DeleteBudgetModalProps): JSX.Element {
-  return (
-    <DeleteModal {...props} title={"Delete Budget"}>
-      <Notification level={"warning"} message={`You are about to delete your ${budget?.name} budget.`}>
-        {"This action is not recoverable, the data will be permanently erased."}
-      </Notification>
-    </DeleteModal>
-  );
-}
+const DeleteBudgetModal = ({ budget, ...props }: DeleteBudgetModalProps): JSX.Element => (
+  <DeleteModal {...props} title={"Delete Budget"}>
+    <Notification level={"warning"} message={`You are about to delete your ${budget?.name} budget.`}>
+      {"This action is not recoverable, the data will be permanently erased."}
+    </Notification>
+  </DeleteModal>
+);
 
 export default DeleteBudgetModal;
