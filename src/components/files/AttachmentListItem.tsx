@@ -36,6 +36,7 @@ const AttachmentListItem = ({ attachment, deleting, onClick, onError, ...props }
           <IconButton
             disabled={downloading}
             loading={downloading}
+            iconSize={"medium"}
             onClick={() => {
               setDownloading(true);
               util.files
@@ -58,7 +59,7 @@ const AttachmentListItem = ({ attachment, deleting, onClick, onError, ...props }
           />
         </div>
         <div className={"button-action-wrapper"}>
-          <TrashButton loading={deleting} disabled={deleting} onClick={() => onClick?.()} />
+          <TrashButton iconSize={"medium"} loading={deleting} disabled={deleting} onClick={() => onClick?.()} />
         </div>
       </div>
     </div>
