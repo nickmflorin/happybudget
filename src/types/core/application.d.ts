@@ -42,7 +42,6 @@ declare namespace Application {
 
   type Store = AuthenticatedModuleStores & {
     readonly loading: boolean;
-    readonly router: import("connected-react-router").RouterState<import("history").LocationState>;
     readonly user: Model.User | null;
     readonly contacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
     readonly filteredContacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
@@ -63,7 +62,6 @@ declare namespace Application {
   type StoreConfig = {
     readonly tokenId: string | null;
     readonly user: Model.User | null;
-    readonly history: import("history").History;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     readonly modules: ModuleConfig<any>[];
   };

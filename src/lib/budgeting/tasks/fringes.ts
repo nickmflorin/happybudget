@@ -4,8 +4,7 @@ import { map, filter, intersection, reduce } from "lodash";
 import { createSelector } from "reselect";
 
 import * as api from "api";
-import { tabling, budgeting } from "lib";
-import { initialFringesState, initialSubAccountsTableState } from "app/Budgeting/store/initialState";
+import { tabling } from "lib";
 
 type R = Tables.FringeRowData;
 type M = Model.Fringe;
@@ -18,10 +17,8 @@ export type FringesTableActionMap<B extends Model.Template | Model.Budget> = Red
   Tables.FringeTableContext
 > & {
   readonly loadingBudget: Redux.ActionCreator<boolean>;
-  readonly requestAccount: Redux.ActionCreator<number>;
-  readonly requestAccountTableData: Redux.TableActionCreator<Redux.TableRequestPayload, Tables.FringeTableContext>;
-  readonly requestSubAccount: Redux.ActionCreator<number>;
-  readonly requestSubAccountTableData: Redux.TableActionCreator<Redux.TableRequestPayload, Tables.FringeTableContext>;
+  readonly requestParent: Redux.ActionCreator<number>;
+  readonly requestParentTableData: Redux.TableActionCreator<Redux.TableRequestPayload, Tables.SubAccountTableContext>;
   readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateActionPayload<B>>;
 };
 
@@ -31,45 +28,15 @@ export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Ta
   Tables.FringeTableContext,
   FringesTableActionMap<B>
 > & {
-  readonly selectAccountTableStore: (state: Application.Store) => Tables.SubAccountTableStore;
-  readonly selectSubAccountTableStore: (state: Application.Store) => Tables.SubAccountTableStore;
+  readonly selectParentTableStore: (state: Application.Store) => Tables.SubAccountTableStore;
 };
 
 export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   config: FringesTableTaskConfig<B>
 ): Omit<Redux.AuthenticatedTableTaskMap<R, M, Tables.FringeTableContext>, "request"> => {
-  const selectPath = (s: Application.Store) => s.router.location.pathname;
-
   const selectTableStore = createSelector(
-    [selectPath, config.selectAccountTableStore, config.selectSubAccountTableStore],
-    (
-      path: string,
-      acountTableStore: Tables.SubAccountTableStore,
-      subaccountTableStore: Tables.SubAccountTableStore
-    ) => {
-      if (budgeting.urls.isAccountUrl(path)) {
-        return acountTableStore.fringes;
-      } else if (budgeting.urls.isSubAccountUrl(path)) {
-        return subaccountTableStore.fringes;
-      }
-      return initialFringesState;
-    }
-  );
-
-  const selectSubAccountsStore = createSelector(
-    [selectPath, config.selectAccountTableStore, config.selectSubAccountTableStore],
-    (
-      path: string,
-      acountTableStore: Tables.SubAccountTableStore,
-      subaccountTableStore: Tables.SubAccountTableStore
-    ) => {
-      if (budgeting.urls.isAccountUrl(path)) {
-        return acountTableStore;
-      } else if (budgeting.urls.isSubAccountUrl(path)) {
-        return subaccountTableStore;
-      }
-      return initialSubAccountsTableState;
-    }
+    config.selectParentTableStore,
+    (tableStore: Tables.SubAccountTableStore) => tableStore.fringes
   );
 
   const bulkCreateTask: (e: Table.RowAddEvent<R>, ctx: CTX) => SagaIterator = tabling.tasks.createBulkTask({
@@ -109,7 +76,6 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         requestPayload
       );
       yield put(config.actions.updateBudgetInState({ id: response.parent.id, data: response.parent as B }));
-      const path = yield select((s: Application.Store) => s.router.location.pathname);
 
       const FRINGE_QUANTITATIVE_FIELDS: (keyof Http.FringePayload)[] = ["cutoff", "rate", "unit"];
 
@@ -132,31 +98,20 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         []
       );
       if (fringeIds.length !== 0) {
-        const subaccounts = yield select(selectSubAccountsStore);
+        const subaccounts = yield select(config.selectParentTableStore);
         const subaccountsWithFringesChanged: Table.ModelRow<Tables.SubAccountRowData>[] = filter(
           filter(subaccounts.data, (r: Tables.SubAccountRow) => tabling.typeguards.isModelRow(r)),
           (r: Tables.SubAccountRow) => intersection(r.data.fringes, fringeIds).length !== 0
         ) as Table.ModelRow<Tables.SubAccountRowData>[];
         if (subaccountsWithFringesChanged.length !== 0) {
-          if (budgeting.urls.isAccountUrl(path)) {
-            yield put(
-              config.actions.requestAccountTableData(
-                { ids: map(subaccountsWithFringesChanged, (r: Table.ModelRow<Tables.SubAccountRowData>) => r.id) },
-                ctx
-              )
-            );
-            // We also need to update the overall Account or SubAccount.
-            yield put(config.actions.requestAccount(ctx.id));
-          } else if (budgeting.urls.isSubAccountUrl(path)) {
-            yield put(
-              config.actions.requestSubAccountTableData(
-                { ids: map(subaccountsWithFringesChanged, (r: Table.ModelRow<Tables.SubAccountRowData>) => r.id) },
-                ctx
-              )
-            );
-            // We also need to update the overall Account or SubAccount.
-            yield put(config.actions.requestSubAccount(ctx.id));
-          }
+          yield put(
+            config.actions.requestParentTableData(
+              { ids: map(subaccountsWithFringesChanged, (r: Table.ModelRow<Tables.SubAccountRowData>) => r.id) },
+              ctx
+            )
+          );
+          // We also need to update the overall Account or SubAccount.
+          yield put(config.actions.requestParent(ctx.id));
         }
       }
     } catch (err: unknown) {

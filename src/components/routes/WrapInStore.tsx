@@ -1,8 +1,7 @@
 import React, { ReactNode, useEffect, useState, useMemo } from "react";
 import { Store } from "redux";
 import { Provider } from "react-redux";
-import { Redirect, useParams, useLocation } from "react-router-dom";
-import { ConnectedRouter } from "connected-react-router";
+import { Redirect, useParams, useLocation, useHistory } from "react-router-dom";
 import * as Sentry from "@sentry/browser";
 import axios, { CancelToken } from "axios";
 import { isNil } from "lodash";
@@ -10,7 +9,7 @@ import { isNil } from "lodash";
 import * as api from "api";
 import { notifications, users } from "lib";
 import { ApplicationSpinner, ConnectedApplicationSpinner } from "components";
-import { configure, history } from "store";
+import { configure } from "store";
 
 type UrlParams = Record<string, string> & { tokenId: string };
 
@@ -102,6 +101,7 @@ const WrapInStore = (props: WrapInStoreProps & { readonly children: ReactNode })
      the user because we already have access to the validated user before we
      redirect into the app */
   const location = useLocation<{ readonly validatedUser?: Model.User | undefined | null } | undefined>();
+  const history = useHistory();
 
   const validatedUser = useMemo(() => location.state?.validatedUser || null, [location.state?.validatedUser]);
 
@@ -223,7 +223,7 @@ const WrapInStore = (props: WrapInStoreProps & { readonly children: ReactNode })
       <Provider store={reduxStore}>
         <React.Fragment>
           <ConnectedApplicationSpinner />
-          <ConnectedRouter history={history}>{props.children}</ConnectedRouter>
+          {props.children}
         </React.Fragment>
       </Provider>
     );

@@ -1,10 +1,12 @@
 import ReactDOM from "react-dom";
+import { createBrowserHistory, History } from "history";
 
 import "style/index.scss";
 
 import App from "./app";
 import configureApplication from "./config";
-import { history } from "./store";
+
+const history: History<unknown> = createBrowserHistory();
 
 /*
 Note:

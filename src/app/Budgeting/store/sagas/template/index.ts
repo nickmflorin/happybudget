@@ -14,10 +14,6 @@ export * as account from "./account";
 export * as subAccount from "./subAccount";
 
 const FringesActionMap = {
-  requestAccount: actions.account.requestAccountAction,
-  requestSubAccount: actions.subAccount.requestSubAccountAction,
-  requestAccountTableData: actions.account.requestAction,
-  requestSubAccountTableData: actions.subAccount.requestAction,
   tableChanged: actions.handleFringesTableChangeEventAction,
   loading: actions.loadingFringesAction,
   response: actions.responseFringesAction,
@@ -40,14 +36,27 @@ function* getBudgetTask(action: Redux.Action<number>): SagaIterator {
   }
 }
 
-export const createFringesTableSaga = (table: Table.TableInstance<Tables.FringeRowData, Model.Fringe>) =>
+export const createFringesTableSaga = (
+  table: Table.TableInstance<Tables.FringeRowData, Model.Fringe>,
+  parentType: "account" | "subaccount"
+) =>
   tabling.sagas.createAuthenticatedTableSaga<Tables.FringeRowData, Model.Fringe, Tables.FringeTableContext>({
     actions: FringesActionMap,
     tasks: budgeting.tasks.fringes.createTableTaskSet<Model.Template>({
       table,
-      selectAccountTableStore: (state: Application.Store) => state.template.account.table,
-      selectSubAccountTableStore: (state: Application.Store) => state.template.subaccount.table,
-      actions: FringesActionMap
+      selectParentTableStore: (state: Application.Store) => state.template[parentType].table,
+      actions:
+        parentType === "account"
+          ? {
+              ...FringesActionMap,
+              requestParentTableData: actions.account.requestAction,
+              requestParent: actions.account.requestAccountAction
+            }
+          : {
+              ...FringesActionMap,
+              requestParentTableData: actions.subAccount.requestAction,
+              requestParent: actions.subAccount.requestSubAccountAction
+            }
     })
   });
 

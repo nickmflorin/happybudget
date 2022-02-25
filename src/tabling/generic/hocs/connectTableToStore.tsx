@@ -25,6 +25,7 @@ export type ConnectTableProps<
   readonly actionContext: C;
   readonly table: NonNullRef<Table.TableInstance<R, M>>;
   readonly selector?: (s: Application.Store) => S;
+  readonly createSaga?: (t: Table.TableInstance<R, M>) => import("redux-saga").Saga;
 };
 
 export type StoreConfig<R extends Table.RowData, M extends Model.RowHttpModel, S extends Redux.TableStore<R>> = {
@@ -36,6 +37,10 @@ export type StoreConfig<R extends Table.RowData, M extends Model.RowHttpModel, S
 		 where the selector depends on props of the parent component and needs
 		 to be passed in as a prop to the connected component. */
   readonly selector?: (s: Application.Store) => S;
+  /* The saga factory can either be passed in as a configuration or in the
+	   props.  The preference is as a configuration, but there are cases where the
+		 factory depends on props of the parent component and needs to be passed in
+		 as a prop to the connected component. */
   readonly createSaga?: (t: Table.TableInstance<R, M>) => import("redux-saga").Saga;
 };
 
@@ -90,10 +95,11 @@ const connectTableToStore =
 				 multiple Sagas being created for a given table... which means every
 				 action will make multiple requests to the backend API. */
       useEffect(() => {
-        if (!isNil(config.createSaga)) {
+        const createSaga = config.createSaga || props.createSaga;
+        if (!isNil(createSaga)) {
           if (sagaInjected.current === false) {
             if (!store.hasSaga(`${config.tableId}-saga`)) {
-              const saga = config.createSaga(props.table.current);
+              const saga = createSaga(props.table.current);
               store.injectSaga(`${config.tableId}-saga`, saga);
             }
             sagaInjected.current = true;

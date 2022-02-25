@@ -1,5 +1,4 @@
 import { combineReducers, CombinedState } from "redux";
-import { connectRouter } from "connected-react-router";
 
 import { isNil, reduce, filter } from "lodash";
 import { redux } from "lib";
@@ -63,7 +62,6 @@ const createPublicApplicationReducer = (
 const createApplicationReducer = (config: Application.StoreConfig): Redux.Reducer<CombinedState<Application.Store>> =>
   combineReducers({
     ...createModularApplicationReducer(filter(config.modules, (c: Application.ModuleConfig) => c.isPublic !== true)),
-    router: connectRouter(config.history),
     public: createPublicApplicationReducer(config),
     contacts: redux.reducers.createAuthenticatedModelListResponseReducer<
       Model.Contact,

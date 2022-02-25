@@ -16,9 +16,7 @@ const ConnectedFringesTable = connectTableToAuthenticatedStore<
     response: actions.template.responseFringesAction,
     setSearch: actions.template.setFringesSearchAction
   },
-  tableId: "template-fringes",
-  createSaga: (table: Table.TableInstance<Tables.FringeRowData, Model.Fringe>) =>
-    sagas.template.createFringesTableSaga(table)
+  tableId: "template-fringes"
 })(FringesTable.AuthenticatedTable);
 
 interface FringesModalProps extends Pick<ModalProps, "open" | "onCancel"> {
@@ -38,6 +36,9 @@ const FringesModal: React.FC<FringesModalProps> = ({ id, budget, budgetId, open,
         actionContext={{ budgetId, id }}
         table={table}
         selector={(si: Application.Store) => selectors.selectFringesStore(si, { parentType, domain: "budget" })}
+        createSaga={(t: Table.TableInstance<Tables.FringeRowData, Model.Fringe>) =>
+          sagas.budget.createFringesTableSaga(t, parentType)
+        }
       />
     </GenericFringesModal>
   );

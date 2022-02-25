@@ -1,5 +1,4 @@
 import { reduce, filter } from "lodash";
-import { RouterState } from "connected-react-router";
 
 import { redux } from "lib";
 
@@ -33,11 +32,7 @@ const createApplicationInitialState = (config: Application.StoreConfig): Applica
   contacts: redux.initialState.initialAuthenticatedModelListResponseState,
   filteredContacts: redux.initialState.initialAuthenticatedModelListResponseState,
   productPermissionModalOpen: false,
-  public: createPublicInitialState(config),
-  router: {
-    location: config.history.location,
-    action: config.history.action
-  } as RouterState
+  public: createPublicInitialState(config)
 });
 
 export default createApplicationInitialState;
