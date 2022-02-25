@@ -11,21 +11,19 @@ type ProductProps = StandardComponentProps & {
   readonly onClick?: () => void;
 };
 
-const Product = ({ onClick, product, extra, hoverBehavior, ...props }: ProductProps): JSX.Element => {
-  return (
-    <div
-      {...props}
-      className={classNames("product", props.className, { "highlight-on-hover": hoverBehavior !== false })}
-      onClick={onClick}
-    >
-      <ProductImage product={product} wrapperStyle={{ height: 36, width: 36 }} />
-      <div className={"product-detail"}>
-        <h4>{product.name}</h4>
-        <p className={"product-description"}>{product.description}</p>
-      </div>
-      {!isNil(extra) && <div className={"product-extra"}>{extra}</div>}
+const Product = ({ onClick, product, extra, hoverBehavior, ...props }: ProductProps): JSX.Element => (
+  <div
+    {...props}
+    className={classNames("product", props.className, { "highlight-on-hover": hoverBehavior !== false })}
+    onClick={onClick}
+  >
+    <ProductImage product={product} wrapperStyle={{ height: 36, width: 36 }} />
+    <div className={"product-detail"}>
+      <h4>{product.name}</h4>
+      <p className={"product-description"}>{product.description}</p>
     </div>
-  );
-};
+    {!isNil(extra) && <div className={"product-extra"}>{extra}</div>}
+  </div>
+);
 
 export default React.memo(Product);

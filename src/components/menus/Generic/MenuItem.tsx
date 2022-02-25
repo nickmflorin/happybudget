@@ -16,7 +16,7 @@ interface MenuItemContentProps {
   readonly checked?: boolean;
 }
 
-const MenuItemContent = (props: MenuItemContentProps): JSX.Element => {
+const MenuItemContent = React.memo((props: MenuItemContentProps): JSX.Element => {
   return (
     <React.Fragment>
       {props.checkbox && <Checkbox checked={props.checked} />}
@@ -36,7 +36,7 @@ const MenuItemContent = (props: MenuItemContentProps): JSX.Element => {
       </div>
     </React.Fragment>
   );
-};
+});
 
 const PrivateCommonMenuItem = <
   S extends Record<string, unknown> = MenuItemSelectedState,

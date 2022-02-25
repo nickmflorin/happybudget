@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
@@ -52,4 +52,4 @@ const ColorIcon = ({
   return <></>;
 };
 
-export default ColorIcon;
+export default React.memo(ColorIcon);

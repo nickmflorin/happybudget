@@ -20,4 +20,4 @@ const FieldError: React.FC<FieldErrorProps> = props => {
   return <></>;
 };
 
-export default FieldError;
+export default React.memo(FieldError);

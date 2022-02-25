@@ -311,4 +311,4 @@ const TemplateEmptyIcon = (): JSX.Element => {
   );
 };
 
-export default TemplateEmptyIcon;
+export default React.memo(TemplateEmptyIcon);

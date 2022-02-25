@@ -5,8 +5,8 @@ type TextWithIncludedLinkProps = {
   readonly children: string | undefined;
 };
 
-const TextWithIncludedLink = (props: TextWithIncludedLinkProps): JSX.Element => {
-  return props.children !== undefined ? (
+const TextWithIncludedLink = (props: TextWithIncludedLinkProps): JSX.Element =>
+  props.children !== undefined ? (
     <span className={"text-with-included-link"}>
       {props.children}
       <IncludeButtonLink style={{ marginLeft: 6 }} includeLink={props.includeLink} />
@@ -14,6 +14,5 @@ const TextWithIncludedLink = (props: TextWithIncludedLinkProps): JSX.Element => 
   ) : (
     <span></span>
   );
-};
 
 export default TextWithIncludedLink;

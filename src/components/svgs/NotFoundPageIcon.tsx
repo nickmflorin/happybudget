@@ -657,4 +657,4 @@ const NotFoundPageIcon = (): JSX.Element => {
   );
 };
 
-export default NotFoundPageIcon;
+export default React.memo(NotFoundPageIcon);

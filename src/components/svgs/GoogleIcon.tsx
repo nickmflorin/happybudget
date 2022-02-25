@@ -35,4 +35,4 @@ const GoogleIcon = (): JSX.Element => {
   );
 };
 
-export default GoogleIcon;
+export default React.memo(GoogleIcon);

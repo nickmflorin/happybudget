@@ -220,10 +220,4 @@ const Tag = <M extends Model.Model = Model.Model, S extends React.CSSProperties 
   );
 };
 
-type MemoizedTagType = {
-  <M extends Model.Model = Model.Model, S extends React.CSSProperties | Pdf.Style = React.CSSProperties>(
-    props: TagProps<M, S>
-  ): JSX.Element;
-};
-
-export default React.memo(Tag) as MemoizedTagType;
+export default React.memo(Tag) as typeof Tag;

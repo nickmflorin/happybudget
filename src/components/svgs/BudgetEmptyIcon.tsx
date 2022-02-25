@@ -269,4 +269,4 @@ const BudgetEmptyIcon = (): JSX.Element => {
   );
 };
 
-export default BudgetEmptyIcon;
+export default React.memo(BudgetEmptyIcon);

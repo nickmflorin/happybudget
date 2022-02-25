@@ -19,19 +19,17 @@ const FormItem = ({
   verticalLayoutOverride,
   dataType,
   ...props
-}: FormItemProps): JSX.Element => {
-  return (
-    <AntdForm.Item
-      {...props}
-      className={classNames("form-item", props.className, {
-        "horizontal-layout-override": horizontalLayoutOverride,
-        "vertical-layout-override": verticalLayoutOverride
-      })}
-      label={!isNil(props.label) ? <FormLabelContent dataType={dataType}>{props.label}</FormLabelContent> : undefined}
-    >
-      {props.children}
-    </AntdForm.Item>
-  );
-};
+}: FormItemProps): JSX.Element => (
+  <AntdForm.Item
+    {...props}
+    className={classNames("form-item", props.className, {
+      "horizontal-layout-override": horizontalLayoutOverride,
+      "vertical-layout-override": verticalLayoutOverride
+    })}
+    label={!isNil(props.label) ? <FormLabelContent dataType={dataType}>{props.label}</FormLabelContent> : undefined}
+  >
+    {props.children}
+  </AntdForm.Item>
+);
 
 export default FormItem;

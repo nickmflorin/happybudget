@@ -13,4 +13,4 @@ const RenderOrSpinner = ({ children, loading, ...props }: RenderOrSpinnerProps):
   return <React.Fragment>{children}</React.Fragment>;
 };
 
-export default RenderOrSpinner;
+export default React.memo(RenderOrSpinner);

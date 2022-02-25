@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 
 import { EntityText } from "components/typography";
@@ -12,26 +13,24 @@ export type ActualOwnersMenuProps = Omit<
   readonly search: string;
 };
 
-const ActualOwnersMenu = (props: ActualOwnersMenuProps) => {
-  return (
-    <TableModelMenu<Model.ActualOwner>
-      {...props}
-      className={classNames("actual-owner-menu", props.className)}
-      getModelIdentifier={(m: Model.ActualOwner) => `${m.type}-${m.id}`}
-      onChange={(e: MenuChangeEvent<MenuItemSelectedState, Model.ActualOwner>) => props.onChange(e.model, e.event)}
-      itemProps={{ className: "actual-owner-menu-item" }}
-      searchIndices={["description", "identifier"]}
-      clientSearching={false}
-      extra={[
-        {
-          id: "no-data",
-          label: "No Sub-Accounts, Details or Markups",
-          showOnNoData: true
-        }
-      ]}
-      renderItemContent={(model: Model.ActualOwner) => <EntityText fillEmpty={"---------"}>{model}</EntityText>}
-    />
-  );
-};
+const ActualOwnersMenu = (props: ActualOwnersMenuProps) => (
+  <TableModelMenu<Model.ActualOwner>
+    {...props}
+    className={classNames("actual-owner-menu", props.className)}
+    getModelIdentifier={(m: Model.ActualOwner) => `${m.type}-${m.id}`}
+    onChange={(e: MenuChangeEvent<MenuItemSelectedState, Model.ActualOwner>) => props.onChange(e.model, e.event)}
+    itemProps={{ className: "actual-owner-menu-item" }}
+    searchIndices={["description", "identifier"]}
+    clientSearching={false}
+    extra={[
+      {
+        id: "no-data",
+        label: "No Sub-Accounts, Details or Markups",
+        showOnNoData: true
+      }
+    ]}
+    renderItemContent={(model: Model.ActualOwner) => <EntityText fillEmpty={"---------"}>{model}</EntityText>}
+  />
+);
 
-export default ActualOwnersMenu;
+export default React.memo(ActualOwnersMenu);

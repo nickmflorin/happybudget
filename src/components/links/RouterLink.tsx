@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, LinkProps } from "react-router-dom";
 import classNames from "classnames";
 import { isNil } from "lodash";
@@ -39,4 +39,4 @@ const RouterLink = ({ className, children, tooltip, icon, disabled, dark, ...pro
   );
 };
 
-export default RouterLink;
+export default React.memo(RouterLink);

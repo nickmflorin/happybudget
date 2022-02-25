@@ -21,41 +21,39 @@ const RecoverPasswordForm: React.FC<RecoverPasswordFormProps> = ({
   loading,
   onSubmit,
   ...props
-}: RecoverPasswordFormProps): JSX.Element => {
-  return (
-    <Form.Form
-      {...props}
-      className={classNames("landing-form", props.className)}
-      onFinish={(values: IRecoverPasswordFormValues) => onSubmit(values)}
-    >
-      <Form.Item
-        name={"email"}
-        rules={[
-          { required: true, message: "Please enter a valid email." },
-          () => ({
-            validateTrigger: "onSubmit",
-            validator(rule: unknown, value: string) {
-              if (value !== "" && !util.validate.validateEmail(value)) {
-                return Promise.reject("The email does not meet our requirements.");
-              }
-              return Promise.resolve();
+}: RecoverPasswordFormProps): JSX.Element => (
+  <Form.Form
+    {...props}
+    className={classNames("landing-form", props.className)}
+    onFinish={(values: IRecoverPasswordFormValues) => onSubmit(values)}
+  >
+    <Form.Item
+      name={"email"}
+      rules={[
+        { required: true, message: "Please enter a valid email." },
+        () => ({
+          validateTrigger: "onSubmit",
+          validator(rule: unknown, value: string) {
+            if (value !== "" && !util.validate.validateEmail(value)) {
+              return Promise.reject("The email does not meet our requirements.");
             }
-          })
-        ]}
-      >
-        <EmailInput size={"large"} />
-      </Form.Item>
-      <Form.Footer>
-        <PrimaryButton loading={loading} xlarge={true} className={"btn--landing"} htmlType={"submit"}>
-          {"Submit"}
-        </PrimaryButton>
-        <div className={"switch-text"}>
-          {"Back to"}
-          <RouterLink to={"/login"}>{"Log In"}</RouterLink>
-        </div>
-      </Form.Footer>
-    </Form.Form>
-  );
-};
+            return Promise.resolve();
+          }
+        })
+      ]}
+    >
+      <EmailInput size={"large"} />
+    </Form.Item>
+    <Form.Footer>
+      <PrimaryButton loading={loading} xlarge={true} className={"btn--landing"} htmlType={"submit"}>
+        {"Submit"}
+      </PrimaryButton>
+      <div className={"switch-text"}>
+        {"Back to"}
+        <RouterLink to={"/login"}>{"Log In"}</RouterLink>
+      </div>
+    </Form.Footer>
+  </Form.Form>
+);
 
 export default RecoverPasswordForm;

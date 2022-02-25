@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 import { ui } from "lib";
 
@@ -8,13 +9,11 @@ interface FormTitleProps extends StandardComponentProps {
   readonly title: string;
 }
 
-const FormTitle = ({ icon, title, ...props }: FormTitleProps): JSX.Element => {
-  return (
-    <div {...props} className={classNames("form-title", props.className)}>
-      {ui.typeguards.iconIsJSX(icon) ? icon : <Icon icon={icon} weight={"regular"} />}
-      {title}
-    </div>
-  );
-};
+const FormTitle = ({ icon, title, ...props }: FormTitleProps): JSX.Element => (
+  <div {...props} className={classNames("form-title", props.className)}>
+    {ui.typeguards.iconIsJSX(icon) ? icon : <Icon icon={icon} weight={"regular"} />}
+    {title}
+  </div>
+);
 
-export default FormTitle;
+export default React.memo(FormTitle);

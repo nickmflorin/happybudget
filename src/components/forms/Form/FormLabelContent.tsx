@@ -26,4 +26,4 @@ const FormLabelContent = ({ dataType, ...props }: FormLabelContentProps): JSX.El
   );
 };
 
-export default FormLabelContent;
+export default React.memo(FormLabelContent);

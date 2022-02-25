@@ -88,8 +88,4 @@ export const MultipleTags = <M extends Model.Model = Model.Model>(props: Multipl
   );
 };
 
-type MemoizedMultipleTagsType = {
-  <M extends Model.Model = Model.Model>(props: MultipleTagsProps<M>): JSX.Element;
-};
-
-export default React.memo(MultipleTags) as MemoizedMultipleTagsType;
+export default React.memo(MultipleTags) as typeof MultipleTags;

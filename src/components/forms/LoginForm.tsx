@@ -27,63 +27,61 @@ const LoginForm: React.FC<LoginFormProps> = ({
   onGoogleError,
   onGoogleScriptLoadFailure,
   ...props
-}: LoginFormProps): JSX.Element => {
-  return (
-    <Form.Form
-      {...props}
-      className={classNames("landing-form", props.className)}
-      onFinish={(values: ILoginFormValues) => onSubmit(values)}
-    >
-      <Form.Item
-        name={"email"}
-        rules={[
-          { required: true, message: "Please enter a valid email." },
-          () => ({
-            validateTrigger: "onSubmit",
-            validator(rule: unknown, value: string) {
-              if (value !== "" && !util.validate.validateEmail(value)) {
-                return Promise.reject("The email does not meet our requirements.");
-              }
-              return Promise.resolve();
+}: LoginFormProps): JSX.Element => (
+  <Form.Form
+    {...props}
+    className={classNames("landing-form", props.className)}
+    onFinish={(values: ILoginFormValues) => onSubmit(values)}
+  >
+    <Form.Item
+      name={"email"}
+      rules={[
+        { required: true, message: "Please enter a valid email." },
+        () => ({
+          validateTrigger: "onSubmit",
+          validator(rule: unknown, value: string) {
+            if (value !== "" && !util.validate.validateEmail(value)) {
+              return Promise.reject("The email does not meet our requirements.");
             }
-          })
-        ]}
+            return Promise.resolve();
+          }
+        })
+      ]}
+    >
+      <EmailInput size={"large"} />
+    </Form.Item>
+    <Form.Item
+      style={{ marginBottom: 0 }}
+      name={"password"}
+      rules={[{ required: true, message: "Please enter a valid password." }]}
+    >
+      <PasswordInput size={"large"} />
+    </Form.Item>
+    <div className={"forgot-password-text"}>
+      <RouterLink to={"/recover-password"} className={"forgot-link"}>
+        {"Forgot Password?"}
+      </RouterLink>
+    </div>
+    <Form.Footer>
+      <PrimaryButton loading={loading} xlarge={true} className={"btn--landing"} htmlType={"submit"}>
+        {"Login"}
+      </PrimaryButton>
+      <SocialButton
+        className={"btn--landing"}
+        xlarge={true}
+        provider={"google"}
+        onGoogleSuccess={onGoogleSuccess}
+        onGoogleError={onGoogleError}
+        onGoogleScriptLoadFailure={onGoogleScriptLoadFailure}
       >
-        <EmailInput size={"large"} />
-      </Form.Item>
-      <Form.Item
-        style={{ marginBottom: 0 }}
-        name={"password"}
-        rules={[{ required: true, message: "Please enter a valid password." }]}
-      >
-        <PasswordInput size={"large"} />
-      </Form.Item>
-      <div className={"forgot-password-text"}>
-        <RouterLink to={"/recover-password"} className={"forgot-link"}>
-          {"Forgot Password?"}
-        </RouterLink>
+        {"Login with Google"}
+      </SocialButton>
+      <div className={"switch-text"}>
+        {"Don't have an account yet?"}
+        <RouterLink to={"/signup"}>{"Sign Up"}</RouterLink>
       </div>
-      <Form.Footer>
-        <PrimaryButton loading={loading} xlarge={true} className={"btn--landing"} htmlType={"submit"}>
-          {"Login"}
-        </PrimaryButton>
-        <SocialButton
-          className={"btn--landing"}
-          xlarge={true}
-          provider={"google"}
-          onGoogleSuccess={onGoogleSuccess}
-          onGoogleError={onGoogleError}
-          onGoogleScriptLoadFailure={onGoogleScriptLoadFailure}
-        >
-          {"Login with Google"}
-        </SocialButton>
-        <div className={"switch-text"}>
-          {"Don't have an account yet?"}
-          <RouterLink to={"/signup"}>{"Sign Up"}</RouterLink>
-        </div>
-      </Form.Footer>
-    </Form.Form>
-  );
-};
+    </Form.Footer>
+  </Form.Form>
+);
 
 export default LoginForm;

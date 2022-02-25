@@ -9,14 +9,12 @@ type ProductsListProps = StandardComponentProps & {
   readonly extra?: (p: Model.Product) => JSX.Element;
 };
 
-const ProductsList = ({ products, extra, ...props }: ProductsListProps) => {
-  return (
-    <div {...props} className={classNames("products", props.className)}>
-      {map(products, (product: Model.Product, index: number) => (
-        <Product key={index} product={product} extra={extra?.(product)} />
-      ))}
-    </div>
-  );
-};
+const ProductsList = ({ products, extra, ...props }: ProductsListProps) => (
+  <div {...props} className={classNames("products", props.className)}>
+    {map(products, (product: Model.Product, index: number) => (
+      <Product key={index} product={product} extra={extra?.(product)} />
+    ))}
+  </div>
+);
 
 export default React.memo(ProductsList);

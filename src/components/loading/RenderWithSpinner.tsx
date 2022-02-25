@@ -31,4 +31,4 @@ const RenderWithSpinner = ({
   );
 };
 
-export default RenderWithSpinner;
+export default React.memo(RenderWithSpinner);

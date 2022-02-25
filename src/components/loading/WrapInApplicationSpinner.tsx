@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 import { setApplicationLoadingAction } from "store/actions";
@@ -30,4 +30,4 @@ const WrapInApplicationSpinner: React.FC<WrapInApplicationSpinnerProps> = ({
   return <>{children}</>;
 };
 
-export default WrapInApplicationSpinner;
+export default React.memo(WrapInApplicationSpinner);

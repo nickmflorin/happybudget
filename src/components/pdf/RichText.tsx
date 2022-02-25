@@ -68,17 +68,15 @@ interface RichTextProps extends StandardPdfComponentProps {
   readonly nodes: Pdf.HTMLNode[] | Pdf.HTMLNode;
 }
 
-const RichText = ({ nodes, ...props }: RichTextProps): JSX.Element => {
-  return (
-    <View {...props}>
-      {filter(
-        map(Array.isArray(nodes) ? nodes : [nodes], (node: Pdf.HTMLNode, index: number): JSX.Element | null => (
-          <RichTextNode key={index} node={node} />
-        )),
-        (element: JSX.Element | null) => !isNil(element)
-      )}
-    </View>
-  );
-};
+const RichText = ({ nodes, ...props }: RichTextProps): JSX.Element => (
+  <View {...props}>
+    {filter(
+      map(Array.isArray(nodes) ? nodes : [nodes], (node: Pdf.HTMLNode, index: number): JSX.Element | null => (
+        <RichTextNode key={index} node={node} />
+      )),
+      (element: JSX.Element | null) => !isNil(element)
+    )}
+  </View>
+);
 
 export default RichText;

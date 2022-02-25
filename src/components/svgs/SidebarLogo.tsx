@@ -54,4 +54,4 @@ const SidebarLogo = (): JSX.Element => {
   );
 };
 
-export default SidebarLogo;
+export default React.memo(SidebarLogo);

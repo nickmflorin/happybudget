@@ -1,3 +1,4 @@
+import React from "react";
 import classNames from "classnames";
 import { Pagination as RootPagination, PaginationProps as RootPaginationProps } from "antd";
 
@@ -9,4 +10,4 @@ const Pagination = ({ small, ...props }: PaginationProps): JSX.Element => (
   <RootPagination {...props} className={classNames("pagination", props.className, { small })} />
 );
 
-export default Pagination;
+export default React.memo(Pagination);

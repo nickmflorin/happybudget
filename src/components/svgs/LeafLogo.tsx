@@ -15,4 +15,4 @@ const LeafLogo = (): JSX.Element => {
   );
 };
 
-export default LeafLogo;
+export default React.memo(LeafLogo);
