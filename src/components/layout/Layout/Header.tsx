@@ -35,6 +35,8 @@ const Header = ({
         <ShowHide show={showHeaderSidebarToggle}>
           <IconButton
             className={"btn--sidebar-toggle"}
+            iconSize={"standard"}
+            size={"large"}
             icon={(params: ClickableIconCallbackParams) => {
               if (sidebarVisible === true && params.isHovered === true) {
                 return <Icon icon={"arrow-alt-to-left"} weight={"light"} green={true} />;
