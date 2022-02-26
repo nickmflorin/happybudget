@@ -308,7 +308,7 @@ export const createTableEventReducer = <
       } else if (typeguards.isRowAddToGroupEvent(e)) {
         return reorderRows(updateRowGroup(state, action, e.payload.rows, e.payload.group));
       }
-    } else {
+    } else if (typeguards.isControlEvent(e)) {
       if (typeguards.isPlaceholdersActivatedEvent<R, M>(e)) {
         const payload: Table.PlaceholdersActivatedPayload<M> = e.payload;
         return reduce(

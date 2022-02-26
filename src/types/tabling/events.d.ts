@@ -30,15 +30,26 @@ declare namespace Table {
 
   type ChangeEventId = ChangeEventIds[keyof ChangeEventIds];
 
-  type EventIds = ChangeEventIds & ControlEventIds;
-  type EventId = ControlEventId | ChangeEventId;
+  /* Meta events are table events that are derived solely from a user's
+	   interaction with a table but operate on events themselves. */
+  type MetaEventIds = {
+    readonly FORWARD: "forward";
+    readonly REVERSE: "reverse";
+  };
 
-  type EventPayload = Record<string, unknown> | Record<string, unknown>[];
+  type MetaEventId = MetaEventIds[keyof MetaEventIds];
+
+  type EventIds = ChangeEventIds & ControlEventIds & MetaEventIds;
+  type EventId = ControlEventId | ChangeEventId | MetaEventId;
+
+  type EventPayload = Record<string, unknown> | Record<string, unknown>[] | null;
 
   type BaseEvent<T extends EventId = EventId, P extends EventPayload = EventPayload> = {
     readonly type: T;
     readonly payload: P;
   };
+
+  type BaseMetaEvent<T extends MetaEventId = MetaEventId> = BaseEvent<T, null>;
 
   type BaseChangeEvent<T extends ChangeEventId = ChangeEventId, P extends EventPayload = EventPayload> = BaseEvent<
     T,
@@ -184,6 +195,9 @@ declare namespace Table {
   type FullRowEvent = RowDeleteEvent | RowRemoveFromGroupEvent | RowAddToGroupEvent;
   type GroupChangeEvent = RowRemoveFromGroupEvent | RowAddToGroupEvent;
 
+  type ForwardEvent = BaseMetaEvent<"forward">;
+  type ReverseEvent = BaseMetaEvent<"reverse">;
+
   type ControlEvents<R extends RowData = RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly modelsUpdated: ModelsUpdatedEvent<M>;
     readonly updateRows: UpdateRowsEvent<R>;
@@ -205,36 +219,34 @@ declare namespace Table {
     readonly rowAddToGroup: RowAddToGroupEvent;
   };
 
+  type MetaEvents = {
+    readonly forward: ForwardEvent;
+    readonly reverse: ReverseEvent;
+  };
+
   type Events<
     R extends RowData = RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     RW extends EditableRow<R> = EditableRow<R>
-  > = ControlEvents<R, M> & ChangeEvents<R, RW>;
+  > = ControlEvents<R, M> & ChangeEvents<R, RW> & MetaEvents;
 
-  type ControlEvent<R extends RowData = RowData, M extends Model.RowHttpModel = Model.RowHttpModel> =
-    | UpdateRowsEvent<R>
-    | PlaceholdersActivatedEvent<M>
-    | ModelsAddedEvent<M>
-    | ModelsUpdatedEvent<M>
-    | GroupAddedEvent
-    | GroupUpdatedEvent
-    | MarkupAddedEvent
-    | MarkupUpdatedEvent;
+  type MetaEvent = MetaEvents[keyof MetaEvents];
 
-  type ChangeEvent<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> =
-    | DataChangeEvent<R, RW>
-    | RowAddEvent<R>
-    | RowInsertEvent<R>
-    | RowDeleteEvent
-    | RowPositionChangedEvent
-    | RowRemoveFromGroupEvent
-    | RowAddToGroupEvent;
+  type ControlEvent<R extends RowData = RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = ControlEvents<
+    R,
+    M
+  >[keyof ControlEvents<R, M>];
+
+  type ChangeEvent<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = ChangeEvents<
+    R,
+    RW
+  >[keyof ChangeEvents<R, RW>];
 
   type Event<
     R extends RowData = RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     RW extends EditableRow<R> = EditableRow<R>
-  > = ControlEvent<R, M> | ChangeEvent<R, RW>;
+  > = ControlEvent<R, M> | ChangeEvent<R, RW> | Table.MetaEvent;
 
   type ChangeEventLookup<
     K extends ChangeEventId,

@@ -18,3 +18,5 @@ export const CONTROL_EVENT_IDS: Table.ControlEventId[] = [
   "markupAdded",
   "markupUpdated"
 ];
+
+export const META_EVENT_IDS: Table.MetaEventId[] = ["forward", "reverse"];
