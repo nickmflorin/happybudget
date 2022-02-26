@@ -94,6 +94,133 @@ const actionInconsistentWithBatch = <
   return !isEqual(action.context, batch.context);
 };
 
+interface Flusher<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context
+> {
+  (config: SagaConfig<R, M, C>, actions: Redux.TableAction<Table.ChangeEvent<R>, C>[]): SagaIterator;
+}
+
+/**
+ * Flushes events that are queued in the Action Channel by batching like,
+ * consecutive events together to perform bulk API updates instead of individual
+ * ones.
+ *
+ * The algorithm is written specifically to only batch together consecutive
+ * events, such that the original order the events occurred in is preserved
+ * (which is important).
+ *
+ * Events: [A, A, A, B, A, A, B, B, C, B, C, A, A, B]
+ * In Batches: [[A, A, A], [B], [A, A], [B, B], [C], [B], [C], [A, A], B]
+ */
+function* flushEvents<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context
+>(config: SagaConfig<R, M, C>, actions: Redux.TableAction<Table.ChangeEvent<R>, C>[]): SagaIterator {
+  const events: Table.ChangeEvent<R>[] = map(actions, (a: Redux.TableAction<Table.ChangeEvent<R>, C>) => a.payload);
+
+  function* flushDataBatch(batch: Batch<Table.DataChangeEvent<R>, R, C> | null): SagaIterator {
+    if (batch !== null && batch.events.length !== 0) {
+      const event = tabling.events.consolidateDataChangeEvents(batch.events);
+      if (!Array.isArray(event.payload) || event.payload.length !== 0) {
+        yield call(config.tasks.handleChangeEvent, event, batch.context);
+      }
+    }
+  }
+
+  function* flushRowAddBatch(batch: Batch<Table.RowAddDataEvent<R>, R, C> | null): SagaIterator {
+    if (batch !== null && batch.events.length !== 0) {
+      const event = tabling.events.consolidateRowAddEvents(batch.events);
+      if (!Array.isArray(event.payload) || event.payload.length !== 0) {
+        yield call(config.tasks.handleChangeEvent, event, batch.context);
+      }
+    }
+  }
+
+  let runningDataChangeBatch: Batch<Table.DataChangeEvent<R>, R, C> | null = null;
+  let runningRowAddBatch: Batch<Table.RowAddDataEvent<R>, R, C> | null = null;
+
+  const addEventToBatch = <E extends Table.DataChangeEvent<R> | Table.RowAddDataEvent<R>>(
+    batch: Batch<E, R, C>,
+    action: Redux.TableAction<E, C>
+  ): Batch<E, R, C> => {
+    if (batch.events.length === 0) {
+      return {
+        ...batch,
+        events: [action.payload],
+        context: action.context
+      };
+    } else {
+      if (actionInconsistentWithBatch(action, batch)) {
+        // This should be prevented before calling this method.
+        throw new Error("Action is inconsistent with batch!");
+      }
+      return { ...batch, events: [...batch.events, action.payload] };
+    }
+  };
+
+  for (let i = 0; i < events.length; i++) {
+    const a = actions[i];
+    if (tabling.typeguards.isActionWithChangeEvent(a, "dataChange")) {
+      /* Queue the row add events when they are happening very close together
+				 in the time dimension.  If an event comes in that is not semantically
+				 "different" from the other events in the currently queued batch,
+				 flush the batch and start a new batch. */
+      if (runningDataChangeBatch === null) {
+        runningDataChangeBatch = {
+          events: [a.payload],
+          context: a.context
+        };
+      } else if (actionInconsistentWithBatch<Table.DataChangeEvent<R>, R, C>(a, runningDataChangeBatch)) {
+        /* If the context of the new event does not match the context of the
+					 current batch, that means that the context quickly changed before
+					 the batch had a chance to flush.  In this case, we need to flush
+					 the previous batch and start a new batch. */
+        yield fork(flushDataBatch, runningDataChangeBatch);
+        runningDataChangeBatch = null;
+      } else {
+        runningDataChangeBatch = addEventToBatch(runningDataChangeBatch, a);
+      }
+    } else if (tabling.typeguards.isRowAddEventAction(a) && tabling.typeguards.isRowAddDataEventAction(a)) {
+      /* Queue the row add events when they are happening very close together
+				 in the time dimension.  If an event comes in that is not semantically
+				 "different" from the other events in the currently queued batch,
+				 flush the batch and start a new batch. */
+      if (runningRowAddBatch === null) {
+        runningRowAddBatch = {
+          events: [a.payload],
+          context: a.context
+        };
+      } else if (actionInconsistentWithBatch(a, runningRowAddBatch)) {
+        /* If the context of the new event does not match the context of the
+					 current batch, that means that the context quickly changed before
+					 the batch had a chance to flush.  In this case, we need to flush the
+					 previous batch and start a new batch. */
+        yield fork(flushRowAddBatch, runningRowAddBatch);
+        runningRowAddBatch = null;
+      } else {
+        runningRowAddBatch = addEventToBatch(runningRowAddBatch, a);
+      }
+    } else {
+      /* If the event was anything other than a row add event or a data change
+				 event, we need to flush the batches for both the queued row add and
+				 data change events and then handle the new event without queueing
+				 it. */
+      yield fork(flushDataBatch, runningDataChangeBatch);
+      runningDataChangeBatch = null;
+      yield fork(flushRowAddBatch, runningRowAddBatch);
+      runningRowAddBatch = null;
+
+      yield fork(config.tasks.handleChangeEvent, a.payload, a.context);
+    }
+  }
+  // Cleanup leftover events at the end.
+  yield fork(flushDataBatch, runningDataChangeBatch);
+  yield fork(flushRowAddBatch, runningRowAddBatch);
+}
+
 export const createAuthenticatedTableSaga = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
@@ -101,120 +228,7 @@ export const createAuthenticatedTableSaga = <
 >(
   config: SagaConfig<R, M, C>
 ): Saga => {
-  /**
-   * Flushes events that are queued in the Action Channel by batching like,
-   * consecutive events together to perform bulk API updates instead of individual
-   * ones.
-   *
-   * The algorithm is written specifically to only batch together consecutive
-   * events, such that the original order the events occurred in is preserved
-   * (which is important).
-   *
-   * Events: [A, A, A, B, A, A, B, B, C, B, C, A, A, B]
-   * In Batches: [[A, A, A], [B], [A, A], [B, B], [C], [B], [C], [A, A], B]
-   */
-  function* flushEvents(actions: Redux.TableAction<Table.ChangeEvent<R>, C>[]): SagaIterator {
-    const events: Table.ChangeEvent<R>[] = map(actions, (a: Redux.TableAction<Table.ChangeEvent<R>, C>) => a.payload);
-
-    function* flushDataBatch(batch: Batch<Table.DataChangeEvent<R>, R, C> | null): SagaIterator {
-      if (batch !== null && batch.events.length !== 0) {
-        const event = tabling.events.consolidateDataChangeEvents(batch.events);
-        if (!Array.isArray(event.payload) || event.payload.length !== 0) {
-          yield call(config.tasks.handleChangeEvent, event, batch.context);
-        }
-      }
-    }
-
-    function* flushRowAddBatch(batch: Batch<Table.RowAddDataEvent<R>, R, C> | null): SagaIterator {
-      if (batch !== null && batch.events.length !== 0) {
-        const event = tabling.events.consolidateRowAddEvents(batch.events);
-        if (!Array.isArray(event.payload) || event.payload.length !== 0) {
-          yield call(config.tasks.handleChangeEvent, event, batch.context);
-        }
-      }
-    }
-
-    let runningDataChangeBatch: Batch<Table.DataChangeEvent<R>, R, C> | null = null;
-    let runningRowAddBatch: Batch<Table.RowAddDataEvent<R>, R, C> | null = null;
-
-    const addEventToBatch = <E extends Table.DataChangeEvent<R> | Table.RowAddDataEvent<R>>(
-      batch: Batch<E, R, C>,
-      action: Redux.TableAction<E, C>
-    ): Batch<E, R, C> => {
-      if (batch.events.length === 0) {
-        return {
-          ...batch,
-          events: [action.payload],
-          context: action.context
-        };
-      } else {
-        if (actionInconsistentWithBatch(action, batch)) {
-          // This should be prevented before calling this method.
-          throw new Error("Action is inconsistent with batch!");
-        }
-        return { ...batch, events: [...batch.events, action.payload] };
-      }
-    };
-
-    for (let i = 0; i < events.length; i++) {
-      const a = actions[i];
-      if (tabling.typeguards.isActionWithChangeEvent(a, "dataChange")) {
-        /* Queue the row add events when they are happening very close together
-           in the time dimension.  If an event comes in that is not semantically
-					 "different" from the other events in the currently queued batch,
-					 flush the batch and start a new batch. */
-        if (runningDataChangeBatch === null) {
-          runningDataChangeBatch = {
-            events: [a.payload],
-            context: a.context
-          };
-        } else if (actionInconsistentWithBatch<Table.DataChangeEvent<R>, R, C>(a, runningDataChangeBatch)) {
-          /* If the context of the new event does not match the context of the
-             current batch, that means that the context quickly changed before
-						 the batch had a chance to flush.  In this case, we need to flush
-						 the previous batch and start a new batch. */
-          yield fork(flushDataBatch, runningDataChangeBatch);
-          runningDataChangeBatch = null;
-        } else {
-          runningDataChangeBatch = addEventToBatch(runningDataChangeBatch, a);
-        }
-      } else if (tabling.typeguards.isRowAddEventAction(a) && tabling.typeguards.isRowAddDataEventAction(a)) {
-        /* Queue the row add events when they are happening very close together
-           in the time dimension.  If an event comes in that is not semantically
-					 "different" from the other events in the currently queued batch,
-					 flush the batch and start a new batch. */
-        if (runningRowAddBatch === null) {
-          runningRowAddBatch = {
-            events: [a.payload],
-            context: a.context
-          };
-        } else if (actionInconsistentWithBatch(a, runningRowAddBatch)) {
-          /* If the context of the new event does not match the context of the
-             current batch, that means that the context quickly changed before
-						 the batch had a chance to flush.  In this case, we need to flush the
-             previous batch and start a new batch. */
-          yield fork(flushRowAddBatch, runningRowAddBatch);
-          runningRowAddBatch = null;
-        } else {
-          runningRowAddBatch = addEventToBatch(runningRowAddBatch, a);
-        }
-      } else {
-        /* If the event was anything other than a row add event or a data change
-           event, we need to flush the batches for both the queued row add and
-           data change events and then handle the new event without queueing
-					 it. */
-        yield fork(flushDataBatch, runningDataChangeBatch);
-        runningDataChangeBatch = null;
-        yield fork(flushRowAddBatch, runningRowAddBatch);
-        runningRowAddBatch = null;
-
-        yield fork(config.tasks.handleChangeEvent, a.payload, a.context);
-      }
-    }
-    // Cleanup leftover events at the end.
-    yield fork(flushDataBatch, runningDataChangeBatch);
-    yield fork(flushRowAddBatch, runningRowAddBatch);
-  }
+  const flusher: Flusher<R, M, C> = flushEvents;
 
   function* tableChangeEventSaga(): SagaIterator {
     const changeChannel = yield actionChannel(config.actions.tableChanged.toString());
@@ -226,7 +240,7 @@ export const createAuthenticatedTableSaga = <
         if (tabling.typeguards.isDataChangeEvent(e)) {
           yield delay(200);
           const actions: Redux.TableAction<Table.ChangeEvent<R>, C>[] = yield flush(changeChannel);
-          yield call(flushEvents, [a, ...actions]);
+          yield call(flusher, config, [a, ...actions]);
         } else if (
           /* We do not want to buffer RowAdd events if the row is being added
 					   either by the RowAddIndexPayload or the RowAddCountPayload. */
@@ -239,7 +253,7 @@ export const createAuthenticatedTableSaga = <
 						 for every new cell value. */
           yield delay(500);
           const actions: Redux.TableAction<Table.ChangeEvent<R>, C>[] = yield flush(changeChannel);
-          yield call(flushEvents, [a, ...actions]);
+          yield call(flusher, config, [a, ...actions]);
         } else {
           yield call(config.tasks.handleChangeEvent, e, a.context);
         }
