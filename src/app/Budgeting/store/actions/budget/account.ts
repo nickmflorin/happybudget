@@ -6,8 +6,8 @@ export const requestAccountAction = redux.actions.createAction<number>("budget.a
 export const loadingAccountAction = redux.actions.createAction<boolean>("budget.account.Loading");
 export const responseAccountAction = redux.actions.createAction<Model.Account | null>("budget.account.Response");
 
-export const handleTableChangeEventAction = redux.actions.createTableAction<
-  Table.ChangeEvent<Tables.SubAccountRowData, Model.SubAccount>,
+export const handleTableEventAction = redux.actions.createTableAction<
+  Table.Event<Tables.SubAccountRowData, Model.SubAccount>,
   Tables.SubAccountTableContext
 >("budget.account.TableChanged");
 

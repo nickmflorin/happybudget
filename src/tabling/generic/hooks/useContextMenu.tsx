@@ -15,7 +15,7 @@ export type UseContextMenuParams<R extends Table.RowData, M extends Model.RowHtt
   readonly getGroupRowName?: Table.RowStringGetter<Table.GroupRow<R>>;
   readonly getMarkupRowLabel?: Table.RowStringGetter<Table.MarkupRow<R>>;
   readonly getMarkupRowName?: Table.RowStringGetter<Table.MarkupRow<R>>;
-  readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
+  readonly onEvent: (event: Table.Event<R, M>) => void;
   readonly getGroupRowContextMenuItems?: (row: Table.GroupRow<R>, node: Table.RowNode) => Table.MenuItemDef[];
   readonly getModelRowContextMenuItems?: (row: Table.ModelRow<R>, node: Table.RowNode) => Table.MenuItemDef[];
   readonly getMarkupRowContextMenuItems?: (row: Table.MarkupRow<R>, node: Table.RowNode) => Table.MenuItemDef[];
@@ -168,7 +168,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
                 name: `Remove ${getRowLabel(row)} from ${getRowName(groupRow, groupRow.groupData.name)} Subtotal`,
                 icon: '<i class="far fa-folder-minus context-icon"></i>',
                 action: () =>
-                  params.onChangeEvent({
+                  params.onEvent({
                     type: "rowRemoveFromGroup",
                     payload: { rows: [row.id], group: groupRow.id }
                   })
@@ -217,7 +217,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
                     name: `${getRowName(gr, gr.groupData.name)}`,
                     icon: '<i class="far fa-folders context-icon"></i>',
                     action: () =>
-                      params.onChangeEvent({
+                      params.onEvent({
                         type: "rowAddToGroup",
                         payload: { rows: [row.id], group: gr.id }
                       })
@@ -229,7 +229,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
         }
         return contextMenuItems;
       },
-    [params.onGroupRows, params.onChangeEvent, findGroupableRowsAbove, getRowLabel, getRowName, params.data]
+    [params.onGroupRows, params.onEvent, findGroupableRowsAbove, getRowLabel, getRowName, params.data]
   );
 
   const getModelRowMarkupContextMenuItems: (row: Table.ModelRow<R>, node: Table.RowNode) => Table.MenuItemDef[] =
@@ -276,7 +276,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
           {
             name: `Delete ${getRowLabel(row)}`,
             icon: '<i class="far fa-trash-alt context-icon"></i>',
-            action: () => params.onChangeEvent({ payload: { rows: row.id }, type: "rowDelete" })
+            action: () => params.onEvent({ payload: { rows: row.id }, type: "rowDelete" })
           }
         ];
       }
@@ -299,7 +299,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
               name: `Insert ${getRowLabel(row)} Above`,
               icon: '<i class="far fa-hand-point-up context-icon"></i>',
               action: () =>
-                params.onChangeEvent({
+                params.onEvent({
                   payload: {
                     previous: previous.id,
                     data: {},
@@ -316,7 +316,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
             name: `Insert ${getRowLabel(row)} Below`,
             icon: '<i class="far fa-hand-point-down context-icon"></i>',
             action: () =>
-              params.onChangeEvent({
+              params.onEvent({
                 payload: {
                   previous: row.id,
                   data: {},
@@ -334,7 +334,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
           {
             name: `Delete ${getRowLabel(row)}`,
             icon: '<i class="far fa-trash-alt context-icon"></i>',
-            action: () => params.onChangeEvent({ payload: { rows: row.id }, type: "rowDelete" })
+            action: () => params.onEvent({ payload: { rows: row.id }, type: "rowDelete" })
           }
         ];
       }
@@ -354,7 +354,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
           name: `Ungroup ${getRowName(row, row.groupData.name)}`,
           icon: '<i class="far fa-folder-minus context-icon"></i>',
           action: () =>
-            params.onChangeEvent({
+            params.onEvent({
               type: "rowDelete",
               payload: { rows: row.id }
             })

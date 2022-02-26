@@ -14,7 +14,7 @@ export type ConnectedAuthenticatedTableInjectedProps<
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = ConnectedTableInjectedProps<R, S> & {
-  readonly onChangeEvent: (e: Table.ChangeEvent<R, M>) => void;
+  readonly onEvent: (e: Table.Event<R, M>) => void;
   readonly onSearch: (v: string) => void;
 };
 
@@ -62,7 +62,7 @@ const connectTableToAuthenticatedStore =
         <ConnectedComponent
           {...(props as T & ConnectAuthenticatedTableProps<R, M, S, C>)}
           onSearch={(v: string) => dispatch(config.actions.setSearch(v, props.actionContext))}
-          onChangeEvent={(e: Table.ChangeEvent<R, M>) => {
+          onEvent={(e: Table.Event<R, M>) => {
             dispatch(config.actions.tableChanged(e, props.actionContext));
           }}
         />

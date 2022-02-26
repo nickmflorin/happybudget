@@ -180,17 +180,17 @@ const AuthenticatedTable = <
   }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns]);
 
   /**
-   * Modified version of the onChangeEvent callback passed into the Grid.  The
+   * Modified version of the onEvent callback passed into the Grid.  The
    * modified version of the callback will first fire the original callback,
    * but then inspect whether or not the column associated with any of the fields
    * that were changed warrant refreshing another column.
    */
-  const _onChangeEvent = useMemo(
-    () => (event: Table.ChangeEvent<R, M>) => {
+  const _onEvent = useMemo(
+    () => (event: Table.Event<R, M>) => {
       const apis: Table.GridApis | null = props.tableApis.get("data");
 
       // TODO: We might have to also apply similiar logic for when a row is added?
-      if (tabling.typeguards.isDataChangeEvent(event)) {
+      if (tabling.typeguards.isChangeEvent(event) && tabling.typeguards.isDataChangeEvent(event)) {
         const nodesToRefresh: Table.RowNode[] = [];
         let columnsToRefresh: string[] = [];
 
@@ -252,13 +252,13 @@ const AuthenticatedTable = <
         }
       }
 
-      /* Wait until the end to trigger the onChangeEvent.  The onChangeEvent
+      /* Wait until the end to trigger the onEvent.  The onEvent
 				 handler is synchronous, and if we execute before hand the callbacks
 				 will not be able to access the previous state of a given row because it
 				 will already have been changed. */
-      props.onChangeEvent(event);
+      props.onEvent(event);
     },
-    [props.onChangeEvent, hooks.useDeepEqualMemo(props.columns)]
+    [props.onEvent, hooks.useDeepEqualMemo(props.columns)]
   );
 
   const setSaving = useMemo(
@@ -311,7 +311,7 @@ const AuthenticatedTable = <
                     props.confirmRowDelete === false ||
                     tabling.cookies.deleteModalConfirmationIsSuppressed()
                   ) {
-                    props.onChangeEvent({
+                    props.onEvent({
                       payload: { rows: map(rows, (r: Table.EditableRow<R>) => r.id) },
                       type: "rowDelete"
                     });
@@ -337,8 +337,8 @@ const AuthenticatedTable = <
       },
       changeColumnVisibility: props.changeColumnVisibility,
       getColumns: () => tabling.columns.filterModelColumns(columns),
-      dispatchEvent: (event: SingleOrArray<Table.ChangeEvent<R, M>>) =>
-        Array.isArray(event) ? map(event, (e: Table.ChangeEvent<R, M>) => _onChangeEvent(e)) : _onChangeEvent(event),
+      dispatchEvent: (event: SingleOrArray<Table.Event<R, M>>) =>
+        Array.isArray(event) ? map(event, (e: Table.Event<R, M>) => _onEvent(e)) : _onEvent(event),
       getRowsAboveAndIncludingFocusedRow: () => {
         const apis = props.tableApis.get("data");
         if (!isNil(apis)) {
@@ -397,7 +397,7 @@ const AuthenticatedTable = <
   const addNewRow = hooks.useDynamicCallback(() => {
     const dataGridApi = props.tableApis.get("data");
     if (!isNil(dataGridApi)) {
-      _onChangeEvent({
+      _onEvent({
         type: "rowAdd",
         payload: { count: 1 },
         placeholderIds: [tabling.managers.placeholderRowId()]
@@ -419,7 +419,7 @@ const AuthenticatedTable = <
           apis={props.tableApis.get("page")}
           onGridReady={props.onPageGridReady}
           onFirstDataRendered={props.onFirstDataRendered}
-          onChangeEvent={_onChangeEvent}
+          onEvent={_onEvent}
           gridOptions={props.tableGridOptions.page}
           columns={columns}
           framework={props.framework}
@@ -448,7 +448,7 @@ const AuthenticatedTable = <
           grid={grid}
           onGridReady={props.onDataGridReady}
           onRowSelectionChanged={(rows: Table.EditableRow<R>[]) => setSelectedRows(rows)}
-          onChangeEvent={_onChangeEvent}
+          onEvent={_onEvent}
           rowHasCheckboxSelection={props.rowHasCheckboxSelection}
         />
         <TableNotifications
@@ -466,7 +466,7 @@ const AuthenticatedTable = <
           gridOptions={props.tableGridOptions.footer}
           columns={columns}
           hiddenColumns={props.hiddenColumns}
-          onChangeEvent={_onChangeEvent}
+          onEvent={_onEvent}
           framework={props.framework}
           constrainHorizontally={props.constrainTableFooterHorizontally}
           checkboxColumn={{
@@ -481,7 +481,7 @@ const AuthenticatedTable = <
             open={true}
             onCancel={() => setDeleteRows(undefined)}
             onOk={() => {
-              props.onChangeEvent({
+              props.onEvent({
                 payload: { rows: map(deleteRows, (r: Table.EditableRow<R>) => r.id) },
                 type: "rowDelete"
               });

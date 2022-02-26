@@ -17,8 +17,9 @@ export const requestFringesAction = redux.actions.createTableAction<
 >("template.fringes.Request");
 export const responseFringesAction =
   redux.actions.createAction<Http.TableResponse<Model.Fringe>>("template.fringes.Response");
-export const handleFringesTableChangeEventAction = redux.actions.createTableAction<
-  Table.ChangeEvent<Tables.FringeRowData, Model.Fringe>,
+
+export const handleFringesTableEventAction = redux.actions.createTableAction<
+  Table.Event<Tables.FringeRowData, Model.Fringe>,
   Tables.FringeTableContext
 >("template.fringes.TableChanged");
 

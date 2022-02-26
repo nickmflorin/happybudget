@@ -8,8 +8,8 @@ export const loadingSubAccountAction = redux.actions.createAction<boolean>("budg
 export const responseSubAccountAction = redux.actions.createAction<Model.SubAccount | null>(
   "budget.subaccount.Response"
 );
-export const handleTableChangeEventAction = redux.actions.createTableAction<
-  Table.ChangeEvent<Tables.SubAccountRowData, Model.SubAccount>,
+export const handleTableEventAction = redux.actions.createTableAction<
+  Table.Event<Tables.SubAccountRowData, Model.SubAccount>,
   Tables.SubAccountTableContext
 >("budget.subaccount.TableChanged");
 

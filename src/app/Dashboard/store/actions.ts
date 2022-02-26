@@ -65,8 +65,8 @@ export const removeCommunityTemplateFromStateAction = redux.actions.createAction
   "dashboard.community.RemoveFromState"
 );
 
-export const handleContactsTableChangeEventAction = redux.actions.createTableAction<
-  Table.ChangeEvent<Tables.ContactRowData, Model.Contact>,
+export const handleContactsTableEventAction = redux.actions.createTableAction<
+  Table.Event<Tables.ContactRowData, Model.Contact>,
   Tables.ContactTableContext
 >("dashboard.contacts.TableChanged");
 

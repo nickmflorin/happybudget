@@ -1,5 +1,7 @@
 import { SyntheticEvent } from "react";
-import { isNil } from "lodash";
+import { includes, isNil } from "lodash";
+
+import * as constants from "./constants";
 
 export const isRow = <R extends Table.RowData, M>(obj: Table.Row<R> | M): obj is Table.Row<R> =>
   typeof obj === "object" && (obj as Table.Row<R>).rowType !== undefined;
@@ -29,9 +31,7 @@ export const isBodyRowId = (id: Table.RowId): id is Table.FooterRowId =>
 
 export const isRowWithIdentifier = <R extends Table.RowData>(
   r: Table.Row<R> | Table.RowWithIdentifier<R>
-): r is Table.RowWithIdentifier<R> => {
-  return isBodyRow(r) && (r as Table.RowWithIdentifier<R>).data.identifier !== undefined;
-};
+): r is Table.RowWithIdentifier<R> => isBodyRow(r) && (r as Table.RowWithIdentifier<R>).data.identifier !== undefined;
 
 export const isMarkupRow = <R extends Table.RowData>(row: Table.Row<R>): row is Table.MarkupRow<R> =>
   (row as Table.MarkupRow<R>).rowType === "markup";
@@ -54,21 +54,16 @@ export const isEditableRow = <R extends Table.RowData>(row: Table.Row<R>): row i
 
 export const isRowWithColor = <R extends Table.RowData>(
   r: Table.Row<R> | Table.RowWithColor<R>
-): r is Table.RowWithColor<R> => {
-  return isModelRow(r) && (r as Table.RowWithColor<R>).data.color !== undefined;
-};
+): r is Table.RowWithColor<R> => isModelRow(r) && (r as Table.RowWithColor<R>).data.color !== undefined;
 
 export const isRowWithName = <R extends Table.RowData>(
   r: Table.Row<R> | Table.RowWithName<R>
-): r is Table.RowWithName<R> => {
-  return isModelRow(r) && (r as Table.RowWithName<R>).data.name !== undefined;
-};
+): r is Table.RowWithName<R> => isModelRow(r) && (r as Table.RowWithName<R>).data.name !== undefined;
 
 export const isRowWithDescription = <R extends Table.RowData>(
   r: Table.Row<R> | Table.RowWithDescription<R>
-): r is Table.RowWithDescription<R> => {
-  return isModelRow(r) && (r as Table.RowWithDescription<R>).data.description !== undefined;
-};
+): r is Table.RowWithDescription<R> =>
+  isModelRow(r) && (r as Table.RowWithDescription<R>).data.description !== undefined;
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const isBodyColumn = <R extends Table.RowData, M extends Model.RowHttpModel, V extends Table.RawRowValue = any>(
@@ -116,71 +111,69 @@ export const isAuthenticatedActionMap = <
   a: A | B
 ): a is B => (a as B).tableChanged !== undefined;
 
-export const isKeyboardEvent = (e: Table.CellDoneEditingEvent): e is KeyboardEvent => {
-  return (e as KeyboardEvent).type === "keydown" && (e as KeyboardEvent).code !== undefined;
-};
+export const isKeyboardEvent = (e: Table.CellDoneEditingEvent): e is KeyboardEvent =>
+  (e as KeyboardEvent).type === "keydown" && (e as KeyboardEvent).code !== undefined;
 
-export const isSyntheticClickEvent = (e: Table.CellDoneEditingEvent): e is SyntheticEvent => {
-  return (e as SyntheticEvent).type === "click";
-};
+export const isSyntheticClickEvent = (e: Table.CellDoneEditingEvent): e is SyntheticEvent =>
+  (e as SyntheticEvent).type === "click";
 
-export const isDataChangeEvent = <
+export const isChangeEvent = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   RW extends Table.EditableRow<R> = Table.EditableRow<R>
 >(
-  e: Table.ChangeEvent<R, M, RW>
-): e is Table.DataChangeEvent<R, RW> => {
-  return (e as Table.DataChangeEvent<R, RW>).type === "dataChange";
-};
+  e: Table.Event<R, M, RW>
+): e is Table.ChangeEvent<R, RW> => includes(constants.CHANGE_EVENT_IDS, (e as Table.DataChangeEvent<R, RW>).type);
 
-export const isDataChangeEventAction = <
+export const isControlEvent = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  RW extends Table.EditableRow<R> = Table.EditableRow<R>
+>(
+  e: Table.Event<R, M, RW>
+): e is Table.ControlEvent<R, M> => includes(constants.CONTROL_EVENT_IDS, (e as Table.ControlEvent<R, M>).type);
+
+export const isDataChangeEvent = <R extends Table.RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>>(
+  e: Table.ChangeEvent<R, RW>
+): e is Table.DataChangeEvent<R, RW> => (e as Table.DataChangeEvent<R, RW>).type === "dataChange";
+
+export const isActionWithChangeEvent = <
+  T extends Table.ChangeEventId,
+  R extends Table.RowData = Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  RW extends Table.EditableRow<R> = Table.ModelRow<R>,
   C extends Table.Context = Table.Context
 >(
-  a: Redux.TableAction<Table.ChangeEvent<R, M>, C>
-): a is Redux.TableAction<Table.DataChangeEvent<R>, C> => {
-  return isDataChangeEvent(a.payload);
-};
+  a: Redux.TableAction<Table.ChangeEvent<R, RW>, C>,
+  t: T
+): a is Redux.TableAction<Table.ChangeEventLookup<T, R, RW>, C> =>
+  (a as Redux.TableAction<Table.EventLookup<T, R, M, RW>, C>).type === t;
 
 export const isModelsUpdatedEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ChangeEvent<R, M>
-): e is Table.ModelsUpdatedEvent<M> => {
-  return (e as Table.ModelsUpdatedEvent<M>).type === "modelsUpdated";
-};
+  e: Table.ControlEvent<R, M>
+): e is Table.ModelsUpdatedEvent<M> => (e as Table.ModelsUpdatedEvent<M>).type === "modelsUpdated";
 
 export const isPlaceholdersActivatedEvent = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
 >(
-  e: Table.ChangeEvent<R, M>
-): e is Table.PlaceholdersActivatedEvent<M> => {
-  return (e as Table.PlaceholdersActivatedEvent<M>).type === "placeholdersActivated";
-};
+  e: Table.ControlEvent<R, M>
+): e is Table.PlaceholdersActivatedEvent<M> =>
+  (e as Table.PlaceholdersActivatedEvent<M>).type === "placeholdersActivated";
 
 export const isUpdateRowsEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ChangeEvent<R, M>
-): e is Table.UpdateRowsEvent<R> => {
-  return (e as Table.UpdateRowsEvent<R>).type === "updateRows";
-};
+  e: Table.ControlEvent<R, M>
+): e is Table.UpdateRowsEvent<R> => (e as Table.UpdateRowsEvent<R>).type === "updateRows";
 
 export const isModelsAddedEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ChangeEvent<R, M>
-): e is Table.ModelsAddedEvent<M> => {
-  return (e as Table.ModelsAddedEvent<M>).type === "modelsAdded";
-};
+  e: Table.ControlEvent<R, M>
+): e is Table.ModelsAddedEvent<M> => (e as Table.ModelsAddedEvent<M>).type === "modelsAdded";
 
-export const isRowInsertEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ChangeEvent<R, M>
-): e is Table.RowInsertEvent<R> => (e as Table.RowInsertEvent<R>).type === "rowInsert";
+export const isRowInsertEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.RowInsertEvent<R> =>
+  (e as Table.RowInsertEvent<R>).type === "rowInsert";
 
-export const isRowAddEvent = <
-  R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
-  P extends Table.RowAddPayload<R> = Table.RowAddPayload<R>
->(
-  e: Table.ChangeEvent<R, M>
+export const isRowAddEvent = <R extends Table.RowData, P extends Table.RowAddPayload<R> = Table.RowAddPayload<R>>(
+  e: Table.ChangeEvent<R>
 ): e is Table.RowAddEvent<R, P> => (e as Table.RowAddEvent<R, P>).type === "rowAdd";
 
 export const isRowAddIndexPayload = <R extends Table.RowData>(
@@ -202,57 +195,44 @@ export const isRowAddDataEvent = <R extends Table.RowData>(
 
 export const isRowAddDataEventAction = <R extends Table.RowData, C extends Table.Context = Table.Context>(
   a: Redux.TableAction<Table.RowAddEvent<R>, C>
-): a is Redux.TableAction<Table.RowAddEvent<R, Table.RowAddDataPayload<R>>, C> => {
-  return isRowAddDataEvent(a.payload);
-};
+): a is Redux.TableAction<Table.RowAddEvent<R, Table.RowAddDataPayload<R>>, C> => isRowAddDataEvent(a.payload);
 
-export const isRowAddEventAction = <
-  R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
-  C extends Table.Context = Table.Context
->(
-  a: Redux.TableAction<Table.ChangeEvent<R, M>, C>
-): a is Redux.TableAction<Table.RowAddEvent<R>, C> => {
-  return isRowAddEvent(a.payload);
-};
+export const isRowAddEventAction = <R extends Table.RowData, C extends Table.Context = Table.Context>(
+  a: Redux.TableAction<Table.ChangeEvent<R>, C>
+): a is Redux.TableAction<Table.RowAddEvent<R>, C> => isRowAddEvent(a.payload);
 
-export const isRowDeleteEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ChangeEvent<R, M>
-): e is Table.RowDeleteEvent => (e as Table.RowDeleteEvent).type === "rowDelete";
+export const isRowDeleteEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.RowDeleteEvent =>
+  (e as Table.RowDeleteEvent).type === "rowDelete";
 
-export const isRowPositionChangedEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ChangeEvent<R, M>
+export const isRowPositionChangedEvent = <R extends Table.RowData>(
+  e: Table.ChangeEvent<R>
 ): e is Table.RowPositionChangedEvent => (e as Table.RowPositionChangedEvent).type === "rowPositionChanged";
 
-export const isRowRemoveFromGroupEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ChangeEvent<R, M>
+export const isRowRemoveFromGroupEvent = <R extends Table.RowData>(
+  e: Table.ChangeEvent<R>
 ): e is Table.RowRemoveFromGroupEvent => (e as Table.RowRemoveFromGroupEvent).type === "rowRemoveFromGroup";
 
-export const isRowAddToGroupEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ChangeEvent<R, M>
-): e is Table.RowAddToGroupEvent => (e as Table.RowAddToGroupEvent).type === "rowAddToGroup";
+export const isRowAddToGroupEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.RowAddToGroupEvent =>
+  (e as Table.RowAddToGroupEvent).type === "rowAddToGroup";
 
 export const isGroupAddedEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ChangeEvent<R, M>
+  e: Table.ControlEvent<R, M>
 ): e is Table.GroupAddedEvent => (e as Table.GroupAddedEvent).type === "groupAdded";
 
-export const isFullRowEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ChangeEvent<R, M>
-): e is Table.FullRowEvent => (e as Table.FullRowEvent).payload.rows !== undefined;
+export const isFullRowEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.FullRowEvent =>
+  (e as Table.FullRowEvent).payload.rows !== undefined;
 
 export const isGroupUpdateEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ChangeEvent<R, M>
+  e: Table.ControlEvent<R, M>
 ): e is Table.GroupUpdatedEvent => (e as Table.GroupUpdatedEvent).type === "groupUpdated";
 
-export const isGroupEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ChangeEvent<R, M>
-): e is Table.GroupEvent =>
-  isRowAddToGroupEvent(e) || isRowRemoveFromGroupEvent(e) || isGroupUpdateEvent(e) || isGroupAddedEvent(e);
+export const isGroupChangeEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.GroupChangeEvent =>
+  isRowAddToGroupEvent(e) || isRowRemoveFromGroupEvent(e);
 
 export const isMarkupAddedEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ChangeEvent<R, M>
+  e: Table.ControlEvent<R, M>
 ): e is Table.MarkupAddedEvent => (e as Table.MarkupAddedEvent).type === "markupAdded";
 
 export const isMarkupUpdatedEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ChangeEvent<R, M>
+  e: Table.ControlEvent<R, M>
 ): e is Table.MarkupUpdatedEvent => (e as Table.MarkupUpdatedEvent).type === "markupUpdated";

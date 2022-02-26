@@ -12,7 +12,7 @@ type CTX = Redux.WithActionContext<Tables.AccountTableContext>;
 
 export type AuthenticatedAccountsTableActionMap<B extends Model.Template | Model.Budget> =
   Redux.AuthenticatedTableActionMap<R, C, Tables.AccountTableContext> & {
-    readonly tableChanged: Redux.TableActionCreator<Table.ChangeEvent<R, C>, Tables.AccountTableContext>;
+    readonly tableChanged: Redux.TableActionCreator<Table.Event<R, C>, Tables.AccountTableContext>;
     readonly loadingBudget: Redux.ActionCreator<boolean>;
     readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateActionPayload<B>>;
   };
@@ -65,7 +65,7 @@ export const createPublicTableTaskSet = <B extends Model.Budget | Model.Template
 
 export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.Template>(
   config: AuthenticatedAccountsTableTaskConfig<B>
-): Redux.AuthenticatedTableTaskMap<R, C, Tables.AccountTableContext> => {
+): Redux.AuthenticatedTableTaskMap<R, Tables.AccountTableContext> => {
   function* request(action: Redux.TableAction<Redux.TableRequestPayload, Tables.AccountTableContext>): SagaIterator {
     if (redux.typeguards.isListRequestIdsAction(action)) {
       const response: Http.ListResponse<Model.Account> = yield api.request(
@@ -425,7 +425,7 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
 
   return {
     request,
-    handleChangeEvent: tabling.tasks.createChangeEventHandler<R, C, Tables.AccountTableContext>({
+    handleChangeEvent: tabling.tasks.createChangeEventHandler<R, Tables.AccountTableContext>({
       rowRemoveFromGroup: handleRowRemoveFromGroupEvent,
       rowInsert: handleRowInsertEvent,
       rowAddToGroup: handleAddRowToGroupEvent,

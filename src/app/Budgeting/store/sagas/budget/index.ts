@@ -18,7 +18,7 @@ export * as account from "./account";
 export * as subAccount from "./subAccount";
 
 const FringesActionMap = {
-  tableChanged: actions.handleFringesTableChangeEventAction,
+  tableChanged: actions.handleFringesTableEventAction,
   loading: actions.loadingFringesAction,
   response: actions.responseFringesAction,
   loadingBudget: actions.loadingBudgetAction,

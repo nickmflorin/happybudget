@@ -7,8 +7,8 @@ export const requestAccountAction = redux.actions.createAction<number>("template
 export const loadingAccountAction = redux.actions.createAction<boolean>("template.account.Loading");
 export const responseAccountAction = redux.actions.createAction<Model.Account | null>("template.account.Response");
 
-export const handleTableChangeEventAction = redux.actions.createTableAction<
-  Table.ChangeEvent<Tables.SubAccountRowData, Model.SubAccount>,
+export const handleTableEventAction = redux.actions.createTableAction<
+  Table.Event<Tables.SubAccountRowData, Model.SubAccount>,
   Tables.SubAccountTableContext
 >("template.account.TableChanged");
 

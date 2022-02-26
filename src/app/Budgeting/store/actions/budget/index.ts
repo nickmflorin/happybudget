@@ -14,14 +14,16 @@ export const requestBudgetAction = redux.actions.createAction<number>("budget.Re
 export const updateBudgetInStateAction =
   redux.actions.createAction<Redux.UpdateActionPayload<Model.Budget>>("budget.UpdateInState");
 export const loadingFringesAction = redux.actions.createAction<boolean>("budget.fringes.Loading");
+
 export const requestFringesAction = redux.actions.createTableAction<
   Redux.TableRequestPayload,
   Tables.FringeTableContext
 >("budget.fringes.Request");
 export const responseFringesAction =
   redux.actions.createAction<Http.TableResponse<Model.Fringe>>("budget.fringes.Response");
-export const handleFringesTableChangeEventAction = redux.actions.createTableAction<
-  Table.ChangeEvent<Tables.FringeRowData, Model.Fringe>,
+
+export const handleFringesTableEventAction = redux.actions.createTableAction<
+  Table.Event<Tables.FringeRowData, Model.Fringe>,
   Tables.FringeTableContext
 >("budget.fringes.TableChanged");
 

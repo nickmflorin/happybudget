@@ -19,7 +19,7 @@ type UseAuthenticatedClipboardParams<R extends Table.RowData, M extends Model.Ro
   "setCellCutChange"
 > & {
   readonly apis: Table.GridApis | null;
-  readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
+  readonly onEvent: (event: Table.Event<R, M>) => void;
 };
 
 const getWritableColumnsAfter = <R extends Table.RowData, M extends Model.RowHttpModel>(
@@ -137,7 +137,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
         if (!isNil(c) && tabling.typeguards.isBodyColumn(c)) {
           if (!isNil(cutCellChange)) {
             p = { ...p, value: cutCellChange.oldValue };
-            params.onChangeEvent({
+            params.onEvent({
               type: "dataChange",
               payload: tabling.events.cellChangeToRowChange(cutCellChange)
             });
@@ -301,7 +301,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
             []
           );
           if (payload.length !== 0) {
-            params.onChangeEvent({
+            params.onEvent({
               type: "rowAdd",
               payload,
               placeholderIds: map(payload, () => tabling.managers.placeholderRowId())

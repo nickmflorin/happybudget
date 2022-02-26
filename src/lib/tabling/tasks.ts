@@ -7,30 +7,16 @@ import * as api from "api";
 import { tabling } from "lib";
 import * as typeguards from "./typeguards";
 
-export const createChangeEventHandler = <
-  R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
-  C extends Table.Context = Table.Context
->(
-  handlers: Partial<Redux.TableEventTaskMapObject<R, M, C>>
-): Redux.TableEventTask<Table.ChangeEvent<R, M>, R, M, C> => {
-  function* handleChangeEvent(e: Table.ChangeEvent<R, M>, context: Redux.WithActionContext<C>): SagaIterator {
-    /* The events that we are excluding here are events that are dispatched
-       after sagas handle the table changes, they are not events that instruct
-       the sagas how to persist a table change via the API. */
-    if (
-      e.type !== "modelsAdded" &&
-      e.type !== "modelsUpdated" &&
-      e.type !== "updateRows" &&
-      e.type !== "placeholdersActivated"
-    ) {
-      const handler = handlers[e.type] as Redux.TableEventTask<Table.ChangeEvent<R, M>, R, M, C> | undefined;
-      /* Do not issue a warning/error if the event type does not have an
+export const createChangeEventHandler = <R extends Table.RowData, C extends Table.Context = Table.Context>(
+  handlers: Partial<Redux.TableChangeEventTaskMapObject<R, C>>
+): Redux.TableChangeEventTask<Table.ChangeEvent<R>, R, C> => {
+  function* handleChangeEvent(e: Table.ChangeEvent<R>, context: Redux.WithActionContext<C>): SagaIterator {
+    const handler = handlers[e.type] as Redux.TableChangeEventTask<Table.ChangeEvent<R>, R, C> | undefined;
+    /* Do not issue a warning/error if the event type does not have an
 				 associated handler because there are event types that correspond to
 				 reducer behavior only. */
-      if (!isNil(handler)) {
-        yield call(handler, e, context);
-      }
+    if (!isNil(handler)) {
+      yield call(handler, e, context);
     }
   }
   return handleChangeEvent;

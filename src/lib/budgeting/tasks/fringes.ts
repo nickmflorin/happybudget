@@ -33,7 +33,7 @@ export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Ta
 
 export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   config: FringesTableTaskConfig<B>
-): Omit<Redux.AuthenticatedTableTaskMap<R, M, Tables.FringeTableContext>, "request"> => {
+): Omit<Redux.AuthenticatedTableTaskMap<R, Tables.FringeTableContext>, "request"> => {
   const selectTableStore = createSelector(
     config.selectParentTableStore,
     (tableStore: Tables.SubAccountTableStore) => tableStore.fringes
@@ -59,13 +59,9 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     ): [number, Http.BulkCreatePayload<Http.FringePayload>] => [ctx.budgetId, p]
   });
 
-  function* bulkUpdateTask(
-    ctx: CTX,
-    e: Table.ChangeEvent<R, M>,
-    requestPayload: Http.BulkUpdatePayload<P>
-  ): SagaIterator {
+  function* bulkUpdateTask(ctx: CTX, e: Table.ChangeEvent<R>, requestPayload: Http.BulkUpdatePayload<P>): SagaIterator {
     config.table.saving(true);
-    if (!tabling.typeguards.isGroupEvent(e)) {
+    if (!tabling.typeguards.isGroupChangeEvent(e)) {
       yield put(config.actions.loadingBudget(true));
     }
     try {
@@ -120,7 +116,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         dispatchClientErrorToSentry: true
       });
     } finally {
-      if (!tabling.typeguards.isGroupEvent(e)) {
+      if (!tabling.typeguards.isGroupChangeEvent(e)) {
         yield put(config.actions.loadingBudget(false));
       }
       config.table.saving(false);
@@ -207,7 +203,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   }
 
   return {
-    handleChangeEvent: tabling.tasks.createChangeEventHandler({
+    handleChangeEvent: tabling.tasks.createChangeEventHandler<R, Tables.FringeTableContext>({
       rowAdd: handleRowAddEvent,
       rowDelete: handleRowDeleteEvent,
       rowInsert: handleRowInsertEvent,
@@ -215,7 +211,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       /* It is safe to assume that the ID of the row for which data is being
 				 changed will always be a ModelRowId - but we have to force coerce that
 				 here. */
-      dataChange: handleDataChangeEvent as Redux.TableEventTask<Table.DataChangeEvent<R>, R, M>
+      dataChange: handleDataChangeEvent as Redux.TableChangeEventTask<Table.DataChangeEvent<R>, R>
     })
   };
 };

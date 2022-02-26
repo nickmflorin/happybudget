@@ -7,8 +7,8 @@ export const setActualOwnersSearchAction = redux.actions.createTableAction<strin
 );
 export const loadingActualOwnersAction = redux.actions.createAction<boolean>("budget.actualowners.Loading");
 
-export const handleTableChangeEventAction = redux.actions.createTableAction<
-  Table.ChangeEvent<Tables.ActualRowData, Model.Actual>,
+export const handleTableEventAction = redux.actions.createTableAction<
+  Table.Event<Tables.ActualRowData, Model.Actual>,
   Tables.ActualTableContext
 >("budget.actuals.TableChanged");
 

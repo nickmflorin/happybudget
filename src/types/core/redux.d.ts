@@ -34,29 +34,20 @@ declare namespace Redux {
 
   type WithActionContext<C extends Record<string, unknown>> = C & ActionContext;
 
-  type TableEventTask<
-    E extends Table.ChangeEvent<R, M>,
+  type TableChangeEventTask<
+    E extends Table.ChangeEvent<R>,
     R extends Table.RowData,
-    M extends Model.RowHttpModel,
     C extends Table.Context = Table.Context
   > = (e: E, context: WithActionContext<C>) => import("@redux-saga/types").SagaIterator;
 
-  type TableEventTaskMapObject<
-    R extends Table.RowData,
-    M extends Model.RowHttpModel = Model.RowHttpModel,
-    C extends Table.Context = Table.Context
-  > = {
-    readonly dataChange: TableEventTask<Table.DataChangeEvent<R>, R, M, C>;
-    readonly rowAdd: TableEventTask<Table.RowAddEvent<R>, R, M, C>;
-    readonly rowInsert: TableEventTask<Table.RowInsertEvent<R>, R, M, C>;
-    readonly rowPositionChanged: TableEventTask<Table.RowPositionChangedEvent, R, M, C>;
-    readonly rowDelete: TableEventTask<Table.RowDeleteEvent, R, M, C>;
-    readonly rowRemoveFromGroup: TableEventTask<Table.RowRemoveFromGroupEvent, R, M, C>;
-    readonly rowAddToGroup: TableEventTask<Table.RowAddToGroupEvent, R, M, C>;
-    readonly groupAdded: TableEventTask<Table.GroupAddedEvent, R, M, C>;
-    readonly groupUpdated: TableEventTask<Table.GroupUpdatedEvent, R, M, C>;
-    readonly markupAdded: TableEventTask<Table.MarkupAddedEvent, R, M, C>;
-    readonly markupUpdated: TableEventTask<Table.MarkupUpdatedEvent, R, M, C>;
+  type TableChangeEventTaskMapObject<R extends Table.RowData, C extends Table.Context = Table.Context> = {
+    readonly dataChange: TableChangeEventTask<Table.DataChangeEvent<R>, R, C>;
+    readonly rowAdd: TableChangeEventTask<Table.RowAddEvent<R>, R, C>;
+    readonly rowInsert: TableChangeEventTask<Table.RowInsertEvent<R>, R, C>;
+    readonly rowPositionChanged: TableChangeEventTask<Table.RowPositionChangedEvent, R, C>;
+    readonly rowDelete: TableChangeEventTask<Table.RowDeleteEvent, R, C>;
+    readonly rowRemoveFromGroup: TableChangeEventTask<Table.RowRemoveFromGroupEvent, R, C>;
+    readonly rowAddToGroup: TableChangeEventTask<Table.RowAddToGroupEvent, R, C>;
   };
 
   type Reducer<S, A = Action> = import("redux").Reducer<S, A>;
@@ -218,12 +209,8 @@ declare namespace Redux {
     readonly request: ContextTask<TableRequestPayload, C>;
   };
 
-  type AuthenticatedTableTaskMap<
-    R extends Table.RowData,
-    M extends Model.RowHttpModel = Model.RowHttpModel,
-    C extends Table.Context = Table.Context
-  > = TableTaskMap<C> & {
-    readonly handleChangeEvent: TableEventTask<Table.ChangeEvent<R, M>, R, M, C>;
+  type AuthenticatedTableTaskMap<R extends Table.RowData, C extends Table.Context = Table.Context> = TableTaskMap<C> & {
+    readonly handleChangeEvent: TableChangeEventTask<Table.ChangeEvent<R>, R, C>;
   };
 
   type TableTaskMapWithRequest<C extends Table.Context = Table.Context> = {
@@ -247,7 +234,7 @@ declare namespace Redux {
     M extends Model.RowHttpModel = Model.RowHttpModel,
     C extends Table.Context = Table.Context
   > = TableActionMap<M, C> & {
-    readonly tableChanged: TableActionCreator<Table.ChangeEvent<R, M>, C>;
+    readonly tableChanged: TableActionCreator<Table.Event<R, M>, C>;
   };
 
   type TableActionMapWithRequest<C extends Table.Context = Table.Context> = {

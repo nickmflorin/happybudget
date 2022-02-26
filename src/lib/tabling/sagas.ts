@@ -30,12 +30,7 @@ export const createPublicTableSaga = <
   return rootSaga;
 };
 
-type Batch<
-  E extends Table.ChangeEvent<R, M>,
-  R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
-  C extends Table.Context = Table.Context
-> = {
+type Batch<E extends Table.ChangeEvent<R>, R extends Table.RowData, C extends Table.Context = Table.Context> = {
   readonly events: E[];
   readonly context: Redux.WithActionContext<C>;
 };
@@ -49,7 +44,7 @@ type SagaConfigWithRequest<
   M,
   C,
   Redux.AuthenticatedTableActionMap<R, M, C>,
-  Redux.AuthenticatedTableTaskMap<R, M, C>
+  Redux.AuthenticatedTableTaskMap<R, C>
 >;
 
 type SagaConfigWithoutRequest<
@@ -61,7 +56,7 @@ type SagaConfigWithoutRequest<
   M,
   C,
   Omit<Redux.AuthenticatedTableActionMap<R, M, C>, "request">,
-  Omit<Redux.AuthenticatedTableTaskMap<R, M, C>, "request">
+  Omit<Redux.AuthenticatedTableTaskMap<R, C>, "request">
 >;
 
 type SagaConfig<
@@ -91,11 +86,10 @@ const configIsWithRequest = <
 const actionInconsistentWithBatch = <
   E extends Table.DataChangeEvent<R> | Table.RowAddDataEvent<R>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context
 >(
   action: Redux.TableAction<E, C>,
-  batch: Batch<E, R, M, C>
+  batch: Batch<E, R, C>
 ): boolean => {
   return !isEqual(action.context, batch.context);
 };
@@ -119,13 +113,10 @@ export const createAuthenticatedTableSaga = <
    * Events: [A, A, A, B, A, A, B, B, C, B, C, A, A, B]
    * In Batches: [[A, A, A], [B], [A, A], [B, B], [C], [B], [C], [A, A], B]
    */
-  function* flushEvents(actions: Redux.TableAction<Table.ChangeEvent<R, M>, C>[]): SagaIterator {
-    const events: Table.ChangeEvent<R, M>[] = map(
-      actions,
-      (a: Redux.TableAction<Table.ChangeEvent<R, M>, C>) => a.payload
-    );
+  function* flushEvents(actions: Redux.TableAction<Table.ChangeEvent<R>, C>[]): SagaIterator {
+    const events: Table.ChangeEvent<R>[] = map(actions, (a: Redux.TableAction<Table.ChangeEvent<R>, C>) => a.payload);
 
-    function* flushDataBatch(batch: Batch<Table.DataChangeEvent<R>, R, M, C> | null): SagaIterator {
+    function* flushDataBatch(batch: Batch<Table.DataChangeEvent<R>, R, C> | null): SagaIterator {
       if (batch !== null && batch.events.length !== 0) {
         const event = tabling.events.consolidateDataChangeEvents(batch.events);
         if (!Array.isArray(event.payload) || event.payload.length !== 0) {
@@ -134,7 +125,7 @@ export const createAuthenticatedTableSaga = <
       }
     }
 
-    function* flushRowAddBatch(batch: Batch<Table.RowAddDataEvent<R>, R, M, C> | null): SagaIterator {
+    function* flushRowAddBatch(batch: Batch<Table.RowAddDataEvent<R>, R, C> | null): SagaIterator {
       if (batch !== null && batch.events.length !== 0) {
         const event = tabling.events.consolidateRowAddEvents(batch.events);
         if (!Array.isArray(event.payload) || event.payload.length !== 0) {
@@ -143,13 +134,13 @@ export const createAuthenticatedTableSaga = <
       }
     }
 
-    let runningDataChangeBatch: Batch<Table.DataChangeEvent<R>, R, M, C> | null = null;
-    let runningRowAddBatch: Batch<Table.RowAddDataEvent<R>, R, M, C> | null = null;
+    let runningDataChangeBatch: Batch<Table.DataChangeEvent<R>, R, C> | null = null;
+    let runningRowAddBatch: Batch<Table.RowAddDataEvent<R>, R, C> | null = null;
 
     const addEventToBatch = <E extends Table.DataChangeEvent<R> | Table.RowAddDataEvent<R>>(
-      batch: Batch<E, R, M, C>,
+      batch: Batch<E, R, C>,
       action: Redux.TableAction<E, C>
-    ): Batch<E, R, M, C> => {
+    ): Batch<E, R, C> => {
       if (batch.events.length === 0) {
         return {
           ...batch,
@@ -167,7 +158,7 @@ export const createAuthenticatedTableSaga = <
 
     for (let i = 0; i < events.length; i++) {
       const a = actions[i];
-      if (tabling.typeguards.isDataChangeEventAction(a)) {
+      if (tabling.typeguards.isActionWithChangeEvent(a, "dataChange")) {
         /* Queue the row add events when they are happening very close together
            in the time dimension.  If an event comes in that is not semantically
 					 "different" from the other events in the currently queued batch,
@@ -177,7 +168,7 @@ export const createAuthenticatedTableSaga = <
             events: [a.payload],
             context: a.context
           };
-        } else if (actionInconsistentWithBatch<Table.DataChangeEvent<R>, R, M, C>(a, runningDataChangeBatch)) {
+        } else if (actionInconsistentWithBatch<Table.DataChangeEvent<R>, R, C>(a, runningDataChangeBatch)) {
           /* If the context of the new event does not match the context of the
              current batch, that means that the context quickly changed before
 						 the batch had a chance to flush.  In this case, we need to flush
@@ -228,28 +219,30 @@ export const createAuthenticatedTableSaga = <
   function* tableChangeEventSaga(): SagaIterator {
     const changeChannel = yield actionChannel(config.actions.tableChanged.toString());
     while (true) {
-      const action: Redux.TableAction<Table.ChangeEvent<R, M>, C> = yield take(changeChannel);
-      const e: Table.ChangeEvent<R, M> = action.payload;
-
-      if (tabling.typeguards.isDataChangeEvent(e)) {
-        yield delay(200);
-        const actions: Redux.TableAction<Table.ChangeEvent<R, M>, C>[] = yield flush(changeChannel);
-        yield call(flushEvents, [action, ...actions]);
-      } else if (
-        /* We do not want to buffer RowAdd events if the row is being added either
-           by the RowAddIndexPayload or the RowAddCountPayload. */
-        tabling.typeguards.isRowAddEvent(e) &&
-        tabling.typeguards.isRowAddDataEvent(e)
-      ) {
-        /* Buffer and flush data change events and new row events that occur
-					 every 500ms - this is particularly important for dragging cell values
-					 to update other cell values as it submits a separate DataChangeEvent
-					 for every new cell value. */
-        yield delay(500);
-        const actions: Redux.TableAction<Table.ChangeEvent<R, M>, C>[] = yield flush(changeChannel);
-        yield call(flushEvents, [action, ...actions]);
-      } else {
-        yield call(config.tasks.handleChangeEvent, e, action.context);
+      const action: Redux.TableAction<Table.Event<R, M>, C> = yield take(changeChannel);
+      const e: Table.Event<R, M> = action.payload;
+      if (tabling.typeguards.isChangeEvent(e)) {
+        const a = action as Redux.TableAction<Table.ChangeEvent<R>, C>;
+        if (tabling.typeguards.isDataChangeEvent(e)) {
+          yield delay(200);
+          const actions: Redux.TableAction<Table.ChangeEvent<R>, C>[] = yield flush(changeChannel);
+          yield call(flushEvents, [a, ...actions]);
+        } else if (
+          /* We do not want to buffer RowAdd events if the row is being added
+					   either by the RowAddIndexPayload or the RowAddCountPayload. */
+          tabling.typeguards.isRowAddEvent(e) &&
+          tabling.typeguards.isRowAddDataEvent(e)
+        ) {
+          /* Buffer and flush data change events and new row events that occur
+						 every 500ms - this is particularly important for dragging cell values
+						 to update other cell values as it submits a separate DataChangeEvent
+						 for every new cell value. */
+          yield delay(500);
+          const actions: Redux.TableAction<Table.ChangeEvent<R>, C>[] = yield flush(changeChannel);
+          yield call(flushEvents, [a, ...actions]);
+        } else {
+          yield call(config.tasks.handleChangeEvent, e, a.context);
+        }
       }
     }
   }

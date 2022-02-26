@@ -269,7 +269,7 @@ const authenticateDataGrid = <
       useAuthenticatedClipboard<R, M>({
         columns: props.columns,
         apis: props.apis,
-        onChangeEvent: props.onChangeEvent
+        onEvent: props.onEvent
       });
     const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
     const oldRow = useRef<Table.ModelRow<R> | null>(null); // TODO: Figure out a better way to do this.
@@ -375,7 +375,7 @@ const authenticateDataGrid = <
                     )
                   );
                   if (changes.length !== 0) {
-                    props.onChangeEvent({
+                    props.onEvent({
                       type: "dataChange",
                       payload: tabling.events.consolidateCellChanges(changes)
                     });
@@ -392,7 +392,7 @@ const authenticateDataGrid = <
                   if (tabling.typeguards.isEditableRow(row) && col.cellEditorPopup === true) {
                     const change = getCellChangeForClear(row, col);
                     if (!isNil(change)) {
-                      props.onChangeEvent({
+                      props.onEvent({
                         type: "dataChange",
                         payload: tabling.events.cellChangeToRowChange(change)
                       });
@@ -423,7 +423,7 @@ const authenticateDataGrid = <
       onNewRowRequired: (newRowIndex: number) => {
         const gridApi: Table.GridApi | undefined = props.apis?.grid;
         if (!isNil(gridApi)) {
-          props.onChangeEvent({
+          props.onEvent({
             type: "rowAdd",
             placeholderIds: [tabling.managers.placeholderRowId()],
             payload: { newIndex: newRowIndex }
@@ -530,7 +530,7 @@ const authenticateDataGrid = <
         []
       );
       if (changes.length !== 0) {
-        props.onChangeEvent({
+        props.onEvent({
           type: "dataChange",
           payload: tabling.events.consolidateCellChanges(changes)
         });
@@ -551,7 +551,7 @@ const authenticateDataGrid = <
           } else {
             const changes = getCellChangesFromEvent(tabling.columns.filterRealColumns(columns), e);
             if (changes.length !== 0) {
-              props.onChangeEvent({ type: "dataChange", payload: tabling.events.consolidateCellChanges(changes) });
+              props.onEvent({ type: "dataChange", payload: tabling.events.consolidateCellChanges(changes) });
               const expandConfig = !isNil(props.editColumnConfig)
                 ? tabling.columns.getEditColumnRowConfig(props.editColumnConfig, row, "expand")
                 : null;
@@ -638,7 +638,7 @@ const authenticateDataGrid = <
           }
         }
       }
-      props.onChangeEvent({
+      props.onEvent({
         type: "rowPositionChanged",
         payload: {
           previous: !isNil(previous) ? previous.id : null,

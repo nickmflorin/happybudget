@@ -11,7 +11,7 @@ export interface AuthenticatedGridProps<R extends Table.RowData, M extends Model
   extends GridProps<R, M> {
   readonly apis: Table.GridApis | null;
   readonly framework?: Table.Framework;
-  readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
+  readonly onEvent: (event: Table.Event<R, M>) => void;
   readonly onRowSelectionChanged?: (rows: Table.EditableRow<R>[]) => void;
 }
 
@@ -47,7 +47,7 @@ const AuthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpModel
         tabling.typeguards.isRealColumn(col)
           ? {
               ...col,
-              cellRendererParams: { ...col.cellRendererParams, onChangeEvent: props.onChangeEvent, readOnly: false }
+              cellRendererParams: { ...col.cellRendererParams, onEvent: props.onEvent, readOnly: false }
             }
           : col
     );

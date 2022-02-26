@@ -93,7 +93,7 @@ const genericReducer = combineReducers({
           }
         ],
         actions: {
-          tableChanged: actions.account.handleTableChangeEventAction,
+          tableChanged: actions.account.handleTableEventAction,
           loading: actions.account.loadingAction,
           response: actions.account.responseAction,
           responseSubAccountUnits: actions.responseSubAccountUnitsAction,
@@ -107,7 +107,7 @@ const genericReducer = combineReducers({
           clearOn: [actions.requestFringesAction],
           actions: {
             responseFringeColors: actions.responseFringeColorsAction,
-            tableChanged: actions.handleFringesTableChangeEventAction,
+            tableChanged: actions.handleFringesTableEventAction,
             loading: actions.loadingFringesAction,
             response: actions.responseFringesAction,
             setSearch: actions.setFringesSearchAction
@@ -126,7 +126,7 @@ const genericReducer = combineReducers({
     ],
 
     actions: {
-      tableChanged: actions.accounts.handleTableChangeEventAction,
+      tableChanged: actions.accounts.handleTableEventAction,
       loading: actions.accounts.loadingAction,
       response: actions.accounts.responseAction,
       setSearch: actions.accounts.setSearchAction
@@ -151,7 +151,7 @@ const genericReducer = combineReducers({
           }
         ],
         actions: {
-          tableChanged: actions.subAccount.handleTableChangeEventAction,
+          tableChanged: actions.subAccount.handleTableEventAction,
           responseSubAccountUnits: actions.responseSubAccountUnitsAction,
           loading: actions.subAccount.loadingAction,
           response: actions.subAccount.responseAction,
@@ -165,7 +165,7 @@ const genericReducer = combineReducers({
           clearOn: [actions.requestFringesAction],
           actions: {
             responseFringeColors: actions.responseFringeColorsAction,
-            tableChanged: actions.handleFringesTableChangeEventAction,
+            tableChanged: actions.handleFringesTableEventAction,
             loading: actions.loadingFringesAction,
             response: actions.responseFringesAction,
             setSearch: actions.setFringesSearchAction
@@ -178,7 +178,7 @@ const genericReducer = combineReducers({
     initialState: initialBudgetState.actuals,
     clearOn: [actions.actuals.requestAction],
     actions: {
-      tableChanged: actions.actuals.handleTableChangeEventAction,
+      tableChanged: actions.actuals.handleTableEventAction,
       loading: actions.actuals.loadingAction,
       response: actions.actuals.responseAction,
       setSearch: actions.actuals.setSearchAction,

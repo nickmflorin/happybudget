@@ -46,7 +46,7 @@ export const createBudgetTableReducer = <
   return tabling.reducers.createTableReducer<R, M, S, C, A>(config);
 };
 
-export const createBudgetTableChangeEventReducer = <
+export const createBudgetTableEventReducer = <
   R extends Tables.AccountRowData | Tables.SubAccountRowData,
   M extends Model.Account | Model.SubAccount,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
@@ -54,99 +54,101 @@ export const createBudgetTableChangeEventReducer = <
   A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
 >(
   config: BudgetTableReducerConfig<R, M, S, C, A>
-): Redux.Reducer<S, Redux.Action<Table.ChangeEvent<R, M>>> => {
+): Redux.Reducer<S, Redux.Action<Table.Event<R, M>>> => {
   const isSubAccountRowData = (
     data: Tables.AccountRowData | Tables.SubAccountRowData
   ): data is Tables.SubAccountRowData => (data as Tables.SubAccountRowData).fringe_contribution !== undefined;
 
-  const generic = tabling.reducers.createTableChangeEventReducer<R, M, S, C, A>(config);
+  const generic = tabling.reducers.createTableEventReducer<R, M, S, C, A>(config);
 
-  return (state: S = config.initialState, action: Redux.Action<Table.ChangeEvent<R, M>>): S => {
+  return (state: S = config.initialState, action: Redux.Action<Table.Event<R, M>>): S => {
     let newState: S = generic(state, action);
 
     const markupRowManager = new tabling.managers.MarkupRowManager({ columns: config.columns });
 
-    const e: Table.ChangeEvent<R, M> = action.payload;
-    if (tabling.typeguards.isMarkupAddedEvent(e)) {
-      const markup: Model.Markup = e.payload;
+    const e: Table.Event<R, M> = action.payload;
+    if (tabling.typeguards.isControlEvent(e)) {
+      if (tabling.typeguards.isMarkupAddedEvent(e)) {
+        const markup: Model.Markup = e.payload;
 
-      const markupRow = markupRowManager.create({ model: markup });
+        const markupRow = markupRowManager.create({ model: markup });
 
-      /* Insert the new MarkupRow(s) into the table and reorder the rows of the
-				 table so that the MarkupRow(s) are in the appropriate location. */
-      return {
-        ...newState,
-        data: tabling.data.orderTableRows<R>([...newState.data, markupRow])
-      };
-    } else if (tabling.typeguards.isMarkupUpdatedEvent(e)) {
-      /*
-      Note: This event occurs when Markup is updated via a Modal and the response
-      is received - so we have access to the complete updated Markup and do not
-      need to perform any recalculations or manipulations of the Markup itself,
-      just the children that belong to the Markup.
-      */
-      const markupRow: Table.MarkupRow<R> | null = markupRowFromState<R, S>(
-        action,
-        newState,
-        tabling.managers.markupRowId(e.payload.id)
-      );
-      if (!isNil(markupRow)) {
-        /*
-        We first have to update the MarkupRow with the new Markup model - which
-        will cause the MarkupRow to include updated values for the unit and rate
-        properties.  Once that is done, we need to update the children rows of
-        the MarkupRow to reflect these new values, and then finally update the
-        MarkupRow again to reflect the new children.
-        */
-        const updatedMarkupRow = markupRowManager.create({ model: e.payload });
-        const childrenRows = filter(
-          newState.data,
-          (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) && includes(updatedMarkupRow.children, r.id)
-        ) as Table.ModelRow<R>[];
-        // Update the Markup Row itself in state.
-        newState = {
-          ...state,
-          data: util.replaceInArray<Table.BodyRow<R>>(state.data, { id: updatedMarkupRow.id }, updatedMarkupRow)
+        /* Insert the new MarkupRow(s) into the table and reorder the rows of the
+					 table so that the MarkupRow(s) are in the appropriate location. */
+        return {
+          ...newState,
+          data: tabling.data.orderTableRows<R>([...newState.data, markupRow])
         };
-        /* Update the children rows of the MarkupRow to reflect the new MarkupRow
-           data. */
-        return reduce(
-          childrenRows,
-          (st: S, r: Table.ModelRow<R>) => {
-            const otherMarkupRows = filter(
-              newState.data,
-              (ri: Table.BodyRow<R>) =>
-                tabling.typeguards.isMarkupRow(ri) && includes(ri.children, r.id) && ri.id !== updatedMarkupRow.id
-            ) as Table.MarkupRow<R>[];
-            return {
-              ...st,
-              data: util.replaceInArray<Table.BodyRow<R>>(
-                st.data,
-                { id: r.id },
-                {
-                  ...r,
-                  data: {
-                    ...r.data,
-                    /* Markup contributions get applied to the value after fringes
-                       are applied. */
-                    markup_contribution: budgeting.businessLogic.contributionFromMarkups(
-                      isSubAccountRowData(r.data)
-                        ? r.data.nominal_value +
-                            r.data.accumulated_fringe_contribution +
-                            r.data.accumulated_markup_contribution +
-                            r.data.fringe_contribution
-                        : r.data.nominal_value +
-                            r.data.accumulated_fringe_contribution +
-                            r.data.accumulated_markup_contribution,
-                      [...otherMarkupRows, updatedMarkupRow]
-                    )
-                  }
-                }
-              )
-            };
-          },
-          newState
+      } else if (tabling.typeguards.isMarkupUpdatedEvent(e)) {
+        /*
+				Note: This event occurs when Markup is updated via a Modal and the
+				response is received - so we have access to the complete updated Markup
+				and do not need to perform any recalculations or manipulations of the
+				Markup itself, just the children that belong to the Markup.
+				*/
+        const markupRow: Table.MarkupRow<R> | null = markupRowFromState<R, S>(
+          action,
+          newState,
+          tabling.managers.markupRowId(e.payload.id)
         );
+        if (!isNil(markupRow)) {
+          /*
+					We first have to update the MarkupRow with the new Markup model - which
+					will cause the MarkupRow to include updated values for the unit and rate
+					properties.  Once that is done, we need to update the children rows of
+					the MarkupRow to reflect these new values, and then finally update the
+					MarkupRow again to reflect the new children.
+					*/
+          const updatedMarkupRow = markupRowManager.create({ model: e.payload });
+          const childrenRows = filter(
+            newState.data,
+            (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) && includes(updatedMarkupRow.children, r.id)
+          ) as Table.ModelRow<R>[];
+          // Update the Markup Row itself in state.
+          newState = {
+            ...state,
+            data: util.replaceInArray<Table.BodyRow<R>>(state.data, { id: updatedMarkupRow.id }, updatedMarkupRow)
+          };
+          /* Update the children rows of the MarkupRow to reflect the new
+					   MarkupRow data. */
+          return reduce(
+            childrenRows,
+            (st: S, r: Table.ModelRow<R>) => {
+              const otherMarkupRows = filter(
+                newState.data,
+                (ri: Table.BodyRow<R>) =>
+                  tabling.typeguards.isMarkupRow(ri) && includes(ri.children, r.id) && ri.id !== updatedMarkupRow.id
+              ) as Table.MarkupRow<R>[];
+              return {
+                ...st,
+                data: util.replaceInArray<Table.BodyRow<R>>(
+                  st.data,
+                  { id: r.id },
+                  {
+                    ...r,
+                    data: {
+                      ...r.data,
+                      /* Markup contributions get applied to the value after
+											   fringes are applied. */
+                      markup_contribution: budgeting.businessLogic.contributionFromMarkups(
+                        isSubAccountRowData(r.data)
+                          ? r.data.nominal_value +
+                              r.data.accumulated_fringe_contribution +
+                              r.data.accumulated_markup_contribution +
+                              r.data.fringe_contribution
+                          : r.data.nominal_value +
+                              r.data.accumulated_fringe_contribution +
+                              r.data.accumulated_markup_contribution,
+                        [...otherMarkupRows, updatedMarkupRow]
+                      )
+                    }
+                  }
+                )
+              };
+            },
+            newState
+          );
+        }
       }
     }
     return newState;
@@ -164,7 +166,7 @@ export const createAuthenticatedBudgetTableReducer = <
     readonly recalculateRow?: (state: S, action: Redux.Action, row: Table.DataRow<R>) => Partial<R>;
   }
 ): Redux.Reducer<S> => {
-  const eventReducer = createBudgetTableChangeEventReducer<R, M, S, C, A>(config);
+  const eventReducer = createBudgetTableEventReducer<R, M, S, C, A>(config);
 
   return tabling.reducers.createAuthenticatedTableReducer<R, M, S, C, A>({
     ...config,

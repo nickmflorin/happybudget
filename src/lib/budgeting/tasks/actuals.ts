@@ -22,7 +22,7 @@ export type ActualsTableTaskConfig = Table.TaskConfig<R, M, Tables.ActualTableCo
   readonly selectOwnersSearch: (state: Application.Store) => string;
 };
 
-export type ActualsAuthenticatedTableTaskMap = Redux.AuthenticatedTableTaskMap<R, M, Tables.ActualTableContext> & {
+export type ActualsAuthenticatedTableTaskMap = Redux.AuthenticatedTableTaskMap<R, Tables.ActualTableContext> & {
   readonly requestActualOwners: Redux.ContextTask<null, Tables.ActualTableContext>;
 };
 

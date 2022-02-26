@@ -65,7 +65,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
     columns: tabling.columns.filterModelColumns(ContactsTable.Columns),
     clearOn: [actions.requestContactsAction],
     actions: {
-      tableChanged: actions.handleContactsTableChangeEventAction,
+      tableChanged: actions.handleContactsTableEventAction,
       loading: actions.loadingContactsAction,
       response: actions.responseContactsAction,
       setSearch: actions.setContactsSearchAction

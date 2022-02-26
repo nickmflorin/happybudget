@@ -142,7 +142,7 @@ export const createAuthenticatedTableTaskSet = <
   B extends Model.Budget | Model.Template
 >(
   config: AuthenticatedSubAccountsTableTaskConfig<M, B>
-): Redux.AuthenticatedTableTaskMap<R, C, Tables.SubAccountTableContext> => {
+): Redux.AuthenticatedTableTaskMap<R, Tables.SubAccountTableContext> => {
   const contactsTasks = contacts.tasks.createTaskSet();
 
   function* requestFringes(ctx: CTX): SagaIterator {
@@ -545,7 +545,7 @@ export const createAuthenticatedTableTaskSet = <
 
   return {
     request,
-    handleChangeEvent: tabling.tasks.createChangeEventHandler<R, C, Tables.SubAccountTableContext>({
+    handleChangeEvent: tabling.tasks.createChangeEventHandler<R, Tables.SubAccountTableContext>({
       rowRemoveFromGroup: handleRemoveRowFromGroupEvent,
       rowInsert: handleRowInsertEvent,
       rowAddToGroup: handleAddRowToGroupEvent,

@@ -61,7 +61,7 @@ export const createTableTaskSet = (
   > & {
     readonly selectStore: (state: Application.Store) => Tables.ContactTableStore;
   }
-): Redux.AuthenticatedTableTaskMap<R, M, Tables.ContactTableContext> => {
+): Redux.AuthenticatedTableTaskMap<R, Tables.ContactTableContext> => {
   function* tableRequest(
     action: Redux.TableAction<Redux.TableRequestPayload, Tables.ContactTableContext>
   ): SagaIterator {
@@ -194,10 +194,9 @@ export const createTableTaskSet = (
       /* It is safe to assume that the ID of the row for which data is being
 			   changed will always be a ModelRowId - but we have to force coerce that
 				 here. */
-      dataChange: handleDataChangeEvent as Redux.TableEventTask<
+      dataChange: handleDataChangeEvent as Redux.TableChangeEventTask<
         Table.DataChangeEvent<R>,
         R,
-        M,
         Tables.ContactTableContext
       >
     })

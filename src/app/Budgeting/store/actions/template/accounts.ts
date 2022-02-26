@@ -1,7 +1,7 @@
 import { redux } from "lib";
 
-export const handleTableChangeEventAction = redux.actions.createTableAction<
-  Table.ChangeEvent<Tables.AccountRowData, Model.Account>,
+export const handleTableEventAction = redux.actions.createTableAction<
+  Table.Event<Tables.AccountRowData, Model.Account>,
   Tables.AccountTableContext
 >("template.TableChanged");
 
