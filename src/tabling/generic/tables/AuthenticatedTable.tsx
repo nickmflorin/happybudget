@@ -337,7 +337,7 @@ const AuthenticatedTable = <
       },
       changeColumnVisibility: props.changeColumnVisibility,
       getColumns: () => tabling.columns.filterModelColumns(columns),
-      applyTableChange: (event: SingleOrArray<Table.ChangeEvent<R, M>>) =>
+      dispatchEvent: (event: SingleOrArray<Table.ChangeEvent<R, M>>) =>
         Array.isArray(event) ? map(event, (e: Table.ChangeEvent<R, M>) => _onChangeEvent(e)) : _onChangeEvent(event),
       getRowsAboveAndIncludingFocusedRow: () => {
         const apis = props.tableApis.get("data");

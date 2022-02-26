@@ -39,7 +39,7 @@ const useAttachments = <
 
   const removeAttachment = useMemo(
     () => (row: Table.ModelRow<R>, rowId: number) => {
-      props.table.applyTableChange({
+      props.table.dispatchEvent({
         type: "updateRows",
         payload: {
           id: row.id,
@@ -54,7 +54,7 @@ const useAttachments = <
 
   const addAttachment = useMemo(
     () => (row: Table.ModelRow<R>, attachment: Model.Attachment) => {
-      props.table.applyTableChange({
+      props.table.dispatchEvent({
         type: "updateRows",
         payload: {
           id: row.id,

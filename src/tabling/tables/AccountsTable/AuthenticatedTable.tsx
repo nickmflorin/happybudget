@@ -48,7 +48,7 @@ const AuthenticatedTable = <B extends Model.BaseBudget>(props: AuthenticatedTabl
     parentType: "budget",
     table: props.table.current,
     onGroupUpdated: (group: Model.Group) =>
-      props.table.current.applyTableChange({
+      props.table.current.dispatchEvent({
         type: "groupUpdated",
         payload: group
       })

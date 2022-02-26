@@ -36,7 +36,7 @@ export const InitialTableRef: Table.TableInstance<Table.RowData, Model.RowHttpMo
   /* eslint-disable @typescript-eslint/no-empty-function */
   changeColumnVisibility: () => {},
   /* eslint-disable @typescript-eslint/no-empty-function */
-  applyTableChange: () => {}
+  dispatchEvent: () => {}
 };
 
 export const useTable = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(): NonNullRef<

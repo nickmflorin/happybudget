@@ -77,7 +77,7 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
               data: { ...rowChange.data, rate: { oldValue: row.data.rate, newValue: m.rate } }
             };
           }
-          props.table.current.applyTableChange({
+          props.table.current.dispatchEvent({
             type: "dataChange",
             payload: rowChange
           });
@@ -94,7 +94,7 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
       if (!isNil(rowId)) {
         const row: Table.BodyRow<R> | null = props.table.current.getRow(rowId);
         if (!isNil(row) && tabling.typeguards.isModelRow(row) && row.data.rate === null && m.rate !== null) {
-          props.table.current.applyTableChange({
+          props.table.current.dispatchEvent({
             type: "dataChange",
             payload: {
               id: row.id,
@@ -142,7 +142,7 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
               if (!isNil(row) && tabling.typeguards.isModelRow(row) && row.data.rate === null) {
                 const contact: Model.Contact | undefined = find(contacts, { id: change.newValue });
                 if (!isNil(contact) && !isNil(contact.rate)) {
-                  props.table.current.applyTableChange({
+                  props.table.current.dispatchEvent({
                     type: "dataChange",
                     payload: { id: row.id, data: { rate: { oldValue: row.data.rate, newValue: contact.rate } } }
                   });

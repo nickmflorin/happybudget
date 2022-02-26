@@ -42,7 +42,7 @@ const useMarkup = <
           onSuccess={(response: RSP) => {
             setMarkupAccounts(null);
             props.onResponse(response);
-            props.table.applyTableChange({
+            props.table.dispatchEvent({
               type: "markupAdded",
               payload: response.data
             });
@@ -66,7 +66,7 @@ const useMarkup = <
           onSuccess={(response: RSP) => {
             setMarkupToEdit(null);
             props.onResponse(response);
-            props.table.applyTableChange({
+            props.table.dispatchEvent({
               type: "markupUpdated",
               payload: response.data
             });

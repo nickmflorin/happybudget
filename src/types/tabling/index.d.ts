@@ -1016,7 +1016,7 @@ declare namespace Table {
       readonly getRow: (id: BodyRowId) => BodyRow<R> | null;
       readonly getRows: () => BodyRow<R>[];
       readonly getRowsAboveAndIncludingFocusedRow: () => BodyRow<R>[];
-      readonly applyTableChange: (event: SingleOrArray<ChangeEvent<R, M>>) => void;
+      readonly dispatchEvent: (event: SingleOrArray<ChangeEvent<R, M>>) => void;
       readonly changeColumnVisibility: (changes: SingleOrArray<ColumnVisibilityChange>, sizeToFit?: boolean) => void;
     };
 

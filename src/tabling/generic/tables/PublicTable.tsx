@@ -135,7 +135,7 @@ const PublicTable = <
       handleRequestError: () => [],
       getColumns: () => tabling.columns.filterModelColumns(columns),
       /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-      applyTableChange: () => {},
+      dispatchEvent: () => {},
       changeColumnVisibility: props.changeColumnVisibility,
       getRowsAboveAndIncludingFocusedRow: () => {
         const apis = props.tableApis.get("data");

@@ -58,7 +58,7 @@ const ContactsTable = (props: Props): JSX.Element => {
   const [__, editContactModal, editContact, _] = useContacts({
     onCreated: (m: Model.Contact) => dispatch(actions.authenticated.addContactToStateAction(m)),
     onUpdated: (m: Model.Contact) =>
-      props.table.current.applyTableChange({
+      props.table.current.dispatchEvent({
         type: "modelsUpdated",
         payload: { model: m }
       }),

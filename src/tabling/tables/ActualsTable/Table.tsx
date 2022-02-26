@@ -141,7 +141,7 @@ const ActualsTable = ({ parent, onOwnersSearch, ...props }: Props): JSX.Element 
             id: row.id,
             data: { contact: { oldValue: row.data.contact, newValue: m.id } }
           };
-          props.table.current.applyTableChange({
+          props.table.current.dispatchEvent({
             type: "dataChange",
             payload: rowChange
           });

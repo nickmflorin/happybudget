@@ -33,7 +33,7 @@ const useGrouping = <R extends Tables.BudgetRowData, M extends Model.RowHttpMode
           open={true}
           onSuccess={(group: Model.Group) => {
             setGroupAccounts(undefined);
-            props.table.applyTableChange({
+            props.table.dispatchEvent({
               type: "groupAdded",
               payload: group
             });
