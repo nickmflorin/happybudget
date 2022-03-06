@@ -47,7 +47,7 @@ const AuthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpModel
         tabling.typeguards.isRealColumn(col)
           ? {
               ...col,
-              cellRendererParams: { ...col.cellRendererParams, onEvent: props.onEvent, readOnly: false }
+              cellRendererParams: { ...col.cellRendererParams, onEvent: props.onEvent }
             }
           : col
     );

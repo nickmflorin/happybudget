@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
-import { map, reduce } from "lodash";
+import { reduce } from "lodash";
 
-import { tabling, hooks } from "lib";
+import { tabling } from "lib";
 import { framework as generic } from "tabling/generic";
 import Grid, { GridProps } from "./Grid";
 
@@ -28,22 +28,7 @@ const PublicGrid = <R extends Table.RowData, M extends Model.RowHttpModel = Mode
     };
   }, [framework, props.id]);
 
-  const columns = useMemo<Table.Column<R, M>[]>(
-    (): Table.Column<R, M>[] =>
-      map(
-        props.columns,
-        (col: Table.Column<R, M>): Table.Column<R, M> =>
-          tabling.typeguards.isRealColumn(col)
-            ? {
-                ...col,
-                cellRendererParams: { ...col.cellRendererParams, readOnly: true }
-              }
-            : col
-      ),
-    [hooks.useDeepEqualMemo(props.columns)]
-  );
-
-  return <Grid {...props} columns={columns} frameworkComponents={frameworkComponents} />;
+  return <Grid {...props} frameworkComponents={frameworkComponents} />;
 };
 
 export default React.memo(PublicGrid) as typeof PublicGrid;
