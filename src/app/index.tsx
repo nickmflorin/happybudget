@@ -4,7 +4,7 @@ import { History } from "history";
 import "style/index.scss";
 
 import { ApplicationSpinner } from "components";
-import { ReduxRoute, NotFoundRoute } from "components/routes";
+import { ReduxRoute, NotFoundRoute, LandingRoute } from "components/routes";
 
 import * as config from "config";
 
@@ -26,7 +26,7 @@ const App = (props: AppProps): JSX.Element => (
         <Switch>
           <Route exact path={"/verify"} component={EmailVerification} />
           <Route exact path={"/recovery"} component={PasswordRecovery} />
-          <Route path={["/login", "/signup", "/reset-password", "/recover-password"]} component={Landing} />
+          <LandingRoute path={["/login", "/signup", "/reset-password", "/recover-password"]} component={Landing} />
           <Route path={"/pub/:tokenId"} component={PublicApplication} />
           <ReduxRoute config={{ isPublic: false }} path={["/"]} component={Application} />
           <NotFoundRoute auto={false} />

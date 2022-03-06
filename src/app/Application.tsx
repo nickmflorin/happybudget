@@ -23,6 +23,7 @@ const Application = (): JSX.Element => {
     <React.Fragment>
       <Switch>
         <Redirect exact from={"/"} to={"/budgets"} />
+        <Redirect exact from={"/login"} to={"/"} />
         <PathParamsRoute<{ budgetId: number }>
           params={["budgetId"]}
           path={"/budgets/:budgetId"}
