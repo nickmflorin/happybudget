@@ -21,7 +21,7 @@ const ConnectedTable = connectTableToAuthenticatedStore<
   Tables.SubAccountTableContext
 >({
   actions: {
-    tableChanged: actions.template.account.handleTableEventAction,
+    handleEvent: actions.template.account.handleTableEventAction,
     loading: actions.template.account.loadingAction,
     response: actions.template.account.responseAction,
     setSearch: actions.template.account.setSearchAction

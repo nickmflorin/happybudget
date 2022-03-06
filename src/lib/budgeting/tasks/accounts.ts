@@ -12,7 +12,7 @@ type CTX = Redux.WithActionContext<Tables.AccountTableContext>;
 
 export type AuthenticatedAccountsTableActionMap<B extends Model.Template | Model.Budget> =
   Redux.AuthenticatedTableActionMap<R, C, Tables.AccountTableContext> & {
-    readonly tableChanged: Redux.TableActionCreator<Table.Event<R, C>, Tables.AccountTableContext>;
+    readonly handleEvent: Redux.TableActionCreator<Table.Event<R, C>, Tables.AccountTableContext>;
     readonly loadingBudget: Redux.ActionCreator<boolean>;
     readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateActionPayload<B>>;
   };
@@ -75,7 +75,7 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
         { ids: action.payload.ids }
       );
       yield put(
-        config.actions.tableChanged(
+        config.actions.handleEvent(
           {
             type: "modelsUpdated",
             payload: map(response.data, (m: Model.Account) => ({ model: m }))
@@ -146,7 +146,7 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
 		*/
     responseActions: (ctx: CTX, r: Http.ParentChildListResponse<Model.BaseBudget, C>, e: Table.RowAddEvent<R>) => [
       config.actions.updateBudgetInState({ id: r.parent.id, data: r.parent as B }),
-      config.actions.tableChanged(
+      config.actions.handleEvent(
         {
           type: "placeholdersActivated",
           payload: { placeholderIds: e.placeholderIds, models: r.children }
@@ -342,7 +342,7 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
 				 if the group did change we have to use the value from the event
 				 payload. */
       yield put(
-        config.actions.tableChanged(
+        config.actions.handleEvent(
           {
             type: "modelsAdded",
             payload: {
@@ -375,7 +375,7 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
 					 the group did change we have to use the value from the event
 					 payload. */
       yield put(
-        config.actions.tableChanged(
+        config.actions.handleEvent(
           {
             type: "modelsUpdated",
             payload: {

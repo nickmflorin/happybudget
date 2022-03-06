@@ -63,7 +63,7 @@ const connectTableToAuthenticatedStore =
           {...(props as T & ConnectAuthenticatedTableProps<R, M, S, C>)}
           onSearch={(v: string) => dispatch(config.actions.setSearch(v, props.actionContext))}
           onEvent={(e: Table.Event<R, M>) => {
-            dispatch(config.actions.tableChanged(e, props.actionContext));
+            dispatch(config.actions.handleEvent(e, props.actionContext));
           }}
         />
       );

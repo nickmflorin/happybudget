@@ -7,7 +7,7 @@ const ActionMap: Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.
   readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateActionPayload<Model.Template>>;
 } = {
   request: actions.requestAction,
-  tableChanged: actions.handleTableEventAction,
+  handleEvent: actions.handleTableEventAction,
   loading: actions.loadingAction,
   response: actions.responseAction,
   loadingBudget: loadingBudgetAction,

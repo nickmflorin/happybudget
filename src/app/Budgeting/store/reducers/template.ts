@@ -41,7 +41,7 @@ const genericReducer = combineReducers({
       }
     ],
     actions: {
-      tableChanged: actions.accounts.handleTableEventAction,
+      handleEvent: actions.accounts.handleTableEventAction,
       loading: actions.accounts.loadingAction,
       response: actions.accounts.responseAction,
       setSearch: actions.accounts.setSearchAction
@@ -66,7 +66,7 @@ const genericReducer = combineReducers({
           }
         ],
         actions: {
-          tableChanged: actions.account.handleTableEventAction,
+          handleEvent: actions.account.handleTableEventAction,
           loading: actions.account.loadingAction,
           response: actions.account.responseAction,
           responseSubAccountUnits: actions.responseSubAccountUnitsAction,
@@ -80,7 +80,7 @@ const genericReducer = combineReducers({
           clearOn: [actions.requestFringesAction],
           actions: {
             responseFringeColors: actions.responseFringeColorsAction,
-            tableChanged: actions.handleFringesTableEventAction,
+            handleEvent: actions.handleFringesTableEventAction,
             loading: actions.loadingFringesAction,
             response: actions.responseFringesAction,
             setSearch: actions.setFringesSearchAction
@@ -106,7 +106,7 @@ const genericReducer = combineReducers({
           }
         ],
         actions: {
-          tableChanged: actions.subAccount.handleTableEventAction,
+          handleEvent: actions.subAccount.handleTableEventAction,
           responseSubAccountUnits: actions.responseSubAccountUnitsAction,
           loading: actions.subAccount.loadingAction,
           response: actions.subAccount.responseAction,
@@ -120,7 +120,7 @@ const genericReducer = combineReducers({
           clearOn: [actions.requestFringesAction],
           actions: {
             responseFringeColors: actions.responseFringeColorsAction,
-            tableChanged: actions.handleFringesTableEventAction,
+            handleEvent: actions.handleFringesTableEventAction,
             loading: actions.loadingFringesAction,
             response: actions.responseFringesAction,
             setSearch: actions.setFringesSearchAction

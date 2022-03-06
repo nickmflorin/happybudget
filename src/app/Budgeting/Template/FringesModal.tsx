@@ -12,7 +12,7 @@ const ConnectedFringesTable = connectTableToAuthenticatedStore<
   Tables.FringeTableContext
 >({
   actions: {
-    tableChanged: actions.template.handleFringesTableEventAction,
+    handleEvent: actions.template.handleFringesTableEventAction,
     loading: actions.template.loadingFringesAction,
     response: actions.template.responseFringesAction,
     setSearch: actions.template.setFringesSearchAction

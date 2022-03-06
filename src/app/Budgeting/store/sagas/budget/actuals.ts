@@ -9,7 +9,7 @@ import { actuals as actions } from "../../actions/budget";
 const ActionMap: budgeting.tasks.actuals.ActualsTableActionMap & {
   readonly request: Redux.TableActionCreator<Redux.TableRequestPayload, Tables.ActualTableContext>;
 } = {
-  tableChanged: actions.handleTableEventAction,
+  handleEvent: actions.handleTableEventAction,
   updateBudgetInState: updateBudgetInStateAction,
   loading: actions.loadingAction,
   request: actions.requestAction,

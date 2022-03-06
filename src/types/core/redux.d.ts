@@ -234,7 +234,7 @@ declare namespace Redux {
     M extends Model.RowHttpModel = Model.RowHttpModel,
     C extends Table.Context = Table.Context
   > = TableActionMap<M, C> & {
-    readonly tableChanged: TableActionCreator<Table.Event<R, M>, C>;
+    readonly handleEvent: TableActionCreator<Table.Event<R, M>, C>;
   };
 
   type TableActionMapWithRequest<C extends Table.Context = Table.Context> = {

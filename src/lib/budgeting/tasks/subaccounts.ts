@@ -216,7 +216,7 @@ export const createAuthenticatedTableTaskSet = <
         { ids: action.payload.ids }
       );
       yield put(
-        config.actions.tableChanged(
+        config.actions.handleEvent(
           {
             type: "modelsUpdated",
             payload: map(response.data, (m: Model.SubAccount) => ({ model: m }))
@@ -290,7 +290,7 @@ export const createAuthenticatedTableTaskSet = <
     responseActions: (ctx: CTX, r: Http.AncestryListResponse<B, M, C>, e: Table.RowAddEvent<R>) => [
       config.actions.updateBudgetInState({ id: r.budget.id, data: r.budget }),
       config.actions.updateParentInState({ id: r.parent.id, data: r.parent }),
-      config.actions.tableChanged(
+      config.actions.handleEvent(
         {
           type: "placeholdersActivated",
           payload: { placeholderIds: e.placeholderIds, models: r.children }
@@ -433,7 +433,7 @@ export const createAuthenticatedTableTaskSet = <
 				 if the group did change we have to use the value from the event
 				 payload. */
       yield put(
-        config.actions.tableChanged(
+        config.actions.handleEvent(
           {
             type: "modelsAdded",
             payload: {
@@ -465,7 +465,7 @@ export const createAuthenticatedTableTaskSet = <
 				 the group did change we have to use the value from the event
 				 payload. */
       yield put(
-        config.actions.tableChanged(
+        config.actions.handleEvent(
           {
             type: "modelsUpdated",
             payload: {

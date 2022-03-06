@@ -85,7 +85,7 @@ export const createTableTaskSet = (
     service: api.bulkCreateContacts,
     selectStore: config.selectStore,
     responseActions: (ctx: CTX, r: Http.ChildListResponse<M>, e: Table.RowAddEvent<R>) => [
-      config.actions.tableChanged(
+      config.actions.handleEvent(
         {
           type: "placeholdersActivated",
           payload: { placeholderIds: e.placeholderIds, models: r.children }
@@ -134,7 +134,7 @@ export const createTableTaskSet = (
         previous: e.payload.previous,
         ...tabling.http.postPayload<R, M, P>(e.payload.data, config.table.getColumns())
       });
-      yield put(config.actions.tableChanged({ type: "modelsAdded", payload: { model: response } }, {}));
+      yield put(config.actions.handleEvent({ type: "modelsAdded", payload: { model: response } }, {}));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, {
         message: ctx.errorMessage || "There was an error adding the rows.",
@@ -151,7 +151,7 @@ export const createTableTaskSet = (
       const response: M = yield api.request(api.updateContact, ctx, e.payload.id, {
         previous: e.payload.previous
       });
-      yield put(config.actions.tableChanged({ type: "modelsUpdated", payload: { model: response } }, {}));
+      yield put(config.actions.handleEvent({ type: "modelsUpdated", payload: { model: response } }, {}));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, {
         message: ctx.errorMessage || "There was an error moving the rows.",

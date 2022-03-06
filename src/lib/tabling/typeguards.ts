@@ -103,13 +103,13 @@ export const isAuthenticatedActionMap = <
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
   A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>,
-  B extends Pick<Redux.AuthenticatedTableActionMap<R, M, C>, "tableChanged"> = Pick<
+  B extends Pick<Redux.AuthenticatedTableActionMap<R, M, C>, "handleEvent"> = Pick<
     Redux.AuthenticatedTableActionMap<R, M, C>,
-    "tableChanged"
+    "handleEvent"
   >
 >(
   a: A | B
-): a is B => (a as B).tableChanged !== undefined;
+): a is B => (a as B).handleEvent !== undefined;
 
 export const isKeyboardEvent = (e: Table.CellDoneEditingEvent): e is KeyboardEvent =>
   (e as KeyboardEvent).type === "keydown" && (e as KeyboardEvent).code !== undefined;

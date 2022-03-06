@@ -16,7 +16,7 @@ const ConnectedContactsTable = connectTableToAuthenticatedStore<ContactsTable.Pr
   selector: (state: Application.Store) => state.dashboard.contacts,
   createSaga: (table: Table.TableInstance<R, M>) => sagas.createContactsTableSaga(table),
   actions: {
-    tableChanged: actions.handleContactsTableEventAction,
+    handleEvent: actions.handleContactsTableEventAction,
     loading: actions.loadingContactsAction,
     response: actions.responseContactsAction,
     setSearch: actions.setContactsSearchAction

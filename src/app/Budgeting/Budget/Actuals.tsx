@@ -25,7 +25,7 @@ const ConnectedActualsTable = connectTableToAuthenticatedStore<
   Tables.ActualTableContext
 >({
   actions: {
-    tableChanged: actions.budget.actuals.handleTableEventAction,
+    handleEvent: actions.budget.actuals.handleTableEventAction,
     loading: actions.budget.actuals.loadingAction,
     response: actions.budget.actuals.responseAction,
     setSearch: actions.budget.actuals.setSearchAction

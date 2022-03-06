@@ -248,7 +248,7 @@ export const createAuthenticatedTableSaga = <
   const flusher: Flusher<R, M, C> = flushEvents;
 
   function* tableChangeEventSaga(): SagaIterator {
-    const changeChannel = yield actionChannel(config.actions.tableChanged.toString());
+    const changeChannel = yield actionChannel(config.actions.handleEvent.toString());
 
     function* handleDataChangeEvent(a: Redux.TableAction<Table.DataChangeEvent<R>, C>): SagaIterator {
       yield delay(200);
