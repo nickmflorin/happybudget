@@ -266,22 +266,44 @@ export const createAuthenticatedTableSaga = <
       yield call(flusher, config, [a, ...actions]);
     }
 
+    function* handleChangeEvent(a: Redux.TableAction<Table.ChangeEvent<R>, C>): SagaIterator {
+      const e: Table.ChangeEvent<R> = a.payload;
+      if (tabling.typeguards.isDataChangeEvent(e)) {
+        yield call(handleDataChangeEvent, a as Redux.TableAction<Table.DataChangeEvent<R>, C>);
+      } else if (
+        /* We do not want to buffer RowAdd events if the row is being added
+					 either by the RowAddIndexPayload or the RowAddCountPayload. */
+        tabling.typeguards.isRowAddEvent(e) &&
+        tabling.typeguards.isRowAddDataEvent(e)
+      ) {
+        yield call(handleRowAddEvent, a as Redux.TableAction<Table.RowAddDataEvent<R>, C>);
+      } else {
+        yield call(config.tasks.handleChangeEvent, e, a.context);
+      }
+    }
+
     while (true) {
       const action: Redux.TableAction<Table.Event<R, M>, C> = yield take(changeChannel);
       const e: Table.Event<R, M> = action.payload;
       if (tabling.typeguards.isChangeEvent(e)) {
-        const a = action as Redux.TableAction<Table.ChangeEvent<R>, C>;
-        if (tabling.typeguards.isDataChangeEvent(e)) {
-          yield call(handleDataChangeEvent, a as Redux.TableAction<Table.DataChangeEvent<R>, C>);
-        } else if (
-          /* We do not want to buffer RowAdd events if the row is being added
-					   either by the RowAddIndexPayload or the RowAddCountPayload. */
-          tabling.typeguards.isRowAddEvent(e) &&
-          tabling.typeguards.isRowAddDataEvent(e)
-        ) {
-          yield call(handleRowAddEvent, a as Redux.TableAction<Table.RowAddDataEvent<R>, C>);
+        yield call(handleChangeEvent, action as Redux.TableAction<Table.ChangeEvent<R>, C>);
+      } else if (tabling.typeguards.isMetaEvent(e)) {
+        if (e.type === "forward") {
+          const forwardEvent = tabling.meta.forwardChangeEvent();
+          if (!isNil(forwardEvent)) {
+            yield call(handleChangeEvent, { ...action, payload: forwardEvent } as Redux.TableAction<
+              Table.ChangeEvent<R>,
+              C
+            >);
+          }
         } else {
-          yield call(config.tasks.handleChangeEvent, e, a.context);
+          const reverseEvent = tabling.meta.reverseChangeEvent();
+          if (!isNil(reverseEvent)) {
+            yield call(handleChangeEvent, { ...action, payload: reverseEvent } as Redux.TableAction<
+              Table.ChangeEvent<R>,
+              C
+            >);
+          }
         }
       }
     }

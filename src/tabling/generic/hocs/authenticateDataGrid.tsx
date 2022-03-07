@@ -854,10 +854,27 @@ const authenticateDataGrid = <
       rowState.current = newRowState;
     });
 
+    const undoKeyListeners = hooks.useDynamicCallback((localApi: Table.GridApi, e: KeyboardEvent) => {
+      const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+      if (e.key === "z" && ctrlCmdPressed) {
+        e.preventDefault();
+        props.onEvent({ type: "reverse", payload: null });
+      }
+    });
+
+    const redoKeyListeners = hooks.useDynamicCallback((localApi: Table.GridApi, e: KeyboardEvent) => {
+      const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+      if (e.key === "r" && ctrlCmdPressed) {
+        e.preventDefault();
+        props.onEvent({ type: "forward", payload: null });
+      }
+    });
+
     return (
       <DG
         {...(props as T & InternalAuthenticateDataGridProps<R, M>)}
         columns={columns}
+        keyListeners={[undoKeyListeners, redoKeyListeners]}
         onRowDataUpdated={onRowDataUpdated}
         getCSVData={getCSVData}
         onCellKeyDown={onCellKeyDown}
