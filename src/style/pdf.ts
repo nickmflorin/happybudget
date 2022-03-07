@@ -115,14 +115,14 @@ const TextStyles: Pdf.ExtensionStyles = {
   paragraph: { ext: ["text"], fontFamily: "AvenirNext", fontSize: 9, lineHeight: "1.5pt" },
   h1: {
     ext: ["header"],
-    fontWeight: 700,
+    fontWeight: 600,
     fontSize: 16,
     lineHeight: "1.5pt",
     marginBottom: 2
   },
   h2: {
     ext: ["header"],
-    fontWeight: 700,
+    fontWeight: 600,
     fontSize: 14,
     lineHeight: "1.5pt",
     marginBottom: 2
@@ -143,14 +143,14 @@ const TextStyles: Pdf.ExtensionStyles = {
   },
   h5: {
     ext: ["header"],
-    fontWeight: 500,
+    fontWeight: 600,
     fontSize: 12,
     lineHeight: "1.5pt",
     marginBottom: 2
   },
   h6: {
     ext: ["header"],
-    fontWeight: 500,
+    fontWeight: 600,
     fontSize: 10,
     lineHeight: "1.5pt",
     marginBottom: 2
