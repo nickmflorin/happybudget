@@ -12,6 +12,7 @@ type WithFooterGridProps<T> = T & { readonly id: "page" | "footer" };
 export interface FooterGridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
   extends GridProps<R, M> {
   readonly constrainHorizontally?: boolean;
+  readonly apis: Table.GridApis | null;
 }
 
 export interface AuthenticatedFooterGridProps<

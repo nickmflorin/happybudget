@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { map, isNil, cloneDeep } from "lodash";
 import classNames from "classnames";
 
@@ -77,8 +77,10 @@ type UseAgProps<R extends Table.RowData> = Omit<Table.AgGridProps, OverriddenAgP
 export interface GridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
   extends UseAgProps<R> {
   readonly id: Table.GridId;
+  readonly apis: Table.GridApis | null;
   readonly tableId: string;
   readonly data?: Table.BodyRow<R>[];
+  readonly keyListeners?: Table.KeyListener[];
   readonly hiddenColumns?: Table.HiddenColumns;
   readonly gridOptions: Table.GridOptions;
   readonly checkboxColumn?: Table.PartialActionColumn<R, M>;
@@ -100,6 +102,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
   rowClass,
   checkboxColumn,
   style,
+  keyListeners,
   localizePopupParent,
   ...props
 }: GridProps<R, M>): JSX.Element => {
@@ -256,6 +259,23 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const getRowNodeId = useMemo(() => (r: any) => r.id, []);
+
+  useEffect(() => {
+    const instantiatedListeners: ((e: KeyboardEvent) => void)[] = [];
+    const apis = props.apis;
+    if (!isNil(apis) && !isNil(keyListeners)) {
+      for (let i = 0; i < keyListeners.length; i++) {
+        const listener = (e: KeyboardEvent) => keyListeners[i](apis.grid, e);
+        window.addEventListener("keydown", listener);
+        instantiatedListeners.push(listener);
+      }
+    }
+    return () => {
+      for (let i = 0; i < instantiatedListeners.length; i++) {
+        window.removeEventListener("keydown", instantiatedListeners[i]);
+      }
+    };
+  }, [keyListeners, props.apis]);
 
   return (
     <div id={`${tableId}-${id}`} className={classNames("ag-theme-alpine", "grid", className)} style={style}>

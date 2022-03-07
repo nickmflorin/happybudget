@@ -262,4 +262,6 @@ declare namespace Table {
   > = Events<R, M, RW>[K];
 
   type CellDoneEditingEvent = import("react").SyntheticEvent | KeyboardEvent;
+
+  type KeyListener = (localApi: GridApi, e: KeyboardEvent) => void;
 }

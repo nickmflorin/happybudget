@@ -25,6 +25,7 @@ export type DataGridProps<
   readonly search?: string;
   /* eslint-disable @typescript-eslint/no-explicit-any */
   readonly editColumnConfig?: Table.EditColumnRowConfig<R, any>[];
+  readonly keyListeners?: Table.KeyListener[];
   readonly onBack?: () => void;
   readonly onLeft?: () => void;
   readonly onRight?: () => void;
@@ -286,29 +287,18 @@ const DataGrid = <
       }
     });
 
-    useEffect(() => {
-      const instantiatedListeners: ((e: KeyboardEvent) => void)[] = [];
-      const keyListeners = [moveDownKeyListener, moveUpKeyListener, moveLeftKeyListener, moveRightKeyListener];
-      const apis: Table.GridApis | null = props.apis;
-      if (!isNil(apis)) {
-        for (let i = 0; i < keyListeners.length; i++) {
-          const listener = (e: KeyboardEvent) => keyListeners[i](apis.grid, e);
-          window.addEventListener("keydown", listener);
-          instantiatedListeners.push(listener);
-        }
-      }
-      return () => {
-        for (let i = 0; i < instantiatedListeners.length; i++) {
-          window.removeEventListener("keydown", instantiatedListeners[i]);
-        }
-      };
-    }, [props.apis]);
-
     return (
       <Component
         {...(props as T & InternalDataGridProps<R, M>)}
         id={"data"}
         columns={columns}
+        keyListeners={[
+          ...(props.keyListeners || []),
+          moveDownKeyListener,
+          moveUpKeyListener,
+          moveLeftKeyListener,
+          moveRightKeyListener
+        ]}
         className={classNames("grid--data", props.className)}
         domLayout={"autoHeight"}
         rowSelection={"multiple"}

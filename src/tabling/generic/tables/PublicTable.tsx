@@ -203,6 +203,7 @@ const PublicTable = <
       showPageFooter={props.showPageFooter}
       footer={
         <PageFooterGrid
+          apis={props.tableApis.get("page")}
           tableId={props.tableId}
           onGridReady={props.onPageGridReady}
           onFirstDataRendered={props.onFirstDataRendered}
@@ -230,6 +231,7 @@ const PublicTable = <
         />
         <TableFooterGrid
           tableId={props.tableId}
+          apis={props.tableApis.get("footer")}
           onGridReady={props.onFooterGridReady}
           onFirstDataRendered={props.onFirstDataRendered}
           gridOptions={props.tableGridOptions.footer}
