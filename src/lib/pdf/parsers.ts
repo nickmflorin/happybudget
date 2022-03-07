@@ -79,7 +79,7 @@ export const removeUnsupportedNodes = (element: Node): Node[] => {
   return map(element.childNodes, (n: Node) => n);
 };
 
-export const structuredNodeType = (node: Node): Pdf.HTMLNodeType => {
+export const structuredNodeType = (node: Node): Pdf.HTMLNodeType | null => {
   if (node.nodeType === Node.TEXT_NODE) {
     return "text";
   } else {
@@ -91,7 +91,8 @@ export const structuredNodeType = (node: Node): Pdf.HTMLNodeType => {
     } else if (typeguards.isFontStyleTag(tag)) {
       return "fontStyle";
     } else {
-      throw new Error(`Unrecognized tag ${tag}!`);
+      console.error(`Encountered unrecognized tag ${tag} while parsing HTML node.`);
+      return null;
     }
   }
 };
@@ -114,21 +115,23 @@ export const structureNode = (node: Node): Pdf.HTMLNode[] => {
       if (!isSupportedNode(n)) {
         console.warn(`Suspicious Behavior: Unsupported node ${n.nodeName} found!`);
         return null;
+      } else if (n.childNodes.length === 0) {
+        // This can often happen if there is no text inside of the node.
+        return null;
       } else {
-        if (n.childNodes.length === 0) {
-          console.warn(`Suspicious Behavior: Empty node ${n.nodeName} found!`);
-          return null;
-        }
         const tag = n.nodeName.toLocaleLowerCase() as Pdf.SupportedHTMLTag;
         if (n.childNodes.length === 1 && n.childNodes[0].nodeType === Node.TEXT_NODE) {
           const nodeValue = n.childNodes[0].nodeValue;
-          if (isNil(nodeValue) || nodeValue === "") {
-            console.warn(`Suspicious Behavior: Node ${n.childNodes[0].nodeName} has invalid value ${nodeValue}!`);
+          if (isNil(nodeValue) || nodeValue.trim() === "") {
+            return null;
+          }
+          const nodeType = structuredNodeType(n);
+          if (nodeType == null) {
             return null;
           }
           return {
             tag,
-            type: structuredNodeType(n),
+            type: nodeType,
             data: nodeValue
           } as Pdf.HTMLNode;
         }
@@ -136,11 +139,16 @@ export const structureNode = (node: Node): Pdf.HTMLNode[] => {
           map(n.childNodes, (ni: Node) => structure(ni)),
           (ni: Pdf.HTMLNode | null) => !isNil(ni)
         ) as Pdf.HTMLNode[];
+
+        // This can often happen if there is no text inside of the node.
         if (children.length === 0) {
-          console.warn(`Suspicious Behavior: Empty node ${n.nodeName} found!`);
           return null;
         }
-        return { tag, type: structuredNodeType(n), data: children } as Pdf.HTMLNode;
+        const nodeType = structuredNodeType(n);
+        if (nodeType == null) {
+          return null;
+        }
+        return { tag, type: nodeType, data: children } as Pdf.HTMLNode;
       }
     } else {
       console.warn(`Suspicious Behavior: Unsupported node type ${n.nodeType} found!`);
@@ -167,6 +175,6 @@ export const convertHtmlIntoDoc = (html: string): Node => {
   return element;
 };
 
-export const convertHtmlIntoNodes = (html: string): Pdf.HTMLNode[] | null => {
+export const convertHtmlIntoNodes = (html: string): Pdf.HTMLNode[] => {
   return structureNode(convertHtmlIntoDoc(html));
 };
