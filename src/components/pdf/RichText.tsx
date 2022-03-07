@@ -17,8 +17,8 @@ const RichTextNode = ({ node, ...props }: RichTextNodeProps): JSX.Element => {
     } else {
       return (
         <Paragraph {...props}>
-          {map(node.data, (n: Pdf.HTMLNode) => (
-            <RichTextNode node={n} />
+          {map(node.data, (n: Pdf.HTMLNode, index: number) => (
+            <RichTextNode key={index} node={n} />
           ))}
         </Paragraph>
       );
@@ -35,8 +35,8 @@ const RichTextNode = ({ node, ...props }: RichTextNodeProps): JSX.Element => {
       } else {
         return (
           <Heading level={level} {...props}>
-            {map(node.data, (n: Pdf.HTMLNode) => (
-              <RichTextNode node={n} />
+            {map(node.data, (n: Pdf.HTMLNode, index: number) => (
+              <RichTextNode key={index} node={n} />
             ))}
           </Heading>
         );
@@ -55,8 +55,8 @@ const RichTextNode = ({ node, ...props }: RichTextNodeProps): JSX.Element => {
     } else {
       return (
         <Text {...props} styles={[...(props.styles || []), ...pdf.parsers.convertTagsToFontStyles([node.tag])]}>
-          {map(node.data, (n: Pdf.HTMLNode) => (
-            <RichTextNode node={n} />
+          {map(node.data, (n: Pdf.HTMLNode, index: number) => (
+            <RichTextNode key={index} node={n} />
           ))}
         </Text>
       );
