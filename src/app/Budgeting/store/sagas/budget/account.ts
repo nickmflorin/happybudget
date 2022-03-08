@@ -47,26 +47,30 @@ const ActionMap = {
 };
 
 export const createTableSaga = (table: Table.TableInstance<Tables.SubAccountRowData, Model.SubAccount>) =>
-  tabling.sagas.createAuthenticatedTableSaga<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableContext>(
-    {
-      actions: { ...ActionMap, request: actions.requestAction },
-      tasks: budgeting.tasks.subaccounts.createAuthenticatedTableTaskSet<Model.Account, Model.Budget>({
-        table,
-        selectStore: (state: Application.Store) => state.budget.account.table,
-        actions: ActionMap,
-        services: {
-          create: api.createAccountChild,
-          request: api.getAccountChildren,
-          requestGroups: api.getAccountGroups,
-          requestMarkups: api.getAccountMarkups,
-          bulkCreate: api.bulkCreateAccountChildren,
-          bulkDelete: api.bulkDeleteAccountChildren,
-          bulkUpdate: api.bulkUpdateAccountChildren,
-          bulkDeleteMarkups: api.bulkDeleteAccountMarkups
-        }
-      })
-    }
-  );
+  tabling.sagas.createAuthenticatedTableSaga<
+    Tables.SubAccountRowData,
+    Model.SubAccount,
+    Tables.SubAccountTableStore,
+    Tables.SubAccountTableContext
+  >({
+    actions: { ...ActionMap, request: actions.requestAction },
+    selectStore: (state: Application.Store) => state.budget.account.table,
+    tasks: budgeting.tasks.subaccounts.createAuthenticatedTableTaskSet<Model.Account, Model.Budget>({
+      table,
+      selectStore: (state: Application.Store) => state.budget.account.table,
+      actions: ActionMap,
+      services: {
+        create: api.createAccountChild,
+        request: api.getAccountChildren,
+        requestGroups: api.getAccountGroups,
+        requestMarkups: api.getAccountMarkups,
+        bulkCreate: api.bulkCreateAccountChildren,
+        bulkDelete: api.bulkDeleteAccountChildren,
+        bulkUpdate: api.bulkUpdateAccountChildren,
+        bulkDeleteMarkups: api.bulkDeleteAccountMarkups
+      }
+    })
+  });
 
 function* watchForRequestAction(): SagaIterator {
   yield takeLatest([actions.requestAccountAction.toString()], getAccount);

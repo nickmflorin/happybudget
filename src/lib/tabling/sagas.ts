@@ -1,15 +1,17 @@
 import { Saga, SagaIterator } from "redux-saga";
-import { spawn, take, call, cancel, actionChannel, delay, flush, fork } from "redux-saga/effects";
+import { spawn, take, call, cancel, actionChannel, delay, flush, fork, select } from "redux-saga/effects";
 import { isNil, map, isEqual } from "lodash";
 
 import { tabling } from "lib";
 
 export const createPublicTableSaga = <
+  R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Table.Context = Table.Context,
   A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
 >(
-  config: Table.PublicSagaConfig<M, C, A>
+  config: Table.PublicSagaConfig<R, M, S, C, A>
 ): Saga => {
   function* requestSaga(): SagaIterator {
     let lastTasks;
@@ -33,10 +35,12 @@ export const createPublicTableSaga = <
 type SagaConfigWithRequest<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Table.Context = Table.Context
 > = Table.AuthenticatedSagaConfig<
   R,
   M,
+  S,
   C,
   Redux.AuthenticatedTableActionMap<R, M, C>,
   Redux.AuthenticatedTableTaskMap<R, C>
@@ -45,10 +49,12 @@ type SagaConfigWithRequest<
 type SagaConfigWithoutRequest<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Table.Context = Table.Context
 > = Table.AuthenticatedSagaConfig<
   R,
   M,
+  S,
   C,
   Omit<Redux.AuthenticatedTableActionMap<R, M, C>, "request">,
   Omit<Redux.AuthenticatedTableTaskMap<R, C>, "request">
@@ -57,16 +63,19 @@ type SagaConfigWithoutRequest<
 type SagaConfig<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Table.Context = Table.Context
-> = SagaConfigWithRequest<R, M, C> | SagaConfigWithoutRequest<R, M, C>;
+> = SagaConfigWithRequest<R, M, S, C> | SagaConfigWithoutRequest<R, M, S, C>;
 
 const configIsWithRequest = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Table.Context = Table.Context
 >(
-  config: SagaConfig<R, M, C>
-): config is SagaConfigWithRequest<R, M, C> => (config as SagaConfigWithRequest<R, M, C>).actions.request !== undefined;
+  config: SagaConfig<R, M, S, C>
+): config is SagaConfigWithRequest<R, M, S, C> =>
+  (config as SagaConfigWithRequest<R, M, S, C>).actions.request !== undefined;
 
 type EmptyBatch = {
   readonly events: [];
@@ -124,9 +133,10 @@ const actionInconsistentWithBatch = <
 interface Flusher<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Table.Context = Table.Context
 > {
-  (config: SagaConfig<R, M, C>, actions: Redux.TableAction<Table.ChangeEvent<R>, C>[]): SagaIterator;
+  (config: SagaConfig<R, M, S, C>, actions: Redux.TableAction<Table.ChangeEvent<R>, C>[]): SagaIterator;
 }
 
 /**
@@ -144,8 +154,9 @@ interface Flusher<
 function* flushEvents<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Table.Context = Table.Context
->(config: SagaConfig<R, M, C>, actions: Redux.TableAction<Table.ChangeEvent<R>, C>[]): SagaIterator {
+>(config: SagaConfig<R, M, S, C>, actions: Redux.TableAction<Table.ChangeEvent<R>, C>[]): SagaIterator {
   const events: Table.ChangeEvent<R>[] = map(actions, (a: Redux.TableAction<Table.ChangeEvent<R>, C>) => a.payload);
 
   let running: RunningBatches<R, C> = {
@@ -241,11 +252,12 @@ function* flushEvents<
 export const createAuthenticatedTableSaga = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Table.Context = Table.Context
 >(
-  config: SagaConfig<R, M, C>
+  config: SagaConfig<R, M, S, C>
 ): Saga => {
-  const flusher: Flusher<R, M, C> = flushEvents;
+  const flusher: Flusher<R, M, S, C> = flushEvents;
 
   function* tableChangeEventSaga(): SagaIterator {
     const changeChannel = yield actionChannel(config.actions.handleEvent.toString());
@@ -318,8 +330,8 @@ export const createAuthenticatedTableSaga = <
 		 requests and populate the table data.
 		 */
   let baseTableSaga: Saga | null = null;
-  if (configIsWithRequest<R, M, C>(config)) {
-    baseTableSaga = createPublicTableSaga<M, C>(config);
+  if (configIsWithRequest<R, M, S, C>(config)) {
+    baseTableSaga = createPublicTableSaga<R, M, S, C>(config);
   }
 
   function* rootSaga(): SagaIterator {

@@ -22,11 +22,9 @@ export type FringesTableActionMap<B extends Model.Template | Model.Budget> = Red
   readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateActionPayload<B>>;
 };
 
-export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Table.TaskConfig<
-  R,
-  M,
-  Tables.FringeTableContext,
-  FringesTableActionMap<B>
+export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Omit<
+  Table.TaskConfig<R, M, Tables.FringeTableStore, Tables.FringeTableContext, FringesTableActionMap<B>>,
+  "selectStore"
 > & {
   readonly selectParentTableStore: (state: Application.Store) => Tables.SubAccountTableStore;
 };

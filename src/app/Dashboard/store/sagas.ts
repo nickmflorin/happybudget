@@ -64,8 +64,14 @@ const ActionMap = {
 };
 
 export const createContactsTableSaga = (table: Table.TableInstance<Tables.ContactRowData, Model.Contact>) =>
-  tabling.sagas.createAuthenticatedTableSaga<Tables.ContactRowData, Model.Contact, Tables.ContactTableContext>({
+  tabling.sagas.createAuthenticatedTableSaga<
+    Tables.ContactRowData,
+    Model.Contact,
+    Tables.ContactTableStore,
+    Tables.ContactTableContext
+  >({
     actions: ActionMap,
+    selectStore: (state: Application.Store) => state.dashboard.contacts,
     tasks: contacts.tasks.createTableTaskSet({
       table,
       selectStore: (state: Application.Store) => state.dashboard.contacts,

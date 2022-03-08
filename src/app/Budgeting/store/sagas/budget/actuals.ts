@@ -31,10 +31,12 @@ export const createTableSaga = (table: Table.TableInstance<Tables.ActualRowData,
   const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
     Tables.ActualRowData,
     Model.Actual,
+    Tables.ActualTableStore,
     Tables.ActualTableContext
   >({
     actions: ActionMap,
-    tasks: tasks
+    tasks: tasks,
+    selectStore: (state: Application.Store) => state.budget.actuals
   });
 
   function* listenForSearchSaga(): SagaIterator {

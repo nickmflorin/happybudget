@@ -47,26 +47,30 @@ const ActionMap = {
 };
 
 export const createTableSaga = (table: Table.TableInstance<Tables.SubAccountRowData, Model.SubAccount>) =>
-  tabling.sagas.createAuthenticatedTableSaga<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableContext>(
-    {
-      actions: { ...ActionMap, request: actions.requestAction },
-      tasks: budgeting.tasks.subaccounts.createAuthenticatedTableTaskSet<Model.SubAccount, Model.Budget>({
-        table,
-        selectStore: (state: Application.Store) => state.budget.subaccount.table,
-        actions: ActionMap,
-        services: {
-          create: api.createSubAccountChild,
-          request: api.getSubAccountChildren,
-          requestGroups: api.getSubAccountGroups,
-          requestMarkups: api.getSubAccountMarkups,
-          bulkCreate: api.bulkCreateSubAccountChildren,
-          bulkDelete: api.bulkDeleteSubAccountChildren,
-          bulkUpdate: api.bulkUpdateSubAccountChildren,
-          bulkDeleteMarkups: api.bulkDeleteSubAccountMarkups
-        }
-      })
-    }
-  );
+  tabling.sagas.createAuthenticatedTableSaga<
+    Tables.SubAccountRowData,
+    Model.SubAccount,
+    Tables.SubAccountTableStore,
+    Tables.SubAccountTableContext
+  >({
+    actions: { ...ActionMap, request: actions.requestAction },
+    selectStore: (state: Application.Store) => state.budget.subaccount.table,
+    tasks: budgeting.tasks.subaccounts.createAuthenticatedTableTaskSet<Model.SubAccount, Model.Budget>({
+      table,
+      selectStore: (state: Application.Store) => state.budget.subaccount.table,
+      actions: ActionMap,
+      services: {
+        create: api.createSubAccountChild,
+        request: api.getSubAccountChildren,
+        requestGroups: api.getSubAccountGroups,
+        requestMarkups: api.getSubAccountMarkups,
+        bulkCreate: api.bulkCreateSubAccountChildren,
+        bulkDelete: api.bulkDeleteSubAccountChildren,
+        bulkUpdate: api.bulkUpdateSubAccountChildren,
+        bulkDeleteMarkups: api.bulkDeleteSubAccountMarkups
+      }
+    })
+  });
 
 function* watchForRequestAction(): SagaIterator {
   yield takeLatest([actions.requestSubAccountAction.toString()], getSubAccount);

@@ -40,8 +40,14 @@ export const createFringesTableSaga = (
   table: Table.TableInstance<Tables.FringeRowData, Model.Fringe>,
   parentType: "account" | "subaccount"
 ) =>
-  tabling.sagas.createAuthenticatedTableSaga<Tables.FringeRowData, Model.Fringe, Tables.FringeTableContext>({
+  tabling.sagas.createAuthenticatedTableSaga<
+    Tables.FringeRowData,
+    Model.Fringe,
+    Tables.FringeTableStore,
+    Tables.FringeTableContext
+  >({
     actions: FringesActionMap,
+    selectStore: (state: Application.Store) => state.template[parentType].table.fringes,
     tasks: budgeting.tasks.fringes.createTableTaskSet<Model.Template>({
       table,
       selectParentTableStore: (state: Application.Store) => state.template[parentType].table,

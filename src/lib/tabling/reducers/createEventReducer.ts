@@ -22,6 +22,8 @@ const createEventReducer = <
       return changeEventReducer(state, e);
     } else if (tabling.typeguards.isControlEvent(e)) {
       return controlEventReducer(state, e);
+    } else if (tabling.typeguards.isMetaEvent(e)) {
+      console.log("Meta event");
     }
     return state;
   };

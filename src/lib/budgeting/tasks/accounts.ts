@@ -20,6 +20,7 @@ export type AuthenticatedAccountsTableActionMap<B extends Model.Template | Model
 export type PublicAccountsTableTaskConfig = Table.TaskConfig<
   R,
   C,
+  Tables.AccountTableStore,
   Tables.AccountTableContext,
   Redux.TableActionMap<C, Tables.AccountTableContext>
 >;
@@ -27,11 +28,10 @@ export type PublicAccountsTableTaskConfig = Table.TaskConfig<
 export type AuthenticatedAccountsTableTaskConfig<B extends Model.Template | Model.Budget> = Table.TaskConfig<
   R,
   C,
+  Tables.AccountTableStore,
   Tables.AccountTableContext,
   AuthenticatedAccountsTableActionMap<B>
-> & {
-  readonly selectStore: (state: Application.Store) => Tables.AccountTableStore;
-};
+>;
 
 export const createPublicTableTaskSet = <B extends Model.Budget | Model.Template>(
   config: PublicAccountsTableTaskConfig | AuthenticatedAccountsTableTaskConfig<B>

@@ -33,11 +33,15 @@ const ActionMap = {
 };
 
 export const createTableSaga = (table: Table.TableInstance<Tables.SubAccountRowData, Model.SubAccount>) =>
-  tabling.sagas.createPublicTableSaga<Model.SubAccount, Tables.SubAccountTableContext>({
+  tabling.sagas.createPublicTableSaga<Tables.SubAccountRowData,
+	Model.SubAccount,
+	Tables.SubAccountTableStore, Tables.SubAccountTableContext>({
     actions: { ...ActionMap, request: actions.requestAction },
+		selectStore: (state: Application.Store) => state.public.budget.subaccount.table,
     tasks: budgeting.tasks.subaccounts.createPublicTableTaskSet({
       table,
       actions: ActionMap,
+			selectStore: (state: Application.Store) => state.public.budget.subaccount.table,
       services: {
         request: api.getSubAccountChildren,
         requestGroups: api.getSubAccountGroups,

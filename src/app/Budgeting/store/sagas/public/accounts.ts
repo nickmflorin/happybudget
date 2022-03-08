@@ -13,10 +13,12 @@ const ActionMap: Redux.TableActionMap<Model.Account, Tables.AccountTableContext>
 };
 
 export const createTableSaga = (table: Table.TableInstance<Tables.AccountRowData, Model.Account>) =>
-  tabling.sagas.createPublicTableSaga<Model.Account, Tables.AccountTableContext>({
+  tabling.sagas.createPublicTableSaga<Tables.AccountRowData, Model.Account, Tables.AccountTableStore, Tables.AccountTableContext>({
     actions: ActionMap,
+		selectStore: (state: Application.Store) => state.public.budget.accounts,
     tasks: budgeting.tasks.accounts.createPublicTableTaskSet<Model.Budget>({
       table,
-      actions: ActionMap
+      actions: ActionMap,
+			selectStore: (state: Application.Store) => state.public.budget.accounts,
     })
   });

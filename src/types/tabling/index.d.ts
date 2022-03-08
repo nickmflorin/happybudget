@@ -765,12 +765,14 @@ declare namespace Table {
   type TaskConfig<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
+    S extends Redux.TableStore<R> = Redux.TableStore<R>,
     C extends Context = Context,
     A extends Omit<Redux.TableActionMap<M, C>, "request"> = Omit<Redux.TableActionMap<M, C>, "request">
   > = Redux.TaskConfig<A> & {
     /* There are edge cases where the table will be null when switching between
 		   tables very fast. */
     readonly table: TableInstance<R, M>;
+    readonly selectStore: (state: Application.Store) => S;
   };
 
   type ReducerConfig<
@@ -779,7 +781,7 @@ declare namespace Table {
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     C extends Context = Context,
     A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
-  > = Omit<TaskConfig<R, M, C, A>, "table"> & {
+  > = Omit<TaskConfig<R, M, S, C, A>, "table" | "selectStore"> & {
     readonly initialState: S;
     readonly columns: ModelColumn<R, M>[];
     readonly defaultData?: Partial<R>;
@@ -789,14 +791,19 @@ declare namespace Table {
   };
 
   type PublicSagaConfig<
+    R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
+    S extends Redux.TableStore<R> = Redux.TableStore<R>,
     C extends Context = Context,
     A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
-  > = Redux.SagaConfig<Redux.TableTaskMap<C>, A>;
+  > = Redux.SagaConfig<Redux.TableTaskMap<C>, A> & {
+    readonly selectStore: (state: Application.Store) => S;
+  };
 
   type AuthenticatedSagaConfig<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
+    S extends Redux.TableStore<R> = Redux.TableStore<R>,
     C extends Context = Context,
     A extends Redux.TableActionMapWithRequestOptional<
       Redux.AuthenticatedTableActionMap<R, M, C>,
@@ -806,7 +813,9 @@ declare namespace Table {
       Redux.AuthenticatedTableTaskMap<R, C>,
       C
     > = Redux.TableTaskMapWithRequestOptional<Redux.AuthenticatedTableTaskMap<R, C>, C>
-  > = Redux.SagaConfig<T, A>;
+  > = Redux.SagaConfig<T, A> & {
+    readonly selectStore: (state: Application.Store) => S;
+  };
 
   /* ------------------------- Redux -------------------------------------- */
 

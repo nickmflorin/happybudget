@@ -49,6 +49,7 @@ export type AuthenticatedSubAccountsTableActionMap<
 export type PublicSubAccountsTableTaskConfig = Table.TaskConfig<
   R,
   C,
+  Tables.SubAccountTableStore,
   Tables.SubAccountTableContext,
   PublicSubAccountsTableActionMap
 > & {
@@ -58,9 +59,14 @@ export type PublicSubAccountsTableTaskConfig = Table.TaskConfig<
 export type AuthenticatedSubAccountsTableTaskConfig<
   M extends Model.Account | Model.SubAccount,
   B extends Model.Template | Model.Budget
-> = Table.TaskConfig<R, C, Tables.SubAccountTableContext, AuthenticatedSubAccountsTableActionMap<M, B>> & {
+> = Table.TaskConfig<
+  R,
+  C,
+  Tables.SubAccountTableStore,
+  Tables.SubAccountTableContext,
+  AuthenticatedSubAccountsTableActionMap<M, B>
+> & {
   readonly services: AuthenticatedSubAccountsTableServiceSet<M, B>;
-  readonly selectStore: (state: Application.Store) => Tables.SubAccountTableStore;
 };
 
 export const createPublicTableTaskSet = (

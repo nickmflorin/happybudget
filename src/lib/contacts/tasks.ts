@@ -56,11 +56,10 @@ export const createTableTaskSet = (
   config: Table.TaskConfig<
     R,
     M,
+    Tables.ContactTableStore,
     Tables.ContactTableContext,
     Redux.AuthenticatedTableActionMap<R, M, Tables.ContactTableContext>
-  > & {
-    readonly selectStore: (state: Application.Store) => Tables.ContactTableStore;
-  }
+  >
 ): Redux.AuthenticatedTableTaskMap<R, Tables.ContactTableContext> => {
   function* tableRequest(
     action: Redux.TableAction<Redux.TableRequestPayload, Tables.ContactTableContext>

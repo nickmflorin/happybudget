@@ -17,8 +17,13 @@ export type ActualsTableActionMap = Redux.AuthenticatedTableActionMap<R, M, Tabl
   readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateActionPayload<Model.Budget>>;
 };
 
-export type ActualsTableTaskConfig = Table.TaskConfig<R, M, Tables.ActualTableContext, ActualsTableActionMap> & {
-  readonly selectStore: (state: Application.Store) => Tables.ActualTableStore;
+export type ActualsTableTaskConfig = Table.TaskConfig<
+  R,
+  M,
+  Tables.ActualTableStore,
+  Tables.ActualTableContext,
+  ActualsTableActionMap
+> & {
   readonly selectOwnersSearch: (state: Application.Store) => string;
 };
 

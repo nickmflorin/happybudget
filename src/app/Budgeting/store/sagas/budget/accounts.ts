@@ -16,8 +16,14 @@ const ActionMap: Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.
 };
 
 export const createTableSaga = (table: Table.TableInstance<Tables.AccountRowData, Model.Account>) =>
-  tabling.sagas.createAuthenticatedTableSaga<Tables.AccountRowData, Model.Account, Tables.AccountTableContext>({
+  tabling.sagas.createAuthenticatedTableSaga<
+    Tables.AccountRowData,
+    Model.Account,
+    Tables.AccountTableStore,
+    Tables.AccountTableContext
+  >({
     actions: ActionMap,
+    selectStore: (state: Application.Store) => state.budget.accounts,
     tasks: budgeting.tasks.accounts.createAuthenticatedTableTaskSet<Model.Budget>({
       table,
       selectStore: (state: Application.Store) => state.budget.accounts,
