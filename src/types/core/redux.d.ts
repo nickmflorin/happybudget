@@ -51,6 +51,8 @@ declare namespace Redux {
   };
 
   type Reducer<S, A = Action> = import("redux").Reducer<S, A>;
+  type ReducerWithDefinedState<S, A = Action> = (s: S, a: A) => S;
+
   type ReducersMapObject<S> = {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     [K in keyof S]-?: Reducer<S[K], Action<any>>;

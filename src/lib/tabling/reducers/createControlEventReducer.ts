@@ -4,8 +4,46 @@ import { tabling, redux, util } from "lib";
 
 import createModelsAddedEventReducer from "./createModelsAddedEventReducer";
 import createModelsUpdatedEventReducer from "./createModelsUpdatedEventReducer";
+import createPlaceholdersActivatedEventReducer from "./createPlaceholdersActivatedEventReducer";
 
 import { reorderRows } from "./util";
+
+const updateRowsReducer = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
+  s: S,
+  e: Table.UpdateRowsEvent<R>
+): S =>
+  reduce(
+    Array.isArray(e.payload) ? e.payload : [e.payload],
+    (st: S, update: Table.UpdateRowPayload<R>) => {
+      const r: Table.ModelRow<R> | null = redux.reducers.findModelInData(
+        filter(st.data, (ri: Table.BodyRow<R>) => tabling.typeguards.isModelRow(ri)),
+        update.id
+      ) as Table.ModelRow<R> | null;
+      if (!isNil(r)) {
+        return reorderRows({
+          ...st,
+          data: util.replaceInArray<Table.BodyRow<R>>(
+            st.data,
+            { id: r.id },
+            { ...r, data: { ...r.data, ...update.data } }
+          )
+        });
+      }
+      return st;
+    },
+    s
+  );
+
+type ControlEventReducers<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
+> = {
+  readonly [Property in keyof Table.ControlEvents<R, M>]: Redux.ReducerWithDefinedState<
+    S,
+    Table.ControlEvents<R, M>[Property]
+  >;
+};
 
 const createControlEventReducer = <
   R extends Table.RowData,
@@ -16,69 +54,16 @@ const createControlEventReducer = <
 >(
   config: Table.ReducerConfig<R, M, S, C, A>
 ): Redux.Reducer<S, Table.ControlEvent<R, M>> => {
-  const modelRowManager = new tabling.managers.ModelRowManager<R, M>({
-    getRowChildren: config.getModelRowChildren,
-    columns: config.columns
-  });
-
-  const modelsAddedReducer = createModelsAddedEventReducer(config);
-  const modelsUpdatedReducer = createModelsUpdatedEventReducer(config);
+  const controlEventReducers: ControlEventReducers<R, M, S> = {
+    modelsAdded: createModelsAddedEventReducer(config),
+    modelsUpdated: createModelsUpdatedEventReducer(config),
+    placeholdersActivated: createPlaceholdersActivatedEventReducer(config),
+    updateRows: updateRowsReducer
+  };
 
   return (state: S = config.initialState, e: Table.ControlEvent<R, M>): S => {
-    if (tabling.typeguards.isPlaceholdersActivatedEvent<R, M>(e)) {
-      const payload: Table.PlaceholdersActivatedPayload<M> = e.payload;
-      return reduce(
-        payload.placeholderIds,
-        (s: S, id: Table.PlaceholderRowId, index: number) => {
-          const r: Table.PlaceholderRow<R> | null = redux.reducers.findModelInData<Table.PlaceholderRow<R>>(
-            filter(s.data, (ri: Table.BodyRow<R>) =>
-              tabling.typeguards.isPlaceholderRow(ri)
-            ) as Table.PlaceholderRow<R>[],
-            id
-          );
-          if (!isNil(r)) {
-            return {
-              ...s,
-              data: util.replaceInArray<Table.BodyRow<R>>(
-                s.data,
-                { id: r.id },
-                modelRowManager.create({ model: payload.models[index] })
-              )
-            };
-          }
-          return s;
-        },
-        state
-      );
-    } else if (tabling.typeguards.isModelsAddedEvent<R, M>(e)) {
-      return modelsAddedReducer(state, e);
-    } else if (tabling.typeguards.isUpdateRowsEvent(e)) {
-      const updates: Table.UpdateRowPayload<R>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
-      return reduce(
-        updates,
-        (s: S, update: Table.UpdateRowPayload<R>) => {
-          const r: Table.ModelRow<R> | null = redux.reducers.findModelInData(
-            filter(s.data, (ri: Table.BodyRow<R>) => tabling.typeguards.isModelRow(ri)),
-            update.id
-          ) as Table.ModelRow<R> | null;
-          if (!isNil(r)) {
-            return reorderRows({
-              ...s,
-              data: util.replaceInArray<Table.BodyRow<R>>(
-                s.data,
-                { id: r.id },
-                { ...r, data: { ...r.data, ...update.data } }
-              )
-            });
-          }
-          return s;
-        },
-        state
-      );
-    } else if (tabling.typeguards.isModelsUpdatedEvent<R, M>(e)) {
-      return modelsUpdatedReducer(state, e);
-    }
-    return state;
+    const reducer = controlEventReducers[e.type] as Redux.ReducerWithDefinedState<S, typeof e>;
+    return reducer(state, e);
   };
 };
 
