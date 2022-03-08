@@ -223,24 +223,8 @@ export const isRowRemoveFromGroupEvent = <R extends Table.RowData>(
 export const isRowAddToGroupEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.RowAddToGroupEvent =>
   (e as Table.RowAddToGroupEvent).type === "rowAddToGroup";
 
-export const isGroupAddedEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ControlEvent<R, M>
-): e is Table.GroupAddedEvent => (e as Table.GroupAddedEvent).type === "groupAdded";
-
 export const isFullRowEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.FullRowEvent =>
   (e as Table.FullRowEvent).payload.rows !== undefined;
 
-export const isGroupUpdateEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ControlEvent<R, M>
-): e is Table.GroupUpdatedEvent => (e as Table.GroupUpdatedEvent).type === "groupUpdated";
-
 export const isGroupChangeEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.GroupChangeEvent =>
   isRowAddToGroupEvent(e) || isRowRemoveFromGroupEvent(e);
-
-export const isMarkupAddedEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ControlEvent<R, M>
-): e is Table.MarkupAddedEvent => (e as Table.MarkupAddedEvent).type === "markupAdded";
-
-export const isMarkupUpdatedEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  e: Table.ControlEvent<R, M>
-): e is Table.MarkupUpdatedEvent => (e as Table.MarkupUpdatedEvent).type === "markupUpdated";

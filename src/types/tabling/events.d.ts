@@ -7,10 +7,6 @@ declare namespace Table {
     readonly UPDATE_ROWS: "updateRows";
     readonly MODELS_ADDED: "modelsAdded";
     readonly PLACEHOLDERS_ACTIVATED: "placeholdersActivated";
-    readonly GROUP_UPDATED: "groupUpdated";
-    readonly GROUP_ADDED: "groupAdded";
-    readonly MARKUP_ADDED: "markupAdded";
-    readonly MARKUP_UPDATED: "markupUpdated";
   };
 
   type ControlEventId = ControlEventIds[keyof ControlEventIds];
@@ -149,14 +145,6 @@ declare namespace Table {
   };
   type RowAddToGroupEvent = BaseChangeEvent<"rowAddToGroup", RowAddToGroupPayload>;
 
-  type GroupAddedPayload = Model.Group;
-  type GroupAddedEvent = BaseControlEvent<"groupAdded", GroupAddedPayload>;
-  type GroupUpdatedEvent = BaseControlEvent<"groupUpdated", Model.Group>;
-
-  type MarkupAddedPayload = Model.Markup;
-  type MarkupAddedEvent = BaseControlEvent<"markupAdded", MarkupAddedPayload>;
-  type MarkupUpdatedEvent = BaseControlEvent<"markupUpdated", Model.Markup>;
-
   /* The Group is not attributed to a model in a detail response so we sometimes
      have to use the value from the original event. */
   type ModelTableEventPayload<M extends Model.RowHttpModel = Model.RowHttpModel> = {
@@ -165,12 +153,12 @@ declare namespace Table {
   };
   type ModelsAddedEvent<M extends Model.RowHttpModel = Model.RowHttpModel> = BaseControlEvent<
     "modelsAdded",
-    SingleOrArray<ModelTableEventPayload<M>>
+    SingleOrArray<ModelTableEventPayload<M> | Model.Group | Model.Markup>
   >;
 
   type ModelsUpdatedEvent<M extends Model.RowHttpModel = Model.RowHttpModel> = BaseControlEvent<
     "modelsUpdated",
-    SingleOrArray<ModelTableEventPayload<M>>
+    SingleOrArray<ModelTableEventPayload<M> | Model.Group | Model.Markup>
   >;
 
   type PlaceholdersActivatedPayload<M extends Model.RowHttpModel> = {
@@ -203,10 +191,6 @@ declare namespace Table {
     readonly updateRows: UpdateRowsEvent<R>;
     readonly modelsAdded: ModelsAddedEvent<M>;
     readonly placeholdersActivated: PlaceholdersActivatedEvent<M>;
-    readonly groupUpdated: GroupUpdatedEvent;
-    readonly groupAdded: GroupAddedEvent;
-    readonly markupAdded: MarkupAddedEvent;
-    readonly markupUpdated: MarkupUpdatedEvent;
   };
 
   type ChangeEvents<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = {

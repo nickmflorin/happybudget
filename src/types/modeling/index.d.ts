@@ -34,6 +34,11 @@ declare namespace Model {
     readonly onMissing?: (params: OnModelMissingCallbackParams<M>) => void;
   };
 
+  type GetReduxModelOptions<M extends Model> = Omit<GetModelOptions<M>, "onMissing"> & {
+    readonly action?: Redux.Action;
+    readonly warningData?: Record<string, unknown>;
+  };
+
   type InferModelFromNameParams<M extends Model> = Omit<GetModelOptions<M>, "onMissing"> & {
     readonly getName?: (m: M) => string | null | undefined;
     readonly caseInsensitive?: boolean;

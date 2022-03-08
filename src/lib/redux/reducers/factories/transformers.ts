@@ -59,7 +59,7 @@ export const authenticatedModelListResponseReducerTransformers = <
     responseWasReceived: false
   }),
   removeFromState: (st: S = initialState, action: Redux.Action<number>) => {
-    const existing = redux.reducers.findModelInData(action, st.data, action.payload);
+    const existing = redux.reducers.findModelInData(st.data, action.payload, { action });
     if (isNil(existing)) {
       return st;
     } else {
@@ -76,7 +76,7 @@ export const authenticatedModelListResponseReducerTransformers = <
     }
   },
   updateInState: (st: S = initialState, action: Redux.Action<Redux.UpdateActionPayload<M>>) => {
-    const existing = redux.reducers.findModelInData(action, st.data, action.payload.id);
+    const existing = redux.reducers.findModelInData(st.data, action.payload.id, { action });
     if (isNil(existing)) {
       return st;
     }
@@ -97,7 +97,7 @@ export const authenticatedModelListResponseReducerTransformers = <
     updating: redux.reducers.modelListActionReducer(st.updating, action)
   }),
   addToState: (st: S = initialState, action: Redux.Action<M>) => {
-    const existing = redux.reducers.findModelInData(action, st.data, action.payload.id, { warnOnMissing: false });
+    const existing = redux.reducers.findModelInData(st.data, action.payload.id, { warnOnMissing: false });
     if (!isNil(existing)) {
       notifications.inconsistentStateError({
         action: action,

@@ -1,17 +1,12 @@
 import { isNil, filter } from "lodash";
 
 import { tabling, redux, budgeting } from "lib";
-import { createBudgetTableReducer, createAuthenticatedBudgetTableReducer, BudgetTableReducerConfig } from "./base";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
 type S = Tables.SubAccountTableStore;
 
-const recalculateSubAccountRow = (
-  st: S,
-  action: Redux.Action,
-  row: Table.DataRow<R>
-): Pick<R, "nominal_value" | "fringe_contribution"> => {
+const recalculateSubAccountRow = (st: S, row: Table.DataRow<R>): Pick<R, "nominal_value" | "fringe_contribution"> => {
   /*
   In the case that the SubAccount has SubAccount(s) itself, the estimated value
 	is determined from the accumulation of the estimated values for those children
@@ -24,7 +19,6 @@ const recalculateSubAccountRow = (
 
   if (isValidToRecalculate) {
     const fringes: Table.ModelRow<Tables.FringeRowData>[] = redux.reducers.findModelsInData(
-      action,
       filter(st.fringes.data, (r: Table.BodyRow<Tables.FringeRowData>) => tabling.typeguards.isModelRow(r)),
       row.data.fringes
     ) as Table.ModelRow<Tables.FringeRowData>[];
@@ -55,11 +49,11 @@ export type SubAccountTableActionMap = Redux.TableActionMap<M, Tables.SubAccount
 };
 
 export const createPublicSubAccountsTableReducer = (
-  config: BudgetTableReducerConfig<R, M, S, Tables.SubAccountTableContext, SubAccountTableActionMap> & {
+  config: Table.ReducerConfig<R, M, S, Tables.SubAccountTableContext, SubAccountTableActionMap> & {
     readonly fringes: Redux.Reducer<Tables.FringeTableStore>;
   }
 ): Redux.Reducer<S> => {
-  const generic = createBudgetTableReducer<R, M, S, Tables.SubAccountTableContext, SubAccountTableActionMap>(config);
+  const generic = tabling.reducers.createPublicTableReducer<R, M, S, Tables.SubAccountTableContext>(config);
 
   return (state: S | undefined = config.initialState, action: Redux.Action): S => {
     let newState = generic(state, action);
@@ -84,13 +78,13 @@ export type AuthenticatedSubAccountTableActionMap = Redux.AuthenticatedTableActi
 
 export const createAuthenticatedSubAccountsTableReducer = (
   config: Omit<
-    BudgetTableReducerConfig<R, M, S, Tables.SubAccountTableContext, AuthenticatedSubAccountTableActionMap> & {
+    Table.ReducerConfig<R, M, S, Tables.SubAccountTableContext, AuthenticatedSubAccountTableActionMap> & {
       readonly fringes: Redux.Reducer<Tables.FringeTableStore>;
     },
     "defaultData"
   >
 ): Redux.Reducer<S> => {
-  const generic = createAuthenticatedBudgetTableReducer<R, M, S, Tables.SubAccountTableContext>({
+  const generic = tabling.reducers.createAuthenticatedTableReducer<R, M, S, Tables.SubAccountTableContext>({
     ...config,
     defaultData: {
       markup_contribution: 0.0,

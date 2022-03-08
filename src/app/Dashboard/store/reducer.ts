@@ -39,7 +39,7 @@ const budgetsReducer: Redux.Reducer<Modules.Dashboard.Store["budgets"]> = (
       data: reduce(
         newState.data,
         (curr: Model.SimpleBudget[], m: Model.SimpleBudget) => {
-          const reperm = redux.reducers.findModelInData(action, repermissioned, m.id, {
+          const reperm = redux.reducers.findModelInData(repermissioned, m.id, {
             modelName: "repermissioned budget"
           });
           if (!isNil(reperm)) {

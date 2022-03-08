@@ -43,7 +43,7 @@ const useMarkup = <
             setMarkupAccounts(null);
             props.onResponse(response);
             props.table.dispatchEvent({
-              type: "markupAdded",
+              type: "modelsAdded",
               payload: response.data
             });
           }}
@@ -67,7 +67,7 @@ const useMarkup = <
             setMarkupToEdit(null);
             props.onResponse(response);
             props.table.dispatchEvent({
-              type: "markupUpdated",
+              type: "modelsUpdated",
               payload: response.data
             });
           }}
