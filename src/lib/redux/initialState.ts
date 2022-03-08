@@ -28,7 +28,8 @@ export const initialAuthenticatedModelListResponseState: Redux.AuthenticatedMode
 export const initialTableState: Redux.TableStore<any> = {
   data: [],
   loading: false,
-  search: ""
+  search: "",
+  eventHistory: []
 };
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */

@@ -113,7 +113,12 @@ const createChangeEventReducer = <
 
   return (state: S = config.initialState, e: Table.ChangeEvent<R>): S => {
     const reducer = changeEventReducers[e.type] as Redux.ReducerWithDefinedState<S, typeof e>;
-    return reducer(state, e);
+    let newState = reducer(state, e);
+
+    if (tabling.typeguards.isTraversibleEvent(e)) {
+      newState = { ...newState, eventHistory: [...newState.eventHistory, e] };
+    }
+    return newState;
   };
 };
 

@@ -24,7 +24,13 @@ declare namespace Table {
     readonly ROW_ADD_TO_GROUP: "rowAddToGroup";
   };
 
+  // Subset of ChangeEvent(s) that support undo/redo.
+  type TraversibleEventIds = {
+    readonly DATA_CHANGE: "dataChange";
+  };
+
   type ChangeEventId = ChangeEventIds[keyof ChangeEventIds];
+  type TraversibleEventId = TraversibleEventIds[keyof TraversibleEventIds];
 
   /* Meta events are table events that are derived solely from a user's
 	   interaction with a table but operate on events themselves. */
@@ -203,6 +209,11 @@ declare namespace Table {
     readonly rowAddToGroup: RowAddToGroupEvent;
   };
 
+  // Events for which undo/redo is supported.  The events must be ChangeEvents.
+  type TraversibleEvents<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = {
+    readonly dataChange: DataChangeEvent<R, RW>;
+  };
+
   type MetaEvents = {
     readonly forward: ForwardEvent;
     readonly reverse: ReverseEvent;
@@ -225,6 +236,25 @@ declare namespace Table {
     R,
     RW
   >[keyof ChangeEvents<R, RW>];
+
+  // Events for which undo/redo is supported.  The events must be ChangeEvents.
+  type TraversibleEvent<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = TraversibleEvents<
+    R,
+    RW
+  >[keyof TraversibleEvents<R, RW>];
+
+  type ReversedEvent<
+    E extends TraversibleEvent<R, RW>,
+    R extends RowData = RowData,
+    RW extends EditableRow<R> = EditableRow<R>
+  > = E & {
+    readonly reversed: true;
+  };
+
+  type ChangeEventHistory<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = (
+    | TraversibleEvent<R, RW>
+    | ReversedEvent<TraversibleEvent<R, RW>>
+  )[];
 
   type Event<
     R extends RowData = RowData,

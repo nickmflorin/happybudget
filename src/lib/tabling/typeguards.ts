@@ -141,6 +141,15 @@ export const isMetaEvent = <
   e: Table.Event<R, M, RW>
 ): e is Table.MetaEvent => includes(constants.META_EVENT_IDS, (e as Table.MetaEvent).type);
 
+export const isTraversibleEvent = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  RW extends Table.EditableRow<R> = Table.EditableRow<R>
+>(
+  e: Table.Event<R, M, RW>
+): e is Table.TraversibleEvent<R, RW> =>
+  includes(constants.TRAVERSIBLE_EVENT_IDS, (e as Table.TraversibleEvent<R, RW>).type);
+
 export const isDataChangeEvent = <R extends Table.RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>>(
   e: Table.ChangeEvent<R, RW>
 ): e is Table.DataChangeEvent<R, RW> => (e as Table.DataChangeEvent<R, RW>).type === "dataChange";

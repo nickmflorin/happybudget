@@ -15,4 +15,6 @@ export const CONTROL_EVENT_IDS: Table.ControlEventId[] = [
   "placeholdersActivated"
 ];
 
+export const TRAVERSIBLE_EVENT_IDS: Table.TraversibleEventId[] = ["dataChange"];
+
 export const META_EVENT_IDS: Table.MetaEventId[] = ["forward", "reverse"];

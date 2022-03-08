@@ -252,6 +252,7 @@ declare namespace Redux {
     readonly data: Table.BodyRow<D>[];
     readonly search: string;
     readonly loading: boolean;
+    readonly eventHistory: Table.ChangeEventHistory<D>;
   };
 
   type BudgetTableStore<R extends Tables.BudgetRowData> = TableStore<R>;
