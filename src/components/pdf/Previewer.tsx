@@ -80,9 +80,7 @@ const Previewer = ({
     const fname = params.filename || filename;
     if (regenerateFileOnExport === false) {
       if (!isNil(file)) {
-        util.files.download(file, !fname.endsWith(".pdf") ? `${fname}.pdf` : fname, {
-          includeExtensionInName: false
-        });
+        util.files.download(file, !fname.endsWith(".pdf") ? `${fname}.pdf` : fname);
         onExportSuccess?.();
       }
     } else {
@@ -96,9 +94,7 @@ const Previewer = ({
       if (!isNil(pdfComponent)) {
         generateFile(pdfComponent)
           .then((f: ArrayBuffer | string) => {
-            util.files.download(f, !fname.endsWith(".pdf") ? `${fname}.pdf` : fname, {
-              includeExtensionInName: false
-            });
+            util.files.download(f, !fname.endsWith(".pdf") ? `${fname}.pdf` : fname);
             onExportSuccess?.();
           })
           .catch((e: Error) => onRenderError(e))
