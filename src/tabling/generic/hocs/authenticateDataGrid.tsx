@@ -864,7 +864,7 @@ const authenticateDataGrid = <
 
     const redoKeyListeners = hooks.useDynamicCallback((localApi: Table.GridApi, e: KeyboardEvent) => {
       const ctrlCmdPressed = e.ctrlKey || e.metaKey;
-      if (e.key === "r" && ctrlCmdPressed) {
+      if (e.key === "z" && ctrlCmdPressed && e.shiftKey) {
         e.preventDefault();
         props.onEvent({ type: "forward", payload: null });
       }

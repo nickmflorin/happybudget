@@ -115,8 +115,30 @@ const createChangeEventReducer = <
     const reducer = changeEventReducers[e.type] as Redux.ReducerWithDefinedState<S, typeof e>;
     let newState = reducer(state, e);
 
-    if (tabling.typeguards.isTraversibleEvent(e)) {
-      newState = { ...newState, eventHistory: [...newState.eventHistory, e] };
+    /* If the event is itself an undo/redo event, do not add alter the event
+		   history in state. */
+    if (!includes(["forward", "reverse"], e.meta)) {
+      if (tabling.meta.eventCanTraverse(e)) {
+        /* If the event is traversible, the eventIndex moves to the front of the
+           event history. */
+        newState = {
+          ...newState,
+          eventHistory: [...newState.eventHistory, e],
+          eventIndex: newState.eventHistory.length
+        };
+      } else {
+        /* If the event is not traversible, it means it does not qualify for undo
+         and/or redo.  This means that we have to clear the event history in
+         memory because the current event can conflict with a previous
+         traversible event.
+
+				 Example) If we alter a cell in a row, that event is traversible and
+				 will be in the event history.  But if we then delete the row, and we
+				 do not clear the event history, and undo action will lead to a 404
+				 response because the row we are undoing the change for no longer exists.
+				 */
+        newState = { ...newState, eventHistory: [], eventIndex: -1 };
+      }
     }
     return newState;
   };

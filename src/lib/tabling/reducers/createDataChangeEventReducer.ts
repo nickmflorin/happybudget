@@ -17,7 +17,10 @@ const createDataChangeEventReducer =
   (s: S = config.initialState, e: Table.DataChangeEvent<R>): S => {
     const consolidated = tabling.events.consolidateRowChanges(e.payload);
 
-    // Note: This grouping may be redundant - we should investigate.
+    /* Note: This grouping may be redundant in the case that the change is
+       dispatched from the Table as the Table will already group the changes
+       by Row, but it is not guaranteed to be the case if the event is dispatched
+       from other locations. */
     const changesPerRow: {
       [key: ID]: { changes: Table.RowChange<R>[]; row: Table.EditableRow<R> };
     } = {};

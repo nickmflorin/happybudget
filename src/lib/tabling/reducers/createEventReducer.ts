@@ -1,3 +1,5 @@
+import { isNil } from "lodash";
+
 import { tabling } from "lib";
 
 import createControlEventReducer from "./createControlEventReducer";
@@ -23,7 +25,19 @@ const createEventReducer = <
     } else if (tabling.typeguards.isControlEvent(e)) {
       return controlEventReducer(state, e);
     } else if (tabling.typeguards.isMetaEvent(e)) {
-      console.log("Meta event");
+      if (e.type === "forward") {
+        const forwardEvent = tabling.meta.getRedoEvent<R>(state);
+        if (!isNil(forwardEvent)) {
+          const newState = { ...state, eventIndex: state.eventIndex + 1 };
+          return changeEventReducer(newState, forwardEvent);
+        }
+      } else {
+        const undoEvent = tabling.meta.getUndoEvent<R>(state);
+        if (!isNil(undoEvent)) {
+          const newState = { ...state, eventIndex: Math.max(state.eventIndex - 1, -1) };
+          return changeEventReducer(newState, undoEvent);
+        }
+      }
     }
     return state;
   };

@@ -29,7 +29,8 @@ export const initialTableState: Redux.TableStore<any> = {
   data: [],
   loading: false,
   search: "",
-  eventHistory: []
+  eventHistory: [],
+  eventIndex: -1
 };
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */

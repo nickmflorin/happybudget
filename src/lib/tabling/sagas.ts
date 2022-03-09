@@ -297,24 +297,19 @@ export const createAuthenticatedTableSaga = <
     while (true) {
       const action: Redux.TableAction<Table.Event<R, M>, C> = yield take(changeChannel);
       const e: Table.Event<R, M> = action.payload;
+      const store = yield select(config.selectStore);
       if (tabling.typeguards.isChangeEvent(e)) {
         yield call(handleChangeEvent, action as Redux.TableAction<Table.ChangeEvent<R>, C>);
       } else if (tabling.typeguards.isMetaEvent(e)) {
         if (e.type === "forward") {
-          const forwardEvent = tabling.meta.forwardChangeEvent();
-          if (!isNil(forwardEvent)) {
-            yield call(handleChangeEvent, { ...action, payload: forwardEvent } as Redux.TableAction<
-              Table.ChangeEvent<R>,
-              C
-            >);
+          const redoEvent = tabling.meta.getRedoEvent<R>(store);
+          if (!isNil(redoEvent)) {
+            yield call(handleChangeEvent, { ...action, payload: redoEvent });
           }
         } else {
-          const reverseEvent = tabling.meta.reverseChangeEvent();
-          if (!isNil(reverseEvent)) {
-            yield call(handleChangeEvent, { ...action, payload: reverseEvent } as Redux.TableAction<
-              Table.ChangeEvent<R>,
-              C
-            >);
+          const undoEvent = tabling.meta.getUndoEvent<R>(store);
+          if (!isNil(undoEvent)) {
+            yield call(handleChangeEvent, { ...action, payload: undoEvent });
           }
         }
       }

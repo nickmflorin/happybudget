@@ -49,6 +49,7 @@ declare namespace Table {
   type BaseEvent<T extends EventId = EventId, P extends EventPayload = EventPayload> = {
     readonly type: T;
     readonly payload: P;
+    readonly meta?: "forward" | "reverse";
   };
 
   type BaseMetaEvent<T extends MetaEventId = MetaEventId> = BaseEvent<T, null>;
@@ -70,7 +71,7 @@ declare namespace Table {
   };
 
   type SoloCellChange<
-    R extends RowData,
+    R extends RowData = RowData,
     RW extends EditableRow<R> = EditableRow<R>,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
@@ -79,22 +80,22 @@ declare namespace Table {
     readonly id: RW["id"];
   };
 
-  type RowChangeData<R extends RowData, RW extends EditableRow<R> = EditableRow<R>> = {
-    [Property in keyof RW["data"]]?: CellChange;
+  type RowChangeData<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = {
+    [Property in keyof RW["data"]]?: CellChange<R[Property]>;
   };
 
-  type RowChange<R extends RowData, RW extends EditableRow<R> = EditableRow<R>> = {
+  type RowChange<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = {
     readonly id: RW["id"];
     readonly data: RowChangeData<R, RW>;
   };
 
-  type DataChangePayload<R extends RowData, RW extends EditableRow<R> = EditableRow<R>> = SingleOrArray<
+  type DataChangePayload<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = SingleOrArray<
     RowChange<R, RW>
   >;
 
-  type ConsolidatedChange<R extends RowData, RW extends EditableRow<R> = EditableRow<R>> = RowChange<R, RW>[];
+  type ConsolidatedChange<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = RowChange<R, RW>[];
 
-  type DataChangeEvent<R extends RowData, RW extends EditableRow<R> = EditableRow<R>> = BaseChangeEvent<
+  type DataChangeEvent<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = BaseChangeEvent<
     "dataChange",
     DataChangePayload<R, RW>
   >;
@@ -118,7 +119,10 @@ declare namespace Table {
   type RowAddDataPayload<R extends RowData> = Partial<R>[];
   type RowAddPayload<R extends RowData> = RowAddCountPayload | RowAddIndexPayload | RowAddDataPayload<R>;
 
-  type RowAddEvent<R extends RowData, P extends RowAddPayload<R> = RowAddPayload<R>> = BaseChangeEvent<"rowAdd", P> & {
+  type RowAddEvent<R extends RowData = RowData, P extends RowAddPayload<R> = RowAddPayload<R>> = BaseChangeEvent<
+    "rowAdd",
+    P
+  > & {
     /* Placeholder IDs must be provided ahead of time so that the IDs are
 			 consistent between the sagas and the reducer. */
     readonly placeholderIds: PlaceholderRowId[];
@@ -243,18 +247,10 @@ declare namespace Table {
     RW
   >[keyof TraversibleEvents<R, RW>];
 
-  type ReversedEvent<
-    E extends TraversibleEvent<R, RW>,
-    R extends RowData = RowData,
-    RW extends EditableRow<R> = EditableRow<R>
-  > = E & {
-    readonly reversed: true;
-  };
-
-  type ChangeEventHistory<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = (
-    | TraversibleEvent<R, RW>
-    | ReversedEvent<TraversibleEvent<R, RW>>
-  )[];
+  type ChangeEventHistory<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = TraversibleEvent<
+    R,
+    RW
+  >[];
 
   type Event<
     R extends RowData = RowData,

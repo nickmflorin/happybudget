@@ -248,11 +248,12 @@ declare namespace Redux {
     C extends Table.Context = Table.Context
   > = Omit<T, "request"> & { readonly request?: T["request"] };
 
-  type TableStore<D extends Table.RowData> = {
+  type TableStore<D extends Table.RowData = Table.RowData> = {
     readonly data: Table.BodyRow<D>[];
     readonly search: string;
     readonly loading: boolean;
     readonly eventHistory: Table.ChangeEventHistory<D>;
+    readonly eventIndex: number;
   };
 
   type BudgetTableStore<R extends Tables.BudgetRowData> = TableStore<R>;
