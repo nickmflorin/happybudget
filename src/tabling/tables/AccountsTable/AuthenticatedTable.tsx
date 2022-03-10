@@ -106,13 +106,13 @@ const AuthenticatedTable = <B extends Model.BaseBudget>(props: AuthenticatedTabl
             }
           }
         },
-        ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
         framework.actions.ToggleColumnAction<R, M>(props.table.current, params),
         framework.actions.ExportCSVAction<R, M>(
           props.table.current,
           params,
           !isNil(props.parent) ? `${props.parent.type}-${props.parent.name}` : ""
-        )
+        ),
+        ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params))
       ],
     [props.actions, props.table.current, onCreateMarkup, onCreateGroup]
   );

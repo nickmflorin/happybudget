@@ -182,7 +182,6 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
             }
           }
         },
-        ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
         framework.actions.ToggleColumnAction<R, M>(props.table.current, params),
         framework.actions.ExportCSVAction<R, M>(
           props.table.current,
@@ -190,7 +189,8 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
           !isNil(props.parent)
             ? `${props.parent.type}-${props.parent.identifier || props.parent.description || ""}`
             : ""
-        )
+        ),
+        ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params))
       ],
     [props.actions, props.table.current, onCreateMarkup, onCreateGroup]
   );
