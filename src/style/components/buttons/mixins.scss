@@ -157,6 +157,10 @@
   @include solid_color($white);
 }
 
+@mixin fg_danger() {
+  @include color_set($red, $red-darker, $red-darker);
+}
+
 @mixin default() {
   @include bg_color_set(#ececec, darken(#ececec, 10%), darken(#ececec, 10%));
   @include solid_color($text-secondary);

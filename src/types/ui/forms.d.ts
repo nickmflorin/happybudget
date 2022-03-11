@@ -3,6 +3,7 @@ declare type RootFormProps<T> = import("antd/lib/form").FormProps<T>;
 
 declare interface FormInstance<T> extends RootFormInstance<T>, UINotificationsManager {
   readonly setLoading: (value: boolean) => void;
+  readonly clearFieldErrors: () => void;
   readonly loading: boolean | undefined;
   readonly isInModal?: boolean;
   /* If it is a boolean, it will automatically focus the first field based on
@@ -28,6 +29,7 @@ declare interface FormProps<T>
   readonly condensed?: boolean;
   readonly initialValues?: Partial<T>;
   readonly formHeaderProps?: StandardComponentProps;
+  readonly autoSubmit?: boolean;
 }
 
 declare type HeaderTemplateFormData = {

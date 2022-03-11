@@ -67,29 +67,36 @@
   }
 }
 
+.btn-link-base {
+	padding: 0;
+    text-decoration: none !important;
+    height: auto;
+    border: none !important;
+
+		&:hover,
+    &:focus {
+      background-color: transparent;
+    }
+
+		.spinner {
+      @include size(14px);
+      color: $blue !important;
+    }
+}
+
 .btn,
 .ant-btn {
   @include btn-base();
 
   // A Button That Looks Like a <a> Link
   &--link {
-    @extend .btn;
-    color: $blue;
-    padding: 0;
-    text-decoration: none !important;
-    height: auto;
-    border: none !important;
-
-    &:hover,
-    &:focus {
-      background-color: transparent;
-    }
-
-    .spinner {
-      @include size(14px);
-      color: $blue !important;
-    }
+    @extend .btn-link-base;
   }
+
+	&--danger-link {
+		@extend .btn-link-base;
+		@include fg_danger();
+	}
 
   &--default {
     @extend .btn;

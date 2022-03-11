@@ -2,7 +2,7 @@ form {
   width: 100%;
 
   .ant-checkbox {
-    top: 0.3rem !important;
+    top: 0.2rem !important;
   }
 }
 
@@ -67,13 +67,6 @@ form {
   }
 
   &.ant-form-vertical {
-    // On the vertical form layout, AntD removes the colon after the label,
-    // which removes the spacing between the checkbox and label. This keeps
-    // the label/chekcbox spacing consistent.
-    label.ant-checkbox-wrapper {
-      margin: 0 2px 0 8px;
-    }
-
     .form-item {
       .ant-form-item-control {
         width: 100%;
@@ -94,6 +87,12 @@ form {
         width: auto !important;
         flex-grow: 100;
       }
+
+			.ant-form-item-label {
+				padding-left: 0px !important;
+				margin-right: 10px;
+				line-height: 28px;
+			}
     }
 
     &.vertical-layout-override {
@@ -172,7 +171,7 @@ form {
         font-weight: 400;
       }
       .ant-form-item-control-input {
-        min-height: 24px;
+        min-height: 28px;
       }
     }
 

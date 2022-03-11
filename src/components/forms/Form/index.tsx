@@ -135,7 +135,17 @@ const withFormItemFirstInputFocused = <
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const PrivateForm = <T extends Record<string, unknown> = any>(
-  { loading, condensed, children, autoFocusField, title, titleIcon, formHeaderProps, ...props }: PrivateFormProps<T>,
+  {
+    loading,
+    condensed,
+    children,
+    autoFocusField,
+    title,
+    titleIcon,
+    formHeaderProps,
+    autoSubmit,
+    ...props
+  }: PrivateFormProps<T>,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   ref: ForwardedRef<any>
 ): JSX.Element => {
@@ -211,6 +221,14 @@ const PrivateForm = <T extends Record<string, unknown> = any>(
   return (
     <RootForm
       {...props}
+      onValuesChange={(changedValues: Partial<T>, values: T) => {
+        /* If auto submitting the form data after it changes, we need to clear
+           the notifications on a change. */
+        if (autoSubmit) {
+          props.form.clearNotifications();
+        }
+        props.onValuesChange?.(changedValues, values);
+      }}
       name={!isNil(props.name) ? props.name : props.form.isInModal === true ? "form_in_modal" : undefined}
       ref={ref}
       className={classNames(props.className, "form", { condensed })}

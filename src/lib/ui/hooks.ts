@@ -1,5 +1,5 @@
 import { RefObject, useRef, useEffect, useState, useMemo } from "react";
-import { forEach, isNil, debounce, find, reduce, uniqueId } from "lodash";
+import { forEach, isNil, debounce, find, reduce, uniqueId, map } from "lodash";
 import * as JsSearch from "js-search";
 import { useMediaQuery } from "react-responsive";
 import { Form as RootForm } from "antd";
@@ -203,17 +203,41 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
     defaultClosable: false
   });
 
+  const clearFieldErrors = useMemo(
+    () => () => {
+      /* Unfortunately, AntD does not provide a way to do this directly (or to
+         iterate over the fields in the Form for that matter).  So we have to
+         reset the fields without any errors to get field level error messages
+         to go away. */
+      const currentFields = antdForm.getFieldsValue();
+      antdForm.setFields(
+        map(Object.keys(currentFields), (key: string) => ({ name: key, value: currentFields[key], errors: [] }))
+      );
+    },
+    []
+  );
+
+  const clearNotifications = useMemo(
+    () => (ids?: SingleOrArray<number>) => {
+      NotificationsHandler.clearNotifications(ids);
+      clearFieldErrors();
+    },
+    []
+  );
+
   const wrapForm = useMemo<FormInstance<T>>(() => {
     return {
       ...antdForm,
       autoFocusField: form?.autoFocusField,
       ...NotificationsHandler,
+      clearFieldErrors,
+      clearNotifications,
       submit: () => {
-        NotificationsHandler.clearNotifications();
+        clearNotifications();
         antdForm.submit();
       },
       resetFields: () => {
-        NotificationsHandler.clearNotifications();
+        clearNotifications();
         antdForm.resetFields();
       },
       setLoading: (v: boolean) => {

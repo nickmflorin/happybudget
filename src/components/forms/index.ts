@@ -14,5 +14,4 @@ export * from "./Form";
 export { default as BudgetTotalChartForm } from "./BudgetTotalChartForm";
 export * from "./BudgetTotalChartForm";
 export { default as ExportActualsPdfForm } from "./ExportActualsPdfForm";
-export { default as CreatePublicTokenForm } from "./CreatePublicTokenForm";
 export { default as EditPublicTokenForm } from "./EditPublicTokenForm";
