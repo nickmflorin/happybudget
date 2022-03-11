@@ -49,7 +49,7 @@ const PublicUrlInput = ({ urlFormatter, value, actions, onChange, ...props }: Pu
           <IconButton
             size={"small"}
             iconSize={"small"}
-            icon={"clipboard"}
+            icon={"link"}
             onClick={() =>
               util.clipboard.copyTextToClipboard(
                 `${process.env.REACT_APP_DOMAIN}${urlFormatter(val)}`,
