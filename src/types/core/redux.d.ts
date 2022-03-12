@@ -15,12 +15,7 @@ declare namespace Redux {
     : never;
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type Transformers<S, A extends ActionMap<any>> = {
-    [K in keyof A]-?: Reducer<S, InferAction<A[K]>>;
-  };
-
-  type _ActionPayload = string | number | boolean | Record<string, unknown>;
-  type ActionPayload = _ActionPayload | null | _ActionPayload[];
+  type ActionPayload = any;
 
   type Task<P extends ActionPayload = ActionPayload> = (action: Action<P>) => import("@redux-saga/types").SagaIterator;
   type ContextTask<P extends ActionPayload = ActionPayload, C extends Table.Context = Table.Context> = (
@@ -55,7 +50,7 @@ declare namespace Redux {
 
   type ReducersMapObject<S> = {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    [K in keyof S]-?: Reducer<S[K], Action<any>>;
+    [K in keyof S]-?: Reducer<S[K], any>;
   };
 
   type StoreObj = Record<string, unknown> | boolean | number;
@@ -178,7 +173,6 @@ declare namespace Redux {
     readonly deleting: ModelListActionStore;
     readonly updating: ModelListActionStore;
     readonly creating: boolean;
-    readonly selected: number[];
     readonly ordering: Http.Ordering<string>;
   };
 

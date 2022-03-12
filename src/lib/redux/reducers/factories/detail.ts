@@ -1,4 +1,4 @@
-import { createObjectReducerFromTransformers } from "./util";
+import { isNil } from "lodash";
 
 /**
  * A reducer factory that creates a generic reducer to handle the read only state
@@ -12,22 +12,21 @@ import { createObjectReducerFromTransformers } from "./util";
  *                  the reducer should listen for.
  * @param options   Additional options supplied to the reducer factory.
  */
-export const createDetailResponseReducer = <
-  M extends Model.HttpModel,
-  S extends Redux.ModelDetailResponseStore<M> = Redux.ModelDetailResponseStore<M>
->(
-  config: Redux.ReducerConfig<S, Redux.ModelDetailResponseActionMap<M>>
-): Redux.Reducer<S> => {
-  const transformers: Redux.Transformers<S, Redux.ModelDetailResponseActionMap<M>> = {
-    response: (st: S = config.initialState, action: Redux.Action<M | null>) => ({
-      ...st,
-      data: action.payload
-    }),
-    loading: (st: S = config.initialState, action: Redux.Action<boolean>) => ({ ...st, loading: action.payload }),
-    updateInState: (st: S = config.initialState, action: Redux.Action<Redux.UpdateActionPayload<M>>) => ({
-      ...st,
-      data: { ...st.data, ...action.payload.data }
-    })
+export const createDetailResponseReducer =
+  <
+    M extends Model.HttpModel,
+    S extends Redux.ModelDetailResponseStore<M> = Redux.ModelDetailResponseStore<M>,
+    A extends Redux.Action = Redux.Action
+  >(
+    config: Redux.ReducerConfig<S, Redux.ModelDetailResponseActionMap<M>>
+  ): Redux.Reducer<S, A> =>
+  (state: S = config.initialState, action: A): S => {
+    if (!isNil(config.actions.response) && action.type === config.actions.response.toString()) {
+      return { ...state, data: action.payload };
+    } else if (!isNil(config.actions.loading) && action.type === config.actions.loading.toString()) {
+      return { ...state, loading: action.payload };
+    } else if (!isNil(config.actions.updateInState) && action.type === config.actions.updateInState.toString()) {
+      return { ...state, data: { ...state.data, ...action.payload.data } };
+    }
+    return state;
   };
-  return createObjectReducerFromTransformers<S, Redux.ModelDetailResponseActionMap<M>>(config, transformers);
-};

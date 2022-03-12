@@ -1,10 +1,7 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Redirect, Switch, useHistory, useLocation } from "react-router-dom";
-import { isNil } from "lodash";
+import { Redirect, Switch } from "react-router-dom";
 
-import { budgeting } from "lib";
-import { Icon } from "components";
 import { CollapsedLayout } from "components/layout";
 import { Route, PathParamsRoute } from "components/routes";
 
@@ -20,8 +17,6 @@ type PublicBudgetProps = {
 };
 
 const PublicBudget = (props: PublicBudgetProps): JSX.Element => {
-  const history = useHistory();
-  const location = useLocation();
   const dispatch = useDispatch();
   const budget = useSelector((s: Application.Store) =>
     selectors.selectBudgetDetail(s, { domain: "budget", public: true })

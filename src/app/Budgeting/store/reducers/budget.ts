@@ -189,7 +189,8 @@ const genericReducer = combineReducers({
       Model.ActualOwner,
       null,
       Tables.ActualTableContext,
-      Redux.AuthenticatedModelListResponseStore<Model.ActualOwner>
+      Redux.AuthenticatedModelListResponseStore<Model.ActualOwner>,
+      Redux.TableAction<Redux.ActionPayload, Tables.ActualTableContext>
     >({
       initialState: redux.initialState.initialAuthenticatedModelListResponseState,
       actions: {
