@@ -5,9 +5,10 @@ import { ui } from "lib";
 
 import { CollapsedSidebar } from "./Sidebar";
 import GenericLayout, { GenericLayoutProps } from "./GenericLayout";
+import { isNil } from "lodash";
 
 export interface CollapsedLayoutProps extends Omit<GenericLayoutProps, "sidebar"> {
-  readonly sidebar: ICollapsedSidebarItem[];
+  readonly sidebar?: ICollapsedSidebarItem[];
 }
 
 const CollapsedLayout = (props: CollapsedLayoutProps): JSX.Element => {
@@ -18,7 +19,11 @@ const CollapsedLayout = (props: CollapsedLayoutProps): JSX.Element => {
       layout={layout}
       className={classNames("layout--collapsed", props.className)}
       style={props.style}
-      sidebar={<CollapsedSidebar sidebar={props.sidebar} toggle={() => layout.current.toggleSidebar()} />}
+      sidebar={
+        !isNil(props.sidebar) ? (
+          <CollapsedSidebar sidebar={props.sidebar} toggle={() => layout.current.toggleSidebar()} />
+        ) : undefined
+      }
     >
       {props.children}
     </GenericLayout>

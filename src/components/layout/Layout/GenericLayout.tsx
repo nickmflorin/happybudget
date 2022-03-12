@@ -43,7 +43,13 @@ const GenericLayout = (props: GenericLayoutProps): JSX.Element => {
   );
 
   return (
-    <div className={classNames("layout", props.className, { "sidebar-visible": sidebarVisible })} style={props.style}>
+    <div
+      className={classNames("layout", props.className, {
+        "without-sidebar": isNil(props.sidebar),
+        "sidebar-visible": sidebarVisible
+      })}
+      style={props.style}
+    >
       {!isNil(props.sidebar) && <div className={classNames("sidebar-container")}>{props.sidebar}</div>}
       <div className={"layout-content"}>
         <BannerNotifications notifications={NotificationsHandler.notifications} />

@@ -32,30 +32,7 @@ const PublicBudget = (props: PublicBudgetProps): JSX.Element => {
   }, [props.budgetId]);
 
   return (
-    <CollapsedLayout
-      className={"layout--budget"}
-      sidebar={[
-        {
-          icon: <Icon weight={"light"} icon={"file-spreadsheet"} />,
-          activeIcon: <Icon weight={"solid"} icon={"file-spreadsheet"} />,
-          onClick: () => {
-            if (!budgeting.urls.isBudgetRelatedUrl(location.pathname, props.budgetId, props.tokenId)) {
-              const budgetLastVisited = budgeting.urls.getLastVisited("budget", props.budgetId, props.tokenId);
-              if (!isNil(budgetLastVisited)) {
-                history.push(budgetLastVisited);
-              } else {
-                history.push(budgeting.urls.getUrl({ domain: "budget", id: props.budgetId }, undefined, props.tokenId));
-              }
-            }
-          },
-          active: budgeting.urls.isBudgetRelatedUrl(location.pathname, props.budgetId, props.tokenId),
-          tooltip: {
-            title: "Budget",
-            placement: "right"
-          }
-        }
-      ]}
-    >
+    <CollapsedLayout className={"layout--budget"}>
       <Switch>
         <Redirect exact from={"/pub/:tokenId/budgets/:budgetId"} to={"/pub/:tokenId/budgets/:budgetId/accounts"} />
         <PathParamsRoute<{ accountId: number }>

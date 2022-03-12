@@ -64,15 +64,19 @@
     }
   }
 
-  @mixin calculate_layout_dimensions($collapsed, $sidebar_hidden, $mobile: false) {
-    $sidebar-width: 260px;
-    @if $collapsed {
-      $sidebar-width: 60px;
-    } @else if $mobile {
-      // On mobile devices, the sidebar (when visible) takes up the full width
-      // of the screen.
-      $sidebar-width: 100%;
-    }
+  @mixin calculate_layout_dimensions($collapsed, $sidebar_hidden, $mobile: false, $sidebar: true) {
+    $sidebar-width: 0px;
+
+		@if $sidebar {
+			$sidebar-width: 260px;
+			@if $collapsed {
+				$sidebar-width: 60px;
+			} @else if $mobile {
+				// On mobile devices, the sidebar (when visible) takes up the full width
+				// of the screen.
+				$sidebar-width: 100%;
+			}
+		}
 
     $sidebar-margin-left: 0px;
     @if $sidebar_hidden {
@@ -91,22 +95,22 @@
     }
   }
 
-  @mixin device_layout_dimensions($collapsed, $sidebar_hidden) {
-    @include calculate_layout_dimensions($collapsed, $sidebar_hidden);
+  @mixin device_layout_dimensions($collapsed, $sidebar_hidden, $sidebar: true) {
+    @include calculate_layout_dimensions($collapsed, $sidebar_hidden, false, $sidebar);
     @include media("<=medium") {
-      @include calculate_layout_dimensions($collapsed, $sidebar_hidden, true);
+      @include calculate_layout_dimensions($collapsed, $sidebar_hidden, true, $sidebar);
     }
   }
 
-  @mixin layout_dimensions($collapsed) {
-    @include device_layout_dimensions($collapsed, true);
+  @mixin layout_dimensions($collapsed, $sidebar: true) {
+    @include device_layout_dimensions($collapsed, true, $sidebar);
     &.sidebar-visible {
-      @include device_layout_dimensions($collapsed, false);
+      @include device_layout_dimensions($collapsed, false, $sidebar);
     }
   }
 
-  @mixin collapsed_layout_dimensions() {
-    @include layout_dimensions(true);
+  @mixin collapsed_layout_dimensions($sidebar: true) {
+    @include layout_dimensions(true, $sidebar);
   }
 
   @mixin expanded_layout_dimensions() {
@@ -123,6 +127,11 @@
     @include expanded_layout_dimensions();
     &--collapsed {
       @include collapsed_layout_dimensions();
+
+			&.without-sidebar {
+				@include collapsed_layout_dimensions(false);
+			}
+
       .sidebar-container {
         // This is important to align the sidebar toggle button in the header.
         padding-top: 8px;
