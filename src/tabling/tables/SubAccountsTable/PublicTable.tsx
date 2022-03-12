@@ -1,9 +1,8 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { isNil, map } from "lodash";
+import { map } from "lodash";
 
 import { models, tabling, hooks } from "lib";
-import { framework } from "tabling/generic";
 
 import { selectors } from "app/Budgeting/store";
 import { PublicBudgetTable, PublicBudgetTableProps } from "../BudgetTable";
@@ -63,15 +62,6 @@ const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model
     [props.onOpenFringesModal, props.parentType, hooks.useDeepEqualMemo(props.columns), processFringesCellForClipboard]
   );
 
-  const actions: Table.PublicMenuActions<R, M> = useMemo(
-    () => (params: Table.PublicMenuActionParams<R, M>) =>
-      [
-        ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
-        framework.actions.ToggleColumnAction<R, M>(props.table.current, params)
-      ],
-    [props.actions, props.table.current]
-  );
-
   return (
     <PublicBudgetTable
       {...props}
@@ -81,7 +71,6 @@ const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model
       pinFirstColumn={true}
       tableId={`public-${props.domain}-${props.parentType}-subaccounts`}
       framework={Framework}
-      actions={actions}
       onBack={onBack}
       onRowExpand={onRowExpand}
       onLeft={onLeft}
