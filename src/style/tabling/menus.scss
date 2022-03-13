@@ -40,11 +40,11 @@
 
   .table-menu-left {
     display: flex;
-    flex-grow: 100;
   }
 
   .table-menu-right {
     display: flex;
+		justify-content: flex-end;
 
     .saving-changes {
       height: 30px;
@@ -55,4 +55,16 @@
       }
     }
   }
+
+	&.has-left-menu {
+		.table-menu-left {
+			flex-grow: 100;
+		}
+	}
+
+	&:not(.has-left-menu) {
+		.table-menu-right {
+			flex-grow: 100;
+		}
+	}
 }

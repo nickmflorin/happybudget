@@ -30,7 +30,7 @@
 .header {
 	@include primary_header_layout(false);
 
-	&.with-logo {
+	&.with-text-logo {
 		@include primary_header_layout(true);
 	}
 

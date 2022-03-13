@@ -69,39 +69,56 @@ const TableMenu = <
         : [],
     [props.menuActionParams]
   );
+
+  const hasLeftMenu = useMemo(
+    () => (!isNil(props.prefixLeft) && props.prefixLeft?.length !== 0) || leftActions.length !== 0,
+    [props.prefixLeft, leftActions]
+  );
+
+  const hasRightMenu = useMemo(
+    () =>
+      (!isNil(props.saving) && isNil(props.savingChangesPortalId)) || rightActions.length !== 0 || !isNil(props.search),
+    [props.saving, props.savingChangesPortalId, rightActions, props.search]
+  );
+
   return (
     <div
       className={classNames(
         "table-action-menu",
         { detached: props.detached },
         { "has-expand-column": props.hasEditColumn },
-        { "has-drag-column": props.hasDragColumn }
+        { "has-drag-column": props.hasDragColumn },
+        { "has-left-menu": hasLeftMenu }
       )}
     >
       <Portal id={props.savingChangesPortalId}>
         {props.savingVisible !== false && <SavingChanges saving={props.saving} />}
       </Portal>
-      <div className={"table-menu-left"}>
-        {map(props.prefixLeft, (element: JSX.Element, i: number) => (
-          <React.Fragment key={i}>{element}</React.Fragment>
-        ))}
-        {leftActions.length !== 0 && <ToolbarComponent actions={leftActions} {...props.menuActionParams} />}
-      </div>
-      <div className={"table-menu-right"}>
-        {/* Reserved for cases where the table is not a full page table and thus
+      <ShowHide show={hasLeftMenu}>
+        <div className={"table-menu-left"}>
+          {map(props.prefixLeft, (element: JSX.Element, i: number) => (
+            <React.Fragment key={i}>{element}</React.Fragment>
+          ))}
+          {leftActions.length !== 0 && <ToolbarComponent actions={leftActions} {...props.menuActionParams} />}
+        </div>
+      </ShowHide>
+      <ShowHide show={hasRightMenu}>
+        <div className={"table-menu-right"}>
+          {/* Reserved for cases where the table is not a full page table and thus
 				  the Saving Changes in the page header is not visible. */}
-        {!isNil(props.saving) && isNil(props.savingChangesPortalId) && <SavingChanges saving={props.saving} />}
-        {rightActions.length !== 0 && <ToolbarComponent actions={rightActions} {...props.menuActionParams} />}
-        <ShowHide show={!isNil(props.search)}>
-          <SearchInput
-            size={"medium"}
-            placeholder={"Search Rows"}
-            value={props.search}
-            style={{ maxWidth: 350, minWidth: 220 }}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onSearch(event.target.value)}
-          />
-        </ShowHide>
-      </div>
+          {!isNil(props.saving) && isNil(props.savingChangesPortalId) && <SavingChanges saving={props.saving} />}
+          {rightActions.length !== 0 && <ToolbarComponent actions={rightActions} {...props.menuActionParams} />}
+          <ShowHide show={!isNil(props.search)}>
+            <SearchInput
+              size={"medium"}
+              placeholder={"Search Rows"}
+              value={props.search}
+              style={{ maxWidth: 350, minWidth: 220 }}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onSearch(event.target.value)}
+            />
+          </ShowHide>
+        </div>
+      </ShowHide>
     </div>
   );
 };

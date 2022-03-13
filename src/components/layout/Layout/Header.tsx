@@ -13,8 +13,8 @@ import { IsAuthenticated } from "components/permissions";
 import { GreenbudgetTextLogo, LeafLogo } from "components/svgs";
 
 export type HeaderProps = StandardComponentProps & {
-  readonly showHeaderSidebarToggle?: boolean | undefined;
-  readonly showHeaderLogo?: boolean | undefined;
+  readonly showSidebarToggle?: boolean | undefined;
+  readonly showTextLogo?: boolean | undefined;
   readonly showLeafLogo?: boolean | undefined;
   readonly sidebarVisible: boolean;
   readonly toggleSidebar: () => void;
@@ -23,8 +23,8 @@ export type HeaderProps = StandardComponentProps & {
 const Header = ({
   sidebarVisible,
   toggleSidebar,
-  showHeaderLogo,
-  showHeaderSidebarToggle,
+  showTextLogo,
+  showSidebarToggle,
   showLeafLogo,
   ...props
 }: HeaderProps): JSX.Element => {
@@ -34,12 +34,12 @@ const Header = ({
     <Layout.Header
       {...props}
       className={classNames("header", props.className, {
-        "with-logo": showHeaderLogo
+        "with-text-logo": showTextLogo
       })}
     >
       <div className={"primary-header"}>
         <div className={"primary-header-left"}>
-          <ShowHide show={showHeaderSidebarToggle}>
+          <ShowHide show={showSidebarToggle}>
             <IconButton
               className={"btn--sidebar-toggle"}
               iconSize={"standard"}
@@ -64,11 +64,13 @@ const Header = ({
           <div id={"breadcrumbs"}></div>
         </div>
 
-        <div className={"primary-header-center"}>
-          <Link className={"logo-link"} to={"/"}>
-            <GreenbudgetTextLogo />
-          </Link>
-        </div>
+        <ShowHide show={showTextLogo}>
+          <div className={"primary-header-center"}>
+            <Link className={"logo-link"} to={"/"}>
+              <GreenbudgetTextLogo />
+            </Link>
+          </div>
+        </ShowHide>
 
         <IsAuthenticated>
           <div className={"primary-header-right"}>

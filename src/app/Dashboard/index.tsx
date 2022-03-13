@@ -47,7 +47,7 @@ const Dashboard = (): JSX.Element => {
           active: location.pathname.startsWith("/contacts")
         }
       ]}
-      showHeaderLogo={true}
+      showHeaderTextLogo={true}
     >
       <Switch>
         <Route exact path={"/contacts"} component={Contacts} />
