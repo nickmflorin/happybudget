@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 
 import { budgeting } from "lib";
 import { Icon } from "components";
-import { CollapsedLayout } from "components/layout";
+import { BudgetLayout } from "components/layout";
 import { Route, PathParamsRoute } from "components/routes";
 
 import Account from "./Account";
@@ -32,8 +32,7 @@ const Template = (props: TemplateProps): JSX.Element => {
   }, [props.budgetId]);
 
   return (
-    <CollapsedLayout
-      className={"layout--budget"}
+    <BudgetLayout
       sidebar={[
         {
           icon: <Icon icon={"copy"} weight={"light"} />,
@@ -85,7 +84,7 @@ const Template = (props: TemplateProps): JSX.Element => {
           )}
         />
       </Switch>
-    </CollapsedLayout>
+    </BudgetLayout>
   );
 };
 

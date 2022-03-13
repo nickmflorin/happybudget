@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 
 import { budgeting } from "lib";
 import { Icon } from "components";
-import { CollapsedLayout } from "components/layout";
+import { BudgetLayout } from "components/layout";
 import { Route, PathParamsRoute } from "components/routes";
 
 import { actions, selectors } from "../store";
@@ -37,8 +37,7 @@ const Budget = (props: BudgetProps): JSX.Element => {
   }, [props.budgetId]);
 
   return (
-    <CollapsedLayout
-      className={"layout--budget"}
+    <BudgetLayout
       sidebar={[
         {
           icon: <Icon weight={"light"} icon={"file-plus"} />,
@@ -152,7 +151,7 @@ const Budget = (props: BudgetProps): JSX.Element => {
         budgetName={!isNil(budget) ? budget.name : `Sample Budget ${new Date().getFullYear()}`}
         filename={!isNil(budget) ? `${budget.name}.pdf` : "budget.pdf"}
       />
-    </CollapsedLayout>
+    </BudgetLayout>
   );
 };
 

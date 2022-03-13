@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect, Switch } from "react-router-dom";
 
-import { CollapsedLayout } from "components/layout";
+import { PublicBudgetLayout } from "components/layout";
 import { Route, PathParamsRoute } from "components/routes";
 
 import { actions, selectors } from "../store";
@@ -27,7 +27,7 @@ const PublicBudget = (props: PublicBudgetProps): JSX.Element => {
   }, [props.budgetId]);
 
   return (
-    <CollapsedLayout className={"layout--budget"} showHeaderLeafLogo={true}>
+    <PublicBudgetLayout>
       <Switch>
         <Redirect exact from={"/pub/:tokenId/budgets/:budgetId"} to={"/pub/:tokenId/budgets/:budgetId/accounts"} />
         <PathParamsRoute<{ accountId: number }>
@@ -50,7 +50,7 @@ const PublicBudget = (props: PublicBudgetProps): JSX.Element => {
           )}
         />
       </Switch>
-    </CollapsedLayout>
+    </PublicBudgetLayout>
   );
 };
 
