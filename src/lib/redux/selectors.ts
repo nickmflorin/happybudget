@@ -1,6 +1,6 @@
 import { shallowEqual } from "react-redux";
-import { createSelector, createSelectorCreator, defaultMemoize } from "reselect";
-import { isEqual, filter, map } from "lodash";
+import { createSelectorCreator, defaultMemoize } from "reselect";
+import { isEqual } from "lodash";
 
 export const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual);
 export const createShallowEqualSelector = createSelectorCreator(defaultMemoize, shallowEqual);
@@ -14,17 +14,3 @@ export const simpleDeepEqualSelector = <T = any>(func: Redux.GenericSelectorFunc
 export const simpleShallowEqualSelector = <T = any>(func: Redux.GenericSelectorFunc<any, T>) => {
   return createShallowEqualSelector(func, (data: T) => data);
 };
-
-type LoadingSelector<S extends Application.Store> = (s: S) => boolean | Redux.ModelListActionInstance[] | undefined;
-
-export const createLoadingSelector = <S extends Application.Store>(...selectors: LoadingSelector<S>[]) =>
-  createSelector(selectors, (...args: (Redux.ModelListActionInstance[] | boolean | undefined)[]) => {
-    return (
-      filter(
-        map(args, (arg: Redux.ModelListActionInstance[] | boolean) =>
-          Array.isArray(arg) ? arg.length !== 0 : arg === true
-        ),
-        (value: boolean) => value === true
-      ).length !== 0
-    );
-  });
