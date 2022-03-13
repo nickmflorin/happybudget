@@ -17,7 +17,11 @@ function MultipleBudgetProductPermissionModal(props: Omit<ModalProps, "title" | 
       {/* It is not ideal that we have to hardcode in this promo code - but it is a
 			stop-gap until we integrate more stable trialing with Stripe. */}
       <p className={"modal-text"}>
-        <span>{"Not to worry! You can upgrade your plan here.  Use promo code "}</span>
+        <span>
+          {"The free plan only gives you access to one budget at a time. " +
+            "Not to worry, you can either delete the current budget or upgrade " +
+            "your plan here for unlimited budgets. Use promo code "}
+        </span>
         <span>
           <b>{"green30"}</b>
         </span>
