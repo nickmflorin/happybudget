@@ -1,6 +1,6 @@
 import { isNil, filter, find, reduce } from "lodash";
 
-import { redux, util, notifications } from "lib";
+import { redux, util, notifications, http } from "lib";
 
 /**
  * A reducer factory that creates a generic reducer to handle the state of a
@@ -62,6 +62,21 @@ export const withAuthentication =
   ): Redux.Reducer<S, A> =>
   (state: S = config.initialState, action: A): S => {
     state = reducer(state, action);
+
+    const reorderIfApplicable = (s: S) => {
+      if (s.ordering.length !== 0) {
+        return {
+          ...s,
+          data: http.util.orderBy(
+            s.data,
+            s.ordering as Http.Ordering<keyof typeof s.data[number] & string>,
+            action.user || null
+          )
+        };
+      }
+      return s;
+    };
+
     if (!isNil(config.actions.setSearch) && action.type === config.actions.setSearch.toString()) {
       const a: Redux.InferAction<typeof config.actions.setSearch> = action;
       return { ...state, search: a.payload };
@@ -79,6 +94,8 @@ export const withAuthentication =
         count: state.count - 1
       };
     } else if (!isNil(config.actions.updateInState) && action.type === config.actions.updateInState.toString()) {
+      /* Note: Eventually we will want to apply `reorderIfApplicable` here but
+         we need to make sure it is fully properly functioning before we do so. */
       const a: Redux.InferAction<typeof config.actions.updateInState> = action;
       const existing = redux.reducers.findModelInData(state.data, a.payload.id, { action: a });
       if (isNil(existing)) {
@@ -100,7 +117,7 @@ export const withAuthentication =
         });
         return state;
       }
-      return { ...state, data: [...state.data, a.payload], count: state.count + 1 };
+      return reorderIfApplicable({ ...state, data: [...state.data, a.payload], count: state.count + 1 });
     } else if (!isNil(config.actions.updateOrdering) && action.type === config.actions.updateOrdering.toString()) {
       const a: Redux.InferAction<typeof config.actions.updateOrdering> = action;
       const existing: Http.FieldOrder<string> | undefined = find(state.ordering, { field: a.payload.field });

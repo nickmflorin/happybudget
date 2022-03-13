@@ -15,6 +15,11 @@ const publicActionMiddleware: MD = api => next => (action: Redux.Action) => {
   return next({ ...action, context: { ...action.context, publicTokenId: state.public.tokenId } });
 };
 
+const userActionMiddleware: MD = api => next => (action: Redux.Action) => {
+  const state = api.getState();
+  return next({ ...action, user: state.user });
+};
+
 const configureStore = (config: Omit<Application.StoreConfig, "modules">): Redux.Store<Application.Store> => {
   const initialState = createApplicationInitialState({ ...config, modules: ModuleConfig });
   const applicationReducer = createApplicationReducer({ ...config, modules: ModuleConfig });
@@ -29,7 +34,7 @@ const configureStore = (config: Omit<Application.StoreConfig, "modules">): Redux
   }
   const sagaMiddleware = createSagaMiddleware(sagaMiddlewareOptions);
 
-  let baseMiddleware: MD[] = [publicActionMiddleware, sagaMiddleware];
+  let baseMiddleware: MD[] = [publicActionMiddleware, userActionMiddleware, sagaMiddleware];
   baseMiddleware =
     process.env.NODE_ENV !== "production"
       ? /* eslint-disable-next-line @typescript-eslint/no-var-requires */

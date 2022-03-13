@@ -10,3 +10,4 @@ export * as typeguards from "./typeguards";
 export * as users from "./users";
 export * as contacts from "./contacts";
 export * as notifications from "./notifications";
+export * as http from "./http";

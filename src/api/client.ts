@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { isNil } from "lodash";
 
-import { util } from "lib";
+import { http } from "lib";
 
 import * as apiUtil from "./util";
 import * as middleware from "./middleware";
@@ -78,9 +78,9 @@ export class ApiClient {
         let rawQuery: Http.RawQuery = { ...rest };
         // Convert Ordering to String if Present
         if (method === HttpRequestMethods.GET && !isNil(ordering)) {
-          rawQuery = { ...rawQuery, ordering: util.urls.convertOrderingQueryToString(ordering) };
+          rawQuery = { ...rawQuery, ordering: http.urls.convertOrderingQueryToString(ordering) };
         }
-        url = util.urls.addQueryParamsToUrl(url, rawQuery, { filter: [""] }) as Http.V1Url;
+        url = http.urls.addQueryParamsToUrl(url, rawQuery, { filter: [""] }) as Http.V1Url;
       }
     } else if (!url.endsWith("/")) {
       url = (url + "/") as Http.V1Url;

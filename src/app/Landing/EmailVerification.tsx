@@ -3,7 +3,7 @@ import { Redirect, useLocation } from "react-router-dom";
 import { isNil, includes } from "lodash";
 
 import * as api from "api";
-import { util, notifications } from "lib";
+import { http, notifications } from "lib";
 import { ApplicationSpinner } from "components";
 
 import { UITokenNotificationRedirectData } from "./Notifications";
@@ -22,7 +22,7 @@ const EmailVerification = (): JSX.Element => {
   const handler = notifications.ui.useNotifications({ defaultClosable: true });
 
   useEffect(() => {
-    const searchParams = util.urls.getQueryParams(location.search);
+    const searchParams = http.urls.getQueryParams(location.search);
     if (!isNil(searchParams.token)) {
       api
         .validateEmailConfirmationToken(searchParams.token)

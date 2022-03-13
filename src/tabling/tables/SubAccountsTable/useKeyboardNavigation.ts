@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useHistory } from "react-router-dom";
 import { isNil, findIndex } from "lodash";
 
-import { budgeting, util } from "lib";
+import { budgeting, http } from "lib";
 
 export type UseKeyboardNavigationProps<B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount> = {
   readonly id: P["id"];
@@ -38,14 +38,14 @@ const useKeyboardNavigation = <
           | Model.SimpleSubAccount;
         if (ancestor.type === "budget") {
           history.push(
-            util.urls.addQueryParamsToUrl(
+            http.urls.addQueryParamsToUrl(
               budgeting.urls.getUrl({ domain: props.domain, id: props.budgetId }, undefined, props.tokenId),
               { row: props.id }
             )
           );
         } else {
           history.push(
-            util.urls.addQueryParamsToUrl(
+            http.urls.addQueryParamsToUrl(
               budgeting.urls.getUrl(
                 { domain: props.domain, id: props.budgetId },
                 { type: ancestor.type, id: ancestor.id },

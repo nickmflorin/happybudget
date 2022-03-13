@@ -8,7 +8,6 @@ export * as events from "./events";
 export * as files from "./files";
 export * as formatters from "./formatters";
 export * as html from "./html";
-export * as urls from "./urls";
 export * as validate from "./validate";
 
 export * from "./string";

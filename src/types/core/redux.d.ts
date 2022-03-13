@@ -72,6 +72,7 @@ declare namespace Redux {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type Action<P extends ActionPayload = any, C extends ActionContext = ActionContext> = BasicAction<P> & {
     readonly context: C;
+    readonly user?: Model.User | null;
   };
 
   type TableActionContext<C extends Table.Context = Table.Context> = WithActionContext<C>;
