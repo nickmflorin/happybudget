@@ -4,15 +4,18 @@ import classNames from "classnames";
 
 import { Layout } from "antd";
 
+import { users } from "lib";
+
 import { Icon, ShowHide } from "components";
 import { IconButton } from "components/buttons";
 import { HelpDropdownMenu, UserDropdownMenu } from "components/dropdowns";
 import { IsAuthenticated } from "components/permissions";
-import { SidebarLogo } from "components/svgs";
+import { GreenbudgetTextLogo, LeafLogo } from "components/svgs";
 
 export type HeaderProps = StandardComponentProps & {
   readonly showHeaderSidebarToggle?: boolean | undefined;
   readonly showHeaderLogo?: boolean | undefined;
+  readonly showLeafLogo?: boolean | undefined;
   readonly sidebarVisible: boolean;
   readonly toggleSidebar: () => void;
 };
@@ -22,52 +25,62 @@ const Header = ({
   toggleSidebar,
   showHeaderLogo,
   showHeaderSidebarToggle,
+  showLeafLogo,
   ...props
-}: HeaderProps): JSX.Element => (
-  <Layout.Header
-    {...props}
-    className={classNames("header", props.className, {
-      "with-logo": showHeaderLogo
-    })}
-  >
-    <div className={"primary-header"}>
-      <div className={"primary-header-left"}>
-        <ShowHide show={showHeaderSidebarToggle}>
-          <IconButton
-            className={"btn--sidebar-toggle"}
-            iconSize={"standard"}
-            size={"large"}
-            icon={(params: ClickableIconCallbackParams) => {
-              if (sidebarVisible === true && params.isHovered === true) {
-                return <Icon icon={"arrow-alt-to-left"} weight={"light"} green={true} />;
-              } else if (params.isHovered === true) {
-                return <Icon icon={"arrow-alt-to-right"} weight={"light"} green={true} />;
-              } else {
-                return <Icon icon={"bars"} weight={"light"} />;
-              }
-            }}
-            onClick={() => toggleSidebar()}
-          />
-        </ShowHide>
-        <div id={"breadcrumbs"}></div>
-      </div>
+}: HeaderProps): JSX.Element => {
+  const user = users.hooks.useUser();
 
-      <div className={"primary-header-center"}>
-        <Link className={"logo-link"} to={"/"}>
-          <SidebarLogo />
-        </Link>
-      </div>
-
-      <IsAuthenticated>
-        <div className={"primary-header-right"}>
-          <div id={"saving-changes"}></div>
-          <HelpDropdownMenu />
-          <UserDropdownMenu />
+  return (
+    <Layout.Header
+      {...props}
+      className={classNames("header", props.className, {
+        "with-logo": showHeaderLogo
+      })}
+    >
+      <div className={"primary-header"}>
+        <div className={"primary-header-left"}>
+          <ShowHide show={showHeaderSidebarToggle}>
+            <IconButton
+              className={"btn--sidebar-toggle"}
+              iconSize={"standard"}
+              size={"large"}
+              icon={(params: ClickableIconCallbackParams) => {
+                if (sidebarVisible === true && params.isHovered === true) {
+                  return <Icon icon={"arrow-alt-to-left"} weight={"light"} green={true} />;
+                } else if (params.isHovered === true) {
+                  return <Icon icon={"arrow-alt-to-right"} weight={"light"} green={true} />;
+                } else {
+                  return <Icon icon={"bars"} weight={"light"} />;
+                }
+              }}
+              onClick={() => toggleSidebar()}
+            />
+          </ShowHide>
+          <ShowHide show={showLeafLogo}>
+            <Link className={"leaf-logo-link"} to={user === null ? "/login" : "/"}>
+              <LeafLogo />
+            </Link>
+          </ShowHide>
+          <div id={"breadcrumbs"}></div>
         </div>
-      </IsAuthenticated>
-    </div>
-    <div id={"supplementary-header"}></div>
-  </Layout.Header>
-);
+
+        <div className={"primary-header-center"}>
+          <Link className={"logo-link"} to={"/"}>
+            <GreenbudgetTextLogo />
+          </Link>
+        </div>
+
+        <IsAuthenticated>
+          <div className={"primary-header-right"}>
+            <div id={"saving-changes"}></div>
+            <HelpDropdownMenu />
+            <UserDropdownMenu />
+          </div>
+        </IsAuthenticated>
+      </div>
+      <div id={"supplementary-header"}></div>
+    </Layout.Header>
+  );
+};
 
 export default React.memo(Header);

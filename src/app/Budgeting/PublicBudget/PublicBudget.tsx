@@ -27,7 +27,7 @@ const PublicBudget = (props: PublicBudgetProps): JSX.Element => {
   }, [props.budgetId]);
 
   return (
-    <CollapsedLayout className={"layout--budget"}>
+    <CollapsedLayout className={"layout--budget"} showHeaderLeafLogo={true}>
       <Switch>
         <Redirect exact from={"/pub/:tokenId/budgets/:budgetId"} to={"/pub/:tokenId/budgets/:budgetId/accounts"} />
         <PathParamsRoute<{ accountId: number }>

@@ -11,6 +11,7 @@ import Header from "./Header";
 export interface GenericLayoutProps extends StandardComponentWithChildrenProps {
   readonly headerProps?: StandardComponentProps;
   readonly showHeaderLogo?: boolean | undefined;
+  readonly showHeaderLeafLogo?: boolean | undefined;
   readonly contentProps?: StandardComponentProps;
   readonly sidebar?: JSX.Element;
   readonly layout?: NonNullRef<ILayoutRef>;
@@ -55,6 +56,7 @@ const GenericLayout = (props: GenericLayoutProps): JSX.Element => {
         <BannerNotifications notifications={NotificationsHandler.notifications} />
         <Header
           {...props.headerProps}
+          showLeafLogo={props.showHeaderLeafLogo}
           showHeaderLogo={props.showHeaderLogo}
           showHeaderSidebarToggle={
             props.showHeaderSidebarToggle === undefined ? !sidebarVisible : props.showHeaderSidebarToggle

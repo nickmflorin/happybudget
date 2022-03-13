@@ -1,167 +1,180 @@
 @mixin primary_header_layout($include_logo: false) {
-  .primary-header {
-    .primary-header-left {
-      @if $include_logo {
-        flex: 1;
-      } @else {
-        flex-grow: 100;
-        margin-right: 10px;
-      }
-    }
-    .primary-header-center {
-      display: none;
-      @if $include_logo {
-        display: flex;
-        margin-left: 10px;
-        margin-right: 10px;
-      }
-      @include media(">=xl") {
-        display: none;
-      }
-    }
-    .primary-header-right {
-      @if $include_logo {
-        flex: 1;
-      }
-    }
-  }
+	.primary-header {
+		.primary-header-left {
+			@if $include_logo {
+				flex: 1;
+			} @else {
+				flex-grow: 100;
+				margin-right: 10px;
+			}
+		}
+		.primary-header-center {
+			display: none;
+			@if $include_logo {
+				display: flex;
+				margin-left: 10px;
+				margin-right: 10px;
+			}
+			@include media('>=xl') {
+				display: none;
+			}
+		}
+		.primary-header-right {
+			@if $include_logo {
+				flex: 1;
+			}
+		}
+	}
 }
 
 .header {
-  @include primary_header_layout(false);
+	@include primary_header_layout(false);
 
-  &.with-logo {
-    @include primary_header_layout(true);
-  }
+	&.with-logo {
+		@include primary_header_layout(true);
+	}
 
-  .primary-header {
-    display: flex;
-    padding: 7px 0;
+	.primary-header {
+		display: flex;
+		padding: 7px 0;
 
-    .primary-header-left {
-      overflow-x: hidden;
-      display: flex;
+		.primary-header-left {
+			overflow-x: hidden;
+			display: flex;
 
-      #breadcrumbs {
-        overflow-x: hidden;
-      }
+			#breadcrumbs {
+				overflow-x: hidden;
+			}
 
-      .btn--sidebar-toggle {
-        padding-left: 0;
-        // We have to adjust the width here so that the icon aligns on the left
-        // of the button so it aligns on the left of the screen.
-        width: 24.5px;
-        min-width: 24.5px;
-        margin-right: 8px;
+			.leaf-logo-link {
+				display: block;
+				text-align: center;
+				height: 36px;
+				padding: 6px;
+				margin-right: 12px;
 
-        .icon {
-          height: 20px;
-          width: 17.5px;
-        }
-      }
-    }
+				svg {
+					height: 100%;
+					width: auto;
+				}
+			}
 
-    .primary-header-center {
-      padding: 5px 0;
-      height: $large-size;
+			.btn--sidebar-toggle {
+				padding-left: 0;
+				// We have to adjust the width here so that the icon aligns on the left
+				// of the button so it aligns on the left of the screen.
+				width: 24.5px;
+				min-width: 24.5px;
+				margin-right: 8px;
 
-      .logo-link {
-        display: block;
-        height: 100%;
+				.icon {
+					height: 20px;
+					width: 17.5px;
+				}
+			}
+		}
 
-        svg {
-          height: 100%;
-          width: auto;
-        }
+		.primary-header-center {
+			padding: 5px 0;
+			height: $large-size;
 
-        @include media(">=medium") {
-          display: none;
-        }
-      }
-    }
+			.logo-link {
+				display: block;
+				height: 100%;
 
-    .primary-header-right {
-      display: flex;
-      justify-content: flex-end;
+				svg {
+					height: 100%;
+					width: auto;
+				}
 
-      // We used to only show this if we explicitly provided a saving prop to the header.
-      // However, now, the tables occasionally inject the SavingChanges component via a Portal,
-      // which means it happens outside of the prop context of the Header component.
-      .saving-changes {
-        // display: none;
-        display: flex;
-      }
+				@include media('>=medium') {
+					display: none;
+				}
+			}
+		}
 
-      .link--help {
-        @include media(">=large") {
-          margin-right: 10px;
-        }
-      }
-    }
-  }
+		.primary-header-right {
+			display: flex;
+			justify-content: flex-end;
+
+			// We used to only show this if we explicitly provided a saving prop to the header.
+			// However, now, the tables occasionally inject the SavingChanges component via a Portal,
+			// which means it happens outside of the prop context of the Header component.
+			.saving-changes {
+				// display: none;
+				display: flex;
+			}
+
+			.link--help {
+				@include media('>=large') {
+					margin-right: 10px;
+				}
+			}
+		}
+	}
 }
 
 .bread-crumbs {
-  display: flex;
-  height: $large-size;
-  overflow-x: hidden;
+	display: flex;
+	height: $large-size;
+	overflow-x: hidden;
 
-  .slash {
-    margin-left: 8px;
-    margin-right: 8px;
-    line-height: $large-size;
-    font-family: $avenir;
-    font-weight: 600;
-    color: $text-primary;
-  }
+	.slash {
+		margin-left: 8px;
+		margin-right: 8px;
+		line-height: $large-size;
+		font-family: $avenir;
+		font-weight: 600;
+		color: $text-primary;
+	}
 
-  .bread-crumb-item {
-    @include vertical-flex-c();
-    cursor: pointer;
+	.bread-crumb-item {
+		@include vertical-flex-c();
+		cursor: pointer;
 
-    &:last-child {
-      overflow-x: hidden;
-    }
+		&:last-child {
+			overflow-x: hidden;
+		}
 
-    .text-wrapper {
-      line-height: $large-size;
-      overflow: hidden;
-      white-space: nowrap;
-      font-size: $standard-text-size;;
-      font-weight: 600;
-      color: $text-secondary;
-      font-family: $avenir;
-    }
+		.text-wrapper {
+			line-height: $large-size;
+			overflow: hidden;
+			white-space: nowrap;
+			font-size: $standard-text-size;
+			font-weight: 600;
+			color: $text-secondary;
+			font-family: $avenir;
+		}
 
-    &:hover {
-      .text-wrapper {
-        color: darken($text-secondary, 20%) !important;
-        .entity-text {
-          .identifier {
-            color: darken(#b5b5b5, 20%) !important;
-          }
-          .description {
-            color: darken($text-secondary, 20%) !important;
-          }
-        }
-      }
-    }
+		&:hover {
+			.text-wrapper {
+				color: darken($text-secondary, 20%) !important;
+				.entity-text {
+					.identifier {
+						color: darken(#b5b5b5, 20%) !important;
+					}
+					.description {
+						color: darken($text-secondary, 20%) !important;
+					}
+				}
+			}
+		}
 
-    &.primary {
-      .text-wrapper {
-        color: $green;
-        font-size: 15px;
-      }
-      &:hover {
-        .text-wrapper {
-          color: $green-darker !important;
-        }
-      }
-    }
-  }
+		&.primary {
+			.text-wrapper {
+				color: $green;
+				font-size: 15px;
+			}
+			&:hover {
+				.text-wrapper {
+					color: $green-darker !important;
+				}
+			}
+		}
+	}
 }
 
 .bread-crumb-dropdown {
-  max-height: 400px;
-  overflow: scroll;
+	max-height: 400px;
+	overflow: scroll;
 }

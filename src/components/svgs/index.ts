@@ -1,4 +1,4 @@
-export { default as SidebarLogo } from "./SidebarLogo";
+export { default as GreenbudgetTextLogo } from "./GreenbudgetTextLogo";
 export { default as Logo } from "./Logo";
 export { default as LeafLogo } from "./LeafLogo";
 export { default as GoogleIcon } from "./GoogleIcon";

@@ -6,7 +6,7 @@ import { ui } from "lib";
 
 import { Icon, ShowHide } from "components";
 import { IconButton } from "components/buttons";
-import { SidebarLogo } from "components/svgs";
+import { GreenbudgetTextLogo } from "components/svgs";
 
 import GenericSidebar, { GenericSidebarProps } from "./GenericSidebar";
 import ExpandedSidebarItem from "./ExpandedSidebarItem";
@@ -36,7 +36,7 @@ const ExpandedSidebar = ({ toggle, ...props }: ExpandedSidebarProps): JSX.Elemen
       </ShowHide>
       <div className={"logo-container"}>
         <Link className={"logo-link"} to={"/"}>
-          <SidebarLogo />
+          <GreenbudgetTextLogo />
         </Link>
       </div>
     </GenericSidebar>
