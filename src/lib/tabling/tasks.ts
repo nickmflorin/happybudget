@@ -10,14 +10,9 @@ import * as typeguards from "./typeguards";
 export const createChangeEventHandler = <R extends Table.RowData, C extends Table.Context = Table.Context>(
   handlers: Partial<Redux.TableChangeEventTaskMapObject<R, C>>
 ): Redux.TableChangeEventTask<Table.ChangeEvent<R>, R, C> => {
-  function* handleChangeEvent(e: Table.ChangeEvent<R>, context: Redux.WithActionContext<C>): SagaIterator {
-    const handler = handlers[e.type] as Redux.TableChangeEventTask<Table.ChangeEvent<R>, R, C> | undefined;
-    /* Do not issue a warning/error if the event type does not have an
-				 associated handler because there are event types that correspond to
-				 reducer behavior only. */
-    if (!isNil(handler)) {
-      yield call(handler, e, context);
-    }
+  function* handleChangeEvent<E extends Table.ChangeEvent<R>>(e: E, context: Redux.WithActionContext<C>): SagaIterator {
+    const handler = handlers[e.type] as Redux.TableChangeEventTask<E, R, C>;
+    yield call(handler, e, context);
   }
   return handleChangeEvent;
 };
