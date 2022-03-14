@@ -200,11 +200,11 @@ const Columns: Table.Column<R, M>[] = [
        because the PDF model form has a domain property as well. */
     isApplicableForModel: (m: Model.SubAccount) => m.domain === "budget"
   }),
-  columns.FakeColumn({ field: "nominal_value", nullValue: 0.0 }),
-  columns.FakeColumn({ field: "markup_contribution", nullValue: 0.0 }),
-  columns.FakeColumn({ field: "fringe_contribution", nullValue: 0.0 }),
-  columns.FakeColumn({ field: "accumulated_fringe_contribution", nullValue: 0.0 }),
-  columns.FakeColumn({ field: "accumulated_markup_contribution", nullValue: 0.0 })
+  columns.FakeColumn({ field: "nominal_value", nullValue: 0.0, defaultValueOnCreate: 0.0 }),
+  columns.FakeColumn({ field: "markup_contribution", nullValue: 0.0, defaultValueOnCreate: 0.0 }),
+  columns.FakeColumn({ field: "fringe_contribution", nullValue: 0.0, defaultValueOnCreate: 0.0 }),
+  columns.FakeColumn({ field: "accumulated_fringe_contribution", nullValue: 0.0, defaultValueOnCreate: 0.0 }),
+  columns.FakeColumn({ field: "accumulated_markup_contribution", nullValue: 0.0, defaultValueOnCreate: 0.0 })
 ];
 
 export default Columns;

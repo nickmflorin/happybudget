@@ -792,7 +792,7 @@ declare namespace Table {
   type DefaultValueOnCreate<R extends RowData> = R[keyof R] | ((r: Partial<R>) => R[keyof R]);
   type DefaultValueOnUpdate<R extends RowData> = R[keyof R] | ((r: Table.ModelRow<R>) => R[keyof R]);
   type DefaultDataOnCreate<R extends RowData> = Partial<R> | ((r: Partial<R>) => Partial<R>);
-  type DefaultDataOnUpdate<R extends RowData> = R | ((r: Table.ModelRow<R>) => R);
+  type DefaultDataOnUpdate<R extends RowData> = R | ((r: Table.ModelRow<R>) => Partial<R>);
 
   type ReducerConfig<
     R extends RowData,

@@ -103,17 +103,10 @@ export const createAuthenticatedSubAccountsTableReducer = (
   >({
     ...config,
     defaultDataOnCreate: (r: Partial<R>): Partial<R> => {
-      const base = {
-        markup_contribution: 0.0,
-        fringe_contribution: 0.0,
-        actual: 0.0,
-        accumulated_markup_contribution: 0.0,
-        accumulated_fringe_contribution: 0.0
-      };
       if (!isNil(r.rate) && isNil(r.quantity)) {
-        return { ...base, quantity: 1.0 };
+        return { ...r, quantity: 1.0 };
       }
-      return base;
+      return r;
     },
     defaultDataOnUpdate: (r: Table.ModelRow<R>): R => {
       if (!isNil(r.data.rate) && isNil(r.data.quantity)) {
