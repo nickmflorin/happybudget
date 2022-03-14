@@ -242,7 +242,7 @@ class ChoicesClass<CH extends Choice<I, N>, I extends number = number, N extends
     if (typeof lookup === "number") {
       ch = find(this.choices, { id: lookup }) as CH | undefined;
     } else {
-      ch = find(this.choices, (c: CH) => c.name.toLocaleLowerCase() === lookup.toLowerCase()) as CH | undefined;
+      ch = find(this.choices, (c: CH) => c.name === lookup) as CH | undefined;
     }
     if (isNil(ch)) {
       throw new Error(`Could not find choice for lookup ${lookup}.`);
