@@ -1,4 +1,4 @@
-import { tabling } from "lib";
+import * as ids from "../ids";
 
 export type CreateRowConfig<RW extends Table.Row<R>, R extends Table.RowData> = {
   readonly id: RW["id"];
@@ -43,7 +43,7 @@ export const createFooterRow = <Grid extends Table.FooterGridId = Table.FooterGr
   createRow<Table.FooterRow, Table.RowData>({
     ...config,
     rowType: "footer",
-    id: tabling.rows.footerRowId(config.gridId)
+    id: ids.footerRowId(config.gridId)
   });
 
 export default RowManager;

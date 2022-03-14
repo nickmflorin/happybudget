@@ -1,6 +1,7 @@
 import { reduce } from "lodash";
 
-import { tabling, notifications } from "lib";
+import * as notifications from "../../../notifications";
+import * as columns from "../../columns";
 import RowManager, { RowManagerConfig, CreateRowConfig } from "./base";
 
 export type CreateBodyRowConfig<RW extends Table.BodyRow<R>, R extends Table.RowData> = CreateRowConfig<RW, R> & {
@@ -36,7 +37,7 @@ abstract class BodyRowManager<
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   createData(...args: any[]): R {
     return reduce(
-      tabling.columns.filterModelColumns(this.columns),
+      columns.filterModelColumns(this.columns),
       (obj: R, c: Table.ModelColumn<R, M>): R => {
         /* If we are dealing with a calculated or body column, we only read
 				the value directly from the model if that column does not have
@@ -47,7 +48,7 @@ abstract class BodyRowManager<
             /* If the DataColumn is intentionally flagged with `isRead = false`,
 						 this means we do not pull the value from the Model but the value
 						 is instead set with value getters. */
-            if (tabling.columns.isDataColumn(c) && c.isRead === false) {
+            if (columns.isDataColumn(c) && c.isRead === false) {
               return obj;
             }
             console.error(`Could not obtain row value for field ${c.field}, ${notifications.objToJson(args)}!`);

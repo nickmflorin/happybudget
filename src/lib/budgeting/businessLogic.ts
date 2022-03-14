@@ -1,6 +1,6 @@
 import { isNil, reduce, filter, includes } from "lodash";
 
-import { tabling } from "lib";
+import * as tabling from "../tabling";
 import * as models from "./models";
 import * as typeguards from "./typeguards";
 

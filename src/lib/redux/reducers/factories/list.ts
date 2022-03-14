@@ -1,6 +1,11 @@
 import { isNil, filter, find, reduce } from "lodash";
 
-import { redux, util, notifications, http } from "lib";
+import * as http from "../../../http";
+import * as notifications from "../../../notifications";
+import * as util from "../../../util";
+
+import { modelListActionReducer } from "../reducers";
+import { findModelInData } from "../util";
 
 /**
  * A reducer factory that creates a generic reducer to handle the state of a
@@ -84,7 +89,7 @@ export const withAuthentication =
       return { ...state, data: [], count: 0 };
     } else if (!isNil(config.actions.removeFromState) && action.type === config.actions.removeFromState.toString()) {
       const a: Redux.InferAction<typeof config.actions.removeFromState> = action;
-      const existing = redux.reducers.findModelInData(state.data, a.payload, { action: a });
+      const existing = findModelInData(state.data, a.payload, { action: a });
       if (isNil(existing)) {
         return state;
       }
@@ -97,7 +102,7 @@ export const withAuthentication =
       /* Note: Eventually we will want to apply `reorderIfApplicable` here but
          we need to make sure it is fully properly functioning before we do so. */
       const a: Redux.InferAction<typeof config.actions.updateInState> = action;
-      const existing = redux.reducers.findModelInData(state.data, a.payload.id, { action: a });
+      const existing = findModelInData(state.data, a.payload.id, { action: a });
       if (isNil(existing)) {
         return state;
       }
@@ -109,7 +114,7 @@ export const withAuthentication =
       };
     } else if (!isNil(config.actions.addToState) && action.type === config.actions.addToState.toString()) {
       const a: Redux.InferAction<typeof config.actions.addToState> = action;
-      const existing = redux.reducers.findModelInData(state.data, a.payload.id, { warnOnMissing: false });
+      const existing = findModelInData(state.data, a.payload.id, { warnOnMissing: false });
       if (!isNil(existing)) {
         notifications.inconsistentStateError({
           action: a,
@@ -148,10 +153,10 @@ export const withAuthentication =
         : { ...state, page: a.payload.page };
     } else if (!isNil(config.actions.deleting) && action.type === config.actions.deleting.toString()) {
       const a: Redux.InferAction<typeof config.actions.deleting> = action;
-      return { ...state, deleting: redux.reducers.modelListActionReducer(state.deleting, a) };
+      return { ...state, deleting: modelListActionReducer(state.deleting, a) };
     } else if (!isNil(config.actions.updating) && action.type === config.actions.updating.toString()) {
       const a: Redux.InferAction<typeof config.actions.updating> = action;
-      return { ...state, updating: redux.reducers.modelListActionReducer(state.updating, a) };
+      return { ...state, updating: modelListActionReducer(state.updating, a) };
     } else if (!isNil(config.actions.creating) && action.type === config.actions.creating.toString()) {
       const a: Redux.InferAction<typeof config.actions.creating> = action;
       return { ...state, creating: a.payload };

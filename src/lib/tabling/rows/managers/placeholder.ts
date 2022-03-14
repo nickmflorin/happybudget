@@ -1,5 +1,5 @@
-import { tabling } from "lib";
-
+import * as columns from "../../columns";
+import * as defaults from "../defaults";
 import BodyRowManager, { BodyRowManagerConfig } from "./body";
 
 type CreatePlaceholderRowConfig<R extends Table.RowData> = {
@@ -37,7 +37,7 @@ class PlaceholderRowManager<
     const defaultData =
       this.defaultData === undefined
         ? undefined
-        : tabling.rows.applyDefaultsOnCreate(tabling.columns.filterModelColumns(this.columns), data, this.defaultData);
+        : defaults.applyDefaultsOnCreate(columns.filterModelColumns(this.columns), data, this.defaultData);
     const defaultValue = defaultData === undefined ? undefined : (defaultData[col.field] as V | undefined);
 
     if (data === undefined || data[col.field] === undefined) {

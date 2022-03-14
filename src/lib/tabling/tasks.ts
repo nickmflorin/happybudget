@@ -4,7 +4,9 @@ import { isNil, map, filter } from "lodash";
 import { createSelector } from "reselect";
 
 import * as api from "api";
-import { tabling } from "lib";
+import * as columns from "./columns";
+import * as events from "./events";
+import * as rows from "./rows";
 
 export const createChangeEventHandler = <R extends Table.RowData, C extends Table.Context = Table.Context>(
   handlers: Partial<Redux.TableChangeEventTaskMapObject<R, C>>
@@ -55,12 +57,13 @@ export const createBulkTask = <
     const store: Table.BodyRow<R>[] = yield select(selectData);
 
     let data: Partial<R>[];
-    if (tabling.events.isRowAddCountPayload(payload) || tabling.events.isRowAddIndexPayload(payload)) {
-      data = tabling.rows.generateNewRowData(
+    if (events.isRowAddCountPayload(payload) || events.isRowAddIndexPayload(payload)) {
+      data = rows.generateNewRowData(
         { store, ...payload },
-        filter(config.table.getColumns(), (cl: Table.DataColumn<R, M>) =>
-          tabling.columns.isBodyColumn(cl)
-        ) as Table.BodyColumn<R, M>[]
+        filter(config.table.getColumns(), (cl: Table.DataColumn<R, M>) => columns.isBodyColumn(cl)) as Table.BodyColumn<
+          R,
+          M
+        >[]
       );
     } else {
       data = payload;
@@ -76,11 +79,12 @@ export const createBulkTask = <
             new rows are being created.`
       );
     }
-    const requestPayload: Http.BulkCreatePayload<P> = tabling.rows.createBulkCreatePayload<R, M, P>(
+    const requestPayload: Http.BulkCreatePayload<P> = rows.createBulkCreatePayload<R, M, P>(
       data,
-      filter(config.table.getColumns(), (c: Table.DataColumn<R, M>) =>
-        tabling.columns.isBodyColumn(c)
-      ) as Table.BodyColumn<R, M>[]
+      filter(config.table.getColumns(), (c: Table.DataColumn<R, M>) => columns.isBodyColumn(c)) as Table.BodyColumn<
+        R,
+        M
+      >[]
     );
     if (!isNil(config.loadingActions)) {
       yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean>) => put(action(true))));

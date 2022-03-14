@@ -3,7 +3,10 @@ import { StrictEffect, call, put, fork, all } from "redux-saga/effects";
 import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
-import { tabling, redux, notifications } from "lib";
+
+import * as notifications from "../../notifications";
+import * as redux from "../../redux";
+import * as tabling from "../../tabling";
 
 type R = Tables.AccountRowData;
 type C = Model.Account;

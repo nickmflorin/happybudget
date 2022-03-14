@@ -1,6 +1,6 @@
 import { find, filter, isNil, forEach, reduce, map } from "lodash";
 
-import { tabling } from "lib";
+import * as tabling from "./tabling";
 import { isHttpModelWithType } from "./typeguards";
 
 export const getRowGeneralReference = <R extends Table.RowData>(row: Table.Row<R>) => {

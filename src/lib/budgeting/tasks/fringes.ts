@@ -4,7 +4,7 @@ import { map, filter, intersection, reduce } from "lodash";
 import { createSelector } from "reselect";
 
 import * as api from "api";
-import { tabling } from "lib";
+import * as tabling from "../../tabling";
 
 type R = Tables.FringeRowData;
 type M = Model.Fringe;

@@ -1,7 +1,8 @@
 import { reduce, filter } from "lodash";
 
-import { tabling } from "lib";
-
+import * as columns from "../columns";
+import * as events from "../events";
+import * as rows from "../rows";
 import { reorderRows } from "./util";
 
 const createRowAddEventReducer = <
@@ -13,20 +14,17 @@ const createRowAddEventReducer = <
 >(
   config: Omit<Table.ReducerConfig<R, M, S, C, A>, "defaultDataOnUpdate">
 ): Redux.Reducer<S, Table.RowAddEvent<R>> => {
-  const placeholderRowManager = new tabling.rows.PlaceholderRowManager<R, M>({
+  const placeholderRowManager = new rows.PlaceholderRowManager<R, M>({
     columns: config.columns,
     defaultData: config.defaultDataOnCreate
   });
   return (s: S = config.initialState, e: Table.RowAddEvent<R>) => {
     const p: Table.RowAddPayload<R> = e.payload;
     let d: Partial<R>[];
-    if (tabling.events.isRowAddCountPayload(p) || tabling.events.isRowAddIndexPayload(p)) {
-      d = tabling.rows.generateNewRowData(
+    if (events.isRowAddCountPayload(p) || events.isRowAddIndexPayload(p)) {
+      d = rows.generateNewRowData(
         { store: s.data, ...p },
-        filter(config.columns, (c: Table.DataColumn<R, M>) => tabling.columns.isBodyColumn(c)) as Table.BodyColumn<
-          R,
-          M
-        >[]
+        filter(config.columns, (c: Table.DataColumn<R, M>) => columns.isBodyColumn(c)) as Table.BodyColumn<R, M>[]
       );
     } else {
       d = p;

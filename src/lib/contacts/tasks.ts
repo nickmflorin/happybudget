@@ -3,8 +3,9 @@ import { put, fork, select } from "redux-saga/effects";
 import { filter } from "lodash";
 
 import * as api from "api";
-import * as actions from "store/actions";
-import { tabling, notifications } from "lib";
+import * as tabling from "../tabling";
+import * as notifications from "../notifications";
+import * as actions from "./actions";
 
 type R = Tables.ContactRowData;
 type M = Model.Contact;
@@ -17,13 +18,13 @@ export const createTaskSet = (): Redux.ModelListResponseTaskMap => {
     try {
       const response: Http.ListResponse<M> = yield api.request(api.getContacts, action.context);
       yield put(actions.responseContactsAction(response));
-      yield put(actions.authenticated.responseFilteredContactsAction(response));
+      yield put(actions.responseFilteredContactsAction(response));
     } catch (e: unknown) {
       notifications.ui.banner.handleRequestError(e as Error, {
         message: action.context.errorMessage || "There was an error retrieving the contacts."
       });
       yield put(actions.responseContactsAction({ count: 0, data: [] }));
-      yield put(actions.authenticated.responseFilteredContactsAction({ count: 0, data: [] }));
+      yield put(actions.responseFilteredContactsAction({ count: 0, data: [] }));
     } finally {
       yield put(actions.loadingContactsAction(false));
     }
@@ -33,20 +34,20 @@ export const createTaskSet = (): Redux.ModelListResponseTaskMap => {
 
 export const createFilteredTaskSet = (): Redux.ModelListResponseTaskMap => {
   function* request(action: Redux.Action<null>): SagaIterator {
-    yield put(actions.authenticated.loadingFilteredContactsAction(true));
+    yield put(actions.loadingFilteredContactsAction(true));
     const query: Http.ListQuery = yield select((state: Application.Store) => ({
       search: state.filteredContacts.search
     }));
     try {
       const response: Http.ListResponse<M> = yield api.request(api.getContacts, action.context, query);
-      yield put(actions.authenticated.responseFilteredContactsAction(response));
+      yield put(actions.responseFilteredContactsAction(response));
     } catch (e: unknown) {
       notifications.ui.banner.handleRequestError(e as Error, {
         message: action.context.errorMessage || "There was an error retrieving the contacts."
       });
-      yield put(actions.authenticated.responseFilteredContactsAction({ count: 0, data: [] }));
+      yield put(actions.responseFilteredContactsAction({ count: 0, data: [] }));
     } finally {
-      yield put(actions.authenticated.loadingFilteredContactsAction(false));
+      yield put(actions.loadingFilteredContactsAction(false));
     }
   }
   return { request };

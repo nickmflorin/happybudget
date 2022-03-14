@@ -1,4 +1,4 @@
-import { redux } from "lib";
+import * as redux from "../redux";
 
 export const selectContacts = redux.selectors.simpleDeepEqualSelector(
   (state: Application.Store) => state.contacts.data

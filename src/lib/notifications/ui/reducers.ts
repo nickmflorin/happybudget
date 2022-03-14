@@ -1,7 +1,7 @@
 import { filter, includes } from "lodash";
 
 import { notificationsAreEqual } from "./util";
-import { AddNotificationsDetail, ClearNotificationsDetail } from ".";
+import { AddNotificationsDetail, ClearNotificationsDetail } from "./base";
 
 type AddNotificationsReducerDetail = Omit<AddNotificationsDetail<UINotification>, "opts"> & {
   // For the reducer, the behavior (append or replace) must be provided.

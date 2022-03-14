@@ -4,8 +4,6 @@ import { isNil, filter } from "lodash";
 
 import { redux, contacts } from "lib";
 
-import * as actions from "./actions";
-
 export const createPublicRootSaga = (config: Application.StoreConfig): Saga => {
   function* applicationSaga(): SagaIterator {
     const publicConfig = filter(config.modules, (c: Application.ModuleConfig) => c.isPublic === true);
@@ -26,13 +24,13 @@ const createApplicationSaga = (config: Application.StoreConfig): Saga => {
   const filteredContactsTasks = contacts.tasks.createFilteredTaskSet();
   const contactsSaga = redux.sagas.createAuthenticatedModelListResponseSaga({
     tasks: contactsTasks,
-    actions: { request: actions.requestContactsAction }
+    actions: { request: contacts.actions.requestContactsAction }
   });
   const filteredContactsSaga = redux.sagas.createAuthenticatedModelListResponseSaga({
     tasks: filteredContactsTasks,
     actions: {
-      request: actions.authenticated.requestFilteredContactsAction,
-      setSearch: actions.authenticated.setContactsSearchAction
+      request: contacts.actions.requestFilteredContactsAction,
+      setSearch: contacts.actions.setContactsSearchAction
     }
   });
   function* applicationSaga(): SagaIterator {

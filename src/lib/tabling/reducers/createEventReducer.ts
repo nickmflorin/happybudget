@@ -1,6 +1,6 @@
 import { isNil } from "lodash";
 
-import { tabling } from "lib";
+import * as events from "../events";
 
 import createControlEventReducer from "./createControlEventReducer";
 import createChangeEventReducer from "./createChangeEventReducer";
@@ -20,19 +20,19 @@ const createEventReducer = <
   const controlEventReducer = createControlEventReducer(config);
 
   return (state: S = config.initialState, e: Table.Event<R, M>): S => {
-    if (tabling.events.isChangeEvent(e)) {
+    if (events.isChangeEvent(e)) {
       return changeEventReducer(state, e);
-    } else if (tabling.events.isControlEvent(e)) {
+    } else if (events.isControlEvent(e)) {
       return controlEventReducer(state, e);
-    } else if (tabling.events.isMetaEvent(e)) {
+    } else if (events.isMetaEvent(e)) {
       if (e.type === "forward") {
-        const forwardEvent = tabling.events.getRedoEvent<R>(state);
+        const forwardEvent = events.getRedoEvent<R>(state);
         if (!isNil(forwardEvent)) {
           const newState = { ...state, eventIndex: state.eventIndex + 1 };
           return changeEventReducer(newState, forwardEvent);
         }
       } else {
-        const undoEvent = tabling.events.getUndoEvent<R>(state);
+        const undoEvent = events.getUndoEvent<R>(state);
         if (!isNil(undoEvent)) {
           const newState = { ...state, eventIndex: Math.max(state.eventIndex - 1, -1) };
           return changeEventReducer(newState, undoEvent);

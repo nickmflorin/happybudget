@@ -1,7 +1,9 @@
 import { filter, isNil, map, findLastIndex, reduce } from "lodash";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
-import { tabling } from "lib";
+import * as aggrid from "../aggrid";
+import * as columns from "../columns";
+import * as typeguards from "./typeguards";
 
 const SEPARATORS = ["-", " ", "  "];
 
@@ -182,7 +184,7 @@ const isReduxSource = <R extends Table.RowData>(
 ): source is ReduxSource<R> | Omit<ReduxSource<R>, "count"> => (source as ReduxSource<R>).store !== undefined;
 
 const getSourceIndex = <R extends Table.RowData>(source: AGSource | Omit<ReduxSource<R>, "count">): number => {
-  const numRows = isAgSource(source) ? tabling.aggrid.getRows(source.api).length : source.store.length;
+  const numRows = isAgSource(source) ? aggrid.getRows(source.api).length : source.store.length;
   if (!isNil(source.newIndex)) {
     if (source.newIndex > numRows) {
       console.warn(
@@ -219,7 +221,7 @@ export const findPreviousModelRows = <R extends Table.RowData>(
   const isModelRowOrData = (
     r: Table.BodyRow<R> | Partial<R>
   ): r is Table.ModelRow<R> | Table.PlaceholderRow<R> | Partial<R> =>
-    tabling.rows.isRow(r) ? tabling.rows.isModelRow(r) || tabling.rows.isPlaceholderRow(r) : true;
+    typeguards.isRow(r) ? typeguards.isModelRow(r) || typeguards.isPlaceholderRow(r) : true;
 
   if (
     runningIndex === 0 ||
@@ -302,7 +304,7 @@ const detectPatternFromPreviousRows = <R extends Table.RowData>(
       block of code would recognize that `undefined` is not a PatternValue and
       previous smart inference based on this column.
       */
-    if (tabling.rows.isRow(ri)) {
+    if (typeguards.isRow(ri)) {
       return ri.data[field];
     } else {
       /*
@@ -348,10 +350,10 @@ const detectPatternFromPreviousRows = <R extends Table.RowData>(
 
 export const inferFillCellValue = <R extends Table.RowData, M extends Model.RowHttpModel>(
   params: FillOperationParams,
-  columns: Table.BodyColumn<R, M>[]
+  cs: Table.BodyColumn<R, M>[]
 ): Table.RawRowValue => {
   if (params.direction === "down") {
-    const c: Table.BodyColumn<R, M> | null = tabling.columns.getColumn(columns, params.column.getColId());
+    const c: Table.BodyColumn<R, M> | null = columns.getColumn(cs, params.column.getColId());
     /* The column will be by default not-fake and readable (`isRead !== false`)
 			 since it is already in the table. */
     if (!isNil(c) && c.smartInference === true && !isNil(params.rowNode.rowIndex)) {
@@ -366,7 +368,7 @@ export const inferFillCellValue = <R extends Table.RowData, M extends Model.RowH
 
 export const generateNewRowData = <R extends Table.RowData, M extends Model.RowHttpModel>(
   source: Source<R>,
-  columns: Table.BodyColumn<R, M>[]
+  cs: Table.BodyColumn<R, M>[]
 ): Partial<R>[] => {
   if (isReduxSource(source) && source.count !== undefined && source.count !== 1) {
     if (source.count === 0) {
@@ -379,7 +381,7 @@ export const generateNewRowData = <R extends Table.RowData, M extends Model.RowH
       const runningRows: Partial<R>[] = [];
       for (let i = 0; i < source.count; i++) {
         const runningSource = { ...source, count: 1, store: [...source.store, ...runningRows] };
-        const newRowData = generateNewRowData(runningSource, columns);
+        const newRowData = generateNewRowData(runningSource, cs);
         runningRows.push(newRowData[0]);
       }
       return runningRows;
@@ -387,11 +389,11 @@ export const generateNewRowData = <R extends Table.RowData, M extends Model.RowH
   } else {
     return [
       reduce(
-        columns,
+        cs,
         (curr: Partial<R>, c: Table.BodyColumn<R, M>) => {
           if (c.smartInference === true) {
             if (isAgSource(source) && isNil(source.newIndex)) {
-              source = { ...source, newIndex: tabling.aggrid.getRows(source.api).length };
+              source = { ...source, newIndex: aggrid.getRows(source.api).length };
             }
             const previousRows = findPreviousModelRows<R>(source);
             if (!isNil(previousRows)) {

@@ -1,7 +1,7 @@
 import { combineReducers, CombinedState } from "redux";
 
 import { isNil, reduce, filter } from "lodash";
-import { redux } from "lib";
+import { redux, contacts } from "lib";
 
 import * as actions from "./actions";
 
@@ -71,12 +71,12 @@ const createApplicationReducer = (config: Application.StoreConfig): Redux.Reduce
     >({
       initialState: redux.initialState.initialAuthenticatedModelListResponseState,
       actions: {
-        request: actions.requestContactsAction,
-        response: actions.responseContactsAction,
-        loading: actions.loadingContactsAction,
-        updateInState: actions.authenticated.updateContactInStateAction,
-        removeFromState: actions.authenticated.removeContactFromStateAction,
-        addToState: actions.authenticated.addContactToStateAction
+        request: contacts.actions.requestContactsAction,
+        response: contacts.actions.responseContactsAction,
+        loading: contacts.actions.loadingContactsAction,
+        updateInState: contacts.actions.updateContactInStateAction,
+        removeFromState: contacts.actions.removeContactFromStateAction,
+        addToState: contacts.actions.addContactToStateAction
       }
     }),
     filteredContacts: redux.reducers.createAuthenticatedModelListResponseReducer<
@@ -87,13 +87,13 @@ const createApplicationReducer = (config: Application.StoreConfig): Redux.Reduce
     >({
       initialState: redux.initialState.initialAuthenticatedModelListResponseState,
       actions: {
-        request: actions.authenticated.requestFilteredContactsAction,
-        response: actions.authenticated.responseFilteredContactsAction,
-        loading: actions.authenticated.loadingFilteredContactsAction,
-        updateInState: actions.authenticated.updateContactInStateAction,
-        removeFromState: actions.authenticated.removeContactFromStateAction,
-        addToState: actions.authenticated.addContactToStateAction,
-        setSearch: actions.authenticated.setContactsSearchAction
+        request: contacts.actions.requestFilteredContactsAction,
+        response: contacts.actions.responseFilteredContactsAction,
+        loading: contacts.actions.loadingFilteredContactsAction,
+        updateInState: contacts.actions.updateContactInStateAction,
+        removeFromState: contacts.actions.removeContactFromStateAction,
+        addToState: contacts.actions.addContactToStateAction,
+        setSearch: contacts.actions.setContactsSearchAction
       }
     }),
     loading: loadingReducer,

@@ -1,7 +1,7 @@
 import { isNil } from "lodash";
 
-import { tabling, util } from "lib";
-
+import * as util from "../../../util";
+import * as columns from "../../columns";
 import BodyRowManager from "./body";
 
 type GetRowValue<R extends Table.RowData, M extends Model.RowHttpModel, V extends Table.RawRowValue> = (
@@ -40,7 +40,7 @@ class ModelRowManager<
     if (col.isApplicableForModel?.(m) === false) {
       return [undefined, false];
     }
-    if (!isNil(getRowValue) && tabling.columns.isDataColumn<R, M>(col)) {
+    if (!isNil(getRowValue) && columns.isDataColumn<R, M>(col)) {
       return [
         getRowValue(m, col, (colr: Table.DataColumn<R, M>, mr: M) => this.getValueForRow<V, C>(colr as C, mr)[0]),
         true

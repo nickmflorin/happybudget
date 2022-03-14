@@ -1,6 +1,8 @@
 import { isNil, filter, includes } from "lodash";
 
-import { tabling, budgeting } from "lib";
+import * as budgeting from "../../../budgeting";
+import * as columns from "../../columns";
+import * as ids from "../ids";
 
 import BodyRowManager from "./body";
 
@@ -25,7 +27,7 @@ class MarkupRowManager<
     markup: Model.Markup
   ): [V | undefined, boolean] {
     // The FakeColumn(s) are not applicable for Markups.
-    if (tabling.columns.isDataColumn<R, M>(col) && !isNil(col.markupField)) {
+    if (columns.isDataColumn<R, M>(col) && !isNil(col.markupField)) {
       return [markup[col.markupField] as V | undefined, true];
     }
     /* We want to indicate that the value is nnot applicable for the column so
@@ -47,7 +49,7 @@ class MarkupRowManager<
       ...this.createBasic(
         {
           ...config,
-          id: tabling.rows.markupRowId(config.model.id)
+          id: ids.markupRowId(config.model.id)
         },
         config.model
       ),

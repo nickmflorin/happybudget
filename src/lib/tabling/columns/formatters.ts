@@ -1,4 +1,4 @@
-import { util } from "lib";
+import * as util from "../../util";
 
 export const isAgFormatterParams = <P extends string | number>(
   params: Table.NativeFormatterParams<P> | Table.AGFormatterParams

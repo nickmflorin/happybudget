@@ -1,6 +1,8 @@
 import { isNil, reduce, filter } from "lodash";
 
-import { tabling, redux, util } from "lib";
+import * as redux from "../../redux";
+import * as util from "../../util";
+import * as rows from "../rows";
 
 const createPlaceholdersActivatedEventReducer = <
   R extends Table.RowData,
@@ -11,7 +13,7 @@ const createPlaceholdersActivatedEventReducer = <
 >(
   config: Table.ReducerConfig<R, M, S, C, A>
 ): Redux.Reducer<S, Table.PlaceholdersActivatedEvent<M>> => {
-  const modelRowManager = new tabling.rows.ModelRowManager<R, M>({
+  const modelRowManager = new rows.ModelRowManager<R, M>({
     getRowChildren: config.getModelRowChildren,
     columns: config.columns
   });
@@ -20,7 +22,7 @@ const createPlaceholdersActivatedEventReducer = <
       e.payload.placeholderIds,
       (st: S, id: Table.PlaceholderRowId, index: number) => {
         const r: Table.PlaceholderRow<R> | null = redux.reducers.findModelInData<Table.PlaceholderRow<R>>(
-          filter(st.data, (ri: Table.BodyRow<R>) => tabling.rows.isPlaceholderRow(ri)) as Table.PlaceholderRow<R>[],
+          filter(st.data, (ri: Table.BodyRow<R>) => rows.isPlaceholderRow(ri)) as Table.PlaceholderRow<R>[],
           id
         );
         if (!isNil(r)) {

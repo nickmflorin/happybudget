@@ -1,4 +1,4 @@
-import { tabling } from "lib";
+import * as tabling from "../../tabling";
 
 type R = Tables.AccountRowData;
 type M = Model.Account;

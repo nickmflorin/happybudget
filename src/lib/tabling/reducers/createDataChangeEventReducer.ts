@@ -1,6 +1,10 @@
 import { isNil, reduce, filter } from "lodash";
 
-import { tabling, redux, util } from "lib";
+import * as redux from "../../redux";
+import * as util from "../../util";
+import * as columns from "../columns";
+import * as events from "../events";
+import * as rows from "../rows";
 
 const createDataChangeEventReducer =
   <
@@ -15,7 +19,7 @@ const createDataChangeEventReducer =
     }
   ): Redux.Reducer<S, Table.DataChangeEvent<R>> =>
   (s: S = config.initialState, e: Table.DataChangeEvent<R>): S => {
-    const consolidated = tabling.events.consolidateRowChanges(e.payload);
+    const consolidated = events.consolidateRowChanges(e.payload);
 
     /* Note: This grouping may be redundant in the case that the change is
        dispatched from the Table as the Table will already group the changes
@@ -27,7 +31,7 @@ const createDataChangeEventReducer =
     for (let i = 0; i < consolidated.length; i++) {
       if (isNil(changesPerRow[consolidated[i].id])) {
         const r: Table.EditableRow<R> | null = redux.reducers.findModelInData<Table.EditableRow<R>>(
-          filter(s.data, (ri: Table.BodyRow<R>) => tabling.rows.isEditableRow(ri)) as Table.EditableRow<R>[],
+          filter(s.data, (ri: Table.BodyRow<R>) => rows.isEditableRow(ri)) as Table.EditableRow<R>[],
           consolidated[i].id
         );
         // We do not apply manual updates via the reducer for Group row data.
@@ -49,19 +53,15 @@ const createDataChangeEventReducer =
       (st: S, dt: { changes: Table.RowChange<R>[]; row: Table.EditableRow<R> }) => {
         let r: Table.EditableRow<R> = reduce(
           dt.changes,
-          (ri: Table.EditableRow<R>, change: Table.RowChange<R>) => tabling.rows.mergeChangesWithRow<R>(ri, change),
+          (ri: Table.EditableRow<R>, change: Table.RowChange<R>) => rows.mergeChangesWithRow<R>(ri, change),
           dt.row
         );
         /* Make sure to add in the default data before any recalculations are
            performed. */
-        if (tabling.rows.isModelRow(r)) {
-          r = tabling.rows.applyDefaultsOnUpdate(
-            tabling.columns.filterModelColumns(config.columns),
-            r,
-            config.defaultDataOnUpdate
-          );
+        if (rows.isModelRow(r)) {
+          r = rows.applyDefaultsOnUpdate(columns.filterModelColumns(config.columns), r, config.defaultDataOnUpdate);
         }
-        if (!isNil(config.recalculateRow) && tabling.rows.isDataRow(r)) {
+        if (!isNil(config.recalculateRow) && rows.isDataRow(r)) {
           r = { ...r, data: { ...r.data, ...config.recalculateRow(st, r) } };
         }
         return {

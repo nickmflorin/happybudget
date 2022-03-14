@@ -1,8 +1,8 @@
 import { Saga, SagaIterator } from "redux-saga";
 import { spawn, take, call, cancel, actionChannel, delay, flush, fork, select } from "redux-saga/effects";
-import { isNil, map, isEqual } from "lodash";
+import { isNil, isEqual } from "lodash";
 
-import { tabling } from "lib";
+import * as events from "./events";
 
 export const createPublicTableSaga = <
   R extends Table.RowData,
@@ -157,8 +157,6 @@ function* flushEvents<
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Table.Context = Table.Context
 >(config: SagaConfig<R, M, S, C>, actions: Redux.TableAction<Table.ChangeEvent<R>, C>[]): SagaIterator {
-  const events: Table.ChangeEvent<R>[] = map(actions, (a: Redux.TableAction<Table.ChangeEvent<R>, C>) => a.payload);
-
   let running: RunningBatches<R, C> = {
     dataChange: { context: null, events: [] },
     rowAdd: { context: null, events: [] }
@@ -191,7 +189,7 @@ function* flushEvents<
   function* flushDataBatch(runningBatches: RunningBatches<R, C>): SagaIterator {
     const b: Batch<Table.DataChangeEvent<R>, R, C> = runningBatches.dataChange;
     if (!batchIsEmpty(b)) {
-      const event = tabling.events.consolidateDataChangeEvents(b.events);
+      const event = events.consolidateDataChangeEvents(b.events);
       if (!Array.isArray(event.payload) || event.payload.length !== 0) {
         yield fork(config.tasks.handleChangeEvent, event, b.context);
       }
@@ -203,9 +201,7 @@ function* flushEvents<
   function* flushRowAddBatch(runningBatches: RunningBatches<R, C>): SagaIterator {
     const b: Batch<Table.RowAddEvent<R>, R, C> = runningBatches.rowAdd;
     if (!batchIsEmpty(b)) {
-      const event = tabling.events.consolidateRowAddEvents(
-        (b as PopulatedBatch<Table.RowAddDataEvent<R>, R, C>).events
-      );
+      const event = events.consolidateRowAddEvents((b as PopulatedBatch<Table.RowAddDataEvent<R>, R, C>).events);
       if (!Array.isArray(event.payload) || event.payload.length !== 0) {
         yield fork(config.tasks.handleChangeEvent, event, b.context);
       }
@@ -214,9 +210,9 @@ function* flushEvents<
     return runningBatches;
   }
 
-  for (let i = 0; i < events.length; i++) {
+  for (let i = 0; i < actions.length; i++) {
     const a = actions[i];
-    if (tabling.events.isActionWithChangeEvent(a, "dataChange")) {
+    if (events.isActionWithChangeEvent(a, "dataChange")) {
       /* If the context of the new event is inconsistent with the batched events
          of the same type, that means the context changed quickly before the
          batch had a chance to flush.  In this case, we need to flush the
@@ -225,7 +221,7 @@ function* flushEvents<
         running = yield call(flushDataBatch, running);
       }
       running = addEventToBatch(a, running);
-    } else if (tabling.events.isRowAddEventAction(a) && tabling.events.isRowAddDataEventAction(a)) {
+    } else if (events.isRowAddEventAction(a) && events.isRowAddDataEventAction(a)) {
       /* If the context of the new event is inconsistent with the batched events
          of the same type, that means the context changed quickly before the
          batch had a chance to flush.  In this case, we need to flush the
@@ -280,13 +276,13 @@ export const createAuthenticatedTableSaga = <
 
     function* handleChangeEvent(a: Redux.TableAction<Table.ChangeEvent<R>, C>): SagaIterator {
       const e: Table.ChangeEvent<R> = a.payload;
-      if (tabling.events.isDataChangeEvent(e)) {
+      if (events.isDataChangeEvent(e)) {
         yield call(handleDataChangeEvent, a as Redux.TableAction<Table.DataChangeEvent<R>, C>);
       } else if (
         /* We do not want to buffer RowAdd events if the row is being added
 					 either by the RowAddIndexPayload or the RowAddCountPayload. */
-        tabling.events.isRowAddEvent(e) &&
-        tabling.events.isRowAddDataEvent(e)
+        events.isRowAddEvent(e) &&
+        events.isRowAddDataEvent(e)
       ) {
         yield call(handleRowAddEvent, a as Redux.TableAction<Table.RowAddDataEvent<R>, C>);
       } else {
@@ -298,16 +294,16 @@ export const createAuthenticatedTableSaga = <
       const action: Redux.TableAction<Table.Event<R, M>, C> = yield take(changeChannel);
       const e: Table.Event<R, M> = action.payload;
       const store = yield select(config.selectStore);
-      if (tabling.events.isChangeEvent(e)) {
+      if (events.isChangeEvent(e)) {
         yield call(handleChangeEvent, action as Redux.TableAction<Table.ChangeEvent<R>, C>);
-      } else if (tabling.events.isMetaEvent(e)) {
+      } else if (events.isMetaEvent(e)) {
         if (e.type === "forward") {
-          const redoEvent = tabling.events.getRedoEvent<R>(store);
+          const redoEvent = events.getRedoEvent<R>(store);
           if (!isNil(redoEvent)) {
             yield call(handleChangeEvent, { ...action, payload: redoEvent });
           }
         } else {
-          const undoEvent = tabling.events.getUndoEvent<R>(store);
+          const undoEvent = events.getUndoEvent<R>(store);
           if (!isNil(undoEvent)) {
             yield call(handleChangeEvent, { ...action, payload: undoEvent });
           }

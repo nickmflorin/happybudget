@@ -1,12 +1,13 @@
 import { reduce } from "lodash";
 
-import { tabling, util } from "lib";
+import * as util from "../../util";
+import * as events from "../events";
 
 export const mergeChangesWithRow = <R extends Table.RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>>(
   row: RW,
   changes: Table.DataChangePayload<R, RW>
 ): RW => {
-  const consolidated: Table.ConsolidatedChange<R, RW> = tabling.events.consolidateRowChanges<R, RW>(changes);
+  const consolidated: Table.ConsolidatedChange<R, RW> = events.consolidateRowChanges<R, RW>(changes);
   const data: RW["data"] = reduce(
     consolidated,
     (curr: RW["data"], change: Table.RowChange<R, RW>) => {

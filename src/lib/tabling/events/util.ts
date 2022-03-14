@@ -1,6 +1,6 @@
 import { isNil, reduce, uniq, map, filter, flatten } from "lodash";
 
-import { util } from "lib";
+import * as util from "../../util";
 
 export const cellChangeToRowChange = <R extends Table.RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>>(
   cellChange: Table.SoloCellChange<R, RW>

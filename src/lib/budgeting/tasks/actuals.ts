@@ -3,7 +3,10 @@ import { put, call, fork, select, all } from "redux-saga/effects";
 import { filter, isNil } from "lodash";
 
 import * as api from "api";
-import { tabling, contacts, notifications } from "lib";
+
+import * as contacts from "../../contacts";
+import * as notifications from "../../notifications";
+import * as tabling from "../../tabling";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;

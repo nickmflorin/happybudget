@@ -1,5 +1,8 @@
 import { map } from "lodash";
-import { redux, notifications, models } from "lib";
+
+import * as notifications from "../../notifications";
+import * as models from "../../models";
+import * as typeguards from "../typeguards";
 
 export const isClearOnAction = <T extends Redux.ActionPayload, C extends Table.Context = Table.Context>(
   clearOn: Redux.ClearOn<T, C>[],
@@ -7,7 +10,7 @@ export const isClearOnAction = <T extends Redux.ActionPayload, C extends Table.C
 ): boolean => {
   for (let i = 0; i < clearOn.length; i++) {
     const clearer = clearOn[i];
-    if (redux.typeguards.isClearOnDetail(clearer)) {
+    if (typeguards.isClearOnDetail(clearer)) {
       if (clearer.action.toString() === action.type && clearer.payload(action.payload) === true) {
         return true;
       }

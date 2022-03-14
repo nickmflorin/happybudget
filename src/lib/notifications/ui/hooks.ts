@@ -10,7 +10,7 @@ import * as typeguards from "./typeguards";
 import { combineFieldNotifications, standardizeNotificationData } from "./util";
 import { UINotificationReducer } from "./reducers";
 import existingNotifications from "./notifications";
-import { AddNotificationsDetail, RequestErrorDetail, ClearNotificationsDetail, LookupAndNotifyDetail } from ".";
+import { AddNotificationsDetail, RequestErrorDetail, ClearNotificationsDetail, LookupAndNotifyDetail } from "./base";
 
 type UseNotificationsConfig = {
   readonly defaultClosable?: boolean;

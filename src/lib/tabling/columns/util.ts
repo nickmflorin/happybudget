@@ -1,7 +1,7 @@
 import React from "react";
 import { find, isNil, reduce, filter, orderBy, map } from "lodash";
 
-import { tabling } from "lib";
+import * as rows from "../rows";
 
 import ColumnTypes from "./ColumnTypes";
 import * as typeguards from "./typeguards";
@@ -54,7 +54,7 @@ export const getColumnRowValue = <
 ): V => {
   const returnNullWithWarning = (fld: string) => {
     // The row managers should prevent this, but you never know.
-    if (tabling.rows.isModelRow(row)) {
+    if (rows.isModelRow(row)) {
       console.error(
         `Undefined value for row ${row.id} (type = ${row.rowType}, ` +
           `modelType = ${row.modelType}) encountered for field ${fld}! ` +
@@ -74,7 +74,7 @@ export const getColumnRowValue = <
   /* If the column does not define a valueGetter, we need to pull the row value
      from the underlying row data. */
   if (isNil(valueGetter)) {
-    if (tabling.rows.isMarkupRow(row)) {
+    if (rows.isMarkupRow(row)) {
       if (!isNil(col.markupField)) {
         if (row.data[col.markupField] === undefined) {
           // The row managers should prevent this, but you never know.
@@ -86,7 +86,7 @@ export const getColumnRowValue = <
            just return the nullValue and do not issue a warning. */
         return col.nullValue;
       }
-    } else if (tabling.rows.isGroupRow(row)) {
+    } else if (rows.isGroupRow(row)) {
       if (!isNil(col.groupField)) {
         if (row.data[col.groupField] === undefined) {
           // The row managers should prevent this, but you never know.

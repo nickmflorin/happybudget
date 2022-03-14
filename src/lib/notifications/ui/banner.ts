@@ -5,7 +5,7 @@ import {
   handleRequestError as RootHandleRequestError,
   clear as RootClear,
   lookupAndNotify as RootLookupAndNotify
-} from ".";
+} from "./base";
 
 /**
  * Dispatches an Event instructing any listeners to add the notification to the
