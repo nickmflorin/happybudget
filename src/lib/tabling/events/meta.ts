@@ -1,6 +1,7 @@
-import { isNil, reduce } from "lodash";
+import { isNil, map, reduce } from "lodash";
 
 import * as typeguards from "./typeguards";
+import * as util from "./util";
 
 type InferR<E> = E extends Table.TraversibleEvent<infer R> ? R : never;
 type InferRW<R extends Table.RowData, E> = E extends Table.TraversibleEvent<R, infer RW> ? RW : never;
@@ -15,30 +16,34 @@ type EventTraverseConfig<
   readonly reverse: (e: E) => RE | null;
 };
 
+const reverseRowChange = <
+  R extends Table.RowData = Table.RowData,
+  RW extends Table.EditableRow<R> = Table.EditableRow<R>
+>(
+  rowChange: Table.RowChange<R, RW>
+): Table.RowChange<R, RW> => {
+  type D = typeof rowChange["data"];
+  const newData: D = reduce(
+    rowChange.data,
+    (prev: D, curr: D[keyof D], key: string) => {
+      return !isNil(curr) ? { ...prev, [key as keyof D]: { oldValue: curr.newValue, newValue: curr.oldValue } } : prev;
+    },
+    {}
+  );
+  return { id: rowChange.id, data: newData };
+};
+
 const EventTraverseConfigs: [EventTraverseConfig<Table.DataChangeEvent>] = [
   {
     typeguard: typeguards.isDataChangeEvent,
-    /* Right now, we are only supporting Table.DataChangeEvent(s) that
-       correspond to updating one cell at a time. */
-    conditional: (e: Table.DataChangeEvent) => !Array.isArray(e.payload) || e.payload.length === 1,
     reverse: <Ri extends Table.RowData = Table.RowData, RWi extends Table.EditableRow<Ri> = Table.EditableRow<Ri>>(
       e: Table.DataChangeEvent<Ri, RWi>
     ): Table.DataChangeEvent<Ri, RWi> => {
       /* We only are interested in the first row change for now, since the
          conditional ensures there is only one row change at a time. */
-      const rowChange = Array.isArray(e.payload) ? e.payload[0] : e.payload;
-
-      type D = typeof rowChange["data"];
-      const newData: D = reduce(
-        rowChange.data,
-        (prev: D, curr: D[keyof D], key: string) => {
-          return !isNil(curr)
-            ? { ...prev, [key as keyof D]: { oldValue: curr.newValue, newValue: curr.oldValue } }
-            : prev;
-        },
-        {}
-      );
-      return { ...e, payload: { id: rowChange.id, data: newData } };
+      let rowChanges = Array.isArray(e.payload) ? e.payload : [e.payload];
+      rowChanges = util.consolidateRowChanges(rowChanges);
+      return { ...e, payload: map(rowChanges, (rch: Table.RowChange<Ri, RWi>) => reverseRowChange(rch)) };
     }
   }
 ];
