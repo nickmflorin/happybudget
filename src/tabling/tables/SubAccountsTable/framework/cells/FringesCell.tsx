@@ -16,9 +16,7 @@ const FringesCell = ({ value, ...props }: FringesCellProps): JSX.Element => {
 
   const applicableFringes: Tables.FringeRow[] = useMemo(() => {
     return models.getModels(
-      filter(fringes, (r: Table.BodyRow<Tables.FringeRowData>) =>
-        tabling.typeguards.isModelRow(r)
-      ) as Tables.FringeRow[],
+      filter(fringes, (r: Table.BodyRow<Tables.FringeRowData>) => tabling.rows.isModelRow(r)) as Tables.FringeRow[],
       value
     );
   }, [hooks.useDeepEqualMemo(fringes), value]);

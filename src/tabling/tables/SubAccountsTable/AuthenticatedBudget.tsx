@@ -64,7 +64,7 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
       const rowId = params?.rowId;
       if (!isNil(rowId)) {
         const row: Table.BodyRow<R> | null = props.table.current.getRow(rowId);
-        if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
+        if (!isNil(row) && tabling.rows.isModelRow(row)) {
           let rowChange: Table.RowChange<R, Table.ModelRow<R>> = {
             id: row.id,
             data: { contact: { oldValue: row.data.contact || null, newValue: m.id } }
@@ -93,7 +93,7 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
       const rowId = params.rowId;
       if (!isNil(rowId)) {
         const row: Table.BodyRow<R> | null = props.table.current.getRow(rowId);
-        if (!isNil(row) && tabling.typeguards.isModelRow(row) && row.data.rate === null && m.rate !== null) {
+        if (!isNil(row) && tabling.rows.isModelRow(row) && row.data.rate === null && m.rate !== null) {
           props.table.current.dispatchEvent({
             type: "dataChange",
             payload: {
@@ -139,7 +139,7 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
 						   (if non-null). */
             if (change.newValue !== null) {
               const row = props.table.current.getRow(id);
-              if (!isNil(row) && tabling.typeguards.isModelRow(row) && row.data.rate === null) {
+              if (!isNil(row) && tabling.rows.isModelRow(row) && row.data.rate === null) {
                 const contact: Model.Contact | undefined = find(contacts, { id: change.newValue });
                 if (!isNil(contact) && !isNil(contact.rate)) {
                   props.table.current.dispatchEvent({

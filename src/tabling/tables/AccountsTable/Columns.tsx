@@ -32,14 +32,14 @@ const Columns: Table.Column<R, M>[] = [
     cellRendererParams: {
       /* For the MarkupRow, we need to remove the flex styling so we can justify
          the Icon at the right end of the cell. */
-      innerCellStyle: (row: Table.BodyRow<R>) => (tabling.typeguards.isMarkupRow(row) ? { display: "block" } : {}),
+      innerCellStyle: (row: Table.BodyRow<R>) => (tabling.rows.isMarkupRow(row) ? { display: "block" } : {}),
       icon: (row: Table.BodyRow<R>) =>
-        tabling.typeguards.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined
+        tabling.rows.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined
     },
     pdfHeaderName: "Category Description",
     pdfFooter: { value: "Grand Total" },
     pdfValueGetter: (r: Table.BodyRow<Tables.AccountRowData>) => {
-      if (tabling.typeguards.isGroupRow(r)) {
+      if (tabling.rows.isGroupRow(r)) {
         return r.groupData.name;
       }
       return r.data.description || "";
@@ -51,7 +51,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.formatters.currencyValueFormatter(v =>
+        : tabling.columns.currencyValueFormatter(v =>
             console.error(`Could not parse currency value ${v} for PDF field 'estimated'.`)
           )(params),
     pdfWidth: 0.15,
@@ -64,7 +64,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.formatters.currencyValueFormatter(v =>
+        : tabling.columns.currencyValueFormatter(v =>
             console.error(`Could not parse currency value ${v} for PDF field 'actual'.`)
           )(params),
     pdfWidth: 0.15,
@@ -79,7 +79,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.formatters.currencyValueFormatter(v =>
+        : tabling.columns.currencyValueFormatter(v =>
             console.error(`Could not parse currency value ${v} for PDF field 'variance'.`)
           )(params),
     pdfWidth: 0.15,

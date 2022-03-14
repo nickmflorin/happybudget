@@ -29,7 +29,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
     return reduce(
       subAccountColumns,
       (curr: AC[], c: C) => {
-        if (tabling.typeguards.isDataColumn(c)) {
+        if (tabling.columns.isDataColumn(c)) {
           return [...curr, c as AC];
         }
         return [
@@ -45,7 +45,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
   }, [columns, subAccountColumns]);
 
   const accountSubHeaderRow: Tables.AccountRow = useMemo(() => {
-    const accountRowManager = new tabling.managers.ModelRowManager<AR, AM>({
+    const accountRowManager = new tabling.rows.ModelRowManager<AR, AM>({
       columns
     });
     return accountRowManager.create({
@@ -58,7 +58,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
   const subAccountColumnIsVisible = useMemo(() => (c: DC) => includes(options.columns, c.field), [options.columns]);
 
   const generateRows = hooks.useDynamicCallback((): JSX.Element[] => {
-    const subAccountRowManager = new tabling.managers.ModelRowManager<R, M>({
+    const subAccountRowManager = new tabling.rows.ModelRowManager<R, M>({
       columns: subAccountColumns
     });
 
@@ -84,7 +84,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
       (subaccount: M) =>
         !(options.excludeZeroTotals === true) || budgeting.businessLogic.estimatedValue(subaccount) !== 0
     );
-    const table: Table.BodyRow<R>[] = tabling.data.createTableRows<R, M>({
+    const table: Table.BodyRow<R>[] = tabling.rows.generateTableData<R, M>({
       response: { models: subaccounts, groups: account.groups, markups: account.children_markups },
       columns: subAccountColumns
     });
@@ -94,10 +94,10 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
         filter(
           table,
           (r: Table.BodyRow<R>) =>
-            tabling.typeguards.isModelRow(r) || tabling.typeguards.isGroupRow(r) || tabling.typeguards.isMarkupRow(r)
+            tabling.rows.isModelRow(r) || tabling.rows.isGroupRow(r) || tabling.rows.isMarkupRow(r)
         ) as (Table.ModelRow<R> | Table.GroupRow<R> | Table.MarkupRow<R>)[],
         (rws: JSX.Element[], subAccountRow: Table.ModelRow<R> | Table.GroupRow<R> | Table.MarkupRow<R>) => {
-          if (tabling.typeguards.isModelRow(subAccountRow)) {
+          if (tabling.rows.isModelRow(subAccountRow)) {
             const subAccount: Model.PdfSubAccount | undefined = find(subaccounts, { id: subAccountRow.id });
             if (!isNil(subAccount)) {
               const details = subAccount.children;
@@ -116,14 +116,14 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                     key={`sub-${subAccountRow.id}`}
                     cellProps={{ className: "subaccount-td", textClassName: "subaccount-tr-td-text" }}
                     className={"subaccount-tr"}
-                    columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
+                    columns={filter(subAccountColumns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
                     columnIsVisible={subAccountColumnIsVisible}
                     data={table}
                     row={subAccountRow}
                   />
                 ];
               } else {
-                const subTable: Table.BodyRow<R>[] = tabling.data.createTableRows<R, M>({
+                const subTable: Table.BodyRow<R>[] = tabling.rows.generateTableData<R, M>({
                   response: { models: details, groups: subAccount.groups, markups },
                   columns: subAccountColumns
                 });
@@ -131,22 +131,20 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                   filter(
                     subTable,
                     (r: Table.BodyRow<R>) =>
-                      tabling.typeguards.isModelRow(r) ||
-                      tabling.typeguards.isGroupRow(r) ||
-                      tabling.typeguards.isMarkupRow(r)
+                      tabling.rows.isModelRow(r) || tabling.rows.isGroupRow(r) || tabling.rows.isMarkupRow(r)
                   ) as (Table.ModelRow<R> | Table.GroupRow<R>)[],
                   (subRws: JSX.Element[], detailRow: Table.ModelRow<R> | Table.GroupRow<R> | Table.MarkupRow<R>) => {
-                    if (tabling.typeguards.isModelRow(detailRow) || tabling.typeguards.isMarkupRow(detailRow)) {
+                    if (tabling.rows.isModelRow(detailRow) || tabling.rows.isMarkupRow(detailRow)) {
                       return [
                         ...subRws,
                         <BodyRow<R, M>
                           key={`detail-${detailRow.id}`}
                           applicableColumns={
-                            tabling.typeguards.isMarkupRow(detailRow)
+                            tabling.rows.isMarkupRow(detailRow)
                               ? ["description", "identifier", "estimated", "variance", "actual"]
                               : undefined
                           }
-                          columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
+                          columns={filter(subAccountColumns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
                           columnIsVisible={subAccountColumnIsVisible}
                           className={"detail-tr"}
                           row={detailRow}
@@ -171,7 +169,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                           row={detailRow}
                           data={table}
                           applicableColumns={["description", "identifier", "estimated", "variance", "actual"]}
-                          columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
+                          columns={filter(subAccountColumns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
                           columnIsVisible={subAccountColumnIsVisible}
                           columnIndent={1}
                           cellProps={{
@@ -201,7 +199,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                         textClassName: "subaccount-tr-td-text"
                       }}
                       className={"subaccount-tr"}
-                      columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
+                      columns={filter(subAccountColumns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
                       data={table}
                       row={subAccountRow}
                       columnIsVisible={subAccountColumnIsVisible}
@@ -215,7 +213,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                     key={`sub-footer-${footerRow.id}`}
                     className={"subaccount-footer-tr"}
                     cellProps={{ className: "subaccount-footer-td", textClassName: "subaccount-footer-tr-td-text" }}
-                    columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
+                    columns={filter(subAccountColumns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
                     columnIsVisible={subAccountColumnIsVisible}
                     data={table}
                     row={footerRow}
@@ -226,7 +224,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
               }
             }
             return rws;
-          } else if (tabling.typeguards.isMarkupRow(subAccountRow)) {
+          } else if (tabling.rows.isMarkupRow(subAccountRow)) {
             return [
               ...rws,
               <BodyRow<R, M>
@@ -234,7 +232,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                 cellProps={{ className: "subaccount-td", textClassName: "subaccount-tr-td-text" }}
                 className={"subaccount-tr"}
                 applicableColumns={["description", "identifier", "estimated", "variance", "actual"]}
-                columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
+                columns={filter(subAccountColumns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
                 columnIsVisible={subAccountColumnIsVisible}
                 data={table}
                 row={subAccountRow}
@@ -248,7 +246,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
                 row={subAccountRow}
                 applicableColumns={["description", "identifier", "estimated", "variance", "actual"]}
                 columnIsVisible={subAccountColumnIsVisible}
-                columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
+                columns={filter(subAccountColumns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
                 data={table}
               />
             ];
@@ -258,14 +256,14 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
           <HeaderRow<R, M>
             key={"account-header"}
             className={"account-header-tr"}
-            columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
+            columns={filter(subAccountColumns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
             columnIsVisible={subAccountColumnIsVisible}
           />,
           <BodyRow<AR, AM>
             key={`account-sub-header-${accountSubHeaderRow.id}`}
             className={"account-sub-header-tr"}
             cellProps={{ textClassName: "account-sub-header-tr-td-text" }}
-            columns={filter(accountSubAccountColumns, (c: AC) => tabling.typeguards.isDataColumn(c)) as ADC[]}
+            columns={filter(accountSubAccountColumns, (c: AC) => tabling.columns.isDataColumn(c)) as ADC[]}
             columnIsVisible={accountColumnIsVisible}
             /* We have to tell the row which columns are applicable for the
 							 Account because the columns are the SubAccount columns, and we
@@ -280,7 +278,7 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
       ),
       <FooterRow<R, M>
         key={"table-footer"}
-        columns={filter(subAccountColumns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
+        columns={filter(subAccountColumns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
         columnIsVisible={subAccountColumnIsVisible}
         applicableColumns={["description", "identifier", "estimated", "variance", "actual"]}
         data={table}

@@ -56,7 +56,7 @@ const ColumnSelect = <
       const column = tabling.columns.getColumn(columns, params.value as string);
       if (!isNil(column)) {
         const colType: Table.ColumnDataType | undefined = !isNil(column.dataType)
-          ? find(tabling.models.ColumnTypes, { id: column.dataType })
+          ? find(tabling.columns.ColumnTypes, { id: column.dataType })
           : undefined;
         return (
           <Tag
@@ -78,7 +78,7 @@ const ColumnSelect = <
     }}
   >
     {map(columns, (column: C, index: number) => {
-      const colType = find(tabling.models.ColumnTypes, { id: column.dataType });
+      const colType = find(tabling.columns.ColumnTypes, { id: column.dataType });
       return (
         <Select.Option className={"column-select-option"} key={index + 1} value={column.field}>
           {!isNil(colType) && !isNil(colType.icon) && (

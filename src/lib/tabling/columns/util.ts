@@ -1,7 +1,9 @@
 import React from "react";
 import { find, isNil, reduce, filter, orderBy, map } from "lodash";
 
-import * as Models from "./models";
+import { tabling } from "lib";
+
+import ColumnTypes from "./ColumnTypes";
 import * as typeguards from "./typeguards";
 
 export const editColumnRowConfigIsApplicable = <R extends Table.RowData, RW extends Table.NonPlaceholderBodyRow<R>>(
@@ -47,12 +49,12 @@ export const getColumnRowValue = <
 >(
   col: Table.DataColumn<R, M, V>,
   row: Table.BodyRow<R>,
-  rows: Table.BodyRow<R>[],
+  rws: Table.BodyRow<R>[],
   tableCase: Case = "aggrid"
 ): V => {
   const returnNullWithWarning = (fld: string) => {
     // The row managers should prevent this, but you never know.
-    if (typeguards.isModelRow(row)) {
+    if (tabling.rows.isModelRow(row)) {
       console.error(
         `Undefined value for row ${row.id} (type = ${row.rowType}, ` +
           `modelType = ${row.modelType}) encountered for field ${fld}! ` +
@@ -72,7 +74,7 @@ export const getColumnRowValue = <
   /* If the column does not define a valueGetter, we need to pull the row value
      from the underlying row data. */
   if (isNil(valueGetter)) {
-    if (typeguards.isMarkupRow(row)) {
+    if (tabling.rows.isMarkupRow(row)) {
       if (!isNil(col.markupField)) {
         if (row.data[col.markupField] === undefined) {
           // The row managers should prevent this, but you never know.
@@ -84,7 +86,7 @@ export const getColumnRowValue = <
            just return the nullValue and do not issue a warning. */
         return col.nullValue;
       }
-    } else if (typeguards.isGroupRow(row)) {
+    } else if (tabling.rows.isGroupRow(row)) {
       if (!isNil(col.groupField)) {
         if (row.data[col.groupField] === undefined) {
           // The row managers should prevent this, but you never know.
@@ -105,7 +107,7 @@ export const getColumnRowValue = <
       return row.data[col.field] as unknown as V;
     }
   } else {
-    return valueGetter(row, rows);
+    return valueGetter(row, rws);
   }
 };
 
@@ -472,7 +474,7 @@ export const getColumnTypeCSSStyle = (
 ): React.CSSProperties => {
   let colType: Table.ColumnDataType;
   if (typeof type === "string") {
-    const ct: Table.ColumnDataType | undefined = find(Models.ColumnTypes, { id: type });
+    const ct: Table.ColumnDataType | undefined = find(ColumnTypes, { id: type });
     if (isNil(ct)) {
       return {};
     }

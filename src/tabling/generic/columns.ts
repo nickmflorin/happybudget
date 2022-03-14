@@ -42,7 +42,7 @@ export const CalculatedColumn = <R extends Table.RowData, M extends Model.RowHtt
       }
       return tabling.aggrid.mergeClassNamesFn("cell--calculated", col?.cellClass)(params);
     },
-    valueFormatter: tabling.formatters.currencyValueFormatter(v =>
+    valueFormatter: tabling.columns.currencyValueFormatter(v =>
       console.error(`Could not parse currency value ${v} for field ${col.field}.`)
     )
   };
@@ -239,14 +239,14 @@ export const IdentifierColumn = <
     suppressSizeToFit: true,
     cellStyle: { textAlign: "left" },
     valueGetter: (row: Table.BodyRow<R>) => {
-      if (tabling.typeguards.isGroupRow(row)) {
+      if (tabling.rows.isGroupRow(row)) {
         return row.groupData.name;
       }
       return row.data.identifier;
     },
     colSpan: (params: Table.ColSpanParams<R, M>) => {
       const row: Table.BodyRow<R> = params.data;
-      if (tabling.typeguards.isGroupRow(row)) {
+      if (tabling.rows.isGroupRow(row)) {
         /*
         Note: We have to look at all of the visible columns that are present up
 				until the calculated columns.  This means we have to use the AG Grid
@@ -256,7 +256,7 @@ export const IdentifierColumn = <
         if (!isNil(agColumns)) {
           const originalCalculatedColumns: string[] = map(
             filter(params.columns, (c: Table.RealColumn<R, M>) =>
-              tabling.typeguards.isCalculatedColumn(c)
+              tabling.columns.isCalculatedColumn(c)
             ) as Table.CalculatedColumn<R, M>[],
             (c: Table.CalculatedColumn<R, M>) => tabling.columns.normalizedField<R, M>(c)
           );

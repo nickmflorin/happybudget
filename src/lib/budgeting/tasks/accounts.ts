@@ -210,9 +210,9 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
   function* updateMarkupTask(ctx: CTX, changes: Table.RowChange<R, Table.MarkupRow<R>>[]): SagaIterator {
     if (changes.length !== 0) {
       const effects: (StrictEffect | null)[] = map(changes, (ch: Table.RowChange<R, Table.MarkupRow<R>>) => {
-        const payload = tabling.http.patchPayload<R, C, Http.MarkupPayload>(ch, config.table.getColumns());
+        const payload = tabling.rows.patchPayload<R, C, Http.MarkupPayload>(ch, config.table.getColumns());
         if (!isNil(payload)) {
-          return api.request(api.updateMarkup, ctx, tabling.managers.markupId(ch.id), payload);
+          return api.request(api.updateMarkup, ctx, tabling.rows.markupId(ch.id), payload);
         }
         return null;
       });
@@ -283,7 +283,7 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
     const requestPayload: Http.BulkUpdatePayload<P> = {
       data: map(ids, (id: Table.ModelRowId) => ({
         id,
-        group: tabling.managers.groupId(e.payload.group)
+        group: tabling.rows.groupId(e.payload.group)
       }))
     };
     yield fork(
@@ -304,16 +304,16 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
       yield put(config.actions.loadingBudget(true));
       config.table.saving(true);
 
-      const modelRowIds = filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[];
+      const modelRowIds = filter(ids, (id: Table.RowId) => tabling.rows.isModelRowId(id)) as number[];
 
       const markupRowIds = map(
-        filter(ids, (id: Table.RowId) => tabling.typeguards.isMarkupRowId(id)) as Table.MarkupRowId[],
-        (id: Table.MarkupRowId) => tabling.managers.markupId(id)
+        filter(ids, (id: Table.RowId) => tabling.rows.isMarkupRowId(id)) as Table.MarkupRowId[],
+        (id: Table.MarkupRowId) => tabling.rows.markupId(id)
       ) as number[];
 
       const groupRowIds = map(
-        filter(ids, (id: Table.RowId) => tabling.typeguards.isGroupRowId(id)) as Table.GroupRowId[],
-        (id: Table.GroupRowId) => tabling.managers.groupId(id)
+        filter(ids, (id: Table.RowId) => tabling.rows.isGroupRowId(id)) as Table.GroupRowId[],
+        (id: Table.GroupRowId) => tabling.rows.groupId(id)
       );
 
       try {
@@ -335,8 +335,8 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
     try {
       const response: C = yield api.request(api.createBudgetChild, ctx, ctx.budgetId, {
         previous: e.payload.previous,
-        group: isNil(e.payload.group) ? null : tabling.managers.groupId(e.payload.group),
-        ...tabling.http.postPayload<R, C, P>(e.payload.data, config.table.getColumns())
+        group: isNil(e.payload.group) ? null : tabling.rows.groupId(e.payload.group),
+        ...tabling.rows.postPayload<R, C, P>(e.payload.data, config.table.getColumns())
       });
       /* The Group is not attributed to the Model in a detail response, so
 				 if the group did change we have to use the value from the event
@@ -347,7 +347,7 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
             type: "modelsAdded",
             payload: {
               model: response,
-              group: !isNil(e.payload.group) ? tabling.managers.groupId(e.payload.group) : null
+              group: !isNil(e.payload.group) ? tabling.rows.groupId(e.payload.group) : null
             }
           },
           ctx
@@ -369,7 +369,7 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
     try {
       const response: C = yield api.request(api.updateAccount, ctx, e.payload.id, {
         previous: e.payload.previous,
-        group: isNil(e.payload.newGroup) ? null : tabling.managers.groupId(e.payload.newGroup)
+        group: isNil(e.payload.newGroup) ? null : tabling.rows.groupId(e.payload.newGroup)
       });
       /* The Group is not attributed to the Model in a detail response, so if
 					 the group did change we have to use the value from the event
@@ -380,7 +380,7 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
             type: "modelsUpdated",
             payload: {
               model: response,
-              group: !isNil(e.payload.newGroup) ? tabling.managers.groupId(e.payload.newGroup) : null
+              group: !isNil(e.payload.newGroup) ? tabling.rows.groupId(e.payload.newGroup) : null
             }
           },
           ctx
@@ -400,16 +400,16 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
     const merged = tabling.events.consolidateRowChanges<R>(e.payload);
 
     const markupChanges: Table.RowChange<R, Table.MarkupRow<R>>[] = filter(merged, (value: Table.RowChange<R>) =>
-      tabling.typeguards.isMarkupRowId(value.id)
+      tabling.rows.isMarkupRowId(value.id)
     ) as Table.RowChange<R, Table.MarkupRow<R>>[];
 
     const dataChanges: Table.RowChange<R, Table.ModelRow<R>>[] = filter(merged, (value: Table.RowChange<R>) =>
-      tabling.typeguards.isModelRowId(value.id)
+      tabling.rows.isModelRowId(value.id)
     ) as Table.RowChange<R, Table.ModelRow<R>>[];
 
     yield fork(updateMarkupTask, ctx, markupChanges);
     if (dataChanges.length !== 0) {
-      const requestPayload = tabling.http.createBulkUpdatePayload<R, C, P>(dataChanges, config.table.getColumns());
+      const requestPayload = tabling.rows.createBulkUpdatePayload<R, C, P>(dataChanges, config.table.getColumns());
       if (requestPayload.data.length !== 0) {
         yield fork(
           bulkUpdateTask,

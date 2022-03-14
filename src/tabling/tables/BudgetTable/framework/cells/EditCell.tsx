@@ -16,7 +16,7 @@ const EditCell = <
     <GenericEditCell
       {...props}
       alwaysShow={(row: Table.BodyRow<R>) =>
-        tabling.typeguards.isModelRow(row) && !isNil(row.children) && row.children.length !== 0
+        tabling.rows.isModelRow(row) && !isNil(row.children) && row.children.length !== 0
       }
     />
   );

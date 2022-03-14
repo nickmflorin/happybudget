@@ -1,6 +1,6 @@
 import { isNil, reduce } from "lodash";
 
-import * as columns from "./columns";
+import * as columns from "../columns";
 
 type Context = "update" | "create";
 

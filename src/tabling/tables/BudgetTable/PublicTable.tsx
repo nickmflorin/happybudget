@@ -24,7 +24,7 @@ const PublicBudgetTable = <
     editColumnConfig={
       [
         {
-          typeguard: tabling.typeguards.isModelRow,
+          typeguard: tabling.rows.isModelRow,
           action: (r: Table.ModelRow<R>) => onRowExpand?.(r),
           behavior: "expand",
           conditional: (r: Table.ModelRow<R>) => r.children.length !== 0

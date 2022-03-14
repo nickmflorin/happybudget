@@ -53,7 +53,7 @@ const useModelMenuEditor = <
       setChangedEvent(null);
       setStopEditingOnChangeEvent(true);
       if (
-        tabling.typeguards.isKeyboardEvent(changedEvent) &&
+        tabling.events.isKeyboardEvent(changedEvent) &&
         (changedEvent.code === "Enter" || changedEvent.code === "Tab")
       ) {
         // Suppress keyboard navigation because we handle it ourselves.
@@ -61,7 +61,7 @@ const useModelMenuEditor = <
           params.stopEditing(true);
           params.onDoneEditing(changedEvent);
         }
-      } else if (tabling.typeguards.isSyntheticClickEvent(changedEvent)) {
+      } else if (tabling.events.isSyntheticClickEvent(changedEvent)) {
         if (stopEditingOnChangeEvent === true) {
           params.stopEditing();
           params.onDoneEditing(changedEvent);

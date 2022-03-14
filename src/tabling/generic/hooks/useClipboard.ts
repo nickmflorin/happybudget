@@ -18,7 +18,7 @@ const processCellValueForClipboard = <R extends Table.RowData, M extends Model.R
   value: Table.RawRowValue
 ): string => {
   const processor = column.processCellForClipboard;
-  if (!isNil(processor) && tabling.typeguards.isModelRow(row)) {
+  if (!isNil(processor) && tabling.rows.isModelRow(row)) {
     return String(processor(row.data));
   } else {
     // The value should never be undefined at this point.
@@ -29,7 +29,7 @@ const processCellValueForClipboard = <R extends Table.RowData, M extends Model.R
         )}.`
       );
       return "";
-    } else if (tabling.typeguards.isBodyColumn(column) && column.nullValue === value) {
+    } else if (tabling.columns.isBodyColumn(column) && column.nullValue === value) {
       return "";
     } else {
       return String(value);
@@ -44,7 +44,7 @@ const useClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
     (p: ProcessCellForExportParams): string => {
       if (!isNil(p.node)) {
         const c: Table.RealColumn<R, M> | null = tabling.columns.getRealColumn(params.columns, p.column.getColId());
-        if (!isNil(c) && tabling.typeguards.isDataColumn(c)) {
+        if (!isNil(c) && tabling.columns.isDataColumn(c)) {
           params.setCellCutChange?.(null);
           const row: Table.BodyRow<R> = p.node.data;
           return processCellValueForClipboard<R, M>(c, row, p.value);
@@ -60,7 +60,7 @@ const useClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
       const cs: Table.DataColumn<R, M>[] = filter(
         params.columns,
         (column: Table.Column<R, M>) =>
-          tabling.typeguards.isDataColumn(column) &&
+          tabling.columns.isDataColumn(column) &&
           !isNil(column.field) &&
           column.canBeExported !== false &&
           (isNil(fields) || includes(fields, column.field))
@@ -69,7 +69,7 @@ const useClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
       gridApi.forEachNode((node: Table.RowNode) => {
         const row: Table.BodyRow<R> = node.data;
         const rows = tabling.aggrid.getRows(gridApi);
-        if (tabling.typeguards.isDataRow(row)) {
+        if (tabling.rows.isDataRow(row)) {
           csvData.push(
             reduce(
               cs,
@@ -81,7 +81,7 @@ const useClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
                 if (!isNil(column.valueGetter)) {
                   processedValue = column.valueGetter(
                     row,
-                    filter(rows, (r: Table.Row<R>) => tabling.typeguards.isBodyRow(r)) as Table.BodyRow<R>[]
+                    filter(rows, (r: Table.Row<R>) => tabling.rows.isBodyRow(r)) as Table.BodyRow<R>[]
                   );
                 } else if (!isNil(column.field)) {
                   processedValue = row.data[column.field];

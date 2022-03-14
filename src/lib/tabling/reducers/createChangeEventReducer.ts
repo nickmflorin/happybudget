@@ -35,8 +35,8 @@ const rowDeleteEventReducer = <R extends Table.RowData, S extends Redux.TableSto
   const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
 
   const modelRows: Table.ModelRow<R>[] = redux.reducers.findModelsInData<Table.ModelRow<R>>(
-    filter(s.data, (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R>[],
-    filter(ids, (id: Table.ModelRowId | Table.MarkupRowId) => tabling.typeguards.isModelRowId(id)) as Table.ModelRowId[]
+    filter(s.data, (r: Table.BodyRow<R>) => tabling.rows.isModelRow(r)) as Table.ModelRow<R>[],
+    filter(ids, (id: Table.ModelRowId | Table.MarkupRowId) => tabling.rows.isModelRowId(id)) as Table.ModelRowId[]
   );
   const newState = removeRowsFromTheirGroupsIfTheyExist(s, modelRows);
   return reorderRows({
@@ -54,7 +54,7 @@ const createRowRemoveFromGroupEventReducer = <
 >(
   config: Table.ReducerConfig<R, M, S, C, A>
 ): Redux.Reducer<S, Table.RowRemoveFromGroupEvent> => {
-  const groupRowManager = new tabling.managers.GroupRowManager<R, M>({ columns: config.columns });
+  const groupRowManager = new tabling.rows.GroupRowManager<R, M>({ columns: config.columns });
 
   return (s: S = config.initialState, e: Table.RowRemoveFromGroupEvent): S => {
     const ids: Table.ModelRowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
@@ -118,7 +118,7 @@ const createChangeEventReducer = <
     /* If the event is itself an undo/redo event, do not add alter the event
 		   history in state. */
     if (!includes(["forward", "reverse"], e.meta)) {
-      if (tabling.meta.eventCanTraverse(e)) {
+      if (tabling.events.eventCanTraverse(e)) {
         /* If the event is traversible, the eventIndex moves to the front of the
            event history. */
         newState = {

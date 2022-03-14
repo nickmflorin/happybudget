@@ -42,7 +42,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
       return true;
     },
     valueGetter: (row: Table.BodyRow<R>) =>
-      tabling.typeguards.isModelRow(row) ? util.conditionalJoinString(row.data.first_name, row.data.last_name) : null
+      tabling.rows.isModelRow(row) ? util.conditionalJoinString(row.data.first_name, row.data.last_name) : null
   }),
   columns.BodyColumn<R, M>({
     field: "company",
@@ -75,7 +75,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     headerName: "Email",
     dataType: "email",
     cellRenderer: { data: "EmailCell" },
-    valueSetter: tabling.valueSetters.emailValueSetter("email"),
+    valueSetter: tabling.columns.emailValueSetter("email"),
     width: 100,
     minWidth: 100
   }),
@@ -84,10 +84,10 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     nullValue: null,
     headerName: "Rate",
     dataType: "currency",
-    valueFormatter: tabling.formatters.currencyValueFormatter(v =>
+    valueFormatter: tabling.columns.currencyValueFormatter(v =>
       console.error(`Could not parse currency value ${v} for field 'rate'.`)
     ),
-    valueSetter: tabling.valueSetters.numericValueSetter("rate"),
+    valueSetter: tabling.columns.numericValueSetter("rate"),
     width: 75,
     minWidth: 75
   }),

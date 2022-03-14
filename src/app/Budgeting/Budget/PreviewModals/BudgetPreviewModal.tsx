@@ -19,7 +19,7 @@ type C = Table.DataColumn<R, M>;
 
 const SubAccountColumns = filter(
   SubAccountsTable.Columns,
-  (c: Table.Column<R, M>) => tabling.typeguards.isDataColumn(c) && c.includeInPdf !== false
+  (c: Table.Column<R, M>) => tabling.columns.isDataColumn(c) && c.includeInPdf !== false
 ) as C[];
 
 const DEFAULT_OPTIONS: ExportBudgetPdfFormOptions = {

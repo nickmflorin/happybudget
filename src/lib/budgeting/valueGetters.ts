@@ -7,14 +7,14 @@ export const estimatedValueGetter = <R extends Tables.BudgetRowData>(
   row: Table.BodyRow<R>,
   rows: Table.BodyRow<R>[]
 ): number => {
-  if (tabling.typeguards.isDataRow(row)) {
+  if (tabling.rows.isDataRow(row)) {
     return businessLogic.estimatedValue(row);
   } else {
     const childrenRows: Table.DataRow<R>[] = filter(
       rows,
-      (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r) && includes(row.children, r.id)
+      (r: Table.BodyRow<R>) => tabling.rows.isDataRow(r) && includes(row.children, r.id)
     ) as Table.DataRow<R>[];
-    if (tabling.typeguards.isMarkupRow(row)) {
+    if (tabling.rows.isMarkupRow(row)) {
       /* Markup rows that are of unit FLAT only count towards the overall
 			   estimated value once, not per Account/Sub Account that is tied to that
 				 Markup (which happens when the Markup is of unit PERCENT). */
@@ -48,12 +48,12 @@ export const actualValueGetter = <R extends Tables.BudgetRowData>(
   row: Table.BodyRow<R>,
   rows: Table.BodyRow<R>[]
 ): number => {
-  if (tabling.typeguards.isDataRow(row) || tabling.typeguards.isMarkupRow(row)) {
+  if (tabling.rows.isDataRow(row) || tabling.rows.isMarkupRow(row)) {
     return row.data.actual;
   } else {
     const childrenRows: Table.DataRow<R>[] = filter(
       rows,
-      (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r) && includes(row.children, r.id)
+      (r: Table.BodyRow<R>) => tabling.rows.isDataRow(r) && includes(row.children, r.id)
     ) as Table.DataRow<R>[];
     return reduce(childrenRows, (curr: number, r: Table.DataRow<R>) => curr + r.data.actual, 0.0);
   }

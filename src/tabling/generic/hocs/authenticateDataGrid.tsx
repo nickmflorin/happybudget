@@ -78,7 +78,7 @@ const getCellChangeForClear = <
   row: RW,
   col: Table.BodyColumn<R, M>
 ): Table.SoloCellChange<R, RW> | null => {
-  if (tabling.typeguards.isMarkupRow(row)) {
+  if (tabling.rows.isMarkupRow(row)) {
     if (!isNil(col.markupField)) {
       const v = row.data[col.markupField];
       if (v === undefined) {
@@ -123,7 +123,7 @@ const getTableChangesFromRangeClear = <R extends Table.RowData, M extends Model.
       const node: Table.RowNode | undefined = api.getDisplayedRowAtIndex(i);
       if (!isNil(node)) {
         const row: Table.BodyRow<R> = node.data;
-        if (tabling.typeguards.isEditableRow(row)) {
+        if (tabling.rows.isEditableRow(row)) {
           for (let j = 0; j < colIds.length; j++) {
             const column = tabling.columns.getBodyColumn(columns, colIds[j]);
             if (!isNil(column)) {
@@ -151,7 +151,7 @@ const getCellChangesFromEvent = <
   event: CellEditingStoppedEvent | CellValueChangedEvent
 ): Table.SoloCellChange<R, RW>[] => {
   const row: RW = event.node.data;
-  if (tabling.typeguards.isEditableRow(row)) {
+  if (tabling.rows.isEditableRow(row)) {
     const column = tabling.columns.getBodyColumn(columns, event.column.getColId());
     if (!isNil(column)) {
       /*
@@ -166,7 +166,7 @@ const getCellChangesFromEvent = <
       let newValue = event.newValue === undefined ? column.nullValue : event.newValue;
 
       let changes: Table.SoloCellChange<R, RW>[];
-      if (!isNil(column.parseIntoFields) && tabling.typeguards.isModelRow(row)) {
+      if (!isNil(column.parseIntoFields) && tabling.rows.isModelRow(row)) {
         const oldParsed = column.parseIntoFields(oldValue);
         const parsed = column.parseIntoFields(newValue);
         // The fields for the parsed values of each value should be the same.
@@ -300,7 +300,7 @@ const authenticateDataGrid = <
           checkbox: {
             checkboxSelection: (params: CheckboxSelectionCallbackParams) => {
               const row: Table.BodyRow<R> = params.data;
-              if (tabling.typeguards.isEditableRow(row)) {
+              if (tabling.rows.isEditableRow(row)) {
                 return isNil(props.rowHasCheckboxSelection) || props.rowHasCheckboxSelection(row);
               }
               return false;
@@ -311,7 +311,7 @@ const authenticateDataGrid = <
           body: (col: Table.BodyColumn<R, M>) => ({
             cellRendererParams: { ...col.cellRendererParams },
             editable: (params: Table.ColumnCallbackParams<R>) => {
-              if (!tabling.typeguards.isEditableRow(params.row)) {
+              if (!tabling.rows.isEditableRow(params.row)) {
                 return false;
               }
               return col.editable === undefined ? true : tabling.columns.isEditable<R, M>(col, params.row);
@@ -389,7 +389,7 @@ const authenticateDataGrid = <
 										presses from triggering edit mode in the Cell Editor and
 										clear the value at this level. */
                   const row: Table.BodyRow<R> = params.node.data;
-                  if (tabling.typeguards.isEditableRow(row) && col.cellEditorPopup === true) {
+                  if (tabling.rows.isEditableRow(row) && col.cellEditorPopup === true) {
                     const change = getCellChangeForClear(row, col);
                     if (!isNil(change)) {
                       props.onEvent({
@@ -425,7 +425,7 @@ const authenticateDataGrid = <
         if (!isNil(gridApi)) {
           props.onEvent({
             type: "rowAdd",
-            placeholderIds: [tabling.managers.placeholderRowId()],
+            placeholderIds: [tabling.rows.placeholderRowId()],
             payload: { newIndex: newRowIndex }
           });
         }
@@ -433,7 +433,7 @@ const authenticateDataGrid = <
     });
 
     const onDoneEditing = hooks.useDynamicCallback((e: Table.CellDoneEditingEvent) => {
-      if (tabling.typeguards.isKeyboardEvent(e)) {
+      if (tabling.events.isKeyboardEvent(e)) {
         const focusedCell = props.apis?.grid.getFocusedCell();
         if (!isNil(focusedCell) && !isNil(focusedCell.rowIndex)) {
           if (e.code === "Enter") {
@@ -479,7 +479,7 @@ const authenticateDataGrid = <
           const node = local.getDisplayedRowAtIndex(focusedCell.rowIndex);
           if (!isNil(node)) {
             const row: Table.BodyRow<R> = node.data;
-            if (tabling.typeguards.isEditableRow(row)) {
+            if (tabling.rows.isEditableRow(row)) {
               const c = tabling.columns.getBodyColumn(columns, focusedCell.column.getColId());
               if (!isNil(c)) {
                 const change = getCellChangeForClear(row, c);
@@ -545,7 +545,7 @@ const authenticateDataGrid = <
 						 database.  While this is an EDGE case, because the placeholder rows
 						 only exist for a very short period of time, these scenarios need to
 						 be more concretely established. */
-        if (tabling.typeguards.isEditableRow(row)) {
+        if (tabling.rows.isEditableRow(row)) {
           if (e.source === "paste") {
             setCellChangeEvents([...cellChangeEvents, e]);
           } else {
@@ -569,14 +569,14 @@ const authenticateDataGrid = <
 
     const onCellEditingStarted = hooks.useDynamicCallback((event: CellEditingStartedEvent) => {
       const row: Table.BodyRow<R> = event.node.data;
-      if (tabling.typeguards.isModelRow(row)) {
+      if (tabling.rows.isModelRow(row)) {
         oldRow.current = row;
       }
     });
 
     const onCellDoubleClicked = hooks.useDynamicCallback((e: CellDoubleClickedEvent) => {
       const row: Table.BodyRow<R> = e.data;
-      if (tabling.typeguards.isModelRow(row)) {
+      if (tabling.rows.isModelRow(row)) {
         const c = tabling.columns.getBodyColumn(columns, e.column.getColId());
         if (!isNil(c)) {
           c.onCellDoubleClicked?.(row);
@@ -593,7 +593,7 @@ const authenticateDataGrid = <
           const row: Table.Row<R> = node.data;
           if (
             !isNil(node.rowIndex) &&
-            tabling.typeguards.isEditableRow(row) &&
+            tabling.rows.isEditableRow(row) &&
             (isNil(props.rowHasCheckboxSelection) || props.rowHasCheckboxSelection(row))
           ) {
             lastSelectionFromRange.current = true;
@@ -621,13 +621,13 @@ const authenticateDataGrid = <
 
       for (let i = 0; i < rows.length; i++) {
         const iteratedRow: Table.BodyRow<R> = rows[i];
-        if (tabling.typeguards.isModelRow(iteratedRow)) {
+        if (tabling.rows.isModelRow(iteratedRow)) {
           if (iteratedRow.id === row.id) {
             foundMovedRow = true;
           } else if (foundMovedRow === false) {
             previous = iteratedRow;
           }
-        } else if (tabling.typeguards.isGroupRow(iteratedRow)) {
+        } else if (tabling.rows.isGroupRow(iteratedRow)) {
           /* If we previously found the ModelRow that was moved, and we hit
                a GroupRow, then that means that the GroupRow is the first GroupRow
                underneath that ModelRow - which means that the ModelRow should now
@@ -693,7 +693,7 @@ const authenticateDataGrid = <
             if (
               !isNil(overRow) &&
               overRow.id !== movingRow.id &&
-              (tabling.typeguards.isModelRow(overRow) || tabling.typeguards.isGroupRow(overRow))
+              (tabling.rows.isModelRow(overRow) || tabling.rows.isGroupRow(overRow))
             ) {
               const store: Table.BodyRow<R>[] = moveInArray(rows, movingRow, e.overIndex + numHiddenRows);
               e.api.setRowData(store);
@@ -711,7 +711,7 @@ const authenticateDataGrid = <
     }));
 
     const fillOperation = hooks.useDynamicCallback((params: FillOperationParams) => {
-      const inferredValue = tabling.patterns.inferFillCellValue(params, tabling.columns.filterBodyColumns(columns));
+      const inferredValue = tabling.rows.inferFillCellValue(params, tabling.columns.filterBodyColumns(columns));
       if (!isNil(inferredValue)) {
         return inferredValue;
       }
@@ -740,7 +740,7 @@ const authenticateDataGrid = <
         /* Find the row index of the newly added ModelRow in the set of
 						 only the existing ModelRow(s) and PlaceholderRow(s) in the table. */
         const modelAndPlaceholderRows: Table.DataRow<R>[] = filter(rows, (r: Table.BodyRow<R>) =>
-          tabling.typeguards.isDataRow(r)
+          tabling.rows.isDataRow(r)
         ) as Table.DataRow<R>[];
         const modelRowModelIndex = findIndex(modelAndPlaceholderRows, (r: Table.DataRow<R>) => r.id === diff[0]);
 
@@ -760,10 +760,7 @@ const authenticateDataGrid = <
         if (diff.length === 1) {
           /* Find the row index of the newly added ModelRow in the set of all
                rows in the table. */
-          const modelRowIndex = findIndex(
-            rows,
-            (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r) && r.id === diff[0]
-          );
+          const modelRowIndex = findIndex(rows, (r: Table.BodyRow<R>) => tabling.rows.isDataRow(r) && r.id === diff[0]);
           if (modelRowIndex !== -1) {
             const focusedCell = api.getFocusedCell();
             /* Only refocus the row to the newly created row if there is already
@@ -816,18 +813,18 @@ const authenticateDataGrid = <
       const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api) as Table.BodyRow<R>[];
       const newRowState: RowState = {
         groupRow: map(
-          filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[],
+          filter(rows, (r: Table.BodyRow<R>) => tabling.rows.isGroupRow(r)) as Table.GroupRow<R>[],
           (g: Table.GroupRow<R>) => g.id
         ),
         modelRow: map(
-          filter(
-            rows,
-            (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r) || tabling.typeguards.isPlaceholderRow(r)
-          ) as (Table.ModelRow<R> | Table.PlaceholderRow<R>)[],
+          filter(rows, (r: Table.BodyRow<R>) => tabling.rows.isModelRow(r) || tabling.rows.isPlaceholderRow(r)) as (
+            | Table.ModelRow<R>
+            | Table.PlaceholderRow<R>
+          )[],
           (g: Table.ModelRow<R> | Table.PlaceholderRow<R>) => g.id
         ),
         markupRow: map(
-          filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[],
+          filter(rows, (r: Table.BodyRow<R>) => tabling.rows.isMarkupRow(r)) as Table.MarkupRow<R>[],
           (g: Table.MarkupRow<R>) => g.id
         )
       };

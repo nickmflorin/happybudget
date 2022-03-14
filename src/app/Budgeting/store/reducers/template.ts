@@ -10,17 +10,17 @@ import { initialTemplateState } from "../initialState";
 const SubAccountColumns = filter(
   SubAccountsTable.Columns,
   (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
-    tabling.typeguards.isModelColumn(c) && intersection([c.field], ["variance", "actual", "contact"]).length === 0
+    tabling.columns.isModelColumn(c) && intersection([c.field], ["variance", "actual", "contact"]).length === 0
 ) as Table.ModelColumn<Tables.SubAccountRowData, Model.SubAccount>[];
 
 const AccountColumns = filter(
   AccountsTable.Columns,
   (c: Table.Column<Tables.AccountRowData, Model.Account>) =>
-    tabling.typeguards.isModelColumn(c) && intersection([c.field], ["variance", "actual"]).length === 0
+    tabling.columns.isModelColumn(c) && intersection([c.field], ["variance", "actual"]).length === 0
 ) as Table.ModelColumn<Tables.AccountRowData, Model.Account>[];
 
 const FringesColumns = filter(FringesTable.Columns, (c: Table.Column<Tables.FringeRowData, Model.Fringe>) =>
-  tabling.typeguards.isModelColumn(c)
+  tabling.columns.isModelColumn(c)
 ) as Table.ModelColumn<Tables.FringeRowData, Model.Fringe>[];
 
 const genericReducer = combineReducers({

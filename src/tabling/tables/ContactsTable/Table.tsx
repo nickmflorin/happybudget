@@ -65,7 +65,7 @@ const ContactsTable = (props: Props): JSX.Element => {
     onAttachmentRemoved: (id: number, attachmentId: number) => {
       const row = props.table.current.getRow(id);
       if (!isNil(row)) {
-        if (tabling.typeguards.isModelRow(row)) {
+        if (tabling.rows.isModelRow(row)) {
           removeAttachment(row, attachmentId);
         } else {
           console.warn(
@@ -83,7 +83,7 @@ const ContactsTable = (props: Props): JSX.Element => {
     onAttachmentAdded: (id: number, m: Model.Attachment) => {
       const row = props.table.current.getRow(id);
       if (!isNil(row)) {
-        if (tabling.typeguards.isModelRow(row)) {
+        if (tabling.rows.isModelRow(row)) {
           addAttachment(row, m);
         } else {
           console.warn(
@@ -116,7 +116,7 @@ const ContactsTable = (props: Props): JSX.Element => {
         editColumnConfig={
           [
             {
-              typeguard: tabling.typeguards.isModelRow,
+              typeguard: tabling.rows.isModelRow,
               action: (r: Table.ModelRow<R>) => editContact({ id: r.id, rowId: r.id }),
               behavior: "expand",
               tooltip: "Edit"

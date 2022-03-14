@@ -24,8 +24,8 @@ interface ActualsPdfProps {
 const ActualColumns = filter(
   GenericActualsTable.Columns,
   (c: Table.Column<R, M>) =>
-    tabling.typeguards.isModelColumn(c) &&
-    ((!tabling.typeguards.isFakeColumn(c) && c.includeInPdf !== false) || tabling.typeguards.isFakeColumn(c))
+    tabling.columns.isModelColumn(c) &&
+    ((!tabling.columns.isFakeColumn(c) && c.includeInPdf !== false) || tabling.columns.isFakeColumn(c))
 ) as Table.ModelColumn<R, M>[];
 
 const ActualsPdf = ({ budget, actuals, contacts, options }: ActualsPdfProps): JSX.Element => {

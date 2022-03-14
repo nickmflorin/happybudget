@@ -17,7 +17,7 @@ type C = Table.DataColumn<R, M>;
 
 const ActualColumns = filter(
   ActualsTable.Columns,
-  (c: Table.Column<R, M>) => tabling.typeguards.isDataColumn(c) && c.includeInPdf !== false
+  (c: Table.Column<R, M>) => tabling.columns.isDataColumn(c) && c.includeInPdf !== false
 ) as C[];
 
 const DEFAULT_OPTIONS: ExportActualsPdfFormOptions = {

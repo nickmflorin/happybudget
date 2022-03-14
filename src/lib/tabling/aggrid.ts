@@ -2,12 +2,12 @@ import classNames from "classnames";
 import { reduce, map, isNil, filter } from "lodash";
 import { CellRange } from "@ag-grid-community/core";
 
-import * as typeguards from "./typeguards";
+import * as rows from "./rows";
 
 export const getRows = <R extends Table.RowData, RW extends Table.Row<R> = Table.Row<R>>(api: Table.GridApi): RW[] => {
-  const rows: RW[] = [];
-  api.forEachNode((node: Table.RowNode) => rows.push(node.data));
-  return rows;
+  const rws: RW[] = [];
+  api.forEachNode((node: Table.RowNode) => rws.push(node.data));
+  return rws;
 };
 
 export const rangeSelectionIsSingleCell = (range: CellRange) => {
@@ -85,7 +85,7 @@ export const getNodePreviousModelRow = <R extends Table.RowData>(
   node: Table.RowNode
 ): Table.ModelRow<R> | null => {
   const modelRowsBefore: Table.ModelRow<R>[] = getRowsBeforeNode<R>(api, node, (r: Table.BodyRow<R>) =>
-    typeguards.isModelRow(r)
+    rows.isModelRow(r)
   ) as Table.ModelRow<R>[];
   return modelRowsBefore.length !== 0 ? modelRowsBefore[0] : null;
 };
@@ -95,7 +95,7 @@ export const getNodeGroupRow = <R extends Table.RowData>(
   node: Table.RowNode
 ): Table.GroupRow<R> | null => {
   const groupRowsAfter: Table.GroupRow<R>[] = getRowsAfterNode<R>(api, node, (r: Table.BodyRow<R>) =>
-    typeguards.isGroupRow(r)
+    rows.isGroupRow(r)
   ) as Table.GroupRow<R>[];
   return groupRowsAfter.length !== 0 ? groupRowsAfter[0] : null;
 };

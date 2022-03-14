@@ -33,7 +33,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfHeaderName: "Description",
     pdfFooter: { value: "Grand Total" },
     pdfValueGetter: (r: Table.BodyRow<Tables.SubAccountRowData>) => {
-      if (tabling.typeguards.isGroupRow(r)) {
+      if (tabling.rows.isGroupRow(r)) {
         return r.groupData.name;
       }
       return r.data.description || "";
@@ -41,13 +41,13 @@ const Columns: Table.Column<R, M>[] = [
     cellRendererParams: {
       /* For the MarkupRow, we need to remove the flex styling so we can justify
          the Icon at the right end of the cell. */
-      innerCellStyle: (row: Table.BodyRow<R>) => (tabling.typeguards.isMarkupRow(row) ? { display: "block" } : {}),
+      innerCellStyle: (row: Table.BodyRow<R>) => (tabling.rows.isMarkupRow(row) ? { display: "block" } : {}),
       icon: (row: Table.BodyRow<R>) =>
-        tabling.typeguards.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined
+        tabling.rows.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined
     },
     colSpan: (params: Table.ColSpanParams<R, M>) => {
       const row: Table.BodyRow<R> = params.data;
-      if ((tabling.typeguards.isModelRow(row) && row.children.length !== 0) || tabling.typeguards.isMarkupRow(row)) {
+      if ((tabling.rows.isModelRow(row) && row.children.length !== 0) || tabling.rows.isMarkupRow(row)) {
         const agColumns: Column[] | undefined = params.columnApi?.getAllDisplayedColumns();
         if (!isNil(agColumns)) {
           const originalCalculatedColumns = map(
@@ -95,7 +95,7 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "Qty",
     pdfWidth: 0.05,
     width: 60,
-    valueSetter: tabling.valueSetters.numericValueSetter("quantity"),
+    valueSetter: tabling.columns.numericValueSetter("quantity"),
     isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r),
     dataType: "number",
     /* If the plurality of the quantity changes, we need to refresh the refresh
@@ -131,7 +131,7 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "X",
     width: 60,
     pdfWidth: 0.05,
-    valueSetter: tabling.valueSetters.numericValueSetter("multiplier"),
+    valueSetter: tabling.columns.numericValueSetter("multiplier"),
     dataType: "number",
     isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r)
   }),
@@ -141,10 +141,10 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "Rate",
     width: 100,
     pdfWidth: 0.05,
-    valueFormatter: tabling.formatters.currencyValueFormatter(v =>
+    valueFormatter: tabling.columns.currencyValueFormatter(v =>
       console.error(`Could not parse currency value ${v} for field 'rate'.`)
     ),
-    valueSetter: tabling.valueSetters.numericValueSetter("rate"),
+    valueSetter: tabling.columns.numericValueSetter("rate"),
     dataType: "currency",
     isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r)
   }),
@@ -163,7 +163,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.formatters.currencyValueFormatter(v =>
+        : tabling.columns.currencyValueFormatter(v =>
             console.error(`Could not parse currency value ${v} for field 'estimated'.`)
           )(params),
     pdfValueGetter: budgeting.valueGetters.estimatedValueGetter,
@@ -176,7 +176,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.formatters.currencyValueFormatter(v =>
+        : tabling.columns.currencyValueFormatter(v =>
             console.error(`Could not parse currency value ${v} for field 'actual'.`)
           )(params),
     pdfValueGetter: budgeting.valueGetters.actualValueGetter,
@@ -191,7 +191,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.formatters.currencyValueFormatter(v =>
+        : tabling.columns.currencyValueFormatter(v =>
             console.error(`Could not parse currency value ${v} for field 'variance'.`)
           )(params),
     pdfValueGetter: budgeting.valueGetters.varianceValueGetter,

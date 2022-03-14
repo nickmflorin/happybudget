@@ -111,7 +111,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
       tabling.columns.filterRealColumns(columns),
       (col: Table.RealColumn<R, M>, index: number): Table.RealColumn<R, M> => {
         const hidden =
-          tabling.typeguards.isDataColumn(col) &&
+          tabling.columns.isDataColumn(col) &&
           col.canBeHidden !== false &&
           !isNil(hiddenColumns) &&
           hiddenColumns[col.field] === true;
@@ -121,7 +121,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
           cellRendererParams: { ...col.cellRendererParams, columns, customCol: col, gridId: id },
           hide: hidden,
           resizable: index === columns.length - 1 ? false : !isNil(col.resizable) ? col.resizable : true,
-          cellStyle: tabling.typeguards.isDataColumn(col)
+          cellStyle: tabling.columns.isDataColumn(col)
             ? !isNil(col.dataType)
               ? { ...tabling.columns.getColumnTypeCSSStyle(col.dataType), ...col.cellStyle }
               : col.cellStyle
@@ -141,11 +141,11 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
         (col: Table.RealColumn<R, M>): Table.ColDef => ({
           ...tabling.columns.parseBaseColumn<R, M, typeof col>(col),
           suppressMenu: true,
-          valueGetter: tabling.typeguards.isDataColumn(col)
+          valueGetter: tabling.columns.isDataColumn(col)
             ? (params: ValueGetterParams) => {
                 if (!isNil(params.node)) {
                   const row: Table.Row<R> = params.node.data;
-                  if (tabling.typeguards.isBodyRow(row)) {
+                  if (tabling.rows.isBodyRow(row)) {
                     return tabling.columns.getColumnRowValue(
                       col,
                       row,
@@ -172,21 +172,21 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
               : 1,
           editable: (params: EditableCallbackParams) => {
             const row: Table.Row<R> = params.node.data;
-            if (tabling.typeguards.isBodyRow(row) && tabling.typeguards.isBodyColumn(col)) {
+            if (tabling.rows.isBodyRow(row) && tabling.columns.isBodyColumn(col)) {
               return tabling.columns.isEditable<R, M>(col, row);
             }
             return false;
           },
           cellClass: (params: CellClassParams) => {
             const row: Table.Row<R> = params.node.data;
-            if (tabling.typeguards.isEditableRow(row)) {
-              const isSelectable = tabling.typeguards.isBodyColumn(col)
+            if (tabling.rows.isEditableRow(row)) {
+              const isSelectable = tabling.columns.isBodyColumn(col)
                 ? isNil(col.selectable)
                   ? true
                   : typeof col.selectable === "function"
                   ? col.selectable({ row })
                   : col.selectable
-                : tabling.typeguards.isCalculatedColumn(col);
+                : tabling.columns.isCalculatedColumn(col);
               return tabling.aggrid.mergeClassNames<CellClassParams>(params, "cell", col.cellClass, {
                 "cell--not-selectable": isSelectable === false
               });
@@ -243,7 +243,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
     () => (params: GetContextMenuItemsParams) => {
       if (!isNil(props.getContextMenuItems) && !isNil(params.node)) {
         const row: Table.Row<R> = params.node.data;
-        if (tabling.typeguards.isBodyRow(row)) {
+        if (tabling.rows.isBodyRow(row)) {
           return props.getContextMenuItems(row, params.node);
         }
       }

@@ -16,7 +16,7 @@ const updateRowsReducer = <R extends Table.RowData, S extends Redux.TableStore<R
     Array.isArray(e.payload) ? e.payload : [e.payload],
     (st: S, update: Table.UpdateRowPayload<R>) => {
       const r: Table.ModelRow<R> | null = redux.reducers.findModelInData(
-        filter(st.data, (ri: Table.BodyRow<R>) => tabling.typeguards.isModelRow(ri)),
+        filter(st.data, (ri: Table.BodyRow<R>) => tabling.rows.isModelRow(ri)),
         update.id
       ) as Table.ModelRow<R> | null;
       if (!isNil(r)) {

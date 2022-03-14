@@ -59,7 +59,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
 
   function* bulkUpdateTask(ctx: CTX, e: Table.ChangeEvent<R>, requestPayload: Http.BulkUpdatePayload<P>): SagaIterator {
     config.table.saving(true);
-    if (!tabling.typeguards.isGroupChangeEvent(e)) {
+    if (!tabling.events.isGroupChangeEvent(e)) {
       yield put(config.actions.loadingBudget(true));
     }
     try {
@@ -94,7 +94,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       if (fringeIds.length !== 0) {
         const subaccounts = yield select(config.selectParentTableStore);
         const subaccountsWithFringesChanged: Table.ModelRow<Tables.SubAccountRowData>[] = filter(
-          filter(subaccounts.data, (r: Tables.SubAccountRow) => tabling.typeguards.isModelRow(r)),
+          filter(subaccounts.data, (r: Tables.SubAccountRow) => tabling.rows.isModelRow(r)),
           (r: Tables.SubAccountRow) => intersection(r.data.fringes, fringeIds).length !== 0
         ) as Table.ModelRow<Tables.SubAccountRowData>[];
         if (subaccountsWithFringesChanged.length !== 0) {
@@ -114,7 +114,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         dispatchClientErrorToSentry: true
       });
     } finally {
-      if (!tabling.typeguards.isGroupChangeEvent(e)) {
+      if (!tabling.events.isGroupChangeEvent(e)) {
         yield put(config.actions.loadingBudget(false));
       }
       config.table.saving(false);
@@ -148,7 +148,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     try {
       const response: M = yield api.request(api.createFringe, ctx, ctx.budgetId, {
         previous: e.payload.previous,
-        ...tabling.http.postPayload<R, M, P>(e.payload.data, config.table.getColumns())
+        ...tabling.rows.postPayload<R, M, P>(e.payload.data, config.table.getColumns())
       });
       yield put(config.actions.handleEvent({ type: "modelsAdded", payload: { model: response } }, ctx));
     } catch (err: unknown) {
@@ -184,7 +184,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
 
   function* handleRowDeleteEvent(e: Table.RowDeleteEvent, ctx: CTX): SagaIterator {
     const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
-    const modelRowIds = filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[];
+    const modelRowIds = filter(ids, (id: Table.RowId) => tabling.rows.isModelRowId(id)) as number[];
     if (modelRowIds.length !== 0) {
       yield fork(bulkDeleteTask, ctx, modelRowIds);
     }
@@ -193,7 +193,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   function* handleDataChangeEvent(e: Table.DataChangeEvent<R, Table.ModelRow<R>>, ctx: CTX): SagaIterator {
     const merged = tabling.events.consolidateRowChanges<R, Table.ModelRow<R>>(e.payload);
     if (merged.length !== 0) {
-      const requestPayload = tabling.http.createBulkUpdatePayload<R, M, P>(merged, config.table.getColumns());
+      const requestPayload = tabling.rows.createBulkUpdatePayload<R, M, P>(merged, config.table.getColumns());
       if (requestPayload.data.length !== 0) {
         yield fork(bulkUpdateTask, ctx, e, requestPayload);
       }

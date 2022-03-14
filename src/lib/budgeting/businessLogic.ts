@@ -28,25 +28,24 @@ type WithEstimation<R extends Tables.BudgetRowData> = WithActual<R> | Model.Temp
 const isGroupObj = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(
   obj: WithEstimation<R> | GroupObj<R>
 ): obj is GroupObj<R> =>
-  (tabling.typeguards.isRow(obj) && tabling.typeguards.isGroupRow(obj)) ||
-  (!tabling.typeguards.isRow(obj) && typeguards.isGroup(obj));
+  (tabling.rows.isRow(obj) && tabling.rows.isGroupRow(obj)) || (!tabling.rows.isRow(obj) && typeguards.isGroup(obj));
 
 export const nominalValue = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(obj: WithEstimation<R>): number =>
-  tabling.typeguards.isRow(obj) ? obj.data.nominal_value : obj.nominal_value;
+  tabling.rows.isRow(obj) ? obj.data.nominal_value : obj.nominal_value;
 
 export const accumulatedMarkupContribution = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(
   obj: WithEstimation<R>
-) => (tabling.typeguards.isRow(obj) ? obj.data.accumulated_markup_contribution : obj.accumulated_markup_contribution);
+) => (tabling.rows.isRow(obj) ? obj.data.accumulated_markup_contribution : obj.accumulated_markup_contribution);
 
 export const accumulatedFringeContribution = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(
   obj: WithEstimation<R>
-) => (tabling.typeguards.isRow(obj) ? obj.data.accumulated_fringe_contribution : obj.accumulated_fringe_contribution);
+) => (tabling.rows.isRow(obj) ? obj.data.accumulated_fringe_contribution : obj.accumulated_fringe_contribution);
 
 export const fringeContribution = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(obj: WithEstimation<R>) =>
   // Only SubAccount(s) have a Fringe Contribution.
-  tabling.typeguards.isRow(obj) && typeguards.isSubAccountRow(obj)
+  tabling.rows.isRow(obj) && typeguards.isSubAccountRow(obj)
     ? obj.data.fringe_contribution
-    : !tabling.typeguards.isRow(obj) && (typeguards.isSubAccount(obj) || typeguards.isPdfSubAccount(obj))
+    : !tabling.rows.isRow(obj) && (typeguards.isSubAccount(obj) || typeguards.isPdfSubAccount(obj))
     ? obj.fringe_contribution
     : 0.0;
 
@@ -103,7 +102,7 @@ export const actualValue = <
       0.0
     );
   }
-  return tabling.typeguards.isRow(obj) ? obj.data.actual : obj.actual;
+  return tabling.rows.isRow(obj) ? obj.data.actual : obj.actual;
 };
 
 export const varianceValue = <
@@ -120,11 +119,11 @@ export const contributionFromMarkups = <R extends Table.RowData = Tables.BudgetR
   value: number,
   markups: (Model.Markup | Table.MarkupRow<R>)[]
 ): number => {
-  const unit = (m: Model.Markup | Table.MarkupRow<R>) => (tabling.typeguards.isRow(m) ? m.markupData.unit : m.unit);
+  const unit = (m: Model.Markup | Table.MarkupRow<R>) => (tabling.rows.isRow(m) ? m.markupData.unit : m.unit);
   return reduce(
     filter(markups, (m: Model.Markup | Table.MarkupRow<R>) => unit(m).id === models.MarkupUnitModels.PERCENT.id),
     (curr: number, markup: Model.Markup | Table.MarkupRow<R>): number => {
-      const rate = tabling.typeguards.isRow(markup) ? markup.markupData.rate : markup.rate;
+      const rate = tabling.rows.isRow(markup) ? markup.markupData.rate : markup.rate;
       if (!isNil(rate)) {
         return curr + rate * value;
       }
@@ -141,9 +140,9 @@ export const contributionFromFringes = (
   return reduce(
     fringes,
     (curr: number, fringe: Model.Fringe | Tables.FringeRow): number => {
-      const unit = tabling.typeguards.isRow(fringe) ? fringe.data.unit : fringe.unit;
-      const rate = tabling.typeguards.isRow(fringe) ? fringe.data.rate : fringe.rate;
-      const cutoff = tabling.typeguards.isRow(fringe) ? fringe.data.cutoff : fringe.cutoff;
+      const unit = tabling.rows.isRow(fringe) ? fringe.data.unit : fringe.unit;
+      const rate = tabling.rows.isRow(fringe) ? fringe.data.rate : fringe.rate;
+      const cutoff = tabling.rows.isRow(fringe) ? fringe.data.cutoff : fringe.cutoff;
       if (!isNil(unit) && !isNil(rate)) {
         if (unit.id === models.FringeUnitModels.FLAT.id) {
           return curr + rate;

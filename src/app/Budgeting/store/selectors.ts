@@ -60,7 +60,7 @@ export const selectFringesStore = createSelector(
 export const selectFringes = createSelector(
   selectFringesStore,
   (s: Tables.FringeTableStore) =>
-    filter(s.data, (f: Table.BodyRow<Tables.FringeRowData>) => tabling.typeguards.isModelRow(f)) as Tables.FringeRow[]
+    filter(s.data, (f: Table.BodyRow<Tables.FringeRowData>) => tabling.rows.isModelRow(f)) as Tables.FringeRow[]
 );
 
 export const selectSubAccountUnits = createSelector(

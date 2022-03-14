@@ -68,9 +68,9 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
           RowStringGetterCase<R, Table.MarkupRow<R>>,
           RowStringGetterCase<R, Table.GroupRow<R>>
         ] = [
-          { getter: params.getModelRowName, flt: tabling.typeguards.isDataRow },
-          { getter: params.getMarkupRowName, flt: tabling.typeguards.isMarkupRow },
-          { getter: params.getGroupRowName, flt: tabling.typeguards.isGroupRow }
+          { getter: params.getModelRowName, flt: tabling.rows.isDataRow },
+          { getter: params.getMarkupRowName, flt: tabling.rows.isMarkupRow },
+          { getter: params.getGroupRowName, flt: tabling.rows.isGroupRow }
         ];
         return evaluateCases(cases, row, def);
       },
@@ -85,9 +85,9 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
           RowStringGetterCase<R, Table.MarkupRow<R>>,
           RowStringGetterCase<R, Table.GroupRow<R>>
         ] = [
-          { getter: params.getModelRowLabel, flt: tabling.typeguards.isDataRow },
-          { getter: params.getMarkupRowLabel, flt: tabling.typeguards.isMarkupRow },
-          { getter: params.getGroupRowLabel, flt: tabling.typeguards.isGroupRow }
+          { getter: params.getModelRowLabel, flt: tabling.rows.isDataRow },
+          { getter: params.getMarkupRowLabel, flt: tabling.rows.isMarkupRow },
+          { getter: params.getGroupRowLabel, flt: tabling.rows.isGroupRow }
         ];
         return evaluateCases(cases, row, def);
       },
@@ -98,7 +98,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
     () =>
       (node: Table.RowNode): Table.ModelRow<R>[] => {
         const firstRow: Table.BodyRow<R> = node.data;
-        if (tabling.typeguards.isModelRow(firstRow)) {
+        if (tabling.rows.isModelRow(firstRow)) {
           const rows: Table.ModelRow<R>[] = [firstRow];
           if (!isNil(params.apis)) {
             let currentNode: Table.RowNode | undefined = node;
@@ -106,9 +106,9 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
               currentNode = params.apis.grid.getDisplayedRowAtIndex(currentNode.rowIndex - 1);
               if (!isNil(currentNode)) {
                 const row: Table.BodyRow<R> = currentNode.data;
-                if (tabling.typeguards.isGroupRow(row)) {
+                if (tabling.rows.isGroupRow(row)) {
                   break;
-                } else if (tabling.typeguards.isModelRow(row)) {
+                } else if (tabling.rows.isModelRow(row)) {
                   rows.push(row);
                 }
               }
@@ -125,7 +125,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
     () =>
       (node: Table.RowNode): Table.ModelRow<R>[] => {
         const firstRow: Table.BodyRow<R> = node.data;
-        if (tabling.typeguards.isModelRow(firstRow)) {
+        if (tabling.rows.isModelRow(firstRow)) {
           const rows: Table.ModelRow<R>[] = [firstRow];
           if (!isNil(params.apis)) {
             let currentNode: Table.RowNode | undefined = node;
@@ -133,7 +133,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
               currentNode = params.apis.grid.getDisplayedRowAtIndex(currentNode.rowIndex - 1);
               if (!isNil(currentNode)) {
                 const row: Table.BodyRow<R> = currentNode.data;
-                if (tabling.typeguards.isModelRow(row)) {
+                if (tabling.rows.isModelRow(row)) {
                   rows.push(row);
                 }
               }
@@ -154,7 +154,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
         const onGroupRows = params.onGroupRows;
         if (!isNil(onGroupRows)) {
           const groupRows: Table.GroupRow<R>[] = filter(params.data, (r: Table.BodyRow<R>) =>
-            tabling.typeguards.isGroupRow(r)
+            tabling.rows.isGroupRow(r)
           ) as Table.GroupRow<R>[];
 
           // The GroupRow that the ModelRow already potentially belongs to.
@@ -378,11 +378,11 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
 
   const getContextMenuItems: (row: Table.BodyRow<R>, node: Table.RowNode) => Table.MenuItemDef[] =
     hooks.useDynamicCallback((row: Table.BodyRow<R>, node: Table.RowNode): Table.MenuItemDef[] => {
-      if (tabling.typeguards.isModelRow(row)) {
+      if (tabling.rows.isModelRow(row)) {
         return getModelRowContextMenuItems(row, node);
-      } else if (tabling.typeguards.isGroupRow(row)) {
+      } else if (tabling.rows.isGroupRow(row)) {
         return getGroupRowContextMenuItems(row, node);
-      } else if (tabling.typeguards.isMarkupRow(row)) {
+      } else if (tabling.rows.isMarkupRow(row)) {
         return getMarkupRowContextMenuItems(row, node);
       }
       return [];

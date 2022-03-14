@@ -40,7 +40,7 @@ const ActualsByDateChart = <D extends Charts.Datum = Charts.Datum>(props: Budget
           labelPrefix={props.tooltipLabelPrefix?.(params)}
           label={params.indexValue}
           value={params.value}
-          valueFormatter={(v: string | number) => tabling.formatters.currencyValueFormatter(v)}
+          valueFormatter={(v: string | number) => tabling.columns.currencyValueFormatter(v)}
         />
       );
     }}

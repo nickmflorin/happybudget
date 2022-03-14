@@ -216,7 +216,7 @@ function* flushEvents<
 
   for (let i = 0; i < events.length; i++) {
     const a = actions[i];
-    if (tabling.typeguards.isActionWithChangeEvent(a, "dataChange")) {
+    if (tabling.events.isActionWithChangeEvent(a, "dataChange")) {
       /* If the context of the new event is inconsistent with the batched events
          of the same type, that means the context changed quickly before the
          batch had a chance to flush.  In this case, we need to flush the
@@ -225,7 +225,7 @@ function* flushEvents<
         running = yield call(flushDataBatch, running);
       }
       running = addEventToBatch(a, running);
-    } else if (tabling.typeguards.isRowAddEventAction(a) && tabling.typeguards.isRowAddDataEventAction(a)) {
+    } else if (tabling.events.isRowAddEventAction(a) && tabling.events.isRowAddDataEventAction(a)) {
       /* If the context of the new event is inconsistent with the batched events
          of the same type, that means the context changed quickly before the
          batch had a chance to flush.  In this case, we need to flush the
@@ -280,13 +280,13 @@ export const createAuthenticatedTableSaga = <
 
     function* handleChangeEvent(a: Redux.TableAction<Table.ChangeEvent<R>, C>): SagaIterator {
       const e: Table.ChangeEvent<R> = a.payload;
-      if (tabling.typeguards.isDataChangeEvent(e)) {
+      if (tabling.events.isDataChangeEvent(e)) {
         yield call(handleDataChangeEvent, a as Redux.TableAction<Table.DataChangeEvent<R>, C>);
       } else if (
         /* We do not want to buffer RowAdd events if the row is being added
 					 either by the RowAddIndexPayload or the RowAddCountPayload. */
-        tabling.typeguards.isRowAddEvent(e) &&
-        tabling.typeguards.isRowAddDataEvent(e)
+        tabling.events.isRowAddEvent(e) &&
+        tabling.events.isRowAddDataEvent(e)
       ) {
         yield call(handleRowAddEvent, a as Redux.TableAction<Table.RowAddDataEvent<R>, C>);
       } else {
@@ -298,16 +298,16 @@ export const createAuthenticatedTableSaga = <
       const action: Redux.TableAction<Table.Event<R, M>, C> = yield take(changeChannel);
       const e: Table.Event<R, M> = action.payload;
       const store = yield select(config.selectStore);
-      if (tabling.typeguards.isChangeEvent(e)) {
+      if (tabling.events.isChangeEvent(e)) {
         yield call(handleChangeEvent, action as Redux.TableAction<Table.ChangeEvent<R>, C>);
-      } else if (tabling.typeguards.isMetaEvent(e)) {
+      } else if (tabling.events.isMetaEvent(e)) {
         if (e.type === "forward") {
-          const redoEvent = tabling.meta.getRedoEvent<R>(store);
+          const redoEvent = tabling.events.getRedoEvent<R>(store);
           if (!isNil(redoEvent)) {
             yield call(handleChangeEvent, { ...action, payload: redoEvent });
           }
         } else {
-          const undoEvent = tabling.meta.getUndoEvent<R>(store);
+          const undoEvent = tabling.events.getUndoEvent<R>(store);
           if (!isNil(undoEvent)) {
             yield call(handleChangeEvent, { ...action, payload: undoEvent });
           }

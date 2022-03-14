@@ -54,7 +54,7 @@ const ContactEditor = <
           id: "add-contact",
           onClick: () => {
             const row: Table.DataRow<R> = props.node.data;
-            if (tabling.typeguards.isModelRow(row) && !isNil(props.column.field)) {
+            if (tabling.rows.isModelRow(row) && !isNil(props.column.field)) {
               const searchValue = editor.menu.current.getSearchValue();
               editor.stopEditing(false);
               if (searchValue !== "") {

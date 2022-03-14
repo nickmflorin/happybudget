@@ -11,7 +11,7 @@ interface FormLabelContentProps {
 
 const FormLabelContent = ({ dataType, ...props }: FormLabelContentProps): JSX.Element => {
   const cType: Table.ColumnDataType | undefined = useMemo(() => {
-    return !isNil(dataType) ? find(tabling.models.ColumnTypes, obj => obj.id === dataType) : undefined;
+    return !isNil(dataType) ? find(tabling.columns.ColumnTypes, obj => obj.id === dataType) : undefined;
   }, [dataType]);
 
   return (

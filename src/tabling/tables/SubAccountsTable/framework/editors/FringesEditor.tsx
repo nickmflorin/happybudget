@@ -40,7 +40,7 @@ const FringesEditor = (props: FringesEditorProps, ref: ForwardedRef<Table.AgEdit
         filter(
           fringes,
           (fringe: Table.BodyRow<Tables.FringeRowData>) =>
-            tabling.typeguards.isModelRow(fringe) && !isNil(fringe.data.name) && fringe.data.name.trim() !== ""
+            tabling.rows.isModelRow(fringe) && !isNil(fringe.data.name) && fringe.data.name.trim() !== ""
         ) as Tables.FringeRow[]
       }
       tagProps={{

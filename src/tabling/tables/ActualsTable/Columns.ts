@@ -39,12 +39,12 @@ const Columns: Table.Column<R, M>[] = [
     cellEditor: "DateEditor",
     cellEditorPopup: true,
     cellEditorPopupPosition: "below",
-    valueFormatter: tabling.formatters.dateValueFormatter(v =>
+    valueFormatter: tabling.columns.dateValueFormatter(v =>
       console.error(`Could not parse date value ${v} for field 'date'.`)
     ),
-    valueSetter: tabling.valueSetters.dateTimeValueSetter("date"),
+    valueSetter: tabling.columns.dateTimeValueSetter("date"),
     pdfFormatter: (params: Table.NativeFormatterParams<string>) =>
-      isNil(params) || params === "" ? "" : tabling.formatters.dateValueFormatter(params),
+      isNil(params) || params === "" ? "" : tabling.columns.dateValueFormatter(params),
     dataType: "date",
     processCellForCSV: (row: R) => {
       return (!isNil(row.date) && util.dates.toDate(row.date)) || "";
@@ -74,20 +74,20 @@ const Columns: Table.Column<R, M>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<number | null>) =>
       isNil(params)
         ? "0.0"
-        : tabling.formatters.currencyValueFormatter(v =>
+        : tabling.columns.currencyValueFormatter(v =>
             console.error(`Could not parse currency value ${v} for PDF field 'value'.`)
           )(params),
-    valueFormatter: tabling.formatters.currencyValueFormatter(v =>
+    valueFormatter: tabling.columns.currencyValueFormatter(v =>
       console.error(`Could not parse currency value ${v} for field 'value'.`)
     ),
-    valueSetter: tabling.valueSetters.numericValueSetter("value"),
+    valueSetter: tabling.columns.numericValueSetter("value"),
     dataType: "currency",
     /* We only want to use BodyCell's in the Footer cells because it slows
 		   rendering performance down dramatically. */
     cellRenderer: { footer: "BodyCell" },
     pdfFooterValueGetter: (rows: Table.BodyRow<R>[]) =>
       reduce(
-        filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R>[],
+        filter(rows, (r: Table.BodyRow<R>) => tabling.rows.isModelRow(r)) as Table.ModelRow<R>[],
         (sum: number, s: Table.ModelRow<R>) => sum + (s.data.value || 0),
         0
       )

@@ -77,7 +77,7 @@ const ActualsTable = ({ parent, onOwnersSearch, ...props }: Props): JSX.Element 
     }
     let availableOwners: (Model.SimpleSubAccount | Model.SimpleMarkup)[] = filter(
       map(
-        filter(props.data, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[],
+        filter(props.data, (r: Table.BodyRow<R>) => tabling.rows.isDataRow(r)) as Table.DataRow<R>[],
         (row: Table.DataRow<R>) => row.data.owner
       ),
       (owner: Model.SimpleSubAccount | Model.SimpleMarkup | null) => owner !== null
@@ -136,7 +136,7 @@ const ActualsTable = ({ parent, onOwnersSearch, ...props }: Props): JSX.Element 
       const rowId = params?.rowId;
       if (!isNil(rowId)) {
         const row: Table.BodyRow<R> | null = props.table.current.getRow(rowId);
-        if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
+        if (!isNil(row) && tabling.rows.isModelRow(row)) {
           const rowChange: Table.RowChange<R> = {
             id: row.id,
             data: { contact: { oldValue: row.data.contact, newValue: m.id } }

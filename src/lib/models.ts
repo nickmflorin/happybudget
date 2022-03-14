@@ -4,14 +4,14 @@ import { tabling } from "lib";
 import { isHttpModelWithType } from "./typeguards";
 
 export const getRowGeneralReference = <R extends Table.RowData>(row: Table.Row<R>) => {
-  if (tabling.typeguards.isModelRow(row)) {
+  if (tabling.rows.isModelRow(row)) {
     return `row (type = ${row.rowType}, modelType = ${row.modelType})`;
   }
   return `row (type = ${row.rowType})`;
 };
 
 export const getModelGeneralReference = <M extends Model.Model>(m: M): string => {
-  return tabling.typeguards.isRow(m) ? getRowGeneralReference(m) : isHttpModelWithType(m) ? `${m.type}` : "model";
+  return tabling.rows.isRow(m) ? getRowGeneralReference(m) : isHttpModelWithType(m) ? `${m.type}` : "model";
 };
 
 const getModelReferenceFn = <M extends Model.Model>(

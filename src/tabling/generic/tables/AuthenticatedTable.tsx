@@ -151,11 +151,10 @@ const AuthenticatedTable = <
         filter(
           props.columns,
           (c: Table.Column<R, M>) =>
-            (tabling.typeguards.isDataColumn(c) && !evaluateColumnExclusionProp(c)) ||
-            !tabling.typeguards.isDataColumn(c)
+            (tabling.columns.isDataColumn(c) && !evaluateColumnExclusionProp(c)) || !tabling.columns.isDataColumn(c)
         ) as Table.Column<R, M>[],
         (c: Table.Column<R, M>) =>
-          tabling.typeguards.isRealColumn(c)
+          tabling.columns.isRealColumn(c)
             ? ({
                 ...c,
                 cellRendererParams: {
@@ -190,7 +189,7 @@ const AuthenticatedTable = <
       const apis: Table.GridApis | null = props.tableApis.get("data");
 
       // TODO: We might have to also apply similiar logic for when a row is added?
-      if (tabling.typeguards.isChangeEvent(event) && tabling.typeguards.isDataChangeEvent(event)) {
+      if (tabling.events.isChangeEvent(event) && tabling.events.isDataChangeEvent(event)) {
         const nodesToRefresh: Table.RowNode[] = [];
         let columnsToRefresh: string[] = [];
 
@@ -217,10 +216,10 @@ const AuthenticatedTable = <
                   rowChange.data
                 ) as Table.CellChange;
                 const col: Table.Column<R, M> | null = tabling.columns.getColumn(props.columns, field);
-                if (!isNil(col) && tabling.typeguards.isBodyColumn<R, M>(col)) {
+                if (!isNil(col) && tabling.columns.isBodyColumn<R, M>(col)) {
                   /* Check if the cellChange is associated with a Column that has
 										 it's own change event handler. */
-                  if (tabling.typeguards.isModelRowId(rowChange.id)) {
+                  if (tabling.rows.isModelRowId(rowChange.id)) {
                     col.onDataChange?.(rowChange.id, change);
                   }
                   /* Check if the cellChange is associated with a Column that when
@@ -303,7 +302,7 @@ const AuthenticatedTable = <
               onClick: () => {
                 const apis: Table.GridApis | null = props.tableApis.get("data");
                 const rows = filter((apis?.grid.getSelectedRows() || []) as Table.BodyRow<R>[], (r: Table.BodyRow<R>) =>
-                  tabling.typeguards.isEditableRow(r)
+                  tabling.rows.isEditableRow(r)
                 ) as Table.EditableRow<R>[];
                 if (rows.length !== 0) {
                   if (
@@ -400,7 +399,7 @@ const AuthenticatedTable = <
       _onEvent({
         type: "rowAdd",
         payload: { count: 1 },
-        placeholderIds: [tabling.managers.placeholderRowId()]
+        placeholderIds: [tabling.rows.placeholderRowId()]
       });
     }
   });

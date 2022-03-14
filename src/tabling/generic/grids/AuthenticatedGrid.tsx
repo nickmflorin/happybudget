@@ -44,7 +44,7 @@ const AuthenticatedGrid = <R extends Table.RowData, M extends Model.RowHttpModel
     return map(
       props.columns,
       (col: Table.Column<R, M>): Table.Column<R, M> =>
-        tabling.typeguards.isRealColumn(col)
+        tabling.columns.isRealColumn(col)
           ? {
               ...col,
               cellRendererParams: { ...col.cellRendererParams, onEvent: props.onEvent }

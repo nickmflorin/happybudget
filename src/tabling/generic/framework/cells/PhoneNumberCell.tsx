@@ -16,7 +16,7 @@ const PhoneNumberCell = <
     <LinkCell<R, M, S, C>
       href={(v: string | number | null) => (!isNil(v) ? `tel:${v}` : undefined)}
       rel={"noreferrer"}
-      valueFormatter={tabling.formatters.phoneNumberValueFormatter}
+      valueFormatter={tabling.columns.phoneNumberValueFormatter}
       {...props}
     />
   );

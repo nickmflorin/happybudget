@@ -49,7 +49,7 @@ const useGrouping = <R extends Tables.BudgetRowData, M extends Model.RowHttpMode
     if (!isNil(groupToEdit)) {
       return (
         <EditGroupModal
-          id={tabling.managers.groupId(groupToEdit.id)}
+          id={tabling.rows.groupId(groupToEdit.id)}
           parentId={props.parentId}
           parentType={props.parentType}
           open={true}

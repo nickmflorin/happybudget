@@ -98,7 +98,7 @@ const Tag = <M extends Model.Model = Model.Model, S extends React.CSSProperties 
         return m.title;
       } else if (typeguards.isModelWithName(m)) {
         return m.name || "";
-      } else if (tabling.typeguards.isRow(m) && tabling.typeguards.isRowWithName(m)) {
+      } else if (tabling.rows.isRow(m) && tabling.rows.isRowWithName(m)) {
         return m.data.name || "";
       }
       return "";
@@ -151,7 +151,7 @@ const Tag = <M extends Model.Model = Model.Model, S extends React.CSSProperties 
         return validateAndReturnColor(m.color, "color");
       } else if (typeguards.isModelWithColor(m)) {
         return validateAndReturnColor(m.color, "color");
-      } else if (tabling.typeguards.isRow(m) && tabling.typeguards.isRowWithColor(m) && !isNil(m.data.color)) {
+      } else if (tabling.rows.isRow(m) && tabling.rows.isRowWithColor(m) && !isNil(m.data.color)) {
         return m.data.color;
       } else if (typeof m.id === "number" && !isNil(colorScheme[m.id])) {
         return colorScheme[m.id];

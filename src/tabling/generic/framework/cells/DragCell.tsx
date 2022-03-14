@@ -17,12 +17,12 @@ const DragCell = <
   const iconRef = useRef(null);
 
   useEffect(() => {
-    if (!isNil(iconRef.current) && tabling.typeguards.isModelRow(row)) {
+    if (!isNil(iconRef.current) && tabling.rows.isModelRow(row)) {
       props.registerRowDragger(iconRef.current);
     }
   }, [iconRef, row.rowType]);
 
-  if (tabling.typeguards.isModelRow(row)) {
+  if (tabling.rows.isModelRow(row)) {
     return (
       <Cell {...props}>
         <Icon ref={iconRef} className={"icon--row-drag"} weight={"solid"} icon={"grip-dots-vertical"} />

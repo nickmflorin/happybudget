@@ -104,7 +104,7 @@ const EditCell = <
   }, [row]);
 
   if (!isNil(config)) {
-    if (config.behavior === "expand" && tabling.typeguards.isModelRow(row)) {
+    if (config.behavior === "expand" && tabling.rows.isModelRow(row)) {
       if (showAlways || rowIsHovered()) {
         return <Action config={config} hovered={rowIsHovered()} row={row} />;
       }
@@ -113,7 +113,7 @@ const EditCell = <
         return (
           <Action
             config={config}
-            iconStyle={tabling.typeguards.isGroupRow(row) && !isNil(colorDef.color) ? { color: colorDef.color } : {}}
+            iconStyle={tabling.rows.isGroupRow(row) && !isNil(colorDef.color) ? { color: colorDef.color } : {}}
             hovered={rowIsHovered()}
             row={row}
           />

@@ -101,13 +101,10 @@ const PublicTable = <
         filter(
           props.columns,
           (c: Table.Column<R, M>) =>
-            tabling.typeguards.isActionColumn(c) ||
-            tabling.typeguards.isFakeColumn(c) ||
-            c.requiresAuthentication !== true
+            tabling.columns.isActionColumn(c) || tabling.columns.isFakeColumn(c) || c.requiresAuthentication !== true
         ),
         (c: Table.Column<R, M>) =>
-          (tabling.typeguards.isDataColumn(c) && !evaluateColumnExclusionProp(c)) ||
-          tabling.typeguards.isActionColumn(c)
+          (tabling.columns.isDataColumn(c) && !evaluateColumnExclusionProp(c)) || tabling.columns.isActionColumn(c)
       ) as Table.RealColumn<R, M>[],
       (c: Table.RealColumn<R, M>) => ({
         ...c,

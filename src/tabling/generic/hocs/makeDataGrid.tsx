@@ -43,7 +43,7 @@ export type InternalDataGridProps<
 };
 
 const getRowColorDef = <R extends Table.RowData>(row: Table.BodyRow<R>): Table.RowColorDef => {
-  if (tabling.typeguards.isGroupRow(row)) {
+  if (tabling.rows.isGroupRow(row)) {
     const colorDef = budgeting.models.getGroupColorDefinition(row);
     if (!isNil(colorDef?.color) && !isNil(colorDef?.backgroundColor)) {
       return {
@@ -78,7 +78,7 @@ const DataGrid = <
 
     const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
       return map(props.columns, (col: Table.Column<R, M>) =>
-        tabling.typeguards.isRealColumn(col)
+        tabling.columns.isRealColumn(col)
           ? {
               ...col,
               cellRendererParams: { ...col.cellRendererParams, getRowColorDef }
@@ -144,7 +144,7 @@ const DataGrid = <
     const getRowClass: Table.GetRowClassName = useMemo(
       () => (params: Table.RowClassParams) => {
         const row: Table.BodyRow<R> = params.node.data;
-        if (tabling.typeguards.isGroupRow(row)) {
+        if (tabling.rows.isGroupRow(row)) {
           return classNames("row--data", "row--group", props.rowClass);
         }
         return classNames("row--data", props.rowClass);
@@ -267,7 +267,7 @@ const DataGrid = <
       const ctrlCmdPressed = e.ctrlKey || e.metaKey;
       if (e.key === "ArrowDown" && ctrlCmdPressed) {
         const focusedRow = tabling.aggrid.getFocusedRow<R>(localApi);
-        if (!isNil(focusedRow) && !isNil(props.editColumnConfig) && !tabling.typeguards.isPlaceholderRow(focusedRow)) {
+        if (!isNil(focusedRow) && !isNil(props.editColumnConfig) && !tabling.rows.isPlaceholderRow(focusedRow)) {
           e.preventDefault();
           e.stopImmediatePropagation();
           e.stopPropagation();

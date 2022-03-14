@@ -20,19 +20,19 @@ const createEventReducer = <
   const controlEventReducer = createControlEventReducer(config);
 
   return (state: S = config.initialState, e: Table.Event<R, M>): S => {
-    if (tabling.typeguards.isChangeEvent(e)) {
+    if (tabling.events.isChangeEvent(e)) {
       return changeEventReducer(state, e);
-    } else if (tabling.typeguards.isControlEvent(e)) {
+    } else if (tabling.events.isControlEvent(e)) {
       return controlEventReducer(state, e);
-    } else if (tabling.typeguards.isMetaEvent(e)) {
+    } else if (tabling.events.isMetaEvent(e)) {
       if (e.type === "forward") {
-        const forwardEvent = tabling.meta.getRedoEvent<R>(state);
+        const forwardEvent = tabling.events.getRedoEvent<R>(state);
         if (!isNil(forwardEvent)) {
           const newState = { ...state, eventIndex: state.eventIndex + 1 };
           return changeEventReducer(newState, forwardEvent);
         }
       } else {
-        const undoEvent = tabling.meta.getUndoEvent<R>(state);
+        const undoEvent = tabling.events.getUndoEvent<R>(state);
         if (!isNil(undoEvent)) {
           const newState = { ...state, eventIndex: Math.max(state.eventIndex - 1, -1) };
           return changeEventReducer(newState, undoEvent);

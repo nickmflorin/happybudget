@@ -13,17 +13,17 @@ const createRowAddEventReducer = <
 >(
   config: Omit<Table.ReducerConfig<R, M, S, C, A>, "defaultDataOnUpdate">
 ): Redux.Reducer<S, Table.RowAddEvent<R>> => {
-  const placeholderRowManager = new tabling.managers.PlaceholderRowManager<R, M>({
+  const placeholderRowManager = new tabling.rows.PlaceholderRowManager<R, M>({
     columns: config.columns,
     defaultData: config.defaultDataOnCreate
   });
   return (s: S = config.initialState, e: Table.RowAddEvent<R>) => {
     const p: Table.RowAddPayload<R> = e.payload;
     let d: Partial<R>[];
-    if (tabling.typeguards.isRowAddCountPayload(p) || tabling.typeguards.isRowAddIndexPayload(p)) {
-      d = tabling.patterns.generateNewRowData(
+    if (tabling.events.isRowAddCountPayload(p) || tabling.events.isRowAddIndexPayload(p)) {
+      d = tabling.rows.generateNewRowData(
         { store: s.data, ...p },
-        filter(config.columns, (c: Table.DataColumn<R, M>) => tabling.typeguards.isBodyColumn(c)) as Table.BodyColumn<
+        filter(config.columns, (c: Table.DataColumn<R, M>) => tabling.columns.isBodyColumn(c)) as Table.BodyColumn<
           R,
           M
         >[]

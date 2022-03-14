@@ -49,7 +49,7 @@ const FooterGrid =
           return col;
         };
         return map(props.columns, (col: Table.Column<R, M>) =>
-          tabling.typeguards.isDataColumn(col) ? UniversalFooterColumn(col) : col
+          tabling.columns.isDataColumn(col) ? UniversalFooterColumn(col) : col
         );
       }, [hooks.useDeepEqualMemo(props.columns)]);
 
@@ -58,7 +58,7 @@ const FooterGrid =
           {...props}
           id={config.id}
           columns={columns}
-          data={[tabling.managers.createFooterRow({ gridId: config.id })]}
+          data={[tabling.rows.createFooterRow({ gridId: config.id })]}
           headerHeight={0}
           rowHeight={config.rowHeight || 38}
           className={classNames("grid--footer", config.className, {

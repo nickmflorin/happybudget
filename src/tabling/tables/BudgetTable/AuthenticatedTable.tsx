@@ -28,17 +28,17 @@ const AuthenticatedBudgetTable = <
     editColumnConfig={
       [
         {
-          typeguard: tabling.typeguards.isMarkupRow,
+          typeguard: tabling.rows.isMarkupRow,
           action: (r: Table.MarkupRow<R>) => onEditMarkup?.(r),
           behavior: "edit"
         },
         {
-          typeguard: tabling.typeguards.isGroupRow,
+          typeguard: tabling.rows.isGroupRow,
           action: (r: Table.GroupRow<R>) => onEditGroup?.(r),
           behavior: "edit"
         },
         {
-          typeguard: tabling.typeguards.isModelRow,
+          typeguard: tabling.rows.isModelRow,
           action: (r: Table.ModelRow<R>) => onRowExpand?.(r),
           behavior: "expand"
         }

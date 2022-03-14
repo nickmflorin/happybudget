@@ -34,12 +34,12 @@ export const injectMarkupsAndGroups = <R extends Table.RowData>(
   const grouped = reduce(
     config.current,
     (curr: ModelsAndGroup[], m: Table.DataRow<R>): ModelsAndGroup[] => {
-      if (tabling.typeguards.isModelRow(m)) {
+      if (tabling.rows.isModelRow(m)) {
         const group = modelGroup(m);
         if (!isNil(group)) {
           const index = findIndex(
             curr,
-            (mg: ModelsAndGroup) => tabling.managers.groupId(mg.group.id) === tabling.managers.groupId(group.id)
+            (mg: ModelsAndGroup) => tabling.rows.groupId(mg.group.id) === tabling.rows.groupId(group.id)
           );
           if (index === -1) {
             return [...curr, { models: [m], group }];
@@ -77,12 +77,12 @@ export const injectMarkupsAndGroups = <R extends Table.RowData>(
   ];
 };
 
-export const orderTableRows = <R extends Table.RowData>(data: Table.BodyRow<R>[]): Table.BodyRow<R>[] => {
+export const orderTableData = <R extends Table.RowData>(data: Table.BodyRow<R>[]): Table.BodyRow<R>[] => {
   /* The order of the actual data rows of the table dictate the order of
      everything else. */
-  const dataRows = filter(data, (r: Table.BodyRow<R>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R>[];
-  const markupRows = filter(data, (r: Table.BodyRow<R>) => tabling.typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[];
-  const groupRows = filter(data, (r: Table.BodyRow<R>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[];
+  const dataRows = filter(data, (r: Table.BodyRow<R>) => tabling.rows.isDataRow(r)) as Table.DataRow<R>[];
+  const markupRows = filter(data, (r: Table.BodyRow<R>) => tabling.rows.isMarkupRow(r)) as Table.MarkupRow<R>[];
+  const groupRows = filter(data, (r: Table.BodyRow<R>) => tabling.rows.isGroupRow(r)) as Table.GroupRow<R>[];
   return injectMarkupsAndGroups<R>({
     groups: groupRows,
     current: dataRows,
@@ -90,16 +90,16 @@ export const orderTableRows = <R extends Table.RowData>(data: Table.BodyRow<R>[]
   });
 };
 
-export const createTableRows = <R extends Table.RowData, M extends Model.RowHttpModel>(
+export const generateTableData = <R extends Table.RowData, M extends Model.RowHttpModel>(
   config: Table.CreateTableDataConfig<R, M>
 ): Table.BodyRow<R>[] => {
-  const modelRowManager = new tabling.managers.ModelRowManager<R, M>({
+  const modelRowManager = new tabling.rows.ModelRowManager<R, M>({
     getRowChildren: config.getModelRowChildren,
     columns: config.columns
   });
-  const groupRowManager = new tabling.managers.GroupRowManager<R, M>({ columns: config.columns });
-  const markupRowManager = new tabling.managers.MarkupRowManager<R, M>({ columns: config.columns });
-  return orderTableRows([
+  const groupRowManager = new tabling.rows.GroupRowManager<R, M>({ columns: config.columns });
+  const markupRowManager = new tabling.rows.MarkupRowManager<R, M>({ columns: config.columns });
+  return orderTableData([
     ...reduce(
       config.response.models,
       (curr: Table.ModelRow<R>[], m: M) => [...curr, modelRowManager.create({ model: m })],

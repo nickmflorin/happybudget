@@ -44,7 +44,7 @@ const BudgetTotalChart = <D extends Charts.Datum = Charts.Datum>(props: BudgetTo
         <Tooltip<Charts.ComputedDatum<D>>
           labelPrefix={props.tooltipLabelPrefix?.(params.datum)}
           datum={params.datum}
-          valueFormatter={(v: string | number) => tabling.formatters.currencyValueFormatter(v)}
+          valueFormatter={(v: string | number) => tabling.columns.currencyValueFormatter(v)}
         />
       )
     }

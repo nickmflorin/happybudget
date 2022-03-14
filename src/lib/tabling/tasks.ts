@@ -5,7 +5,6 @@ import { createSelector } from "reselect";
 
 import * as api from "api";
 import { tabling } from "lib";
-import * as typeguards from "./typeguards";
 
 export const createChangeEventHandler = <R extends Table.RowData, C extends Table.Context = Table.Context>(
   handlers: Partial<Redux.TableChangeEventTaskMapObject<R, C>>
@@ -56,11 +55,11 @@ export const createBulkTask = <
     const store: Table.BodyRow<R>[] = yield select(selectData);
 
     let data: Partial<R>[];
-    if (tabling.typeguards.isRowAddCountPayload(payload) || tabling.typeguards.isRowAddIndexPayload(payload)) {
-      data = tabling.patterns.generateNewRowData(
+    if (tabling.events.isRowAddCountPayload(payload) || tabling.events.isRowAddIndexPayload(payload)) {
+      data = tabling.rows.generateNewRowData(
         { store, ...payload },
         filter(config.table.getColumns(), (cl: Table.DataColumn<R, M>) =>
-          typeguards.isBodyColumn(cl)
+          tabling.columns.isBodyColumn(cl)
         ) as Table.BodyColumn<R, M>[]
       );
     } else {
@@ -77,12 +76,11 @@ export const createBulkTask = <
             new rows are being created.`
       );
     }
-    const requestPayload: Http.BulkCreatePayload<P> = tabling.http.createBulkCreatePayload<R, M, P>(
+    const requestPayload: Http.BulkCreatePayload<P> = tabling.rows.createBulkCreatePayload<R, M, P>(
       data,
-      filter(config.table.getColumns(), (c: Table.DataColumn<R, M>) => typeguards.isBodyColumn(c)) as Table.BodyColumn<
-        R,
-        M
-      >[]
+      filter(config.table.getColumns(), (c: Table.DataColumn<R, M>) =>
+        tabling.columns.isBodyColumn(c)
+      ) as Table.BodyColumn<R, M>[]
     );
     if (!isNil(config.loadingActions)) {
       yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean>) => put(action(true))));

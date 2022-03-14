@@ -27,7 +27,7 @@ const createDataChangeEventReducer =
     for (let i = 0; i < consolidated.length; i++) {
       if (isNil(changesPerRow[consolidated[i].id])) {
         const r: Table.EditableRow<R> | null = redux.reducers.findModelInData<Table.EditableRow<R>>(
-          filter(s.data, (ri: Table.BodyRow<R>) => tabling.typeguards.isEditableRow(ri)) as Table.EditableRow<R>[],
+          filter(s.data, (ri: Table.BodyRow<R>) => tabling.rows.isEditableRow(ri)) as Table.EditableRow<R>[],
           consolidated[i].id
         );
         // We do not apply manual updates via the reducer for Group row data.
@@ -49,19 +49,19 @@ const createDataChangeEventReducer =
       (st: S, dt: { changes: Table.RowChange<R>[]; row: Table.EditableRow<R> }) => {
         let r: Table.EditableRow<R> = reduce(
           dt.changes,
-          (ri: Table.EditableRow<R>, change: Table.RowChange<R>) => tabling.events.mergeChangesWithRow<R>(ri, change),
+          (ri: Table.EditableRow<R>, change: Table.RowChange<R>) => tabling.rows.mergeChangesWithRow<R>(ri, change),
           dt.row
         );
         /* Make sure to add in the default data before any recalculations are
            performed. */
-        if (tabling.typeguards.isModelRow(r)) {
-          r = tabling.defaults.applyDefaultsOnUpdate(
+        if (tabling.rows.isModelRow(r)) {
+          r = tabling.rows.applyDefaultsOnUpdate(
             tabling.columns.filterModelColumns(config.columns),
             r,
             config.defaultDataOnUpdate
           );
         }
-        if (!isNil(config.recalculateRow) && tabling.typeguards.isDataRow(r)) {
+        if (!isNil(config.recalculateRow) && tabling.rows.isDataRow(r)) {
           r = { ...r, data: { ...r.data, ...config.recalculateRow(st, r) } };
         }
         return {

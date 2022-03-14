@@ -36,8 +36,8 @@ const HeaderCell = <R extends Table.RowData, M extends Model.RowHttpModel = Mode
   onEdit
 }: HeaderCellProps<R, M>): JSX.Element => {
   const dataType: Table.ColumnDataType | null = useMemo(() => {
-    return tabling.typeguards.isDataColumn(column)
-      ? find(tabling.models.ColumnTypes, { id: column.dataType }) || null
+    return tabling.columns.isDataColumn(column)
+      ? find(tabling.columns.ColumnTypes, { id: column.dataType }) || null
       : null;
   }, [column]);
 
@@ -60,7 +60,7 @@ const HeaderCell = <R extends Table.RowData, M extends Model.RowHttpModel = Mode
         </VerticalFlexCenter>
       )}
       <div className={"text"}>{displayName}</div>
-      {!isNil(onEdit) && tabling.typeguards.isBodyColumn(column) && (
+      {!isNil(onEdit) && tabling.columns.isBodyColumn(column) && (
         <VerticalFlexCenter>
           <IconButton
             iconSize={"xsmall"}

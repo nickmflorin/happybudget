@@ -131,7 +131,7 @@ export const createTableTaskSet = (
     try {
       const response: M = yield api.request(api.createContact, ctx, {
         previous: e.payload.previous,
-        ...tabling.http.postPayload<R, M, P>(e.payload.data, config.table.getColumns())
+        ...tabling.rows.postPayload<R, M, P>(e.payload.data, config.table.getColumns())
       });
       yield put(config.actions.handleEvent({ type: "modelsAdded", payload: { model: response } }, {}));
     } catch (err: unknown) {
@@ -167,7 +167,7 @@ export const createTableTaskSet = (
 
   function* handleRowDeleteEvent(e: Table.RowDeleteEvent, ctx: CTX): SagaIterator {
     const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
-    const modelRowIds = filter(ids, (id: Table.RowId) => tabling.typeguards.isModelRowId(id)) as number[];
+    const modelRowIds = filter(ids, (id: Table.RowId) => tabling.rows.isModelRowId(id)) as number[];
     if (modelRowIds.length !== 0) {
       yield fork(bulkDeleteTask, ctx, modelRowIds);
     }
@@ -176,7 +176,7 @@ export const createTableTaskSet = (
   function* handleDataChangeEvent(e: Table.DataChangeEvent<R, Table.ModelRow<R>>, ctx: CTX): SagaIterator {
     const merged = tabling.events.consolidateRowChanges(e.payload);
     if (merged.length !== 0) {
-      const requestPayload = tabling.http.createBulkUpdatePayload<R, M, P>(merged, config.table.getColumns());
+      const requestPayload = tabling.rows.createBulkUpdatePayload<R, M, P>(merged, config.table.getColumns());
       if (requestPayload.data.length !== 0) {
         yield fork(bulkUpdateTask, ctx, requestPayload);
       }

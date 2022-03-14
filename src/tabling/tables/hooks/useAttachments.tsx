@@ -74,7 +74,7 @@ const useAttachments = <
 
   const processAttachmentsCellFromClipboard = hooks.useDynamicCallback((value: string) => {
     const modelRows = filter(props.table.getRows(), (r: Table.Row<R>) =>
-      tabling.typeguards.isModelRow(r)
+      tabling.rows.isModelRow(r)
     ) as Table.ModelRow<R>[];
     const attachments = reduce(
       modelRows,
@@ -102,7 +102,7 @@ const useAttachments = <
         onAttachmentRemoved={(id: number) => {
           const row = props.table.getRow(editAttachments);
           if (!isNil(row)) {
-            if (tabling.typeguards.isModelRow(row)) {
+            if (tabling.rows.isModelRow(row)) {
               removeAttachment(row, id);
             } else {
               console.warn(
@@ -120,7 +120,7 @@ const useAttachments = <
         onAttachmentAdded={(m: Model.Attachment) => {
           const row = props.table.getRow(editAttachments);
           if (!isNil(row)) {
-            if (tabling.typeguards.isModelRow(row)) {
+            if (tabling.rows.isModelRow(row)) {
               addAttachment(row, m);
             } else {
               console.warn(

@@ -1,7 +1,6 @@
 import { isNil, reduce } from "lodash";
 
-import * as managers from "./managers";
-import * as typeguards from "./typeguards";
+import { tabling } from "lib";
 
 const issueWarningsForParsedFieldColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
   col: Table.BodyColumn<R, M>
@@ -33,7 +32,7 @@ export const patchPayload = <
   return reduce(
     columns,
     (p: P, col: Table.ModelColumn<R, M, Table.RawRowValue>) => {
-      if (typeguards.isBodyColumn(col)) {
+      if (tabling.columns.isBodyColumn(col)) {
         /* If the column defines `parsedFields` and `parseIntoFields`, the column
            value is derived from the Column(s) with fields dictated by the
            `parsedFields` array.  In this case, the Column's field itself won't
@@ -90,7 +89,7 @@ export const bulkPatchPayload = <
 ): Http.ModelBulkUpdatePayload<P> | null => {
   const patch = patchPayload<R, M, P, RW>(change, columns);
   if (!isNil(patch)) {
-    return { id: managers.editableId(change.id), ...patch };
+    return { id: tabling.rows.editableId(change.id), ...patch };
   }
   return null;
 };
@@ -131,7 +130,7 @@ export const postPayload = <R extends Table.RowData, M extends Model.RowHttpMode
   return reduce(
     columns,
     (p: P, col: Table.ModelColumn<R, M, Table.RawRowValue>) => {
-      if (typeguards.isBodyColumn(col)) {
+      if (tabling.columns.isBodyColumn(col)) {
         const value: Table.InferV<typeof col> | undefined = data[col.field] as Table.InferV<typeof col> | undefined;
         if (value !== undefined) {
           if (!isNil(col.getHttpValue)) {

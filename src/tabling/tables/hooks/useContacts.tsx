@@ -99,12 +99,12 @@ const useContacts = <
 			unfocused case).
 			*/
     const rowNodes: Table.RowNode[] = [];
-    if (tabling.typeguards.isBodyColumn(params.cell.column) && params.cell.column.field === "contact") {
+    if (tabling.columns.isBodyColumn(params.cell.column) && params.cell.column.field === "contact") {
       rowNodes.push(params.cell.rowNode);
     }
     if (
       !isNil(params.previousCell) &&
-      tabling.typeguards.isBodyColumn(params.previousCell.column) &&
+      tabling.columns.isBodyColumn(params.previousCell.column) &&
       params.previousCell.column.field === "contact"
     ) {
       rowNodes.push(params.previousCell.rowNode);

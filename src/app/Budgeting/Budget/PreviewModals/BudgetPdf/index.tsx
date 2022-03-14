@@ -27,15 +27,15 @@ type AC = Table.ModelColumn<AR, AM>;
 const AccountColumns = filter(
   GenericAccountsTable.Columns,
   (c: Table.Column<AR, AM>) =>
-    tabling.typeguards.isModelColumn(c) &&
-    ((!tabling.typeguards.isFakeColumn(c) && c.includeInPdf !== false) || tabling.typeguards.isFakeColumn(c))
+    tabling.columns.isModelColumn(c) &&
+    ((!tabling.columns.isFakeColumn(c) && c.includeInPdf !== false) || tabling.columns.isFakeColumn(c))
 ) as AC[];
 
 const SubAccountColumns = filter(
   GenericSubAccountsTable.Columns,
   (c: Table.Column<R, M>) =>
-    tabling.typeguards.isModelColumn(c) &&
-    ((!tabling.typeguards.isFakeColumn(c) && c.includeInPdf !== false) || tabling.typeguards.isFakeColumn(c))
+    tabling.columns.isModelColumn(c) &&
+    ((!tabling.columns.isFakeColumn(c) && c.includeInPdf !== false) || tabling.columns.isFakeColumn(c))
 ) as C[];
 
 const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element => {
@@ -102,9 +102,7 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
               <Tag
                 model={params.rawValue}
                 isPlural={
-                  !isNil(params.row) &&
-                  tabling.typeguards.isModelRow(params.row) &&
-                  (params.row?.data.quantity ?? 0) > 1
+                  !isNil(params.row) && tabling.rows.isModelRow(params.row) && (params.row?.data.quantity ?? 0) > 1
                 }
               />
             ) : (

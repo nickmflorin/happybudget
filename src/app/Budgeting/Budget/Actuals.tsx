@@ -41,7 +41,7 @@ const ConnectedActualsTable = connectTableToAuthenticatedStore<
           value: reduce(
             rows,
             (sum: number, s: Table.BodyRow<Tables.ActualRowData>) =>
-              tabling.typeguards.isModelRow(s) ? sum + (s.data.value || 0) : sum,
+              tabling.rows.isModelRow(s) ? sum + (s.data.value || 0) : sum,
             0
           )
         };

@@ -47,7 +47,7 @@ const AuthenticatedMenu = <R extends Table.RowData, M extends Model.RowHttpModel
               props.apis?.grid.forEachNode((node: Table.RowNode) => {
                 const row: Table.BodyRow<R> = node.data;
                 if (
-                  tabling.typeguards.isEditableRow(row) &&
+                  tabling.rows.isEditableRow(row) &&
                   (isNil(props.rowHasCheckboxSelection) || props.rowHasCheckboxSelection(row))
                 ) {
                   node.setSelected(e.target.checked);

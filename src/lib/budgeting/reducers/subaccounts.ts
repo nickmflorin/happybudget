@@ -17,11 +17,11 @@ const recalculateSubAccountRow = (st: S, row: Table.DataRow<R>): Pick<R, "nomina
 	SubAccount(s) on another page are altered.
   */
   const isValidToRecalculate =
-    tabling.typeguards.isPlaceholderRow<R>(row) || (!isNil(row.children) && row.children.length === 0);
+    tabling.rows.isPlaceholderRow<R>(row) || (!isNil(row.children) && row.children.length === 0);
 
   if (isValidToRecalculate) {
     const fringes: Table.ModelRow<Tables.FringeRowData>[] = redux.reducers.findModelsInData(
-      filter(st.fringes.data, (r: Table.BodyRow<Tables.FringeRowData>) => tabling.typeguards.isModelRow(r)),
+      filter(st.fringes.data, (r: Table.BodyRow<Tables.FringeRowData>) => tabling.rows.isModelRow(r)),
       row.data.fringes
     ) as Table.ModelRow<Tables.FringeRowData>[];
     if (!isNil(row.data.rate)) {

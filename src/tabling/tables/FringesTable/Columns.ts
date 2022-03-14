@@ -42,40 +42,40 @@ const Columns: Table.Column<R, M>[] = [
     width: 100,
     valueSetter: (params: ValueSetterParams) => {
       const row: Table.BodyRow<R> = params.data;
-      if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
+      if (!isNil(row) && tabling.rows.isModelRow(row)) {
         const unit = row.data.unit === null ? budgeting.models.FringeUnitModels.PERCENT : row.data.unit;
         return unit.id === budgeting.models.FringeUnitModels.FLAT.id
-          ? tabling.valueSetters.numericValueSetter("rate")(params)
-          : tabling.valueSetters.percentageToDecimalValueSetter("rate")(params);
+          ? tabling.columns.numericValueSetter("rate")(params)
+          : tabling.columns.percentageToDecimalValueSetter("rate")(params);
       }
       /* Here, we have to assume that the value should be formatted as a
          percentage. */
-      return tabling.valueSetters.percentageToDecimalValueSetter("rate")(params);
+      return tabling.columns.percentageToDecimalValueSetter("rate")(params);
     },
     valueFormatter: (params: Table.AGFormatterParams) => {
-      if (tabling.formatters.isAgFormatterParams(params)) {
+      if (tabling.columns.isAgFormatterParams(params)) {
         const row: Table.BodyRow<R> = params.data;
-        if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
+        if (!isNil(row) && tabling.rows.isModelRow(row)) {
           // The default Fringe Unit in the backend is PERCENT.
           const unit = row.data.unit === null ? budgeting.models.FringeUnitModels.PERCENT : row.data.unit;
           return unit.id === budgeting.models.FringeUnitModels.FLAT.id
-            ? tabling.formatters.currencyValueFormatter(v =>
+            ? tabling.columns.currencyValueFormatter(v =>
                 console.error(`Could not parse currency value ${v} for field 'rate'.`)
               )(params)
-            : tabling.formatters.percentageValueFormatter(v =>
+            : tabling.columns.percentageValueFormatter(v =>
                 console.error(`Could not parse percentage value ${v} for field 'rate'.`)
               )(params);
         }
         /* Here, we have to assume that the value should be formatted as a
            percentage. */
-        return tabling.formatters.percentageValueFormatter(v =>
+        return tabling.columns.percentageValueFormatter(v =>
           console.error(`Could not parse percentage value ${v} for field 'rate'.`)
         )(params);
       } else {
         /* The only time the params would be native formatter params would be if
 				   this column was being used in a PDF - which it isn't, so this is safe
 				   for now. */
-        return tabling.formatters.percentageValueFormatter(v =>
+        return tabling.columns.percentageValueFormatter(v =>
           console.error(`Could not parse percentage value ${v} for field 'rate'.`)
         )(params);
       }

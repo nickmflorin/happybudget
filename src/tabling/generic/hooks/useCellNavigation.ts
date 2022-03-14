@@ -39,7 +39,7 @@ const findNextNavigatableNodes = <R extends Table.RowData>(
 
   const isNavigatableNode = (node: Table.RowNode) => {
     const row: Table.BodyRow<R> = node.data;
-    return tabling.typeguards.isEditableRow(row);
+    return tabling.rows.isEditableRow(row);
   };
 
   let nodesAfterNavigatable: Table.RowNode[] = [];
@@ -180,8 +180,8 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
           if (rows.length === 0) {
             return true;
           } else if (
-            tabling.typeguards.isModelRow(r) &&
-            filter(rows, (ri: Table.BodyRow<R>) => tabling.typeguards.isModelRow(ri)).length === 0
+            tabling.rows.isModelRow(r) &&
+            filter(rows, (ri: Table.BodyRow<R>) => tabling.rows.isModelRow(ri)).length === 0
           ) {
             return true;
           }

@@ -30,8 +30,7 @@ export const getGroupColorDefinition = <R extends Table.RowData>(
   group: Style.HexColor | Model.Group | Table.GroupRow<R>
 ): Table.RowColorDef => {
   if (!isNil(group)) {
-    const color =
-      typeof group === "string" ? group : tabling.typeguards.isRow(group) ? group.groupData.color : group.color;
+    const color = typeof group === "string" ? group : tabling.rows.isRow(group) ? group.groupData.color : group.color;
     if (!isNil(color)) {
       return {
         backgroundColor: color,

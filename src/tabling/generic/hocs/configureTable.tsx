@@ -113,7 +113,7 @@ const configureTable = <
       columns: map(
         filter(
           props.columns,
-          (col: Table.Column<R, M>) => tabling.typeguards.isDataColumn(col) && col.canBeHidden !== false
+          (col: Table.Column<R, M>) => tabling.columns.isDataColumn(col) && col.canBeHidden !== false
         ) as Table.DataColumn<R, M>[]
       ),
       apis: _apis
@@ -171,7 +171,7 @@ const configureTable = <
           return util.replaceInArray<Table.Column<R, M>>(
             cs,
             (c: Table.Column<R, M>) =>
-              tabling.typeguards.isRealColumn(c) &&
+              tabling.columns.isRealColumn(c) &&
               tabling.columns.normalizedField<R, M>(c) === tabling.columns.normalizedField<R, M>(realColumns[0]),
             { ...realColumns[0], pinned: "left" }
           );

@@ -31,7 +31,7 @@ const getWritableColumnsAfter = <R extends Table.RowData, M extends Model.RowHtt
   let current: Table.AgColumn | null = col;
   while (!isNil(current)) {
     const c = tabling.columns.getColumn(columns, current.getColId());
-    if (!isNil(c) && tabling.typeguards.isBodyColumn<R, M>(c)) {
+    if (!isNil(c) && tabling.columns.isBodyColumn<R, M>(c)) {
       cols.push(c);
     }
     current = api.getDisplayedColAfter(current);
@@ -52,7 +52,7 @@ const processValueFromClipboard = <
 		 return the current value as to not cause data loss. */
   if (value === undefined) {
     if (!isNil(row)) {
-      if (tabling.typeguards.isMarkupRow(row)) {
+      if (tabling.rows.isMarkupRow(row)) {
         if (!isNil(c.markupField)) {
           const v = row.data[c.markupField];
           return v as unknown as V;
@@ -60,7 +60,7 @@ const processValueFromClipboard = <
         /* We return undefined to communicate to the calling logic that the
            column is not applicable for this row. */
         return undefined;
-      } else if (tabling.typeguards.isGroupRow(row)) {
+      } else if (tabling.rows.isGroupRow(row)) {
         /* We return undefined to communicate to the calling logic that the
            column is not applicable for this row. */
         return undefined;
@@ -134,7 +134,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
         const node: Table.RowNode = p.node;
         const field = p.column.getColId();
         const c = tabling.columns.getColumn(params.columns, field);
-        if (!isNil(c) && tabling.typeguards.isBodyColumn(c)) {
+        if (!isNil(c) && tabling.columns.isBodyColumn(c)) {
           if (!isNil(cutCellChange)) {
             p = { ...p, value: cutCellChange.oldValue };
             params.onEvent({
@@ -160,18 +160,17 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
       if (!isNil(apis)) {
         const rows = tabling.aggrid.getRows(apis.grid);
         const lastIndex =
-          apis.grid.getDisplayedRowCount() -
-          filter(rows, (r: Table.BodyRow<R>) => tabling.typeguards.isMarkupRow(r)).length;
+          apis.grid.getDisplayedRowCount() - filter(rows, (r: Table.BodyRow<R>) => tabling.rows.isMarkupRow(r)).length;
         const focusedCell = apis.grid.getFocusedCell();
 
         /* We enforce that bulk paste operations cannot happen inside of the
            MarkupRow(s) at the bottom of the table. */
-        if (!isNil(focusedCell) && tabling.typeguards.isModelRow(rows[focusedCell.rowIndex])) {
+        if (!isNil(focusedCell) && tabling.rows.isModelRow(rows[focusedCell.rowIndex])) {
           /* If the first column from the focused cell is not writable, that
              means we are trying to copy and paste with the focused cell being
              associated with a column like the index column. */
           const c = tabling.columns.getColumn(params.columns, focusedCell.column.getColId());
-          if (isNil(c) || !tabling.typeguards.isBodyColumn<R, M>(c)) {
+          if (isNil(c) || !tabling.columns.isBodyColumn<R, M>(c)) {
             return [];
           }
 
@@ -197,9 +196,9 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
 										 simply add an empty data set for the Group Row data (since
 										 it will not trigger a change anyways) and also append the
                      data at the current iteration. */
-                  if (tabling.typeguards.isGroupRow(row)) {
+                  if (tabling.rows.isGroupRow(row)) {
                     return [...curr, [""], arr];
-                  } else if (tabling.typeguards.isModelRow(row)) {
+                  } else if (tabling.rows.isModelRow(row)) {
                     return [...curr, arr];
                   } else {
                     /* If we are trying to paste into a placeholder row, we need
@@ -304,7 +303,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
             params.onEvent({
               type: "rowAdd",
               payload,
-              placeholderIds: map(payload, () => tabling.managers.placeholderRowId())
+              placeholderIds: map(payload, () => tabling.rows.placeholderRowId())
             });
           }
           /* All we need to do is return the data corresponding to updates to

@@ -146,11 +146,11 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
           isWriteOnly: true,
           onClick: () => {
             let rows = filter(params.selectedRows, (r: Table.BodyRow<R>) =>
-              tabling.typeguards.isModelRow(r)
+              tabling.rows.isModelRow(r)
             ) as Table.ModelRow<R>[];
             if (rows.length === 0) {
               const focusedRow = props.table.current.getFocusedRow();
-              if (!isNil(focusedRow) && tabling.typeguards.isModelRow(focusedRow)) {
+              if (!isNil(focusedRow) && tabling.rows.isModelRow(focusedRow)) {
                 rows = [focusedRow];
               }
             }
@@ -165,7 +165,7 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
           isWriteOnly: true,
           onClick: () => {
             const selectedRows = filter(params.selectedRows, (r: Table.BodyRow<R>) =>
-              tabling.typeguards.isModelRow(r)
+              tabling.rows.isModelRow(r)
             ) as Table.ModelRow<R>[];
             /* If rows are explicitly selected for the Markup, we want to
 							 include them as the default children for the Markup in the
@@ -174,7 +174,7 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
               onCreateMarkup(map(selectedRows, (row: Table.ModelRow<R>) => row.id));
             } else {
               const rows: Table.ModelRow<R>[] = filter(props.table.current.getRows(), (r: Table.BodyRow<R>) =>
-                tabling.typeguards.isModelRow(r)
+                tabling.rows.isModelRow(r)
               ) as Table.ModelRow<R>[];
               if (rows.length !== 0) {
                 onCreateMarkup();
@@ -215,7 +215,7 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
           rows === undefined ? onCreateMarkup() : onCreateMarkup(map(rows, (row: Table.ModelRow<R>) => row.id))
         }
         onEditGroup={(group: Table.GroupRow<R>) => onEditGroup(group)}
-        onEditMarkup={(row: Table.MarkupRow<R>) => onEditMarkup(tabling.managers.markupId(row.id))}
+        onEditMarkup={(row: Table.MarkupRow<R>) => onEditMarkup(tabling.rows.markupId(row.id))}
         actions={actions}
         onBack={onBack}
         onRowExpand={onRowExpand}

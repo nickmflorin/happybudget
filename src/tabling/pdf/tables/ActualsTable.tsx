@@ -20,7 +20,7 @@ const ActualsTable = ({ columns, data, options }: ActualsTableProps): JSX.Elemen
   const columnIsVisible = useMemo(() => (c: DC) => includes(options.columns, c.field), [options.columns]);
 
   const generateRows = hooks.useDynamicCallback((): JSX.Element[] => {
-    const rowData = tabling.data.createTableRows<R, M>({
+    const rowData = tabling.rows.generateTableData<R, M>({
       response: { models: data },
       columns
     });
@@ -28,13 +28,13 @@ const ActualsTable = ({ columns, data, options }: ActualsTableProps): JSX.Elemen
       ...reduce(
         rowData,
         (rws: JSX.Element[], row: Table.BodyRow<R>) => {
-          if (tabling.typeguards.isModelRow(row)) {
+          if (tabling.rows.isModelRow(row)) {
             return [
               ...rws,
               <BodyRow<R, M>
                 key={`row-${row.id}`}
                 columnIsVisible={columnIsVisible}
-                columns={filter(columns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
+                columns={filter(columns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
                 row={row}
                 data={rowData}
               />
@@ -46,14 +46,14 @@ const ActualsTable = ({ columns, data, options }: ActualsTableProps): JSX.Elemen
           <HeaderRow<R, M>
             key={"header-row"}
             columnIsVisible={columnIsVisible}
-            columns={filter(columns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
+            columns={filter(columns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
           />
         ]
       ),
       <FooterRow<R, M>
         key={"footer-row"}
         columnIsVisible={columnIsVisible}
-        columns={filter(columns, (c: C) => tabling.typeguards.isDataColumn(c)) as DC[]}
+        columns={filter(columns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
         data={rowData}
       />
     ];
