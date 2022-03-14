@@ -4,8 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { isNil, find } from "lodash";
 
 import * as api from "api";
-import { actions } from "store";
-import { tabling, hooks } from "lib";
+import { tabling, hooks, contacts } from "lib";
 import { framework } from "tabling/generic";
 
 import { selectors } from "app/Budgeting/store";
@@ -57,7 +56,7 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
 
   const onContactCreated = useMemo(
     () => (m: Model.Contact, params?: CreateContactParams) => {
-      dispatch(actions.authenticated.addContactToStateAction(m));
+      dispatch(contacts.actions.addContactToStateAction(m));
       /* If we have enough information from before the contact was created in
 			   the specific cell, combine that information with the new value to
 				 perform a table update, showing the created contact in the new cell. */
@@ -89,7 +88,7 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
 
   const onContactUpdated = useMemo(
     () => (m: Model.Contact, params: EditContactParams) => {
-      dispatch(actions.authenticated.updateContactInStateAction({ id: m.id, data: m }));
+      dispatch(contacts.actions.updateContactInStateAction({ id: m.id, data: m }));
       const rowId = params.rowId;
       if (!isNil(rowId)) {
         const row: Table.BodyRow<R> | null = props.table.current.getRow(rowId);
@@ -109,7 +108,7 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
 
   const {
     modals,
-    data: contacts,
+    data: cs,
     columns: columnsWithContacts,
     onCellFocusChanged
   } = useContacts({
@@ -140,7 +139,7 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
             if (change.newValue !== null) {
               const row = props.table.current.getRow(id);
               if (!isNil(row) && tabling.rows.isModelRow(row) && row.data.rate === null) {
-                const contact: Model.Contact | undefined = find(contacts, { id: change.newValue });
+                const contact: Model.Contact | undefined = find(cs, { id: change.newValue });
                 if (!isNil(contact) && !isNil(contact.rate)) {
                   props.table.current.dispatchEvent({
                     type: "dataChange",

@@ -4,8 +4,7 @@ import { Dispatch } from "redux";
 import { map, filter, isNil } from "lodash";
 
 import * as api from "api";
-import { models, tabling, hooks } from "lib";
-import { actions } from "store";
+import { models, tabling, hooks, contacts } from "lib";
 
 import { CreateContactParams } from "components/hooks";
 import { framework } from "tabling/generic";
@@ -129,7 +128,7 @@ const ActualsTable = ({ parent, onOwnersSearch, ...props }: Props): JSX.Element 
 
   const onContactCreated = useMemo(
     () => (m: Model.Contact, params?: CreateContactParams) => {
-      dispatch(actions.authenticated.addContactToStateAction(m));
+      dispatch(contacts.actions.addContactToStateAction(m));
       /* If we have enough information from before the contact was created in
 				 the specific cell, combine that information with the new value to
 				 perform a table update, showing the created contact in the new cell. */
@@ -154,7 +153,7 @@ const ActualsTable = ({ parent, onOwnersSearch, ...props }: Props): JSX.Element 
   const {
     modals: contactModals,
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-    data: contacts,
+    data: cs,
     columns: columnsWithContacts,
     onCellFocusChanged
   } = useContacts({

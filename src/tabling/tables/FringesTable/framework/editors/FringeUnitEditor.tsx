@@ -20,7 +20,7 @@ const FringeUnitEditor = (
     <ChoiceSelectEditor<Model.FringeUnit, Tables.FringeRowData, Model.Fringe, Tables.FringeTableStore>
       searchIndices={["name"]}
       ref={ref}
-      models={budgeting.models.FringeUnits}
+      models={budgeting.models.FringeUnits.choices}
       {...props}
     />
   );

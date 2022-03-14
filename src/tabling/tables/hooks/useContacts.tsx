@@ -3,7 +3,6 @@ import { Dispatch } from "redux";
 import { useDispatch } from "react-redux";
 import { isNil, find } from "lodash";
 
-import { actions } from "store";
 import { models, tabling, hooks, contacts } from "lib";
 import { useContacts as useContactsComponents, EditContactParams, CreateContactParams } from "components/hooks";
 
@@ -82,7 +81,7 @@ const useContacts = <
           },
           cellEditorParams: {
             onNewContact: (params: { name?: string; rowId: Table.ModelRowId }) => createContact(params),
-            setSearch: (v: string) => dispatch(actions.authenticated.setContactsSearchAction(v, {}))
+            setSearch: (v: string) => dispatch(contacts.actions.setContactsSearchAction(v, {}))
           },
           processCellFromClipboard
         }
