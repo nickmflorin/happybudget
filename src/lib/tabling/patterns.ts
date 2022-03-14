@@ -402,8 +402,6 @@ export const generateNewRowData = <R extends Table.RowData, M extends Model.RowH
                 return { ...curr, [c.field]: inferred };
               }
             }
-          } else if (c.defaultNewRowValue !== undefined) {
-            return { ...curr, [c.field]: c.defaultNewRowValue };
           }
           return curr;
         },

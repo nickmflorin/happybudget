@@ -312,6 +312,8 @@ declare namespace Table {
 
   type BaseModelColumn<
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    R extends RowData = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
@@ -326,6 +328,14 @@ declare namespace Table {
        unexpectedly encountered (in which case an error will be issued) or
        another value that we treat as null is encountered (i.e. blank strings). */
     readonly nullValue: V;
+    /* Callback or explicit value that the RowData should be attributed with
+       in the case that the original value is equal to the nullValue when a
+       row is created. */
+    readonly defaultValueOnCreate?: Table.DefaultValueOnCreate<R>;
+    /* Callback or explicit value that the RowData should be attributed with
+       in the case that the original value is equal to the nullValue when a
+       row is updated. */
+    readonly defaultValueOnUpdate?: Table.DefaultValueOnUpdate<R>;
     /* If not provided, the default behavior is to obtain the Row's value by
        attribute on the Model M corresponding to the Column's designated
 			 `field`. */
@@ -342,20 +352,24 @@ declare namespace Table {
 
   type FakeColumn<
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    R extends RowData = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
   > = BaseColumn &
-    BaseModelColumn<M, V> & {
+    BaseModelColumn<R, M, V> & {
       readonly cType: "fake";
     };
 
   type PartialFakeColumn<
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    R extends RowData = any,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
-  > = Omit<Partial<FakeColumn<M, V>>, "field" | "nullValue"> & Pick<FakeColumn<M, V>, "field" | "nullValue">;
+  > = Omit<Partial<FakeColumn<R, M, V>>, "field" | "nullValue"> & Pick<FakeColumn<R, M, V>, "field" | "nullValue">;
 
   type ActionColumnId = "checkbox" | "edit" | "drag";
 
@@ -379,7 +393,7 @@ declare namespace Table {
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
-  > = BaseModelColumn<M, V> & {
+  > = BaseModelColumn<R, M, V> & {
     // This field will be used to pull data from the Markup model if applicable.
     readonly markupField?: keyof Model.Markup;
     // This field will be used to pull data from the Group model if applicable.
@@ -389,14 +403,12 @@ declare namespace Table {
        value getters). */
     readonly isRead?: boolean;
     readonly headerName?: string;
-    readonly pdfHeaderName?: string;
     readonly dataType?: ColumnDataTypeId;
     readonly page?: FooterColumn<R, M>;
     readonly defaultHidden?: boolean;
     readonly canBeHidden?: boolean;
     readonly canBeExported?: boolean;
     readonly requiresAuthentication?: boolean;
-    readonly defaultNewRowValue?: boolean;
     readonly includeInPdf?: boolean;
     /* Callback to indicate whether or not the column is applicable for a given
        model.  If the column is not applicable, a warning will not be issued
@@ -411,6 +423,8 @@ declare namespace Table {
     readonly getHttpValue?: (value: V) => any;
     readonly processCellForCSV?: (row: R) => string | number;
     readonly processCellForClipboard?: (row: R) => string | number;
+    // PDF Column Properties
+    readonly pdfHeaderName?: string;
     readonly pdfWidth?: number;
     readonly pdfFlexGrow?: true;
     readonly pdfFooter?: PdfFooterColumn<V>;
@@ -503,7 +517,7 @@ declare namespace Table {
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
-  > = DataColumn<R, M, V> | FakeColumn<M, V>;
+  > = DataColumn<R, M, V> | FakeColumn<R, M, V>;
 
   type RealColumn<
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -521,7 +535,7 @@ declare namespace Table {
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
-  > = BodyColumn<R, M, V> | ActionColumn<R, M> | CalculatedColumn<R, M, V> | FakeColumn<M, V>;
+  > = BodyColumn<R, M, V> | ActionColumn<R, M> | CalculatedColumn<R, M, V> | FakeColumn<R, M, V>;
 
   interface FooterColumn<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
     extends Pick<DataColumn<R, M>, "colSpan"> {
@@ -775,6 +789,11 @@ declare namespace Table {
     readonly selectStore: (state: Application.Store) => S;
   };
 
+  type DefaultValueOnCreate<R extends RowData> = R[keyof R] | ((r: Partial<R>) => R[keyof R]);
+  type DefaultValueOnUpdate<R extends RowData> = R[keyof R] | ((r: Table.ModelRow<R>) => R[keyof R]);
+  type DefaultDataOnCreate<R extends RowData> = Partial<R> | ((r: Partial<R>) => Partial<R>);
+  type DefaultDataOnUpdate<R extends RowData> = R | ((r: Table.ModelRow<R>) => R);
+
   type ReducerConfig<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
@@ -784,7 +803,8 @@ declare namespace Table {
   > = Omit<TaskConfig<R, M, S, C, A>, "table" | "selectStore"> & {
     readonly initialState: S;
     readonly columns: ModelColumn<R, M>[];
-    readonly defaultData?: Partial<R>;
+    readonly defaultDataOnCreate?: DefaultDataOnCreate<R>;
+    readonly defaultDataOnUpdate?: DefaultDataOnUpdate<R>;
     readonly getModelRowChildren?: (m: M) => number[];
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     readonly clearOn: Redux.ClearOn<any, C>[];

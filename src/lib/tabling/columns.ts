@@ -114,14 +114,16 @@ export const getColumn = <CA extends Table.Column[]>(
   field: string,
   flt?: (c: CA[number]) => boolean
 ): CA[number] | null => {
+  const realColumnLookupFilter = (c: CA[number]) =>
+    typeguards.isRealColumn<Table.InferR<typeof c>, Table.InferM<typeof c>>(c) &&
+    normalizedField<Table.InferR<typeof c>, Table.InferM<typeof c>>(c) === field;
+
+  const fakeColumnLooupFilter = (c: CA[number]) =>
+    typeguards.isFakeColumn<Table.InferR<typeof c>, Table.InferM<typeof c>>(c) && c.field === field;
+
   const baseFlt = isNil(flt)
-    ? (c: typeof columns[number]) =>
-        typeguards.isRealColumn<Table.InferR<typeof c>, Table.InferM<typeof c>>(c) &&
-        normalizedField<Table.InferR<typeof c>, Table.InferM<typeof c>>(c) === field
-    : (c: CA[number]) =>
-        flt(c) &&
-        typeguards.isRealColumn<Table.InferR<typeof c>, Table.InferM<typeof c>>(c) &&
-        normalizedField<Table.InferR<typeof c>, Table.InferM<typeof c>>(c) === field;
+    ? (c: typeof columns[number]) => realColumnLookupFilter(c) || fakeColumnLooupFilter(c)
+    : (c: CA[number]) => (flt(c) && realColumnLookupFilter(c)) || fakeColumnLooupFilter(c);
   const foundColumn = find(columns, baseFlt);
   if (!isNil(foundColumn)) {
     return foundColumn;
@@ -176,10 +178,10 @@ export const filterActionColumns = <CA extends Table.Column[]>(
 
 export const filterFakeColumns = <CA extends Table.Column[]>(
   columns: CA
-): CA extends Table.Column<Table.RowData, infer M, infer V>[] ? Table.FakeColumn<M, V>[] : never =>
+): CA extends Table.Column<infer R, infer M, infer V>[] ? Table.FakeColumn<R, M, V>[] : never =>
   filter(columns, (col: typeof columns[number]) =>
     typeguards.isFakeColumn<Table.InferR<typeof col>, Table.InferM<typeof col>>(col)
-  ) as CA extends Table.Column<Table.RowData, infer M, infer V>[] ? Table.FakeColumn<M, V>[] : never;
+  ) as CA extends Table.Column<infer R, infer M, infer V>[] ? Table.FakeColumn<R, M, V>[] : never;
 
 export const filterCalculatedColumns = <CA extends Table.Column[]>(
   columns: CA
@@ -258,7 +260,6 @@ export const parseBaseColumn = <R extends Table.RowData, M extends Model.RowHttp
       dataType,
       nullValue,
       cType,
-      defaultNewRowValue,
       defaultHidden,
       includeInPdf,
       pdfWidth,
@@ -303,7 +304,6 @@ export const parseBaseColumn = <R extends Table.RowData, M extends Model.RowHttp
       isApplicableForModel,
       isApplicableForRowType,
       smartInference,
-      defaultNewRowValue,
       defaultHidden,
       includeInPdf,
       pdfWidth,

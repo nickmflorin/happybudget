@@ -18,3 +18,4 @@ export * as tasks from "./tasks";
 export * as patterns from "./patterns";
 export * as constants from "./constants";
 export * as meta from "./meta";
+export * as defaults from "./defaults";

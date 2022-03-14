@@ -182,7 +182,6 @@ export const consolidateDataChangeEvents = <
 };
 
 export const mergeChangesWithRow = <R extends Table.RowData, RW extends Table.EditableRow<R> = Table.EditableRow<R>>(
-  id: Table.RowId,
   row: RW,
   changes: Table.DataChangePayload<R, RW>
 ): RW => {
@@ -190,7 +189,7 @@ export const mergeChangesWithRow = <R extends Table.RowData, RW extends Table.Ed
   const data: RW["data"] = reduce(
     consolidated,
     (curr: RW["data"], change: Table.RowChange<R, RW>) => {
-      if (change.id !== id) {
+      if (change.id !== row.id) {
         console.error("Cannot apply table changes from one row to another row!");
         return curr;
       } else {

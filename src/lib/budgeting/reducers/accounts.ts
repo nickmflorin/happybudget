@@ -15,10 +15,10 @@ export const createPublicAccountsTableReducer = (config: ReducerConfig): Redux.R
 };
 
 export const createAuthenticatedAccountsTableReducer = (
-  config: Omit<ReducerConfig<AM>, "defaultData">
+  config: Omit<ReducerConfig<AM>, "defaultDataOnCreate">
 ): Redux.Reducer<S, ACTION> =>
   tabling.reducers.createAuthenticatedTableReducer<R, M, S, Tables.AccountTableContext, AM, ACTION>({
-    defaultData: {
+    defaultDataOnCreate: {
       markup_contribution: 0.0,
       actual: 0.0,
       accumulated_markup_contribution: 0.0,

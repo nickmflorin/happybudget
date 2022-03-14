@@ -1,6 +1,7 @@
 import { reduce, filter, isNil, includes } from "lodash";
 import { util, budgeting, notifications } from "lib";
 
+import * as defaults from "./defaults";
 import * as typeguards from "./typeguards";
 import * as columnFns from "./columns";
 
@@ -140,7 +141,7 @@ type PlaceholderRowConfig<
   R extends Table.RowData,
   M extends Model.RowHttpModel
 > = Omit<BodyRowManagerConfig<RW, R, M>, "rowType"> & {
-  readonly defaultData?: Partial<R>;
+  readonly defaultData?: Table.DefaultDataOnCreate<R>;
 };
 
 export class PlaceholderRowManager<
@@ -148,7 +149,7 @@ export class PlaceholderRowManager<
   M extends Model.RowHttpModel = Model.RowHttpModel
 > extends BodyRowManager<Table.PlaceholderRow<R>, R, M> {
   public getRowChildren: ((m: M) => number[]) | undefined;
-  public defaultData?: Partial<R>;
+  public defaultData?: Table.DefaultDataOnCreate<R>;
 
   constructor(config: PlaceholderRowConfig<Table.PlaceholderRow<R>, R, M>) {
     super({ ...config, rowType: "placeholder" });
@@ -162,14 +163,16 @@ export class PlaceholderRowManager<
     if (col.isApplicableForRowType?.(this.rowType) === false) {
       return [undefined, false];
     }
-    const value = this.defaultData === undefined ? undefined : (this.defaultData[col.field] as V | undefined);
-    if (value === undefined) {
-      if (data === undefined || data[col.field] === undefined) {
-        return [col.nullValue, true];
-      }
-      return [data[col.field] as unknown as V, true];
+    const defaultData =
+      this.defaultData === undefined
+        ? undefined
+        : defaults.applyDefaultsOnCreate(columnFns.filterModelColumns(this.columns), data, this.defaultData);
+    const defaultValue = defaultData === undefined ? undefined : (defaultData[col.field] as V | undefined);
+
+    if (data === undefined || data[col.field] === undefined) {
+      return defaultValue === undefined ? [col.nullValue, true] : [defaultValue, true];
     }
-    return [value, true];
+    return [data[col.field] as unknown as V, true];
   }
 
   create(config: CreatePlaceholderRowConfig<R>): Table.PlaceholderRow<R> {

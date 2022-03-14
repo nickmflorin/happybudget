@@ -84,7 +84,7 @@ export const isDataColumn = <R extends Table.RowData, M extends Model.RowHttpMod
 
 export const isFakeColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
   c: Table.Column<R, M>
-): c is Table.FakeColumn<M> => (c as Table.FakeColumn<M>).cType === "fake";
+): c is Table.FakeColumn<R, M> => (c as Table.FakeColumn<R, M>).cType === "fake";
 
 export const isRealColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
   c: Table.Column<R, M>

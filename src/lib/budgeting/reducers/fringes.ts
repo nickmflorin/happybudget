@@ -35,7 +35,7 @@ export type AuthenticatedFringeTableActionMap = Redux.AuthenticatedTableActionMa
 };
 
 export const createAuthenticatedFringesTableReducer = (
-  config: Omit<Table.ReducerConfig<R, M, S, CTX, AuthenticatedFringeTableActionMap>, "defaultData">
+  config: Omit<Table.ReducerConfig<R, M, S, CTX, AuthenticatedFringeTableActionMap>, "defaultDataOnCreate">
 ): Redux.Reducer<S, ACTION> => {
   const generic = tabling.reducers.createAuthenticatedTableReducer<
     R,
@@ -46,7 +46,7 @@ export const createAuthenticatedFringesTableReducer = (
     ACTION
   >({
     ...config,
-    defaultData: {
+    defaultDataOnCreate: {
       unit: budgeting.models.FringeUnitModels.PERCENT,
       rate: 0.0
     }

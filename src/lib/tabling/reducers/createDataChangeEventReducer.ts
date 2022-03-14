@@ -10,7 +10,7 @@ const createDataChangeEventReducer =
     C extends Table.Context = Table.Context,
     A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
   >(
-    config: Table.ReducerConfig<R, M, S, C, A> & {
+    config: Omit<Table.ReducerConfig<R, M, S, C, A>, "defaultDataOnCreate"> & {
       readonly recalculateRow?: (state: S, row: Table.DataRow<R>) => Partial<R>;
     }
   ): Redux.Reducer<S, Table.DataChangeEvent<R>> =>
@@ -49,10 +49,18 @@ const createDataChangeEventReducer =
       (st: S, dt: { changes: Table.RowChange<R>[]; row: Table.EditableRow<R> }) => {
         let r: Table.EditableRow<R> = reduce(
           dt.changes,
-          (ri: Table.EditableRow<R>, change: Table.RowChange<R>) =>
-            tabling.events.mergeChangesWithRow<R>(ri.id, ri, change),
+          (ri: Table.EditableRow<R>, change: Table.RowChange<R>) => tabling.events.mergeChangesWithRow<R>(ri, change),
           dt.row
         );
+        /* Make sure to add in the default data before any recalculations are
+           performed. */
+        if (tabling.typeguards.isModelRow(r)) {
+          r = tabling.defaults.applyDefaultsOnUpdate(
+            tabling.columns.filterModelColumns(config.columns),
+            r,
+            config.defaultDataOnUpdate
+          );
+        }
         if (!isNil(config.recalculateRow) && tabling.typeguards.isDataRow(r)) {
           r = { ...r, data: { ...r.data, ...config.recalculateRow(st, r) } };
         }

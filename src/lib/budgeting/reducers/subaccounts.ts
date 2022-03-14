@@ -24,12 +24,13 @@ const recalculateSubAccountRow = (st: S, row: Table.DataRow<R>): Pick<R, "nomina
       filter(st.fringes.data, (r: Table.BodyRow<Tables.FringeRowData>) => tabling.typeguards.isModelRow(r)),
       row.data.fringes
     ) as Table.ModelRow<Tables.FringeRowData>[];
-    if (!isNil(row.data.quantity) && !isNil(row.data.rate)) {
+    if (!isNil(row.data.rate)) {
       const multiplier = row.data.multiplier || 1.0;
+      const quantity = row.data.quantity || 1.0;
       return {
-        nominal_value: row.data.quantity * row.data.rate * multiplier,
+        nominal_value: quantity * row.data.rate * multiplier,
         fringe_contribution: budgeting.businessLogic.contributionFromFringes(
-          row.data.quantity * row.data.rate * multiplier,
+          quantity * row.data.rate * multiplier,
           fringes
         )
       };
@@ -89,7 +90,7 @@ export const createAuthenticatedSubAccountsTableReducer = (
         Redux.TableAction<Redux.ActionPayload, Tables.FringeTableContext>
       >;
     },
-    "defaultData"
+    "defaultDateOnCreate" | "defaultDataOnUpdate"
   >
 ): Redux.Reducer<S, ACTION> => {
   const generic = tabling.reducers.createAuthenticatedTableReducer<
@@ -101,12 +102,24 @@ export const createAuthenticatedSubAccountsTableReducer = (
     ACTION
   >({
     ...config,
-    defaultData: {
-      markup_contribution: 0.0,
-      fringe_contribution: 0.0,
-      actual: 0.0,
-      accumulated_markup_contribution: 0.0,
-      accumulated_fringe_contribution: 0.0
+    defaultDataOnCreate: (r: Partial<R>): Partial<R> => {
+      const base = {
+        markup_contribution: 0.0,
+        fringe_contribution: 0.0,
+        actual: 0.0,
+        accumulated_markup_contribution: 0.0,
+        accumulated_fringe_contribution: 0.0
+      };
+      if (!isNil(r.rate) && isNil(r.quantity)) {
+        return { ...base, quantity: 1.0 };
+      }
+      return base;
+    },
+    defaultDataOnUpdate: (r: Table.ModelRow<R>): R => {
+      if (!isNil(r.data.rate) && isNil(r.data.quantity)) {
+        return { ...r.data, quantity: 1.0 };
+      }
+      return r.data;
     },
     recalculateRow: recalculateSubAccountRow
   });

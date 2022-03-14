@@ -11,11 +11,11 @@ const createRowAddEventReducer = <
   C extends Table.Context = Table.Context,
   A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
 >(
-  config: Table.ReducerConfig<R, M, S, C, A>
+  config: Omit<Table.ReducerConfig<R, M, S, C, A>, "defaultDataOnUpdate">
 ): Redux.Reducer<S, Table.RowAddEvent<R>> => {
   const placeholderRowManager = new tabling.managers.PlaceholderRowManager<R, M>({
     columns: config.columns,
-    defaultData: config.defaultData
+    defaultData: config.defaultDataOnCreate
   });
   return (s: S = config.initialState, e: Table.RowAddEvent<R>) => {
     const p: Table.RowAddPayload<R> = e.payload;
