@@ -47,7 +47,7 @@ const MarkupForm = (
 
       <Form.Item name={"unit"} label={"Type"} rules={[{ required: true, message: "Please select a type." }]}>
         <Select suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />} placeholder={"Select Type"}>
-          {budgeting.models.MarkupUnits.map((m: Model.MarkupUnit, index: number) => (
+          {budgeting.models.MarkupUnits.choices.map((m: Model.MarkupUnit, index: number) => (
             <Select.Option key={index} value={m.id}>
               {m.name}
             </Select.Option>
@@ -58,7 +58,7 @@ const MarkupForm = (
       <Form.Item
         name={"rate"}
         label={"Amount"}
-        style={unitState !== budgeting.models.MarkupUnitModels.PERCENT.id ? { display: "none" } : {}}
+        style={unitState !== budgeting.models.MarkupUnits.Percent.id ? { display: "none" } : {}}
         rules={[
           { required: false },
           () => ({
@@ -76,7 +76,7 @@ const MarkupForm = (
       <Form.Item
         name={"rate"}
         label={"Amount"}
-        style={unitState !== budgeting.models.MarkupUnitModels.FLAT.id ? { display: "none" } : {}}
+        style={unitState !== budgeting.models.MarkupUnits.Flat.id ? { display: "none" } : {}}
         rules={[
           { required: false },
           () => ({
@@ -108,7 +108,7 @@ const MarkupForm = (
 								 doing that validation here will prevent the form from submitting
 								 in the FLAT state. */
               const unit = getFieldValue("unit");
-              if (unit === budgeting.models.MarkupUnitModels.PERCENT.id && (isNil(value) || value.length === 0)) {
+              if (unit === budgeting.models.MarkupUnits.Percent.id && (isNil(value) || value.length === 0)) {
                 return Promise.reject("At least one account must be selected.");
               }
               return Promise.resolve();
@@ -121,7 +121,7 @@ const MarkupForm = (
           showArrow
           loading={availableChildrenLoading}
           mode={"multiple"}
-          disabled={availableChildrenLoading || unitState !== budgeting.models.MarkupUnitModels.PERCENT.id}
+          disabled={availableChildrenLoading || unitState !== budgeting.models.MarkupUnits.Percent.id}
         >
           {map(availableChildren, (obj: Model.SimpleAccount | Model.SimpleSubAccount, index: number) => {
             return (

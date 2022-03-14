@@ -53,6 +53,16 @@ declare namespace Model {
     name: N;
   };
 
+  type DynamicChoices<CH extends Choice<I, N>, I extends number = number, N extends string = string> = {
+    [key in CH["name"]]: CH;
+  };
+
+  type Choices<CH extends Choice<I, N>, I extends number = number, N extends string = string> = {
+    readonly choices: CH[];
+    readonly get: (id: I) => CH;
+    readonly infer: (name: string, options?: Omit<InferModelFromNameParams<CH>, "getName">) => CH | null;
+  } & DynamicChoices<CH, I, N>;
+
   type MarkupUnitId = 0 | 1;
 
   type MarkupUnitName = "Percent" | "Flat";

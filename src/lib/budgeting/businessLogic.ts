@@ -121,7 +121,7 @@ export const contributionFromMarkups = <R extends Table.RowData = Tables.BudgetR
 ): number => {
   const unit = (m: Model.Markup | Table.MarkupRow<R>) => (tabling.rows.isRow(m) ? m.markupData.unit : m.unit);
   return reduce(
-    filter(markups, (m: Model.Markup | Table.MarkupRow<R>) => unit(m).id === models.MarkupUnitModels.PERCENT.id),
+    filter(markups, (m: Model.Markup | Table.MarkupRow<R>) => unit(m).id === models.MarkupUnits.Percent.id),
     (curr: number, markup: Model.Markup | Table.MarkupRow<R>): number => {
       const rate = tabling.rows.isRow(markup) ? markup.markupData.rate : markup.rate;
       if (!isNil(rate)) {
@@ -144,7 +144,7 @@ export const contributionFromFringes = (
       const rate = tabling.rows.isRow(fringe) ? fringe.data.rate : fringe.rate;
       const cutoff = tabling.rows.isRow(fringe) ? fringe.data.cutoff : fringe.cutoff;
       if (!isNil(unit) && !isNil(rate)) {
-        if (unit.id === models.FringeUnitModels.FLAT.id) {
+        if (unit.id === models.FringeUnits.Flat.id) {
           return curr + rate;
         } else {
           if (cutoff === null || cutoff >= value) {

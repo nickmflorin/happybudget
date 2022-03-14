@@ -143,14 +143,6 @@ export const inferModelFromName = <M extends Model.Model>(
   }
 };
 
-export const findChoiceForName = <M extends Model.Choice = Model.Choice>(
-  ms: M[],
-  name: string,
-  options?: Omit<Model.InferModelFromNameParams<M>, "getName">
-): M | null => {
-  return inferModelFromName(ms, name, { caseInsensitive: false, ...options });
-};
-
 /**
  * Safely parses a name into the first and last name, even in the case that
  * there are multiple name parts.
@@ -217,9 +209,6 @@ export const getModel = <M extends Model.Model>(
   }
 };
 
-export const findChoiceForId = (ms: Model.Choice[], id: number): Model.Choice | null =>
-  getModel(ms, id, { warnOnMissing: true });
-
 export const getModels = <M extends Model.Model>(
   ms: M[],
   ids: Model.ModelLookup<M>[],
@@ -229,4 +218,51 @@ export const getModels = <M extends Model.Model>(
     map(ids, (id: Model.ModelLookup<M>) => getModel(ms, id, options)),
     (m: M | null) => !isNil(m)
   ) as M[];
+};
+
+export class Choice<I extends number = number, N extends string = string> implements Model.Choice<I, N> {
+  public readonly id: I;
+  public readonly name: N;
+
+  constructor(id: I, name: N) {
+    this.id = id;
+    this.name = name;
+  }
+}
+
+class ChoicesClass<CH extends Choice<I, N>, I extends number = number, N extends string = string> {
+  public readonly choices: CH[];
+
+  constructor(choices: CH[]) {
+    this.choices = choices;
+  }
+
+  get = (lookup: I | N): CH => {
+    let ch: CH | undefined;
+    if (typeof lookup === "number") {
+      ch = find(this.choices, { id: lookup }) as CH | undefined;
+    } else {
+      ch = find(this.choices, (c: CH) => c.name.toLocaleLowerCase() === lookup.toLowerCase()) as CH | undefined;
+    }
+    if (isNil(ch)) {
+      throw new Error(`Could not find choice for lookup ${lookup}.`);
+    }
+    return ch;
+  };
+
+  infer = (name: string, options?: Omit<Model.InferModelFromNameParams<CH>, "getName">) =>
+    inferModelFromName(this.choices, name, { caseInsensitive: false, ...options });
+}
+
+export const Choices = <CH extends Choice<I, N>, I extends number = number, N extends string = string>(
+  choices: CH[]
+): Model.Choices<CH, I, N> => {
+  const chClass = new ChoicesClass<CH, I, N>(choices);
+
+  const dynamic: Model.DynamicChoices<CH, I, N> = {} as Model.DynamicChoices<CH, I, N>;
+  for (let i = 0; i < choices.length; i++) {
+    dynamic[choices[i].name] = choices[i];
+  }
+
+  return { ...chClass, ...dynamic };
 };

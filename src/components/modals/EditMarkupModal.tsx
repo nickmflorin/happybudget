@@ -61,7 +61,7 @@ const EditMarkupModal = <
         const { rate, children, ...payload } = p;
         let mutated = { ...payload } as Http.MarkupPayload;
         // FLAT Markups do not have any children.
-        if (mutated.unit === budgeting.models.MarkupUnitModels.PERCENT.id) {
+        if (mutated.unit === budgeting.models.MarkupUnits.Percent.id) {
           /* The children should not be an empty list as the Form should have
 						 already validated that. */
           mutated = { ...mutated, children };

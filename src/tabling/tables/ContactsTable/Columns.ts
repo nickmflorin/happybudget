@@ -98,8 +98,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     defaultHidden: true,
     cellRenderer: { data: "ContactTypeCell" },
     cellEditor: "ContactTypeEditor",
-    processCellFromClipboard: (name: string) =>
-      models.findChoiceForName<Model.ContactType>(contacts.models.ContactTypes, name),
+    processCellFromClipboard: (name: string) => contacts.models.ContactTypes.infer(name),
     width: 100,
     minWidth: 100
   }),

@@ -18,7 +18,7 @@ const ContactTypeEditor = (
   return (
     <ChoiceSelectEditor<Model.ContactType, Tables.ContactRowData, Model.Contact, Tables.ContactTableStore>
       searchIndices={["name"]}
-      models={contacts.models.ContactTypes}
+      models={contacts.models.ContactTypes.choices}
       ref={ref}
       {...props}
     />

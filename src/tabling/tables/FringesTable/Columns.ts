@@ -1,7 +1,7 @@
 import { isNil } from "lodash";
 import { ValueSetterParams } from "@ag-grid-community/core";
 
-import { models, budgeting, tabling } from "lib";
+import { budgeting, tabling } from "lib";
 import { columns } from "../../generic";
 
 type R = Tables.FringeRowData;
@@ -43,8 +43,8 @@ const Columns: Table.Column<R, M>[] = [
     valueSetter: (params: ValueSetterParams) => {
       const row: Table.BodyRow<R> = params.data;
       if (!isNil(row) && tabling.rows.isModelRow(row)) {
-        const unit = row.data.unit === null ? budgeting.models.FringeUnitModels.PERCENT : row.data.unit;
-        return unit.id === budgeting.models.FringeUnitModels.FLAT.id
+        const unit = row.data.unit === null ? budgeting.models.FringeUnits.Percent : row.data.unit;
+        return unit.id === budgeting.models.FringeUnits.Flat.id
           ? tabling.columns.numericValueSetter("rate")(params)
           : tabling.columns.percentageToDecimalValueSetter("rate")(params);
       }
@@ -57,8 +57,8 @@ const Columns: Table.Column<R, M>[] = [
         const row: Table.BodyRow<R> = params.data;
         if (!isNil(row) && tabling.rows.isModelRow(row)) {
           // The default Fringe Unit in the backend is PERCENT.
-          const unit = row.data.unit === null ? budgeting.models.FringeUnitModels.PERCENT : row.data.unit;
-          return unit.id === budgeting.models.FringeUnitModels.FLAT.id
+          const unit = row.data.unit === null ? budgeting.models.FringeUnits.Percent : row.data.unit;
+          return unit.id === budgeting.models.FringeUnits.Flat.id
             ? tabling.columns.currencyValueFormatter(v =>
                 console.error(`Could not parse currency value ${v} for field 'rate'.`)
               )(params)
@@ -87,8 +87,7 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "Unit",
     cellRenderer: { data: "FringeUnitCell" },
     cellEditor: "FringeUnitEditor",
-    processCellFromClipboard: (name: string) =>
-      models.findChoiceForName<Model.FringeUnit>(budgeting.models.FringeUnits, name)
+    processCellFromClipboard: (name: string) => budgeting.models.FringeUnits.infer(name)
   }),
   columns.BodyColumn<R, M>({
     nullValue: null,

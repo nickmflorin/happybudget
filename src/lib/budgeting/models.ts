@@ -1,6 +1,6 @@
 import { isNil } from "lodash";
-
 import { Colors } from "style/constants";
+import * as models from "../models";
 import * as tabling from "../tabling";
 import * as util from "../util";
 
@@ -9,24 +9,20 @@ export enum FringeUnitNames {
   FLAT = "Flat"
 }
 
-export const FringeUnitModels: { [key in "PERCENT" | "FLAT"]: Model.FringeUnit } = {
-  PERCENT: { id: 0, name: FringeUnitNames.PERCENT },
-  FLAT: { id: 1, name: FringeUnitNames.FLAT }
-};
-
-export const FringeUnits = Object.values(FringeUnitModels);
+export const FringeUnits = models.Choices([
+  new models.Choice(0, FringeUnitNames.PERCENT),
+  new models.Choice(1, FringeUnitNames.FLAT)
+]);
 
 export enum MarkupUnitNames {
   PERCENT = "Percent",
   FLAT = "Flat"
 }
 
-export const MarkupUnitModels: { [key: string]: Model.MarkupUnit } = {
-  PERCENT: { id: 0, name: MarkupUnitNames.PERCENT },
-  FLAT: { id: 1, name: MarkupUnitNames.FLAT }
-};
-
-export const MarkupUnits = Object.values(MarkupUnitModels);
+export const MarkupUnits = models.Choices([
+  new models.Choice(0, MarkupUnitNames.PERCENT),
+  new models.Choice(1, MarkupUnitNames.FLAT)
+]);
 
 export const getGroupColorDefinition = <R extends Table.RowData>(
   group: Style.HexColor | Model.Group | Table.GroupRow<R>
