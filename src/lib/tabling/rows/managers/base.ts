@@ -71,6 +71,10 @@ abstract class BodyRowManager<
     };
   }
 
+  throwNotApplicable(): void {
+    throw new FieldNotApplicableForRow();
+  }
+
   createData(...args: ARGS): R {
     return reduce(
       tabling.columns.filterModelColumns(this.columns),

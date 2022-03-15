@@ -4,7 +4,8 @@ import * as budgeting from "../../../budgeting";
 import * as columns from "../../columns";
 import * as ids from "../ids";
 
-import BodyRowManager, { BodyRowManagerConfig, FieldNotApplicableForRow } from "./base";
+import { BodyRowManagerConfig } from "./base";
+import EditableRowManager from "./editable";
 
 type CreateMarkupRowConfig = {
   readonly model: Model.Markup;
@@ -13,7 +14,7 @@ type CreateMarkupRowConfig = {
 class MarkupRowManager<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
-> extends BodyRowManager<Table.MarkupRow<R>, R, M, [Model.Markup]> {
+> extends EditableRowManager<Table.MarkupRow<R>, R, M, [Model.Markup]> {
   constructor(config: Omit<BodyRowManagerConfig<Table.MarkupRow<R>, R, M>, "rowType">) {
     super({ ...config, rowType: "markup" });
   }
@@ -29,7 +30,7 @@ class MarkupRowManager<
     /* We need to indicate that the value is not applicable for the column for
        this GroupRow, otherwise a warning will be issued and the value will be
        set to the column's `nullValue`. */
-    throw new FieldNotApplicableForRow();
+    this.throwNotApplicable();
   }
 
   removeChildren(row: Table.MarkupRow<R>, Ids: SingleOrArray<number>): Table.MarkupRow<R> {

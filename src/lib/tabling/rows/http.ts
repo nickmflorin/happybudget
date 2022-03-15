@@ -29,8 +29,8 @@ export const patchPayload = <
 >(
   change: Table.RowChange<R, RW>,
   cs: Table.ModelColumn<R, M, Table.RawRowValue>[]
-): P | null => {
-  return reduce(
+): P | null =>
+  reduce(
     cs,
     (p: P, col: Table.ModelColumn<R, M, Table.RawRowValue>) => {
       if (columns.isBodyColumn(col)) {
@@ -77,7 +77,6 @@ export const patchPayload = <
     },
     {} as P
   );
-};
 
 export const bulkPatchPayload = <
   R extends Table.RowData,

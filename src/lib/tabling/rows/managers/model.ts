@@ -2,7 +2,8 @@ import { isNil } from "lodash";
 
 import { tabling, util } from "lib";
 
-import BodyRowManager, { BodyRowManagerConfig, FieldNotApplicableForRow } from "./base";
+import { BodyRowManagerConfig } from "./base";
+import EditableRowManager from "./editable";
 
 type GetRowValue<R extends Table.RowData, M extends Model.RowHttpModel, V extends Table.RawRowValue> = (
   m: M,
@@ -27,7 +28,7 @@ class ModelRowManager<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-> extends BodyRowManager<Table.ModelRow<R>, R, M, [M, GetRowValue<R, M, any> | undefined]> {
+> extends EditableRowManager<Table.ModelRow<R>, R, M, [M, GetRowValue<R, M, any> | undefined]> {
   public getRowChildren: ((m: M) => number[]) | undefined;
 
   constructor(config: ModelRowManagerConfig<R, M>) {
@@ -41,7 +42,7 @@ class ModelRowManager<
     // The optional `getRowValue` callback is only used for PDF cases.
   >(col: C, m: M, getRowValue?: GetRowValue<R, M, V>): V | undefined {
     if (col.isApplicableForModel?.(m) === false) {
-      throw new FieldNotApplicableForRow();
+      this.throwNotApplicable();
     }
     if (!isNil(getRowValue) && tabling.columns.isDataColumn<R, M>(col)) {
       return getRowValue(m, col, (colr: Table.DataColumn<R, M>, mr: M) => this.getValueForRow<V, C>(colr as C, mr));

@@ -3,7 +3,7 @@ import { isNil, filter, includes } from "lodash";
 import * as columns from "../../columns";
 import * as ids from "../ids";
 
-import BodyRowManager, { BodyRowManagerConfig, FieldNotApplicableForRow } from "./base";
+import BodyRowManager, { BodyRowManagerConfig } from "./base";
 
 type CreateGroupRowConfig = {
   readonly model: Model.Group;
@@ -28,7 +28,7 @@ class GroupRowManager<
     /* We need to indicate that the value is not applicable for the column for
        this GroupRow, otherwise a warning will be issued and the value will be
        set to the column's `nullValue`. */
-    throw new FieldNotApplicableForRow();
+    this.throwNotApplicable();
   }
 
   removeChildren(row: Table.GroupRow<R>, Ids: SingleOrArray<number>): Table.GroupRow<R> {
