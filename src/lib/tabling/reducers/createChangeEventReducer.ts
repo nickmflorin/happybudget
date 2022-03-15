@@ -111,7 +111,8 @@ const createChangeEventReducer = <
     rowRemoveFromGroup: createRowRemoveFromGroupEventReducer(config),
     rowAddToGroup: rowAddToGroupEventReducer,
     rowInsert: rowInsertEventReducer,
-    rowPositionChanged: rowPositionChangedEventReducer
+    rowPositionChanged: rowPositionChangedEventReducer,
+    groupAdd: (s: any, a: any) => s
   };
 
   return (state: S = config.initialState, e: Table.ChangeEvent<R>): S => {

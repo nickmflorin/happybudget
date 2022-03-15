@@ -361,7 +361,6 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
         message: ctx.errorMessage || "There was an error adding the table rows.",
         dispatchClientErrorToSentry: true
       });
-      notifications.requestError(err as Error);
     } finally {
       config.table.saving(false);
     }
@@ -426,6 +425,30 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
     }
   }
 
+  function* handleGroupAddEvent(e: Table.GroupAddEvent, ctx: CTX): SagaIterator {
+    config.table.saving(true);
+    try {
+      const response: Model.Group = yield api.request(api.createBudgetGroup, ctx, ctx.budgetId, e.payload);
+      yield put(config.actions.handleEvent({ type: "modelsAdded", payload: response }, ctx));
+      e.onSuccess?.(response);
+    } catch (err: unknown) {
+      if (!isNil(e.onError)) {
+        e.onError(err as Error);
+      } else {
+        /* This error may be a form related error that we want to show in the
+           Form, in which case we shouldn't dispatch to Sentry.  However, group
+           creation is currently handled by the Form, in which the onError
+           callback will be included. */
+        config.table.handleRequestError(err as Error, {
+          message: ctx.errorMessage || "There was an error creating the group.",
+          dispatchClientErrorToSentry: true
+        });
+      }
+    } finally {
+      config.table.saving(false);
+    }
+  }
+
   return {
     request,
     handleChangeEvent: tabling.tasks.createChangeEventHandler<R, Tables.AccountTableContext>({
@@ -433,6 +456,7 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
       rowInsert: handleRowInsertEvent,
       rowAddToGroup: handleAddRowToGroupEvent,
       rowAdd: handleRowAddEvent,
+      groupAdd: handleGroupAddEvent,
       rowDelete: handleRowDeleteEvent,
       dataChange: handleDataChangeEvent,
       rowPositionChanged: handleRowPositionChangedEvent

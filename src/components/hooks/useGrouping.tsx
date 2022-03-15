@@ -28,22 +28,17 @@ const useGrouping = <R extends Tables.BudgetRowData, M extends Model.RowHttpMode
       return (
         <CreateGroupModal
           id={props.parentId}
+          table={props.table}
           parentType={props.parentType}
           children={groupAccounts}
           open={true}
-          onSuccess={(group: Model.Group) => {
-            setGroupAccounts(undefined);
-            props.table.dispatchEvent({
-              type: "modelsAdded",
-              payload: group
-            });
-          }}
+          onSuccess={() => setGroupAccounts(undefined)}
           onCancel={() => setGroupAccounts(undefined)}
         />
       );
     }
     return <></>;
-  }, [props.parentId, props.parentType, props.table, groupAccounts, setGroupAccounts]);
+  }, [props.table, props.parentId, props.parentType, props.table, groupAccounts, setGroupAccounts]);
 
   const editGroupModal = useMemo((): JSX.Element => {
     if (!isNil(groupToEdit)) {

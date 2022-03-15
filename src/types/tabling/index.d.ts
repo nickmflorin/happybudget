@@ -774,7 +774,7 @@ declare namespace Table {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type RowDataSelector<R extends RowData> = (state: any) => Partial<R>;
 
-  type Context = Record<string, number | string>;
+  type Context = Record<string, unknown>;
 
   type TaskConfig<
     R extends RowData,

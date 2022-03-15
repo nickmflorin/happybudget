@@ -25,6 +25,7 @@ export type AuthenticatedSubAccountsTableServiceSet<
   B extends Model.Template | Model.Budget
 > = PublicSubAccountsTableServiceSet & {
   readonly create: Http.DetailPostService<C, P>;
+  readonly createGroup: Http.DetailPostService<Model.Group, Http.GroupPayload>;
   readonly bulkDelete: Http.TreeBulkDeleteService<B, M>;
   readonly bulkDeleteMarkups: Http.TreeBulkDeleteService<B, M>;
   readonly bulkUpdate: Http.TreeBulkUpdateService<B, M, C, P>;
@@ -553,6 +554,30 @@ export const createAuthenticatedTableTaskSet = <
     }
   }
 
+  function* handleGroupAddEvent(e: Table.GroupAddEvent, ctx: CTX): SagaIterator {
+    config.table.saving(true);
+    try {
+      const response: Model.Group = yield api.request(config.services.createGroup, ctx, ctx.id, e.payload);
+      yield put(config.actions.handleEvent({ type: "modelsAdded", payload: response }, ctx));
+      e.onSuccess?.(response);
+    } catch (err: unknown) {
+      if (!isNil(e.onError)) {
+        e.onError(err as Error);
+      } else {
+        /* This error may be a form related error that we want to show in the
+           Form, in which case we shouldn't dispatch to Sentry.  However, group
+           creation is currently handled by the Form, in which the onError
+           callback will be included. */
+        config.table.handleRequestError(err as Error, {
+          message: ctx.errorMessage || "There was an error creating the group.",
+          dispatchClientErrorToSentry: true
+        });
+      }
+    } finally {
+      config.table.saving(false);
+    }
+  }
+
   return {
     request,
     handleChangeEvent: tabling.tasks.createChangeEventHandler<R, Tables.SubAccountTableContext>({
@@ -560,6 +585,7 @@ export const createAuthenticatedTableTaskSet = <
       rowInsert: handleRowInsertEvent,
       rowAddToGroup: handleAddRowToGroupEvent,
       rowAdd: handleRowAddEvent,
+      groupAdd: handleGroupAddEvent,
       rowDelete: handleRowDeleteEvent,
       dataChange: handleDataChangeEvent,
       rowPositionChanged: handleRowPositionChangedEvent

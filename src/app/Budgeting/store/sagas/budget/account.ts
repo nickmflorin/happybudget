@@ -61,6 +61,7 @@ export const createTableSaga = (table: Table.TableInstance<Tables.SubAccountRowD
       actions: ActionMap,
       services: {
         create: api.createAccountChild,
+        createGroup: api.createAccountGroup,
         request: api.getAccountChildren,
         requestGroups: api.getAccountGroups,
         requestMarkups: api.getAccountMarkups,

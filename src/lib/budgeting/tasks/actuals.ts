@@ -88,7 +88,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsAuthe
         call(requestActuals, action.context),
         call(requestActualTypes, action.context),
         call(requestActualOwners, action as Redux.TableAction<null, Tables.ActualTableContext>),
-        call(contactsTasks.request, action as Redux.TableAction<null>)
+        call(contactsTasks.request, action as unknown as Redux.TableAction<null>)
       ]);
     } catch (e: unknown) {
       const err = e as Error;

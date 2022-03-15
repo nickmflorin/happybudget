@@ -209,7 +209,11 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       /* It is safe to assume that the ID of the row for which data is being
 				 changed will always be a ModelRowId - but we have to force coerce that
 				 here. */
-      dataChange: handleDataChangeEvent as Redux.TableChangeEventTask<Table.DataChangeEvent<R>, R>
+      dataChange: handleDataChangeEvent as Redux.TableChangeEventTask<
+        Table.DataChangeEvent<R>,
+        R,
+        Tables.FringeTableContext
+      >
     })
   };
 };

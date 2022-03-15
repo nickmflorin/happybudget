@@ -10,13 +10,19 @@ export interface CreateModelModalProps<M extends Model.Model, R = M> extends Mod
   readonly onSuccess: (m: R) => void;
 }
 
+export type CreateModelCallbacks<R> = {
+  readonly onError: (e: Error) => void;
+  readonly onSuccess: (m: R) => void;
+};
+
 interface PrivateCreateModelModalProps<M extends Model.Model, P extends Http.PayloadObj, V = P, R = M>
   extends CreateModelModalProps<M, R> {
   readonly form?: FormInstance<V>;
   readonly title?: string | JSX.Element | ((form: FormInstance<V>) => JSX.Element | string);
   readonly autoFocusField?: number;
   readonly requestOptions?: Omit<Http.RequestOptions, "cancelToken">;
-  readonly create: (payload: P, options: Http.RequestOptions) => Promise<R>;
+  readonly create?: (payload: P, options: Http.RequestOptions) => Promise<R>;
+  readonly createSync?: (payload: P, callbacks: CreateModelCallbacks<R>) => void;
   readonly children: (form: FormInstance<V>) => JSX.Element;
   readonly interceptPayload?: (p: V) => P;
   /* Conditionally handle the request error.  Returns True if it was handled
@@ -31,6 +37,7 @@ const CreateModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = 
   form,
   requestOptions,
   create,
+  createSync,
   onSuccess,
   children,
   interceptPayload,
@@ -50,6 +57,31 @@ const CreateModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = 
     }
   }, [props.title]);
 
+  const _onSuccess = useMemo(
+    () => (response: R) => {
+      if (isMounted.current) {
+        Form.setLoading(false);
+        Form.resetFields();
+      }
+      onSuccess(response);
+    },
+    [isMounted.current, onSuccess]
+  );
+
+  const _onError = useMemo(
+    () => (e: Error) => {
+      if (isMounted.current) {
+        Form.setLoading(false);
+      }
+      if (interceptError?.(Form, e) !== true) {
+        if (isMounted.current) {
+          Form.handleRequestError(e);
+        }
+      }
+    },
+    [isMounted.current, interceptError]
+  );
+
   const onOk = useMemo(
     () => () => {
       Form.validateFields()
@@ -66,24 +98,14 @@ const CreateModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = 
                   : curr,
               payload
             );
-            Form.setLoading(true);
-            create(payload, { ...requestOptions, cancelToken: cancelToken() })
-              .then((response: R) => {
-                if (isMounted.current) {
-                  Form.resetFields();
-                  onSuccess(response);
-                }
-              })
-              .catch((e: Error) => {
-                if (interceptError?.(Form, e) !== true) {
-                  Form.handleRequestError(e);
-                }
-              })
-              .finally(() => {
-                if (isMounted.current) {
-                  Form.setLoading(false);
-                }
-              });
+            if (!isNil(create)) {
+              Form.setLoading(true);
+              create(payload, { ...requestOptions, cancelToken: cancelToken() })
+                .then((response: R) => _onSuccess(response))
+                .catch((e: Error) => _onError(e));
+            } else if (!isNil(createSync)) {
+              createSync(payload, { onError: _onError, onSuccess: _onSuccess });
+            }
           }
         })
         .catch(() => {
