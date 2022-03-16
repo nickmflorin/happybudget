@@ -50,6 +50,7 @@ export const createTableSaga = (table: Table.TableInstance<Tables.SubAccountRowD
       services: {
         create: api.createAccountChild,
         createGroup: api.createAccountGroup,
+        createMarkup: api.createAccountMarkup,
         request: api.getAccountChildren,
         requestGroups: api.getAccountGroups,
         requestMarkups: api.getAccountMarkups,

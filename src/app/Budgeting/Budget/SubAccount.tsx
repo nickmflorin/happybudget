@@ -93,10 +93,6 @@ const SubAccount = ({ setPreviewModalVisible, ...props }: SubAccountProps): JSX.
         onExportPdf={() => setPreviewModalVisible(true)}
         onOpenFringesModal={() => setFringesModalVisible(true)}
         table={table}
-        onParentUpdated={(p: Model.SubAccount) =>
-          dispatch(actions.budget.subAccount.updateInStateAction({ id: p.id, data: p }))
-        }
-        onBudgetUpdated={(b: Model.Budget) => dispatch(actions.budget.updateBudgetInStateAction({ id: b.id, data: b }))}
         onShared={(publicToken: Model.PublicToken) =>
           dispatch(
             actions.budget.updateBudgetInStateAction({ id: props.budgetId, data: { public_token: publicToken } })

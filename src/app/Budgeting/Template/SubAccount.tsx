@@ -86,12 +86,6 @@ const SubAccount = (props: SubAccountProps): JSX.Element => {
         parentType={"subaccount"}
         onOpenFringesModal={() => setFringesModalVisible(true)}
         table={table}
-        onParentUpdated={(p: Model.SubAccount) =>
-          dispatch(actions.template.subAccount.updateInStateAction({ id: p.id, data: p }))
-        }
-        onBudgetUpdated={(b: Model.Template) =>
-          dispatch(actions.template.updateBudgetInStateAction({ id: b.id, data: b }))
-        }
       />
       <FringesModal
         {...props}

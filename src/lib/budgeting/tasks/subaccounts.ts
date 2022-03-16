@@ -22,6 +22,7 @@ export type AuthenticatedSubAccountsTableServiceSet<
 > = PublicSubAccountsTableServiceSet & {
   readonly create: Http.DetailPostService<C, P>;
   readonly createGroup: Http.DetailPostService<Model.Group, Http.GroupPayload>;
+  readonly createMarkup: Http.DetailPostService<Http.AncestryResponse<B, M, Model.Markup>, Http.MarkupPayload>;
   readonly bulkDelete: Http.TreeBulkDeleteService<B, M>;
   readonly bulkDeleteMarkups: Http.TreeBulkDeleteService<B, M>;
   readonly bulkUpdate: Http.TreeBulkUpdateService<B, M, C, P>;
@@ -520,6 +521,19 @@ export const createAuthenticatedTableTaskSet = <
     e.onSuccess?.(response);
   }
 
+  function* handleMarkupAddEvent(e: Table.MarkupAddEvent, ctx: CTX): SagaIterator {
+    const response: Http.AncestryResponse<B, M, Model.Markup> = yield api.request(
+      config.services.createMarkup,
+      ctx,
+      ctx.budgetId,
+      e.payload
+    );
+    yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
+    yield put(config.actions.updateParentInState({ id: response.parent.id, data: response.parent }));
+    yield put(config.actions.handleEvent({ type: "modelsAdded", payload: response.data }, ctx));
+    e.onSuccess?.(response);
+  }
+
   return {
     request,
     handleChangeEvent: tabling.tasks.createChangeEventHandler<R, Tables.SubAccountTableContext>({
@@ -530,6 +544,7 @@ export const createAuthenticatedTableTaskSet = <
       rowAdd: handleRowAddEvent,
       rowInsert: tabling.tasks.task(handleRowInsertEvent, config.table, "There was an error adding the table rows."),
       groupAdd: tabling.tasks.task(handleGroupAddEvent, config.table, "There was an error creating the group."),
+      markupAdd: tabling.tasks.task(handleMarkupAddEvent, config.table, "There was an error creating the markup."),
       rowPositionChanged: tabling.tasks.task(
         handleRowPositionChangedEvent,
         config.table,

@@ -389,6 +389,18 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
     e.onSuccess?.(response);
   }
 
+  function* handleMarkupAddEvent(e: Table.MarkupAddEvent, ctx: CTX): SagaIterator {
+    const response: Http.ParentChildResponse<B, Model.Markup> = yield api.request(
+      api.createBudgetMarkup,
+      ctx,
+      ctx.budgetId,
+      e.payload
+    );
+    yield put(config.actions.updateBudgetInState({ id: response.parent.id, data: response.parent }));
+    yield put(config.actions.handleEvent({ type: "modelsAdded", payload: response.data }, ctx));
+    e.onSuccess?.(response);
+  }
+
   return {
     request,
     handleChangeEvent: tabling.tasks.createChangeEventHandler<R, Tables.AccountTableContext>({
@@ -399,6 +411,7 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
       rowAdd: handleRowAddEvent,
       rowInsert: tabling.tasks.task(handleRowInsertEvent, config.table, "There was an error adding the table rows."),
       groupAdd: tabling.tasks.task(handleGroupAddEvent, config.table, "There was an error creating the group."),
+      markupAdd: tabling.tasks.task(handleMarkupAddEvent, config.table, "There was an error creating the markup."),
       rowPositionChanged: tabling.tasks.task(
         handleRowPositionChangedEvent,
         config.table,

@@ -40,8 +40,12 @@ export const createChangeEventHandler = <R extends Table.RowData, C extends Tabl
   handlers: Partial<Redux.TableChangeEventTaskMapObject<R, C>>
 ): Redux.TableChangeEventTask<Table.ChangeEvent<R>, R, C> => {
   function* handleChangeEvent<E extends Table.ChangeEvent<R>>(e: E, context: Redux.WithActionContext<C>): SagaIterator {
-    const handler = handlers[e.type] as Redux.TableChangeEventTask<E, R, C>;
-    yield call(handler, e, context);
+    const handler = handlers[e.type] as Redux.TableChangeEventTask<E, R, C> | undefined;
+    if (!isNil(handler)) {
+      yield call(handler, e, context);
+    } else {
+      console.error(`Detected event type ${e.type} for which a task is not registered!`);
+    }
   }
   return handleChangeEvent;
 };

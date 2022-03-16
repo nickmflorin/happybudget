@@ -69,7 +69,6 @@ const Accounts = ({ setPreviewModalVisible, ...props }: AccountsProps): JSX.Elem
         actionContext={{ budgetId: props.budgetId }}
         table={table}
         onExportPdf={() => setPreviewModalVisible(true)}
-        onParentUpdated={(p: Model.Budget) => dispatch(actions.budget.updateBudgetInStateAction({ id: p.id, data: p }))}
         onShared={(publicToken: Model.PublicToken) =>
           dispatch(
             actions.budget.updateBudgetInStateAction({ id: props.budgetId, data: { public_token: publicToken } })

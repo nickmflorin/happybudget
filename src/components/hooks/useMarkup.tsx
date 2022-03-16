@@ -13,7 +13,7 @@ interface UseMarkupProps<
   readonly parentId: PARENT["id"];
   readonly parentType: PARENT["type"] | "budget";
   readonly table: Table.TableInstance<R, M>;
-  readonly onResponse: (response: RSP) => void;
+  readonly onResponse?: (response: RSP) => void;
 }
 
 type UseMarkupReturnType = [JSX.Element, (m: number) => void, (ms?: number[]) => void];
@@ -34,18 +34,17 @@ const useMarkup = <
   const createMarkupModal = useMemo((): JSX.Element => {
     if (markupAccounts !== null) {
       return (
-        <CreateMarkupModal<MM, B, PARENT, RSP>
+        <CreateMarkupModal<MM, B, PARENT, R, M, RSP>
           id={props.parentId}
           parentType={props.parentType}
+          table={props.table}
           children={markupAccounts}
           open={true}
           onSuccess={(response: RSP) => {
+            /* Note: The table saga handles the dispatching of the event to add
+               the model to state. */
             setMarkupAccounts(null);
-            props.onResponse(response);
-            props.table.dispatchEvent({
-              type: "modelsAdded",
-              payload: response.data
-            });
+            props.onResponse?.(response);
           }}
           onCancel={() => setMarkupAccounts(null)}
         />
@@ -65,7 +64,7 @@ const useMarkup = <
           onCancel={() => setMarkupToEdit(null)}
           onSuccess={(response: RSP) => {
             setMarkupToEdit(null);
-            props.onResponse(response);
+            props.onResponse?.(response);
             props.table.dispatchEvent({
               type: "modelsUpdated",
               payload: response.data

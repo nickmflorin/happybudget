@@ -86,12 +86,6 @@ const Account = (props: AccountProps): JSX.Element => {
         parentType={"account"}
         onOpenFringesModal={() => setFringesModalVisible(true)}
         table={table}
-        onParentUpdated={(p: Model.Account) =>
-          dispatch(actions.template.account.updateInStateAction({ id: p.id, data: p }))
-        }
-        onBudgetUpdated={(b: Model.Template) =>
-          dispatch(actions.template.updateBudgetInStateAction({ id: b.id, data: b }))
-        }
       />
       <FringesModal
         {...props}

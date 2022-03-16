@@ -43,8 +43,6 @@ export type AuthenticatedTableProps<B extends Model.BaseBudget, P extends Model.
   readonly parentType: P["type"];
   readonly actionContext: Tables.SubAccountTableContext;
   readonly onOpenFringesModal: () => void;
-  readonly onParentUpdated: (m: P) => void;
-  readonly onBudgetUpdated: (m: B) => void;
 };
 
 const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount>(
@@ -104,11 +102,7 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
   >({
     parentId: props.id,
     parentType: props.parentType,
-    table: props.table.current,
-    onResponse: (response: Http.AncestryResponse<B, P, Model.Markup>) => {
-      props.onParentUpdated(response.parent);
-      props.onBudgetUpdated(response.budget);
-    }
+    table: props.table.current
   });
 
   const columns = useMemo(

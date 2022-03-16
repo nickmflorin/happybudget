@@ -18,6 +18,7 @@ declare namespace Table {
     readonly DATA_CHANGE: "dataChange";
     readonly ROW_ADD: "rowAdd";
     readonly GROUP_ADD: "groupAdd";
+    readonly MARKUP_ADD: "markupAdd";
     readonly ROW_INSERT: "rowInsert";
     readonly ROW_POSITION_CHANGED: "rowPositionChanged";
     readonly ROW_DELETE: "rowDelete";
@@ -136,6 +137,7 @@ declare namespace Table {
   type RowAddDataEvent<R extends RowData> = RowAddEvent<R, RowAddDataPayload<R>>;
 
   type GroupAddEvent = BaseChangeEvent<"groupAdd", Http.GroupPayload>;
+  type MarkupAddEvent = BaseChangeEvent<"markupAdd", Http.MarkupPayload>;
 
   type RowPositionChangedPayload = {
     readonly previous: number | null;
@@ -219,6 +221,7 @@ declare namespace Table {
     readonly rowRemoveFromGroup: RowRemoveFromGroupEvent;
     readonly rowAddToGroup: RowAddToGroupEvent;
     readonly groupAdd: GroupAddEvent;
+    readonly markupAdd: MarkupAddEvent;
   };
 
   // Events for which undo/redo is supported.  The events must be ChangeEvents.

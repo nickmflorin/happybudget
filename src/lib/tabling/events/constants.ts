@@ -2,6 +2,7 @@ export const CHANGE_EVENT_IDS: Table.ChangeEventId[] = [
   "dataChange",
   "rowAdd",
   "groupAdd",
+  "markupAdd",
   "rowInsert",
   "rowPositionChanged",
   "rowDelete",

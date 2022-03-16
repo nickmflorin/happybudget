@@ -5,42 +5,48 @@ import * as api from "api";
 import { ui, budgeting } from "lib";
 import { MarkupForm } from "components/forms";
 
-import { CreateModelModal, CreateModelModalProps } from "./generic";
+import { CreateModelModal, CreateModelModalProps, CreateModelCallbacks } from "./generic";
 
 interface CreateMarkupModalProps<
   B extends Model.Budget | Model.Template,
   PARENT extends Model.Account | Model.SubAccount,
-  R extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>
-> extends Omit<CreateModelModalProps<Model.Markup, R>, "children"> {
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+  RSP extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>
+> extends Omit<CreateModelModalProps<Model.Markup, RSP>, "children"> {
   readonly id: PARENT["id"];
   readonly children?: number[];
+  readonly table: Table.TableInstance<R, M>;
   readonly parentType: PARENT["type"] | "budget";
 }
 
 type MarkupFormValues = Omit<Http.MarkupPayload, "rate"> & { readonly rate: string };
 
 const CreateMarkupModal = <
-  M extends Model.SimpleAccount | Model.SimpleSubAccount,
+  MM extends Model.SimpleAccount | Model.SimpleSubAccount,
   B extends Model.Budget | Model.Template,
   PARENT extends Model.Account | Model.SubAccount,
-  R extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+  RSP extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>
 >({
   id,
   parentType,
   children,
+  table,
   ...props
-}: CreateMarkupModalProps<B, PARENT, R>): JSX.Element => {
+}: CreateMarkupModalProps<B, PARENT, R, M, RSP>): JSX.Element => {
   const form = ui.hooks.useForm<MarkupFormValues>();
   const [cancelToken] = api.useCancelToken();
 
-  const [availableChildren, setAvailableChildren] = useState<M[]>([]);
+  const [availableChildren, setAvailableChildren] = useState<MM[]>([]);
   const [availableChildrenLoading, setAvailableChildrenLoading] = useState(false);
 
   useEffect(() => {
     setAvailableChildrenLoading(true);
     api
-      .getTableChildren<M>(id, parentType, { simple: true }, { cancelToken: cancelToken() })
-      .then((response: Http.ListResponse<M>) => {
+      .getTableChildren<MM>(id, parentType, { simple: true }, { cancelToken: cancelToken() })
+      .then((response: Http.ListResponse<MM>) => {
         setAvailableChildren(response.data);
         /* Wait until the available children are set in the Form so the select
 					 doesn't render selected children with missing labels. */
@@ -55,13 +61,13 @@ const CreateMarkupModal = <
   }, [id, children]);
 
   return (
-    <CreateModelModal<Model.Markup, Http.MarkupPayload, MarkupFormValues, R>
+    <CreateModelModal<Model.Markup, Http.MarkupPayload, MarkupFormValues, RSP>
       {...props}
       title={"Markup"}
       titleIcon={"badge-percent"}
       form={form}
-      create={(payload: Http.MarkupPayload, options?: Http.RequestOptions) =>
-        api.createTableMarkup(id, parentType, payload, options)
+      createSync={(payload: Http.MarkupPayload, callbacks: CreateModelCallbacks<RSP>) =>
+        table.dispatchEvent({ type: "markupAdd", payload, ...callbacks })
       }
       interceptPayload={(p: MarkupFormValues) => {
         const { rate, children: markupChildren, ...payload } = p;
