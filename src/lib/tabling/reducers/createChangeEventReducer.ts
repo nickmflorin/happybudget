@@ -111,7 +111,8 @@ const createChangeEventReducer = <
     rowPositionChanged: rowPositionChangedEventReducer,
     // These events are specific only to the sagas, so we just use the identity.
     groupAdd: redux.reducers.identityReducerWithDefinedState,
-    markupAdd: redux.reducers.identityReducerWithDefinedState
+    markupAdd: redux.reducers.identityReducerWithDefinedState,
+    markupUpdate: redux.reducers.identityReducerWithDefinedState
   };
 
   return (state: S = config.initialState, e: Table.ChangeEvent<R>): S => {

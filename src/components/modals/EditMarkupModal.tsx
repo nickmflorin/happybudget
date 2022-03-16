@@ -7,41 +7,47 @@ import { ui, budgeting } from "lib";
 import { MarkupForm } from "components/forms";
 import { IMarkupForm } from "components/forms/MarkupForm";
 
-import { EditModelModal, EditModelModalProps } from "./generic";
+import { EditModelModal, EditModelModalProps, UpdateModelCallbacks } from "./generic";
 
 type MarkupFormValues = Omit<Http.MarkupPayload, "rate"> & { readonly rate: string };
 
 interface EditMarkupModalProps<
   B extends Model.Budget | Model.Template,
   PARENT extends Model.Account | Model.SubAccount,
-  R extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>
-> extends EditModelModalProps<Model.Markup, R> {
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+  RSP extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>
+> extends EditModelModalProps<Model.Markup, RSP> {
   readonly parentId: PARENT["id"];
   readonly parentType: PARENT["type"] | "budget";
+  readonly table: Table.TableInstance<R, M>;
 }
 
 const EditMarkupModal = <
-  M extends Model.SimpleAccount | Model.SimpleSubAccount,
+  MM extends Model.SimpleAccount | Model.SimpleSubAccount,
   B extends Model.Budget | Model.Template,
   PARENT extends Model.Account | Model.SubAccount,
-  R extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+  RSP extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>
 >({
   parentId,
   parentType,
+  table,
   ...props
-}: EditMarkupModalProps<B, PARENT, R>): JSX.Element => {
+}: EditMarkupModalProps<B, PARENT, R, M, RSP>): JSX.Element => {
   const form = ui.hooks.useFormIfNotDefined<MarkupFormValues>({ isInModal: true });
   const [cancelToken] = api.useCancelToken();
   const markupRef = useRef<IMarkupForm>(null);
 
-  const [availableChildren, setAvailableChildren] = useState<M[]>([]);
+  const [availableChildren, setAvailableChildren] = useState<MM[]>([]);
   const [availableChildrenLoading, setAvailableChildrenLoading] = useState(false);
 
   useEffect(() => {
     setAvailableChildrenLoading(true);
     api
-      .getTableChildren<M>(parentId, parentType, { simple: true }, { cancelToken: cancelToken() })
-      .then((response: Http.ListResponse<M>) => {
+      .getTableChildren<MM>(parentId, parentType, { simple: true }, { cancelToken: cancelToken() })
+      .then((response: Http.ListResponse<MM>) => {
         setAvailableChildren(response.data);
       })
       .catch((e: Error) => {
@@ -51,12 +57,14 @@ const EditMarkupModal = <
   }, [parentId]);
 
   return (
-    <EditModelModal<Model.Markup, Http.MarkupPayload, MarkupFormValues, R>
+    <EditModelModal<Model.Markup, Http.MarkupPayload, MarkupFormValues, RSP>
       {...props}
       title={"Markup"}
       form={form}
       request={api.getMarkup}
-      update={api.updateMarkup}
+      updateSync={(payload: Partial<Http.MarkupPayload>, callbacks: UpdateModelCallbacks<RSP>) =>
+        table.dispatchEvent({ type: "markupUpdate", payload: { id: props.id, data: payload }, ...callbacks })
+      }
       interceptPayload={(p: MarkupFormValues) => {
         const { rate, children, ...payload } = p;
         let mutated = { ...payload } as Http.MarkupPayload;

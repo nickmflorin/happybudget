@@ -19,6 +19,7 @@ declare namespace Table {
     readonly ROW_ADD: "rowAdd";
     readonly GROUP_ADD: "groupAdd";
     readonly MARKUP_ADD: "markupAdd";
+    readonly MARKUP_UPDATE: "markupUpdate";
     readonly ROW_INSERT: "rowInsert";
     readonly ROW_POSITION_CHANGED: "rowPositionChanged";
     readonly ROW_DELETE: "rowDelete";
@@ -138,6 +139,10 @@ declare namespace Table {
 
   type GroupAddEvent = BaseChangeEvent<"groupAdd", Http.GroupPayload>;
   type MarkupAddEvent = BaseChangeEvent<"markupAdd", Http.MarkupPayload>;
+  type MarkupUpdateEvent = BaseChangeEvent<
+    "markupUpdate",
+    Redux.HttpUpdateModelPayload<Model.Markup, Http.MarkupPayload>
+  >;
 
   type RowPositionChangedPayload = {
     readonly previous: number | null;
@@ -222,6 +227,7 @@ declare namespace Table {
     readonly rowAddToGroup: RowAddToGroupEvent;
     readonly groupAdd: GroupAddEvent;
     readonly markupAdd: MarkupAddEvent;
+    readonly markupUpdate: MarkupUpdateEvent;
   };
 
   // Events for which undo/redo is supported.  The events must be ChangeEvents.

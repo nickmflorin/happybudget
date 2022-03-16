@@ -3,7 +3,7 @@ import { budgeting, tabling } from "lib";
 import { accounts as actions, updateBudgetInStateAction } from "../../actions/budget";
 
 const ActionMap: Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account, Tables.AccountTableContext> & {
-  readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateActionPayload<Model.Budget>>;
+  readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateModelPayload<Model.Budget>>;
 } = {
   request: actions.requestAction,
   handleEvent: actions.handleTableEventAction,

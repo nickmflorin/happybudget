@@ -18,7 +18,7 @@ export type FringesTableActionMap<B extends Model.Template | Model.Budget> = Red
 > & {
   readonly requestParent: Redux.ActionCreator<number>;
   readonly requestParentTableData: Redux.TableActionCreator<Redux.TableRequestPayload, Tables.SubAccountTableContext>;
-  readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateActionPayload<B>>;
+  readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateModelPayload<B>>;
 };
 
 export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Omit<

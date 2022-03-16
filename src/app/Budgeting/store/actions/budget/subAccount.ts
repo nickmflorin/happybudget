@@ -1,6 +1,6 @@
 import { redux } from "lib";
 
-export const updateInStateAction = redux.actions.createAction<Redux.UpdateActionPayload<Model.SubAccount>>(
+export const updateInStateAction = redux.actions.createAction<Redux.UpdateModelPayload<Model.SubAccount>>(
   "budget.subaccount.UpdateInState"
 );
 export const requestSubAccountAction = redux.actions.createAction<number>("budget.subaccount.Request");

@@ -5,7 +5,7 @@ import { redux } from "lib";
 type M = Model.Account;
 
 export type AccountDetailActionMap = Omit<Redux.ModelDetailResponseActionMap<M>, "updateInState"> & {
-  readonly updateInState?: Redux.ActionCreator<Redux.UpdateActionPayload<Model.Account>>;
+  readonly updateInState?: Redux.ActionCreator<Redux.UpdateModelPayload<Model.Account>>;
 };
 
 type MinimalAccountStore = {

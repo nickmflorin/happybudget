@@ -39,8 +39,8 @@ export type AuthenticatedSubAccountsTableActionMap<
   M extends Model.Account | Model.SubAccount,
   B extends Model.Template | Model.Budget
 > = Redux.AuthenticatedTableActionMap<R, C, Tables.SubAccountTableContext> & {
-  readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateActionPayload<B>>;
-  readonly updateParentInState: Redux.ActionCreator<Redux.UpdateActionPayload<M>>;
+  readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateModelPayload<B>>;
+  readonly updateParentInState: Redux.ActionCreator<Redux.UpdateModelPayload<M>>;
   readonly responseSubAccountUnits: Redux.ActionCreator<Http.ListResponse<Model.Tag>>;
   readonly responseFringes: Redux.ActionCreator<Http.TableResponse<Model.Fringe>>;
   readonly responseFringeColors: Redux.ActionCreator<Http.ListResponse<string>>;
@@ -534,6 +534,19 @@ export const createAuthenticatedTableTaskSet = <
     e.onSuccess?.(response);
   }
 
+  function* handleMarkupUpdateEvent(e: Table.MarkupUpdateEvent, ctx: CTX): SagaIterator {
+    const response: Http.AncestryResponse<B, M, Model.Markup> = yield api.request(
+      api.updateMarkup,
+      ctx,
+      e.payload.id,
+      e.payload.data
+    );
+    yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
+    yield put(config.actions.updateParentInState({ id: response.parent.id, data: response.parent }));
+    yield put(config.actions.handleEvent({ type: "modelsUpdated", payload: response.data }, ctx));
+    e.onSuccess?.(response);
+  }
+
   return {
     request,
     handleChangeEvent: tabling.tasks.createChangeEventHandler<R, Tables.SubAccountTableContext>({
@@ -545,6 +558,11 @@ export const createAuthenticatedTableTaskSet = <
       rowInsert: tabling.tasks.task(handleRowInsertEvent, config.table, "There was an error adding the table rows."),
       groupAdd: tabling.tasks.task(handleGroupAddEvent, config.table, "There was an error creating the group."),
       markupAdd: tabling.tasks.task(handleMarkupAddEvent, config.table, "There was an error creating the markup."),
+      markupUpdate: tabling.tasks.task(
+        handleMarkupUpdateEvent,
+        config.table,
+        "There was an error updating the markup."
+      ),
       rowPositionChanged: tabling.tasks.task(
         handleRowPositionChangedEvent,
         config.table,

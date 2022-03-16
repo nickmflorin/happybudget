@@ -5,7 +5,7 @@ export const loadingContactsAction = redux.actions.createAction<boolean>("contac
 export const responseContactsAction = redux.actions.createAction<Http.ListResponse<Model.Contact>>("contacts.Response");
 export const removeContactFromStateAction = redux.actions.createAction<number>("user.contacts.RemoveFromState");
 export const updateContactInStateAction =
-  redux.actions.createAction<Redux.UpdateActionPayload<Model.Contact>>("user.contacts.UpdateInState");
+  redux.actions.createAction<Redux.UpdateModelPayload<Model.Contact>>("user.contacts.UpdateInState");
 export const addContactToStateAction = redux.actions.createAction<Model.Contact>("user.contacts.AddToState");
 export const setContactsSearchAction = redux.actions.createTableAction<string, Tables.ContactTableContext>(
   "user.contacts.SetSearch"

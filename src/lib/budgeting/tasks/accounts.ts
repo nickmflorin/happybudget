@@ -14,7 +14,7 @@ type CTX = Redux.WithActionContext<Tables.AccountTableContext>;
 export type AuthenticatedAccountsTableActionMap<B extends Model.Template | Model.Budget> =
   Redux.AuthenticatedTableActionMap<R, C, Tables.AccountTableContext> & {
     readonly handleEvent: Redux.TableActionCreator<Table.Event<R, C>, Tables.AccountTableContext>;
-    readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateActionPayload<B>>;
+    readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateModelPayload<B>>;
   };
 
 export type PublicAccountsTableTaskConfig = Table.TaskConfig<
@@ -401,6 +401,18 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
     e.onSuccess?.(response);
   }
 
+  function* handleMarkupUpdateEvent(e: Table.MarkupUpdateEvent, ctx: CTX): SagaIterator {
+    const response: Http.ParentChildResponse<B, Model.Markup> = yield api.request(
+      api.updateMarkup,
+      ctx,
+      e.payload.id,
+      e.payload.data
+    );
+    yield put(config.actions.updateBudgetInState({ id: response.parent.id, data: response.parent }));
+    yield put(config.actions.handleEvent({ type: "modelsUpdated", payload: response.data }, ctx));
+    e.onSuccess?.(response);
+  }
+
   return {
     request,
     handleChangeEvent: tabling.tasks.createChangeEventHandler<R, Tables.AccountTableContext>({
@@ -412,6 +424,11 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
       rowInsert: tabling.tasks.task(handleRowInsertEvent, config.table, "There was an error adding the table rows."),
       groupAdd: tabling.tasks.task(handleGroupAddEvent, config.table, "There was an error creating the group."),
       markupAdd: tabling.tasks.task(handleMarkupAddEvent, config.table, "There was an error creating the markup."),
+      markupUpdate: tabling.tasks.task(
+        handleMarkupUpdateEvent,
+        config.table,
+        "There was an error updating the markup."
+      ),
       rowPositionChanged: tabling.tasks.task(
         handleRowPositionChangedEvent,
         config.table,

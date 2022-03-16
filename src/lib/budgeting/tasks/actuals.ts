@@ -14,7 +14,7 @@ export type ActualsTableActionMap = Redux.AuthenticatedTableActionMap<R, M, Tabl
   readonly loadingActualOwners: Redux.ActionCreator<boolean>;
   readonly responseActualOwners: Redux.ActionCreator<Http.ListResponse<Model.ActualOwner>>;
   readonly responseActualTypes: Redux.ActionCreator<Http.ListResponse<Model.Tag>>;
-  readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateActionPayload<Model.Budget>>;
+  readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateModelPayload<Model.Budget>>;
 };
 
 export type ActualsTableTaskConfig = Table.TaskConfig<

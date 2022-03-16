@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { isNil, includes, reduce } from "lodash";
 
 import * as api from "api";
-import { ui } from "lib";
+import { ui, hooks } from "lib";
 
 import Modal from "./Modal";
 
@@ -53,6 +53,12 @@ const CreateModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = 
   const [cancelToken] = api.useCancelToken();
   const isMounted = ui.hooks.useIsMounted();
 
+  const onLoading = hooks.useDynamicCallback((v: boolean) => {
+    if (isMounted.current) {
+      Form.setLoading(v);
+    }
+  });
+
   const title = useMemo(() => {
     if (typeof props.title === "function") {
       return props.title(Form);
@@ -63,8 +69,8 @@ const CreateModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = 
 
   const _onSuccess = useMemo(
     () => (response: R) => {
+      onLoading(false);
       if (isMounted.current) {
-        Form.setLoading(false);
         Form.resetFields();
       }
       onSuccess(response);
@@ -74,9 +80,7 @@ const CreateModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = 
 
   const _onError = useMemo(
     () => (e: Error) => {
-      if (isMounted.current) {
-        Form.setLoading(false);
-      }
+      onLoading(false);
       if (interceptError?.(Form, e) !== true) {
         if (isMounted.current) {
           Form.handleRequestError(e);
@@ -103,11 +107,12 @@ const CreateModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = 
               payload
             );
             if (!isNil(create)) {
-              Form.setLoading(true);
+              onLoading(true);
               create(payload, { ...requestOptions, cancelToken: cancelToken() })
                 .then((response: R) => _onSuccess(response))
                 .catch((e: Error) => _onError(e));
             } else if (!isNil(createSync)) {
+              onLoading(true);
               createSync(payload, { onError: _onError, onSuccess: _onSuccess });
             }
           }

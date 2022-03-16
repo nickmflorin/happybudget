@@ -40,6 +40,7 @@ declare namespace Redux {
     readonly rowAdd: TableChangeEventTask<Table.RowAddEvent<R>, R, C>;
     readonly groupAdd: TableChangeEventTask<Table.GroupAddEvent, R, C>;
     readonly markupAdd: TableChangeEventTask<Table.MarkupAddEvent, R, C>;
+    readonly markupUpdate: TableChangeEventTask<Table.MarkupUpdateEvent, R, C>;
     readonly rowInsert: TableChangeEventTask<Table.RowInsertEvent<R>, R, C>;
     readonly rowPositionChanged: TableChangeEventTask<Table.RowPositionChangedEvent, R, C>;
     readonly rowDelete: TableChangeEventTask<Table.RowDeleteEvent, R, C>;
@@ -120,9 +121,14 @@ declare namespace Redux {
 
   type ModelListActionStore = ModelListActionInstance[];
 
-  type UpdateActionPayload<T extends Record<string, unknown>, Id extends ID = number> = {
-    id: Id;
+  type UpdateModelPayload<T extends Model.Model> = {
+    id: T["id"];
     data: Partial<T>;
+  };
+
+  type HttpUpdateModelPayload<T extends Model.Model, P> = {
+    id: T["id"];
+    data: Partial<P>;
   };
 
   type TableRequestPayload = { ids: number[] } | null;
@@ -147,7 +153,7 @@ declare namespace Redux {
   type ModelDetailResponseActionMap<M extends Model.HttpModel> = {
     readonly loading: ActionCreator<boolean>;
     readonly response: ActionCreator<M | null>;
-    readonly updateInState: ActionCreator<UpdateActionPayload<M>>;
+    readonly updateInState: ActionCreator<UpdateModelPayload<M>>;
   };
 
   type ListResponseStore<T> = {
@@ -194,7 +200,7 @@ declare namespace Redux {
     readonly removeFromState: ActionCreator<number>;
     readonly deleting?: ActionCreator<ModelListActionPayload>;
     readonly addToState: ActionCreator<M>;
-    readonly updateInState: ActionCreator<UpdateActionPayload<M>>;
+    readonly updateInState: ActionCreator<UpdateModelPayload<M>>;
     readonly setSearch?: TableActionCreator<string, C>;
     readonly setPagination: ActionCreator<Pagination>;
     readonly updateOrdering?: ActionCreator<UpdateOrderingPayload<string>>;

@@ -56,19 +56,18 @@ const useMarkup = <
   const editMarkupModal = useMemo((): JSX.Element => {
     if (!isNil(markupToEdit)) {
       return (
-        <EditMarkupModal<MM, B, PARENT, RSP>
+        <EditMarkupModal<MM, B, PARENT, R, M, RSP>
           id={markupToEdit}
           parentId={props.parentId}
           parentType={props.parentType}
+          table={props.table}
           open={true}
           onCancel={() => setMarkupToEdit(null)}
           onSuccess={(response: RSP) => {
+            /* Note: The table saga handles the dispatching of the event to
+						   update the model to state. */
             setMarkupToEdit(null);
             props.onResponse?.(response);
-            props.table.dispatchEvent({
-              type: "modelsUpdated",
-              payload: response.data
-            });
           }}
         />
       );
