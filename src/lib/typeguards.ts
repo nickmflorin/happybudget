@@ -1,16 +1,16 @@
-export const isModelWithColor = <M extends Model.HttpModel>(
+export const isModelWithColor = <M extends Model.Model>(
   model: M | Model.ModelWithColor<M>
 ): model is Model.ModelWithColor<M> => (model as Model.ModelWithColor<M>).color !== undefined;
 
-export const isModelWithName = <M extends Model.HttpModel>(
+export const isModelWithName = <M extends Model.Model>(
   model: M | Model.ModelWithName<M>
 ): model is Model.ModelWithName<M> => (model as Model.ModelWithName<M>).name !== undefined;
 
-export const isModelWithDescription = <M extends Model.HttpModel>(
+export const isModelWithDescription = <M extends Model.Model>(
   model: M | Model.ModelWithDescription<M>
 ): model is Model.ModelWithDescription<M> => (model as Model.ModelWithDescription<M>).description !== undefined;
 
-export const isModelWithIdentifier = <M extends Model.HttpModel>(
+export const isModelWithIdentifier = <M extends Model.Model>(
   model: M | Model.ModelWithIdentifier<M>
 ): model is Model.ModelWithIdentifier<M> => (model as Model.ModelWithIdentifier<M>).identifier !== undefined;
 

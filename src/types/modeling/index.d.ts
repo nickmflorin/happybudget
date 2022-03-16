@@ -82,13 +82,13 @@ declare namespace Model {
 
   type Entity = Account | SubAccount | Budget | Template | Markup;
 
-  type ModelWithColor<M extends HttpModel> = M & { color: Style.HexColor | null };
+  type ModelWithColor<M extends Model> = M & { color: Style.HexColor | null };
 
-  type ModelWithName<M extends HttpModel> = M & { name: string | null };
+  type ModelWithName<M extends Model> = M & { name: string | null };
 
-  type ModelWithDescription<M extends HttpModel> = M & { description: string | null };
+  type ModelWithDescription<M extends Model> = M & { description: string | null };
 
-  type ModelWithIdentifier<M extends HttpModel> = M & { identifier: string | null };
+  type ModelWithIdentifier<M extends Model> = M & { identifier: string | null };
 
   type Tag = HttpModel & {
     readonly title: string;
