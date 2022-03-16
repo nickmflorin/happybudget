@@ -170,25 +170,6 @@
   }
 }
 
-.color-select {
-  display: flex;
-  flex-wrap: wrap;
-  flex-grow: 100;
-  padding-top: 6px;
-  padding-bottom: 6px;
-  margin-bottom: -12px !important;
-
-  .color-select-color {
-    flex: 1 1 24px;
-    margin-bottom: 12px;
-    max-width: 24px;
-
-    &:not(:last-child) {
-      margin-right: 12px;
-    }
-  }
-}
-
 .header-template-select {
   &.select {
     width: 200px;

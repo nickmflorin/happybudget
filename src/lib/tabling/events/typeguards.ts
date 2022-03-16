@@ -123,9 +123,3 @@ export const isRowRemoveFromGroupEvent = <R extends Table.RowData>(
 
 export const isRowAddToGroupEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.RowAddToGroupEvent =>
   (e as Table.RowAddToGroupEvent).type === "rowAddToGroup";
-
-export const isFullRowEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.FullRowEvent =>
-  (e as Table.FullRowEvent).payload.rows !== undefined;
-
-export const isGroupChangeEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.GroupChangeEvent =>
-  isRowAddToGroupEvent(e) || isRowRemoveFromGroupEvent(e);

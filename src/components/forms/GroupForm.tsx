@@ -36,7 +36,7 @@ const GroupForm = <M extends Model.SimpleAccount | Model.SimpleSubAccount>({
         <Input placeholder={"Name"} />
       </Form.Item>
       <Form.Item name={"color"} label={"Color"}>
-        <ColorSelect colors={colors} />
+        <ColorSelect colors={colors} useDefault={true} colorSize={20} selectable={true} treatDefaultAsNull={true} />
       </Form.Item>
       <Form.Item
         name={"children"}

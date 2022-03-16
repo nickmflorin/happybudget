@@ -2,7 +2,7 @@
   height: 20px;
   text-align: center;
   line-height: 20.5px;
-  font-size: $medium-text-size;;
+  font-size: $medium-text-size;
   padding-top: 0px !important;
   padding-bottom: 0px !important;
   padding-left: 8px;
@@ -17,7 +17,7 @@
 
   &.uppercase {
     text-transform: uppercase;
-    font-size: $small-text-size;;
+    font-size: $small-text-size;
   }
 
   &.fill-width {
@@ -51,7 +51,7 @@
     display: block;
     font-family: $avenir;
     line-height: 20.5px;
-    font-size: $medium-text-size;;
+    font-size: $medium-text-size;
     font-weight: 400;
     color: $blue !important;
     height: 20px;
@@ -85,28 +85,47 @@
 
 .color-grid {
   display: flex;
-  flex-direction: column;
   flex-wrap: wrap;
   flex-grow: 100;
   padding: 6px;
 
-  .color-row {
-    display: flex;
-    flex-direction: row;
+	.color {
+		margin-bottom: 12px;
 
-    .color {
-      flex: 1 1;
-      margin-bottom: 12px;
+		&:not(:last-child) {
+			margin-right: 12px;
+		}
+	}
 
-      &:not(:last-child) {
-        margin-right: 12px;
+	// if the ColorGrid is wrapped, the Color(s) will be displayed up until the
+	// right edge and then start on a new line.
+  &.wrapped {
+    margin-bottom: -12px !important;
+
+		.color {
+			flex: 1 1 24px;
+			max-width: 24px;
+		}
+  }
+
+	// If the ColorGrid is not wrapped, it will be displayed with a certain number
+	// of colors per row.
+  &:not(.wrapped) {
+    flex-direction: column;
+
+    .color-row {
+      display: flex;
+      flex-direction: row;
+
+      .color {
+        flex: 1 1;
+      }
+
+      &:last-child {
+        .color {
+          margin-bottom: 0px;
+        }
       }
     }
-
-		&:last-child {
-			.color {
-				margin-bottom: 0px;
-			}
-		}
   }
 }

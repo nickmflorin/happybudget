@@ -8,7 +8,7 @@ interface UseGroupingProps<R extends Tables.BudgetRowData, M extends Model.RowHt
   readonly parentId: number;
   readonly parentType: Model.ParentType;
   readonly table: Table.TableInstance<R, M>;
-  readonly onGroupUpdated: (group: Model.Group) => void;
+  readonly onGroupUpdated?: (group: Model.Group) => void;
 }
 
 type UseGroupingReturnType<R extends Tables.BudgetRowData> = [
@@ -48,10 +48,11 @@ const useGrouping = <R extends Tables.BudgetRowData, M extends Model.RowHttpMode
           parentId={props.parentId}
           parentType={props.parentType}
           open={true}
+          table={props.table}
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
-            props.onGroupUpdated(group);
+            props.onGroupUpdated?.(group);
           }}
         />
       );

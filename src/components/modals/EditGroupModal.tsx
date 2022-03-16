@@ -5,29 +5,36 @@ import { ui } from "lib";
 
 import { GroupForm } from "components/forms";
 
-import { EditModelModal, EditModelModalProps } from "./generic";
+import { EditModelModal, EditModelModalProps, UpdateModelCallbacks } from "./generic";
 
-interface EditGroupModalProps extends EditModelModalProps<Model.Group> {
+interface EditGroupModalProps<R extends Table.RowData, M extends Model.RowHttpModel>
+  extends EditModelModalProps<Model.Group> {
+  readonly table: Table.TableInstance<R, M>;
   readonly parentId: number;
   readonly parentType: Model.ParentType;
 }
 
-const EditGroupModal = <M extends Model.SimpleAccount | Model.SimpleSubAccount>({
+const EditGroupModal = <
+  MM extends Model.SimpleAccount | Model.SimpleSubAccount,
+  R extends Table.RowData,
+  M extends Model.RowHttpModel
+>({
   parentId,
   parentType,
+  table,
   ...props
-}: EditGroupModalProps): JSX.Element => {
+}: EditGroupModalProps<R, M>): JSX.Element => {
   const form = ui.hooks.useForm<Http.GroupPayload>();
   const [cancelToken] = api.useCancelToken();
 
-  const [availableChildren, setAvailableChildren] = useState<M[]>([]);
+  const [availableChildren, setAvailableChildren] = useState<MM[]>([]);
   const [availableChildrenLoading, setAvailableChildrenLoading] = useState(false);
 
   useEffect(() => {
     setAvailableChildrenLoading(true);
     api
-      .getTableChildren<M>(parentId, parentType, { simple: true }, { cancelToken: cancelToken() })
-      .then((response: Http.ListResponse<M>) => {
+      .getTableChildren<MM>(parentId, parentType, { simple: true }, { cancelToken: cancelToken() })
+      .then((response: Http.ListResponse<MM>) => {
         setAvailableChildren(response.data);
       })
       .catch((e: Error) => {
@@ -44,6 +51,9 @@ const EditGroupModal = <M extends Model.SimpleAccount | Model.SimpleSubAccount>(
       titleIcon={"folder"}
       request={api.getGroup}
       update={api.updateGroup}
+      updateSync={(payload: Partial<Http.GroupPayload>, callbacks: UpdateModelCallbacks<Model.Group>) =>
+        table.dispatchEvent({ type: "groupUpdate", payload: { id: props.id, data: payload }, ...callbacks })
+      }
       setFormData={(group: Model.Group) => {
         form.setFields([
           { name: "name", value: group.name },
