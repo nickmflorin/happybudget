@@ -18,6 +18,7 @@ declare namespace Table {
     readonly DATA_CHANGE: "dataChange";
     readonly ROW_ADD: "rowAdd";
     readonly GROUP_ADD: "groupAdd";
+    readonly GROUP_UPDATE: "groupUpdate";
     readonly MARKUP_ADD: "markupAdd";
     readonly MARKUP_UPDATE: "markupUpdate";
     readonly ROW_INSERT: "rowInsert";
@@ -138,6 +139,7 @@ declare namespace Table {
   type RowAddDataEvent<R extends RowData> = RowAddEvent<R, RowAddDataPayload<R>>;
 
   type GroupAddEvent = BaseChangeEvent<"groupAdd", Http.GroupPayload>;
+  type GroupUpdateEvent = BaseChangeEvent<"groupUpdate", Redux.HttpUpdateModelPayload<Model.Group, Http.GroupPayload>>;
   type MarkupAddEvent = BaseChangeEvent<"markupAdd", Http.MarkupPayload>;
   type MarkupUpdateEvent = BaseChangeEvent<
     "markupUpdate",
@@ -204,9 +206,6 @@ declare namespace Table {
 
   type UpdateRowsEvent<R extends RowData = RowData> = BaseControlEvent<"updateRows", UpdateRowsEventPayload<R>>;
 
-  type FullRowEvent = RowDeleteEvent | RowRemoveFromGroupEvent | RowAddToGroupEvent;
-  type GroupChangeEvent = RowRemoveFromGroupEvent | RowAddToGroupEvent;
-
   type ForwardEvent = BaseMetaEvent<"forward">;
   type ReverseEvent = BaseMetaEvent<"reverse">;
 
@@ -226,6 +225,7 @@ declare namespace Table {
     readonly rowRemoveFromGroup: RowRemoveFromGroupEvent;
     readonly rowAddToGroup: RowAddToGroupEvent;
     readonly groupAdd: GroupAddEvent;
+    readonly groupUpdate: GroupUpdateEvent;
     readonly markupAdd: MarkupAddEvent;
     readonly markupUpdate: MarkupUpdateEvent;
   };

@@ -39,6 +39,7 @@ declare namespace Redux {
     readonly dataChange: TableChangeEventTask<Table.DataChangeEvent<R>, R, C>;
     readonly rowAdd: TableChangeEventTask<Table.RowAddEvent<R>, R, C>;
     readonly groupAdd: TableChangeEventTask<Table.GroupAddEvent, R, C>;
+    readonly groupUpdate: TableChangeEventTask<Table.GroupUpdateEvent, R, C>;
     readonly markupAdd: TableChangeEventTask<Table.MarkupAddEvent, R, C>;
     readonly markupUpdate: TableChangeEventTask<Table.MarkupUpdateEvent, R, C>;
     readonly rowInsert: TableChangeEventTask<Table.RowInsertEvent<R>, R, C>;

@@ -1,52 +1,6 @@
-import React, { useState } from "react";
-import { isNil, map } from "lodash";
-import classNames from "classnames";
+import React from "react";
+import { ColorGrid, ColorGridProps } from "components/tagging";
 
-import { RenderOrSpinner } from "components";
-import { Color } from "components/tagging";
-
-type ColorSelectProps = StandardComponentProps & {
-  readonly colors: string[];
-  readonly value?: string | null;
-  readonly itemClassName?: string;
-  readonly itemStyle?: React.CSSProperties;
-  readonly loading?: boolean;
-  readonly onChange?: (value: string, e: React.MouseEvent<HTMLDivElement>) => void;
-};
-
-const ColorSelect: React.FC<ColorSelectProps> = ({
-  className,
-  itemClassName,
-  itemStyle = {},
-  style = {},
-  colors,
-  value,
-  loading,
-  onChange
-}) => {
-  const [color, setColor] = useState<string>(colors[0]);
-  return (
-    <RenderOrSpinner loading={loading}>
-      <div className={classNames("color-select", className)} style={style}>
-        {map(colors, (c: string, index: number) => {
-          return (
-            <Color
-              key={index}
-              color={c || color}
-              selected={!isNil(value) ? value === c : color === c}
-              className={classNames("color-select-color", itemClassName)}
-              style={itemStyle}
-              size={16}
-              onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-                setColor(c);
-                onChange?.(c, e);
-              }}
-            />
-          );
-        })}
-      </div>
-    </RenderOrSpinner>
-  );
-};
+const ColorSelect: React.FC<ColorGridProps> = props => <ColorGrid colorSize={16} {...props} wrapped={true} />;
 
 export default React.memo(ColorSelect);

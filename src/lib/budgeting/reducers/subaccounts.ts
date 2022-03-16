@@ -26,7 +26,7 @@ const recalculateSubAccountRow = (st: S, row: Table.DataRow<R>): Pick<R, "nomina
     ) as Table.ModelRow<Tables.FringeRowData>[];
     if (!isNil(row.data.rate)) {
       const multiplier = row.data.multiplier || 1.0;
-      const quantity = row.data.quantity || 1.0;
+      const quantity = row.data.quantity === null ? 1.0 : row.data.quantity;
       return {
         nominal_value: quantity * row.data.rate * multiplier,
         fringe_contribution: budgeting.businessLogic.contributionFromFringes(
