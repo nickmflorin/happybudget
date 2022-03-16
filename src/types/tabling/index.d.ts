@@ -144,7 +144,7 @@ declare namespace Table {
     readonly getRowColorDef: (row: BodyRow<R>) => RowColorDef;
     readonly selector: (state: Application.Store) => S;
     readonly onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
-    readonly onEvent?: (event: Event<R, M, Table.EditableRow<R>>) => void;
+    readonly onEvent?: (event: Event<R, M, EditableRow<R>>) => void;
   }
 
   type CellWithChildrenProps<
@@ -331,11 +331,11 @@ declare namespace Table {
     /* Callback or explicit value that the RowData should be attributed with
        in the case that the original value is equal to the nullValue when a
        row is created. */
-    readonly defaultValueOnCreate?: Table.DefaultValueOnCreate<R>;
+    readonly defaultValueOnCreate?: DefaultValueOnCreate<R>;
     /* Callback or explicit value that the RowData should be attributed with
        in the case that the original value is equal to the nullValue when a
        row is updated. */
-    readonly defaultValueOnUpdate?: Table.DefaultValueOnUpdate<R>;
+    readonly defaultValueOnUpdate?: DefaultValueOnUpdate<R>;
     /* If not provided, the default behavior is to obtain the Row's value by
        attribute on the Model M corresponding to the Column's designated
 			 `field`. */
@@ -790,9 +790,9 @@ declare namespace Table {
   };
 
   type DefaultValueOnCreate<R extends RowData> = R[keyof R] | ((r: Partial<R>) => R[keyof R]);
-  type DefaultValueOnUpdate<R extends RowData> = R[keyof R] | ((r: Table.ModelRow<R>) => R[keyof R]);
+  type DefaultValueOnUpdate<R extends RowData> = R[keyof R] | ((r: ModelRow<R>) => R[keyof R]);
   type DefaultDataOnCreate<R extends RowData> = Partial<R> | ((r: Partial<R>) => Partial<R>);
-  type DefaultDataOnUpdate<R extends RowData> = R | ((r: Table.ModelRow<R>) => Partial<R>);
+  type DefaultDataOnUpdate<R extends RowData> = R | ((r: ModelRow<R>) => Partial<R>);
 
   type ReducerConfig<
     R extends RowData,
