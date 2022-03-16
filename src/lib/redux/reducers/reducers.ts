@@ -1,6 +1,13 @@
 import { isNil, filter, find } from "lodash";
-import * as notifications from "../../notifications";
-import * as util from "../../util";
+
+import { notifications, util } from "lib";
+
+export const identityReducer =
+  <S>(initialState: S): Redux.Reducer<S> =>
+  (st: S = initialState) =>
+    st;
+
+export const identityReducerWithDefinedState = <S>(st: S) => st;
 
 export const modelListActionReducer: Redux.Reducer<
   Redux.ModelListActionStore,

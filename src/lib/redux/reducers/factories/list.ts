@@ -1,8 +1,6 @@
 import { isNil, filter, find, reduce } from "lodash";
 
-import * as http from "../../../http";
-import * as notifications from "../../../notifications";
-import * as util from "../../../util";
+import { http, notifications, util } from "lib";
 
 import { modelListActionReducer } from "../reducers";
 import { findModelInData } from "../util";

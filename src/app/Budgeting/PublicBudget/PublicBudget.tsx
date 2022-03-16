@@ -21,13 +21,16 @@ const PublicBudget = (props: PublicBudgetProps): JSX.Element => {
   const budget = useSelector((s: Application.Store) =>
     selectors.selectBudgetDetail(s, { domain: "budget", public: true })
   ) as Model.Budget | null;
+  const budgetLoading = useSelector((s: Application.Store) =>
+    selectors.selectBudgetLoading(s, { domain: "budget", public: true })
+  );
 
   useEffect(() => {
     dispatch(actions.pub.requestBudgetAction(props.budgetId));
   }, [props.budgetId]);
 
   return (
-    <PublicBudgetLayout>
+    <PublicBudgetLayout budgetLoading={budgetLoading}>
       <Switch>
         <Redirect exact from={"/pub/:tokenId/budgets/:budgetId"} to={"/pub/:tokenId/budgets/:budgetId/accounts"} />
         <PathParamsRoute<{ accountId: number }>

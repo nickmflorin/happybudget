@@ -25,7 +25,6 @@ function* getSubAccount(action: Redux.Action<number>): SagaIterator {
 const ActionMap = {
   loading: actions.loadingAction,
   response: actions.responseAction,
-  loadingBudget: loadingBudgetAction,
   setSearch: actions.setSearchAction,
   responseFringes: responseFringesAction,
   responseFringeColors: responseFringeColorsAction,

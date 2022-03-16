@@ -1,4 +1,4 @@
-import * as contacts from "../contacts";
+import { contacts } from "lib";
 
 export const isUserWithImage = (user: Model.User | Model.SimpleUser | Model.Contact): user is Model.UserWithImage =>
   contacts.typeguards.isContact(user)

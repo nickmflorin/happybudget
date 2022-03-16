@@ -1,5 +1,5 @@
 import { combineReducers } from "redux";
-import * as redux from "../../redux";
+import { redux } from "lib";
 
 type M = Model.SubAccount;
 

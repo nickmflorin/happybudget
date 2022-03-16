@@ -1,7 +1,6 @@
 import { isNil, reduce, filter, includes, intersection } from "lodash";
 
-import * as util from "../../util";
-import * as rows from "../rows";
+import { tabling, util } from "lib";
 import { reorderRows, updateRowGroup } from "./util";
 
 /**
@@ -21,9 +20,9 @@ const createModelsAddedEventReducer = <
 >(
   config: Table.ReducerConfig<R, M, S, C, A>
 ): Redux.Reducer<S, Table.ModelsAddedEvent<M>> => {
-  const groupRowManager = new rows.GroupRowManager<R, M>({ columns: config.columns });
-  const markupRowManager = new rows.MarkupRowManager({ columns: config.columns });
-  const modelRowManager = new rows.ModelRowManager<R, M>({
+  const groupRowManager = new tabling.rows.GroupRowManager<R, M>({ columns: config.columns });
+  const markupRowManager = new tabling.rows.MarkupRowManager({ columns: config.columns });
+  const modelRowManager = new tabling.rows.ModelRowManager<R, M>({
     getRowChildren: config.getModelRowChildren,
     columns: config.columns
   });
@@ -49,7 +48,7 @@ const createModelsAddedEventReducer = <
     const newGroupRow: Table.GroupRow<R> = groupRowManager.create({ model: group });
     const groupsWithChild: Table.GroupRow<R>[] = filter(
       s.data,
-      (r: Table.Row<R>) => rows.isGroupRow(r) && intersection(r.children, newGroupRow.children).length !== 0
+      (r: Table.Row<R>) => tabling.rows.isGroupRow(r) && intersection(r.children, newGroupRow.children).length !== 0
     ) as Table.GroupRow<R>[];
     const newState = reduce(
       groupsWithChild,
@@ -115,7 +114,7 @@ const createModelsAddedEventReducer = <
     const modelRow: Table.ModelRow<R> = modelRowManager.create({ model });
     s = { ...s, data: [...s.data, modelRow] };
     if (!isNil(group)) {
-      s = updateRowGroup(s, [modelRow.id], rows.groupRowId(group));
+      s = updateRowGroup(s, [modelRow.id], tabling.rows.groupRowId(group));
     }
     return reorder ? reorderRows(s) : s;
   };

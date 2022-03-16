@@ -7,7 +7,6 @@ import { budgeting, tabling, notifications } from "lib";
 
 import {
   subAccount as actions,
-  loadingBudgetAction,
   updateBudgetInStateAction,
   responseFringeColorsAction,
   responseFringesAction,
@@ -38,7 +37,6 @@ const ActionMap = {
   handleEvent: actions.handleTableEventAction,
   loading: actions.loadingAction,
   response: actions.responseAction,
-  loadingBudget: loadingBudgetAction,
   updateBudgetInState: updateBudgetInStateAction,
   setSearch: actions.setSearchAction,
   responseFringes: responseFringesAction,

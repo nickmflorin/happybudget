@@ -3,10 +3,7 @@ import { put, call, fork, select, all } from "redux-saga/effects";
 import { filter, isNil } from "lodash";
 
 import * as api from "api";
-
-import * as contacts from "../../contacts";
-import * as notifications from "../../notifications";
-import * as tabling from "../../tabling";
+import { tabling, contacts, notifications } from "lib";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;
@@ -171,54 +168,34 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsAuthe
   }
 
   function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent, ctx: CTX): SagaIterator {
-    config.table.saving(true);
-    try {
-      const response: M = yield api.request(api.updateActual, ctx, e.payload.id, {
-        previous: e.payload.previous
-      });
-      yield put(
-        config.actions.handleEvent(
-          {
-            type: "modelsUpdated",
-            payload: { model: response }
-          },
-          ctx
-        )
-      );
-    } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, {
-        message: ctx.errorMessage || "There was an error moving the table rows.",
-        dispatchClientErrorToSentry: true
-      });
-    } finally {
-      config.table.saving(false);
-    }
+    const response: M = yield api.request(api.updateActual, ctx, e.payload.id, {
+      previous: e.payload.previous
+    });
+    yield put(
+      config.actions.handleEvent(
+        {
+          type: "modelsUpdated",
+          payload: { model: response }
+        },
+        ctx
+      )
+    );
   }
 
   function* handleRowInsertEvent(e: Table.RowInsertEvent<R>, ctx: CTX): SagaIterator {
-    config.table.saving(true);
-    try {
-      const response: M = yield api.request(api.createActual, ctx, ctx.budgetId, {
-        previous: e.payload.previous,
-        ...tabling.rows.postPayload<R, M, P>(e.payload.data, config.table.getColumns())
-      });
-      yield put(
-        config.actions.handleEvent(
-          {
-            type: "modelsAdded",
-            payload: { model: response }
-          },
-          ctx
-        )
-      );
-    } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, {
-        message: ctx.errorMessage || "There was an error adding the table rows.",
-        dispatchClientErrorToSentry: true
-      });
-    } finally {
-      config.table.saving(false);
-    }
+    const response: M = yield api.request(api.createActual, ctx, ctx.budgetId, {
+      previous: e.payload.previous,
+      ...tabling.rows.postPayload<R, M, P>(e.payload.data, config.table.getColumns())
+    });
+    yield put(
+      config.actions.handleEvent(
+        {
+          type: "modelsAdded",
+          payload: { model: response }
+        },
+        ctx
+      )
+    );
   }
 
   function* handleRowAddEvent(e: Table.RowAddEvent<R>, ctx: Tables.ActualTableContext): SagaIterator {
@@ -248,10 +225,14 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsAuthe
     requestActualOwners,
     handleChangeEvent: tabling.tasks.createChangeEventHandler({
       rowAdd: handleRowAddEvent,
-      rowInsert: handleRowInsertEvent,
       rowDelete: handleRowDeleteEvent,
       dataChange: handleDataChangeEvent,
-      rowPositionChanged: handleRowPositionChangedEvent
+      rowInsert: tabling.tasks.task(handleRowInsertEvent, config.table, "There was an error adding the table rows."),
+      rowPositionChanged: tabling.tasks.task(
+        handleRowPositionChangedEvent,
+        config.table,
+        "There was an error moving the table rows."
+      )
     })
   };
 };

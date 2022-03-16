@@ -1,8 +1,6 @@
 import { isNil, filter } from "lodash";
 
-import * as redux from "../../redux";
-import * as tabling from "../../tabling";
-import * as businessLogic from "../businessLogic";
+import { tabling, redux, budgeting } from "lib";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
@@ -31,12 +29,15 @@ const recalculateSubAccountRow = (st: S, row: Table.DataRow<R>): Pick<R, "nomina
       const quantity = row.data.quantity || 1.0;
       return {
         nominal_value: quantity * row.data.rate * multiplier,
-        fringe_contribution: businessLogic.contributionFromFringes(quantity * row.data.rate * multiplier, fringes)
+        fringe_contribution: budgeting.businessLogic.contributionFromFringes(
+          quantity * row.data.rate * multiplier,
+          fringes
+        )
       };
     } else {
       return {
         nominal_value: 0.0,
-        fringe_contribution: businessLogic.contributionFromFringes(0.0, fringes)
+        fringe_contribution: budgeting.businessLogic.contributionFromFringes(0.0, fringes)
       };
     }
   }

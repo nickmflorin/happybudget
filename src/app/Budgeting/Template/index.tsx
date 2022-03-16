@@ -26,6 +26,7 @@ const Template = (props: TemplateProps): JSX.Element => {
   const budget = useSelector((s: Application.Store) =>
     selectors.selectBudgetDetail(s, { domain: "template" })
   ) as Model.Template | null;
+  const budgetLoading = useSelector((s: Application.Store) => selectors.selectBudgetLoading(s, { domain: "template" }));
 
   useEffect(() => {
     dispatch(actions.template.requestBudgetAction(props.budgetId));
@@ -33,6 +34,7 @@ const Template = (props: TemplateProps): JSX.Element => {
 
   return (
     <BudgetLayout
+      budgetLoading={budgetLoading}
       sidebar={[
         {
           icon: <Icon icon={"copy"} weight={"light"} />,

@@ -3,8 +3,8 @@ import { put, fork, select } from "redux-saga/effects";
 import { filter } from "lodash";
 
 import * as api from "api";
-import * as tabling from "../tabling";
-import * as notifications from "../notifications";
+import { tabling, notifications } from "lib";
+
 import * as actions from "./actions";
 
 type R = Tables.ContactRowData;
@@ -128,38 +128,18 @@ export const createTableTaskSet = (
   }
 
   function* handleRowInsertEvent(e: Table.RowInsertEvent<R>, ctx: CTX): SagaIterator {
-    config.table.saving(true);
-    try {
-      const response: M = yield api.request(api.createContact, ctx, {
-        previous: e.payload.previous,
-        ...tabling.rows.postPayload<R, M, P>(e.payload.data, config.table.getColumns())
-      });
-      yield put(config.actions.handleEvent({ type: "modelsAdded", payload: { model: response } }, {}));
-    } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, {
-        message: ctx.errorMessage || "There was an error adding the rows.",
-        dispatchClientErrorToSentry: true
-      });
-    } finally {
-      config.table.saving(false);
-    }
+    const response: M = yield api.request(api.createContact, ctx, {
+      previous: e.payload.previous,
+      ...tabling.rows.postPayload<R, M, P>(e.payload.data, config.table.getColumns())
+    });
+    yield put(config.actions.handleEvent({ type: "modelsAdded", payload: { model: response } }, {}));
   }
 
   function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent, ctx: CTX): SagaIterator {
-    config.table.saving(true);
-    try {
-      const response: M = yield api.request(api.updateContact, ctx, e.payload.id, {
-        previous: e.payload.previous
-      });
-      yield put(config.actions.handleEvent({ type: "modelsUpdated", payload: { model: response } }, {}));
-    } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, {
-        message: ctx.errorMessage || "There was an error moving the rows.",
-        dispatchClientErrorToSentry: true
-      });
-    } finally {
-      config.table.saving(false);
-    }
+    const response: M = yield api.request(api.updateContact, ctx, e.payload.id, {
+      previous: e.payload.previous
+    });
+    yield put(config.actions.handleEvent({ type: "modelsUpdated", payload: { model: response } }, {}));
   }
 
   function* handleRowAddEvent(e: Table.RowAddEvent<R>, ctx: CTX): SagaIterator {
@@ -188,9 +168,13 @@ export const createTableTaskSet = (
     request: tableRequest,
     handleChangeEvent: tabling.tasks.createChangeEventHandler({
       rowAdd: handleRowAddEvent,
-      rowInsert: handleRowInsertEvent,
       rowDelete: handleRowDeleteEvent,
-      rowPositionChanged: handleRowPositionChangedEvent,
+      rowInsert: tabling.tasks.task(handleRowInsertEvent, config.table, "There was an error adding the table rows."),
+      rowPositionChanged: tabling.tasks.task(
+        handleRowPositionChangedEvent,
+        config.table,
+        "There was an error moving the table rows."
+      ),
       /* It is safe to assume that the ID of the row for which data is being
 			   changed will always be a ModelRowId - but we have to force coerce that
 				 here. */

@@ -23,6 +23,13 @@ export const selectBudgetDetail = createSelector(
     da.public === true ? s.public.budget.detail.data : s[da.domain].detail.data
 );
 
+export const selectBudgetLoading = createSelector(
+  getState,
+  getDomainAndAuth,
+  (s: Application.Store, da: DomainAndAuth) =>
+    da.public === true ? s.public.budget.detail.loading : s[da.domain].detail.loading
+);
+
 export const selectAccountDetail = createSelector(
   getState,
   getDomainAndAuth,

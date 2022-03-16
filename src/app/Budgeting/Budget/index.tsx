@@ -29,6 +29,7 @@ const Budget = (props: BudgetProps): JSX.Element => {
   const budget = useSelector((s: Application.Store) =>
     selectors.selectBudgetDetail(s, { domain: "budget" })
   ) as Model.Budget | null;
+  const budgetLoading = useSelector((s: Application.Store) => selectors.selectBudgetLoading(s, { domain: "budget" }));
 
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
 
@@ -38,6 +39,7 @@ const Budget = (props: BudgetProps): JSX.Element => {
 
   return (
     <BudgetLayout
+      budgetLoading={budgetLoading}
       sidebar={[
         {
           icon: <Icon weight={"light"} icon={"file-plus"} />,

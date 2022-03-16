@@ -1,4 +1,4 @@
-import * as tabling from "../../tabling";
+import { tabling } from "lib";
 
 type M = Model.Actual;
 type R = Tables.ActualRowData;

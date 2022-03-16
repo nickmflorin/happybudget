@@ -22,6 +22,10 @@ interface PrivateCreateModelModalProps<M extends Model.Model, P extends Http.Pay
   readonly autoFocusField?: number;
   readonly requestOptions?: Omit<Http.RequestOptions, "cancelToken">;
   readonly create?: (payload: P, options: Http.RequestOptions) => Promise<R>;
+  /* Used when the async API call should be managed by logic external to this
+	   component.  This is typically used when the API call is performed in Sagas,
+		 and callbacks need to be provided to the API call performed in those Sagas.
+		 */
   readonly createSync?: (payload: P, callbacks: CreateModelCallbacks<R>) => void;
   readonly children: (form: FormInstance<V>) => JSX.Element;
   readonly interceptPayload?: (p: V) => P;
