@@ -1,9 +1,6 @@
 import { isNil, reduce, filter, includes, intersection } from "lodash";
 
-import * as budgeting from "../../budgeting";
-import * as redux from "../../redux";
-import * as util from "../../util";
-import * as rows from "../rows";
+import { tabling, budgeting, redux, util } from "lib";
 import { groupRowFromState, reorderRows, markupRowFromState, updateRowGroup, rowGroupRowFromState } from "./util";
 
 /**
@@ -23,9 +20,9 @@ const createModelsUpdatedEventReducer = <
 >(
   config: Table.ReducerConfig<R, M, S, C, A>
 ): Redux.Reducer<S, Table.ModelsUpdatedEvent<M>> => {
-  const groupRowManager = new rows.GroupRowManager<R, M>({ columns: config.columns });
-  const markupRowManager = new rows.MarkupRowManager({ columns: config.columns });
-  const modelRowManager = new rows.ModelRowManager<R, M>({
+  const groupRowManager = new tabling.rows.GroupRowManager<R, M>({ columns: config.columns });
+  const markupRowManager = new tabling.rows.MarkupRowManager({ columns: config.columns });
+  const modelRowManager = new tabling.rows.ModelRowManager<R, M>({
     getRowChildren: config.getModelRowChildren,
     columns: config.columns
   });
@@ -44,12 +41,12 @@ const createModelsUpdatedEventReducer = <
    *          updated Table.GroupRow.
    */
   const updateGroupInState = (group: Model.Group, s: S, reorder = true) => {
-    const groupRow: Table.GroupRow<R> | null = groupRowFromState<R, S>(s, rows.groupRowId(group.id));
+    const groupRow: Table.GroupRow<R> | null = groupRowFromState<R, S>(s, tabling.rows.groupRowId(group.id));
     if (!isNil(groupRow)) {
       const newGroupRow: Table.GroupRow<R> = groupRowManager.create({ model: group });
       const groupsWithChild: Table.GroupRow<R>[] = filter(
         s.data,
-        (r: Table.Row<R>) => rows.isGroupRow(r) && intersection(r.children, newGroupRow.children).length !== 0
+        (r: Table.Row<R>) => tabling.rows.isGroupRow(r) && intersection(r.children, newGroupRow.children).length !== 0
       ) as Table.GroupRow<R>[];
       const newState = reduce(
         groupsWithChild,
@@ -102,12 +99,12 @@ const createModelsUpdatedEventReducer = <
     const isSubAccountRowData = (d: BR): d is Tables.SubAccountRowData =>
       (d as Tables.SubAccountRowData).fringe_contribution !== undefined;
 
-    const markupRow: Table.MarkupRow<R> | null = markupRowFromState<R, S>(s, rows.markupRowId(markup.id));
+    const markupRow: Table.MarkupRow<R> | null = markupRowFromState<R, S>(s, tabling.rows.markupRowId(markup.id));
     if (!isNil(markupRow)) {
       const updatedMarkupRow = markupRowManager.create({ model: markup });
       const childrenRows = filter(
         s.data,
-        (r: Table.BodyRow<R>) => rows.isModelRow(r) && includes(updatedMarkupRow.children, r.id)
+        (r: Table.BodyRow<R>) => tabling.rows.isModelRow(r) && includes(updatedMarkupRow.children, r.id)
       ) as Table.ModelRow<R>[];
       // Update the Markup Row itself in state.
       s = {
@@ -127,7 +124,7 @@ const createModelsUpdatedEventReducer = <
           const otherMarkupRows = filter(
             s.data,
             (ri: Table.BodyRow<R>) =>
-              rows.isMarkupRow(ri) && includes(ri.children, row.id) && ri.id !== updatedMarkupRow.id
+              tabling.rows.isMarkupRow(ri) && includes(ri.children, row.id) && ri.id !== updatedMarkupRow.id
           ) as Table.MarkupRow<R>[];
           return {
             ...st,
@@ -178,7 +175,7 @@ const createModelsUpdatedEventReducer = <
    */
   const updateModelInState = (model: M, group: number | null | undefined, s: S, reorder = true) => {
     const modelRow: Table.ModelRow<R> | null = redux.reducers.modelFromState<Table.ModelRow<R>>(
-      filter(s.data, (ri: Table.BodyRow<R>) => rows.isModelRow(ri)) as Table.ModelRow<R>[],
+      filter(s.data, (ri: Table.BodyRow<R>) => tabling.rows.isModelRow(ri)) as Table.ModelRow<R>[],
       model.id
     );
     if (!isNil(modelRow)) {
@@ -190,7 +187,7 @@ const createModelsUpdatedEventReducer = <
 				there was no change to the model's group.  A `null` group means
 				that the group was removed. */
       if (group !== undefined) {
-        const groupRowId = group !== null ? rows.groupRowId(group) : null;
+        const groupRowId = group !== null ? tabling.rows.groupRowId(group) : null;
         const previousGroupRow: Table.GroupRow<R> | null = rowGroupRowFromState<R, S>(s, model.id, {
           warnOnMissing: false
         });

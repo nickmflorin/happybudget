@@ -4,9 +4,7 @@ import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
 
-import * as notifications from "../../notifications";
-import * as redux from "../../redux";
-import * as tabling from "../../tabling";
+import { tabling, notifications, redux } from "lib";
 
 type R = Tables.AccountRowData;
 type C = Model.Account;
@@ -16,8 +14,7 @@ type CTX = Redux.WithActionContext<Tables.AccountTableContext>;
 export type AuthenticatedAccountsTableActionMap<B extends Model.Template | Model.Budget> =
   Redux.AuthenticatedTableActionMap<R, C, Tables.AccountTableContext> & {
     readonly handleEvent: Redux.TableActionCreator<Table.Event<R, C>, Tables.AccountTableContext>;
-    readonly loadingBudget: Redux.ActionCreator<boolean>;
-    readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateActionPayload<B>>;
+    readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateModelPayload<B>>;
   };
 
 export type PublicAccountsTableTaskConfig = Table.TaskConfig<
@@ -163,15 +160,8 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
     ): [number, Http.BulkCreatePayload<Http.ContactPayload>] => [ctx.budgetId, p]
   });
 
-  function* bulkUpdateTask(
-    ctx: CTX,
-    requestPayload: Http.BulkUpdatePayload<Http.AccountPayload>,
-    isGroupEvent = false
-  ): SagaIterator {
+  function* bulkUpdateTask(ctx: CTX, requestPayload: Http.BulkUpdatePayload<Http.AccountPayload>): SagaIterator {
     config.table.saving(true);
-    if (isGroupEvent !== true) {
-      yield put(config.actions.loadingBudget(true));
-    }
     try {
       const response: Http.ServiceResponse<typeof api.bulkUpdateBudgetChildren> = yield api.request(
         api.bulkUpdateBudgetChildren,
@@ -186,9 +176,6 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
       });
     } finally {
       config.table.saving(false);
-      if (isGroupEvent !== true) {
-        yield put(config.actions.loadingBudget(true));
-      }
       try {
         const response: Http.ServiceResponse<typeof api.bulkUpdateBudgetChildren> = yield api.request(
           api.bulkUpdateBudgetChildren,
@@ -203,9 +190,6 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
         });
       } finally {
         config.table.saving(false);
-        if (isGroupEvent !== true) {
-          yield put(config.actions.loadingBudget(false));
-        }
       }
     }
   }
@@ -276,8 +260,7 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
     yield fork(
       bulkUpdateTask,
       { errorMessage: "There was an error removing the row from the group.", ...ctx },
-      requestPayload,
-      true
+      requestPayload
     );
   }
 
@@ -292,8 +275,7 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
     yield fork(
       bulkUpdateTask,
       { errorMessage: "There was an error adding the row to the group.", ...ctx },
-      requestPayload,
-      true
+      requestPayload
     );
   }
 
@@ -304,7 +286,6 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
   function* handleRowDeleteEvent(e: Table.RowDeleteEvent, ctx: CTX): SagaIterator {
     const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
     if (ids.length !== 0) {
-      yield put(config.actions.loadingBudget(true));
       config.table.saving(true);
 
       const modelRowIds = filter(ids, (id: Table.RowId) => tabling.rows.isModelRowId(id)) as number[];
@@ -328,75 +309,51 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
         });
       } finally {
         config.table.saving(false);
-        yield put(config.actions.loadingBudget(false));
       }
     }
   }
 
   function* handleRowInsertEvent(e: Table.RowInsertEvent<R>, ctx: CTX): SagaIterator {
-    config.table.saving(true);
-    try {
-      const response: C = yield api.request(api.createBudgetChild, ctx, ctx.budgetId, {
-        previous: e.payload.previous,
-        group: isNil(e.payload.group) ? null : tabling.rows.groupId(e.payload.group),
-        ...tabling.rows.postPayload<R, C, P>(e.payload.data, config.table.getColumns())
-      });
-      /* The Group is not attributed to the Model in a detail response, so
-				 if the group did change we have to use the value from the event
-				 payload. */
-      yield put(
-        config.actions.handleEvent(
-          {
-            type: "modelsAdded",
-            payload: {
-              model: response,
-              group: !isNil(e.payload.group) ? tabling.rows.groupId(e.payload.group) : null
-            }
-          },
-          ctx
-        )
-      );
-    } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, {
-        message: ctx.errorMessage || "There was an error adding the table rows.",
-        dispatchClientErrorToSentry: true
-      });
-      notifications.requestError(err as Error);
-    } finally {
-      config.table.saving(false);
-    }
+    const response: C = yield api.request(api.createBudgetChild, ctx, ctx.budgetId, {
+      previous: e.payload.previous,
+      group: isNil(e.payload.group) ? null : tabling.rows.groupId(e.payload.group),
+      ...tabling.rows.postPayload<R, C, P>(e.payload.data, config.table.getColumns())
+    });
+    /* The Group is not attributed to the Model in a detail response, so if the
+		   group did change we have to use the value from the event payload. */
+    yield put(
+      config.actions.handleEvent(
+        {
+          type: "modelsAdded",
+          payload: {
+            model: response,
+            group: !isNil(e.payload.group) ? tabling.rows.groupId(e.payload.group) : null
+          }
+        },
+        ctx
+      )
+    );
   }
 
   function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent, ctx: CTX): SagaIterator {
-    config.table.saving(true);
-    try {
-      const response: C = yield api.request(api.updateAccount, ctx, e.payload.id, {
-        previous: e.payload.previous,
-        group: isNil(e.payload.newGroup) ? null : tabling.rows.groupId(e.payload.newGroup)
-      });
-      /* The Group is not attributed to the Model in a detail response, so if
-					 the group did change we have to use the value from the event
-					 payload. */
-      yield put(
-        config.actions.handleEvent(
-          {
-            type: "modelsUpdated",
-            payload: {
-              model: response,
-              group: !isNil(e.payload.newGroup) ? tabling.rows.groupId(e.payload.newGroup) : null
-            }
-          },
-          ctx
-        )
-      );
-    } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, {
-        message: ctx.errorMessage || "There was an error moving the table rows.",
-        dispatchClientErrorToSentry: true
-      });
-    } finally {
-      config.table.saving(false);
-    }
+    const response: C = yield api.request(api.updateAccount, ctx, e.payload.id, {
+      previous: e.payload.previous,
+      group: isNil(e.payload.newGroup) ? null : tabling.rows.groupId(e.payload.newGroup)
+    });
+    /* The Group is not attributed to the Model in a detail response, so if the
+		   group did change we have to use the value from the event payload. */
+    yield put(
+      config.actions.handleEvent(
+        {
+          type: "modelsUpdated",
+          payload: {
+            model: response,
+            group: !isNil(e.payload.newGroup) ? tabling.rows.groupId(e.payload.newGroup) : null
+          }
+        },
+        ctx
+      )
+    );
   }
 
   function* handleDataChangeEvent(e: Table.DataChangeEvent<R>, ctx: CTX): SagaIterator {
@@ -426,16 +383,57 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
     }
   }
 
+  function* handleGroupAddEvent(e: Table.GroupAddEvent, ctx: CTX): SagaIterator {
+    const response: Model.Group = yield api.request(api.createBudgetGroup, ctx, ctx.budgetId, e.payload);
+    yield put(config.actions.handleEvent({ type: "modelsAdded", payload: response }, ctx));
+    e.onSuccess?.(response);
+  }
+
+  function* handleMarkupAddEvent(e: Table.MarkupAddEvent, ctx: CTX): SagaIterator {
+    const response: Http.ParentChildResponse<B, Model.Markup> = yield api.request(
+      api.createBudgetMarkup,
+      ctx,
+      ctx.budgetId,
+      e.payload
+    );
+    yield put(config.actions.updateBudgetInState({ id: response.parent.id, data: response.parent }));
+    yield put(config.actions.handleEvent({ type: "modelsAdded", payload: response.data }, ctx));
+    e.onSuccess?.(response);
+  }
+
+  function* handleMarkupUpdateEvent(e: Table.MarkupUpdateEvent, ctx: CTX): SagaIterator {
+    const response: Http.ParentChildResponse<B, Model.Markup> = yield api.request(
+      api.updateMarkup,
+      ctx,
+      e.payload.id,
+      e.payload.data
+    );
+    yield put(config.actions.updateBudgetInState({ id: response.parent.id, data: response.parent }));
+    yield put(config.actions.handleEvent({ type: "modelsUpdated", payload: response.data }, ctx));
+    e.onSuccess?.(response);
+  }
+
   return {
     request,
     handleChangeEvent: tabling.tasks.createChangeEventHandler<R, Tables.AccountTableContext>({
       rowRemoveFromGroup: handleRowRemoveFromGroupEvent,
-      rowInsert: handleRowInsertEvent,
       rowAddToGroup: handleAddRowToGroupEvent,
-      rowAdd: handleRowAddEvent,
       rowDelete: handleRowDeleteEvent,
       dataChange: handleDataChangeEvent,
-      rowPositionChanged: handleRowPositionChangedEvent
+      rowAdd: handleRowAddEvent,
+      rowInsert: tabling.tasks.task(handleRowInsertEvent, config.table, "There was an error adding the table rows."),
+      groupAdd: tabling.tasks.task(handleGroupAddEvent, config.table, "There was an error creating the group."),
+      markupAdd: tabling.tasks.task(handleMarkupAddEvent, config.table, "There was an error creating the markup."),
+      markupUpdate: tabling.tasks.task(
+        handleMarkupUpdateEvent,
+        config.table,
+        "There was an error updating the markup."
+      ),
+      rowPositionChanged: tabling.tasks.task(
+        handleRowPositionChangedEvent,
+        config.table,
+        "There was an error moving the table rows."
+      )
     })
   };
 };

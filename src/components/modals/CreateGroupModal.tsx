@@ -4,31 +4,38 @@ import * as api from "api";
 import { ui } from "lib";
 import { GroupForm } from "components/forms";
 
-import { CreateModelModal, CreateModelModalProps } from "./generic";
+import { CreateModelModal, CreateModelModalProps, CreateModelCallbacks } from "./generic";
 
-interface CreateGroupModalProps extends CreateModelModalProps<Model.Group> {
+interface CreateGroupModalProps<R extends Table.RowData, M extends Model.RowHttpModel>
+  extends CreateModelModalProps<Model.Group> {
   readonly id: number;
   readonly children: number[];
+  readonly table: Table.TableInstance<R, M>;
   readonly parentType: Model.ParentType;
 }
 
-const CreateGroupModal = <M extends Model.SimpleAccount | Model.SimpleSubAccount>({
+const CreateGroupModal = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+  MM extends Model.SimpleAccount | Model.SimpleSubAccount
+>({
   id,
   children,
   parentType,
+  table,
   ...props
-}: CreateGroupModalProps): JSX.Element => {
+}: CreateGroupModalProps<R, M>): JSX.Element => {
   const form = ui.hooks.useForm<Http.GroupPayload>();
   const [cancelToken] = api.useCancelToken();
 
-  const [availableChildren, setAvailableChildren] = useState<M[]>([]);
+  const [availableChildren, setAvailableChildren] = useState<MM[]>([]);
   const [availableChildrenLoading, setAvailableChildrenLoading] = useState(false);
 
   useEffect(() => {
     setAvailableChildrenLoading(true);
     api
-      .getTableChildren<M>(id, parentType, { simple: true }, { cancelToken: cancelToken() })
-      .then((response: Http.ListResponse<M>) => {
+      .getTableChildren<MM>(id, parentType, { simple: true }, { cancelToken: cancelToken() })
+      .then((response: Http.ListResponse<MM>) => {
         setAvailableChildren(response.data);
         form.setFields([{ name: "children", value: children }]);
       })
@@ -44,8 +51,8 @@ const CreateGroupModal = <M extends Model.SimpleAccount | Model.SimpleSubAccount
       title={"Subtotal"}
       titleIcon={"folder"}
       form={form}
-      create={(payload: Http.GroupPayload, options?: Http.RequestOptions) =>
-        api.createTableGroup(id, parentType, payload, options)
+      createSync={(payload: Http.GroupPayload, callbacks: CreateModelCallbacks<Model.Group>) =>
+        table.dispatchEvent({ type: "groupAdd", payload, ...callbacks })
       }
     >
       {() => (

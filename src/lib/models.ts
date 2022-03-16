@@ -1,17 +1,19 @@
 import { find, filter, isNil, forEach, reduce, map } from "lodash";
 
-import * as tabling from "./tabling";
 import { isHttpModelWithType } from "./typeguards";
 
 export const getRowGeneralReference = <R extends Table.RowData>(row: Table.Row<R>) => {
-  if (tabling.rows.isModelRow(row)) {
+  if (row.rowType === "model") {
     return `row (type = ${row.rowType}, modelType = ${row.modelType})`;
   }
   return `row (type = ${row.rowType})`;
 };
 
 export const getModelGeneralReference = <M extends Model.Model>(m: M): string => {
-  return tabling.rows.isRow(m) ? getRowGeneralReference(m) : isHttpModelWithType(m) ? `${m.type}` : "model";
+  const isRow = (obj: Table.Row<Table.RowData> | M): obj is Table.Row<Table.RowData> =>
+    typeof obj === "object" && (obj as Table.Row<Table.RowData>).rowType !== undefined;
+
+  return isRow(m) ? getRowGeneralReference(m) : isHttpModelWithType(m) ? `${m.type}` : "model";
 };
 
 const getModelReferenceFn = <M extends Model.Model>(

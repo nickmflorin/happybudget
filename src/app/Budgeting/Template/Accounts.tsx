@@ -65,9 +65,6 @@ const Accounts = (props: AccountsProps): JSX.Element => {
         parent={props.budget}
         actionContext={{ budgetId: props.budgetId }}
         table={table}
-        onParentUpdated={(p: Model.Template) =>
-          dispatch(actions.template.updateBudgetInStateAction({ id: p.id, data: p }))
-        }
       />
     </BudgetPage>
   );

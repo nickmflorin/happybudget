@@ -3,36 +3,32 @@ import { isNil, filter, includes } from "lodash";
 import * as columns from "../../columns";
 import * as ids from "../ids";
 
-import BodyRowManager from "./body";
+import BodyRowManager, { BodyRowManagerConfig } from "./base";
 
 type CreateGroupRowConfig = {
   readonly model: Model.Group;
 };
 
-type GroupRowManagerConfig<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
-  readonly columns: Table.Column<R, M>[];
-};
-
 class GroupRowManager<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
-> extends BodyRowManager<Table.GroupRow<R>, R, M> {
-  constructor(config: GroupRowManagerConfig<R, M>) {
+> extends BodyRowManager<Table.GroupRow<R>, R, M, [Model.Group]> {
+  constructor(config: Omit<BodyRowManagerConfig<Table.GroupRow<R>, R, M>, "rowType">) {
     super({ ...config, rowType: "group" });
   }
 
   getValueForRow<V extends Table.RawRowValue, C extends Table.ModelColumn<R, M, V>>(
     col: C,
     group: Model.Group
-  ): [V | undefined, boolean] {
+  ): V | undefined {
     // The FakeColumn(s) are not applicable for Groups.
     if (columns.isDataColumn<R, M>(col) && !isNil(col.groupField)) {
-      return [group[col.groupField] as V, true];
+      return group[col.groupField] as V;
     }
-    /* We want to indicate that the value is not applicable for the column so
-		 	 that it is not included in the row data and a warning is not issued when
-			 the value is undefined */
-    return [undefined, false];
+    /* We need to indicate that the value is not applicable for the column for
+       this GroupRow, otherwise a warning will be issued and the value will be
+       set to the column's `nullValue`. */
+    this.throwNotApplicable();
   }
 
   removeChildren(row: Table.GroupRow<R>, Ids: SingleOrArray<number>): Table.GroupRow<R> {

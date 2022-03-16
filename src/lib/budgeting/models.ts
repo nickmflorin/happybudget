@@ -1,8 +1,8 @@
 import { isNil } from "lodash";
 import { Colors } from "style/constants";
+
+import { tabling, util } from "lib";
 import * as models from "../models";
-import * as tabling from "../tabling";
-import * as util from "../util";
 
 export enum FringeUnitNames {
   PERCENT = "Percent",

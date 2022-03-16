@@ -1,10 +1,10 @@
 import { combineReducers } from "redux";
-import * as redux from "../../redux";
+import { redux } from "lib";
 
 type M = Model.SubAccount;
 
 export type SubAccountAccountDetailActionMap = Omit<Redux.ModelDetailResponseActionMap<M>, "updateInState"> & {
-  readonly updateInState?: Redux.ActionCreator<Redux.UpdateActionPayload<Model.SubAccount>>;
+  readonly updateInState?: Redux.ActionCreator<Redux.UpdateModelPayload<Model.SubAccount>>;
 };
 
 type MinimalSubAccountStore = {

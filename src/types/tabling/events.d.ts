@@ -17,6 +17,9 @@ declare namespace Table {
   type ChangeEventIds = {
     readonly DATA_CHANGE: "dataChange";
     readonly ROW_ADD: "rowAdd";
+    readonly GROUP_ADD: "groupAdd";
+    readonly MARKUP_ADD: "markupAdd";
+    readonly MARKUP_UPDATE: "markupUpdate";
     readonly ROW_INSERT: "rowInsert";
     readonly ROW_POSITION_CHANGED: "rowPositionChanged";
     readonly ROW_DELETE: "rowDelete";
@@ -57,7 +60,11 @@ declare namespace Table {
   type BaseChangeEvent<T extends ChangeEventId = ChangeEventId, P extends EventPayload = EventPayload> = BaseEvent<
     T,
     P
-  >;
+  > & {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    readonly onSuccess?: (v: any) => void;
+    readonly onError?: (e: Error) => void;
+  };
 
   type BaseControlEvent<T extends ControlEventId = ControlEventId, P extends EventPayload = EventPayload> = BaseEvent<
     T,
@@ -129,6 +136,13 @@ declare namespace Table {
   };
 
   type RowAddDataEvent<R extends RowData> = RowAddEvent<R, RowAddDataPayload<R>>;
+
+  type GroupAddEvent = BaseChangeEvent<"groupAdd", Http.GroupPayload>;
+  type MarkupAddEvent = BaseChangeEvent<"markupAdd", Http.MarkupPayload>;
+  type MarkupUpdateEvent = BaseChangeEvent<
+    "markupUpdate",
+    Redux.HttpUpdateModelPayload<Model.Markup, Http.MarkupPayload>
+  >;
 
   type RowPositionChangedPayload = {
     readonly previous: number | null;
@@ -211,6 +225,9 @@ declare namespace Table {
     readonly rowDelete: RowDeleteEvent;
     readonly rowRemoveFromGroup: RowRemoveFromGroupEvent;
     readonly rowAddToGroup: RowAddToGroupEvent;
+    readonly groupAdd: GroupAddEvent;
+    readonly markupAdd: MarkupAddEvent;
+    readonly markupUpdate: MarkupUpdateEvent;
   };
 
   // Events for which undo/redo is supported.  The events must be ChangeEvents.

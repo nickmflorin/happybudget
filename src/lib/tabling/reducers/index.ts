@@ -1,6 +1,5 @@
-import * as redux from "../../redux";
+import { redux, tabling } from "lib";
 import createEventReducer from "./createEventReducer";
-import * as rows from "../rows";
 
 export const createTableReducer = <
   R extends Table.RowData,
@@ -22,7 +21,7 @@ export const createTableReducer = <
       const response: Http.TableResponse<M> = action.payload;
       return {
         ...newState,
-        data: rows.generateTableData<R, M>({
+        data: tabling.rows.generateTableData<R, M>({
           ...config,
           response
         })

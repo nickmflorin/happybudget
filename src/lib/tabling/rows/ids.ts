@@ -1,4 +1,4 @@
-import * as util from "../../util";
+import { util } from "lib";
 import * as typeguards from "./typeguards";
 
 export const markupRowId = (r: number): Table.MarkupRowId => `markup-${r}`;

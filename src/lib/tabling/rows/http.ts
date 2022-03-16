@@ -1,7 +1,6 @@
 import { isNil, reduce } from "lodash";
 
-import * as columns from "../columns";
-import * as ids from "./ids";
+import { tabling } from "lib";
 
 const issueWarningsForParsedFieldColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
   col: Table.BodyColumn<R, M>
@@ -29,11 +28,11 @@ export const patchPayload = <
 >(
   change: Table.RowChange<R, RW>,
   cs: Table.ModelColumn<R, M, Table.RawRowValue>[]
-): P | null => {
-  return reduce(
+): P | null =>
+  reduce(
     cs,
     (p: P, col: Table.ModelColumn<R, M, Table.RawRowValue>) => {
-      if (columns.isBodyColumn(col)) {
+      if (tabling.columns.isBodyColumn(col)) {
         /* If the column defines `parsedFields` and `parseIntoFields`, the column
            value is derived from the Column(s) with fields dictated by the
            `parsedFields` array.  In this case, the Column's field itself won't
@@ -77,7 +76,6 @@ export const patchPayload = <
     },
     {} as P
   );
-};
 
 export const bulkPatchPayload = <
   R extends Table.RowData,
@@ -90,7 +88,7 @@ export const bulkPatchPayload = <
 ): Http.ModelBulkUpdatePayload<P> | null => {
   const patch = patchPayload<R, M, P, RW>(change, cs);
   if (!isNil(patch)) {
-    return { id: ids.editableId(change.id), ...patch };
+    return { id: tabling.rows.editableId(change.id), ...patch };
   }
   return null;
 };
@@ -131,7 +129,7 @@ export const postPayload = <R extends Table.RowData, M extends Model.RowHttpMode
   return reduce(
     cs,
     (p: P, col: Table.ModelColumn<R, M, Table.RawRowValue>) => {
-      if (columns.isBodyColumn(col)) {
+      if (tabling.columns.isBodyColumn(col)) {
         const value: Table.InferV<typeof col> | undefined = data[col.field] as Table.InferV<typeof col> | undefined;
         if (value !== undefined) {
           if (!isNil(col.getHttpValue)) {

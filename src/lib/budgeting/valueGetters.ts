@@ -1,5 +1,6 @@
 import { filter, reduce, includes } from "lodash";
-import * as tabling from "../tabling";
+
+import { tabling } from "lib";
 import * as businessLogic from "./businessLogic";
 import * as models from "./models";
 

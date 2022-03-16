@@ -1,8 +1,9 @@
 import { isNil } from "lodash";
 
-import * as util from "../../../util";
-import * as columns from "../../columns";
-import BodyRowManager from "./body";
+import { tabling, util } from "lib";
+
+import { BodyRowManagerConfig } from "./base";
+import EditableRowManager from "./editable";
 
 type GetRowValue<R extends Table.RowData, M extends Model.RowHttpModel, V extends Table.RawRowValue> = (
   m: M,
@@ -16,15 +17,18 @@ type CreateModelRowConfig<R extends Table.RowData, M extends Model.RowHttpModel>
   readonly getRowValue?: GetRowValue<R, M, Table.RawRowValue> | undefined;
 };
 
-type ModelRowManagerConfig<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
-  readonly columns: Table.Column<R, M>[];
+type ModelRowManagerConfig<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = Omit<
+  BodyRowManagerConfig<Table.ModelRow<R>, R, M>,
+  "rowType"
+> & {
   readonly getRowChildren?: (m: M) => number[];
 };
 
 class ModelRowManager<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
-> extends BodyRowManager<Table.ModelRow<R>, R, M> {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+> extends EditableRowManager<Table.ModelRow<R>, R, M, [M, GetRowValue<R, M, any> | undefined]> {
   public getRowChildren: ((m: M) => number[]) | undefined;
 
   constructor(config: ModelRowManagerConfig<R, M>) {
@@ -36,19 +40,16 @@ class ModelRowManager<
     V extends Table.RawRowValue,
     C extends Table.ModelColumn<R, M, V>
     // The optional `getRowValue` callback is only used for PDF cases.
-  >(col: C, m: M, getRowValue?: GetRowValue<R, M, V>): [V | undefined, boolean] {
+  >(col: C, m: M, getRowValue?: GetRowValue<R, M, V>): V | undefined {
     if (col.isApplicableForModel?.(m) === false) {
-      return [undefined, false];
+      this.throwNotApplicable();
     }
-    if (!isNil(getRowValue) && columns.isDataColumn<R, M>(col)) {
-      return [
-        getRowValue(m, col, (colr: Table.DataColumn<R, M>, mr: M) => this.getValueForRow<V, C>(colr as C, mr)[0]),
-        true
-      ];
+    if (!isNil(getRowValue) && tabling.columns.isDataColumn<R, M>(col)) {
+      return getRowValue(m, col, (colr: Table.DataColumn<R, M>, mr: M) => this.getValueForRow<V, C>(colr as C, mr));
     } else if (!isNil(col.getRowValue)) {
-      return [col.getRowValue(m), true];
+      return col.getRowValue(m);
     } else {
-      return [util.getKeyValue<M, keyof M>(col.field as keyof M)(m) as unknown as V | undefined, true];
+      return util.getKeyValue<M, keyof M>(col.field as keyof M)(m) as unknown as V | undefined;
     }
   }
 

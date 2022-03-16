@@ -1,7 +1,7 @@
 import { isNil } from "lodash";
 import { ValueSetterParams } from "@ag-grid-community/core";
 
-import * as util from "../../util";
+import { util } from "lib";
 
 const numericValueConverter = (value: Table.RawRowValue): number | null | false => {
   if (value === null) {

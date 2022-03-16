@@ -11,6 +11,11 @@ export interface EditModelModalProps<M extends Model.Model, R = M> extends Modal
   readonly onSuccess: (m: R) => void;
 }
 
+export type UpdateModelCallbacks<R> = {
+  readonly onError: (e: Error) => void;
+  readonly onSuccess: (m: R) => void;
+};
+
 interface PrivateEditModelModalProps<M extends Model.Model, P extends Http.PayloadObj, V = P, R = M>
   extends EditModelModalProps<M, R> {
   readonly form?: FormInstance<V>;
@@ -19,7 +24,12 @@ interface PrivateEditModelModalProps<M extends Model.Model, P extends Http.Paylo
   readonly onModelLoaded?: (m: M) => void;
   readonly setFormData: (m: M, form: FormInstance<V>) => void;
   readonly request: (id: number, opts?: Http.RequestOptions) => Promise<M>;
-  readonly update: (id: number, payload: P, options: Http.RequestOptions) => Promise<R>;
+  /* Used when the async API call should be managed by logic external to this
+	   component.  This is typically used when the API call is performed in Sagas,
+		 and callbacks need to be provided to the API call performed in those Sagas.
+		 */
+  readonly updateSync?: (payload: P, callbacks: UpdateModelCallbacks<R>) => void;
+  readonly update?: (id: number, payload: P, options: Http.RequestOptions) => Promise<R>;
   readonly children: (m: M | null, form: FormInstance<V>) => JSX.Element;
   readonly interceptPayload?: (p: V) => P;
   /* Conditionally handle the request error.  Returns True if it was handled
@@ -37,6 +47,7 @@ const EditModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = P,
   onSuccess,
   request,
   update,
+  updateSync,
   children,
   interceptPayload,
   interceptError,
@@ -66,7 +77,7 @@ const EditModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = P,
   });
 
   const onLoading = hooks.useDynamicCallback((v: boolean) => {
-    if (props.open === true) {
+    if (isMounted.current) {
       Form.setLoading(v);
     }
   });
@@ -92,6 +103,29 @@ const EditModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = P,
     }
   }, [instance, props.title]);
 
+  const _onSuccess = useMemo(
+    () => (response: R) => {
+      onLoading(false);
+      if (isMounted.current) {
+        Form.resetFields();
+      }
+      onSuccess(response);
+    },
+    [isMounted.current, onSuccess]
+  );
+
+  const _onError = useMemo(
+    () => (e: Error) => {
+      onLoading(false);
+      if (interceptError?.(Form, e) !== true) {
+        if (isMounted.current) {
+          Form.handleRequestError(e);
+        }
+      }
+    },
+    [isMounted.current, interceptError]
+  );
+
   const onOk = useCallback(async () => {
     Form.validateFields()
       .then((values: V) => {
@@ -107,25 +141,15 @@ const EditModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = P,
                 : curr,
             payload
           );
-
-          Form.setLoading(true);
-          update(id, payload, { cancelToken: getToken() })
-            .then((response: R) => {
-              if (isMounted.current) {
-                Form.resetFields();
-              }
-              onSuccess(response);
-            })
-            .catch((e: Error) => {
-              if (interceptError?.(Form, e) !== true) {
-                Form.handleRequestError(e);
-              }
-            })
-            .finally(() => {
-              if (isMounted.current) {
-                Form.setLoading(false);
-              }
-            });
+          if (!isNil(update)) {
+            onLoading(true);
+            update(id, payload, { cancelToken: getToken() })
+              .then((response: R) => _onSuccess(response))
+              .catch((e: Error) => _onError(e));
+          } else if (!isNil(updateSync)) {
+            onLoading(true);
+            updateSync(payload, { onSuccess: _onSuccess, onError: _onError });
+          }
         }
       })
       .catch(() => {

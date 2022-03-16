@@ -1,16 +1,14 @@
 import { budgeting, tabling } from "lib";
 
-import { accounts as actions, loadingBudgetAction, updateBudgetInStateAction } from "../../actions/budget";
+import { accounts as actions, updateBudgetInStateAction } from "../../actions/budget";
 
 const ActionMap: Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account, Tables.AccountTableContext> & {
-  readonly loadingBudget: Redux.ActionCreator<boolean>;
-  readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateActionPayload<Model.Budget>>;
+  readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateModelPayload<Model.Budget>>;
 } = {
   request: actions.requestAction,
   handleEvent: actions.handleTableEventAction,
   loading: actions.loadingAction,
   response: actions.responseAction,
-  loadingBudget: loadingBudgetAction,
   updateBudgetInState: updateBudgetInStateAction,
   setSearch: actions.setSearchAction
 };

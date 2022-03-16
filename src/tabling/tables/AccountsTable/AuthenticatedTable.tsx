@@ -37,7 +37,6 @@ export type AuthenticatedTableProps<B extends Model.BaseBudget> = Omit<
   readonly parent: B | null;
   readonly domain: B["domain"];
   readonly actionContext: Tables.AccountTableContext;
-  readonly onParentUpdated: (m: B) => void;
 };
 
 const AuthenticatedTable = <B extends Model.BaseBudget>(props: AuthenticatedTableProps<B>): JSX.Element => {
@@ -57,8 +56,7 @@ const AuthenticatedTable = <B extends Model.BaseBudget>(props: AuthenticatedTabl
   const [markupModals, onEditMarkup, onCreateMarkup] = useMarkup({
     parentId: props.id,
     parentType: "budget",
-    table: props.table.current,
-    onResponse: (response: Http.ParentChildResponse<B, Model.Markup>) => props.onParentUpdated(response.parent)
+    table: props.table.current
   });
 
   const actions: Table.AuthenticatedMenuActions<R, M> = useMemo(

@@ -1,14 +1,11 @@
 import { budgeting, tabling } from "lib";
 
-import { accounts as actions, loadingBudgetAction } from "../../actions/public";
+import { accounts as actions } from "../../actions/public";
 
-const ActionMap: Redux.TableActionMap<Model.Account, Tables.AccountTableContext> & {
-  readonly loadingBudget: Redux.ActionCreator<boolean>;
-} = {
+const ActionMap: Redux.TableActionMap<Model.Account, Tables.AccountTableContext> = {
   request: actions.requestAction,
   loading: actions.loadingAction,
   response: actions.responseAction,
-  loadingBudget: loadingBudgetAction,
   setSearch: actions.setSearchAction
 };
 

@@ -1,6 +1,6 @@
-import * as columns from "../../columns";
-import * as defaults from "../defaults";
-import BodyRowManager, { BodyRowManagerConfig } from "./body";
+import { tabling } from "lib";
+
+import BodyRowManager, { BodyRowManagerConfig, FieldNotApplicableForRow } from "./base";
 
 type CreatePlaceholderRowConfig<R extends Table.RowData> = {
   readonly id: Table.PlaceholderRowId;
@@ -18,7 +18,7 @@ type PlaceholderRowConfig<
 class PlaceholderRowManager<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
-> extends BodyRowManager<Table.PlaceholderRow<R>, R, M> {
+> extends BodyRowManager<Table.PlaceholderRow<R>, R, M, [Partial<R> | undefined]> {
   public getRowChildren: ((m: M) => number[]) | undefined;
   public defaultData?: Table.DefaultDataOnCreate<R>;
 
@@ -30,20 +30,20 @@ class PlaceholderRowManager<
   getValueForRow<V extends Table.RawRowValue, C extends Table.ModelColumn<R, M, V>>(
     col: C,
     data?: Partial<R>
-  ): [V | undefined, boolean] {
+  ): V | undefined {
     if (col.isApplicableForRowType?.(this.rowType) === false) {
-      return [undefined, false];
+      throw new FieldNotApplicableForRow();
     }
     const defaultData =
       this.defaultData === undefined
         ? undefined
-        : defaults.applyDefaultsOnCreate(columns.filterModelColumns(this.columns), data, this.defaultData);
+        : tabling.rows.applyDefaultsOnCreate(tabling.columns.filterModelColumns(this.columns), data, this.defaultData);
     const defaultValue = defaultData === undefined ? undefined : (defaultData[col.field] as V | undefined);
 
     if (data === undefined || data[col.field] === undefined) {
-      return defaultValue === undefined ? [col.nullValue, true] : [defaultValue, true];
+      return defaultValue === undefined ? col.nullValue : defaultValue;
     }
-    return [data[col.field] as unknown as V, true];
+    return data[col.field] as unknown as V;
   }
 
   create(config: CreatePlaceholderRowConfig<R>): Table.PlaceholderRow<R> {

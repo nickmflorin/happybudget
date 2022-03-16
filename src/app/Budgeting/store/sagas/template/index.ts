@@ -17,7 +17,6 @@ const FringesActionMap = {
   handleEvent: actions.handleFringesTableEventAction,
   loading: actions.loadingFringesAction,
   response: actions.responseFringesAction,
-  loadingBudget: actions.loadingBudgetAction,
   updateBudgetInState: actions.updateBudgetInStateAction,
   setSearch: actions.setFringesSearchAction,
   responseFringeColors: actions.responseFringeColorsAction

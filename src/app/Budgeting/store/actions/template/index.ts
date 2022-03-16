@@ -9,7 +9,7 @@ export const responseBudgetAction = redux.actions.createAction<Model.Template | 
 export const requestBudgetAction = redux.actions.createAction<number>("template.Request");
 
 export const updateBudgetInStateAction =
-  redux.actions.createAction<Redux.UpdateActionPayload<Model.Template>>("template.UpdateInState");
+  redux.actions.createAction<Redux.UpdateModelPayload<Model.Template>>("template.UpdateInState");
 export const loadingFringesAction = redux.actions.createAction<boolean>("template.fringes.Loading");
 export const requestFringesAction = redux.actions.createTableAction<
   Redux.TableRequestPayload,

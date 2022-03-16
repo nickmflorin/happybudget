@@ -17,7 +17,7 @@ export const setBudgetsPaginationAction = redux.actions.createAction<Pagination>
 export const updateBudgetsOrderingAction = redux.actions.createAction<Redux.UpdateOrderingPayload>(
   "dashboard.budgets.UpdateOrdering"
 );
-export const updateBudgetInStateAction = redux.actions.createAction<Redux.UpdateActionPayload<Model.Budget>>(
+export const updateBudgetInStateAction = redux.actions.createAction<Redux.UpdateModelPayload<Model.SimpleBudget>>(
   "dashboard.budgets.UpdateInState"
 );
 export const addBudgetToStateAction = redux.actions.createAction<Model.SimpleBudget>("dashboard.budgets.AddToState");
@@ -34,7 +34,7 @@ export const setTemplatesPaginationAction = redux.actions.createAction<Paginatio
 export const updateTemplatesOrderingAction = redux.actions.createAction<Redux.UpdateOrderingPayload>(
   "dashboard.templates.UpdateOrdering"
 );
-export const updateTemplateInStateAction = redux.actions.createAction<Redux.UpdateActionPayload<Model.Template>>(
+export const updateTemplateInStateAction = redux.actions.createAction<Redux.UpdateModelPayload<Model.SimpleTemplate>>(
   "dashboard.templates.UpdateInState"
 );
 export const addTemplateToStateAction = redux.actions.createAction<Model.SimpleTemplate>(
@@ -56,7 +56,7 @@ export const updateCommunityTemplatesOrderingAction = redux.actions.createAction
   "dashboard.community.UpdateOrdering"
 );
 export const updateCommunityTemplateInStateAction = redux.actions.createAction<
-  Redux.UpdateActionPayload<Model.Template>
+  Redux.UpdateModelPayload<Model.SimpleTemplate>
 >("dashboard.community.UpdateInState");
 export const addCommunityTemplateToStateAction = redux.actions.createAction<Model.SimpleTemplate>(
   "dashboard.community.AddToState"
@@ -83,6 +83,6 @@ export const loadingContactsAction = redux.actions.createAction<boolean>("dashbo
 export const responseContactsAction =
   redux.actions.createAction<Http.TableResponse<Model.Contact>>("dashboard.contacts.Response");
 export const removeContactFromStateAction = redux.actions.createAction<number>("dashboard.contacts.RemoveFromState");
-export const updateContactInStateAction = redux.actions.createAction<Redux.UpdateActionPayload<Model.Contact>>(
+export const updateContactInStateAction = redux.actions.createAction<Redux.UpdateModelPayload<Model.Contact>>(
   "dashboard.contacts.UpdateInState"
 );

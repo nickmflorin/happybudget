@@ -24,8 +24,6 @@ export type AuthenticatedBudgetProps<P extends Model.Account | Model.SubAccount>
   readonly onShared: (token: Model.PublicToken) => void;
   readonly onShareUpdated: (token: Model.PublicToken) => void;
   readonly onUnshared: () => void;
-  readonly onParentUpdated: (p: P) => void;
-  readonly onBudgetUpdated: (m: Model.Budget) => void;
 };
 
 const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(

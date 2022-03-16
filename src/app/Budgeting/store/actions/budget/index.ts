@@ -12,7 +12,7 @@ export const responseBudgetAction = redux.actions.createAction<Model.Budget | nu
 export const requestBudgetAction = redux.actions.createAction<number>("budget.Request");
 
 export const updateBudgetInStateAction =
-  redux.actions.createAction<Redux.UpdateActionPayload<Model.Budget>>("budget.UpdateInState");
+  redux.actions.createAction<Redux.UpdateModelPayload<Model.Budget>>("budget.UpdateInState");
 export const loadingFringesAction = redux.actions.createAction<boolean>("budget.fringes.Loading");
 
 export const requestFringesAction = redux.actions.createTableAction<

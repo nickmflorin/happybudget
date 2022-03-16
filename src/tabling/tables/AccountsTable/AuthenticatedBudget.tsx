@@ -17,7 +17,6 @@ export type AuthenticatedBudgetProps = Omit<AuthenticatedTableProps<Model.Budget
   readonly onShared: (token: Model.PublicToken) => void;
   readonly onShareUpdated: (token: Model.PublicToken) => void;
   readonly onUnshared: () => void;
-  readonly onParentUpdated: (p: Model.Budget) => void;
 };
 
 const AuthenticatedBudget = (props: AuthenticatedBudgetProps): JSX.Element => {

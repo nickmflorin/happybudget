@@ -4,36 +4,33 @@ import * as budgeting from "../../../budgeting";
 import * as columns from "../../columns";
 import * as ids from "../ids";
 
-import BodyRowManager from "./body";
+import { BodyRowManagerConfig } from "./base";
+import EditableRowManager from "./editable";
 
 type CreateMarkupRowConfig = {
   readonly model: Model.Markup;
 };
 
-type MarkupRowManagerConfig<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
-  readonly columns: Table.Column<R, M>[];
-};
-
 class MarkupRowManager<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel
-> extends BodyRowManager<Table.MarkupRow<R>, R, M> {
-  constructor(config: MarkupRowManagerConfig<R, M>) {
+> extends EditableRowManager<Table.MarkupRow<R>, R, M, [Model.Markup]> {
+  constructor(config: Omit<BodyRowManagerConfig<Table.MarkupRow<R>, R, M>, "rowType">) {
     super({ ...config, rowType: "markup" });
   }
 
   getValueForRow<V extends Table.RawRowValue, C extends Table.ModelColumn<R, M, V>>(
     col: C,
     markup: Model.Markup
-  ): [V | undefined, boolean] {
+  ): V | undefined {
     // The FakeColumn(s) are not applicable for Markups.
     if (columns.isDataColumn<R, M>(col) && !isNil(col.markupField)) {
-      return [markup[col.markupField] as V | undefined, true];
+      return markup[col.markupField] as V | undefined;
     }
-    /* We want to indicate that the value is nnot applicable for the column so
-		 	 that it is not included in the row data and a warning is not issued when
-			 the value is undefined */
-    return [undefined, false];
+    /* We need to indicate that the value is not applicable for the column for
+       this GroupRow, otherwise a warning will be issued and the value will be
+       set to the column's `nullValue`. */
+    this.throwNotApplicable();
   }
 
   removeChildren(row: Table.MarkupRow<R>, Ids: SingleOrArray<number>): Table.MarkupRow<R> {

@@ -8,12 +8,44 @@ import * as columns from "./columns";
 import * as events from "./events";
 import * as rows from "./rows";
 
+export const task = <
+  E extends Table.ChangeEvent<R>,
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+  C extends Table.Context
+>(
+  saga: Redux.TableChangeEventTask<E, R, C>,
+  table: Table.TableInstance<R, M>,
+  defaultErrorMessage: string
+): Redux.TableChangeEventTask<E, R, C> =>
+  function* (e: E, ctx: Redux.WithActionContext<C>): SagaIterator {
+    table.saving(true);
+    try {
+      yield call(saga, e, ctx);
+    } catch (err: unknown) {
+      if (!isNil(e.onError)) {
+        e.onError(err as Error);
+      } else {
+        table.handleRequestError(err as Error, {
+          message: ctx.errorMessage || defaultErrorMessage,
+          dispatchClientErrorToSentry: true
+        });
+      }
+    } finally {
+      table.saving(false);
+    }
+  };
+
 export const createChangeEventHandler = <R extends Table.RowData, C extends Table.Context = Table.Context>(
   handlers: Partial<Redux.TableChangeEventTaskMapObject<R, C>>
 ): Redux.TableChangeEventTask<Table.ChangeEvent<R>, R, C> => {
   function* handleChangeEvent<E extends Table.ChangeEvent<R>>(e: E, context: Redux.WithActionContext<C>): SagaIterator {
-    const handler = handlers[e.type] as Redux.TableChangeEventTask<E, R, C>;
-    yield call(handler, e, context);
+    const handler = handlers[e.type] as Redux.TableChangeEventTask<E, R, C> | undefined;
+    if (!isNil(handler)) {
+      yield call(handler, e, context);
+    } else {
+      console.error(`Detected event type ${e.type} for which a task is not registered!`);
+    }
   }
   return handleChangeEvent;
 };

@@ -1,6 +1,6 @@
 import { isNil, reduce } from "lodash";
 
-import * as columns from "../columns";
+import { tabling } from "lib";
 
 type Context = "update" | "create";
 
@@ -59,7 +59,7 @@ function insertDefaults<R extends Table.RowData, M extends Model.RowHttpModel, D
   let key: keyof R;
   for (key in defaults) {
     // A warning will be issued if the column is null.
-    const column = columns.getColumn(cs, key);
+    const column = tabling.columns.getColumn(cs, key);
     if (!isNil(column)) {
       if (data[key] === undefined) {
         if (context === "update") {

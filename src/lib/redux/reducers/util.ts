@@ -1,8 +1,6 @@
 import { map } from "lodash";
 
-import * as notifications from "../../notifications";
-import * as models from "../../models";
-import * as typeguards from "../typeguards";
+import { redux, models, notifications } from "lib";
 
 export const isClearOnAction = <T extends Redux.ActionPayload, C extends Table.Context = Table.Context>(
   clearOn: Redux.ClearOn<T, C>[],
@@ -10,7 +8,7 @@ export const isClearOnAction = <T extends Redux.ActionPayload, C extends Table.C
 ): boolean => {
   for (let i = 0; i < clearOn.length; i++) {
     const clearer = clearOn[i];
-    if (typeguards.isClearOnDetail(clearer)) {
+    if (redux.typeguards.isClearOnDetail(clearer)) {
       if (clearer.action.toString() === action.type && clearer.payload(action.payload) === true) {
         return true;
       }
@@ -68,8 +66,3 @@ export const modelFromState = <M extends Model.Model>(
   id: Model.ModelLookup<M> | M,
   options?: Model.GetReduxModelOptions<M>
 ): M | null => (isModel(id) ? id : findModelInData<M>(data, id as Model.ModelLookup<M>, options));
-
-export const identityReducer =
-  <S>(initialState: S): Redux.Reducer<S> =>
-  (st: S = initialState) =>
-    st;
