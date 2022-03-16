@@ -17,6 +17,10 @@ declare namespace Model {
     readonly type: T;
   };
 
+  type RowHttpModel<T extends RowHttpModelType = RowHttpModelType> = GenericHttpModel<T> & {
+    readonly order: string;
+  };
+
   type PublicHttpModel<T extends HttpModelType = HttpModelType> = GenericHttpModel<T> & {
     readonly public_token: PublicToken | null;
   };
@@ -42,10 +46,6 @@ declare namespace Model {
   type InferModelFromNameParams<M extends Model> = Omit<GetModelOptions<M>, "onMissing"> & {
     readonly getName?: (m: M) => string | null | undefined;
     readonly caseInsensitive?: boolean;
-  };
-
-  type RowHttpModel<T extends RowHttpModelType = RowHttpModelType> = GenericHttpModel<T> & {
-    readonly order: string;
   };
 
   type Choice<I extends number = number, N extends string = string> = {
@@ -82,13 +82,13 @@ declare namespace Model {
 
   type Entity = Account | SubAccount | Budget | Template | Markup;
 
-  type ModelWithColor = HttpModel & { color: Style.HexColor | null };
+  type ModelWithColor<M extends HttpModel> = M & { color: Style.HexColor | null };
 
-  type ModelWithName = HttpModel & { name: string | null };
+  type ModelWithName<M extends HttpModel> = M & { name: string | null };
 
-  type ModelWithDescription = HttpModel & { description: string | null };
+  type ModelWithDescription<M extends HttpModel> = M & { description: string | null };
 
-  type ModelWithIdentifier = HttpModel & { identifier: string | null };
+  type ModelWithIdentifier<M extends HttpModel> = M & { identifier: string | null };
 
   type Tag = HttpModel & {
     readonly title: string;
