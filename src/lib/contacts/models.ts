@@ -1,3 +1,5 @@
+import { isNil } from "lodash";
+
 import * as models from "../models";
 
 export enum ContactTypeNames {
@@ -13,4 +15,6 @@ export const ContactTypes = models.Choices([
 ]);
 
 export const contactName = (contact: Model.Contact): string | null =>
-  contact.contact_type?.id === ContactTypes.Vendor.id ? contact.company : contact.full_name;
+  contact.contact_type?.id === ContactTypes.Vendor.id && !isNil(contact.company) && contact.company.trim() !== ""
+    ? contact.company
+    : contact.full_name;
