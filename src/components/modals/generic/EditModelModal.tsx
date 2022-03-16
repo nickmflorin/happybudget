@@ -16,8 +16,12 @@ export type UpdateModelCallbacks<R> = {
   readonly onSuccess: (m: R) => void;
 };
 
-interface PrivateEditModelModalProps<M extends Model.Model, P extends Http.PayloadObj, V = P, R = M>
-  extends EditModelModalProps<M, R> {
+interface PrivateEditModelModalProps<
+  M extends Model.GenericHttpModel,
+  P extends Http.ModelPayload<M> = Http.ModelPayload<M>,
+  V = P,
+  R = M
+> extends EditModelModalProps<M, R> {
   readonly form?: FormInstance<V>;
   readonly title?: string | JSX.Element | ((m: M, form: FormInstance<V>) => JSX.Element | string);
   readonly autoFocusField?: number;
@@ -39,7 +43,12 @@ interface PrivateEditModelModalProps<M extends Model.Model, P extends Http.Paylo
   readonly convertEmptyStringsToNull?: (keyof P)[] | boolean;
 }
 
-const EditModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = P, R = M>({
+const EditModelModal = <
+  M extends Model.GenericHttpModel,
+  P extends Http.ModelPayload<M> = Http.ModelPayload<M>,
+  V = P,
+  R = M
+>({
   id,
   autoFocusField,
   form,

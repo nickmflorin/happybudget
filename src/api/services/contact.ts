@@ -31,12 +31,12 @@ export const getContactTaggedActuals = services.detailListService<Model.TaggedAc
 ]);
 
 export const bulkUpdateContacts = services.bulkUpdateService<
-  Http.ContactPayload,
+  Http.ModelPayload<Model.Contact>,
   Http.ChildListResponse<Model.Contact>
 >(["contacts", "bulk-update"]);
 
 export const bulkCreateContacts = services.bulkCreateService<
-  Http.ContactPayload,
+  Http.ModelPayload<Model.Contact>,
   Http.ChildListResponse<Model.Contact>
 >(["contacts", "bulk-create"]);
 

@@ -169,4 +169,19 @@ declare namespace Http {
   type SyncCheckoutSessionPayload = {
     readonly session_id: string;
   };
+
+  type ModelPayloadMap = {
+    contact: ContactPayload;
+    actual: ActualPayload;
+    budget: BudgetPayload | TemplatePayload;
+    fringe: FringePayload;
+    markup: MarkupPayload;
+    account: AccountPayload;
+    subaccount: SubAccountPayload;
+    group: GroupPayload;
+  };
+
+  type ModelPayload<M extends Model.GenericHttpModel> = M["type"] extends keyof ModelPayloadMap
+    ? ModelPayloadMap[M["type"]]
+    : never;
 }

@@ -46,7 +46,7 @@ const CreateGroupModal = <
   }, [id]);
 
   return (
-    <CreateModelModal<Model.Group, Http.GroupPayload>
+    <CreateModelModal<Model.Group>
       {...props}
       title={"Subtotal"}
       titleIcon={"folder"}

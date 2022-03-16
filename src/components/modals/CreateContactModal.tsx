@@ -56,7 +56,7 @@ const CreateContactModal = ({ initialValues, ...props }: CreateContactModalProps
   );
 
   return (
-    <CreateModelModal
+    <CreateModelModal<Model.Contact>
       {...props}
       className={"contact-modal"}
       form={form}
