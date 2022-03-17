@@ -1,24 +1,22 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 
 interface HorizontalFlexCenterProps extends StandardComponentProps {
   children: ReactNode;
 }
 
-const HorizontalFlexCenter: React.FC<HorizontalFlexCenterProps> = ({ children, className, style = {} }) => {
-  return (
-    <div
-      className={className}
-      style={{
-        ...style,
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center"
-      }}
-    >
-      {children}
-    </div>
-  );
-};
+const HorizontalFlexCenter: React.FC<HorizontalFlexCenterProps> = ({ children, className, style = {} }) => (
+  <div
+    className={className}
+    style={{
+      ...style,
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center"
+    }}
+  >
+    {children}
+  </div>
+);
 
-export default HorizontalFlexCenter;
+export default React.memo(HorizontalFlexCenter);
