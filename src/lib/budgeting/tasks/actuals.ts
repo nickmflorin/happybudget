@@ -199,7 +199,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsAuthe
   }
 
   function* handleRowAddEvent(e: Table.RowAddEvent<R>, ctx: Tables.ActualTableContext): SagaIterator {
-    yield fork(bulkCreateTask, e, ctx);
+    yield call(bulkCreateTask, e, ctx);
   }
 
   function* handleRowDeleteEvent(e: Table.RowDeleteEvent, ctx: Tables.ActualTableContext): SagaIterator {

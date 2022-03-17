@@ -1,5 +1,5 @@
 import { SagaIterator } from "redux-saga";
-import { put, fork, select } from "redux-saga/effects";
+import { put, fork, select, call } from "redux-saga/effects";
 import { filter } from "lodash";
 
 import * as api from "api";
@@ -143,7 +143,7 @@ export const createTableTaskSet = (
   }
 
   function* handleRowAddEvent(e: Table.RowAddEvent<R>, ctx: CTX): SagaIterator {
-    yield fork(bulkCreateTask, e, ctx);
+    yield call(bulkCreateTask, e, ctx);
   }
 
   function* handleRowDeleteEvent(e: Table.RowDeleteEvent, ctx: CTX): SagaIterator {
