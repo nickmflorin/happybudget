@@ -35,8 +35,8 @@ export const FieldErrorCodes: { [key: string]: Http.FieldErrorCode } = {
 };
 
 export const GlobalErrorCodes: { [key: string]: Http.GlobalErrorCode } = {
-  PDF_ERROR: "pdf_error",
-  RATE_LIMITED: "rate_limited"
+  BAD_REQUEST: "bad_request",
+  EMAIL_ERROR: "email_error"
 };
 
 export const HttpErrorCodes: { [key: string]: Http.HttpErrorCode } = {
