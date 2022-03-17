@@ -97,7 +97,7 @@ export const getRedoEvent = <R extends Table.RowData, S extends Redux.TableStore
   if (isNil(nextEvent)) {
     return null;
   }
-  return nextEvent;
+  return { ...nextEvent, meta: "forward" };
 };
 
 export const getUndoEvent = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(

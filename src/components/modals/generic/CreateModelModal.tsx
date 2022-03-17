@@ -15,8 +15,12 @@ export type CreateModelCallbacks<R> = {
   readonly onSuccess: (m: R) => void;
 };
 
-interface PrivateCreateModelModalProps<M extends Model.Model, P extends Http.PayloadObj, V = P, R = M>
-  extends CreateModelModalProps<M, R> {
+interface PrivateCreateModelModalProps<
+  M extends Model.GenericHttpModel,
+  P extends Http.ModelPayload<M> = Http.ModelPayload<M>,
+  V = P,
+  R = M
+> extends CreateModelModalProps<M, R> {
   readonly form?: FormInstance<V>;
   readonly title?: string | JSX.Element | ((form: FormInstance<V>) => JSX.Element | string);
   readonly autoFocusField?: number;
@@ -36,7 +40,12 @@ interface PrivateCreateModelModalProps<M extends Model.Model, P extends Http.Pay
   readonly convertEmptyStringsToNull?: (keyof P)[] | boolean;
 }
 
-const CreateModelModal = <M extends Model.Model, P extends Http.PayloadObj, V = P, R = M>({
+const CreateModelModal = <
+  M extends Model.GenericHttpModel,
+  P extends Http.ModelPayload<M> = Http.ModelPayload<M>,
+  V = P,
+  R = M
+>({
   autoFocusField,
   form,
   requestOptions,
