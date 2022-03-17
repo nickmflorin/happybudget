@@ -462,7 +462,7 @@ export const createAuthenticatedTableTaskSet = <
 
   function* handleRowAddEvent(e: Table.RowAddEvent<R>, ctx: CTX): SagaIterator {
     if (!isNil(bulkCreateTask)) {
-      yield fork(bulkCreateTask, e, ctx);
+      yield call(bulkCreateTask, e, ctx);
     }
   }
 

@@ -280,7 +280,7 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
   }
 
   function* handleRowAddEvent(e: Table.RowAddEvent<R>, ctx: CTX): SagaIterator {
-    yield fork(bulkCreateTask, e, { errorMessage: "There was an error creating the rows", ...ctx });
+    yield call(bulkCreateTask, e, { errorMessage: "There was an error creating the rows", ...ctx });
   }
 
   function* handleRowDeleteEvent(e: Table.RowDeleteEvent, ctx: CTX): SagaIterator {
