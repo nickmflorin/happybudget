@@ -1,3 +1,6 @@
+export const isModelType = <M extends Model.GenericHttpModel>(m: Model.GenericHttpModel, t: M["type"]): m is M =>
+  (m as M).type === t;
+
 export const isModelWithColor = <M extends Model.Model>(
   model: M | Model.ModelWithColor<M>
 ): model is Model.ModelWithColor<M> => (model as Model.ModelWithColor<M>).color !== undefined;
