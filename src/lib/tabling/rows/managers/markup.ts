@@ -1,8 +1,6 @@
 import { isNil, filter, includes } from "lodash";
 
-import * as budgeting from "../../../budgeting";
-import * as columns from "../../columns";
-import * as ids from "../ids";
+import { model, tabling } from "lib";
 
 import { BodyRowManagerConfig } from "./base";
 import EditableRowManager from "./editable";
@@ -24,7 +22,7 @@ class MarkupRowManager<
     markup: Model.Markup
   ): V | undefined {
     // The FakeColumn(s) are not applicable for Markups.
-    if (columns.isDataColumn<R, M>(col) && !isNil(col.markupField)) {
+    if (tabling.columns.isDataColumn<R, M>(col) && !isNil(col.markupField)) {
       return markup[col.markupField] as V | undefined;
     }
     /* We need to indicate that the value is not applicable for the column for
@@ -46,11 +44,11 @@ class MarkupRowManager<
       ...this.createBasic(
         {
           ...config,
-          id: ids.markupRowId(config.model.id)
+          id: tabling.rows.markupRowId(config.model.id)
         },
         config.model
       ),
-      children: budgeting.typeguards.isPercentMarkup(config.model) ? config.model.children : [],
+      children: model.budgeting.isPercentMarkup(config.model) ? config.model.children : [],
       markupData: {
         unit: config.model.unit,
         rate: config.model.rate

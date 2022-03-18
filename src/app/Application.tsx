@@ -3,7 +3,7 @@ import { Switch, Redirect, Route } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 
-import { actions } from "store";
+import * as store from "store";
 
 import { MultipleBudgetProductPermissionModal } from "components/modals";
 import { NotFoundRoute, PathParamsRoute } from "components/routes";
@@ -43,7 +43,7 @@ const Application = (): JSX.Element => {
       </Switch>
       <MultipleBudgetProductPermissionModal
         open={ProductPermissionModalOpen}
-        onCancel={() => dispatch(actions.authenticated.setProductPermissionModalOpenAction(false))}
+        onCancel={() => dispatch(store.actions.setProductPermissionModalOpenAction(false))}
       />
     </React.Fragment>
   );

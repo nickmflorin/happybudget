@@ -12,7 +12,7 @@ export interface PrimaryButtonIconToggleProps extends Omit<ButtonProps, "icon" |
 }
 
 const PrimaryButtonIconToggle = ({ icon, breakpoint, text, ...props }: PrimaryButtonIconToggleProps): JSX.Element => {
-  const isLessThan = ui.hooks.useLessThanBreakpoint(breakpoint);
+  const isLessThan = ui.useLessThanBreakpoint(breakpoint);
   if (isLessThan) {
     return <PrimaryIconButton icon={icon} {...props} />;
   }

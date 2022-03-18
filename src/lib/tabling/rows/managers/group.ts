@@ -1,7 +1,6 @@
 import { isNil, filter, includes } from "lodash";
 
-import * as columns from "../../columns";
-import * as ids from "../ids";
+import { tabling } from "lib";
 
 import BodyRowManager, { BodyRowManagerConfig } from "./base";
 
@@ -22,7 +21,7 @@ class GroupRowManager<
     group: Model.Group
   ): V | undefined {
     // The FakeColumn(s) are not applicable for Groups.
-    if (columns.isDataColumn<R, M>(col) && !isNil(col.groupField)) {
+    if (tabling.columns.isDataColumn<R, M>(col) && !isNil(col.groupField)) {
       return group[col.groupField] as V;
     }
     /* We need to indicate that the value is not applicable for the column for
@@ -44,7 +43,7 @@ class GroupRowManager<
       ...this.createBasic(
         {
           ...config,
-          id: ids.groupRowId(config.model.id)
+          id: tabling.rows.groupRowId(config.model.id)
         },
         config.model
       ),

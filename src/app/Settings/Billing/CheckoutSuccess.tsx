@@ -40,7 +40,7 @@ const CheckoutSuccess = (): JSX.Element => {
       api
         .syncCheckoutSession({ session_id: sessionId })
         .then((u: Model.User) => {
-          dispatch(actions.authenticated.updateLoggedInUserAction(u));
+          dispatch(actions.updateLoggedInUserAction(u));
           setRedirect({
             pathname: "/billing",
             state: {

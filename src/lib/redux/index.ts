@@ -1,7 +1,8 @@
 export * as actions from "./actions";
-export * as hooks from "./hooks";
-export * as initialState from "./initialState";
+export * from "./hooks";
+export * from "./initialState";
 export * as reducers from "./reducers";
-export * as sagas from "./sagas";
-export * as selectors from "./selectors";
-export * as typeguards from "./typeguards";
+export * from "./sagas";
+export * from "./selectors";
+export * from "./typeguards";
+export * from "./util";

@@ -14,7 +14,7 @@ export type RouterLinkProps = LinkProps &
 
 const RouterLink = ({ className, children, tooltip, icon, disabled, dark, ...props }: RouterLinkProps): JSX.Element => {
   const [isHovered, setIsHovered] = useState(false);
-  const prefix = ui.hooks.useClickableIcon(icon, { isHovered });
+  const prefix = ui.useClickableIcon(icon, { isHovered });
 
   return (
     <TooltipWrapper tooltip={tooltip}>

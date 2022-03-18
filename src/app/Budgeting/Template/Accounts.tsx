@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
-import { budgeting, tabling } from "lib";
+import { budgeting, tabling, model } from "lib";
 import { AccountsTable as GenericAccountsTable, connectTableToAuthenticatedStore } from "tabling";
 
 import { BudgetPage } from "../Pages";
@@ -33,7 +33,7 @@ const ConnectedTable = connectTableToAuthenticatedStore<
       (state: Application.Store) => state.template.detail.data,
       (budget: Model.Template | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
-        estimated: !isNil(budget) ? budgeting.businessLogic.estimatedValue(budget) : 0.0
+        estimated: !isNil(budget) ? model.budgeting.estimatedValue(budget) : 0.0
       })
     )
   }

@@ -32,7 +32,7 @@ const createDataChangeEventReducer =
     } = {};
     for (let i = 0; i < consolidated.length; i++) {
       if (isNil(changesPerRow[consolidated[i].id])) {
-        const r: Table.EditableRow<R> | null = redux.reducers.findModelInData<Table.EditableRow<R>>(
+        const r: Table.EditableRow<R> | null = redux.findModelInData<Table.EditableRow<R>>(
           filter(s.data, (ri: Table.BodyRow<R>) => tabling.rows.isEditableRow(ri)) as Table.EditableRow<R>[],
           consolidated[i].id
         );

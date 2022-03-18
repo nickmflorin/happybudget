@@ -2,11 +2,11 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { isNil, map, filter } from "lodash";
 
-import { models, tabling, hooks } from "lib";
+import { model, tabling, hooks } from "lib";
 import { framework } from "tabling/generic";
 
 import { selectors } from "app/Budgeting/store";
-import { useGrouping, useMarkup } from "components/hooks";
+import { useGrouping, useMarkup } from "components/model/hooks";
 import { AuthenticatedBudgetTable, AuthenticatedBudgetTableProps } from "../BudgetTable";
 import useKeyboardNavigation, { UseKeyboardNavigationReturnType } from "./useKeyboardNavigation";
 import { Framework } from "./framework";
@@ -58,7 +58,7 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
   );
 
   const processUnitCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
-    models.inferModelFromName<Model.Tag>(subaccountUnits, name, {
+    model.inferModelFromName<Model.Tag>(subaccountUnits, name, {
       getName: (m: Model.Tag) => m.title,
       warnOnMissing: false
     })
@@ -68,7 +68,7 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
     /* Here, we convert from IDs to Rows then back to IDs to ensure that the
        IDs are valid. */
     return map(
-      models.getModels<Tables.FringeRow>(fringes, models.parseIdsFromDeliminatedString(value), {
+      model.getModels<Tables.FringeRow>(fringes, model.parseIdsFromDeliminatedString(value), {
         warnOnMissing: false,
         modelName: "fringe"
       }),
@@ -77,7 +77,7 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
   });
 
   const processFringesCellForClipboard = hooks.useDynamicCallback((row: R) => {
-    const fs = models.getModels<Tables.FringeRow>(fringes, row.fringes, { modelName: "fringe" });
+    const fs = model.getModels<Tables.FringeRow>(fringes, row.fringes, { modelName: "fringe" });
     return map(fs, (fringe: Tables.FringeRow) => fringe.id).join(", ");
   });
 

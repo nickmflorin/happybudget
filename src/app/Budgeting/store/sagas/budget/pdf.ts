@@ -2,14 +2,14 @@ import { SagaIterator } from "redux-saga";
 import { spawn, take, cancel, fork, put } from "redux-saga/effects";
 
 import * as api from "api";
-import { notifications } from "lib";
+import { notifications, http } from "lib";
 
 import * as actions from "../../actions/budget/pdf";
 
 function* loadHeaderTemplateTask(action: Redux.Action<number>): SagaIterator {
   yield put(actions.setLoadingHeaderTemplateDetailAction(true));
   try {
-    const response: Model.HeaderTemplate = yield api.request(api.getHeaderTemplate, action.context, action.payload);
+    const response: Model.HeaderTemplate = yield http.request(api.getHeaderTemplate, action.context, action.payload);
     yield put(actions.displayHeaderTemplateAction(response));
   } catch (e: unknown) {
     // TODO: It would be more appropriate to show the error in the Modal.
@@ -33,7 +33,7 @@ function* watchForLoadHeaderTemplateTask(): SagaIterator {
 function* getHeaderTemplatesTask(action: Redux.Action<null>): SagaIterator {
   yield put(actions.loadingHeaderTemplatesAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleHeaderTemplate> = yield api.request(
+    const response: Http.ListResponse<Model.SimpleHeaderTemplate> = yield http.request(
       api.getHeaderTemplates,
       action.context,
       {}

@@ -34,7 +34,7 @@ const rowDeleteEventReducer = <R extends Table.RowData, S extends Redux.TableSto
 ): S => {
   const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
 
-  const modelRows: Table.ModelRow<R>[] = redux.reducers.findModelsInData<Table.ModelRow<R>>(
+  const modelRows: Table.ModelRow<R>[] = redux.findModelsInData<Table.ModelRow<R>>(
     filter(s.data, (r: Table.BodyRow<R>) => tabling.rows.isModelRow(r)) as Table.ModelRow<R>[],
     filter(ids, (id: Table.ModelRowId | Table.MarkupRowId) => tabling.rows.isModelRowId(id)) as Table.ModelRowId[]
   );

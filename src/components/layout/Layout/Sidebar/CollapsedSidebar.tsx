@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import classNames from "classnames";
 
-import { users } from "lib";
+import * as store from "store";
 
 import { Icon } from "components";
 import { IconButton } from "components/buttons";
@@ -17,7 +17,7 @@ export interface CollapsedSidebarProps
 }
 
 const CollapsedSidebar = ({ toggle, ...props }: CollapsedSidebarProps): JSX.Element => {
-  const user = users.hooks.useUser();
+  const user = store.hooks.useUser();
 
   return (
     <GenericSidebar<ICollapsedSidebarItem>

@@ -6,7 +6,7 @@ import { Select, Switch, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import * as api from "api";
-import { typeguards } from "lib";
+import { model } from "lib";
 
 import { Icon, Form, ShowHide, Separator } from "components";
 import { ColumnSelect, Input, CKEditor } from "components/fields";
@@ -247,10 +247,10 @@ const ExportForm = (
         right_info: data.right_info,
         name
       };
-      if (!isNil(data.left_image) && typeguards.isUploadedImage(data.left_image)) {
+      if (!isNil(data.left_image) && model.isUploadedImage(data.left_image)) {
         requestPayload = { ...requestPayload, left_image: data.left_image.data };
       }
-      if (!isNil(data.right_image) && typeguards.isUploadedImage(data.right_image)) {
+      if (!isNil(data.right_image) && model.isUploadedImage(data.right_image)) {
         requestPayload = { ...requestPayload, right_image: data.right_image.data };
       }
       if (!isNil(original)) {
@@ -309,12 +309,12 @@ const ExportForm = (
       };
       /* We only want to include the images in the payload if they were changed
 				 - this means they are either null or of the UploadedImage form. */
-      if (!isNil(data.left_image) && typeguards.isUploadedImage(data.left_image)) {
+      if (!isNil(data.left_image) && model.isUploadedImage(data.left_image)) {
         requestPayload = { ...requestPayload, left_image: data.left_image.data };
       } else if (isNil(data.left_image)) {
         requestPayload = { ...requestPayload, left_image: null };
       }
-      if (!isNil(data.right_image) && typeguards.isUploadedImage(data.right_image)) {
+      if (!isNil(data.right_image) && model.isUploadedImage(data.right_image)) {
         requestPayload = { ...requestPayload, right_image: data.right_image.data };
       } else if (isNil(data.right_image)) {
         requestPayload = { ...requestPayload, right_image: null };

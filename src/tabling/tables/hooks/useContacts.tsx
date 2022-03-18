@@ -3,8 +3,10 @@ import { Dispatch } from "redux";
 import { useDispatch } from "react-redux";
 import { isNil, find } from "lodash";
 
-import { models, tabling, hooks, contacts } from "lib";
-import { useContacts as useContactsComponents, EditContactParams, CreateContactParams } from "components/hooks";
+import { model, tabling, hooks } from "lib";
+import * as store from "store";
+
+import { useContacts as useContactsComponents, EditContactParams, CreateContactParams } from "components/model/hooks";
 
 type UseContactsReturnType<
   R extends Tables.ActualRowData | Tables.SubAccountRowData | Tables.ContactRowData,
@@ -34,7 +36,7 @@ const useContacts = <
 >(
   props: UseContactsProps<R, M>
 ): UseContactsReturnType<R, M> => {
-  const cs = contacts.hooks.useContacts();
+  const cs = store.hooks.useContacts();
   const dispatch: Dispatch = useDispatch();
 
   const processCellForClipboard = hooks.useDynamicCallback((row: R) => {
@@ -42,14 +44,14 @@ const useContacts = <
     if (isNil(id)) {
       return "";
     }
-    const m = models.getModel(cs, id, { modelName: "contact" });
+    const m = model.getModel(cs, id, { modelName: "contact" });
     return m?.full_name || "";
   });
 
   const processCellForCSV = hooks.useDynamicCallback((row: R) => {
     if (!isNil(row.contact)) {
-      const m: Model.Contact | null = models.getModel(cs, row.contact);
-      return (!isNil(m) && contacts.models.contactName(m)) || "";
+      const m: Model.Contact | null = model.getModel(cs, row.contact);
+      return (!isNil(m) && model.contact.contactName(m)) || "";
     }
     return "";
   });
@@ -58,7 +60,7 @@ const useContacts = <
     if (name.trim() === "") {
       return null;
     } else {
-      const names = models.parseFirstAndLastName(name);
+      const names = model.parseFirstAndLastName(name);
       const contact: Model.Contact | undefined = find(cs, {
         first_name: names[0],
         last_name: names[1]
@@ -81,7 +83,7 @@ const useContacts = <
           },
           cellEditorParams: {
             onNewContact: (params: { name?: string; rowId: Table.ModelRowId }) => createContact(params),
-            setSearch: (v: string) => dispatch(contacts.actions.setContactsSearchAction(v, {}))
+            setSearch: (v: string) => dispatch(store.actions.setContactsSearchAction(v, {}))
           },
           processCellFromClipboard
         }

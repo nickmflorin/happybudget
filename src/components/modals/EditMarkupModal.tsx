@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { ui, budgeting } from "lib";
+import { ui, model, http } from "lib";
 
 import { MarkupForm } from "components/forms";
 import { IMarkupForm } from "components/forms/MarkupForm";
@@ -36,8 +36,8 @@ const EditMarkupModal = <
   table,
   ...props
 }: EditMarkupModalProps<B, PARENT, R, M, RSP>): JSX.Element => {
-  const form = ui.hooks.useFormIfNotDefined<MarkupFormValues>({ isInModal: true });
-  const [cancelToken] = api.useCancelToken();
+  const form = ui.useFormIfNotDefined<MarkupFormValues>({ isInModal: true });
+  const [cancelToken] = http.useCancelToken();
   const markupRef = useRef<IMarkupForm>(null);
 
   const [availableChildren, setAvailableChildren] = useState<MM[]>([]);
@@ -69,7 +69,7 @@ const EditMarkupModal = <
         const { rate, children, ...payload } = p;
         let mutated = { ...payload } as Http.MarkupPayload;
         // FLAT Markups do not have any children.
-        if (mutated.unit === budgeting.models.MarkupUnits.Percent.id) {
+        if (mutated.unit === model.budgeting.MarkupUnits.Percent.id) {
           /* The children should not be an empty list as the Form should have
 						 already validated that. */
           mutated = { ...mutated, children };
@@ -94,7 +94,7 @@ const EditMarkupModal = <
           { name: "description", value: markup.description },
           { name: "unit", value: markup.unit?.id === undefined ? null : markup.unit.id }
         ];
-        if (budgeting.typeguards.isPercentMarkup(markup)) {
+        if (model.budgeting.isPercentMarkup(markup)) {
           fields = [
             ...fields,
             { name: "children", value: markup.children },

@@ -1,6 +1,7 @@
 import { reduce, isEqual } from "lodash";
 
-import * as api from "api";
+import { http } from "lib";
+
 import { objToJson } from "../util";
 import * as typeguards from "./typeguards";
 
@@ -10,7 +11,7 @@ import * as typeguards from "./typeguards";
  * as the `inspect` package will replace circular references with [Circular].
  */
 export const notificationDetailToString = (e: NotificationDetail) => {
-  return e instanceof Error ? String(e) : typeof e === "string" ? e : api.standardizeError(e).message;
+  return e instanceof Error ? String(e) : typeof e === "string" ? e : http.standardizeError(e).message;
 };
 
 export const notificationDetailsEqual = (
@@ -25,7 +26,7 @@ export const notificationDetailsEqual = (
     return true;
   } else if (n1 === undefined || n2 === undefined) {
     return false;
-  } else if (api.typeguards.isHttpError(n1) && api.typeguards.isHttpError(n2) && isEqual(n1, n2)) {
+  } else if (http.isHttpError(n1) && http.isHttpError(n2) && isEqual(n1, n2)) {
     return true;
   }
   return false;
@@ -44,7 +45,7 @@ const StringEquality: UINotificationEquality<string> = {
 };
 
 const HttpErrorEquality: UINotificationEquality<Http.Error> = {
-  typeguard: (n: UINotificationType): n is Http.Error => api.typeguards.isHttpError(n),
+  typeguard: (n: UINotificationType): n is Http.Error => http.isHttpError(n),
   func: (n1: Http.Error, n2: Http.Error) => isEqual(n1, n2)
 };
 
@@ -114,16 +115,16 @@ const StringStandard: UINotificationStandard<string> = {
 };
 
 const HttpErrorStandard: UINotificationStandard<Http.Error> = {
-  typeguard: (n: UINotificationType): n is Http.Error => api.typeguards.isHttpError(n),
+  typeguard: (n: UINotificationType): n is Http.Error => http.isHttpError(n),
   func: (e: Http.Error, opts?: Omit<UINotificationOptions, "behavior">) =>
     CentralStandardizer(
       {
-        message: opts?.message || api.standardizeError(e).message,
+        message: opts?.message || http.standardizeError(e).message,
         detail:
           opts?.detail !== undefined
             ? opts?.detail
             : opts?.message !== undefined
-            ? api.standardizeError(e).message
+            ? http.standardizeError(e).message
             : undefined,
         level: "warning"
       },

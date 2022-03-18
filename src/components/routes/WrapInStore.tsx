@@ -7,7 +7,7 @@ import axios, { CancelToken } from "axios";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { notifications, users } from "lib";
+import { notifications, model, http } from "lib";
 import { ApplicationSpinner, ConnectedApplicationSpinner } from "components";
 import { configure } from "store";
 
@@ -86,7 +86,7 @@ const propsArePublic = (props: WrapInStoreProps): props is WrapInPublicStoreProp
 
 const handleUser = (user: Model.User) => {
   Sentry.setUser({ email: user.email, id: String(user.id) });
-  users.plugins.identify(user);
+  model.user.identify(user);
 };
 
 type RedirectPath = "/login" | "/404";
@@ -94,7 +94,7 @@ type RedirectPath = "/login" | "/404";
 const WrapInStore = (props: WrapInStoreProps & { readonly children: ReactNode }): JSX.Element => {
   const [redirect, setRedirect] = useState<RedirectPath | null>(null);
   const [reduxStore, setReduxStore] = useState<Store<Application.Store, Redux.Action> | undefined>(undefined);
-  const [newCancelToken] = api.useCancelToken();
+  const [newCancelToken] = http.useCancelToken();
   const urlParams = useParams<UrlParams>();
 
   /* There are cases, mostly login cases, where we do not need to revalidate

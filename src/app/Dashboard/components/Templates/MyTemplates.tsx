@@ -34,9 +34,9 @@ interface MyTemplatesProps {
 const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, setTemplateToDerive }): JSX.Element => {
   const [templateToEdit, setTemplateToEdit] = useState<number | undefined>(undefined);
   const [createTemplateModalOpen, setCreateTempateModalOpen] = useState(false);
-  const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
-  const [isMoving, setMoving, setMoved] = redux.hooks.useTrackModelActions([]);
-  const [isDuplicating, setDuplicating, setDuplicated] = redux.hooks.useTrackModelActions([]);
+  const [isDeleting, setDeleting, setDeleted] = redux.useTrackModelActions([]);
+  const [isMoving, setMoving, setMoved] = redux.useTrackModelActions([]);
+  const [isDuplicating, setDuplicating, setDuplicated] = redux.useTrackModelActions([]);
 
   const dispatch: Redux.Dispatch = useDispatch();
   const templates = useSelector(selectTemplates);

@@ -3,6 +3,7 @@ import { Route, RouteProps, Redirect } from "react-router-dom";
 import { isNil } from "lodash";
 
 import * as api from "api";
+import { http } from "lib";
 import { ApplicationSpinner } from "components";
 
 type RedirectPath = "/";
@@ -10,7 +11,7 @@ type RedirectPath = "/";
 const LandingRoute = (props: RouteProps): JSX.Element => {
   const [checkingAuthentication, setCheckingAuthentication] = useState(true);
   const [redirect, setRedirect] = useState<RedirectPath | null>(null);
-  const [newCancelToken] = api.useCancelToken();
+  const [newCancelToken] = http.useCancelToken();
 
   useEffect(() => {
     api

@@ -4,11 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { isNil, find } from "lodash";
 
 import * as api from "api";
-import { tabling, hooks, contacts } from "lib";
+import { tabling, hooks } from "lib";
+import * as store from "store";
+
 import { framework } from "tabling/generic";
 
 import { selectors } from "app/Budgeting/store";
-import { CreateContactParams, EditContactParams } from "components/hooks";
+import { CreateContactParams, EditContactParams } from "components/model/hooks";
 import { useAttachments, useContacts } from "../hooks";
 import AuthenticatedTable, { AuthenticatedTableProps } from "./AuthenticatedTable";
 import Columns from "./Columns";
@@ -54,7 +56,7 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
 
   const onContactCreated = useMemo(
     () => (m: Model.Contact, params?: CreateContactParams) => {
-      dispatch(contacts.actions.addContactToStateAction(m));
+      dispatch(store.actions.addContactToStateAction(m));
       /* If we have enough information from before the contact was created in
 			   the specific cell, combine that information with the new value to
 				 perform a table update, showing the created contact in the new cell. */
@@ -86,7 +88,7 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
 
   const onContactUpdated = useMemo(
     () => (m: Model.Contact, params: EditContactParams) => {
-      dispatch(contacts.actions.updateContactInStateAction({ id: m.id, data: m }));
+      dispatch(store.actions.updateContactInStateAction({ id: m.id, data: m }));
       const rowId = params.rowId;
       if (!isNil(rowId)) {
         const row: Table.BodyRow<R> | null = props.table.current.getRow(rowId);

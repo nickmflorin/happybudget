@@ -19,7 +19,7 @@ export const groupRowFromState = <R extends Table.RowData, S extends Redux.Table
   if (!isNil(rowId)) {
     predicate = (g: Table.GroupRow<R>) => g.id === id && includes(g.children, rowId);
   }
-  return redux.reducers.modelFromState<Table.GroupRow<R>>(
+  return redux.modelFromState<Table.GroupRow<R>>(
     filter(st.data, (r: Table.BodyRow<R>) => tabling.rows.isGroupRow(r)) as Table.GroupRow<R>[],
     predicate,
     options
@@ -36,7 +36,7 @@ export const markupRowFromState = <R extends Table.RowData, S extends Redux.Tabl
   if (!isNil(rowId)) {
     predicate = (mrk: Table.MarkupRow<R>) => mrk.id === id && includes(mrk.children, rowId);
   }
-  return redux.reducers.modelFromState<Table.MarkupRow<R>>(
+  return redux.modelFromState<Table.MarkupRow<R>>(
     filter(st.data, (r: Table.BodyRow<R>) => tabling.rows.isMarkupRow(r)) as Table.MarkupRow<R>[],
     predicate,
     options
@@ -49,7 +49,7 @@ export const rowGroupRowFromState = <R extends Table.RowData, S extends Redux.Ta
   options?: Model.GetReduxModelOptions<Table.GroupRow<R>>
 ): Table.GroupRow<R> | null => {
   const predicate = (g: Table.GroupRow<R>) => includes(g.children, rowId);
-  return redux.reducers.modelFromState<Table.GroupRow<R>>(
+  return redux.modelFromState<Table.GroupRow<R>>(
     filter(st.data, (r: Table.BodyRow<R>) => tabling.rows.isGroupRow(r)) as Table.GroupRow<R>[],
     predicate,
     options
@@ -77,7 +77,7 @@ export const removeRowsFromTheirGroupsIfTheyExist = <
     (alterations: AlteredGroups, rowId: Table.ModelRowId | Table.ModelRow<R>) => {
       let r: Table.ModelRow<R> | null = null;
       if (typeof rowId === "number" || typeof rowId === "string") {
-        r = redux.reducers.modelFromState<Table.ModelRow<R>>(
+        r = redux.modelFromState<Table.ModelRow<R>>(
           filter(st.data, (ri: Table.BodyRow<R>) => tabling.rows.isDataRow(ri)) as Table.ModelRow<R>[],
           rowId
         );
@@ -139,7 +139,7 @@ export const updateRowGroup = <R extends Table.RowData, S extends Redux.TableSto
 			 we simply set the children propery to these IDs afterwards anyways) - but
 			 is done so to make sure that the IDs are valid and associated with
 			 ModelRow(s) in state. */
-    const rws = redux.reducers.findModelsInData<Table.ModelRow<R>>(
+    const rws = redux.findModelsInData<Table.ModelRow<R>>(
       filter(newState.data, (r: Table.BodyRow<R>) => tabling.rows.isModelRow(r)) as Table.ModelRow<R>[],
       uniq([...ids, ...g.children])
     );

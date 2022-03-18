@@ -68,7 +68,7 @@ const analysisReducer: Redux.Reducer<Modules.Budget.AnalysisStore> = (
 
 const genericReducer = combineReducers({
   detail: redux.reducers.createDetailResponseReducer<Model.Budget>({
-    initialState: redux.initialState.initialDetailResponseState,
+    initialState: redux.initialDetailResponseState,
     actions: {
       loading: actions.loadingBudgetAction,
       response: actions.responseBudgetAction,
@@ -89,7 +89,7 @@ const genericReducer = combineReducers({
         clearOn: [
           {
             action: actions.account.requestAction,
-            payload: (p: Redux.TableRequestPayload) => !redux.typeguards.isListRequestIdsPayload(p)
+            payload: (p: Redux.TableRequestPayload) => !redux.isListRequestIdsPayload(p)
           }
         ],
         actions: {
@@ -121,7 +121,7 @@ const genericReducer = combineReducers({
     clearOn: [
       {
         action: actions.accounts.requestAction,
-        payload: (p: Redux.TableRequestPayload) => !redux.typeguards.isListRequestIdsPayload(p)
+        payload: (p: Redux.TableRequestPayload) => !redux.isListRequestIdsPayload(p)
       }
     ],
 
@@ -147,7 +147,7 @@ const genericReducer = combineReducers({
         clearOn: [
           {
             action: actions.subAccount.requestAction,
-            payload: (p: Redux.TableRequestPayload) => !redux.typeguards.isListRequestIdsPayload(p)
+            payload: (p: Redux.TableRequestPayload) => !redux.isListRequestIdsPayload(p)
           }
         ],
         actions: {
@@ -192,7 +192,7 @@ const genericReducer = combineReducers({
       Redux.AuthenticatedModelListResponseStore<Model.ActualOwner>,
       Redux.TableAction<Redux.ActionPayload, Tables.ActualTableContext>
     >({
-      initialState: redux.initialState.initialAuthenticatedModelListResponseState,
+      initialState: redux.initialAuthenticatedModelListResponseState,
       actions: {
         loading: actions.actuals.loadingActualOwnersAction,
         response: actions.actuals.responseActualOwnersAction,

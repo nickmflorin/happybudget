@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { find, reduce, filter, includes, map, isNil } from "lodash";
 
-import { redux, budgeting, hooks, tabling, util, ui } from "lib";
+import { redux, model, hooks, tabling, util, ui } from "lib";
 import { DEFAULT_COLOR_SCHEME, Colors } from "style/constants";
 
 import { NoData } from "components";
@@ -11,12 +11,8 @@ import { BudgetTotalChart } from "components/charts";
 import { Tile } from "components/containers";
 import { BudgetTotalChartForm, BudgetTotalChartFormValues } from "components/forms";
 
-const selectGroups = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Store) => state.budget.analysis.groups.data
-);
-const selectAccounts = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Store) => state.budget.analysis.accounts.data
-);
+const selectGroups = redux.simpleDeepEqualSelector((state: Application.Store) => state.budget.analysis.groups.data);
+const selectAccounts = redux.simpleDeepEqualSelector((state: Application.Store) => state.budget.analysis.accounts.data);
 
 const selectResponseWasReceived = (state: Application.Store) => state.budget.analysis.responseWasReceived;
 
@@ -24,27 +20,27 @@ type M = Model.Group | Model.Account;
 type Datum = Charts.Datum & { readonly type: "account" | "group" };
 
 const getColor = (obj: M, index: number) =>
-  budgeting.typeguards.isGroup(obj)
+  model.budgeting.isGroup(obj)
     ? obj.color || Colors.COLOR_NO_COLOR
     : util.colors.getLoopedColorInScheme(DEFAULT_COLOR_SCHEME, index);
-const getLabel = (obj: M) => (budgeting.typeguards.isGroup(obj) ? obj.name : obj.description || obj.identifier || "");
+const getLabel = (obj: M) => (model.budgeting.isGroup(obj) ? obj.name : obj.description || obj.identifier || "");
 const getId = (obj: M) => `${obj.type}-${obj.id}`;
 
 const Metrics: Charts.BudgetTotal.Metric<M>[] = [
   {
     label: "Estimated",
     id: "estimated",
-    getValue: (obj: M, objs: Model.Account[]) => budgeting.businessLogic.estimatedValue(obj, objs)
+    getValue: (obj: M, objs: Model.Account[]) => model.budgeting.estimatedValue(obj, objs)
   },
   {
     label: "Actual",
     id: "actual",
-    getValue: (obj: M, objs: Model.Account[]) => budgeting.businessLogic.actualValue(obj, objs)
+    getValue: (obj: M, objs: Model.Account[]) => model.budgeting.actualValue(obj, objs)
   },
   {
     label: "Variance",
     id: "variance",
-    getValue: (obj: M, objs: Model.Account[]) => budgeting.businessLogic.varianceValue(obj, objs)
+    getValue: (obj: M, objs: Model.Account[]) => model.budgeting.varianceValue(obj, objs)
   }
 ];
 
@@ -107,7 +103,7 @@ const BudgetTotal = ({ budget, budgetId, ...props }: BudgetTotalProps): JSX.Elem
   const [metric, setMetric] = useState<Charts.BudgetTotal.MetricId>("estimated");
   const [grouped, setGrouped] = useState(true);
 
-  const form = ui.hooks.useForm<BudgetTotalChartFormValues>();
+  const form = ui.useForm<BudgetTotalChartFormValues>();
 
   const groups = useSelector(selectGroups);
   const accounts = useSelector(selectAccounts);
@@ -124,15 +120,15 @@ const BudgetTotal = ({ budget, budgetId, ...props }: BudgetTotalProps): JSX.Elem
         case "actual":
           return tabling.columns.currencyValueFormatter(v =>
             console.error(`Could not parse currency from value ${v} for budget actual.`)
-          )(budgeting.businessLogic.actualValue(budget));
+          )(model.budgeting.actualValue(budget));
         case "variance":
           return tabling.columns.currencyValueFormatter(v =>
             console.error(`Could not parse currency from value ${v} for budget variance.`)
-          )(budgeting.businessLogic.varianceValue(budget));
+          )(model.budgeting.varianceValue(budget));
         default:
           return tabling.columns.currencyValueFormatter(v =>
             console.error(`Could not parse currency from value ${v} for budget estimated.`)
-          )(budgeting.businessLogic.estimatedValue(budget));
+          )(model.budgeting.estimatedValue(budget));
       }
     }
     return tabling.columns.currencyValueFormatter(0);

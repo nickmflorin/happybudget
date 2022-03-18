@@ -5,7 +5,7 @@ import { isNil, map } from "lodash";
 
 import * as api from "api";
 import * as store from "store";
-import { redux, notifications, users } from "lib";
+import { redux, notifications, model } from "lib";
 
 import { Icon, Pagination, NoData } from "components";
 import { PrimaryButtonIconToggle, OrderingButtonIconToggle } from "components/buttons";
@@ -28,9 +28,9 @@ const selectBudgetsSearch = (state: Application.Store) => state.dashboard.budget
 const selectBudgetsOrdering = (state: Application.Store) => state.dashboard.budgets.ordering;
 
 const Budgets = (): JSX.Element => {
-  const user = users.hooks.useLoggedInUser();
-  const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
-  const [isDuplicating, setDuplicating, setDuplicated] = redux.hooks.useTrackModelActions([]);
+  const user = store.hooks.useLoggedInUser();
+  const [isDeleting, setDeleting, setDeleted] = redux.useTrackModelActions([]);
+  const [isDuplicating, setDuplicating, setDuplicated] = redux.useTrackModelActions([]);
 
   const [budgetToEdit, setBudgetToEdit] = useState<number | null>(null);
   const [budgetToDelete, setBudgetToDelete] = useState<Model.SimpleBudget | null>(null);
@@ -79,9 +79,9 @@ const Budgets = (): JSX.Element => {
                  request anyways, this is okay. */
               if (
                 user.num_budgets !== 0 &&
-                !users.permissions.userHasPermission(user, users.permissions.Permissions.MULTIPLE_BUDGETS)
+                !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
               ) {
-                dispatch(store.actions.authenticated.setProductPermissionModalOpenAction(true));
+                dispatch(store.actions.setProductPermissionModalOpenAction(true));
               } else {
                 setCreateBudgetModalOpen(true);
               }
@@ -150,9 +150,9 @@ const Budgets = (): JSX.Element => {
 											 permissions, this is okay. */
                     if (
                       user.num_budgets !== 0 &&
-                      !users.permissions.userHasPermission(user, users.permissions.Permissions.MULTIPLE_BUDGETS)
+                      !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
                     ) {
-                      dispatch(store.actions.authenticated.setProductPermissionModalOpenAction(true));
+                      dispatch(store.actions.setProductPermissionModalOpenAction(true));
                     } else {
                       setDuplicating(budget.id);
                       api
@@ -221,9 +221,7 @@ const Budgets = (): JSX.Element => {
             /* It is safe to coerce to an Budget because the User must be logged
 						   in at this point. */
             dispatch(actions.addBudgetToStateAction(budget as Model.AuthenticatedBudget));
-            dispatch(
-              store.actions.authenticated.updateLoggedInUserAction({ ...user, num_budgets: user.num_budgets + 1 })
-            );
+            dispatch(store.actions.updateLoggedInUserAction({ ...user, num_budgets: user.num_budgets + 1 }));
             setCreateBudgetModalOpen(false);
             history.push(`/budgets/${budget.id}/accounts`);
           }}
@@ -242,7 +240,7 @@ const Budgets = (): JSX.Element => {
                 dispatch(actions.removeBudgetFromStateAction(budgetToDelete.id));
                 dispatch(actions.requestPermissioningBudgetsAction(null));
                 dispatch(
-                  store.actions.authenticated.updateLoggedInUserAction({
+                  store.actions.updateLoggedInUserAction({
                     ...user,
                     num_budgets: Math.max(user.num_budgets - 1, 0)
                   })

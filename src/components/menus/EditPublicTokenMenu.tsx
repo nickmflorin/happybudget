@@ -6,7 +6,7 @@ import { EditPublicTokenForm } from "components/forms";
 import { EditPublicTokenFormValues, IEditPublicTokenFormRef } from "components/forms/EditPublicTokenForm";
 
 import * as api from "api";
-import { ui } from "lib";
+import { ui, http } from "lib";
 
 import ContentMenu from "./ContentMenu";
 
@@ -24,9 +24,9 @@ const EditPublicTokenMenu = ({
   onDeleted,
   ...props
 }: EditPublicTokenMenuProps): JSX.Element => {
-  const form = ui.hooks.useForm<EditPublicTokenFormValues>();
+  const form = ui.useForm<EditPublicTokenFormValues>();
   const [publicToken, setPublicToken] = useState<Model.PublicToken | null>(null);
-  const [cancelToken] = api.useCancelToken();
+  const [cancelToken] = http.useCancelToken();
   const formRef = useRef<IEditPublicTokenFormRef>(null);
 
   useEffect(() => {

@@ -1,13 +1,13 @@
 import { ReactNode } from "react";
 import { ShowHide } from "components";
-import { users } from "lib";
+import * as store from "store";
 
 type IsStaffProps = {
   children: ReactNode;
 };
 
 const IsStaff: React.FC<IsStaffProps> = ({ children }) => {
-  const user = users.hooks.useLoggedInUser();
+  const user = store.hooks.useLoggedInUser();
   return <ShowHide show={user.is_staff === true}>{children}</ShowHide>;
 };
 

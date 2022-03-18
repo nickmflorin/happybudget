@@ -11,7 +11,7 @@ export interface PortalProps {
 }
 
 const Portal = ({ id, children, visible }: PortalProps): JSX.Element => {
-  const target = ui.hooks.usePortal(id);
+  const target = ui.usePortal(id);
   if (!isNil(target) && visible !== false) {
     return createPortal(children, target);
   }

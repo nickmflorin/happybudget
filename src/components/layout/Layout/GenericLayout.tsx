@@ -19,7 +19,7 @@ export interface GenericLayoutProps extends StandardComponentWithChildrenProps {
 }
 
 const GenericLayout = (props: GenericLayoutProps): JSX.Element => {
-  const isMobile = ui.hooks.useLessThanBreakpoint("medium");
+  const isMobile = ui.useLessThanBreakpoint("medium");
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const NotificationsHandler = notifications.ui.useNotificationsEventListener({
     destinationId: "banner",

@@ -16,7 +16,7 @@ interface CreateContactModalProps extends CreateModelModalProps<Model.Contact> {
 const MemoizedContactForm = React.memo(ContactForm);
 
 const CreateContactModal = ({ initialValues, ...props }: CreateContactModalProps): JSX.Element => {
-  const form = ui.hooks.useForm<Http.ContactPayload>();
+  const form = ui.useForm<Http.ContactPayload>();
   const [image, setImage] = useState<UploadedImage | null>(null);
   /*
   Note: We have to use a ref here, instead of storing firstName and lastName in

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { isNil } from "lodash";
 import { createSelector } from "reselect";
 
-import { tabling, budgeting } from "lib";
+import { tabling, budgeting, model } from "lib";
 import { connectTableToAuthenticatedStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
 
 import { BudgetPage } from "../Pages";
@@ -35,14 +35,14 @@ const ConnectedTable = connectTableToAuthenticatedStore<
       (state: Application.Store) => state.template.detail.data,
       (budget: Model.Template | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
-        estimated: !isNil(budget) ? budgeting.businessLogic.estimatedValue(budget) : 0.0
+        estimated: !isNil(budget) ? model.budgeting.estimatedValue(budget) : 0.0
       })
     ),
     footer: createSelector(
       (state: Application.Store) => state.template.subaccount.detail.data,
       (detail: Model.SubAccount | null) => ({
         identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
-        estimated: !isNil(detail) ? budgeting.businessLogic.estimatedValue(detail) : 0.0
+        estimated: !isNil(detail) ? model.budgeting.estimatedValue(detail) : 0.0
       })
     )
   }

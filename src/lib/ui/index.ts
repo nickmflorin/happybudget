@@ -1,4 +1,4 @@
-export * as typeguards from "./typeguards";
-export * as hooks from "./hooks";
+export * from "./typeguards";
+export * from "./hooks";
+export * from "./util";
 export * as progress from "./progress";
-export * as util from "./util";

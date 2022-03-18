@@ -52,7 +52,7 @@ const HeaderCell = <R extends Table.RowData, M extends Model.RowHttpModel = Mode
     <div className={classNames("inner-cell--header", className)} style={{ ...columnStyle, ...style }}>
       {!isNil(dataType) && !isNil(dataType.icon) && (
         <VerticalFlexCenter>
-          {ui.typeguards.iconIsJSX(dataType.icon) ? (
+          {ui.iconIsJSX(dataType.icon) ? (
             dataType.icon
           ) : (
             <Icon className={"icon--table-header"} icon={dataType.icon} weight={"solid"} />

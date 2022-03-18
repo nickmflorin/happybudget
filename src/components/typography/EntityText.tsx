@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { typeguards } from "lib";
+import { model } from "lib";
 
 export interface EntityTextProps extends StandardComponentProps {
   readonly children: Model.HttpModel;
@@ -39,15 +39,15 @@ export const EntityTextIdentifier = (props: EntiyTextPartProps): JSX.Element => 
 const EntityText: React.FC<EntityTextProps> = ({ children, fillEmpty, ...props }) => {
   const identifier = useMemo(
     () =>
-      typeguards.isModelWithIdentifier(children)
+      model.isModelWithIdentifier(children)
         ? children.identifier
-        : typeguards.isModelWithName(children)
+        : model.isModelWithName(children)
         ? children.name
         : undefined,
     [children]
   );
   const description = useMemo(
-    () => (typeguards.isModelWithDescription(children) ? children.description : undefined),
+    () => (model.isModelWithDescription(children) ? children.description : undefined),
     [children]
   );
 

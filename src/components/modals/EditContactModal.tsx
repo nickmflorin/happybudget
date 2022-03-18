@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 import * as api from "api";
 
 import { Separator } from "components";
-import { TaggedActuals } from "components/contacts";
+import { TaggedActuals } from "components/model/contacts";
 import { ContactForm } from "components/forms";
 import { ImageAndName } from "components/fields";
 import { IImageAndNameRef } from "components/fields/ImageAndName";

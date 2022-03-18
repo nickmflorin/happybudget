@@ -4,7 +4,8 @@ import { isNil, map, filter } from "lodash";
 import classNames from "classnames";
 
 import * as api from "api";
-import { redux, ui, tabling, pdf, util, contacts } from "lib";
+import { redux, ui, tabling, pdf, util, http } from "lib";
+import * as store from "store";
 
 import { ExportBudgetPdfForm } from "components/forms";
 import { PreviewModal } from "components/modals";
@@ -55,16 +56,16 @@ interface PreviewModalProps extends ModalProps {
   readonly onSuccess?: () => void;
 }
 
-const selectHeaderTemplatesLoading = redux.selectors.simpleShallowEqualSelector(
+const selectHeaderTemplatesLoading = redux.simpleShallowEqualSelector(
   (state: Application.Store) => state.budget.headerTemplates.loading
 );
-const selectHeaderTemplates = redux.selectors.simpleDeepEqualSelector(
+const selectHeaderTemplates = redux.simpleDeepEqualSelector(
   (state: Application.Store) => state.budget.headerTemplates.data
 );
-const selectDisplayedHeaderTemplate = redux.selectors.simpleDeepEqualSelector(
+const selectDisplayedHeaderTemplate = redux.simpleDeepEqualSelector(
   (state: Application.Store) => state.budget.headerTemplates.displayedTemplate
 );
-const selectHeaderTemplateLoading = redux.selectors.simpleShallowEqualSelector(
+const selectHeaderTemplateLoading = redux.simpleShallowEqualSelector(
   (state: Application.Store) => state.budget.headerTemplates.loadingDetail
 );
 
@@ -78,15 +79,15 @@ const BudgetPreviewModal = ({
 }: PreviewModalProps): JSX.Element => {
   const previewer = useRef<Pdf.IPreviewerRef>(null);
   const [loadingData, setLoadingData] = useState(false);
-  const [getToken] = api.useCancelToken({ preserve: true, createOnInit: true });
+  const [getToken] = http.useCancelToken({ preserve: true, createOnInit: true });
 
-  const cs = contacts.hooks.useContacts();
+  const cs = store.hooks.useContacts();
 
   const [budget, setBudget] = useState<Model.PdfBudget | null>(null);
   const [options, setOptions] = useState<ExportBudgetPdfFormOptions>(DEFAULT_OPTIONS);
 
-  const form = ui.hooks.useForm<ExportBudgetPdfFormOptions>({ isInModal: true });
-  const modal = ui.hooks.useModal();
+  const form = ui.useForm<ExportBudgetPdfFormOptions>({ isInModal: true });
+  const modal = ui.useModal();
   const dispatch = useDispatch();
 
   const headerTemplatesLoading = useSelector(selectHeaderTemplatesLoading);
@@ -157,7 +158,7 @@ const BudgetPreviewModal = ({
         });
       }
     },
-    [budget, contacts, options]
+    [budget, cs, options]
   );
 
   return (

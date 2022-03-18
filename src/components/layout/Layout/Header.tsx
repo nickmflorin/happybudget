@@ -4,7 +4,7 @@ import classNames from "classnames";
 
 import { Layout } from "antd";
 
-import { users } from "lib";
+import * as store from "store";
 
 import { Icon, ShowHide } from "components";
 import { IconButton } from "components/buttons";
@@ -28,7 +28,7 @@ const Header = ({
   showLeafLogo,
   ...props
 }: HeaderProps): JSX.Element => {
-  const user = users.hooks.useUser();
+  const user = store.hooks.useUser();
 
   return (
     <Layout.Header

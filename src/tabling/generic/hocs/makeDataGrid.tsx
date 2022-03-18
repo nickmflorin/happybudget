@@ -7,7 +7,7 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 
 import { CellMouseOverEvent, CellFocusedEvent } from "@ag-grid-community/core";
 
-import { tabling, hooks, budgeting, notifications } from "lib";
+import { tabling, hooks, model, notifications } from "lib";
 
 export type InjectedDataGridProps = {
   readonly id: Table.GridId;
@@ -44,7 +44,7 @@ export type InternalDataGridProps<
 
 const getRowColorDef = <R extends Table.RowData>(row: Table.BodyRow<R>): Table.RowColorDef => {
   if (tabling.rows.isGroupRow(row)) {
-    const colorDef = budgeting.models.getGroupColorDefinition(row);
+    const colorDef = model.budgeting.getGroupColorDefinition(row);
     if (!isNil(colorDef?.color) && !isNil(colorDef?.backgroundColor)) {
       return {
         color: colorDef?.color,

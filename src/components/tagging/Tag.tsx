@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { DEFAULT_COLOR_SCHEME, Colors } from "style/constants";
-import { typeguards, util, tabling } from "lib";
+import { model, util, tabling } from "lib";
 import { TooltipWrapper } from "components/tooltips";
 
 const TagRenderer = <S extends React.CSSProperties | Pdf.Style = React.CSSProperties>({
@@ -91,12 +91,12 @@ const Tag = <M extends Model.Model = Model.Model, S extends React.CSSProperties 
         }
         return "";
       }
-      if (typeguards.isTag(m)) {
+      if (model.isTag(m)) {
         if (props.isPlural === true && !isNil(m.plural_title)) {
           return m.plural_title;
         }
         return m.title;
-      } else if (typeguards.isModelWithName(m)) {
+      } else if (model.isModelWithName(m)) {
         return m.name || "";
       } else if (tabling.rows.isRow(m) && tabling.rows.isRowWithName(m)) {
         return m.data.name || "";
@@ -147,9 +147,9 @@ const Tag = <M extends Model.Model = Model.Model, S extends React.CSSProperties 
           return validateAndReturnColor(color, "getModelColor callback");
         }
       }
-      if (typeguards.isTag(m)) {
+      if (model.isTag(m)) {
         return validateAndReturnColor(m.color, "color");
-      } else if (typeguards.isModelWithColor(m)) {
+      } else if (model.isModelWithColor(m)) {
         return validateAndReturnColor(m.color, "color");
       } else if (tabling.rows.isRow(m) && tabling.rows.isRowWithColor(m) && !isNil(m.data.color)) {
         return m.data.color;

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import * as api from "api";
-import { ui } from "lib";
+import { ui, http } from "lib";
 import { GroupForm } from "components/forms";
 
 import { CreateModelModal, CreateModelModalProps, CreateModelCallbacks } from "./generic";
@@ -25,8 +25,8 @@ const CreateGroupModal = <
   table,
   ...props
 }: CreateGroupModalProps<R, M>): JSX.Element => {
-  const form = ui.hooks.useForm<Http.GroupPayload>();
-  const [cancelToken] = api.useCancelToken();
+  const form = ui.useForm<Http.GroupPayload>();
+  const [cancelToken] = http.useCancelToken();
 
   const [availableChildren, setAvailableChildren] = useState<MM[]>([]);
   const [availableChildrenLoading, setAvailableChildrenLoading] = useState(false);

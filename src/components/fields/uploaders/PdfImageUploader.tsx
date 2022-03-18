@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { typeguards, util } from "lib";
+import { model, util } from "lib";
 
 import { Icon } from "components";
 import { ClearButton } from "components/buttons";
@@ -27,12 +27,12 @@ const PdfImageUploader = (props: UploaderProps): JSX.Element => (
             </div>
           </React.Fragment>
         );
-      } else if (typeguards.isUploadParamsWithImage(params)) {
+      } else if (model.isUploadParamsWithImage(params)) {
         return (
           <React.Fragment>
             <Icon icon={"check-circle"} weight={"solid"} style={{ marginLeft: 6 }} />
             <div className={"upload-text file-text"}>
-              {typeguards.isUploadedImage(params.image)
+              {model.isUploadedImage(params.image)
                 ? util.files.truncateFileName(params.image.fileName || params.image.name, 18)
                 : `Saved ${params.image.extension} Image`}
             </div>

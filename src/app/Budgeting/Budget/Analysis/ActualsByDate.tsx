@@ -12,9 +12,7 @@ import { NoData } from "components";
 import { ActualsByDateChart } from "components/charts";
 import { Tile } from "components/containers";
 
-const selectActuals = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Store) => state.budget.analysis.actuals.data
-);
+const selectActuals = redux.simpleDeepEqualSelector((state: Application.Store) => state.budget.analysis.actuals.data);
 
 const selectResponseWasReceived = (state: Application.Store) => state.budget.analysis.responseWasReceived;
 

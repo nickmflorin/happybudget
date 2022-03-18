@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { isNil } from "lodash";
 
 import * as store from "store";
-import { users } from "lib";
+import { model } from "lib";
 import { CreateBudgetModal } from "components/modals";
 
 import { actions } from "../../store";
@@ -15,7 +15,7 @@ import MyTemplates from "./MyTemplates";
 const Templates = (): JSX.Element => {
   const [templateToDerive, _setTemplateToDerive] = useState<number | undefined>(undefined);
   const [createBudgetModalOpen, _setCreateBudgetModalOpen] = useState(false);
-  const user = users.hooks.useLoggedInUser();
+  const user = store.hooks.useLoggedInUser();
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -25,9 +25,9 @@ const Templates = (): JSX.Element => {
       if (
         id !== undefined &&
         user.num_budgets !== 0 &&
-        !users.permissions.userHasPermission(user, users.permissions.Permissions.MULTIPLE_BUDGETS)
+        !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
       ) {
-        dispatch(store.actions.authenticated.setProductPermissionModalOpenAction(true));
+        dispatch(store.actions.setProductPermissionModalOpenAction(true));
       } else {
         _setTemplateToDerive(id);
       }
@@ -40,9 +40,9 @@ const Templates = (): JSX.Element => {
       if (
         v === true &&
         user.num_budgets !== 0 &&
-        !users.permissions.userHasPermission(user, users.permissions.Permissions.MULTIPLE_BUDGETS)
+        !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
       ) {
-        dispatch(store.actions.authenticated.setProductPermissionModalOpenAction(true));
+        dispatch(store.actions.setProductPermissionModalOpenAction(true));
       } else {
         _setCreateBudgetModalOpen(v);
       }
@@ -80,9 +80,7 @@ const Templates = (): JSX.Element => {
             /* It is safe to coerce to an Budget because the User must be
 						   logged in at this point. */
             dispatch(actions.addBudgetToStateAction(budget as Model.AuthenticatedBudget));
-            dispatch(
-              store.actions.authenticated.updateLoggedInUserAction({ ...user, num_budgets: user.num_budgets + 1 })
-            );
+            dispatch(store.actions.updateLoggedInUserAction({ ...user, num_budgets: user.num_budgets + 1 }));
             history.push(`/budgets/${budget.id}/accounts`);
           }}
         />
@@ -96,9 +94,7 @@ const Templates = (): JSX.Element => {
             /* It is safe to coerce to an Budget because the User must be logged
 						   in at this point. */
             dispatch(actions.addBudgetToStateAction(budget as Model.AuthenticatedBudget));
-            dispatch(
-              store.actions.authenticated.updateLoggedInUserAction({ ...user, num_budgets: user.num_budgets + 1 })
-            );
+            dispatch(store.actions.updateLoggedInUserAction({ ...user, num_budgets: user.num_budgets + 1 }));
             history.push(`/budgets/${budget.id}/accounts`);
           }}
         />

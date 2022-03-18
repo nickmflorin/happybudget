@@ -15,7 +15,7 @@ const GenericSidebarItem = <T extends ISidebarItem>(
   const location = useLocation();
 
   const active = useMemo(
-    () => ui.util.itemIsActive(props, location),
+    () => ui.itemIsActive(props, location),
     [props.active, location.pathname, props.to, props.activePathRegexes]
   );
 

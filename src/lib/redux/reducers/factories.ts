@@ -1,0 +1,252 @@
+import { isNil, filter, find, reduce } from "lodash";
+
+import { http, notifications, util } from "lib";
+
+import { modelListActionReducer } from "./reducers";
+import { findModelInData } from "../util";
+
+export const createSimplePayloadReducer = <P extends Redux.ActionPayload>(
+  config: Redux.ReducerConfig<P, { set: Redux.ActionCreator<P> }>
+): Redux.Reducer<P> => {
+  const reducer: Redux.Reducer<P> = (state: P = config.initialState, action: Redux.Action<P>): P => {
+    if (config.actions.set?.toString() === action.type) {
+      return action.payload;
+    }
+    return state;
+  };
+  return reducer;
+};
+
+export const createSimpleBooleanReducer = (
+  config: Omit<Redux.ReducerConfig<boolean, { set: Redux.ActionCreator<boolean> }>, "initialState">
+): Redux.Reducer<boolean> => createSimplePayloadReducer<boolean>({ ...config, initialState: false });
+
+/**
+ * A reducer factory that creates a generic reducer to handle the state of a
+ * list of primary keys that indicate that certain behavior is taking place for
+ * the models corresponding to the primary keys of the list.  For instance, if
+ * we wanted to keep track of the Accounts that are actively being updated, the
+ * reducer would handle the state of a list of primary keys corresponding to the
+ * Accounts that are being updated.
+ *
+ * The reducer has default behavior that is mapped to the action types via
+ * the mappings parameter.
+ *
+ * @param mappings  Mappings of the standard actions to the specific actions that
+ *                  the reducer should listen for.
+ * @param options   Additional options supplied to the reducer factory.
+ */
+export const createModelListActionReducer =
+  (
+    config: Omit<
+      Redux.ReducerConfig<Redux.ModelListActionStore, { change: Redux.ActionCreator<Redux.ModelListActionPayload> }>,
+      "initialState"
+    >
+  ) =>
+  (st: Redux.ModelListActionStore = [], action: Redux.Action<Redux.ModelListActionPayload>) => {
+    if (config.actions.change?.toString() === action.type) {
+      return modelListActionReducer(st, action);
+    }
+    return st;
+  };
+
+/**
+ * A reducer factory that creates a generic reducer to handle the read only state
+ * of a detail response, where a detail response might be the response received
+ * from submitting an API request to /entity/<pk>.
+ *
+ * The reducer has default behavior that is mapped to the action types via
+ * the mappings parameter.
+ *
+ * @param mappings  Mappings of the standard actions to the specific actions that
+ *                  the reducer should listen for.
+ * @param options   Additional options supplied to the reducer factory.
+ */
+export const createDetailResponseReducer =
+  <
+    M extends Model.HttpModel,
+    S extends Redux.ModelDetailResponseStore<M> = Redux.ModelDetailResponseStore<M>,
+    A extends Redux.Action = Redux.Action
+  >(
+    config: Redux.ReducerConfig<S, Redux.ModelDetailResponseActionMap<M>>
+  ): Redux.Reducer<S, A> =>
+  (state: S = config.initialState, action: A): S => {
+    if (!isNil(config.actions.response) && action.type === config.actions.response.toString()) {
+      return { ...state, data: action.payload };
+    } else if (!isNil(config.actions.loading) && action.type === config.actions.loading.toString()) {
+      return { ...state, loading: action.payload };
+    } else if (!isNil(config.actions.updateInState) && action.type === config.actions.updateInState.toString()) {
+      return { ...state, data: { ...state.data, ...action.payload.data } };
+    }
+    return state;
+  };
+
+/**
+ * A reducer factory that creates a generic reducer to handle the state of a
+ * list response, where a list response might be the response received from
+ * submitting an API request to /entity/.
+ *
+ * The reducer has default behavior that is mapped to the action types via
+ * the mappings parameter.
+ *
+ * @param config  The Redux.ReducerConfig object that contains information about
+ *                the behavior of the reducer returned from the factory.
+ */
+export const createListResponseReducer =
+  <
+    M,
+    P extends Redux.ActionPayload = null,
+    S extends Redux.ListResponseStore<M> = Redux.ListResponseStore<M>,
+    A extends Redux.Action = Redux.Action
+  >(
+    config: Redux.ReducerConfig<S, Redux.ListResponseActionMap<M, P>>
+  ): Redux.Reducer<S, A> =>
+  (state: S = config.initialState, action: A): S => {
+    if (!isNil(config.actions.request) && action.type === config.actions.request.toString()) {
+      return { ...state, responseWasReceived: false };
+    } else if (!isNil(config.actions.loading) && action.type === config.actions.loading.toString()) {
+      return { ...state, loading: action.payload };
+    } else if (!isNil(config.actions.response) && action.type === config.actions.response.toString()) {
+      return {
+        ...state,
+        responseWasReceived: true,
+        data: action.payload.data,
+        count: action.payload.count
+      };
+    }
+    return state;
+  };
+
+export const createModelListResponseReducer = <
+  M extends Model.HttpModel,
+  P extends Redux.ActionPayload = null,
+  S extends Redux.ModelListResponseStore<M> = Redux.ModelListResponseStore<M>,
+  A extends Redux.Action = Redux.Action,
+  AM extends Redux.ModelListResponseActionMap<M, P> = Redux.ModelListResponseActionMap<M, P>
+>(
+  config: Redux.ReducerConfig<S, AM>
+): Redux.Reducer<S, A> => createListResponseReducer(config);
+
+export const withAuthentication =
+  <
+    M extends Model.HttpModel,
+    P extends Redux.ActionPayload = null,
+    C extends Table.Context = Table.Context,
+    S extends Redux.AuthenticatedModelListResponseStore<M> = Redux.AuthenticatedModelListResponseStore<M>,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    A extends Redux.TableAction<any, C> = Redux.TableAction<any, C>
+  >(
+    reducer: Redux.Reducer<S, A>,
+    config: Redux.ReducerConfig<S, Redux.AuthenticatedModelListResponseActionMap<M, P, C>>
+  ): Redux.Reducer<S, A> =>
+  (state: S = config.initialState, action: A): S => {
+    state = reducer(state, action);
+
+    const reorderIfApplicable = (s: S) => {
+      if (s.ordering.length !== 0) {
+        return {
+          ...s,
+          data: http.orderBy(
+            s.data,
+            s.ordering as Http.Ordering<keyof typeof s.data[number] & string>,
+            action.user || null
+          )
+        };
+      }
+      return s;
+    };
+
+    if (!isNil(config.actions.setSearch) && action.type === config.actions.setSearch.toString()) {
+      const a: Redux.InferAction<typeof config.actions.setSearch> = action;
+      return { ...state, search: a.payload };
+    } else if (!isNil(config.actions.request) && action.type === config.actions.request.toString()) {
+      return { ...state, data: [], count: 0 };
+    } else if (!isNil(config.actions.removeFromState) && action.type === config.actions.removeFromState.toString()) {
+      const a: Redux.InferAction<typeof config.actions.removeFromState> = action;
+      const existing = findModelInData(state.data, a.payload, { action: a });
+      if (isNil(existing)) {
+        return state;
+      }
+      return {
+        ...state,
+        data: filter(state.data, (entity: M) => entity.id !== a.payload),
+        count: state.count - 1
+      };
+    } else if (!isNil(config.actions.updateInState) && action.type === config.actions.updateInState.toString()) {
+      /* Note: Eventually we will want to apply `reorderIfApplicable` here but
+         we need to make sure it is fully properly functioning before we do so. */
+      const a: Redux.InferAction<typeof config.actions.updateInState> = action;
+      const existing = findModelInData(state.data, a.payload.id, { action: a });
+      if (isNil(existing)) {
+        return state;
+      }
+      /* eslint-disable @typescript-eslint/no-unused-vars */
+      const { id: _, ...withoutId } = a.payload.data;
+      return {
+        ...state,
+        data: util.replaceInArray<M>(state.data, { id: a.payload.id }, { ...existing, ...withoutId })
+      };
+    } else if (!isNil(config.actions.addToState) && action.type === config.actions.addToState.toString()) {
+      const a: Redux.InferAction<typeof config.actions.addToState> = action;
+      const existing = findModelInData(state.data, a.payload.id, { warnOnMissing: false });
+      if (!isNil(existing)) {
+        notifications.inconsistentStateError({
+          action: a,
+          reason: "Instance already exists in state when it is not expected to."
+        });
+        return state;
+      }
+      return reorderIfApplicable({ ...state, data: [...state.data, a.payload], count: state.count + 1 });
+    } else if (!isNil(config.actions.updateOrdering) && action.type === config.actions.updateOrdering.toString()) {
+      const a: Redux.InferAction<typeof config.actions.updateOrdering> = action;
+      const existing: Http.FieldOrder<string> | undefined = find(state.ordering, { field: a.payload.field });
+      if (isNil(existing)) {
+        notifications.inconsistentStateError({
+          action: a,
+          reason: "Ordering for field does not exist in state when it is expected to."
+        });
+        return state;
+      }
+      return {
+        ...state,
+        ordering: reduce(
+          state.ordering,
+          (curr: Http.Ordering<string>, o: Http.FieldOrder<string>) => {
+            if (o.field === a.payload.field) {
+              return [...curr, { ...o, order: a.payload.order }];
+            }
+            return [...curr, { ...o, order: 0 }];
+          },
+          []
+        )
+      };
+    } else if (!isNil(config.actions.setPagination) && action.type === config.actions.setPagination.toString()) {
+      const a: Redux.InferAction<typeof config.actions.setPagination> = action;
+      return !isNil(a.payload.pageSize)
+        ? { ...state, page: a.payload.page, pageSize: a.payload.pageSize }
+        : { ...state, page: a.payload.page };
+    } else if (!isNil(config.actions.deleting) && action.type === config.actions.deleting.toString()) {
+      const a: Redux.InferAction<typeof config.actions.deleting> = action;
+      return { ...state, deleting: modelListActionReducer(state.deleting, a) };
+    } else if (!isNil(config.actions.updating) && action.type === config.actions.updating.toString()) {
+      const a: Redux.InferAction<typeof config.actions.updating> = action;
+      return { ...state, updating: modelListActionReducer(state.updating, a) };
+    } else if (!isNil(config.actions.creating) && action.type === config.actions.creating.toString()) {
+      const a: Redux.InferAction<typeof config.actions.creating> = action;
+      return { ...state, creating: a.payload };
+    }
+    return state;
+  };
+
+export const createAuthenticatedModelListResponseReducer = <
+  M extends Model.HttpModel,
+  P extends Redux.ActionPayload = null,
+  C extends Table.Context = Table.Context,
+  S extends Redux.AuthenticatedModelListResponseStore<M> = Redux.AuthenticatedModelListResponseStore<M>,
+  A extends Redux.TableAction<P, C> = Redux.TableAction<P, C>
+>(
+  config: Redux.ReducerConfig<S, Partial<Redux.AuthenticatedModelListResponseActionMap<M, P, C>>>
+): Redux.Reducer<S, A> => {
+  const reducer = createModelListResponseReducer<M, P, S, A>(config);
+  return withAuthentication<M, P, C, S, A>(reducer, config);
+};

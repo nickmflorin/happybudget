@@ -1,14 +1,11 @@
 export * as budgeting from "./budgeting";
-export * as contacts from "./contacts";
 export * as cookies from "./cookies";
 export * as hooks from "./hooks";
 export * as http from "./http";
-export * as models from "./models";
+export * as model from "./model";
 export * as notifications from "./notifications";
 export * as pdf from "./pdf";
 export * as redux from "./redux";
 export * as tabling from "./tabling";
-export * as typeguards from "./typeguards";
-export * as users from "./users";
 export * as ui from "./ui";
 export * as util from "./util";

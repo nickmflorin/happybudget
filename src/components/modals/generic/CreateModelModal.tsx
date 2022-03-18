@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 import { isNil, includes, reduce } from "lodash";
 
-import * as api from "api";
-import { ui, hooks } from "lib";
+import { ui, hooks, http } from "lib";
 
 import Modal from "./Modal";
 
@@ -58,9 +57,9 @@ const CreateModelModal = <
   convertEmptyStringsToNull,
   ...props
 }: PrivateCreateModelModalProps<M, P, V, R>): JSX.Element => {
-  const Form = ui.hooks.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
-  const [cancelToken] = api.useCancelToken();
-  const isMounted = ui.hooks.useIsMounted();
+  const Form = ui.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
+  const [cancelToken] = http.useCancelToken();
+  const isMounted = ui.useIsMounted();
 
   const onLoading = hooks.useDynamicCallback((v: boolean) => {
     if (isMounted.current) {

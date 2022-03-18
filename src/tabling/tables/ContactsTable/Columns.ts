@@ -1,7 +1,7 @@
 import { isNil } from "lodash";
 import { ValueSetterParams } from "@ag-grid-community/core";
 
-import { contacts, models, tabling, util } from "lib";
+import { model, tabling, util } from "lib";
 import { columns } from "../../generic";
 
 type R = Tables.ContactRowData;
@@ -24,7 +24,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     minWidth: 140,
     parsedFields: ["first_name", "last_name"],
     parseIntoFields: (value: string | null) => {
-      const parsed = !isNil(value) ? models.parseFirstAndLastName(value) : null;
+      const parsed = !isNil(value) ? model.parseFirstAndLastName(value) : null;
       return [
         { field: "first_name", value: !isNil(parsed) ? parsed[0] : null },
         { field: "last_name", value: !isNil(parsed) ? parsed[1] : null }
@@ -35,7 +35,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
         params.data.data.first_name = null;
         params.data.data.last_name = null;
       } else {
-        const parsed = models.parseFirstAndLastName(params.newValue);
+        const parsed = model.parseFirstAndLastName(params.newValue);
         params.data.data.first_name = parsed[0];
         params.data.data.last_name = parsed[1];
       }
@@ -98,7 +98,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     defaultHidden: true,
     cellRenderer: { data: "ContactTypeCell" },
     cellEditor: "ContactTypeEditor",
-    processCellFromClipboard: (name: string) => contacts.models.ContactTypes.infer(name),
+    processCellFromClipboard: (name: string) => model.contact.ContactTypes.infer(name),
     width: 100,
     minWidth: 100
   }),

@@ -64,7 +64,7 @@ const Image = (props: ImageProps): JSX.Element => {
       </ShowHide>
       {!isNil(props.fallbackIcon) && useFallback ? (
         <div className={"icon-wrapper"}>
-          {ui.typeguards.iconIsJSX(props.fallbackIcon) ? (
+          {ui.iconIsJSX(props.fallbackIcon) ? (
             props.fallbackIcon
           ) : (
             <Icon className={"icon--image-fallback"} icon={props.fallbackIcon} />

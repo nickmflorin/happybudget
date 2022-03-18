@@ -3,7 +3,8 @@ import { isNil, map, filter } from "lodash";
 import classNames from "classnames";
 
 import * as api from "api";
-import { ui, tabling, pdf, util, contacts } from "lib";
+import { ui, tabling, pdf, util, http } from "lib";
+import * as store from "store";
 
 import { ExportActualsPdfForm } from "components/forms";
 import { PreviewModal } from "components/modals";
@@ -56,15 +57,15 @@ const ActualsPreviewModal = ({
   ...props
 }: ActualsPreviewModalProps): JSX.Element => {
   const previewer = useRef<Pdf.IPreviewerRef>(null);
-  const [getToken] = api.useCancelToken({ preserve: true, createOnInit: true });
+  const [getToken] = http.useCancelToken({ preserve: true, createOnInit: true });
 
-  const cs = contacts.hooks.useContacts();
+  const cs = store.hooks.useContacts();
 
   const [options, setOptions] = useState<ExportActualsPdfFormOptions>(DEFAULT_OPTIONS);
   const [actuals, setActuals] = useState<M[] | null>(null);
 
-  const form = ui.hooks.useForm<ExportActualsPdfFormOptions>({ isInModal: true });
-  const modal = ui.hooks.useModal();
+  const form = ui.useForm<ExportActualsPdfFormOptions>({ isInModal: true });
+  const modal = ui.useModal();
 
   const convertOptions = useMemo(
     () =>
@@ -120,7 +121,7 @@ const ActualsPreviewModal = ({
         });
       }
     },
-    [budget, contacts, actuals, options]
+    [budget, cs, actuals, options]
   );
 
   return (

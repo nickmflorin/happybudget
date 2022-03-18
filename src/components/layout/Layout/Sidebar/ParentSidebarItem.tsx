@@ -16,7 +16,7 @@ const ParentSidebarItem = (
   const history = useHistory();
 
   const { submenu, closeSidebarOnClick, ...item } = props;
-  const isActive = useMemo(() => ui.util.itemIsActive(props, location), [props, location]);
+  const isActive = useMemo(() => ui.itemIsActive(props, location), [props, location]);
 
   useEffect(() => {
     if (isActive === true) {

@@ -5,7 +5,7 @@ import { isNil, map, filter } from "lodash";
 import { tabling, budgeting } from "lib";
 import { framework } from "tabling/generic";
 
-import { useGrouping, useMarkup } from "components/hooks";
+import { useGrouping, useMarkup } from "components/model/hooks";
 import { AuthenticatedBudgetTable, AuthenticatedBudgetTableProps } from "../BudgetTable";
 
 type R = Tables.AccountRowData;

@@ -54,7 +54,7 @@ const Button = (
   const isFakeDisabled = useMemo(() => disabled === true && !isNil(tooltip), [disabled, tooltip]);
   const [isHovered, setIsHovered] = useState(false);
 
-  const iC = ui.hooks.useClickableIcon(icon, { isHovered, iconProps });
+  const iC = ui.useClickableIcon(icon, { isHovered, iconProps });
 
   const prefix = useMemo(() => {
     if (isNil(iC)) {

@@ -1,6 +1,7 @@
 import { AxiosResponse } from "axios";
 import { isNil, map } from "lodash";
-import * as codes from "./codes";
+
+import { http } from "lib";
 import * as util from "./util";
 
 export enum HttpErrorTypes {
@@ -94,7 +95,7 @@ export class ClientError extends HttpError implements Http.IHttpClientError {
     this.url = config.url;
     this.response = config.response;
     this.status = config.status;
-    this.errors = map(config.errors, (e: Http.Error) => codes.standardizeError(e));
+    this.errors = map(config.errors, (e: Http.Error) => http.standardizeError(e));
   }
 
   public get authenticationError(): Http.AuthError | null {

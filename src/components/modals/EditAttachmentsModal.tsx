@@ -14,7 +14,7 @@ const EditAttachmentsModal = ({
   onAttachmentAdded,
   ...props
 }: EditAttachmentsModalProps): JSX.Element => {
-  const modal = ui.hooks.useModalIfNotDefined(props.modal);
+  const modal = ui.useModalIfNotDefined(props.modal);
 
   return (
     <Modal {...props} modal={modal} title={"Attachments"} titleIcon={"paperclip"} footer={null}>

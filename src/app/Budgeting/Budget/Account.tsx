@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { isNil } from "lodash";
 import { createSelector } from "reselect";
 
-import { tabling, budgeting } from "lib";
+import { tabling, model, budgeting } from "lib";
 import { connectTableToAuthenticatedStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
 
 import { BudgetPage } from "../Pages";
@@ -35,8 +35,8 @@ const ConnectedTable = connectTableToAuthenticatedStore<
       (state: Application.Store) => state.budget.detail.data,
       (budget: Model.Budget | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
-        estimated: !isNil(budget) ? budgeting.businessLogic.estimatedValue(budget) : 0.0,
-        variance: !isNil(budget) ? budgeting.businessLogic.varianceValue(budget) : 0.0,
+        estimated: !isNil(budget) ? model.budgeting.estimatedValue(budget) : 0.0,
+        variance: !isNil(budget) ? model.budgeting.varianceValue(budget) : 0.0,
         actual: budget?.actual || 0.0
       })
     ),
@@ -44,8 +44,8 @@ const ConnectedTable = connectTableToAuthenticatedStore<
       (state: Application.Store) => state.budget.account.detail.data,
       (detail: Model.Account | null) => ({
         identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
-        estimated: !isNil(detail) ? budgeting.businessLogic.estimatedValue(detail) : 0.0,
-        variance: !isNil(detail) ? budgeting.businessLogic.varianceValue(detail) : 0.0,
+        estimated: !isNil(detail) ? model.budgeting.estimatedValue(detail) : 0.0,
+        variance: !isNil(detail) ? model.budgeting.varianceValue(detail) : 0.0,
         actual: detail?.actual || 0.0
       })
     )

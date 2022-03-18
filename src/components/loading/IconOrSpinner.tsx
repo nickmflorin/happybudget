@@ -28,7 +28,7 @@ const IconOrSpinner = ({ loading, icon, spinnerProps, ...props }: IconOrSpinnerP
   } else if (!isNil(icon)) {
     return (
       <div {...props} className={classNames("icon-or-spinner", props.className)}>
-        <div className={"icon-wrapper"}>{ui.typeguards.iconIsJSX(icon) ? icon : <Icon icon={icon} />}</div>
+        <div className={"icon-wrapper"}>{ui.iconIsJSX(icon) ? icon : <Icon icon={icon} />}</div>
       </div>
     );
   } else {

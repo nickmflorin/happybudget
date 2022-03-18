@@ -6,7 +6,8 @@ import { Icon } from "components";
 import { IncludeButtonLink } from "components/buttons";
 import { InfoTooltip } from "components/tooltips";
 
-import { util, users } from "lib";
+import { util } from "lib";
+import * as store from "store";
 
 import Card, { CardProps } from "./Card";
 
@@ -28,8 +29,8 @@ const BudgetCard = ({
   onDuplicate,
   ...props
 }: BudgetCardProps): JSX.Element => {
-  const user = users.hooks.useLoggedInUser();
-  const tz = users.hooks.useTimezone();
+  const user = store.hooks.useLoggedInUser();
+  const tz = store.hooks.useTimezone();
 
   const subTitle = useMemo(() => {
     if (util.dates.isToday(budget.updated_at)) {

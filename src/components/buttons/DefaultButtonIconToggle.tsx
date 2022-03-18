@@ -18,7 +18,7 @@ const DefaultButtonIconToggle = ({
   children,
   ...props
 }: DefaultButtonIconToggleProps): JSX.Element => {
-  const isLessThan = ui.hooks.useLessThanBreakpoint(breakpoint);
+  const isLessThan = ui.useLessThanBreakpoint(breakpoint);
   if (isLessThan) {
     return <DefaultIconButton {...props} icon={breakpointIcon || props.icon} style={breakpointStyle || props.style} />;
   }

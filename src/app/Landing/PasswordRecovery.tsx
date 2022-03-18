@@ -25,7 +25,7 @@ const PasswordRecovery = (): JSX.Element => {
   const handler = notifications.ui.useNotifications({ defaultClosable: true });
 
   useEffect(() => {
-    const searchParams = http.urls.getQueryParams(location.search);
+    const searchParams = http.getQueryParams(location.search);
     if (!isNil(searchParams.token)) {
       api
         .validatePasswordRecoveryToken(searchParams.token)
