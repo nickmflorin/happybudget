@@ -11,7 +11,7 @@ type ImportActualsDropdownMenuProps = Omit<
   DropdownMenuProps<MenuItemSelectedState, ImportActualsMenuItemModel>,
   "onChange" | "mode" | "clientSearching" | "searchIndices" | "includeSearch" | "checkbox" | "selected" | "models"
 > & {
-    readonly onChange: (source: Model.ActualImportSource) => void;
+  readonly onChange: (source: Model.ActualImportSource) => void;
 };
 
 const ImportActualsDropdownMenu = (props: ImportActualsDropdownMenuProps): JSX.Element => (

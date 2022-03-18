@@ -1,4 +1,3 @@
-
 import { useEffect, useMemo, useState } from "react";
 import { usePlaidLink, PlaidLinkOptions } from "react-plaid-link";
 import { isNil } from "lodash";
@@ -28,19 +27,19 @@ const usePlaid = (props: UsePlaidProps): UsePlaidReturnType => {
   useEffect(() => {
     if (!isNil(error)) {
       props.onError?.(error.message);}
-    }, [error, props.onError]);
+  }, [error, props.onError]);
+
+  const _open = useMemo(
+    () => (token: string) => {
+      if (ready) {
+        setLinkToken(token);
+        open();
+      }
+    },
+    [open, ready]
+  );
+
+  return { open: _open };
+};
   
-    const _open = useMemo(
-      () => (token: string) => {
-        if (ready) {
-          setLinkToken(token);
-          open();
-        }
-      },
-      [open, ready]
-    );
-  
-    return { open: _open };
-  };
-  
-  export default usePlaid;
+export default usePlaid;

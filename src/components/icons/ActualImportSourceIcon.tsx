@@ -33,8 +33,8 @@ type ActualImportSourceIconProps = Omit<IconProps, "icon"> & {
 };
 
 const ActualImportSourceIcon = ({ source, ...props }: ActualImportSourceIconProps) => {
-    const icon = useMemo(() => getImportSourceIcon(typeof source === "number" ? source : source.id), [source]);
-    return <Icon {...props} icon={icon} />;
-  };
+  const icon = useMemo(() => getImportSourceIcon(typeof source === "number" ? source : source.id), [source]);
+  return <Icon {...props} icon={icon} />;
+};
   
-  export default React.memo(ActualImportSourceIcon);
+export default React.memo(ActualImportSourceIcon);
