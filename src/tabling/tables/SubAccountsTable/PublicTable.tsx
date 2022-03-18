@@ -38,7 +38,7 @@ export type PublicTableProps<B extends Model.BaseBudget, P extends Model.Account
 const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount>(
   props: PublicTableProps<B, P>
 ): JSX.Element => {
-  const { onBack, onLeft, onRight, onRowExpand } = useKeyboardNavigation(props);
+  const { onBack, onLeft, onRight, onRowExpand } = useKeyboardNavigation({ ...props, authenticated: false });
 
   const fringes = useSelector((s: Application.Store) =>
     selectors.selectFringes(s, { domain: props.domain, parentType: props.parentType })

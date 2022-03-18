@@ -48,7 +48,10 @@ export type AuthenticatedTableProps<B extends Model.BaseBudget, P extends Model.
 const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount>(
   props: AuthenticatedTableProps<B, P>
 ): JSX.Element => {
-  const { onBack, onLeft, onRight, onRowExpand } = useKeyboardNavigation(props);
+  const { onBack, onLeft, onRight, onRowExpand, confirmExpandModal } = useKeyboardNavigation({
+    ...props,
+    authenticated: true
+  });
 
   const fringes = useSelector((s: Application.Store) =>
     selectors.selectFringes(s, { domain: props.domain, parentType: props.parentType })
@@ -218,6 +221,7 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
       />
       {markupModals}
       {groupModals}
+      {confirmExpandModal}
     </React.Fragment>
   );
 };

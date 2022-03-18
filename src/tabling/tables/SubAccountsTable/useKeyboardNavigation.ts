@@ -4,6 +4,8 @@ import { isNil, findIndex } from "lodash";
 
 import { budgeting, http } from "lib";
 
+import { useConfirmation } from "components/notifications/hooks";
+
 export type UseKeyboardNavigationProps<B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount> = {
   readonly id: P["id"];
   readonly budgetId: B["id"];
@@ -11,6 +13,7 @@ export type UseKeyboardNavigationProps<B extends Model.BaseBudget, P extends Mod
   readonly parent: P | null;
   readonly parentType: P["type"];
   readonly tokenId?: string;
+  readonly authenticated: boolean;
 };
 
 export type UseKeyboardNavigationReturnType<R extends Tables.BudgetRowData> = {
@@ -18,6 +21,7 @@ export type UseKeyboardNavigationReturnType<R extends Tables.BudgetRowData> = {
   readonly onLeft: () => void;
   readonly onRight: () => void;
   readonly onRowExpand: undefined | ((row: Table.ModelRow<R>) => void);
+  readonly confirmExpandModal: JSX.Element;
 };
 
 const useKeyboardNavigation = <
@@ -28,6 +32,20 @@ const useKeyboardNavigation = <
   props: UseKeyboardNavigationProps<B, P>
 ): UseKeyboardNavigationReturnType<R> => {
   const history = useHistory();
+
+  const [confirmExpandModal, confirmRowExpand] = useConfirmation<[Table.ModelRow<R>]>({
+    suppressionKey: "subaccount-row-expand-confirmation-suppressed",
+    detail: "This will hide the values for several columns, but do not worry - the data will not be erased.",
+    title: "Expand Row",
+    onConfirmed: (row: Table.ModelRow<R>) =>
+      history.push(
+        budgeting.urls.getUrl(
+          { domain: props.domain, id: props.budgetId },
+          { type: "subaccount", id: row.id },
+          props.tokenId
+        )
+      )
+  });
 
   const onBack = useMemo(
     () => () => {
@@ -64,13 +82,15 @@ const useKeyboardNavigation = <
     () =>
       props.parentType === "account"
         ? (row: Table.ModelRow<R>) =>
-            history.push(
-              budgeting.urls.getUrl(
-                { domain: props.domain, id: props.budgetId },
-                { type: "subaccount", id: row.id },
-                props.tokenId
-              )
-            )
+            props.authenticated === true
+              ? confirmRowExpand([row], "You are about to expand the row.")
+              : history.push(
+                  budgeting.urls.getUrl(
+                    { domain: props.domain, id: props.budgetId },
+                    { type: "subaccount", id: row.id },
+                    props.tokenId
+                  )
+                )
         : undefined,
     [props.domain, props.budgetId, props.parentType, props.tokenId]
   );
@@ -117,7 +137,7 @@ const useKeyboardNavigation = <
     [props.budgetId, props.domain, props.parent, props.parentType, props.tokenId]
   );
 
-  return { onBack, onLeft, onRight, onRowExpand };
+  return { onBack, onLeft, onRight, onRowExpand, confirmExpandModal };
 };
 
 export default useKeyboardNavigation;

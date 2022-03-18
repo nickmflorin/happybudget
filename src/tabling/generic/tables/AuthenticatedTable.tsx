@@ -291,7 +291,7 @@ const AuthenticatedTable = <
   const [confirmModal, confirmRowDelete] = useConfirmation<[Table.EditableRow<R>[]]>({
     okButtonClass: "btn--danger",
     okText: "Delete",
-    suppressionKey: "delete-modal-confirmation-visibility",
+    suppressionKey: "delete-confirmation-suppressed",
     detail: "This action is not recoverable, the data will be permanently erased.",
     title: "Delete Rows",
     onConfirmed: (rows: Table.EditableRow<R>[]) =>

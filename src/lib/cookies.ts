@@ -16,9 +16,3 @@ export const confirmationIsSuppressed = (key: string) => {
   }
   return false;
 };
-
-export const setDeleteModalConfirmationSuppression = (value: boolean) =>
-  setConfirmationSuppressed("delete-modal-confirmation-visibility", value);
-
-export const deleteModalConfirmationIsSuppressed = () =>
-  confirmationIsSuppressed("delete-modal-confirmation-visibility");
