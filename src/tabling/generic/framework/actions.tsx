@@ -1,6 +1,7 @@
 import { isNil } from "lodash";
 
-import { util } from "lib";
+import * as api from "api";
+import { util, integrations } from "lib";
 
 import {
   ExportCSVDropdownMenu,
@@ -61,11 +62,37 @@ export const ToggleColumnAction = <R extends Table.RowData, M extends Model.RowH
   )
 });
 
-export const ImportActualsAction = (onImport: (source: Model.ActualImportSourceId) => void): Table.MenuActionObj => ({
+type ImportActualsActionProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
+  readonly table: Table.TableInstance<R, M>;
+  readonly onLinkToken: (linkToken: string) => void;
+};
+
+export const ImportActualsAction = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+  props: ImportActualsActionProps<R, M>
+): Table.MenuActionObj => ({
   label: "Sources",
-  icon: "file-import", // TODO: temp icon, replace with
+  icon: "file-import",
   wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => (
-    <ImportActualsDropdownMenu onChange={onImport}>{children}</ImportActualsDropdownMenu>
+    <ImportActualsDropdownMenu
+      onChange={(m: Model.ActualImportSource) => {
+        if (m.id === integrations.models.ActualImportSourceModels.PLAID.id) {
+          /* NOTE: Ideally, we might want to show a loading indicator next to
+					   the menu item in the menu - but we have not exposed functionality
+						 on the menu to allow that yet. */
+          props.table.notify({ message: "Connecting to Plaid.", closable: true, duration: 3000 });
+          api
+            .createPlaidLinkToken()
+            .then((response: { link_token: string }) => {
+              props.onLinkToken(response.link_token);
+            })
+            .catch((e: Error) => props.table.handleRequestError(e));
+        } else {
+          console.warn(`Detected unconfigured import source ${m.id}.`);
+        }
+      }}
+    >
+      {children}
+    </ImportActualsDropdownMenu>
   )
 });
 

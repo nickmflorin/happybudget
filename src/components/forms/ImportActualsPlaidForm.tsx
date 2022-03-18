@@ -8,14 +8,13 @@ export type ImportActualsPlaidFormValues = {
 
 export type ImportActualsPlaidFormProps = FormProps<ImportActualsPlaidFormValues>;
 
-// TODO: Fix DatePicker getting cut off by modal bounds
 const ImportActualsPlaidForm = (props: ImportActualsPlaidFormProps) => (
-  <Form.Form id={"testtesttest"} layout={"vertical"} {...props}>
+  <Form.Form layout={"vertical"} {...props}>
     <Form.Item required={true} label="Start Date" name={"start_date"}>
       <DatePicker dateFormat={"dd/MM/yyyy"} />
     </Form.Item>
     <Form.Item label="End Date" name={"end_date"}>
-      <DatePicker dateFormat={"dd/MM/yyyy"} />
+      <DatePicker popperProps={{ strategy: "fixed" }} dateFormat={"dd/MM/yyyy"} />
     </Form.Item>
   </Form.Form>
 );

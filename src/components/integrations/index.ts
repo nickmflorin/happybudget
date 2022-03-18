@@ -1,1 +1,1 @@
-export { default as PlaidConnect } from "./PlaidConnect";
+export { default as usePlaid } from "./usePlaid";

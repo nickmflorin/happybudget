@@ -9,3 +9,4 @@ export * as redux from "./redux";
 export * as tabling from "./tabling";
 export * as ui from "./ui";
 export * as util from "./util";
+export * as integrations from "./integrations";
