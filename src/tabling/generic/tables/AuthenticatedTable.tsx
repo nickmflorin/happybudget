@@ -2,10 +2,10 @@ import React, { useImperativeHandle, useState, useMemo, useRef } from "react";
 import { forEach, isNil, uniq, map, filter, includes, reduce } from "lodash";
 import { Subtract } from "utility-types";
 
-import { tabling, util, hooks, cookies, notifications } from "lib";
+import { tabling, util, hooks, notifications } from "lib";
 
 import { TableNotifications } from "components/notifications";
-import { DeleteRowsModal } from "components/modals";
+import { useConfirmation } from "components/notifications/hooks";
 import { AuthenticatedGrid } from "tabling/generic";
 
 import * as genericColumns from "../columns";
@@ -114,7 +114,6 @@ const AuthenticatedTable = <
      can be cancelled. */
   const hideSavingChangesTimout = useRef<NodeJS.Timeout | null>(null);
   const [selectedRows, setSelectedRows] = useState<Table.EditableRow<R>[]>([]);
-  const [deleteRows, setDeleteRows] = useState<Table.EditableRow<R>[] | undefined>(undefined);
   const NotificationsHandler = notifications.ui.useNotificationsManager({
     defaultBehavior: "append",
     defaultClosable: true
@@ -289,6 +288,19 @@ const AuthenticatedTable = <
     [saving, hideSavingChangesTimout.current]
   );
 
+  const [confirmModal, confirmRowDelete] = useConfirmation<[Table.EditableRow<R>[]]>({
+    okButtonClass: "btn--danger",
+    okText: "Delete",
+    suppressionKey: "delete-modal-confirmation-visibility",
+    detail: "This action is not recoverable, the data will be permanently erased.",
+    title: "Delete Rows",
+    onConfirmed: (rows: Table.EditableRow<R>[]) =>
+      props.onEvent({
+        payload: { rows: map(rows, (r: Table.EditableRow<R>) => r.id) },
+        type: "rowDelete"
+      })
+  });
+
   const actions = useMemo<Table.AuthenticatedMenuActions<R, M>>(
     (): Table.AuthenticatedMenuActions<R, M> =>
       tabling.menu.combineMenuActions<Table.AuthenticatedMenuActionParams<R, M>, R, M>(
@@ -304,19 +316,9 @@ const AuthenticatedTable = <
                 const rows = filter((apis?.grid.getSelectedRows() || []) as Table.BodyRow<R>[], (r: Table.BodyRow<R>) =>
                   tabling.rows.isEditableRow(r)
                 ) as Table.EditableRow<R>[];
+
                 if (rows.length !== 0) {
-                  if (
-                    rows.length === 1 ||
-                    props.confirmRowDelete === false ||
-                    cookies.deleteModalConfirmationIsSuppressed()
-                  ) {
-                    props.onEvent({
-                      payload: { rows: map(rows, (r: Table.EditableRow<R>) => r.id) },
-                      type: "rowDelete"
-                    });
-                  } else {
-                    setDeleteRows(rows);
-                  }
+                  confirmRowDelete([rows], `You are about to delete ${rows.length} rows.`);
                 }
               }
             }
@@ -475,20 +477,7 @@ const AuthenticatedTable = <
             }
           }}
         />
-        {!isNil(deleteRows) && (
-          <DeleteRowsModal
-            open={true}
-            onCancel={() => setDeleteRows(undefined)}
-            onOk={() => {
-              props.onEvent({
-                payload: { rows: map(deleteRows, (r: Table.EditableRow<R>) => r.id) },
-                type: "rowDelete"
-              });
-              setDeleteRows(undefined);
-            }}
-            rows={deleteRows}
-          />
-        )}
+        {confirmModal}
       </React.Fragment>
     </TableWrapper>
   );

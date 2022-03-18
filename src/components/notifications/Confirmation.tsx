@@ -21,25 +21,20 @@ const Confirmation = ({
   children,
   suppressionKey,
   ...props
-}: ConfirmationProps): JSX.Element => {
-  if (cookies.confirmationIsSuppressed(suppressionKey)) {
-    return <></>;
-  }
-  return (
-    <div {...props} className={classNames("confirmation", props.className)}>
-      <Notification bare={true} level={level} message={message}>
-        {children}
-      </Notification>
-      <Checkbox
-        style={{ display: "flex", alignItems: "center", marginTop: "10px" }}
-        onChange={(e: CheckboxChangeEvent) => {
-          cookies.setConfirmationSuppressed(suppressionKey, e.target.checked);
-        }}
-      >
-        {"Don't show this message again"}
-      </Checkbox>
-    </div>
-  );
-};
+}: ConfirmationProps): JSX.Element => (
+  <div {...props} className={classNames("confirmation", props.className)}>
+    <Notification bare={true} level={level} message={message}>
+      {children}
+    </Notification>
+    <Checkbox
+      style={{ display: "flex", alignItems: "center", marginTop: "10px" }}
+      onChange={(e: CheckboxChangeEvent) => {
+        cookies.setConfirmationSuppressed(suppressionKey, e.target.checked);
+      }}
+    >
+      {"Don't show this message again"}
+    </Checkbox>
+  </div>
+);
 
 export default React.memo(Confirmation);

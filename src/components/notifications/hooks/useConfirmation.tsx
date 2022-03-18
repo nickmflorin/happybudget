@@ -6,61 +6,59 @@ import { ConfirmationModal } from "components/modals";
 import { ConfirmationProps } from "components/notifications";
 import { isNil } from "lodash";
 
-type UseConfirmationProps = Pick<ConfirmationProps, "suppressionKey"> & {
+type UseConfirmationProps<ARGS extends Array<unknown>> = Pick<ConfirmationProps, "suppressionKey"> & {
   readonly detail: string;
   readonly message?: string;
   readonly okText?: string;
   readonly cancelText?: string;
   readonly okButtonClass?: string;
-  readonly onConfirmed: () => void;
+  readonly title?: string;
+  readonly onConfirmed: (...args: ARGS) => void;
 };
 
-const useConfirmation = (props: UseConfirmationProps): [JSX.Element, () => void] => {
-  const [visible, setVisible] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+const useConfirmation = <ARGS extends Array<unknown>>(
+  props: UseConfirmationProps<ARGS>
+): [JSX.Element, (passThrough: ARGS, m?: string) => void] => {
+  const [modal, setModal] = useState<JSX.Element | null>(null);
 
-  const modal = useMemo(() => {
-    const msg = !isNil(message) ? message : !isNil(props.message) ? props.message : "";
-    if (visible) {
-      return (
+  const _setModal = useMemo(
+    () => (passThrough: ARGS, m?: string) => {
+      const msg = !isNil(m) ? m : !isNil(props.message) ? props.message : "";
+      const mdl = (
         <ConfirmationModal
+          open={true}
           okText={props.okText}
           cancelText={props.cancelText}
+          title={props.title}
           okButtonClass={props.okButtonClass}
           message={msg}
           suppressionKey={props.suppressionKey}
           onOk={() => {
-            setVisible(false);
-            setMessage(null);
-            props.onConfirmed();
+            setModal(null);
+            props.onConfirmed(...passThrough);
           }}
-          onCancel={() => {
-            setMessage(null);
-            setVisible(false);
-          }}
+          onCancel={() => setModal(null)}
         >
           {props.detail}
         </ConfirmationModal>
       );
-    }
-    return <></>;
-  }, [props.message, message, props.suppressionKey, props.detail, visible, props.onConfirmed]);
-
-  const confirm = useMemo(
-    () => (m?: string) => {
-      if (cookies.confirmationIsSuppressed(props.suppressionKey)) {
-        props.onConfirmed();
-      } else {
-        if (!isNil(m)) {
-          setMessage(m);
-        }
-        setVisible(true);
-      }
+      setModal(mdl);
     },
-    [props.onConfirmed]
+    [props.message, props.cancelText, props.okText, props.okButtonClass, props.suppressionKey, props.title]
   );
 
-  return [modal, confirm];
+  const confirm = useMemo(
+    () => (passThrough: ARGS, m?: string) => {
+      if (cookies.confirmationIsSuppressed(props.suppressionKey)) {
+        props.onConfirmed(...passThrough);
+      } else {
+        _setModal(passThrough, m);
+      }
+    },
+    [props.onConfirmed, props.suppressionKey]
+  );
+
+  return [modal || <></>, confirm];
 };
 
 export default useConfirmation;

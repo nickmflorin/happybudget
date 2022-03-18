@@ -10,7 +10,6 @@ export { default as CreateContactModal } from "./CreateContactModal";
 export { default as EditContactModal } from "./EditContactModal";
 export { default as FringesModal } from "./FringesModal";
 export { default as CreateMarkupModal } from "./CreateMarkupModal";
-export { default as DeleteRowsModal } from "./DeleteRowsModal";
 export { default as EditAttachmentsModal } from "./EditAttachmentsModal";
 export { default as DeleteBudgetModal } from "./DeleteBudgetModal";
 export { default as PreviewModal } from "./PreviewModal";
