@@ -39,7 +39,7 @@ const budgetsReducer: Redux.Reducer<Modules.Dashboard.Store["budgets"]> = (
       data: reduce(
         newState.data,
         (curr: Model.SimpleBudget[], m: Model.SimpleBudget) => {
-          const reperm = redux.reducers.findModelInData(repermissioned, m.id, {
+          const reperm = redux.findModelInData(repermissioned, m.id, {
             modelName: "repermissioned budget"
           });
           if (!isNil(reperm)) {
@@ -70,7 +70,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
       response: actions.responseContactsAction,
       setSearch: actions.setContactsSearchAction
     },
-    initialState: redux.initialState.initialTableState
+    initialState: redux.initialTableState
   }),
   templates: redux.reducers.createAuthenticatedModelListResponseReducer<
     Model.SimpleTemplate,
@@ -78,7 +78,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
     Tables.ContactTableContext,
     Redux.AuthenticatedModelListResponseStore<Model.SimpleTemplate>
   >({
-    initialState: redux.initialState.initialAuthenticatedModelListResponseState,
+    initialState: redux.initialAuthenticatedModelListResponseState,
     actions: {
       request: actions.requestTemplatesAction,
       response: actions.responseTemplatesAction,
@@ -97,7 +97,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
     Tables.ContactTableContext,
     Redux.AuthenticatedModelListResponseStore<Model.SimpleTemplate>
   >({
-    initialState: redux.initialState.initialAuthenticatedModelListResponseState,
+    initialState: redux.initialAuthenticatedModelListResponseState,
     actions: {
       request: actions.requestCommunityTemplatesAction,
       response: actions.responseCommunityTemplatesAction,

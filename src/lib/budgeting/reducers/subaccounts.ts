@@ -1,6 +1,6 @@
 import { isNil, filter } from "lodash";
 
-import { tabling, redux, budgeting } from "lib";
+import { tabling, redux, model } from "lib";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
@@ -20,7 +20,7 @@ const recalculateSubAccountRow = (st: S, row: Table.DataRow<R>): Pick<R, "nomina
     tabling.rows.isPlaceholderRow<R>(row) || (!isNil(row.children) && row.children.length === 0);
 
   if (isValidToRecalculate) {
-    const fringes: Table.ModelRow<Tables.FringeRowData>[] = redux.reducers.findModelsInData(
+    const fringes: Table.ModelRow<Tables.FringeRowData>[] = redux.findModelsInData(
       filter(st.fringes.data, (r: Table.BodyRow<Tables.FringeRowData>) => tabling.rows.isModelRow(r)),
       row.data.fringes
     ) as Table.ModelRow<Tables.FringeRowData>[];
@@ -29,15 +29,12 @@ const recalculateSubAccountRow = (st: S, row: Table.DataRow<R>): Pick<R, "nomina
       const quantity = row.data.quantity === null ? 1.0 : row.data.quantity;
       return {
         nominal_value: quantity * row.data.rate * multiplier,
-        fringe_contribution: budgeting.businessLogic.contributionFromFringes(
-          quantity * row.data.rate * multiplier,
-          fringes
-        )
+        fringe_contribution: model.budgeting.contributionFromFringes(quantity * row.data.rate * multiplier, fringes)
       };
     } else {
       return {
         nominal_value: 0.0,
-        fringe_contribution: budgeting.businessLogic.contributionFromFringes(0.0, fringes)
+        fringe_contribution: model.budgeting.contributionFromFringes(0.0, fringes)
       };
     }
   }

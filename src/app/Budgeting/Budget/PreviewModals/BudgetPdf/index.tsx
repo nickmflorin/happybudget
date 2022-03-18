@@ -5,7 +5,7 @@ import { ShowHide } from "components";
 import { Document, View, Page, Tag, Text, NoDataPage } from "components/pdf";
 import { AccountsTable as GenericAccountsTable, SubAccountsTable as GenericSubAccountsTable } from "tabling";
 import { AccountsTable, AccountTable } from "tabling/pdf";
-import { tabling, budgeting } from "lib";
+import { tabling, model } from "lib";
 
 import PageHeader from "./PageHeader";
 import Notes from "./Notes";
@@ -45,14 +45,14 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
         pdfFooterValueGetter: `${budget.name} Total`
       },
       estimated: {
-        pdfFooterValueGetter: budgeting.businessLogic.estimatedValue(budget)
+        pdfFooterValueGetter: model.budgeting.estimatedValue(budget)
       },
       variance: {
-        pdfFooterValueGetter: budgeting.businessLogic.varianceValue(budget)
+        pdfFooterValueGetter: model.budgeting.varianceValue(budget)
       },
 
       actual: {
-        pdfFooterValueGetter: budgeting.businessLogic.actualValue(budget)
+        pdfFooterValueGetter: model.budgeting.actualValue(budget)
       }
     });
     return tabling.columns.orderColumns(
@@ -110,21 +110,21 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
             )
         },
         estimated: {
-          pdfFooterValueGetter: budgeting.businessLogic.estimatedValue(account),
+          pdfFooterValueGetter: model.budgeting.estimatedValue(account),
           pdfChildFooter: (m: M) => {
-            return { value: budgeting.businessLogic.estimatedValue(m) };
+            return { value: model.budgeting.estimatedValue(m) };
           }
         },
         variance: {
-          pdfFooterValueGetter: budgeting.businessLogic.varianceValue(account),
+          pdfFooterValueGetter: model.budgeting.varianceValue(account),
           pdfChildFooter: (m: M) => {
-            return { value: budgeting.businessLogic.varianceValue(m) };
+            return { value: model.budgeting.varianceValue(m) };
           }
         },
         actual: {
-          pdfFooterValueGetter: budgeting.businessLogic.actualValue(account),
+          pdfFooterValueGetter: model.budgeting.actualValue(account),
           pdfChildFooter: (m: M) => {
-            return { value: budgeting.businessLogic.actualValue(m) };
+            return { value: model.budgeting.actualValue(m) };
           }
         }
       });
@@ -139,12 +139,12 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
     return filter(
       budget.children,
       (account: Model.PdfAccount) =>
-        (!(options.excludeZeroTotals === true) || budgeting.businessLogic.estimatedValue(account) !== 0) &&
+        (!(options.excludeZeroTotals === true) || model.budgeting.estimatedValue(account) !== 0) &&
         (isNil(options.tables) || includes(options.tables, account.id)) &&
         filter(
           account.children,
           (subaccount: Model.PdfSubAccount) =>
-            !(options.excludeZeroTotals === true) || budgeting.businessLogic.estimatedValue(subaccount) !== 0
+            !(options.excludeZeroTotals === true) || model.budgeting.estimatedValue(subaccount) !== 0
         ).length !== 0
     );
   }, [budget, options]);
@@ -172,7 +172,7 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
             data={filter(
               budget.children,
               (account: Model.PdfAccount) =>
-                !(options.excludeZeroTotals === true) || budgeting.businessLogic.estimatedValue(account) !== 0
+                !(options.excludeZeroTotals === true) || model.budgeting.estimatedValue(account) !== 0
             )}
             markups={budget.children_markups}
             groups={budget.groups}

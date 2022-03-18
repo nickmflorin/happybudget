@@ -2,7 +2,7 @@ import { SagaIterator } from "redux-saga";
 import { put, select } from "redux-saga/effects";
 
 import * as api from "api";
-import { notifications } from "lib";
+import { notifications, http } from "lib";
 import * as actions from "./actions";
 
 export function* getBudgetsTask(action: Redux.Action<null>): SagaIterator {
@@ -14,7 +14,7 @@ export function* getBudgetsTask(action: Redux.Action<null>): SagaIterator {
   }));
   yield put(actions.loadingBudgetsAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleBudget> = yield api.request(api.getBudgets, action.context, query);
+    const response: Http.ListResponse<Model.SimpleBudget> = yield http.request(api.getBudgets, action.context, query);
     yield put(actions.responseBudgetsAction(response));
   } catch (e: unknown) {
     notifications.ui.banner.handleRequestError(e as Error);
@@ -27,7 +27,7 @@ export function* getBudgetsTask(action: Redux.Action<null>): SagaIterator {
 export function* getBudgetsPermissioningTask(action: Redux.Action<null>): SagaIterator {
   yield put(actions.loadingBudgetsAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleBudget> = yield api.request(api.getBudgets, action.context, {});
+    const response: Http.ListResponse<Model.SimpleBudget> = yield http.request(api.getBudgets, action.context, {});
     yield put(actions.responsePermissionedBudgetsAction(response));
   } catch (e: unknown) {
     notifications.ui.banner.handleRequestError(e as Error);
@@ -48,7 +48,7 @@ export function* getTemplatesTask(action: Redux.Action<null>): SagaIterator {
   });
   yield put(actions.loadingTemplatesAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleTemplate> = yield api.request(
+    const response: Http.ListResponse<Model.SimpleTemplate> = yield http.request(
       api.getTemplates,
       action.context,
       query
@@ -73,7 +73,7 @@ export function* getCommunityTemplatesTask(action: Redux.Action<null>): SagaIter
   });
   yield put(actions.loadingCommunityTemplatesAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleTemplate> = yield api.request(
+    const response: Http.ListResponse<Model.SimpleTemplate> = yield http.request(
       api.getCommunityTemplates,
       action.context,
       query

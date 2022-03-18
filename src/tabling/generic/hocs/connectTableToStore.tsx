@@ -63,7 +63,7 @@ const connectTableToStore =
     config: StoreConfig<R, M, S>
   ) =>
   (Component: React.FunctionComponent<T>): React.FunctionComponent<HOCProps<T, R, M, S, C>> => {
-    let configuredSelector: (state: Application.Store) => S = () => redux.initialState.initialTableState as S;
+    let configuredSelector: (state: Application.Store) => S = () => redux.initialTableState as S;
     if (!isNil(config.selector)) {
       configuredSelector = config.selector;
     }

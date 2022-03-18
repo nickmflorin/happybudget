@@ -3,7 +3,8 @@ import { spawn, takeLatest, put } from "redux-saga/effects";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { budgeting, tabling, notifications } from "lib";
+import { tabling, notifications, http } from "lib";
+import * as store from "store";
 
 import * as actions from "../../actions/budget";
 
@@ -28,7 +29,7 @@ const FringesActionMap = {
 function* getBudgetTask(action: Redux.Action<number>): SagaIterator {
   yield put(actions.loadingBudgetAction(true));
   try {
-    const response: Model.Budget = yield api.request(api.getBudget, action.context, action.payload);
+    const response: Model.Budget = yield http.request(api.getBudget, action.context, action.payload);
     yield put(actions.responseBudgetAction(response));
   } catch (e: unknown) {
     const err = e as Error;
@@ -59,7 +60,7 @@ export const createFringesTableSaga = (
   >({
     actions: FringesActionMap,
     selectStore: (state: Application.Store) => state.budget[parentType].table.fringes,
-    tasks: budgeting.tasks.fringes.createTableTaskSet<Model.Budget>({
+    tasks: store.tasks.fringes.createTableTaskSet<Model.Budget>({
       table,
       selectParentTableStore: (state: Application.Store) => state.budget[parentType].table,
       actions:

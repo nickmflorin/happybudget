@@ -33,7 +33,7 @@ export const withSize =
     ? React.ForwardRefRenderFunction<REF, CT & { readonly ref?: ForwardedRef<REF> }>
     : React.FunctionComponent<CT> => {
     const WithSize = (props: CT & { readonly forwardedRef?: ForwardedRef<REF> }): JSX.Element => {
-      const _size = ui.hooks.useSize(props, conf);
+      const _size = ui.useSize(props, conf);
 
       let injectedProps = { ...props };
 

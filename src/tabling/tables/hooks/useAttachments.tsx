@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { reduce, uniq, filter, isNil } from "lodash";
 
-import { hooks, models, tabling } from "lib";
+import { hooks, model, tabling } from "lib";
 import { EditAttachmentsModal } from "components/modals";
 
 import usePublicAttachments from "./usePublicAttachments";
@@ -81,7 +81,7 @@ const useAttachments = <
       (curr: Model.SimpleAttachment[], r: Table.ModelRow<R>) => uniq([...curr, ...(r.data.attachments || [])]),
       []
     );
-    return models.getModels<Model.SimpleAttachment>(attachments, models.parseIdsFromDeliminatedString(value), {
+    return model.getModels<Model.SimpleAttachment>(attachments, model.parseIdsFromDeliminatedString(value), {
       warnOnMissing: false,
       modelName: "attachment"
     });

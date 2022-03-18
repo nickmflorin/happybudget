@@ -17,7 +17,7 @@ export interface ExpandedSidebarProps
 }
 
 const ExpandedSidebar = ({ toggle, ...props }: ExpandedSidebarProps): JSX.Element => {
-  const isMobile = ui.hooks.useLessThanBreakpoint("medium");
+  const isMobile = ui.useLessThanBreakpoint("medium");
 
   return (
     <GenericSidebar<IExpandedSidebarItem>

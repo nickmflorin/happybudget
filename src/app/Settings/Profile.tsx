@@ -3,8 +3,8 @@ import { useDispatch } from "react-redux";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { ui, typeguards, notifications, users } from "lib";
-import { actions } from "store";
+import { ui, model, notifications } from "lib";
+import * as store from "store";
 
 import { Tile } from "components/containers";
 import { UserProfileForm } from "components/forms";
@@ -13,8 +13,8 @@ import { IImageAndNameRef } from "components/fields/ImageAndName";
 import { Page } from "components/layout";
 
 const Profile = (): JSX.Element => {
-  const form = ui.hooks.useForm<Http.UserPayload>();
-  const user = users.hooks.useLoggedInUser();
+  const form = ui.useForm<Http.UserPayload>();
+  const user = store.hooks.useLoggedInUser();
   const dispatch: Redux.Dispatch = useDispatch();
   const [image, setImage] = useState<UploadedImage | SavedImage | null>(null);
   /*
@@ -65,7 +65,7 @@ const Profile = (): JSX.Element => {
           onFinish={(values: Partial<Http.UserPayload>) => {
             form.setLoading(true);
             let payload = { ...values };
-            if (!isNil(image) && typeguards.isUploadedImage(image)) {
+            if (!isNil(image) && model.isUploadedImage(image)) {
               payload = { ...payload, profile_image: image.data };
             } else if (isNil(image)) {
               payload = { ...payload, profile_image: null };
@@ -77,7 +77,7 @@ const Profile = (): JSX.Element => {
                   level: "success",
                   message: "Your information was successfully saved."
                 });
-                dispatch(actions.authenticated.updateLoggedInUserAction(response));
+                dispatch(store.actions.updateLoggedInUserAction(response));
               })
               .catch((e: Error) => form.handleRequestError(e))
               .finally(() => form.setLoading(false));

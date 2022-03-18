@@ -11,7 +11,7 @@ export interface ExpandedLayoutProps extends Omit<GenericLayoutProps, "sidebar">
 }
 
 const ExpandedLayout = (props: ExpandedLayoutProps): JSX.Element => {
-  const layout = ui.hooks.useLayoutIfNotDefined(props.layout);
+  const layout = ui.useLayoutIfNotDefined(props.layout);
 
   return (
     <GenericLayout

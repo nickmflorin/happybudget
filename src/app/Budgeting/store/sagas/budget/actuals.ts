@@ -1,12 +1,13 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, debounce } from "redux-saga/effects";
 
-import { tabling, budgeting } from "lib";
+import { tabling } from "lib";
+import * as store from "store";
 
 import { updateBudgetInStateAction } from "../../actions/budget";
 import { actuals as actions } from "../../actions/budget";
 
-const ActionMap: budgeting.tasks.actuals.ActualsTableActionMap & {
+const ActionMap: store.tasks.actuals.ActualsTableActionMap & {
   readonly request: Redux.TableActionCreator<Redux.TableRequestPayload, Tables.ActualTableContext>;
 } = {
   handleEvent: actions.handleTableEventAction,
@@ -21,7 +22,7 @@ const ActionMap: budgeting.tasks.actuals.ActualsTableActionMap & {
 };
 
 export const createTableSaga = (table: Table.TableInstance<Tables.ActualRowData, Model.Actual>) => {
-  const tasks = budgeting.tasks.actuals.createTableTaskSet({
+  const tasks = store.tasks.actuals.createTableTaskSet({
     table,
     selectStore: (state: Application.Store) => state.budget.actuals,
     selectOwnersSearch: (state: Application.Store) => state.budget.actuals.owners.search,

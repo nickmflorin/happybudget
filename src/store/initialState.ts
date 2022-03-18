@@ -27,8 +27,8 @@ const createApplicationInitialState = (config: Application.StoreConfig): Applica
   ...createModularApplicationState(filter(config.modules, (c: Application.ModuleConfig) => c.isPublic !== true)),
   user: config.user,
   loading: false,
-  contacts: redux.initialState.initialAuthenticatedModelListResponseState,
-  filteredContacts: redux.initialState.initialAuthenticatedModelListResponseState,
+  contacts: redux.initialAuthenticatedModelListResponseState,
+  filteredContacts: redux.initialAuthenticatedModelListResponseState,
   productPermissionModalOpen: false,
   public: createPublicInitialState(config)
 });

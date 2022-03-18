@@ -3,7 +3,7 @@ import axios from "axios";
 import { isNil, filter, map, reduce } from "lodash";
 
 import * as api from "api";
-import { util, hooks } from "lib";
+import { util, hooks, http } from "lib";
 
 import * as internal from "../internal";
 import * as typeguards from "./typeguards";
@@ -31,15 +31,14 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
 
       const fieldRelatedErrors: (Http.FieldError | UIFieldNotification)[] = filter(
         notices,
-        (n: UINotificationType) =>
-          typeguards.isUIFieldNotification(n) || (api.typeguards.isHttpError(n) && api.typeguards.isFieldError(n))
+        (n: UINotificationType) => typeguards.isUIFieldNotification(n) || (http.isHttpError(n) && http.isFieldError(n))
       ) as (Http.FieldError | UIFieldNotification)[];
 
       // Filter out the notifications that do not pertain to individual fields.
       notices = filter(
         notices,
         (n: UINotificationType) =>
-          !(typeguards.isUIFieldNotification(n) || (api.typeguards.isHttpError(n) && api.typeguards.isFieldError(n)))
+          !(typeguards.isUIFieldNotification(n) || (http.isHttpError(n) && http.isFieldError(n)))
       ) as UINonFieldNotificationType[];
 
       /* For the notification sources that pertain to field type errors, a

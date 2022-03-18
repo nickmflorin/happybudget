@@ -5,8 +5,9 @@ import { isNil } from "lodash";
 import axios from "axios";
 
 import * as api from "api";
-import { notifications, users } from "lib";
-import { actions } from "store";
+import { notifications, http } from "lib";
+import * as store from "store";
+
 import { WrapInApplicationSpinner } from "components";
 
 export type PrivateRouteProps = RouteProps & {
@@ -15,11 +16,11 @@ export type PrivateRouteProps = RouteProps & {
 };
 
 const PrivateRoute = ({ forceReloadFromStripe, revalidate, ...props }: PrivateRouteProps): JSX.Element => {
-  const authenticatedUser = users.hooks.useUser();
+  const authenticatedUser = store.hooks.useUser();
   const [redirect, setRedirect] = useState(false);
   const [authenticating, setAuthenticating] = useState(true);
   const dispatch: Redux.Dispatch = useDispatch();
-  const [newCancelToken] = api.useCancelToken();
+  const [newCancelToken] = http.useCancelToken();
 
   useEffect(() => {
     /* If there is not already an authenticated user in the store, we want to
@@ -44,7 +45,7 @@ const PrivateRoute = ({ forceReloadFromStripe, revalidate, ...props }: PrivateRo
             });
             setAuthenticating(false);
           } else {
-            dispatch(actions.authenticated.updateLoggedInUserAction(response));
+            dispatch(store.actions.updateLoggedInUserAction(response));
             setAuthenticating(false);
           }
         })

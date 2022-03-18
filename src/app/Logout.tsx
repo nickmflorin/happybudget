@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Redirect } from "react-router-dom";
+
 import * as api from "api";
 import { notifications } from "lib";
-import { actions } from "store";
+import * as store from "store";
 
 export const Logout = (): JSX.Element => {
   const [redirect, setRedirect] = useState(false);
@@ -12,7 +13,7 @@ export const Logout = (): JSX.Element => {
   useEffect(() => {
     api
       .logout()
-      .then(() => dispatch(actions.authenticated.clearLoggedInUserAction(null)))
+      .then(() => dispatch(store.actions.clearLoggedInUserAction(null)))
       .catch(e => notifications.requestError(e))
       .finally(() => setRedirect(true));
   }, []);

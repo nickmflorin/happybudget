@@ -1,4 +1,5 @@
-import { budgeting, tabling } from "lib";
+import { tabling } from "lib";
+import * as store from "store";
 
 import { accounts as actions, updateBudgetInStateAction } from "../../actions/template";
 
@@ -22,7 +23,7 @@ export const createTableSaga = (table: Table.TableInstance<Tables.AccountRowData
   >({
     actions: ActionMap,
     selectStore: (state: Application.Store) => state.template.accounts,
-    tasks: budgeting.tasks.accounts.createAuthenticatedTableTaskSet<Model.Template>({
+    tasks: store.tasks.accounts.createAuthenticatedTableTaskSet<Model.Template>({
       table,
       selectStore: (state: Application.Store) => state.template.accounts,
       actions: ActionMap

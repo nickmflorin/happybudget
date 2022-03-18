@@ -19,7 +19,7 @@ const createPlaceholdersActivatedEventReducer = <
     return reduce(
       e.payload.placeholderIds,
       (st: S, id: Table.PlaceholderRowId, index: number) => {
-        const r: Table.PlaceholderRow<R> | null = redux.reducers.findModelInData<Table.PlaceholderRow<R>>(
+        const r: Table.PlaceholderRow<R> | null = redux.findModelInData<Table.PlaceholderRow<R>>(
           filter(st.data, (ri: Table.BodyRow<R>) => tabling.rows.isPlaceholderRow(ri)) as Table.PlaceholderRow<R>[],
           id
         );

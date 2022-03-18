@@ -37,9 +37,7 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
         className={classNames("budget-table-menu", props.className, { active: action.active })}
         size={"medium"}
         disabled={action.disabled}
-        icon={
-          !isNil(action.icon) ? ui.typeguards.iconIsJSX(action.icon) ? action.icon : <Icon icon={action.icon} /> : <></>
-        }
+        icon={!isNil(action.icon) ? ui.iconIsJSX(action.icon) ? action.icon : <Icon icon={action.icon} /> : <></>}
         tooltip={
           !isNil(action.tooltip)
             ? typeof action.tooltip === "string"
@@ -67,9 +65,7 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
         iconSize={"medium"}
         onClick={() => !isNil(action.onClick) && action.onClick()}
         disabled={action.disabled}
-        icon={
-          !isNil(action.icon) ? ui.typeguards.iconIsJSX(action.icon) ? action.icon : <Icon icon={action.icon} /> : <></>
-        }
+        icon={!isNil(action.icon) ? ui.iconIsJSX(action.icon) ? action.icon : <Icon icon={action.icon} /> : <></>}
         tooltip={
           !isNil(action.tooltip)
             ? typeof action.tooltip === "string"

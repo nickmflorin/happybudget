@@ -11,7 +11,7 @@ import { UnverifiedEmailNotification, UserNotOnWaitlistNotification } from "./No
 
 const Signup = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const form = ui.hooks.useForm<ISignupFormValues>();
+  const form = ui.useForm<ISignupFormValues>();
   const history = useHistory();
 
   const handleAuthError = useMemo(

@@ -26,7 +26,7 @@ export const createAccountDetailReducer = <S extends MinimalAccountStore>(
   return combineReducers({
     ...config.reducers,
     detail: redux.reducers.createDetailResponseReducer<Model.Account>({
-      initialState: redux.initialState.initialDetailResponseState,
+      initialState: redux.initialDetailResponseState,
       actions: config.actions
     })
   }) as Redux.Reducer<S>;

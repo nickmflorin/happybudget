@@ -1,3 +1,4 @@
+export { default as ConfirmationModal } from "./ConfirmationModal";
 export { default as CreateBudgetModal } from "./CreateBudgetModal";
 export { default as CreateTemplateModal } from "./CreateTemplateModal";
 export { default as CreateGroupModal } from "./CreateGroupModal";

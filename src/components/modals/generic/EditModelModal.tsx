@@ -1,8 +1,7 @@
 import { useMemo, useCallback } from "react";
 import { isNil, includes, reduce } from "lodash";
 
-import { ui, hooks } from "lib";
-import * as api from "api";
+import { ui, hooks, model, http } from "lib";
 
 import Modal from "./Modal";
 
@@ -64,9 +63,9 @@ const EditModelModal = <
   convertEmptyStringsToNull,
   ...props
 }: PrivateEditModelModalProps<M, P, V, R>): JSX.Element => {
-  const Form = ui.hooks.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
-  const [getToken] = api.useCancelToken({ preserve: true, createOnInit: true });
-  const isMounted = ui.hooks.useIsMounted();
+  const Form = ui.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
+  const [getToken] = http.useCancelToken({ preserve: true, createOnInit: true });
+  const isMounted = ui.useIsMounted();
 
   const onResponse = hooks.useDynamicCallback((m: M) => {
     if (!isNil(m) && props.open === true) {
@@ -92,7 +91,7 @@ const EditModelModal = <
   });
 
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-  const [instance, loading, error] = api.useModel<M>(id, {
+  const [instance, loading, error] = model.useModel<M>(id, {
     request,
     onResponse,
     conditional: () => props.open === true,

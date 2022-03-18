@@ -78,9 +78,9 @@ export class ApiClient {
         let rawQuery: Http.RawQuery = { ...rest };
         // Convert Ordering to String if Present
         if (method === HttpRequestMethods.GET && !isNil(ordering)) {
-          rawQuery = { ...rawQuery, ordering: http.urls.convertOrderingQueryToString(ordering) };
+          rawQuery = { ...rawQuery, ordering: http.convertOrderingQueryToString(ordering) };
         }
-        url = http.urls.addQueryParamsToUrl(url, rawQuery, { filter: [""] }) as Http.V1Url;
+        url = http.addQueryParamsToUrl(url, rawQuery, { filter: [""] }) as Http.V1Url;
       }
     } else if (!url.endsWith("/")) {
       url = (url + "/") as Http.V1Url;

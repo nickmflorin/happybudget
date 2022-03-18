@@ -7,7 +7,7 @@ declare namespace Http {
 
   type FileErrorCode = "invalid_file_name" | "invalid_file_extension";
 
-  type GlobalErrorCode = "pdf_error" | "rate_limited" | "email_error";
+  type GlobalErrorCode = "bad_request" | "email_error";
 
   type PermissionErrorCode = "permission_error" | "product_permission_error";
   type BillingErrorCode = "stripe_request_error" | "checkout_error" | "checkout_session_inactive";

@@ -1,8 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { isNil } from "lodash";
 
-import * as api from "api";
-import { ui } from "lib";
+import { ui, http } from "lib";
 
 import { Icon } from "components";
 import { Menu } from "components/menus";
@@ -50,9 +49,9 @@ const ShareDropdownMenu = <P extends Model.PublicHttpModel, R extends Table.RowD
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
 
-  const menu = ui.hooks.useMenuIfNotDefined(props.menu);
-  const overlayId = ui.hooks.useId("public-token-overlay-");
-  const [cancelToken] = api.useCancelToken();
+  const menu = ui.useMenuIfNotDefined(props.menu);
+  const overlayId = ui.useId("public-token-overlay-");
+  const [cancelToken] = http.useCancelToken();
 
   const performShare = useMemo(
     () => () => {

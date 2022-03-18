@@ -3,7 +3,8 @@ import { call, put, select, all } from "redux-saga/effects";
 import { isNil, map, filter } from "lodash";
 import { createSelector } from "reselect";
 
-import * as api from "api";
+import { http } from "lib";
+
 import * as columns from "./columns";
 import * as events from "./events";
 import * as rows from "./rows";
@@ -124,7 +125,7 @@ export const createBulkTask = <
     config.table.saving(true);
     const performCreate = config.performCreate(ctx, requestPayload);
     try {
-      const response: Http.ServiceResponse<SERVICE> = yield api.request(config.service, ctx, ...performCreate);
+      const response: Http.ServiceResponse<SERVICE> = yield http.request(config.service, ctx, ...performCreate);
       yield all(map(config.responseActions(ctx, response, e), (action: Redux.Action) => put(action)));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, {

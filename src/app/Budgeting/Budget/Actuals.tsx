@@ -13,9 +13,7 @@ import { ActualsPreviewModal } from "./PreviewModals";
 type R = Tables.ActualRowData;
 type M = Model.Actual;
 
-const selectActualTypes = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Store) => state.budget.actuals.types
-);
+const selectActualTypes = redux.simpleDeepEqualSelector((state: Application.Store) => state.budget.actuals.types);
 
 const ConnectedActualsTable = connectTableToAuthenticatedStore<
   ActualsTable.Props,
@@ -32,7 +30,7 @@ const ConnectedActualsTable = connectTableToAuthenticatedStore<
   },
   tableId: "budget-actuals",
   createSaga: (table: Table.TableInstance<R, M>) => sagas.budget.actuals.createTableSaga(table),
-  selector: redux.selectors.simpleDeepEqualSelector((state: Application.Store) => state.budget.actuals),
+  selector: redux.simpleDeepEqualSelector((state: Application.Store) => state.budget.actuals),
   footerRowSelectors: {
     footer: createSelector(
       (state: Application.Store) => state.budget.actuals.data,

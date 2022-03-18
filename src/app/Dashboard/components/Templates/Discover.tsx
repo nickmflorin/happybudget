@@ -4,7 +4,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { map, isNil } from "lodash";
 
 import * as api from "api";
-import { redux, notifications, users } from "lib";
+import { redux, notifications } from "lib";
+import * as store from "store";
 
 import { ShowHide, Icon, Pagination } from "components";
 import { PrimaryButtonIconToggle, OrderingButtonIconToggle } from "components/buttons";
@@ -34,10 +35,10 @@ interface DiscoverProps {
 const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTemplateToDerive }): JSX.Element => {
   const [templateToEdit, setTemplateToEdit] = useState<number | undefined>(undefined);
   const [createTemplateModalOpen, setCreateTempateModalOpen] = useState(false);
-  const user = users.hooks.useLoggedInUser();
-  const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
-  const [isTogglingVisibility, setTogglingVisibility, setVisibilityToggled] = redux.hooks.useTrackModelActions([]);
-  const [isDuplicating, setDuplicating, setDuplicated] = redux.hooks.useTrackModelActions([]);
+  const user = store.hooks.useLoggedInUser();
+  const [isDeleting, setDeleting, setDeleted] = redux.useTrackModelActions([]);
+  const [isTogglingVisibility, setTogglingVisibility, setVisibilityToggled] = redux.useTrackModelActions([]);
+  const [isDuplicating, setDuplicating, setDuplicated] = redux.useTrackModelActions([]);
 
   const dispatch: Redux.Dispatch = useDispatch();
   const templates = useSelector(selectTemplates);

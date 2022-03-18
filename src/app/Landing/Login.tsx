@@ -20,7 +20,7 @@ import {
 
 const Login = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const form = ui.hooks.useForm<ILoginFormValues>();
+  const form = ui.useForm<ILoginFormValues>();
   const history = useHistory();
   const location = useLocation<{
     readonly notifications?: UINotificationData[];

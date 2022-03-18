@@ -4,9 +4,10 @@ import { Dispatch } from "redux";
 import { map, filter, isNil } from "lodash";
 
 import * as api from "api";
-import { models, tabling, hooks, contacts } from "lib";
+import { model, tabling, hooks } from "lib";
+import * as store from "store";
 
-import { CreateContactParams } from "components/hooks";
+import { CreateContactParams } from "components/model/hooks";
 import { framework } from "tabling/generic";
 import { AuthenticatedTable, AuthenticatedTableProps } from "tabling/generic/tables";
 import { useAttachments, useContacts } from "../hooks";
@@ -64,7 +65,7 @@ const ActualsTable = ({ parent, onOwnersSearch, ...props }: Props): JSX.Element 
   });
 
   const processActualTypeCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
-    models.inferModelFromName<Model.Tag>(props.actualTypes, name, {
+    model.inferModelFromName<Model.Tag>(props.actualTypes, name, {
       getName: (m: Model.Tag) => m.title,
       warnOnMissing: false
     })
@@ -120,7 +121,7 @@ const ActualsTable = ({ parent, onOwnersSearch, ...props }: Props): JSX.Element 
       );
       /* NOTE: If there are multiple owners with the same identifier, this will
          return the first and issue a warning. */
-      return models.inferModelFromName<Model.SimpleSubAccount | Model.SimpleMarkup>(availableOwners, value, {
+      return model.inferModelFromName<Model.SimpleSubAccount | Model.SimpleMarkup>(availableOwners, value, {
         getName: (m: Model.SimpleSubAccount | Model.SimpleMarkup) => m.identifier
       });
     }
@@ -128,7 +129,7 @@ const ActualsTable = ({ parent, onOwnersSearch, ...props }: Props): JSX.Element 
 
   const onContactCreated = useMemo(
     () => (m: Model.Contact, params?: CreateContactParams) => {
-      dispatch(contacts.actions.addContactToStateAction(m));
+      dispatch(store.actions.addContactToStateAction(m));
       /* If we have enough information from before the contact was created in
 				 the specific cell, combine that information with the new value to
 				 perform a table update, showing the created contact in the new cell. */

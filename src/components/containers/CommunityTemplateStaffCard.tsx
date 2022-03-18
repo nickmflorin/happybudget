@@ -3,7 +3,8 @@ import { isNil } from "lodash";
 import classNames from "classnames";
 
 import { Icon } from "components";
-import { users, util } from "lib";
+import { util } from "lib";
+import * as store from "store";
 
 import Card, { CardProps } from "./Card";
 
@@ -32,8 +33,8 @@ const CommunityTemplateStaffCard = ({
   onDelete,
   ...props
 }: CommunityTemplateStaffCardProps): JSX.Element => {
-  const user = users.hooks.useLoggedInUser();
-  const tz = users.hooks.useTimezone();
+  const user = store.hooks.useLoggedInUser();
+  const tz = store.hooks.useTimezone();
 
   const subTitle = useMemo(() => {
     if (util.dates.isToday(budget.updated_at)) {

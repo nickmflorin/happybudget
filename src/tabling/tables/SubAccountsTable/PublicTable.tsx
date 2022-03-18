@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { map } from "lodash";
 
-import { models, tabling, hooks } from "lib";
+import { model, tabling, hooks } from "lib";
 
 import { selectors } from "app/Budgeting/store";
 import { PublicBudgetTable, PublicBudgetTableProps } from "../BudgetTable";
@@ -45,7 +45,7 @@ const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model
   );
 
   const processFringesCellForClipboard = hooks.useDynamicCallback((row: R) => {
-    const fs = models.getModels<Tables.FringeRow>(fringes, row.fringes, { modelName: "fringe" });
+    const fs = model.getModels<Tables.FringeRow>(fringes, row.fringes, { modelName: "fringe" });
     return map(fs, (fringe: Tables.FringeRow) => fringe.id).join(", ");
   });
 

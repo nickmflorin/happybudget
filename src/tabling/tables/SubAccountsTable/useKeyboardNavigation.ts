@@ -38,14 +38,14 @@ const useKeyboardNavigation = <
           | Model.SimpleSubAccount;
         if (ancestor.type === "budget") {
           history.push(
-            http.urls.addQueryParamsToUrl(
+            http.addQueryParamsToUrl(
               budgeting.urls.getUrl({ domain: props.domain, id: props.budgetId }, undefined, props.tokenId),
               { row: props.id }
             )
           );
         } else {
           history.push(
-            http.urls.addQueryParamsToUrl(
+            http.addQueryParamsToUrl(
               budgeting.urls.getUrl(
                 { domain: props.domain, id: props.budgetId },
                 { type: ancestor.type, id: ancestor.id },

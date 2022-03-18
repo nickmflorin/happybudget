@@ -2,7 +2,8 @@ import * as Sentry from "@sentry/react";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { toTitleCase } from "lib/util/formatters";
+import { http, util } from "lib";
+
 import { objToJson } from "./util";
 
 type InternalNotificationOptions = Pick<InternalNotification, "dispatchToSentry" | "level">;
@@ -18,7 +19,7 @@ const consoleMethod = (level: AppNotificationConsoleLevel): Console["warn" | "er
 };
 
 const isNotificationObj = (n: InternalNotification | NotificationDetail): n is InternalNotification =>
-  typeof n !== "string" && !(n instanceof Error) && !api.typeguards.isHttpError(n);
+  typeof n !== "string" && !(n instanceof Error) && !http.isHttpError(n);
 
 const isError = (n: InternalNotification | NotificationDetail): n is Error =>
   typeof n !== "string" && n instanceof Error;
@@ -59,7 +60,7 @@ const consoleMessage = (e: InternalNotification | NotificationDetail): string | 
     }
     return e.message || e.error || "";
   }
-  return api.typeguards.isHttpError(e) ? e.message : e;
+  return http.isHttpError(e) ? e.message : e;
 };
 
 export const notify = (e: InternalNotification | NotificationDetail, opts?: InternalNotificationOptions): void => {
@@ -134,7 +135,7 @@ export const inconsistentStateError = <P extends Redux.ActionPayload = Redux.Act
     : payload;
 
   const addParamValue = (message: string, paramName: string, value: ParamV<P>) =>
-    message + `\n\t${toTitleCase(paramName)}: ${value}`;
+    message + `\n\t${util.formatters.toTitleCase(paramName)}: ${value}`;
 
   const addParam = (message: string, paramName: string, paramValue: ParamV<P>) => {
     if (paramValue !== undefined) {

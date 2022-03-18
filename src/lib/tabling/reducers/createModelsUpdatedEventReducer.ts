@@ -1,6 +1,6 @@
 import { isNil, reduce, filter, includes, intersection } from "lodash";
 
-import { tabling, budgeting, redux, util } from "lib";
+import { tabling, redux, util, model } from "lib";
 import { groupRowFromState, reorderRows, markupRowFromState, updateRowGroup, rowGroupRowFromState } from "./util";
 
 /**
@@ -140,7 +140,7 @@ const createModelsUpdatedEventReducer = <
                   ...row.data,
                   /* Markup contributions get applied to the value after
 										fringes are applied. */
-                  markup_contribution: budgeting.businessLogic.contributionFromMarkups(
+                  markup_contribution: model.budgeting.contributionFromMarkups(
                     isSubAccountRowData(row.data)
                       ? row.data.nominal_value +
                           row.data.accumulated_fringe_contribution +
@@ -173,22 +173,22 @@ const createModelsUpdatedEventReducer = <
    * @returns The updated table store, Redux.TableStore<R>, with the
    *          Table.ModelRow updated in the store data.
    */
-  const updateModelInState = (model: M, group: number | null | undefined, s: S, reorder = true) => {
-    const modelRow: Table.ModelRow<R> | null = redux.reducers.modelFromState<Table.ModelRow<R>>(
+  const updateModelInState = (m: M, group: number | null | undefined, s: S, reorder = true) => {
+    const modelRow: Table.ModelRow<R> | null = redux.modelFromState<Table.ModelRow<R>>(
       filter(s.data, (ri: Table.BodyRow<R>) => tabling.rows.isModelRow(ri)) as Table.ModelRow<R>[],
-      model.id
+      m.id
     );
     if (!isNil(modelRow)) {
       s = {
         ...s,
-        data: util.replaceInArray<Table.BodyRow<R>>(s.data, { id: modelRow.id }, modelRowManager.create({ model }))
+        data: util.replaceInArray<Table.BodyRow<R>>(s.data, { id: modelRow.id }, modelRowManager.create({ model: m }))
       };
       /* If the `group` on the event payload is undefined, it means
 				there was no change to the model's group.  A `null` group means
 				that the group was removed. */
       if (group !== undefined) {
         const groupRowId = group !== null ? tabling.rows.groupRowId(group) : null;
-        const previousGroupRow: Table.GroupRow<R> | null = rowGroupRowFromState<R, S>(s, model.id, {
+        const previousGroupRow: Table.GroupRow<R> | null = rowGroupRowFromState<R, S>(s, m.id, {
           warnOnMissing: false
         });
         const previousGroupRowId = !isNil(previousGroupRow) ? previousGroupRow.id : null;

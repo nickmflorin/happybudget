@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 
-import { typeguards } from "lib";
+import { model } from "lib";
 
 import { Icon, FullSize, VerticalFlexCenter } from "components";
 import { UserImageOrInitials, EditImageOverlay } from "components/images";
@@ -32,7 +32,7 @@ const UploadUserImage = ({ firstName, lastName, ...props }: UploadUserImageProps
         <FullSize>
           <UserImageOrInitials
             circle={true}
-            src={typeguards.isUploadParamsWithImage(params) ? params.image.url : null}
+            src={model.isUploadParamsWithImage(params) ? params.image.url : null}
             firstName={firstName}
             lastName={lastName}
             imageOverlay={() => <EditImageOverlay visible={true} onClear={params.onClear} isImage={true} />}

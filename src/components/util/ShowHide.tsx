@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 
 type ShowHideProps = {
   readonly show?: boolean;
@@ -21,4 +21,4 @@ function ShowHide(props: ShowHideProps): JSX.Element {
   }
 }
 
-export default ShowHide;
+export default React.memo(ShowHide);

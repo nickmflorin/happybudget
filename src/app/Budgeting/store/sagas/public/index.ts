@@ -2,7 +2,7 @@ import { SagaIterator } from "redux-saga";
 import { spawn, takeLatest, put } from "redux-saga/effects";
 
 import * as api from "api";
-import { notifications } from "lib";
+import { notifications, http } from "lib";
 
 import * as actions from "../../actions/public";
 import accountSaga from "./account";
@@ -15,7 +15,7 @@ export * as subAccount from "./subAccount";
 function* getBudgetTask(action: Redux.Action<number>): SagaIterator {
   yield put(actions.loadingBudgetAction(true));
   try {
-    const response: Model.Budget = yield api.request(api.getBudget, action.context, action.payload);
+    const response: Model.Budget = yield http.request(api.getBudget, action.context, action.payload);
     yield put(actions.responseBudgetAction(response));
   } catch (e: unknown) {
     notifications.ui.banner.handleRequestError(e as Error);

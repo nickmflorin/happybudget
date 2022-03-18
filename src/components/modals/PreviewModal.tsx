@@ -14,7 +14,7 @@ interface PreviewModalProps
 }
 
 const PreviewModal = ({ className, style, open, onCancel, children, ...props }: PreviewModalProps): JSX.Element => {
-  const modal = ui.hooks.useModalIfNotDefined(props.modal);
+  const modal = ui.useModalIfNotDefined(props.modal);
 
   return (
     <Modal

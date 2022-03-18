@@ -149,7 +149,7 @@ const PrivateForm = <T extends Record<string, unknown> = any>(
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   ref: ForwardedRef<any>
 ): JSX.Element => {
-  const firstRender = ui.hooks.useTrackFirstRender();
+  const firstRender = ui.useTrackFirstRender();
   const childrenArray = useMemo<JSX.Element[]>(() => {
     /*
     Under certain conditions, we want to auto focus the first field of a Form.

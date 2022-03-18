@@ -24,7 +24,7 @@ type IRedirect = {
 const ResetPassword = (): JSX.Element => {
   const [redirect, setRedirect] = useState<IRedirect | undefined>(undefined);
   const [loading, setLoading] = useState(false);
-  const form = ui.hooks.useForm<IResetPasswordFormValues>();
+  const form = ui.useForm<IResetPasswordFormValues>();
   const location = useLocation<{
     readonly token?: string | undefined;
   }>();

@@ -11,7 +11,7 @@ interface ModalTitleProps extends StandardComponentProps {
 const ModalTitle = ({ icon, title, ...props }: ModalTitleProps): JSX.Element => {
   return (
     <div {...props} className={classNames("ant-modal-title", "modal-title", props.className)}>
-      {ui.typeguards.iconIsJSX(icon) ? icon : <Icon icon={icon} weight={"regular"} />}
+      {ui.iconIsJSX(icon) ? icon : <Icon icon={icon} weight={"regular"} />}
       {title}
     </div>
   );

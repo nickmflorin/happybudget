@@ -12,7 +12,7 @@ export type CollapsedLayoutProps = Omit<GenericLayoutProps, "sidebar"> & {
 };
 
 const CollapsedLayout = (props: CollapsedLayoutProps): JSX.Element => {
-  const layout = ui.hooks.useLayoutIfNotDefined(props.layout);
+  const layout = ui.useLayoutIfNotDefined(props.layout);
 
   return (
     <GenericLayout

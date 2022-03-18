@@ -2,7 +2,7 @@ import React, { useImperativeHandle, useState, useMemo, useRef } from "react";
 import { forEach, isNil, uniq, map, filter, includes, reduce } from "lodash";
 import { Subtract } from "utility-types";
 
-import { tabling, util, hooks, notifications } from "lib";
+import { tabling, util, hooks, cookies, notifications } from "lib";
 
 import { TableNotifications } from "components/notifications";
 import { DeleteRowsModal } from "components/modals";
@@ -308,7 +308,7 @@ const AuthenticatedTable = <
                   if (
                     rows.length === 1 ||
                     props.confirmRowDelete === false ||
-                    tabling.cookies.deleteModalConfirmationIsSuppressed()
+                    cookies.deleteModalConfirmationIsSuppressed()
                   ) {
                     props.onEvent({
                       payload: { rows: map(rows, (r: Table.EditableRow<R>) => r.id) },

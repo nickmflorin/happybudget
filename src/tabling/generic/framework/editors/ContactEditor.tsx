@@ -1,7 +1,9 @@
 import { forwardRef, ForwardedRef } from "react";
 import { filter, isNil } from "lodash";
 
-import { tabling, contacts } from "lib";
+import { tabling, model } from "lib";
+import * as store from "store";
+
 import { Icon } from "components";
 import { framework } from "tabling/generic";
 
@@ -25,8 +27,8 @@ const ContactEditor = <
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   ref: ForwardedRef<any>
 ) => {
-  const cs = contacts.hooks.useFilteredContacts();
-  const loading = contacts.hooks.useFilteredContactsLoading();
+  const cs = store.hooks.useFilteredContacts();
+  const loading = store.hooks.useFilteredContactsLoading();
 
   const [editor] = framework.editors.useModelMenuEditor<number, Model.Contact, R, M, S>({
     ...props,
@@ -47,7 +49,7 @@ const ContactEditor = <
         color: "#EFEFEF",
         textColor: "#2182e4",
         className: "tag--contact",
-        getModelText: (m: Model.Contact) => contacts.models.contactName(m)
+        getModelText: (m: Model.Contact) => model.contact.contactName(m)
       }}
       extra={[
         {

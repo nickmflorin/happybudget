@@ -37,9 +37,9 @@ const useModelMenuEditor = <
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   params: UseModelMenuEditorParams<V, R, M, S> & { readonly forwardedRef: ForwardedRef<any> }
 ): [IEditor<V, C, R, M, S>] => {
-  const menu = ui.hooks.useMenu<MenuItemSelectedState, C>();
+  const menu = ui.useMenu<MenuItemSelectedState, C>();
 
-  const isFirstRender = ui.hooks.useTrackFirstRender();
+  const isFirstRender = ui.useTrackFirstRender();
   const [value, setValue] = useState<V | null>(params.value);
   const [changedEvent, setChangedEvent] = useState<Table.CellDoneEditingEvent | null>(null);
   const [stopEditingOnChangeEvent, setStopEditingOnChangeEvent] = useState(true);

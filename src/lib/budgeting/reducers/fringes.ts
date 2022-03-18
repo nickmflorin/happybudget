@@ -1,4 +1,4 @@
-import { tabling, budgeting } from "lib";
+import { tabling, model } from "lib";
 
 type R = Tables.FringeRowData;
 type M = Model.Fringe;
@@ -47,7 +47,7 @@ export const createAuthenticatedFringesTableReducer = (
   >({
     ...config,
     defaultDataOnCreate: {
-      unit: budgeting.models.FringeUnits.Percent,
+      unit: model.budgeting.FringeUnits.Percent,
       rate: 0.0
     }
   });

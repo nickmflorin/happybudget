@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { filter } from "lodash";
 
-import * as api from "api";
-import { redux, notifications } from "lib";
+import { redux, notifications, http } from "lib";
 
 import AttachmentsList from "./AttachmentsList";
 import AttachmentsFilePond from "./AttachmentsFilePond";
@@ -22,8 +21,8 @@ export interface EditAttachmentsProps {
 }
 
 const EditAttachments = (props: EditAttachmentsProps): JSX.Element => {
-  const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
-  const [cancelToken] = api.useCancelToken();
+  const [isDeleting, setDeleting, setDeleted] = redux.useTrackModelActions([]);
+  const [cancelToken] = http.useCancelToken();
   const [loadingAttachments, setLoadingAttachments] = useState(false);
   const [attachments, setAttachments] = useState<Model.Attachment[]>([]);
 

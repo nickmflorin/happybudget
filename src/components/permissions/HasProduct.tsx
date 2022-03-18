@@ -1,7 +1,8 @@
 import { ReactNode, useMemo } from "react";
 
 import { ShowHide } from "components";
-import { users } from "lib";
+import { model } from "lib";
+import * as store from "store";
 
 interface HasProductProps {
   readonly children: ReactNode;
@@ -9,9 +10,9 @@ interface HasProductProps {
 }
 
 const HasProduct: React.FC<HasProductProps> = ({ product, children }) => {
-  const user = users.hooks.useLoggedInUser();
+  const user = store.hooks.useLoggedInUser();
   const visible = useMemo(
-    () => users.permissions.userHasProduct(user, product),
+    () => model.user.userHasProduct(user, product),
     [product, user.product_id, user.billing_status]
   );
   return <ShowHide show={visible}>{children}</ShowHide>;

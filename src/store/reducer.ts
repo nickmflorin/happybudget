@@ -1,7 +1,7 @@
 import { combineReducers, CombinedState } from "redux";
 
 import { isNil, reduce, filter } from "lodash";
-import { redux, contacts } from "lib";
+import { redux } from "lib";
 
 import * as actions from "./actions";
 
@@ -12,14 +12,14 @@ const createUserReducer =
        initially configured with that user.  If the store was not configured with
        that user or the store was configured with no user at all, we do not
        permit the update. */
-    if (action.type === actions.authenticated.updateLoggedInUserAction.toString()) {
+    if (action.type === actions.updateLoggedInUserAction.toString()) {
       if (state !== null) {
         if (state.id !== action.payload.id) {
           throw new Error("Attempting to update the store with different user than the store was configured for.");
         }
         return { ...state, ...action.payload };
       }
-    } else if (action.type === actions.authenticated.clearLoggedInUserAction.toString()) {
+    } else if (action.type === actions.clearLoggedInUserAction.toString()) {
       return null;
     }
     return state;
@@ -69,14 +69,14 @@ const createApplicationReducer = (config: Application.StoreConfig): Redux.Reduce
       Tables.ContactTableContext,
       Redux.AuthenticatedModelListResponseStore<Model.Contact>
     >({
-      initialState: redux.initialState.initialAuthenticatedModelListResponseState,
+      initialState: redux.initialAuthenticatedModelListResponseState,
       actions: {
-        request: contacts.actions.requestContactsAction,
-        response: contacts.actions.responseContactsAction,
-        loading: contacts.actions.loadingContactsAction,
-        updateInState: contacts.actions.updateContactInStateAction,
-        removeFromState: contacts.actions.removeContactFromStateAction,
-        addToState: contacts.actions.addContactToStateAction
+        request: actions.requestContactsAction,
+        response: actions.responseContactsAction,
+        loading: actions.loadingContactsAction,
+        updateInState: actions.updateContactInStateAction,
+        removeFromState: actions.removeContactFromStateAction,
+        addToState: actions.addContactToStateAction
       }
     }),
     filteredContacts: redux.reducers.createAuthenticatedModelListResponseReducer<
@@ -85,21 +85,21 @@ const createApplicationReducer = (config: Application.StoreConfig): Redux.Reduce
       Tables.ContactTableContext,
       Redux.AuthenticatedModelListResponseStore<Model.Contact>
     >({
-      initialState: redux.initialState.initialAuthenticatedModelListResponseState,
+      initialState: redux.initialAuthenticatedModelListResponseState,
       actions: {
-        request: contacts.actions.requestFilteredContactsAction,
-        response: contacts.actions.responseFilteredContactsAction,
-        loading: contacts.actions.loadingFilteredContactsAction,
-        updateInState: contacts.actions.updateContactInStateAction,
-        removeFromState: contacts.actions.removeContactFromStateAction,
-        addToState: contacts.actions.addContactToStateAction,
-        setSearch: contacts.actions.setContactsSearchAction
+        request: actions.requestFilteredContactsAction,
+        response: actions.responseFilteredContactsAction,
+        loading: actions.loadingFilteredContactsAction,
+        updateInState: actions.updateContactInStateAction,
+        removeFromState: actions.removeContactFromStateAction,
+        addToState: actions.addContactToStateAction,
+        setSearch: actions.setContactsSearchAction
       }
     }),
     loading: loadingReducer,
     user: createUserReducer(config.user),
     productPermissionModalOpen: redux.reducers.createSimpleBooleanReducer({
-      actions: { set: actions.authenticated.setProductPermissionModalOpenAction }
+      actions: { set: actions.setProductPermissionModalOpenAction }
     })
   });
 

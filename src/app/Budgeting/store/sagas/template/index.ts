@@ -2,7 +2,8 @@ import { SagaIterator } from "redux-saga";
 import { spawn, takeLatest, put } from "redux-saga/effects";
 
 import * as api from "api";
-import { budgeting, tabling, notifications } from "lib";
+import { tabling, notifications, http } from "lib";
+import * as store from "store";
 
 import * as actions from "../../actions/template";
 
@@ -25,7 +26,7 @@ const FringesActionMap = {
 function* getBudgetTask(action: Redux.Action<number>): SagaIterator {
   yield put(actions.loadingBudgetAction(true));
   try {
-    const response: Model.Template = yield api.request(api.getBudget, action.context, action.payload);
+    const response: Model.Template = yield http.request(api.getBudget, action.context, action.payload);
     yield put(actions.responseBudgetAction(response));
   } catch (e: unknown) {
     notifications.ui.banner.handleRequestError(e as Error);
@@ -47,7 +48,7 @@ export const createFringesTableSaga = (
   >({
     actions: FringesActionMap,
     selectStore: (state: Application.Store) => state.template[parentType].table.fringes,
-    tasks: budgeting.tasks.fringes.createTableTaskSet<Model.Template>({
+    tasks: store.tasks.fringes.createTableTaskSet<Model.Template>({
       table,
       selectParentTableStore: (state: Application.Store) => state.template[parentType].table,
       actions:

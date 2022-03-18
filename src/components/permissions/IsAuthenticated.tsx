@@ -1,13 +1,13 @@
 import { ReactNode } from "react";
 import { ShowHide } from "components";
-import { users } from "lib";
+import { hooks } from "store";
 
 type IsAuthenticatedProps = {
   children: ReactNode;
 };
 
 const IsAuthenticated: React.FC<IsAuthenticatedProps> = ({ children }) => {
-  const user = users.hooks.useUser();
+  const user = hooks.useUser();
   return <ShowHide show={user !== null}>{children}</ShowHide>;
 };
 

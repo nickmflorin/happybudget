@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useHistory } from "react-router-dom";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { notifications, users } from "lib";
+import { notifications } from "lib";
+import * as store from "store";
 
-import { ProductsManager } from "components/billing";
+import { ProductsManager } from "components/model/billing";
 
 const Billing = (): JSX.Element => {
   const [subscribing, setSubscribing] = useState<Model.ProductId | null>(null);
   const [managing, setManaging] = useState(false);
-  const user = users.hooks.useLoggedInUser();
+  const user = store.hooks.useLoggedInUser();
   const history = useHistory();
   const location = useLocation<{
     readonly notification?: UINotificationData;

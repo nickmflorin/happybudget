@@ -4,9 +4,10 @@ import { Dispatch } from "redux";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { tabling, util, contacts } from "lib";
+import { tabling, util } from "lib";
+import * as store from "store";
 
-import { useContacts } from "components/hooks";
+import { hooks } from "components/model";
 import { framework } from "tabling/generic";
 import { AuthenticatedTable, AuthenticatedTableProps } from "tabling/generic/tables";
 import { useAttachments } from "../hooks";
@@ -54,8 +55,8 @@ const ContactsTable = (props: Props): JSX.Element => {
   });
 
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-  const [__, editContactModal, editContact, _] = useContacts({
-    onCreated: (m: Model.Contact) => dispatch(contacts.actions.addContactToStateAction(m)),
+  const [__, editContactModal, editContact, _] = hooks.useContacts({
+    onCreated: (m: Model.Contact) => dispatch(store.actions.addContactToStateAction(m)),
     onUpdated: (m: Model.Contact) =>
       props.table.current.dispatchEvent({
         type: "modelsUpdated",

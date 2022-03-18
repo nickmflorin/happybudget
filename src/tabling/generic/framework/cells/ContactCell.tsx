@@ -3,7 +3,8 @@ import { find, isNil } from "lodash";
 import classNames from "classnames";
 
 import { Tag } from "components/tagging";
-import { contacts } from "lib";
+import { model } from "lib";
+import * as store from "store";
 
 import { Cell } from "./generic";
 
@@ -24,8 +25,8 @@ const ContactCell = <
   ...props
 }: ContactCellProps<R, M, S>): JSX.Element => {
   const row: Table.ModelRow<R> = props.node.data;
-  const cs = contacts.hooks.useContacts();
-  const loaded = contacts.hooks.useContactsLoaded();
+  const cs = store.hooks.useContacts();
+  const loaded = store.hooks.useContactsLoaded();
 
   const m = useMemo(() => {
     if (!isNil(value)) {
@@ -58,7 +59,7 @@ const ContactCell = <
           className={classNames("tag--contact", { focused: isFocused })}
           color={"#EFEFEF"}
           textColor={"#2182e4"}
-          text={!isNil(m) ? contacts.models.contactName(m) : ""}
+          text={!isNil(m) ? model.contact.contactName(m) : ""}
           onClick={() => props.onEditContact({ contact: m.id, rowId: row.id })}
           disabled={!isFocused}
         />

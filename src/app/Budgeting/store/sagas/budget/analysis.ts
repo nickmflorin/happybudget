@@ -2,16 +2,16 @@ import { SagaIterator } from "redux-saga";
 import { put, all } from "redux-saga/effects";
 
 import * as api from "api";
-import { notifications, redux } from "lib";
+import { notifications, redux, http } from "lib";
 
 import * as actions from "../../actions/budget";
 
 function* request(action: Redux.Action<number>): SagaIterator {
   yield put(actions.analysis.loadingAction(true));
   const effects = [
-    api.request(api.getBudgetChildren, action.context, action.payload, {}),
-    api.request(api.getBudgetGroups, action.context, action.payload, {}),
-    api.request(api.getActuals, action.context, action.payload, {})
+    http.request(api.getBudgetChildren, action.context, action.payload, {}),
+    http.request(api.getBudgetGroups, action.context, action.payload, {}),
+    http.request(api.getActuals, action.context, action.payload, {})
   ];
   try {
     const [accounts, groups, actuals]: [
@@ -40,7 +40,7 @@ function* request(action: Redux.Action<number>): SagaIterator {
   }
 }
 
-const rootSaga = redux.sagas.createListResponseSaga<number>({
+const rootSaga = redux.createListResponseSaga<number>({
   tasks: { request },
   actions: { request: actions.analysis.requestAction }
 });

@@ -3,7 +3,8 @@ import { put, takeLatest, spawn } from "redux-saga/effects";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { budgeting, tabling, notifications } from "lib";
+import * as store from "store";
+import { tabling, notifications, http } from "lib";
 
 import {
   account as actions,
@@ -15,7 +16,7 @@ import {
 
 function* getAccount(action: Redux.Action<number>): SagaIterator {
   try {
-    const response: Model.Account = yield api.request(api.getAccount, action.context, action.payload);
+    const response: Model.Account = yield http.request(api.getAccount, action.context, action.payload);
     yield put(actions.responseAccountAction(response));
   } catch (e: unknown) {
     const err = e as Error;
@@ -53,7 +54,7 @@ export const createTableSaga = (table: Table.TableInstance<Tables.SubAccountRowD
   >({
     actions: { ...ActionMap, request: actions.requestAction },
     selectStore: (state: Application.Store) => state.budget.account.table,
-    tasks: budgeting.tasks.subaccounts.createAuthenticatedTableTaskSet<Model.Account, Model.Budget>({
+    tasks: store.tasks.subaccounts.createAuthenticatedTableTaskSet<Model.Account, Model.Budget>({
       table,
       selectStore: (state: Application.Store) => state.budget.account.table,
       actions: ActionMap,

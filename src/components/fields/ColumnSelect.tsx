@@ -67,7 +67,7 @@ const ColumnSelect = <
           >
             {!isNil(colType) && !isNil(colType.icon) && (
               <div className={"icon-wrapper"}>
-                {ui.typeguards.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}
+                {ui.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}
               </div>
             )}
             {getLabel(column)}
@@ -83,7 +83,7 @@ const ColumnSelect = <
         <Select.Option className={"column-select-option"} key={index + 1} value={column.field}>
           {!isNil(colType) && !isNil(colType.icon) && (
             <div className={"icon-wrapper"}>
-              {ui.typeguards.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}
+              {ui.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}
             </div>
           )}
           {getLabel(column)}

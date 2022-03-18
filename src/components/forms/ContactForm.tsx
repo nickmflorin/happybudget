@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 
-import { contacts } from "lib";
+import { model } from "lib";
 
 import { Form, Icon } from "components";
 import { Input, Select, InputOnFocus, TextArea } from "components/fields";
@@ -23,7 +23,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ form, initialValues, attachme
   >
     <Form.Item name={"contact_type"} label={"Type"} dataType={"singleSelect"}>
       <Select suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />} placeholder={"Select Type"}>
-        {contacts.models.ContactTypes.choices.map((m: Model.ContactType, index: number) => (
+        {model.contact.ContactTypes.choices.map((m: Model.ContactType, index: number) => (
           <Select.Option key={index} value={m.id}>
             {m.name}
           </Select.Option>

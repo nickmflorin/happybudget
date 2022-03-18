@@ -2,7 +2,10 @@ import { SagaIterator, Saga } from "redux-saga";
 import { spawn } from "redux-saga/effects";
 import { isNil, filter } from "lodash";
 
-import { redux, contacts } from "lib";
+import { redux } from "lib";
+
+import * as actions from "./actions";
+import * as tasks from "./tasks";
 
 export const createPublicRootSaga = (config: Application.StoreConfig): Saga => {
   function* applicationSaga(): SagaIterator {
@@ -20,17 +23,17 @@ export const createPublicRootSaga = (config: Application.StoreConfig): Saga => {
 const createApplicationSaga = (config: Application.StoreConfig): Saga => {
   const publicSaga = createPublicRootSaga(config);
 
-  const contactsTasks = contacts.tasks.createTaskSet();
-  const filteredContactsTasks = contacts.tasks.createFilteredTaskSet();
-  const contactsSaga = redux.sagas.createAuthenticatedModelListResponseSaga({
+  const contactsTasks = tasks.contacts.createTaskSet();
+  const filteredContactsTasks = tasks.contacts.createFilteredTaskSet();
+  const contactsSaga = redux.createAuthenticatedModelListResponseSaga({
     tasks: contactsTasks,
-    actions: { request: contacts.actions.requestContactsAction }
+    actions: { request: actions.requestContactsAction }
   });
-  const filteredContactsSaga = redux.sagas.createAuthenticatedModelListResponseSaga({
+  const filteredContactsSaga = redux.createAuthenticatedModelListResponseSaga({
     tasks: filteredContactsTasks,
     actions: {
-      request: contacts.actions.requestFilteredContactsAction,
-      setSearch: contacts.actions.setContactsSearchAction
+      request: actions.requestFilteredContactsAction,
+      setSearch: actions.setContactsSearchAction
     }
   });
   function* applicationSaga(): SagaIterator {

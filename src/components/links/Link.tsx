@@ -13,7 +13,7 @@ export type LinkProps = StandardComponentWithChildrenProps &
 
 const Link = ({ className, children, tooltip, icon, disabled, dark, ...props }: LinkProps): JSX.Element => {
   const [isHovered, setIsHovered] = useState(false);
-  const prefix = ui.hooks.useClickableIcon(icon, { isHovered });
+  const prefix = ui.useClickableIcon(icon, { isHovered });
 
   return (
     <TooltipWrapper tooltip={tooltip}>

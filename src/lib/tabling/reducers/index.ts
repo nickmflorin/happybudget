@@ -13,7 +13,7 @@ export const createTableReducer = <
   return (state: S | undefined = config.initialState, action: Redux.Action): S => {
     let newState = { ...state };
 
-    if (redux.reducers.isClearOnAction(config.clearOn, action)) {
+    if (redux.isClearOnAction(config.clearOn, action)) {
       newState = { ...state, data: [] };
     }
 
