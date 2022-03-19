@@ -133,7 +133,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
                       .updateBudget<Model.Template>(template.id, { hidden: false })
                       .then((response: Model.Template) => {
                         dispatch(actions.updateCommunityTemplateInStateAction({ id: template.id, data: response }));
-                        e.closeParentDropdown?.();
+                        e.item.closeParentDropdown?.();
                       })
                       .catch((err: Error) => notifications.requestError(err))
                       .finally(() => setVisibilityToggled(template.id));
@@ -143,7 +143,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
                       .updateBudget<Model.Template>(template.id, { hidden: true })
                       .then((response: Model.Template) => {
                         dispatch(actions.updateCommunityTemplateInStateAction({ id: template.id, data: response }));
-                        e.closeParentDropdown?.();
+                        e.item.closeParentDropdown?.();
                       })
                       .catch((err: Error) => notifications.requestError(err))
                       .finally(() => setVisibilityToggled(template.id));
@@ -156,7 +156,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
                   api
                     .deleteBudget(template.id)
                     .then(() => {
-                      e.closeParentDropdown?.();
+                      e.item.closeParentDropdown?.();
                       dispatch(actions.removeCommunityTemplateFromStateAction(template.id));
                     })
                     .catch((err: Error) => notifications.requestError(err))
@@ -170,7 +170,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
                        that sometimes takes a very long time. */
                     .duplicateBudget<Model.Template>(template.id, { timeout: 120 * 1000 })
                     .then((response: Model.Template) => {
-                      e.closeParentDropdown?.();
+                      e.item.closeParentDropdown?.();
                       dispatch(actions.addCommunityTemplateToStateAction(response));
                     })
                     .catch((err: Error) => notifications.requestError(err))

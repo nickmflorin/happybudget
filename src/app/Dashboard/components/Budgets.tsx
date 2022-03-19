@@ -160,7 +160,7 @@ const Budgets = (): JSX.Element => {
 												   request that sometimes takes a very long time. */
                         .duplicateBudget<Model.Budget>(budget.id, { timeout: 120 * 1000 })
                         .then((response: Model.Budget) => {
-                          e.closeParentDropdown?.();
+                          e.item.closeParentDropdown?.();
                           /* It is safe to coerce to an Budget
                              because the User must be logged in at this point. */
                           dispatch(actions.addBudgetToStateAction(response as Model.AuthenticatedBudget));

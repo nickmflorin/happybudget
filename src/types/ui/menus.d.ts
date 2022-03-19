@@ -24,17 +24,17 @@ declare type MenuButtonClickEvent<
   readonly event: React.MouseEvent<HTMLButtonElement>;
 };
 
+declare type IMenuItemRef<S extends Record<string, unknown> = MenuItemSelectedState> = {
+  readonly closeParentDropdown: (() => void) | undefined;
+  readonly setLoading: (v: boolean) => void;
+  readonly performClick: (e: Table.CellDoneEditingEvent) => void;
+  readonly getState: () => S;
+};
+
 declare type MenuItemModelClickEvent<S extends Record<string, unknown> = MenuItemSelectedState> = {
   readonly state: S;
   readonly event: Table.CellDoneEditingEvent;
-  readonly closeParentDropdown: (() => void) | undefined;
-};
-
-declare type MenuItemClickEvent<
-  S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
-> = MenuItemModelClickEvent<S> & {
-  readonly model: M;
+  readonly item: Omit<IMenuItemRef<S>, "performClick">;
 };
 
 type InferStateFromModel<M> = M extends MenuItemModel<infer S> ? S : never;
@@ -42,11 +42,12 @@ type InferStateFromModel<M> = M extends MenuItemModel<infer S> ? S : never;
 declare type MenuChangeEvent<
   S extends Record<string, unknown> = MenuItemSelectedState,
   M extends MenuItemModel<S> = MenuItemModel<S>
-> = MenuItemClickEvent<S, M> & {
+> = MenuItemModelClickEvent<S> & {
+  readonly model: M;
   readonly menuState: MenuItemStateWithModel<S, M>[];
 };
 
-declare type MenuItemModel<S extends Record<string, unknown> = MenuItemSelectedState> = Model.Model & {
+declare type BaseMenuItemModel = Model.Model & {
   readonly label?: string | number | null;
   readonly icon?: IconOrElement;
   readonly loading?: boolean;
@@ -56,10 +57,13 @@ declare type MenuItemModel<S extends Record<string, unknown> = MenuItemSelectedS
   readonly defaultFocused?: boolean;
   readonly keepDropdownOpenOnClick?: boolean;
   readonly renderContent?: () => JSX.Element;
+};
+
+declare type MenuItemModel<S extends Record<string, unknown> = MenuItemSelectedState> = BaseMenuItemModel & {
   readonly onClick?: (e: MenuItemModelClickEvent<S>) => void;
 };
 
-declare type ExtraMenuItemModel = Omit<MenuItemModel, "onClick"> & {
+declare type ExtraMenuItemModel = BaseMenuItemModel & {
   readonly showOnNoSearchResults?: boolean;
   readonly focusOnNoSearchResults?: boolean;
   readonly leaveAtBottom?: boolean;
@@ -67,37 +71,6 @@ declare type ExtraMenuItemModel = Omit<MenuItemModel, "onClick"> & {
   readonly focusOnNoData?: boolean;
   readonly onClick?: (e: MenuExtraItemClickEvent) => void;
 };
-
-declare interface ICommonMenuItem<
-  S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
-> extends Omit<StandardComponentProps, "id"> {
-  readonly model: M;
-  readonly menuId: string;
-  readonly focused: boolean;
-  readonly keepDropdownOpenOnClick?: boolean;
-  readonly closeParentDropdown?: () => void;
-  readonly onClick?: (e: Table.CellDoneEditingEvent) => void;
-}
-
-declare interface IMenuItem<
-  S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
-> extends StandardComponentProps,
-    Omit<ICommonMenuItem<S, M>, "onClick"> {
-  readonly checkbox?: boolean;
-  readonly label?: string;
-  readonly state: S;
-  readonly getLabel?: (m: M, s: S) => string;
-  readonly renderContent?: (model: M, s: S) => JSX.Element;
-  readonly iconAfterLabel?: (model: M, s: S) => JSX.Element;
-  readonly onClick?: (params: MenuItemClickEvent<S, M>) => void;
-}
-
-declare type IExtraMenuItem = Omit<StandardComponentProps, "id"> &
-  Omit<ICommonMenuItem<ExtraMenuItemModel>, "onClick"> & {
-    readonly onClick?: (e: MenuExtraItemClickEvent) => void;
-  };
 
 declare interface IMenuButton<
   S extends Record<string, unknown> = MenuItemSelectedState,

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef, useImperativeHandle, useReducer } from "react";
+import React, { RefObject, useState, useMemo, useEffect, useRef, useImperativeHandle, useReducer } from "react";
 import classNames from "classnames";
 import { map, isNil, includes, filter, find, uniqueId, forEach } from "lodash";
 
@@ -108,10 +108,14 @@ const menuStateReducer = <
   return newState;
 };
 
+type ItemRefs<S extends Record<string, unknown> = MenuItemSelectedState> = { [key in ID]: RefObject<IMenuItemRef<S>> };
+
 const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M extends MenuItemModel<S> = MenuItemModel<S>>(
   props: IMenu<S, M> & { readonly menu?: NonNullRef<IMenuRef<S, M>> }
 ): JSX.Element => {
   const ref = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<ItemRefs<S>>({} as ItemRefs<S>);
+
   const searchRef = useRef<AntDInput>(null);
   const [menuState, dispatchMenuState]: [MenuState<S, M>, (action: MenuStateAction<S, M>) => void] = useReducer(
     menuStateReducer,
@@ -123,7 +127,7 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
   const menu = ui.useMenuIfNotDefined<S, M>(props.menu);
   const menuId = useMemo(() => (!isNil(props.id) ? props.id : uniqueId("menu-")), [props.id]);
 
-  const [_selected, setSelected] = useState<ID[]>(
+  const [_selected, setSelected] = useState<M["id"][]>(
     isNil(props.defaultSelected)
       ? []
       : Array.isArray(props.defaultSelected)
@@ -218,7 +222,7 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
 						 the Menu is operating as multiple = true) we should see if there is
 						 a way to recover the last active selection instead of defaulting to
 						 the first selected model in the array. */
-          forEach(selectedState, (id: ID | string) => {
+          forEach(selectedState, (id: M["id"] | string) => {
             const m: GenericModelItem<S, M> | undefined = find(
               availableModelItems,
               (item: GenericModelItem<S, M>) => getModelIdentifier(item.model) === id
@@ -322,61 +326,51 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
     if (!isNil(explicitStateGetter)) {
       return (m: M): S => explicitStateGetter(m);
     }
-    return (m: M, sel: ID[], def?: { readonly id: ID; readonly selected: boolean }): S =>
+    return (m: M, sel: M["id"][], def?: { readonly id: M["id"]; readonly selected: boolean }): S =>
       ({
         selected: !isNil(def) && def.id === m.id ? def.selected : includes(sel, getModelIdentifier(m))
       } as unknown as S);
-  }, [props.getItemState]);
+  }, [props.getItemState, getModelIdentifier]);
 
   const getState = useMemo(
     () =>
-      (sel: ID[], def?: { readonly id: ID; readonly selected: boolean }): S[] =>
+      (sel: M["id"][], def?: { readonly id: M["id"]; readonly selected: boolean }): S[] =>
         map(props.models, (m: M) => getItemState(m, sel, def)),
     [hooks.useDeepEqualMemo(props.models), getItemState]
   );
 
   const getModelAttributedState = useMemo(
     () =>
-      (sel: ID[], def?: { readonly id: ID; readonly selected: boolean }): MenuItemStateWithModel<S, M>[] =>
+      (sel: M["id"][], def?: { readonly id: M["id"]; readonly selected: boolean }): MenuItemStateWithModel<S, M>[] =>
         map(props.models, (m: M) => ({ ...getItemState(m, sel, def), model: m })),
     [hooks.useDeepEqualMemo(props.models), getItemState]
   );
 
-  const onMenuItemClick: (e: MenuItemClickEvent<S, M>) => void = hooks.useDynamicCallback(
-    (e: MenuItemClickEvent<S, M>) => {
+  const onMenuItemClick: (e: MenuItemModelClickEvent<S>, m: M) => void = hooks.useDynamicCallback(
+    (e: MenuItemModelClickEvent<S>, m: M) => {
+      const id = getModelIdentifier(m);
+
       if (mode === "single") {
-        const newSelected = [getModelIdentifier(e.model)];
-        setSelected(newSelected);
-        e.model.onClick?.({
-          event: e.event,
-          closeParentDropdown: props.closeParentDropdown,
-          state: getItemState(e.model, newSelected)
-        });
-        props.onChange?.({ ...e, menuState: getModelAttributedState(newSelected) });
+        setSelected([id]);
+        props.onChange?.({ ...e, model: m, menuState: getModelAttributedState([id]) });
       } else {
-        let newSelected: ID[];
+        let newSelected: M["id"][];
         let newDefaultState: MenuItemSelectedState = { selected: false };
 
-        const id = getModelIdentifier(e.model);
-
         if (includes(selected, id)) {
-          newSelected = filter(selected, (i: ID) => i !== id);
+          newSelected = filter(selected, (i: M["id"]) => i !== id);
         } else {
           newSelected = [...selected, id];
           newDefaultState = { selected: true };
         }
-        const state: S = getItemState(e.model, newSelected, { id, ...newDefaultState });
-        e.model.onClick?.({
-          event: e.event,
-          closeParentDropdown: props.closeParentDropdown,
-          state
-        });
+        const state: S = getItemState(m, newSelected, { id, ...newDefaultState });
         setSelected(newSelected);
         props.onChange?.({
           ...e,
           /* Override the current menu item selected state because change hasn't
-					   propgated yet. */
+             propgated yet. */
           state,
+          model: m,
           menuState: getModelAttributedState(newSelected, { id, ...newDefaultState })
         });
       }
@@ -388,12 +382,10 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
       const item = menuState.availableItems[menuState.focusedIndex];
       if (!isNil(item)) {
         if (isModelItem(item)) {
-          onMenuItemClick({
-            model: item.model,
-            event,
-            closeParentDropdown: props.closeParentDropdown,
-            state: getItemState(item.model, selected)
-          });
+          const itemRef = itemRefs.current[item.model.id];
+          if (!isNil(itemRef) && !isNil(itemRef.current)) {
+            itemRef.current.performClick(event);
+          }
         } else {
           if (!isNil(item.extra.onClick)) {
             item.extra.onClick({ event, closeParentDropdown: props.closeParentDropdown });
@@ -506,27 +498,43 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
         <RenderWithSpinner loading={props.loading} spinnerProps={{ size: "small" }}>
           <ul>
             <React.Fragment>
-              {map(availableModelItems, (item: GenericModelItem<S, M>, index: number) => (
-                <MenuItem<S, M>
-                  key={`${menuId}-${item.model.id}-${index}`}
-                  style={props.itemProps?.style}
-                  className={props.itemProps?.className}
-                  model={item.model}
-                  menuId={menuId}
-                  state={getItemState(item.model, selected)}
-                  renderContent={props.renderItemContent || item.model.renderContent}
-                  iconAfterLabel={props.itemIconAfterLabel}
-                  focused={
-                    (item.model.defaultFocused && menuState.focusedIndex === null) ||
-                    menuState.focusedIndex === indexMap[getModelIdentifier(item.model)]
-                  }
-                  checkbox={props.checkbox}
-                  closeParentDropdown={props.closeParentDropdown}
-                  keepDropdownOpenOnClick={props.keepDropdownOpenOnClick}
-                  getLabel={props.getItemLabel}
-                  onClick={(event: MenuItemClickEvent<S, M>) => onMenuItemClick(event)}
-                />
-              ))}
+              {map(availableModelItems, (item: GenericModelItem<S, M>, index: number) => {
+                let rf: RefObject<IMenuItemRef<S>> | undefined = itemRefs.current[item.model.id];
+                if (isNil(rf)) {
+                  rf = React.createRef<IMenuItemRef<S>>();
+                  itemRefs.current[item.model.id] = rf;
+                }
+                return (
+                  <MenuItem<S, M>
+                    key={`${menuId}-${item.model.id}-${index}`}
+                    style={props.itemProps?.style}
+                    ref={rf}
+                    className={props.itemProps?.className}
+                    model={{
+                      ...item.model,
+                      onClick: (e: MenuItemModelClickEvent<S>) => {
+                        /* We have to mutate the model onClick behavior such that
+                           the Menu can also trigger the onChange handler in the
+                           event that an item is clicked. */
+                        item.model.onClick?.(e);
+                        onMenuItemClick(e, item.model);
+                      }
+                    }}
+                    menuId={menuId}
+                    state={getItemState(item.model, selected)}
+                    renderContent={props.renderItemContent || item.model.renderContent}
+                    iconAfterLabel={props.itemIconAfterLabel}
+                    focused={
+                      (item.model.defaultFocused && menuState.focusedIndex === null) ||
+                      menuState.focusedIndex === indexMap[getModelIdentifier(item.model)]
+                    }
+                    checkbox={props.checkbox}
+                    closeParentDropdown={props.closeParentDropdown}
+                    keepDropdownOpenOnClick={props.keepDropdownOpenOnClick}
+                    getLabel={props.getItemLabel}
+                  />
+                );
+              })}
               {map(availableExtraItems, (item: GenericExtraItem, index: number) => {
                 return (
                   <ExtraMenuItem

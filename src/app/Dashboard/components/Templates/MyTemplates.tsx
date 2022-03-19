@@ -133,7 +133,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
                     api
                       .deleteBudget(template.id)
                       .then(() => {
-                        e.closeParentDropdown?.();
+                        e.item.closeParentDropdown?.();
                         dispatch(actions.removeTemplateFromStateAction(template.id));
                       })
                       .catch((err: Error) => notifications.requestError(err))
@@ -145,7 +145,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
                     api
                       .updateBudget<Model.Template>(template.id, { community: true })
                       .then((response: Model.Template) => {
-                        e.closeParentDropdown?.();
+                        e.item.closeParentDropdown?.();
                         dispatch(actions.removeTemplateFromStateAction(template.id));
                         dispatch(actions.addTemplateToStateAction(response));
                       })
@@ -159,7 +159,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
                          that sometimes takes a very long time. */
                       .duplicateBudget<Model.Template>(template.id, { timeout: 120 * 1000 })
                       .then((response: Model.Template) => {
-                        e.closeParentDropdown?.();
+                        e.item.closeParentDropdown?.();
                         dispatch(actions.addTemplateToStateAction(response));
                       })
                       .catch((err: Error) => notifications.requestError(err))
