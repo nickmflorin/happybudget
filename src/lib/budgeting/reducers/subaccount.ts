@@ -21,12 +21,11 @@ export type SubAccountAccountDetailReducerConfig<S extends MinimalSubAccountStor
 
 export const createSubAccountDetailReducer = <S extends MinimalSubAccountStore>(
   config: SubAccountAccountDetailReducerConfig<S>
-): Redux.Reducer<S> => {
-  return combineReducers({
+): Redux.Reducer<S> =>
+  combineReducers({
     ...config.reducers,
     detail: redux.reducers.createDetailResponseReducer<Model.SubAccount>({
       initialState: redux.initialDetailResponseState,
       actions: config.actions
     })
   }) as Redux.Reducer<S>;
-};
