@@ -4,6 +4,7 @@ import { Dispatch } from "redux";
 import { map, filter, isNil } from "lodash";
 
 import * as api from "api";
+import { Config } from "config";
 import { model, tabling, hooks } from "lib";
 import * as store from "store";
 
@@ -226,19 +227,25 @@ const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Pro
         getModelRowName={(r: Table.DataRow<R>) => r.data.name}
         getModelRowLabel={"Actual"}
         framework={Framework}
-        actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
-          framework.actions.ToggleColumnAction(props.table.current, params),
-          framework.actions.ImportActualsAction({
-            table: props.table.current,
-            onLinkToken: (linkToken: string) => open(linkToken)
-          }),
-          framework.actions.ExportCSVAction(
-            props.table.current,
-            params,
-            !isNil(parent) ? `${parent.name}_actuals` : "actuals"
-          ),
-          framework.actions.ExportPdfAction(props.onExportPdf)
-        ]}
+        actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => {
+          let actions = [
+            framework.actions.ToggleColumnAction(props.table.current, params),
+            framework.actions.ImportActualsAction({
+              table: props.table.current,
+              onLinkToken: (linkToken: string) => open(linkToken)
+            })
+          ];
+          if (Config.actualsImportEnabled === true) {
+            actions = [
+              ...actions,
+              framework.actions.ImportActualsAction({
+                table: props.table.current,
+                onLinkToken: (linkToken: string) => open(linkToken)
+              })
+            ];
+          }
+          return [...actions, framework.actions.ExportPdfAction(props.onExportPdf)];
+        }}
       />
       {modal}
       {contactModals}
