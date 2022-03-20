@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames";
 
 import * as api from "api";
-import { ui, integrations } from "lib";
+import { ui, integrations, http } from "lib";
 
 import { Modal } from "components";
 import { ImportActualsPlaidForm } from "components/forms";
@@ -15,8 +15,8 @@ type ImportActualsPlaidModalProps = Omit<ModalProps, "title" | "onOk"> & {
 };
 
 const ImportActualsPlaidModal = ({ budgetId, onSuccess, ...props }: ImportActualsPlaidModalProps): JSX.Element => {
-  const form = ui.hooks.useForm<ImportActualsPlaidFormValues>();
-  const [cancelToken] = api.useCancelToken();
+  const form = ui.useForm<ImportActualsPlaidFormValues>();
+  const [cancelToken] = http.useCancelToken();
 
   return (
     <Modal
