@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
-import { map, filter, isNil, set } from "lodash";
+import { map, filter, isNil } from "lodash";
 
 import * as api from "api";
 import { model, tabling, hooks } from "lib";

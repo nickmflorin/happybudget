@@ -1,5 +1,5 @@
 export enum ActualImportSourceNames {
-  PLAID = "plaid"
+  PLAID = "Plaid"
 }
 
 export const ActualImportSourceModels: { [key: string]: Model.ActualImportSource } = {

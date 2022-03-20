@@ -36,5 +36,5 @@ const ActualImportSourceIcon = ({ source, ...props }: ActualImportSourceIconProp
   const icon = useMemo(() => getImportSourceIcon(typeof source === "number" ? source : source.id), [source]);
   return <Icon {...props} icon={icon} />;
 };
-  
+
 export default React.memo(ActualImportSourceIcon);

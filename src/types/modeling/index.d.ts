@@ -326,7 +326,7 @@ declare namespace Model {
   };
 
   type ActualImportSourceId = 0;
-  type ActualImportSourceName = "plaid";
+  type ActualImportSourceName = "Plaid";
   type ActualImportSource = Choice<ActualImportSourceId, ActualImportSourceName>;
 
   type Actual = RowHttpModel<"actual"> & {

@@ -32,7 +32,8 @@ const ImportActualsPlaidModal = ({ budgetId, onSuccess, ...props }: ImportActual
               .bulkImportActuals(
                 budgetId,
                 {
-                  ...values,
+                  start_date: values.start_date.toISOString().substring(0, 10),
+                  end_date: values.end_date?.toISOString().substring(0, 10),
                   public_token: props.publicToken,
                   source: integrations.models.ActualImportSourceModels.PLAID.id
                 },

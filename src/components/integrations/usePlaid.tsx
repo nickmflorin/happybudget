@@ -16,7 +16,13 @@ const usePlaid = (props: UsePlaidProps): UsePlaidReturnType => {
 
   const config = useMemo<PlaidLinkOptions>(
     () => ({
-      onSuccess: (publicToken: string) => props.onSuccess?.(publicToken),
+      onSuccess: (publicToken: string) => {
+        setLinkToken(null);
+        props.onSuccess?.(publicToken);
+      },
+      onExit: () => {
+        setLinkToken(null);
+      },
       token: linkToken
     }),
     [linkToken, props.onSuccess]
@@ -26,20 +32,21 @@ const usePlaid = (props: UsePlaidProps): UsePlaidReturnType => {
 
   useEffect(() => {
     if (!isNil(error)) {
-      props.onError?.(error.message);}
+      props.onError?.(error.message);
+    }
+    if (linkToken && ready) {
+      open();
+    }
   }, [error, props.onError]);
 
   const _open = useMemo(
     () => (token: string) => {
-      if (ready) {
-        setLinkToken(token);
-        open();
-      }
+      setLinkToken(token);
     },
-    [open, ready]
+    []
   );
 
   return { open: _open };
 };
-  
+
 export default usePlaid;

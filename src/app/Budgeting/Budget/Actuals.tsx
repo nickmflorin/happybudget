@@ -72,9 +72,9 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
           table={table}
           actionContext={{ budgetId }}
           actualTypes={actualTypes}
-          onImport={(b: Model.Budget, ms: Model.Actual[]) => {
+          onImportSuccess={(b: Model.Budget, ms: Model.Actual[]) => {
             dispatch(actions.budget.updateBudgetInStateAction({ id: b.id, data: b }));
-            table.current.applyTableChange({
+            table.current.dispatchEvent({
               type: "modelsAdded",
               payload: map(ms, (m: Model.Actual) => ({ model: m }))
             });
