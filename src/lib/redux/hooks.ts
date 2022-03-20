@@ -2,6 +2,29 @@ import { useReducer, useMemo } from "react";
 import { includes, map } from "lodash";
 import * as reducers from "./reducers";
 
+type UseSelectionReturnType<M extends Model.Model> = {
+  readonly selected: M["id"][];
+  readonly select: (id: SingleOrArray<M["id"]>) => void;
+  readonly deselect: (id: SingleOrArray<M["id"]>) => void;
+  readonly toggle: (id: SingleOrArray<M["id"]>) => void;
+};
+
+export const useSelection = <M extends Model.Model>(
+  mode: ModelSelectionMode,
+  initialState?: M["id"][]
+): UseSelectionReturnType<M> => {
+  const [store, dispatch] = useReducer(
+    reducers.createSelectionReducer<M>(mode, initialState || []),
+    initialState || []
+  );
+  return {
+    selected: store,
+    select: (id: SingleOrArray<M["id"]>) => dispatch({ type: "SELECT", payload: id }),
+    deselect: (id: SingleOrArray<M["id"]>) => dispatch({ type: "DESELECT", payload: id }),
+    toggle: (id: SingleOrArray<M["id"]>) => dispatch({ type: "TOGGLE", payload: id })
+  };
+};
+
 export const useTrackModelActions = (
   initialState?: Redux.ModelListActionStore
 ): [(id: ID) => boolean, (id: ID) => void, (id: ID) => void, ID[]] => {

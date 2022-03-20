@@ -4,7 +4,7 @@ import { map, isNil, includes, filter, find, uniqueId, forEach } from "lodash";
 
 import { Input as AntDInput } from "antd";
 
-import { hooks, ui, util } from "lib";
+import { hooks, ui, util, redux } from "lib";
 import { RenderWithSpinner, ShowHide } from "components";
 import { Button } from "components/buttons";
 import { SearchInput } from "components/fields";
@@ -127,14 +127,24 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
   const menu = ui.useMenuIfNotDefined<S, M>(props.menu);
   const menuId = useMemo(() => (!isNil(props.id) ? props.id : uniqueId("menu-")), [props.id]);
 
-  const [_selected, setSelected] = useState<M["id"][]>(
-    isNil(props.defaultSelected)
-      ? []
-      : Array.isArray(props.defaultSelected)
-      ? props.defaultSelected
-      : [props.defaultSelected]
+  const defaultSelected = useMemo(
+    () =>
+      isNil(props.defaultSelected)
+        ? []
+        : Array.isArray(props.defaultSelected)
+        ? props.defaultSelected
+        : [props.defaultSelected],
+    [props.defaultSelected]
   );
 
+  /* The selection state internal to the component in the case that the component
+     is unmanaged (i.e. we are not passing in the selection state to the
+     component explicitly). */
+  const { selected: _selected, toggle } = redux.useSelection(props.mode || "single", defaultSelected);
+
+  /* The "true" selected state that chooses between the explicitly passed in
+     selected state or the internal selected state based on whether or not the
+     explicit selected state is passed in. */
   const selected = useMemo(
     () => (!isNil(props.selected) ? (Array.isArray(props.selected) ? props.selected : [props.selected]) : _selected),
     [props.selected, _selected]
@@ -350,13 +360,16 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
     (e: MenuItemModelClickEvent<S>, m: M) => {
       const id = getModelIdentifier(m);
 
+      toggle(id);
+
       if (mode === "single") {
-        setSelected([id]);
         props.onChange?.({ ...e, model: m, menuState: getModelAttributedState([id]) });
       } else {
         let newSelected: M["id"][];
         let newDefaultState: MenuItemSelectedState = { selected: false };
 
+        /* We have to calculate the new selected state explicitly here because
+           the state will not have been updated via `toggle` at this point yet. */
         if (includes(selected, id)) {
           newSelected = filter(selected, (i: M["id"]) => i !== id);
         } else {
@@ -364,7 +377,6 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
           newDefaultState = { selected: true };
         }
         const state: S = getItemState(m, newSelected, { id, ...newDefaultState });
-        setSelected(newSelected);
         props.onChange?.({
           ...e,
           /* Override the current menu item selected state because change hasn't
@@ -424,6 +436,14 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
   }, [focused]);
 
   useImperativeHandle(menu, () => ({
+    setItemLoading: (id: M["id"], v: boolean) => {
+      const rf = itemRefs.current[id];
+      if (isNil(rf)) {
+        console.warn(`Cannot set item ${id} loading state because there is not an item with that ID.`);
+      } else if (!isNil(rf.current)) {
+        rf.current.setLoading(v);
+      }
+    },
     getState: () => getState(selected),
     getSearchValue: () => search,
     incrementFocusedIndex: () => dispatchMenuState({ type: "INCREMENT" }),

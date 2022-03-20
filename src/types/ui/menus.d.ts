@@ -1,5 +1,3 @@
-declare type MenuMode = "single" | "multiple";
-
 declare type MenuItemSelectedState = {
   readonly selected: boolean;
 };
@@ -87,6 +85,7 @@ declare type IMenuRef<
   S extends Record<string, unknown> = MenuItemSelectedState,
   M extends MenuItemModel<S> = MenuItemModel<S>
 > = {
+  readonly setItemLoading: (id: M["id"], v: boolean) => void;
   readonly getState: () => S[];
   readonly getSearchValue: () => string;
   readonly incrementFocusedIndex: () => void;
@@ -104,7 +103,7 @@ declare type IMenu<
   readonly models: M[];
   readonly checkbox?: boolean;
   readonly selected?: ID[] | null | undefined | ID;
-  readonly mode?: MenuMode;
+  readonly mode?: ModelSelectionMode;
   readonly defaultSelected?: ID[] | ID;
   readonly itemProps?: StandardComponentProps;
   readonly loading?: boolean;

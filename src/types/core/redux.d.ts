@@ -68,9 +68,9 @@ declare namespace Redux {
   type Dispatch = import("redux").Dispatch<Action>;
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type BasicAction<P extends ActionPayload = any> = {
+  type BasicAction<P extends ActionPayload = any, T extends string = string> = {
     readonly payload: P;
-    readonly type: string;
+    readonly type: T;
   };
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */

@@ -87,3 +87,5 @@ declare type StandardSize = "xsmall" | "small" | "medium" | "standard" | "large"
 declare type UseSizeProps<T extends string = StandardSize, S extends string = "size"> = {
   [key in S]?: T;
 } & { [key in T]?: boolean };
+
+declare type ModelSelectionMode = "single" | "multiple";

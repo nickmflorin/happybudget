@@ -195,9 +195,7 @@ const Budgets = (): JSX.Element => {
               pageSize={pageSize}
               current={page}
               total={count}
-              onChange={(pg: number) => {
-                dispatch(actions.setBudgetsPaginationAction({ page: pg }));
-              }}
+              onChange={(pg: number) => dispatch(actions.setBudgetsPaginationAction({ page: pg }))}
             />
           </Page.Footer>
         )}

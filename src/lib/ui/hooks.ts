@@ -72,6 +72,8 @@ export const useLayoutIfNotDefined = (layout?: NonNullRef<ILayoutRef>): NonNullR
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const InitialMenuRef: IMenuRef<any, any> = {
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+  setItemLoading: () => {},
   getState: () => [],
   getSearchValue: () => "",
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
