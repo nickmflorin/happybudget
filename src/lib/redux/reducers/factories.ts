@@ -5,21 +5,32 @@ import { http, notifications, util } from "lib";
 import { modelListActionReducer } from "./reducers";
 import { findModelInData } from "../util";
 
-export const createSimplePayloadReducer = <P extends Redux.ActionPayload>(
-  config: Redux.ReducerConfig<P, { set: Redux.ActionCreator<P> }>
-): Redux.Reducer<P> => {
-  const reducer: Redux.Reducer<P> = (state: P = config.initialState, action: Redux.Action<P>): P => {
+export const createSimplePayloadReducer =
+  <P extends Redux.ActionPayload>(config: Redux.ReducerConfig<P, { set: Redux.ActionCreator<P> }>): Redux.Reducer<P> =>
+  (state: P = config.initialState, action: Redux.Action<P>): P => {
     if (config.actions.set?.toString() === action.type) {
       return action.payload;
     }
     return state;
   };
-  return reducer;
-};
 
 export const createSimpleBooleanReducer = (
   config: Omit<Redux.ReducerConfig<boolean, { set: Redux.ActionCreator<boolean> }>, "initialState">
 ): Redux.Reducer<boolean> => createSimplePayloadReducer<boolean>({ ...config, initialState: false });
+
+export const createSimpleBooleanToggleReducer =
+  (
+    config: Omit<Redux.ReducerConfig<boolean, { set: Redux.ActionCreator<boolean | "TOGGLE"> }>, "initialState">
+  ): Redux.Reducer<boolean> =>
+  (state = false, action: Redux.Action<boolean | "TOGGLE">) => {
+    if (config.actions.set?.toString() === action.type) {
+      if (typeof action.payload === "string") {
+        return !state;
+      }
+      return action.payload;
+    }
+    return state;
+  };
 
 /**
  * A reducer factory that creates a generic reducer to handle the state of a

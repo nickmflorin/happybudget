@@ -29,7 +29,6 @@ const Header = ({
   ...props
 }: HeaderProps): JSX.Element => {
   const user = store.hooks.useUser();
-
   return (
     <Layout.Header
       {...props}

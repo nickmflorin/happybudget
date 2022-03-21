@@ -100,6 +100,9 @@ const createApplicationReducer = (config: Application.StoreConfig): Redux.Reduce
     user: createUserReducer(config.user),
     productPermissionModalOpen: redux.reducers.createSimpleBooleanReducer({
       actions: { set: actions.setProductPermissionModalOpenAction }
+    }),
+    drawerOpen: redux.reducers.createSimpleBooleanToggleReducer({
+      actions: { set: actions.setApplicationDrawerAction }
     })
   });
 

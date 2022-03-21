@@ -2,6 +2,8 @@ import { redux } from "lib";
 
 export const selectApplicationLoading = (state: Application.Store) => state.loading;
 
+export const selectApplicationDrawerOpen = (state: Application.Store) => state.drawerOpen;
+
 export const selectUser = (s: Application.Store) => s.user;
 
 export const selectLoggedInUser = (s: Application.Store) => {

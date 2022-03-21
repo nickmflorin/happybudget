@@ -27,6 +27,7 @@ const createApplicationInitialState = (config: Application.StoreConfig): Applica
   ...createModularApplicationState(filter(config.modules, (c: Application.ModuleConfig) => c.isPublic !== true)),
   user: config.user,
   loading: false,
+  drawerOpen: false,
   contacts: redux.initialAuthenticatedModelListResponseState,
   filteredContacts: redux.initialAuthenticatedModelListResponseState,
   productPermissionModalOpen: false,

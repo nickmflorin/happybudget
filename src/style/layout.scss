@@ -168,6 +168,29 @@
         display: flex;
         flex-direction: row;
 
+				.drawer {
+					max-width: 300px;
+					overflow-y: hidden;
+					display: flex;
+					flex-direction: column;
+					padding: 35px 15px 15px 15px;
+					border: $border;
+					position: relative;
+
+					.btn--drawer-close {
+						position: absolute;
+						top: 5px;
+						right: 5px;
+						@include size(26px);
+					}
+
+					.drawer-content {
+						display: flex;
+						flex-direction: column;
+						overflow-y: scroll;
+					}
+				}
+
         .sub-content {
           overflow-y: hidden;
           display: flex;

@@ -47,6 +47,7 @@ declare namespace Application {
     readonly filteredContacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
     readonly productPermissionModalOpen: boolean;
     readonly public: PublicStore;
+    readonly drawerOpen: boolean;
   };
 
   interface ModuleConfig<
