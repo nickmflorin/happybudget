@@ -10,12 +10,7 @@
     "plugin:prettier/recommended",
     "plugin:@typescript-eslint/recommended"
   ],
-  "plugins": [
-    "prettier",
-    "react",
-    "react-hooks",
-    "@typescript-eslint"
-  ],
+  "plugins": ["prettier", "react", "react-hooks", "@typescript-eslint"],
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly",
@@ -35,26 +30,14 @@
       "version": "detect"
     }
   },
-  "ignorePatterns": [
-    "*.svg",
-    "node_modules",
-    "build",
-    "dist",
-    "public"
-  ],
+  "ignorePatterns": ["*.svg", "node_modules", "build", "dist", "public"],
   "rules": {
     "prettier/prettier": "error",
     "no-global-assign": 2,
     "no-redeclare": "off", // Messes with function overloading.
     "no-restricted-globals": 2,
-    "quotes": [
-      1,
-      "double"
-    ],
-    "semi": [
-      1,
-      "always"
-    ],
+    "quotes": [1, "double"],
+    "semi": [1, "always"],
     "no-tabs": [
       "error",
       {
@@ -73,14 +56,8 @@
       }
     ],
     "no-eval": "warn",
-    "object-curly-spacing": [
-      1,
-      "always"
-    ],
-    "multiline-comment-style": [
-      "warn",
-      "bare-block"
-    ],
+    "object-curly-spacing": [1, "always"],
+    "multiline-comment-style": ["warn", "bare-block"],
     "max-len": [
       "warn",
       {
@@ -96,9 +73,11 @@
     "react/react-in-jsx-scope": ["off"],
     "react/display-name": ["off"],
     "react/no-children-prop": ["off"],
-    "@typescript-eslint/no-shadow": [
-      "error"
+    "react/jsx-curly-brace-presence": [
+      "error",
+      { "props": "always", "children": "always", "propElementValues": "always" }
     ],
+    "@typescript-eslint/no-shadow": ["error"],
     // Note:  These non-typescript base rules have to be disabled as of TS
     // 4.0.0 in order to prevent false positives.  The no-undef lint rule does
     // not use TypeScript to determine the global variables that exist -
@@ -109,21 +88,11 @@
     // rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
     "no-use-before-define": "off",
     "no-undef": "off",
-    "@typescript-eslint/ban-ts-comment": [
-      "off"
-    ],
-    "@typescript-eslint/no-namespace": [
-      "off"
-    ],
-    "@typescript-eslint/no-use-before-define": [
-      "error"
-    ],
+    "@typescript-eslint/ban-ts-comment": ["off"],
+    "@typescript-eslint/no-namespace": ["off"],
+    "@typescript-eslint/no-use-before-define": ["error"],
     // Eventually, we want to turn the next two rules into warnings.
-    "@typescript-eslint/explicit-module-boundary-types": [
-      "off"
-    ],
-    "@typescript-eslint/explicit-function-return-type": [
-      "off"
-    ]
+    "@typescript-eslint/explicit-module-boundary-types": ["off"],
+    "@typescript-eslint/explicit-function-return-type": ["off"]
   }
 }
