@@ -147,7 +147,7 @@ following configurations to your `settings.json` file:
 
 ```json
 {
-  "eslint.options": {},
+	"eslint.options": {},
 	"eslint.validate": [
 		"javascript",
 		"javascriptreact",
@@ -163,15 +163,15 @@ following configurations to your `settings.json` file:
 	"[typescriptreact]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
-  "editor.rulers": [
+	"editor.rulers": [
 		80,
 		100
 	],
-  "scss.lint.duplicateProperties": "warning",
+	"scss.lint.duplicateProperties": "warning",
 	"scssFormatter.singleQuote": true,
 	"prettier.useTabs": false,
 	"eslint.format.enable": true,
-  "prettier.jsxSingleQuote": true,
+	"prettier.jsxSingleQuote": true,
 	"prettier.jsxBracketSameLine": true,
 	"prettier.printWidth": 120,
 	"eslint.alwaysShowStatus": true,
