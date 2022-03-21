@@ -73,10 +73,7 @@
     "react/react-in-jsx-scope": ["off"],
     "react/display-name": ["off"],
     "react/no-children-prop": ["off"],
-    "react/jsx-curly-brace-presence": [
-      "error",
-      { "props": "always", "children": "always", "propElementValues": "always" }
-    ],
+    "react/jsx-curly-brace-presence": ["error", "always"],
     "@typescript-eslint/no-shadow": ["error"],
     // Note:  These non-typescript base rules have to be disabled as of TS
     // 4.0.0 in order to prevent false positives.  The no-undef lint rule does
