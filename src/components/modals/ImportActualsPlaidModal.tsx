@@ -1,5 +1,6 @@
 import React from "react";
 import classNames from "classnames";
+import moment from "moment";
 
 import * as api from "api";
 import { ui, integrations, http } from "lib";
@@ -28,12 +29,17 @@ const ImportActualsPlaidModal = ({ budgetId, onSuccess, ...props }: ImportActual
           .validateFields()
           .then((values: ImportActualsPlaidFormValues) => {
             form.setLoading(true);
+            const start_date = moment(values.start_date.toISOString()).format("YYYY-MM-DD");
+            let end_date: string | null = null;
+            if (values.end_date) {
+              end_date = moment(values.end_date.toISOString()).format("YYYY-MM-DD");
+            }
             api
               .bulkImportActuals(
                 budgetId,
                 {
-                  start_date: values.start_date.toISOString().substring(0, 10),
-                  end_date: values.end_date?.toISOString().substring(0, 10),
+                  start_date: start_date,
+                  end_date: end_date,
                   public_token: props.publicToken,
                   source: integrations.models.ActualImportSourceModels.PLAID.id
                 },
