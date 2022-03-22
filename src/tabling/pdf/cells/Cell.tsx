@@ -101,6 +101,8 @@ export interface CellProps<
   readonly debug?: boolean;
   readonly indented?: boolean;
   readonly hideContent?: boolean;
+  readonly firstChild: boolean;
+  readonly lastChild: boolean;
 }
 
 export interface PrivateCellProps<
@@ -145,6 +147,17 @@ const Cell = <
     };
   }, [props.column]);
 
+  const className = useMemo(() => {
+    let cs = ["td", props.className];
+    if (props.firstChild) {
+      cs = [...cs, "td-first-child"];
+    }
+    if (props.lastChild) {
+      cs = [...cs, "td-last-child"];
+    }
+    return cs;
+  }, [props.className, props.firstChild]);
+
   return (
     <View
       className={classNames(
@@ -152,7 +165,7 @@ const Cell = <
           props.isHeader === true ? props.column.pdfHeaderCellProps?.className : props.column.pdfCellProps?.className,
           callbackParams
         ),
-        evaluateClassName<R, M, V>(props.className, callbackParams),
+        evaluateClassName<R, M, V>(className, callbackParams),
         { indented: props.indented === true }
       )}
       style={cellStyle}

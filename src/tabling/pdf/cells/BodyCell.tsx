@@ -28,8 +28,6 @@ interface PrivateBodyCellProps<
     BodyCellProps<R, M, V> {
   readonly data: Table.BodyRow<R>[];
   readonly row?: RW;
-  readonly firstChild: boolean;
-  readonly lastChild: boolean;
 }
 
 const BodyCell = <
@@ -65,25 +63,8 @@ const BodyCell = <
     return typeof rawValue === "string" || typeof rawValue === "number" ? props.column.pdfFormatter(rawValue) : "";
   }, [rawValue, props.column]);
 
-  const className = useMemo(() => {
-    let cs = ["td", props.className];
-    if (props.firstChild) {
-      cs = [...cs, "td-first-child"];
-    }
-    if (props.lastChild) {
-      cs = [...cs, "td-last-child"];
-    }
-    return cs;
-  }, [props.className, props.firstChild]);
-
   return (
-    <Cell<R, M, V>
-      {...props}
-      value={value}
-      rawValue={rawValue}
-      className={className}
-      textClassName={["td-text", props.textClassName]}
-    />
+    <Cell<R, M, V> {...props} value={value} rawValue={rawValue} textClassName={["td-text", props.textClassName]} />
   );
 };
 
