@@ -22,7 +22,7 @@ const getImportSourceIcon = (id: Model.ActualImportSourceId): IconProp => {
     IMPORT_SOURCE_MAPPING,
     (mp: ImportSourceIconMap) => mp.sourceId === id
   );
-  if (!isNil(mapping)) {
+  if (isNil(mapping)) {
     console.warn(`No icon is configured for import source ${id}.`);
   }
   return mapping?.icon || "file-import";
