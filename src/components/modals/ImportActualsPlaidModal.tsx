@@ -29,17 +29,15 @@ const ImportActualsPlaidModal = ({ budgetId, onSuccess, ...props }: ImportActual
           .validateFields()
           .then((values: ImportActualsPlaidFormValues) => {
             form.setLoading(true);
-            const start_date = moment(values.start_date.toISOString()).format("YYYY-MM-DD");
-            let end_date: string | null = null;
-            if (values.end_date) {
-              end_date = moment(values.end_date.toISOString()).format("YYYY-MM-DD");
-            }
             api
               .bulkImportActuals(
                 budgetId,
                 {
-                  start_date: start_date,
-                  end_date: end_date,
+                  start_date: moment(values.start_date.toISOString()).format("YYYY-MM-DD"),
+                  end_date:
+                    values.end_date !== null
+                      ? moment(values.end_date.toISOString()).format("YYYY-MM-DD")
+                      : values.end_date,
                   public_token: props.publicToken,
                   source: integrations.models.ActualImportSourceModels.PLAID.id
                 },
