@@ -19,21 +19,19 @@ const HeaderRow = <
 >({
   cellProps,
   ...props
-}: HeaderRowProps<R, M, V>): JSX.Element => {
-  return (
-    <Row<R, M, V>
-      {...props}
-      className={classNames("header-tr", props.className)}
-      renderCell={(params: {
-        lastChild: boolean;
-        firstChild: boolean;
-        column: Table.DataColumn<R, M, V>;
-        colIndex: number;
-      }) => {
-        return <HeaderCell<R, M, V> {...params} {...cellProps} />;
-      }}
-    />
-  );
-};
+}: HeaderRowProps<R, M, V>): JSX.Element => (
+  <Row<R, M, V>
+    {...props}
+    className={classNames("header-tr", props.className)}
+    renderCell={(params: {
+      lastChild: boolean;
+      firstChild: boolean;
+      column: Table.DataColumn<R, M, V>;
+      colIndex: number;
+    }) => {
+      return <HeaderCell<R, M, V> {...params} {...cellProps} />;
+    }}
+  />
+);
 
 export default HeaderRow;
