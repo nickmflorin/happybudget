@@ -228,13 +228,7 @@ const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Pro
         getModelRowLabel={"Actual"}
         framework={Framework}
         actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => {
-          let actions = [
-            framework.actions.ToggleColumnAction(props.table.current, params),
-            framework.actions.ImportActualsAction({
-              table: props.table.current,
-              onLinkToken: (linkToken: string) => open(linkToken)
-            })
-          ];
+          let actions = [framework.actions.ToggleColumnAction(props.table.current, params)];
           if (Config.actualsImportEnabled === true) {
             actions = [
               ...actions,

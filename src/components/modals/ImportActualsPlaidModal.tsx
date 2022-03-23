@@ -3,7 +3,7 @@ import classNames from "classnames";
 import moment from "moment";
 
 import * as api from "api";
-import { ui, integrations, http } from "lib";
+import { ui, model, http } from "lib";
 
 import { Modal } from "components";
 import { ImportActualsPlaidForm } from "components/forms";
@@ -39,7 +39,7 @@ const ImportActualsPlaidModal = ({ budgetId, onSuccess, ...props }: ImportActual
                       ? moment(values.end_date.toISOString()).format("YYYY-MM-DD")
                       : values.end_date,
                   public_token: props.publicToken,
-                  source: integrations.models.ActualImportSourceModels.PLAID.id
+                  source: model.budgeting.ActualImportSources.Plaid.id
                 },
                 { cancelToken: cancelToken() }
               )

@@ -24,6 +24,12 @@ export const MarkupUnits = choice.Choices([
   choice.Choice(1, MarkupUnitNames.FLAT)
 ]);
 
+export enum ActualImportSourceNames {
+  PLAID = "Plaid"
+}
+
+export const ActualImportSources = choice.Choices([choice.Choice(0, ActualImportSourceNames.PLAID)]);
+
 export const getGroupColorDefinition = <R extends Table.RowData>(
   group: Style.HexColor | Model.Group | Table.GroupRow<R>
 ): Table.RowColorDef => {

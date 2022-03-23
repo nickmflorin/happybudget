@@ -1,7 +1,7 @@
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { util, integrations } from "lib";
+import { util, model } from "lib";
 
 import {
   ExportCSVDropdownMenu,
@@ -75,7 +75,7 @@ export const ImportActualsAction = <R extends Table.RowData, M extends Model.Row
   wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => (
     <ImportActualsDropdownMenu
       onChange={(m: Model.ActualImportSource) => {
-        if (m.id === integrations.models.ActualImportSourceModels.PLAID.id) {
+        if (m.id === model.budgeting.ActualImportSources.Plaid.id) {
           /* NOTE: Ideally, we might want to show a loading indicator next to
 					   the menu item in the menu - but we have not exposed functionality
 						 on the menu to allow that yet. */

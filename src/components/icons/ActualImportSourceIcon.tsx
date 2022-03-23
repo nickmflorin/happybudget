@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { isNil, find } from "lodash";
 
-import { integrations } from "lib";
+import { model } from "lib";
 
 import Icon from "./Icon";
 
@@ -13,7 +13,7 @@ type ImportSourceIconMap = {
 const IMPORT_SOURCE_MAPPING: ImportSourceIconMap[] = [
   {
     icon: "bank",
-    sourceId: integrations.models.ActualImportSourceModels.PLAID.id
+    sourceId: model.budgeting.ActualImportSources.Plaid.id
   }
 ];
 
