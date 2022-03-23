@@ -1,5 +1,6 @@
 export { default as Confirmation } from "./Confirmation";
 export * from "./Confirmation";
+export * from "./hooks";
 export { default as Info } from "./Info";
 export { default as Error } from "./Error";
 export { default as Success } from "./Success";

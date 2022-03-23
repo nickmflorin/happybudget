@@ -21,7 +21,7 @@ export interface EditAttachmentsProps {
 }
 
 const EditAttachments = (props: EditAttachmentsProps): JSX.Element => {
-  const [isDeleting, setDeleting, setDeleted] = redux.useTrackModelActions([]);
+  const { isActive: isDeleting, removeFromState: setDeleted, addToState: setDeleting } = redux.useTrackModelActions([]);
   const [cancelToken] = http.useCancelToken();
   const [loadingAttachments, setLoadingAttachments] = useState(false);
   const [attachments, setAttachments] = useState<Model.Attachment[]>([]);

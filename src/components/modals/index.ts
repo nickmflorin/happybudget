@@ -4,7 +4,6 @@ export { default as CreateContactModal } from "./CreateContactModal";
 export { default as CreateGroupModal } from "./CreateGroupModal";
 export { default as CreateMarkupModal } from "./CreateMarkupModal";
 export { default as CreateTemplateModal } from "./CreateTemplateModal";
-export { default as DeleteBudgetModal } from "./DeleteBudgetModal";
 export { default as EditAttachmentsModal } from "./EditAttachmentsModal";
 export { default as EditBudgetModal } from "./EditBudgetModal";
 export { default as EditContactModal } from "./EditContactModal";

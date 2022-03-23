@@ -25,9 +25,14 @@ export const useSelection = <M extends Model.Model>(
   };
 };
 
-export const useTrackModelActions = (
-  initialState?: Redux.ModelListActionStore
-): [(id: ID) => boolean, (id: ID) => void, (id: ID) => void, ID[]] => {
+type UseTrackModelActionsReturnType = {
+  readonly isActive: (id: ID) => boolean;
+  readonly addToState: (id: ID) => void;
+  readonly removeFromState: (id: ID) => void;
+  readonly active: ID[];
+};
+
+export const useTrackModelActions = (initialState?: Redux.ModelListActionStore): UseTrackModelActionsReturnType => {
   const [store, dispatch] = useReducer(reducers.modelListActionReducer, initialState || []);
 
   /* The reducer does not care about the action TYPE - just the payload.  So we
@@ -36,7 +41,7 @@ export const useTrackModelActions = (
   const addToState = (id: ID) => dispatch({ type: "NONE", payload: { id, value: true }, context: {} });
   const removeFromState = (id: ID) => dispatch({ type: "NONE", payload: { id, value: false }, context: {} });
 
-  const isDeleting = useMemo(
+  const isActive = useMemo(
     () => (id: ID) =>
       includes(
         map(store, (instance: Redux.ModelListActionInstance) => instance.id),
@@ -45,10 +50,10 @@ export const useTrackModelActions = (
     [store]
   );
 
-  return [
-    isDeleting,
+  return {
+    isActive,
     addToState,
     removeFromState,
-    map(store, (instance: Redux.ModelListActionInstance) => instance.id)
-  ];
+    active: map(store, (instance: Redux.ModelListActionInstance) => instance.id)
+  };
 };

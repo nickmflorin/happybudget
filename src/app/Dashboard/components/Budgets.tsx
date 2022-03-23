@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil, map } from "lodash";
@@ -13,7 +13,8 @@ import { BudgetCard } from "components/containers";
 import { BudgetDropdownMenu, OrderingDropdownMenu } from "components/dropdowns";
 import { Input } from "components/fields";
 import { Page } from "components/layout";
-import { EditBudgetModal, DeleteBudgetModal, CreateBudgetModal } from "components/modals";
+import { EditBudgetModal, CreateBudgetModal } from "components/modals";
+import { useConfirmation } from "components/notifications";
 import { BudgetEmptyIcon } from "components/svgs";
 
 import { actions } from "../store";
@@ -29,11 +30,14 @@ const selectBudgetsOrdering = (state: Application.Store) => state.dashboard.budg
 
 const Budgets = (): JSX.Element => {
   const user = store.hooks.useLoggedInUser();
-  const [isDeleting, setDeleting, setDeleted] = redux.useTrackModelActions([]);
-  const [isDuplicating, setDuplicating, setDuplicated] = redux.useTrackModelActions([]);
+  const { isActive: isDeleting, removeFromState: setDeleted, addToState: setDeleting } = redux.useTrackModelActions([]);
+  const {
+    isActive: isDuplicating,
+    removeFromState: setDuplicated,
+    addToState: setDuplicating
+  } = redux.useTrackModelActions([]);
 
   const [budgetToEdit, setBudgetToEdit] = useState<number | null>(null);
-  const [budgetToDelete, setBudgetToDelete] = useState<Model.SimpleBudget | null>(null);
   const [createBudgetModalOpen, setCreateBudgetModalOpen] = useState(false);
   const history = useHistory();
 
@@ -50,6 +54,37 @@ const Budgets = (): JSX.Element => {
   useEffect(() => {
     dispatch(actions.requestBudgetsAction(null));
   }, []);
+
+  const deleteBudget = useMemo(
+    () => (b: Model.SimpleBudget, e: MenuItemModelClickEvent) => {
+      setDeleting(b.id);
+      api
+        .deleteBudget(b.id)
+        .then(() => {
+          e.item.closeParentDropdown?.();
+          dispatch(actions.removeBudgetFromStateAction(b.id));
+          dispatch(actions.requestPermissioningBudgetsAction(null));
+          dispatch(
+            store.actions.updateLoggedInUserAction({
+              ...user,
+              num_budgets: Math.max(user.num_budgets - 1, 0)
+            })
+          );
+        })
+        .catch((err: Error) => notifications.requestError(err))
+        .finally(() => setDeleted(b.id));
+    },
+    [setDeleted]
+  );
+
+  const [confirmModal, confirmBudgetDelete] = useConfirmation<[Model.SimpleBudget, MenuItemModelClickEvent]>({
+    okButtonClass: "btn--danger",
+    okText: "Delete",
+    suppressionKey: "delete-budget-confirmation-suppressed",
+    detail: "This action is not recoverable, the data will be permanently erased.",
+    title: "Delete Budget",
+    onConfirmed: (b: Model.SimpleBudget, e: MenuItemModelClickEvent) => deleteBudget(b, e)
+  });
 
   return (
     <React.Fragment>
@@ -141,7 +176,7 @@ const Budgets = (): JSX.Element => {
                   duplicating={isDuplicating(budget.id)}
                   onClick={() => history.push(`/budgets/${budget.id}`)}
                   onEdit={() => setBudgetToEdit(budget.id)}
-                  onDelete={() => setBudgetToDelete(budget)}
+                  onDelete={(e: MenuItemModelClickEvent) => confirmBudgetDelete([budget, e])}
                   onDuplicate={(e: MenuItemModelClickEvent) => {
                     /* Note: Normally we would want to rely on a request to the
 										   backend as the source of truth for a user permission
@@ -225,33 +260,7 @@ const Budgets = (): JSX.Element => {
           }}
         />
       )}
-      {!isNil(budgetToDelete) && (
-        <DeleteBudgetModal
-          open={true}
-          onCancel={() => setBudgetToDelete(null)}
-          onOk={() => {
-            setBudgetToDelete(null);
-            setDeleting(budgetToDelete.id);
-            api
-              .deleteBudget(budgetToDelete.id)
-              .then(() => {
-                dispatch(actions.removeBudgetFromStateAction(budgetToDelete.id));
-                dispatch(actions.requestPermissioningBudgetsAction(null));
-                dispatch(
-                  store.actions.updateLoggedInUserAction({
-                    ...user,
-                    num_budgets: Math.max(user.num_budgets - 1, 0)
-                  })
-                );
-              })
-              .catch((err: Error) => notifications.requestError(err))
-              .finally(() => {
-                setDeleted(budgetToDelete.id);
-              });
-          }}
-          budget={budgetToDelete}
-        />
-      )}
+      {confirmModal}
     </React.Fragment>
   );
 };

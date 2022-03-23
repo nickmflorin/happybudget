@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { map, isNil } from "lodash";
@@ -14,6 +14,7 @@ import { OrderingDropdownMenu } from "components/dropdowns";
 import { SearchInput } from "components/fields";
 import { Page } from "components/layout";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
+import { useConfirmation } from "components/notifications";
 import { IsStaff } from "components/permissions";
 
 import { actions } from "../../store";
@@ -36,9 +37,18 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
   const [templateToEdit, setTemplateToEdit] = useState<number | undefined>(undefined);
   const [createTemplateModalOpen, setCreateTempateModalOpen] = useState(false);
   const user = store.hooks.useLoggedInUser();
-  const [isDeleting, setDeleting, setDeleted] = redux.useTrackModelActions([]);
-  const [isTogglingVisibility, setTogglingVisibility, setVisibilityToggled] = redux.useTrackModelActions([]);
-  const [isDuplicating, setDuplicating, setDuplicated] = redux.useTrackModelActions([]);
+
+  const { isActive: isDeleting, removeFromState: setDeleted, addToState: setDeleting } = redux.useTrackModelActions([]);
+  const {
+    isActive: isTogglingVisibility,
+    addToState: setTogglingVisibility,
+    removeFromState: setVisibilityToggled
+  } = redux.useTrackModelActions([]);
+  const {
+    isActive: isDuplicating,
+    removeFromState: setDuplicated,
+    addToState: setDuplicating
+  } = redux.useTrackModelActions([]);
 
   const dispatch: Redux.Dispatch = useDispatch();
   const templates = useSelector(selectTemplates);
@@ -55,6 +65,30 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
   useEffect(() => {
     dispatch(actions.requestCommunityTemplatesAction(null));
   }, []);
+
+  const deleteBudget = useMemo(
+    () => (b: Model.SimpleTemplate, e: MenuItemModelClickEvent) => {
+      setDeleting(b.id);
+      api
+        .deleteBudget(b.id)
+        .then(() => {
+          e.item.closeParentDropdown?.();
+          dispatch(actions.removeCommunityTemplateFromStateAction(b.id));
+        })
+        .catch((err: Error) => notifications.requestError(err))
+        .finally(() => setDeleted(b.id));
+    },
+    []
+  );
+
+  const [confirmModal, confirmBudgetDelete] = useConfirmation<[Model.SimpleTemplate, MenuItemModelClickEvent]>({
+    okButtonClass: "btn--danger",
+    okText: "Delete",
+    suppressionKey: "delete-discover-template-confirmation-suppressed",
+    detail: "This action is not recoverable, the data will be permanently erased.",
+    title: "Delete Template",
+    onConfirmed: (b: Model.SimpleTemplate, e: MenuItemModelClickEvent) => deleteBudget(b, e)
+  });
 
   return (
     <React.Fragment>
@@ -151,17 +185,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
                 }}
                 onEdit={() => history.push(`/templates/${template.id}/accounts`)}
                 onEditNameImage={() => setTemplateToEdit(template.id)}
-                onDelete={(e: MenuItemModelClickEvent) => {
-                  setDeleting(template.id);
-                  api
-                    .deleteBudget(template.id)
-                    .then(() => {
-                      e.item.closeParentDropdown?.();
-                      dispatch(actions.removeCommunityTemplateFromStateAction(template.id));
-                    })
-                    .catch((err: Error) => notifications.requestError(err))
-                    .finally(() => setDeleted(template.id));
-                }}
+                onDelete={(e: MenuItemModelClickEvent) => confirmBudgetDelete([template, e])}
                 onClick={() => setTemplateToDerive(template.id)}
                 onDuplicate={(e: MenuItemModelClickEvent) => {
                   setDuplicating(template.id);
@@ -230,6 +254,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
           }}
         />
       </IsStaff>
+      <IsStaff>{confirmModal}</IsStaff>
     </React.Fragment>
   );
 };

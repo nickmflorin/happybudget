@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { map, isNil } from "lodash";
@@ -13,6 +13,7 @@ import { OrderingDropdownMenu } from "components/dropdowns";
 import { SearchInput } from "components/fields";
 import { Page } from "components/layout";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
+import { useConfirmation } from "components/notifications";
 import { TemplateEmptyIcon } from "components/svgs";
 
 import { actions } from "../../store";
@@ -34,9 +35,14 @@ interface MyTemplatesProps {
 const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, setTemplateToDerive }): JSX.Element => {
   const [templateToEdit, setTemplateToEdit] = useState<number | undefined>(undefined);
   const [createTemplateModalOpen, setCreateTempateModalOpen] = useState(false);
-  const [isDeleting, setDeleting, setDeleted] = redux.useTrackModelActions([]);
-  const [isMoving, setMoving, setMoved] = redux.useTrackModelActions([]);
-  const [isDuplicating, setDuplicating, setDuplicated] = redux.useTrackModelActions([]);
+
+  const { isActive: isDeleting, removeFromState: setDeleted, addToState: setDeleting } = redux.useTrackModelActions([]);
+  const {
+    isActive: isDuplicating,
+    removeFromState: setDuplicated,
+    addToState: setDuplicating
+  } = redux.useTrackModelActions([]);
+  const { isActive: isMoving, removeFromState: setMoved, addToState: setMoving } = redux.useTrackModelActions([]);
 
   const dispatch: Redux.Dispatch = useDispatch();
   const templates = useSelector(selectTemplates);
@@ -49,6 +55,30 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
   const ordering = useSelector(selectOrdering);
 
   const history = useHistory();
+
+  const deleteBudget = useMemo(
+    () => (b: Model.SimpleTemplate, e: MenuItemModelClickEvent) => {
+      setDeleting(b.id);
+      api
+        .deleteBudget(b.id)
+        .then(() => {
+          e.item.closeParentDropdown?.();
+          dispatch(actions.removeTemplateFromStateAction(b.id));
+        })
+        .catch((err: Error) => notifications.requestError(err))
+        .finally(() => setDeleted(b.id));
+    },
+    [setDeleted]
+  );
+
+  const [confirmModal, confirmBudgetDelete] = useConfirmation<[Model.SimpleTemplate, MenuItemModelClickEvent]>({
+    okButtonClass: "btn--danger",
+    okText: "Delete",
+    suppressionKey: "delete-template-confirmation-suppressed",
+    detail: "This action is not recoverable, the data will be permanently erased.",
+    title: "Delete Template",
+    onConfirmed: (b: Model.SimpleTemplate, e: MenuItemModelClickEvent) => deleteBudget(b, e)
+  });
 
   useEffect(() => {
     dispatch(actions.requestTemplatesAction(null));
@@ -128,17 +158,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
                   disabled={isDeleting(template.id) || isMoving(template.id) || isDuplicating(template.id)}
                   onEdit={() => history.push(`/templates/${template.id}/accounts`)}
                   onEditNameImage={() => setTemplateToEdit(template.id)}
-                  onDelete={(e: MenuItemModelClickEvent) => {
-                    setDeleting(template.id);
-                    api
-                      .deleteBudget(template.id)
-                      .then(() => {
-                        e.item.closeParentDropdown?.();
-                        dispatch(actions.removeTemplateFromStateAction(template.id));
-                      })
-                      .catch((err: Error) => notifications.requestError(err))
-                      .finally(() => setDeleted(template.id));
-                  }}
+                  onDelete={(e: MenuItemModelClickEvent) => confirmBudgetDelete([template, e])}
                   onClick={() => setTemplateToDerive(template.id)}
                   onMoveToCommunity={(e: MenuItemModelClickEvent) => {
                     setMoving(template.id);
@@ -212,6 +232,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
           history.push(`/templates/${template.id}/accounts`);
         }}
       />
+      {confirmModal}
     </React.Fragment>
   );
 };
