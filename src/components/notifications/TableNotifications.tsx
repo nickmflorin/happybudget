@@ -7,13 +7,13 @@ type TableNotificationsProps = {
   readonly offset?: number;
 };
 
-const TableNotifications = ({ tableId, offset = 90, ...props }: TableNotificationsProps) => (
+const TableNotifications = ({ tableId, offset = 30, ...props }: TableNotificationsProps) => (
   <Notifications
     id={`${tableId}-notifications-container`}
-    /* Table notifications need to have a fixed wrapper around the children so
+    /* Table notifications need to have a static wrapper around the children so
        so that when rendered underneath the table, they ignore the overflow-y
        hidden attributes on the parent. */
-    fixedWrapper={true}
+    staticWrapper={true}
     {...props}
     className={"table-notifications"}
     style={{ bottom: `${offset}px` }}

@@ -457,7 +457,7 @@ const AuthenticatedTable = <
           tableId={props.tableId}
           /* If there is no data in the table, we want to render the notification
              under the table - otherwise, it will be hard to read. */
-          offset={props.data.length === 0 ? -10 : 90}
+          offset={props.data.length === 0 ? -10 : 30}
         />
         <TableFooterGrid
           tableId={props.tableId}

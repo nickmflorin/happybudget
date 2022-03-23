@@ -152,5 +152,9 @@
 			color: $white;
       font-family: $avenir;
     }
+
+		&:not(:last-child) {
+			margin-bottom: 10px;
+		}
   }
 }

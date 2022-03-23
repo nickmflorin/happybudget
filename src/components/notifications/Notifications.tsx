@@ -7,25 +7,25 @@ type NotificationsProps = StandardComponentProps & {
   /* There are cases where we need to render the notifications outside of the
      parent container when the parent container has overflow: hidden set.  We
      can accomplish this by wrapping the children in a <div> with
-		 position: fixed, which works because the parent notifications <div> has
+		 position: static, which works because the parent notifications <div> has
 		 position: absolute. */
-  readonly fixedWrapper?: boolean;
+  readonly staticWrapper?: boolean;
   readonly notifications: UINotification[];
   readonly notificationProps?: NotificationProps;
   readonly children?: RenderPropChild<{ notification: UINotification }>;
 };
 
-const WrapInFixed = (props: { readonly children: JSX.Element; readonly fixed?: boolean }): JSX.Element => {
-  if (props.fixed === true) {
-    return <div style={{ position: "fixed" }}>{props.children}</div>;
+const WrapInStatic = (props: { readonly children: JSX.Element; readonly static?: boolean }): JSX.Element => {
+  if (props.static === true) {
+    return <div style={{ position: "static" }}>{props.children}</div>;
   }
   return props.children;
 };
 
-const Notifications = ({ children, notificationProps, notifications, fixedWrapper, ...props }: NotificationsProps) =>
+const Notifications = ({ children, notificationProps, notifications, staticWrapper, ...props }: NotificationsProps) =>
   notifications.length !== 0 ? (
     <div {...props} className={classNames("notifications", props.className)}>
-      <WrapInFixed fixed={fixedWrapper}>
+      <WrapInStatic static={staticWrapper}>
         <React.Fragment>
           {map(notifications, (n: UINotification, index: number) => {
             if (!isNil(children)) {
@@ -34,7 +34,7 @@ const Notifications = ({ children, notificationProps, notifications, fixedWrappe
             return <Notification key={index} {...n} {...notificationProps} />;
           })}
         </React.Fragment>
-      </WrapInFixed>
+      </WrapInStatic>
     </div>
   ) : (
     <></>
