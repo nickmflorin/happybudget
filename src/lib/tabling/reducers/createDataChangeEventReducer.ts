@@ -27,49 +27,46 @@ const createDataChangeEventReducer =
        dispatched from the Table as the Table will already group the changes
        by Row, but it is not guaranteed to be the case if the event is dispatched
        from other locations. */
-    const changesPerRow: {
-      [key: ID]: { changes: Table.RowChange<R>[]; row: Table.EditableRow<R> };
-    } = {};
-    for (let i = 0; i < consolidated.length; i++) {
-      if (isNil(changesPerRow[consolidated[i].id])) {
+    type ChangesPerRow = { [key: ID]: { data: Table.RowChangeData<R>; row: Table.EditableRow<R> } };
+
+    const changesPerRow: ChangesPerRow = reduce(
+      consolidated,
+      (curr: ChangesPerRow, rowChange: Table.RowChange<R>) => {
         const r: Table.EditableRow<R> | null = redux.findModelInData<Table.EditableRow<R>>(
           filter(s.data, (ri: Table.BodyRow<R>) => tabling.rows.isEditableRow(ri)) as Table.EditableRow<R>[],
-          consolidated[i].id
+          rowChange.id
         );
-        // We do not apply manual updates via the reducer for Group row data.
+        /* A warning will be issued if the row associated with the change could
+         not be found. */
         if (!isNil(r)) {
-          changesPerRow[consolidated[i].id] = { changes: [], row: r };
+          if (!isNil(curr[r.id])) {
+            return { ...curr, [r.id]: { row: r, data: { ...curr[r.id].data, ...rowChange.data } } };
+          } else {
+            return { ...curr, [r.id]: { data: rowChange.data, row: r } };
+          }
+        } else {
+          return curr;
         }
-      }
-      if (!isNil(changesPerRow[consolidated[i].id])) {
-        changesPerRow[consolidated[i].id] = {
-          ...changesPerRow[consolidated[i].id],
-          changes: [...changesPerRow[consolidated[i].id].changes, consolidated[i]]
-        };
-      }
-    }
+      },
+      {}
+    );
+
     /* For each Row that was changed, apply that change to the Row stored in
 			 state. */
     return reduce(
       changesPerRow,
-      (st: S, dt: { changes: Table.RowChange<R>[]; row: Table.EditableRow<R> }) => {
-        let r: Table.EditableRow<R> = reduce(
-          dt.changes,
-          (ri: Table.EditableRow<R>, change: Table.RowChange<R>) => {
-            if (tabling.rows.isMarkupRow(ri)) {
-              return markupRowManager.mergeChangesWithRow(ri, change as Table.RowChange<R, Table.MarkupRow<R>>);
-            } else {
-              return modelRowManager.mergeChangesWithRow(ri, change as Table.RowChange<R, Table.ModelRow<R>>);
-            }
-          },
-          dt.row
-        );
+      (st: S, dt: { data: Table.RowChangeData<R>; row: Table.EditableRow<R> }) => {
+        let r: Table.EditableRow<R> = tabling.rows.isMarkupRow(dt.row)
+          ? markupRowManager.mergeChangesWithRow(dt.row, dt.data as Table.RowChangeData<R, Table.MarkupRow<R>>)
+          : modelRowManager.mergeChangesWithRow(dt.row, dt.data as Table.RowChangeData<R, Table.ModelRow<R>>);
+
         /* Make sure to add in the default data before any recalculations are
            performed. */
         if (tabling.rows.isModelRow(r)) {
           r = tabling.rows.applyDefaultsOnUpdate(
             tabling.columns.filterModelColumns(config.columns),
             r,
+            dt.data as Table.RowChangeData<R, Table.ModelRow<R>>,
             config.defaultDataOnUpdate
           );
         }

@@ -115,6 +115,7 @@ export const applyDefaultsOnCreate = <R extends Table.RowData, M extends Model.R
 export const applyDefaultsOnUpdate = <R extends Table.RowData, M extends Model.RowHttpModel>(
   cs: Table.ModelColumn<R, M>[],
   row: Table.ModelRow<R>,
+  change: Table.RowChangeData<R, Table.ModelRow<R>>,
   defaults?: Table.DefaultDataOnUpdate<R>
 ): Table.ModelRow<R> => {
   /* Apply defaults defined on the columns themselves before defaults are
@@ -141,7 +142,7 @@ export const applyDefaultsOnUpdate = <R extends Table.RowData, M extends Model.R
   };
   if (defaults !== undefined) {
     return typeof defaults === "function"
-      ? { ...row, data: insertDefaults(cs, row.data, defaults(row), "update") }
+      ? { ...row, data: insertDefaults(cs, row.data, defaults(row, change), "update") }
       : { ...row, data: insertDefaults(cs, row.data, defaults, "update") };
   }
   return row;

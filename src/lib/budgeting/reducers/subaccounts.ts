@@ -24,9 +24,11 @@ const recalculateSubAccountRow = (st: S, row: Table.DataRow<R>): Pick<R, "nomina
       filter(st.fringes.data, (r: Table.BodyRow<Tables.FringeRowData>) => tabling.rows.isModelRow(r)),
       row.data.fringes
     ) as Table.ModelRow<Tables.FringeRowData>[];
-    if (!isNil(row.data.rate)) {
+
+    if (!isNil(row.data.rate) && !isNil(row.data.quantity)) {
       const multiplier = row.data.multiplier || 1.0;
-      const quantity = row.data.quantity === null ? 1.0 : row.data.quantity;
+      // const quantity = row.data.quantity === null ? 1.0 : row.data.quantity;
+      const quantity = row.data.quantity;
       return {
         nominal_value: quantity * row.data.rate * multiplier,
         fringe_contribution: model.budgeting.contributionFromFringes(quantity * row.data.rate * multiplier, fringes)
@@ -105,8 +107,8 @@ export const createAuthenticatedSubAccountsTableReducer = (
       }
       return r;
     },
-    defaultDataOnUpdate: (r: Table.ModelRow<R>): R => {
-      if (!isNil(r.data.rate) && isNil(r.data.quantity)) {
+    defaultDataOnUpdate: (r: Table.ModelRow<R>, changes: Table.RowChangeData<R, Table.ModelRow<R>>): R => {
+      if (!isNil(r.data.rate) && isNil(r.data.quantity) && isNil(changes.quantity)) {
         return { ...r.data, quantity: 1.0 };
       }
       return r.data;
