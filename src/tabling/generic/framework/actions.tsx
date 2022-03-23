@@ -10,6 +10,7 @@ import {
   ImportActualsDropdownMenu
 } from "components/dropdowns";
 import { ShareDropdownMenuProps } from "components/dropdowns/ShareDropdownMenu";
+import { ImportActualsMenuItemModel } from "components/dropdowns/ImportActualsDropdownMenu";
 
 export const ExportPdfAction = (onExport: () => void): Table.MenuActionObj => ({
   icon: "print",
@@ -74,18 +75,19 @@ export const ImportActualsAction = <R extends Table.RowData, M extends Model.Row
   icon: "file-import",
   wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => (
     <ImportActualsDropdownMenu
-      onChange={(m: Model.ActualImportSource) => {
+      onChange={(m: Model.ActualImportSource, menu: IMenuRef<MenuItemSelectedState, ImportActualsMenuItemModel>) => {
         if (m.id === model.budgeting.ActualImportSources.Plaid.id) {
-          /* NOTE: Ideally, we might want to show a loading indicator next to
-					   the menu item in the menu - but we have not exposed functionality
-						 on the menu to allow that yet. */
-          props.table.notify({ message: "Connecting to Plaid.", closable: true, duration: 3000 });
+          menu.setItemLoading(m.id, true);
           api
             .createPlaidLinkToken()
             .then((response: { link_token: string }) => {
+              menu.setItemLoading(m.id, false);
               props.onLinkToken(response.link_token);
             })
-            .catch((e: Error) => props.table.handleRequestError(e));
+            .catch((e: Error) => {
+              menu.setItemLoading(m.id, false);
+              props.table.handleRequestError(e);
+            });
         } else {
           console.warn(`Detected unconfigured import source ${m.id}.`);
         }

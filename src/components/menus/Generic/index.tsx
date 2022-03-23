@@ -363,7 +363,7 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
       toggle(id);
 
       if (mode === "single") {
-        props.onChange?.({ ...e, model: m, menuState: getModelAttributedState([id]) });
+        props.onChange?.({ ...e, model: m, menu: menu.current, menuState: getModelAttributedState([id]) });
       } else {
         let newSelected: M["id"][];
         let newDefaultState: MenuItemSelectedState = { selected: false };
@@ -383,6 +383,7 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
              propgated yet. */
           state,
           model: m,
+          menu: menu.current,
           menuState: getModelAttributedState(newSelected, { id, ...newDefaultState })
         });
       }

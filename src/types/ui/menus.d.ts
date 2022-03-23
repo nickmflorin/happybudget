@@ -43,6 +43,7 @@ declare type MenuChangeEvent<
 > = MenuItemModelClickEvent<S> & {
   readonly model: M;
   readonly menuState: MenuItemStateWithModel<S, M>[];
+  readonly menu: IMenuRef<S, M>;
 };
 
 declare type BaseMenuItemModel = Model.Model & {
