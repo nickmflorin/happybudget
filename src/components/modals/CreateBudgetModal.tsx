@@ -22,11 +22,7 @@ const CreateBudgetModal = ({ templateId, ...props }: CreateBudgetModalProps): JS
          that sometimes takes a very long time. */
       requestOptions={{ timeout: 120 * 1000 }}
       interceptError={(f: FormInstance<Http.BudgetPayload>, e: Error) => {
-        if (
-          e instanceof api.ClientError &&
-          !isNil(e.permissionError) &&
-          e.permissionError.code === api.ErrorCodes.PRODUCT_PERMISSION_ERROR
-        ) {
+        if (e instanceof api.PermissionError && e.code === api.ErrorCodes.permission.PRODUCT_PERMISSION_ERROR) {
           f.lookupAndNotify("budgetCountPermissionError", {});
           return true;
         }

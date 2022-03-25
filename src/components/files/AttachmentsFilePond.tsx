@@ -4,6 +4,7 @@ import { ActualFileObject, FilePondFile, ProgressServerConfigFunction } from "fi
 import { map } from "lodash";
 
 import * as api from "api";
+import { notifications } from "lib";
 
 interface AttachmentsFilePondProps {
   readonly id: number;
@@ -57,7 +58,10 @@ const AttachmentsFilePond = (props: AttachmentsFilePondProps): JSX.Element => {
           abort: () => void
         ) => {
           const request = api.xhr.uploadAttachmentFile(file, props.path, {
-            error,
+            error: (e: Http.ApiError) => {
+              notifications.internal.handleRequestError(e);
+              error("There was an error uploading the attachment.");
+            },
             progress,
             success: (ms: Model.Attachment[]) =>
               map(ms, (m: Model.Attachment) => {

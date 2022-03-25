@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import { useHistory } from "react-router-dom";
-import { isNil } from "lodash";
 
 import * as api from "api";
 import { ui, notifications } from "lib";
@@ -14,29 +13,15 @@ const Signup = (): JSX.Element => {
   const form = ui.useForm<ISignupFormValues>();
   const history = useHistory();
 
-  const handleAuthError = useMemo(
-    () => (e: Http.AuthError) => {
-      if (e.code === api.ErrorCodes.ACCOUNT_NOT_ON_WAITLIST) {
-        form.notify(UserNotOnWaitlistNotification());
-        return true;
-      }
-      return false;
-    },
-    [form.handleRequestError, form.notify]
-  );
-
   const handleError = useMemo(
     () => (e: Error) => {
-      if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
-        const handled = handleAuthError(e.authenticationError);
-        if (!handled) {
-          form.handleRequestError(e);
-        }
+      if (e instanceof api.AuthenticationError && e.code === api.ErrorCodes.auth.ACCOUNT_NOT_ON_WAITLIST) {
+        form.notify(UserNotOnWaitlistNotification());
       } else {
         form.handleRequestError(e);
       }
     },
-    [form.handleRequestError, handleAuthError]
+    []
   );
 
   return (
@@ -62,10 +47,18 @@ const Signup = (): JSX.Element => {
             .finally(() => setLoading(false));
         }}
         onGoogleScriptLoadFailure={(error: Record<string, unknown>) => {
-          notifications.notify({ level: "error", dispatchToSentry: true, message: notifications.objToJson(error) });
+          notifications.internal.notify({
+            level: "error",
+            dispatchToSentry: true,
+            message: notifications.objToJson(error)
+          });
         }}
         onGoogleError={(error: Record<string, unknown>) => {
-          notifications.notify({ level: "error", dispatchToSentry: true, message: notifications.objToJson(error) });
+          notifications.internal.notify({
+            level: "error",
+            dispatchToSentry: true,
+            message: notifications.objToJson(error)
+          });
           form.notify("There was an error authenticating with Google.");
         }}
         onSubmit={(values: ISignupFormValues) => {

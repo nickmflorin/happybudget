@@ -1,15 +1,54 @@
-import { isNil } from "lodash";
 import { ActualFileObject } from "filepond/types";
 
-import { notifications } from "lib";
+import * as errors from "./errors";
+import * as parsers from "./parsers";
+import { setRequestHeaders } from "./util";
 
-import { parseFieldError, parseGlobalError, setRequestHeaders } from "./util";
-
-type UploadAttachmentFileOptions = {
+type XHRRequestOptions<R> = {
   readonly progress?: (computable: boolean, percent: number, total: number) => void;
-  readonly error?: (message: string) => void;
-  readonly success?: (m: Model.Attachment[]) => void;
+  readonly error?: (e: Http.ApiError) => void;
+  readonly success?: (r: R) => void;
   readonly send?: boolean;
+};
+
+export const xhrRequestor = <R>(req: XMLHttpRequest, data: FormData, opts?: XHRRequestOptions<R>): XMLHttpRequest => {
+  req.withCredentials = true;
+  setRequestHeaders(req);
+
+  req.upload.onprogress = (evt: ProgressEvent) => {
+    opts?.progress?.(evt.lengthComputable, evt.loaded, evt.total);
+  };
+
+  req.onload = function () {
+    const err = parsers.parseErrorFromResponse(
+      {
+        data: req.response,
+        url: req.responseURL,
+        status: req.status
+      },
+      true
+    );
+    if (err !== null) {
+      // If the user is being force logged out - do nothing.
+      if (!(err instanceof errors.ForceLogout)) {
+        throw opts?.error?.(err);
+      }
+    } else {
+      const responseData = JSON.parse(req.response);
+      opts?.success?.(responseData);
+    }
+  };
+  if (opts?.send !== false) {
+    req.send(data);
+  }
+  return req;
+};
+
+export const xhrPostRequest = <R>(path: string, data: FormData, opts?: XHRRequestOptions<R>) => {
+  const request = new XMLHttpRequest();
+  const url = `${process.env.REACT_APP_API_DOMAIN}${path}`;
+  request.open("POST", url, true);
+  return xhrRequestor(request, data, opts);
 };
 
 type F = File | ActualFileObject;
@@ -24,11 +63,9 @@ const isFiles = (f: UploadableFileProp): f is F[] => Array.isArray(f);
 export const uploadAttachmentFile = (
   file: File | ActualFileObject | (File | ActualFileObject)[] | FileList,
   path: string,
-  options?: UploadAttachmentFileOptions
+  options?: XHRRequestOptions<Model.Attachment[]>
 ): XMLHttpRequest => {
-  const url = `${process.env.REACT_APP_API_DOMAIN}${path}`;
   const formData = new FormData();
-
   if (isFile(file)) {
     formData.append("file", file, file.name);
   } else if (isFiles(file)) {
@@ -38,58 +75,8 @@ export const uploadAttachmentFile = (
   } else {
     Object.entries(file).forEach((v: [string, File]) => formData.append("files", v[1], v[1].name));
   }
-
-  const request = new XMLHttpRequest();
-  request.open("POST", url, true);
-
-  request.withCredentials = true;
-  setRequestHeaders(request);
-
-  request.upload.onprogress = evt => {
-    options?.progress?.(evt.lengthComputable, evt.loaded, evt.total);
-  };
-
-  request.onload = function () {
-    if (request.status >= 200 && request.status < 300) {
-      const responseData: { data: Model.Attachment[] } = JSON.parse(request.response);
-      options?.success?.(responseData.data);
-    } else {
-      if (request.status === 401) {
-        // It is safe to assume that this is not the token validation endpoint.
-        window.location.href = "/login";
-      } else {
-        let errorData: Http.ErrorResponse | null = null;
-        try {
-          errorData = JSON.parse(request.response);
-        } catch (err) {
-          if (err instanceof SyntaxError) {
-            console.warn("Could not parse error data from response while uploading attachment.");
-            options?.error?.("There was an error processing the attachment.");
-          } else {
-            throw err;
-          }
-        }
-        if (!isNil(errorData)) {
-          const fieldError = parseFieldError(errorData.errors, "file");
-          const globalError = parseGlobalError(errorData.errors);
-          if (!isNil(globalError)) {
-            options?.error?.(globalError.message);
-          } else if (!isNil(fieldError)) {
-            options?.error?.(fieldError.message);
-          } else {
-            console.warn(
-              "Unexpected error returned when uploading attachment. \n" + notifications.objToJson(errorData)
-            );
-            options?.error?.("There was an error processing the attachment.");
-          }
-        } else {
-          options?.error?.("There was an error processing the attachment.");
-        }
-      }
-    }
-  };
-  if (options?.send !== false) {
-    request.send(formData);
-  }
-  return request;
+  return xhrPostRequest<{ readonly data: Model.Attachment[] }>(path, formData, {
+    ...options,
+    success: (r: { readonly data: Model.Attachment[] }) => options?.success?.(r.data)
+  });
 };

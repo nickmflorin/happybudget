@@ -201,7 +201,7 @@ export const withAuthentication =
       const a: Redux.InferAction<typeof config.actions.addToState> = action;
       const existing = findModelInData(state.data, a.payload.id, { warnOnMissing: false });
       if (!isNil(existing)) {
-        notifications.inconsistentStateError({
+        notifications.internal.inconsistentStateError({
           action: a,
           reason: "Instance already exists in state when it is not expected to."
         });
@@ -212,7 +212,7 @@ export const withAuthentication =
       const a: Redux.InferAction<typeof config.actions.updateOrdering> = action;
       const existing: Http.FieldOrder<string> | undefined = find(state.ordering, { field: a.payload.field });
       if (isNil(existing)) {
-        notifications.inconsistentStateError({
+        notifications.internal.inconsistentStateError({
           action: a,
           reason: "Ordering for field does not exist in state when it is expected to."
         });

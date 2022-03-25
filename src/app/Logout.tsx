@@ -14,7 +14,7 @@ export const Logout = (): JSX.Element => {
     api
       .logout()
       .then(() => dispatch(store.actions.clearLoggedInUserAction(null)))
-      .catch(e => notifications.requestError(e))
+      .catch(e => notifications.internal.handleRequestError(e))
       .finally(() => setRedirect(true));
   }, []);
 

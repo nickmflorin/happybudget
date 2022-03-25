@@ -32,7 +32,7 @@ const validateAuthToken = (forceReloadFromStripe: boolean, cancelToken: CancelTo
       .validateAuthToken({ force_reload_from_stripe: forceReloadFromStripe }, { cancelToken })
       .then((response: Model.User) => resolve(response))
       .catch((e: Error) => {
-        if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
+        if (e instanceof api.AuthenticationError) {
           resolve(null);
         } else {
           reject(e);
@@ -55,7 +55,7 @@ const validatePublicToken = (
         resolve(response.token_id);
       })
       .catch((e: Error) => {
-        if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
+        if (e instanceof api.AuthenticationError) {
           resolve(null);
         } else {
           reject(e);
@@ -120,7 +120,7 @@ const WrapInStore = (props: WrapInStoreProps & { readonly children: ReactNode })
          that the token validation was not successful, any other error (outside
          of a cancelled request) is unexpected. */
       if (!axios.isCancel(e)) {
-        notifications.requestError(e);
+        notifications.internal.handleRequestError(e);
       }
       setRedirect("/login");
     },

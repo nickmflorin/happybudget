@@ -1,24 +1,51 @@
-import { AxiosResponse } from "axios";
-import { isNil, map } from "lodash";
+import { isEqual, map, reduce, find } from "lodash";
 
-import { http } from "lib";
-import * as util from "./util";
+import * as codes from "./codes";
+import * as typeguards from "./typeguards";
 
-export enum HttpErrorTypes {
-  CLIENT = "CLIENT",
-  NETWORK = "NETWORK",
-  SERVER = "SERVER"
-}
+type ErrorStandard<T extends Http.ResponseError> = {
+  readonly typeguard: (e: Http.ResponseError | Http.UnknownResponseError) => e is T;
+  readonly filter?: (e: T) => boolean;
+  readonly func: (e: T) => T;
+  readonly code?: T["code"];
+};
 
-export enum ApiErrorTypes {
-  AUTH = "auth",
-  UNKNOWN = "unknown",
-  HTTP = "http",
-  FIELD = "field",
-  GLOBAL = "global",
-  BILLING = "billing",
-  PERMISSION = "permission"
-}
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+const ErrorStandards: ErrorStandard<any>[] = [
+  {
+    typeguard: typeguards.isResponseFieldError,
+    filter: (e: Http.ResponseFieldError) => e.code === codes.FieldErrorCodes.UNIQUE && e.field === "email",
+    func: (e: Http.ResponseFieldError) => ({ ...e, message: "A user already exists with the provided email." })
+  },
+  {
+    typeguard: typeguards.isResponseFieldError,
+    code: codes.FieldErrorCodes.UNIQUE,
+    func: (e: Http.ResponseFieldError) => ({ ...e, message: `The field ${e.field} must be unique.` })
+  },
+  {
+    typeguard: typeguards.isResponseFieldError,
+    code: codes.FieldErrorCodes.REQUIRED,
+    func: (e: Http.ResponseFieldError) => ({ ...e, message: `The field ${e.field} is required.` })
+  }
+];
+
+const standardizeResponseError = <T extends Http.ResponseError | Http.UnknownResponseError>(e: T): T =>
+  reduce(
+    ErrorStandards,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    (curr: T, s: ErrorStandard<any>): T => {
+      if (s.typeguard(e)) {
+        if (s.code !== undefined && curr.code !== s.code) {
+          return curr;
+        } else if (s.filter !== undefined && s.filter(e) !== true) {
+          return curr;
+        }
+        return s.func(e);
+      }
+      return curr;
+    },
+    e
+  );
 
 /**
  * When an exception returned by the backend indicates that we need to force
@@ -39,27 +66,83 @@ export class ForceLogout extends Error {
   }
 }
 
+type RequestErrorConfig = {
+  readonly name?: string | undefined;
+  readonly message: string;
+  readonly url: string;
+};
+
 /**
  * Base class for all request errors.  Should not be used directly, but rather
  * one of ClientError or NetworkError or ServerError should be used.
  */
-export class HttpError extends Error {
-  constructor(message: string, name?: string) {
+export abstract class RequestError extends Error implements Http.IRequestError {
+  public url: string;
+
+  constructor(config: RequestErrorConfig) {
     super("");
-    this.message = message;
-    this.name = name || "HttpError";
+    this.message = config.message;
+    this.name = config.name || "HttpError";
+    this.url = config.url;
   }
+
+  abstract equals(other: Http.ApiError): boolean;
 }
 
-const stringifyErrors = (errors: Http.Error[]): string => {
+const stringifyErrors = <E extends Http.ResponseError | Http.UnknownResponseError>(
+  errors: Omit<E, "error_type">[]
+): string => {
   if (errors.length === 0) {
     return "";
   } else if (errors.length === 1) {
     return errors[0].message;
   } else {
-    const errorStrings: string[] = map(errors, (e: Http.Error, index: number) => `${index + 1}. ${e.message}`);
+    const errorStrings: string[] = map(
+      errors,
+      (e: Omit<E, "error_type">, index: number) => `${index + 1}. ${e.message}`
+    );
     return "\n" + errorStrings.join("\n");
   }
+};
+
+export const stringifyResponseFieldError = (
+  e: Omit<Http.ResponseFieldError, "error_type"> | UIFieldNotification,
+  index?: number
+): string => {
+  const errIsResponseError = (
+    er: Omit<Http.ResponseFieldError, "error_type"> | UIFieldNotification
+  ): er is Omit<Http.ResponseFieldError, "error_type"> =>
+    (er as Omit<Http.ResponseFieldError, "error_type">).code !== undefined;
+
+  const message = errIsResponseError(e)
+    ? standardizeResponseError<Http.ResponseFieldError>({ ...e, error_type: "field" }).message
+    : e.message;
+  return index === undefined ? `<b>${e.field}</b>: ${message}` : `${index}. <b>${e.field}</b>: ${message}`;
+};
+
+export const stringifyResponseFieldErrors = (
+  errors: (Omit<Http.ResponseFieldError, "error_type"> | UIFieldNotification)[],
+  includeIndices = true
+): string[] =>
+  map(errors, (e: Omit<Http.ResponseFieldError, "error_type"> | UIFieldNotification, index: number): string =>
+    stringifyResponseFieldError(e, includeIndices === false ? undefined : index + 1)
+  );
+
+export const stringifyFieldErrorsToMessage = (
+  errors: (Omit<Http.ResponseFieldError, "error_type"> | UIFieldNotification)[],
+  includeIndices = true
+): string =>
+  "There were errors related to the following fields: \n" +
+  stringifyResponseFieldErrors(errors, includeIndices).join("\n");
+
+type ClientErrorConfig<E extends Http.ResponseError | Http.UnknownResponseError> = Omit<
+  RequestErrorConfig,
+  "message" | "name"
+> & {
+  readonly status: number;
+  readonly errors: Omit<E, "error_type">[];
+  readonly userFacingMessage: string;
+  readonly errorType: E["error_type"];
 };
 
 /**
@@ -67,64 +150,139 @@ const stringifyErrors = (errors: Http.Error[]): string => {
  * and the response status code is between 400 and 499.  In this case, Django
  * REST Framework will include an error in the response body.
  */
-export class ClientError extends HttpError implements Http.IHttpClientError {
-  public static type = HttpErrorTypes.CLIENT;
+export abstract class ClientError<
+    E extends Http.ResponseError | Http.UnknownResponseError = Http.ResponseError | Http.UnknownResponseError
+  >
+  extends RequestError
+  implements Http.IClientError<E>
+{
   public status: number;
-  public url: string;
-  public response: AxiosResponse<Http.ErrorResponse>;
-  public errors: Http.Error[];
+  public errorType: E["error_type"];
+  /* We allow this to be a plural because in the case of field level errors,
+     there may be multiple errors in the response body. */
+  public errors: Omit<E, "error_type">[];
+  public userFacingMessage: string;
+
+  constructor(config: ClientErrorConfig<E>) {
+    super({
+      message:
+        `[${config.status}] There was an error making a request to ` +
+        `${config.url}: ` +
+        `${stringifyErrors(config.errors)}`,
+      name: "ClientError",
+      ...config
+    });
+    this.errorType = config.errorType;
+    this.status = config.status;
+
+    this.errors = map(config.errors, (e: Omit<E, "error_type">) =>
+      standardizeResponseError<E>({ ...e, error_type: this.errorType } as E)
+    );
+    this.userFacingMessage = config.userFacingMessage;
+  }
+
+  equals = (other: Http.ApiError): boolean =>
+    other instanceof ClientError && other.errorType === this.errorType && isEqual(this.errors, other.errors);
+}
+
+export abstract class SingularError<E extends Http.ResponseError | Http.UnknownResponseError>
+  extends ClientError<E>
+  implements Http.ISingularClientError<E>
+{
+  public error: Omit<E, "error_type">;
+  public code: E["code"];
+
+  constructor(config: Omit<E, "error_type"> & Omit<ClientErrorConfig<E>, "errors" | "userFacingMessage">) {
+    super({
+      ...config,
+      userFacingMessage: config.message,
+      errors: [{ message: config.message, code: config.code } as E]
+    });
+    // Assign based on the standardized errors.
+    this.error = this.errors[0];
+    this.code = config.code;
+  }
+}
+
+export class UnknownClientError extends SingularError<Http.UnknownResponseError> implements Http.IUnknownError {
+  constructor(
+    config: Omit<ClientErrorConfig<Http.UnknownResponseError>, "errors" | "userFacingMessage" | "errorType">
+  ) {
+    super({
+      ...config,
+      message: "Unknown client error.",
+      code: codes.UnknownErrorCodes.UNKNOWN,
+      errorType: "unknown"
+    });
+  }
+}
+
+export class AuthenticationError extends SingularError<Http.ResponseAuthError> implements Http.IAuthenticationError {
+  public userId: number | undefined;
 
   constructor(
-    config: Omit<
-      Http.IHttpClientError,
-      | "message"
-      | "name"
-      | "authenticationError"
-      | "httpError"
-      | "fieldErrors"
-      | "globalError"
-      | "unknownError"
-      | "billingError"
-      | "permissionError"
-    >
+    config: Omit<Http.ResponseAuthError, "error_type"> &
+      Omit<ClientErrorConfig<Http.ResponseAuthError>, "errors" | "userFacingMessage" | "errorType">
   ) {
-    super(
-      `[${config.status}] There was an error making a request to ${config.url}: ${stringifyErrors(config.errors)}`,
-      "ClientError"
-    );
-    this.url = config.url;
-    this.response = config.response;
-    this.status = config.status;
-    this.errors = map(config.errors, (e: Http.Error) => http.standardizeError(e));
+    super({ ...config, errorType: "auth" });
+    this.userId = config.user_id;
+  }
+}
+
+export class PermissionError extends SingularError<Http.ResponsePermissionError> implements Http.IPermissionError {
+  constructor(
+    config: Omit<Http.ResponsePermissionError, "error_type"> &
+      Omit<ClientErrorConfig<Http.ResponsePermissionError>, "errors" | "userFacingMessage" | "errorType">
+  ) {
+    super({ ...config, errorType: "permission" });
+  }
+}
+
+export class HttpError extends SingularError<Http.ResponseHttpError> implements Http.IHttpError {
+  constructor(
+    config: Omit<Http.ResponseHttpError, "error_type"> &
+      Omit<ClientErrorConfig<Http.ResponseHttpError>, "errors" | "userFacingMessage" | "errorType">
+  ) {
+    super({ ...config, errorType: "http" });
+  }
+}
+
+export class BillingError extends SingularError<Http.ResponseBillingError> implements Http.IBillingError {
+  constructor(
+    config: Omit<Http.ResponseBillingError, "error_type"> &
+      Omit<ClientErrorConfig<Http.ResponseBillingError>, "errors" | "userFacingMessage" | "errorType">
+  ) {
+    super({ ...config, errorType: "billing" });
+  }
+}
+
+export class BadRequestError extends SingularError<Http.ResponseBadRequestError> implements Http.IBadRequestError {
+  constructor(
+    config: Omit<Http.ResponseBadRequestError, "error_type"> &
+      Omit<ClientErrorConfig<Http.ResponseBadRequestError>, "errors" | "userFacingMessage" | "errorType">
+  ) {
+    super({ ...config, errorType: "bad_request" });
+  }
+}
+
+export class FormError extends SingularError<Http.ResponseFormError> implements Http.IFormError {
+  constructor(
+    config: Omit<Http.ResponseFormError, "error_type"> &
+      Omit<ClientErrorConfig<Http.ResponseFormError>, "errors" | "userFacingMessage" | "errorType">
+  ) {
+    super({ ...config, errorType: "form" });
+  }
+}
+
+export class FieldsError extends ClientError<Http.ResponseFieldError> implements Http.IFieldsError {
+  constructor(config: Omit<ClientErrorConfig<Http.ResponseFieldError>, "userFacingMessage" | "errorType">) {
+    super({ ...config, userFacingMessage: stringifyFieldErrorsToMessage(config.errors), errorType: "field" });
   }
 
-  public get authenticationError(): Http.AuthError | null {
-    return util.parseAuthError(this);
-  }
-
-  public get httpError(): Http.HttpError | null {
-    return util.parseHttpError(this);
-  }
-
-  public get billingError(): Http.BillingError | null {
-    return util.parseBillingError(this);
-  }
-
-  public get permissionError(): Http.PermissionError | null {
-    return util.parsePermissionError(this);
-  }
-
-  public get fieldErrors(): Http.FieldError[] {
-    return util.parseFieldErrors(this);
-  }
-
-  public get globalError(): Http.GlobalError | null {
-    return util.parseGlobalError(this);
-  }
-
-  public get unknownError(): Http.UnknownError | null {
-    return util.parseUnknownError(this);
-  }
+  getError = (field: string): Omit<Http.ResponseFieldError, "error_type"> | null => {
+    const fld: Omit<Http.ResponseFieldError, "error_type"> | undefined = find(this.errors, { field });
+    return fld === undefined ? null : fld;
+  };
 }
 
 /**
@@ -132,38 +290,33 @@ export class ClientError extends HttpError implements Http.IHttpClientError {
  * but the response status code is >= 500.  This can occur due to Internal
  * Server Errors.
  */
-export class ServerError extends HttpError implements Http.IHttpServerError {
-  public static type = HttpErrorTypes.SERVER;
-  public url?: string;
+export class ServerError extends RequestError implements Http.IServerError {
   public status: number;
 
-  constructor(config: Omit<Http.IHttpServerError, "message" | "name">) {
-    super(
-      !isNil(config.url)
-        ? `There was a ${config.status} server error making a request to ${config.url}.`
-        : `There was a ${config.status} server error making a request.`,
-      "ServerError"
-    );
-    this.url = config.url;
+  constructor(config: Omit<RequestErrorConfig, "message" | "name"> & { readonly status: number }) {
+    super({
+      message: `There was a ${config.status} server error making a request to ${config.url}.`,
+      name: "ServerError",
+      ...config
+    });
     this.status = config.status;
   }
+
+  equals = (other: Http.ApiError): boolean => other instanceof ServerError;
 }
 
 /**
  * A NetworkError refers to a HTTP request error where there is no response.
  * This can occur when the server is down or there are connectivity issues.
  */
-export class NetworkError extends HttpError implements Http.IHttpNetworkError {
-  public static type = HttpErrorTypes.NETWORK;
-  public url?: string | undefined;
-
-  constructor(config?: Omit<Http.IHttpNetworkError, "message" | "name">) {
-    super(
-      !isNil(config?.url)
-        ? `There was a network error making a request to ${config?.url}.`
-        : "There was a network error.",
-      "NetworkError"
-    );
-    this.url = config?.url;
+export class NetworkError extends RequestError implements Http.INetworkError {
+  constructor(config: Omit<RequestErrorConfig, "message" | "name">) {
+    super({
+      message: `There was a network error making a request to ${config.url}.`,
+      name: "NetworkError",
+      ...config
+    });
   }
+
+  equals = (other: Http.ApiError): boolean => other instanceof NetworkError;
 }

@@ -3,7 +3,7 @@ import axios from "axios";
 import { isNil, filter, map, reduce } from "lodash";
 
 import * as api from "api";
-import { util, hooks, http } from "lib";
+import { util, hooks } from "lib";
 
 import * as internal from "../internal";
 import * as typeguards from "./typeguards";
@@ -29,16 +29,20 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
     () => (notes: SingleOrArray<UINotificationType>, opts?: UINotificationOptions) => {
       let notices = Array.isArray(notes) ? notes : [notes];
 
-      const fieldRelatedErrors: (Http.FieldError | UIFieldNotification)[] = filter(
-        notices,
-        (n: UINotificationType) => typeguards.isUIFieldNotification(n) || (http.isHttpError(n) && http.isFieldError(n))
-      ) as (Http.FieldError | UIFieldNotification)[];
+      const fieldRelatedErrors = reduce(
+        filter(
+          notices,
+          (n: UINotificationType) => typeguards.isUIFieldNotification(n) || n instanceof api.FieldsError
+        ) as (UIFieldNotification | api.FieldsError)[],
+        (curr: UIFieldNotification[], e: api.FieldsError | UIFieldNotification) =>
+          e instanceof api.FieldsError ? [...curr, ...e.errors] : [...curr, e],
+        []
+      );
 
       // Filter out the notifications that do not pertain to individual fields.
       notices = filter(
         notices,
-        (n: UINotificationType) =>
-          !(typeguards.isUIFieldNotification(n) || (http.isHttpError(n) && http.isFieldError(n)))
+        (n: UINotificationType) => !typeguards.isUIFieldNotification(n) && !(n instanceof api.FieldsError)
       ) as UINonFieldNotificationType[];
 
       /* For the notification sources that pertain to field type errors, a
@@ -113,13 +117,13 @@ export const useNotifications = (config: UseNotificationsConfig): UINotification
              not be getting a ClientError, in which case we should dispatch to
              Sentry. */
           if (opts?.dispatchClientErrorToSentry === true) {
-            internal.requestError(e);
+            internal.handleRequestError(e);
           }
           return getNotifications(e.errors, { message: "There was a problem with your request.", ...opts });
         } else {
           /* Dispatch the notification to the internal handler so we can, if
            appropriate, send notifications to Sentry or the console. */
-          internal.requestError(e);
+          internal.handleRequestError(e);
           return getNotifications(e, {
             message: "There was an error with your request.",
             detail: "There was a problem communicating with the server.",

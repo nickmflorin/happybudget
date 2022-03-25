@@ -75,7 +75,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
           e.item.closeParentDropdown?.();
           dispatch(actions.removeCommunityTemplateFromStateAction(b.id));
         })
-        .catch((err: Error) => notifications.requestError(err))
+        .catch((err: Error) => notifications.internal.handleRequestError(err))
         .finally(() => setDeleted(b.id));
     },
     []
@@ -169,7 +169,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
                         dispatch(actions.updateCommunityTemplateInStateAction({ id: template.id, data: response }));
                         e.item.closeParentDropdown?.();
                       })
-                      .catch((err: Error) => notifications.requestError(err))
+                      .catch((err: Error) => notifications.internal.handleRequestError(err))
                       .finally(() => setVisibilityToggled(template.id));
                   } else {
                     setTogglingVisibility(template.id);
@@ -179,7 +179,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
                         dispatch(actions.updateCommunityTemplateInStateAction({ id: template.id, data: response }));
                         e.item.closeParentDropdown?.();
                       })
-                      .catch((err: Error) => notifications.requestError(err))
+                      .catch((err: Error) => notifications.internal.handleRequestError(err))
                       .finally(() => setVisibilityToggled(template.id));
                   }
                 }}
@@ -197,7 +197,7 @@ const Discover: React.FC<DiscoverProps> = ({ setCreateBudgetModalOpen, setTempla
                       e.item.closeParentDropdown?.();
                       dispatch(actions.addCommunityTemplateToStateAction(response));
                     })
-                    .catch((err: Error) => notifications.requestError(err))
+                    .catch((err: Error) => notifications.internal.handleRequestError(err))
                     .finally(() => setDuplicated(template.id));
                 }}
               />

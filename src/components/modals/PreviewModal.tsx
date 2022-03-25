@@ -30,7 +30,7 @@ const PreviewModal = ({ className, style, open, onCancel, children, ...props }: 
       <Previewer
         {...props}
         onRenderError={(e: Error) => {
-          notifications.notify({
+          notifications.internal.notify({
             error: e,
             level: "error",
             dispatchToSentry: true

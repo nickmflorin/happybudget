@@ -1,52 +1,39 @@
 import { reduce, isEqual } from "lodash";
 
-import { http } from "lib";
+import * as api from "api";
 
 import { objToJson } from "../util";
 import * as typeguards from "./typeguards";
 
-/**
- * Safely converts an object with potential circular references to JSON for
- * logging, which avoids potential circular references errors in our logs
- * as the `inspect` package will replace circular references with [Circular].
- */
-export const notificationDetailToString = (e: NotificationDetail) => {
-  return e instanceof Error ? String(e) : typeof e === "string" ? e : http.standardizeError(e).message;
+export const notificationDetailToString = (e: UINotificationDetail) => {
+  return e instanceof api.RequestError ? (e instanceof api.ClientError ? e.userFacingMessage : e.message) : e;
 };
 
 export const notificationDetailsEqual = (
-  n1: NotificationDetail | undefined,
-  n2: NotificationDetail | undefined
+  n1: UINotificationDetail | undefined,
+  n2: UINotificationDetail | undefined
 ): boolean => {
-  /* We never consider two separately thrown Errors as being equal in terms of
-     notifications. */
   if (typeof n1 === "string" && typeof n2 === "string" && n1 === n2) {
     return true;
   } else if (n1 === undefined && n2 === undefined) {
     return true;
   } else if (n1 === undefined || n2 === undefined) {
     return false;
-  } else if (http.isHttpError(n1) && http.isHttpError(n2) && isEqual(n1, n2)) {
-    return true;
+  } else if (n1 instanceof api.RequestError && n2 instanceof api.RequestError) {
+    return n1.equals(n2);
   }
   return false;
 };
 
-const ErrorEquality: UINotificationEquality<Error> = {
-  typeguard: typeguards.isError,
-  /* We never consider two separately thrown Errors as being equal in terms of
-     notifications. */
-  func: () => false
+const ErrorEquality: UINotificationEquality<Http.ApiError> = {
+  typeguard: (n: UINotificationType): n is Http.ApiError =>
+    n instanceof api.ClientError || n instanceof api.NetworkError || n instanceof api.ServerError,
+  func: (n1: Http.ApiError, n2: Http.ApiError) => notificationDetailsEqual(n1, n2)
 };
 
 const StringEquality: UINotificationEquality<string> = {
   typeguard: (n: UINotificationType): n is string => typeof n === "string",
   func: (n1: string, n2: string) => n1 === n2
-};
-
-const HttpErrorEquality: UINotificationEquality<Http.Error> = {
-  typeguard: (n: UINotificationType): n is Http.Error => http.isHttpError(n),
-  func: (n1: Http.Error, n2: Http.Error) => isEqual(n1, n2)
 };
 
 const UIFieldNotificationEquality: UINotificationEquality<UIFieldNotification> = {
@@ -61,20 +48,11 @@ const UINotificationEquality: UINotificationEquality<UINotification> = {
 };
 
 const NotificationEqualities: [
-  UINotificationEquality<Error>,
+  UINotificationEquality<Http.ApiError>,
   UINotificationEquality<string>,
-  UINotificationEquality<Http.Error>,
   UINotificationEquality<UIFieldNotification>,
   UINotificationEquality<UINotification>
-] = [
-  ErrorEquality,
-  StringEquality,
-  /* Since UIFieldNotification is assignable to Http.FieldError, this
-     standardizer must come before `UIFieldNotificationStandard`. */
-  HttpErrorEquality,
-  UIFieldNotificationEquality,
-  UINotificationEquality
-];
+] = [ErrorEquality, StringEquality, UIFieldNotificationEquality, UINotificationEquality];
 
 export const notificationsAreEqual = (n1: UINotificationType, n2: UINotificationType): boolean => {
   for (let i = 0; i < NotificationEqualities.length; i++) {
@@ -96,10 +74,19 @@ const CentralStandardizer = (n: UINotificationData, opts?: Omit<UINotificationOp
   };
 };
 
-const ErrorStandard: UINotificationStandard<Error> = {
-  typeguard: typeguards.isError,
-  func: (e: Error, opts?: Omit<UINotificationOptions, "behavior">) =>
-    CentralStandardizer({ level: "error", message: "There was an error.", detail: e.message, ...opts }, opts)
+const ErrorStandard: UINotificationStandard<Http.ApiError> = {
+  typeguard: (n: UINotificationType): n is Http.ApiError =>
+    n instanceof api.ClientError || n instanceof api.NetworkError || n instanceof api.ServerError,
+  func: (e: Http.ApiError, opts?: Omit<UINotificationOptions, "behavior">) =>
+    CentralStandardizer(
+      {
+        level: "error",
+        message: "There was an error.",
+        detail: e instanceof api.ClientError ? e.userFacingMessage : e.message,
+        ...opts
+      },
+      opts
+    )
 };
 
 const StringStandard: UINotificationStandard<string> = {
@@ -108,24 +95,6 @@ const StringStandard: UINotificationStandard<string> = {
     CentralStandardizer(
       {
         message: e,
-        level: "warning"
-      },
-      opts
-    )
-};
-
-const HttpErrorStandard: UINotificationStandard<Http.Error> = {
-  typeguard: (n: UINotificationType): n is Http.Error => http.isHttpError(n),
-  func: (e: Http.Error, opts?: Omit<UINotificationOptions, "behavior">) =>
-    CentralStandardizer(
-      {
-        message: opts?.message || http.standardizeError(e).message,
-        detail:
-          opts?.detail !== undefined
-            ? opts?.detail
-            : opts?.message !== undefined
-            ? http.standardizeError(e).message
-            : undefined,
         level: "warning"
       },
       opts
@@ -151,20 +120,11 @@ const UINotificationDataStandard: UINotificationStandard<UINotificationData> = {
 };
 
 const NotificationStandards: [
-  UINotificationStandard<Error>,
+  UINotificationStandard<Http.ApiError>,
   UINotificationStandard<string>,
-  UINotificationStandard<Http.Error>,
   UINotificationStandard<UIFieldNotification>,
   UINotificationStandard<UINotificationData>
-] = [
-  ErrorStandard,
-  StringStandard,
-  /* Since UIFieldNotification is assignable to Http.FieldError, this
-     standardizer must come before `UIFieldNotificationStandard`. */
-  HttpErrorStandard,
-  UIFieldNotificationStandard,
-  UINotificationDataStandard
-];
+] = [ErrorStandard, StringStandard, UIFieldNotificationStandard, UINotificationDataStandard];
 
 export const standardizeNotificationData = (
   n: UINotificationType,
@@ -184,8 +144,16 @@ export const standardizeNotificationData = (
   return null;
 };
 
+export const flattenFieldNotifications = (ns: (UIFieldNotification | api.FieldsError)[]): UIFieldNotification[] =>
+  reduce(
+    ns,
+    (curr: UIFieldNotification[], e: api.FieldsError | UIFieldNotification) =>
+      e instanceof api.FieldsError ? [...curr, ...e.errors] : [...curr, e],
+    []
+  );
+
 export const combineFieldNotifications = (
-  ns: (UIFieldNotification | Http.FieldError)[],
+  ns: (UIFieldNotification | api.FieldsError)[],
   opts?: Omit<UINotificationOptions, "behavior">
 ): UINotificationData | null => {
   /* If there is only a single field related error, just treat it as we would
@@ -193,20 +161,9 @@ export const combineFieldNotifications = (
   if (ns.length === 1) {
     return standardizeNotificationData(ns[0]);
   }
-  const detailLines = reduce(
-    ns,
-    (curr: string[], n: UIFieldNotification | Http.FieldError, index: number) => {
-      const standardized = standardizeNotificationData(n);
-      if (standardized !== null) {
-        return [...curr, `(${index + 1}) <b>${n.field}</b>: ${standardized.message}`];
-      }
-      return curr;
-    },
-    []
-  );
   return {
     message: opts?.message || "There were errors related to the following fields:",
-    detail: detailLines.join("\n"),
+    detail: api.stringifyResponseFieldErrors(flattenFieldNotifications(ns)).join("\n"),
     level: "warning"
   };
 };

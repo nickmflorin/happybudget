@@ -20,35 +20,41 @@ export const BillingErrorCodes: { [key: string]: Http.BillingErrorCode } = {
   CHECKOUT_SESSION_INACTIVE: "checkout_session_inactive"
 };
 
-export const FieldErrorCodes: { [key: string]: Http.FieldErrorCode } = {
-  EMAIL_DOES_NOT_EXIST: "email_does_not_exist",
-  INVALID_CREDENTIALS: "invalid_credentials",
+export const FormErrorCodes: { [key: string]: Http.FormErrorCode } = {
   UNIQUE: "unique",
   INVALID: "invalid",
-  REQUIRED: "required",
+  REQUIRED: "required"
+};
+
+export const FieldErrorCodes: { [key: string]: Http.FieldErrorCode } = {
+  ...FormErrorCodes,
+  EMAIL_DOES_NOT_EXIST: "email_does_not_exist",
+  INVALID_CREDENTIALS: "invalid_credentials",
   INVALID_FILE_NAME: "invalid_file_name",
   INVALID_FILE_EXTENSION: "invalid_file_extension"
 };
 
-export const GlobalErrorCodes: { [key: string]: Http.GlobalErrorCode } = {
-  BAD_REQUEST: "bad_request",
-  EMAIL_ERROR: "email_error"
+export const BadRequestErrorCodes: { [key: string]: Http.BadRequestErrorCode } = {
+  BAD_REQUEST: "bad_request"
 };
 
 export const HttpErrorCodes: { [key: string]: Http.HttpErrorCode } = {
-  NOT_FOUND: "not_found"
+  NOT_FOUND: "not_found",
+  METHOD_NOT_ALLOWED: "method_not_allowed"
 };
 
 export const UnknownErrorCodes: { [key: string]: Http.UnknownErrorCode } = {
   UNKNOWN: "unknown"
 };
 
-export const ErrorCodes: { [key: string]: Http.ErrorCode } = {
-  ...AuthErrorCodes,
-  ...GlobalErrorCodes,
-  ...FieldErrorCodes,
-  ...HttpErrorCodes,
-  ...UnknownErrorCodes,
-  ...PermissionErrorCodes,
-  ...BillingErrorCodes
-};
+export const ErrorCodes: { [Property in keyof Http.ErrorCodeMap]: { [key: string]: Http.ErrorCodeLookup<Property> } } =
+  {
+    auth: AuthErrorCodes,
+    form: FormErrorCodes,
+    permission: PermissionErrorCodes,
+    billing: BillingErrorCodes,
+    field: FieldErrorCodes,
+    http: HttpErrorCodes,
+    bad_request: BadRequestErrorCodes,
+    unknown: UnknownErrorCodes
+  };

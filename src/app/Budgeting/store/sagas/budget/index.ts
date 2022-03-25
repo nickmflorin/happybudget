@@ -1,6 +1,5 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, takeLatest, put } from "redux-saga/effects";
-import { isNil } from "lodash";
 
 import * as api from "api";
 import { tabling, notifications, http } from "lib";
@@ -33,14 +32,10 @@ function* getBudgetTask(action: Redux.Action<number>): SagaIterator {
     yield put(actions.responseBudgetAction(response));
   } catch (e: unknown) {
     const err = e as Error;
-    if (
-      err instanceof api.ClientError &&
-      !isNil(err.permissionError) &&
-      err.permissionError.code === api.ErrorCodes.PRODUCT_PERMISSION_ERROR
-    ) {
+    if (err instanceof api.PermissionError && err.code === api.ErrorCodes.permission.PRODUCT_PERMISSION_ERROR) {
       notifications.ui.banner.lookupAndNotify("budgetSubscriptionPermissionError");
     } else {
-      notifications.ui.banner.handleRequestError(e as Error);
+      notifications.ui.banner.handleRequestError(err);
     }
     yield put(actions.responseBudgetAction(null));
   } finally {

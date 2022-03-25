@@ -1,6 +1,6 @@
 import { SagaIterator } from "redux-saga";
 import { put, call, fork, select, all } from "redux-saga/effects";
-import { filter, isNil } from "lodash";
+import { filter } from "lodash";
 
 import * as api from "api";
 import { tabling, http, notifications } from "lib";
@@ -90,11 +90,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsAuthe
       ]);
     } catch (e: unknown) {
       const err = e as Error;
-      if (
-        err instanceof api.ClientError &&
-        !isNil(err.permissionError) &&
-        err.permissionError.code === api.ErrorCodes.PRODUCT_PERMISSION_ERROR
-      ) {
+      if (err instanceof api.PermissionError && err.code === api.ErrorCodes.permission.PRODUCT_PERMISSION_ERROR) {
         notifications.ui.banner.lookupAndNotify("budgetSubscriptionPermissionError");
       } else {
         config.table.handleRequestError(e as Error, {

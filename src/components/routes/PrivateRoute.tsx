@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Route, Redirect, RouteProps } from "react-router-dom";
-import { isNil } from "lodash";
 import axios from "axios";
 
 import * as api from "api";
@@ -36,7 +35,7 @@ const PrivateRoute = ({ forceReloadFromStripe, revalidate, ...props }: PrivateRo
         )
         .then((response: Model.User) => {
           if (response.id !== authenticatedUser.id) {
-            notifications.notify({
+            notifications.internal.notify({
               dispatchToSentry: true,
               level: "error",
               message:
@@ -53,8 +52,8 @@ const PrivateRoute = ({ forceReloadFromStripe, revalidate, ...props }: PrivateRo
           if (!axios.isCancel(e)) {
             /* An authentication error is expected if the validation fails - in
                which case we do not want to dispatch the error to Sentry */
-            if (!(e instanceof api.ClientError && !isNil(e.authenticationError))) {
-              notifications.requestError(e);
+            if (!(e instanceof api.AuthenticationError)) {
+              notifications.internal.handleRequestError(e);
             } else {
               /* Only redirect the user out of the application if the error was
 							   due to token validation failure. */

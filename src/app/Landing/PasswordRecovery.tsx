@@ -36,20 +36,21 @@ const PasswordRecovery = (): JSX.Element => {
           });
         })
         .catch((e: Error) => {
-          if (e instanceof api.ClientError || e instanceof api.NetworkError || e instanceof api.ServerError) {
-            if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
-              if (includes([api.ErrorCodes.TOKEN_EXPIRED, api.ErrorCodes.TOKEN_INVALID], e.authenticationError.code)) {
-                setRedirect({
-                  pathname: "/login",
-                  state: {
-                    tokenNotification: {
-                      tokenType: "password-recovery",
-                      userId: e.authenticationError.user_id,
-                      code: e.authenticationError.code as Http.TokenErrorCode
-                    }
+          if (e instanceof api.RequestError) {
+            if (
+              e instanceof api.AuthenticationError &&
+              includes([api.ErrorCodes.auth.TOKEN_EXPIRED, api.ErrorCodes.auth.TOKEN_INVALID], e.code)
+            ) {
+              setRedirect({
+                pathname: "/login",
+                state: {
+                  tokenNotification: {
+                    tokenType: "password-recovery",
+                    userId: e.userId,
+                    code: e.code as Http.TokenErrorCode
                   }
-                });
-              }
+                }
+              });
             } else {
               setRedirect({
                 pathname: "/login",

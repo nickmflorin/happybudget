@@ -71,7 +71,7 @@ const Budgets = (): JSX.Element => {
             })
           );
         })
-        .catch((err: Error) => notifications.requestError(err))
+        .catch((err: Error) => notifications.internal.handleRequestError(err))
         .finally(() => setDeleted(b.id));
     },
     [setDeleted]
@@ -202,14 +202,13 @@ const Budgets = (): JSX.Element => {
                         })
                         .catch((err: Error) => {
                           if (
-                            err instanceof api.ClientError &&
-                            !isNil(err.permissionError) &&
-                            err.permissionError.code === api.ErrorCodes.PRODUCT_PERMISSION_ERROR
+                            err instanceof api.PermissionError &&
+                            err.code === api.ErrorCodes.permission.PRODUCT_PERMISSION_ERROR
                           ) {
                             /* Edge case, since we would prevent this action
                                if this were the case before submitting the
 															 request. */
-                            notifications.ui.banner.lookupAndNotify("budgetCountPermissionError", {});
+                            notifications.ui.banner.lookupAndNotify("budgetSubscriptionPermissionError");
                           } else {
                             notifications.ui.banner.handleRequestError(err);
                           }

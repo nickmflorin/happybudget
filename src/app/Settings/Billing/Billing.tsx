@@ -26,8 +26,7 @@ const Billing = (): JSX.Element => {
 				 and will respond with `checkout_session_inactive`.  In this case, we do
 				 not want to issue a warning indicating that the checkout session needs
 				 to be manually associated with the user. */
-      const isSuperficialError =
-        e instanceof api.ClientError && e.billingError !== null && e.billingError.code === "checkout_session_inactive";
+      const isSuperficialError = e instanceof api.BillingError && e.code === "checkout_session_inactive";
       if (!isSuperficialError) {
         console.error(
           `FATAL Error: Could not sync the checkout session with ID ${sessionId} for user ${user.id}.` +

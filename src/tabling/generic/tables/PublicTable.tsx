@@ -96,7 +96,7 @@ const PublicTable = <
       }
       return false;
     };
-    return map(
+    const cs = map(
       filter(
         filter(
           props.columns,
@@ -116,7 +116,11 @@ const PublicTable = <
         cellEditorParams: { ...c.cellEditorParams, selector: props.selector }
       })
     );
-  }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns]);
+    return map(cs, (c: Table.Column<R, M>) => ({
+      ...c,
+      cellRendererParams: { ...c.cellRendererParams, table: props.table.current }
+    }));
+  }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns, props.table.current]);
 
   useImperativeHandle(
     props.table,

@@ -9,7 +9,7 @@ import AttachmentsFilePond from "./AttachmentsFilePond";
 export interface EditAttachmentsProps {
   readonly id: number;
   readonly path: string;
-  readonly onError: (notification: UINotificationData) => void;
+  readonly onDownloadError: (e: Error) => void;
   readonly onAttachmentRemoved?: (id: number) => void;
   readonly onAttachmentAdded?: (m: Model.Attachment) => void;
   readonly listAttachments: (
@@ -31,7 +31,7 @@ const EditAttachments = (props: EditAttachmentsProps): JSX.Element => {
     props
       .listAttachments(props.id, {}, { cancelToken: cancelToken() })
       .then((response: Http.ListResponse<Model.Attachment>) => setAttachments(response.data))
-      .catch((e: Error) => notifications.requestError(e))
+      .catch((e: Error) => notifications.internal.handleRequestError(e))
       .finally(() => setLoadingAttachments(false));
   }, [props.id]);
 
@@ -57,7 +57,7 @@ const EditAttachments = (props: EditAttachmentsProps): JSX.Element => {
       props
         .deleteAttachment(attachment.id, props.id, { cancelToken: cancelToken() })
         .then(() => onAttachmentRemoved(attachment.id))
-        .catch((e: Error) => notifications.requestError(e))
+        .catch((e: Error) => notifications.internal.handleRequestError(e))
         .finally(() => setDeleted(attachment.id));
     },
     [setDeleting, setDeleted]
@@ -69,7 +69,7 @@ const EditAttachments = (props: EditAttachmentsProps): JSX.Element => {
         <AttachmentsList
           attachments={attachments}
           loading={loadingAttachments}
-          onError={props.onError}
+          onDownloadError={props.onDownloadError}
           isDeleting={isDeleting}
           onDelete={onDelete}
           style={{ maxHeight: 400, overflowY: "scroll", marginBottom: 15 }}

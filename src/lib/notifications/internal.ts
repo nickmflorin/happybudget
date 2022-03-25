@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/react";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { http, util } from "lib";
+import { util } from "lib";
 
 import { objToJson } from "./util";
 
@@ -18,14 +18,11 @@ const consoleMethod = (level: AppNotificationConsoleLevel): Console["warn" | "er
   return console[consoleMethodMap[level]];
 };
 
-const isNotificationObj = (n: InternalNotification | NotificationDetail): n is InternalNotification =>
-  typeof n !== "string" && !(n instanceof Error) && !http.isHttpError(n);
-
-const isError = (n: InternalNotification | NotificationDetail): n is Error =>
-  typeof n !== "string" && n instanceof Error;
+const isNotificationObj = (n: InternalNotification | Error | string): n is InternalNotification =>
+  typeof n !== "string" && !(n instanceof Error);
 
 const shouldDispatchToSentry = (
-  e: InternalNotification | NotificationDetail,
+  e: InternalNotification | Error | string,
   opts?: InternalNotificationOptions
 ): boolean => {
   const optsSentry = opts?.dispatchToSentry !== undefined ? opts?.dispatchToSentry : true;
@@ -38,7 +35,7 @@ const shouldDispatchToSentry = (
 };
 
 const notificationLevel = (
-  e: InternalNotification | NotificationDetail,
+  e: InternalNotification | Error | string,
   opts?: InternalNotificationOptions
 ): "error" | "warning" => {
   if (isNotificationObj(e)) {
@@ -53,17 +50,17 @@ const notificationLevel = (
   return opts?.level !== undefined ? opts?.level : "warning";
 };
 
-const consoleMessage = (e: InternalNotification | NotificationDetail): string | Error => {
+const consoleMessage = (e: InternalNotification | Error | string): string | Error => {
   if (isNotificationObj(e)) {
     if (!isNil(e.message) && !isNil(e.error)) {
       return `${e.message}\nError: ${e.error.message}`;
     }
     return e.message || e.error || "";
   }
-  return http.isHttpError(e) ? e.message : e;
+  return e instanceof api.RequestError ? e.message : e;
 };
 
-export const notify = (e: InternalNotification | NotificationDetail, opts?: InternalNotificationOptions): void => {
+export const notify = (e: InternalNotification | Error | string, opts?: InternalNotificationOptions): void => {
   /* Note: Issuing a console.warn or console.error will automatically dispatch
      to Sentry. */
   const dispatchToSentry = shouldDispatchToSentry(e, opts);
@@ -79,7 +76,7 @@ export const notify = (e: InternalNotification | NotificationDetail, opts?: Inte
       scope.setExtra("ignore", true);
       consoler?.(consoleMessage(e));
     });
-  } else if (dispatchToSentry === true && isError(e)) {
+  } else if (dispatchToSentry === true && e instanceof Error) {
     /* In local development, we do not use Sentry - so we still have to issue
        the message to the console. */
     if (process.env.REACT_APP_PRODUCTION_ENV === "local") {
@@ -157,7 +154,7 @@ export const inconsistentStateError = <P extends Redux.ActionPayload = Redux.Act
   });
 };
 
-export const requestError = (e: Error, opts?: InternalNotificationOptions) => {
+export const handleRequestError = (e: Error, opts?: InternalNotificationOptions) => {
   if (e instanceof api.ClientError || e instanceof api.ServerError) {
     notify({
       dispatchToSentry: true,

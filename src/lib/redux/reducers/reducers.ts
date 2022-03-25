@@ -30,7 +30,7 @@ export const modelListActionReducer: Redux.Reducer<
   } else {
     const instance: Redux.ModelListActionInstance | undefined = find(st, { id: action.payload.id });
     if (isNil(instance)) {
-      notifications.inconsistentStateError({
+      notifications.internal.inconsistentStateError({
         action: "Removing from model list action state.",
         reason: "The instance does not exist in state when it is expected to."
       });

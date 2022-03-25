@@ -29,31 +29,27 @@ const Login = (): JSX.Element => {
 
   const handleLoginError = useMemo(
     () => (e: Error) => {
-      if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
-        if (e.authenticationError.code === api.ErrorCodes.ACCOUNT_NOT_VERIFIED) {
-          if (isNil(e.authenticationError.user_id)) {
-            console.error(
-              `The user's email confirmation token has expired, but we cannot
-								resend the verification email because the response did not include
-								the user's ID.`
-            );
-          }
-          form.notify(
-            UnverifiedEmailNotification({
-              userId: e.authenticationError.user_id,
-              onSuccess: () =>
-                form.notify({
-                  level: "success",
-                  message: "Confirmation email successfully sent.",
-                  detail: "Please check your inbox.",
-                  closable: true
-                }),
-              onError: (err: Error) => form.handleRequestError(err)
-            })
+      if (e instanceof api.AuthenticationError && e.code === api.ErrorCodes.auth.ACCOUNT_NOT_VERIFIED) {
+        if (isNil(e.userId)) {
+          console.error(
+            `The user's email confirmation token has expired, but we cannot
+							resend the verification email because the response did not include
+							the user's ID.`
           );
-        } else {
-          form.handleRequestError(e);
         }
+        form.notify(
+          UnverifiedEmailNotification({
+            userId: e.userId,
+            onSuccess: () =>
+              form.notify({
+                level: "success",
+                message: "Confirmation email successfully sent.",
+                detail: "Please check your inbox.",
+                closable: true
+              }),
+            onError: (err: Error) => form.handleRequestError(err)
+          })
+        );
       } else {
         form.handleRequestError(e);
       }
@@ -68,7 +64,7 @@ const Login = (): JSX.Element => {
       const { state, ...statelessLocation } = location;
       history.replace(statelessLocation);
       if (n.tokenType === "email-confirmation") {
-        if (n.code === api.ErrorCodes.TOKEN_EXPIRED) {
+        if (n.code === api.ErrorCodes.auth.TOKEN_EXPIRED) {
           if (isNil(n.userId)) {
             console.error(
               `Email confirmation token has expired, but we cannot
@@ -92,7 +88,7 @@ const Login = (): JSX.Element => {
           form.notify(EmailTokenInvalidNotification());
         }
       } else {
-        if (n.code === api.ErrorCodes.TOKEN_EXPIRED) {
+        if (n.code === api.ErrorCodes.auth.TOKEN_EXPIRED) {
           if (isNil(n.userId)) {
             console.error(
               `Password recovery token has expired, but we cannot
@@ -132,10 +128,18 @@ const Login = (): JSX.Element => {
             .finally(() => setLoading(false));
         }}
         onGoogleScriptLoadFailure={(error: Record<string, unknown>) => {
-          notifications.notify({ level: "error", dispatchToSentry: true, message: notifications.objToJson(error) });
+          notifications.internal.notify({
+            level: "error",
+            dispatchToSentry: true,
+            message: notifications.objToJson(error)
+          });
         }}
         onGoogleError={(error: Record<string, unknown>) => {
-          notifications.notify({ level: "error", dispatchToSentry: true, message: notifications.objToJson(error) });
+          notifications.internal.notify({
+            level: "error",
+            dispatchToSentry: true,
+            message: notifications.objToJson(error)
+          });
           form.notify("There was an error authenticating with Google.");
         }}
         onSubmit={(values: ILoginFormValues) => {

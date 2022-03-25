@@ -1,7 +1,7 @@
 declare type AppNotificationConsoleLevel = "info" | "error" | "warning";
 declare type AppNotificationLevel = AppNotificationConsoleLevel | "success";
 
-declare type NotificationDetail = Error | Http.Error | string;
+declare type UINotificationDetail = Http.ApiError | string;
 
 declare type UINotificationBehavior = "append" | "replace";
 
@@ -36,7 +36,7 @@ declare type AppNotification<L extends AppNotificationLevel = AppNotificationLev
 
 declare type UINotificationData<L extends AppNotificationLevel = AppNotificationLevel> = AppNotification<L> & {
   readonly closable?: boolean;
-  readonly detail?: NotificationDetail;
+  readonly detail?: UINotificationDetail;
   readonly duration?: number;
   readonly includeLink?: IncludeLink | undefined;
 };
@@ -81,7 +81,7 @@ declare type UINotificationsHandler = {
     opts?: UINotificationOptions
   ) => UINotificationData[];
   readonly getRequestErrorNotifications: (
-    e: Error,
+    e: import("api/errors").ClientError | import("api/errors").NetworkError | import("api/errors").ServerError,
     opts?: UINotificationOptions & { readonly dispatchClientErrorToSentry?: boolean }
   ) => UINotificationData[];
 };
@@ -98,7 +98,7 @@ declare type UINotificationsManager = {
   readonly notifications: UINotification[];
 };
 
-type UINonFieldNotificationType = UINotificationData | NotificationDetail;
+type UINonFieldNotificationType = UINotificationData | UINotificationDetail;
 
 type UINotificationType = UINonFieldNotificationType | UIFieldNotification;
 

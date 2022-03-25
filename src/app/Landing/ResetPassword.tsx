@@ -74,17 +74,16 @@ const ResetPassword = (): JSX.Element => {
                  login page and display the error for simplicity case (versus
 								 duplicating all the error handling code here). */
                 if (
-                  e instanceof api.ClientError &&
-                  !isNil(e.authenticationError) &&
-                  includes([api.ErrorCodes.TOKEN_EXPIRED, api.ErrorCodes.TOKEN_INVALID], e.authenticationError.code)
+                  e instanceof api.AuthenticationError &&
+                  includes([api.ErrorCodes.auth.TOKEN_EXPIRED, api.ErrorCodes.auth.TOKEN_INVALID], e.code)
                 ) {
                   setRedirect({
                     pathname: "/login",
                     state: {
                       tokenNotification: {
                         tokenType: "password-recovery",
-                        userId: e.authenticationError.user_id,
-                        code: e.authenticationError.code as Http.TokenErrorCode
+                        userId: e.userId,
+                        code: e.code as Http.TokenErrorCode
                       }
                     }
                   });

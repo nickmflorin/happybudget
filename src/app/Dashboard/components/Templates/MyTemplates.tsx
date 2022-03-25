@@ -65,7 +65,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
           e.item.closeParentDropdown?.();
           dispatch(actions.removeTemplateFromStateAction(b.id));
         })
-        .catch((err: Error) => notifications.requestError(err))
+        .catch((err: Error) => notifications.internal.handleRequestError(err))
         .finally(() => setDeleted(b.id));
     },
     [setDeleted]
@@ -169,7 +169,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
                         dispatch(actions.removeTemplateFromStateAction(template.id));
                         dispatch(actions.addTemplateToStateAction(response));
                       })
-                      .catch((err: Error) => notifications.requestError(err))
+                      .catch((err: Error) => notifications.internal.handleRequestError(err))
                       .finally(() => setMoved(template.id));
                   }}
                   onDuplicate={(e: MenuItemModelClickEvent) => {
@@ -182,7 +182,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
                         e.item.closeParentDropdown?.();
                         dispatch(actions.addTemplateToStateAction(response));
                       })
-                      .catch((err: Error) => notifications.requestError(err))
+                      .catch((err: Error) => notifications.internal.handleRequestError(err))
                       .finally(() => setDuplicated(template.id));
                   }}
                 />

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Route, RouteProps, Redirect } from "react-router-dom";
-import { isNil } from "lodash";
 
 import * as api from "api";
 import { http } from "lib";
@@ -18,9 +17,10 @@ const LandingRoute = (props: RouteProps): JSX.Element => {
       .validateAuthToken({ force_reload_from_stripe: false }, { cancelToken: newCancelToken() })
       .then(() => setRedirect("/"))
       .catch((e: Error) => {
-        if (e instanceof api.ClientError && !isNil(e.authenticationError)) {
+        if (e instanceof api.AuthenticationError) {
           setCheckingAuthentication(false);
         } else {
+          // TODO: Redirect to "We are experiencing technical difficulties page."
           throw e;
         }
       });

@@ -3,7 +3,7 @@ import { isNil, map } from "lodash";
 import { Progress } from "antd";
 
 import * as api from "api";
-import { ui, notifications } from "lib";
+import { ui } from "lib";
 
 import { Icon } from "components";
 import { AttachmentText } from "components/typography";
@@ -89,18 +89,17 @@ const AttachmentsCell = <
     };
 
     const handleDrop = (e: DragEvent) => {
-      const error = (message: string) => {
-        notifications.ui.banner.notify({ level: "error", message });
-        notifications.notify({ message, level: "error", dispatchToSentry: true });
-        progressCancel();
-      };
-
       e.preventDefault();
       e.stopPropagation();
       dispatchDragState({ type: "SET_DRAG", payload: false });
       if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
         api.xhr.uploadAttachmentFile(e.dataTransfer.files, props.uploadAttachmentsPath(row.id), {
-          error,
+          error: (err: Http.ApiError) => {
+            props.table.handleRequestError(err, {
+              message: "There was an error uploading the attachment."
+            });
+            progressCancel();
+          },
           progress: (computable: boolean, percent: number, total: number) => progressUpdate(percent, total),
           success: (ms: Model.Attachment[]) => map(ms, (m: Model.Attachment) => props.onAttachmentAdded(row, m))
         });

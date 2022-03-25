@@ -2,6 +2,7 @@ import React, { useState, useRef, useMemo } from "react";
 import { isNil } from "lodash";
 
 import * as api from "api";
+import { notifications } from "lib";
 
 import { Separator } from "components";
 import { TaggedActuals } from "components/model/contacts";
@@ -15,8 +16,6 @@ interface EditContactModalProps extends EditModelModalProps<Model.Contact> {
   readonly onAttachmentRemoved?: (id: number) => void;
   readonly onAttachmentAdded?: (m: Model.Attachment) => void;
 }
-
-const MemoizedContactForm = React.memo(ContactForm);
 
 const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: EditContactModalProps): JSX.Element => {
   const [image, setImage] = useState<UploadedImage | null | undefined>(undefined);
@@ -82,7 +81,7 @@ const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: 
     >
       {(m: Model.Contact | null, form: FormInstance<Http.ContactPayload>) => (
         <React.Fragment>
-          <MemoizedContactForm
+          <ContactForm
             form={form}
             onValuesChange={onValuesChange}
             attachmentsProps={
@@ -92,7 +91,14 @@ const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: 
                     onAttachmentAdded: onAttachmentAdded,
                     listAttachments: api.getContactAttachments,
                     deleteAttachment: api.deleteContactAttachment,
-                    onError: (notification: UINotificationData) => form.notify(notification),
+                    onDownloadError: (e: Error) => {
+                      notifications.internal.notify({
+                        error: e,
+                        level: "error",
+                        dispatchToSentry: true
+                      });
+                      form.notify({ message: "There was an error downloading your attachment." });
+                    },
                     path: `/v1/contacts/${m.id}/attachments/`,
                     id: m.id
                   }

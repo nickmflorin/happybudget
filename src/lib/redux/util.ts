@@ -31,12 +31,12 @@ const onMissing =
     };
     const lookup = params.lookup;
     if (typeof lookup === "function") {
-      notifications.inconsistentStateError({
+      notifications.internal.inconsistentStateError({
         ...mutatedWarningData,
         evaluatedCallback: notifications.objToJson(map(data, (mi: M) => lookup(mi)))
       });
     } else {
-      notifications.inconsistentStateError({ ...mutatedWarningData, id: params.lookup });
+      notifications.internal.inconsistentStateError({ ...mutatedWarningData, id: params.lookup });
     }
   };
 

@@ -1,9 +1,10 @@
 import { ui } from "lib";
 import { EditAttachments, EditAttachmentsProps } from "components/files";
 
+import { notifications } from "lib";
 import { Modal } from "./generic";
 
-interface EditAttachmentsModalProps extends ModalProps, Omit<EditAttachmentsProps, "onError"> {}
+interface EditAttachmentsModalProps extends ModalProps, Omit<EditAttachmentsProps, "onDownloadError"> {}
 
 const EditAttachmentsModal = ({
   id,
@@ -25,7 +26,14 @@ const EditAttachmentsModal = ({
         onAttachmentRemoved={onAttachmentRemoved}
         listAttachments={listAttachments}
         deleteAttachment={deleteAttachment}
-        onError={(notification: UINotificationData) => modal.current.notify(notification)}
+        onDownloadError={(e: Error) => {
+          notifications.internal.notify({
+            error: e,
+            level: "error",
+            dispatchToSentry: true
+          });
+          modal.current.notify({ message: "There was an error downloading your attachment." });
+        }}
       />
     </Modal>
   );

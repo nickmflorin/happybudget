@@ -1,7 +1,7 @@
 import { useState } from "react";
 import classNames from "classnames";
 
-import { util, notifications } from "lib";
+import { util } from "lib";
 
 import { Icon } from "components";
 import { IconButton, TrashButton } from "components/buttons";
@@ -14,10 +14,10 @@ type AttachmentListItemProps = StandardComponentProps & {
   readonly attachment: Model.Attachment;
   readonly deleting?: boolean;
   readonly onClick?: () => void;
-  readonly onError: (notification: UINotificationData) => void;
+  readonly onDownloadError: (e: Error) => void;
 };
 
-const AttachmentListItem = ({ attachment, deleting, onClick, onError, ...props }: AttachmentListItemProps) => {
+const AttachmentListItem = ({ attachment, deleting, onClick, onDownloadError, ...props }: AttachmentListItemProps) => {
   const [downloading, setDownloading] = useState(false);
 
   return (
@@ -42,17 +42,7 @@ const AttachmentListItem = ({ attachment, deleting, onClick, onError, ...props }
               util.files
                 .getDataFromURL(attachment.url)
                 .then((response: string | ArrayBuffer) => util.files.download(response, attachment.name))
-                .catch((e: Error) => {
-                  notifications.notify({
-                    error: e,
-                    level: "error",
-                    dispatchToSentry: true
-                  });
-                  onError({
-                    detail: e,
-                    message: "There was an error downloading your attachment."
-                  });
-                })
+                .catch((e: Error) => onDownloadError(e))
                 .finally(() => setDownloading(false));
             }}
             icon={<Icon icon={"arrow-circle-down"} weight={"regular"} />}

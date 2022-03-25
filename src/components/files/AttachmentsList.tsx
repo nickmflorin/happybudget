@@ -11,10 +11,17 @@ type AttachmentsListProps = StandardComponentProps & {
   readonly loading?: boolean;
   readonly onDelete?: (m: Model.Attachment) => void;
   readonly isDeleting?: (id: number) => void;
-  readonly onError: (notification: UINotificationData) => void;
+  readonly onDownloadError: (e: Error) => void;
 };
 
-const AttachmentsList = ({ attachments, loading, onDelete, isDeleting, onError, ...props }: AttachmentsListProps) => (
+const AttachmentsList = ({
+  attachments,
+  loading,
+  onDelete,
+  isDeleting,
+  onDownloadError,
+  ...props
+}: AttachmentsListProps) => (
   <RenderWithSpinner loading={loading}>
     <div {...props} className={classNames("attachments-list", props.className)}>
       {map(attachments, (attachment: Model.Attachment, index: number) => (
@@ -23,7 +30,7 @@ const AttachmentsList = ({ attachments, loading, onDelete, isDeleting, onError, 
           attachment={attachment}
           onClick={() => onDelete?.(attachment)}
           deleting={isDeleting?.(attachment.id) || false}
-          onError={onError}
+          onDownloadError={onDownloadError}
         />
       ))}
     </div>

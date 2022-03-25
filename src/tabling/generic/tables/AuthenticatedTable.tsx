@@ -174,8 +174,11 @@ const AuthenticatedTable = <
         ...cs
       ];
     }
-    return cs;
-  }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns]);
+    return map(cs, (c: Table.Column<R, M>) => ({
+      ...c,
+      cellRendererParams: { ...c.cellRendererParams, table: props.table.current }
+    }));
+  }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns, props.table.current]);
 
   /**
    * Modified version of the onEvent callback passed into the Grid.  The

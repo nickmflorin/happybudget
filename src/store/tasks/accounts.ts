@@ -112,11 +112,7 @@ export const createAuthenticatedTableTaskSet = <B extends Model.Budget | Model.T
         }
       } catch (e: unknown) {
         const err = e as Error;
-        if (
-          err instanceof api.ClientError &&
-          !isNil(err.permissionError) &&
-          err.permissionError.code === api.ErrorCodes.PRODUCT_PERMISSION_ERROR
-        ) {
+        if (err instanceof api.PermissionError && err.code === api.ErrorCodes.permission.PRODUCT_PERMISSION_ERROR) {
           notifications.ui.banner.lookupAndNotify("budgetSubscriptionPermissionError");
         } else {
           config.table.handleRequestError(e as Error, {

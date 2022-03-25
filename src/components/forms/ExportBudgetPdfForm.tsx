@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, forwardRef, ForwardedRef, useImperativeHandle, useEffect } from "react";
 import classNames from "classnames";
-import { map, isNil, find, debounce } from "lodash";
+import { map, isNil, debounce } from "lodash";
 
 import { Select, Switch, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
@@ -273,18 +273,14 @@ const ExportForm = (
              to that field attribute, we will let the global form error handler
              take effect. */
           let manuallySetFieldError = false;
-          if (e instanceof api.ClientError && !isNil(saveFormRef.current)) {
-            if (e.fieldErrors.length !== 0) {
-              /* There is a small chance there are multiple errors for the
-								 `name` field, but we can only display 1. */
-              const nameError: Http.FieldError | undefined = find(e.fieldErrors, { field: "name" });
-              if (!isNil(nameError)) {
-                manuallySetFieldError = true;
-                if (nameError.code === "unique") {
-                  saveFormRef.current.setError("The template name must be unique.");
-                } else {
-                  saveFormRef.current.setError(nameError.message);
-                }
+          if (e instanceof api.FieldsError && !isNil(saveFormRef.current)) {
+            const fldError = e.getError("name");
+            if (!isNil(fldError)) {
+              manuallySetFieldError = true;
+              if (fldError.code === "unique") {
+                saveFormRef.current.setError("The template name must be unique.");
+              } else {
+                saveFormRef.current.setError(fldError.message);
               }
             }
             if (!manuallySetFieldError) {
