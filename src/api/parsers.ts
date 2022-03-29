@@ -258,8 +258,7 @@ const _parseClientError = (
       return _parseClientErrorFromResponseBody(response, JSON.parse(response.data));
     } catch (err) {
       /* If the error response body could not be parsed to JSON, then the
-         `parseClientErrorFromResponseBody` will return an unknown client
-				 error. */
+         `parseClientErrorFromResponseBody` will return an UnknownClientError. */
       if (err instanceof SyntaxError) {
         return _parseClientErrorFromResponseBody(response);
       } else {
@@ -276,8 +275,8 @@ const _parseClientError = (
  * the case that the response was successful.
  *
  * @param response       The AxiosResponse attached to the error or the explicit
- *                       ExplicitErrorResponseInfo object that contains details
- *                       about the response that are required for error handling.
+ *                       ErrorResponseInfo object that contains details about the
+ *                       response that are required for error handling.
  * @param forceLogout    Whether or not the user should be forcefully logged out
  *                       on a [401] response.
  */
@@ -288,7 +287,7 @@ export const parseErrorFromResponse = (
   if (forceLogout === true && response.status == 401) {
     window.location.href = "/logout";
     /* We throw an error because the mechanics making the API request are
-			 expecting a defined response or an Error to be thrown.  If we to return
+			 expecting a defined response or an Error to be thrown.  If we return
 			 nothing, we may get misleading errors dispatched to Sentry that occur
 			 between the time this method returns and the time the redirect actually
 			 takes place. */

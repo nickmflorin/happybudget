@@ -119,7 +119,6 @@ interface UnverifiedEmailNotificationProps {
 export const UnverifiedEmailNotification = (props: UnverifiedEmailNotificationProps): UINotificationData => ({
   level: "warning",
   message: props.message,
-
   detail: !isNil(props.detail)
     ? props.detail
     : !isNil(props.userId)
