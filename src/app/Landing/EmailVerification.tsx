@@ -41,7 +41,7 @@ const EmailVerification = (): JSX.Element => {
           });
         })
         .catch((e: Error) => {
-          if (e instanceof api.ClientError || e instanceof api.NetworkError || e instanceof api.ServerError) {
+          if (e instanceof api.RequestError) {
             if (
               e instanceof api.AuthenticationError &&
               includes([api.ErrorCodes.auth.TOKEN_EXPIRED, api.ErrorCodes.auth.TOKEN_INVALID], e.code)

@@ -232,7 +232,7 @@ export const useNotificationsManager = (config: UseNotificationsManagerConfig): 
   const handleRequestError = useMemo(
     () => (e: Error, opts?: UINotificationOptions & { readonly dispatchClientErrorToSentry?: boolean }) => {
       if (!axios.isCancel(e) && !(e instanceof api.ForceLogout)) {
-        if (e instanceof api.ClientError || e instanceof api.NetworkError || e instanceof api.ServerError) {
+        if (e instanceof api.RequestError) {
           return notify(handler.getRequestErrorNotifications(e, opts));
         } else {
           throw e;
