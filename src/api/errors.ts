@@ -73,8 +73,9 @@ type RequestErrorConfig = {
 };
 
 /**
- * Base class for all request errors.  Should not be used directly, but rather
- * one of ClientError or NetworkError or ServerError should be used.
+ * Base class for all request errors that occur when an API request is made to
+ * the internal API supporting the FE.  Should not be used directly, but rather
+ * used indirectly via ClientError, NetworkError or ServerError.
  */
 export abstract class RequestError extends Error implements Http.IRequestError {
   public url: string;

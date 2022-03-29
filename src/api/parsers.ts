@@ -235,7 +235,7 @@ const _parseSingleResponseError = (response: ClientErrorResponseInfo) => {
 const _parseClientErrorFromResponseBody = (response: ErrorResponseInfo, body?: Http.ErrorResponse) => {
   if (isNil(body)) {
     return _inferUnknownError(response, "The response body could not be parsed.");
-  } else if (isNil(body.errors)) {
+  } else if (isNil(body.errors) || !Array.isArray(body.errors)) {
     return _inferUnknownError(response, "Unexpectedly received response body without any defined errors.");
   } else if (body.errors.length === 0) {
     return _inferUnknownError(response, "There are no errors in the response body.");
