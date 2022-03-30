@@ -54,11 +54,8 @@ const PrivateRoute = ({ forceReloadFromStripe, revalidate, ...props }: PrivateRo
                which case we do not want to dispatch the error to Sentry */
             if (!(e instanceof api.AuthenticationError)) {
               notifications.internal.handleRequestError(e);
-            } else {
-              /* Only redirect the user out of the application if the error was
-							   due to token validation failure. */
-              setRedirect(true);
             }
+            setRedirect(true);
           }
           setAuthenticating(false);
         });

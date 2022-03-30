@@ -1,4 +1,4 @@
-import { isEqual, map, reduce, find } from "lodash";
+import { isEqual, map, reduce, find, isNil } from "lodash";
 
 import * as codes from "./codes";
 import * as typeguards from "./typeguards";
@@ -69,7 +69,7 @@ export class ForceLogout extends Error {
 type RequestErrorConfig = {
   readonly name?: string | undefined;
   readonly message: string;
-  readonly url: string;
+  readonly url: string | undefined;
 };
 
 /**
@@ -84,7 +84,7 @@ export abstract class RequestError extends Error implements Http.IRequestError {
     super("");
     this.message = config.message;
     this.name = config.name || "HttpError";
-    this.url = config.url;
+    this.url = config.url || "";
   }
 
   abstract equals(other: Http.ApiError): boolean;
@@ -313,7 +313,9 @@ export class ServerError extends RequestError implements Http.IServerError {
 export class NetworkError extends RequestError implements Http.INetworkError {
   constructor(config: Omit<RequestErrorConfig, "message" | "name">) {
     super({
-      message: `There was a network error making a request to ${config.url}.`,
+      message: !isNil(config.url)
+        ? `There was a network error making a request to ${config.url}.`
+        : "There was a network error.",
       name: "NetworkError",
       ...config
     });

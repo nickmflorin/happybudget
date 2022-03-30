@@ -5,7 +5,7 @@ import * as api from "api";
 import { TemplateForm } from "components/forms";
 import { CreateModelModal, CreateModelModalProps } from "./generic";
 
-interface CreateBudgetModalProps extends CreateModelModalProps<Model.Budget> {
+interface CreateBudgetModalProps extends CreateModelModalProps<Model.UserBudget> {
   readonly templateId?: number;
   readonly title?: string;
 }
@@ -14,7 +14,7 @@ const CreateBudgetModal = ({ templateId, ...props }: CreateBudgetModalProps): JS
   const [file, setFile] = useState<UploadedImage | null>(null);
 
   return (
-    <CreateModelModal<Model.Budget, Http.BudgetPayload>
+    <CreateModelModal<Model.UserBudget, Http.BudgetPayload>
       title={"Create Budget"}
       {...props}
       create={api.createBudget}

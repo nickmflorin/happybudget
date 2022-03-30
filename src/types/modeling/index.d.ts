@@ -195,25 +195,26 @@ declare namespace Model {
     readonly domain: "budget";
     readonly image: SavedImage | null;
     readonly updated_at: string;
+    /* This field will only ever be applicable when retrieving budgets or a
+       budget for which the user has created.  Since we only ever retrieve
+       lists of budgets for which the user created, it is safe to assume this
+       will always be on the model in that case. */
     readonly is_permissioned: boolean;
   };
 
-  type Budget = Omit<SimpleBudget, "is_permissioned"> &
+  type _Budget = Omit<SimpleBudget, "is_permissioned"> &
     PublicHttpModel & {
       readonly nominal_value: number;
       readonly actual: number;
       readonly accumulated_fringe_contribution: number;
       readonly accumulated_markup_contribution: number;
-      /* This field will not be included when the User is not authenticated, which
-       is only applicable for the Budget model - since we never retrieve a list
-       of Budget(s) in the public case. */
-      readonly is_permissioned?: boolean;
     };
 
-  type AuthenticatedBudget = Omit<Budget, "is_permissioned"> & {
+  type AnotherUserBudget = _Budget;
+  type UserBudget = _Budget & {
     readonly is_permissioned: boolean;
   };
-  type PublicBudget = Omit<Budget, "is_permissioned">;
+  type Budget = AnotherUserBudget | UserBudget;
 
   type BaseBudget = Budget | Template;
 

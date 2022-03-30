@@ -25,7 +25,7 @@ export const HttpErrorResponseMiddlware =
       }
       throw err;
     } else if (!isNil(error.request)) {
-      throw new errors.NetworkError(url);
+      throw new errors.NetworkError({ url });
     } else {
       throw error;
     }

@@ -193,12 +193,10 @@ const Budgets = (): JSX.Element => {
                       api
                         /* We have to use a large timeout because this is a
 												   request that sometimes takes a very long time. */
-                        .duplicateBudget<Model.Budget>(budget.id, { timeout: 120 * 1000 })
-                        .then((response: Model.Budget) => {
+                        .duplicateBudget<Model.UserBudget>(budget.id, { timeout: 120 * 1000 })
+                        .then((response: Model.UserBudget) => {
                           e.item.closeParentDropdown?.();
-                          /* It is safe to coerce to an Budget
-                             because the User must be logged in at this point. */
-                          dispatch(actions.addBudgetToStateAction(response as Model.AuthenticatedBudget));
+                          dispatch(actions.addBudgetToStateAction(response));
                         })
                         .catch((err: Error) => {
                           if (
@@ -249,10 +247,8 @@ const Budgets = (): JSX.Element => {
         <CreateBudgetModal
           open={true}
           onCancel={() => setCreateBudgetModalOpen(false)}
-          onSuccess={(budget: Model.Budget) => {
-            /* It is safe to coerce to an Budget because the User must be logged
-						   in at this point. */
-            dispatch(actions.addBudgetToStateAction(budget as Model.AuthenticatedBudget));
+          onSuccess={(budget: Model.UserBudget) => {
+            dispatch(actions.addBudgetToStateAction(budget));
             dispatch(store.actions.updateLoggedInUserAction({ ...user, num_budgets: user.num_budgets + 1 }));
             setCreateBudgetModalOpen(false);
             history.push(`/budgets/${budget.id}/accounts`);

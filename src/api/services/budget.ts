@@ -44,7 +44,7 @@ export const createActual = services.detailPostService<Http.ActualPayload, Model
 export const getActuals = services.detailListService<Model.Actual>((id: number) => ["budgets", id, "actuals"]);
 export const deleteBudget = services.deleteService((id: number) => ["budgets", id]);
 
-export const createBudget = services.postService<Http.BudgetPayload, Model.Budget>(["budgets"]);
+export const createBudget = services.postService<Http.BudgetPayload, Model.UserBudget>(["budgets"]);
 export const createTemplate = services.postService<Http.TemplatePayload, Model.Template>(["templates"]);
 export const createCommunityTemplate = services.postService<Http.TemplatePayload | FormData, Model.Template>([
   "templates",
