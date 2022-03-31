@@ -14,3 +14,4 @@ export { default as FringesModal } from "./FringesModal";
 export { default as MultipleBudgetProductPermissionModal } from "./MultipleBudgetProductPermissionModal";
 export { default as PreviewModal } from "./PreviewModal";
 export { default as ImportActualsPlaidModal } from "./ImportActualsPlaidModal";
+export { default as CollaboratorsModal } from "./CollaboratorsModal";

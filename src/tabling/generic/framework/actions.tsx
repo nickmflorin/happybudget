@@ -2,6 +2,7 @@ import { isNil } from "lodash";
 
 import * as api from "api";
 import { util, model } from "lib";
+import { DefaultButton } from "components/buttons";
 
 import {
   ExportCSVDropdownMenu,
@@ -61,6 +62,17 @@ export const ToggleColumnAction = <R extends Table.RowData, M extends Model.RowH
       {children}
     </ToggleColumnsDropdownMenu>
   )
+});
+
+export const CollaboratorsAction = (action: Omit<Partial<Table.MenuActionObj>, "render">): Table.MenuActionObj => ({
+  ...action,
+  render: () => {
+    return (
+      <DefaultButton medium icon={"user-group"} onClick={action.onClick}>
+        {"Collaborators"}
+      </DefaultButton>
+    );
+  }
 });
 
 type ImportActualsActionProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {

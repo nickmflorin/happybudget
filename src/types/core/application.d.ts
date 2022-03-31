@@ -6,6 +6,7 @@ declare namespace Application {
     readonly acceptedImageTypes: string[];
     readonly maxImageSize: number; // In MB
     readonly actualsImportEnabled: boolean;
+    readonly collaborationEnabled: boolean;
   };
 
   type ConfigOption = {

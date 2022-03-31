@@ -1,6 +1,11 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
+import { isNil } from "lodash";
+
+import { Config } from "config";
 import { tabling } from "lib";
-import { AuthenticatedTable, AuthenticatedTableProps } from "tabling/generic";
+import { AuthenticatedTable, AuthenticatedTableProps, framework } from "tabling/generic";
+
+import { CollaboratorsModal } from "components/modals";
 import { Framework } from "./framework";
 
 export type AuthenticatedBudgetTableProps<
@@ -22,34 +27,62 @@ const AuthenticatedBudgetTable = <
   onEditGroup,
   onRowExpand,
   ...props
-}: AuthenticatedBudgetTableProps<R, M, S>): JSX.Element => (
-  <AuthenticatedTable
-    {...props}
-    editColumnConfig={
-      [
-        {
-          typeguard: tabling.rows.isMarkupRow,
-          action: (r: Table.MarkupRow<R>) => onEditMarkup?.(r),
-          behavior: "edit"
-        },
-        {
-          typeguard: tabling.rows.isGroupRow,
-          action: (r: Table.GroupRow<R>) => onEditGroup?.(r),
-          behavior: "edit"
-        },
-        {
-          typeguard: tabling.rows.isModelRow,
-          action: (r: Table.ModelRow<R>) => onRowExpand?.(r),
-          behavior: "expand"
+}: AuthenticatedBudgetTableProps<R, M, S>): JSX.Element => {
+  const [collaboratorsModalOpen, setCollaboratorsModalOpen] = useState(false);
+
+  const actions = useMemo<Table.AuthenticatedMenuActions<R, M>>(
+    (): Table.AuthenticatedMenuActions<R, M> =>
+      Config.collaborationEnabled
+        ? tabling.menu.combineMenuActions<Table.AuthenticatedMenuActionParams<R, M>, R, M>(
+            () => [
+              framework.actions.CollaboratorsAction({
+                location: "right",
+                onClick: () => setCollaboratorsModalOpen(true)
+              })
+            ],
+            !isNil(props.actions) ? props.actions : []
+          )
+        : !isNil(props.actions)
+        ? props.actions
+        : [],
+    [props.actions]
+  );
+
+  return (
+    <React.Fragment>
+      <AuthenticatedTable
+        {...props}
+        actions={actions}
+        editColumnConfig={
+          [
+            {
+              typeguard: tabling.rows.isMarkupRow,
+              action: (r: Table.MarkupRow<R>) => onEditMarkup?.(r),
+              behavior: "edit"
+            },
+            {
+              typeguard: tabling.rows.isGroupRow,
+              action: (r: Table.GroupRow<R>) => onEditGroup?.(r),
+              behavior: "edit"
+            },
+            {
+              typeguard: tabling.rows.isModelRow,
+              action: (r: Table.ModelRow<R>) => onRowExpand?.(r),
+              behavior: "expand"
+            }
+          ] as [
+            Table.EditColumnRowConfig<R, Table.MarkupRow<R>>,
+            Table.EditColumnRowConfig<R, Table.GroupRow<R>>,
+            Table.EditColumnRowConfig<R, Table.ModelRow<R>>
+          ]
         }
-      ] as [
-        Table.EditColumnRowConfig<R, Table.MarkupRow<R>>,
-        Table.EditColumnRowConfig<R, Table.GroupRow<R>>,
-        Table.EditColumnRowConfig<R, Table.ModelRow<R>>
-      ]
-    }
-    framework={tabling.aggrid.combineFrameworks(Framework, props.framework)}
-  />
-);
+        framework={tabling.aggrid.combineFrameworks(Framework, props.framework)}
+      />
+      {collaboratorsModalOpen === true && (
+        <CollaboratorsModal open={true} onCancel={() => setCollaboratorsModalOpen(false)} />
+      )}
+    </React.Fragment>
+  );
+};
 
 export default React.memo(AuthenticatedBudgetTable) as typeof AuthenticatedBudgetTable;
