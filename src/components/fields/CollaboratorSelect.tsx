@@ -1,18 +1,20 @@
 import { useMemo } from "react";
 import AsyncSelect from "react-select/async";
+import { MultiValue } from "react-select/dist/declarations/src/types";
 import { map } from "lodash";
 
 import { hooks } from "store";
 
 import * as api from "api";
 
-type CollaboratorSelectProps = {
+type CollaboratorSelectProps = StandardComponentProps & {
   readonly currentCollaborators: Model.Collaborator[];
+  readonly onChange?: (userIds: number[]) => void;
 };
 
-type Datum = { readonly label: string };
+type Datum = { readonly label: string; readonly id: number };
 
-const CollaboratorSelect = ({ currentCollaborators }: CollaboratorSelectProps): JSX.Element => {
+const CollaboratorSelect = ({ currentCollaborators, ...props }: CollaboratorSelectProps): JSX.Element => {
   const user = hooks.useLoggedInUser();
 
   const loadOptions = useMemo(
@@ -23,7 +25,7 @@ const CollaboratorSelect = ({ currentCollaborators }: CollaboratorSelectProps): 
             exclude: [...map(currentCollaborators, (c: Model.Collaborator) => c.user.id), user.id]
           })
           .then((response: Http.ListResponse<Model.SimpleUser>) => {
-            resolve(map(response.data, (u: Model.SimpleUser) => ({ label: u.full_name })));
+            resolve(map(response.data, (u: Model.SimpleUser) => ({ label: u.full_name, id: u.id })));
           })
           .catch((e: Error) => {
             reject(e);
@@ -33,7 +35,15 @@ const CollaboratorSelect = ({ currentCollaborators }: CollaboratorSelectProps): 
     [user.id, currentCollaborators]
   );
 
-  return <AsyncSelect cacheOptions={true} loadOptions={loadOptions} />;
+  return (
+    <AsyncSelect
+      {...props}
+      cacheOptions={true}
+      loadOptions={loadOptions}
+      isMulti={true}
+      onChange={(newValue: MultiValue<Datum>) => props.onChange?.(map(newValue, (d: Datum) => d.id))}
+    />
+  );
 };
 
 export default CollaboratorSelect;

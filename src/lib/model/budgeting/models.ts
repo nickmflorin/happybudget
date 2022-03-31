@@ -24,6 +24,18 @@ export const MarkupUnits = choice.Choices([
   choice.Choice(1, MarkupUnitNames.FLAT)
 ]);
 
+export enum CollaboratorAccessTypeNames {
+  VIEWONLY = "View Only",
+  OWNER = "Owner",
+  EDITOR = "Editor"
+}
+
+export const CollaboratorAccessTypes = choice.Choices([
+  choice.Choice(0, CollaboratorAccessTypeNames.VIEWONLY),
+  choice.Choice(1, CollaboratorAccessTypeNames.EDITOR),
+  choice.Choice(2, CollaboratorAccessTypeNames.OWNER)
+]);
+
 export enum ActualImportSourceNames {
   PLAID = "Plaid"
 }
