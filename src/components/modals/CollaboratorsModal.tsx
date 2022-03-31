@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import classNames from "classnames";
-import { map } from "lodash";
+import { map, filter } from "lodash";
 
 import * as api from "api";
 import { ui, http, model } from "lib";
@@ -76,7 +76,25 @@ const CollaboratorsModal = ({ budgetId, ...props }: CollaboratorsModalProps): JS
         </div>
         <PrimaryButton onClick={() => addCollaborators(newCollaboratorUsers)}>{"Add"}</PrimaryButton>
       </div>
-      <CollaboratorsList collaborators={collaborators} />
+      <CollaboratorsList
+        collaborators={collaborators}
+        style={{ marginTop: 15 }}
+        onRemoveCollaborator={(m: Model.Collaborator) => {
+          /* TODO: Display loading indicator in specific line item and give the
+             line item less opacity. */
+          modal.current.setLoading(true);
+          api
+            .deleteCollaborator(m.id)
+            .then(() => {
+              modal.current.setLoading(false);
+              setCollaborators(filter(collaborators, (c: Model.Collaborator) => c.id !== m.id));
+            })
+            .catch((e: Error) => {
+              modal.current.setLoading(false);
+              modal.current.handleRequestError(e);
+            });
+        }}
+      />
     </Modal>
   );
 };

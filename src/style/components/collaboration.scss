@@ -1,0 +1,21 @@
+.collaborators-list {
+	.collaborator-list-item {
+		display: flex;
+
+		.user-image-or-initials-container {
+			height: 32px;
+			width: 32px;
+			margin-right: 8px;
+		}
+
+		.name-container {
+			line-height: 32px;
+			font-weight: 500;
+			flex-grow: 100;
+		}
+
+		.btn--icon-only {
+
+		}
+	}
+}

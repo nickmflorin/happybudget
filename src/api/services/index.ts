@@ -3,6 +3,7 @@ export * from "./actual";
 export * from "./auth";
 export * from "./billing";
 export * from "./budget";
+export * from "./collaborator";
 export * from "./contact";
 export * from "./fringe";
 export * from "./group";

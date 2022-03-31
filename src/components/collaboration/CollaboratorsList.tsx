@@ -2,14 +2,17 @@ import React from "react";
 import { map } from "lodash";
 import classNames from "classnames";
 
+import CollaboratorListItem from "./CollaboratorListItem";
+
 type CollaboratorsListProps = StandardComponentProps & {
   readonly collaborators: Model.Collaborator[];
+  readonly onRemoveCollaborator: (c: Model.Collaborator) => void;
 };
 
-const CollaboratorsList = ({ collaborators, ...props }: CollaboratorsListProps) => (
+const CollaboratorsList = ({ collaborators, onRemoveCollaborator, ...props }: CollaboratorsListProps) => (
   <div {...props} className={classNames("collaborators-list", props.className)}>
     {map(collaborators, (c: Model.Collaborator, i: number) => (
-      <h1 key={i}>{c.user.full_name}</h1>
+      <CollaboratorListItem key={i} collaborator={c} onClear={() => onRemoveCollaborator(c)} />
     ))}
   </div>
 );
