@@ -68,11 +68,12 @@ const CollaboratorsModal = ({ budgetId, ...props }: CollaboratorsModalProps): JS
       className={classNames("collaborators-modal", props.className)}
     >
       <div style={{ display: "flex" }}>
-        <CollaboratorSelect
-          currentCollaborators={collaborators}
-          style={{ marginRight: 15 }}
-          onChange={(ids: number[]) => setNewCollaboratorUsers(ids)}
-        />
+        <div style={{ marginRight: 15, flexGrow: 100 }}>
+          <CollaboratorSelect
+            currentCollaborators={collaborators}
+            onChange={(ids: number[]) => setNewCollaboratorUsers(ids)}
+          />
+        </div>
         <PrimaryButton onClick={() => addCollaborators(newCollaboratorUsers)}>{"Add"}</PrimaryButton>
       </div>
       <CollaboratorsList collaborators={collaborators} />

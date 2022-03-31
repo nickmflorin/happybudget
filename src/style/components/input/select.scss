@@ -220,3 +220,40 @@
     }
   }
 }
+
+.react-select-container {
+	width: 100%;
+
+	.react-select__control {
+		min-height: $standard-size;
+		height: $standard-size;
+		border-radius: $input-border-radius;
+		border: $border !important;
+		border-color: $border-color !important;
+
+		.react-select__value-container {
+			height: $standard-size;
+			padding: 0px 6px;
+
+			.react-select__input-container {
+				margin: 0;
+			}
+		}
+
+		.react-select__indicators {
+			height: $standard-size;
+
+			.react-select__indicator-separator {
+				display: none;
+			}
+
+			.react-select__indicator {
+				@include size($standard-size);
+
+				svg {
+					@include size(16px);
+				}
+			}
+		}
+	}
+}

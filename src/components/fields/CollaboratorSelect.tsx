@@ -1,14 +1,16 @@
 import { useMemo } from "react";
 import AsyncSelect from "react-select/async";
 import { MultiValue } from "react-select/dist/declarations/src/types";
+import classNames from "classnames";
 import { map } from "lodash";
 
 import { hooks } from "store";
 
 import * as api from "api";
 
-type CollaboratorSelectProps = StandardComponentProps & {
+type CollaboratorSelectProps = {
   readonly currentCollaborators: Model.Collaborator[];
+  readonly className?: string;
   readonly onChange?: (userIds: number[]) => void;
 };
 
@@ -38,6 +40,8 @@ const CollaboratorSelect = ({ currentCollaborators, ...props }: CollaboratorSele
   return (
     <AsyncSelect
       {...props}
+      className={classNames("react-select-container", props.className)}
+      classNamePrefix={"react-select"}
       cacheOptions={true}
       loadOptions={loadOptions}
       isMulti={true}
