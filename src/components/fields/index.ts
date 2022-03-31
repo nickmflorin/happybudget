@@ -17,3 +17,4 @@ export { default as ImageAndName } from "./ImageAndName";
 export { default as PublicUrlInput } from "./PublicUrlInput";
 export { default as DatePicker } from "./DatePicker";
 export { default as HeaderTemplateSelect } from "./HeaderTemplateSelect";
+export { default as CollaboratorSelect } from "./CollaboratorSelect";

@@ -4,6 +4,15 @@ import * as services from "./services";
 
 export const register = services.postService<Http.RegistrationPayload, Model.User>(["users", "registration"]);
 
+export const searchUsers = async (
+  search: string,
+  query?: Http.ListQuery,
+  options?: Http.RequestOptions
+): Promise<Http.ListResponse<Model.SimpleUser>> => {
+  const url = services.URL.v1("users");
+  return client.list<Model.SimpleUser>(url, { ...query, search }, options);
+};
+
 export const updateActiveUser = services.patchService<Partial<Http.UserPayload | FormData>, Model.User>([
   "users",
   "user"

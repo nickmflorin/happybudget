@@ -36,6 +36,7 @@ declare namespace Http {
   type ListQuery<O extends string = string> = Omit<RawQuery, "ordering"> & {
     readonly ordering?: Ordering<O>;
     readonly ids?: number[];
+    readonly exclude?: number[];
   };
 
   type FullServiceArgs<ARGS extends unknown[]> = [...ARGS, RequestOptions?];
