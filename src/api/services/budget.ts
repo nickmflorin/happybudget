@@ -21,6 +21,13 @@ type UpdateBudget = {
 };
 
 export const updateBudget = services.detailPatchService((id: number) => ["budgets", id]) as UpdateBudget;
+export const deleteBudget = services.deleteService((id: number) => ["budgets", id]);
+export const createBudget = services.postService<Http.BudgetPayload, Model.UserBudget>(["budgets"]);
+export const createTemplate = services.postService<Http.TemplatePayload, Model.Template>(["templates"]);
+export const createCommunityTemplate = services.postService<Http.TemplatePayload | FormData, Model.Template>([
+  "templates",
+  "community"
+]);
 
 export const getBudgetPdf = services.retrieveService<Model.PdfBudget>((id: number) => ["budgets", id, "pdf"]);
 export const getBudgets = services.listService<Model.SimpleBudget>(["budgets"]);
@@ -35,21 +42,30 @@ export const getBudgetActualOwners = services.detailListService<Model.ActualOwne
   id,
   "actual-owners"
 ]);
+
 export const getFringes = services.detailListService<Model.Fringe>((id: number) => ["budgets", id, "fringes"]);
+export const createFringe = services.detailPostService<Http.FringePayload, Model.Fringe>((id: number) => [
+  "budgets",
+  id,
+  "fringes"
+]);
+
+export const getCollaborators = services.detailListService<Model.Collaborator>((id: number) => [
+  "budgets",
+  id,
+  "collaborators"
+]);
+export const createCollaborator = services.detailPostService<Http.CollaboratorPayload, Model.Collaborator>(
+  (id: number) => ["budgets", id, "collaborators"]
+);
+
+export const getActuals = services.detailListService<Model.Actual>((id: number) => ["budgets", id, "actuals"]);
 export const createActual = services.detailPostService<Http.ActualPayload, Model.Actual>((id: number) => [
   "budgets",
   id,
   "actuals"
 ]);
-export const getActuals = services.detailListService<Model.Actual>((id: number) => ["budgets", id, "actuals"]);
-export const deleteBudget = services.deleteService((id: number) => ["budgets", id]);
 
-export const createBudget = services.postService<Http.BudgetPayload, Model.UserBudget>(["budgets"]);
-export const createTemplate = services.postService<Http.TemplatePayload, Model.Template>(["templates"]);
-export const createCommunityTemplate = services.postService<Http.TemplatePayload | FormData, Model.Template>([
-  "templates",
-  "community"
-]);
 export const createBudgetChild = services.detailPostService<Http.AccountPayload, Model.Account>((id: number) => [
   "budgets",
   id,
@@ -60,12 +76,6 @@ export const createBudgetGroup = services.detailPostService<Http.GroupPayload, M
   "budgets",
   id,
   "groups"
-]);
-
-export const createFringe = services.detailPostService<Http.FringePayload, Model.Fringe>((id: number) => [
-  "budgets",
-  id,
-  "fringes"
 ]);
 
 export const duplicateBudget = async <B extends Model.BaseBudget>(

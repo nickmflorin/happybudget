@@ -7,7 +7,7 @@ declare namespace Model {
 
   type RowHttpModelType = "subaccount" | "account" | "fringe" | "actual" | "contact" | "pdf-account" | "pdf-subaccount";
 
-  type HttpModelType = RowHttpModelType | "markup" | "group" | "budget" | "template" | "pdf-budget";
+  type HttpModelType = RowHttpModelType | "collaborator" | "markup" | "group" | "budget" | "template" | "pdf-budget";
 
   type HttpModel = {
     readonly id: number;
@@ -64,9 +64,7 @@ declare namespace Model {
   } & DynamicChoices<CH, I, N>;
 
   type MarkupUnitId = 0 | 1;
-
   type MarkupUnitName = "Percent" | "Flat";
-
   type MarkupUnit = Choice<0, "Percent"> | Choice<1, "Flat">;
 
   type FringeUnitId = 0 | 1;
@@ -77,10 +75,12 @@ declare namespace Model {
   type ContactTypeId = 0 | 1 | 2;
   type ContactType = Choice<ContactTypeId, ContactTypeName>;
 
+  type CollaboratorAccessTypeName = "View Only" | "Editor" | "Owner";
+  type CollaboratorAccessTypeId = 0 | 1 | 2;
+  type CollaboratorAccessType = Choice<CollaboratorAccessTypeId, CollaboratorAccessTypeName>;
+
   type ParentType = "account" | "subaccount" | "budget";
   type BudgetDomain = "budget" | "template";
-
-  type Entity = Account | SubAccount | Budget | Template | Markup;
 
   type ModelWithColor<M extends Model> = M & { color: Style.HexColor | null };
 
@@ -215,8 +215,14 @@ declare namespace Model {
     readonly is_permissioned: boolean;
   };
   type Budget = AnotherUserBudget | UserBudget;
-
   type BaseBudget = Budget | Template;
+
+  type Collaborator = GenericHttpModel<"collaborator"> & {
+    readonly created_at: string;
+    readonly updated_at: string;
+    readonly access_type: CollaboratorAccessType;
+    readonly user: Model.SimpleUser;
+  };
 
   type PdfBudget = GenericHttpModel<"pdf-budget"> & {
     readonly name: string;

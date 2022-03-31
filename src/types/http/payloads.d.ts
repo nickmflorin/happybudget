@@ -83,6 +83,13 @@ declare namespace Http {
     readonly image?: string | ArrayBuffer | null;
   };
 
+  type CollaboratorPayload = {
+    readonly access_type: Model.CollaboratorAccessTypeId;
+    /* The user is only allowed to be included when creating collaborators,
+       not updating them. */
+    readonly user: number;
+  };
+
   type TemplatePayload = {
     readonly image?: string | ArrayBuffer | null;
     readonly community?: boolean;
@@ -186,6 +193,7 @@ declare namespace Http {
     account: AccountPayload;
     subaccount: SubAccountPayload;
     group: GroupPayload;
+    collaborator: CollaboratorPayload;
   };
 
   type ModelPayload<M extends Model.GenericHttpModel> = M["type"] extends keyof ModelPayloadMap
