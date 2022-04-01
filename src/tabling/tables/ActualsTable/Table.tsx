@@ -10,7 +10,7 @@ import * as store from "store";
 
 import { CreateContactParams } from "components/model/hooks";
 import { ImportActualsPlaidModal } from "components/modals";
-import { usePlaid } from "components/integrations";
+import { usePlaid, UsePlaidSuccessParams } from "components/integrations";
 
 import { framework } from "tabling/generic";
 import { AuthenticatedTable, AuthenticatedTableProps } from "tabling/generic/tables";
@@ -53,10 +53,10 @@ export type Props = Omit<AuthenticatedTableProps<R, M, S>, OmitProps> & {
 
 const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Props): JSX.Element => {
   const dispatch: Dispatch = useDispatch();
-  const [plaidPublicToken, setPlaidPublicToken] = useState<string | null>(null);
+  const [plaidSuccessParams, setPlaidSuccessParams] = useState<UsePlaidSuccessParams | null>(null);
 
   const { open } = usePlaid({
-    onSuccess: (publicToken: string) => setPlaidPublicToken(publicToken),
+    onSuccess: (p: UsePlaidSuccessParams) => setPlaidSuccessParams(p),
     onError: (e: string) =>
       props.table.current.notify({
         message: "There was an error connecting to Plaid.",
@@ -243,14 +243,15 @@ const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Pro
       />
       {modal}
       {contactModals}
-      {!isNil(parent) && !isNil(plaidPublicToken) && (
+      {!isNil(parent) && !isNil(plaidSuccessParams) && (
         <ImportActualsPlaidModal
           open={true}
-          onCancel={() => setPlaidPublicToken(null)}
-          publicToken={plaidPublicToken}
+          onCancel={() => setPlaidSuccessParams(null)}
+          publicToken={plaidSuccessParams.publicToken}
           budgetId={parent.id}
+          accountIds={plaidSuccessParams.accountIds}
           onSuccess={(b: Model.Budget, ms: Model.Actual[]) => {
-            setPlaidPublicToken(null);
+            setPlaidSuccessParams(null);
             onImportSuccess(b, ms);
           }}
         />

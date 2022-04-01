@@ -144,6 +144,7 @@ declare namespace Http {
     readonly end_date?: string | null;
     readonly source: Model.ActualImportSourceId;
     readonly public_token: string;
+    readonly account_ids?: string[];
   };
 
   type HeaderTemplatePayload = {

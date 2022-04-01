@@ -12,10 +12,17 @@ import { ImportActualsPlaidFormValues } from "components/forms/ImportActualsPlai
 type ImportActualsPlaidModalProps = Omit<ModalProps, "title" | "onOk"> & {
   readonly budgetId: number;
   readonly publicToken: string;
+  readonly accountIds?: string[];
   readonly onSuccess: (budget: Model.Budget, actuals: Model.Actual[]) => void;
 };
 
-const ImportActualsPlaidModal = ({ budgetId, onSuccess, ...props }: ImportActualsPlaidModalProps): JSX.Element => {
+const ImportActualsPlaidModal = ({
+  accountIds,
+  publicToken,
+  budgetId,
+  onSuccess,
+  ...props
+}: ImportActualsPlaidModalProps): JSX.Element => {
   const form = ui.useForm<ImportActualsPlaidFormValues>();
   const [cancelToken] = http.useCancelToken();
 
@@ -38,8 +45,9 @@ const ImportActualsPlaidModal = ({ budgetId, onSuccess, ...props }: ImportActual
                     values.end_date !== null
                       ? moment(values.end_date.toISOString()).format("YYYY-MM-DD")
                       : values.end_date,
-                  public_token: props.publicToken,
-                  source: model.budgeting.ActualImportSources.Plaid.id
+                  public_token: publicToken,
+                  source: model.budgeting.ActualImportSources.Plaid.id,
+                  account_ids: accountIds
                 },
                 { cancelToken: cancelToken() }
               )
