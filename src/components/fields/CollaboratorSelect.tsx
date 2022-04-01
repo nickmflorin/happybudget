@@ -26,12 +26,10 @@ const CollaboratorSelect = ({ currentCollaborators, ...props }: CollaboratorSele
           .searchUsers(inputValue, {
             exclude: [...map(currentCollaborators, (c: Model.Collaborator) => c.user.id), user.id]
           })
-          .then((response: Http.ListResponse<Model.SimpleUser>) => {
-            resolve(map(response.data, (u: Model.SimpleUser) => ({ label: u.full_name, id: u.id })));
-          })
-          .catch((e: Error) => {
-            reject(e);
-          });
+          .then((response: Http.ListResponse<Model.SimpleUser>) =>
+            resolve(map(response.data, (u: Model.SimpleUser) => ({ label: u.full_name, id: u.id })))
+          )
+          .catch((e: Error) => reject(e));
       });
     },
     [user.id, currentCollaborators]
