@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { map, filter } from "lodash";
 
 import * as api from "api";
-import { ui, http, model } from "lib";
+import { ui, http, model, redux, util } from "lib";
 
 import { PrimaryButton } from "components/buttons";
 import { CollaboratorsList } from "components/collaboration";
@@ -18,6 +18,8 @@ type CollaboratorsModalProps = ModalProps & {
 const CollaboratorsModal = ({ budgetId, ...props }: CollaboratorsModalProps): JSX.Element => {
   const [collaborators, setCollaborators] = useState<Model.Collaborator[]>([]);
   const [newCollaboratorUsers, setNewCollaboratorUsers] = useState<number[]>([]);
+  const { isActive: isDeleting, removeFromState: setDeleted, addToState: setDeleting } = redux.useTrackModelActions([]);
+  const { isActive: isUpdating, removeFromState: setUpdated, addToState: setUpdating } = redux.useTrackModelActions([]);
 
   const modal = ui.useModal();
   const [cancelToken] = http.useCancelToken();
@@ -79,18 +81,31 @@ const CollaboratorsModal = ({ budgetId, ...props }: CollaboratorsModalProps): JS
       <CollaboratorsList
         collaborators={collaborators}
         style={{ marginTop: 15 }}
-        onRemoveCollaborator={(m: Model.Collaborator) => {
-          /* TODO: Display loading indicator in specific line item and give the
-             line item less opacity. */
-          modal.current.setLoading(true);
+        isDeleting={isDeleting}
+        isUpdating={isUpdating}
+        onChangeAccessType={(m: Model.Collaborator, ac: Model.CollaboratorAccessTypeId) => {
+          setUpdating(m.id);
           api
-            .deleteCollaborator(m.id)
+            .updateCollaborator(m.id, { access_type: ac }, { cancelToken: cancelToken() })
+            .then((c: Model.Collaborator) => {
+              setUpdated(c.id);
+              setCollaborators(util.replaceInArray(collaborators, { id: m.id }, c));
+            })
+            .catch((e: Error) => {
+              setUpdated(m.id);
+              modal.current.handleRequestError(e);
+            });
+        }}
+        onRemoveCollaborator={(m: Model.Collaborator) => {
+          setDeleting(m.id);
+          api
+            .deleteCollaborator(m.id, { cancelToken: cancelToken() })
             .then(() => {
-              modal.current.setLoading(false);
+              setDeleted(m.id);
               setCollaborators(filter(collaborators, (c: Model.Collaborator) => c.id !== m.id));
             })
             .catch((e: Error) => {
-              modal.current.setLoading(false);
+              setDeleted(m.id);
               modal.current.handleRequestError(e);
             });
         }}

@@ -2,10 +2,19 @@
 	.collaborator-list-item {
 		display: flex;
 
+		&.loading {
+			opacity: 0.6;
+		}
+
+		> * {
+			&:not(:last-child) {
+				margin-right: 8px;
+			}
+		}
+
 		.user-image-or-initials-container {
 			height: 32px;
 			width: 32px;
-			margin-right: 8px;
 		}
 
 		.name-container {
@@ -14,8 +23,8 @@
 			flex-grow: 100;
 		}
 
-		.btn--icon-only {
-
+		&:not(:last-child) {
+			margin-bottom: 8px;
 		}
 	}
 }
