@@ -13,6 +13,7 @@ type M = Model.Account;
 type S = Tables.AccountTableStore;
 
 type OmitProps =
+  | "budgetId"
   | "onRowExpand"
   | "showPageFooter"
   | "pinFirstColumn"
@@ -119,6 +120,7 @@ const AuthenticatedTable = <B extends Model.BaseBudget>(props: AuthenticatedTabl
     <React.Fragment>
       <AuthenticatedBudgetTable
         {...props}
+        budgetId={props.id}
         showPageFooter={false}
         pinFirstColumn={true}
         getModelRowName={(r: Table.DataRow<R>) => r.data.identifier || r.data.description}

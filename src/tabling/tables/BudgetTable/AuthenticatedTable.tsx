@@ -13,7 +13,8 @@ export type AuthenticatedBudgetTableProps<
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
 > = AuthenticatedTableProps<R, M, S> & {
-  readonly id: number;
+  readonly budgetId: number;
+  readonly includeCollaborators: boolean;
   readonly onEditMarkup?: (row: Table.MarkupRow<R>) => void;
   readonly onEditGroup?: (row: Table.GroupRow<R>) => void;
   readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
@@ -24,6 +25,7 @@ const AuthenticatedBudgetTable = <
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
 >({
+  includeCollaborators,
   onEditMarkup,
   onEditGroup,
   onRowExpand,
@@ -33,7 +35,7 @@ const AuthenticatedBudgetTable = <
 
   const actions = useMemo<Table.AuthenticatedMenuActions<R, M>>(
     (): Table.AuthenticatedMenuActions<R, M> =>
-      Config.collaborationEnabled
+      Config.collaborationEnabled && includeCollaborators
         ? tabling.menu.combineMenuActions<Table.AuthenticatedMenuActionParams<R, M>, R, M>(
             () => [
               framework.actions.CollaboratorsAction({
@@ -79,8 +81,8 @@ const AuthenticatedBudgetTable = <
         }
         framework={tabling.aggrid.combineFrameworks(Framework, props.framework)}
       />
-      {collaboratorsModalOpen === true && (
-        <CollaboratorsModal open={true} onCancel={() => setCollaboratorsModalOpen(false)} budgetId={props.id} />
+      {collaboratorsModalOpen === true && includeCollaborators && (
+        <CollaboratorsModal open={true} onCancel={() => setCollaboratorsModalOpen(false)} budgetId={props.budgetId} />
       )}
     </React.Fragment>
   );

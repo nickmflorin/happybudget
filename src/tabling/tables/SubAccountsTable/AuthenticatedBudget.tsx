@@ -20,7 +20,7 @@ type M = Model.SubAccount;
 
 export type AuthenticatedBudgetProps<P extends Model.Account | Model.SubAccount> = Omit<
   AuthenticatedTableProps<Model.Budget, P>,
-  "domain" | "onCellFocusChanged" | "columns"
+  "domain" | "onCellFocusChanged" | "columns" | "includeCollaborators"
 > & {
   readonly onExportPdf: () => void;
   readonly onShared: (token: Model.PublicToken) => void;
@@ -188,6 +188,7 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
       <AuthenticatedTable
         {...props}
         domain={"budget"}
+        includeCollaborators={true}
         onCellFocusChanged={onCellFocusChanged}
         columns={columns}
         actions={tableActions}

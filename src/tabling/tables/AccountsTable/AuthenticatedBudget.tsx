@@ -12,7 +12,10 @@ import Columns from "./Columns";
 type R = Tables.AccountRowData;
 type M = Model.Account;
 
-export type AuthenticatedBudgetProps = Omit<AuthenticatedTableProps<Model.Budget>, "domain" | "columns"> & {
+export type AuthenticatedBudgetProps = Omit<
+  AuthenticatedTableProps<Model.Budget>,
+  "domain" | "columns" | "includeCollaborators"
+> & {
   readonly onExportPdf: () => void;
   readonly onShared: (token: Model.PublicToken) => void;
   readonly onShareUpdated: (token: Model.PublicToken) => void;
@@ -48,7 +51,15 @@ const AuthenticatedBudget = (props: AuthenticatedBudgetProps): JSX.Element => {
     [budget, props.actions, props.onShared]
   );
 
-  return <AuthenticatedTable<Model.Budget> {...props} domain={"budget"} columns={Columns} actions={tableActions} />;
+  return (
+    <AuthenticatedTable<Model.Budget>
+      {...props}
+      includeCollaborators={true}
+      domain={"budget"}
+      columns={Columns}
+      actions={tableActions}
+    />
+  );
 };
 
 export default React.memo(AuthenticatedBudget);
