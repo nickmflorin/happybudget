@@ -28,7 +28,7 @@ const ParentSidebarItem = (
     <React.Fragment>
       <ExpandedSidebarItem
         {...item}
-        style={{ marginBottom: 10 }}
+        style={{ marginBottom: 5 }}
         onClick={() => {
           /* The parent will be active if any of it's children items are active,
 					and if this is the case then we do not want to perform any action
