@@ -7,3 +7,4 @@ export { default as Icon } from "./icons/Icon";
 export { default as Separator } from "./Separator";
 export { default as Pagination } from "./Pagination";
 export { default as NoData } from "./NoData";
+export * from "./NoData";

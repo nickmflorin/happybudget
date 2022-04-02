@@ -1,38 +1,44 @@
-import { useEffect } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
 
-import { model } from "lib";
 import * as store from "store";
+import { model } from "lib";
 
 import { Icon } from "components";
 import { PrimaryButtonIconToggle } from "components/buttons";
-import { CollaboratingBudgetCard } from "components/containers";
 import { BudgetDropdownMenu } from "components/dropdowns";
 import { BudgetEmptyIcon } from "components/svgs";
 
-import DashboardPage, { RenderDashboardPageCardParams } from "../DashboardPage";
-import { actions } from "../../store";
+import GenericOwned, { GenericOwnedProps, RenderGenericOwnedCardParams } from "../GenericOwned";
 
-type CollaboratingProps = {
+export type RenderGenericOwnedBudgetCardParams = RenderGenericOwnedCardParams<Model.SimpleBudget>;
+
+export type GenericOwnedBudgetProps = Omit<
+  GenericOwnedProps<Model.SimpleBudget>,
+  "confirmDeleteProps" | "noDataProps"
+> & {
   readonly onCreate: () => void;
+  readonly noDataProps: Omit<GenericOwnedProps<Model.SimpleBudget>["noDataProps"], "emptyChild">;
 };
 
-const Collaborating = (props: CollaboratingProps): JSX.Element => {
+const GenericOwnedBudget = (props: GenericOwnedBudgetProps): JSX.Element => {
   const user = store.hooks.useLoggedInUser();
   const dispatch: Redux.Dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(actions.requestCollaboratingAction(null));
-  }, []);
-
   return (
-    <DashboardPage
-      title={"Collaborating Budgets"}
-      selector={(s: Application.Store) => s.dashboard.collaborating}
-      noDataProps={{ title: "You are not collaborating on any budgets yet!", child: <BudgetEmptyIcon /> }}
-      onSearch={(v: string) => dispatch(actions.setCollaboratingSearchAction(v, {}))}
-      onUpdatePagination={(p: Pagination) => dispatch(actions.setCollaboratingPaginationAction(p))}
-      onUpdateOrdering={(o: Redux.UpdateOrderingPayload) => dispatch(actions.updateCollaboratingOrderingAction(o))}
+    <GenericOwned
+      {...props}
+      noDataProps={{ ...props.noDataProps, child: <BudgetEmptyIcon /> }}
+      onDeleted={(b: Model.SimpleBudget) => {
+        dispatch(
+          store.actions.updateLoggedInUserAction({
+            ...user,
+            num_budgets: Math.max(user.num_budgets - 1, 0)
+          })
+        );
+        props.onDeleted(b);
+      }}
+      confirmDeleteProps={{ suppressionKey: "delete-budget-confirmation-suppressed", title: "Delete Budget" }}
       createMenuElement={
         <BudgetDropdownMenu
           key={1}
@@ -59,11 +65,8 @@ const Collaborating = (props: CollaboratingProps): JSX.Element => {
           />
         </BudgetDropdownMenu>
       }
-      renderCard={(params: RenderDashboardPageCardParams<Model.SimpleCollaboratingBudget>) => (
-        <CollaboratingBudgetCard {...params} />
-      )}
     />
   );
 };
 
-export default Collaborating;
+export default React.memo(GenericOwnedBudget);

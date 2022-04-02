@@ -9,10 +9,18 @@ import BaseBudgetCard, { BaseBudgetCardProps } from "./BaseBudgetCard";
 
 export type UserBudgetCardProps = Omit<BaseBudgetCardProps<Model.SimpleBudget>, "cornerActions"> & {
   readonly onEdit: () => void;
+  readonly deleting: boolean;
   readonly onDelete: (e: MenuItemModelClickEvent) => void;
 };
 
-const UserBudgetCard = ({ disabled, dropdown, onEdit, onDelete, ...props }: UserBudgetCardProps): JSX.Element => (
+const UserBudgetCard = ({
+  disabled,
+  dropdown,
+  deleting,
+  onEdit,
+  onDelete,
+  ...props
+}: UserBudgetCardProps): JSX.Element => (
   <BaseBudgetCard
     {...props}
     cornerActions={(iconClassName: string) => [
@@ -55,7 +63,8 @@ const UserBudgetCard = ({ disabled, dropdown, onEdit, onDelete, ...props }: User
         label: "Delete",
         icon: <Icon icon={"trash"} weight={"light"} />,
         onClick: (e: MenuItemModelClickEvent) => onDelete(e),
-        keepDropdownOpenOnClick: false
+        keepDropdownOpenOnClick: false,
+        loading: deleting
       },
       ...(dropdown || [])
     ]}

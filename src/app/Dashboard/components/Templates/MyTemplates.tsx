@@ -1,42 +1,29 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { map, isNil } from "lodash";
+import { useDispatch } from "react-redux";
+import { isNil } from "lodash";
 
 import * as api from "api";
 import { redux, notifications } from "lib";
 
-import { ShowHide, Icon, Pagination, NoData } from "components";
-import { PrimaryButtonIconToggle, OrderingButtonIconToggle } from "components/buttons";
+import { ShowHide } from "components";
 import { TemplateCard, EmptyCard } from "components/containers";
-import { OrderingDropdownMenu } from "components/dropdowns";
-import { SearchInput } from "components/fields";
-import { Page } from "components/layout";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
-import { useConfirmation } from "components/notifications";
 import { TemplateEmptyIcon } from "components/svgs";
+
+import GenericOwnedTemplate, { RenderGenericOwnedTemplateCardParams } from "./GenericOwnedTemplate";
 
 import { actions } from "../../store";
 
-const selectTemplates = (state: Application.Store) => state.dashboard.templates.data;
-const selectResponseWasReceived = (state: Application.Store) => state.dashboard.templates.responseWasReceived;
-const selectLoading = (state: Application.Store) => state.dashboard.templates.loading;
-const selectPage = (state: Application.Store) => state.dashboard.templates.page;
-const selectPageSize = (state: Application.Store) => state.dashboard.templates.pageSize;
-const selectCount = (state: Application.Store) => state.dashboard.templates.count;
-const selectSearch = (state: Application.Store) => state.dashboard.templates.search;
-const selectOrdering = (state: Application.Store) => state.dashboard.templates.ordering;
-
 interface MyTemplatesProps {
-  readonly setTemplateToDerive: (template: number) => void;
-  readonly setCreateBudgetModalOpen: (v: boolean) => void;
+  readonly onDeriveBudget: (template: number) => void;
+  readonly onCreateBudget: () => void;
 }
 
-const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, setTemplateToDerive }): JSX.Element => {
+const MyTemplates: React.FC<MyTemplatesProps> = ({ onCreateBudget, onDeriveBudget }): JSX.Element => {
   const [templateToEdit, setTemplateToEdit] = useState<number | undefined>(undefined);
   const [createTemplateModalOpen, setCreateTempateModalOpen] = useState(false);
 
-  const { isActive: isDeleting, removeFromState: setDeleted, addToState: setDeleting } = redux.useTrackModelActions([]);
   const {
     isActive: isDuplicating,
     removeFromState: setDuplicated,
@@ -45,40 +32,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
   const { isActive: isMoving, removeFromState: setMoved, addToState: setMoving } = redux.useTrackModelActions([]);
 
   const dispatch: Redux.Dispatch = useDispatch();
-  const templates = useSelector(selectTemplates);
-  const loading = useSelector(selectLoading);
-  const responseWasReceived = useSelector(selectResponseWasReceived);
-  const page = useSelector(selectPage);
-  const pageSize = useSelector(selectPageSize);
-  const count = useSelector(selectCount);
-  const search = useSelector(selectSearch);
-  const ordering = useSelector(selectOrdering);
-
   const history = useHistory();
-
-  const deleteBudget = useMemo(
-    () => (b: Model.SimpleTemplate, e: MenuItemModelClickEvent) => {
-      setDeleting(b.id);
-      api
-        .deleteBudget(b.id)
-        .then(() => {
-          e.item.closeParentDropdown?.();
-          dispatch(actions.removeTemplateFromStateAction(b.id));
-        })
-        .catch((err: Error) => notifications.internal.handleRequestError(err))
-        .finally(() => setDeleted(b.id));
-    },
-    [setDeleted]
-  );
-
-  const [confirmModal, confirmBudgetDelete] = useConfirmation<[Model.SimpleTemplate, MenuItemModelClickEvent]>({
-    okButtonClass: "btn--danger",
-    okText: "Delete",
-    suppressionKey: "delete-template-confirmation-suppressed",
-    detail: "This action is not recoverable, the data will be permanently erased.",
-    title: "Delete Template",
-    onConfirmed: (b: Model.SimpleTemplate, e: MenuItemModelClickEvent) => deleteBudget(b, e)
-  });
 
   useEffect(() => {
     dispatch(actions.requestTemplatesAction(null));
@@ -86,132 +40,70 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
 
   return (
     <React.Fragment>
-      <Page
-        className={"my-templates"}
-        pageProps={{ className: "dashboard-page" }}
+      <GenericOwnedTemplate
         title={"My Templates"}
-        loading={loading}
-        subMenu={[
-          <SearchInput
-            key={1}
-            placeholder={"Search Templates..."}
-            value={search}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              dispatch(actions.setTemplatesSearchAction(event.target.value, {}))
-            }
-          />,
-          <PrimaryButtonIconToggle
-            key={2}
-            icon={<Icon icon={"plus"} weight={"regular"} />}
-            onClick={() => setCreateBudgetModalOpen(true)}
-            text={"New Blank Budget"}
-            breakpoint={"medium"}
-          />,
-          <OrderingDropdownMenu
-            key={3}
-            ordering={ordering}
-            onChange={(field: string, order: Http.Order) =>
-              dispatch(actions.updateTemplatesOrderingAction({ field, order }))
-            }
-            models={[
-              { id: "created_at", icon: "bars-sort", label: "Created" },
-              { id: "updated_at", icon: "timer", label: "Last Updated" },
-              { id: "name", icon: "sort-alpha-down", label: "Name" }
-            ]}
-          >
-            <OrderingButtonIconToggle
-              breakpoint={"medium"}
-              ordering={ordering}
-              labelMap={{
-                created_at: "Created",
-                updated_at: "Last Updated",
-                name: "Name"
-              }}
+        selector={(s: Application.Store) => s.dashboard.templates}
+        onSearch={(v: string) => dispatch(actions.setTemplatesSearchAction(v, {}))}
+        noDataProps={{
+          title: "You don't have any templates yet!",
+          subTitle: "Create your own templates or choose one we curated in Discover.",
+          button: {
+            onClick: () => setCreateTempateModalOpen(true),
+            text: "Create a Template"
+          },
+          child: <TemplateEmptyIcon />
+        }}
+        onUpdatePagination={(p: Pagination) => dispatch(actions.setTemplatesPaginationAction(p))}
+        onUpdateOrdering={(o: Redux.UpdateOrderingPayload) => dispatch(actions.updateTemplatesOrderingAction(o))}
+        onCreate={onCreateBudget}
+        onDeleted={(b: Model.SimpleTemplate) => dispatch(actions.removeTemplateFromStateAction(b.id))}
+        lastCard={(budgets: Model.SimpleTemplate[]) => (
+          <ShowHide show={budgets.length !== 0}>
+            <EmptyCard
+              className={"template-empty-card"}
+              icon={"plus"}
+              onClick={() => setCreateTempateModalOpen(true)}
             />
-          </OrderingDropdownMenu>
-        ]}
-        contentScrollable={true}
-      >
-        {templates.length === 0 && responseWasReceived ? (
-          <NoData
-            title={"You don't have any templates yet!"}
-            subTitle={"Create your own templates or choose one we curated in Discover."}
-            button={{
-              onClick: () => setCreateTempateModalOpen(true),
-              text: "Create a Template"
+          </ShowHide>
+        )}
+        renderCard={(params: RenderGenericOwnedTemplateCardParams) => (
+          <TemplateCard
+            {...params}
+            duplicating={isDuplicating(params.budget.id)}
+            moving={isMoving(params.budget.id)}
+            loading={params.deleting}
+            disabled={params.deleting || isMoving(params.budget.id) || isDuplicating(params.budget.id)}
+            onEdit={() => history.push(`/templates/${params.budget.id}/accounts`)}
+            onEditNameImage={() => setTemplateToEdit(params.budget.id)}
+            onClick={() => onDeriveBudget(params.budget.id)}
+            onMoveToCommunity={(e: MenuItemModelClickEvent) => {
+              setMoving(params.budget.id);
+              api
+                .updateBudget<Model.Template>(params.budget.id, { community: true })
+                .then((response: Model.Template) => {
+                  e.item.closeParentDropdown?.();
+                  dispatch(actions.removeTemplateFromStateAction(params.budget.id));
+                  dispatch(actions.addTemplateToStateAction(response));
+                })
+                .catch((err: Error) => notifications.internal.handleRequestError(err))
+                .finally(() => setMoved(params.budget.id));
             }}
-            icon={<Icon icon={"plus"} weight={"light"} />}
-          >
-            <TemplateEmptyIcon />
-          </NoData>
-        ) : (
-          <div className={"dashboard-card-grid"}>
-            {map(templates, (template: Model.SimpleTemplate, index: number) => {
-              return (
-                <TemplateCard
-                  key={index}
-                  template={template}
-                  duplicating={isDuplicating(template.id)}
-                  moving={isMoving(template.id)}
-                  deleting={isDeleting(template.id)}
-                  loading={isDeleting(template.id)}
-                  disabled={isDeleting(template.id) || isMoving(template.id) || isDuplicating(template.id)}
-                  onEdit={() => history.push(`/templates/${template.id}/accounts`)}
-                  onEditNameImage={() => setTemplateToEdit(template.id)}
-                  onDelete={(e: MenuItemModelClickEvent) => confirmBudgetDelete([template, e])}
-                  onClick={() => setTemplateToDerive(template.id)}
-                  onMoveToCommunity={(e: MenuItemModelClickEvent) => {
-                    setMoving(template.id);
-                    api
-                      .updateBudget<Model.Template>(template.id, { community: true })
-                      .then((response: Model.Template) => {
-                        e.item.closeParentDropdown?.();
-                        dispatch(actions.removeTemplateFromStateAction(template.id));
-                        dispatch(actions.addTemplateToStateAction(response));
-                      })
-                      .catch((err: Error) => notifications.internal.handleRequestError(err))
-                      .finally(() => setMoved(template.id));
-                  }}
-                  onDuplicate={(e: MenuItemModelClickEvent) => {
-                    setDuplicating(template.id);
-                    api
-                      /* We have to use a large timeout because this is a request
-                         that sometimes takes a very long time. */
-                      .duplicateBudget<Model.Template>(template.id, { timeout: 120 * 1000 })
-                      .then((response: Model.Template) => {
-                        e.item.closeParentDropdown?.();
-                        dispatch(actions.addTemplateToStateAction(response));
-                      })
-                      .catch((err: Error) => notifications.internal.handleRequestError(err))
-                      .finally(() => setDuplicated(template.id));
-                  }}
-                />
-              );
-            })}
-            <ShowHide show={templates.length !== 0}>
-              <EmptyCard
-                className={"template-empty-card"}
-                icon={"plus"}
-                onClick={() => setCreateTempateModalOpen(true)}
-              />
-            </ShowHide>
-          </div>
+            onDuplicate={(e: MenuItemModelClickEvent) => {
+              setDuplicating(params.budget.id);
+              api
+                /* We have to use a large timeout because this is a request that
+								   sometimes takes a very long time. */
+                .duplicateBudget<Model.Template>(params.budget.id, { timeout: 120 * 1000 })
+                .then((response: Model.Template) => {
+                  e.item.closeParentDropdown?.();
+                  dispatch(actions.addTemplateToStateAction(response));
+                })
+                .catch((err: Error) => notifications.internal.handleRequestError(err))
+                .finally(() => setDuplicated(params.budget.id));
+            }}
+          />
         )}
-        {templates.length !== 0 && responseWasReceived && (
-          <Page.Footer>
-            <Pagination
-              hideOnSinglePage={true}
-              defaultPageSize={100}
-              pageSize={pageSize}
-              current={page}
-              total={count}
-              onChange={(pg: number) => {
-                dispatch(actions.setTemplatesPaginationAction({ page: pg }));
-              }}
-            />
-          </Page.Footer>
-        )}
-      </Page>
+      />
       {!isNil(templateToEdit) && (
         <EditTemplateModal
           open={true}
@@ -232,7 +124,6 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setCreateBudgetModalOpen, set
           history.push(`/templates/${template.id}/accounts`);
         }}
       />
-      {confirmModal}
     </React.Fragment>
   );
 };

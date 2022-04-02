@@ -4,15 +4,18 @@ import classNames from "classnames";
 
 import { PrimaryButton } from "components/buttons";
 
-type NoDataProps = StandardComponentProps & {
-  readonly children?: ReactNode;
+export type NoDataProps = StandardComponentProps & {
   readonly title?: string;
   readonly subTitle?: string;
   readonly button?: { readonly onClick?: () => void; readonly text: string };
   readonly icon?: IconOrElement;
 };
 
-const NoData = ({ title, subTitle, button, icon, children, ...props }: NoDataProps): JSX.Element => (
+type PrivateNoDataProps = NoDataProps & {
+  readonly children?: ReactNode;
+};
+
+const NoData = ({ title, subTitle, button, icon, children, ...props }: PrivateNoDataProps): JSX.Element => (
   <div {...props} className={classNames("no-data", props.className)}>
     <div className={"no-data-content"}>
       {children}

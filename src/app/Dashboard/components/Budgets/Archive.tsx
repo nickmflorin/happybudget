@@ -1,18 +1,11 @@
 import { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { ArchivedBudgetCard } from "components/containers";
-import UserGeneric, { RenderUserCardParams } from "./UserGeneric";
-import { actions } from "../../store";
+import { BudgetEmptyIcon } from "components/svgs";
 
-const selectBudgets = (state: Application.Store) => state.dashboard.archive.data;
-const selectBudgetsResponseReceived = (state: Application.Store) => state.dashboard.archive.responseWasReceived;
-const selectLoadingBudgets = (state: Application.Store) => state.dashboard.archive.loading;
-const selectBudgetPage = (state: Application.Store) => state.dashboard.archive.page;
-const selectBudgetPageSize = (state: Application.Store) => state.dashboard.archive.pageSize;
-const selectBudgetsCount = (state: Application.Store) => state.dashboard.archive.count;
-const selectBudgetsSearch = (state: Application.Store) => state.dashboard.archive.search;
-const selectBudgetsOrdering = (state: Application.Store) => state.dashboard.archive.ordering;
+import GenericOwnedBudget, { RenderGenericOwnedBudgetCardParams } from "./GenericOwnedBudget";
+import { actions } from "../../store";
 
 type ArchiveProps = {
   readonly onEdit: (b: Model.SimpleBudget) => void;
@@ -22,40 +15,24 @@ type ArchiveProps = {
 const Archive = (props: ArchiveProps): JSX.Element => {
   const dispatch: Redux.Dispatch = useDispatch();
 
-  const budgets = useSelector(selectBudgets);
-  const loading = useSelector(selectLoadingBudgets);
-  const responseWasReceived = useSelector(selectBudgetsResponseReceived);
-  const page = useSelector(selectBudgetPage);
-  const pageSize = useSelector(selectBudgetPageSize);
-  const count = useSelector(selectBudgetsCount);
-  const search = useSelector(selectBudgetsSearch);
-  const ordering = useSelector(selectBudgetsOrdering);
-
   useEffect(() => {
     dispatch(actions.requestArchiveAction(null));
   }, []);
 
   return (
-    <UserGeneric
+    <GenericOwnedBudget
       title={"Archived Budgets"}
-      noDataTitle={"You don't have any archived budgets yet!"}
-      search={search}
-      page={page}
-      pageSize={pageSize}
-      loading={loading}
-      budgets={budgets}
-      count={count}
-      ordering={ordering}
-      responseWasReceived={responseWasReceived}
-      onCreate={props.onCreate}
+      selector={(s: Application.Store) => s.dashboard.archive}
+      noDataProps={{ title: "You don't have any archived budgets yet!", child: <BudgetEmptyIcon /> }}
+      onSearch={(v: string) => dispatch(actions.setArchiveSearchAction(v, {}))}
       onUpdatePagination={(p: Pagination) => dispatch(actions.setArchivePaginationAction(p))}
       onUpdateOrdering={(o: Redux.UpdateOrderingPayload) => dispatch(actions.updateArchiveOrderingAction(o))}
-      onSearch={(v: string) => dispatch(actions.setArchiveSearchAction(v, {}))}
+      onCreate={props.onCreate}
       onDeleted={(b: Model.SimpleBudget) => {
         dispatch(actions.removeArchiveFromStateAction(b.id));
         dispatch(actions.requestPermissioningArchiveAction(null));
       }}
-      renderCard={(params: RenderUserCardParams) => (
+      renderCard={(params: RenderGenericOwnedBudgetCardParams) => (
         <ArchivedBudgetCard
           {...params}
           disabled={params.deleting}

@@ -7,7 +7,7 @@ import * as store from "store";
 import Card, { CardProps } from "./Card";
 
 type TemplateCardProps = Pick<CardProps, "disabled" | "loading" | "onClick" | "className" | "style"> & {
-  readonly template: Model.SimpleTemplate;
+  readonly budget: Model.SimpleTemplate;
   readonly duplicating: boolean;
   readonly moving: boolean;
   readonly deleting: boolean;
@@ -19,7 +19,7 @@ type TemplateCardProps = Pick<CardProps, "disabled" | "loading" | "onClick" | "c
 };
 
 const TemplateCard = ({
-  template,
+  budget,
   duplicating,
   deleting,
   moving,
@@ -33,21 +33,21 @@ const TemplateCard = ({
   const user = store.hooks.useLoggedInUser();
 
   useEffect(() => {
-    if (!isNil(template.image) && isNil(template.image.url)) {
+    if (!isNil(budget.image) && isNil(budget.image.url)) {
       console.warn(
-        `Template ${template.id} has an image with an undefined URL.
+        `Template ${budget.id} has an image with an undefined URL.
         This most likely means something wonky is going on with S3.`
       );
     }
-  }, [template.image]);
+  }, [budget.image]);
 
   return (
     <Card
       {...props}
       style={{ height: 194 }}
-      title={template.name}
-      tourId={template.name}
-      image={template.image}
+      title={budget.name}
+      tourId={budget.name}
+      image={budget.image}
       dropdown={[
         {
           id: "edit",

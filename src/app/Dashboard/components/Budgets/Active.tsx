@@ -1,22 +1,15 @@
 import { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import * as api from "api";
 import * as store from "store";
-import { redux, notifications, model } from "lib";
+import { model, notifications, redux } from "lib";
 
 import { BudgetCard } from "components/containers";
-import UserGeneric, { RenderUserCardParams } from "./UserGeneric";
-import { actions } from "../../store";
+import { BudgetEmptyIcon } from "components/svgs";
 
-const selectBudgets = (state: Application.Store) => state.dashboard.budgets.data;
-const selectBudgetsResponseReceived = (state: Application.Store) => state.dashboard.budgets.responseWasReceived;
-const selectLoadingBudgets = (state: Application.Store) => state.dashboard.budgets.loading;
-const selectBudgetPage = (state: Application.Store) => state.dashboard.budgets.page;
-const selectBudgetPageSize = (state: Application.Store) => state.dashboard.budgets.pageSize;
-const selectBudgetsCount = (state: Application.Store) => state.dashboard.budgets.count;
-const selectBudgetsSearch = (state: Application.Store) => state.dashboard.budgets.search;
-const selectBudgetsOrdering = (state: Application.Store) => state.dashboard.budgets.ordering;
+import GenericOwnedBudget, { RenderGenericOwnedBudgetCardParams } from "./GenericOwnedBudget";
+import { actions } from "../../store";
 
 type ActiveProps = {
   readonly onEdit: (b: Model.SimpleBudget) => void;
@@ -24,6 +17,7 @@ type ActiveProps = {
 };
 
 const Active = (props: ActiveProps): JSX.Element => {
+  const dispatch: Redux.Dispatch = useDispatch();
   const user = store.hooks.useLoggedInUser();
   const {
     isActive: isDuplicating,
@@ -31,46 +25,29 @@ const Active = (props: ActiveProps): JSX.Element => {
     addToState: setDuplicating
   } = redux.useTrackModelActions([]);
 
-  const dispatch: Redux.Dispatch = useDispatch();
-
-  const budgets = useSelector(selectBudgets);
-  const loading = useSelector(selectLoadingBudgets);
-  const responseWasReceived = useSelector(selectBudgetsResponseReceived);
-  const page = useSelector(selectBudgetPage);
-  const pageSize = useSelector(selectBudgetPageSize);
-  const count = useSelector(selectBudgetsCount);
-  const search = useSelector(selectBudgetsSearch);
-  const ordering = useSelector(selectBudgetsOrdering);
-
   useEffect(() => {
     dispatch(actions.requestBudgetsAction(null));
   }, []);
 
   return (
-    <UserGeneric
+    <GenericOwnedBudget
       title={"My Budgets"}
-      noDataTitle={"You don't have any budgets yet! Create a new budget."}
-      noDataSubTitle={
+      noDataProps={{
+        title: "You don't have any budgets yet! Create a new budget.",
+        child: <BudgetEmptyIcon />,
         // eslint-disable-next-line quotes
-        'Tip: Click the "Create Budget" button above and create an empty budget or start one from a template.'
-      }
-      search={search}
-      page={page}
-      pageSize={pageSize}
-      loading={loading}
-      budgets={budgets}
-      count={count}
-      ordering={ordering}
-      responseWasReceived={responseWasReceived}
-      onCreate={props.onCreate}
+        subTitle: 'Tip: Click the "Create Budget" button above and create an empty budget or start one from a template.'
+      }}
+      selector={(s: Application.Store) => s.dashboard.budgets}
+      onSearch={(v: string) => dispatch(actions.setBudgetsSearchAction(v, {}))}
       onUpdatePagination={(p: Pagination) => dispatch(actions.setBudgetsPaginationAction(p))}
       onUpdateOrdering={(o: Redux.UpdateOrderingPayload) => dispatch(actions.updateBudgetsOrderingAction(o))}
-      onSearch={(v: string) => dispatch(actions.setBudgetsSearchAction(v, {}))}
+      onCreate={props.onCreate}
       onDeleted={(b: Model.SimpleBudget) => {
         dispatch(actions.removeBudgetFromStateAction(b.id));
         dispatch(actions.requestPermissioningBudgetsAction(null));
       }}
-      renderCard={(params: RenderUserCardParams) => (
+      renderCard={(params: RenderGenericOwnedBudgetCardParams) => (
         <BudgetCard
           {...params}
           disabled={params.deleting || isDuplicating(params.budget.id)}
