@@ -1,13 +1,14 @@
-import React, { useEffect } from "react";
-import { isNil } from "lodash";
+import React from "react";
 
 import { Icon } from "components";
 import * as store from "store";
 
-import Card, { CardProps } from "./Card";
+import BaseBudgetCard, { BaseBudgetCardProps } from "./BaseBudgetCard";
 
-type TemplateCardProps = Pick<CardProps, "disabled" | "loading" | "onClick" | "className" | "style"> & {
-  readonly budget: Model.SimpleTemplate;
+type TemplateCardProps = Omit<
+  BaseBudgetCardProps<Model.SimpleTemplate>,
+  "dropdown" | "cornerActions" | "includeSubTitle"
+> & {
   readonly duplicating: boolean;
   readonly moving: boolean;
   readonly deleting: boolean;
@@ -19,7 +20,6 @@ type TemplateCardProps = Pick<CardProps, "disabled" | "loading" | "onClick" | "c
 };
 
 const TemplateCard = ({
-  budget,
   duplicating,
   deleting,
   moving,
@@ -31,23 +31,11 @@ const TemplateCard = ({
   ...props
 }: TemplateCardProps): JSX.Element => {
   const user = store.hooks.useLoggedInUser();
-
-  useEffect(() => {
-    if (!isNil(budget.image) && isNil(budget.image.url)) {
-      console.warn(
-        `Template ${budget.id} has an image with an undefined URL.
-        This most likely means something wonky is going on with S3.`
-      );
-    }
-  }, [budget.image]);
-
   return (
-    <Card
+    <BaseBudgetCard
       {...props}
       style={{ height: 194 }}
-      title={budget.name}
-      tourId={budget.name}
-      image={budget.image}
+      includeSubTitle={false}
       dropdown={[
         {
           id: "edit",

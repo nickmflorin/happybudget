@@ -5,23 +5,16 @@ import { Icon } from "components";
 import { IncludeButtonLink } from "components/buttons";
 import { InfoTooltip } from "components/tooltips";
 
-import BaseBudgetCard, { BaseBudgetCardProps } from "./BaseBudgetCard";
+import GenericBudgetCard, { GenericBudgetCardProps } from "./GenericBudgetCard";
 
-export type UserBudgetCardProps = Omit<BaseBudgetCardProps<Model.SimpleBudget>, "cornerActions"> & {
-  readonly onEdit: () => void;
+export type GenericOwnedBudgetCardProps = Omit<GenericBudgetCardProps<Model.SimpleBudget>, "cornerActions"> & {
   readonly deleting: boolean;
+  readonly onEdit: () => void;
   readonly onDelete: (e: MenuItemModelClickEvent) => void;
 };
 
-const UserBudgetCard = ({
-  disabled,
-  dropdown,
-  deleting,
-  onEdit,
-  onDelete,
-  ...props
-}: UserBudgetCardProps): JSX.Element => (
-  <BaseBudgetCard
+const GenericOwnedBudgetCard = ({ deleting, onEdit, onDelete, ...props }: GenericOwnedBudgetCardProps): JSX.Element => (
+  <GenericBudgetCard
     {...props}
     cornerActions={(iconClassName: string) => [
       {
@@ -50,7 +43,7 @@ const UserBudgetCard = ({
         visible: props.budget.is_permissioned
       }
     ]}
-    disabled={disabled || props.budget.is_permissioned}
+    disabled={props.disabled || props.budget.is_permissioned}
     dropdown={[
       {
         id: "edit",
@@ -66,9 +59,9 @@ const UserBudgetCard = ({
         keepDropdownOpenOnClick: false,
         loading: deleting
       },
-      ...(dropdown || [])
+      ...(props.dropdown || [])
     ]}
   />
 );
 
-export default React.memo(UserBudgetCard);
+export default React.memo(GenericOwnedBudgetCard);

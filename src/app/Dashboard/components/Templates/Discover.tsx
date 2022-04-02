@@ -8,7 +8,7 @@ import * as store from "store";
 import { redux, notifications } from "lib";
 
 import { ShowHide } from "components";
-import { CommunityTemplateCard, CommunityTemplateStaffCard, EmptyCard } from "components/containers";
+import { CommunityTemplateCard, CommunityTemplateStaffCard, EmptyCard } from "components/containers/cards";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
 import { IsStaff } from "components/permissions";
 

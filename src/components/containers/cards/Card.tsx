@@ -59,7 +59,6 @@ const Card = ({
   const divProps = useMemo(() => {
     const Props = {
       ...props,
-      "data-tour-id": tourId,
       className: classNames("card", props.className, { disabled: loading || disabled, loading })
     };
     if (!isNil(tourId)) {

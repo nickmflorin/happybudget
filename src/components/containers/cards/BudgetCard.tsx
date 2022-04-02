@@ -1,15 +1,15 @@
 import React from "react";
 
 import { Icon } from "components";
-import UserBudgetCard, { UserBudgetCardProps } from "./UserBudgetCard";
+import GenericOwnedBudgetCard, { GenericOwnedBudgetCardProps } from "./GenericOwnedBudgetCard";
 
-type BudgetCardProps = Omit<UserBudgetCardProps, "dropdown"> & {
+type BudgetCardProps = Omit<GenericOwnedBudgetCardProps, "dropdown"> & {
   readonly duplicating: boolean;
   readonly onDuplicate: (e: MenuItemModelClickEvent) => void;
 };
 
 const BudgetCard = ({ duplicating, onDuplicate, ...props }: BudgetCardProps): JSX.Element => (
-  <UserBudgetCard
+  <GenericOwnedBudgetCard
     {...props}
     dropdown={[
       {

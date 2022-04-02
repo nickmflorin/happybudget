@@ -5,7 +5,7 @@ import * as api from "api";
 import * as store from "store";
 import { model, notifications, redux } from "lib";
 
-import { BudgetCard } from "components/containers";
+import { BudgetCard } from "components/containers/cards";
 import { BudgetEmptyIcon } from "components/svgs";
 
 import GenericOwnedBudget, { RenderGenericOwnedBudgetCardParams } from "./GenericOwnedBudget";

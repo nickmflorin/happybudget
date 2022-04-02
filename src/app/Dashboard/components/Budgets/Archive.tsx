@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
-import { ArchivedBudgetCard } from "components/containers";
+import { ArchivedBudgetCard } from "components/containers/cards";
 import { BudgetEmptyIcon } from "components/svgs";
 
 import GenericOwnedBudget, { RenderGenericOwnedBudgetCardParams } from "./GenericOwnedBudget";

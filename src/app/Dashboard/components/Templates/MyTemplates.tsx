@@ -7,7 +7,7 @@ import * as api from "api";
 import { redux, notifications } from "lib";
 
 import { ShowHide } from "components";
-import { TemplateCard, EmptyCard } from "components/containers";
+import { TemplateCard, EmptyCard } from "components/containers/cards";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
 import { TemplateEmptyIcon } from "components/svgs";
 

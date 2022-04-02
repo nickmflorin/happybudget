@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo } from "react";
-import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { util } from "lib";
@@ -7,15 +6,15 @@ import * as store from "store";
 
 import Card, { CardProps } from "./Card";
 
-export type BaseBudgetCardProps<B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget> = Omit<
-  CardProps,
-  "subTitle" | "title" | "tourId" | "image"
-> & {
-  readonly budget: B;
-};
+export type BaseBudgetCardProps<B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate> =
+  Omit<CardProps, "subTitle" | "title" | "tourId" | "image"> & {
+    readonly budget: B;
+    readonly includeSubTitle?: boolean;
+  };
 
-const BaseBudgetCard = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget>({
+const BaseBudgetCard = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>({
   budget,
+  includeSubTitle,
   ...props
 }: BaseBudgetCardProps<B>): JSX.Element => {
   const user = store.hooks.useLoggedInUser();
@@ -31,7 +30,7 @@ const BaseBudgetCard = <B extends Model.SimpleBudget | Model.SimpleCollaborating
   useEffect(() => {
     if (!isNil(budget.image) && isNil(budget.image.url)) {
       console.warn(
-        `Budget ${budget.id} has an image with an undefined URL.
+        `Budget ${budget.id}, domain ${budget.domain} has an image with an undefined URL.
         This most likely means something wonky is going on with S3.`
       );
     }
@@ -41,9 +40,8 @@ const BaseBudgetCard = <B extends Model.SimpleBudget | Model.SimpleCollaborating
     <Card
       {...props}
       tourId={budget.name}
-      className={classNames("budget-card", props.className)}
       title={budget.name}
-      subTitle={subTitle}
+      subTitle={includeSubTitle !== false ? subTitle : undefined}
       image={budget.image}
     />
   );

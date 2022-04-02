@@ -6,7 +6,7 @@ import * as store from "store";
 
 import { Icon } from "components";
 import { PrimaryButtonIconToggle } from "components/buttons";
-import { CollaboratingBudgetCard } from "components/containers";
+import { CollaboratingBudgetCard } from "components/containers/cards";
 import { BudgetDropdownMenu } from "components/dropdowns";
 import { BudgetEmptyIcon } from "components/svgs";
 
