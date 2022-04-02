@@ -84,8 +84,8 @@ const Dashboard = (): JSX.Element => {
               },
               {
                 label: "Archive",
-                icon: <Icon icon={"folder-open"} weight={"light"} />,
-                activeIcon: <Icon icon={"folder-open"} weight={"solid"} />,
+                icon: <Icon icon={"books"} weight={"light"} />,
+                activeIcon: <Icon icon={"books"} weight={"solid"} />,
                 onClick: () => history.push("/archive"),
                 active: location.pathname.startsWith("/archive")
               }

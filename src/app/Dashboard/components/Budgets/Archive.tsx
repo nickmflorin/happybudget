@@ -38,6 +38,10 @@ const Archive = (props: ArchiveProps): JSX.Element => {
           disabled={params.deleting}
           loading={params.deleting}
           onEdit={() => props.onEdit(params.budget)}
+          onActivated={(b: Model.UserBudget) => {
+            dispatch(actions.removeArchiveFromStateAction(b.id));
+            dispatch(actions.addBudgetToStateAction(b));
+          }}
         />
       )}
     />
