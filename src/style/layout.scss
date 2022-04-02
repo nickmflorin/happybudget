@@ -167,6 +167,7 @@
       .content {
         display: flex;
         flex-direction: row;
+				flex-grow: 100;
 
 				.drawer {
 					max-width: 300px;

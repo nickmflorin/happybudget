@@ -36,7 +36,10 @@ const Application = (): JSX.Element => {
           component={Template}
           redux={false}
         />
-        <Route path={["/budgets", "/contacts", "/templates", "/discover"]} component={Dashboard} />
+        <Route
+          path={["/budgets", "/contacts", "/templates", "/discover", "/collaborating", "/archive"]}
+          component={Dashboard}
+        />
         <Route path={["/profile", "/security", "/billing"]} component={Settings} />
         <Route exact path={"/logout"} component={Logout} />
         <NotFoundRoute auto={true} />

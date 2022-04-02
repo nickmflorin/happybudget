@@ -1,5 +1,7 @@
 import { Route, Switch, useHistory, useLocation } from "react-router-dom";
 
+import { Config } from "config";
+
 import { Icon } from "components";
 import { ExpandedLayout } from "components/layout";
 import { Contacts, Templates, Budgets } from "./components";
@@ -33,11 +35,33 @@ const Dashboard = (): JSX.Element => {
           ]
         },
         {
-          label: "My Budgets",
-          icon: <Icon icon={"copy"} weight={"light"} />,
-          activeIcon: <Icon icon={"copy"} weight={"solid"} />,
-          onClick: () => history.push("/budgets"),
-          active: location.pathname.startsWith("/budgets")
+          label: "Budgets",
+          icon: <Icon icon={"file-plus"} weight={"light"} />,
+          activeIcon: <Icon icon={"file-plus"} weight={"solid"} />,
+          submenu: [
+            {
+              label: "Active",
+              icon: <Icon icon={"copy"} weight={"light"} />,
+              activeIcon: <Icon icon={"copy"} weight={"solid"} />,
+              onClick: () => history.push("/budgets"),
+              active: location.pathname.startsWith("/budgets")
+            },
+            {
+              label: "Collaborating",
+              icon: <Icon icon={"users"} weight={"light"} />,
+              activeIcon: <Icon icon={"users"} weight={"solid"} />,
+              onClick: () => history.push("/collaborating"),
+              active: location.pathname.startsWith("/collaborating"),
+              hidden: !Config.collaborationEnabled
+            },
+            {
+              label: "Archive",
+              icon: <Icon icon={"folder-open"} weight={"light"} />,
+              activeIcon: <Icon icon={"folder-open"} weight={"solid"} />,
+              onClick: () => history.push("/archive"),
+              active: location.pathname.startsWith("/archive")
+            }
+          ]
         },
         {
           label: "Contacts",
@@ -51,7 +75,7 @@ const Dashboard = (): JSX.Element => {
     >
       <Switch>
         <Route exact path={"/contacts"} component={Contacts} />
-        <Route exact path={"/budgets"} component={Budgets} />
+        <Route exact path={["/budgets", "/collaborating", "/archive"]} component={Budgets} />
         <Route path={["/templates", "/discover"]} component={Templates} />
       </Switch>
     </ExpandedLayout>
