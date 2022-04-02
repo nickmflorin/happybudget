@@ -23,6 +23,43 @@ export const updateBudgetInStateAction = redux.actions.createAction<Redux.Update
 export const addBudgetToStateAction = redux.actions.createAction<Model.SimpleBudget>("dashboard.budgets.AddToState");
 export const removeBudgetFromStateAction = redux.actions.createAction<number>("dashboard.budgets.RemoveFromState");
 
+export const requestArchiveAction = redux.actions.createAction<null>("dashboard.archive.Request");
+export const requestPermissioningArchiveAction = redux.actions.createAction<null>(
+  "dashboard.archive.RequestPermissioned"
+);
+export const loadingArchiveAction = redux.actions.createAction<boolean>("dashboard.archive.Loading");
+export const responsePermissionedArchiveAction = redux.actions.createAction<Http.ListResponse<Model.SimpleBudget>>(
+  "dashboard.archive.ResponsePermissioned"
+);
+export const responseArchiveAction =
+  redux.actions.createAction<Http.ListResponse<Model.SimpleBudget>>("dashboard.archive.Response");
+export const setArchiveSearchAction = redux.actions.createTableAction<string, Table.Context>(
+  "dashboard.archive.SetSearch"
+);
+export const setArchivePaginationAction = redux.actions.createAction<Pagination>("dashboard.archive.SetPagination");
+export const updateArchiveOrderingAction = redux.actions.createAction<Redux.UpdateOrderingPayload>(
+  "dashboard.archive.UpdateOrdering"
+);
+export const updateArchiveInStateAction = redux.actions.createAction<Redux.UpdateModelPayload<Model.SimpleBudget>>(
+  "dashboard.archive.UpdateInState"
+);
+export const removeArchiveFromStateAction = redux.actions.createAction<number>("dashboard.archive.RemoveFromState");
+
+export const requestCollaboratingAction = redux.actions.createAction<null>("dashboard.collaborating.Request");
+export const loadingCollaboratingAction = redux.actions.createAction<boolean>("dashboard.collaborating.Loading");
+export const responseCollaboratingAction = redux.actions.createAction<
+  Http.ListResponse<Model.SimpleCollaboratingBudget>
+>("dashboard.collaborating.Response");
+export const setCollaboratingSearchAction = redux.actions.createTableAction<string, Table.Context>(
+  "dashboard.collaborating.SetSearch"
+);
+export const setCollaboratingPaginationAction = redux.actions.createAction<Pagination>(
+  "dashboard.collaborating.SetPagination"
+);
+export const updateCollaboratingOrderingAction = redux.actions.createAction<Redux.UpdateOrderingPayload>(
+  "dashboard.collaborating.UpdateOrdering"
+);
+
 export const requestTemplatesAction = redux.actions.createAction<null>("dashboard.templates.Request");
 export const loadingTemplatesAction = redux.actions.createAction<boolean>("dashboard.templates.Loading");
 export const responseTemplatesAction =

@@ -37,6 +37,69 @@ export function* getBudgetsPermissioningTask(action: Redux.Action<null>): SagaIt
   }
 }
 
+export function* getArchiveTask(action: Redux.Action<null>): SagaIterator {
+  const query = yield select((state: Application.Store) => ({
+    search: state.dashboard.archive.search,
+    page: state.dashboard.archive.page,
+    page_size: state.dashboard.archive.pageSize,
+    ordering: state.dashboard.archive.ordering
+  }));
+  yield put(actions.loadingArchiveAction(true));
+  try {
+    const response: Http.ListResponse<Model.SimpleBudget> = yield http.request(
+      api.getArchivedBudgets,
+      action.context,
+      query
+    );
+    yield put(actions.responseArchiveAction(response));
+  } catch (e: unknown) {
+    notifications.ui.banner.handleRequestError(e as Error);
+    yield put(actions.responseArchiveAction({ count: 0, data: [] }));
+  } finally {
+    yield put(actions.loadingArchiveAction(false));
+  }
+}
+
+export function* getArchivePermissioningTask(action: Redux.Action<null>): SagaIterator {
+  yield put(actions.loadingArchiveAction(true));
+  try {
+    const response: Http.ListResponse<Model.SimpleBudget> = yield http.request(
+      api.getArchivedBudgets,
+      action.context,
+      {}
+    );
+    yield put(actions.responsePermissionedArchiveAction(response));
+  } catch (e: unknown) {
+    notifications.ui.banner.handleRequestError(e as Error);
+    yield put(actions.responseArchiveAction({ count: 0, data: [] }));
+  } finally {
+    yield put(actions.loadingArchiveAction(false));
+  }
+}
+
+export function* getCollaboratingTask(action: Redux.Action<null>): SagaIterator {
+  const query = yield select((state: Application.Store) => ({
+    search: state.dashboard.collaborating.search,
+    page: state.dashboard.collaborating.page,
+    page_size: state.dashboard.collaborating.pageSize,
+    ordering: state.dashboard.collaborating.ordering
+  }));
+  yield put(actions.loadingCollaboratingAction(true));
+  try {
+    const response: Http.ListResponse<Model.SimpleCollaboratingBudget> = yield http.request(
+      api.getCollaboratingBudgets,
+      action.context,
+      query
+    );
+    yield put(actions.responseCollaboratingAction(response));
+  } catch (e: unknown) {
+    notifications.ui.banner.handleRequestError(e as Error);
+    yield put(actions.responseCollaboratingAction({ count: 0, data: [] }));
+  } finally {
+    yield put(actions.loadingCollaboratingAction(false));
+  }
+}
+
 export function* getTemplatesTask(action: Redux.Action<null>): SagaIterator {
   const query = yield select((state: Application.Store) => {
     return {

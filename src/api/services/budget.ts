@@ -31,6 +31,11 @@ export const createCommunityTemplate = services.postService<Http.TemplatePayload
 
 export const getBudgetPdf = services.retrieveService<Model.PdfBudget>((id: number) => ["budgets", id, "pdf"]);
 export const getBudgets = services.listService<Model.SimpleBudget>(["budgets"]);
+export const getArchivedBudgets = services.listService<Model.SimpleBudget>(["budgets", "archived"]);
+export const getCollaboratingBudgets = services.listService<Model.SimpleCollaboratingBudget>([
+  "budgets",
+  "collaborating"
+]);
 export const getTemplates = services.listService<Model.SimpleTemplate>(["templates"]);
 export const getCommunityTemplates = services.listService<Model.SimpleTemplate>(["templates", "community"]);
 

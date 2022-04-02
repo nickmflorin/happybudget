@@ -7,12 +7,7 @@ import { ContactsTable } from "tabling";
 import initialState from "./initialState";
 import * as actions from "./actions";
 
-const rootBudgetsReducer = redux.reducers.createAuthenticatedModelListResponseReducer<
-  Model.SimpleBudget,
-  null,
-  Tables.ContactTableContext,
-  Redux.AuthenticatedModelListResponseStore<Model.SimpleBudget>
->({
+const rootBudgetsReducer = redux.reducers.createAuthenticatedModelListResponseReducer<Model.SimpleBudget>({
   initialState: initialState.budgets,
   actions: {
     request: actions.requestBudgetsAction,
@@ -27,35 +22,61 @@ const rootBudgetsReducer = redux.reducers.createAuthenticatedModelListResponseRe
   }
 });
 
-const budgetsReducer: Redux.Reducer<Modules.Dashboard.Store["budgets"]> = (
-  state: Modules.Dashboard.Store["budgets"] = initialState.budgets,
-  action: Redux.Action
-) => {
-  const newState = rootBudgetsReducer(state, action);
-  if (action.type === actions.responsePermissionedBudgetsAction.toString()) {
-    const repermissioned: Model.SimpleBudget[] = action.payload.data;
-    return {
-      ...newState,
-      data: reduce(
-        newState.data,
-        (curr: Model.SimpleBudget[], m: Model.SimpleBudget) => {
-          const reperm = redux.findModelInData(repermissioned, m.id, {
-            modelName: "repermissioned budget"
-          });
-          if (!isNil(reperm)) {
-            return [...curr, { ...m, is_permissioned: reperm.is_permissioned }];
-          }
-          return [...curr, m];
-        },
-        []
-      )
-    };
+const rootArchiveReducer = redux.reducers.createAuthenticatedModelListResponseReducer<Model.SimpleBudget>({
+  initialState: initialState.archive,
+  actions: {
+    request: actions.requestArchiveAction,
+    response: actions.responseArchiveAction,
+    loading: actions.loadingArchiveAction,
+    setSearch: actions.setArchiveSearchAction,
+    removeFromState: actions.removeArchiveFromStateAction,
+    updateInState: actions.updateArchiveInStateAction,
+    setPagination: actions.setArchivePaginationAction,
+    updateOrdering: actions.updateArchiveOrderingAction
   }
-  return newState;
+});
+
+const createBudgetsReducer = <L extends "budgets" | "archive">(location: L) => {
+  const root = location === "budgets" ? rootBudgetsReducer : rootArchiveReducer;
+  const repermissionAction =
+    location === "budgets" ? actions.responsePermissionedBudgetsAction : actions.responsePermissionedArchiveAction;
+  return (state: Modules.Dashboard.Store[L] = initialState[location], action: Redux.Action) => {
+    const newState = root(state, action);
+    if (action.type === repermissionAction.toString()) {
+      const repermissioned: Model.SimpleBudget[] = action.payload.data;
+      return {
+        ...newState,
+        data: reduce(
+          newState.data,
+          (curr: Model.SimpleBudget[], m: Model.SimpleBudget) => {
+            const reperm = redux.findModelInData(repermissioned, m.id);
+            if (!isNil(reperm)) {
+              return [...curr, { ...m, is_permissioned: reperm.is_permissioned }];
+            }
+            return [...curr, m];
+          },
+          []
+        )
+      };
+    }
+    return newState;
+  };
 };
 
 const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
-  budgets: budgetsReducer,
+  budgets: createBudgetsReducer("budgets"),
+  archive: createBudgetsReducer("archive"),
+  collaborating: redux.reducers.createAuthenticatedModelListResponseReducer<Model.SimpleCollaboratingBudget>({
+    initialState: redux.initialAuthenticatedModelListResponseState,
+    actions: {
+      request: actions.requestCollaboratingAction,
+      response: actions.responseCollaboratingAction,
+      loading: actions.loadingCollaboratingAction,
+      setSearch: actions.setCollaboratingSearchAction,
+      setPagination: actions.setCollaboratingPaginationAction,
+      updateOrdering: actions.updateCollaboratingOrderingAction
+    }
+  }),
   contacts: tabling.reducers.createAuthenticatedTableReducer<
     Tables.ContactRowData,
     Model.Contact,
@@ -72,12 +93,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
     },
     initialState: redux.initialTableState
   }),
-  templates: redux.reducers.createAuthenticatedModelListResponseReducer<
-    Model.SimpleTemplate,
-    null,
-    Tables.ContactTableContext,
-    Redux.AuthenticatedModelListResponseStore<Model.SimpleTemplate>
-  >({
+  templates: redux.reducers.createAuthenticatedModelListResponseReducer<Model.SimpleTemplate>({
     initialState: redux.initialAuthenticatedModelListResponseState,
     actions: {
       request: actions.requestTemplatesAction,
@@ -91,12 +107,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
       updateOrdering: actions.updateTemplatesOrderingAction
     }
   }),
-  community: redux.reducers.createAuthenticatedModelListResponseReducer<
-    Model.SimpleTemplate,
-    null,
-    Tables.ContactTableContext,
-    Redux.AuthenticatedModelListResponseStore<Model.SimpleTemplate>
-  >({
+  community: redux.reducers.createAuthenticatedModelListResponseReducer<Model.SimpleTemplate>({
     initialState: redux.initialAuthenticatedModelListResponseState,
     actions: {
       request: actions.requestCommunityTemplatesAction,

@@ -48,6 +48,8 @@ declare namespace Modules {
   namespace Dashboard {
     interface Store {
       readonly budgets: Redux.AuthenticatedModelListResponseStore<Model.SimpleBudget>;
+      readonly archive: Redux.AuthenticatedModelListResponseStore<Model.SimpleBudget>;
+      readonly collaborating: Redux.AuthenticatedModelListResponseStore<Model.SimpleCollaboratingBudget>;
       readonly templates: Redux.AuthenticatedModelListResponseStore<Model.SimpleTemplate>;
       readonly community: Redux.AuthenticatedModelListResponseStore<Model.SimpleTemplate>;
       readonly contacts: Tables.ContactTableStore;

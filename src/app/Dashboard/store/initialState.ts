@@ -10,6 +10,24 @@ const initialState: Modules.Dashboard.Store = {
       { field: "name", order: 0 }
     ]
   },
+  collaborating: {
+    ...redux.initialAuthenticatedModelListResponseState,
+    pageSize: 100,
+    ordering: [
+      { field: "created_at", order: 0 },
+      { field: "updated_at", order: -1 },
+      { field: "name", order: 0 }
+    ]
+  },
+  archive: {
+    ...redux.initialAuthenticatedModelListResponseState,
+    pageSize: 100,
+    ordering: [
+      { field: "created_at", order: 0 },
+      { field: "updated_at", order: -1 },
+      { field: "name", order: 0 }
+    ]
+  },
   templates: {
     ...redux.initialAuthenticatedModelListResponseState,
     pageSize: 100,

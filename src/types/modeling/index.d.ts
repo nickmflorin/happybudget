@@ -191,14 +191,13 @@ declare namespace Model {
     readonly accumulated_markup_contribution: number;
   };
 
-  type SimpleBudget = AbstractBudget & {
+  type SimpleCollaboratingBudget = AbstractBudget & {
     readonly domain: "budget";
     readonly image: SavedImage | null;
     readonly updated_at: string;
-    /* This field will only ever be applicable when retrieving budgets or a
-       budget for which the user has created.  Since we only ever retrieve
-       lists of budgets for which the user created, it is safe to assume this
-       will always be on the model in that case. */
+  };
+
+  type SimpleBudget = SimpleCollaboratingBudget & {
     readonly is_permissioned: boolean;
   };
 
