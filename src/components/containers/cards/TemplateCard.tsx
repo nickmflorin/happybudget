@@ -1,81 +1,57 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
+
+import * as api from "api";
+import * as store from "store";
+import { http, notifications } from "lib";
 
 import { Icon } from "components";
-import * as store from "store";
 
-import BaseBudgetCard, { BaseBudgetCardProps } from "./BaseBudgetCard";
+import GenericTemplateCard, { GenericTemplateCardProps } from "./GenericTemplateCard";
 
-type TemplateCardProps = Omit<
-  BaseBudgetCardProps<Model.SimpleTemplate>,
-  "dropdown" | "cornerActions" | "includeSubTitle"
-> & {
-  readonly duplicating: boolean;
-  readonly moving: boolean;
-  readonly deleting: boolean;
-  readonly onEdit: () => void;
-  readonly onEditNameImage: () => void;
-  readonly onDelete: (e: MenuItemModelClickEvent) => void;
-  readonly onMoveToCommunity: (e: MenuItemModelClickEvent) => void;
-  readonly onDuplicate: (e: MenuItemModelClickEvent) => void;
+type TemplateCardProps = Omit<GenericTemplateCardProps, "dropdown"> & {
+  readonly onMoved: (response: Model.Template) => void;
 };
 
-const TemplateCard = ({
-  duplicating,
-  deleting,
-  moving,
-  onDuplicate,
-  onEditNameImage,
-  onEdit,
-  onDelete,
-  onMoveToCommunity,
-  ...props
-}: TemplateCardProps): JSX.Element => {
+const TemplateCard = ({ onMoved, ...props }: TemplateCardProps): JSX.Element => {
+  const [moving, setMoving] = useState(false);
+
   const user = store.hooks.useLoggedInUser();
+  const [cancelToken] = http.useCancelToken();
+
+  const move = useMemo(
+    () => (e: MenuItemModelClickEvent) => {
+      setMoving(true);
+      api
+        .updateBudget<Model.Template>(props.budget.id, { community: true }, { cancelToken: cancelToken() })
+        .then((response: Model.Template) => {
+          e.item.closeParentDropdown?.();
+          setMoving(false);
+          onMoved(response);
+        })
+        .catch((err: Error) => {
+          setMoving(false);
+          notifications.internal.handleRequestError(err);
+        });
+    },
+    [onMoved, props.budget.id]
+  );
+
   return (
-    <BaseBudgetCard
+    <GenericTemplateCard
       {...props}
       style={{ height: 194 }}
+      disabled={props.disabled || moving}
       includeSubTitle={false}
       dropdown={[
-        {
-          id: "edit",
-          label: "Edit",
-          icon: <Icon icon={"edit"} weight={"light"} />,
-          onClick: () => onEdit()
-        },
-        {
-          id: "edit_name_image",
-          label: "Edit Name/Image",
-          icon: <Icon icon={"image"} weight={"light"} />,
-          onClick: () => onEditNameImage()
-        },
-        {
-          id: "duplicate",
-          label: "Duplicate",
-          icon: <Icon icon={"clone"} weight={"light"} />,
-          onClick: (e: MenuItemModelClickEvent) => onDuplicate(e),
-          keepDropdownOpenOnClick: true,
-          loading: duplicating,
-          disabled: duplicating
-        },
         {
           id: "move",
           label: "Move to Community",
           icon: <Icon icon={"user-friends"} weight={"light"} />,
-          onClick: (e: MenuItemModelClickEvent) => onMoveToCommunity(e),
+          onClick: (e: MenuItemModelClickEvent) => move(e),
           keepDropdownOpenOnClick: true,
           visible: user.is_staff === true,
           loading: moving,
           disabled: moving
-        },
-        {
-          id: "delete",
-          label: "Delete",
-          icon: <Icon icon={"trash"} weight={"light"} />,
-          onClick: (e: MenuItemModelClickEvent) => onDelete(e),
-          keepDropdownOpenOnClick: true,
-          loading: deleting,
-          disabled: deleting
         }
       ]}
     />

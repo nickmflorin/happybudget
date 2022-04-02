@@ -3,9 +3,6 @@ import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { isNil } from "lodash";
 
-import * as api from "api";
-import { redux, notifications } from "lib";
-
 import { ShowHide } from "components";
 import { TemplateCard, EmptyCard } from "components/containers/cards";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
@@ -23,13 +20,6 @@ interface MyTemplatesProps {
 const MyTemplates: React.FC<MyTemplatesProps> = ({ onCreateBudget, onDeriveBudget }): JSX.Element => {
   const [templateToEdit, setTemplateToEdit] = useState<number | undefined>(undefined);
   const [createTemplateModalOpen, setCreateTempateModalOpen] = useState(false);
-
-  const {
-    isActive: isDuplicating,
-    removeFromState: setDuplicated,
-    addToState: setDuplicating
-  } = redux.useTrackModelActions([]);
-  const { isActive: isMoving, removeFromState: setMoved, addToState: setMoving } = redux.useTrackModelActions([]);
 
   const dispatch: Redux.Dispatch = useDispatch();
   const history = useHistory();
@@ -69,37 +59,15 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ onCreateBudget, onDeriveBudge
         renderCard={(params: RenderGenericOwnedTemplateCardParams) => (
           <TemplateCard
             {...params}
-            duplicating={isDuplicating(params.budget.id)}
-            moving={isMoving(params.budget.id)}
             loading={params.deleting}
-            disabled={params.deleting || isMoving(params.budget.id) || isDuplicating(params.budget.id)}
+            disabled={params.deleting}
             onEdit={() => history.push(`/templates/${params.budget.id}/accounts`)}
             onEditNameImage={() => setTemplateToEdit(params.budget.id)}
             onClick={() => onDeriveBudget(params.budget.id)}
-            onMoveToCommunity={(e: MenuItemModelClickEvent) => {
-              setMoving(params.budget.id);
-              api
-                .updateBudget<Model.Template>(params.budget.id, { community: true })
-                .then((response: Model.Template) => {
-                  e.item.closeParentDropdown?.();
-                  dispatch(actions.removeTemplateFromStateAction(params.budget.id));
-                  dispatch(actions.addTemplateToStateAction(response));
-                })
-                .catch((err: Error) => notifications.internal.handleRequestError(err))
-                .finally(() => setMoved(params.budget.id));
-            }}
-            onDuplicate={(e: MenuItemModelClickEvent) => {
-              setDuplicating(params.budget.id);
-              api
-                /* We have to use a large timeout because this is a request that
-								   sometimes takes a very long time. */
-                .duplicateBudget<Model.Template>(params.budget.id, { timeout: 120 * 1000 })
-                .then((response: Model.Template) => {
-                  e.item.closeParentDropdown?.();
-                  dispatch(actions.addTemplateToStateAction(response));
-                })
-                .catch((err: Error) => notifications.internal.handleRequestError(err))
-                .finally(() => setDuplicated(params.budget.id));
+            onDuplicated={(b: Model.Template) => dispatch(actions.addTemplateToStateAction(b))}
+            onMoved={(b: Model.Template) => {
+              dispatch(actions.removeTemplateFromStateAction(params.budget.id));
+              dispatch(actions.addTemplateToStateAction(b));
             }}
           />
         )}
