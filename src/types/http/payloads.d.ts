@@ -81,6 +81,7 @@ declare namespace Http {
     readonly name: Model.Budget["name"];
     readonly template?: number;
     readonly image?: string | ArrayBuffer | null;
+    readonly archived?: boolean;
   };
 
   type CollaboratorPayload = {

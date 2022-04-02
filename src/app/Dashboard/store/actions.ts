@@ -44,6 +44,7 @@ export const updateArchiveInStateAction = redux.actions.createAction<Redux.Updat
   "dashboard.archive.UpdateInState"
 );
 export const removeArchiveFromStateAction = redux.actions.createAction<number>("dashboard.archive.RemoveFromState");
+export const addArchiveToStateAction = redux.actions.createAction<Model.SimpleBudget>("dashboard.archive.AddToState");
 
 export const requestCollaboratingAction = redux.actions.createAction<null>("dashboard.collaborating.Request");
 export const loadingCollaboratingAction = redux.actions.createAction<boolean>("dashboard.collaborating.Loading");

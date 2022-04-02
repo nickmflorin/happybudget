@@ -32,7 +32,8 @@ const rootArchiveReducer = redux.reducers.createAuthenticatedModelListResponseRe
     removeFromState: actions.removeArchiveFromStateAction,
     updateInState: actions.updateArchiveInStateAction,
     setPagination: actions.setArchivePaginationAction,
-    updateOrdering: actions.updateArchiveOrderingAction
+    updateOrdering: actions.updateArchiveOrderingAction,
+    addToState: actions.addArchiveToStateAction
   }
 });
 

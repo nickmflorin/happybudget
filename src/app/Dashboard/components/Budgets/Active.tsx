@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 
 import * as api from "api";
 import * as store from "store";
-import { model, notifications, redux } from "lib";
+import { model, notifications, redux, http } from "lib";
 
 import { BudgetCard } from "components/containers/cards";
 import { BudgetEmptyIcon } from "components/svgs";
@@ -19,6 +19,8 @@ type ActiveProps = {
 const Active = (props: ActiveProps): JSX.Element => {
   const dispatch: Redux.Dispatch = useDispatch();
   const user = store.hooks.useLoggedInUser();
+  const [cancelToken] = http.useCancelToken();
+
   const {
     isActive: isDuplicating,
     removeFromState: setDuplicated,
@@ -54,6 +56,10 @@ const Active = (props: ActiveProps): JSX.Element => {
           loading={params.deleting}
           duplicating={isDuplicating(params.budget.id)}
           onEdit={() => props.onEdit(params.budget)}
+          onArchived={(b: Model.UserBudget) => {
+            dispatch(actions.removeBudgetFromStateAction(b.id));
+            dispatch(actions.addArchiveToStateAction(b));
+          }}
           onDuplicate={(e: MenuItemModelClickEvent) => {
             /* Note: Normally we would want to rely on a request to the backend
 						   as the source of truth for a user permission related action, but
@@ -70,7 +76,10 @@ const Active = (props: ActiveProps): JSX.Element => {
               api
                 /* We have to use a large timeout because this is a request
 								   that sometimes takes a very long time. */
-                .duplicateBudget<Model.UserBudget>(params.budget.id, { timeout: 120 * 1000 })
+                .duplicateBudget<Model.UserBudget>(params.budget.id, {
+                  timeout: 120 * 1000,
+                  cancelToken: cancelToken()
+                })
                 .then((response: Model.UserBudget) => {
                   e.item.closeParentDropdown?.();
                   dispatch(actions.addBudgetToStateAction(response));
