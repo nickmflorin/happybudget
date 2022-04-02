@@ -43,20 +43,20 @@ const Dashboard = (): JSX.Element => {
         sidebar={[
           {
             label: "Templates",
-            icon: <Icon icon={"file-plus"} weight={"light"} />,
-            activeIcon: <Icon icon={"file-plus"} weight={"solid"} />,
+            icon: <Icon icon={"folder-open"} weight={"regular"} />,
+            activeIcon: <Icon icon={"folder-open"} weight={"solid"} />,
             submenu: [
               {
                 label: "Discover",
-                icon: <Icon icon={"users"} weight={"light"} />,
-                activeIcon: <Icon icon={"users"} weight={"solid"} />,
+                icon: <Icon icon={"camera-movie"} weight={"regular"} />,
+                activeIcon: <Icon icon={"camera-movie"} weight={"solid"} />,
                 onClick: () => history.push("/discover"),
                 active: location.pathname.startsWith("/discover")
               },
               {
                 label: "My Templates",
-                icon: <Icon icon={"folder-open"} weight={"light"} />,
-                activeIcon: <Icon icon={"folder-open"} weight={"solid"} />,
+                icon: <Icon icon={"copy"} weight={"regular"} />,
+                activeIcon: <Icon icon={"copy"} weight={"solid"} />,
                 onClick: () => history.push("/templates"),
                 active: location.pathname.startsWith("/templates")
               }
@@ -64,19 +64,19 @@ const Dashboard = (): JSX.Element => {
           },
           {
             label: "Budgets",
-            icon: <Icon icon={"file-plus"} weight={"light"} />,
-            activeIcon: <Icon icon={"file-plus"} weight={"solid"} />,
+            icon: <Icon icon={"folder-open"} weight={"regular"} />,
+            activeIcon: <Icon icon={"folder-open"} weight={"solid"} />,
             submenu: [
               {
                 label: "Active",
-                icon: <Icon icon={"copy"} weight={"light"} />,
+                icon: <Icon icon={"copy"} weight={"regular"} />,
                 activeIcon: <Icon icon={"copy"} weight={"solid"} />,
                 onClick: () => history.push("/budgets"),
                 active: location.pathname.startsWith("/budgets")
               },
               {
                 label: "Collaborating",
-                icon: <Icon icon={"users"} weight={"light"} />,
+                icon: <Icon icon={"users"} weight={"regular"} />,
                 activeIcon: <Icon icon={"users"} weight={"solid"} />,
                 onClick: () => history.push("/collaborating"),
                 active: location.pathname.startsWith("/collaborating"),
@@ -84,7 +84,7 @@ const Dashboard = (): JSX.Element => {
               },
               {
                 label: "Archive",
-                icon: <Icon icon={"books"} weight={"light"} />,
+                icon: <Icon icon={"books"} weight={"regular"} />,
                 activeIcon: <Icon icon={"books"} weight={"solid"} />,
                 onClick: () => history.push("/archive"),
                 active: location.pathname.startsWith("/archive")
@@ -93,7 +93,7 @@ const Dashboard = (): JSX.Element => {
           },
           {
             label: "Contacts",
-            icon: <Icon icon={"address-book"} weight={"light"} flip={"horizontal"} />,
+            icon: <Icon icon={"address-book"} weight={"regular"} flip={"horizontal"} />,
             activeIcon: <Icon icon={"address-book"} weight={"solid"} flip={"horizontal"} />,
             onClick: () => history.push("/contacts"),
             active: location.pathname.startsWith("/contacts")
