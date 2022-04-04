@@ -82,7 +82,7 @@ const useKeyboardNavigation = <
     () =>
       props.parentType === "account"
         ? (row: Table.ModelRow<R>) =>
-            props.authenticated === true
+            props.authenticated === true && row.children.length === 0
               ? confirmRowExpand([row], "You are about to expand the row.")
               : history.push(
                   budgeting.urls.getUrl(
