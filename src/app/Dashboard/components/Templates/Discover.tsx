@@ -28,7 +28,7 @@ const Discover: React.FC<DiscoverProps> = ({ onCreateBudget, onDeriveBudget }): 
   const history = useHistory();
 
   useEffect(() => {
-    dispatch(actions.requestTemplatesAction(null));
+    dispatch(actions.requestCommunityAction(null));
   }, []);
 
   return (
@@ -36,13 +36,11 @@ const Discover: React.FC<DiscoverProps> = ({ onCreateBudget, onDeriveBudget }): 
       <GenericOwnedTemplate
         title={"Discover"}
         selector={(s: Application.Store) => s.dashboard.community}
-        onSearch={(v: string) => dispatch(actions.setCommunityTemplatesSearchAction(v, {}))}
-        onUpdatePagination={(p: Pagination) => dispatch(actions.setCommunityTemplatesPaginationAction(p))}
-        onUpdateOrdering={(o: Redux.UpdateOrderingPayload) =>
-          dispatch(actions.updateCommunityTemplatesOrderingAction(o))
-        }
+        onSearch={(v: string) => dispatch(actions.setCommunitySearchAction(v, {}))}
+        onUpdatePagination={(p: Pagination) => dispatch(actions.setCommunityPaginationAction(p))}
+        onUpdateOrdering={(o: Redux.UpdateOrderingPayload) => dispatch(actions.updateCommunityOrderingAction(o))}
         onCreate={onCreateBudget}
-        onDeleted={(b: Model.SimpleTemplate) => dispatch(actions.removeCommunityTemplateFromStateAction(b.id))}
+        onDeleted={(b: Model.SimpleTemplate) => dispatch(actions.removeCommunityFromStateAction(b.id))}
         lastCard={(budgets: Model.SimpleTemplate[]) => (
           <ShowHide show={budgets.length !== 0}>
             <EmptyCard
@@ -68,12 +66,12 @@ const Discover: React.FC<DiscoverProps> = ({ onCreateBudget, onDeriveBudget }): 
               disabled={params.deleting}
               loading={params.deleting}
               onVisibilityToggled={(b: Model.Template) =>
-                dispatch(actions.updateCommunityTemplateInStateAction({ id: params.budget.id, data: b }))
+                dispatch(actions.updateCommunityInStateAction({ id: params.budget.id, data: b }))
               }
               onEdit={() => history.push(`/templates/${params.budget.id}/accounts`)}
               onEditNameImage={() => setTemplateToEdit(params.budget.id)}
               onClick={() => onDeriveBudget(params.budget.id)}
-              onDuplicated={(b: Model.Template) => dispatch(actions.addCommunityTemplateToStateAction(b))}
+              onDuplicated={(b: Model.Template) => dispatch(actions.addCommunityToStateAction(b))}
             />
           );
           if (user.is_staff !== true) {
@@ -93,7 +91,7 @@ const Discover: React.FC<DiscoverProps> = ({ onCreateBudget, onDeriveBudget }): 
             onCancel={() => setTemplateToEdit(undefined)}
             onSuccess={(template: Model.Template) => {
               setTemplateToEdit(undefined);
-              dispatch(actions.updateCommunityTemplateInStateAction({ id: template.id, data: template }));
+              dispatch(actions.updateCommunityInStateAction({ id: template.id, data: template }));
             }}
           />
         </IsStaff>
@@ -105,7 +103,7 @@ const Discover: React.FC<DiscoverProps> = ({ onCreateBudget, onDeriveBudget }): 
           onCancel={() => setCreateTempateModalOpen(false)}
           onSuccess={(template: Model.Template) => {
             setCreateTempateModalOpen(false);
-            dispatch(actions.addCommunityTemplateToStateAction(template));
+            dispatch(actions.addCommunityToStateAction(template));
             history.push(`/templates/${template.id}/accounts`);
           }}
         />

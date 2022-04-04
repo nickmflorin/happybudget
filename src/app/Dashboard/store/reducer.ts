@@ -111,15 +111,15 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
   community: redux.reducers.createAuthenticatedModelListResponseReducer<Model.SimpleTemplate>({
     initialState: redux.initialAuthenticatedModelListResponseState,
     actions: {
-      request: actions.requestCommunityTemplatesAction,
-      response: actions.responseCommunityTemplatesAction,
-      loading: actions.loadingCommunityTemplatesAction,
-      setSearch: actions.setCommunityTemplatesSearchAction,
-      addToState: actions.addCommunityTemplateToStateAction,
-      removeFromState: actions.removeCommunityTemplateFromStateAction,
-      updateInState: actions.updateCommunityTemplateInStateAction,
-      setPagination: actions.setCommunityTemplatesPaginationAction,
-      updateOrdering: actions.updateCommunityTemplatesOrderingAction
+      request: actions.requestCommunityAction,
+      response: actions.responseCommunityAction,
+      loading: actions.loadingCommunityAction,
+      setSearch: actions.setCommunitySearchAction,
+      addToState: actions.addCommunityToStateAction,
+      removeFromState: actions.removeCommunityFromStateAction,
+      updateInState: actions.updateCommunityInStateAction,
+      setPagination: actions.setCommunityPaginationAction,
+      updateOrdering: actions.updateCommunityOrderingAction
     }
   })
 });

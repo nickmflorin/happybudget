@@ -75,19 +75,19 @@ function* watchForSearchTemplatesSaga(): SagaIterator {
   yield debounce(250, actions.setTemplatesSearchAction.toString(), tasks.getTemplatesTask);
 }
 
-function* watchForCommunityTemplatesRefreshSaga(): SagaIterator {
+function* watchForCommunityRefreshSaga(): SagaIterator {
   yield takeLatest(
     [
-      actions.requestCommunityTemplatesAction.toString(),
-      actions.setCommunityTemplatesPaginationAction.toString(),
-      actions.updateCommunityTemplatesOrderingAction.toString()
+      actions.requestCommunityAction.toString(),
+      actions.setCommunityPaginationAction.toString(),
+      actions.updateCommunityOrderingAction.toString()
     ],
-    tasks.getCommunityTemplatesTask
+    tasks.getCommunityTask
   );
 }
 
-function* watchForSearchCommunityTemplatesSaga(): SagaIterator {
-  yield debounce(250, actions.setCommunityTemplatesSearchAction.toString(), tasks.getCommunityTemplatesTask);
+function* watchForSearchCommunitySaga(): SagaIterator {
+  yield debounce(250, actions.setCommunitySearchAction.toString(), tasks.getCommunityTask);
 }
 
 const ActionMap = {
@@ -125,6 +125,6 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForArchiveRefreshSaga);
   yield spawn(watchForArchivePermissioningRefreshSaga);
   yield spawn(watchForSearchArchiveSaga);
-  yield spawn(watchForCommunityTemplatesRefreshSaga);
-  yield spawn(watchForSearchCommunityTemplatesSaga);
+  yield spawn(watchForCommunityRefreshSaga);
+  yield spawn(watchForSearchCommunitySaga);
 }

@@ -80,28 +80,24 @@ export const addTemplateToStateAction = redux.actions.createAction<Model.SimpleT
 );
 export const removeTemplateFromStateAction = redux.actions.createAction<number>("dashboard.templates.RemoveFromState");
 
-export const requestCommunityTemplatesAction = redux.actions.createAction<null>("dashboard.community.Request");
-export const loadingCommunityTemplatesAction = redux.actions.createAction<boolean>("dashboard.community.Loading");
-export const responseCommunityTemplatesAction =
+export const requestCommunityAction = redux.actions.createAction<null>("dashboard.community.Request");
+export const loadingCommunityAction = redux.actions.createAction<boolean>("dashboard.community.Loading");
+export const responseCommunityAction =
   redux.actions.createAction<Http.ListResponse<Model.SimpleTemplate>>("dashboard.community.Response");
-export const setCommunityTemplatesSearchAction = redux.actions.createTableAction<string, Table.Context>(
+export const setCommunitySearchAction = redux.actions.createTableAction<string, Table.Context>(
   "dashboard.community.SetSearch"
 );
-export const setCommunityTemplatesPaginationAction = redux.actions.createAction<Pagination>(
-  "dashboard.community.SetPagination"
-);
-export const updateCommunityTemplatesOrderingAction = redux.actions.createAction<Redux.UpdateOrderingPayload>(
+export const setCommunityPaginationAction = redux.actions.createAction<Pagination>("dashboard.community.SetPagination");
+export const updateCommunityOrderingAction = redux.actions.createAction<Redux.UpdateOrderingPayload>(
   "dashboard.community.UpdateOrdering"
 );
-export const updateCommunityTemplateInStateAction = redux.actions.createAction<
-  Redux.UpdateModelPayload<Model.SimpleTemplate>
->("dashboard.community.UpdateInState");
-export const addCommunityTemplateToStateAction = redux.actions.createAction<Model.SimpleTemplate>(
+export const updateCommunityInStateAction = redux.actions.createAction<Redux.UpdateModelPayload<Model.SimpleTemplate>>(
+  "dashboard.community.UpdateInState"
+);
+export const addCommunityToStateAction = redux.actions.createAction<Model.SimpleTemplate>(
   "dashboard.community.AddToState"
 );
-export const removeCommunityTemplateFromStateAction = redux.actions.createAction<number>(
-  "dashboard.community.RemoveFromState"
-);
+export const removeCommunityFromStateAction = redux.actions.createAction<number>("dashboard.community.RemoveFromState");
 
 export const handleContactsTableEventAction = redux.actions.createTableAction<
   Table.Event<Tables.ContactRowData, Model.Contact>,

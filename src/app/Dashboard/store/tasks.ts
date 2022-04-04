@@ -125,7 +125,7 @@ export function* getTemplatesTask(action: Redux.Action<null>): SagaIterator {
   }
 }
 
-export function* getCommunityTemplatesTask(action: Redux.Action<null>): SagaIterator {
+export function* getCommunityTask(action: Redux.Action<null>): SagaIterator {
   const query = yield select((state: Application.Store) => {
     return {
       search: state.dashboard.community.search,
@@ -134,18 +134,18 @@ export function* getCommunityTemplatesTask(action: Redux.Action<null>): SagaIter
       ordering: state.dashboard.community.ordering
     };
   });
-  yield put(actions.loadingCommunityTemplatesAction(true));
+  yield put(actions.loadingCommunityAction(true));
   try {
     const response: Http.ListResponse<Model.SimpleTemplate> = yield http.request(
       api.getCommunityTemplates,
       action.context,
       query
     );
-    yield put(actions.responseCommunityTemplatesAction(response));
+    yield put(actions.responseCommunityAction(response));
   } catch (e: unknown) {
     notifications.ui.banner.handleRequestError(e as Error);
-    yield put(actions.responseCommunityTemplatesAction({ count: 0, data: [] }));
+    yield put(actions.responseCommunityAction({ count: 0, data: [] }));
   } finally {
-    yield put(actions.loadingCommunityTemplatesAction(false));
+    yield put(actions.loadingCommunityAction(false));
   }
 }
