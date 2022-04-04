@@ -43,7 +43,7 @@ const Collaborating = (props: CollaboratingProps): JSX.Element => {
 							 proper permissions creating multiple budgets during the API
 							 request anyways, this is okay. */
             if (
-              user.num_budgets !== 0 &&
+              user.metrics.num_budgets !== 0 &&
               !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
             ) {
               dispatch(store.actions.setProductPermissionModalOpenAction(true));

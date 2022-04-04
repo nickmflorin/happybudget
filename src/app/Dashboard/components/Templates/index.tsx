@@ -26,7 +26,7 @@ const Templates = (props: TemplatesProps): JSX.Element => {
     () => (id: number | undefined) => {
       if (
         id !== undefined &&
-        user.num_budgets !== 0 &&
+        user.metrics.num_budgets !== 0 &&
         !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
       ) {
         dispatch(store.actions.setProductPermissionModalOpenAction(true));
@@ -52,7 +52,7 @@ const Templates = (props: TemplatesProps): JSX.Element => {
           onSuccess={(budget: Model.UserBudget) => {
             setTemplateToDerive(undefined);
             dispatch(actions.addBudgetToStateAction(budget));
-            dispatch(store.actions.updateLoggedInUserAction({ ...user, num_budgets: user.num_budgets + 1 }));
+            dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "increment" }));
             history.push(`/budgets/${budget.id}/accounts`);
           }}
         />

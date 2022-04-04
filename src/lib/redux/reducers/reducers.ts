@@ -121,3 +121,28 @@ export const createSelectionReducer = <M extends Model.Model>(
     return state;
   };
 };
+
+export const withActionsOnly = <S, A extends Redux.Action = Redux.Action>(
+  reducer: Redux.Reducer<S, A>,
+  initialState: S,
+  actions: (Redux.ActionCreator | Redux.TableActionCreator | string)[]
+): Redux.Reducer<S, A> => {
+  const actionNames = reduce(
+    actions,
+    (curr: string[], a: Redux.ActionCreator | Redux.TableActionCreator | string) =>
+      typeof a === "string" ? [...curr, a] : [...curr, a.toString()],
+    []
+  );
+  /* We have to force coerce to R since the form of the reducer may differ based
+     on the optional s? parameter and included initialState initializer:
+
+		 (1) (s: S | undefined = initialState, a: A) => S
+		 (2) (s: S, a: A) => S
+		 */
+  return (s: S | undefined = initialState, a: A): S => {
+    if (!includes(actionNames, a.type)) {
+      return s;
+    }
+    return reducer(s, a);
+  };
+};

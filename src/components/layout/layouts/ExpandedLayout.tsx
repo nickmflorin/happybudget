@@ -3,7 +3,7 @@ import classNames from "classnames";
 
 import { ui } from "lib";
 
-import { ExpandedSidebar } from "./Sidebar";
+import { ExpandedSidebar } from "../sidebars";
 import GenericLayout, { GenericLayoutProps } from "./GenericLayout";
 
 export interface ExpandedLayoutProps extends Omit<GenericLayoutProps, "sidebar"> {

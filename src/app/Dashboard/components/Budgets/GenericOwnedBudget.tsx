@@ -30,12 +30,7 @@ const GenericOwnedBudget = (props: GenericOwnedBudgetProps): JSX.Element => {
       {...props}
       noDataProps={{ ...props.noDataProps, child: <BudgetEmptyIcon /> }}
       onDeleted={(b: Model.SimpleBudget) => {
-        dispatch(
-          store.actions.updateLoggedInUserAction({
-            ...user,
-            num_budgets: Math.max(user.num_budgets - 1, 0)
-          })
-        );
+        dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "decrement" }));
         props.onDeleted(b);
       }}
       confirmDeleteProps={{ suppressionKey: "delete-budget-confirmation-suppressed", title: "Delete Budget" }}
@@ -49,7 +44,7 @@ const GenericOwnedBudget = (props: GenericOwnedBudgetProps): JSX.Element => {
 							 proper permissions creating multiple budgets during the API
 							 request anyways, this is okay. */
             if (
-              user.num_budgets !== 0 &&
+              user.metrics.num_budgets !== 0 &&
               !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
             ) {
               dispatch(store.actions.setProductPermissionModalOpenAction(true));

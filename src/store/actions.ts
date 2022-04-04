@@ -3,6 +3,8 @@ import { redux } from "lib";
 export const setApplicationLoadingAction = redux.actions.createAction<boolean>("SetApplicationLoading");
 export const setApplicationDrawerAction = redux.actions.createAction<boolean | "TOGGLE">("SetApplicationDrawer");
 
+export const updateLoggedInUserMetricsAction =
+  redux.actions.createAction<Redux.UserMetricsActionPayload>("user.UpdateMetrics");
 export const updateLoggedInUserAction = redux.actions.createAction<Model.User>("user.UpdateInState");
 export const clearLoggedInUserAction = redux.actions.createAction<null>("user.Clear");
 export const setProductPermissionModalOpenAction = redux.actions.createAction<boolean>("SetProductPermissionModalOpen");

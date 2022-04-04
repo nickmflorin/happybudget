@@ -3,7 +3,7 @@ import classNames from "classnames";
 
 import { ui } from "lib";
 
-import { CollapsedSidebar } from "./Sidebar";
+import { CollapsedSidebar } from "../sidebars";
 import GenericLayout, { GenericLayoutProps } from "./GenericLayout";
 import { isNil } from "lodash";
 

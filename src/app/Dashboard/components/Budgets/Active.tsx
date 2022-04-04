@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
+import * as store from "store";
+
 import { BudgetCard } from "components/containers/cards";
 import { BudgetEmptyIcon } from "components/svgs";
 
@@ -36,6 +38,7 @@ const Active = (props: ActiveProps): JSX.Element => {
       onDeleted={(b: Model.SimpleBudget) => {
         dispatch(actions.removeBudgetFromStateAction(b.id));
         dispatch(actions.requestPermissioningBudgetsAction(null));
+        dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "decrement" }));
       }}
       renderCard={(params: RenderGenericOwnedBudgetCardParams) => (
         <BudgetCard
@@ -45,9 +48,16 @@ const Active = (props: ActiveProps): JSX.Element => {
           onEdit={() => props.onEdit(params.budget)}
           onArchived={(b: Model.UserBudget) => {
             dispatch(actions.removeBudgetFromStateAction(b.id));
+            dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "decrement" }));
             dispatch(actions.addArchiveToStateAction(b));
+            dispatch(
+              store.actions.updateLoggedInUserMetricsAction({ metric: "num_archived_budgets", change: "increment" })
+            );
           }}
-          onDuplicated={(b: Model.UserBudget) => dispatch(actions.addBudgetToStateAction(b))}
+          onDuplicated={(b: Model.UserBudget) => {
+            dispatch(actions.addBudgetToStateAction(b));
+            dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "increment" }));
+          }}
         />
       )}
     />

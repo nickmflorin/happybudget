@@ -40,6 +40,11 @@ const GenericSidebarItem = <T extends ISidebarItem>(
             <div className={"icon-container"}>{active && !isNil(props.activeIcon) ? props.activeIcon : props.icon}</div>
           </ShowHide>
           {props.children}
+          <ShowHide show={!isNil(props.tagText)}>
+            <div className={"sidebar-menu-item-tag-container"}>
+              <div className={"sidebar-menu-item-tag"}>{props.tagText}</div>
+            </div>
+          </ShowHide>
         </div>
         <ShowHide show={props.separatorAfter === true}>
           <Separator color={"#3f4252"} style={{ width: "80%" }} />

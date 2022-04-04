@@ -112,6 +112,14 @@ declare namespace Model {
     readonly profile_image: SavedImage | null;
   };
 
+  type UserMetrics = {
+    readonly num_budgets: number;
+    readonly num_collaborating_budgets: number;
+    readonly num_templates: number;
+    readonly num_contacts: number;
+    readonly num_archived_budgets: number;
+  };
+
   type User = SimpleUser & {
     readonly last_login: null | string;
     readonly date_joined: string;
@@ -126,7 +134,7 @@ declare namespace Model {
     readonly phone_number: number | null;
     readonly product_id: ProductId | null;
     readonly billing_status: BillingStatus | null;
-    readonly num_budgets: number;
+    readonly metrics: UserMetrics;
   };
 
   type SimpleAttachment = HttpModel & {

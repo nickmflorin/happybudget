@@ -1,4 +1,4 @@
-export * from "./Layout";
+export * from "./layouts";
 export { default as Portal } from "./Portal";
 export { default as Page } from "./Page";
 export { default as PortalOrRender } from "./PortalOrRender";

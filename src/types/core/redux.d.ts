@@ -67,35 +67,35 @@ declare namespace Redux {
 
   type Dispatch = import("redux").Dispatch<Action>;
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type BasicAction<P extends ActionPayload = any, T extends string = string> = {
+  type BasicAction<P extends ActionPayload = ActionPayload, T extends string = string> = {
     readonly payload: P;
     readonly type: T;
   };
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type Action<P extends ActionPayload = any, C extends ActionContext = ActionContext> = BasicAction<P> & {
+  type Action<
+    P extends ActionPayload = ActionPayload,
+    C extends ActionContext = ActionContext,
+    T extends string = string
+  > = BasicAction<P, T> & {
     readonly context: C;
     readonly user?: Model.User | null;
   };
 
   type TableActionContext<C extends Table.Context = Table.Context> = WithActionContext<C>;
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type TableAction<P extends ActionPayload = any, C extends Table.Context = Table.Context> = Action<
-    P,
-    WithActionContext<C>
-  >;
+  type TableAction<
+    P extends ActionPayload = ActionPayload,
+    C extends Table.Context = Table.Context,
+    T extends string = string
+  > = Action<P, WithActionContext<C>, T>;
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type ActionCreator<P extends ActionPayload = any> = {
+  type ActionCreator<P extends ActionPayload = ActionPayload> = {
     type: string;
     toString: () => string;
     (p: P, ctx?: Pick<ActionContext, "errorMessage">): Action<P>;
   };
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type TableActionCreator<P extends ActionPayload = any, C extends Table.Context = Table.Context> = {
+  type TableActionCreator<P extends ActionPayload = ActionPayload, C extends Table.Context = Table.Context> = {
     type: string;
     toString: () => string;
     (p: P, ctx: Omit<WithActionContext<C>, "publicTokenId">): Action<P, WithActionContext<C>>;
@@ -126,6 +126,38 @@ declare namespace Redux {
     id: T["id"];
     data: Partial<T>;
   };
+
+  type UserMetricsIncrementByPayload = {
+    readonly incrementBy: number;
+    readonly metric: keyof Model.User["metrics"];
+  };
+
+  type UserMetricsDecrementByPayload = {
+    readonly decrementBy: number;
+    readonly metric: keyof Model.User["metrics"];
+  };
+
+  type UserMetricsChangePayload = {
+    readonly change: "increment" | "decrement";
+    readonly metric: keyof Model.User["metrics"];
+  };
+
+  type UserMetricsValuePayload = {
+    readonly value: number;
+    readonly metric: keyof Model.User["metrics"];
+  };
+
+  type UserMetricsActionPayload =
+    | UserMetricsIncrementByPayload
+    | UserMetricsDecrementByPayload
+    | UserMetricsChangePayload
+    | UserMetricsValuePayload;
+
+  type UserMetricsAction =
+    | Redux.Action<UserMetricsIncrementByPayload>
+    | Redux.Action<UserMetricsDecrementByPayload>
+    | Redux.Action<UserMetricsChangePayload>
+    | Redux.Action<UserMetricsValuePayload>;
 
   type HttpUpdateModelPayload<T extends Model.Model, P> = {
     id: T["id"];

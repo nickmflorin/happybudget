@@ -1,5 +1,5 @@
 import { SagaIterator } from "redux-saga";
-import { put, select } from "redux-saga/effects";
+import { all, put, select, call } from "redux-saga/effects";
 
 import * as api from "api";
 import { notifications, http } from "lib";
@@ -148,4 +148,13 @@ export function* getCommunityTask(action: Redux.Action<null>): SagaIterator {
   } finally {
     yield put(actions.loadingCommunityAction(false));
   }
+}
+
+export function* getDataTask(action: Redux.Action<null>): SagaIterator {
+  yield all([
+    call(getBudgetsTask, action),
+    call(getArchiveTask, action),
+    call(getTemplatesTask, action),
+    call(getCollaboratingTask, action)
+  ]);
 }

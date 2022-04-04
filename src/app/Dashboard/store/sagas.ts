@@ -7,6 +7,10 @@ import * as store from "store";
 import * as actions from "./actions";
 import * as tasks from "./tasks";
 
+function* watchForRequestSaga(): SagaIterator {
+  yield takeLatest([actions.requestDataAction.toString()], tasks.getDataTask);
+}
+
 function* watchForBudgetsRefreshSaga(): SagaIterator {
   yield takeLatest(
     [
@@ -127,4 +131,5 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForSearchArchiveSaga);
   yield spawn(watchForCommunityRefreshSaga);
   yield spawn(watchForSearchCommunitySaga);
+  yield spawn(watchForRequestSaga);
 }

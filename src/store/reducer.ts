@@ -1,39 +1,69 @@
 import { combineReducers, CombinedState } from "redux";
 
-import { isNil, reduce, filter } from "lodash";
+import { reduce, filter } from "lodash";
 import { redux } from "lib";
 
 import * as actions from "./actions";
 
-const createUserReducer =
-  (user: Model.User | null): Redux.Reducer<Model.User | null, Redux.Action<Model.User>> =>
-  (state: Model.User | null = user, action: Redux.Action<Model.User>): Model.User | null => {
-    /* We only allow the user to be updated in the store if the store was
-       initially configured with that user.  If the store was not configured with
-       that user or the store was configured with no user at all, we do not
-       permit the update. */
-    if (action.type === actions.updateLoggedInUserAction.toString()) {
-      if (state !== null) {
-        if (state.id !== action.payload.id) {
-          throw new Error("Attempting to update the store with different user than the store was configured for.");
-        }
-        return { ...state, ...action.payload };
-      }
-    } else if (action.type === actions.clearLoggedInUserAction.toString()) {
-      return null;
-    }
-    return state;
-  };
+type UpdateUserAction = Redux.Action<Model.User>;
+type ClearUserAction = Redux.Action<null>;
+type UserAction = UpdateUserAction | Redux.UserMetricsAction | ClearUserAction;
 
-const loadingReducer: Redux.Reducer<boolean, Redux.Action<boolean>> = (
-  state = false,
-  action: Redux.Action<boolean>
-): boolean => {
-  if (!isNil(action.payload) && action.type === actions.setApplicationLoadingAction.toString()) {
-    return action.payload;
+const isUserMetricsValueAction = (a: Redux.UserMetricsAction): a is Redux.Action<Redux.UserMetricsValuePayload> =>
+  (a as Redux.Action<Redux.UserMetricsValuePayload>).payload.value !== undefined;
+
+const isUserMetricsChangeAction = (a: Redux.UserMetricsAction): a is Redux.Action<Redux.UserMetricsChangePayload> =>
+  (a as Redux.Action<Redux.UserMetricsChangePayload>).payload.change !== undefined;
+
+const isUserMetricsIncrementByAction = (
+  a: Redux.UserMetricsAction
+): a is Redux.Action<Redux.UserMetricsIncrementByPayload> =>
+  (a as Redux.Action<Redux.UserMetricsIncrementByPayload>).payload.incrementBy !== undefined;
+
+const userMetricsReducer = (state: Model.UserMetrics, action: Redux.UserMetricsAction): Model.UserMetrics => {
+  const metric = action.payload.metric;
+  if (isUserMetricsValueAction(action)) {
+    return { ...state, [metric]: action.payload.value };
+  } else if (isUserMetricsChangeAction(action)) {
+    return action.payload.change === "decrement"
+      ? { ...state, [metric]: Math.max(state[metric] - 1, 0) }
+      : { ...state, [metric]: state[metric] + 1 };
+  } else if (isUserMetricsIncrementByAction(action)) {
+    return { ...state, [metric]: state[metric] + action.payload.incrementBy };
+  } else {
+    return { ...state, [metric]: Math.max(state[metric] - action.payload.decrementBy, 0) };
   }
-  return state;
 };
+
+const isUpdateUserAction = (a: UserAction): a is UpdateUserAction =>
+  a.type === actions.updateLoggedInUserAction.toString();
+
+const isUserMetricsAction = (a: UserAction): a is Redux.UserMetricsAction =>
+  a.type === actions.updateLoggedInUserMetricsAction.toString();
+
+const createUserReducer =
+  (user: Model.User | null): Redux.Reducer<Model.User | null, UserAction> =>
+  (state: Model.User | null = user, action: UserAction): Model.User | null => {
+    /* We only allow the user or the user metrics to be updated in the store if
+		   the store was initially configured with that user.  If the store was not
+			 configured with a user, we simply do not perform the update.  If the store
+			 was configured with a different user, than we need to raise an error - as
+			 this is a sign that there is a flaw in our application logic. */
+    if (isUserMetricsAction(action) || isUpdateUserAction(action)) {
+      /* Do not permit the update if the store was not configured with a user or
+         the user was cleared from the store. */
+      if (state !== null) {
+        if (isUpdateUserAction(action) && state.id !== action.payload.id) {
+          throw new Error("Attempting to update the store with different user than the store was configured for.");
+        } else if (isUpdateUserAction(action)) {
+          return { ...state, ...action.payload };
+        } else {
+          return { ...state, metrics: userMetricsReducer(state.metrics, action) };
+        }
+      }
+    }
+    return null;
+  };
 
 const createModularApplicationReducer = <
   S extends Application.AuthenticatedModuleReducers | Application.PublicModuleReducers
@@ -96,8 +126,14 @@ const createApplicationReducer = (config: Application.StoreConfig): Redux.Reduce
         setSearch: actions.setContactsSearchAction
       }
     }),
-    loading: loadingReducer,
-    user: createUserReducer(config.user),
+    loading: redux.reducers.createSimpleBooleanReducer({
+      actions: { set: actions.setApplicationLoadingAction }
+    }),
+    user: redux.reducers.withActionsOnly<Model.User | null, UserAction>(createUserReducer(config.user), config.user, [
+      actions.updateLoggedInUserAction,
+      actions.updateLoggedInUserMetricsAction,
+      actions.clearLoggedInUserAction
+    ]),
     productPermissionModalOpen: redux.reducers.createSimpleBooleanReducer({
       actions: { set: actions.setProductPermissionModalOpenAction }
     }),

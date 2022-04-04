@@ -42,7 +42,10 @@ const BudgetCard = ({ onArchived, onDuplicated, ...props }: BudgetCardProps): JS
 
   const duplicate = useMemo(
     () => (e: MenuItemModelClickEvent) => {
-      if (user.num_budgets !== 0 && !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)) {
+      if (
+        user.metrics.num_budgets !== 0 &&
+        !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
+      ) {
         dispatch(store.actions.setProductPermissionModalOpenAction(true));
       } else {
         setDuplicating(true);

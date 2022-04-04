@@ -1,5 +1,7 @@
 import { redux } from "lib";
 
+export const requestDataAction = redux.actions.createAction<null>("dashboard.Request");
+
 export const requestBudgetsAction = redux.actions.createAction<null>("dashboard.budgets.Request");
 export const requestPermissioningBudgetsAction = redux.actions.createAction<null>(
   "dashboard.budgets.RequestPermissioned"

@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
+import * as store from "store";
+
 import { ArchivedBudgetCard } from "components/containers/cards";
 import { BudgetEmptyIcon } from "components/svgs";
 
@@ -31,6 +33,9 @@ const Archive = (props: ArchiveProps): JSX.Element => {
       onDeleted={(b: Model.SimpleBudget) => {
         dispatch(actions.removeArchiveFromStateAction(b.id));
         dispatch(actions.requestPermissioningArchiveAction(null));
+        dispatch(
+          store.actions.updateLoggedInUserMetricsAction({ metric: "num_archived_budgets", change: "decrement" })
+        );
       }}
       renderCard={(params: RenderGenericOwnedBudgetCardParams) => (
         <ArchivedBudgetCard
@@ -39,7 +44,11 @@ const Archive = (props: ArchiveProps): JSX.Element => {
           loading={params.deleting}
           onEdit={() => props.onEdit(params.budget)}
           onActivated={(b: Model.UserBudget) => {
+            dispatch(
+              store.actions.updateLoggedInUserMetricsAction({ metric: "num_archived_budgets", change: "decrement" })
+            );
             dispatch(actions.removeArchiveFromStateAction(b.id));
+            dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "increment" }));
             dispatch(actions.addBudgetToStateAction(b));
           }}
         />

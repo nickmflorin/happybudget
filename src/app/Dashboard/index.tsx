@@ -26,7 +26,7 @@ const Dashboard = (): JSX.Element => {
     () => (v: boolean) => {
       if (
         v === true &&
-        user.num_budgets !== 0 &&
+        user.metrics.num_budgets !== 0 &&
         !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
       ) {
         dispatch(store.actions.setProductPermissionModalOpenAction(true));
@@ -58,7 +58,8 @@ const Dashboard = (): JSX.Element => {
                 icon: <Icon icon={"copy"} weight={"regular"} />,
                 activeIcon: <Icon icon={"copy"} weight={"solid"} />,
                 onClick: () => history.push("/templates"),
-                active: location.pathname.startsWith("/templates")
+                active: location.pathname.startsWith("/templates"),
+                tagText: user.metrics.num_templates
               }
             ]
           },
@@ -72,7 +73,8 @@ const Dashboard = (): JSX.Element => {
                 icon: <Icon icon={"copy"} weight={"regular"} />,
                 activeIcon: <Icon icon={"copy"} weight={"solid"} />,
                 onClick: () => history.push("/budgets"),
-                active: location.pathname.startsWith("/budgets")
+                active: location.pathname.startsWith("/budgets"),
+                tagText: user.metrics.num_budgets
               },
               {
                 label: "Collaborating",
@@ -80,14 +82,16 @@ const Dashboard = (): JSX.Element => {
                 activeIcon: <Icon icon={"users"} weight={"solid"} />,
                 onClick: () => history.push("/collaborating"),
                 active: location.pathname.startsWith("/collaborating"),
-                hidden: !Config.collaborationEnabled
+                hidden: !Config.collaborationEnabled,
+                tagText: user.metrics.num_collaborating_budgets
               },
               {
                 label: "Archive",
                 icon: <Icon icon={"books"} weight={"regular"} />,
                 activeIcon: <Icon icon={"books"} weight={"solid"} />,
                 onClick: () => history.push("/archive"),
-                active: location.pathname.startsWith("/archive")
+                active: location.pathname.startsWith("/archive"),
+                tagText: user.metrics.num_archived_budgets
               }
             ]
           },
@@ -96,7 +100,8 @@ const Dashboard = (): JSX.Element => {
             icon: <Icon icon={"address-book"} weight={"regular"} flip={"horizontal"} />,
             activeIcon: <Icon icon={"address-book"} weight={"solid"} flip={"horizontal"} />,
             onClick: () => history.push("/contacts"),
-            active: location.pathname.startsWith("/contacts")
+            active: location.pathname.startsWith("/contacts"),
+            tagText: user.metrics.num_contacts
           }
         ]}
         showHeaderTextLogo={true}
@@ -123,7 +128,7 @@ const Dashboard = (): JSX.Element => {
             /* It is safe to coerce to an Budget because the User must be logged
 						   in at this point. */
             dispatch(actions.addBudgetToStateAction(budget));
-            dispatch(store.actions.updateLoggedInUserAction({ ...user, num_budgets: user.num_budgets + 1 }));
+            dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "increment" }));
             history.push(`/budgets/${budget.id}/accounts`);
           }}
         />

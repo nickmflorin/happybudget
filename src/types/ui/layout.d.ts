@@ -25,6 +25,7 @@ declare interface ISidebarItem {
   readonly activePathRegexes?: RegExp[];
   readonly separatorAfter?: boolean;
   readonly tooltip?: Tooltip;
+  readonly tagText?: string | number;
   readonly onClick?: () => void;
 }
 
