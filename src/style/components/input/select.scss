@@ -226,17 +226,42 @@
 
 	.react-select__control {
 		min-height: $standard-size;
-		height: $standard-size;
 		border-radius: $input-border-radius;
 		border: $border !important;
 		border-color: $border-color !important;
+		box-shadow: none !important;
+		font-size: $standard-text-size;
 
 		.react-select__value-container {
 			height: $standard-size;
 			padding: 0px 6px;
 
+			&.react-select__value-container--is-multi {
+				height: unset;
+				min-height: $standard-size;
+				position: relative;
+				top: 1px;
+			}
+
 			.react-select__input-container {
 				margin: 0;
+			}
+
+			.react-select__multi-value {
+				background-color: #EFEFEF;
+				font-size: 12px;
+				font-weight: 500;
+				font-family: $avenir;
+				color: $text-secondary;
+				position: relative;
+				bottom: 1px;
+
+				.react-select__multi-value__remove {
+					&:hover {
+						background-color: unset !important;
+						color: $blue;
+					}
+				}
 			}
 		}
 
@@ -255,5 +280,60 @@
 				}
 			}
 		}
+	}
+
+	&.borderless {
+		.react-select__control {
+			border: none !important;
+		}
+	}
+
+	.react-select__menu {
+		background-color: $white;
+		border-radius: 0px;
+		box-shadow: none !important;
+		margin-bottom: 0px;
+		margin-top: 2px;
+		border: $menu-border;
+
+		.react-select__menu-list {
+			padding-top: 0px;
+			padding-bottom: 0px;
+
+			.react-select__option {
+				padding: 4px 8px;
+				line-height: 16px;
+				font-family: $avenir;
+				color: $text-secondary;
+				font-size: $medium-text-size;
+
+				&.react-select__option--is-focused {
+					color: $text-primary;
+					background-color: $active-hover-color;
+				}
+
+				&.react-select__option--is-selected {
+					color: $text-primary;
+					background-color: $active-hover-color;
+					font-weight: 500;
+				}
+			}
+		}
+	}
+}
+
+.collaborator-select-option {
+	display: flex !important;
+
+	.user-image-or-initials-container {
+		height: 24px;
+		width: 24px;
+		margin-right: 8px;
+	}
+
+	.name-container {
+		line-height: 24px;
+		font-weight: 500;
+		flex-grow: 100;
 	}
 }

@@ -13,6 +13,8 @@ declare namespace Model {
     readonly id: number;
   };
 
+  type WithStringId<M extends Model.HttpModel> = Omit<M, "id"> & { readonly id: string };
+
   type GenericHttpModel<T extends HttpModelType = HttpModelType> = HttpModel & {
     readonly type: T;
   };

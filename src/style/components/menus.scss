@@ -75,7 +75,7 @@
 	}
 
   &.selected {
-    background-color: #f1f1f1 !important;
+    background-color: $active-hover-color !important;
     span.text-container {
       color: $text-primary !important;
     }
@@ -83,7 +83,7 @@
   &:focus:not(.selected),
   &.focused:not(.selected),
   &:hover:not(.selected) {
-    background-color: #f1f1f1 !important;
+    background-color: $active-hover-color !important;
     span.text-container {
       color: $text-primary !important;
     }

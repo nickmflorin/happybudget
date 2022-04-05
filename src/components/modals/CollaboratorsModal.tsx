@@ -73,7 +73,7 @@ const CollaboratorsModal = ({ budgetId, ...props }: CollaboratorsModalProps): JS
         <div style={{ marginRight: 15, flexGrow: 100 }}>
           <CollaboratorSelect
             currentCollaborators={collaborators}
-            onChange={(ids: number[]) => setNewCollaboratorUsers(ids)}
+            onChange={(users: Model.SimpleUser[]) => setNewCollaboratorUsers(map(users, (u: Model.SimpleUser) => u.id))}
           />
         </div>
         <PrimaryButton onClick={() => addCollaborators(newCollaboratorUsers)}>{"Add"}</PrimaryButton>

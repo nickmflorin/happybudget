@@ -1,11 +1,8 @@
 import React from "react";
 import classNames from "classnames";
-import { map } from "lodash";
-
-import { model } from "lib";
 
 import { ClearButton } from "components/buttons";
-import { Select } from "components/fields";
+import { CollaboratorAccessTypeSelect } from "components/fields";
 import { UserImageOrInitials } from "components/images";
 
 type CollaboratorListItemProps = StandardComponentProps & {
@@ -29,16 +26,20 @@ const CollaboratorListItem = ({
       <UserImageOrInitials circle={true} user={collaborator.user} />
     </div>
     <div className={"name-container"}>{collaborator.user.full_name}</div>
-    <Select
-      style={{ width: 150 }}
-      value={collaborator.access_type.id}
-      options={map(model.budgeting.CollaboratorAccessTypes.choices, (ch: Model.CollaboratorAccessType) => ({
-        value: ch.id,
-        label: ch.name
-      }))}
-      onChange={(ac: Model.CollaboratorAccessTypeId) => onChangeAccessType(ac)}
-    />
-    <ClearButton onClick={() => onDelete()} />
+    <div style={{ width: 110 }}>
+      <CollaboratorAccessTypeSelect
+        value={collaborator.access_type.id}
+        onChange={(accessType: Model.CollaboratorAccessType | null) => {
+          /* Since the select will always be initialized with an access type,
+             and it is not clearable, the value should never be null.  But we
+             still have to type check to satisfy TS. */
+          if (accessType !== null) {
+            onChangeAccessType(accessType.id);
+          }
+        }}
+      />
+    </div>
+    <ClearButton iconSize={"small"} onClick={() => onDelete()} />
   </div>
 );
 

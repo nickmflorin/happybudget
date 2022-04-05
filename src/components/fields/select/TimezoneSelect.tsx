@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 
 import { Icon } from "components";
 import { Select } from "components/fields";
-import { SelectProps } from "components/fields/Select";
+import { SelectProps } from "components/fields/select/Select";
 
 // Copied directly from RC-Select
 interface OptionCoreData {
