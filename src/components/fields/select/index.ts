@@ -7,7 +7,6 @@ export { default as SingleSelect } from "./SingleSelect";
 export { default as SingleHttpModelSelect } from "./SingleHttpModelSelect";
 export { default as MultiHttpModelAsyncSelect } from "./MultiHttpModelAsyncSelect";
 export { default as ColumnSelect } from "./ColumnSelect";
-export { default as GroupSelect } from "./GroupSelect";
 export { default as HeaderTemplateSelect } from "./HeaderTemplateSelect";
 export { default as CollaboratorSelect } from "./CollaboratorSelect";
 export { default as CollaboratorAccessTypeSelect } from "./CollaboratorAccessTypeSelect";
