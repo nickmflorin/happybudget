@@ -1,22 +1,15 @@
 import React from "react";
 
 import { model } from "lib";
-import SingleHttpModelSelect, { SingleHttpModelSelectProps } from "./SingleHttpModelSelect";
+import SingleChoiceSelect, { SingleChoiceSelectProps } from "./SingleChoiceSelect";
 
 export type CollaboratorAccessTypeSelectProps = Omit<
-  SingleHttpModelSelectProps<Model.CollaboratorAccessType>,
+  SingleChoiceSelectProps<Model.CollaboratorAccessType>,
   "options" | "getOptionLabel"
 >;
 
 const CollaboratorAccessTypeSelect = (props: CollaboratorAccessTypeSelectProps): JSX.Element => (
-  <SingleHttpModelSelect
-    borderless={true}
-    {...props}
-    options={model.budgeting.CollaboratorAccessTypes.choices}
-    getOptionLabel={(option: Model.CollaboratorAccessType) => option.name}
-    isClearable={false}
-    isSearchable={false}
-  />
+  <SingleChoiceSelect borderless={true} {...props} options={model.budgeting.CollaboratorAccessTypes.choices} />
 );
 
 export default React.memo(CollaboratorAccessTypeSelect);
