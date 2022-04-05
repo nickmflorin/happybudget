@@ -47,28 +47,44 @@ const isUserClearAction = (a: UserAction): a is Redux.UserMetricsAction =>
   a.type === actions.clearLoggedInUserAction.toString();
 
 const createUserReducer = (user: Model.User | null): Redux.Reducer<Model.User | null, UserAction> => {
+  /* We only need to be concerned with metrics when the store is configured
+	   with a user, and since the user cannot change from null => Model.User
+		 without reconfiguring the store (see note below) we do not need to worry
+		 about updating the metrics reducer based on the presence of a user after
+		 the store is configured. */
   let userMetricsReducer: Redux.Reducer<Model.UserMetrics, Redux.UserMetricsAction> | null = null;
   if (user !== null) {
     userMetricsReducer = createUserMetricsReducer(user);
   }
   return (state: Model.User | null = user, action: UserAction): Model.User | null => {
-    /* We only allow the user or the user metrics to be updated in the store if
-		   the store was initially configured with that user.  If the store was not
-			 configured with a user, we simply do not perform the update.  If the store
-			 was configured with a different user, than we need to raise an error - as
-			 this is a sign that there is a flaw in our application logic. */
-    if (isUserMetricsAction(action) || isUpdateUserAction(action)) {
-      /* Do not permit the update if the store was not configured with a user or
-         the user was cleared from the store. */
-      if (state !== null) {
-        if (isUpdateUserAction(action) && state.id !== action.payload.id) {
-          throw new Error("Attempting to update the store with different user than the store was configured for.");
-        } else if (isUpdateUserAction(action)) {
-          return { ...state, ...action.payload };
-        } else if (userMetricsReducer !== null) {
-          return { ...state, metrics: userMetricsReducer(state.metrics, action) };
-        }
+    /* The user is defined when the store is configured, and will never change
+		   from a null value to Model.User (only from Model.User => null in the case
+			 of a logout).  This is because when the user is logged in, and there is
+			 an active user present, the store's state is not updated with that user,
+			 but the store is recreated/reconfigured with that logged in user.
+
+			 This means that if there is not currently a user in the store, we do not
+			 want to apply any state updates.
+			 */
+    if (state === null) {
+      return null;
+    } else if (isUpdateUserAction(action)) {
+      /* Do not permit the update to the user in the store if it pertains to
+         a different user than the store was configured for as this would
+         indicate that something is critically wrong with our application logic
+         since a different user should trigger the reconfiguration of the entire
+         store. */
+      if (state.id !== action.payload.id) {
+        throw new Error("Attempting to update the store with different user than the store was configured for.");
       }
+      return { ...state, ...action.payload };
+    } else if (isUserMetricsAction(action)) {
+      /* This should not happen, as it would mean that the user changed from
+         null to a non-null value without having reconfigured the store. */
+      if (userMetricsReducer === null) {
+        throw new Error("Attempting to update user metrics when the store was not configured with a user.");
+      }
+      return { ...state, metrics: userMetricsReducer(state.metrics, action) };
     } else if (isUserClearAction(action)) {
       return null;
     }
