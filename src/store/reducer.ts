@@ -20,20 +20,22 @@ const isUserMetricsIncrementByAction = (
 ): a is Redux.Action<Redux.UserMetricsIncrementByPayload> =>
   (a as Redux.Action<Redux.UserMetricsIncrementByPayload>).payload.incrementBy !== undefined;
 
-const userMetricsReducer = (state: Model.UserMetrics, action: Redux.UserMetricsAction): Model.UserMetrics => {
-  const metric = action.payload.metric;
-  if (isUserMetricsValueAction(action)) {
-    return { ...state, [metric]: action.payload.value };
-  } else if (isUserMetricsChangeAction(action)) {
-    return action.payload.change === "decrement"
-      ? { ...state, [metric]: Math.max(state[metric] - 1, 0) }
-      : { ...state, [metric]: state[metric] + 1 };
-  } else if (isUserMetricsIncrementByAction(action)) {
-    return { ...state, [metric]: state[metric] + action.payload.incrementBy };
-  } else {
-    return { ...state, [metric]: Math.max(state[metric] - action.payload.decrementBy, 0) };
-  }
-};
+const createUserMetricsReducer =
+  (user: Model.User): Redux.Reducer<Model.UserMetrics, Redux.UserMetricsAction> =>
+  (state: Model.UserMetrics = user.metrics, action: Redux.UserMetricsAction): Model.UserMetrics => {
+    const metric = action.payload.metric;
+    if (isUserMetricsValueAction(action)) {
+      return { ...state, [metric]: action.payload.value };
+    } else if (isUserMetricsChangeAction(action)) {
+      return action.payload.change === "decrement"
+        ? { ...state, [metric]: Math.max(state[metric] - 1, 0) }
+        : { ...state, [metric]: state[metric] + 1 };
+    } else if (isUserMetricsIncrementByAction(action)) {
+      return { ...state, [metric]: state[metric] + action.payload.incrementBy };
+    } else {
+      return { ...state, [metric]: Math.max(state[metric] - action.payload.decrementBy, 0) };
+    }
+  };
 
 const isUpdateUserAction = (a: UserAction): a is UpdateUserAction =>
   a.type === actions.updateLoggedInUserAction.toString();
@@ -41,9 +43,15 @@ const isUpdateUserAction = (a: UserAction): a is UpdateUserAction =>
 const isUserMetricsAction = (a: UserAction): a is Redux.UserMetricsAction =>
   a.type === actions.updateLoggedInUserMetricsAction.toString();
 
-const createUserReducer =
-  (user: Model.User | null): Redux.Reducer<Model.User | null, UserAction> =>
-  (state: Model.User | null = user, action: UserAction): Model.User | null => {
+const isUserClearAction = (a: UserAction): a is Redux.UserMetricsAction =>
+  a.type === actions.clearLoggedInUserAction.toString();
+
+const createUserReducer = (user: Model.User | null): Redux.Reducer<Model.User | null, UserAction> => {
+  let userMetricsReducer: Redux.Reducer<Model.UserMetrics, Redux.UserMetricsAction> | null = null;
+  if (user !== null) {
+    userMetricsReducer = createUserMetricsReducer(user);
+  }
+  return (state: Model.User | null = user, action: UserAction): Model.User | null => {
     /* We only allow the user or the user metrics to be updated in the store if
 		   the store was initially configured with that user.  If the store was not
 			 configured with a user, we simply do not perform the update.  If the store
@@ -57,13 +65,16 @@ const createUserReducer =
           throw new Error("Attempting to update the store with different user than the store was configured for.");
         } else if (isUpdateUserAction(action)) {
           return { ...state, ...action.payload };
-        } else {
+        } else if (userMetricsReducer !== null) {
           return { ...state, metrics: userMetricsReducer(state.metrics, action) };
         }
       }
+    } else if (isUserClearAction(action)) {
+      return null;
     }
-    return null;
+    return state;
   };
+};
 
 const createModularApplicationReducer = <
   S extends Application.AuthenticatedModuleReducers | Application.PublicModuleReducers
