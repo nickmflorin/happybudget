@@ -103,7 +103,7 @@ const BudgetTotal = ({ budget, budgetId, ...props }: BudgetTotalProps): JSX.Elem
   const [metric, setMetric] = useState<Charts.BudgetTotal.MetricId>("estimated");
   const [grouped, setGrouped] = useState(true);
 
-  const form = ui.useForm<BudgetTotalChartFormValues>();
+  const form = ui.form.useForm<BudgetTotalChartFormValues>();
 
   const groups = useSelector(selectGroups);
   const accounts = useSelector(selectAccounts);

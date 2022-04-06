@@ -2,13 +2,13 @@ import { isNil } from "lodash";
 
 import { isParentSidebarItem } from "./typeguards";
 
-export const itemIsActive = (
+export const sidebarItemIsActive = (
   item: IExpandedSidebarItem | ICollapsedSidebarItem,
   location: { pathname: string }
 ): boolean => {
   if (isParentSidebarItem(item)) {
     for (let i = 0; i < item.submenu.length; i++) {
-      if (itemIsActive(item.submenu[i], location)) {
+      if (sidebarItemIsActive(item.submenu[i], location)) {
         return true;
       }
     }

@@ -23,7 +23,7 @@ const ImportActualsPlaidModal = ({
   onSuccess,
   ...props
 }: ImportActualsPlaidModalProps): JSX.Element => {
-  const form = ui.useForm<ImportActualsPlaidFormValues>();
+  const form = ui.form.useForm<ImportActualsPlaidFormValues>();
   const [cancelToken] = http.useCancelToken();
 
   return (

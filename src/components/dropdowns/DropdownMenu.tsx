@@ -31,7 +31,7 @@ const DropdownMenu = <
   const [visible, setVisible] = useState(false);
 
   const _menuId = useMemo(() => (!isNil(menuId) ? menuId : uniqueId("dropdown-menu-")), [menuId]);
-  const menu = ui.useMenuIfNotDefined<S, M>(props.menu);
+  const menu = ui.menu.useMenuIfNotDefined<S, M>(props.menu);
 
   useEffect(() => {
     if (visible === true && !isNil(menu.current)) {

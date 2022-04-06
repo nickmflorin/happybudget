@@ -49,7 +49,7 @@ const ShareDropdownMenu = <P extends Model.PublicHttpModel, R extends Table.RowD
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
 
-  const menu = ui.useMenuIfNotDefined(props.menu);
+  const menu = ui.menu.useMenuIfNotDefined(props.menu);
   const overlayId = ui.useId("public-token-overlay-");
   const [cancelToken] = http.useCancelToken();
 

@@ -9,7 +9,7 @@ import { Page } from "components/layout";
 import { ChangePasswordFormValues } from "components/forms/ChangePasswordForm";
 
 const Security = (): JSX.Element => {
-  const form = ui.useForm<ChangePasswordFormValues>();
+  const form = ui.form.useForm<ChangePasswordFormValues>();
 
   return (
     <Page className={"security"} title={"Security"}>

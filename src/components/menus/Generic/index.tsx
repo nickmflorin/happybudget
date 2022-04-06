@@ -124,7 +124,7 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
 
   const [focused, setFocused] = useState(false);
 
-  const menu = ui.useMenuIfNotDefined<S, M>(props.menu);
+  const menu = ui.menu.useMenuIfNotDefined<S, M>(props.menu);
   const menuId = useMemo(() => (!isNil(props.id) ? props.id : uniqueId("menu-")), [props.id]);
 
   const defaultSelected = useMemo(

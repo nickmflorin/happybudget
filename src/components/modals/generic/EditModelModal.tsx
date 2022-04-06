@@ -63,7 +63,7 @@ const EditModelModal = <
   convertEmptyStringsToNull,
   ...props
 }: PrivateEditModelModalProps<M, P, V, R>): JSX.Element => {
-  const Form = ui.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
+  const Form = ui.form.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
   const [getToken] = http.useCancelToken({ preserve: true, createOnInit: true });
   const isMounted = ui.useIsMounted();
 

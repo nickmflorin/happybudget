@@ -24,7 +24,7 @@ const EditPublicTokenMenu = ({
   onDeleted,
   ...props
 }: EditPublicTokenMenuProps): JSX.Element => {
-  const form = ui.useForm<EditPublicTokenFormValues>();
+  const form = ui.form.useForm<EditPublicTokenFormValues>();
   const [publicToken, setPublicToken] = useState<Model.PublicToken | null>(null);
   const [cancelToken] = http.useCancelToken();
   const formRef = useRef<IEditPublicTokenFormRef>(null);

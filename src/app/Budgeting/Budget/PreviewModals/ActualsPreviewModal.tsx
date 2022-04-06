@@ -64,7 +64,7 @@ const ActualsPreviewModal = ({
   const [options, setOptions] = useState<ExportActualsPdfFormOptions>(DEFAULT_OPTIONS);
   const [actuals, setActuals] = useState<M[] | null>(null);
 
-  const form = ui.useForm<ExportActualsPdfFormOptions>({ isInModal: true });
+  const form = ui.form.useForm<ExportActualsPdfFormOptions>({ isInModal: true });
   const modal = ui.useModal();
 
   const convertOptions = useMemo(

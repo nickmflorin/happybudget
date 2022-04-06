@@ -57,7 +57,7 @@ const CreateModelModal = <
   convertEmptyStringsToNull,
   ...props
 }: PrivateCreateModelModalProps<M, P, V, R>): JSX.Element => {
-  const Form = ui.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
+  const Form = ui.form.useFormIfNotDefined<V>({ isInModal: true, autoFocusField }, form);
   const [cancelToken] = http.useCancelToken();
   const isMounted = ui.useIsMounted();
 

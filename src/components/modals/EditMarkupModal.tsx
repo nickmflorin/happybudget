@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useRef } from "react";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { ui, model, http } from "lib";
+import { model } from "lib";
 
 import { MarkupForm } from "components/forms";
 import { IMarkupForm } from "components/forms/MarkupForm";
@@ -36,31 +36,12 @@ const EditMarkupModal = <
   table,
   ...props
 }: EditMarkupModalProps<B, PARENT, R, M, RSP>): JSX.Element => {
-  const form = ui.useFormIfNotDefined<MarkupFormValues>({ isInModal: true });
-  const [cancelToken] = http.useCancelToken();
   const markupRef = useRef<IMarkupForm>(null);
-
-  const [availableChildren, setAvailableChildren] = useState<MM[]>([]);
-  const [availableChildrenLoading, setAvailableChildrenLoading] = useState(false);
-
-  useEffect(() => {
-    setAvailableChildrenLoading(true);
-    api
-      .getTableChildren<MM>(parentId, parentType, { simple: true }, { cancelToken: cancelToken() })
-      .then((response: Http.ListResponse<MM>) => {
-        setAvailableChildren(response.data);
-      })
-      .catch((e: Error) => {
-        form.handleRequestError(e);
-      })
-      .finally(() => setAvailableChildrenLoading(false));
-  }, [parentId]);
 
   return (
     <EditModelModal<Model.Markup, Http.MarkupPayload, MarkupFormValues, RSP>
       {...props}
       title={"Markup"}
-      form={form}
       request={api.getMarkup}
       updateSync={(payload: Partial<Http.MarkupPayload>, callbacks: UpdateModelCallbacks<RSP>) =>
         table.dispatchEvent({ type: "markupUpdate", payload: { id: props.id, data: payload }, ...callbacks })
@@ -86,7 +67,7 @@ const EditMarkupModal = <
         }
         return mutated;
       }}
-      setFormData={(markup: Model.Markup) => {
+      setFormData={(markup: Model.Markup, form: FormInstance<MarkupFormValues>) => {
         // Because AntD sucks and form.setFields does not trigger onValuesChanged.
         markupRef.current?.setUnitState(markup.unit?.id === undefined ? null : markup.unit?.id);
         let fields: (FormField<Model.FlatMarkup> | FormField<Model.PercentMarkup>)[] = [
@@ -106,13 +87,8 @@ const EditMarkupModal = <
         form.setFields(fields);
       }}
     >
-      {() => (
-        <MarkupForm
-          ref={markupRef}
-          form={form}
-          availableChildren={availableChildren}
-          availableChildrenLoading={availableChildrenLoading}
-        />
+      {(m: Model.Markup | null, form: FormInstance<MarkupFormValues>) => (
+        <MarkupForm<MM, PARENT> ref={markupRef} form={form} parentId={parentId} parentType={parentType} />
       )}
     </EditModelModal>
   );

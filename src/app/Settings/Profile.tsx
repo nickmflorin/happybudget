@@ -13,7 +13,7 @@ import { IImageAndNameRef } from "components/fields/ImageAndName";
 import { Page } from "components/layout";
 
 const Profile = (): JSX.Element => {
-  const form = ui.useForm<Http.UserPayload>();
+  const form = ui.form.useForm<Http.UserPayload>();
   const user = store.hooks.useLoggedInUser();
   const dispatch: Redux.Dispatch = useDispatch();
   const [image, setImage] = useState<UploadedImage | SavedImage | null>(null);

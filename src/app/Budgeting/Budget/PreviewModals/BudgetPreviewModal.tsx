@@ -86,7 +86,7 @@ const BudgetPreviewModal = ({
   const [budget, setBudget] = useState<Model.PdfBudget | null>(null);
   const [options, setOptions] = useState<ExportBudgetPdfFormOptions>(DEFAULT_OPTIONS);
 
-  const form = ui.useForm<ExportBudgetPdfFormOptions>({ isInModal: true });
+  const form = ui.form.useForm<ExportBudgetPdfFormOptions>({ isInModal: true });
   const modal = ui.useModal();
   const dispatch = useDispatch();
 

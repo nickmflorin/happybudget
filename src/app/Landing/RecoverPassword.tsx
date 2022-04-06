@@ -9,7 +9,7 @@ import { IRecoverPasswordFormValues } from "components/forms/RecoverPasswordForm
 
 const RecoverPassword = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const form = ui.useForm<IRecoverPasswordFormValues>();
+  const form = ui.form.useForm<IRecoverPasswordFormValues>();
 
   return (
     <LandingFormContainer title={"Reset password"}>

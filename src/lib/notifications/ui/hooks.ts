@@ -162,6 +162,15 @@ type UseNotificationsManagerConfig = UseNotificationsConfig & {
   readonly defaultBehavior: UINotificationBehavior;
 };
 
+export const InitialNotificationsManager: UINotificationsManager = {
+  notifications: [],
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+  clearNotifications: () => {},
+  notify: () => [],
+  lookupAndNotify: () => [],
+  handleRequestError: () => []
+};
+
 /**
  * Manages notifications for a component.
  *

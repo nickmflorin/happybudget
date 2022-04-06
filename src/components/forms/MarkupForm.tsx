@@ -1,25 +1,27 @@
 import { useImperativeHandle, useState, forwardRef, ForwardedRef } from "react";
-import { isNil, map } from "lodash";
+import { isNil } from "lodash";
 
 import { model, util } from "lib";
 
-import { Form, Icon } from "components";
-import { Input, PercentInput, Select } from "components/fields";
-import { EntityText } from "components/typography";
+import { Form } from "components";
+import { ChildrenSelect, Input, PercentInput, MarkupUnitSelect } from "components/fields";
 
 type MarkupFormValues = Omit<Http.MarkupPayload, "rate"> & { readonly rate: string };
 
-interface MarkupFormProps extends FormProps<MarkupFormValues> {
-  readonly availableChildren: (Model.SimpleAccount | Model.SimpleSubAccount)[];
-  readonly availableChildrenLoading: boolean;
-}
+type MarkupFormProps<PARENT extends Model.Account | Model.SubAccount> = FormProps<MarkupFormValues> & {
+  readonly parentId: PARENT["id"];
+  readonly parentType: PARENT["type"] | "budget";
+};
 
 export type IMarkupForm = {
   readonly setUnitState: (unit: Model.MarkupUnitId | null) => void;
 };
 
-const MarkupForm = (
-  { availableChildren, availableChildrenLoading, ...props }: MarkupFormProps,
+const MarkupForm = <
+  MM extends Model.SimpleAccount | Model.SimpleSubAccount,
+  PARENT extends Model.Account | Model.SubAccount
+>(
+  { parentType, parentId, ...props }: MarkupFormProps<PARENT>,
   ref: ForwardedRef<IMarkupForm>
 ) => {
   const [unitState, setUnitState] = useState<Model.MarkupUnitId | null>(
@@ -46,13 +48,7 @@ const MarkupForm = (
       </Form.Item>
 
       <Form.Item name={"unit"} label={"Type"} rules={[{ required: true, message: "Please select a type." }]}>
-        <Select suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />} placeholder={"Select Type"}>
-          {model.budgeting.MarkupUnits.choices.map((m: Model.MarkupUnit, index: number) => (
-            <Select.Option key={index} value={m.id}>
-              {m.name}
-            </Select.Option>
-          ))}
-        </Select>
+        <MarkupUnitSelect />
       </Form.Item>
 
       <Form.Item
@@ -116,24 +112,22 @@ const MarkupForm = (
           })
         ]}
       >
-        <Select
-          suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
-          showArrow
-          loading={availableChildrenLoading}
-          mode={"multiple"}
-          disabled={availableChildrenLoading || unitState !== model.budgeting.MarkupUnits.Percent.id}
-        >
-          {map(availableChildren, (obj: Model.SimpleAccount | Model.SimpleSubAccount, index: number) => {
-            return (
-              <Select.Option key={index + 1} value={obj.id}>
-                <EntityText fillEmpty={"----"}>{obj}</EntityText>
-              </Select.Option>
-            );
-          })}
-        </Select>
+        <ChildrenSelect<MM>
+          parentType={parentType}
+          parentId={parentId}
+          isDisabled={unitState !== model.budgeting.MarkupUnits.Percent.id}
+        />
       </Form.Item>
     </Form.Form>
   );
 };
 
-export default forwardRef(MarkupForm);
+type MarkupFormType = <
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+  MM extends Model.SimpleAccount | Model.SimpleSubAccount,
+  PARENT extends Model.Account | Model.SubAccount
+>(
+  props: MarkupFormProps<PARENT> & { readonly ref?: ForwardedRef<IMarkupForm> }
+) => JSX.Element;
+
+export default forwardRef(MarkupForm) as MarkupFormType;

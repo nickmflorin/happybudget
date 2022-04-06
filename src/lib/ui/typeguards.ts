@@ -4,7 +4,3 @@ export const iconIsJSX = (icon: IconOrElement): icon is JSX.Element => React.isV
 
 export const clickableIconIsCallback = (icon: ClickableIconOrElement): icon is ClickableIconCallback =>
   typeof icon === "function";
-
-export const isParentSidebarItem = (
-  obj: IExpandedSidebarItem | ICollapsedSidebarItem
-): obj is IExpandedParentSidebarItem => (obj as IExpandedParentSidebarItem).submenu !== undefined;

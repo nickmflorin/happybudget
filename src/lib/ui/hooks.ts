@@ -1,12 +1,11 @@
 import { RefObject, useRef, useEffect, useState, useMemo } from "react";
-import { forEach, isNil, debounce, find, reduce, uniqueId, map } from "lodash";
+import { forEach, isNil, debounce, uniqueId } from "lodash";
 import * as JsSearch from "js-search";
 import { useMediaQuery } from "react-responsive";
-import { Form as RootForm } from "antd";
 
 import { Breakpoints } from "style/constants";
 
-import { util, hooks, notifications } from "lib";
+import { hooks, notifications } from "lib";
 
 export * from "./tsxHooks";
 
@@ -52,91 +51,8 @@ export const useSize = <T extends string = StandardSize, P extends UseSizeProps<
     return config?.default || ("standard" as T);
   }, [config, props]);
 
-export const InitialLayoutRef: ILayoutRef = {
-  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-  setSidebarVisible: () => {},
-  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-  toggleSidebar: () => {},
-  sidebarVisible: true
-};
-
-export const useLayout = (): NonNullRef<ILayoutRef> => {
-  return useRef<ILayoutRef>(InitialLayoutRef);
-};
-
-export const useLayoutIfNotDefined = (layout?: NonNullRef<ILayoutRef>): NonNullRef<ILayoutRef> => {
-  const ref = useRef<ILayoutRef>(InitialLayoutRef);
-  const returnRef = useMemo(() => (!isNil(layout) ? layout : ref), [layout, ref.current]);
-  return returnRef;
-};
-
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export const InitialMenuRef: IMenuRef<any, any> = {
-  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-  setItemLoading: () => {},
-  getState: () => [],
-  getSearchValue: () => "",
-  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-  incrementFocusedIndex: () => {},
-  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-  decrementFocusedIndex: () => {},
-  getModelAtFocusedIndex: () => null,
-  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-  performActionAtFocusedIndex: () => {},
-  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-  focus: () => {},
-  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-  focusSearch: () => {}
-};
-
-export const useMenu = <
-  S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
->(): NonNullRef<IMenuRef<S, M>> => {
-  return useRef<IMenuRef<S, M>>(InitialMenuRef);
-};
-
-export const useMenuIfNotDefined = <
-  S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
->(
-  menu?: NonNullRef<IMenuRef<S, M>>
-): NonNullRef<IMenuRef<S, M>> => {
-  const ref = useRef<IMenuRef<S, M>>(InitialMenuRef);
-  const returnRef = useMemo(() => (!isNil(menu) ? menu : ref), [menu, ref.current]);
-  return returnRef;
-};
-
-export const InitialNotificationsManager: UINotificationsManager = {
-  notifications: [],
-  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-  clearNotifications: () => {},
-  notify: () => [],
-  lookupAndNotify: () => [],
-  handleRequestError: () => []
-};
-
-export const InitialContentMenuRef: ContentMenuInstance = {
-  ...InitialNotificationsManager,
-  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-  setLoading: () => {},
-  loading: false
-};
-
-export const useContentMenu = (): NonNullRef<ContentMenuInstance> => {
-  const ref = useRef<ContentMenuInstance>(InitialContentMenuRef);
-
-  return ref;
-};
-
-export const useContentMenuIfNotDefined = (menu?: NonNullRef<ContentMenuInstance>): NonNullRef<ContentMenuInstance> => {
-  const ref = useRef<ContentMenuInstance>(InitialContentMenuRef);
-  const returnRef = useMemo(() => (!isNil(menu) ? menu : ref), [menu, ref.current]);
-  return returnRef;
-};
-
 export const InitialModalRef: ModalInstance = {
-  ...InitialNotificationsManager,
+  ...notifications.ui.InitialNotificationsManager,
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   setLoading: () => {},
   loading: false
@@ -167,104 +83,6 @@ export const useDropdownIfNotDefined = (dropdown?: NonNullRef<IDropdownRef>): No
   const ref = useRef<IDropdownRef>(InitialDropdownRef);
   const returnRef = useMemo(() => (!isNil(dropdown) ? dropdown : ref), [dropdown, ref.current]);
   return returnRef;
-};
-
-export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormInstance<T> => {
-  const _useAntdForm = RootForm.useForm();
-  const antdForm = _useAntdForm[0];
-  const isMounted = useIsMounted();
-
-  const [loading, setLoading] = useState<boolean | undefined>(undefined);
-
-  const handleFieldErrors = useMemo(
-    () => (errors: UIFieldNotification[]) => {
-      const fieldsWithErrors = reduce(
-        errors,
-        (curr: FieldWithErrors[], e: UIFieldNotification): FieldWithErrors[] => {
-          const existing = find(curr, { name: e.field });
-          if (!isNil(existing)) {
-            return util.replaceInArray<FieldWithErrors>(
-              curr,
-              { name: e.field },
-              { ...existing, errors: [...existing.errors, e.message] }
-            );
-          } else {
-            return [...curr, { name: e.field, errors: [e.message] }];
-          }
-        },
-        []
-      );
-      antdForm.setFields(fieldsWithErrors);
-    },
-    [antdForm.setFields]
-  );
-
-  const NotificationsHandler = notifications.ui.useNotificationsManager({
-    handleFieldErrors,
-    defaultBehavior: "replace",
-    defaultClosable: false
-  });
-
-  const clearFieldErrors = useMemo(
-    () => () => {
-      /* Unfortunately, AntD does not provide a way to do this directly (or to
-         iterate over the fields in the Form for that matter).  So we have to
-         reset the fields without any errors to get field level error messages
-         to go away. */
-      const currentFields = antdForm.getFieldsValue();
-      antdForm.setFields(
-        map(Object.keys(currentFields), (key: string) => ({ name: key, value: currentFields[key], errors: [] }))
-      );
-    },
-    []
-  );
-
-  const clearNotifications = useMemo(
-    () => (ids?: SingleOrArray<number>) => {
-      NotificationsHandler.clearNotifications(ids);
-      clearFieldErrors();
-    },
-    []
-  );
-
-  const wrapForm = useMemo<FormInstance<T>>(() => {
-    return {
-      ...antdForm,
-      autoFocusField: form?.autoFocusField,
-      ...NotificationsHandler,
-      clearFieldErrors,
-      clearNotifications,
-      submit: () => {
-        clearNotifications();
-        antdForm.submit();
-      },
-      resetFields: () => {
-        clearNotifications();
-        antdForm.resetFields();
-      },
-      setLoading: (v: boolean) => {
-        /* Only change the state if the Form is still mounted - otherwise we
-           introduce a memory leak.  This can happen often in Modals where
-           the onSuccess callback is triggered and the modal is closed before
-           form.setLoading(false) is called. */
-        if (isMounted.current) {
-          setLoading(v);
-        }
-      },
-      loading,
-      ...form
-    };
-  }, [form, antdForm, loading, NotificationsHandler]);
-
-  return wrapForm;
-};
-
-export const useFormIfNotDefined = <T>(
-  options?: Partial<FormInstance<T>> | undefined,
-  form?: FormInstance<T>
-): FormInstance<T> => {
-  const newForm = useForm(options);
-  return useMemo(() => (!isNil(form) ? form : newForm), [form, newForm]);
 };
 
 export const useLessThanBreakpoint = (id: Style.BreakpointId): boolean => {

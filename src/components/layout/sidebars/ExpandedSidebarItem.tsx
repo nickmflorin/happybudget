@@ -8,7 +8,7 @@ import ParentSidebarItem from "./ParentSidebarItem";
 const ExpandedSidebarItem = (
   props: IExpandedSidebarItem & StandardComponentProps & { readonly closeSidebarOnClick?: () => void }
 ): JSX.Element => {
-  if (ui.isParentSidebarItem(props)) {
+  if (ui.layout.isParentSidebarItem(props)) {
     return <ParentSidebarItem {...props} />;
   }
   return (

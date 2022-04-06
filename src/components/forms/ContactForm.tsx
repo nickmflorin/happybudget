@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { model } from "lib";
 
 import { Form, Icon } from "components";
-import { Input, Select, InputOnFocus, TextArea } from "components/fields";
+import { Input, InputOnFocus, TextArea, ContactTypeSelect } from "components/fields";
 import { EditAttachments, EditAttachmentsProps } from "components/files";
 import { Link } from "components/links";
 import { isNil } from "lodash";
@@ -22,13 +22,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ form, initialValues, attachme
     initialValues={initialValues}
   >
     <Form.Item name={"contact_type"} label={"Type"} dataType={"singleSelect"}>
-      <Select suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />} placeholder={"Select Type"}>
-        {model.contact.ContactTypes.choices.map((m: Model.ContactType, index: number) => (
-          <Select.Option key={index} value={m.id}>
-            {m.name}
-          </Select.Option>
-        ))}
-      </Select>
+      <ContactTypeSelect />
     </Form.Item>
     <Form.Item name={"first_name"} label={"First Name"} dataType={"text"}>
       <Input />

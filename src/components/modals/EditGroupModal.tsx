@@ -22,7 +22,7 @@ const EditGroupModal = <
   table,
   ...props
 }: EditGroupModalProps<R, M>): JSX.Element => {
-  const form = ui.useForm<Http.GroupPayload>();
+  const form = ui.form.useForm<Http.GroupPayload>();
   return (
     <EditModelModal<Model.Group, Http.GroupPayload>
       {...props}
