@@ -64,7 +64,10 @@ const TagRenderer = <S extends React.CSSProperties | Pdf.Style = React.CSSProper
   );
 };
 
-const Tag = <M extends Model.Model = Model.Model, S extends React.CSSProperties | Pdf.Style = React.CSSProperties>(
+export const Tag = <
+  M extends Model.Model = Model.Model,
+  S extends React.CSSProperties | Pdf.Style = React.CSSProperties
+>(
   props: TagProps<M, S>
 ): JSX.Element => {
   const colorScheme = useMemo(() => {

@@ -16,4 +16,4 @@ const MultiAsyncSelect = <
   props: MultiAsyncSelectProps<O, RSP, G>
 ): JSX.Element => <AsyncSelect {...props} isMulti={true} />;
 
-export default React.memo(MultiAsyncSelect) as typeof MultiAsyncSelect;
+export default MultiAsyncSelect;

@@ -1,15 +1,19 @@
 import React from "react";
-import { GroupBase } from "react-select";
 
 import AsyncSelect, { AsyncSelectProps } from "./AsyncSelect";
 
-export type SingleAsyncSelectProps<Option, Group extends GroupBase<Option> = GroupBase<Option>> = Omit<
-  AsyncSelectProps<Option, false, Group>,
-  "isMulti"
->;
+export type SingleAsyncSelectProps<
+  O,
+  RSP extends Http.ListResponse<unknown> = Http.ListResponse<unknown>,
+  G extends AsyncSelectGroupBase<O> = AsyncSelectGroupBase<O>
+> = Omit<AsyncSelectProps<O, false, RSP, G>, "isMulti">;
 
-const SingleAsyncSelect = <O, G extends GroupBase<O> = GroupBase<O>>(
-  props: SingleAsyncSelectProps<O, G>
+const SingleAsyncSelect = <
+  O,
+  RSP extends Http.ListResponse<unknown> = Http.ListResponse<unknown>,
+  G extends AsyncSelectGroupBase<O> = AsyncSelectGroupBase<O>
+>(
+  props: SingleAsyncSelectProps<O, RSP, G>
 ): JSX.Element => <AsyncSelect {...props} isMulti={false} />;
 
 export default React.memo(SingleAsyncSelect) as typeof SingleAsyncSelect;

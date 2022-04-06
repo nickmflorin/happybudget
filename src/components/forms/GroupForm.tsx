@@ -1,22 +1,21 @@
 import { useEffect } from "react";
-import { isNil, map } from "lodash";
+import { isNil } from "lodash";
 
 import { model } from "lib";
 
-import { Form, Icon } from "components";
-import { Input, Select, ColorSelect } from "components/fields";
-import { EntityText } from "components/typography";
+import { Form } from "components";
+import { Input, ColorSelect, ChildrenSelect } from "components/fields";
 
-interface GroupFormProps<M extends Model.SimpleAccount | Model.SimpleSubAccount> extends FormProps<Http.GroupPayload> {
-  readonly availableChildren: M[];
-  readonly availableChildrenLoading: boolean;
+interface GroupFormProps extends FormProps<Http.GroupPayload> {
+  readonly parentId: number;
+  readonly parentType: Model.ParentType;
 }
 
-const GroupForm = <M extends Model.SimpleAccount | Model.SimpleSubAccount>({
-  availableChildren,
-  availableChildrenLoading,
+const GroupForm = <MM extends Model.SimpleAccount | Model.SimpleSubAccount>({
+  parentType,
+  parentId,
   ...props
-}: GroupFormProps<M>): JSX.Element => {
+}: GroupFormProps): JSX.Element => {
   const [colors, loading, error] = model.budgeting.useGroupColors();
 
   useEffect(() => {
@@ -53,21 +52,7 @@ const GroupForm = <M extends Model.SimpleAccount | Model.SimpleSubAccount>({
           })
         ]}
       >
-        <Select
-          suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
-          showArrow
-          loading={availableChildrenLoading}
-          disabled={availableChildrenLoading}
-          mode={"multiple"}
-        >
-          {map(availableChildren, (obj: Model.SimpleAccount | Model.SimpleSubAccount, index: number) => {
-            return (
-              <Select.Option key={index + 1} value={obj.id}>
-                <EntityText fillEmpty={"----"}>{obj}</EntityText>
-              </Select.Option>
-            );
-          })}
-        </Select>
+        <ChildrenSelect<MM> parentType={parentType} parentId={parentId} />
       </Form.Item>
     </Form.Form>
   );

@@ -14,7 +14,10 @@ export const HttpHeaderRequestMiddleware = (config: AxiosRequestConfig): AxiosRe
 export const HttpErrorResponseMiddlware =
   (forceLogout = true) =>
   (error: AxiosError<Http.ErrorResponse>) => {
-    const url = !isNil(error.request.config) ? error.request.config.url : undefined;
+    /* I don't fully understand why, because if this is the case then the Axios
+       type bindings are wrong, but occassionally error.request will not be
+       defined. */
+    const url = !isNil(error.request) && !isNil(error.request.config) ? error.request.config.url : undefined;
     if (!isNil(error.response)) {
       const err = parsers.parseErrorFromResponse(error.response, forceLogout);
       if (err === null) {

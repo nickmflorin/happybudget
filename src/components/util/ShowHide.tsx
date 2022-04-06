@@ -11,7 +11,7 @@ type ShowHideProps = {
  * passed in.  One of `show` or `hide` must be passed in, if neither are passed
  * in the children will be shown regardless.
  */
-function ShowHide(props: ShowHideProps): JSX.Element {
+const ShowHide = (props: ShowHideProps): JSX.Element => {
   if (Object.hasOwnProperty.call(props, "show")) {
     return <>{props.show ? props.children : <></>}</>;
   } else if (Object.hasOwnProperty.call(props, "hide")) {
@@ -19,6 +19,6 @@ function ShowHide(props: ShowHideProps): JSX.Element {
   } else {
     return <>{props.children}</>;
   }
-}
+};
 
 export default React.memo(ShowHide);

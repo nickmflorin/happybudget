@@ -1,9 +1,10 @@
 import React, { useMemo } from "react";
 import { SingleValue } from "react-select/dist/declarations/src/types";
-import { map } from "lodash";
+import { map, find } from "lodash";
+
+import { ui } from "lib";
 
 import SingleSelect, { SingleSelectProps } from "./SingleSelect";
-import { useModelSelect } from "./hooks";
 
 export type SingleModelSelectProps<M extends Model.Model> = Omit<
   SingleSelectProps<Model.WithStringId<M>>,
@@ -20,13 +21,24 @@ const SingleModelSelect = <M extends Model.Model>({
   getOptionLabel,
   ...props
 }: SingleModelSelectProps<M>): JSX.Element => {
-  const { retrieve, toModel, toOption } = useModelSelect(props.options);
+  const retrieve = useMemo(
+    () =>
+      (id: M["id"] | null): M | undefined => {
+        const m: M | undefined = find(props.options, { id }) as M | undefined;
+        if (m === undefined) {
+          console.warn(`Could not parse select model from data for ID ${id}.`);
+          return undefined;
+        }
+        return m;
+      },
+    [props.options]
+  );
 
   const convertValue = useMemo(
     () =>
       (v: M["id"] | null): Model.WithStringId<M> | null | undefined => {
         const m = retrieve(v);
-        return m === undefined ? undefined : toOption(m);
+        return m === undefined ? undefined : ui.toSelectOption(m);
       },
     []
   );
@@ -37,10 +49,10 @@ const SingleModelSelect = <M extends Model.Model>({
       defaultValue={props.defaultValue === undefined ? undefined : convertValue(props.defaultValue)}
       value={convertValue(props.value)}
       options={map(props.options, (o: M) => ({ ...o, id: String(o.id) })) as Model.WithStringId<M>[]}
-      getOptionLabel={(mI: Model.WithStringId<M>) => getOptionLabel(toModel(mI))}
+      getOptionLabel={(mI: Model.WithStringId<M>) => getOptionLabel(ui.toSelectModel(mI))}
       getOptionValue={(m: Model.WithStringId<M>) => m.id}
       onChange={(newValue: SingleValue<Model.WithStringId<M>>) =>
-        props.onChange?.(newValue !== null ? toModel(newValue) : newValue)
+        props.onChange?.(newValue !== null ? ui.toSelectModel(newValue) : newValue)
       }
     />
   );

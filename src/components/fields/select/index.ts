@@ -9,6 +9,7 @@ export { default as SingleChoiceSelect } from "./SingleChoiceSelect";
 export { default as MultiModelAsyncSelect } from "./MultiModelAsyncSelect";
 export { default as ColumnSelect } from "./ColumnSelect";
 export { default as HeaderTemplateSelect } from "./HeaderTemplateSelect";
+export { default as ChildrenSelect } from "./ChildrenSelect";
 export { default as CollaboratorSelect } from "./CollaboratorSelect";
 export { default as CollaboratorAccessTypeSelect } from "./CollaboratorAccessTypeSelect";
 export { default as TimezoneSelect } from "./TimezoneSelect";

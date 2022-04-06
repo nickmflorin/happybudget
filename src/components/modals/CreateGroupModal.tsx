@@ -1,7 +1,3 @@
-import { useEffect, useState } from "react";
-
-import * as api from "api";
-import { ui, http } from "lib";
 import { GroupForm } from "components/forms";
 
 import { CreateModelModal, CreateModelModalProps, CreateModelCallbacks } from "./generic";
@@ -24,46 +20,19 @@ const CreateGroupModal = <
   parentType,
   table,
   ...props
-}: CreateGroupModalProps<R, M>): JSX.Element => {
-  const form = ui.useForm<Http.GroupPayload>();
-  const [cancelToken] = http.useCancelToken();
-
-  const [availableChildren, setAvailableChildren] = useState<MM[]>([]);
-  const [availableChildrenLoading, setAvailableChildrenLoading] = useState(false);
-
-  useEffect(() => {
-    setAvailableChildrenLoading(true);
-    api
-      .getTableChildren<MM>(id, parentType, { simple: true }, { cancelToken: cancelToken() })
-      .then((response: Http.ListResponse<MM>) => {
-        setAvailableChildren(response.data);
-        form.setFields([{ name: "children", value: children }]);
-      })
-      .catch((e: Error) => {
-        form.handleRequestError(e);
-      })
-      .finally(() => setAvailableChildrenLoading(false));
-  }, [id]);
-
-  return (
-    <CreateModelModal<Model.Group>
-      {...props}
-      title={"Subtotal"}
-      titleIcon={"folder"}
-      form={form}
-      createSync={(payload: Http.GroupPayload, callbacks: CreateModelCallbacks<Model.Group>) =>
-        table.dispatchEvent({ type: "groupAdd", payload, ...callbacks })
-      }
-    >
-      {() => (
-        <GroupForm
-          form={form}
-          availableChildren={availableChildren}
-          availableChildrenLoading={availableChildrenLoading}
-        />
-      )}
-    </CreateModelModal>
-  );
-};
+}: CreateGroupModalProps<R, M>): JSX.Element => (
+  <CreateModelModal<Model.Group>
+    {...props}
+    title={"Subtotal"}
+    titleIcon={"folder"}
+    createSync={(payload: Http.GroupPayload, callbacks: CreateModelCallbacks<Model.Group>) =>
+      table.dispatchEvent({ type: "groupAdd", payload, ...callbacks })
+    }
+  >
+    {(form: FormInstance<Http.GroupPayload>) => (
+      <GroupForm<MM> form={form} parentType={parentType} parentId={id} initialValues={{ children }} />
+    )}
+  </CreateModelModal>
+);
 
 export default CreateGroupModal;

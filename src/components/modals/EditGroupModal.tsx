@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
-
 import * as api from "api";
-import { ui, http } from "lib";
+import { ui } from "lib";
 
 import { GroupForm } from "components/forms";
 
@@ -25,24 +23,6 @@ const EditGroupModal = <
   ...props
 }: EditGroupModalProps<R, M>): JSX.Element => {
   const form = ui.useForm<Http.GroupPayload>();
-  const [cancelToken] = http.useCancelToken();
-
-  const [availableChildren, setAvailableChildren] = useState<MM[]>([]);
-  const [availableChildrenLoading, setAvailableChildrenLoading] = useState(false);
-
-  useEffect(() => {
-    setAvailableChildrenLoading(true);
-    api
-      .getTableChildren<MM>(parentId, parentType, { simple: true }, { cancelToken: cancelToken() })
-      .then((response: Http.ListResponse<MM>) => {
-        setAvailableChildren(response.data);
-      })
-      .catch((e: Error) => {
-        form.handleRequestError(e);
-      })
-      .finally(() => setAvailableChildrenLoading(false));
-  }, [parentId]);
-
   return (
     <EditModelModal<Model.Group, Http.GroupPayload>
       {...props}
@@ -62,13 +42,7 @@ const EditGroupModal = <
         ]);
       }}
     >
-      {() => (
-        <GroupForm
-          form={form}
-          availableChildren={availableChildren}
-          availableChildrenLoading={availableChildrenLoading}
-        />
-      )}
+      {() => <GroupForm<MM> form={form} parentType={parentType} parentId={parentId} />}
     </EditModelModal>
   );
 };

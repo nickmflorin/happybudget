@@ -9,7 +9,7 @@ import { http, ui } from "lib";
 
 import { UserImageOrInitials } from "components/images";
 
-import { AsyncOptionRender } from "./AsyncSelect";
+import { AsyncOption } from "./AsyncSelect";
 import MultiModelAsyncSelect, { MultiModelAsyncSelectProps } from "./MultiModelAsyncSelect";
 
 export type CollaboratorSelectProps = Omit<
@@ -23,7 +23,7 @@ const Option = <G extends AsyncSelectGroupBase<Model.WithStringId<Model.SimpleUs
   props: OptionProps<AsyncSelectOption<Model.WithStringId<Model.SimpleUser>>, true, G>
 ) =>
   ui.isSelectErrorOption(props.data) ? (
-    <AsyncOptionRender {...props} />
+    <AsyncOption {...props} />
   ) : (
     <components.Option {...props} className={classNames("collaborator-select-option", props.className)}>
       <div className={"user-image-or-initials-container"}>

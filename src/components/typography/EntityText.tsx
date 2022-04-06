@@ -4,10 +4,10 @@ import { isNil } from "lodash";
 
 import { model } from "lib";
 
-export interface EntityTextProps extends StandardComponentProps {
+export type EntityTextProps = StandardComponentProps & {
   readonly children: Model.HttpModel;
   readonly fillEmpty?: boolean | string;
-}
+};
 
 type EntiyTextPartProps = StandardComponentProps & {
   readonly children?: string | undefined | null;

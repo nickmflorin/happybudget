@@ -1,10 +1,18 @@
 import React, { useMemo } from "react";
-import { OptionProps, GroupBase, OnChangeValue, SelectComponentsConfig } from "react-select";
+import {
+  components,
+  OptionProps,
+  GroupBase,
+  OnChangeValue,
+  SelectComponentsConfig,
+  MultiValueProps
+} from "react-select";
 import RCAsyncSelect, { AsyncProps } from "react-select/async";
 import classNames from "classnames";
 import { filter, isNil } from "lodash";
 
 import { ui, notifications } from "lib";
+import { ConditionalWrapper } from "components";
 
 export type AsyncSelectProps<
   O,
@@ -17,6 +25,7 @@ export type AsyncSelectProps<
 > & {
   readonly borderless?: boolean;
   readonly components?: SelectComponentsConfig<AsyncSelectOption<O>, M, G>;
+  readonly wrapperStyle?: React.CSSProperties;
   readonly onResponse?: (response: RSP) => void;
   readonly loadOptions?: (inputValue: string) => Promise<RSP>;
   readonly onError?: (e: Error) => void;
@@ -26,11 +35,17 @@ export type AsyncSelectProps<
   readonly onChange?: (m: OnChangeValue<O, M>) => void;
 };
 
-export const AsyncOptionRender = <
-  O,
-  M extends boolean = false,
-  G extends AsyncSelectGroupBase<O> = AsyncSelectGroupBase<O>
->(
+const MultiValue = <O, M extends boolean = false, G extends AsyncSelectGroupBase<O> = AsyncSelectGroupBase<O>>(
+  props: MultiValueProps<AsyncSelectOption<O>, M, G>
+) => {
+  /* TODO: We need to prevent this by not allowing the error option to be
+     clickable. */
+  return ui.isSelectErrorOption(props.data) ? <></> : <components.MultiValue {...props} />;
+};
+
+export const AsyncMultiValue = React.memo(MultiValue) as typeof MultiValue;
+
+const Option = <O, M extends boolean = false, G extends AsyncSelectGroupBase<O> = AsyncSelectGroupBase<O>>(
   props: OptionProps<AsyncSelectOption<O>, M, G>
 ): JSX.Element =>
   ui.isSelectErrorOption(props.data) ? (
@@ -39,10 +54,10 @@ export const AsyncOptionRender = <
       {props.data.detail}
     </div>
   ) : (
-    <>{props.selectProps.getOptionLabel(props.data)}</>
+    <components.Option {...props} />
   );
 
-const MemoizedAsyncOptionRender = React.memo(AsyncOptionRender) as typeof AsyncOptionRender;
+export const AsyncOption = React.memo(Option) as typeof Option;
 
 const AsyncSelect = <
   O,
@@ -51,6 +66,7 @@ const AsyncSelect = <
   G extends GroupBase<O | SelectErrorOption> = GroupBase<O | SelectErrorOption>
 >({
   borderless,
+  wrapperStyle,
   loadOptions,
   onError,
   onResponse,
@@ -103,56 +119,58 @@ const AsyncSelect = <
   );
 
   return (
-    <RCAsyncSelect
-      cacheOptions={true}
-      components={{ ...props.components, Option: MemoizedAsyncOptionRender }}
-      {...props}
-      loadOptions={_loadOptions}
-      className={classNames("react-select-container", props.className, { borderless })}
-      classNamePrefix={"react-select"}
-      getOptionLabel={(m: O | SelectErrorOption) => {
-        if (ui.isSelectErrorOption(m)) {
-          return "";
-        }
-        return props.getOptionLabel?.(m) || "";
-      }}
-      getOptionValue={(m: O | SelectErrorOption) => {
-        if (ui.isSelectErrorOption(m)) {
-          return "";
-        }
-        return props.getOptionValue(m);
-      }}
-      onChange={(v: OnChangeValue<AsyncSelectOption<O>, M>) => {
-        if (Array.isArray(v)) {
-          /* If there is an error, it will be embedded in the options as the first
-				 and only option.  If this is the case, we do not want to trigger the
-				 onChange handler. */
-          const errs = filter(v, (vi: AsyncSelectOption<O>) => ui.isSelectErrorOption(vi)) as SelectErrorOption[];
-          if (errs.length !== 0) {
-            if (errs.length !== 1) {
-              console.warn(
-                "Suspicious Select Behavior: There should only ever be one " +
-                  "option dedicated to indicating an HTTP error."
-              );
-            }
-            if (v.length !== errs.length) {
-              console.warn(
-                "Suspicious Select Behavior: When there is an option dedicated " +
-                  "to indicating an HTTP error, there should be no other options."
-              );
+    <ConditionalWrapper conditional={wrapperStyle !== undefined} style={wrapperStyle}>
+      <RCAsyncSelect
+        cacheOptions={true}
+        {...props}
+        components={{ MultiValue: AsyncMultiValue, Option: AsyncOption, ...props.components }}
+        loadOptions={_loadOptions}
+        className={classNames("react-select-container", props.className, { borderless })}
+        classNamePrefix={"react-select"}
+        getOptionLabel={(m: O | SelectErrorOption) => {
+          if (ui.isSelectErrorOption(m)) {
+            return "";
+          }
+          return props.getOptionLabel?.(m) || "";
+        }}
+        getOptionValue={(m: O | SelectErrorOption) => {
+          if (ui.isSelectErrorOption(m)) {
+            return "";
+          }
+          return props.getOptionValue(m);
+        }}
+        onChange={(v: OnChangeValue<AsyncSelectOption<O>, M>) => {
+          if (Array.isArray(v)) {
+            /* If there is an error, it will be embedded in the options as the
+						   first and only option.  If this is the case, we do not want to
+							 trigger the onChange handler. */
+            const errs = filter(v, (vi: AsyncSelectOption<O>) => ui.isSelectErrorOption(vi)) as SelectErrorOption[];
+            if (errs.length !== 0) {
+              if (errs.length !== 1) {
+                console.warn(
+                  "Suspicious Select Behavior: There should only ever be one " +
+                    "option dedicated to indicating an HTTP error."
+                );
+              }
+              if (v.length !== errs.length) {
+                console.warn(
+                  "Suspicious Select Behavior: When there is an option dedicated " +
+                    "to indicating an HTTP error, there should be no other options."
+                );
+              }
+            } else {
+              props.onChange?.(v as OnChangeValue<O, M>);
             }
           } else {
-            props.onChange?.(v as OnChangeValue<O, M>);
-          }
-        } else {
-          /* If the only option is an error, we do not want to trigger the
+            /* If the only option is an error, we do not want to trigger the
 					   onChange behavior. */
-          if (v === null || !ui.isSelectErrorOption(v)) {
-            props.onChange?.(v as OnChangeValue<O, M>);
+            if (v === null || !ui.isSelectErrorOption(v)) {
+              props.onChange?.(v as OnChangeValue<O, M>);
+            }
           }
-        }
-      }}
-    />
+        }}
+      />
+    </ConditionalWrapper>
   );
 };
 
