@@ -3,10 +3,7 @@ import React from "react";
 import { model } from "lib";
 import SingleChoiceSelect, { SingleChoiceSelectProps } from "./SingleChoiceSelect";
 
-export type CollaboratorAccessTypeSelectProps = Omit<
-  SingleChoiceSelectProps<Model.CollaboratorAccessType>,
-  "options" | "getOptionLabel"
->;
+export type CollaboratorAccessTypeSelectProps = Omit<SingleChoiceSelectProps<Model.CollaboratorAccessType>, "options">;
 
 const CollaboratorAccessTypeSelect = (props: CollaboratorAccessTypeSelectProps): JSX.Element => (
   <SingleChoiceSelect borderless={true} {...props} options={model.budgeting.CollaboratorAccessTypes.choices} />

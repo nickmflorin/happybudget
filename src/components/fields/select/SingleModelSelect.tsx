@@ -11,7 +11,7 @@ export type SingleModelSelectProps<M extends Model.Model> = Omit<
   "getOptionLabel" | "getOptionValue" | "options" | "value" | "defaultValue" | "onChange"
 > & {
   readonly options: M[];
-  readonly value: M["id"] | null;
+  readonly value?: M["id"] | null;
   readonly defaultValue?: M["id"] | null;
   readonly onChange?: (ms: M | null) => void;
   readonly getOptionLabel: (m: M) => string;
@@ -47,7 +47,7 @@ const SingleModelSelect = <M extends Model.Model>({
     <SingleSelect<Model.WithStringId<M>>
       {...props}
       defaultValue={props.defaultValue === undefined ? undefined : convertValue(props.defaultValue)}
-      value={convertValue(props.value)}
+      value={props.value === undefined ? undefined : convertValue(props.value)}
       options={map(props.options, (o: M) => ({ ...o, id: String(o.id) })) as Model.WithStringId<M>[]}
       getOptionLabel={(mI: Model.WithStringId<M>) => getOptionLabel(ui.toSelectModel(mI))}
       getOptionValue={(m: Model.WithStringId<M>) => m.id}

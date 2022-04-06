@@ -8,6 +8,7 @@ export { default as SingleModelSelect } from "./SingleModelSelect";
 export { default as SingleChoiceSelect } from "./SingleChoiceSelect";
 export { default as MultiModelAsyncSelect } from "./MultiModelAsyncSelect";
 export { default as ColumnSelect } from "./ColumnSelect";
+export { default as ContactTypeSelect } from "./ContactTypeSelect";
 export { default as HeaderTemplateSelect } from "./HeaderTemplateSelect";
 export { default as ChildrenSelect } from "./ChildrenSelect";
 export { default as CollaboratorSelect } from "./CollaboratorSelect";
