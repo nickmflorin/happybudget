@@ -1,17 +1,17 @@
+import React from "react";
 import EntityText, { EntityTextProps } from "components/typography/EntityText";
 import Tag from "./Tag";
 
 type EntityTextTagProps<
   M extends Model.HttpModel,
   S extends React.CSSProperties | Pdf.Style = React.CSSProperties
-> = Omit<TagProps<M, S>, "model"> & EntityTextProps;
-
-const EntityTextTag = <M extends Model.HttpModel, S extends React.CSSProperties | Pdf.Style = React.CSSProperties>({
-  fillEmpty,
-  children,
-  ...props
-}: EntityTextTagProps<M, S>): JSX.Element => {
-  return <Tag {...props} render={() => <EntityText fillEmpty={fillEmpty}>{children}</EntityText>}></Tag>;
+> = EntityTextProps & {
+  readonly tagProps?: Omit<TagProps<M, S>, "model">;
 };
 
-export default EntityTextTag;
+const EntityTextTag = <M extends Model.HttpModel, S extends React.CSSProperties | Pdf.Style = React.CSSProperties>({
+  tagProps,
+  ...props
+}: EntityTextTagProps<M, S>): JSX.Element => <Tag {...tagProps} render={() => <EntityText {...props} />} />;
+
+export default React.memo(EntityTextTag);

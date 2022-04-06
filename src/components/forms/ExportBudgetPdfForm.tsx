@@ -12,7 +12,6 @@ import { Icon, Form, ShowHide, Separator } from "components";
 import { ColumnSelect, Input, CKEditor } from "components/fields";
 import { PdfImageUploader } from "components/fields/uploaders";
 import { EntityText } from "components/typography";
-import { EntityTextDescription } from "components/typography/EntityText";
 
 import HeaderTemplateSaveForm, { IHeaderTemplateSaveFormRef } from "./HeaderTemplateSaveForm";
 
@@ -469,7 +468,7 @@ const ExportForm = (
             className={classNames({ disabled: showAllTables })}
           >
             <Select.Option key={0} value={"topsheet"}>
-              <EntityTextDescription>{"Top Sheet"}</EntityTextDescription>
+              <EntityText description={"Top Sheet"} />
             </Select.Option>
             {map(accounts, (account: Model.PdfAccount, index: number) => {
               return (

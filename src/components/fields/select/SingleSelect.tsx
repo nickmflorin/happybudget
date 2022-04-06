@@ -9,7 +9,7 @@ export type SingleSelectProps<Option, Group extends GroupBase<Option> = GroupBas
 >;
 
 const SingleSelect = <O, G extends GroupBase<O> = GroupBase<O>>(props: SingleSelectProps<O, G>): JSX.Element => (
-  <Select {...props} isMulti={false} />
+  <Select isSearchable={false} {...props} isMulti={false} />
 );
 
 export default React.memo(SingleSelect) as typeof SingleSelect;

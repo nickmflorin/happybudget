@@ -1,9 +1,7 @@
-import { map } from "lodash";
-
 import { Checkbox } from "antd";
 
-import { Form, Icon } from "components";
-import { Select } from "components/fields";
+import { Form } from "components";
+import { SingleModelSelect } from "components/fields";
 
 export type BudgetTotalChartFormValues = {
   readonly metric: Charts.BudgetTotal.MetricId;
@@ -20,13 +18,7 @@ const BudgetTotalChartForm = ({ metrics, ...props }: BudgetTotalChartFormProps) 
       <Checkbox defaultChecked={props.initialValues?.grouped} />
     </Form.Item>
     <Form.Item name={"metric"}>
-      <Select suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}>
-        {map(metrics, (metric: Charts.BudgetTotal.Metric, index: number) => (
-          <Select.Option key={index} value={metric.id}>
-            {metric.label}
-          </Select.Option>
-        ))}
-      </Select>
+      <SingleModelSelect options={metrics} getOptionLabel={(m: Charts.BudgetTotal.Metric) => m.label} />
     </Form.Item>
   </Form.Form>
 );

@@ -2,11 +2,14 @@ import React, { useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { model } from "lib";
+import { model as libmodel } from "lib";
 
 export type EntityTextProps = StandardComponentProps & {
-  readonly children: Model.HttpModel;
+  readonly children?: Model.HttpModel;
   readonly fillEmpty?: boolean | string;
+  readonly model?: Model.HttpModel;
+  readonly description?: string;
+  readonly identifier?: string;
 };
 
 type EntiyTextPartProps = StandardComponentProps & {
@@ -36,29 +39,43 @@ export const EntityTextIdentifier = (props: EntiyTextPartProps): JSX.Element => 
   <EntityTextPart {...props} className={classNames("entity-text-identifier", props.className)} />
 );
 
-const EntityText: React.FC<EntityTextProps> = ({ children, fillEmpty, ...props }) => {
-  const identifier = useMemo(
+const EntityText: React.FC<EntityTextProps> = ({ children, fillEmpty, description, identifier, model, ...props }) => {
+  const entityModel = useMemo(() => (!isNil(model) ? model : !isNil(children) ? children : null), [model, children]);
+
+  const _identifier = useMemo(() => {
+    if (!isNil(identifier)) {
+      return identifier;
+    } else if (!isNil(entityModel)) {
+      return libmodel.isModelWithIdentifier(entityModel)
+        ? entityModel.identifier
+        : libmodel.isModelWithName(entityModel)
+        ? entityModel.name
+        : undefined;
+    }
+    return undefined;
+  }, [entityModel, identifier]);
+
+  const _description = useMemo(
     () =>
-      model.isModelWithIdentifier(children)
-        ? children.identifier
-        : model.isModelWithName(children)
-        ? children.name
+      !isNil(description)
+        ? description
+        : !isNil(entityModel) && libmodel.isModelWithDescription(entityModel)
+        ? entityModel.description
         : undefined,
-    [children]
-  );
-  const description = useMemo(
-    () => (model.isModelWithDescription(children) ? children.description : undefined),
-    [children]
+    [entityModel, description]
   );
 
   return (
     <span {...props} className={classNames("entity-text", props.className)}>
-      {(!isNil(identifier) || !isNil(fillEmpty)) && (
-        <EntityTextIdentifier fillEmpty={fillEmpty}>{identifier}</EntityTextIdentifier>
+      {(!isNil(_identifier) || (!isNil(fillEmpty) && isNil(_description))) && (
+        <EntityTextIdentifier fillEmpty={fillEmpty}>{_identifier}</EntityTextIdentifier>
       )}
-      {!isNil(description) && (
-        <EntityTextDescription className={classNames({ "with-identifier": !isNil(identifier) || !isNil(fillEmpty) })}>
-          {description}
+      {(!isNil(_description) || (!isNil(fillEmpty) && isNil(_identifier))) && (
+        <EntityTextDescription
+          className={classNames({ "with-identifier": !isNil(_identifier) || !isNil(fillEmpty) })}
+          fillEmpty={isNil(_identifier) && !isNil(fillEmpty)}
+        >
+          {_description}
         </EntityTextDescription>
       )}
     </span>
