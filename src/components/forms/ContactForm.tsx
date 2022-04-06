@@ -1,9 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 
-import { model } from "lib";
-
-import { Form, Icon } from "components";
+import { Form } from "components";
 import { Input, InputOnFocus, TextArea, ContactTypeSelect } from "components/fields";
 import { EditAttachments, EditAttachmentsProps } from "components/files";
 import { Link } from "components/links";
