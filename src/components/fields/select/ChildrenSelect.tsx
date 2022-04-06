@@ -25,11 +25,11 @@ const MultiValue = <
 >(
   props: MultiValueProps<AsyncSelectOption<Model.WithStringId<M>>, true, G>
 ) => {
-  return ui.isSelectErrorOption(props.data) ? (
+  return ui.select.isSelectErrorOption(props.data) ? (
     <AsyncMultiValue {...props} />
   ) : (
     <components.MultiValue {...props}>
-      <EntityTextTag>{ui.toSelectModel(props.data)}</EntityTextTag>
+      <EntityTextTag>{ui.select.toSelectModel(props.data)}</EntityTextTag>
     </components.MultiValue>
   );
 };
@@ -40,11 +40,11 @@ const Option = <
 >(
   props: OptionProps<AsyncSelectOption<Model.WithStringId<M>>, true, G>
 ) => {
-  return ui.isSelectErrorOption(props.data) ? (
+  return ui.select.isSelectErrorOption(props.data) ? (
     <AsyncOption {...props} />
   ) : (
     <components.Option {...props} className={classNames("child-select-option", props.className)}>
-      <EntityText fillEmpty={"----"}>{ui.toSelectModel(props.data)}</EntityText>
+      <EntityText fillEmpty={"----"}>{ui.select.toSelectModel(props.data)}</EntityText>
     </components.Option>
   );
 };
@@ -64,7 +64,7 @@ const ChildrenSelect = <M extends Model.SimpleAccount | Model.SimpleSubAccount>(
       isSearchable={false}
       components={{ Option: MemoizedOption, MultiValue }}
       noOptionsMessage={() => "No accounts found."}
-      processResponse={(rsp: Http.ListResponse<M>) => map(rsp.data, (d: M) => ui.toSelectOption(d))}
+      processResponse={(rsp: Http.ListResponse<M>) => map(rsp.data, (d: M) => ui.select.toSelectOption(d))}
       loadOptions={() =>
         api.getTableChildren<M>(parentId, parentType, { simple: true }, { cancelToken: cancelToken() })
       }

@@ -22,7 +22,7 @@ export type CollaboratorSelectProps = Omit<
 const Option = <G extends AsyncSelectGroupBase<Model.WithStringId<Model.SimpleUser>>>(
   props: OptionProps<AsyncSelectOption<Model.WithStringId<Model.SimpleUser>>, true, G>
 ) =>
-  ui.isSelectErrorOption(props.data) ? (
+  ui.select.isSelectErrorOption(props.data) ? (
     <AsyncOption {...props} />
   ) : (
     <components.Option {...props} className={classNames("collaborator-select-option", props.className)}>

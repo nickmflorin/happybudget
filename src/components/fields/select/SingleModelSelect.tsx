@@ -38,7 +38,7 @@ const SingleModelSelect = <M extends Model.Model>({
     () =>
       (v: M["id"] | null): Model.WithStringId<M> | null | undefined => {
         const m = retrieve(v);
-        return m === undefined ? undefined : ui.toSelectOption(m);
+        return m === undefined ? undefined : ui.select.toSelectOption(m);
       },
     []
   );
@@ -49,10 +49,10 @@ const SingleModelSelect = <M extends Model.Model>({
       defaultValue={props.defaultValue === undefined ? undefined : convertValue(props.defaultValue)}
       value={props.value === undefined ? undefined : convertValue(props.value)}
       options={map(props.options, (o: M) => ({ ...o, id: String(o.id) })) as Model.WithStringId<M>[]}
-      getOptionLabel={(mI: Model.WithStringId<M>) => getOptionLabel(ui.toSelectModel(mI))}
+      getOptionLabel={(mI: Model.WithStringId<M>) => getOptionLabel(ui.select.toSelectModel(mI))}
       getOptionValue={(m: Model.WithStringId<M>) => m.id}
       onChange={(newValue: SingleValue<Model.WithStringId<M>>) =>
-        props.onChange?.(newValue !== null ? ui.toSelectModel(newValue) : newValue)
+        props.onChange?.(newValue !== null ? ui.select.toSelectModel(newValue) : newValue)
       }
     />
   );

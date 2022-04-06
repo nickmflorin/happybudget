@@ -40,7 +40,7 @@ const MultiValue = <O, M extends boolean = false, G extends AsyncSelectGroupBase
 ) => {
   /* TODO: We need to prevent this by not allowing the error option to be
      clickable. */
-  return ui.isSelectErrorOption(props.data) ? <></> : <components.MultiValue {...props} />;
+  return ui.select.isSelectErrorOption(props.data) ? <></> : <components.MultiValue {...props} />;
 };
 
 export const AsyncMultiValue = React.memo(MultiValue) as typeof MultiValue;
@@ -48,7 +48,7 @@ export const AsyncMultiValue = React.memo(MultiValue) as typeof MultiValue;
 const Option = <O, M extends boolean = false, G extends AsyncSelectGroupBase<O> = AsyncSelectGroupBase<O>>(
   props: OptionProps<AsyncSelectOption<O>, M, G>
 ): JSX.Element =>
-  ui.isSelectErrorOption(props.data) ? (
+  ui.select.isSelectErrorOption(props.data) ? (
     <div>
       {props.data.message}
       {props.data.detail}
@@ -128,13 +128,13 @@ const AsyncSelect = <
         className={classNames("react-select-container", props.className, { borderless })}
         classNamePrefix={"react-select"}
         getOptionLabel={(m: O | SelectErrorOption) => {
-          if (ui.isSelectErrorOption(m)) {
+          if (ui.select.isSelectErrorOption(m)) {
             return "";
           }
           return props.getOptionLabel?.(m) || "";
         }}
         getOptionValue={(m: O | SelectErrorOption) => {
-          if (ui.isSelectErrorOption(m)) {
+          if (ui.select.isSelectErrorOption(m)) {
             return "";
           }
           return props.getOptionValue(m);
@@ -144,7 +144,9 @@ const AsyncSelect = <
             /* If there is an error, it will be embedded in the options as the
 						   first and only option.  If this is the case, we do not want to
 							 trigger the onChange handler. */
-            const errs = filter(v, (vi: AsyncSelectOption<O>) => ui.isSelectErrorOption(vi)) as SelectErrorOption[];
+            const errs = filter(v, (vi: AsyncSelectOption<O>) =>
+              ui.select.isSelectErrorOption(vi)
+            ) as SelectErrorOption[];
             if (errs.length !== 0) {
               if (errs.length !== 1) {
                 console.warn(
@@ -164,7 +166,7 @@ const AsyncSelect = <
           } else {
             /* If the only option is an error, we do not want to trigger the
 					   onChange behavior. */
-            if (v === null || !ui.isSelectErrorOption(v)) {
+            if (v === null || !ui.select.isSelectErrorOption(v)) {
               props.onChange?.(v as OnChangeValue<O, M>);
             }
           }
