@@ -46,7 +46,7 @@ const ImportActualsPlaidModal = ({
                       ? moment(values.end_date.toISOString()).format("YYYY-MM-DD")
                       : values.end_date,
                   public_token: publicToken,
-                  source: model.budgeting.ActualImportSources.Plaid.id,
+                  source: model.budgeting.ActualImportSources.bank_account.id,
                   account_ids: accountIds
                 },
                 { cancelToken: cancelToken() }

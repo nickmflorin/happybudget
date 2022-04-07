@@ -17,7 +17,7 @@ export const estimatedValueGetter = <R extends Tables.BudgetRowData>(
       /* Markup rows that are of unit FLAT only count towards the overall
 			   estimated value once, not per Account/Sub Account that is tied to that
 				 Markup (which happens when the Markup is of unit PERCENT). */
-      if (row.markupData.unit.id === model.budgeting.MarkupUnits.Flat.id) {
+      if (row.markupData.unit.id === model.budgeting.MarkupUnits.flat.id) {
         return row.markupData.rate || 0.0;
       }
       /* The Markup's estimated value is the sum of the contributions of each

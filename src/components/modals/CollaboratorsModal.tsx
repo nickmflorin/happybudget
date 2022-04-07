@@ -43,7 +43,7 @@ const CollaboratorsModal = ({ budgetId, ...props }: CollaboratorsModalProps): JS
       const promises: Promise<Model.Collaborator>[] = map(ids, (id: number) =>
         api.createCollaborator(budgetId, {
           user: id,
-          access_type: model.budgeting.CollaboratorAccessTypes["View Only"].id
+          access_type: model.budgeting.CollaboratorAccessTypes.view_only.id
         })
       );
       modal.current.setLoading(true);
@@ -82,7 +82,7 @@ const CollaboratorsModal = ({ budgetId, ...props }: CollaboratorsModalProps): JS
         style={{ marginTop: 15 }}
         isDeleting={isDeleting}
         isUpdating={isUpdating}
-        onChangeAccessType={(m: Model.Collaborator, ac: Model.CollaboratorAccessTypeId) => {
+        onChangeAccessType={(m: Model.Collaborator, ac: Model.CollaboratorAccessType["id"]) => {
           setUpdating(m.id);
           api
             .updateCollaborator(m.id, { access_type: ac }, { cancelToken: cancelToken() })

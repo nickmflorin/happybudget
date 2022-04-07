@@ -6,18 +6,18 @@ import { model } from "lib";
 import Icon from "./Icon";
 
 type ImportSourceIconMap = {
-  readonly sourceId: Model.ActualImportSourceId;
+  readonly sourceId: Model.ActualImportSource["id"];
   readonly icon: IconProp;
 };
 
 const IMPORT_SOURCE_MAPPING: ImportSourceIconMap[] = [
   {
     icon: "bank",
-    sourceId: model.budgeting.ActualImportSources.Plaid.id
+    sourceId: model.budgeting.ActualImportSources.bank_account.id
   }
 ];
 
-const getImportSourceIcon = (id: Model.ActualImportSourceId): IconProp => {
+const getImportSourceIcon = (id: Model.ActualImportSource["id"]): IconProp => {
   const mapping: ImportSourceIconMap | undefined = find(
     IMPORT_SOURCE_MAPPING,
     (mp: ImportSourceIconMap) => mp.sourceId === id
@@ -29,7 +29,7 @@ const getImportSourceIcon = (id: Model.ActualImportSourceId): IconProp => {
 };
 
 type ActualImportSourceIconProps = Omit<IconProps, "icon"> & {
-  readonly source: Model.ActualImportSource | Model.ActualImportSourceId;
+  readonly source: Model.ActualImportSource | Model.ActualImportSource["id"];
 };
 
 const ActualImportSourceIcon = ({ source, ...props }: ActualImportSourceIconProps) => {

@@ -43,8 +43,8 @@ const Columns: Table.Column<R, M>[] = [
     valueSetter: (params: ValueSetterParams) => {
       const row: Table.BodyRow<R> = params.data;
       if (!isNil(row) && tabling.rows.isModelRow(row)) {
-        const unit = row.data.unit === null ? model.budgeting.FringeUnits.Percent : row.data.unit;
-        return unit.id === model.budgeting.FringeUnits.Flat.id
+        const unit = row.data.unit === null ? model.budgeting.FringeUnits.percent : row.data.unit;
+        return unit.id === model.budgeting.FringeUnits.flat.id
           ? tabling.columns.numericValueSetter("rate")(params)
           : tabling.columns.percentageToDecimalValueSetter("rate")(params);
       }
@@ -57,8 +57,8 @@ const Columns: Table.Column<R, M>[] = [
         const row: Table.BodyRow<R> = params.data;
         if (!isNil(row) && tabling.rows.isModelRow(row)) {
           // The default Fringe Unit in the backend is PERCENT.
-          const unit = row.data.unit === null ? model.budgeting.FringeUnits.Percent : row.data.unit;
-          return unit.id === model.budgeting.FringeUnits.Flat.id
+          const unit = row.data.unit === null ? model.budgeting.FringeUnits.percent : row.data.unit;
+          return unit.id === model.budgeting.FringeUnits.flat.id
             ? tabling.columns.currencyValueFormatter(v =>
                 console.error(`Could not parse currency value ${v} for field 'rate'.`)
               )(params)

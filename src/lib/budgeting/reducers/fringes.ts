@@ -47,7 +47,7 @@ export const createAuthenticatedFringesTableReducer = (
   >({
     ...config,
     defaultDataOnCreate: {
-      unit: model.budgeting.FringeUnits.Percent,
+      unit: model.budgeting.FringeUnits.percent,
       rate: 0.0
     }
   });

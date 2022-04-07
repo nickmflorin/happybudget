@@ -9,9 +9,14 @@ export enum FringeUnitNames {
   FLAT = "Flat"
 }
 
+export enum FringeUnitSlugs {
+  PERCENT = "percent",
+  FLAT = "flat"
+}
+
 export const FringeUnits = choice.Choices([
-  choice.Choice(0, FringeUnitNames.PERCENT),
-  choice.Choice(1, FringeUnitNames.FLAT)
+  choice.Choice(0, FringeUnitNames.PERCENT, FringeUnitSlugs.PERCENT),
+  choice.Choice(1, FringeUnitNames.FLAT, FringeUnitSlugs.FLAT)
 ]);
 
 export enum MarkupUnitNames {
@@ -19,9 +24,14 @@ export enum MarkupUnitNames {
   FLAT = "Flat"
 }
 
+export enum MarkupUnitSlugs {
+  PERCENT = "percent",
+  FLAT = "flat"
+}
+
 export const MarkupUnits = choice.Choices([
-  choice.Choice(0, MarkupUnitNames.PERCENT),
-  choice.Choice(1, MarkupUnitNames.FLAT)
+  choice.Choice(0, MarkupUnitNames.PERCENT, MarkupUnitSlugs.PERCENT),
+  choice.Choice(1, MarkupUnitNames.FLAT, MarkupUnitSlugs.FLAT)
 ]);
 
 export enum CollaboratorAccessTypeNames {
@@ -30,17 +40,29 @@ export enum CollaboratorAccessTypeNames {
   EDITOR = "Editor"
 }
 
+export enum CollaboratorAccessTypeSlugs {
+  VIEWONLY = "view_only",
+  OWNER = "owner",
+  EDITOR = "editor"
+}
+
 export const CollaboratorAccessTypes = choice.Choices([
-  choice.Choice(0, CollaboratorAccessTypeNames.VIEWONLY),
-  choice.Choice(1, CollaboratorAccessTypeNames.EDITOR),
-  choice.Choice(2, CollaboratorAccessTypeNames.OWNER)
+  choice.Choice(0, CollaboratorAccessTypeNames.VIEWONLY, CollaboratorAccessTypeSlugs.VIEWONLY),
+  choice.Choice(1, CollaboratorAccessTypeNames.EDITOR, CollaboratorAccessTypeSlugs.EDITOR),
+  choice.Choice(2, CollaboratorAccessTypeNames.OWNER, CollaboratorAccessTypeSlugs.OWNER)
 ]);
 
 export enum ActualImportSourceNames {
-  PLAID = "Plaid"
+  BANKACCOUNT = "Bank Account"
 }
 
-export const ActualImportSources = choice.Choices([choice.Choice(0, ActualImportSourceNames.PLAID)]);
+export enum ActualImportSourceSlugs {
+  BANKACCOUNT = "bank_account"
+}
+
+export const ActualImportSources = choice.Choices([
+  choice.Choice(0, ActualImportSourceNames.BANKACCOUNT, ActualImportSourceSlugs.BANKACCOUNT)
+]);
 
 export const getGroupColorDefinition = <R extends Table.RowData>(
   group: Style.HexColor | Model.Group | Table.GroupRow<R>

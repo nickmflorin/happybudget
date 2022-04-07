@@ -6,7 +6,7 @@ import CollaboratorListItem from "./CollaboratorListItem";
 
 type CollaboratorsListProps = StandardComponentProps & {
   readonly collaborators: Model.Collaborator[];
-  readonly onChangeAccessType: (c: Model.Collaborator, ac: Model.CollaboratorAccessTypeId) => void;
+  readonly onChangeAccessType: (c: Model.Collaborator, ac: Model.CollaboratorAccessType["id"]) => void;
   readonly onRemoveCollaborator: (c: Model.Collaborator) => void;
   readonly isDeleting: (id: number) => boolean;
   readonly isUpdating: (id: number) => boolean;
@@ -27,7 +27,7 @@ const CollaboratorsList = ({
         collaborator={c}
         deleting={isDeleting(c.id)}
         updating={isUpdating(c.id)}
-        onChangeAccessType={(ac: Model.CollaboratorAccessTypeId) => onChangeAccessType(c, ac)}
+        onChangeAccessType={(ac: Model.CollaboratorAccessType["id"]) => onChangeAccessType(c, ac)}
         onDelete={() => onRemoveCollaborator(c)}
       />
     ))}

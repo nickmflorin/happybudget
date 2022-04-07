@@ -1,7 +1,8 @@
 import * as cells from "./cells";
 import * as editors from "./editors";
+export * as actions from "./actions";
 
-const FrameworkComponents: Table.Framework = {
+export const FrameworkComponents: Table.Framework = {
   editors: {
     ActualTypeEditor: editors.ActualTypeEditor,
     ActualOwnerEditor: editors.ActualOwnerEditor

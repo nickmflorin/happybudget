@@ -10,7 +10,7 @@ type CollaboratorListItemProps = StandardComponentProps & {
   readonly updating: boolean;
   readonly collaborator: Model.Collaborator;
   readonly onDelete: () => void;
-  readonly onChangeAccessType: (ac: Model.CollaboratorAccessTypeId) => void;
+  readonly onChangeAccessType: (ac: Model.CollaboratorAccessType["id"]) => void;
 };
 
 const CollaboratorListItem = ({

@@ -14,7 +14,7 @@ type MarkupFormProps<PARENT extends Model.Account | Model.SubAccount> = FormProp
 };
 
 export type IMarkupForm = {
-  readonly setUnitState: (unit: Model.MarkupUnitId | null) => void;
+  readonly setUnitState: (unit: Model.MarkupUnit["id"] | null) => void;
 };
 
 const MarkupForm = <
@@ -24,7 +24,7 @@ const MarkupForm = <
   { parentType, parentId, ...props }: MarkupFormProps<PARENT>,
   ref: ForwardedRef<IMarkupForm>
 ) => {
-  const [unitState, setUnitState] = useState<Model.MarkupUnitId | null>(
+  const [unitState, setUnitState] = useState<Model.MarkupUnit["id"] | null>(
     props.initialValues?.unit === undefined ? null : props.initialValues?.unit
   );
 
@@ -54,7 +54,7 @@ const MarkupForm = <
       <Form.Item
         name={"rate"}
         label={"Amount"}
-        style={unitState !== model.budgeting.MarkupUnits.Percent.id ? { display: "none" } : {}}
+        style={unitState !== model.budgeting.MarkupUnits.percent.id ? { display: "none" } : {}}
         rules={[
           { required: false },
           () => ({
@@ -72,7 +72,7 @@ const MarkupForm = <
       <Form.Item
         name={"rate"}
         label={"Amount"}
-        style={unitState !== model.budgeting.MarkupUnits.Flat.id ? { display: "none" } : {}}
+        style={unitState !== model.budgeting.MarkupUnits.flat.id ? { display: "none" } : {}}
         rules={[
           { required: false },
           () => ({
@@ -104,7 +104,7 @@ const MarkupForm = <
 								 doing that validation here will prevent the form from submitting
 								 in the FLAT state. */
               const unit = getFieldValue("unit");
-              if (unit === model.budgeting.MarkupUnits.Percent.id && (isNil(value) || value.length === 0)) {
+              if (unit === model.budgeting.MarkupUnits.percent.id && (isNil(value) || value.length === 0)) {
                 return Promise.reject("At least one account must be selected.");
               }
               return Promise.resolve();
@@ -115,7 +115,7 @@ const MarkupForm = <
         <ChildrenSelect<MM>
           parentType={parentType}
           parentId={parentId}
-          isDisabled={unitState !== model.budgeting.MarkupUnits.Percent.id}
+          isDisabled={unitState !== model.budgeting.MarkupUnits.percent.id}
         />
       </Form.Item>
     </Form.Form>

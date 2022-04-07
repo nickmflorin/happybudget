@@ -58,7 +58,7 @@ declare namespace Http {
     readonly description?: string | null;
     readonly cutoff?: number | null;
     readonly rate: number;
-    readonly unit?: Model.FringeUnitId;
+    readonly unit?: Model.FringeUnit["id"];
     readonly color?: string | null;
     readonly previous?: number | null;
   };
@@ -66,7 +66,7 @@ declare namespace Http {
   type MarkupPayload = {
     readonly identifier?: string | null;
     readonly description?: string | null;
-    readonly unit: Model.MarkupUnitId;
+    readonly unit: Model.MarkupUnit["id"];
     readonly rate?: number | null;
     readonly children?: number[];
     readonly groups?: number[];
@@ -85,7 +85,7 @@ declare namespace Http {
   };
 
   type CollaboratorPayload = {
-    readonly access_type: Model.CollaboratorAccessTypeId;
+    readonly access_type: Model.CollaboratorAccessType["id"];
     /* The user is only allowed to be included when creating collaborators,
        not updating them. */
     readonly user: number;
@@ -143,7 +143,7 @@ declare namespace Http {
   type BulkImportActualsPayload = {
     readonly start_date: string;
     readonly end_date?: string | null;
-    readonly source: Model.ActualImportSourceId;
+    readonly source: Model.ActualImportSource["id"];
     readonly public_token: string;
     readonly account_ids?: string[];
   };
@@ -166,7 +166,7 @@ declare namespace Http {
     readonly city?: Model.Contact["city"];
     readonly phone_number?: Model.Contact["phone_number"];
     readonly email?: Model.Contact["email"];
-    readonly contact_type?: Model.ContactTypeId | null;
+    readonly contact_type?: Model.ContactType["id"] | null;
     readonly image?: ArrayBuffer | string | null;
     readonly previous?: number | null;
     readonly first_name: Model.Contact["first_name"];

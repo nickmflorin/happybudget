@@ -12,11 +12,11 @@ import { CreateContactParams } from "components/model/hooks";
 import { ImportActualsPlaidModal } from "components/modals";
 import { usePlaid, UsePlaidSuccessParams } from "components/integrations";
 
-import { framework } from "tabling/generic";
+import { framework as genericFramework } from "tabling/generic";
 import { AuthenticatedTable, AuthenticatedTableProps } from "tabling/generic/tables";
 import { useAttachments, useContacts } from "../hooks";
 
-import Framework from "./framework";
+import * as framework from "./framework";
 import Columns from "./Columns";
 
 type OmitProps =
@@ -226,9 +226,9 @@ const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Pro
         savingChangesPortalId={"saving-changes"}
         getModelRowName={(r: Table.DataRow<R>) => r.data.name}
         getModelRowLabel={"Actual"}
-        framework={Framework}
+        framework={framework.FrameworkComponents}
         actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => {
-          let actions = [framework.actions.ToggleColumnAction(props.table.current, params)];
+          let actions = [genericFramework.actions.ToggleColumnAction(props.table.current, params)];
           if (Config.actualsImportEnabled === true) {
             actions = [
               ...actions,
@@ -238,7 +238,7 @@ const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Pro
               })
             ];
           }
-          return [...actions, framework.actions.ExportPdfAction(props.onExportPdf)];
+          return [...actions, genericFramework.actions.ExportPdfAction(props.onExportPdf)];
         }}
       />
       {modal}

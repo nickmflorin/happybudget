@@ -1,17 +1,10 @@
 import { isNil } from "lodash";
 
-import * as api from "api";
-import { util, model } from "lib";
+import { util } from "lib";
 import { DefaultButton } from "components/buttons";
 
-import {
-  ExportCSVDropdownMenu,
-  ToggleColumnsDropdownMenu,
-  ShareDropdownMenu,
-  ImportActualsDropdownMenu
-} from "components/dropdowns";
+import { ExportCSVDropdownMenu, ToggleColumnsDropdownMenu, ShareDropdownMenu } from "components/dropdowns";
 import { ShareDropdownMenuProps } from "components/dropdowns/ShareDropdownMenu";
-import { ImportActualsMenuItemModel } from "components/dropdowns/ImportActualsDropdownMenu";
 
 export const ExportPdfAction = (onExport: () => void): Table.MenuActionObj => ({
   icon: "print",
@@ -73,41 +66,6 @@ export const CollaboratorsAction = (action: Omit<Partial<Table.MenuActionObj>, "
       </DefaultButton>
     );
   }
-});
-
-type ImportActualsActionProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
-  readonly table: Table.TableInstance<R, M>;
-  readonly onLinkToken: (linkToken: string) => void;
-};
-
-export const ImportActualsAction = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  props: ImportActualsActionProps<R, M>
-): Table.MenuActionObj => ({
-  label: "Sources",
-  icon: "file-import",
-  wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => (
-    <ImportActualsDropdownMenu
-      onChange={(m: Model.ActualImportSource, menu: IMenuRef<MenuItemSelectedState, ImportActualsMenuItemModel>) => {
-        if (m.id === model.budgeting.ActualImportSources.Plaid.id) {
-          menu.setItemLoading(m.id, true);
-          api
-            .createPlaidLinkToken()
-            .then((response: { link_token: string }) => {
-              menu.setItemLoading(m.id, false);
-              props.onLinkToken(response.link_token);
-            })
-            .catch((e: Error) => {
-              menu.setItemLoading(m.id, false);
-              props.table.handleRequestError(e);
-            });
-        } else {
-          console.warn(`Detected unconfigured import source ${m.id}.`);
-        }
-      }}
-    >
-      {children}
-    </ImportActualsDropdownMenu>
-  )
 });
 
 export const ShareAction = <B extends Model.PublicHttpModel, R extends Table.RowData, M extends Model.RowHttpModel>(

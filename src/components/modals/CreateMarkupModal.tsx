@@ -43,7 +43,7 @@ const CreateMarkupModal = <
       const { rate, children: markupChildren, ...payload } = p;
       let mutated = { ...payload } as Http.MarkupPayload;
       // FLAT Markups do not have any children.
-      if (mutated.unit === model.budgeting.MarkupUnits.Percent.id) {
+      if (mutated.unit === model.budgeting.MarkupUnits.percent.id) {
         /* The children should not be an empty list as the Form should have
 						 already validated that. */
         mutated = { ...mutated, children: markupChildren };
@@ -68,8 +68,8 @@ const CreateMarkupModal = <
         parentType={parentType}
         initialValues={
           children === undefined
-            ? { children: children || [], unit: model.budgeting.MarkupUnits.Flat.id }
-            : { children: children || [], unit: model.budgeting.MarkupUnits.Percent.id }
+            ? { children: children || [], unit: model.budgeting.MarkupUnits.flat.id }
+            : { children: children || [], unit: model.budgeting.MarkupUnits.percent.id }
         }
       />
     )}

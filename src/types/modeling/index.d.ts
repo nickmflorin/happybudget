@@ -50,36 +50,49 @@ declare namespace Model {
     readonly caseInsensitive?: boolean;
   };
 
-  type Choice<I extends number = number, N extends string = string> = {
+  type Choice<I extends number = number, N extends string = string, S extends string = string> = {
     id: I;
     name: N;
+    slug: S;
   };
 
-  type DynamicChoices<CH extends Choice<I, N>, I extends number = number, N extends string = string> = {
-    [key in CH["name"]]: CH;
+  type _InferChoice<ARGS> = ARGS extends [number, string, string] ? Choice<ARGS[0], ARGS[1], ARGS[2]> : never;
+  type _DistributeChoice<T> = T extends [infer I, infer N, infer S] ? _InferChoice<[I, N, S]> : never;
+
+  type DynamicChoices<
+    CH extends Choice<I, N, S>,
+    I extends number = number,
+    N extends string = string,
+    S extends string = string
+  > = {
+    [key in CH["slug"]]: CH;
   };
 
-  type Choices<CH extends Choice<I, N>, I extends number = number, N extends string = string> = {
+  type Choices<
+    CH extends Choice<I, N, S>,
+    I extends number = number,
+    N extends string = string,
+    S extends string = string
+  > = {
     readonly choices: CH[];
-    readonly get: (id: I) => CH;
+    readonly get: (id: I | S) => CH;
     readonly infer: (name: string, options?: Omit<InferModelFromNameParams<CH>, "getName">) => CH | null;
-  } & DynamicChoices<CH, I, N>;
+  } & DynamicChoices<CH, I, N, S>;
 
-  type MarkupUnitId = 0 | 1;
-  type MarkupUnitName = "Percent" | "Flat";
-  type MarkupUnit = Choice<0, "Percent"> | Choice<1, "Flat">;
+  type MarkupUnitChoices = [0, "Percent", "percent"] | [1, "Flat", "flat"];
+  type MarkupUnit = _DistributeChoice<MarkupUnitChoices>;
 
-  type FringeUnitId = 0 | 1;
-  type FringeUnitName = "Percent" | "Flat";
-  type FringeUnit = Choice<FringeUnitId, FringeUnitName>;
+  type FringeUnitChoices = [0, "Percent", "percent"] | [1, "Flat", "flat"];
+  type FringeUnit = _DistributeChoice<FringeUnitChoices>;
 
-  type ContactTypeName = "Contractor" | "Employee" | "Vendor";
-  type ContactTypeId = 0 | 1 | 2;
-  type ContactType = Choice<ContactTypeId, ContactTypeName>;
+  type ContactTypeChoices = [0, "Contractor", "contractor"] | [1, "Employee", "employee"] | [2, "Vendor", "vendor"];
+  type ContactType = _DistributeChoice<ContactTypeChoices>;
 
-  type CollaboratorAccessTypeName = "View Only" | "Editor" | "Owner";
-  type CollaboratorAccessTypeId = 0 | 1 | 2;
-  type CollaboratorAccessType = Choice<CollaboratorAccessTypeId, CollaboratorAccessTypeName>;
+  type CollaboratorAccessTypeChoices = [0, "View Only", "view_only"] | [1, "Editor", "editor"] | [2, "Owner", "owner"];
+  type CollaboratorAccessType = _DistributeChoice<CollaboratorAccessTypeChoices>;
+
+  type ActualImportSourceChoices = [0, "Bank Account", "bank_account"];
+  type ActualImportSource = _DistributeChoice<ActualImportSourceChoices>;
 
   type ParentType = "account" | "subaccount" | "budget";
   type BudgetDomain = "budget" | "template";
@@ -169,13 +182,13 @@ declare namespace Model {
   };
 
   type FlatMarkup = Omit<UnknownMarkup, "unit"> & {
-    readonly unit: Choice<1, "Flat">;
+    readonly unit: Choice<1, "Flat", "flat">;
     readonly actual: number;
   };
 
   type PercentMarkup = Omit<UnknownMarkup, "unit"> & {
     readonly children: number[];
-    readonly unit: Choice<0, "Percent">;
+    readonly unit: Choice<0, "Percent", "percent">;
     readonly actual: number;
   };
 
@@ -340,10 +353,6 @@ declare namespace Model {
     readonly owner: ActualOwner | null;
     readonly budget: SimpleBudget;
   };
-
-  type ActualImportSourceId = 0;
-  type ActualImportSourceName = "Plaid";
-  type ActualImportSource = Choice<ActualImportSourceId, ActualImportSourceName>;
 
   type Actual = RowHttpModel<"actual"> & {
     readonly contact: number | null;
