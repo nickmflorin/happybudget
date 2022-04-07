@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { DEFAULT_COLOR_SCHEME, Colors } from "style/constants";
-import { model, util, tabling } from "lib";
+import { model, util } from "lib";
 import { TooltipWrapper } from "components/tooltips";
 
 const TagRenderer = <S extends React.CSSProperties | Pdf.Style = React.CSSProperties>({
@@ -64,48 +64,15 @@ const TagRenderer = <S extends React.CSSProperties | Pdf.Style = React.CSSProper
   );
 };
 
+const MemoizedTagRenderer = React.memo(TagRenderer) as typeof TagRenderer;
+
 export const Tag = <
   M extends Model.Model = Model.Model,
   S extends React.CSSProperties | Pdf.Style = React.CSSProperties
 >(
   props: TagProps<M, S>
 ): JSX.Element => {
-  const colorScheme = useMemo(() => {
-    let tagColorScheme = DEFAULT_COLOR_SCHEME;
-    if (!isNil(props.scheme)) {
-      tagColorScheme = props.scheme;
-    }
-    return tagColorScheme;
-  }, [props.scheme]);
-
   const tagText = useMemo((): string | M[keyof M] => {
-    const getTextFromModel = (m: M): string | M[keyof M] => {
-      if (!isNil(props.modelTextField)) {
-        const modelTextFieldValue = util.getKeyValue<M, keyof M>(props.modelTextField)(m);
-        if (!isNil(modelTextFieldValue) && typeof modelTextFieldValue !== "string") {
-          console.error(`The field ${props.modelTextField} did not return a string.`);
-          return "";
-        }
-        return modelTextFieldValue || "";
-      } else if (!isNil(props.getModelText)) {
-        const text = props.getModelText(m);
-        if (!isNil(text)) {
-          return text;
-        }
-        return "";
-      }
-      if (model.isTag(m)) {
-        if (props.isPlural === true && !isNil(m.plural_title)) {
-          return m.plural_title;
-        }
-        return m.title;
-      } else if (model.isModelWithName(m)) {
-        return m.name || "";
-      } else if (tabling.rows.isRow(m) && tabling.rows.isRowWithName(m)) {
-        return m.data.name || "";
-      }
-      return "";
-    };
     if (props.isPlural === true && !isNil(props.pluralText)) {
       return props.pluralText;
     } else if (!isNil(props.text)) {
@@ -114,68 +81,61 @@ export const Tag = <
       if (typeof props.children === "string") {
         return props.children;
       }
-      return getTextFromModel(props.children);
+      return model.getModelName(props.children, {
+        isPlural: props.isPlural,
+        getModelName: props.getModelText,
+        modelNameField: props.modelTextField
+      });
     } else if (!isNil(props.model)) {
-      return getTextFromModel(props.model);
+      return model.getModelName(props.model, {
+        isPlural: props.isPlural,
+        getModelName: props.getModelText,
+        modelNameField: props.modelTextField
+      });
     }
     return "";
-  }, [props]);
+  }, [
+    props.isPlural,
+    props.pluralText,
+    props.text,
+    props.children,
+    props.model,
+    props.getModelText,
+    props.modelTextField
+  ]);
 
   const tagColor = useMemo((): Style.HexColor | null => {
-    const validateAndReturnColor = (color: Style.HexColor | null | undefined, field: string): Style.HexColor | null => {
-      if (color === undefined) {
-        return Colors.COLOR_NO_COLOR;
-      } else if (color === null) {
-        return null;
-      } else if (typeof color !== "string") {
-        console.error(`The field ${field} did not return a string color.`);
-        return Colors.COLOR_NO_COLOR;
-      }
-      if (!color.startsWith("#")) {
-        color = `#${color}`;
-      }
-      if (color.length !== 7) {
-        console.error(`The field ${field} did not return a valid HEX string color.`);
-        return Colors.COLOR_NO_COLOR;
-      }
-      return color;
-    };
-    const getColorFromModel = (m: M): Style.HexColor | null => {
-      if (!isNil(props.modelColorField)) {
-        const modelColorFieldValue: unknown = m[props.modelColorField];
-        return validateAndReturnColor(modelColorFieldValue as Style.HexColor, props.modelColorField as string);
-      } else if (!isNil(props.getModelColor)) {
-        const color = props.getModelColor(m);
-        if (!isNil(color)) {
-          return validateAndReturnColor(color, "getModelColor callback");
-        }
-      }
-      if (model.isTag(m)) {
-        return validateAndReturnColor(m.color, "color");
-      } else if (model.isModelWithColor(m)) {
-        return validateAndReturnColor(m.color, "color");
-      } else if (tabling.rows.isRow(m) && tabling.rows.isRowWithColor(m) && !isNil(m.data.color)) {
-        return m.data.color;
-      } else if (typeof m.id === "number" && !isNil(colorScheme[m.id])) {
-        return colorScheme[m.id];
-      }
-      return Colors.COLOR_NO_COLOR;
-    };
-
     if (props.color !== undefined) {
-      return validateAndReturnColor(props.color, "color");
+      return model.validatedColor(props.color);
     } else if (!isNil(props.children) && typeof props.children !== "string") {
-      return getColorFromModel(props.children);
+      return model.getModelColor(props.children, {
+        scheme: props.scheme,
+        getModelColor: props.getModelColor,
+        modelColorField: props.modelColorField
+      });
     } else if (!isNil(props.model)) {
-      return getColorFromModel(props.model);
+      return model.getModelColor(props.model, {
+        scheme: props.scheme,
+        getModelColor: props.getModelColor,
+        modelColorField: props.modelColorField
+      });
     } else if (!isNil(props.colorIndex)) {
+      const colorScheme = props.scheme || DEFAULT_COLOR_SCHEME;
       if (!isNil(colorScheme[props.colorIndex])) {
         return colorScheme[props.colorIndex];
       }
       return Colors.COLOR_NO_COLOR;
     }
-    return util.selectConsistent(colorScheme, tagText as string);
-  }, [props]);
+    return util.selectConsistent(props.scheme || DEFAULT_COLOR_SCHEME, tagText as string);
+  }, [
+    tagText,
+    props.color,
+    props.children,
+    props.getModelColor,
+    props.modelColorField,
+    props.scheme,
+    props.colorIndex
+  ]);
 
   const tagTextColor = useMemo(() => {
     if (!isNil(props.textColor)) {
@@ -213,12 +173,15 @@ export const Tag = <
     props.fillWidth
   ]);
 
+  /* If the render method is provided, it is responsible for rendering the
+     entire Tag - not just the contents inside of the Tag.  This is primarily
+     just used for PDF purposes. */
   if (!isNil(props.render)) {
     return <TooltipWrapper tooltip={props.tooltip}>{props.render(renderParams)}</TooltipWrapper>;
   }
   return (
     <TooltipWrapper tooltip={props.tooltip}>
-      <TagRenderer<S> {...renderParams} />
+      <MemoizedTagRenderer<S> {...renderParams} />
     </TooltipWrapper>
   );
 };

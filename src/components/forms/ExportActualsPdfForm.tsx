@@ -76,10 +76,10 @@ const ExportActualsPdfForm = (
 
         <Form.Item label={"Columns"} name={"columns"}>
           <ColumnSelect<Tables.ActualRowData, Model.Actual>
-            getLabel={(c: Table.DataColumn<Tables.ActualRowData, Model.Actual>) =>
+            getOptionLabel={(c: Table.DataColumn<Tables.ActualRowData, Model.Actual>) =>
               c.pdfHeaderName || c.headerName || ""
             }
-            columns={columns}
+            options={columns}
           />
         </Form.Item>
 

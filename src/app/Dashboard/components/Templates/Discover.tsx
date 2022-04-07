@@ -87,7 +87,7 @@ const Discover: React.FC<DiscoverProps> = ({ onCreateBudget, onDeriveBudget }): 
         <IsStaff>
           <EditTemplateModal
             open={true}
-            id={templateToEdit}
+            modelId={templateToEdit}
             onCancel={() => setTemplateToEdit(undefined)}
             onSuccess={(template: Model.Template) => {
               setTemplateToEdit(undefined);

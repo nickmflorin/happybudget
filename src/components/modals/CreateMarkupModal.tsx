@@ -10,7 +10,7 @@ interface CreateMarkupModalProps<
   M extends Model.RowHttpModel,
   RSP extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>
 > extends Omit<CreateModelModalProps<Model.Markup, RSP>, "children"> {
-  readonly id: PARENT["id"];
+  readonly parentId: PARENT["id"];
   readonly children?: number[];
   readonly table: Table.TableInstance<R, M>;
   readonly parentType: PARENT["type"] | "budget";
@@ -26,7 +26,7 @@ const CreateMarkupModal = <
   M extends Model.RowHttpModel,
   RSP extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>
 >({
-  id,
+  parentId,
   parentType,
   children,
   table,
@@ -64,7 +64,7 @@ const CreateMarkupModal = <
     {(form: FormInstance<MarkupFormValues>) => (
       <MarkupForm<MM, PARENT>
         form={form}
-        parentId={id}
+        parentId={parentId}
         parentType={parentType}
         initialValues={
           children === undefined

@@ -27,7 +27,7 @@ const useGrouping = <R extends Tables.BudgetRowData, M extends Model.RowHttpMode
     if (!isNil(groupAccounts)) {
       return (
         <CreateGroupModal
-          id={props.parentId}
+          parentId={props.parentId}
           table={props.table}
           parentType={props.parentType}
           children={groupAccounts}
@@ -44,7 +44,7 @@ const useGrouping = <R extends Tables.BudgetRowData, M extends Model.RowHttpMode
     if (!isNil(groupToEdit)) {
       return (
         <EditGroupModal
-          id={tabling.rows.groupId(groupToEdit.id)}
+          modelId={tabling.rows.groupId(groupToEdit.id)}
           parentId={props.parentId}
           parentType={props.parentType}
           open={true}

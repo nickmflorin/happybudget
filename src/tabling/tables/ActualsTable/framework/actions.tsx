@@ -1,6 +1,8 @@
 import * as api from "api";
 import { model } from "lib";
 
+import { Icon } from "components";
+
 import { ImportActualsDropdownMenu } from "components/dropdowns";
 import { ImportActualsMenuItemModel } from "components/dropdowns/ImportActualsDropdownMenu";
 
@@ -13,7 +15,7 @@ export const ImportActualsAction = <R extends Table.RowData, M extends Model.Row
   props: ImportActualsActionProps<R, M>
 ): Table.MenuActionObj => ({
   label: "Sources",
-  icon: "file-import",
+  icon: <Icon icon={"infinity"} weight={"solid"} />,
   wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => (
     <ImportActualsDropdownMenu
       onChange={(m: Model.ActualImportSource, menu: IMenuRef<MenuItemSelectedState, ImportActualsMenuItemModel>) => {

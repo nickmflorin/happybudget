@@ -83,7 +83,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ onCreateBudget, onDeriveBudge
       {!isNil(templateToEdit) && (
         <EditTemplateModal
           open={true}
-          id={templateToEdit}
+          modelId={templateToEdit}
           onCancel={() => setTemplateToEdit(undefined)}
           onSuccess={(template: Model.Template) => {
             setTemplateToEdit(undefined);

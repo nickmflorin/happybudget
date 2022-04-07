@@ -1,47 +1,40 @@
-import { MultiValue } from "react-select/dist/declarations/src/types";
-import { map } from "lodash";
-
-import { ui } from "lib";
+import React from "react";
 
 import MultiAsyncSelect, { MultiAsyncSelectProps } from "./MultiAsyncSelect";
+import {
+  withMultiModelSelect,
+  withMultiModelAsyncSelect,
+  WithMultiModelSelectProps,
+  WithMultiModelAsyncSelectProps,
+  MultiModelSelectInjectedProps,
+  MultiModelAsyncSelectInjectedProps
+} from "./hocs";
 
-export const convertOptions = <M extends Model.Model>(options: MultiValue<Model.WithStringId<M>>): M["id"][] =>
-  map(options, (o: Model.WithStringId<M>) => ui.select.toSelectModel(o).id);
+type BaseProps<
+  M extends Model.Model,
+  G extends AsyncSelectGroupBase<AsyncModelSelectOption<M>> = AsyncSelectGroupBase<AsyncModelSelectOption<M>>
+> = Omit<
+  MultiAsyncSelectProps<AsyncModelSelectOption<M>, Http.ListResponse<M>, G>,
+  "getOptionLabel" | "getOptionValue" | "onChange" | "options" | "value"
+>;
+
+type _MultiModelAsyncSelectProps<
+  M extends Model.Model,
+  G extends AsyncSelectGroupBase<AsyncModelSelectOption<M>> = AsyncSelectGroupBase<AsyncModelSelectOption<M>>
+> = BaseProps<M, G> & MultiModelSelectInjectedProps<M> & MultiModelAsyncSelectInjectedProps<M>;
 
 export type MultiModelAsyncSelectProps<
   M extends Model.Model,
-  G extends AsyncSelectGroupBase<Model.WithStringId<M>> = AsyncSelectGroupBase<Model.WithStringId<M>>
-> = Omit<
-  MultiAsyncSelectProps<Model.WithStringId<M>, Http.ListResponse<M>, G>,
-  "getOptionLabel" | "getOptionValue" | "onChange" | "options" | "value"
-> & {
-  readonly onChange?: (ms: M["id"][]) => void;
-  readonly getOptionLabel?: (m: M) => string;
-  readonly value?: M["id"][];
-};
+  G extends AsyncSelectGroupBase<AsyncModelSelectOption<M>> = AsyncSelectGroupBase<AsyncModelSelectOption<M>>
+> = BaseProps<M, G> & WithMultiModelSelectProps<M> & WithMultiModelAsyncSelectProps<M>;
 
-const MultiModelAsyncSelect = <
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+const WithMulti = withMultiModelSelect<any, _MultiModelAsyncSelectProps<any, any>>(MultiAsyncSelect);
+const WithAsync = withMultiModelAsyncSelect(WithMulti);
+
+export default React.memo(WithAsync) as <
   M extends Model.Model,
-  G extends AsyncSelectGroupBase<Model.WithStringId<M>> = AsyncSelectGroupBase<Model.WithStringId<M>>
->({
-  value,
-  getOptionLabel,
-  ...props
-}: MultiModelAsyncSelectProps<M, G>): JSX.Element => {
-  const { value: v, onResponse } = ui.select.useMultiModelSelect<M>({ value, isAsync: true });
-
-  return (
-    <MultiAsyncSelect
-      {...props}
-      defaultOptions={true}
-      value={v}
-      processResponse={(rsp: Http.ListResponse<M>) => map(rsp.data, (d: M) => ui.select.toSelectOption(d))}
-      onResponse={onResponse}
-      getOptionLabel={(mS: Model.WithStringId<M>) => getOptionLabel?.(ui.select.toSelectModel(mS)) || ""}
-      getOptionValue={(m: Model.WithStringId<M>) => m.id}
-      onChange={(newValue: MultiValue<Model.WithStringId<M>>) => props.onChange?.(convertOptions(newValue))}
-    />
-  );
-};
-
-export default MultiModelAsyncSelect;
+  G extends AsyncSelectGroupBase<AsyncModelSelectOption<M>> = AsyncSelectGroupBase<AsyncModelSelectOption<M>>
+>(
+  props: MultiModelAsyncSelectProps<M, G>
+) => JSX.Element;

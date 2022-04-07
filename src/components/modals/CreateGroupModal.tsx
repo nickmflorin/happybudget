@@ -4,7 +4,7 @@ import { CreateModelModal, CreateModelModalProps, CreateModelCallbacks } from ".
 
 interface CreateGroupModalProps<R extends Table.RowData, M extends Model.RowHttpModel>
   extends CreateModelModalProps<Model.Group> {
-  readonly id: number;
+  readonly parentId: number;
   readonly children: number[];
   readonly table: Table.TableInstance<R, M>;
   readonly parentType: Model.ParentType;
@@ -15,7 +15,7 @@ const CreateGroupModal = <
   M extends Model.RowHttpModel,
   MM extends Model.SimpleAccount | Model.SimpleSubAccount
 >({
-  id,
+  parentId,
   children,
   parentType,
   table,
@@ -30,7 +30,7 @@ const CreateGroupModal = <
     }
   >
     {(form: FormInstance<Http.GroupPayload>) => (
-      <GroupForm<MM> form={form} parentType={parentType} parentId={id} initialValues={{ children }} />
+      <GroupForm<MM> form={form} parentType={parentType} parentId={parentId} initialValues={{ children }} />
     )}
   </CreateModelModal>
 );

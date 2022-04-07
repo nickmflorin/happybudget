@@ -438,7 +438,7 @@ const ExportForm = (
         </Form.Item>
 
         <Form.Item label={"Columns"} name={"columns"}>
-          <ColumnSelect<R, M, C> getLabel={(c: C) => c.pdfHeaderName || c.headerName || ""} columns={columns} />
+          <ColumnSelect<R, M, C> getOptionLabel={(c: C) => c.pdfHeaderName || c.headerName || ""} options={columns} />
         </Form.Item>
 
         <Form.Item label={"Show All Tables"} horizontalLayoutOverride={true}>

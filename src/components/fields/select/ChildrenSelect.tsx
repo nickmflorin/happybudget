@@ -5,10 +5,10 @@ import classNames from "classnames";
 
 import * as api from "api";
 import { http, ui } from "lib";
-import { EntityTextTag } from "components/tagging";
 import { EntityText } from "components/typography";
 
-import { AsyncOption, AsyncMultiValue } from "./AsyncSelect";
+import AsyncOption from "./AsyncOption";
+import AsyncMultiValue from "./AsyncMultiValue";
 import MultiModelAsyncSelect, { MultiModelAsyncSelectProps } from "./MultiModelAsyncSelect";
 
 export type ChildrenSelectProps<M extends Model.SimpleAccount | Model.SimpleSubAccount> = Omit<
@@ -21,30 +21,32 @@ export type ChildrenSelectProps<M extends Model.SimpleAccount | Model.SimpleSubA
 
 const MultiValue = <
   M extends Model.SimpleAccount | Model.SimpleSubAccount,
-  G extends AsyncSelectGroupBase<Model.WithStringId<M>>
+  G extends AsyncSelectGroupBase<AsyncModelSelectOption<M>>
 >(
-  props: MultiValueProps<AsyncSelectOption<Model.WithStringId<M>>, true, G>
+  props: MultiValueProps<AsyncSelectOption<AsyncModelSelectOption<M>>, true, G>
 ) => {
   return ui.select.isSelectErrorOption(props.data) ? (
     <AsyncMultiValue {...props} />
   ) : (
     <components.MultiValue {...props}>
-      <EntityTextTag>{ui.select.toSelectModel(props.data)}</EntityTextTag>
+      <EntityText fillEmpty={"----"}>{ui.select.toSelectModel<M>(props.data)}</EntityText>
     </components.MultiValue>
   );
 };
 
+const MemoizedMultiValue = React.memo(MultiValue) as typeof MultiValue;
+
 const Option = <
   M extends Model.SimpleAccount | Model.SimpleSubAccount,
-  G extends AsyncSelectGroupBase<Model.WithStringId<M>>
+  G extends AsyncSelectGroupBase<AsyncModelSelectOption<M>>
 >(
-  props: OptionProps<AsyncSelectOption<Model.WithStringId<M>>, true, G>
+  props: OptionProps<AsyncSelectOption<AsyncModelSelectOption<M>>, true, G>
 ) => {
   return ui.select.isSelectErrorOption(props.data) ? (
     <AsyncOption {...props} />
   ) : (
     <components.Option {...props} className={classNames("child-select-option", props.className)}>
-      <EntityText fillEmpty={"----"}>{ui.select.toSelectModel(props.data)}</EntityText>
+      <EntityText fillEmpty={"----"}>{ui.select.toSelectModel<M>(props.data)}</EntityText>
     </components.Option>
   );
 };
@@ -62,9 +64,9 @@ const ChildrenSelect = <M extends Model.SimpleAccount | Model.SimpleSubAccount>(
       placeholder={"Search accounts..."}
       {...props}
       isSearchable={false}
-      components={{ Option: MemoizedOption, MultiValue }}
+      components={{ Option: MemoizedOption, MultiValue: MemoizedMultiValue }}
       noOptionsMessage={() => "No accounts found."}
-      processResponse={(rsp: Http.ListResponse<M>) => map(rsp.data, (d: M) => ui.select.toSelectOption(d))}
+      processResponse={(rsp: Http.ListResponse<M>) => map(rsp.data, (d: M) => ui.select.toModelSelectOption(d))}
       loadOptions={() =>
         api.getTableChildren<M>(parentId, parentType, { simple: true }, { cancelToken: cancelToken() })
       }

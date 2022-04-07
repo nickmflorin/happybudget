@@ -25,7 +25,7 @@ const Budgets = (props: BudgetsProps): JSX.Element => {
         const modal = (
           <EditBudgetModal
             open={true}
-            id={b.id}
+            modelId={b.id}
             onCancel={() => setEditModal(null)}
             onSuccess={(budget: Model.Budget) => {
               setEditModal(null);

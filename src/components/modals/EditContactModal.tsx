@@ -100,13 +100,17 @@ const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: 
                       form.notify({ message: "There was an error downloading your attachment." });
                     },
                     path: `/v1/contacts/${m.id}/attachments/`,
-                    id: m.id
+                    modelId: m.id
                   }
                 : undefined
             }
           />
           <Separator />
-          <TaggedActuals contactId={props.id} title={"History"} onError={(e: Error) => form.handleRequestError(e)} />
+          <TaggedActuals
+            contactId={props.modelId}
+            title={"History"}
+            onError={(e: Error) => form.handleRequestError(e)}
+          />
         </React.Fragment>
       )}
     </EditModelModal>

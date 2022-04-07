@@ -6,6 +6,7 @@ declare interface ModalInstance extends UINotificationsManager {
 }
 
 declare interface ModalProps extends Omit<RootModalProps, "visible"> {
+  readonly id?: string;
   readonly open?: boolean;
   readonly titleIcon?: IconOrElement;
   readonly onCancel?: () => void;

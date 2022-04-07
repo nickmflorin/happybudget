@@ -1,36 +1,6 @@
 @import "./base";
 @import "./mixins";
 
-// Must be outside of select because it does not render inside of select component.
-.ant-select-item-option {
-  &.column-select-option {
-    .ant-select-item-option-content {
-      display: flex;
-
-      .icon-wrapper {
-        @include size(22px);
-
-        svg {
-          @include size(12px);
-        }
-      }
-    }
-  }
-  &.group-select-option {
-    .ant-select-item-option-content {
-      display: flex;
-
-      .icon-wrapper {
-        @include size(22px);
-
-        .color {
-          @include size(16px);
-        }
-      }
-    }
-  }
-}
-
 .select,
 .ant-select {
   @extend .input-base;
@@ -111,50 +81,6 @@
   }
 }
 
-.group-select {
-  .group-select-tag {
-    display: flex;
-    line-height: 22px;
-
-    .icon-wrapper {
-      height: 22px;
-      width: 22px;
-      margin-right: -4px;
-
-      .color {
-        height: 12px;
-        width: 12px;
-      }
-    }
-
-    .ant-tag-close-icon {
-      @include vertical-flex-c();
-    }
-  }
-}
-
-.column-select {
-  .column-select-tag {
-    display: flex;
-    flex-direction: row;
-    line-height: 22px;
-
-    .icon-wrapper {
-      height: 22px;
-      width: 22px;
-      margin-right: -4px;
-
-      svg {
-        @include size(12px);
-      }
-    }
-
-    .ant-tag-close-icon {
-      @include vertical-flex-c();
-    }
-  }
-}
-
 .ant-select-item-option {
   color: $text-secondary;
   font-size: $standard-text-size;;
@@ -221,6 +147,10 @@
   }
 }
 
+.react-select__menu-portal {
+	z-index: 9999;
+}
+
 .react-select-container {
 	width: 100%;
 
@@ -255,11 +185,28 @@
 				color: $text-secondary;
 				position: relative;
 				bottom: 1px;
+				display: flex;
 
 				.react-select__multi-value__remove {
 					&:hover {
 						background-color: unset !important;
 						color: $blue;
+					}
+				}
+
+				.react-select__multi-value__label {
+					display: flex;
+					flex-direction: row;
+				}
+
+				.icon-wrapper {
+					@include size(16px);
+					aspect-ratio: 1;
+					margin-right: 2px;
+					@include vertical-flex-c();
+
+					svg {
+						@include size(12px);
 					}
 				}
 			}
@@ -306,6 +253,8 @@
 				font-family: $avenir;
 				color: $text-secondary;
 				font-size: $medium-text-size;
+				display: flex;
+				font-weight: 500;
 
 				&.react-select__option--is-focused {
 					color: $text-primary;
@@ -315,7 +264,18 @@
 				&.react-select__option--is-selected {
 					color: $text-primary;
 					background-color: $active-hover-color;
-					font-weight: 500;
+					font-weight: 600;
+				}
+
+				.icon-wrapper {
+					@include size(16px);
+					aspect-ratio: 1;
+					margin-right: 4px;
+					@include vertical-flex-c();
+
+					svg {
+						@include size(12px);
+					}
 				}
 			}
 		}

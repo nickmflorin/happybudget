@@ -2,17 +2,17 @@ import React from "react";
 import moment from "moment-timezone";
 import { isNil, map } from "lodash";
 
-import SingleModelSelect, { SingleModelSelectProps } from "./SingleModelSelect";
+import SingleModelSyncSelect, { SingleModelSyncSelectProps } from "./SingleModelSyncSelect";
 
 type Option = { readonly id: string; readonly label: string };
 
 const toId = (v: string) => v.replace(" ", "").replace("_", "").toLowerCase();
 
-const TimezoneSelect: React.FC<Omit<SingleModelSelectProps<Option>, "getOptionLabel" | "options">> = ({
+const TimezoneSelect: React.FC<Omit<SingleModelSyncSelectProps<Option>, "getOptionLabel" | "options">> = ({
   placeholder = "Time Zone",
   ...props
 }) => (
-  <SingleModelSelect
+  <SingleModelSyncSelect
     {...props}
     placeholder={placeholder}
     options={map(moment.tz.names(), (name: string) => ({

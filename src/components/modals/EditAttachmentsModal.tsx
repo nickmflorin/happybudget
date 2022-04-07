@@ -4,10 +4,13 @@ import { EditAttachments, EditAttachmentsProps } from "components/files";
 import { notifications } from "lib";
 import { Modal } from "./generic";
 
-interface EditAttachmentsModalProps extends ModalProps, Omit<EditAttachmentsProps, "onDownloadError"> {}
+type EditAttachmentsModalProps = ModalProps &
+  Omit<EditAttachmentsProps, "onDownloadError"> & {
+    readonly modelId: number;
+  };
 
 const EditAttachmentsModal = ({
-  id,
+  modelId,
   path,
   onAttachmentRemoved,
   listAttachments,
@@ -21,7 +24,7 @@ const EditAttachmentsModal = ({
     <Modal {...props} modal={modal} title={"Attachments"} titleIcon={"paperclip"} footer={null}>
       <EditAttachments
         path={path}
-        id={id}
+        modelId={modelId}
         onAttachmentAdded={onAttachmentAdded}
         onAttachmentRemoved={onAttachmentRemoved}
         listAttachments={listAttachments}

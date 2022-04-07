@@ -35,7 +35,7 @@ const useMarkup = <
     if (markupAccounts !== null) {
       return (
         <CreateMarkupModal<MM, B, PARENT, R, M, RSP>
-          id={props.parentId}
+          parentId={props.parentId}
           parentType={props.parentType}
           table={props.table}
           children={markupAccounts}
@@ -57,7 +57,7 @@ const useMarkup = <
     if (!isNil(markupToEdit)) {
       return (
         <EditMarkupModal<MM, B, PARENT, R, M, RSP>
-          id={markupToEdit}
+          modelId={markupToEdit}
           parentId={props.parentId}
           parentType={props.parentType}
           table={props.table}

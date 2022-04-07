@@ -93,7 +93,7 @@ const useAttachments = <
     }
     return (
       <EditAttachmentsModal
-        id={editAttachments}
+        modelId={editAttachments}
         listAttachments={props.listAttachments}
         deleteAttachment={props.deleteAttachment}
         path={props.path(editAttachments)}

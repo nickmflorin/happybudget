@@ -1,12 +1,12 @@
 import React from "react";
-import SingleModelSelect, { SingleModelSelectProps } from "./SingleModelSelect";
+import SingleModelSyncSelect, { SingleModelSyncSelectProps } from "./SingleModelSyncSelect";
 
 export type SingleChoiceSelectProps<
   C extends Model.Choice<I, N, S>,
   I extends number = number,
   N extends string = string,
   S extends string = string
-> = Omit<SingleModelSelectProps<C>, "getOptionLabel"> & {
+> = Omit<SingleModelSyncSelectProps<C>, "getOptionLabel"> & {
   // Optional, because for a choice we have access to the name property.
   readonly getOptionLabel?: (m: C) => string;
 };
@@ -19,7 +19,7 @@ const SingleChoiceSelect = <
 >(
   props: SingleChoiceSelectProps<C, I, N, S>
 ): JSX.Element => (
-  <SingleModelSelect<C> isClearable={false} isSearchable={false} getOptionLabel={(m: C) => m.name} {...props} />
+  <SingleModelSyncSelect<C> isClearable={false} isSearchable={false} getOptionLabel={(m: C) => m.name} {...props} />
 );
 
 export default React.memo(SingleChoiceSelect) as typeof SingleChoiceSelect;

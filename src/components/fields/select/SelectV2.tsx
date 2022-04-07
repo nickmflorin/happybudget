@@ -3,24 +3,26 @@ import RCSelect, { Props, GroupBase } from "react-select";
 import classNames from "classnames";
 
 import { ConditionalWrapper } from "components";
+import Option from "./Option";
 
 export type SelectProps<
-  Option,
+  O extends SelectOption,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
-> = Props<Option, IsMulti, Group> & {
+  Group extends SelectGroupBase<O> = SelectGroupBase<O>
+> = Props<O, IsMulti, Group> & {
   readonly borderless?: boolean;
   readonly wrapperStyle?: React.CSSProperties;
 };
 
-const Select = <O, M extends boolean = false, G extends GroupBase<O> = GroupBase<O>>({
+const Select = <O extends SelectOption, IsMulti extends boolean = false, G extends GroupBase<O> = GroupBase<O>>({
   borderless,
   wrapperStyle,
   ...props
-}: SelectProps<O, M, G>): JSX.Element => (
+}: SelectProps<O, IsMulti, G>): JSX.Element => (
   <ConditionalWrapper conditional={wrapperStyle !== undefined} style={wrapperStyle}>
     <RCSelect
       {...props}
+      components={{ Option, ...props.components }}
       className={classNames("react-select-container", props.className, { borderless })}
       classNamePrefix={"react-select"}
     />

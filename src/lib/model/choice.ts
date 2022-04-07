@@ -1,6 +1,5 @@
 import { find, isNil } from "lodash";
-
-import { inferModelFromName } from "./util";
+import { inferModelFromName } from "./lookup";
 
 export class ChoiceClass<I extends number = number, N extends string = string, S extends string = string>
   implements Model.Choice<I, N, S>

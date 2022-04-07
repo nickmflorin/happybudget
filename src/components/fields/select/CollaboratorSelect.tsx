@@ -1,6 +1,5 @@
 import React from "react";
 import { map } from "lodash";
-import { components, OptionProps } from "react-select";
 import classNames from "classnames";
 
 import * as api from "api";
@@ -9,7 +8,8 @@ import { http, ui } from "lib";
 
 import { UserImageOrInitials } from "components/images";
 
-import { AsyncOption } from "./AsyncSelect";
+import AsyncOption, { AsyncOptionProps } from "./AsyncOption";
+import { OptionChildrenRenderProps } from "./Option";
 import MultiModelAsyncSelect, { MultiModelAsyncSelectProps } from "./MultiModelAsyncSelect";
 
 export type CollaboratorSelectProps = Omit<
@@ -19,18 +19,24 @@ export type CollaboratorSelectProps = Omit<
   readonly currentCollaborators: Model.Collaborator[];
 };
 
-const Option = <G extends AsyncSelectGroupBase<Model.WithStringId<Model.SimpleUser>>>(
-  props: OptionProps<AsyncSelectOption<Model.WithStringId<Model.SimpleUser>>, true, G>
+const Option = <G extends AsyncSelectGroupBase<ModelSelectOption<Model.SimpleUser>>>(
+  props: AsyncOptionProps<ModelSelectOption<Model.SimpleUser>, true, G>
 ) =>
   ui.select.isSelectErrorOption(props.data) ? (
-    <AsyncOption {...props} />
+    <AsyncOption<ModelSelectOption<Model.SimpleUser>, true, G> {...props} />
   ) : (
-    <components.Option {...props} className={classNames("collaborator-select-option", props.className)}>
-      <div className={"user-image-or-initials-container"}>
-        <UserImageOrInitials circle={true} user={{ ...props.data, id: parseInt(props.data.id) }} />
-      </div>
-      <div className={"name-container"}>{props.data.full_name}</div>
-    </components.Option>
+    <AsyncOption {...props} className={classNames("collaborator-select-option", props.className)}>
+      <React.Fragment>
+        {(params: OptionChildrenRenderProps<ModelSelectOption<Model.SimpleUser>, true>) => (
+          <React.Fragment>
+            <div className={"user-image-or-initials-container"}>
+              <UserImageOrInitials circle={true} user={{ ...params.data, id: parseInt(params.data.id) }} />
+            </div>
+            <div className={"name-container"}>{params.data.full_name}</div>
+          </React.Fragment>
+        )}
+      </React.Fragment>
+    </AsyncOption>
   );
 
 const MemoizedOption = React.memo(Option) as typeof Option;

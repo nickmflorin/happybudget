@@ -7,7 +7,7 @@ import AttachmentsList from "./AttachmentsList";
 import AttachmentsFilePond from "./AttachmentsFilePond";
 
 export interface EditAttachmentsProps {
-  readonly id: number;
+  readonly modelId: number;
   readonly path: string;
   readonly onDownloadError: (e: Error) => void;
   readonly onAttachmentRemoved?: (id: number) => void;
@@ -29,11 +29,11 @@ const EditAttachments = (props: EditAttachmentsProps): JSX.Element => {
   useEffect(() => {
     setLoadingAttachments(true);
     props
-      .listAttachments(props.id, {}, { cancelToken: cancelToken() })
+      .listAttachments(props.modelId, {}, { cancelToken: cancelToken() })
       .then((response: Http.ListResponse<Model.Attachment>) => setAttachments(response.data))
       .catch((e: Error) => notifications.internal.handleRequestError(e))
       .finally(() => setLoadingAttachments(false));
-  }, [props.id]);
+  }, [props.modelId]);
 
   const onAttachmentAdded = useMemo(
     () => (attachment: Model.Attachment) => {
@@ -55,7 +55,7 @@ const EditAttachments = (props: EditAttachmentsProps): JSX.Element => {
     () => (attachment: Model.Attachment) => {
       setDeleting(attachment.id);
       props
-        .deleteAttachment(attachment.id, props.id, { cancelToken: cancelToken() })
+        .deleteAttachment(attachment.id, props.modelId, { cancelToken: cancelToken() })
         .then(() => onAttachmentRemoved(attachment.id))
         .catch((e: Error) => notifications.internal.handleRequestError(e))
         .finally(() => setDeleted(attachment.id));
@@ -76,7 +76,7 @@ const EditAttachments = (props: EditAttachmentsProps): JSX.Element => {
         />
       )}
       <AttachmentsFilePond
-        id={props.id}
+        id={props.modelId}
         path={props.path}
         onAttachmentAdded={onAttachmentAdded}
         onAttachmentRemoved={onAttachmentRemoved}

@@ -60,7 +60,7 @@ const useContacts = (props: UseContactsProps): UseContactsReturnType => {
     () => (params: EditContactParams) => {
       const modal = (
         <EditContactModal
-          id={params.id}
+          modelId={params.id}
           onCancel={() => setEditContactModal(null)}
           onAttachmentRemoved={(id: number) => props.onAttachmentRemoved?.(params.id, id)}
           onAttachmentAdded={(m: Model.Attachment) => props.onAttachmentAdded?.(params.id, m)}

@@ -3,13 +3,13 @@ import React from "react";
 import AsyncSelect, { AsyncSelectProps } from "./AsyncSelect";
 
 export type SingleAsyncSelectProps<
-  O,
+  O extends SelectOption,
   RSP extends Http.ListResponse<unknown> = Http.ListResponse<unknown>,
   G extends AsyncSelectGroupBase<O> = AsyncSelectGroupBase<O>
 > = Omit<AsyncSelectProps<O, false, RSP, G>, "isMulti">;
 
 const SingleAsyncSelect = <
-  O,
+  O extends SelectOption,
   RSP extends Http.ListResponse<unknown> = Http.ListResponse<unknown>,
   G extends AsyncSelectGroupBase<O> = AsyncSelectGroupBase<O>
 >(

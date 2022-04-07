@@ -6,7 +6,7 @@ import { ui, hooks, model, http } from "lib";
 import Modal from "./Modal";
 
 export interface EditModelModalProps<M extends Model.Model, R = M> extends ModalProps {
-  readonly id: number;
+  readonly modelId: number;
   readonly onSuccess: (m: R) => void;
 }
 
@@ -48,7 +48,7 @@ const EditModelModal = <
   V = P,
   R = M
 >({
-  id,
+  modelId,
   autoFocusField,
   form,
   onModelLoaded,
@@ -91,7 +91,7 @@ const EditModelModal = <
   });
 
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-  const [instance, loading, error] = model.useModel<M>(id, {
+  const [instance, loading, error] = model.useModel<M>(modelId, {
     request,
     onResponse,
     conditional: () => props.open === true,
@@ -151,7 +151,7 @@ const EditModelModal = <
           );
           if (!isNil(update)) {
             onLoading(true);
-            update(id, payload, { cancelToken: getToken() })
+            update(modelId, payload, { cancelToken: getToken() })
               .then((response: R) => _onSuccess(response))
               .catch((e: Error) => _onError(e));
           } else if (!isNil(updateSync)) {

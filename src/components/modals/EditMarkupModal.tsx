@@ -44,7 +44,7 @@ const EditMarkupModal = <
       title={"Markup"}
       request={api.getMarkup}
       updateSync={(payload: Partial<Http.MarkupPayload>, callbacks: UpdateModelCallbacks<RSP>) =>
-        table.dispatchEvent({ type: "markupUpdate", payload: { id: props.id, data: payload }, ...callbacks })
+        table.dispatchEvent({ type: "markupUpdate", payload: { id: props.modelId, data: payload }, ...callbacks })
       }
       interceptPayload={(p: MarkupFormValues) => {
         const { rate, children, ...payload } = p;

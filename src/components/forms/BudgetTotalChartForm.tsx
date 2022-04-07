@@ -1,7 +1,7 @@
 import { Checkbox } from "antd";
 
 import { Form } from "components";
-import { SingleModelSelect } from "components/fields";
+import { SingleModelSyncSelect } from "components/fields";
 
 export type BudgetTotalChartFormValues = {
   readonly metric: Charts.BudgetTotal.MetricId;
@@ -18,7 +18,7 @@ const BudgetTotalChartForm = ({ metrics, ...props }: BudgetTotalChartFormProps) 
       <Checkbox defaultChecked={props.initialValues?.grouped} />
     </Form.Item>
     <Form.Item name={"metric"}>
-      <SingleModelSelect options={metrics} getOptionLabel={(m: Charts.BudgetTotal.Metric) => m.label} />
+      <SingleModelSyncSelect options={metrics} getOptionLabel={(m: Charts.BudgetTotal.Metric) => m.label} />
     </Form.Item>
   </Form.Form>
 );

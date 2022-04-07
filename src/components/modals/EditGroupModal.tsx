@@ -32,7 +32,7 @@ const EditGroupModal = <
       request={api.getGroup}
       update={api.updateGroup}
       updateSync={(payload: Partial<Http.GroupPayload>, callbacks: UpdateModelCallbacks<Model.Group>) =>
-        table.dispatchEvent({ type: "groupUpdate", payload: { id: props.id, data: payload }, ...callbacks })
+        table.dispatchEvent({ type: "groupUpdate", payload: { id: props.modelId, data: payload }, ...callbacks })
       }
       setFormData={(group: Model.Group) => {
         form.setFields([
