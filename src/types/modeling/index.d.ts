@@ -131,7 +131,6 @@ declare namespace Model {
     readonly num_budgets: number;
     readonly num_collaborating_budgets: number;
     readonly num_templates: number;
-    readonly num_contacts: number;
     readonly num_archived_budgets: number;
   };
 

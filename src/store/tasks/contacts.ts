@@ -3,7 +3,6 @@ import { put, fork, select, call } from "redux-saga/effects";
 import { filter } from "lodash";
 
 import * as api from "api";
-import * as store from "store";
 import { tabling, notifications, http } from "lib";
 
 import * as actions from "../actions";
@@ -92,8 +91,7 @@ export const createTableTaskSet = (
           payload: { placeholderIds: e.placeholderIds, models: r.children }
         },
         ctx
-      ),
-      store.actions.updateLoggedInUserMetricsAction({ metric: "num_contacts", incrementBy: r.children.length })
+      )
     ],
     performCreate: (
       ctx: Redux.WithActionContext<Tables.ContactTableContext>,
@@ -119,7 +117,6 @@ export const createTableTaskSet = (
     config.table.saving(true);
     try {
       yield http.request(api.bulkDeleteContacts, ctx, { ids });
-      store.actions.updateLoggedInUserMetricsAction({ metric: "num_contacts", decrementBy: ids.length });
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, {
         message: ctx.errorMessage || "There was an error removing the table rows.",
