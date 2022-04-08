@@ -25,6 +25,7 @@ const Select = <O extends SelectOption, IsMulti extends boolean = false, G exten
       components={{ Option, ...props.components }}
       className={classNames("react-select-container", props.className, { borderless })}
       classNamePrefix={"react-select"}
+      menuPosition={"fixed"}
     />
   </ConditionalWrapper>
 );

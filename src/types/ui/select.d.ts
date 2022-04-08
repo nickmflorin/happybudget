@@ -13,10 +13,6 @@ type ModelSelectOption<M extends Model.Model> = SelectOption &
     readonly id: string;
   };
 
-/* type ModelSelectErrorOption = SelectErrorOption & {
-     readonly id: "error";
-   }; */
-
 type SelectModel<M extends Model.Model> = SelectOption & M;
 
 type SelectGroupBase<O extends SelectOption> = import("react-select").GroupBase<O>;

@@ -51,6 +51,7 @@ const CollaboratorSelect = ({ currentCollaborators, ...props }: CollaboratorSele
       {...props}
       components={{ Option: MemoizedOption }}
       noOptionsMessage={() => "No users found."}
+      loadOptionsWithoutValue={false}
       loadOptions={(inputValue: string) =>
         api.searchUsers(
           inputValue,

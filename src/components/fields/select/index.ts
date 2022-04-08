@@ -7,7 +7,7 @@ export { default as SingleSelect } from "./SingleSelect";
 export { default as SingleModelSyncSelect } from "./SingleModelSyncSelect";
 export { default as SingleChoiceSelect } from "./SingleChoiceSelect";
 export { default as MultiModelAsyncSelect } from "./MultiModelAsyncSelect";
-export { default as ColumnSelect } from "./ColumnSelectv2";
+export { default as ColumnSelect } from "./ColumnSelect";
 export { default as ContactTypeSelect } from "./ContactTypeSelect";
 export { default as MarkupUnitSelect } from "./MarkupUnitSelect";
 export { default as HeaderTemplateSelect } from "./HeaderTemplateSelect";

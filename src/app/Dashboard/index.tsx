@@ -100,8 +100,7 @@ const Dashboard = (): JSX.Element => {
             icon: <Icon icon={"address-book"} weight={"regular"} flip={"horizontal"} />,
             activeIcon: <Icon icon={"address-book"} weight={"solid"} flip={"horizontal"} />,
             onClick: () => history.push("/contacts"),
-            active: location.pathname.startsWith("/contacts"),
-            tagText: user.metrics.num_contacts
+            active: location.pathname.startsWith("/contacts")
           }
         ]}
         showHeaderTextLogo={true}

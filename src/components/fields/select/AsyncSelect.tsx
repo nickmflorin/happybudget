@@ -21,6 +21,7 @@ export type AsyncSelectProps<
   readonly borderless?: boolean;
   readonly components?: SelectComponentsConfig<AsyncSelectOption<O>, M, G>;
   readonly wrapperStyle?: React.CSSProperties;
+  readonly loadOptionsWithoutValue?: boolean;
   readonly onResponse?: (response: RSP) => void;
   readonly loadOptions?: (inputValue: string) => Promise<RSP>;
   readonly onError?: (e: Error) => void;
@@ -38,6 +39,7 @@ const AsyncSelect = <
 >({
   borderless,
   wrapperStyle,
+  loadOptionsWithoutValue,
   loadOptions,
   onError,
   onResponse,
@@ -47,6 +49,9 @@ const AsyncSelect = <
   const _loadOptions = useMemo(
     () => (inputValue: string) =>
       new Promise<AsyncSelectOption<O>[]>(resolve => {
+        if (inputValue.trim() === "" && loadOptionsWithoutValue === false) {
+          resolve([]);
+        }
         /* Unfortunately, the reject of the promise is pointless - as it does
            not trigger anything in the underlying mechanics of react-select.
            The only way to properly handle errors is to resolve the Promise with
@@ -86,7 +91,7 @@ const AsyncSelect = <
             });
         }
       }),
-    [loadOptions, onError, processResponse]
+    [loadOptions, onError, processResponse, loadOptionsWithoutValue]
   );
 
   return (

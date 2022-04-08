@@ -1,96 +1,56 @@
 import React from "react";
-import classNames from "classnames";
-import { map, isNil, find } from "lodash";
-import { Tag } from "antd";
+import { map, find, isNil } from "lodash";
 
-import { tabling, ui } from "lib";
-import { Icon } from "components";
-import Select, { SelectProps } from "./Select";
+import { tabling } from "lib";
 
-// Does not seem to be exportable from AntD/RCSelect so we just copy it here.
-type Key = string | number;
-type RawValueType = string | number;
+import MultiModelSyncSelect, { MultiModelSyncSelectProps } from "./MultiModelSyncSelect";
 
-interface LabelValueType {
-  key?: Key;
-  value?: RawValueType;
-  label?: React.ReactNode;
-  isCacheable?: boolean;
-}
-
-type DefaultValueType = RawValueType | RawValueType[] | LabelValueType | LabelValueType[];
-
-type CustomTagProps = {
-  label: React.ReactNode;
-  value: DefaultValueType;
-  disabled: boolean;
-  onClose: (event?: React.MouseEvent<HTMLElement, MouseEvent>) => void;
-  closable: boolean;
+type ColumnModel<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+  C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>
+> = C & {
+  readonly id: C["field"];
+  readonly icon?: IconOrElement;
 };
 
-export interface ColumnSelectProps<
+type ColumnSelectProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends Model.RowHttpModel,
   C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>
-> extends SelectProps<string> {
-  readonly columns: C[];
-  readonly getLabel: (c: C) => string;
-}
+> = Omit<MultiModelSyncSelectProps<ColumnModel<R, M, C>>, "getOptionLabel" | "options"> & {
+  readonly options: C[];
+  readonly getOptionLabel?: (c: C) => string;
+};
+
+const toModel = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+  C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>
+>(
+  c: C
+): ColumnModel<R, M, C> => {
+  const colType: Table.ColumnDataType | undefined = !isNil(c.dataType)
+    ? find(tabling.columns.ColumnTypes, { id: c.dataType })
+    : undefined;
+  return { ...c, id: c.field, icon: colType?.icon };
+};
 
 const ColumnSelect = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends Model.RowHttpModel,
   C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>
->({
-  columns,
-  getLabel,
-  ...props
-}: ColumnSelectProps<R, M, C>): JSX.Element => (
-  <Select
-    suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
+>(
+  props: ColumnSelectProps<R, M, C>
+) => (
+  <MultiModelSyncSelect
+    placeholder={"Select columns..."}
+    getOptionLabel={(m: ColumnModel<R, M, C>) =>
+      !isNil(props.getOptionLabel) ? props.getOptionLabel(m) : m.headerName || ""
+    }
     {...props}
-    className={classNames("column-select", props.className)}
-    mode={"multiple"}
-    showArrow
-    tagRender={(params: CustomTagProps) => {
-      const column = tabling.columns.getColumn(columns, params.value as string);
-      if (!isNil(column)) {
-        const colType: Table.ColumnDataType | undefined = !isNil(column.dataType)
-          ? find(tabling.columns.ColumnTypes, { id: column.dataType })
-          : undefined;
-        return (
-          <Tag
-            className={"column-select-tag"}
-            style={{ marginRight: 3 }}
-            onMouseDown={e => e.stopPropagation()}
-            {...params}
-          >
-            {!isNil(colType) && !isNil(colType.icon) && (
-              <div className={"icon-wrapper"}>
-                {ui.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}
-              </div>
-            )}
-            {getLabel(column)}
-          </Tag>
-        );
-      }
-      return <></>;
-    }}
-  >
-    {map(columns, (column: C, index: number) => {
-      const colType = find(tabling.columns.ColumnTypes, { id: column.dataType });
-      return (
-        <Select.Option className={"column-select-option"} key={index + 1} value={column.field}>
-          {!isNil(colType) && !isNil(colType.icon) && (
-            <div className={"icon-wrapper"}>
-              {ui.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}
-            </div>
-          )}
-          {getLabel(column)}
-        </Select.Option>
-      );
-    })}
-  </Select>
+    options={map(props.options, (o: C) => toModel<R, M, C>(o))}
+  />
 );
 
-export default ColumnSelect;
+export default React.memo(ColumnSelect) as typeof ColumnSelect;
