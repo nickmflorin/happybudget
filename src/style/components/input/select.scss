@@ -1,150 +1,150 @@
-@import "./base";
-@import "./mixins";
+@import './base';
+@import './mixins';
 
 .select,
 .ant-select {
-  @extend .input-base;
-  background-color: $white !important;
+	@extend .input-base;
+	background-color: $white !important;
 
-  .ant-select-selector {
-    @extend .input-base;
-    @include transition(none !important);
-    height: 100% !important;
-    background-color: $white !important;
-    border-color: $border-color !important;
-    border: $border !important;
+	.ant-select-selector {
+		@extend .input-base;
+		@include transition(none !important);
+		height: 100% !important;
+		background-color: $white !important;
+		border-color: $border-color !important;
+		border: $border !important;
 
-    .ant-select-selection-item {
-      font-weight: 500;
-      height: 100%;
-    }
-  }
+		.ant-select-selection-item {
+			font-weight: 500;
+			height: 100%;
+		}
+	}
 
-  &:not(.ant-select-disabled):hover {
-    .ant-select-selector {
-      border-color: $border-color !important;
-      border: $border !important;
-    }
-  }
+	&:not(.ant-select-disabled):hover {
+		.ant-select-selector {
+			border-color: $border-color !important;
+			border: $border !important;
+		}
+	}
 
-  &.ant-select-open .ant-select-arrow svg {
-    color: $black;
-  }
-  &.disabled {
-    background-color: $gray-light !important;
-    .ant-select-selector {
-      background-color: $gray-light !important;
-    }
-  }
+	&.ant-select-open .ant-select-arrow svg {
+		color: $black;
+	}
+	&.disabled {
+		background-color: $gray-light !important;
+		.ant-select-selector {
+			background-color: $gray-light !important;
+		}
+	}
 }
 
 .select.ant-select-single {
-  @include standard_height("standard");
+	@include standard_height('standard');
 
-  .ant-select-selector {
-    @include input_framework(8px, 0.8rem, 12px, $standard-size, $input-border-radius, 1px);
-    // Instead of the 30px line-height, the 28px seems to do a better job
-    // vertically centering the text.
-    line-height: 28px !important;
+	.ant-select-selector {
+		@include input_framework(8px, 0.8rem, 12px, $standard-size, $input-border-radius, 1px);
+		// Instead of the 30px line-height, the 28px seems to do a better job
+		// vertically centering the text.
+		line-height: 28px !important;
 
-    .ant-select-selection-item {
-      font-weight: 500;
-      height: 100%;
-      line-height: inherit !important;
-    }
-  }
+		.ant-select-selection-item {
+			font-weight: 500;
+			height: 100%;
+			line-height: inherit !important;
+		}
+	}
 }
 
 // For now, our select-multiple is just configured for the standard height.
 // We will need to customize this CSS more to allow for other height/size
 // variants.
 .select.ant-select-multiple {
-  min-height: 32px !important;
+	min-height: 32px !important;
 
-  .ant-select-selector {
+	.ant-select-selector {
 		@include input_framework(8px, 0.8rem, 12px, $standard-size, $input-border-radius, 1px);
-    padding: 2px 4px !important;
-    line-height: 26px !important;
+		padding: 2px 4px !important;
+		line-height: 26px !important;
 
-    .ant-select-selection-overflow {
-      padding: 0 !important;
-      line-height: unset !important;
+		.ant-select-selection-overflow {
+			padding: 0 !important;
+			line-height: unset !important;
 
-      .ant-select-selection-overflow-item {
-        .ant-select-selection-item {
-          font-weight: 500;
-          height: 24px;
-          line-height: 24px !important;
-        }
-      }
-    }
-  }
+			.ant-select-selection-overflow-item {
+				.ant-select-selection-item {
+					font-weight: 500;
+					height: 24px;
+					line-height: 24px !important;
+				}
+			}
+		}
+	}
 }
 
 .ant-select-item-option {
-  color: $text-secondary;
-  font-size: $standard-text-size;;
-  font-weight: 500;
-  font-family: $avenir;
-  min-height: $medium-size;
-  height: $medium-size;
+	color: $text-secondary;
+	font-size: $standard-text-size;
+	font-weight: 500;
+	font-family: $avenir;
+	min-height: $medium-size;
+	height: $medium-size;
 
-  .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-    color: $text-secondary;
-    font-weight: 600;
-    background-color: #e6f7ff;
-  }
+	.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+		color: $text-secondary;
+		font-weight: 600;
+		background-color: #e6f7ff;
+	}
 }
 
 .header-template-select {
-  &.select {
-    width: 200px;
-    margin-right: 10px;
-  }
+	&.select {
+		width: 200px;
+		margin-right: 10px;
+	}
 
-  .header-template-select-option-icon-wrapper {
-    display: none;
-  }
+	.header-template-select-option-icon-wrapper {
+		display: none;
+	}
 }
 
 .header-template-select-option {
-  .ant-select-item-option-content {
-    display: flex;
-    width: 100%;
+	.ant-select-item-option-content {
+		display: flex;
+		width: 100%;
 
-    .header-template-select-option-icon-wrapper {
-      display: none;
-      margin-left: auto;
+		.header-template-select-option-icon-wrapper {
+			display: none;
+			margin-left: auto;
 
-      .spinner {
-        height: 16px !important;
-        width: 16px !important;
-        position: relative;
-      }
+			.spinner {
+				height: 16px !important;
+				width: 16px !important;
+				position: relative;
+			}
 
-      .btn--icon-only {
-        padding-right: 0px !important;
+			.btn--icon-only {
+				padding-right: 0px !important;
 
-        svg {
-          height: 14px;
-          width: auto;
-          color: $red;
-        }
+				svg {
+					height: 14px;
+					width: auto;
+					color: $red;
+				}
 
-        &:hover {
-          svg {
-            color: $red-hover !important;
-          }
-        }
-      }
-    }
+				&:hover {
+					svg {
+						color: $red-hover !important;
+					}
+				}
+			}
+		}
 
-    &:hover {
-      .header-template-select-option-icon-wrapper {
-        @include vertical-flex-c();
-      }
-    }
-  }
+		&:hover {
+			.header-template-select-option-icon-wrapper {
+				@include vertical-flex-c();
+			}
+		}
+	}
 }
 
 .react-select__menu-portal {
@@ -154,17 +154,32 @@
 .react-select-container {
 	width: 100%;
 
+	&.disabled {
+		.react-select__control {
+			background-color: $gray-light !important;
+			.ant-select-selector {
+				background-color: $gray-light !important;
+			}
+		}
+	}
+
 	.react-select__control {
 		min-height: $standard-size;
 		border-radius: $input-border-radius;
 		border: $border !important;
 		border-color: $border-color !important;
 		box-shadow: none !important;
-		font-size: $standard-text-size;
+		font-size: $medium-text-size;
 
 		.react-select__value-container {
 			height: $standard-size;
 			padding: 0px 6px;
+
+			.select__placeholder {
+				line-height: 32px;
+				font-size: $medium-text-size;
+				font-family: $avenir;
+			}
 
 			&.react-select__value-container--is-multi {
 				height: unset;
@@ -178,7 +193,7 @@
 			}
 
 			.react-select__multi-value {
-				background-color: #EFEFEF;
+				background-color: #efefef;
 				font-size: 12px;
 				font-weight: 500;
 				font-family: $avenir;

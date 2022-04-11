@@ -8,10 +8,13 @@ import MultiValue, { MultiValueProps } from "./MultiValue";
 
 export type EntityTextMultiValueProps<
   M extends Model.HttpModel,
-  G extends SelectGroupBase<ModelSelectOption<M>>
+  G extends SelectGroupBase<ModelSelectOption<M>> = SelectGroupBase<ModelSelectOption<M>>
 > = MultiValueProps<ModelSelectOption<M>, G>;
 
-const EntityTextMultiValue = <M extends Model.HttpModel, G extends SelectGroupBase<ModelSelectOption<M>>>(
+const EntityTextMultiValue = <
+  M extends Model.HttpModel,
+  G extends SelectGroupBase<ModelSelectOption<M>> = SelectGroupBase<ModelSelectOption<M>>
+>(
   props: EntityTextMultiValueProps<M, G>
 ) => (
   <MultiValue {...props} className={classNames("entity-text-multi-value", props.className)}>

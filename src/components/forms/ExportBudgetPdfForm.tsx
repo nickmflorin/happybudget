@@ -1,17 +1,16 @@
 import { useState, useMemo, useRef, forwardRef, ForwardedRef, useImperativeHandle, useEffect } from "react";
 import classNames from "classnames";
-import { map, isNil, debounce } from "lodash";
+import { isNil, debounce } from "lodash";
 
-import { Select, Switch, Checkbox } from "antd";
+import { Switch, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import * as api from "api";
 import { model } from "lib";
 
-import { Icon, Form, ShowHide, Separator } from "components";
-import { ColumnSelect, Input, CKEditor } from "components/fields";
+import { Form, ShowHide, Separator } from "components";
+import { ColumnSelect, Input, CKEditor, AccountTableSelect } from "components/fields";
 import { PdfImageUploader } from "components/fields/uploaders";
-import { EntityText } from "components/typography";
 
 import HeaderTemplateSaveForm, { IHeaderTemplateSaveFormRef } from "./HeaderTemplateSaveForm";
 
@@ -459,27 +458,12 @@ const ExportForm = (
           />
         </Form.Item>
         <Form.Item label={"Tables"} name={"tables"} style={{ marginBottom: 5 }}>
-          <Select
-            suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />}
-            showArrow
-            disabled={accountsLoading}
-            loading={accountsLoading}
-            mode={"multiple"}
-            className={classNames({ disabled: showAllTables })}
-          >
-            <Select.Option key={0} value={"topsheet"}>
-              <EntityText description={"Top Sheet"} />
-            </Select.Option>
-            {map(accounts, (account: Model.PdfAccount, index: number) => {
-              return (
-                <Select.Option key={index + 1} value={account.id}>
-                  <EntityText fillEmpty={"----"}>{account}</EntityText>
-                </Select.Option>
-              );
-            })}
-          </Select>
+          <AccountTableSelect
+            isDisabled={accountsLoading || showAllTables}
+            isLoading={accountsLoading}
+            options={accounts}
+          />
         </Form.Item>
-
         <Form.Item valuePropName={"checked"} name={"excludeZeroTotals"} label={"Exclude Accounts Totalling Zero"}>
           <Switch
             checkedChildren={"ON"}

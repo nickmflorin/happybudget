@@ -15,3 +15,4 @@ export { default as ChildrenSelect } from "./ChildrenSelect";
 export { default as CollaboratorSelect } from "./CollaboratorSelect";
 export { default as CollaboratorAccessTypeSelect } from "./CollaboratorAccessTypeSelect";
 export { default as TimezoneSelect } from "./TimezoneSelect";
+export { default as AccountTableSelect } from "./AccountTableSelect";

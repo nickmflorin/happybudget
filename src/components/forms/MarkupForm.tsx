@@ -87,11 +87,9 @@ const MarkupForm = <
       >
         <Input />
       </Form.Item>
-
       <Form.Item name={"identifier"} label={"Account #"}>
         <Input />
       </Form.Item>
-
       <Form.Item
         name={"children"}
         label={"Include Accounts"}

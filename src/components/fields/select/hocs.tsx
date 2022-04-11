@@ -40,7 +40,7 @@ export type SingleModelSelectInjectedProps<M extends Model.Model> = ModelSelectI
 };
 
 export type WithSingleModelSelectProps<M extends Model.Model> = WithModelSelectProps<M> & {
-  readonly onChange?: (ms: M | null) => void;
+  readonly onChange?: (ms: M["id"] | null) => void;
 };
 
 export const withSingleModelSelect = <
@@ -59,7 +59,7 @@ export const withSingleModelSelect = <
     <C
       {...(props as T)}
       onChange={(newValue: SingleValue<ModelSelectOption<M>>) =>
-        props.onChange?.(newValue !== null ? ui.select.toSelectModel(newValue) : newValue)
+        props.onChange?.(newValue !== null ? ui.select.toSelectModel(newValue).id : newValue)
       }
     />
   );

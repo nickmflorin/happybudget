@@ -23,7 +23,7 @@ const Select = <O extends SelectOption, IsMulti extends boolean = false, G exten
     <RCSelect
       {...props}
       components={{ Option, ...props.components }}
-      className={classNames("react-select-container", props.className, { borderless })}
+      className={classNames("react-select-container", props.className, { disabled: props.isDisabled }, { borderless })}
       classNamePrefix={"react-select"}
       menuPosition={"fixed"}
     />
