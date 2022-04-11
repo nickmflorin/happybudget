@@ -42,7 +42,7 @@ interface PrivateCreateModelModalProps<
 const CreateModelModal = <
   M extends Model.GenericHttpModel,
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>,
-  V = P,
+  V extends Record<string, unknown> = P,
   R = M
 >({
   autoFocusField,

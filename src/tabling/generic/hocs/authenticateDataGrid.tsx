@@ -810,7 +810,7 @@ const authenticateDataGrid = <
     );
 
     const onRowDataUpdated = hooks.useDynamicCallback((e: RowDataUpdatedEvent) => {
-      const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api) as Table.BodyRow<R>[];
+      const rows: Table.BodyRow<R>[] = tabling.aggrid.getRows(e.api);
       const newRowState: RowState = {
         groupRow: map(
           filter(rows, (r: Table.BodyRow<R>) => tabling.rows.isGroupRow(r)) as Table.GroupRow<R>[],

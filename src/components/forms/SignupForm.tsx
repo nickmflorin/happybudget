@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { isNil } from "lodash";
 
 import { Form } from "components";
 import { PasswordInput, EmailInput, UserInput } from "components/fields";
@@ -103,10 +104,14 @@ const SignupForm = ({
       >
         {"Signup with Google"}
       </SocialButton>
-      <div className={"alt-link-text"}>
-        {"By signing up, you agree to our"}
-        <Link href={`${process.env.REACT_APP_TERMS_AND_CONDITIONS_URL}`}>{"Terms and Conditions."}</Link>
-      </div>
+      {!isNil(process.env.REACT_APP_TERMS_AND_CONDITIONS_URL) ? (
+        <div className={"alt-link-text"}>
+          {"By signing up, you agree to our"}
+          <Link href={`${process.env.REACT_APP_TERMS_AND_CONDITIONS_URL}`}>{"Terms and Conditions."}</Link>
+        </div>
+      ) : (
+        <></>
+      )}
       <div className={"switch-text"}>
         {"Already have an account?"}
         <RouterLink to={"/login"}>{"Log In"}</RouterLink>

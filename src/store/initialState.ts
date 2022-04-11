@@ -11,6 +11,7 @@ const createModularApplicationState = <
     config,
     (prev: S, moduleConfig: Application.ModuleConfig) => {
       if (typeof moduleConfig.initialState === "function") {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         return { ...prev, [moduleConfig.label]: moduleConfig.initialState() };
       }
       return { ...prev, [moduleConfig.label]: moduleConfig.initialState };

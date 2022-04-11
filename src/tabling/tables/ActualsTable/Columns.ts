@@ -39,7 +39,7 @@ const Columns: Table.Column<R, M>[] = [
     cellEditor: "DateEditor",
     cellEditorPopup: true,
     cellEditorPopupPosition: "below",
-    valueFormatter: tabling.columns.dateValueFormatter(v =>
+    valueFormatter: tabling.columns.dateValueFormatter((v: string) =>
       console.error(`Could not parse date value ${v} for field 'date'.`)
     ),
     valueSetter: tabling.columns.dateTimeValueSetter("date"),
@@ -74,10 +74,10 @@ const Columns: Table.Column<R, M>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<number | null>) =>
       isNil(params)
         ? "0.0"
-        : tabling.columns.currencyValueFormatter(v =>
+        : tabling.columns.currencyValueFormatter((v: string) =>
             console.error(`Could not parse currency value ${v} for PDF field 'value'.`)
           )(params),
-    valueFormatter: tabling.columns.currencyValueFormatter(v =>
+    valueFormatter: tabling.columns.currencyValueFormatter((v: string) =>
       console.error(`Could not parse currency value ${v} for field 'value'.`)
     ),
     valueSetter: tabling.columns.numericValueSetter("value"),

@@ -141,7 +141,7 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "Rate",
     width: 100,
     pdfWidth: 0.05,
-    valueFormatter: tabling.columns.currencyValueFormatter(v =>
+    valueFormatter: tabling.columns.currencyValueFormatter((v: string) =>
       console.error(`Could not parse currency value ${v} for field 'rate'.`)
     ),
     valueSetter: tabling.columns.numericValueSetter("rate"),
@@ -163,7 +163,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.columns.currencyValueFormatter(v =>
+        : tabling.columns.currencyValueFormatter((v: string) =>
             console.error(`Could not parse currency value ${v} for field 'estimated'.`)
           )(params),
     pdfValueGetter: budgeting.valueGetters.estimatedValueGetter,
@@ -176,7 +176,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.columns.currencyValueFormatter(v =>
+        : tabling.columns.currencyValueFormatter((v: string) =>
             console.error(`Could not parse currency value ${v} for field 'actual'.`)
           )(params),
     pdfValueGetter: budgeting.valueGetters.actualValueGetter,
@@ -191,7 +191,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.columns.currencyValueFormatter(v =>
+        : tabling.columns.currencyValueFormatter((v: string) =>
             console.error(`Could not parse currency value ${v} for field 'variance'.`)
           )(params),
     pdfValueGetter: budgeting.valueGetters.varianceValueGetter,

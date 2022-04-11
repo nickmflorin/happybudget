@@ -109,7 +109,7 @@ export const inferModelFromName = <M extends Model.Model>(
           : String(nameValue).trim() === String(value).trim().toLocaleLowerCase();
       }
       return false;
-    }) as M[];
+    });
   };
 
   const returnAndWarn = (m: M | null): M | null => {
@@ -193,7 +193,7 @@ export const getModel = <M extends Model.Model>(
   options?: Model.GetModelOptions<M>
 ): M | null => {
   const predicate = typeof id === "function" ? id : (m: M) => m.id === id;
-  const model: M | undefined = find(ms, predicate) as M | undefined;
+  const model: M | undefined = find(ms, predicate);
   if (isNil(model)) {
     if (!isNil(options?.onMissing) && options?.warnOnMissing !== false) {
       options?.onMissing({

@@ -117,7 +117,10 @@ const withFormItemFirstInputFocused = <
                 formProps.form.setFieldsValue({ [props.name]: value } as any);
               }
               if (!isNil(inputChildren[0].props.onChange)) {
-                inputChildren[firstInputIndex].props.onChange(e);
+                const handler = inputChildren[0].props.onChange as (
+                  e: React.ChangeEvent<HTMLInputElement> | number
+                ) => void;
+                handler(e);
               }
             }}
           />,

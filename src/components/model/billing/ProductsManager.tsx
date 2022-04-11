@@ -69,21 +69,19 @@ const ProductsManager = ({
             `Subscription ${sub.id} for user ${user.id} has a 'canceled' status, but does not have a 'cancel_at' date.`
           );
         }
+        const cancelAt = !isNil(sub.cancel_at) ? util.dates.toDisplayDate(sub.cancel_at) : null;
         return (
           <React.Fragment>
             <Tag className={"tag--product"} text={"Canceled"} />
-            {!isNil(sub.cancel_at) && (
-              <div className={"tag-text"}>{`Valid through ${util.dates.toDisplayDate(sub.cancel_at)}.`}</div>
-            )}
+            {!isNil(cancelAt) && <div className={"tag-text"}>{`Valid through ${cancelAt}.`}</div>}
           </React.Fragment>
         );
       } else if (sub.status === "expired") {
+        const expiredAt = !isNil(sub.current_period_end) ? util.dates.toDisplayDate(sub.current_period_end) : null;
         return (
           <React.Fragment>
             <Tag className={"tag--product"} text={"Expired"} />
-            {!isNil(sub.cancel_at) && (
-              <div className={"tag-text"}>{`Expired on ${util.dates.toDisplayDate(sub.current_period_end)}.`}</div>
-            )}
+            {!isNil(expiredAt) && <div className={"tag-text"}>{`Expired on ${expiredAt}.`}</div>}
           </React.Fragment>
         );
       } else {

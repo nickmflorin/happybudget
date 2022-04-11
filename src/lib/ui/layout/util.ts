@@ -19,7 +19,7 @@ export const sidebarItemIsActive = (
     }
     if (!isNil(item.activePathRegexes)) {
       for (let i = 0; i < item.activePathRegexes.length; i++) {
-        if (location.pathname.match(item.activePathRegexes[i])) {
+        if (item.activePathRegexes[i].exec(location.pathname)) {
           return true;
         }
       }

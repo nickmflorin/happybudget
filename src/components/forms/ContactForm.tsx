@@ -39,7 +39,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ form, initialValues, attachme
     </Form.Item>
     <Form.Item name={"email"} label={"Email"} dataType={"email"}>
       <InputOnFocus renderBlurredContentOnNoValue={true}>
-        {(value?: string) => <Link href={`mailto:${value}`}>{value}</Link>}
+        {(value?: string) => (!isNil(value) ? <Link href={`mailto:${value}`}>{value}</Link> : <></>)}
       </InputOnFocus>
     </Form.Item>
     <Form.Item name={"phone_number"} label={"Phone Number"} dataType={"phone"}>

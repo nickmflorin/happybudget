@@ -39,7 +39,7 @@ export const request = <R, ARGS extends unknown[], C extends Redux.ActionContext
           callingArgs = [...callingArgs, undefined] as ARGS;
         }
       }
-      callingArgs = [...callingArgs, { ...(opts as Http.RequestOptions), ...config }] as ARGS;
+      callingArgs = [...callingArgs, { ...opts, ...config }] as ARGS;
     } else {
       /* Since we are inserting the request options as the last argument, we
          have to account for optional arguments that may come before the request

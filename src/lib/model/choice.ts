@@ -32,7 +32,7 @@ class ChoicesClass<
     if (typeof lookup === "number") {
       ch = find(this.choices, { id: lookup }) as CH | undefined;
     } else {
-      ch = find(this.choices, (c: CH) => c.slug === lookup) as CH | undefined;
+      ch = find(this.choices, (c: CH) => c.slug === lookup);
     }
     if (isNil(ch)) {
       throw new Error(`Could not find choice for lookup ${lookup}.`);

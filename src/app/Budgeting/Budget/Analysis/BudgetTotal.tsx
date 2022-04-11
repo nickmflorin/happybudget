@@ -118,15 +118,15 @@ const BudgetTotal = ({ budget, budgetId, ...props }: BudgetTotalProps): JSX.Elem
     if (!isNil(budget)) {
       switch (metric) {
         case "actual":
-          return tabling.columns.currencyValueFormatter(v =>
+          return tabling.columns.currencyValueFormatter((v: string) =>
             console.error(`Could not parse currency from value ${v} for budget actual.`)
           )(model.budgeting.actualValue(budget));
         case "variance":
-          return tabling.columns.currencyValueFormatter(v =>
+          return tabling.columns.currencyValueFormatter((v: string) =>
             console.error(`Could not parse currency from value ${v} for budget variance.`)
           )(model.budgeting.varianceValue(budget));
         default:
-          return tabling.columns.currencyValueFormatter(v =>
+          return tabling.columns.currencyValueFormatter((v: string) =>
             console.error(`Could not parse currency from value ${v} for budget estimated.`)
           )(model.budgeting.estimatedValue(budget));
       }

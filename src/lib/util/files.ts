@@ -102,7 +102,7 @@ export const parseFileName = (name: string, options?: ParseFileNameOptions): Par
     extension = extensionFromName;
     name = removeExtensionFromFileName(name, extension);
   }
-  let fullName = `${name}.${extension}` as `${string}.${string}`;
+  let fullName: FileWithExtension = `${name}.${extension}`;
   if (options?.formatForDownload) {
     fullName = formatFileNameForDownload(fullName) as FileWithExtension;
   }
@@ -131,7 +131,7 @@ export const getDataFromURL = (url: string): Promise<string | ArrayBuffer> =>
     xhr.send();
   });
 
-export const downloadData = async (data: string, name: string) => {
+export const downloadData = (data: string, name: string) => {
   const link = document.createElement("a");
   link.href = data;
   link.setAttribute("download", name);
@@ -143,7 +143,7 @@ export const downloadData = async (data: string, name: string) => {
   }
 };
 
-export const downloadBlob = async (blob: Blob, name: string) => {
+export const downloadBlob = (blob: Blob, name: string) => {
   const blobUrl = URL.createObjectURL(blob);
   if (!isNil(blobUrl)) {
     downloadData(blobUrl, name);
@@ -160,7 +160,7 @@ export const extensionIsImage = (ext: string) => {
   return mimeType.split("/")[0] === "image";
 };
 
-export const download = async (
+export const download = (
   fileObj: string | ArrayBuffer | Blob,
   nm: string,
   options?: Omit<ParseFileNameOptions, "formatForDownload">
@@ -187,7 +187,7 @@ export const download = async (
   }
 };
 
-export const downloadAsCsvFile = async (filename: string, data: CSVData) => {
+export const downloadAsCsvFile = (filename: string, data: CSVData) => {
   const processRow = (row: CSVRow): string => {
     let finalVal = "";
     for (let j = 0; j < row.length; j++) {

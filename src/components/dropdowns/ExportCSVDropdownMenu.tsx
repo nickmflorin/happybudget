@@ -50,9 +50,9 @@ const ExportCSVDropdownMenu = <R extends Table.RowData, M extends Model.RowHttpM
           },
           []
         );
-        setSelected(selectedIds as string[]);
+        setSelected(selectedIds);
       }}
-      selected={selected as string[]}
+      selected={selected}
       models={map(exportableColumns, (col: Table.DataColumn<R, M>) => ({
         id: col.field,
         label: col.headerName || ""

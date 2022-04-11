@@ -32,7 +32,7 @@ export const ImportActualsAction = <R extends Table.RowData, M extends Model.Row
               props.table.handleRequestError(e);
             });
         } else {
-          console.warn(`Detected unconfigured import source ${m.id}.`);
+          console.warn(`Detected unconfigured import source ${String(m.id)}.`);
         }
       }}
     >

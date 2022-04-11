@@ -168,7 +168,7 @@ export abstract class ClientError<
     super({
       message:
         `[${config.status}] There was an error making a request to ` +
-        `${config.url}: ` +
+        `${config.url || "..."}: ` +
         `${stringifyErrors(config.errors)}`,
       name: "ClientError",
       ...config
@@ -296,7 +296,7 @@ export class ServerError extends RequestError implements Http.IServerError {
 
   constructor(config: Omit<RequestErrorConfig, "message" | "name"> & { readonly status: number }) {
     super({
-      message: `There was a ${config.status} server error making a request to ${config.url}.`,
+      message: `There was a ${config.status} server error making a request to ${config.url || "..."}.`,
       name: "ServerError",
       ...config
     });

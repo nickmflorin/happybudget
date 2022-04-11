@@ -37,7 +37,7 @@ const DEFAULT_OPTIONS: ExportBudgetPdfFormOptions = {
   columns: filter(
     map(SubAccountColumns, (column: C) => tabling.columns.normalizedField<R, M>(column)),
     (field: string | undefined) => !isNil(field)
-  ) as string[]
+  )
 };
 
 interface BudgetPdfFuncProps {

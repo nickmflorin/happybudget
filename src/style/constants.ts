@@ -67,7 +67,7 @@ export const SupportedFontFaces: Style.FontFace[] = [
 ];
 
 export const fontToString = (font: Style.Font): string => {
-  return `Font { family = ${font.family}, weight: ${font.weight}, italic: ${font.italic || false} }`;
+  return `Font { family = ${font.family}, weight: ${font.weight}, italic: ${String(font.italic || false)} }`;
 };
 
 export const getFontSourceModuleName = (font: Style.Font): string => {

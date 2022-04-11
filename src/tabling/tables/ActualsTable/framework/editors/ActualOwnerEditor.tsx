@@ -41,7 +41,7 @@ const ActualOwnerEditor = (
       onChange={(m: Model.ActualOwner, e: Table.CellDoneEditingEvent) => {
         editor.onChange(m, e);
       }}
-      menu={editor.menu as NonNullRef<IMenuRef<MenuItemSelectedState, Model.ActualOwner>>}
+      menu={editor.menu}
       focusSearchOnCharPress={true}
     />
   );

@@ -1,5 +1,4 @@
 declare module "*.ttf";
-declare module "classnames";
 declare module "@editorjs/paragraph";
 declare module "@editorjs/header";
 declare module "@editorjs/table";

@@ -15,9 +15,11 @@ function Fancybox(props: FancyboxProps) {
   useEffect(() => {
     const opts = props.options || {};
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     NativeFancybox.bind("[data-fancybox]", opts);
 
     return () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       NativeFancybox.destroy();
     };
   }, [props.options]);

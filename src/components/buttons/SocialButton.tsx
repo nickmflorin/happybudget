@@ -57,7 +57,7 @@ const SocialButton = ({
       />
     );
   }
-  console.warn(`Unsupported social login provider ${provider}.`);
+  console.warn(`Unsupported social login provider ${provider as string}.`);
   return <></>;
 };
 

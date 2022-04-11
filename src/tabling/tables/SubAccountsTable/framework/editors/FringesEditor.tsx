@@ -51,7 +51,7 @@ const FringesEditor = (props: FringesEditorProps, ref: ForwardedRef<Table.AgEdit
         const selectedStates = filter(
           e.menuState,
           (s: MenuItemStateWithModel<MenuItemSelectedState, Tables.FringeRow>) => s.selected === true
-        ) as MenuItemStateWithModel<MenuItemSelectedState, Tables.FringeRow>[];
+        );
         const ms = map(
           selectedStates,
           (s: MenuItemStateWithModel<MenuItemSelectedState, Tables.FringeRow>) => s.model.id

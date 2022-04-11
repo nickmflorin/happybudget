@@ -27,7 +27,7 @@ const DEFAULT_OPTIONS: ExportActualsPdfFormOptions = {
   columns: filter(
     map(ActualColumns, (column: C) => tabling.columns.normalizedField<R, M>(column)),
     (field: string | undefined) => !isNil(field)
-  ) as string[],
+  ),
   header: `<h2>Sample Title ${new Date().getFullYear()}</h2><p>Sample Subtitle</p>`
 };
 

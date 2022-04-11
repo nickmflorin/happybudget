@@ -51,7 +51,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.columns.currencyValueFormatter(v =>
+        : tabling.columns.currencyValueFormatter((v: string) =>
             console.error(`Could not parse currency value ${v} for PDF field 'estimated'.`)
           )(params),
     pdfWidth: 0.15,
@@ -64,7 +64,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.columns.currencyValueFormatter(v =>
+        : tabling.columns.currencyValueFormatter((v: string) =>
             console.error(`Could not parse currency value ${v} for PDF field 'actual'.`)
           )(params),
     pdfWidth: 0.15,
@@ -79,7 +79,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.columns.currencyValueFormatter(v =>
+        : tabling.columns.currencyValueFormatter((v: string) =>
             console.error(`Could not parse currency value ${v} for PDF field 'variance'.`)
           )(params),
     pdfWidth: 0.15,

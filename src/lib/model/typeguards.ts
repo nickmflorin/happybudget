@@ -25,7 +25,7 @@ export const isHttpModelWithType = <
   T extends Model.HttpModelType = Model.HttpModelType
 >(
   m: M | G
-): m is G => isHttpModel(m) && (m as G).type !== undefined;
+): m is G => isHttpModel(m) && m.type !== undefined;
 
 export const isTag = (model: Model.Model | Model.Tag): model is Model.Tag =>
   (model as Model.Tag).title !== undefined && (model as Model.Tag).color !== undefined;

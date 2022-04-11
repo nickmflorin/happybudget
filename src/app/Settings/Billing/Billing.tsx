@@ -32,7 +32,7 @@ const Billing = (): JSX.Element => {
           `FATAL Error: Could not sync the checkout session with ID ${sessionId} for user ${user.id}.` +
             "This means that the user is subscribed to products in Stripe but has not " +
             "been associated with that subscription in our database.  This needs to be done manually." +
-            `\nOriginal Error: ${e}`
+            `\nOriginal Error: ${String(e)}`
         );
         notifications.ui.banner.notify({
           level: "error",

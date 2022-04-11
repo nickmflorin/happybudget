@@ -24,7 +24,7 @@ const formatAs = (
       }
     : /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       (v: any) => {
-        console.error(`Could not parse value ${v} into ${fmtType}!`);
+        console.error(`Could not parse value ${String(v)} into ${fmtType}!`);
         return "";
       };
   return fmt(value, fullOnError);
@@ -88,7 +88,7 @@ export const formatAsPhoneNumber: Table.NativeFormatter<number | string> = (
       // Don't format string.
       return numeric;
     } else if (numeric.length === 11 || numeric.length === 10) {
-      const match = numeric.match(/^(1|)?(\d{3})(\d{3})(\d{4})$/);
+      const match = /^(1|)?(\d{3})(\d{3})(\d{4})$/.exec(numeric);
       if (match) {
         const intlCode = match[1] ? "+1 " : "";
         return [intlCode, "(", match[2], ") ", match[3], " ", match[4]].join("");

@@ -58,12 +58,12 @@ export const getColumnRowValue = <
       console.error(
         `Undefined value for row ${row.id} (type = ${row.rowType}, ` +
           `modelType = ${row.modelType}) encountered for field ${fld}! ` +
-          `Returning ${col.nullValue}.`
+          `Returning ${String(col.nullValue)}.`
       );
     } else {
       console.error(
         `Undefined value for row ${row.id} (type = ${row.rowType}) ` +
-          `encountered for field ${fld}! Returning ${col.nullValue}.`
+          `encountered for field ${fld}! Returning ${String(col.nullValue)}.`
       );
     }
     return col.nullValue;
@@ -384,7 +384,7 @@ export const normalizePdfColumnWidths = <CA extends Table.Column[]>(
       );
       console.warn(
         `Found multiple columns, ${flexColumnFields.join(", ")}, with 'pdfFlexGrow' specified.
-        Since only one column can flex grow in the PDF, only the column ${flexColumnFields[0]}
+        Since only one column can flex grow in the PDF, only the column ${flexColumnFields[0] || ""}
         will have 'pdfFlexGrow' applied.`
       );
     }

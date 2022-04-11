@@ -4,7 +4,9 @@ import { Form as RootForm } from "antd";
 
 import { util, ui, notifications } from "lib";
 
-export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormInstance<T> => {
+export const useForm = <T extends Record<string, unknown>>(
+  form?: Partial<FormInstance<T>> | undefined
+): FormInstance<T> => {
   const _useAntdForm = RootForm.useForm();
   const antdForm = _useAntdForm[0];
   const isMounted = ui.useIsMounted();
@@ -46,7 +48,7 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
          iterate over the fields in the Form for that matter).  So we have to
          reset the fields without any errors to get field level error messages
          to go away. */
-      const currentFields = antdForm.getFieldsValue();
+      const currentFields: T = antdForm.getFieldsValue();
       antdForm.setFields(
         map(Object.keys(currentFields), (key: string) => ({ name: key, value: currentFields[key], errors: [] }))
       );
@@ -94,7 +96,7 @@ export const useForm = <T>(form?: Partial<FormInstance<T>> | undefined): FormIns
   return wrapForm;
 };
 
-export const useFormIfNotDefined = <T>(
+export const useFormIfNotDefined = <T extends Record<string, unknown>>(
   options?: Partial<FormInstance<T>> | undefined,
   form?: FormInstance<T>
 ): FormInstance<T> => {

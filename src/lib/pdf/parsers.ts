@@ -22,7 +22,7 @@ export const cleanText = (text: string) => {
 export const removeWhitespace = (node: Node) => {
   for (let i = node.childNodes.length; i-- > 0; ) {
     const child = node.childNodes[i];
-    if (!isNil(child.nodeValue) && child.nodeType === 3 && child.nodeValue.match(/^\s*$/)) {
+    if (!isNil(child.nodeValue) && child.nodeType === 3 && /^\s*$/.exec(child.nodeValue)) {
       node.removeChild(child);
     }
     if (child.nodeType === 1) {
@@ -91,7 +91,7 @@ export const structuredNodeType = (node: Node): Pdf.HTMLNodeType | null => {
     } else if (typeguards.isFontStyleTag(tag)) {
       return "fontStyle";
     } else {
-      console.error(`Encountered unrecognized tag ${tag} while parsing HTML node.`);
+      console.error(`Encountered unrecognized tag ${tag as string} while parsing HTML node.`);
       return null;
     }
   }

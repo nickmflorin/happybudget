@@ -44,7 +44,7 @@ export const withSize =
       }
       const sizeClassName: string | undefined = !isNil(_size)
         ? !isNil(conf?.classNamePrefix)
-          ? `${conf?.classNamePrefix}${_size}`
+          ? `${conf?.classNamePrefix as string}${_size}`
           : _size
         : undefined;
       injectedProps = { ...injectedProps, className: classNames(props.className, sizeClassName) };

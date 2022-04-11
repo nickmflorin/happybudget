@@ -130,7 +130,7 @@ export const postPayload = <R extends Table.RowData, M extends Model.RowHttpMode
     cs,
     (p: P, col: Table.ModelColumn<R, M, Table.RawRowValue>) => {
       if (tabling.columns.isBodyColumn(col)) {
-        const value: Table.InferV<typeof col> | undefined = data[col.field] as Table.InferV<typeof col> | undefined;
+        const value: Table.InferV<typeof col> | undefined = data[col.field];
         if (value !== undefined) {
           if (!isNil(col.getHttpValue)) {
             const httpValue = col.getHttpValue(value);

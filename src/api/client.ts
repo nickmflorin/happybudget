@@ -112,11 +112,11 @@ export class ApiClient {
     options?: Http.RequestOptions | undefined
   ): Promise<T> => {
     const lookup = {
-      [HttpRequestMethods.POST]: this.instance.post,
-      [HttpRequestMethods.GET]: this.instance.get,
-      [HttpRequestMethods.PUT]: this.instance.put,
-      [HttpRequestMethods.DELETE]: this.instance.delete,
-      [HttpRequestMethods.PATCH]: this.instance.patch
+      [HttpRequestMethods.POST]: this.instance.post.bind(ApiClient),
+      [HttpRequestMethods.GET]: this.instance.get.bind(ApiClient),
+      [HttpRequestMethods.PUT]: this.instance.put.bind(ApiClient),
+      [HttpRequestMethods.DELETE]: this.instance.delete.bind(ApiClient),
+      [HttpRequestMethods.PATCH]: this.instance.patch.bind(ApiClient)
     };
     url = this._prepare_url(url, method, query);
     let response: AxiosResponse<T>;

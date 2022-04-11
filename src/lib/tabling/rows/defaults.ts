@@ -64,7 +64,7 @@ function insertDefaults<R extends Table.RowData, M extends Model.RowHttpModel, D
       if (data[key] === undefined) {
         if (context === "update") {
           console.warn(
-            `Encountered an undefined value for column ${key} when attempting to set default values on the row.`
+            `Encountered an undefined value for column ${String(key)} when attempting to set default values on the row.`
           );
         } else {
           data = { ...data, [key]: defaults[key] };

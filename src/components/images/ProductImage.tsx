@@ -19,7 +19,7 @@ const ProductImage = ({ product, ...props }: ProductImageProps): JSX.Element => 
     src={product.image}
     onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
       notifications.internal.notify({
-        message: `Error loading product image at src ${product.image}!`,
+        message: `Error loading product image at src ${product.image || "unknown"}!`,
         dispatchToSentry: true,
         level: "error"
       });

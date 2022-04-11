@@ -67,7 +67,7 @@ export const estimatedValue = <
       );
     }
     return reduce(
-      filter(children, (c: C) => includes(obj.children, c.id)) as C[],
+      filter(children, (c: C) => includes(obj.children, c.id)),
       (curr: number, c: C) => curr + nominalValue(c),
       0.0
     );
@@ -98,7 +98,7 @@ export const actualValue = <
       );
     }
     return reduce(
-      filter(children, (c: C) => includes(obj.children, c.id)) as C[],
+      filter(children, (c: C) => includes(obj.children, c.id)),
       (curr: number, c: C) => curr + actualValue(c),
       0.0
     );

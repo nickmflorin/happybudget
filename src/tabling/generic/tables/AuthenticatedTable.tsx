@@ -151,7 +151,7 @@ const AuthenticatedTable = <
           props.columns,
           (c: Table.Column<R, M>) =>
             (tabling.columns.isDataColumn(c) && !evaluateColumnExclusionProp(c)) || !tabling.columns.isDataColumn(c)
-        ) as Table.Column<R, M>[],
+        ),
         (c: Table.Column<R, M>) =>
           tabling.columns.isRealColumn(c)
             ? ({
@@ -248,7 +248,7 @@ const AuthenticatedTable = <
           apis?.grid.refreshCells({
             force: true,
             rowNodes: nodesToRefresh,
-            columns: columnsToRefresh as string[]
+            columns: columnsToRefresh
           });
         }
       }

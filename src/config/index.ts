@@ -28,7 +28,7 @@ const validateEnvironmentVariables = () => {
 
 let prevPath: string | null = null;
 
-const configureApplication = async (history: History) => {
+const configureApplication = (history: History) => {
   validateEnvironmentVariables();
   configureAgGrid();
   configureFontAwesome();
@@ -47,6 +47,7 @@ const configureApplication = async (history: History) => {
     history.listen((location: Location) => {
       if (location.pathname !== prevPath) {
         prevPath = location.pathname;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         window.analytics.page();
       }
     });
@@ -59,6 +60,7 @@ const configureApplication = async (history: History) => {
   if (process.env.NODE_ENV === "development" && Config.whyDidYouRender) {
     /* eslint-disable-next-line @typescript-eslint/no-var-requires */
     const whyDidYouRender = require("@welldone-software/why-did-you-render");
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     whyDidYouRender(React, {
       trackAllPureComponents: true,
       trackHooks: true,

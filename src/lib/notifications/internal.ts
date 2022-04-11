@@ -132,7 +132,7 @@ export const inconsistentStateError = <P extends Redux.ActionPayload = Redux.Act
     : payload;
 
   const addParamValue = (message: string, paramName: string, value: ParamV<P>) =>
-    message + `\n\t${util.formatters.toTitleCase(paramName)}: ${value}`;
+    message + `\n\t${util.formatters.toTitleCase(paramName)}: ${String(value)}`;
 
   const addParam = (message: string, paramName: string, paramValue: ParamV<P>) =>
     paramValue !== undefined ? addParamValue(message, paramName, paramValue) : message;

@@ -30,7 +30,7 @@ export const toLocalizedMoment = (value?: string | Moment, options?: IDateOption
     value = isNil(tz) ? moment.utc(value) : moment.tz(value, tz);
     if (!value.isValid()) {
       if (options?.warnOnInvalid !== false) {
-        console.warn(`Value ${value} could not be converted to a valid moment.`);
+        console.warn(`Value ${String(value)} could not be converted to a valid moment.`);
       }
       return undefined;
     }

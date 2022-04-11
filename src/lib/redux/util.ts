@@ -67,4 +67,4 @@ export const modelFromState = <M extends Model.Model>(
   data: M[],
   id: Model.ModelLookup<M> | M,
   options?: Model.GetReduxModelOptions<M>
-): M | null => (isModel(id) ? id : findModelInData<M>(data, id as Model.ModelLookup<M>, options));
+): M | null => (isModel(id) ? id : findModelInData<M>(data, id, options));

@@ -14,7 +14,7 @@ abstract class EditableRowManager<
       const cellChange = util.getKeyValue<Table.RowChangeData<R, RW>, keyof RW["data"]>(field)(
         change
       ) as Table.CellChange<R[keyof R]>;
-      row = { ...row, data: { ...row.data, [field as string]: cellChange.newValue } };
+      row = { ...row, data: { ...row.data, [field]: cellChange.newValue } };
     }
     return row;
   };

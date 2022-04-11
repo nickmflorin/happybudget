@@ -45,7 +45,7 @@ interface PrivateEditModelModalProps<
 const EditModelModal = <
   M extends Model.GenericHttpModel,
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>,
-  V = P,
+  V extends Record<string, unknown> = P,
   R = M
 >({
   modelId,
@@ -134,7 +134,7 @@ const EditModelModal = <
     [isMounted.current, interceptError]
   );
 
-  const onOk = useCallback(async () => {
+  const onOk = useCallback(() => {
     Form.validateFields()
       .then((values: V) => {
         if (isMounted.current) {

@@ -55,7 +55,7 @@ const Previewer = ({
   const [refreshRequired, setRefreshRequired] = useState(false);
 
   const render = useMemo(
-    () => async (component?: JSX.Element) => {
+    () => (component?: JSX.Element) => {
       let pdfComponent: JSX.Element | undefined;
       if (!isNil(component)) {
         pdfComponent = component;
@@ -128,12 +128,12 @@ const Previewer = ({
       {refreshRequired && (
         <div
           className={"previewer-refresh"}
-          onClick={async () => {
+          onClick={() => {
             if (generatingPdf || loadingData) {
               return;
             }
             setRefreshRequired(false);
-            await render();
+            render();
           }}
         >
           <Button className={"btn--over"} disabled={generatingPdf || loadingData}>

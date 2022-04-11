@@ -86,6 +86,7 @@ const postIdentify = (id: PluginId, user: Model.User) => {
 
 export const identifySegment = (user: Model.User) => {
   if (identifyRequired("segment", user) && process.env.NODE_ENV !== "development") {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     window.analytics.identify(user.id, {
       name: user.full_name,
       email: user.email
@@ -120,6 +121,7 @@ export const identifyCanny = (user: Model.User) => {
             "to a date."
         );
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         window.Canny("identify", {
           appID: process.env.REACT_APP_CANNY_APP_ID,
           user: {
@@ -158,6 +160,7 @@ export const identifyIntercom = (user: Model.User) => {
             "to a date."
         );
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         window.Intercom("boot", {
           app_id: process.env.REACT_APP_INTERCOM_APP_ID,
           user_id: user.id,

@@ -35,7 +35,7 @@ const ToggleColumnsDropdownMenu = <R extends Table.RowData, M extends Model.RowH
           (col: Table.DataColumn<R, M>) => isNil(props.hiddenColumns) || props.hiddenColumns[col.field] !== true
         ),
         (col: Table.DataColumn<R, M>) => col.field
-      ) as string[],
+      ),
     [hideableColumns, props.hiddenColumns]
   );
 
@@ -48,7 +48,7 @@ const ToggleColumnsDropdownMenu = <R extends Table.RowData, M extends Model.RowH
       searchIndices={["label"]}
       clientSearching={true}
       checkbox={true}
-      selected={selected as string[]}
+      selected={selected}
       keepDropdownOpenOnClick={true}
       models={map(hideableColumns, (col: Table.DataColumn<R, M>) => ({
         id: col.field,

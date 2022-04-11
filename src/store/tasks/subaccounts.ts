@@ -473,7 +473,7 @@ export const createAuthenticatedTableTaskSet = <
       const markupRowIds = map(
         filter(ids, (id: Table.RowId) => tabling.rows.isMarkupRowId(id)) as Table.MarkupRowId[],
         (id: Table.MarkupRowId) => tabling.rows.markupId(id)
-      ) as number[];
+      );
 
       const groupRowIds = map(
         filter(ids, (id: Table.RowId) => tabling.rows.isGroupRowId(id)) as Table.GroupRowId[],

@@ -61,7 +61,7 @@ const useHiddenColumns = <R extends Table.RowData, M extends Model.RowHttpModel 
           (c: Table.DataColumn<R, M>) => c.field
         ),
         (f: string | undefined) => !isNil(f)
-      ) as string[]
+      )
     );
     const hidden: Table.HiddenColumns = reduce(
       params.columns,
@@ -93,7 +93,7 @@ const useHiddenColumns = <R extends Table.RowData, M extends Model.RowHttpModel 
         if (!isNil(cs)) {
           const c: Table.AgColumn | undefined = find(cs, (ci: Table.AgColumn) => ci.getColId() === field);
           if (!isNil(c) && c.isVisible() === hidden) {
-            params.apis.columnMap((a: Table.ColumnApi) => a.setColumnVisible(field as string, !hidden));
+            params.apis.columnMap((a: Table.ColumnApi) => a.setColumnVisible(field, !hidden));
           }
         }
       }

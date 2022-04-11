@@ -21,7 +21,7 @@ const HeaderTemplateSelect = (props: HeaderTemplateSelectProps): JSX.Element => 
     showArrow
     loading={props.loading}
     disabled={props.loading}
-    value={!isNil(props.value) ? (props.value.id as number) : "none"}
+    value={!isNil(props.value) ? props.value.id : "none"}
     onChange={(value: number | "none") => {
       if (typeof value === "number") {
         props.onLoad(value);

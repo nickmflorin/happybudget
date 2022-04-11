@@ -10,7 +10,7 @@ export const validatedColor = (color: Style.HexColor | null | undefined): Style.
   } else if (color === null) {
     return null;
   } else if (typeof color !== "string") {
-    console.error(`Invalid color ${color} detected!`);
+    console.error(`Invalid color ${String(color)} detected!`);
     return Colors.COLOR_NO_COLOR;
   } else {
     if (!color.startsWith("#")) {
@@ -91,7 +91,7 @@ export const getModelName = <M extends Model.Model>(m: M, opts?: GetModelNameOpt
     const modelNameFieldValue = util.getKeyValue<M, keyof M>(modelNameField)(m);
     if (!isNil(modelNameFieldValue)) {
       if (typeof modelNameFieldValue !== "string") {
-        console.error(`The field ${modelNameField} did not return a string.`);
+        console.error(`The field ${String(modelNameField)} did not return a string.`);
         return "";
       }
       return modelNameFieldValue;
