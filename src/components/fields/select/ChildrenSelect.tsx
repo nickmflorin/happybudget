@@ -23,7 +23,7 @@ const ChildrenSelect = <M extends Model.SimpleAccount | Model.SimpleSubAccount>(
 }: ChildrenSelectProps<M>): JSX.Element => {
   const [cancelToken] = http.useCancelToken();
   return (
-    <MultiModelAsyncSelect
+    <MultiModelAsyncSelect<M>
       placeholder={"Search accounts..."}
       {...props}
       isSearchable={false}

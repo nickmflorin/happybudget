@@ -1,31 +1,18 @@
 import React from "react";
-import { components, MultiValueProps } from "react-select";
 
-import classNames from "classnames";
-
-import { ui } from "lib";
-import { EntityText } from "components/typography";
-
-import AsyncMultiValue from "./AsyncMultiValue";
+import { withAsyncMultiValue, AsyncMultiValueProps } from "./AsyncMultiValue";
+import EntityTextMultiValue from "./EntityTextMultiValue";
 
 export type AsyncEntityTextMultiValueProps<
   M extends Model.HttpModel,
-  G extends AsyncSelectGroupBase<AsyncModelSelectOption<M>>
-> = MultiValueProps<AsyncSelectOption<AsyncModelSelectOption<M>>, true, G>;
+  G extends AsyncSelectGroupBase<AsyncModelSelectOption<M>> = AsyncSelectGroupBase<AsyncModelSelectOption<M>>
+> = AsyncMultiValueProps<AsyncModelSelectOption<M>, G>;
 
-const AsyncEntityTextMultiValue = <
+const AsyncEntityTextMultiValue = withAsyncMultiValue<ModelSelectOption<Model.HttpModel>>(EntityTextMultiValue);
+
+export default React.memo(AsyncEntityTextMultiValue) as <
   M extends Model.HttpModel,
-  G extends AsyncSelectGroupBase<AsyncModelSelectOption<M>>
+  G extends AsyncSelectGroupBase<AsyncModelSelectOption<M>> = AsyncSelectGroupBase<AsyncModelSelectOption<M>>
 >(
   props: AsyncEntityTextMultiValueProps<M, G>
-) => {
-  return ui.select.isSelectErrorOption(props.data) ? (
-    <AsyncMultiValue {...props} className={classNames("entity-text-multi-value", props.className)} />
-  ) : (
-    <components.MultiValue {...props} className={classNames("entity-text-multi-value", props.className)}>
-      <EntityText fillEmpty={"----"}>{ui.select.toSelectModel<M>(props.data)}</EntityText>
-    </components.MultiValue>
-  );
-};
-
-export default React.memo(AsyncEntityTextMultiValue) as typeof AsyncEntityTextMultiValue;
+) => JSX.Element;

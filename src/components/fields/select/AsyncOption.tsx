@@ -1,8 +1,30 @@
 import React, { ReactNode } from "react";
 
 import { ui } from "lib";
+import { Error } from "components/notifications";
 
 import Option, { OptionProps, OptionChildrenRenderProps } from "./Option";
+
+export const withAsyncOption = <
+  O extends SelectOption,
+  AO extends AsyncSelectOption<O> = AsyncSelectOption<O>,
+  M extends boolean = false,
+  G extends SelectGroupBase<O> = SelectGroupBase<O>,
+  T extends OptionProps<O, M, G> = OptionProps<O, M, G>
+>(
+  Component: React.FunctionComponent<T>
+): React.FunctionComponent<OptionProps<AO, M, SelectGroupBase<AO>>> => {
+  const WithAsync = (props: OptionProps<AO, M, SelectGroupBase<AO>>): JSX.Element => {
+    return ui.select.isSelectErrorOption(props.data) ? (
+      <Option {...props}>
+        <Error message={props.data.message} detail={props.data.detail} bare={true} />
+      </Option>
+    ) : (
+      <Component {...(props as unknown as T)} />
+    );
+  };
+  return WithAsync;
+};
 
 export type AsyncOptionProps<
   O extends SelectOption,
@@ -15,22 +37,12 @@ export type AsyncOptionProps<
   readonly children: ReactNode | ((params: OptionChildrenRenderProps<O, M, SelectGroupBase<O>>) => JSX.Element);
 };
 
-const AsyncOption = <
+const AsyncOption = withAsyncOption(Option);
+
+export default React.memo(AsyncOption) as <
   O extends SelectOption,
   M extends boolean = false,
   G extends AsyncSelectGroupBase<O> = AsyncSelectGroupBase<O>
 >(
-  props: OptionProps<AsyncSelectOption<O>, M, G>
-): JSX.Element =>
-  ui.select.isSelectErrorOption(props.data) ? (
-    <Option {...props}>
-      <div style={{ display: "flex" }}>
-        {props.data.message}
-        {props.data.detail}
-      </div>
-    </Option>
-  ) : (
-    <Option {...props} />
-  );
-
-export default React.memo(AsyncOption) as typeof AsyncOption;
+  props: AsyncOptionProps<O, M, G>
+) => JSX.Element;

@@ -15,10 +15,9 @@ export type OptionChildrenRenderProps<
 export type OptionProps<
   O extends SelectOption,
   IsMulti extends boolean = false,
-  G extends GroupBase<O> = GroupBase<O>,
-  RENDERPARAMS extends OptionChildrenRenderProps<O, IsMulti, G> = OptionChildrenRenderProps<O, IsMulti, G>
+  G extends GroupBase<O> = GroupBase<O>
 > = OptionChildrenRenderProps<O, IsMulti, G> & {
-  readonly children: ReactNode | ((params: RENDERPARAMS) => JSX.Element);
+  readonly children: ReactNode | ((params: OptionChildrenRenderProps<O, IsMulti, G>) => JSX.Element);
 };
 
 const Option = <O extends SelectOption, IsMulti extends boolean = false, G extends GroupBase<O> = GroupBase<O>>(
