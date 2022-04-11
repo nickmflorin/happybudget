@@ -26,9 +26,9 @@ const ConnectedTable = connectTableToAuthenticatedStore<
     response: actions.template.subAccount.responseAction,
     setSearch: actions.template.subAccount.setSearchAction
   },
-  tableId: "template-account-subaccounts-table",
+  tableId: "template-subaccount-subaccounts-table",
   selector: (s: Application.Store) =>
-    selectors.selectSubAccountsTableStore(s, { parentType: "account", domain: "template" }),
+    selectors.selectSubAccountsTableStore(s, { parentType: "subaccount", domain: "template" }),
   createSaga: (table: Table.TableInstance<R, M>) => sagas.template.subAccount.createTableSaga(table),
   footerRowSelectors: {
     page: createSelector(
@@ -91,7 +91,7 @@ const SubAccount = (props: SubAccountProps): JSX.Element => {
         {...props}
         table={fringesTable}
         open={fringesModalVisible}
-        parentType={"account"}
+        parentType={"subaccount"}
         onCancel={() => setFringesModalVisible(false)}
       />
     </BudgetPage>

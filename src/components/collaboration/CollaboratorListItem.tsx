@@ -29,12 +29,12 @@ const CollaboratorListItem = ({
     <div style={{ width: 110 }}>
       <CollaboratorAccessTypeSelect
         value={collaborator.access_type.id}
-        onChange={(accessType: Model.CollaboratorAccessType | null) => {
+        onChange={(accessType: Model.CollaboratorAccessType["id"] | null) => {
           /* Since the select will always be initialized with an access type,
              and it is not clearable, the value should never be null.  But we
              still have to type check to satisfy TS. */
           if (accessType !== null) {
-            onChangeAccessType(accessType.id);
+            onChangeAccessType(accessType);
           }
         }}
       />
