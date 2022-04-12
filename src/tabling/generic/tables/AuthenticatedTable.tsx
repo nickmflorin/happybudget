@@ -114,6 +114,7 @@ const AuthenticatedTable = <
      can be cancelled. */
   const hideSavingChangesTimout = useRef<NodeJS.Timeout | null>(null);
   const [selectedRows, setSelectedRows] = useState<Table.EditableRow<R>[]>([]);
+
   const NotificationsHandler = notifications.ui.useNotificationsManager({
     defaultBehavior: "append",
     defaultClosable: true
@@ -307,29 +308,26 @@ const AuthenticatedTable = <
   const actions = useMemo<Table.AuthenticatedMenuActions<R, M>>(
     (): Table.AuthenticatedMenuActions<R, M> =>
       tabling.menu.combineMenuActions<Table.AuthenticatedMenuActionParams<R, M>, R, M>(
-        (params: Table.AuthenticatedMenuActionParams<R, M>) => {
-          return [
-            {
-              index: 0,
-              icon: "trash-alt",
-              disabled: params.selectedRows.length === 0,
-              isWriteOnly: true,
-              onClick: () => {
-                const apis: Table.GridApis | null = props.tableApis.get("data");
-                const rows = filter((apis?.grid.getSelectedRows() || []) as Table.BodyRow<R>[], (r: Table.BodyRow<R>) =>
-                  tabling.rows.isEditableRow(r)
-                ) as Table.EditableRow<R>[];
-
-                if (rows.length !== 0) {
-                  confirmRowDelete([rows], `You are about to delete ${rows.length} rows.`);
-                }
+        () => [
+          {
+            index: 0,
+            icon: "trash-alt",
+            disabled: selectedRows.length === 0,
+            isWriteOnly: true,
+            onClick: () => {
+              const apis: Table.GridApis | null = props.tableApis.get("data");
+              const rows = filter((apis?.grid.getSelectedRows() || []) as Table.BodyRow<R>[], (r: Table.BodyRow<R>) =>
+                tabling.rows.isEditableRow(r)
+              ) as Table.EditableRow<R>[];
+              if (rows.length !== 0) {
+                confirmRowDelete([rows], `You are about to delete ${rows.length} rows.`);
               }
             }
-          ];
-        },
+          }
+        ],
         !isNil(props.actions) ? props.actions : []
       ),
-    [props.actions, props.tableApis]
+    [props.actions, props.tableApis, selectedRows.length]
   );
 
   useImperativeHandle(props.table, () => {
@@ -409,6 +407,10 @@ const AuthenticatedTable = <
     }
   });
 
+  const onRowSelectionChanged = hooks.useDynamicCallback((rows: Table.EditableRow<R>[]) => {
+    setSelectedRows(rows);
+  });
+
   return (
     <TableWrapper
       id={props.tableId}
@@ -451,7 +453,7 @@ const AuthenticatedTable = <
           gridOptions={props.tableGridOptions.data}
           grid={grid}
           onGridReady={props.onDataGridReady}
-          onRowSelectionChanged={(rows: Table.EditableRow<R>[]) => setSelectedRows(rows)}
+          onRowSelectionChanged={onRowSelectionChanged}
           onEvent={_onEvent}
           rowHasCheckboxSelection={props.rowHasCheckboxSelection}
         />

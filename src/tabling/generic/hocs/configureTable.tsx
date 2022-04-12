@@ -201,7 +201,7 @@ const configureTable = <
         ];
       }
       return cols;
-    }, [hooks.useDeepEqualMemo(props.columns), props.pinFirstColumn, hasEditColumn, props.editColumnConfig]);
+    }, []);
 
     return (
       <Component

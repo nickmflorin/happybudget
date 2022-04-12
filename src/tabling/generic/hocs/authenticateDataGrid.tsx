@@ -336,7 +336,7 @@ const authenticateDataGrid = <
           })
         }
       );
-    }, [hooks.useDeepEqualMemo(props.columns), props.apis]);
+    }, []);
 
     const partialColumns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
       return tabling.columns.normalizeColumns(
@@ -415,7 +415,7 @@ const authenticateDataGrid = <
           })
         }
       );
-    }, [hooks.useDeepEqualMemo(unsuppressedColumns)]);
+    }, []);
 
     const [navigateToNextCell, tabToNextCell, moveToNextColumn, moveToNextRow] = useCellNavigation<R, M>({
       apis: props.apis,
@@ -455,7 +455,7 @@ const authenticateDataGrid = <
           })
         }
       );
-    }, [hooks.useDeepEqualMemo(partialColumns)]);
+    }, []);
 
     const [getContextMenuItems] = useContextMenu<R, M>(props);
 
@@ -598,16 +598,16 @@ const authenticateDataGrid = <
           ) {
             lastSelectionFromRange.current = true;
             if (node.rowIndex >= (indices[0] as number) && node.rowIndex <= (indices[1] as number)) {
-              node.setSelected(true, undefined, true);
+              node.setSelected(true);
             } else {
-              node.setSelected(false, undefined, true);
+              node.setSelected(false);
             }
           }
         });
       } else if (indices[0] === indices[1] && lastSelectionFromRange.current === true) {
         lastSelectionFromRange.current = false;
         e.api.forEachNode((node: Table.RowNode) => {
-          node.setSelected(false, undefined, true);
+          node.setSelected(false);
         });
       }
     });
