@@ -1,14 +1,7 @@
 import React from "react";
 
 import SingleSelect, { SingleSelectProps } from "./SingleSelect";
-import {
-  withSingleModelSelect,
-  withSingleModelAsyncSelect,
-  WithSingleModelAsyncSelectProps,
-  WithSingleModelSelectProps,
-  ModelAsyncSelectInjectedProps,
-  SingleModelSelectInjectedProps
-} from "./hocs";
+import * as hocs from "./hocs";
 
 type BaseProps<M extends Model.Model = Model.Model> = Omit<
   SingleSelectProps<ModelSelectOption<M>>,
@@ -16,15 +9,15 @@ type BaseProps<M extends Model.Model = Model.Model> = Omit<
 >;
 
 type _SingleModelSelectProps<M extends Model.Model = Model.Model> = BaseProps<M> &
-  SingleModelSelectInjectedProps<M> &
-  ModelAsyncSelectInjectedProps<M>;
+  hocs.SingleModelSelectInjectedProps<M> &
+  hocs.ModelAsyncSelectInjectedProps<M>;
 
 export type SingleModelSelectProps<M extends Model.Model = Model.Model> = BaseProps<M> &
-  WithSingleModelAsyncSelectProps<M> &
-  WithSingleModelSelectProps<M>;
+  hocs.WithSingleModelAsyncSelectProps<M> &
+  hocs.WithSingleModelSelectProps<M>;
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-const WithSingle = withSingleModelSelect<any, _SingleModelSelectProps<any>>(SingleSelect);
-const WithAsync = withSingleModelAsyncSelect(WithSingle);
+const WithSingle = hocs.withSingleModelSelect<any, any, _SingleModelSelectProps<any>>(SingleSelect);
+const WithAsync = hocs.withSingleModelAsyncSelect(WithSingle);
 
 export default React.memo(WithAsync) as <M extends Model.Model>(props: SingleModelSelectProps<M>) => JSX.Element;

@@ -1,22 +1,26 @@
 import React from "react";
 
-import MultiValue, { MultiValueProps } from "./MultiValue";
-import Option, { OptionProps } from "./Option";
-import MultiModelSyncSelect, { MultiModelSyncSelectProps } from "./MultiModelSyncSelect";
-import EntityTextMultiValue from "./EntityTextMultiValue";
-import EntityTextOption from "./EntityTextOption";
+import { options, multivalue, MultiModelSyncSelect, MultiModelSyncSelectProps } from "./generic";
 
 type AccountTableModel = Model.PdfAccount | { readonly id: "topsheet" };
 
-type AccountTableMultiValueProps = MultiValueProps<ModelSelectOption<AccountTableModel>>;
+type AccountTableMultiValueProps = multivalue.MultiValueProps<ModelSelectOption<AccountTableModel>>;
 
 const AccountTableMultiValue = (props: AccountTableMultiValueProps) =>
-  props.data.id === "topsheet" ? <MultiValue {...props}>{"Topsheet"}</MultiValue> : <EntityTextMultiValue {...props} />;
+  props.data.id === "topsheet" ? (
+    <multivalue.MultiValue {...props}>{"Topsheet"}</multivalue.MultiValue>
+  ) : (
+    <multivalue.EntityTextMultiValue {...props} />
+  );
 
-type AccountTableOptionProps = OptionProps<ModelSelectOption<AccountTableModel>, true>;
+type AccountTableOptionProps = options.OptionProps<ModelSelectOption<AccountTableModel>, true>;
 
 const AccountTableOption = (props: AccountTableOptionProps) =>
-  props.data.id === "topsheet" ? <Option {...props}>{"Topsheet"}</Option> : <EntityTextOption {...props} />;
+  props.data.id === "topsheet" ? (
+    <options.Option {...props}>{"Topsheet"}</options.Option>
+  ) : (
+    <options.EntityTextOption {...props} />
+  );
 
 export type AccountTableProps = Omit<
   MultiModelSyncSelectProps<AccountTableModel>,

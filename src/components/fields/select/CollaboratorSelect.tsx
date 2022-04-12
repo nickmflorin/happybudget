@@ -4,13 +4,11 @@ import classNames from "classnames";
 
 import * as api from "api";
 import { hooks } from "store";
-import { http, ui } from "lib";
+import { http } from "lib";
 
 import { UserImageOrInitials } from "components/images";
 
-import AsyncOption, { AsyncOptionProps } from "./AsyncOption";
-import { OptionChildrenRenderProps } from "./Option";
-import MultiModelAsyncSelect, { MultiModelAsyncSelectProps } from "./MultiModelAsyncSelect";
+import { options, MultiModelAsyncSelect, MultiModelAsyncSelectProps } from "./generic";
 
 export type CollaboratorSelectProps = Omit<
   MultiModelAsyncSelectProps<Model.SimpleUser>,
@@ -19,25 +17,22 @@ export type CollaboratorSelectProps = Omit<
   readonly currentCollaborators: Model.Collaborator[];
 };
 
-const Option = <G extends AsyncSelectGroupBase<ModelSelectOption<Model.SimpleUser>>>(
-  props: AsyncOptionProps<ModelSelectOption<Model.SimpleUser>, true, G>
-) =>
-  ui.select.isSelectErrorOption(props.data) ? (
-    <AsyncOption<ModelSelectOption<Model.SimpleUser>, true, G> {...props} />
-  ) : (
-    <AsyncOption {...props} className={classNames("collaborator-select-option", props.className)}>
-      <React.Fragment>
-        {(params: OptionChildrenRenderProps<ModelSelectOption<Model.SimpleUser>, true>) => (
-          <React.Fragment>
-            <div className={"user-image-or-initials-container"}>
-              <UserImageOrInitials circle={true} user={{ ...params.data, id: parseInt(params.data.id) }} />
-            </div>
-            <div className={"name-container"}>{params.data.full_name}</div>
-          </React.Fragment>
-        )}
-      </React.Fragment>
-    </AsyncOption>
-  );
+const Option = <G extends SelectGroupBase<ModelSelectOption<Model.SimpleUser>>>(
+  props: options.ModelSelectOptionProps<ModelSelectOption<Model.SimpleUser>, true, G>
+) => (
+  <options.ModelSelectOption {...props} className={classNames("collaborator-select-option", props.className)}>
+    <React.Fragment>
+      {(params: options.OptionChildrenRenderProps<ModelSelectOption<Model.SimpleUser>, true>) => (
+        <React.Fragment>
+          <div className={"user-image-or-initials-container"}>
+            <UserImageOrInitials circle={true} user={{ ...params.data, id: parseInt(params.data.id) }} />
+          </div>
+          <div className={"name-container"}>{params.data.full_name}</div>
+        </React.Fragment>
+      )}
+    </React.Fragment>
+  </options.ModelSelectOption>
+);
 
 const MemoizedOption = React.memo(Option) as typeof Option;
 
@@ -46,7 +41,7 @@ const CollaboratorSelect = ({ currentCollaborators, ...props }: CollaboratorSele
   const [cancelToken] = http.useCancelToken();
 
   return (
-    <MultiModelAsyncSelect
+    <MultiModelAsyncSelect<Model.SimpleUser>
       placeholder={"Search users..."}
       {...props}
       components={{ Option: MemoizedOption }}

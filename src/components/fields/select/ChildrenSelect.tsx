@@ -4,9 +4,7 @@ import { map } from "lodash";
 import * as api from "api";
 import { http, ui } from "lib";
 
-import MultiModelAsyncSelect, { MultiModelAsyncSelectProps } from "./MultiModelAsyncSelect";
-import AsyncEntityTextMultiValue from "./AsyncEntityTextMultiValue";
-import AsyncEntityTextOption from "./AsyncEntityTextOption";
+import { options, multivalue, MultiModelAsyncSelect, MultiModelAsyncSelectProps } from "./generic";
 
 export type ChildrenSelectProps<M extends Model.SimpleAccount | Model.SimpleSubAccount> = Omit<
   MultiModelAsyncSelectProps<M>,
@@ -27,7 +25,7 @@ const ChildrenSelect = <M extends Model.SimpleAccount | Model.SimpleSubAccount>(
       placeholder={"Search accounts..."}
       {...props}
       isSearchable={false}
-      components={{ Option: AsyncEntityTextOption, MultiValue: AsyncEntityTextMultiValue }}
+      components={{ Option: options.EntityTextOption, MultiValue: multivalue.EntityTextMultiValue }}
       noOptionsMessage={() => "No accounts found."}
       processResponse={(rsp: Http.ListResponse<M>) => map(rsp.data, (d: M) => ui.select.toModelSelectOption(d))}
       loadOptions={() =>

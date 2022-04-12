@@ -1,6 +1,6 @@
-import { isNil, filter, find, includes, reduce, uniq } from "lodash";
+import { filter, includes, reduce, uniq } from "lodash";
 
-import { notifications, util } from "lib";
+import { notifications } from "lib";
 
 export const identityReducer =
   <S>(initialState: S): Redux.Reducer<S> =>
@@ -9,43 +9,33 @@ export const identityReducer =
 
 export const identityReducerWithDefinedState = <S>(st: S) => st;
 
-export const modelListActionReducer: Redux.Reducer<
-  Redux.ModelListActionStore,
-  Redux.Action<Redux.ModelListActionPayload>
-> = (
-  st: Redux.ModelListActionStore = [],
-  action: Redux.Action<Redux.ModelListActionPayload>
-): Redux.ModelListActionStore => {
-  if (action.payload.value === true) {
-    const instance: Redux.ModelListActionInstance | undefined = find(st, { id: action.payload.id });
-    if (!isNil(instance)) {
-      return util.replaceInArray<Redux.ModelListActionInstance>(
-        st,
-        { id: action.payload.id },
-        { ...instance, count: instance.count + 1 }
-      );
-    } else {
-      return [...st, { id: action.payload.id, count: 1 }];
+export const modelListActionReducer = <M extends Model.Model = Model.Model>(
+  st: Redux.ModelListActionStore<M> = { current: [], completed: [], failed: [] },
+  action: Redux.ModelListActionAction<M>
+): Redux.ModelListActionStore<M> => {
+  if (action.value === true) {
+    if (!includes(st.current, action.id)) {
+      return { ...st, current: [...st.current, action.id] };
     }
+    notifications.internal.inconsistentStateError({
+      action: "Adding to model list action state.",
+      reason: "The instance already exists in state when it is expected to."
+    });
+    return st;
   } else {
-    const instance: Redux.ModelListActionInstance | undefined = find(st, { id: action.payload.id });
-    if (isNil(instance)) {
-      notifications.internal.inconsistentStateError({
-        action: "Removing from model list action state.",
-        reason: "The instance does not exist in state when it is expected to."
-      });
-      return st;
-    } else {
-      if (instance.count === 1) {
-        return filter(st, (inst: Redux.ModelListActionInstance) => inst.id !== action.payload.id);
-      } else {
-        return util.replaceInArray<Redux.ModelListActionInstance>(
-          st,
-          { id: action.payload.id },
-          { ...instance, count: instance.count - 1 }
-        );
-      }
+    if (includes(st.current, action.id)) {
+      return {
+        ...st,
+        current: filter(st.current, (id: M["id"]) => id !== action.id),
+        failed: action.success === false ? [...st.failed, action.id] : st.failed,
+        completed: action.success !== false ? [...st.completed, action.id] : st.completed
+      };
     }
+    notifications.internal.inconsistentStateError({
+      action: "Removing from model list action state.",
+      reason: "The instance does not exist in state when it is expected to."
+    });
+    return st;
   }
 };
 

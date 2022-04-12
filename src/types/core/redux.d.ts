@@ -117,10 +117,22 @@ declare namespace Redux {
 
   type ListStore<T> = T[];
 
-  type ModelListActionPayload = { id: ID; value: boolean };
-  type ModelListActionInstance = { id: ID; count: number };
+  type ModelListActionCompleteAction<M extends Model.Model = Model.Model> = {
+    readonly id: M["id"];
+    readonly value: false;
+    readonly success?: boolean;
+  };
+  type ModelListActionStartAction<M extends Model.Model = Model.Model> = { readonly id: M["id"]; readonly value: true };
 
-  type ModelListActionStore = ModelListActionInstance[];
+  type ModelListActionAction<M extends Model.Model = Model.Model> =
+    | ModelListActionStartAction<M>
+    | ModelListActionCompleteAction<M>;
+
+  type ModelListActionStore<M extends Model.Model = Model.Model> = {
+    readonly current: M["id"][];
+    readonly completed: M["id"][];
+    readonly failed: M["id"][];
+  };
 
   type UpdateModelPayload<T extends Model.Model> = {
     id: T["id"];
@@ -228,10 +240,10 @@ declare namespace Redux {
     P extends ActionPayload = null,
     C extends Table.Context = Table.Context
   > = ModelListResponseActionMap<M, P> & {
-    readonly updating?: ActionCreator<ModelListActionPayload>;
+    readonly updating?: ActionCreator<ModelListActionAction>;
     readonly creating?: ActionCreator<boolean>;
     readonly removeFromState: ActionCreator<number>;
-    readonly deleting?: ActionCreator<ModelListActionPayload>;
+    readonly deleting?: ActionCreator<ModelListActionAction>;
     readonly addToState: ActionCreator<M>;
     readonly updateInState: ActionCreator<UpdateModelPayload<M>>;
     readonly setSearch?: TableActionCreator<string, C>;

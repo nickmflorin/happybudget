@@ -3,7 +3,7 @@ import { map, find, isNil } from "lodash";
 
 import { tabling } from "lib";
 
-import MultiModelSyncSelect, { MultiModelSyncSelectProps } from "./MultiModelSyncSelect";
+import { MultiModelSyncSelect, MultiModelSyncSelectProps } from "./generic";
 
 type ColumnModel<
   R extends Table.RowData,

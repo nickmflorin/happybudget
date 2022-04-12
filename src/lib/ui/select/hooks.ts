@@ -1,7 +1,25 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { MultiValue, SingleValue } from "react-select";
+import { isNil } from "lodash";
 
+import { notifications } from "lib";
 import { parseMultiModelSelectValues, parseSingleModelSelectValues } from "./util";
+
+export const InitialSelectRef: SelectInstance = {
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+  ...notifications.ui.InitialNotificationsManager
+};
+
+export const useSelect = (): NonNullRef<SelectInstance> => {
+  const ref = useRef<SelectInstance>(InitialSelectRef);
+  return ref;
+};
+
+export const useSelectIfNotDefined = (select?: NonNullRef<SelectInstance>): NonNullRef<SelectInstance> => {
+  const ref = useRef<SelectInstance>(InitialSelectRef);
+  const returnRef = useMemo(() => (!isNil(select) ? select : ref), [select, ref.current]);
+  return returnRef;
+};
 
 type UseMultiModelAsyncSelectProps<M extends Model.Model> = {
   readonly value?: M["id"][];

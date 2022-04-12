@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { components, OptionProps as RootOptionProps, GroupBase } from "react-select";
 import { isNil } from "lodash";
 import classNames from "classnames";
@@ -18,6 +18,7 @@ export type OptionProps<
   G extends GroupBase<O> = GroupBase<O>
 > = OptionChildrenRenderProps<O, IsMulti, G> & {
   readonly children: ReactNode | ((params: OptionChildrenRenderProps<O, IsMulti, G>) => JSX.Element);
+  readonly extra?: JSX.Element;
 };
 
 const Option = <O extends SelectOption, IsMulti extends boolean = false, G extends GroupBase<O> = GroupBase<O>>(
@@ -32,7 +33,8 @@ const Option = <O extends SelectOption, IsMulti extends boolean = false, G exten
     <div className={"select-option-content"}>
       {typeof props.children === "function" ? props.children(props) : props.children}
     </div>
+    {!isNil(props.extra) && <div className={"select-option-extra"}>{props.extra}</div>}
   </components.Option>
 );
 
-export default React.memo(Option) as typeof Option;
+export default Option;

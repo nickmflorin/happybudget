@@ -9,3 +9,4 @@ export { default as Notification } from "./Notification";
 export { default as Notifications } from "./Notifications";
 export { default as BannerNotifications } from "./BannerNotifications";
 export { default as TableNotifications } from "./TableNotifications";
+export { default as InputFieldNotifications } from "./InputFieldNotifications";

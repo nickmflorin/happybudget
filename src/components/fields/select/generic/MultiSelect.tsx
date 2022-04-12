@@ -1,7 +1,7 @@
 import React from "react";
 
-import MultiValue from "./MultiValue";
-import Select, { SelectProps } from "./SelectV2";
+import MultiValue from "./multivalue/MultiValue";
+import Select, { SelectProps } from "./Select";
 
 export type MultiSelectProps<O extends SelectOption, G extends SelectGroupBase<O> = SelectGroupBase<O>> = Omit<
   SelectProps<O, true, G>,

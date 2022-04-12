@@ -1,6 +1,6 @@
 declare namespace Model {
-  type Model = {
-    readonly id: ID;
+  type Model<I extends ID = ID> = {
+    readonly id: I;
   };
 
   type PartialModel<M extends Model> = Partial<Omit<M, "id">> & Pick<M, "id">;

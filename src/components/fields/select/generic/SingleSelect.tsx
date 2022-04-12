@@ -1,7 +1,7 @@
 import React from "react";
 import { GroupBase } from "react-select";
 
-import Select, { SelectProps } from "./SelectV2";
+import Select, { SelectProps } from "./Select";
 
 export type SingleSelectProps<O extends SelectOption, Group extends GroupBase<O> = GroupBase<O>> = Omit<
   SelectProps<O, false, Group>,

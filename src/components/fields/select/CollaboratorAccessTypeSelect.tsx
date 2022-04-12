@@ -1,7 +1,7 @@
 import React from "react";
 
 import { model } from "lib";
-import SingleChoiceSelect, { SingleChoiceSelectProps } from "./SingleChoiceSelect";
+import { SingleChoiceSelect, SingleChoiceSelectProps } from "./generic";
 
 export type CollaboratorAccessTypeSelectProps = Omit<SingleChoiceSelectProps<Model.CollaboratorAccessType>, "options">;
 

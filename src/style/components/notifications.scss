@@ -7,6 +7,7 @@
 		@include size(22px);
     padding: 3px;
     margin-right: 6px;
+		@include vertical-flex-c();
 
     .icon {
       font-size: $xlarge-text-size;;
@@ -99,6 +100,61 @@
   > .notification {
     &:not(:last-child) {
       margin-bottom: 8px;
+    }
+  }
+}
+
+.input-field-notifications {
+	margin-top: 8px !important;
+	margin-bottom: 2px !important;
+
+	> .notification {
+    &:not(:last-child) {
+      margin-bottom: 4px;
+    }
+  }
+
+	.notification-left {
+		@include size(16px);
+    padding: 2px;
+    margin-right: 4px;
+
+    .icon {
+      font-size: $medium-text-size;
+			@include size(12px);
+    }
+  }
+
+	.notification-middle {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 100;
+
+    .notification-message {
+      font-weight: 500;
+      font-size: $medium-text-size;;
+      line-height: 16px;
+      color: $text-primary;
+      font-family: $avenir;
+    }
+
+    .notification-detail {
+      margin-top: 2px;
+      font-size: $small-text-size;;
+      line-height: 16px;
+      font-family: $avenir;
+      font-weight: 400;
+      color: $text-secondary;
+    }
+  }
+
+	.notification-right {
+    @include size(14px);
+    padding: 3px;
+    margin-left: 4px;
+
+    .icon {
+      font-size: $medium-text-size;;
     }
   }
 }

@@ -166,8 +166,11 @@
 	.react-select__control {
 		min-height: $standard-size;
 		border-radius: $input-border-radius;
-		border: $border !important;
-		border-color: $border-color !important;
+		// We use this combination of outline and border to make the select have
+		// a height of 32px.
+		outline: $border !important;
+		outline-offset: -1px;
+		border: none !important;
 		box-shadow: none !important;
 		font-size: $medium-text-size;
 
@@ -175,17 +178,24 @@
 			height: $standard-size;
 			padding: 0px 6px;
 
-			.select__placeholder {
+			.react-select__placeholder {
 				line-height: 32px;
 				font-size: $medium-text-size;
 				font-family: $avenir;
 			}
 
 			&.react-select__value-container--is-multi {
-				height: unset;
 				min-height: $standard-size;
-				position: relative;
-				top: 1px;
+
+				&.react-select__value-container--has-value {
+					position: relative;
+					height: unset;
+					top: 1px;
+				}
+			}
+
+			&:not(.react-select__value-container--is-multi) {
+				height: $standard-size;
 			}
 
 			.react-select__input-container {
@@ -290,6 +300,23 @@
 
 					svg {
 						@include size(12px);
+					}
+				}
+
+				.select-option-content {
+					flex-grow: 100;
+					line-height: 16px;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+				}
+
+				.select-option-extra {
+					margin-left: 4px;
+
+					> .btn--icon-only {
+						height: 20px;
+						width: 20px;
 					}
 				}
 			}

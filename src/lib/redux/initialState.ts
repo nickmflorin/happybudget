@@ -18,8 +18,8 @@ export const initialAuthenticatedModelListResponseState: Redux.AuthenticatedMode
   page: 1,
   pageSize: 10,
   creating: false,
-  deleting: [],
-  updating: [],
+  deleting: { current: [], completed: [], failed: [] },
+  updating: { current: [], completed: [], failed: [] },
   ordering: []
 };
 

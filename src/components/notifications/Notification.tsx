@@ -10,6 +10,7 @@ import { TextWithIncludedLink } from "components/typography";
 
 export type NotificationProps = Omit<StandardComponentProps, "id"> & {
   readonly includeIcon?: boolean;
+  readonly bare?: boolean;
 };
 
 export type NotificationObjectProps = UINotification & Omit<NotificationProps, "id">;
@@ -18,7 +19,6 @@ export type NoticationComponentProps = UINotificationData &
     readonly children?: string;
     readonly remove?: () => void;
     readonly id?: string | number;
-    readonly bare?: boolean;
   };
 
 type _NotificationProps = NotificationObjectProps | NoticationComponentProps;

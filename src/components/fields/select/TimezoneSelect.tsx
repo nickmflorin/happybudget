@@ -2,7 +2,7 @@ import React from "react";
 import moment from "moment-timezone";
 import { isNil, map } from "lodash";
 
-import SingleModelSyncSelect, { SingleModelSyncSelectProps } from "./SingleModelSyncSelect";
+import { SingleModelSyncSelect, SingleModelSyncSelectProps } from "./generic";
 
 type Option = { readonly id: string; readonly label: string };
 
