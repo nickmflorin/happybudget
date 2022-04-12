@@ -61,7 +61,7 @@ export const parseSingleModelSelectValues = <M extends Model.Model>(
  */
 export const parseMultiModelSelectValues = <M extends Model.Model>(
   data: (M | ModelSelectOption<M>)[],
-  value?: M["id"][]
+  value?: M["id"][] | undefined
 ): MultiValue<ModelSelectOption<M>> | undefined => {
   const retrieve = (id: M["id"], dat: M[]): FetchedValue<M> => {
     const m: M | undefined = find(dat, (d: M) => d.id === id);

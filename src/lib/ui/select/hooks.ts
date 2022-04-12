@@ -22,12 +22,12 @@ export const useSelectIfNotDefined = (select?: NonNullRef<SelectInstance>): NonN
 };
 
 type UseMultiModelAsyncSelectProps<M extends Model.Model> = {
-  readonly value?: M["id"][];
+  readonly value?: M["id"][] | undefined;
   readonly isAsync: true;
 };
 
 type UseMultiModelSyncSelectProps<M extends Model.Model> = {
-  readonly value?: M["id"][];
+  readonly value?: M["id"][] | undefined;
   readonly options: (M | ModelSelectOption<M>)[];
 };
 
@@ -50,7 +50,7 @@ export const useMultiModelSelect = <M extends Model.Model>(
 ): UseMultiModelSelectReturnType<M> => {
   const [data, setData] = useState<M[]>([]);
 
-  const convertedValue = useMemo<MultiValue<ModelSelectOption<M>>>(
+  const convertedValue = useMemo<MultiValue<ModelSelectOption<M>> | undefined>(
     () => parseMultiModelSelectValues(isMultiAsync(props) ? data : props.options, props.value),
     [props]
   );
@@ -77,7 +77,7 @@ const isSingleAsync = <M extends Model.Model>(
 ): props is UseSingleModelAsyncSelectProps<M> => (props as UseSingleModelAsyncSelectProps<M>).isAsync === true;
 
 type UseSingleModelSelectReturnType<M extends Model.Model> = {
-  readonly value: SingleValue<ModelSelectOption<M>>;
+  readonly value: SingleValue<ModelSelectOption<M>> | undefined;
   // Only applicable for the async case.
   readonly onResponse: (response: Http.ListResponse<M>) => void;
 };
@@ -87,7 +87,7 @@ export const useSingleModelSelect = <M extends Model.Model>(
 ): UseSingleModelSelectReturnType<M> => {
   const [data, setData] = useState<M[]>([]);
 
-  const convertedValue = useMemo<SingleValue<ModelSelectOption<M>>>(
+  const convertedValue = useMemo<SingleValue<ModelSelectOption<M>> | undefined>(
     () => parseSingleModelSelectValues(isSingleAsync(props) ? data : props.options, props.value),
     [props]
   );

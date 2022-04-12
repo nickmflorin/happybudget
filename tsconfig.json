@@ -13,7 +13,7 @@
     ],
     "noEmitOnError": true,
     "allowJs": false,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
@@ -36,6 +36,5 @@
     "src/**/*.ts",
     "src/types/**/*.d.ts",
     "src/**/*.tsx"
-  ],
-  "exclude": ["**/node_modules", "**/.*/"]
+  ]
 }
