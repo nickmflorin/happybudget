@@ -65,24 +65,25 @@ const AsyncSelect = <
       new Promise<O[]>(resolve => {
         if (inputValue.trim() === "" && loadOptionsWithoutValue === false) {
           resolve([]);
-        }
-        /* Unfortunately, the reject of the promise is pointless - as it does
+        } else {
+          /* Unfortunately, the reject of the promise is pointless - as it does
            not trigger anything in the underlying mechanics of react-select. */
-        if (!isNil(loadOptions)) {
-          loadOptions(inputValue)
-            .then((response: RSP) => {
-              onResponse?.(response);
-              notificationsManager.clearNotifications();
-              if (!isNil(processResponse)) {
-                resolve(processResponse(response));
-              } else {
-                console.error(
-                  "The options were loaded asynchronusly, but the process response method was not provided."
-                );
-                resolve([]);
-              }
-            })
-            .catch((e: Error) => _onError(e));
+          if (!isNil(loadOptions)) {
+            loadOptions(inputValue)
+              .then((response: RSP) => {
+                onResponse?.(response);
+                notificationsManager.clearNotifications();
+                if (!isNil(processResponse)) {
+                  resolve(processResponse(response));
+                } else {
+                  console.error(
+                    "The options were loaded asynchronusly, but the process response method was not provided."
+                  );
+                  resolve([]);
+                }
+              })
+              .catch((e: Error) => _onError(e));
+          }
         }
       }),
     [loadOptions, onError, processResponse, loadOptionsWithoutValue]

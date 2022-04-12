@@ -21,16 +21,12 @@ const Option = <G extends SelectGroupBase<ModelSelectOption<Model.SimpleUser>>>(
   props: options.ModelSelectOptionProps<ModelSelectOption<Model.SimpleUser>, true, G>
 ) => (
   <options.ModelSelectOption {...props} className={classNames("collaborator-select-option", props.className)}>
-    <React.Fragment>
-      {(params: options.OptionChildrenRenderProps<ModelSelectOption<Model.SimpleUser>, true>) => (
-        <React.Fragment>
-          <div className={"user-image-or-initials-container"}>
-            <UserImageOrInitials circle={true} user={{ ...params.data, id: parseInt(params.data.id) }} />
-          </div>
-          <div className={"name-container"}>{params.data.full_name}</div>
-        </React.Fragment>
-      )}
-    </React.Fragment>
+    <div style={{ display: "flex" }}>
+      <div className={"user-image-or-initials-container"}>
+        <UserImageOrInitials circle={true} user={{ ...props.data, id: parseInt(props.data.id) }} />
+      </div>
+      <div className={"name-container"}>{props.data.full_name}</div>
+    </div>
   </options.ModelSelectOption>
 );
 
