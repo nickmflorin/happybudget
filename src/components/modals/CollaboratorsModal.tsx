@@ -75,7 +75,12 @@ const CollaboratorsModal = ({ budgetId, ...props }: CollaboratorsModalProps): JS
           currentCollaborators={collaborators}
           onChange={(users: number[]) => setNewCollaboratorUsers(users)}
         />
-        <PrimaryButton onClick={() => addCollaborators(newCollaboratorUsers)}>{"Add"}</PrimaryButton>
+        <PrimaryButton
+          disabled={newCollaboratorUsers.length === 0}
+          onClick={() => addCollaborators(newCollaboratorUsers)}
+        >
+          {"Add"}
+        </PrimaryButton>
       </div>
       <CollaboratorsList
         collaborators={collaborators}

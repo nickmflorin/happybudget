@@ -27,8 +27,8 @@ const isSelectOption = <M extends Model.Model>(m: M | ModelSelectOption<M>): m i
  */
 export const parseSingleModelSelectValues = <M extends Model.Model>(
   data: (M | ModelSelectOption<M>)[],
-  value?: M["id"] | null
-): SingleValue<ModelSelectOption<M>> => {
+  value?: M["id"] | null | undefined
+): SingleValue<ModelSelectOption<M>> | undefined => {
   const retrieve = (id: M["id"], dat: M[]): FetchedValue<M> => {
     const m: M | undefined = find(dat, (d: M) => d.id === id);
     return m === undefined ? { id, model: null } : { id, model: m };
@@ -37,7 +37,7 @@ export const parseSingleModelSelectValues = <M extends Model.Model>(
   const dataSource = map(data, (o: M | ModelSelectOption<M>) => (isSelectOption(o) ? toSelectModel(o) : o));
 
   if (value === undefined || value === null) {
-    return null;
+    return value;
   }
   const retrieved: FetchedValue<M> = retrieve(value, dataSource);
   if (retrieved.model === null) {
@@ -62,7 +62,7 @@ export const parseSingleModelSelectValues = <M extends Model.Model>(
 export const parseMultiModelSelectValues = <M extends Model.Model>(
   data: (M | ModelSelectOption<M>)[],
   value?: M["id"][]
-): MultiValue<ModelSelectOption<M>> => {
+): MultiValue<ModelSelectOption<M>> | undefined => {
   const retrieve = (id: M["id"], dat: M[]): FetchedValue<M> => {
     const m: M | undefined = find(dat, (d: M) => d.id === id);
     return m === undefined ? { id, model: null } : { id, model: m };
@@ -70,7 +70,13 @@ export const parseMultiModelSelectValues = <M extends Model.Model>(
 
   const dataSource = map(data, (o: M | ModelSelectOption<M>) => (isSelectOption(o) ? toSelectModel(o) : o));
 
-  if (value === undefined || (value.length === 0 && dataSource.length === 0)) {
+  if (value === undefined) {
+    /* It is important to return the undefined value instead of an empty array
+       because if the value is not provided to the select, the select needs to
+       know it is an uncontrolled component (not a controlled component with
+       no value). */
+    return undefined;
+  } else if (value.length === 0 && dataSource.length === 0) {
     return [];
   }
   const retrieved: FetchedValue<M>[] = map(value, (id: M["id"]) => retrieve(id, dataSource));

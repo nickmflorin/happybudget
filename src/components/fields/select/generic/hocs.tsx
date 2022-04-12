@@ -114,6 +114,7 @@ export const withMultiModelSelect = <
   ): JSX.Element => (
     <C
       {...(props as T & { readonly onChange?: (ms: M["id"][]) => void })}
+      isMulti={true}
       onChange={(newValue: MultiValue<ModelSelectOption<M>>) => props.onChange?.(convertMultiOptions(newValue))}
     />
   );

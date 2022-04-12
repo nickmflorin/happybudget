@@ -35,7 +35,6 @@ const MemoizedOption = React.memo(Option) as typeof Option;
 const CollaboratorSelect = ({ currentCollaborators, ...props }: CollaboratorSelectProps): JSX.Element => {
   const user = hooks.useLoggedInUser();
   const [cancelToken] = http.useCancelToken();
-
   return (
     <MultiModelAsyncSelect<Model.SimpleUser>
       placeholder={"Search users..."}

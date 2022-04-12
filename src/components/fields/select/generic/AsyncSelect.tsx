@@ -67,7 +67,7 @@ const AsyncSelect = <
           resolve([]);
         } else {
           /* Unfortunately, the reject of the promise is pointless - as it does
-           not trigger anything in the underlying mechanics of react-select. */
+					not trigger anything in the underlying mechanics of react-select. */
           if (!isNil(loadOptions)) {
             loadOptions(inputValue)
               .then((response: RSP) => {

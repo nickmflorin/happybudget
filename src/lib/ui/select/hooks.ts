@@ -40,7 +40,7 @@ const isMultiAsync = <M extends Model.Model>(
 ): props is UseMultiModelAsyncSelectProps<M> => (props as UseMultiModelAsyncSelectProps<M>).isAsync === true;
 
 type UseMultiModelSelectReturnType<M extends Model.Model> = {
-  readonly value: MultiValue<ModelSelectOption<M>>;
+  readonly value: MultiValue<ModelSelectOption<M>> | undefined;
   // Only applicable for the async case.
   readonly onResponse: (response: Http.ListResponse<M>) => void;
 };
@@ -59,12 +59,12 @@ export const useMultiModelSelect = <M extends Model.Model>(
 };
 
 type UseSingleModelSyncSelectProps<M extends Model.Model> = {
-  readonly value?: M["id"] | null;
+  readonly value?: M["id"] | null | undefined;
   readonly options: (M | ModelSelectOption<M>)[];
 };
 
 type UseSingleModelAsyncSelectProps<M extends Model.Model> = {
-  readonly value?: M["id"] | null;
+  readonly value?: M["id"] | null | undefined;
   readonly isAsync: true;
 };
 
