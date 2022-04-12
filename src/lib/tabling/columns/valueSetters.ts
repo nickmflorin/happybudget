@@ -42,6 +42,21 @@ export const percentageToDecimalValueSetter =
     return false;
   };
 
+export const dateValueSetter =
+  (field: string) =>
+  (params: ValueSetterParams): boolean => {
+    if (params.newValue === undefined || params.newValue === null) {
+      params.data.data[field] = null;
+      return true;
+    }
+    const dateTime = util.dates.toApiDate(params.newValue);
+    if (!isNil(dateTime)) {
+      params.data.data[field] = dateTime;
+      return true;
+    }
+    return false;
+  };
+
 export const dateTimeValueSetter =
   (field: string) =>
   (params: ValueSetterParams): boolean => {

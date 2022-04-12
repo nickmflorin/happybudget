@@ -42,7 +42,7 @@ const Columns: Table.Column<R, M>[] = [
     valueFormatter: tabling.columns.dateValueFormatter((v: string) =>
       console.error(`Could not parse date value ${v} for field 'date'.`)
     ),
-    valueSetter: tabling.columns.dateTimeValueSetter("date"),
+    valueSetter: tabling.columns.dateValueSetter("date"),
     pdfFormatter: (params: Table.NativeFormatterParams<string>) =>
       isNil(params) || params === "" ? "" : tabling.columns.dateValueFormatter(params),
     dataType: "date",
