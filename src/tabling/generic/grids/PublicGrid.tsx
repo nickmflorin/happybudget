@@ -28,7 +28,7 @@ const PublicGrid = <R extends Table.RowData, M extends Model.RowHttpModel = Mode
     };
   }, [framework, props.id]);
 
-  return <Grid {...props} frameworkComponents={frameworkComponents} />;
+  return <Grid {...props} enableFillHandle={false} frameworkComponents={frameworkComponents} />;
 };
 
 export default React.memo(PublicGrid) as typeof PublicGrid;
