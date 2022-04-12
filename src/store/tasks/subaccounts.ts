@@ -522,7 +522,7 @@ export const createAuthenticatedTableTaskSet = <
     const response: Http.AncestryResponse<B, M, Model.Markup> = yield http.request(
       config.services.createMarkup,
       ctx,
-      ctx.budgetId,
+      ctx.id,
       e.payload
     );
     yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
