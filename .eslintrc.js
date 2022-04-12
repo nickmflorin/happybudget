@@ -11,7 +11,7 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking"
   ],
-  plugins: ["react", "react-hooks", "@typescript-eslint"],
+  plugins: ["react", "react-hooks", "prettier", "@typescript-eslint"],
   globals: {
     Atomics: "readonly",
     SharedArrayBuffer: "readonly"
@@ -29,7 +29,7 @@ module.exports = {
       version: "detect"
     }
   },
-  ignorePatterns: ["*.svg", "node_modules", "build", "dist", "public"],
+  ignorePatterns: ["*.svg", "node_modules/**/*", "build", "dist", "public"],
   rules: {
     "prettier/prettier": "error",
     "no-global-assign": 2,

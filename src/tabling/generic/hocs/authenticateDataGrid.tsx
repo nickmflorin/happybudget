@@ -598,16 +598,16 @@ const authenticateDataGrid = <
           ) {
             lastSelectionFromRange.current = true;
             if (node.rowIndex >= (indices[0] as number) && node.rowIndex <= (indices[1] as number)) {
-              node.setSelected(true);
+              node.setSelected(true, undefined, true);
             } else {
-              node.setSelected(false);
+              node.setSelected(false, undefined, true);
             }
           }
         });
       } else if (indices[0] === indices[1] && lastSelectionFromRange.current === true) {
         lastSelectionFromRange.current = false;
         e.api.forEachNode((node: Table.RowNode) => {
-          node.setSelected(false);
+          node.setSelected(false, undefined, true);
         });
       }
     });
