@@ -6,7 +6,7 @@ end_of_line = lf
 indent_size = 2
 indent_style = space
 insert_final_newline = true
-trim_trailing_whitespace = π
+trim_trailing_whitespace = true
 
 [*.{js,css,html,scss,ts,tsx,jsx,.d.ts}]
 indent_style = tab
@@ -14,3 +14,4 @@ indent_size = 2
 
 [*.md]
 trim_trailing_whitespace = false
+

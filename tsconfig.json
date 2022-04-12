@@ -2,15 +2,8 @@
   "compilerOptions": {
     "target": "es2017",
     "baseUrl": "src",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "typeRoots": [
-      "./src/types/",
-      "node_modules/@types"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "typeRoots": ["./src/types/", "node_modules/@types"],
     "noEmitOnError": true,
     "allowJs": false,
     "skipLibCheck": true,
@@ -31,10 +24,6 @@
     "sourceRoot": "./src",
     "resolveJsonModule": true
   },
-  "include": [
-    "src/react-app-env.d.ts",
-    "src/**/*.ts",
-    "src/types/**/*.d.ts",
-    "src/**/*.tsx"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "build", ".vscode", ".git"]
 }

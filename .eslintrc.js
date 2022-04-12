@@ -8,22 +8,24 @@ module.exports = {
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:prettier/recommended",
-    "prettier",
-    "prettier/prettier",
-    "prettier/react",
-    "prettier/@typescript-eslint"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking"
   ],
-  plugins: ["prettier", "react", "react-hooks", "@typescript-eslint"],
+  plugins: ["react", "react-hooks", "@typescript-eslint"],
   globals: {
     Atomics: "readonly",
-    SharedArrayBuffer: "readonly",
-    JSX: "readonly"
+    SharedArrayBuffer: "readonly"
   },
   parser: "@typescript-eslint/parser",
+  parserOptions: {
+    sourceType: "module",
+    tsconfigRootDir: __dirname,
+    project: ["./tsconfig.json"]
+  },
   settings: {
     react: {
       /* Tells eslint-plugin-react to automatically detect the version of React
-         to use. */
+				 to use. */
       version: "detect"
     }
   },
@@ -72,42 +74,28 @@ module.exports = {
     "react/no-children-prop": ["off"],
     "react/jsx-curly-brace-presence": ["error", "always"],
     /* Note:  These non-typescript base rules have to be disabled as of TS
-       4.0.0 in order to prevent false positives.  The no-undef lint rule does
-       not use TypeScript to determine the global variables that exist -
-       instead, it relies upon ESLint's configuration - so it is strongly
-       recommended that it be turned off since TS will handle it anyways.
-       https://github.com/typescript-eslint/typescript-eslint/blob/master/
-       docs/getting-started/linting/FAQ.md#i-get-errors-from-the-no-undef-
-       rule-about-global-variables-not-being-defined-even-though-there-are-no-
+			 4.0.0 in order to prevent false positives.  The no-undef lint rule does
+			 not use TypeScript to determine the global variables that exist -
+			 instead, it relies upon ESLint's configuration - so it is strongly
+			 recommended that it be turned off since TS will handle it anyways.
+			 https://github.com/typescript-eslint/typescript-eslint/blob/master/
+			 docs/getting-started/linting/FAQ.md#i-get-errors-from-the-no-undef-
+			 rule-about-global-variables-not-being-defined-even-though-there-are-no-
 			 typescript-errors */
     "no-use-before-define": "off",
-    "no-undef": "off"
-  },
-  overrides: [
-    {
-      files: ["*.ts", "*.tsx"],
-      extends: [
-        "plugin:@typescript-eslint/recommended",
-        "plugin:@typescript-eslint/recommended-requiring-type-checking"
-      ],
-      parserOptions: {
-        project: ["./tsconfig.json"] // Specify it only for TypeScript files
-      },
-      rules: {
-        "@typescript-eslint/no-unsafe-assignment": ["off"],
-        "@typescript-eslint/ban-ts-comment": ["off"],
-        "@typescript-eslint/no-namespace": ["off"],
-        "@typescript-eslint/no-unsafe-return": ["off"],
-        "@typescript-eslint/no-use-before-define": ["error"],
-        "@typescript-eslint/restrict-plus-operands": ["off"],
-        "@typescript-eslint/no-shadow": ["error"],
-        // Eventually, we want to turn the next two rules into warnings.
-        "@typescript-eslint/explicit-module-boundary-types": ["off"],
-        "@typescript-eslint/explicit-function-return-type": ["off"],
-        /* It would be nice for this to be an error, but unfortunately AG Grid's
-           type bindings are so terrible that it makes it difficult. */
-        "@typescript-eslint/no-unsafe-member-access": ["off"]
-      }
-    }
-  ]
+    "no-undef": "off",
+    "@typescript-eslint/no-unsafe-assignment": ["off"],
+    "@typescript-eslint/ban-ts-comment": ["off"],
+    "@typescript-eslint/no-namespace": ["off"],
+    "@typescript-eslint/no-unsafe-return": ["off"],
+    "@typescript-eslint/no-use-before-define": ["error"],
+    "@typescript-eslint/restrict-plus-operands": ["off"],
+    "@typescript-eslint/no-shadow": ["error"],
+    // Eventually, we want to turn the next two rules into warnings.
+    "@typescript-eslint/explicit-module-boundary-types": ["off"],
+    "@typescript-eslint/explicit-function-return-type": ["off"],
+    /* It would be nice for this to be an error, but unfortunately AG Grid's
+			 type bindings are so terrible that it makes it difficult. */
+    "@typescript-eslint/no-unsafe-member-access": ["off"]
+  }
 };
