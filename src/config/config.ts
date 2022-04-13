@@ -6,7 +6,6 @@ const MAX_IMAGE_SIZE = 2; // In MB
 
 const ConfigOptions: Application.ConfigOption[] = [
   { name: "collaborationEnabled", prodEnv: ["dev", "local"] },
-  { name: "actualsImportEnabled", prodEnv: ["dev", "local"] },
   { name: "tableDebug", default: false, prodEnv: "local" },
   { name: "reportWebVitals", default: false, prodEnv: "local" },
   { name: "whyDidYouRender", default: false, prodEnv: "local" }

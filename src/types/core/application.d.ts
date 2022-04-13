@@ -5,7 +5,6 @@ declare namespace Application {
     readonly whyDidYouRender: boolean;
     readonly acceptedImageTypes: string[];
     readonly maxImageSize: number; // In MB
-    readonly actualsImportEnabled: boolean;
     readonly collaborationEnabled: boolean;
   };
 

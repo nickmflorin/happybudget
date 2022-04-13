@@ -227,19 +227,14 @@ const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Pro
         getModelRowName={(r: Table.DataRow<R>) => r.data.name}
         getModelRowLabel={"Actual"}
         framework={framework.FrameworkComponents}
-        actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => {
-          let actions = [genericFramework.actions.ToggleColumnAction(props.table.current, params)];
-          if (Config.actualsImportEnabled === true) {
-            actions = [
-              ...actions,
-              framework.actions.ImportActualsAction({
-                table: props.table.current,
-                onLinkToken: (linkToken: string) => open(linkToken)
-              })
-            ];
-          }
-          return [...actions, genericFramework.actions.ExportPdfAction(props.onExportPdf)];
-        }}
+        actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
+          genericFramework.actions.ToggleColumnAction(props.table.current, params),
+          framework.actions.ImportActualsAction({
+            table: props.table.current,
+            onLinkToken: (linkToken: string) => open(linkToken)
+          }),
+          genericFramework.actions.ExportPdfAction(props.onExportPdf)
+        ]}
       />
       {modal}
       {contactModals}
