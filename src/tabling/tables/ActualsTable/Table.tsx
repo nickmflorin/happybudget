@@ -4,7 +4,6 @@ import { Dispatch } from "redux";
 import { map, filter, isNil } from "lodash";
 
 import * as api from "api";
-import { Config } from "config";
 import { model, tabling, hooks } from "lib";
 import * as store from "store";
 
