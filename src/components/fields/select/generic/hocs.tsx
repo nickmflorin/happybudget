@@ -12,12 +12,16 @@ export type ModelSelectInjectedProps<M extends Model.Model> = {
   readonly getOptionValue: (m: ModelSelectOption<M>) => string;
 };
 
+type SetDelete = (v: boolean) => void;
+
 type WithModelSelectProps<
   M extends Model.Model,
   IsMulti extends boolean = false,
   G extends SelectGroupBase<ModelSelectOption<M>> = SelectGroupBase<ModelSelectOption<M>>
 > = {
   readonly getOptionLabel?: (m: M) => string;
+  readonly optionCanDelete?: (m: M) => boolean;
+  readonly onDelete?: (m: M, cb: SetDelete) => void;
   readonly components?: SelectComponentsConfig<ModelSelectOption<M>, IsMulti, G>;
 };
 

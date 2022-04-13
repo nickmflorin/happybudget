@@ -4,23 +4,11 @@ module.exports = {
     es6: true,
     node: true
   },
-  extends: [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:prettier/recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking"
-  ],
+  extends: ["eslint:recommended", "plugin:react/recommended", "plugin:prettier/recommended"],
   plugins: ["react", "react-hooks", "prettier", "@typescript-eslint"],
   globals: {
     Atomics: "readonly",
     SharedArrayBuffer: "readonly"
-  },
-  parser: "@typescript-eslint/parser",
-  parserOptions: {
-    sourceType: "module",
-    tsconfigRootDir: __dirname,
-    project: ["./tsconfig.json"]
   },
   settings: {
     react: {
@@ -83,19 +71,35 @@ module.exports = {
 			 rule-about-global-variables-not-being-defined-even-though-there-are-no-
 			 typescript-errors */
     "no-use-before-define": "off",
-    "no-undef": "off",
-    "@typescript-eslint/no-unsafe-assignment": ["off"],
-    "@typescript-eslint/ban-ts-comment": ["off"],
-    "@typescript-eslint/no-namespace": ["off"],
-    "@typescript-eslint/no-unsafe-return": ["off"],
-    "@typescript-eslint/no-use-before-define": ["error"],
-    "@typescript-eslint/restrict-plus-operands": ["off"],
-    "@typescript-eslint/no-shadow": ["error"],
-    // Eventually, we want to turn the next two rules into warnings.
-    "@typescript-eslint/explicit-module-boundary-types": ["off"],
-    "@typescript-eslint/explicit-function-return-type": ["off"],
-    /* It would be nice for this to be an error, but unfortunately AG Grid's
+    "no-undef": "off"
+  },
+  parser: "@typescript-eslint/parser",
+  overrides: [
+    {
+      files: ["*.ts", "*.tsx"],
+      extends: [
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking"
+      ],
+
+      parserOptions: {
+        project: ["./tsconfig.json"]
+      },
+      rules: {
+        "@typescript-eslint/no-unsafe-assignment": ["off"],
+        "@typescript-eslint/ban-ts-comment": ["off"],
+        "@typescript-eslint/no-namespace": ["off"],
+        "@typescript-eslint/no-unsafe-return": ["off"],
+        "@typescript-eslint/no-use-before-define": ["error"],
+        "@typescript-eslint/restrict-plus-operands": ["off"],
+        "@typescript-eslint/no-shadow": ["error"],
+        // Eventually, we want to turn the next two rules into warnings.
+        "@typescript-eslint/explicit-module-boundary-types": ["off"],
+        "@typescript-eslint/explicit-function-return-type": ["off"],
+        /* It would be nice for this to be an error, but unfortunately AG Grid's
 			 type bindings are so terrible that it makes it difficult. */
-    "@typescript-eslint/no-unsafe-member-access": ["off"]
-  }
+        "@typescript-eslint/no-unsafe-member-access": ["off"]
+      }
+    }
+  ]
 };

@@ -7,7 +7,6 @@ import * as store from "store";
 
 import * as actions from "../../actions/budget";
 
-import pdfSaga from "./pdf";
 import analysisSaga from "./analysis";
 import accountSaga from "./account";
 import subAccountSaga from "./subAccount";
@@ -74,7 +73,6 @@ export const createFringesTableSaga = (
   });
 
 export default function* rootSaga(): SagaIterator {
-  yield spawn(pdfSaga);
   yield spawn(analysisSaga);
   yield spawn(accountSaga);
   yield spawn(subAccountSaga);

@@ -1,14 +1,18 @@
-type SelectInstance = UINotificationsManager;
+declare type SelectInstance = UINotificationsManager;
 
-type SelectOption = {
+declare type HeaderTemplateSelectInstance = SelectInstance & {
+  readonly addOption: (m: Model.HeaderTemplate | Model.SimpleHeaderTemplate) => void;
+};
+
+declare type SelectOption = {
   readonly icon?: IconOrElement;
 };
 
-type ModelSelectOption<M extends Model.Model> = SelectOption &
+declare type ModelSelectOption<M extends Model.Model> = SelectOption &
   Omit<M, "id"> & {
     readonly id: string;
   };
 
-type SelectModel<M extends Model.Model> = SelectOption & M;
+declare type SelectModel<M extends Model.Model> = SelectOption & M;
 
-type SelectGroupBase<O extends SelectOption> = import("react-select").GroupBase<O>;
+declare type SelectGroupBase<O extends SelectOption> = import("react-select").GroupBase<O>;

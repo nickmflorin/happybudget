@@ -38,18 +38,11 @@ export const initialAccountState: Modules.AccountStore = {
   table: initialSubAccountsTableState
 };
 
-export const initialHeaderTemplatesState: Modules.Budget.HeaderTemplatesStore = {
-  ...redux.initialAuthenticatedModelListResponseState,
-  displayedTemplate: null,
-  loadingDetail: false
-};
-
 export const initialBudgetState: Modules.Budget.Store = {
   detail: redux.initialDetailResponseState,
   account: initialAccountState,
   accounts: redux.initialTableState,
   subaccount: initialSubAccountState,
-  headerTemplates: initialHeaderTemplatesState,
   analysis: initialAnalysisState,
   actuals: {
     ...redux.initialTableState,

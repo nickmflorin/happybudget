@@ -6,7 +6,7 @@ import { Switch, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import * as api from "api";
-import { model } from "lib";
+import { model, ui } from "lib";
 
 import { Form, ShowHide, Separator } from "components";
 import { ColumnSelect, Input, CKEditor, AccountTableSelect } from "components/fields";
@@ -25,33 +25,15 @@ interface ExportFormProps extends FormProps<ExportBudgetPdfFormOptions> {
   readonly columns: C[];
   readonly accounts: Model.PdfAccount[];
   readonly accountsLoading?: boolean;
-  readonly displayedHeaderTemplate: Model.HeaderTemplate | null;
-  readonly headerTemplates: Model.HeaderTemplate[];
-  readonly headerTemplatesLoading: boolean;
-  readonly onClearHeaderTemplate: () => void;
-  readonly onLoadHeaderTemplate: (id: number) => void;
-  readonly onHeaderTemplateDeleted: (id: number) => void;
-  readonly onHeaderTemplateCreated: (template: Model.HeaderTemplate) => void;
-  readonly onHeaderTemplateUpdated?: (template: Model.HeaderTemplate) => void;
 }
 
 const ExportForm = (
-  {
-    accountsLoading,
-    accounts,
-    columns,
-    displayedHeaderTemplate,
-    headerTemplates,
-    headerTemplatesLoading,
-    onHeaderTemplateCreated,
-    onClearHeaderTemplate,
-    onLoadHeaderTemplate,
-    onHeaderTemplateUpdated,
-    onHeaderTemplateDeleted,
-    ...props
-  }: ExportFormProps,
+  { accountsLoading, accounts, columns, ...props }: ExportFormProps,
   ref: ForwardedRef<IExportFormRef<ExportBudgetPdfFormOptions>>
 ): JSX.Element => {
+  const select = ui.select.useHeaderTemplateSelect();
+  const [displayedHeaderTemplate, setDisplayedHeaderTemplate] = useState<Model.HeaderTemplate | null>(null);
+
   const suppressValueChangeTrigger = useRef(false);
   const leftInfoEditor = useRef<IEditor>(null);
   const rightInfoEditor = useRef<IEditor>(null);
@@ -62,12 +44,8 @@ const ExportForm = (
   const [showAllTables, setShowAllTables] = useState(isNil(props.initialValues?.tables));
   const [includeNotes, setIncludeNotes] = useState(false);
   const [notesHtml, setNotesHtml] = useState<string | null>(props.initialValues?.notes || null);
-  const [leftImage, _setLeftImage] = useState<UploadedImage | SavedImage | null>(
-    displayedHeaderTemplate?.left_image || null
-  );
-  const [rightImage, _setRightImage] = useState<UploadedImage | SavedImage | null>(
-    displayedHeaderTemplate?.right_image || null
-  );
+  const [leftImage, _setLeftImage] = useState<UploadedImage | SavedImage | null>(null);
+  const [rightImage, _setRightImage] = useState<UploadedImage | SavedImage | null>(null);
 
   const _formDataWithoutHeader = useMemo(() => {
     return (values: Omit<ExportBudgetPdfFormOptions, NonFormFields>): Omit<ExportBudgetPdfFormOptions, "header"> => {
@@ -258,7 +236,8 @@ const ExportForm = (
       api
         .createHeaderTemplate(requestPayload)
         .then((response: Model.HeaderTemplate) => {
-          onHeaderTemplateCreated(response);
+          select.current.addOption(response);
+          setDisplayedHeaderTemplate(response);
           if (!isNil(saveFormRef.current)) {
             saveFormRef.current.setRequestNameInput(false);
           }
@@ -316,8 +295,7 @@ const ExportForm = (
       setSaving(true);
       api
         .updateHeaderTemplate(template.id, requestPayload)
-        .then((response: Model.HeaderTemplate) => {
-          onHeaderTemplateUpdated?.(response);
+        .then(() => {
           if (!isNil(saveFormRef.current)) {
             saveFormRef.current.setRequestNameInput(false);
           }
@@ -415,14 +393,15 @@ const ExportForm = (
         </div>
 
         <HeaderTemplateSaveForm
-          loading={headerTemplatesLoading}
-          onLoad={onLoadHeaderTemplate}
-          onClear={onClearHeaderTemplate}
-          onHeaderTemplateDeleted={onHeaderTemplateDeleted}
           value={displayedHeaderTemplate}
-          templates={headerTemplates}
+          onChange={(m: Model.HeaderTemplate | null) => setDisplayedHeaderTemplate(m)}
+          onDeleted={(id: number) => {
+            if (!isNil(displayedHeaderTemplate) && id === displayedHeaderTemplate.id) {
+              setDisplayedHeaderTemplate(null);
+            }
+          }}
           ref={saveFormRef}
-          existing={!isNil(displayedHeaderTemplate)}
+          select={select}
           saving={saving}
           onSave={onSave}
           style={{ marginTop: 10 }}

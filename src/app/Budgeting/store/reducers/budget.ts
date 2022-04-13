@@ -11,36 +11,6 @@ const ActualColumns = tabling.columns.filterModelColumns(ActualsTable.Columns);
 const AccountColumns = tabling.columns.filterModelColumns(AccountsTable.Columns);
 const FringesColumns = tabling.columns.filterModelColumns(FringesTable.Columns);
 
-const headerTemplatesRootReducer: Redux.Reducer<Modules.Budget.HeaderTemplatesStore> = (
-  state: Modules.Budget.HeaderTemplatesStore = initialBudgetState.headerTemplates,
-  action: Redux.Action
-): Modules.Budget.HeaderTemplatesStore => {
-  const listResponseReducer = redux.reducers.createAuthenticatedModelListResponseReducer<
-    Model.SimpleHeaderTemplate,
-    null,
-    Table.Context,
-    Modules.Budget.HeaderTemplatesStore
-  >({
-    initialState: initialBudgetState.headerTemplates,
-    actions: {
-      loading: actions.pdf.loadingHeaderTemplatesAction,
-      response: actions.pdf.responseHeaderTemplatesAction,
-      addToState: actions.pdf.addHeaderTemplateToStateAction,
-      removeFromState: actions.pdf.removeHeaderTemplateFromStateAction
-    }
-  });
-  let newState = listResponseReducer(state, action);
-  if (action.type === actions.pdf.displayHeaderTemplateAction.toString()) {
-    const template: Model.HeaderTemplate = action.payload;
-    newState = { ...newState, displayedTemplate: template };
-  } else if (action.type === actions.pdf.loadHeaderTemplateAction.toString()) {
-    newState = { ...newState, loadingDetail: action.payload };
-  } else if (action.type === actions.pdf.clearHeaderTemplateAction.toString()) {
-    newState = { ...newState, displayedTemplate: null };
-  }
-  return newState;
-};
-
 const analysisReducer: Redux.Reducer<Modules.Budget.AnalysisStore> = (
   state: Modules.Budget.AnalysisStore = initialBudgetState.analysis,
   action: Redux.Action
@@ -199,8 +169,7 @@ const genericReducer = combineReducers({
         setSearch: actions.actuals.setActualOwnersSearchAction
       }
     })
-  }),
-  headerTemplates: headerTemplatesRootReducer
+  })
 });
 
 const rootReducer: Redux.Reducer<Modules.Budget.Store> = (

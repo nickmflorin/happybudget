@@ -1,66 +1,94 @@
-import React from "react";
-import { isNil, map } from "lodash";
+import { useEffect, useState, useImperativeHandle, useMemo } from "react";
+import { filter } from "lodash";
 
-import { Spinner, Icon } from "components";
-import { IconButton } from "components/buttons";
-import { Select } from "components/fields";
+import * as api from "api";
+import { http, ui } from "lib";
 
-type HeaderTemplateSelectProps = {
-  readonly value: Model.HeaderTemplate | null;
-  readonly templates: Model.HeaderTemplate[];
-  readonly loading: boolean;
-  readonly deleting: number | null;
-  readonly onClear: () => void;
-  readonly onLoad: (id: number) => void;
-  readonly onDelete: (id: number) => void;
+import { SingleModelSyncSelect, SingleModelSyncSelectProps } from "./generic";
+
+export type HeaderTemplateSelectProps = Omit<
+  SingleModelSyncSelectProps<Model.SimpleHeaderTemplate>,
+  "loadOptions" | "getOptionLabel" | "noOptionsMessage" | "components" | "onChange" | "options" | "select" | "onChange"
+> & {
+  readonly select?: NonNullRef<HeaderTemplateSelectInstance>;
+  readonly onDeleted?: (id: number) => void;
+  readonly onChange: (m: Model.HeaderTemplate | null) => void;
 };
 
-const HeaderTemplateSelect = (props: HeaderTemplateSelectProps): JSX.Element => (
-  <Select
-    className={"header-template-select"}
-    showArrow
-    loading={props.loading}
-    disabled={props.loading}
-    value={!isNil(props.value) ? props.value.id : "none"}
-    onChange={(value: number | "none") => {
-      if (typeof value === "number") {
-        props.onLoad(value);
-      } else {
-        props.onClear();
-      }
-    }}
-  >
-    <React.Fragment>
-      <Select.Option key={0} value={"none"}>
-        {"Select Header Template"}
-      </Select.Option>
+const HeaderTemplateSelect = ({ onDeleted, ...props }: HeaderTemplateSelectProps): JSX.Element => {
+  const [cancelToken] = http.useCancelToken();
+  const select = ui.select.useHeaderTemplateSelectIfNotDefined(props.select);
+  const [options, setOptions] = useState<Model.SimpleHeaderTemplate[]>([]);
+  const [loading, setLoading] = useState(false);
 
-      {map(props.templates, (template: Model.HeaderTemplate, index: number) => {
-        return (
-          <Select.Option className={"header-template-select-option"} key={index + 1} value={template.id}>
-            {template.name}
-            <div className={"header-template-select-option-icon-wrapper"}>
-              {template.id === props.deleting ? (
-                <Spinner />
-              ) : !isNil(props.deleting) ? (
-                <></>
-              ) : (
-                <IconButton
-                  icon={<Icon icon={"trash"} weight={"regular"} />}
-                  iconSize={"xsmall"}
-                  onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
-                    event.stopPropagation();
-                    event.preventDefault();
-                    props.onDelete(template.id);
-                  }}
-                />
-              )}
-            </div>
-          </Select.Option>
-        );
-      })}
-    </React.Fragment>
-  </Select>
-);
+  useImperativeHandle(select, () => ({
+    ...select.current,
+    addOption: (m: Model.HeaderTemplate | Model.SimpleHeaderTemplate) => {
+      setOptions([...options, m]);
+    }
+  }));
+
+  useEffect(() => {
+    api
+      .getHeaderTemplates({}, { cancelToken: cancelToken() })
+      .then((rsp: Http.ListResponse<Model.SimpleHeaderTemplate>) => {
+        setLoading(false);
+        setOptions(rsp.data);
+      })
+      .catch((e: Error) => {
+        setLoading(false);
+        select.current.handleRequestError(e);
+      });
+  }, []);
+
+  const _onChange = useMemo(
+    () => (id: number | null) => {
+      if (id === null) {
+        props.onChange(id);
+      } else {
+        setLoading(true);
+        api
+          .getHeaderTemplate(id, { cancelToken: cancelToken() })
+          .then((m: Model.HeaderTemplate) => {
+            setLoading(false);
+            props.onChange(m);
+          })
+          .catch((e: Error) => {
+            setLoading(false);
+            select.current.handleRequestError(e);
+          });
+      }
+    },
+    [props.onChange]
+  );
+
+  return (
+    <SingleModelSyncSelect
+      {...props}
+      select={select}
+      options={options}
+      isSearchable={false}
+      isClearable={true}
+      isLoading={loading}
+      placeholder={"Select header template..."}
+      getOptionLabel={(m: Model.SimpleHeaderTemplate) => m.name}
+      onChange={_onChange}
+      onDelete={(m: Model.SimpleHeaderTemplate, setDeleting: (v: boolean) => void) => {
+        setDeleting(true);
+        api
+          .deleteHeaderTemplate(m.id)
+          .then(() => {
+            setDeleting(false);
+            setOptions(filter(options, (o: Model.SimpleHeaderTemplate) => o.id !== m.id));
+            onDeleted?.(m.id);
+          })
+          .catch((e: Error) => {
+            setDeleting(false);
+            select.current.handleRequestError(e);
+          });
+      }}
+    />
+  );
+};
 
 export default HeaderTemplateSelect;

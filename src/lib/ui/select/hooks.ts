@@ -6,7 +6,6 @@ import { notifications } from "lib";
 import { parseMultiModelSelectValues, parseSingleModelSelectValues } from "./util";
 
 export const InitialSelectRef: SelectInstance = {
-  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   ...notifications.ui.InitialNotificationsManager
 };
 
@@ -17,6 +16,25 @@ export const useSelect = (): NonNullRef<SelectInstance> => {
 
 export const useSelectIfNotDefined = (select?: NonNullRef<SelectInstance>): NonNullRef<SelectInstance> => {
   const ref = useRef<SelectInstance>(InitialSelectRef);
+  const returnRef = useMemo(() => (!isNil(select) ? select : ref), [select, ref.current]);
+  return returnRef;
+};
+
+export const InitialHeaderTemplateSelectRef: HeaderTemplateSelectInstance = {
+  ...InitialSelectRef,
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
+  addOption: (m: Model.HeaderTemplate | Model.SimpleHeaderTemplate) => {}
+};
+
+export const useHeaderTemplateSelect = (): NonNullRef<HeaderTemplateSelectInstance> => {
+  const ref = useRef<HeaderTemplateSelectInstance>(InitialHeaderTemplateSelectRef);
+  return ref;
+};
+
+export const useHeaderTemplateSelectIfNotDefined = (
+  select?: NonNullRef<HeaderTemplateSelectInstance>
+): NonNullRef<HeaderTemplateSelectInstance> => {
+  const ref = useRef<HeaderTemplateSelectInstance>(InitialHeaderTemplateSelectRef);
   const returnRef = useMemo(() => (!isNil(select) ? select : ref), [select, ref.current]);
   return returnRef;
 };

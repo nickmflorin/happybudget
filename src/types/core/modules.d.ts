@@ -21,11 +21,6 @@ declare namespace Modules {
   }
 
   namespace Budget {
-    interface HeaderTemplatesStore extends Redux.AuthenticatedModelListResponseStore<Model.HeaderTemplate> {
-      readonly displayedTemplate: Model.HeaderTemplate | null;
-      readonly loadingDetail: boolean;
-    }
-
     type AnalysisStore = {
       readonly accounts: Omit<Redux.ModelListResponseStore<Model.Account>, "loading" | "responseWasReceived">;
       readonly groups: Omit<Redux.ModelListResponseStore<Model.Group>, "loading" | "responseWasReceived">;
@@ -40,7 +35,6 @@ declare namespace Modules {
       readonly account: AccountStore;
       readonly accounts: Tables.AccountTableStore;
       readonly actuals: Tables.ActualTableStore;
-      readonly headerTemplates: HeaderTemplatesStore;
       readonly analysis: AnalysisStore;
     }
   }

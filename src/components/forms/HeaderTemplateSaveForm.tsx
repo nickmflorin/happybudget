@@ -2,8 +2,6 @@ import { useState, useEffect, useImperativeHandle, forwardRef, ForwardedRef } fr
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import * as api from "api";
-
 import { ShowHide, Form } from "components";
 import { DefaultButton, ClearButton } from "components/buttons";
 import { Input, HeaderTemplateSelect } from "components/fields";
@@ -15,38 +13,22 @@ export type IHeaderTemplateSaveFormRef = {
 
 interface HeaderTemplateSaveFormProps extends StandardComponentProps {
   readonly disabled?: boolean;
-  readonly existing: boolean;
   readonly saving: boolean;
-  readonly onSave: (name?: string) => void;
-  readonly loading: boolean;
-  readonly onLoad: (id: number) => void;
-  readonly onClear: () => void;
+  readonly select: NonNullRef<HeaderTemplateSelectInstance>;
   readonly value: Model.HeaderTemplate | null;
-  readonly templates: Model.HeaderTemplate[];
-  readonly onHeaderTemplateDeleted: (id: number) => void;
+  readonly onSave: (name?: string) => void;
+  readonly onChange: (m: Model.HeaderTemplate | null) => void;
+  readonly onDeleted: (id: number) => void;
 }
 
 const HeaderTemplateSaveForm = (
-  {
-    disabled,
-    saving,
-    existing,
-    onSave,
-    loading,
-    onLoad,
-    onClear,
-    value,
-    templates,
-    onHeaderTemplateDeleted,
-    ...props
-  }: HeaderTemplateSaveFormProps,
+  { value, disabled, saving, select, onSave, onChange, onDeleted, ...props }: HeaderTemplateSaveFormProps,
   ref: ForwardedRef<IHeaderTemplateSaveFormRef>
 ): JSX.Element => {
   const [error, setError] = useState<string | null>(null);
   const [saveAsMode, setSaveAsMode] = useState(false);
   const [requestNameInput, setRequestNameInput] = useState(false);
   const [name, setName] = useState<string>("");
-  const [deleting, setDeleting] = useState<number | null>(null);
 
   useImperativeHandle(ref, () => ({
     setRequestNameInput,
@@ -64,26 +46,16 @@ const HeaderTemplateSaveForm = (
       <Form.Item label={"Header Template"}>
         <div className={"header-template-save-form-content"}>
           <HeaderTemplateSelect
-            loading={loading}
-            onLoad={onLoad}
-            onClear={onClear}
-            value={value}
-            templates={templates}
-            deleting={deleting}
-            onDelete={(id: number) => {
-              setDeleting(id);
-              api
-                .deleteHeaderTemplate(id)
-                .then(() => onHeaderTemplateDeleted(id))
-                // .catch((e: Error) => props.form.handleRequestError(e))
-                .catch(() => setError("An error occurred while deleting the header template."))
-                .finally(() => setDeleting(null));
-            }}
+            wrapperStyle={{ width: 200, marginRight: 6 }}
+            value={isNil(value) ? value : value.id}
+            onChange={onChange}
+            select={select}
+            onDeleted={onDeleted}
           />
           <DefaultButton
             disabled={disabled || saving}
             loading={saving}
-            style={{ marginRight: !isNil(existing) || requestNameInput ? 6 : 0, fontSize: "11px" }}
+            style={{ marginRight: !isNil(value) || requestNameInput ? 6 : 0, fontSize: "11px" }}
             onClick={() => {
               if (requestNameInput === true) {
                 if (name.trim() !== "") {
@@ -92,7 +64,7 @@ const HeaderTemplateSaveForm = (
                 } else {
                   setError("Template name is required.");
                 }
-              } else if (existing === false) {
+              } else if (isNil(value)) {
                 setError(null);
                 setRequestNameInput(true);
               } else {
@@ -104,7 +76,7 @@ const HeaderTemplateSaveForm = (
             {"Save"}
           </DefaultButton>
 
-          <ShowHide show={existing && saveAsMode === false}>
+          <ShowHide show={!isNil(value) && saveAsMode === false}>
             <DefaultButton
               style={{ marginRight: requestNameInput ? 6 : 0, fontSize: "11px" }}
               disabled={disabled || saving || saveAsMode === true}

@@ -1,17 +1,15 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
 import { isNil, map, filter } from "lodash";
 import classNames from "classnames";
 
 import * as api from "api";
-import { redux, ui, tabling, pdf, util, http } from "lib";
+import { ui, tabling, pdf, util, http } from "lib";
 import * as store from "store";
 
 import { ExportBudgetPdfForm } from "components/forms";
 import { PreviewModal } from "components/modals";
 import { SubAccountsTable } from "tabling";
 
-import { actions } from "../../store";
 import BudgetPdf from "./BudgetPdf";
 
 type R = Tables.SubAccountRowData;
@@ -56,19 +54,6 @@ interface PreviewModalProps extends ModalProps {
   readonly onSuccess?: () => void;
 }
 
-const selectHeaderTemplatesLoading = redux.simpleShallowEqualSelector(
-  (state: Application.Store) => state.budget.headerTemplates.loading
-);
-const selectHeaderTemplates = redux.simpleDeepEqualSelector(
-  (state: Application.Store) => state.budget.headerTemplates.data
-);
-const selectDisplayedHeaderTemplate = redux.simpleDeepEqualSelector(
-  (state: Application.Store) => state.budget.headerTemplates.displayedTemplate
-);
-const selectHeaderTemplateLoading = redux.simpleShallowEqualSelector(
-  (state: Application.Store) => state.budget.headerTemplates.loadingDetail
-);
-
 const BudgetPreviewModal = ({
   budgetId,
   budgetName,
@@ -88,12 +73,6 @@ const BudgetPreviewModal = ({
 
   const form = ui.form.useForm<ExportBudgetPdfFormOptions>({ isInModal: true });
   const modal = ui.useModal();
-  const dispatch = useDispatch();
-
-  const headerTemplatesLoading = useSelector(selectHeaderTemplatesLoading);
-  const headerTemplates = useSelector(selectHeaderTemplates);
-  const displayedHeaderTemplate = useSelector(selectDisplayedHeaderTemplate);
-  const headerTemplateLoading = useSelector(selectHeaderTemplateLoading);
 
   const convertOptions = useMemo(
     () =>
@@ -122,7 +101,6 @@ const BudgetPreviewModal = ({
 
   useEffect(() => {
     if (props.open === true) {
-      dispatch(actions.budget.pdf.requestHeaderTemplatesAction(null));
       api
         .getBudgetPdf(budgetId, { cancelToken: getToken() })
         .then((response: Model.PdfBudget) => {
@@ -180,28 +158,12 @@ const BudgetPreviewModal = ({
             header: `<h2>${budgetName}</h2><p>Cost Summary</p>`
           }
         }}
-        loading={headerTemplateLoading}
-        headerTemplates={headerTemplates}
-        headerTemplatesLoading={headerTemplatesLoading}
         accountsLoading={loadingData}
         accounts={!isNil(budget) ? budget.children : []}
         columns={SubAccountColumns}
         onValuesChange={(changedValues: Partial<ExportBudgetPdfFormOptions>, values: ExportBudgetPdfFormOptions) => {
           setOptions(values);
           previewer.current?.refreshRequired();
-        }}
-        displayedHeaderTemplate={displayedHeaderTemplate}
-        onClearHeaderTemplate={() => dispatch(actions.budget.pdf.clearHeaderTemplateAction(null))}
-        onLoadHeaderTemplate={(id: number) => dispatch(actions.budget.pdf.loadHeaderTemplateAction(id))}
-        onHeaderTemplateDeleted={(id: number) => {
-          if (!isNil(displayedHeaderTemplate) && displayedHeaderTemplate.id === id) {
-            dispatch(actions.budget.pdf.clearHeaderTemplateAction(null));
-          }
-          dispatch(actions.budget.pdf.removeHeaderTemplateFromStateAction(id));
-        }}
-        onHeaderTemplateCreated={(template: Model.HeaderTemplate) => {
-          dispatch(actions.budget.pdf.addHeaderTemplateToStateAction(template));
-          dispatch(actions.budget.pdf.displayHeaderTemplateAction(template));
         }}
       />
     </PreviewModal>
