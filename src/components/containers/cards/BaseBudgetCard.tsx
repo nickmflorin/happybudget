@@ -24,7 +24,9 @@ const BaseBudgetCard = <B extends Model.SimpleBudget | Model.SimpleCollaborating
     if (util.dates.isToday(budget.updated_at)) {
       return `Last edited ${util.dates.toDisplayTimeSince(budget.updated_at)} by ${user.full_name}`;
     }
-    return `Last edited by ${user.full_name} on ${util.dates.toAbbvDisplayDateTime(budget.updated_at, { tz }) || ""}`;
+    return `Last edited by ${user.full_name} on ${
+      util.dates.toLocalizedAbbvDisplayDateTime(budget.updated_at, { tz }) || ""
+    }`;
   }, [budget.updated_at, user.full_name]);
 
   useEffect(() => {
