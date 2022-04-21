@@ -16,7 +16,7 @@ export type UseKeyboardNavigationProps<B extends Model.BaseBudget, P extends Mod
   readonly authenticated: boolean;
 };
 
-export type UseKeyboardNavigationReturnType<R extends Tables.BudgetRowData> = {
+export type UseKeyboardNavigationReturnType<R extends Tables.SubAccountRowData> = {
   readonly onBack: () => void;
   readonly onLeft: () => void;
   readonly onRight: () => void;
@@ -24,10 +24,20 @@ export type UseKeyboardNavigationReturnType<R extends Tables.BudgetRowData> = {
   readonly confirmExpandModal: JSX.Element;
 };
 
+const rowShouldWarn = <R extends Tables.SubAccountRowData>(row: Table.ModelRow<R>) =>
+  row.children.length === 0 &&
+  (!isNil(row.data.contact) ||
+    row.data.fringes.length !== 0 ||
+    (!isNil(row.data.attachments) && row.data.attachments.length !== 0) ||
+    !isNil(row.data.multiplier) ||
+    !isNil(row.data.quantity) ||
+    !isNil(row.data.rate) ||
+    !isNil(row.data.unit));
+
 const useKeyboardNavigation = <
   B extends Model.BaseBudget,
   P extends Model.Account | Model.SubAccount,
-  R extends Tables.BudgetRowData
+  R extends Tables.SubAccountRowData
 >(
   props: UseKeyboardNavigationProps<B, P>
 ): UseKeyboardNavigationReturnType<R> => {
@@ -82,7 +92,7 @@ const useKeyboardNavigation = <
     () =>
       props.parentType === "account"
         ? (row: Table.ModelRow<R>) =>
-            props.authenticated === true && row.children.length === 0
+            props.authenticated === true && rowShouldWarn(row)
               ? confirmRowExpand([row], "You are about to expand the row.")
               : history.push(
                   budgeting.urls.getUrl(
