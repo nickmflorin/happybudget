@@ -51,34 +51,48 @@ const AuthenticatedBudgetTable = <
     [props.actions]
   );
 
+  const editColumnConfig = useMemo(() => {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    let config: Table.EditColumnRowConfig<R, any>[] = [];
+    if (!isNil(onEditMarkup)) {
+      config = [
+        ...config,
+        {
+          typeguard: tabling.rows.isMarkupRow,
+          action: (r: Table.MarkupRow<R>) => onEditMarkup(r),
+          behavior: "edit"
+        }
+      ];
+    }
+    if (!isNil(onEditGroup)) {
+      config = [
+        ...config,
+        {
+          typeguard: tabling.rows.isGroupRow,
+          action: (r: Table.GroupRow<R>) => onEditGroup(r),
+          behavior: "edit"
+        }
+      ];
+    }
+    if (!isNil(onRowExpand)) {
+      config = [
+        ...config,
+        {
+          typeguard: tabling.rows.isModelRow,
+          action: (r: Table.ModelRow<R>) => onRowExpand(r),
+          behavior: "expand"
+        }
+      ];
+    }
+    return config;
+  }, [onEditMarkup, onEditGroup, onRowExpand]);
+
   return (
     <React.Fragment>
       <AuthenticatedTable
         {...props}
         actions={actions}
-        editColumnConfig={
-          [
-            {
-              typeguard: tabling.rows.isMarkupRow,
-              action: (r: Table.MarkupRow<R>) => onEditMarkup?.(r),
-              behavior: "edit"
-            },
-            {
-              typeguard: tabling.rows.isGroupRow,
-              action: (r: Table.GroupRow<R>) => onEditGroup?.(r),
-              behavior: "edit"
-            },
-            {
-              typeguard: tabling.rows.isModelRow,
-              action: (r: Table.ModelRow<R>) => onRowExpand?.(r),
-              behavior: "expand"
-            }
-          ] as [
-            Table.EditColumnRowConfig<R, Table.MarkupRow<R>>,
-            Table.EditColumnRowConfig<R, Table.GroupRow<R>>,
-            Table.EditColumnRowConfig<R, Table.ModelRow<R>>
-          ]
-        }
+        editColumnConfig={editColumnConfig}
         framework={tabling.aggrid.combineFrameworks(Framework, props.framework)}
       />
       {collaboratorsModalOpen === true && includeCollaborators && (
