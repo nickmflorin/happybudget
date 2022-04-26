@@ -57,7 +57,7 @@ const Accounts = (props: AccountsProps): JSX.Element => {
   }, [props.budget]);
 
   useEffect(() => {
-    dispatch(actions.budget.accounts.requestAction(null, { budgetId: props.budgetId }));
+    dispatch(actions.pub.accounts.requestAction(null, { budgetId: props.budgetId }));
   }, [props.budgetId]);
 
   return (

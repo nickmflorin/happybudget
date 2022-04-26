@@ -1,10 +1,10 @@
 import { redux } from "lib";
 
 export const requestAction = redux.actions.createTableAction<Redux.TableRequestPayload, Tables.AccountTableContext>(
-  "budget.TableRequest"
+  "public.TableRequest"
 );
-export const loadingAction = redux.actions.createAction<boolean>("budget.TableLoading");
-export const responseAction = redux.actions.createAction<Http.TableResponse<Model.Account>>("budget.TableResponse");
+export const loadingAction = redux.actions.createAction<boolean>("public.TableLoading");
+export const responseAction = redux.actions.createAction<Http.TableResponse<Model.Account>>("public.TableResponse");
 export const setSearchAction = redux.actions.createTableAction<string, Tables.AccountTableContext>(
-  "budget.SetTableSearch"
+  "public.SetTableSearch"
 );

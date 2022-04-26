@@ -27,7 +27,7 @@ const ConnectedTable = connectTableToPublicStore<
   },
   tableId: "public-budget-account-subaccounts-table",
   selector: (s: Application.Store) =>
-    selectors.selectSubAccountsTableStore(s, { parentType: "account", domain: "budget" }),
+    selectors.selectSubAccountsTableStore(s, { parentType: "account", domain: "budget", public: true }),
   createSaga: (table: Table.TableInstance<R, M>) => sagas.pub.account.createTableSaga(table),
   footerRowSelectors: {
     page: createSelector(
@@ -70,7 +70,7 @@ const Account = (props: AccountProps): JSX.Element => {
   const table = tabling.hooks.useTable<Tables.SubAccountRowData, Model.SubAccount>();
 
   useEffect(() => {
-    dispatch(actions.budget.account.requestAccountAction(props.id));
+    dispatch(actions.pub.account.requestAccountAction(props.id));
   }, [props.id]);
 
   useEffect(() => {

@@ -113,8 +113,6 @@ const genericReducer = combineReducers({
 const rootReducer: Redux.Reducer<Modules.PublicBudget.Store> = (
   state: Modules.PublicBudget.Store = initialPublicBudgetState,
   action: Redux.Action
-): Modules.PublicBudget.Store => {
-  return genericReducer(state, action);
-};
+): Modules.PublicBudget.Store => genericReducer(state, action);
 
 export default rootReducer;

@@ -70,7 +70,7 @@ const SubAccount = (props: SubAccountProps): JSX.Element => {
   );
 
   useEffect(() => {
-    dispatch(actions.budget.subAccount.requestSubAccountAction(props.id));
+    dispatch(actions.pub.subAccount.requestSubAccountAction(props.id));
   }, [props.id]);
 
   useEffect(() => {
@@ -78,6 +78,10 @@ const SubAccount = (props: SubAccountProps): JSX.Element => {
       budgeting.urls.setLastVisited(props.budget, subaccount, props.tokenId);
     }
   }, [props.budget, subaccount]);
+
+  useEffect(() => {
+    dispatch(actions.pub.subAccount.requestAction(null, { id: props.id, budgetId: props.budgetId }));
+  }, [props.id, props.budgetId]);
 
   return (
     <BudgetPage parent={subaccount} {...props}>
