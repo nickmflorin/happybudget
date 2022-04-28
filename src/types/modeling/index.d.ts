@@ -196,14 +196,15 @@ declare namespace Model {
   type AbstractBudget = GenericHttpModel<"budget"> & {
     readonly name: string;
     readonly domain: BudgetDomain;
+    readonly updated_at: string;
+    readonly image: SavedImage | null;
+    readonly updated_by: SimpleUser;
   };
 
   type SimpleTemplate = AbstractBudget & {
     readonly domain: "template";
-    readonly image: SavedImage | null;
     // The hidden attribute will not be present for non-community templates.
     readonly hidden?: boolean;
-    readonly updated_at: string;
   };
 
   type Template = SimpleTemplate & {
@@ -215,8 +216,6 @@ declare namespace Model {
 
   type SimpleCollaboratingBudget = AbstractBudget & {
     readonly domain: "budget";
-    readonly image: SavedImage | null;
-    readonly updated_at: string;
   };
 
   type SimpleBudget = SimpleCollaboratingBudget & {

@@ -17,17 +17,16 @@ const BaseBudgetCard = <B extends Model.SimpleBudget | Model.SimpleCollaborating
   includeSubTitle,
   ...props
 }: BaseBudgetCardProps<B>): JSX.Element => {
-  const user = store.hooks.useLoggedInUser();
   const tz = store.hooks.useTimezone();
 
   const subTitle = useMemo(() => {
     if (util.dates.isToday(budget.updated_at)) {
-      return `Last edited ${util.dates.toDisplayTimeSince(budget.updated_at)} by ${user.full_name}`;
+      return `Last edited ${util.dates.toDisplayTimeSince(budget.updated_at)} by ${budget.updated_by.full_name}`;
     }
-    return `Last edited by ${user.full_name} on ${
+    return `Last edited by ${budget.updated_by.full_name} on ${
       util.dates.toLocalizedAbbvDisplayDateTime(budget.updated_at, { tz }) || ""
     }`;
-  }, [budget.updated_at, user.full_name]);
+  }, [budget.updated_at, budget.updated_by]);
 
   useEffect(() => {
     if (!isNil(budget.image) && isNil(budget.image.url)) {
