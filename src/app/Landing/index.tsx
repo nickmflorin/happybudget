@@ -1,6 +1,7 @@
 import React from "react";
 import { Switch, Route } from "react-router-dom";
 
+import { Icon } from "components";
 import { Logo } from "components/svgs";
 import * as config from "config";
 
@@ -21,6 +22,12 @@ const Landing = (): JSX.Element => (
         <Route exact path={"/reset-password"} component={ResetPassword} />
         <Route exact path={"/recover-password"} component={RecoverPassword} />
       </Switch>
+      <div className={"copyright"}>
+        <div className={"icon-wrapper"}>
+          <Icon icon={"copyright"} weight={"regular"} />
+        </div>
+        <div className={"copyright-text"}>{"Nick Florin, 2021"}</div>
+      </div>
     </div>
     <div className={"landing-page-right"}>
       <div className={"logo-container"}>
