@@ -1,5 +1,7 @@
 # Green Budget
 
+&copy; Nick Florin, 2021
+
 ### System Requirements
 
 - yarn
