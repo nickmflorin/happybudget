@@ -26,7 +26,7 @@ const Landing = (): JSX.Element => (
         <div className={"icon-wrapper"}>
           <Icon icon={"copyright"} weight={"regular"} />
         </div>
-        <div className={"copyright-text"}>{"Nick Florin, 2021"}</div>
+        <div className={"copyright-text"}>{"Nick Florin, 2022"}</div>
       </div>
     </div>
     <div className={"landing-page-right"}>
