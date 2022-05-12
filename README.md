@@ -1,4 +1,4 @@
-# Green Budget
+# HappyBudget
 
 &copy; Nick Florin, 2021
 
@@ -14,7 +14,7 @@
 Clone this repository locally and `cd` into the directory.
 
 ```bash
-$ git clone https://github.com/Saturation-IO/greenbudget-frontend.git
+$ git clone https://github.com/nickmflorin/happybudget.git
 ```
 
 ### Step 2: Environment
@@ -77,8 +77,8 @@ For the non-sensitive configuration, you can reference the `base_env` file in
 the project root for the configuration you will need to start the app locally:
 
 ```
-REACT_APP_API_DOMAIN=http://local.greenbudget.io:8000
-REACT_APP_DOMAIN=http://local.greenbudget.io:3000
+REACT_APP_API_DOMAIN=http://local.happybudget.io:8000
+REACT_APP_DOMAIN=http://local.happybudget.io:3000
 REACT_APP_PRODUCTION_ENV=local
 ```
 
@@ -187,7 +187,12 @@ following configurations to your `settings.json` file:
 
 Once the dependencies are installed via `yarn` and the `.env.local` file is
 present, we need to setup our `/etc/hosts` file such that we can use
-`local.greenbudget.io` as a valid domain for the local development server.
+`local.happybudget.io` as a valid domain for the local development server.
+
+Note that this step is also performed while configuring the
+[happybudget-api](https://github.com/nickmflorin/happybudget-api.git)
+repository for local development - so if you already configured that
+repository properly this step can be skipped.
 
 Edit your `/etc/hosts` file as follows:
 
@@ -198,11 +203,11 @@ $ sudo nano /etc/hosts
 Add the following configuration to the file:
 
 ```bash
-127.0.0.1       local.greenbudget.io
+127.0.0.1       local.happybudget.io
 ```
 
 Now, when we start the development server, we will be able to access the
-application at `local.greenbudget.io:3000`.
+application at `local.happybudget.io:3000`.
 
 To start the development server, run the following command:
 
