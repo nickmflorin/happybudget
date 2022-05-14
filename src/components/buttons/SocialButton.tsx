@@ -32,8 +32,11 @@ const SocialButton = ({
   ...props
 }: SocialButtonProps): JSX.Element => {
   if (provider === "google") {
+    /* This should be prevented since our environment does not allow for the
+       case where SOCIAL_AUTHENTICATION_ENABLED is false and GOOGLE_CLIENT_KEY
+       is not defined - and this button should not be shown if
+       SOCIAL_AUTHENTICATION_ENABLED is false. */
     if (isNil(config.env.GOOGLE_CLIENT_KEY)) {
-      console.warn("Cannot establish Google Login as `REACT_APP_GOOGLE_CLIENT_KEY` is not defined in environment.");
       return <></>;
     }
     return (

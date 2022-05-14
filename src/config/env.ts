@@ -6,7 +6,7 @@ export const ACCCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png"];
 export const MAX_IMAGE_SIZE = 2; // In MB
 
 export const ENV = config.Config<Application.Environment>({
-  nodeSourceName: "REACT_APP_PRODUCTION_ENV",
+  nodeSourceName: "PRODUCTION_ENV",
   validators: [(v: string) => includes(Environments.__ALL__, v)],
   defaultValue: "local"
 });
@@ -20,7 +20,7 @@ export const environmentIsLocal = () => ENV === Environments.LOCAL;
 export const environmentIsRemote = () => includes(Environments.__REMOTE__, ENV);
 
 export const API_DOMAIN = config.Config<string>({
-  nodeSourceName: "REACT_APP_API_DOMAIN",
+  nodeSourceName: "API_DOMAIN",
   validators: [(v: string) => v.startsWith("http://") || v.startsWith("https://"), (v: string) => !v.endsWith("/")],
   defaultValue: {
     local: "http://local.happybudget.io:8000",
@@ -30,7 +30,7 @@ export const API_DOMAIN = config.Config<string>({
 });
 
 export const APP_DOMAIN = config.Config<string>({
-  nodeSourceName: "REACT_APP_DOMAIN",
+  nodeSourceName: "DOMAIN",
   validators: [(v: string) => v.startsWith("http://") || v.startsWith("https://")],
   defaultValue: {
     local: "http://local.happybudget.io:3000",
@@ -40,12 +40,12 @@ export const APP_DOMAIN = config.Config<string>({
 });
 
 export const BILLING_ENABLED = config.BooleanConfig({
-  nodeSourceName: "REACT_APP_BILLING_ENABLED",
+  nodeSourceName: "BILLING_ENABLED",
   defaultValue: false
 });
 
 export const COLLABORATION_ENABLED = config.BooleanConfig({
-  nodeSourceName: "REACT_APP_COLLABORATION_ENABLED",
+  nodeSourceName: "COLLABORATION_ENABLED",
   defaultValue: {
     local: true,
     dev: true,
@@ -54,83 +54,96 @@ export const COLLABORATION_ENABLED = config.BooleanConfig({
 });
 
 export const EMAIL_ENABLED = config.BooleanConfig({
-  nodeSourceName: "REACT_APP_EMAIL_ENABLED",
+  nodeSourceName: "EMAIL_ENABLED",
   defaultValue: false
 });
 
 export const EMAIL_VERIFICATION_ENABLED = config.BooleanConfig({
-  nodeSourceName: "REACT_APP_EMAIL_VERIFICATION_ENABLED",
-  defaultValue: false
+  nodeSourceName: "EMAIL_VERIFICATION_ENABLED",
+  defaultValue: false,
+  validators: (v: boolean) => {
+    if (v === true && EMAIL_ENABLED === false) {
+      return ({ name }: config.ConfigMessageCallbackParams<boolean>) =>
+        `Configuration ${name} is ${String(v)} but 'EMAIL_ENABLED' is false.`;
+    }
+    return true;
+  }
 });
 
 export const TABLE_DEBUG = config.BooleanConfig({
-  nodeSourceName: "REACT_APP_TABLE_DEBUG",
+  nodeSourceName: "TABLE_DEBUG",
   memorySourceName: "tableDebug",
   defaultValue: false
 });
 
 export const REPORT_WEB_VITALS = config.BooleanConfig({
-  nodeSourceName: "REACT_APP_REPORT_WEB_VITALS",
+  nodeSourceName: "REPORT_WEB_VITALS",
   memorySourceName: "reportWebVitals",
   defaultValue: false
 });
 
 export const WHY_DID_YOU_RENDER = config.BooleanConfig({
-  nodeSourceName: "REACT_APP_WHY_DID_YOU_RENDER",
+  nodeSourceName: "WHY_DID_YOU_RENDER",
   memorySourceName: "whyDidYouRender",
   defaultValue: false
 });
 
 export const SOCIAL_AUTHENTICATION_ENABLED = config.BooleanConfig({
-  nodeSourceName: "REACT_APP_SOCIAL_AUTHENTICATION_ENABLED",
+  nodeSourceName: "SOCIAL_AUTHENTICATION_ENABLED",
   defaultValue: true
 });
 
 export const GOOGLE_CLIENT_KEY = config.Config<string, string | undefined>({
-  nodeSourceName: "REACT_APP_GOOGLE_CLIENT_KEY",
-  required: false
+  nodeSourceName: "GOOGLE_CLIENT_KEY",
+  required: false,
+  rawValidators: (v: string | undefined) => {
+    if (v === undefined && SOCIAL_AUTHENTICATION_ENABLED === true) {
+      return ({ name }: config.ConfigMessageCallbackParams<string | undefined>) =>
+        `Configuration ${name} is not defined but 'SOCIAL_AUTHENTICATION_ENABLED' is true.`;
+    }
+    return true;
+  }
 });
 
 export const CANNY_FEEDBACK_URL = config.Config<string, string | undefined>({
-  nodeSourceName: "REACT_APP_CANNY_FEEDBACK_URL",
+  nodeSourceName: "CANNY_FEEDBACK_URL",
   required: false
 });
 
 export const CANNY_APP_ID = config.Config<string, string | undefined>({
-  nodeSourceName: "REACT_APP_CANNY_APP_ID",
+  nodeSourceName: "CANNY_APP_ID",
   required: false,
   warning: {
-    app: () => console.warn("Will not be able to identify users with Canny as REACT_APP_CANNY_APP_ID is not defined.")
+    app: () => console.warn("Will not be able to identify users with Canny as CANNY_APP_ID is not defined.")
   }
 });
 
 export const INTERCOM_SUPPORT_URL = config.Config<string, string | undefined>({
-  nodeSourceName: "REACT_APP_INTERCOM_SUPPORT_URL",
+  nodeSourceName: "INTERCOM_SUPPORT_URL",
   required: false
 });
 
 export const INTERCOM_APP_ID = config.Config<string, string | undefined>({
-  nodeSourceName: "REACT_APP_INTERCOM_APP_ID",
+  nodeSourceName: "INTERCOM_APP_ID",
   required: false,
   warning: {
-    app: () =>
-      console.warn("Will not be able to identify users with Intercom as REACT_APP_INTERCOM_APP_ID is not defined.")
+    app: () => console.warn("Will not be able to identify users with Intercom as INTERCOM_APP_ID is not defined.")
   }
 });
 
 export const TERMS_AND_CONDITIONS_URL = config.Config<string, string | undefined>({
-  nodeSourceName: "REACT_APP_TERMS_AND_CONDITIONS_URL",
+  nodeSourceName: "TERMS_AND_CONDITIONS_URL",
   required: false
 });
 
 export const AG_GRID_KEY = config.Config<string, string | undefined>({
-  nodeSourceName: "REACT_APP_AG_GRID_KEY",
+  nodeSourceName: "AG_GRID_KEY",
   required: false,
-  warning: () => console.warn("No REACT_APP_AG_GRID_KEY found in environment.  App may not behave as expected.")
+  warning: () => console.warn("No AG_GRID_KEY found in environment.  App may not behave as expected.")
 });
 
 export const SENTRY_DSN = config.Config<string, string | undefined>({
-  nodeSourceName: "REACT_APP_SENTRY_DSN",
+  nodeSourceName: "SENTRY_DSN",
   required: {
     local: false,
     dev: true,
@@ -139,7 +152,7 @@ export const SENTRY_DSN = config.Config<string, string | undefined>({
 });
 
 export const SENTRY_ENV = config.Config<"development" | "production">({
-  nodeSourceName: "REACT_APP_SENTRY_ENV",
+  nodeSourceName: "SENTRY_ENV",
   defaultValue: {
     local: "development", // This doesn't matter since it is not used.
     app: "production",

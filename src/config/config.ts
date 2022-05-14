@@ -34,8 +34,9 @@ type FailedConfigValidatorResult<T> = {
   readonly value: T;
 };
 type ConfigValidator<T> = (v: T) => ConfigValidatorResult<T>;
+type ConfigRawValidator = ConfigValidator<string | undefined>;
 
-const isConfigValidatorResult = <V extends ConfigValue>(
+const isConfigValidatorResult = <V>(
   result: FailedConfigValidatorResult<V> | parsers.FailedConfigParserResult
 ): result is FailedConfigValidatorResult<V> => (result as FailedConfigValidatorResult<V>).result !== undefined;
 
@@ -49,9 +50,10 @@ type ConfigParams<V extends ConfigValue> = {
   readonly defaultValue?: EnvMappedValue<V>;
   /* Either the the `nodeSourceName` or `memorySourceName` (or both) must be
      included. */
-  readonly nodeSourceName?: keyof NodeJS.ProcessEnv;
+  readonly nodeSourceName?: keyof NodeJS.ProcessEnv & string;
   readonly memorySourceName?: string;
   readonly validators?: SingleOrArray<ConfigValidator<V>>;
+  readonly rawValidators?: SingleOrArray<ConfigRawValidator>;
   readonly warning?: EnvMappedValue<() => void>;
 };
 
@@ -59,9 +61,10 @@ class _Config<V extends ConfigValue, UV extends V | undefined = V> implements IE
   private readonly parser: parsers.Parser<V> | undefined;
   private readonly required: EnvMappedValue<boolean> | undefined;
   private readonly defaultValue: EnvMappedValue<V> | undefined;
-  private readonly nodeSourceName: keyof NodeJS.ProcessEnv | undefined;
+  private readonly _nodeSourceName: (keyof NodeJS.ProcessEnv & string) | undefined;
   private readonly memorySourceName: string | undefined;
   private readonly validators: ConfigValidator<V>[];
+  private readonly rawValidators: ConfigRawValidator[];
   private readonly warning?: EnvMappedValue<() => void>;
 
   constructor(config: ConfigParams<V>) {
@@ -69,10 +72,16 @@ class _Config<V extends ConfigValue, UV extends V | undefined = V> implements IE
     this.warning = config.warning;
     this.required = config.required;
     this.defaultValue = config.defaultValue;
-    this.nodeSourceName = config.nodeSourceName;
+    this._nodeSourceName = config.nodeSourceName;
     this.memorySourceName = config.memorySourceName;
     this.validators =
       config.validators === undefined ? [] : Array.isArray(config.validators) ? config.validators : [config.validators];
+    this.rawValidators =
+      config.rawValidators === undefined
+        ? []
+        : Array.isArray(config.rawValidators)
+        ? config.rawValidators
+        : [config.rawValidators];
   }
 
   public static getProdEnv = (): NodeJS.ProcessEnv["REACT_APP_PRODUCTION_ENV"] => {
@@ -96,6 +105,7 @@ class _Config<V extends ConfigValue, UV extends V | undefined = V> implements IE
     const raw = this.getRawValue();
     if (raw !== undefined) {
       [rawValue, source] = raw;
+      this.performRawValidation(rawValue);
       if (!isNil(this.parser)) {
         const parserResult = this.parser(rawValue);
         if (parsers.isParserFailedResult(parserResult)) {
@@ -106,11 +116,13 @@ class _Config<V extends ConfigValue, UV extends V | undefined = V> implements IE
       } else {
         value = rawValue as V;
       }
+    } else {
+      this.performRawValidation(raw);
     }
     if (value === undefined) {
       const isRequired = this.getIsRequired();
       if (isRequired === true) {
-        throw new Error(`Config ${this.getName(source)} is not defined and is required.`);
+        throw new Error(`Config ${this.getExternalName(source)} is not defined and is required.`);
       }
       if (!isNil(this.warning) && valueIsMapped(this.warning)) {
         const warnFn = this.warning[_Config.getProdEnv()];
@@ -128,30 +140,51 @@ class _Config<V extends ConfigValue, UV extends V | undefined = V> implements IE
     return value as UV;
   };
 
-  private getName = (source?: ConfigSource): string =>
+  private get externalNodeSourceName(): string | undefined {
+    if (this._nodeSourceName !== undefined && this._nodeSourceName.startsWith("REACT_APP_")) {
+      return this._nodeSourceName.split("REACT_APP_")[1];
+    }
+    return this._nodeSourceName;
+  }
+
+  private get internalNodeSourceName(): string | undefined {
+    if (this._nodeSourceName !== undefined && !this._nodeSourceName.startsWith("REACT_APP_")) {
+      return `REACT_APP_${this._nodeSourceName}`;
+    }
+    return this._nodeSourceName;
+  }
+
+  private get externalName(): string {
+    if (isNil(this.memorySourceName) && isNil(this.externalNodeSourceName)) {
+      throw new Error("Configuration does not specify `memorySourceName` or `nodeSourceName`.");
+    }
+    return (this.externalNodeSourceName || this.memorySourceName) as string;
+  }
+
+  private getExternalName = (source?: ConfigSource) =>
     source === undefined
-      ? ((this.nodeSourceName || this.memorySourceName) as string)
+      ? this.externalName
       : ({
           memory: this.memorySourceName,
-          node: this.nodeSourceName
+          node: this.externalNodeSourceName
         }[source] as string);
 
-  private failedValidation = (
-    result: FailedConfigValidatorResult<V> | parsers.FailedConfigParserResult,
+  private failedValidation = <CV extends V | string | undefined>(
+    result: FailedConfigValidatorResult<CV> | parsers.FailedConfigParserResult,
     source?: ConfigSource
   ) => {
-    let message = `Invalid value ${String(result.value)} provided for config ${this.getName(source)}.`;
+    let message = `Invalid value ${String(result.value)} provided for config ${this.getExternalName(source)}.`;
     if (isConfigValidatorResult(result)) {
       const content = result.result;
       if (typeof content === "string") {
         message = content;
       } else if (typeof content === "function") {
-        message = content({ value: result.value, name: this.getName(source) });
+        message = content({ value: result.value, name: this.getExternalName(source) });
       }
     } else if (typeof result.message === "string") {
       message = result.message;
     } else if (typeof result.message === "function") {
-      message = result.message({ name: this.getName(source), value: result.value });
+      message = result.message({ name: this.getExternalName(source), value: result.value });
     }
     throw new Error(message);
   };
@@ -159,6 +192,15 @@ class _Config<V extends ConfigValue, UV extends V | undefined = V> implements IE
   private performValidation = (v: V, source?: ConfigSource) => {
     for (let i = 0; i < this.validators.length; i++) {
       const result = this.validators[i](v);
+      if (result !== true) {
+        this.failedValidation({ result, value: v }, source);
+      }
+    }
+  };
+
+  private performRawValidation = (v: string | undefined, source?: ConfigSource) => {
+    for (let i = 0; i < this.rawValidators.length; i++) {
+      const result = this.rawValidators[i](v);
       if (result !== true) {
         this.failedValidation({ result, value: v }, source);
       }
@@ -189,7 +231,7 @@ class _Config<V extends ConfigValue, UV extends V | undefined = V> implements IE
   };
 
   private getRawValue = (): RawValue => {
-    if (isNil(this.memorySourceName) && isNil(this.nodeSourceName)) {
+    if (isNil(this.memorySourceName) && isNil(this.internalNodeSourceName)) {
       throw new Error("Configuration does not specify `memorySourceName` or `nodeSourceName`.");
     }
     // Priority should be given to values that are present in the ENV file.
@@ -205,7 +247,7 @@ class _Config<V extends ConfigValue, UV extends V | undefined = V> implements IE
   };
 
   private getRawValueFromEnv = (): string | undefined =>
-    this.nodeSourceName !== undefined ? process.env[this.nodeSourceName] : undefined;
+    this.internalNodeSourceName !== undefined ? process.env[this.internalNodeSourceName] : undefined;
 
   private getRawValueFromMemory = (): string | undefined => {
     if (isNil(this.memorySourceName)) {
