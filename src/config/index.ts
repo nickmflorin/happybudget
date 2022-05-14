@@ -12,8 +12,9 @@ export { default as componentLoader } from "./componentLoader";
 export { default as lazyWithRetry } from "./lazyWithRetry";
 export { default as registerIcons } from "./configureFontAwesome";
 
-export * from "./config";
+export * from "./constants";
 export * as env from "./env";
+export * as parsers from "./parsers";
 export * as localization from "./localization";
 
 let prevPath: string | null = null;

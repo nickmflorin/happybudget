@@ -9,7 +9,7 @@ export const setConfirmationSuppressed = (key: string, value: boolean) => {
 export const confirmationIsSuppressed = (key: string) => {
   const cookiesObj = new Cookies();
   const value = cookiesObj.get(key);
-  const booleanValue = config.booleanParser({ strict: false })(value);
+  const booleanValue = config.parsers.booleanParser({ strict: false })(value);
   // The value will be undefined if a boolean value cannot be inferred.
   if (booleanValue !== undefined) {
     return booleanValue;

@@ -1,7 +1,5 @@
 import { includes, isNil } from "lodash";
-
-const TRUTHY_VALUES = ["1", "true", "on"];
-const FALSEY_VALUES = ["0", "false", "off"];
+import * as parsers from "./parsers";
 
 const DEFAULT_REQUIRED = true;
 
@@ -10,7 +8,7 @@ type EnvMappedValue<T> = EnvMap<T> | T;
 
 const valueIsMapped = <T>(d: EnvMappedValue<T>): d is EnvMap<T> => typeof d === "object";
 
-type ConfigValue = boolean | number | string;
+export type ConfigValue = boolean | number | string;
 type ConfigSource = "memory" | "node";
 type RawValue = [string, ConfigSource] | undefined;
 
@@ -18,12 +16,12 @@ type RawValue = [string, ConfigSource] | undefined;
  * Configuration messages are used in the Error that is raised when a value
  * fails to be correctly parsed or fails validation checks.
  */
-type ConfigMessageCallbackParams<T> = {
+export type ConfigMessageCallbackParams<T> = {
   readonly name: string;
   readonly value: T;
 };
-type ConfigMessageCallback<T> = (p: ConfigMessageCallbackParams<T>) => string;
-type ConfigMessage<T> = string | ConfigMessageCallback<T>;
+export type ConfigMessageCallback<T> = (p: ConfigMessageCallbackParams<T>) => string;
+export type ConfigMessage<T> = string | ConfigMessageCallback<T>;
 
 /**
  * Validators are responsible for validating that a *defined* value read from
@@ -37,55 +35,16 @@ type FailedConfigValidatorResult<T> = {
 };
 type ConfigValidator<T> = (v: T) => ConfigValidatorResult<T>;
 
-/**
- * Parsers are responsible for parsing a *defined* string value from either
- * the ENV file or local storage and returning the appropriate native value.
- */
-type FailedConfigParserResult = {
-  readonly value: string;
-  readonly message?: ConfigMessage<string>;
-};
-type ConfigParserOptions = {
-  readonly message?: ConfigMessage<string>;
-  readonly strict?: boolean;
-};
-type ConfigParserResult<V extends ConfigValue> = V | FailedConfigParserResult | undefined;
-type Parser<V extends ConfigValue> = (v: string) => ConfigParserResult<V>;
-
 const isConfigValidatorResult = <V extends ConfigValue>(
-  result: FailedConfigValidatorResult<V> | FailedConfigParserResult
+  result: FailedConfigValidatorResult<V> | parsers.FailedConfigParserResult
 ): result is FailedConfigValidatorResult<V> => (result as FailedConfigValidatorResult<V>).result !== undefined;
-
-const isParserFailedResult = <V extends ConfigValue>(
-  result: ConfigParserResult<V>
-): result is FailedConfigParserResult => typeof result === "object";
-
-export const booleanParser =
-  (opts?: ConfigParserOptions) =>
-  (v: string): ConfigParserResult<boolean> => {
-    if (includes(TRUTHY_VALUES, v)) {
-      return true;
-    } else if (includes(FALSEY_VALUES, v)) {
-      return false;
-    } else if (opts?.strict === false) {
-      return undefined;
-    } else {
-      return {
-        message:
-          opts?.message ||
-          (({ name }: ConfigMessageCallbackParams<string>) =>
-            `Config ${name} value ${v} could not be converted to a boolean.`),
-        value: v
-      };
-    }
-  };
 
 type IEnvVar<V extends ConfigValue, UV extends V | undefined = V> = {
   readonly getValue: () => UV;
 };
 
 type ConfigParams<V extends ConfigValue> = {
-  readonly parser?: Parser<V>;
+  readonly parser?: parsers.Parser<V>;
   readonly required?: EnvMappedValue<boolean>;
   readonly defaultValue?: EnvMappedValue<V>;
   /* Either the the `nodeSourceName` or `memorySourceName` (or both) must be
@@ -97,7 +56,7 @@ type ConfigParams<V extends ConfigValue> = {
 };
 
 class _Config<V extends ConfigValue, UV extends V | undefined = V> implements IEnvVar<V, UV> {
-  private readonly parser: Parser<V> | undefined;
+  private readonly parser: parsers.Parser<V> | undefined;
   private readonly required: EnvMappedValue<boolean> | undefined;
   private readonly defaultValue: EnvMappedValue<V> | undefined;
   private readonly nodeSourceName: keyof NodeJS.ProcessEnv | undefined;
@@ -139,7 +98,7 @@ class _Config<V extends ConfigValue, UV extends V | undefined = V> implements IE
       [rawValue, source] = raw;
       if (!isNil(this.parser)) {
         const parserResult = this.parser(rawValue);
-        if (isParserFailedResult(parserResult)) {
+        if (parsers.isParserFailedResult(parserResult)) {
           this.failedValidation(parserResult, source);
         } else {
           value = parserResult;
@@ -178,7 +137,7 @@ class _Config<V extends ConfigValue, UV extends V | undefined = V> implements IE
         }[source] as string);
 
   private failedValidation = (
-    result: FailedConfigValidatorResult<V> | FailedConfigParserResult,
+    result: FailedConfigValidatorResult<V> | parsers.FailedConfigParserResult,
     source?: ConfigSource
   ) => {
     let message = `Invalid value ${String(result.value)} provided for config ${this.getName(source)}.`;
@@ -266,7 +225,7 @@ export const Config = <V extends ConfigValue, UV extends V | undefined = V>(conf
 export const BooleanConfig = (config: Omit<ConfigParams<boolean>, "parser">) =>
   Config<boolean>({
     ...config,
-    parser: booleanParser()
+    parser: parsers.booleanParser()
   });
 
 export default Config;

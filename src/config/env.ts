@@ -1,17 +1,9 @@
 import { includes } from "lodash";
+import { Environments } from "./constants";
 import * as config from "./config";
 
 export const ACCCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png"];
 export const MAX_IMAGE_SIZE = 2; // In MB
-
-export const Environments: Application.Environments = {
-  APP: "app",
-  DEV: "dev",
-  LOCAL: "local",
-  __ALL__: ["app", "dev", "local"],
-  __NON_PROD__: ["dev", "local"],
-  __REMOTE__: ["dev", "app"]
-};
 
 export const ENV = config.Config<Application.Environment>({
   nodeSourceName: "REACT_APP_PRODUCTION_ENV",
@@ -87,6 +79,11 @@ export const WHY_DID_YOU_RENDER = config.BooleanConfig({
   nodeSourceName: "REACT_APP_WHY_DID_YOU_RENDER",
   memorySourceName: "whyDidYouRender",
   defaultValue: false
+});
+
+export const SOCIAL_AUTHENTICATION_ENABLED = config.BooleanConfig({
+  nodeSourceName: "REACT_APP_SOCIAL_AUTHENTICATION_ENABLED",
+  defaultValue: true
 });
 
 export const GOOGLE_CLIENT_KEY = config.Config<string, string | undefined>({
