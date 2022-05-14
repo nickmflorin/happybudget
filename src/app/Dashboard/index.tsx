@@ -27,7 +27,8 @@ const Dashboard = (): JSX.Element => {
       if (
         v === true &&
         user.metrics.num_budgets !== 0 &&
-        !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
+        !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS) &&
+        config.env.BILLING_ENABLED
       ) {
         dispatch(store.actions.setProductPermissionModalOpenAction(true));
       } else {
