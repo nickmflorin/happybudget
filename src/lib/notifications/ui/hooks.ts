@@ -95,7 +95,8 @@ export const parseNotifications = (
 
 export const parseKnownRequestErrorNotifications = (
   e: api.ClientError | api.NetworkError | api.ServerError,
-  opts?: UINotificationOptions & { readonly dispatchClientErrorToSentry?: boolean }
+  opts?: UINotificationOptions &
+    Pick<UseNotificationsConfig, "handleFieldErrors"> & { readonly dispatchClientErrorToSentry?: boolean }
 ) => {
   if (e instanceof api.ClientError) {
     /* By default, we do not want to dispatch ClientError(s) to Sentry,
@@ -121,7 +122,8 @@ export const parseKnownRequestErrorNotifications = (
 
 export const parseRequestErrorNotifications = (
   e: Error,
-  opts?: UINotificationOptions & { readonly dispatchClientErrorToSentry?: boolean }
+  opts?: UINotificationOptions &
+    Pick<UseNotificationsConfig, "handleFieldErrors"> & { readonly dispatchClientErrorToSentry?: boolean }
 ) => {
   if (!axios.isCancel(e) && !(e instanceof api.ForceLogout)) {
     if (e instanceof api.RequestError) {
@@ -199,15 +201,9 @@ export const useNotificationsManager = (config: UseNotificationsManagerConfig): 
     return map(ns, (n: Omit<UINotification, "remove">) => ({ ...n, remove: () => clearNotifications(n.id) }));
   }, [clearNotifications, ns]);
 
-  /**
-   * Dispatches a single notification or a series of notifications to state.
-   * Each notification (of type UINotificationType) is standardized to the
-   * consistent UINotification object form and then added to the notifications
-   * in state so they can be easily rendered by components using this hook.
-   */
-  const notify = useMemo(
-    () => (notes: SingleOrArray<UINotificationType>, opts?: UINotificationOptions) => {
-      const notificationsToAdd = map(handler.getNotifications(notes, opts), (d: UINotificationData) => {
+  const _notify = useMemo(
+    () => (notes: SingleOrArray<UINotificationData>, opts?: UINotificationOptions) => {
+      const notificationsToAdd = map(notes, (d: UINotificationData) => {
         const id = util.generateRandomNumericId();
         return {
           ...d,
@@ -230,7 +226,21 @@ export const useNotificationsManager = (config: UseNotificationsManagerConfig): 
       }
       return notificationsToAdd;
     },
-    [config?.handleFieldErrors, clearNotifications]
+    [clearNotifications]
+  );
+
+  /**
+   * Dispatches a single notification or a series of notifications to state.
+   * Each notification (of type UINotificationType) is standardized to the
+   * consistent UINotification object form and then added to the notifications
+   * in state so they can be easily rendered by components using this hook.
+   */
+  const notify = useMemo(
+    () => (notes: SingleOrArray<UINotificationType>, opts?: UINotificationOptions) => {
+      const notificationsToAdd = handler.getNotifications(notes, opts);
+      return _notify(notificationsToAdd, opts);
+    },
+    [_notify]
   );
 
   const lookupAndNotify = useMemo(
@@ -258,8 +268,12 @@ export const useNotificationsManager = (config: UseNotificationsManagerConfig): 
    */
   const handleRequestError = useMemo(
     () => (e: Error, opts?: UINotificationOptions & { readonly dispatchClientErrorToSentry?: boolean }) => {
-      const notices = parseRequestErrorNotifications(e, opts);
-      return notify(notices);
+      /* Since we are not using the `getNotifications()` method, which would
+         convert the notifications to UINotificationData[] and dispatch field
+         related errors to the field handler, we must explicitly provide the
+         field handler from the hook configuration. */
+      const notices = parseRequestErrorNotifications(e, { ...opts, handleFieldErrors: config.handleFieldErrors });
+      return _notify(notices);
     },
     []
   );

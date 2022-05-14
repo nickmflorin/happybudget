@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { isNil } from "lodash";
 
+import * as config from "config";
 import * as api from "api";
 import { ui, notifications } from "lib";
 
@@ -30,6 +31,23 @@ const Login = (): JSX.Element => {
   const handleLoginError = useMemo(
     () => (e: Error) => {
       if (e instanceof api.AuthenticationError && e.code === api.ErrorCodes.auth.ACCOUNT_NOT_VERIFIED) {
+        /* The Backend & Frontend need to have consistent configurations for
+           email verification and email in general, if they do not a user will
+					 potentially not be able to login and not be able to verify their
+					 email.
+					 */
+        if (config.env.EMAIL_ENABLED === false || config.env.EMAIL_VERIFICATION_ENABLED === false) {
+          console.error(
+            "User login is being prevented due to an unverified email, but email " +
+              "verification is disabled.  This indicates a mismatch in configuration " +
+              "between the API and application."
+          );
+        }
+        /* The error should include a User ID - which is required such that we
+           can send the email verification to the email address registered with
+           the user.  If we cannot, we should still let them know that their
+           email is unverified - but inform them that they need to contact
+           support. */
         if (isNil(e.userId)) {
           console.error(
             `The user's email confirmation token has expired, but we cannot
