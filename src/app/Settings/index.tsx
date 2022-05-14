@@ -1,10 +1,11 @@
 import React from "react";
 import { Switch, useHistory, useLocation } from "react-router-dom";
 
+import * as config from "config";
+
 import { Icon } from "components";
 import { ExpandedLayout } from "components/layout";
-import { Route } from "components/routes";
-import * as config from "config";
+import { ConfigRoute, Route } from "components/routes";
 
 const Profile = config.lazyWithRetry(() => import("./Profile"));
 const Security = config.lazyWithRetry(() => import("./Security"));
@@ -36,14 +37,20 @@ const Settings = (): JSX.Element => {
           icon: <Icon icon={"wallet"} weight={"light"} />,
           activeIcon: <Icon icon={"wallet"} weight={"solid"} />,
           onClick: () => history.push("/billing"),
-          active: location.pathname.startsWith("/billing")
+          active: location.pathname.startsWith("/billing"),
+          hidden: !config.env.BILLING_ENABLED
         }
       ]}
     >
       <Switch>
         <Route exact path={"/profile"} component={Profile} />
         <Route exact path={"/security"} component={Security} />
-        <Route path={"/billing"} component={Billing} forceReloadFromStripe={true} />
+        <ConfigRoute
+          path={"/billing"}
+          component={Billing}
+          forceReloadFromStripe={true}
+          enabled={config.env.BILLING_ENABLED}
+        />
       </Switch>
     </ExpandedLayout>
   );

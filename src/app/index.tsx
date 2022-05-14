@@ -3,10 +3,10 @@ import { Router, Switch, Route } from "react-router-dom";
 import { History } from "history";
 import "style/index.scss";
 
-import { ApplicationSpinner } from "components";
-import { ReduxRoute, NotFoundRoute, LandingRoute } from "components/routes";
-
 import * as config from "config";
+
+import { ApplicationSpinner } from "components";
+import { ReduxRoute, NotFoundRoute, LandingRoute, ConfigRoute } from "components/routes";
 
 const PublicApplication = config.lazyWithRetry(() => import("./PublicApplication"));
 const Application = config.lazyWithRetry(() => import("./Application"));
@@ -24,9 +24,21 @@ const App = (props: AppProps): JSX.Element => (
       <div id={"application-spinner-container"}></div>
       <Suspense fallback={<ApplicationSpinner visible={true} />}>
         <Switch>
-          <Route exact path={"/verify"} component={EmailVerification} />
-          <Route exact path={"/recovery"} component={PasswordRecovery} />
-          <LandingRoute path={["/login", "/signup", "/reset-password", "/recover-password"]} component={Landing} />
+          <ConfigRoute
+            exact
+            path={"/verify"}
+            component={EmailVerification}
+            enabled={config.env.EMAIL_ENABLED && config.env.EMAIL_VERIFICATION_ENABLED}
+          />
+          <ConfigRoute exact path={"/recovery"} component={PasswordRecovery} enabled={config.env.EMAIL_ENABLED} />
+          <LandingRoute
+            path={
+              config.env.EMAIL_ENABLED
+                ? ["/login", "/signup", "/reset-password", "/recover-password"]
+                : ["/login", "/signup"]
+            }
+            component={Landing}
+          />
           <Route path={"/pub/:tokenId"} component={PublicApplication} />
           <ReduxRoute config={{ isPublic: false }} path={["/"]} component={Application} />
           <NotFoundRoute auto={false} />

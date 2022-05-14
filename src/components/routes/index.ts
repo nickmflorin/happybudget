@@ -1,4 +1,5 @@
 export { default as PrivateRoute } from "./PrivateRoute";
+export { default as ConfigRoute } from "./ConfigRoute";
 export { default as ReduxRoute } from "./ReduxRoute";
 export { default as LandingRoute } from "./LandingRoute";
 export { default as NotFoundRoute } from "./NotFoundRoute";

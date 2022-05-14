@@ -1,7 +1,9 @@
 import React from "react";
 import classNames from "classnames";
 
-import { Form } from "components";
+import * as config from "config";
+
+import { Form, ShowHide } from "components";
 import { PasswordInput, EmailInput } from "components/fields";
 import { PrimaryButton, SocialButton } from "components/buttons";
 import { RouterLink } from "components/links";
@@ -57,25 +59,29 @@ const LoginForm: React.FC<LoginFormProps> = ({
     >
       <PasswordInput size={"large"} />
     </Form.Item>
-    <div className={"forgot-password-text"}>
-      <RouterLink to={"/recover-password"} className={"forgot-link"}>
-        {"Forgot Password?"}
-      </RouterLink>
-    </div>
+    <ShowHide show={config.env.EMAIL_ENABLED}>
+      <div className={"forgot-password-text"}>
+        <RouterLink to={"/recover-password"} className={"forgot-link"}>
+          {"Forgot Password?"}
+        </RouterLink>
+      </div>
+    </ShowHide>
     <Form.Footer>
       <PrimaryButton loading={loading} xlarge={true} className={"btn--landing"} htmlType={"submit"}>
         {"Login"}
       </PrimaryButton>
-      <SocialButton
-        className={"btn--landing"}
-        xlarge={true}
-        provider={"google"}
-        onGoogleSuccess={onGoogleSuccess}
-        onGoogleError={onGoogleError}
-        onGoogleScriptLoadFailure={onGoogleScriptLoadFailure}
-      >
-        {"Login with Google"}
-      </SocialButton>
+      <ShowHide show={config.env.SOCIAL_AUTHENTICATION_ENABLED}>
+        <SocialButton
+          className={"btn--landing"}
+          xlarge={true}
+          provider={"google"}
+          onGoogleSuccess={onGoogleSuccess}
+          onGoogleError={onGoogleError}
+          onGoogleScriptLoadFailure={onGoogleScriptLoadFailure}
+        >
+          {"Login with Google"}
+        </SocialButton>
+      </ShowHide>
       <div className={"switch-text"}>
         {"Don't have an account yet?"}
         <RouterLink to={"/signup"}>{"Sign Up"}</RouterLink>

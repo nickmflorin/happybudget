@@ -1,9 +1,11 @@
 import React from "react";
 import { Switch, Route } from "react-router-dom";
 
-import { Icon } from "components";
-import { Logo } from "components/svgs";
 import * as config from "config";
+
+import { Icon } from "components";
+import { ConfigRoute } from "components/routes";
+import { Logo } from "components/svgs";
 
 const Login = config.lazyWithRetry(() => import("./Login"));
 const Signup = config.lazyWithRetry(() => import("./Signup"));
@@ -19,14 +21,14 @@ const Landing = (): JSX.Element => (
       <Switch>
         <Route exact path={"/login"} component={Login} />
         <Route exact path={"/signup"} component={Signup} />
-        <Route exact path={"/reset-password"} component={ResetPassword} />
-        <Route exact path={"/recover-password"} component={RecoverPassword} />
+        <ConfigRoute exact path={"/reset-password"} component={ResetPassword} enabled={config.env.EMAIL_ENABLED} />
+        <ConfigRoute exact path={"/recover-password"} component={RecoverPassword} enabled={config.env.EMAIL_ENABLED} />
       </Switch>
       <div className={"copyright"}>
         <div className={"icon-wrapper"}>
           <Icon icon={"copyright"} weight={"regular"} />
         </div>
-        <div className={"copyright-text"}>{"Nick Florin, 2022"}</div>
+        <div className={"copyright-text"}>{"2022 Nick Florin"}</div>
       </div>
     </div>
     <div className={"landing-page-right"}>
