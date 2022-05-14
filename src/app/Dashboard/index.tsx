@@ -3,9 +3,9 @@ import { Dispatch } from "redux";
 import { Route, Switch, useHistory, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
+import * as config from "config";
 import * as store from "store";
 import { model } from "lib";
-import { Config } from "config";
 
 import { Icon } from "components";
 import { ExpandedLayout } from "components/layout";
@@ -82,7 +82,7 @@ const Dashboard = (): JSX.Element => {
                 activeIcon: <Icon icon={"users"} weight={"solid"} />,
                 onClick: () => history.push("/collaborating"),
                 active: location.pathname.startsWith("/collaborating"),
-                hidden: !Config.collaborationEnabled,
+                hidden: !config.env.COLLABORATION_ENABLED,
                 tagText: user.metrics.num_collaborating_budgets
               },
               {

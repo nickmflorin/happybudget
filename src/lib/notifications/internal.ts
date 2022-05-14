@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/react";
 import { isNil } from "lodash";
 
 import * as api from "api";
+import * as config from "config";
 import { util } from "lib";
 
 import { objToJson } from "./util";
@@ -79,7 +80,7 @@ export const notify = (e: InternalNotification | Error | string, opts?: Internal
   } else if (dispatchToSentry === true && e instanceof Error) {
     /* In local development, we do not use Sentry - so we still have to issue
        the message to the console. */
-    if (process.env.REACT_APP_PRODUCTION_ENV === "local") {
+    if (config.env.environmentIsLocal()) {
       consoler(consoleMessage(e));
     }
     /* If this is an error or warning but we have the actual Error object, we\

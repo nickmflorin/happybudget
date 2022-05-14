@@ -1,6 +1,8 @@
 import { isNil } from "lodash";
 import Cookies from "universal-cookie";
 
+import * as config from "config";
+
 export const getRequestHeaders = (): { [key: string]: string } => {
   const headers: { [key: string]: string } = {};
   const cookies = new Cookies();
@@ -8,7 +10,7 @@ export const getRequestHeaders = (): { [key: string]: string } => {
      with Django - unfortunately, we cannot include it as a cookie only
      because their middleware looks for it in the headers. */
   let csrfToken: string = cookies.get("happybudgetcsrftoken");
-  if (process.env.REACT_APP_PRODUCTION_ENV === "local") {
+  if (config.env.environmentIsLocal()) {
     csrfToken = cookies.get("localhappybudgetcsrftoken");
   }
   if (!isNil(csrfToken)) {

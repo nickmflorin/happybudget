@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { isNil } from "lodash";
 
-import { Config } from "config";
+import * as config from "config";
 import { tabling } from "lib";
 import { AuthenticatedTable, AuthenticatedTableProps, framework } from "tabling/generic";
 
@@ -35,7 +35,7 @@ const AuthenticatedBudgetTable = <
 
   const actions = useMemo<Table.AuthenticatedMenuActions<R, M>>(
     (): Table.AuthenticatedMenuActions<R, M> =>
-      Config.collaborationEnabled && includeCollaborators
+      config.env.COLLABORATION_ENABLED && includeCollaborators
         ? tabling.menu.combineMenuActions<Table.AuthenticatedMenuActionParams<R, M>, R, M>(
             () => [
               framework.actions.CollaboratorsAction({
@@ -53,10 +53,10 @@ const AuthenticatedBudgetTable = <
 
   const editColumnConfig = useMemo(() => {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    let config: Table.EditColumnRowConfig<R, any>[] = [];
+    let c: Table.EditColumnRowConfig<R, any>[] = [];
     if (!isNil(onEditMarkup)) {
-      config = [
-        ...config,
+      c = [
+        ...c,
         {
           typeguard: tabling.rows.isMarkupRow,
           action: (r: Table.MarkupRow<R>) => onEditMarkup(r),
@@ -65,8 +65,8 @@ const AuthenticatedBudgetTable = <
       ];
     }
     if (!isNil(onEditGroup)) {
-      config = [
-        ...config,
+      c = [
+        ...c,
         {
           typeguard: tabling.rows.isGroupRow,
           action: (r: Table.GroupRow<R>) => onEditGroup(r),
@@ -75,8 +75,8 @@ const AuthenticatedBudgetTable = <
       ];
     }
     if (!isNil(onRowExpand)) {
-      config = [
-        ...config,
+      c = [
+        ...c,
         {
           typeguard: tabling.rows.isModelRow,
           action: (r: Table.ModelRow<R>) => onRowExpand(r),
@@ -84,7 +84,7 @@ const AuthenticatedBudgetTable = <
         }
       ];
     }
-    return config;
+    return c;
   }, [onEditMarkup, onEditGroup, onRowExpand]);
 
   return (

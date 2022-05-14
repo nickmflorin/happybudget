@@ -1,6 +1,8 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
 
+import * as config from "config";
+
 import { Icon } from "components";
 import { AccountCircleLink } from "components/links";
 import * as store from "store";
@@ -26,7 +28,7 @@ const UserDropdownMenu = (props: Omit<DropdownMenuProps, "models" | "menuClassNa
           id: "admin",
           label: "Admin",
           onClick: () => {
-            window.location.href = `${process.env.REACT_APP_API_DOMAIN}/admin`;
+            window.location.href = `${config.env.API_DOMAIN}/admin`;
           },
           icon: <Icon icon={"lock"} weight={"light"} />,
           visible: user.is_staff === true

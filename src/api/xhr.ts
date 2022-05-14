@@ -1,5 +1,7 @@
 import { ActualFileObject } from "filepond/types";
 
+import * as config from "config";
+
 import * as errors from "./errors";
 import * as parsers from "./parsers";
 import { setRequestHeaders } from "./util";
@@ -46,7 +48,7 @@ export const xhrRequestor = <R>(req: XMLHttpRequest, data: FormData, opts?: XHRR
 
 export const xhrPostRequest = <R>(path: string, data: FormData, opts?: XHRRequestOptions<R>) => {
   const request = new XMLHttpRequest();
-  const url = `${process.env.REACT_APP_API_DOMAIN}${path}`;
+  const url = `${config.env.API_DOMAIN}${path}`;
   request.open("POST", url, true);
   return xhrRequestor(request, data, opts);
 };

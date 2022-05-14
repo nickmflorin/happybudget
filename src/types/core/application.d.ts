@@ -1,19 +1,12 @@
 declare namespace Application {
-  type Config = {
-    readonly reportWebVitals: boolean;
-    readonly tableDebug: boolean;
-    readonly whyDidYouRender: boolean;
-    readonly acceptedImageTypes: string[];
-    readonly maxImageSize: number; // In MB
-    readonly collaborationEnabled: boolean;
-  };
-
-  type ConfigOption = {
-    readonly name: keyof Config;
-    readonly default?: boolean;
-    readonly hardOverride?: boolean;
-    readonly env?: SingleOrArray<NodeJS.ProcessEnv["NODE_ENV"]>;
-    readonly prodEnv?: SingleOrArray<NodeJS.ProcessEnv["PRODUCTION_ENV"]>;
+  type Environment = "app" | "dev" | "local";
+  type Environments = {
+    readonly APP: "app";
+    readonly DEV: "dev";
+    readonly LOCAL: "local";
+    readonly __NON_PROD__: ["dev", "local"];
+    readonly __REMOTE__: ["dev", "app"];
+    readonly __ALL__: ["app", "dev", "local"];
   };
 
   type ModuleLabel = "dashboard" | "budget" | "template";

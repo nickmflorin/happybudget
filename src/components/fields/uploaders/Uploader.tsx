@@ -9,8 +9,8 @@ import { UploadChangeParam } from "antd/lib/upload";
 import { UploadFile } from "antd/lib/upload/interface";
 
 import * as api from "api";
+import * as config from "config";
 import { util } from "lib";
-import { Config } from "config";
 
 import { Icon, RenderWithSpinner, Image, ShowHide } from "components";
 import { ImageClearButton } from "components/buttons";
@@ -156,13 +156,15 @@ const Uploader = (
         listType={"picture-card"}
         showUploadList={false}
         beforeUpload={(file: File) => {
-          if (!includes(Config.acceptedImageTypes, file.type)) {
+          if (!includes(config.env.ACCCEPTED_IMAGE_TYPES, file.type)) {
             _onError(
-              `${file.type} is not an acceptable image type.  Must be one of ${Config.acceptedImageTypes.join(", ")}.`
+              `${file.type} is not an acceptable image type.  Must be one of ${config.env.ACCCEPTED_IMAGE_TYPES.join(
+                ", "
+              )}.`
             );
             return false;
           } else if (util.files.fileSizeInMB(file) > 2) {
-            _onError(`The image must be smaller than ${Config.maxImageSize}MB.`);
+            _onError(`The image must be smaller than ${config.env.MAX_IMAGE_SIZE}MB.`);
             return false;
           }
           return true;

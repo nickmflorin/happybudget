@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { isNil } from "lodash";
 
+import * as config from "config";
 import { http } from "lib";
 
 import * as apiUtil from "./util";
@@ -15,17 +16,17 @@ export enum HttpRequestMethods {
 }
 
 export const authenticatedInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_DOMAIN,
+  baseURL: config.env.API_DOMAIN,
   withCredentials: true
 });
 
 export const tokenValidationInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_DOMAIN,
+  baseURL: config.env.API_DOMAIN,
   withCredentials: true
 });
 
 export const unauthenticatedInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_DOMAIN,
+  baseURL: config.env.API_DOMAIN,
   withCredentials: true
 });
 

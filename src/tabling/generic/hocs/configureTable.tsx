@@ -3,7 +3,7 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 import { map, isNil, filter, reduce } from "lodash";
 import { Subtract } from "utility-types";
 
-import { Config } from "config";
+import * as config from "config";
 import { tabling, hooks, util } from "lib";
 
 import * as genericColumns from "../columns";
@@ -17,7 +17,7 @@ export const DefaultDataGridOptions: Table.GridOptions = {
     suppressMovable: true
   },
   suppressHorizontalScroll: true,
-  suppressContextMenu: Config.tableDebug,
+  suppressContextMenu: config.env.TABLE_DEBUG,
   /* If for whatever reason, we have a table that cannot support bulk-updating,
      these two parameters need to be set to true. */
   suppressCopyRowsToClipboard: false,

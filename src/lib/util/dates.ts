@@ -2,7 +2,7 @@ import moment from "moment-timezone";
 import { Moment } from "moment";
 import { isNil } from "lodash";
 
-import { localization } from "config";
+import * as config from "config";
 
 type IDateOptions = {
   readonly warnOnInvalid?: boolean;
@@ -102,14 +102,14 @@ const Converter = (formatter: string) => (value?: string | null | Moment, option
   return mmt.format(formatter);
 };
 
-export const toLocalizedDate = LocalizedConverter(localization.MOMENT_DATE_FORMAT);
-export const toDate = Converter(localization.MOMENT_DATE_FORMAT);
-export const toLocalizedDateTime = LocalizedConverter(localization.MOMENT_DATETIME_FORMAT);
-export const toDateTime = Converter(localization.MOMENT_DATETIME_FORMAT);
-export const toLocalizedApiDate = LocalizedConverter(localization.MOMENT_API_DATE_FORMAT);
-export const toApiDate = Converter(localization.MOMENT_API_DATE_FORMAT);
-export const toLocalizedApiDateTime = LocalizedConverter(localization.MOMENT_API_DATETIME_FORMAT);
-export const toApiDateTime = Converter(localization.MOMENT_API_DATETIME_FORMAT);
+export const toLocalizedDate = LocalizedConverter(config.localization.MOMENT_DATE_FORMAT);
+export const toDate = Converter(config.localization.MOMENT_DATE_FORMAT);
+export const toLocalizedDateTime = LocalizedConverter(config.localization.MOMENT_DATETIME_FORMAT);
+export const toDateTime = Converter(config.localization.MOMENT_DATETIME_FORMAT);
+export const toLocalizedApiDate = LocalizedConverter(config.localization.MOMENT_API_DATE_FORMAT);
+export const toApiDate = Converter(config.localization.MOMENT_API_DATE_FORMAT);
+export const toLocalizedApiDateTime = LocalizedConverter(config.localization.MOMENT_API_DATETIME_FORMAT);
+export const toApiDateTime = Converter(config.localization.MOMENT_API_DATETIME_FORMAT);
 /**
  * Converts a provided string or Moment instance to a standardized
  * string representation of the date and time used for display in the UI.
@@ -117,8 +117,8 @@ export const toApiDateTime = Converter(localization.MOMENT_API_DATETIME_FORMAT);
  * @param value:   Either a string date/time or a Moment instance that will
  *                 be converted to a datetime display format.
  */
-export const toLocalizedDisplayDateTime = LocalizedConverter(localization.DATETIME_DISPLAY_FORMAT);
-export const toDisplayDateTime = Converter(localization.DATETIME_DISPLAY_FORMAT);
+export const toLocalizedDisplayDateTime = LocalizedConverter(config.localization.DATETIME_DISPLAY_FORMAT);
+export const toDisplayDateTime = Converter(config.localization.DATETIME_DISPLAY_FORMAT);
 
 /**
  * Converts a provided string or Moment instance to a standardized
@@ -128,8 +128,8 @@ export const toDisplayDateTime = Converter(localization.DATETIME_DISPLAY_FORMAT)
  * @param value:   Either a string date/time or a Moment instance that will
  *                 be converted to a datetime display format.
  */
-export const toLocalizedAbbvDisplayDateTime = LocalizedConverter(localization.DATETIME_ABBV_DISPLAY_FORMAT);
-export const toAbbvDisplayDateTime = Converter(localization.DATETIME_ABBV_DISPLAY_FORMAT);
+export const toLocalizedAbbvDisplayDateTime = LocalizedConverter(config.localization.DATETIME_ABBV_DISPLAY_FORMAT);
+export const toAbbvDisplayDateTime = Converter(config.localization.DATETIME_ABBV_DISPLAY_FORMAT);
 
 /**
  * Converts a provided string or Moment instance to a standardized
@@ -138,8 +138,8 @@ export const toAbbvDisplayDateTime = Converter(localization.DATETIME_ABBV_DISPLA
  * @param value:   Either a string date/time or a Moment instance that will
  *                 be converted to a date display format.
  */
-export const toLocalizedDisplayDate = LocalizedConverter(localization.DATE_DISPLAY_FORMAT);
-export const toDisplayDate = Converter(localization.DATE_DISPLAY_FORMAT);
+export const toLocalizedDisplayDate = LocalizedConverter(config.localization.DATE_DISPLAY_FORMAT);
+export const toDisplayDate = Converter(config.localization.DATE_DISPLAY_FORMAT);
 /**
  * Converts a provided string or Moment instance to a standardized
  * string representation of the time used for display in the UI.
@@ -147,8 +147,8 @@ export const toDisplayDate = Converter(localization.DATE_DISPLAY_FORMAT);
  * @param value:   Either a string date/time or a Moment instance that will
  *                 be converted to a time display format.
  */
-export const toLocalizedDisplayTime = LocalizedConverter(localization.TIME_DISPLAY_FORMAT);
-export const toDisplayTime = Converter(localization.TIME_DISPLAY_FORMAT);
+export const toLocalizedDisplayTime = LocalizedConverter(config.localization.TIME_DISPLAY_FORMAT);
+export const toDisplayTime = Converter(config.localization.TIME_DISPLAY_FORMAT);
 
 /**
  * A string representing a general time from now to the specified moment

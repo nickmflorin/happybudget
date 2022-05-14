@@ -1,6 +1,8 @@
 import classNames from "classnames";
 import { isNil } from "lodash";
 
+import * as config from "config";
+
 import { Form } from "components";
 import { PasswordInput, EmailInput, UserInput } from "components/fields";
 import { PrimaryButton, SocialButton } from "components/buttons";
@@ -104,10 +106,10 @@ const SignupForm = ({
       >
         {"Signup with Google"}
       </SocialButton>
-      {!isNil(process.env.REACT_APP_TERMS_AND_CONDITIONS_URL) ? (
+      {!isNil(config.env.TERMS_AND_CONDITIONS_URL) ? (
         <div className={"alt-link-text"}>
           {"By signing up, you agree to our"}
-          <Link href={`${process.env.REACT_APP_TERMS_AND_CONDITIONS_URL}`}>{"Terms and Conditions."}</Link>
+          <Link href={`${config.env.TERMS_AND_CONDITIONS_URL}`}>{"Terms and Conditions."}</Link>
         </div>
       ) : (
         <></>

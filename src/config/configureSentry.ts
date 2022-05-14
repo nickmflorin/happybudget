@@ -3,13 +3,15 @@ import { Integrations } from "@sentry/tracing";
 import { CaptureConsole, ExtraErrorData } from "@sentry/integrations";
 import SentryRRWeb from "@sentry/rrweb";
 
+import * as env from "./env";
+
 const configureSentry = () => {
-  if (process.env.REACT_APP_SENTRY_DSN) {
+  if (env.SENTRY_DSN) {
     Sentry.configureScope((scope: Sentry.Scope) => {
       scope.setTag("userAgent", window.navigator.userAgent);
     });
     Sentry.init({
-      dsn: process.env.REACT_APP_SENTRY_DSN,
+      dsn: env.SENTRY_DSN,
       normalizeDepth: 4,
       integrations: [
         new Integrations.BrowserTracing(),
@@ -36,7 +38,7 @@ const configureSentry = () => {
         // Random plugins/extensions
         "top.GLOBALS"
       ],
-      environment: process.env.REACT_APP_SENTRY_ENV || "development",
+      environment: env.SENTRY_ENV,
       tracesSampleRate: 1.0,
       beforeSend: (event: Sentry.Event) => {
         // Allows us to disable Sentry for a single line of code.

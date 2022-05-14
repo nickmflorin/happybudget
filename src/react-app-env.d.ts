@@ -18,13 +18,20 @@ declare namespace NodeJS {
        variable will be "prod", even when the ENV variable is not specified,
        unless "sandbox" is specified in the env file. */
     readonly REACT_APP_PLAID_ENV?: "sandbox" | "prod";
+    /* This environment variable allows us to distinguish between dev and
+       production remote servers, and local development. */
     readonly REACT_APP_PRODUCTION_ENV: "dev" | "app" | "local";
     readonly REACT_APP_SENTRY_DSN: string | undefined;
     readonly REACT_APP_AG_GRID_KEY: string | undefined;
     readonly REACT_APP_GOOGLE_CLIENT_KEY: string | undefined;
     readonly REACT_APP_API_DOMAIN: string;
     readonly REACT_APP_DOMAIN: string;
+    readonly REACT_APP_BILLING_ENABLED: string | undefined;
+    readonly REACT_APP_EMAIL_ENABLED: string | undefined;
+    readonly REACT_APP_EMAIL_VERIFICATION_ENABLED: string | undefined;
+    // Applicable Pre Copy Right Infringement
     readonly REACT_APP_CANNY_FEEDBACK_URL: string | undefined;
+    // Applicable Pre Copy Right Infringement
     readonly REACT_APP_INTERCOM_SUPPORT_URL: string | undefined;
   }
 }

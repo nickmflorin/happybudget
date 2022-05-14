@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { isNil } from "lodash";
 import { SourceObject } from "@react-pdf/types";
 
+import * as config from "config";
 import { View, Text, RichText, Image } from "components/pdf";
 
 type SubHeaderItemImage = {
@@ -70,7 +71,7 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
     () =>
       (image: string): SourceObject => {
         let headers = {};
-        if (process.env.NODE_ENV === "production") {
+        if (config.env.environmentIsProd()) {
           /* We need to include Cache-Control headers in the passed in src object
 					   because there is a bug with React PDF as it relates to AWS.
 						 However, if we include these locally, we get a CORS error. */

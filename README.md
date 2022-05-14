@@ -1,6 +1,6 @@
 # HappyBudget
 
-&copy; Nick Florin, 2021
+&copy; Nick Florin, 2022
 
 ### System Requirements
 

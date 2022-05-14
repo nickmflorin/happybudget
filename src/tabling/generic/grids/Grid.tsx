@@ -27,7 +27,7 @@ import {
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
-import { Config } from "config";
+import * as config from "config";
 import { tabling, hooks, util } from "lib";
 
 type OverriddenAgProps =
@@ -303,7 +303,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
         getRowClass={getRowClass}
         rowData={rowData}
         columnDefs={colDefs}
-        debug={Config.tableDebug}
+        debug={config.env.TABLE_DEBUG}
         modules={AllModules}
         overlayNoRowsTemplate={"<span></span>"}
         overlayLoadingTemplate={"<span></span>"}

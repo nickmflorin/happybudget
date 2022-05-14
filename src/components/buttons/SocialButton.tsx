@@ -2,6 +2,8 @@ import React from "react";
 import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
 import { isNil } from "lodash";
 
+import * as config from "config";
+
 import { ButtonProps } from "./Button";
 import GoogleAuthButton from "./GoogleAuthButton";
 
@@ -30,13 +32,13 @@ const SocialButton = ({
   ...props
 }: SocialButtonProps): JSX.Element => {
   if (provider === "google") {
-    if (isNil(process.env.REACT_APP_GOOGLE_CLIENT_KEY)) {
+    if (isNil(config.env.GOOGLE_CLIENT_KEY)) {
       console.warn("Cannot establish Google Login as `REACT_APP_GOOGLE_CLIENT_KEY` is not defined in environment.");
       return <></>;
     }
     return (
       <GoogleLogin
-        clientId={process.env.REACT_APP_GOOGLE_CLIENT_KEY}
+        clientId={config.env.GOOGLE_CLIENT_KEY}
         render={(p: { onClick: () => void; disabled?: boolean }) => (
           <GoogleAuthButton {...props} onClick={p.onClick} disabled={p.disabled} />
         )}

@@ -1,6 +1,8 @@
 import React from "react";
 import { isNil } from "lodash";
 
+import * as config from "config";
+
 import { Icon } from "components";
 import { HelpLink } from "components/links";
 
@@ -18,12 +20,12 @@ const HelpDropdownMenu = (
         id: "feedback",
         label: "Feedback/Feature Request",
         onClick: () => {
-          if (!isNil(process.env.REACT_APP_CANNY_FEEDBACK_URL)) {
-            window.open(process.env.REACT_APP_CANNY_FEEDBACK_URL, "_blank");
+          if (!isNil(config.env.CANNY_FEEDBACK_URL)) {
+            window.open(config.env.CANNY_FEEDBACK_URL, "_blank");
           } else {
             console.warn(
               `Could not identify Canny feedback URL as ENV variable
-											'REACT_APP_CANNY_FEEDBACK_URL; is not defined.`
+											'CANNY_FEEDBACK_URL; is not defined.`
             );
           }
         },
@@ -38,12 +40,12 @@ const HelpDropdownMenu = (
         id: "faq",
         label: "Support Articles",
         onClick: () => {
-          if (!isNil(process.env.REACT_APP_INTERCOM_SUPPORT_URL)) {
-            window.open(process.env.REACT_APP_INTERCOM_SUPPORT_URL, "_blank");
+          if (!isNil(config.env.INTERCOM_SUPPORT_URL)) {
+            window.open(config.env.INTERCOM_SUPPORT_URL, "_blank");
           } else {
             console.warn(
               `Could not identify Intercom support URL as ENV variable
-											'REACT_APP_INTERCOM_SUPPORT_URL; is not defined.`
+											'INTERCOM_SUPPORT_URL; is not defined.`
             );
           }
         },

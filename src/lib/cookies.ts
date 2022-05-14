@@ -1,5 +1,5 @@
 import Cookies from "universal-cookie";
-import * as flags from "config/flags";
+import * as config from "config";
 
 export const setConfirmationSuppressed = (key: string, value: boolean) => {
   const cookiesObj = new Cookies();
@@ -9,10 +9,10 @@ export const setConfirmationSuppressed = (key: string, value: boolean) => {
 export const confirmationIsSuppressed = (key: string) => {
   const cookiesObj = new Cookies();
   const value = cookiesObj.get(key);
-  const valueIsTruthy = flags.stringIsTruthy(value);
+  const booleanValue = config.booleanParser({ strict: false })(value);
   // The value will be undefined if a boolean value cannot be inferred.
-  if (valueIsTruthy !== undefined) {
-    return valueIsTruthy;
+  if (booleanValue !== undefined) {
+    return booleanValue;
   }
   return false;
 };

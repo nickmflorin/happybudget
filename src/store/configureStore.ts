@@ -2,6 +2,8 @@ import { Middleware, StoreEnhancer, createStore, applyMiddleware, compose, Prelo
 import createSagaMiddleware, { SagaMiddlewareOptions } from "redux-saga";
 import * as Sentry from "@sentry/react";
 
+import * as config from "config";
+
 import ModuleConfig from "./config";
 import createSagaManager from "./createSagaManager";
 import createApplicationReducer from "./reducer";
@@ -20,30 +22,29 @@ const userActionMiddleware: MD = api => next => (action: Redux.Action) => {
   return next({ ...action, user: state.user });
 };
 
-const configureStore = (config: Omit<Application.StoreConfig, "modules">): Redux.Store<Application.Store> => {
-  const initialState = createApplicationInitialState({ ...config, modules: ModuleConfig });
-  const applicationReducer = createApplicationReducer({ ...config, modules: ModuleConfig });
-  const applicationSaga = createApplicationSaga({ ...config, modules: ModuleConfig });
+const configureStore = (c: Omit<Application.StoreConfig, "modules">): Redux.Store<Application.Store> => {
+  const initialState = createApplicationInitialState({ ...c, modules: ModuleConfig });
+  const applicationReducer = createApplicationReducer({ ...c, modules: ModuleConfig });
+  const applicationSaga = createApplicationSaga({ ...c, modules: ModuleConfig });
 
   /* Create the redux-saga middleware that allows the sagas to run as side-effects
      in the application.  If in a production environment, instruct the middleware
      to funnel errors through to Sentry. */
   let sagaMiddlewareOptions: SagaMiddlewareOptions = {};
-  if (process.env.NODE_ENV === "production") {
+  if (config.env.environmentIsRemote()) {
     sagaMiddlewareOptions = { ...sagaMiddlewareOptions, onError: (error: Error) => Sentry.captureException(error) };
   }
   const sagaMiddleware = createSagaMiddleware(sagaMiddlewareOptions);
 
   let baseMiddleware: MD[] = [publicActionMiddleware, userActionMiddleware, sagaMiddleware];
-  baseMiddleware =
-    process.env.NODE_ENV !== "production"
-      ? /* eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-call */
-        [require("redux-immutable-state-invariant").default(), ...baseMiddleware]
-      : baseMiddleware;
+  baseMiddleware = config.env.environmentIsLocal()
+    ? /* eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-call */
+      [require("redux-immutable-state-invariant").default(), ...baseMiddleware]
+    : baseMiddleware;
 
   const composeEnhancers = (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ as typeof compose) || compose;
   let enhancers = composeEnhancers(applyMiddleware(...baseMiddleware));
-  if (process.env.NODE_ENV === "production") {
+  if (config.env.environmentIsRemote()) {
     const sentryReduxEnhancer: StoreEnhancer<{
       dispatch: unknown;
     }> = Sentry.createReduxEnhancer();

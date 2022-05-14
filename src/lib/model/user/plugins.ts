@@ -2,6 +2,7 @@ import moment from "moment-timezone";
 import Cookies from "universal-cookie";
 import { isNil, find } from "lodash";
 
+import * as config from "config";
 import { util } from "lib";
 
 const cookies = new Cookies();
@@ -85,7 +86,7 @@ const postIdentify = (id: PluginId, user: Model.User) => {
 };
 
 export const identifySegment = (user: Model.User) => {
-  if (identifyRequired("segment", user) && process.env.NODE_ENV !== "development") {
+  if (identifyRequired("segment", user) && config.env.SEGMENT_ENABLED) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     window.analytics.identify(user.id, {
       name: user.full_name,
@@ -109,7 +110,7 @@ export const identifyCanny = (user: Model.User) => {
   if (identifyRequired("canny", user)) {
     /* We do not want to makes calls to Canny's API in local development by
        default. */
-    if (!isNil(process.env.REACT_APP_CANNY_APP_ID)) {
+    if (!isNil(config.env.CANNY_APP_ID)) {
       const userJoined = util.dates.toLocalizedMoment(user.date_joined, {
         warnOnInvalid: false,
         tz: user.timezone
@@ -123,7 +124,7 @@ export const identifyCanny = (user: Model.User) => {
       } else {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         window.Canny("identify", {
-          appID: process.env.REACT_APP_CANNY_APP_ID,
+          appID: config.env.CANNY_APP_ID,
           user: {
             id: user.id,
             email: user.email,
@@ -137,18 +138,13 @@ export const identifyCanny = (user: Model.User) => {
          the date was valid in order to not flood Sentry with the same warning
          over and over again. */
       postIdentify("canny", user);
-    } else if (process.env.NODE_ENV === "production") {
-      console.warn(
-        `Could not identify Canny user as ENV variable 'REACT_APP_CANNY_APP_ID'
-				is not defined.`
-      );
     }
   }
 };
 
 export const identifyIntercom = (user: Model.User) => {
   if (identifyRequired("intercom", user)) {
-    if (!isNil(process.env.REACT_APP_INTERCOM_APP_ID)) {
+    if (!isNil(config.env.INTERCOM_APP_ID)) {
       const userJoined = util.dates.toLocalizedMoment(user.date_joined, {
         warnOnInvalid: false,
         tz: user.timezone
@@ -162,7 +158,7 @@ export const identifyIntercom = (user: Model.User) => {
       } else {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         window.Intercom("boot", {
-          app_id: process.env.REACT_APP_INTERCOM_APP_ID,
+          app_id: config.env.INTERCOM_APP_ID,
           user_id: user.id,
           email: user.email,
           name: user.full_name,
@@ -170,11 +166,6 @@ export const identifyIntercom = (user: Model.User) => {
           custom_launcher_selector: "#support-menu-item-intercom-chat"
         });
       }
-    } else if (process.env.NODE_ENV === "production") {
-      console.warn(
-        `Could not identify Intercom user as ENV variable 'REACT_APP_INTERCOM_APP_ID'
-				is not defined.`
-      );
     }
   }
 };

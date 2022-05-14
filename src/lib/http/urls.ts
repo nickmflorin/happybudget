@@ -1,21 +1,6 @@
 import { forEach, isNil, reduce } from "lodash";
 
 /**
- * Returns the React app domain from the environment variable
- * REACT_APP_DOMAIN.  Note that the REACT_APP_DOMAIN must NOT
- * contain a trailing slash.
- */
-export const getDomain = (): string => {
-  /* If we don't check process.env.REACT_APP_DOMAIN for null/undefined, we can get
-     misleading errors. */
-  const domain = process.env.REACT_APP_DOMAIN;
-  if (isNil(domain)) {
-    throw new Error("The REACT_APP_DOMAIN environment variable is missing from the .env file.");
-  }
-  return domain;
-};
-
-/**
  * Parses the provided URL and returns the query parameters in the URL as
  * an object.
  * @param url The URL for which we want to get the query parameters from.
