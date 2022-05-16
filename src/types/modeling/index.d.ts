@@ -198,7 +198,9 @@ declare namespace Model {
     readonly domain: BudgetDomain;
     readonly updated_at: string;
     readonly image: SavedImage | null;
-    readonly updated_by: Omit<SimpleUser, "profile_image">;
+    /* A budget will not have an updated by field in the case that the user who
+       updated the budget has since been deleted. */
+    readonly updated_by: Omit<SimpleUser, "profile_image"> | null;
   };
 
   type SimpleTemplate = AbstractBudget & {

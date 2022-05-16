@@ -21,11 +21,16 @@ const BaseBudgetCard = <B extends Model.SimpleBudget | Model.SimpleCollaborating
 
   const subTitle = useMemo(() => {
     if (util.dates.isToday(budget.updated_at)) {
-      return `Last edited ${util.dates.toDisplayTimeSince(budget.updated_at)} by ${budget.updated_by.full_name}`;
+      if (!isNil(budget.updated_by)) {
+        return `Last edited ${util.dates.toDisplayTimeSince(budget.updated_at)} by ${budget.updated_by.full_name}`;
+      }
+      return `Last edited ${util.dates.toDisplayTimeSince(budget.updated_at)}`;
+    } else if (!isNil(budget.updated_by)) {
+      return `Last edited by ${budget.updated_by.full_name} on ${
+        util.dates.toLocalizedAbbvDisplayDateTime(budget.updated_at, { tz }) || ""
+      }`;
     }
-    return `Last edited by ${budget.updated_by.full_name} on ${
-      util.dates.toLocalizedAbbvDisplayDateTime(budget.updated_at, { tz }) || ""
-    }`;
+    return `Last edited on ${util.dates.toLocalizedAbbvDisplayDateTime(budget.updated_at, { tz }) || ""}`;
   }, [budget.updated_at, budget.updated_by]);
 
   useEffect(() => {
