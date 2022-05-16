@@ -12,15 +12,10 @@ export interface UserImageProps extends Omit<ImageProps, "src"> {
 
 const UserImage = ({ user, src, ...props }: UserImageProps): JSX.Element => {
   const imageSrc = useMemo<string | null>(() => {
-    if (isNil(src)) {
-      if (!isNil(user) && model.contact.isContact(user)) {
-        return !isNil(user.image) ? user.image.url : null;
-      } else if (!isNil(user)) {
-        return !isNil(user.profile_image) ? user.profile_image.url : null;
-      }
-      return null;
+    if (isNil(src) && !isNil(user)) {
+      return model.contact.isContact(user) ? user.image?.url || null : user.profile_image.url;
     }
-    return src;
+    return src || null;
   }, [user, src]);
   return !isNil(imageSrc) ? (
     <Image

@@ -198,7 +198,7 @@ declare namespace Model {
     readonly domain: BudgetDomain;
     readonly updated_at: string;
     readonly image: SavedImage | null;
-    readonly updated_by: SimpleUser;
+    readonly updated_by: Omit<SimpleUser, "profile_image">;
   };
 
   type SimpleTemplate = AbstractBudget & {

@@ -3,11 +3,14 @@ declare type CSVData = CSVRow[];
 
 // Image data that is received from the API.
 declare type SavedImage = {
-  readonly url: string; // URL will be string, unless something happened with S3.
-  readonly size: number;
-  readonly height: number;
-  readonly width: number;
-  readonly extension: string;
+  // URL will always be present, even if the image could not be found.
+  readonly url: string;
+  /* Size, height, width and extension can be null if the image could not be
+     found. */
+  readonly size: number | null;
+  readonly height: number | null;
+  readonly width: number | null;
+  readonly extension: string | null;
 };
 
 // Image data that is received from an upload, but not saved to the API.
