@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
-import { model } from "lib";
+import * as config from "config";
 import * as store from "store";
+import { model } from "lib";
 
 import { Icon } from "components";
 import { PrimaryButtonIconToggle } from "components/buttons";
@@ -44,6 +45,7 @@ const Collaborating = (props: CollaboratingProps): JSX.Element => {
 							 request anyways, this is okay. */
             if (
               user.metrics.num_budgets !== 0 &&
+              config.env.BILLING_ENABLED &&
               !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
             ) {
               dispatch(store.actions.setProductPermissionModalOpenAction(true));

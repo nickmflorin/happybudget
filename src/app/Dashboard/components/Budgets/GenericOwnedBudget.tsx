@@ -1,6 +1,7 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 
+import * as config from "config";
 import * as store from "store";
 import { model } from "lib";
 
@@ -45,6 +46,7 @@ const GenericOwnedBudget = (props: GenericOwnedBudgetProps): JSX.Element => {
 							 request anyways, this is okay. */
             if (
               user.metrics.num_budgets !== 0 &&
+              config.env.BILLING_ENABLED &&
               !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
             ) {
               dispatch(store.actions.setProductPermissionModalOpenAction(true));

@@ -3,6 +3,7 @@ import { Dispatch } from "redux";
 import { useDispatch } from "react-redux";
 
 import * as api from "api";
+import * as config from "config";
 import * as store from "store";
 import { http, notifications, model } from "lib";
 
@@ -44,6 +45,7 @@ const BudgetCard = ({ onArchived, onDuplicated, ...props }: BudgetCardProps): JS
     () => (e: MenuItemModelClickEvent) => {
       if (
         user.metrics.num_budgets !== 0 &&
+        config.env.BILLING_ENABLED &&
         !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
       ) {
         dispatch(store.actions.setProductPermissionModalOpenAction(true));

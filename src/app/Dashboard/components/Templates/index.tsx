@@ -3,6 +3,7 @@ import { Switch, Route, useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { isNil } from "lodash";
 
+import * as config from "config";
 import * as store from "store";
 import { model } from "lib";
 import { CreateBudgetModal } from "components/modals";
@@ -27,6 +28,7 @@ const Templates = (props: TemplatesProps): JSX.Element => {
       if (
         id !== undefined &&
         user.metrics.num_budgets !== 0 &&
+        config.env.BILLING_ENABLED &&
         !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
       ) {
         dispatch(store.actions.setProductPermissionModalOpenAction(true));
