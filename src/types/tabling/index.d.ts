@@ -876,6 +876,7 @@ declare namespace Table {
     readonly icon?: IconOrElement;
     readonly tooltip?: DeterministicTooltip;
     readonly disabled?: boolean;
+    readonly hidden?: boolean;
     readonly label?: string;
     readonly isWriteOnly?: boolean;
     readonly location?: "right" | "left";

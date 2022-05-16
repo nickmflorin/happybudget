@@ -17,7 +17,9 @@ interface TableMenuActionProps extends StandardComponentProps {
 }
 
 const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.Element => {
-  if (!isNil(action.render)) {
+  if (action.hidden) {
+    return <></>;
+  } else if (!isNil(action.render)) {
     /* For the buttons to properly work when included in a Dropdown, we need to
 		   expose both the onClick and id prop such that AntD can control the dropdown
 		   visibility via the button and the dropdown will close when clicked outside

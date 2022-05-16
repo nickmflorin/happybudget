@@ -12,7 +12,7 @@ export type Toolbar<
   T extends Table.PublicMenuActionParams<R, M>,
   R extends Table.RowData,
   M extends Model.RowHttpModel
-> = React.ComponentType<T & { readonly actions: Table.MenuActions<R, M, T> }>;
+> = React.ComponentType<T & { readonly actions: Table.MenuActionObj[] }>;
 
 export type MenuProps<
   T extends Table.PublicMenuActionParams<R, M>,
@@ -49,26 +49,18 @@ const TableMenu = <
 ) => {
   const ToolbarComponent = props.toolbar;
 
-  const leftActions = useMemo(
+  const evaluated = useMemo(
     () =>
       !isNil(props.actions) && !isNil(props.menuActionParams.apis)
-        ? filter(
-            tabling.menu.evaluateActions<R, M, T>(props.actions, props.menuActionParams),
-            (a: Table.MenuActionObj) => a.location !== "right"
-          )
+        ? tabling.menu.evaluateActions<R, M, T>(props.actions, props.menuActionParams)
         : [],
-    [props.menuActionParams]
+    [props.actions, props.menuActionParams]
   );
-  const rightActions = useMemo(
-    () =>
-      !isNil(props.actions) && !isNil(props.menuActionParams.apis)
-        ? filter(
-            tabling.menu.evaluateActions<R, M, T>(props.actions, props.menuActionParams),
-            (a: Table.MenuActionObj) => a.location === "right"
-          )
-        : [],
-    [props.menuActionParams]
-  );
+
+  const actions = useMemo(() => filter(evaluated, (a: Table.MenuActionObj) => a.hidden !== true), [evaluated]);
+
+  const leftActions = useMemo(() => filter(actions, (a: Table.MenuActionObj) => a.location !== "right"), [actions]);
+  const rightActions = useMemo(() => filter(actions, (a: Table.MenuActionObj) => a.location === "right"), [actions]);
 
   const hasLeftMenu = useMemo(
     () => (!isNil(props.prefixLeft) && props.prefixLeft?.length !== 0) || leftActions.length !== 0,

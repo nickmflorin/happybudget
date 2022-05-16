@@ -161,3 +161,8 @@ export const SENTRY_ENV = config.Config<"development" | "production">({
 });
 
 export const SEGMENT_ENABLED = environmentIsProd();
+
+export const PLAID_ENABLED = config.BooleanConfig({
+  nodeSourceName: "PLAID_ENABLED",
+  defaultValue: false
+});

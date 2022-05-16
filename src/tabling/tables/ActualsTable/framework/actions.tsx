@@ -1,4 +1,5 @@
 import * as api from "api";
+import * as config from "config";
 import { model } from "lib";
 
 import { Icon } from "components";
@@ -16,6 +17,7 @@ export const ImportActualsAction = <R extends Table.RowData, M extends Model.Row
 ): Table.MenuActionObj => ({
   label: "Sources",
   icon: <Icon icon={"infinity"} weight={"solid"} />,
+  hidden: !config.env.PLAID_ENABLED,
   wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => (
     <ImportActualsDropdownMenu
       onChange={(m: Model.ActualImportSource, menu: IMenuRef<MenuItemSelectedState, ImportActualsMenuItemModel>) => {
