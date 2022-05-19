@@ -1,5 +1,5 @@
 import React, { forwardRef } from "react";
-import { Input as AntDInput } from "antd";
+import { InputRef, Input as AntDInput } from "antd";
 import { InputProps as AntDInputProps } from "antd/lib/input";
 import classNames from "classnames";
 
@@ -12,13 +12,13 @@ type PrivateInputProps = Omit<AntDInputProps, "size">;
 
 export type InputProps = PrivateInputProps & UseSizeProps;
 
-const Input = (props: PrivateInputProps, ref: React.ForwardedRef<AntDInput>): JSX.Element => (
+const Input = (props: PrivateInputProps, ref: React.ForwardedRef<InputRef>): JSX.Element => (
   <AntDInput {...props} ref={ref} className={classNames("input", props.className)} />
 );
 
-export default withSize<InputProps, StandardSize, "size", AntDInput>({
+export default withSize<InputProps, StandardSize, "size", InputRef>({
   hasRef: true
 })(forwardRef(Input)) as React.ForwardRefRenderFunction<
-  AntDInput,
-  InputProps & { readonly ref?: React.ForwardedRef<AntDInput> }
+  InputRef,
+  InputProps & { readonly ref?: React.ForwardedRef<InputRef> }
 >;

@@ -1,10 +1,12 @@
-import React, { forwardRef, useMemo, RefObject, ForwardedRef } from "react";
+import React, { ReactNode, forwardRef, useMemo, RefObject, ForwardedRef } from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
-import { ui } from "lib";
+import { ui, tabling } from "lib";
 
 import { Icon } from "components";
+import { IconButton } from "components/buttons";
+import { InfoTooltip } from "components/tooltips";
 
 const Cell = <
   R extends Table.RowData,
@@ -18,6 +20,7 @@ const Cell = <
   ref: ForwardedRef<HTMLDivElement>
 ): JSX.Element => {
   const row: Table.BodyRow<R> = props.node.data;
+  const col = props.customCol;
 
   const icon = useMemo<IconOrElement | null | undefined>(() => {
     if (!isNil(props.icon)) {
@@ -28,6 +31,39 @@ const Cell = <
     }
     return null;
   }, [props.icon]);
+
+  const infoComponent = useMemo(() => {
+    if (tabling.rows.isModelRow(row) && tabling.columns.isCalculatedColumn<R, M>(col)) {
+      const toolTipContent = props.infoTooltip?.({ col, row });
+      if (!isNil(props.onInfoClicked)) {
+        return (
+          <div className={"info-wrapper"}>
+            <IconButton
+              className={"btn--cell-info"}
+              onClick={() => props.onInfoClicked?.({ row, col })}
+              icon={<Icon icon={"circle-info"} weight={"solid"} />}
+              tooltip={
+                !isNil(toolTipContent)
+                  ? ({ children }: { children: ReactNode }) => (
+                      <InfoTooltip content={toolTipContent}>{children}</InfoTooltip>
+                    )
+                  : undefined
+              }
+            />
+          </div>
+        );
+      } else if (!isNil(toolTipContent)) {
+        return (
+          <div className={"info-wrapper"}>
+            <InfoTooltip content={toolTipContent}>
+              <Icon className={"icon--cell-info"} icon={"circle-info"} weight={"solid"} />
+            </InfoTooltip>
+          </div>
+        );
+      }
+    }
+    return <></>;
+  }, [props.onInfoClicked, row, col, props.infoTooltip]);
 
   return (
     <div
@@ -48,6 +84,7 @@ const Cell = <
       ref={ref}
       onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => !isNil(props.onKeyDown) && props.onKeyDown(event)}
     >
+      {infoComponent}
       {props.children}
       {!isNil(icon) ? (
         <div className={"icon-wrapper"}>{ui.iconIsJSX(icon) ? icon : <Icon icon={icon} weight={"light"} />}</div>

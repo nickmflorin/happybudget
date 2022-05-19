@@ -1,17 +1,17 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import Tooltip from "./Tooltip";
 
-interface TooltipOrTitleProps extends Omit<TooltipProps, "title"> {
+type TooltipOrContentProps = Omit<TooltipProps, "content"> & {
   readonly children?: ReactNode;
   readonly tooltip: Tooltip;
-}
+};
 
-const TooltipOrTitle = ({ tooltip, children, ...props }: TooltipOrTitleProps): JSX.Element => {
+const TooltipOrContent = ({ tooltip, children, ...props }: TooltipOrContentProps): JSX.Element => {
   if (typeof tooltip === "function") {
     return tooltip({ children });
   } else if (typeof tooltip === "string") {
     return (
-      <Tooltip {...props} title={tooltip}>
+      <Tooltip {...props} content={tooltip}>
         {children}
       </Tooltip>
     );
@@ -23,4 +23,4 @@ const TooltipOrTitle = ({ tooltip, children, ...props }: TooltipOrTitleProps): J
   );
 };
 
-export default TooltipOrTitle;
+export default React.memo(TooltipOrContent);

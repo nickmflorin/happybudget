@@ -26,6 +26,11 @@ export type DataGridProps<
   /* eslint-disable @typescript-eslint/no-explicit-any */
   readonly editColumnConfig?: Table.EditColumnRowConfig<R, any>[];
   readonly keyListeners?: Table.KeyListener[];
+  readonly calculatedCellHasInfo?:
+    | boolean
+    | ((cell: Table.CellConstruct<Table.ModelRow<R>, Table.CalculatedColumn<R, M>>) => boolean);
+  readonly onCalculatedCellInfoClicked?: Table.CellProps<R, M>["onInfoClicked"];
+  readonly calculatedCellInfoTooltip?: Table.CellProps<R, M>["infoTooltip"];
   readonly onBack?: () => void;
   readonly onLeft?: () => void;
   readonly onRight?: () => void;
@@ -77,13 +82,27 @@ const DataGrid = <
     const location = useLocation();
 
     const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-      return map(props.columns, (col: Table.Column<R, M>) =>
-        tabling.columns.isRealColumn(col)
-          ? {
-              ...col,
-              cellRendererParams: { ...col.cellRendererParams, getRowColorDef }
-            }
-          : col
+      return map(
+        map(props.columns, (col: Table.Column<R, M>) =>
+          tabling.columns.isRealColumn(col)
+            ? {
+                ...col,
+                cellRendererParams: { ...col.cellRendererParams, getRowColorDef }
+              }
+            : col
+        ),
+        (col: Table.Column<R, M>) =>
+          tabling.columns.isCalculatedColumn(col)
+            ? {
+                ...col,
+                cellRendererParams: {
+                  ...col.cellRendererParams,
+                  hasInfo: props.calculatedCellHasInfo,
+                  onInfoClicked: props.onCalculatedCellInfoClicked,
+                  infoTooltip: props.calculatedCellInfoTooltip
+                }
+              }
+            : col
       );
     }, [hooks.useDeepEqualMemo(props.columns)]);
 

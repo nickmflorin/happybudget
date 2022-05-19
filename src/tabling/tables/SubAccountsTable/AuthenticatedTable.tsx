@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { isNil, map, filter } from "lodash";
 
-import { model, tabling, hooks } from "lib";
+import { model, tabling, hooks, util } from "lib";
 import { framework } from "tabling/generic";
 
 import { selectors } from "app/Budgeting/store";
@@ -218,6 +218,22 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
         onRowExpand={onRowExpand}
         onLeft={onLeft}
         onRight={onRight}
+        calculatedCellInfoTooltip={(cell: Table.CellConstruct<Table.ModelRow<R>, Table.CalculatedColumn<R, M>>) =>
+          cell.row.children.length === 0
+            ? [
+                {
+                  label: "Nominal Value",
+                  value: cell.row.data.nominal_value,
+                  formatter: util.formatters.formatAsCurrency
+                },
+                {
+                  label: "Fringe Contribution",
+                  value: cell.row.data.fringe_contribution,
+                  formatter: util.formatters.formatAsCurrency
+                }
+              ]
+            : null
+        }
       />
       {markupModals}
       {groupModals}

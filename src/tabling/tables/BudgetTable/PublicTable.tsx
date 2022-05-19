@@ -32,6 +32,7 @@ const PublicBudgetTable = <
       ] as [Table.EditColumnRowConfig<R, Table.ModelRow<R>>]
     }
     framework={tabling.aggrid.combineFrameworks(Framework, props.framework)}
+    calculatedCellHasInfo={true}
   />
 );
 

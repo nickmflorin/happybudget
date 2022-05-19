@@ -61,7 +61,6 @@ export type TableConfigurationProps<R extends Table.RowData, M extends Model.Row
   readonly pinFirstColumn?: boolean;
   readonly pinActionColumns?: boolean;
   readonly sizeToFit?: boolean;
-  readonly framework?: Table.Framework;
   readonly columns: Table.Column<R, M>[];
 };
 

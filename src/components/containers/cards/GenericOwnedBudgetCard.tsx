@@ -20,7 +20,7 @@ const GenericOwnedBudgetCard = ({ deleting, onEdit, onDelete, ...props }: Generi
       {
         render: () => (
           <InfoTooltip
-            title={
+            content={
               <div style={{ display: "flex", flexDirection: "column" }}>
                 {"You are not subscribed to the correct products to access this budget."}
                 <IncludeButtonLink

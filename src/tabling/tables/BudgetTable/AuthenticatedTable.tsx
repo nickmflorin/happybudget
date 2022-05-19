@@ -93,6 +93,7 @@ const AuthenticatedBudgetTable = <
         {...props}
         actions={actions}
         editColumnConfig={editColumnConfig}
+        calculatedCellHasInfo={true}
         framework={tabling.aggrid.combineFrameworks(Framework, props.framework)}
       />
       {collaboratorsModalOpen === true && includeCollaborators && (

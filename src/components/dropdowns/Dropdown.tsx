@@ -8,15 +8,15 @@ import { DropDownProps as AntdDropdownProps } from "antd/lib/dropdown";
 
 import { util } from "lib";
 
-export interface DropdownProps extends Omit<AntdDropdownProps, "overlay" | "visible"> {
+export type DropdownProps = Omit<AntdDropdownProps, "overlay" | "visible"> & {
   readonly visible?: boolean;
-  readonly setVisible?: (visible: boolean) => void;
   readonly overlayId?: string;
-  readonly onClickAway?: (e: MouseEvent | TouchEvent) => void;
   readonly children: React.ReactChild | React.ReactChild[];
   readonly overlay: React.ReactElement | (() => React.ReactElement);
   readonly dropdown?: NonNullRef<IDropdownRef>;
-}
+  readonly setVisible?: (visible: boolean) => void;
+  readonly onClickAway?: (e: FocusEvent | MouseEvent | TouchEvent) => void;
+};
 
 const Dropdown = ({
   onClickAway,
@@ -70,7 +70,7 @@ const Dropdown = ({
       trigger={props.trigger || ["click"]}
       overlay={
         <ClickAwayListener
-          onClickAway={(e: MouseEvent | TouchEvent) => {
+          onClickAway={(e: FocusEvent | MouseEvent | TouchEvent) => {
             /* react-click-away-listener does a pretty shitty job of weeding out
                click events inside the element that it's ClickAwayListener
                component wraps.

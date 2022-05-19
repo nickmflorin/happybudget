@@ -16,18 +16,15 @@ const PublicGrid = <R extends Table.RowData, M extends Model.RowHttpModel = Mode
 }: PublicGridProps<R, M>): JSX.Element => {
   const frameworkComponents = useMemo<Table.FrameworkGroup>((): Table.FrameworkGroup => {
     const combinedFramework = tabling.aggrid.combineFrameworks(generic.Framework, framework);
-    return {
-      ...reduce(
-        combinedFramework.cells?.[props.id],
-        (prev: Table.FrameworkGroup, cell: React.ComponentType<Record<string, unknown>>, name: string) => ({
-          ...prev,
-          [name]: cell
-        }),
-        {}
-      )
-    };
+    return reduce(
+      combinedFramework.cells?.[props.id],
+      (prev: Table.FrameworkGroup, cell: React.ComponentType<Record<string, unknown>>, name: string) => ({
+        ...prev,
+        [name]: cell
+      }),
+      {}
+    );
   }, [framework, props.id]);
-
   return <Grid {...props} enableFillHandle={false} frameworkComponents={frameworkComponents} />;
 };
 

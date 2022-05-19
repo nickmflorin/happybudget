@@ -29,12 +29,11 @@ $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bas
 ```
 
 Use `nvm` to establish the version of Node that you will use with this project.
-Typically, version 16.0.0 is a safe bet, but anything lower than 12.0.0 is likely
-a candidate to cause a problem.
+The version should be 17.0.0.
 
 ```bash
-$ nvm install 16.0.0
-$ nvm use 16.0.0
+$ nvm install 17.0.0
+$ nvm use 17.0.0
 ```
 
 Confirm that `nvm` is pointing at the correct Node version:

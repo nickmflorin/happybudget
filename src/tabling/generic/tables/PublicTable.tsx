@@ -229,6 +229,8 @@ const PublicTable = <
           gridOptions={props.tableGridOptions.data}
           grid={grid}
           onGridReady={props.onDataGridReady}
+          calculatedCellHasInfo={props.calculatedCellHasInfo}
+          onCalculatedCellInfoClicked={props.onCalculatedCellInfoClicked}
         />
         <TableFooterGrid
           tableId={props.tableId}

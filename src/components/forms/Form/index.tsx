@@ -2,7 +2,7 @@ import React, { useEffect, forwardRef, useMemo, ForwardedRef } from "react";
 import { filter, isNil, find, indexOf, map } from "lodash";
 import classNames from "classnames";
 
-import { Form as RootForm, Input } from "antd";
+import { Form as RootForm, InputRef } from "antd";
 
 import { RenderWithSpinner } from "components";
 import { Notifications } from "components/notifications";
@@ -27,7 +27,7 @@ interface PrivateFormProps<T = Record<string, unknown>> extends FormProps<T> {
 const withAutoFocusInput =
   <P extends Record<string, unknown>>(Component: React.ComponentType<P>) =>
   (props: P): JSX.Element => {
-    const inputRef = React.useRef<Input>(null);
+    const inputRef = React.useRef<InputRef>(null);
 
     useEffect(() => {
       if (!isNil(inputRef.current) && !isNil(inputRef.current.focus)) {

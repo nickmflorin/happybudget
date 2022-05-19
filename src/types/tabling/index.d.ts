@@ -130,7 +130,7 @@ declare namespace Table {
     C extends RealColumn<R, M, V> = BodyColumn<R, M, V>
   > extends Omit<import("@ag-grid-community/core").ICellRendererParams, "value">,
       StandardComponentProps {
-    readonly loading?: boolean;
+    readonly tooltip?: Tooltip;
     readonly hideClear?: boolean;
     readonly customCol: C;
     readonly value: V;
@@ -143,6 +143,12 @@ declare namespace Table {
 			 be careful.  We need a better way of establishing which props are
 			 available to cells based on which grid they lie in. */
     readonly getRowColorDef: (row: BodyRow<R>) => RowColorDef;
+    /* Info is only applicable for cells where the column is a CalculatedColumn
+       (currently) and the row is a ModelRow. */
+    readonly onInfoClicked?: (cell: Table.CellConstruct<Table.ModelRow<R>, Table.CalculatedColumn<R, M>>) => void;
+    readonly infoTooltip?: (
+      cell: Table.CellConstruct<Table.ModelRow<R>, Table.CalculatedColumn<R, M>>
+    ) => TooltipContent | null;
     readonly selector: (state: Application.Store) => S;
     readonly onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
     readonly onEvent?: (event: Event<R, M, EditableRow<R>>) => void;
@@ -175,13 +181,6 @@ declare namespace Table {
   /* ------------------------- Framework ------------------------------------ */
 
   /* ------------------------- Columns -------------------------------------- */
-  type AGFormatterParams = import("@ag-grid-community/core").ValueFormatterParams;
-  type AGFormatter = (params: AGFormatterParams) => string;
-
-  type NativeFormatterParams<P> = P | null;
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type NativeFormatter<P> = (params: NativeFormatterParams<P>, onError?: OnFormatError) => string;
-
   type ColDef = import("@ag-grid-community/core").ColDef;
 
   type AgColumn = import("@ag-grid-community/core").Column;
@@ -564,6 +563,11 @@ declare namespace Table {
   type CellClassName = ClassName<import("@ag-grid-community/core").CellClassParams>;
 
   type CellStyle = import("@ag-grid-community/core").CellStyle | import("@ag-grid-community/core").CellStyleFunc;
+
+  type CellConstruct<RW extends Table.BodyRow, C extends Table.DataColumn> = {
+    readonly col: C;
+    readonly row: RW;
+  };
 
   type PdfCellCallbackParams<
     R extends RowData,

@@ -4,7 +4,7 @@ import { EntityText } from "components/typography";
 import { EntityTextProps } from "components/typography/EntityText";
 import RootTooltip from "./Tooltip";
 
-export type EntityTooltipProps = Omit<TooltipProps, "title"> & {
+export type EntityTooltipProps = Omit<TooltipProps, "content"> & {
   readonly entity: Model.HttpModel;
 } & Pick<EntityTextProps, "fillEmpty">;
 
@@ -17,7 +17,7 @@ const EntityTooltip = ({
   <RootTooltip
     {...props}
     overlayClassName={classNames("tooltip--entity", props.overlayClassName)}
-    title={<EntityText fillEmpty={fillEmpty}>{entity}</EntityText>}
+    content={<EntityText fillEmpty={fillEmpty}>{entity}</EntityText>}
   >
     {children}
   </RootTooltip>

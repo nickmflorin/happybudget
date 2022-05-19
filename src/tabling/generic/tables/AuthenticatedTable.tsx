@@ -35,6 +35,7 @@ export type BaseTableProps<
   M extends Model.RowHttpModel = Model.RowHttpModel
 > = TableConfigurationProps<R, M> &
   DataGridProps<R, M> & {
+    readonly framework?: Table.Framework;
     readonly minimal?: boolean;
     readonly rowHeight?: number;
     readonly menuPortalId?: string;
@@ -456,6 +457,8 @@ const AuthenticatedTable = <
           onRowSelectionChanged={onRowSelectionChanged}
           onEvent={_onEvent}
           rowHasCheckboxSelection={props.rowHasCheckboxSelection}
+          calculatedCellHasInfo={props.calculatedCellHasInfo}
+          onCalculatedCellInfoClicked={props.onCalculatedCellInfoClicked}
         />
         <TableNotifications
           notifications={NotificationsHandler.notifications}

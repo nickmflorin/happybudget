@@ -1,12 +1,12 @@
 import React, { forwardRef } from "react";
-import { Input as AntDInput } from "antd";
+import { InputRef } from "antd";
 import classNames from "classnames";
 import { Icon } from "components";
 import Input, { InputProps } from "./Input";
 
 export type SearchInputProps = InputProps;
 
-const SearchInput = (props: SearchInputProps, ref: React.ForwardedRef<AntDInput>): JSX.Element => (
+const SearchInput = (props: SearchInputProps, ref: React.ForwardedRef<InputRef>): JSX.Element => (
   <Input
     placeholder={"Search"}
     allowClear={true}

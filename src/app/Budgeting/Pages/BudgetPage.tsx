@@ -31,7 +31,7 @@ const BudgetPage = <B extends Model.Budget | Model.Template, P extends Model.Acc
               id: b.id,
               primary: true,
               label: b.name,
-              tooltip: { title: "Top Sheet", placement: "bottom" },
+              tooltip: { content: "Top Sheet", placement: "bottom" },
               url: budgeting.urls.getUrl(b, undefined, tokenId)
             })
           },

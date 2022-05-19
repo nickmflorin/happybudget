@@ -34,7 +34,9 @@ const PdfImageUploader = (props: UploaderProps): JSX.Element => (
             <div className={"upload-text file-text"}>
               {model.isUploadedImage(params.image)
                 ? util.files.truncateFileName(params.image.fileName || params.image.name, 18)
-                : `Saved ${params.image.extension} Image`}
+                : !isNil(params.image.extension)
+                ? `Saved ${params.image.extension} Image`
+                : "Saved Image"}
             </div>
             <ClearButton
               size={"small"}

@@ -17,23 +17,6 @@ declare type PropsOf<T> = T extends React.ComponentType<infer Props> ? Props : n
 
 declare type RenderFunc = () => JSX.Element;
 
-declare type TooltipType = "info" | "action";
-
-/* For Tooltips, the className and style will wind up being attributed to the
-   children components.  We need to use overlayClassName and overlayStyle. */
-declare type TooltipProps = Omit<
-  Partial<import("antd/lib/tooltip").TooltipPropsWithTitle>,
-  "title" | "className" | "style"
-> & {
-  readonly title: string | JSX.Element;
-  readonly includeLink?: IncludeLink;
-  readonly type?: TooltipType;
-};
-
-declare type DeterministicTooltip = string | Omit<TooltipProps, "children">;
-
-declare type Tooltip = DeterministicTooltip | RenderPropChild<{ children: import("react").ReactNode }>;
-
 declare type LinkObj = {
   readonly text?: string;
   readonly to?: string;

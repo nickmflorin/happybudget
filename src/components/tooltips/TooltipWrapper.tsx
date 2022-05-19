@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { isNil } from "lodash";
-import TooltipOrTitle from "./TooltipOrTitle";
+import TooltipOrContent from "./TooltipOrContent";
 
 interface TooltipWrapperProps {
   readonly children: ReactNode;
@@ -9,7 +9,7 @@ interface TooltipWrapperProps {
 
 const TooltipWrapper = ({ children, tooltip }: TooltipWrapperProps): JSX.Element => {
   if (!isNil(tooltip)) {
-    return <TooltipOrTitle tooltip={tooltip}>{children}</TooltipOrTitle>;
+    return <TooltipOrContent tooltip={tooltip}>{children}</TooltipOrContent>;
   } else {
     return <>{children}</>;
   }

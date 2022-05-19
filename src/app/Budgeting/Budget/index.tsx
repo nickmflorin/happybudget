@@ -46,7 +46,7 @@ const Budget = (props: BudgetProps): JSX.Element => {
           activeIcon: <Icon weight={"solid"} icon={"file-plus"} />,
           onClick: () => history.push("/discover"),
           tooltip: {
-            title: "Templates",
+            content: "Templates",
             placement: "right"
           }
         },
@@ -55,7 +55,7 @@ const Budget = (props: BudgetProps): JSX.Element => {
           activeIcon: <Icon weight={"solid"} icon={"copy"} />,
           onClick: () => history.push("/budgets"),
           tooltip: {
-            title: "My Budgets",
+            content: "My Budgets",
             placement: "right"
           }
         },
@@ -65,7 +65,7 @@ const Budget = (props: BudgetProps): JSX.Element => {
           onClick: () => history.push("/contacts"),
           separatorAfter: true,
           tooltip: {
-            title: "Contacts",
+            content: "Contacts",
             placement: "right"
           }
         },
@@ -75,7 +75,7 @@ const Budget = (props: BudgetProps): JSX.Element => {
           onClick: () => history.push(`/budgets/${props.budgetId}/analysis`),
           active: location.pathname.startsWith(`/budgets/${props.budgetId}/analysis`),
           tooltip: {
-            title: "Analysis",
+            content: "Analysis",
             placement: "right"
           }
         },
@@ -94,7 +94,7 @@ const Budget = (props: BudgetProps): JSX.Element => {
           },
           active: budgeting.urls.isBudgetRelatedUrl(location.pathname, props.budgetId),
           tooltip: {
-            title: "Budget",
+            content: "Budget",
             placement: "right"
           }
         },
@@ -104,7 +104,7 @@ const Budget = (props: BudgetProps): JSX.Element => {
           onClick: () => history.push(`/budgets/${props.budgetId}/actuals`),
           active: location.pathname.startsWith(`/budgets/${props.budgetId}/actuals`),
           tooltip: {
-            title: "Actuals",
+            content: "Actuals",
             placement: "right"
           }
         }

@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { map } from "lodash";
 
-import { model, tabling, hooks } from "lib";
+import { model, tabling, hooks, util } from "lib";
 
 import { selectors } from "app/Budgeting/store";
 import { PublicBudgetTable, PublicBudgetTableProps } from "../BudgetTable";
@@ -75,6 +75,22 @@ const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model
       onRowExpand={onRowExpand}
       onLeft={onLeft}
       onRight={onRight}
+      calculatedCellInfoTooltip={(cell: Table.CellConstruct<Table.ModelRow<R>, Table.CalculatedColumn<R, M>>) =>
+        cell.row.children.length === 0
+          ? [
+              {
+                label: "Nominal Value",
+                value: cell.row.data.nominal_value,
+                formatter: util.formatters.formatAsCurrency
+              },
+              {
+                label: "Fringe Contribution",
+                value: cell.row.data.fringe_contribution,
+                formatter: util.formatters.formatAsCurrency
+              }
+            ]
+          : null
+      }
     />
   );
 };

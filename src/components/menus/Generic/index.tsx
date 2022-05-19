@@ -2,7 +2,7 @@ import React, { RefObject, useState, useMemo, useEffect, useRef, useImperativeHa
 import classNames from "classnames";
 import { map, isNil, includes, filter, find, uniqueId, forEach } from "lodash";
 
-import { Input as AntDInput } from "antd";
+import { InputRef } from "antd";
 
 import { hooks, ui, util, redux } from "lib";
 import { RenderWithSpinner, ShowHide } from "components";
@@ -116,7 +116,7 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
   const ref = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<ItemRefs<S>>({} as ItemRefs<S>);
 
-  const searchRef = useRef<AntDInput>(null);
+  const searchRef = useRef<InputRef>(null);
   const [menuState, dispatchMenuState]: [MenuState<S, M>, (action: MenuStateAction<S, M>) => void] = useReducer(
     menuStateReducer,
     initialMenuState
@@ -466,7 +466,6 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
       if (value === true) {
         setTimeout(() => {
           searchRef.current?.focus();
-          searchRef.current?.setState({ focused: true });
         }, 25);
         if (!isNil(searchValue)) {
           setSearch(searchValue);
@@ -474,7 +473,6 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
       } else {
         setTimeout(() => {
           searchRef.current?.blur();
-          searchRef.current?.setState({ focused: false });
         }, 25);
       }
     },

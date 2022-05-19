@@ -7,9 +7,14 @@
 	@if ($border-color == null) {
 		$border-color: $background;
 	}
-	.ant-tooltip-arrow-content {
-		background-color: transparent !important;
+
+	.ant-tooltip-arrow {
+		display: none !important;
+		.ant-tooltip-arrow-content {
+			box-shadow: none !important;
+		}
 	}
+
 	.ant-tooltip-content {
 		font-weight: 500;
 		font-size: $standard-text-size;;
@@ -18,6 +23,10 @@
 			border: 1px solid $border-color;
 			background-color: $background !important;
 			color: $color !important;
+
+      > * {
+        color: $color !important;
+      }
 		}
 	}
 }
@@ -51,6 +60,7 @@
 
 .tooltip {
 	@extend .ant-tooltip;
+  @include include_tooltip_color($green, $white, $green);
 
 	&--action {
 		@include include_tooltip_color($green, $white, $green);

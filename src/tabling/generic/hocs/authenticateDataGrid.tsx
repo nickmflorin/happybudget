@@ -309,7 +309,6 @@ const authenticateDataGrid = <
         },
         {
           body: (col: Table.BodyColumn<R, M>) => ({
-            cellRendererParams: { ...col.cellRendererParams },
             editable: (params: Table.ColumnCallbackParams<R>) => {
               if (!tabling.rows.isEditableRow(params.row)) {
                 return false;

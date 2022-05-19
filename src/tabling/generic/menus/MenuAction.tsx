@@ -44,7 +44,7 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
           !isNil(action.tooltip)
             ? typeof action.tooltip === "string"
               ? {
-                  title: action.tooltip,
+                  content: action.tooltip,
                   placement: "bottom",
                   overlayClassName: classNames({ disabled: action.disabled === true })
                 }
@@ -72,7 +72,7 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
           !isNil(action.tooltip)
             ? typeof action.tooltip === "string"
               ? {
-                  title: action.tooltip,
+                  content: action.tooltip,
                   placement: "bottom",
                   overlayClassName: classNames({ disabled: action.disabled === true })
                 }

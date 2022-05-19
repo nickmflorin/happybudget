@@ -25,5 +25,5 @@
     "resolveJsonModule": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "build", ".vscode", ".git"]
+  "exclude": ["**/node_modules", "**/build", ".vscode", ".git"]
 }

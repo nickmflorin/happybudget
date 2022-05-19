@@ -2,7 +2,7 @@ import React, { useState, useMemo, forwardRef } from "react";
 import { map } from "lodash";
 import classNames from "classnames";
 
-import { Input as AntDInput, Popover as AntDPopover } from "antd";
+import { InputRef, Input as AntDInput, Popover as AntDPopover } from "antd";
 import { InputProps as AntDInputProps } from "antd/lib/input";
 
 import { Icon } from "components";
@@ -47,7 +47,7 @@ export type PasswordInputProps = PrivatePasswordInputProps & UseSizeProps;
 
 const PasswordInput = (
   { hasValidator, ...props }: PrivatePasswordInputProps,
-  ref: React.ForwardedRef<AntDInput>
+  ref: React.ForwardedRef<InputRef>
 ): JSX.Element => {
   const [validationState, setValidationState] = useState<PasswordValidationState>(initialValidationState);
 
@@ -93,9 +93,9 @@ const PasswordInput = (
   return children;
 };
 
-export default withSize<PasswordInputProps, StandardSize, "size", AntDInput>({
+export default withSize<PasswordInputProps, StandardSize, "size", InputRef>({
   hasRef: true
 })(forwardRef(PasswordInput)) as React.ForwardRefRenderFunction<
-  AntDInput,
-  PasswordInputProps & { readonly ref?: React.ForwardedRef<AntDInput> }
+  InputRef,
+  PasswordInputProps & { readonly ref?: React.ForwardedRef<InputRef> }
 >;

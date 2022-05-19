@@ -28,6 +28,7 @@ export const CalculatedColumn = <R extends Table.RowData, M extends Model.RowHtt
     /* We do not want to use the cell renderers for the body cells because it
        slows rendering down dramatically. */
     cellRenderer: {
+      data: "CalculatedCell",
       footer: "CalculatedCell",
       page: "CalculatedCell"
     },

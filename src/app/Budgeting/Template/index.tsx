@@ -41,7 +41,7 @@ const Template = (props: TemplateProps): JSX.Element => {
           activeIcon: <Icon icon={"copy"} weight={"solid"} />,
           onClick: () => history.push("/templates"),
           tooltip: {
-            title: "My Templates",
+            content: "My Templates",
             placement: "right"
           }
         },
@@ -62,7 +62,7 @@ const Template = (props: TemplateProps): JSX.Element => {
             location.pathname.startsWith("/templates") &&
             !location.pathname.startsWith(`/templates/${props.budgetId}/fringes`),
           tooltip: {
-            title: "Template",
+            content: "Template",
             placement: "right"
           }
         }

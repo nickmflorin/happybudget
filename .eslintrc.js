@@ -17,7 +17,9 @@ module.exports = {
       version: "detect"
     }
   },
-  ignorePatterns: ["*.svg", "node_modules/**/*", "build", "dist", "public"],
+  /* I am not 100% sure that the node_modules are being ignored properly, hence
+     the multiple references. */
+  ignorePatterns: ["*.svg", "node_modules/**/*", "**/node_modules/**/*", "build", "dist", "public"],
   rules: {
     "prettier/prettier": "error",
     "no-global-assign": 2,
@@ -97,7 +99,7 @@ module.exports = {
         "@typescript-eslint/explicit-module-boundary-types": ["off"],
         "@typescript-eslint/explicit-function-return-type": ["off"],
         /* It would be nice for this to be an error, but unfortunately AG Grid's
-			 type bindings are so terrible that it makes it difficult. */
+			     type bindings are so terrible that it makes it difficult. */
         "@typescript-eslint/no-unsafe-member-access": ["off"]
       }
     }
