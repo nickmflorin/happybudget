@@ -1,7 +1,7 @@
 import React from "react";
 import { isNil } from "lodash";
 
-import { tabling } from "lib";
+import { formatters } from "lib";
 import LinkCell, { LinkCellProps } from "./LinkCell";
 
 const PhoneNumberCell = <
@@ -16,7 +16,7 @@ const PhoneNumberCell = <
     <LinkCell<R, M, S, C>
       href={(v: string | number | null) => (!isNil(v) ? `tel:${v}` : undefined)}
       rel={"noreferrer"}
-      valueFormatter={tabling.columns.phoneNumberValueFormatter}
+      valueFormatter={formatters.phoneNumberFormatter}
       {...props}
     />
   );

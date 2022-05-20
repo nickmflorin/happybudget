@@ -21,7 +21,7 @@ const isNotFormatterParams = <
   T extends string | number | Moment = string | number,
   O extends FormatterOpts<T> = FormatterOpts<T>
 >(
-  p: FormatterParams<T> | OnFormatError<T> | O
+  p: PARAMS<T, O>
 ): p is FormatterParams<T> =>
   typeof p === "function" || (typeof p === "object" && Object.prototype.hasOwnProperty.call(p, "value"));
 
@@ -29,8 +29,15 @@ const isFormatterParams = <
   T extends string | number | Moment = string | number,
   O extends FormatterOpts<T> = FormatterOpts<T>
 >(
-  p: FormatterParams<T> | OnFormatError<T> | O
+  p: PARAMS<T, O>
 ): p is FormatterParams<T> => !isNotFormatterParams(p);
+
+const isErrorHandler = <
+  T extends string | number | Moment = string | number,
+  O extends FormatterOpts<T> = FormatterOpts<T>
+>(
+  p: PARAMS<T, O>
+): p is OnFormatError<T> => typeof p === "function";
 
 export const isAgFormatterParams = <T extends string | number | Moment = string | number>(
   params: NativeFormatterParams<T> | AGFormatterParams
@@ -57,9 +64,12 @@ const formatAs = <
     return valuedFormatter(p, {
       onError: (v: T) => console.error(`Could not parse value ${String(v)} into ${fmtType}!`)
     } as O) as RT<T, O, P>;
+  } else if (isErrorHandler(p)) {
+    const opts = { onError: p } as O;
+    return ((params: FormatterParams<T>) => valuedFormatter(params, opts)) as RT<T, O, P>;
+  } else {
+    return ((params: FormatterParams<T>) => valuedFormatter(params, p as unknown as O)) as RT<T, O, P>;
   }
-  const opts = typeof p === "function" ? ({ onError: p } as O) : (p as O);
-  return ((params: FormatterParams<T>) => valuedFormatter(params, opts)) as RT<T, O, P>;
 };
 
 export const currencyFormatter = <P extends PARAMS<string | number, FormatterOpts<string | number>>>(params: P) =>
