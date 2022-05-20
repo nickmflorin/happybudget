@@ -1,5 +1,5 @@
 import { isNil } from "lodash";
-import { tabling, budgeting } from "lib";
+import { tabling, budgeting, formatters } from "lib";
 
 import { Icon } from "components";
 import { columns } from "../../generic";
@@ -48,11 +48,11 @@ const Columns: Table.Column<R, M>[] = [
   columns.EstimatedColumn<R, M>({
     field: "estimated",
     isRead: false,
-    pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
+    pdfFormatter: (params: NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.columns.currencyValueFormatter((v: string) =>
-            console.error(`Could not parse currency value ${v} for PDF field 'estimated'.`)
+        : formatters.currencyFormatter((v: string | number) =>
+            console.error(`Could not parse currency value ${String(v)} for PDF field 'estimated'.`)
           )(params),
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.estimatedValueGetter
@@ -61,11 +61,11 @@ const Columns: Table.Column<R, M>[] = [
     field: "actual",
     markupField: "actual",
     isRead: true,
-    pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
+    pdfFormatter: (params: NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.columns.currencyValueFormatter((v: string) =>
-            console.error(`Could not parse currency value ${v} for PDF field 'actual'.`)
+        : formatters.currencyFormatter((v: string | number) =>
+            console.error(`Could not parse currency value ${String(v)} for PDF field 'actual'.`)
           )(params),
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.actualValueGetter,
@@ -76,11 +76,11 @@ const Columns: Table.Column<R, M>[] = [
   columns.VarianceColumn<R, M>({
     field: "variance",
     isRead: false,
-    pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
+    pdfFormatter: (params: NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.columns.currencyValueFormatter((v: string) =>
-            console.error(`Could not parse currency value ${v} for PDF field 'variance'.`)
+        : formatters.currencyFormatter((v: string | number) =>
+            console.error(`Could not parse currency value ${String(v)} for PDF field 'variance'.`)
           )(params),
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.varianceValueGetter,

@@ -1,7 +1,7 @@
 import { isNil } from "lodash";
 import { ValueSetterParams } from "@ag-grid-community/core";
 
-import { model, tabling, util } from "lib";
+import { model, tabling, util, formatters } from "lib";
 import { columns } from "../../generic";
 
 type R = Tables.ContactRowData;
@@ -84,8 +84,8 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     nullValue: null,
     headerName: "Rate",
     dataType: "currency",
-    valueFormatter: tabling.columns.currencyValueFormatter((v: string) =>
-      console.error(`Could not parse currency value ${v} for field 'rate'.`)
+    valueFormatter: formatters.currencyFormatter((v: string | number) =>
+      console.error(`Could not parse currency value ${String(v)} for field 'rate'.`)
     ),
     valueSetter: tabling.columns.numericValueSetter("rate"),
     width: 75,

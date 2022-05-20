@@ -1,7 +1,7 @@
 import { isNil, map, findIndex, includes, filter } from "lodash";
 import { SuppressKeyboardEventParams, CellClassParams } from "@ag-grid-community/core";
 
-import { util, tabling, budgeting, notifications } from "lib";
+import { util, tabling, budgeting, notifications, formatters } from "lib";
 
 export const ActionColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
   col: Table.PartialActionColumn<R, M> & { readonly colId: Table.ActionColumnId }
@@ -43,8 +43,8 @@ export const CalculatedColumn = <R extends Table.RowData, M extends Model.RowHtt
       }
       return tabling.aggrid.mergeClassNamesFn("cell--calculated", col?.cellClass)(params);
     },
-    valueFormatter: tabling.columns.currencyValueFormatter((v: string) =>
-      console.error(`Could not parse currency value ${v} for field ${col.field}.`)
+    valueFormatter: formatters.currencyFormatter((v: string | number) =>
+      console.error(`Could not parse currency value ${String(v)} for field ${col.field}.`)
     )
   };
 };

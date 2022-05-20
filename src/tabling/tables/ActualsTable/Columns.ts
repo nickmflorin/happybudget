@@ -1,6 +1,7 @@
 import { isNil, reduce, filter } from "lodash";
+import { Moment } from "moment";
 
-import { tabling, util } from "lib";
+import { tabling, util, formatters } from "lib";
 import { columns } from "../../generic";
 
 type R = Tables.ActualRowData;
@@ -39,12 +40,11 @@ const Columns: Table.Column<R, M>[] = [
     cellEditor: "DateEditor",
     cellEditorPopup: true,
     cellEditorPopupPosition: "below",
-    valueFormatter: tabling.columns.dateValueFormatter((v: string) =>
-      console.error(`Could not parse date value ${v} for field 'date'.`)
+    valueFormatter: formatters.dateFormatter((v: string | number | Moment) =>
+      console.error(`Could not parse date value ${String(v)} for field 'date'.`)
     ),
     valueSetter: tabling.columns.dateValueSetter("date"),
-    pdfFormatter: (params: Table.NativeFormatterParams<string>) =>
-      isNil(params) || params === "" ? "" : tabling.columns.dateValueFormatter(params),
+    pdfFormatter: (params: NativeFormatterParams<string | Moment>) => formatters.dateFormatter(params),
     dataType: "date",
     processCellForCSV: (row: R) => {
       return (!isNil(row.date) && util.dates.toDate(row.date)) || "";
@@ -71,14 +71,14 @@ const Columns: Table.Column<R, M>[] = [
     footer: {
       cellStyle: { textAlign: "right" }
     },
-    pdfFormatter: (params: Table.NativeFormatterParams<number | null>) =>
+    pdfFormatter: (params: NativeFormatterParams<number>) =>
       isNil(params)
         ? "0.0"
-        : tabling.columns.currencyValueFormatter((v: string) =>
-            console.error(`Could not parse currency value ${v} for PDF field 'value'.`)
+        : formatters.currencyFormatter((v: string | number) =>
+            console.error(`Could not parse currency value ${String(v)} for PDF field 'value'.`)
           )(params),
-    valueFormatter: tabling.columns.currencyValueFormatter((v: string) =>
-      console.error(`Could not parse currency value ${v} for field 'value'.`)
+    valueFormatter: formatters.currencyFormatter((v: string | number) =>
+      console.error(`Could not parse currency value ${String(v)} for field 'value'.`)
     ),
     valueSetter: tabling.columns.numericValueSetter("value"),
     dataType: "currency",

@@ -6,7 +6,7 @@ export * as clipboard from "./clipboard";
 export * as dates from "./dates";
 export * as events from "./events";
 export * as files from "./files";
-export * as formatters from "./formatters";
+export * as formatters from "../formatters";
 export * as html from "./html";
 export * as validate from "./validate";
 

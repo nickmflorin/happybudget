@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { find, reduce, filter, includes, map, isNil } from "lodash";
 
-import { redux, model, hooks, tabling, util, ui } from "lib";
+import { redux, model, hooks, util, ui, formatters } from "lib";
 import { DEFAULT_COLOR_SCHEME, Colors } from "style/constants";
 
 import { NoData } from "components";
@@ -118,20 +118,20 @@ const BudgetTotal = ({ budget, budgetId, ...props }: BudgetTotalProps): JSX.Elem
     if (!isNil(budget)) {
       switch (metric) {
         case "actual":
-          return tabling.columns.currencyValueFormatter((v: string) =>
+          return formatters.currencyFormatter((v: string | number) =>
             console.error(`Could not parse currency from value ${v} for budget actual.`)
           )(model.budgeting.actualValue(budget));
         case "variance":
-          return tabling.columns.currencyValueFormatter((v: string) =>
+          return formatters.currencyFormatter((v: string | number) =>
             console.error(`Could not parse currency from value ${v} for budget variance.`)
           )(model.budgeting.varianceValue(budget));
         default:
-          return tabling.columns.currencyValueFormatter((v: string) =>
+          return formatters.currencyFormatter((v: string | number) =>
             console.error(`Could not parse currency from value ${v} for budget estimated.`)
           )(model.budgeting.estimatedValue(budget));
       }
     }
-    return tabling.columns.currencyValueFormatter(0);
+    return formatters.currencyFormatter(0);
   }, [budget, metric]);
 
   return (

@@ -3,7 +3,7 @@ declare type TooltipType = "info" | "action";
 declare type IItemizedTooltipItem = {
   readonly label: string;
   readonly value: string | number;
-  readonly formatter?: Table.NativeFormatter<string | number>;
+  readonly formatter?: NativeFormatter<string | number>;
 };
 
 type TooltipContent = string | JSX.Element | IItemizedTooltipItem[];
@@ -18,7 +18,7 @@ declare type TooltipProps = Omit<
   readonly includeLink?: IncludeLink;
   readonly type?: TooltipType;
   // Only applicable when content is specified as IItemizedTooltipItem[].
-  readonly valueFormatter?: Table.NativeFormatter<string | number>;
+  readonly valueFormatter?: NativeFormatter<string | number>;
 };
 
 declare type DeterministicTooltip = string | Omit<TooltipProps, "children">;

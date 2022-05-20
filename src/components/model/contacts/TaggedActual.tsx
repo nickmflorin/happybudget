@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { util } from "lib";
+import { util, formatters } from "lib";
 import { RouterLink } from "components/links";
 import { EntityText } from "components/typography";
 
@@ -37,7 +37,7 @@ const TaggedActual = ({ taggedActual, ...props }: TaggedActualProps): JSX.Elemen
         {!isNil(taggedActual.date) && util.dates.toAbbvDisplayDateTime(taggedActual.date)}
       </TaggedActualDetail>
       <TaggedActualDetail field={"Paid"} style={{ width: "15%" }}>
-        {util.formatters.formatAsCurrency(taggedActual.value)}
+        {formatters.currencyFormatter(taggedActual.value)}
       </TaggedActualDetail>
     </div>
   </div>

@@ -1,7 +1,7 @@
 import { ResponsivePie } from "@nivo/pie";
 import { isNil } from "lodash";
 
-import { tabling } from "lib";
+import { formatters } from "lib";
 
 import Tooltip from "./Tooltip";
 
@@ -44,7 +44,7 @@ const BudgetTotalChart = <D extends Charts.Datum = Charts.Datum>(props: BudgetTo
         <Tooltip<Charts.ComputedDatum<D>>
           labelPrefix={props.tooltipLabelPrefix?.(params.datum)}
           datum={params.datum}
-          valueFormatter={(v: string | number) => tabling.columns.currencyValueFormatter(v)}
+          valueFormatter={formatters.currencyFormatter}
         />
       )
     }

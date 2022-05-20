@@ -3,7 +3,7 @@ import { isNil } from "lodash";
 
 import * as api from "api";
 import * as config from "config";
-import { util } from "lib";
+import { formatters } from "lib";
 
 import { objToJson } from "./util";
 
@@ -133,7 +133,7 @@ export const inconsistentStateError = <P extends Redux.ActionPayload = Redux.Act
     : payload;
 
   const addParamValue = (message: string, paramName: string, value: ParamV<P>) =>
-    message + `\n\t${util.formatters.toTitleCase(paramName)}: ${String(value)}`;
+    message + `\n\t${formatters.titleCaseFormatter(paramName)}: ${String(value)}`;
 
   const addParam = (message: string, paramName: string, paramValue: ParamV<P>) =>
     paramValue !== undefined ? addParamValue(message, paramName, paramValue) : message;

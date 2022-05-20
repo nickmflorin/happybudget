@@ -1,7 +1,7 @@
 import { findIndex, isNil, map, includes } from "lodash";
 import { Column } from "@ag-grid-community/core";
 
-import { tabling, budgeting } from "lib";
+import { tabling, budgeting, formatters } from "lib";
 import { Icon } from "components";
 import { columns } from "../../generic";
 
@@ -141,8 +141,8 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "Rate",
     width: 100,
     pdfWidth: 0.05,
-    valueFormatter: tabling.columns.currencyValueFormatter((v: string) =>
-      console.error(`Could not parse currency value ${v} for field 'rate'.`)
+    valueFormatter: formatters.currencyFormatter((v: string | number) =>
+      console.error(`Could not parse currency value ${String(v)} for field 'rate'.`)
     ),
     valueSetter: tabling.columns.numericValueSetter("rate"),
     dataType: "currency",
@@ -160,11 +160,11 @@ const Columns: Table.Column<R, M>[] = [
   columns.EstimatedColumn<R, M>({
     field: "estimated",
     isRead: false,
-    pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
+    pdfFormatter: (params: NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.columns.currencyValueFormatter((v: string) =>
-            console.error(`Could not parse currency value ${v} for field 'estimated'.`)
+        : formatters.currencyFormatter((v: string | number) =>
+            console.error(`Could not parse currency value ${String(v)} for field 'estimated'.`)
           )(params),
     pdfValueGetter: budgeting.valueGetters.estimatedValueGetter,
     pdfWidth: 0.12
@@ -173,11 +173,11 @@ const Columns: Table.Column<R, M>[] = [
     field: "actual",
     markupField: "actual",
     isRead: true,
-    pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
+    pdfFormatter: (params: NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.columns.currencyValueFormatter((v: string) =>
-            console.error(`Could not parse currency value ${v} for field 'actual'.`)
+        : formatters.currencyFormatter((v: string | number) =>
+            console.error(`Could not parse currency value ${String(v)} for field 'actual'.`)
           )(params),
     pdfValueGetter: budgeting.valueGetters.actualValueGetter,
     pdfWidth: 0.12,
@@ -188,11 +188,11 @@ const Columns: Table.Column<R, M>[] = [
   columns.VarianceColumn<R, M>({
     field: "variance",
     isRead: false,
-    pdfFormatter: (params: Table.NativeFormatterParams<string | number>) =>
+    pdfFormatter: (params: NativeFormatterParams<string | number>) =>
       isNil(params) || params === ""
         ? "0.00"
-        : tabling.columns.currencyValueFormatter((v: string) =>
-            console.error(`Could not parse currency value ${v} for field 'variance'.`)
+        : formatters.currencyFormatter((v: string | number) =>
+            console.error(`Could not parse currency value ${String(v)} for field 'variance'.`)
           )(params),
     pdfValueGetter: budgeting.valueGetters.varianceValueGetter,
     pdfWidth: 0.12,

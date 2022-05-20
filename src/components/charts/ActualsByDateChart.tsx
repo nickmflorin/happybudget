@@ -2,7 +2,7 @@ import { ResponsiveBar } from "@nivo/bar";
 import { BarTooltipProps } from "@nivo/bar/dist/types";
 import { isNil } from "lodash";
 
-import { tabling } from "lib";
+import { formatters } from "lib";
 
 import Tooltip from "./Tooltip";
 
@@ -40,7 +40,7 @@ const ActualsByDateChart = <D extends Charts.Datum = Charts.Datum>(props: Budget
           labelPrefix={props.tooltipLabelPrefix?.(params)}
           label={params.indexValue}
           value={params.value}
-          valueFormatter={(v: string | number) => tabling.columns.currencyValueFormatter(v)}
+          valueFormatter={formatters.currencyFormatter}
         />
       );
     }}

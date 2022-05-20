@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { map } from "lodash";
 
-import { model, tabling, hooks, util } from "lib";
+import { model, tabling, hooks, formatters } from "lib";
 
 import { selectors } from "app/Budgeting/store";
 import { PublicBudgetTable, PublicBudgetTableProps } from "../BudgetTable";
@@ -81,12 +81,12 @@ const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model
               {
                 label: "Nominal Value",
                 value: cell.row.data.nominal_value,
-                formatter: util.formatters.formatAsCurrency
+                formatter: formatters.currencyFormatter
               },
               {
                 label: "Fringe Contribution",
                 value: cell.row.data.fringe_contribution,
-                formatter: util.formatters.formatAsCurrency
+                formatter: formatters.currencyFormatter
               }
             ]
           : null

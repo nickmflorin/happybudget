@@ -1,5 +1,6 @@
 export * as budgeting from "./budgeting";
 export * as cookies from "./cookies";
+export * as formatters from "./formatters";
 export * as hooks from "./hooks";
 export * as http from "./http";
 export * as model from "./model";

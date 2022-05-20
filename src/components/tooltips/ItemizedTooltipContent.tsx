@@ -5,7 +5,7 @@ import ItemizedTooltipItem from "./ItemizedTooltipItem";
 
 type ItemizedTooltipContentProps = {
   readonly items: IItemizedTooltipItem[];
-  readonly formatter?: Table.NativeFormatter<string | number>;
+  readonly formatter?: NativeFormatter<string | number>;
 };
 
 const ItemizedTooltipContent = (props: ItemizedTooltipContentProps): JSX.Element => (
