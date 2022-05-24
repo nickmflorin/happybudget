@@ -48,7 +48,7 @@ const FILE_ICON_EXTENSION_MAPPING: FileIconExtensionMap[] = [
   }
 ];
 
-const getFileExtension = (name: string | undefined, ext: string | undefined): string | undefined => {
+const getFileExtension = (name: string | undefined, ext: string | undefined | null): string | undefined => {
   if (!isNil(ext)) {
     return ext.toLowerCase();
   } else if (!isNil(name)) {
@@ -57,7 +57,7 @@ const getFileExtension = (name: string | undefined, ext: string | undefined): st
   return undefined;
 };
 
-const getFileIcon = (name: string | undefined, ext: string | undefined): IconProp => {
+const getFileIcon = (name: string | undefined, ext: string | undefined | null): IconProp => {
   const mapping: FileIconExtensionMap | undefined = find(FILE_ICON_EXTENSION_MAPPING, (mp: FileIconExtensionMap) =>
     includes(mp.extensions, getFileExtension(name, ext))
   );
@@ -66,7 +66,7 @@ const getFileIcon = (name: string | undefined, ext: string | undefined): IconPro
 
 type FileIconProps = Omit<IconProps, "icon"> & {
   readonly name?: string | undefined;
-  readonly ext?: string | undefined;
+  readonly ext?: string | null | undefined;
 };
 
 const FileIcon = ({ name, ext, ...props }: FileIconProps) => {

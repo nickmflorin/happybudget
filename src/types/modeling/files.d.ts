@@ -3,13 +3,12 @@ declare type CSVData = CSVRow[];
 
 // Image data that is received from the API.
 declare type SavedImage = {
-  // URL will always be present, even if the image could not be found.
   readonly url: string;
-  /* Size, height, width and extension can be null if the image could not be
-     found. */
-  readonly size: number | null;
-  readonly height: number | null;
-  readonly width: number | null;
+  readonly size: number;
+  readonly height: number;
+  readonly width: number;
+  /* The extension will be null if the file name is corrupted and the extension
+     cannot be determined. */
   readonly extension: string | null;
 };
 

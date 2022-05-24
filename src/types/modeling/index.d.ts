@@ -153,7 +153,9 @@ declare namespace Model {
 
   type SimpleAttachment = HttpModel & {
     readonly name: string;
-    readonly extension: string;
+    /* The extension will be null if the file name is corrupted and the extension
+     cannot be determined. */
+    readonly extension: string | null;
     readonly url: string;
   };
 
