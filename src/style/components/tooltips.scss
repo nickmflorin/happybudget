@@ -75,3 +75,27 @@
 	}
 }
 
+.itemized-tooltip-content {
+	display: flex;
+	flex-direction: column;
+
+	> .itemized-tooltip-item {
+		display: flex;
+    flex-direction: row;
+
+    .label {
+      font-size: 12px;
+      margin-right: 6px;
+      font-weight: 500;
+      line-height: 22px;
+    }
+
+    .value {
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 22px;
+      text-align: right;
+      flex-grow: 100;
+    }
+	}
+}
