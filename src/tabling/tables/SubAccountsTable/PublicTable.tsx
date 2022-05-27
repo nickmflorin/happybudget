@@ -76,7 +76,9 @@ const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model
       onLeft={onLeft}
       onRight={onRight}
       calculatedCellInfoTooltip={(cell: Table.CellConstruct<Table.ModelRow<R>, Table.CalculatedColumn<R, M>>) =>
-        cell.row.children.length === 0
+        cell.row.children.length === 0 &&
+        cell.col.field === "estimated" &&
+        model.budgeting.estimatedValue(cell.row) !== 0
           ? [
               {
                 label: "Nominal Value",
@@ -86,6 +88,11 @@ const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model
               {
                 label: "Fringe Contribution",
                 value: cell.row.data.fringe_contribution,
+                formatter: formatters.currencyFormatter
+              },
+              {
+                label: "Markup Contribution",
+                value: cell.row.data.markup_contribution,
                 formatter: formatters.currencyFormatter
               }
             ]
