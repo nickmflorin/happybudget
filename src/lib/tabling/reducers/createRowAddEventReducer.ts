@@ -7,11 +7,10 @@ const createRowAddEventReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Table.Context = Table.Context,
-  A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
+  C extends Redux.ActionContext = Redux.ActionContext
 >(
-  config: Omit<Table.ReducerConfig<R, M, S, C, A>, "defaultDataOnUpdate">
-): Redux.Reducer<S, Table.RowAddEvent<R>> => {
+  config: Omit<Table.AuthenticatedReducerConfig<R, M, S, C>, "defaultDataOnUpdate">
+): Redux.BasicReducer<S, Table.RowAddEvent<R>> => {
   const placeholderRowManager = new tabling.rows.PlaceholderRowManager<R, M>({
     columns: config.columns,
     defaultData: config.defaultDataOnCreate

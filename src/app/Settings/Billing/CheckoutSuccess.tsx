@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { Redirect, useLocation } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { actions } from "store";
+import * as store from "store";
 
 import { ApplicationSpinner } from "components";
 
@@ -18,8 +17,8 @@ type IRedirect = {
 };
 
 const CheckoutSuccess = (): JSX.Element => {
+  const [_, updateUser] = store.hooks.useLoggedInUser();
   const [redirect, setRedirect] = useState<IRedirect | null>(null);
-  const dispatch = useDispatch();
   const location = useLocation();
 
   useEffect(() => {
@@ -40,7 +39,7 @@ const CheckoutSuccess = (): JSX.Element => {
       api
         .syncCheckoutSession({ session_id: sessionId })
         .then((u: Model.User) => {
-          dispatch(actions.updateLoggedInUserAction(u));
+          updateUser(u);
           setRedirect({
             pathname: "/billing",
             state: {

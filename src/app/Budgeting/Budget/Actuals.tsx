@@ -4,6 +4,7 @@ import { createSelector } from "reselect";
 import { isNil, map, reduce } from "lodash";
 
 import { redux, tabling } from "lib";
+import * as store from "store";
 import { ActualsTable, connectTableToAuthenticatedStore } from "tabling";
 
 import { ActualsPage } from "../Pages";
@@ -12,25 +13,18 @@ import { ActualsPreviewModal } from "./PreviewModals";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;
+type TC = ActualsTableActionContext;
 
-const selectActualTypes = redux.simpleDeepEqualSelector((state: Application.Store) => state.budget.actuals.types);
-
-const ConnectedActualsTable = connectTableToAuthenticatedStore<
-  ActualsTable.Props,
-  R,
-  M,
-  Tables.ActualTableStore,
-  Tables.ActualTableContext
->({
+const ConnectedActualsTable = connectTableToAuthenticatedStore<ActualsTable.Props, R, M, TC, Tables.ActualTableStore>({
   actions: {
     handleEvent: actions.budget.actuals.handleTableEventAction,
     loading: actions.budget.actuals.loadingAction,
     response: actions.budget.actuals.responseAction,
     setSearch: actions.budget.actuals.setSearchAction
   },
-  tableId: "budget-actuals",
+  tableId: () => "budget-actuals",
   createSaga: (table: Table.TableInstance<R, M>) => sagas.budget.actuals.createTableSaga(table),
-  selector: redux.simpleDeepEqualSelector((state: Application.Store) => state.budget.actuals),
+  selector: () => redux.simpleDeepEqualSelector((state: Application.Store) => state.budget.actuals),
   footerRowSelectors: {
     footer: createSelector(
       (state: Application.Store) => state.budget.actuals.data,
@@ -58,7 +52,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
 
   const dispatch = useDispatch();
   const table = tabling.hooks.useTable<R, M>();
-  const actualTypes = useSelector(selectActualTypes);
+  const actualTypes = useSelector(store.selectors.selectActualTypes);
 
   useEffect(() => {
     dispatch(actions.budget.actuals.requestAction(null, { budgetId }));
@@ -70,10 +64,10 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
         <ConnectedActualsTable
           parent={budget}
           table={table}
-          actionContext={{ budgetId }}
+          tableContext={{ budgetId }}
           actualTypes={actualTypes}
           onImportSuccess={(b: Model.Budget, ms: Model.Actual[]) => {
-            dispatch(actions.budget.updateBudgetInStateAction({ id: b.id, data: b }));
+            dispatch(actions.budget.updateBudgetInStateAction({ id: b.id, data: b }, {}));
             table.current.dispatchEvent({
               type: "modelsAdded",
               payload: map(ms, (m: Model.Actual) => ({ model: m }))

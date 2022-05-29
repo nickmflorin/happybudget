@@ -19,11 +19,11 @@ type CollaboratingProps = {
 };
 
 const Collaborating = (props: CollaboratingProps): JSX.Element => {
-  const user = store.hooks.useLoggedInUser();
+  const [user, _] = store.hooks.useLoggedInUser();
   const dispatch: Redux.Dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(actions.requestCollaboratingAction(null));
+    dispatch(actions.requestCollaboratingAction(null, {}));
   }, []);
 
   return (
@@ -32,8 +32,8 @@ const Collaborating = (props: CollaboratingProps): JSX.Element => {
       selector={(s: Application.Store) => s.dashboard.collaborating}
       noDataProps={{ title: "You are not collaborating on any budgets yet!", child: <BudgetEmptyIcon /> }}
       onSearch={(v: string) => dispatch(actions.setCollaboratingSearchAction(v, {}))}
-      onUpdatePagination={(p: Pagination) => dispatch(actions.setCollaboratingPaginationAction(p))}
-      onUpdateOrdering={(o: Redux.UpdateOrderingPayload) => dispatch(actions.updateCollaboratingOrderingAction(o))}
+      onUpdatePagination={(p: Pagination) => dispatch(actions.setCollaboratingPaginationAction(p, {}))}
+      onUpdateOrdering={(o: Redux.UpdateOrderingPayload) => dispatch(actions.updateCollaboratingOrderingAction(o, {}))}
       createMenuElement={
         <BudgetDropdownMenu
           key={1}
@@ -48,7 +48,7 @@ const Collaborating = (props: CollaboratingProps): JSX.Element => {
               config.env.BILLING_ENABLED &&
               !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
             ) {
-              dispatch(store.actions.setProductPermissionModalOpenAction(true));
+              dispatch(store.actions.setProductPermissionModalOpenAction(true, {}));
             } else {
               props.onCreate();
             }

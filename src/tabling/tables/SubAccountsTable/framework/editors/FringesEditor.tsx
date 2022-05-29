@@ -2,25 +2,37 @@ import { forwardRef, ForwardedRef } from "react";
 import { useSelector } from "react-redux";
 import { isNil, filter, map } from "lodash";
 
+import * as selectors from "app/Budgeting/store/selectors";
 import { tabling } from "lib";
 
 import { Icon } from "components";
 import { ModelTagsMenu } from "components/menus";
 import { framework } from "tabling/generic";
 
-export interface FringesEditorProps
-  extends Table.EditorParams<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore> {
+export interface FringesEditorProps<B extends Model.Budget | Model.Template, P extends Model.Account | Model.SubAccount>
+  extends Table.EditorProps<
+    Tables.SubAccountRowData,
+    Model.SubAccount,
+    SubAccountsTableContext<B, P, false>,
+    Tables.SubAccountTableStore
+  > {
   readonly onAddFringes: () => void;
   readonly colId: keyof Tables.SubAccountRowData;
 }
 
-const FringesEditor = (props: FringesEditorProps, ref: ForwardedRef<Table.AgEditorRef<number[]>>) => {
-  const fringes = useSelector((state: Application.Store) => props.selector(state).fringes.data);
+const FringesEditor = <B extends Model.Budget | Model.Template, P extends Model.Account | Model.SubAccount>(
+  props: FringesEditorProps<B, P>,
+  ref: ForwardedRef<Table.AgEditorRef<number[]>>
+) => {
+  const fringes: Table.BodyRow<Tables.FringeRowData>[] = useSelector((state: Application.Store) =>
+    selectors.selectFringes(state, props.tableContext)
+  );
   const [editor] = framework.editors.useModelMenuEditor<
     number[],
     Tables.FringeRow,
     Tables.SubAccountRowData,
     Model.SubAccount,
+    SubAccountsTableContext<B, P, false>,
     Tables.SubAccountTableStore
   >({
     ...props,

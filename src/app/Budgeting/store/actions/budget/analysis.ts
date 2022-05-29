@@ -1,9 +1,13 @@
 import { redux } from "lib";
 
-export const requestAction = redux.actions.createAction<number>("budget.analysis.Request");
-export const loadingAction = redux.actions.createAction<boolean>("budget.analysis.Loading");
-export const responseAction = redux.actions.createAction<{
+const creator = redux.actions.createActionCreator({ label: "budget" });
+
+export const requestAction = creator<Redux.RequestPayload, Redux.WithActionContext<{ readonly budgetId: number }>>(
+  "analysis.Request"
+);
+export const loadingAction = creator<boolean>("analysis.Loading");
+export const responseAction = creator<{
   readonly groups: Http.ListResponse<Model.Group>;
   readonly accounts: Http.ListResponse<Model.Account>;
   readonly actuals: Http.ListResponse<Model.Actual>;
-}>("budget.analysis.Response");
+}>("analysis.Response");

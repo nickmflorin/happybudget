@@ -13,7 +13,7 @@ export const Logout = (): JSX.Element => {
   useEffect(() => {
     api
       .logout()
-      .then(() => dispatch(store.actions.clearLoggedInUserAction(null)))
+      .then(() => dispatch(store.actions.clearLoggedInUserAction(null, {})))
       .catch(e => notifications.internal.handleRequestError(e))
       .finally(() => setRedirect(true));
   }, []);

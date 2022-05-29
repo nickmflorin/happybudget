@@ -30,3 +30,14 @@ export const selectFilteredContacts = redux.simpleDeepEqualSelector(
 export const selectFilteredContactsLoading = redux.simpleShallowEqualSelector(
   (state: Application.Store) => state.filteredContacts.loading
 );
+
+export const selectSubAccountUnitStore = redux.simpleDeepEqualSelector(
+  (state: Application.Store) => state.subaccountUnits
+);
+export const selectSubAccountUnits = redux.simpleDeepEqualSelector(
+  (state: Application.Store) => state.subaccountUnits.data
+);
+export const selectFringeColorStore = redux.simpleDeepEqualSelector((state: Application.Store) => state.fringeColors);
+export const selectFringeColors = redux.simpleDeepEqualSelector((state: Application.Store) => state.fringeColors.data);
+export const selectActualTypeStore = redux.simpleDeepEqualSelector((state: Application.Store) => state.actualTypes);
+export const selectActualTypes = redux.simpleDeepEqualSelector((state: Application.Store) => state.actualTypes.data);

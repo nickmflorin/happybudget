@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
-import { tabling, budgeting, model } from "lib";
+import { tabling, budgeting } from "lib";
 
 import { connectTableToAuthenticatedStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
 
@@ -13,13 +12,14 @@ import FringesModal from "./FringesModal";
 
 type M = Model.SubAccount;
 type R = Tables.SubAccountRowData;
+type TC = SubAccountsTableContext<Model.Budget, Model.SubAccount, false>;
 
 const ConnectedTable = connectTableToAuthenticatedStore<
   GenericSubAccountsTable.AuthenticatedBudgetProps<Model.SubAccount>,
   R,
   M,
-  Tables.SubAccountTableStore,
-  Tables.SubAccountTableContext
+  TC,
+  Tables.SubAccountTableStore
 >({
   actions: {
     handleEvent: actions.budget.subAccount.handleTableEventAction,
@@ -27,30 +27,13 @@ const ConnectedTable = connectTableToAuthenticatedStore<
     response: actions.budget.subAccount.responseAction,
     setSearch: actions.budget.subAccount.setSearchAction
   },
-  tableId: "budget-subaccount-subaccounts-table",
-  selector: (s: Application.Store) =>
-    selectors.selectSubAccountsTableStore(s, { parentType: "subaccount", domain: "budget" }),
+  tableId: (c: TC) => `${c.domain}-${c.parentType}-subaccounts`,
+  selector: (c: TC) => selectors.createSubAccountsTableStoreSelector(c),
   createSaga: (table: Table.TableInstance<R, M>) => sagas.budget.subAccount.createTableSaga(table),
-  footerRowSelectors: {
-    page: createSelector(
-      (state: Application.Store) => state.budget.detail.data,
-      (budget: Model.Budget | null) => ({
-        identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
-        estimated: !isNil(budget) ? model.budgeting.estimatedValue(budget) : 0.0,
-        variance: !isNil(budget) ? model.budgeting.varianceValue(budget) : 0.0,
-        actual: budget?.actual || 0.0
-      })
-    ),
-    footer: createSelector(
-      (state: Application.Store) => state.budget.subaccount.detail.data,
-      (detail: Model.SubAccount | null) => ({
-        identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
-        estimated: !isNil(detail) ? model.budgeting.estimatedValue(detail) : 0.0,
-        variance: !isNil(detail) ? model.budgeting.varianceValue(detail) : 0.0,
-        actual: detail?.actual || 0.0
-      })
-    )
-  }
+  footerRowSelectors: (c: TC) => ({
+    page: selectors.createBudgetFooterSelector(c),
+    footer: selectors.createSubAccountFooterSelector({ ...c, id: c.parentId })
+  })
 })(GenericSubAccountsTable.AuthenticatedBudget);
 
 interface SubAccountProps {
@@ -63,15 +46,26 @@ interface SubAccountProps {
 const SubAccount = ({ setPreviewModalVisible, ...props }: SubAccountProps): JSX.Element => {
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
   const fringesTable = tabling.hooks.useTable<Tables.FringeRowData, Model.Fringe>();
-
   const dispatch = useDispatch();
-
-  const subaccount = useSelector((s: Application.Store) => selectors.selectSubAccountDetail(s, { domain: "budget" }));
-  const table = tabling.hooks.useTable<Tables.SubAccountRowData, Model.SubAccount>();
+  const table = tabling.hooks.useTable<R, M>();
+  const subaccount = useSelector((s: Application.Store) =>
+    selectors.selectSubAccountDetail(s, {
+      id: props.id,
+      domain: "budget",
+      public: false
+    })
+  );
 
   useEffect(() => {
-    dispatch(actions.budget.subAccount.requestSubAccountAction(props.id));
-  }, [props.id]);
+    dispatch(
+      actions.budget.subAccount.requestSubAccountAction(null, {
+        id: props.id,
+        domain: "budget",
+        public: false,
+        budgetId: props.budgetId
+      })
+    );
+  }, [props.id, props.budgetId]);
 
   useEffect(() => {
     if (!isNil(props.budget) && !isNil(subaccount)) {
@@ -80,7 +74,15 @@ const SubAccount = ({ setPreviewModalVisible, ...props }: SubAccountProps): JSX.
   }, [props.budget, subaccount]);
 
   useEffect(() => {
-    dispatch(actions.budget.subAccount.requestAction(null, { id: props.id, budgetId: props.budgetId }));
+    dispatch(
+      actions.budget.subAccount.requestAction(null, {
+        domain: "budget",
+        parentType: "subaccount",
+        budgetId: props.budgetId,
+        public: false,
+        parentId: props.id
+      })
+    );
   }, [props.id, props.budgetId]);
 
   return (
@@ -88,23 +90,28 @@ const SubAccount = ({ setPreviewModalVisible, ...props }: SubAccountProps): JSX.
       <ConnectedTable
         {...props}
         parent={subaccount}
-        actionContext={{ budgetId: props.budgetId, id: props.id }}
-        parentType={"subaccount"}
+        tableContext={{
+          parentId: props.id,
+          budgetId: props.budgetId,
+          parentType: "subaccount",
+          domain: "budget",
+          public: false
+        }}
         onExportPdf={() => setPreviewModalVisible(true)}
         onOpenFringesModal={() => setFringesModalVisible(true)}
         table={table}
         onShared={(publicToken: Model.PublicToken) =>
           dispatch(
-            actions.budget.updateBudgetInStateAction({ id: props.budgetId, data: { public_token: publicToken } })
+            actions.budget.updateBudgetInStateAction({ id: props.budgetId, data: { public_token: publicToken } }, {})
           )
         }
         onShareUpdated={(publicToken: Model.PublicToken) =>
           dispatch(
-            actions.budget.updateBudgetInStateAction({ id: props.budgetId, data: { public_token: publicToken } })
+            actions.budget.updateBudgetInStateAction({ id: props.budgetId, data: { public_token: publicToken } }, {})
           )
         }
         onUnshared={() =>
-          dispatch(actions.budget.updateBudgetInStateAction({ id: props.budgetId, data: { public_token: null } }))
+          dispatch(actions.budget.updateBudgetInStateAction({ id: props.budgetId, data: { public_token: null } }, {}))
         }
       />
       <FringesModal

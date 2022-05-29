@@ -99,18 +99,22 @@ export const parseKnownRequestErrorNotifications = (
     Pick<UseNotificationsConfig, "handleFieldErrors"> & { readonly dispatchClientErrorToSentry?: boolean }
 ) => {
   if (e instanceof api.ClientError) {
-    /* By default, we do not want to dispatch ClientError(s) to Sentry,
-			 because these are mostly used for control flow and are raised in
-			 expected cases.  However, there are times that we know we should
-			 not be getting a ClientError, in which case we should dispatch to
-			 Sentry. */
+    /*
+		By default, we do not want to dispatch ClientError(s) to Sentry,
+		because these are mostly used for control flow and are raised in
+		expected cases.  However, there are times that we know we should
+		not be getting a ClientError, in which case we should dispatch to
+		Sentry.
+		*/
     if (opts?.dispatchClientErrorToSentry === true) {
       internal.handleRequestError(e);
     }
     return parseNotifications(e.errors, { message: "There was a problem with your request.", ...opts });
   } else {
-    /* Dispatch the notification to the internal handler so we can, if
-		 appropriate, send notifications to Sentry or the console. */
+    /*
+		Dispatch the notification to the internal handler so we can, if
+		appropriate, send notifications to Sentry or the console.
+		*/
     internal.handleRequestError(e);
     return parseNotifications(e, {
       message: "There was an error with your request.",

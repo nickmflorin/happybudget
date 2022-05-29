@@ -5,11 +5,12 @@ import { isNil } from "lodash";
 const useFormattedValue = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   V extends string | number | null = string | number | null,
-  C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>
+  CL extends Table.DataColumn<R, M> = Table.DataColumn<R, M>
 >(
-  props: Table.ValueCellProps<R, M, S, V, C>
+  props: Table.ValueCellProps<R, M, C, S, V, CL>
 ): V => {
   const formatterParams = useMemo<ValueFormatterParams | null>(
     () =>

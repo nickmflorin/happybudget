@@ -4,12 +4,16 @@ import GenericFringesModal from "components/modals/FringesModal";
 
 import { actions, selectors, sagas } from "../store";
 
+type R = Tables.FringeRowData;
+type M = Model.Fringe;
+type TC = FringesTableContext<Model.Budget, Model.Account | Model.SubAccount, false>;
+
 const ConnectedFringesTable = connectTableToAuthenticatedStore<
-  FringesTable.AuthenticatedFringesTableProps<Model.Budget>,
-  Tables.FringeRowData,
-  Model.Fringe,
-  Tables.FringeTableStore,
-  Tables.FringeTableContext
+  FringesTable.AuthenticatedFringesTableProps<Model.Budget, Model.Account | Model.SubAccount>,
+  R,
+  M,
+  TC,
+  Tables.FringeTableStore
 >({
   actions: {
     handleEvent: actions.budget.handleFringesTableEventAction,
@@ -17,7 +21,9 @@ const ConnectedFringesTable = connectTableToAuthenticatedStore<
     response: actions.budget.responseFringesAction,
     setSearch: actions.budget.setFringesSearchAction
   },
-  tableId: "budget-fringes"
+  createSaga: (t: Table.TableInstance<R, M>) => sagas.budget.createFringesTableSaga(t),
+  selector: (c: TC) => (si: Application.Store) => selectors.selectFringesStore(si, c),
+  tableId: (c: TC) => `${c.domain}-fringes`
 })(FringesTable.AuthenticatedTable);
 
 interface FringesModalProps extends Pick<ModalProps, "open" | "onCancel"> {
@@ -25,20 +31,15 @@ interface FringesModalProps extends Pick<ModalProps, "open" | "onCancel"> {
   readonly budget: Model.Budget | null;
   readonly parentType: "account" | "subaccount";
   readonly id: number;
-  readonly table: NonNullRef<Table.TableInstance<Tables.FringeRowData, Model.Fringe>>;
+  readonly table: NonNullRef<Table.TableInstance<R, M>>;
 }
 
 const FringesModal: React.FC<FringesModalProps> = ({ id, budget, budgetId, open, parentType, table, onCancel }) => (
   <GenericFringesModal open={open} onCancel={onCancel}>
     <ConnectedFringesTable
       budget={budget}
-      domain={"budget"}
-      actionContext={{ budgetId, id }}
+      tableContext={{ budgetId, parentId: id, parentType, domain: "budget", public: false }}
       table={table}
-      createSaga={(t: Table.TableInstance<Tables.FringeRowData, Model.Fringe>) =>
-        sagas.budget.createFringesTableSaga(t, parentType)
-      }
-      selector={(si: Application.Store) => selectors.selectFringesStore(si, { parentType, domain: "budget" })}
     />
   </GenericFringesModal>
 );

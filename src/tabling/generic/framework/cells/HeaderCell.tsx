@@ -35,18 +35,16 @@ const HeaderCell = <R extends Table.RowData, M extends Model.RowHttpModel = Mode
   style = {},
   onEdit
 }: HeaderCellProps<R, M>): JSX.Element => {
-  const dataType: Table.ColumnDataType | null = useMemo(() => {
-    return tabling.columns.isDataColumn(column)
-      ? find(tabling.columns.ColumnTypes, { id: column.dataType }) || null
-      : null;
-  }, [column]);
+  const dataType: Table.ColumnDataType | null = useMemo(
+    () =>
+      tabling.columns.isDataColumn(column) ? find(tabling.columns.ColumnTypes, { id: column.dataType }) || null : null,
+    [column]
+  );
 
-  const columnStyle = useMemo(() => {
-    if (!isNil(dataType)) {
-      return tabling.columns.getColumnTypeCSSStyle(dataType, { header: true });
-    }
-    return {};
-  }, [dataType]);
+  const columnStyle = useMemo(
+    () => (!isNil(dataType) ? tabling.columns.getColumnTypeCSSStyle(dataType, { header: true }) : {}),
+    [dataType]
+  );
 
   return (
     <div className={classNames("inner-cell--header", className)} style={{ ...columnStyle, ...style }}>

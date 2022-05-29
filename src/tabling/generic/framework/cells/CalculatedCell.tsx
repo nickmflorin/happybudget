@@ -1,31 +1,28 @@
-import React, { useMemo } from "react";
+import React, { ReactNode, useMemo } from "react";
 import { isNil } from "lodash";
 
 import { tabling } from "lib";
 
+import { Icon } from "components";
+import { IconButton } from "components/buttons";
+import { InfoTooltip } from "components/tooltips";
+
 import BodyCell from "./BodyCell";
 import connectCellToStore from "./connectCellToStore";
-
-export type CalculatedCellProps<
-  R extends Table.RowData = Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
-> = Table.ValueCellProps<R, M, S, number | null, Table.CalculatedColumn<R, M, number | null>> & {
-  readonly hasInfo?:
-    | boolean
-    | ((cell: Table.CellConstruct<Table.ModelRow<R>, Table.CalculatedColumn<R, M>>) => boolean | undefined);
-};
 
 const CalculatedCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >({
   hasInfo,
   onInfoClicked,
+  infoTooltip,
   ...props
-}: CalculatedCellProps<R, M, S>): JSX.Element => {
+}: Table.CalculatedCellProps<R, M, C, S>): JSX.Element => {
   const row: Table.ModelRow<R> | Table.FooterRow = props.node.data;
+  const col = props.customCol;
 
   const _hasInfo = useMemo(
     () =>
@@ -37,21 +34,52 @@ const CalculatedCell = <
     [hasInfo, row, props.customCol]
   );
 
-  if (tabling.rows.isModelRow(row) && !isNil(onInfoClicked) && _hasInfo) {
-    return (
-      <BodyCell<R, M, S, number | null, Table.CalculatedColumn<R, M, number | null>>
-        {...props}
-        onInfoClicked={onInfoClicked}
-      />
-    );
-  }
-  return <BodyCell<R, M, S, number | null, Table.CalculatedColumn<R, M, number | null>> {...props} />;
+  const prefixChildren = useMemo(() => {
+    if (tabling.rows.isModelRow(row) && _hasInfo) {
+      const toolTipContent = infoTooltip?.({ col, row });
+      if (!isNil(onInfoClicked)) {
+        return (
+          <div className={"info-wrapper"}>
+            <IconButton
+              className={"btn--cell-info"}
+              onClick={() => onInfoClicked?.({ row, col })}
+              icon={<Icon icon={"circle-info"} weight={"solid"} />}
+              tooltip={
+                !isNil(toolTipContent)
+                  ? ({ children }: { children: ReactNode }) => (
+                      <InfoTooltip content={toolTipContent}>{children}</InfoTooltip>
+                    )
+                  : undefined
+              }
+            />
+          </div>
+        );
+      } else if (!isNil(toolTipContent)) {
+        return (
+          <div className={"info-wrapper"}>
+            <InfoTooltip content={toolTipContent}>
+              <Icon className={"icon--cell-info"} icon={"circle-info"} weight={"solid"} />
+            </InfoTooltip>
+          </div>
+        );
+      }
+    }
+    return <></>;
+  }, [onInfoClicked, row, col, infoTooltip]);
+
+  return (
+    <BodyCell<R, M, C, S, number | null, Table.CalculatedColumn<R, M, number | null>>
+      {...props}
+      prefixChildren={prefixChildren}
+    />
+  );
 };
 
 export default connectCellToStore<
-  CalculatedCellProps<Table.RowData, Model.RowHttpModel, Redux.TableStore<Table.RowData>>,
+  Table.CalculatedCellProps<Table.RowData, Model.RowHttpModel, Table.Context, Redux.TableStore<Table.RowData>>,
   Table.RowData,
   Model.RowHttpModel,
+  Table.Context,
   Redux.TableStore<Table.RowData>,
   number | null,
   Table.CalculatedColumn<Table.RowData, Model.RowHttpModel, number | null>

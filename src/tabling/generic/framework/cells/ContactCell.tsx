@@ -11,19 +11,21 @@ import { Cell } from "./generic";
 interface ContactCellProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
-> extends Table.CellProps<R, M, S, number | null> {
+> extends Table.CellProps<R, M, C, S, number | null> {
   readonly onEditContact: (params: { contact: number; rowId: Table.ModelRowId }) => void;
 }
 
 const ContactCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >({
   value,
   ...props
-}: ContactCellProps<R, M, S>): JSX.Element => {
+}: ContactCellProps<R, M, C, S>): JSX.Element => {
   const row: Table.ModelRow<R> = props.node.data;
   const cs = store.hooks.useContacts();
   const loaded = store.hooks.useContactsLoaded();

@@ -3,7 +3,7 @@ import { filter, includes, reduce, uniq } from "lodash";
 import { notifications } from "lib";
 
 export const identityReducer =
-  <S>(initialState: S): Redux.Reducer<S> =>
+  <S, C extends Redux.ActionContext = Redux.ActionContext>(initialState: S): Redux.Reducer<S, C> =>
   (st: S = initialState) =>
     st;
 
@@ -97,7 +97,7 @@ export const createSelectionHandlers = <M extends Model.Model>(mode: ModelSelect
 export const createSelectionReducer = <M extends Model.Model>(
   mode: ModelSelectionMode,
   initialState: SelectionState<M>
-): Redux.Reducer<M["id"][], SelectionAction<M>> => {
+): Redux.BasicReducer<M["id"][], SelectionAction<M>> => {
   const handlers = createSelectionHandlers<M>(mode);
   return (state: M["id"][] = initialState, action: SelectionAction<M>) => {
     const ids = uniq(Array.isArray(action.payload) ? action.payload : [action.payload]);
@@ -112,27 +112,26 @@ export const createSelectionReducer = <M extends Model.Model>(
   };
 };
 
-export const withActionsOnly = <S, A extends Redux.Action = Redux.Action>(
-  reducer: Redux.Reducer<S, A>,
+export const withActionsOnly = <
+  S,
+  C extends Redux.ActionContext = Redux.ActionContext,
+  A extends Redux.AnyPayloadAction<C> = Redux.AnyPayloadAction<C>
+>(
+  reducer: Redux.Reducer<S, C, A>,
   initialState: S,
-  actions: (Redux.ActionCreator | Redux.TableActionCreator | string)[]
-): Redux.Reducer<S, A> => {
+  actions: (Redux.AnyPayloadActionCreator<C> | string)[]
+): Redux.Reducer<S, C, A> => {
   const actionNames = reduce(
     actions,
-    (curr: string[], a: Redux.ActionCreator | Redux.TableActionCreator | string) =>
+    (curr: string[], a: Redux.AnyPayloadActionCreator<C> | string) =>
       typeof a === "string" ? [...curr, a] : [...curr, a.toString()],
     []
   );
-  /* We have to force coerce to R since the form of the reducer may differ based
-     on the optional s? parameter and included initialState initializer:
-
-		 (1) (s: S | undefined = initialState, a: A) => S
-		 (2) (s: S, a: A) => S
-		 */
-  return (s: S | undefined = initialState, a: A): S => {
-    if (!includes(actionNames, a.type)) {
-      return s;
-    }
-    return reducer(s, a);
-  };
+  /*
+	We have to force coerce to R since the form of the reducer may differ based
+  on the optional s? parameter and included initialState initializer:
+	(1) (s: S | undefined = initialState, a: A) => S
+	(2) (s: S, a: A) => S
+	*/
+  return (s: S | undefined = initialState, a: A): S => (!includes(actionNames, a.type) ? s : reducer(s, a));
 };

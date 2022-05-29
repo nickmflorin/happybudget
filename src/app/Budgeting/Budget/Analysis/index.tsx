@@ -17,7 +17,7 @@ const Analysis = ({ budget, budgetId }: AnalysisProps): JSX.Element => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(actions.budget.analysis.requestAction(budgetId));
+    dispatch(actions.budget.analysis.requestAction(null, { budgetId }));
   }, [budgetId]);
 
   return (

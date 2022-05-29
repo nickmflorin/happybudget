@@ -1,11 +1,11 @@
 import { combineReducers } from "redux";
-import { filter, intersection } from "lodash";
+import { filter, intersection, includes, isNil } from "lodash";
 
-import { redux, budgeting, tabling } from "lib";
+import { redux, budgeting, tabling, context } from "lib";
 import { AccountsTable, SubAccountsTable, FringesTable } from "tabling";
 
 import * as actions from "../actions/template";
-import { initialTemplateState } from "../initialState";
+import * as initialState from "../initialState";
 
 const SubAccountColumns = filter(
   SubAccountsTable.Columns,
@@ -23,8 +23,59 @@ const FringesColumns = filter(FringesTable.Columns, (c: Table.Column<Tables.Frin
   tabling.columns.isModelColumn(c)
 ) as Table.ModelColumn<Tables.FringeRowData, Model.Fringe>[];
 
-const genericReducer = combineReducers({
-  detail: redux.reducers.createDetailResponseReducer<Model.Template>({
+const subaccountStoreReducer = budgeting.reducers.createAuthenticatedAccountSubAccountStoreReducer<
+  Model.Template,
+  Model.SubAccount
+>({
+  initialState: initialState.initialSubAccountState,
+  columns: SubAccountColumns,
+  actions: {
+    loading: actions.subAccount.loadingSubAccountAction,
+    response: actions.subAccount.responseSubAccountAction,
+    updateInState: actions.subAccount.updateInStateAction,
+    invalidate: actions.subAccount.invalidateSubAccountAction
+  },
+  tableActions: {
+    request: actions.subAccount.requestAction,
+    handleEvent: actions.subAccount.handleTableEventAction,
+    loading: actions.subAccount.loadingAction,
+    response: actions.subAccount.responseAction,
+    setSearch: actions.subAccount.setSearchAction,
+    invalidate: actions.subAccount.invalidateAction
+  }
+});
+
+const accountStoreReducer = budgeting.reducers.createAuthenticatedAccountSubAccountStoreReducer<
+  Model.Template,
+  Model.Account
+>({
+  initialState: initialState.initialAccountState,
+  columns: SubAccountColumns,
+  actions: {
+    loading: actions.account.loadingAccountAction,
+    response: actions.account.responseAccountAction,
+    updateInState: actions.account.updateInStateAction,
+    invalidate: actions.account.invalidateAccountAction
+  },
+  tableActions: {
+    request: actions.account.requestAction,
+    handleEvent: actions.account.handleTableEventAction,
+    loading: actions.account.loadingAction,
+    response: actions.account.responseAction,
+    setSearch: actions.account.setSearchAction,
+    invalidate: actions.account.invalidateAction
+  }
+});
+
+const genericReducer: Redux.Reducer<Modules.Template.Store> = combineReducers({
+  /*
+	The account and subaccount keys of the reducer are handled separately, but
+	they are still in parallel to the other keys of the store - so we just use
+	the identity.
+	*/
+  account: redux.reducers.identityReducer<Redux.ModelIndexedStore<Modules.AccountStore>>({}),
+  subaccount: redux.reducers.identityReducer<Redux.ModelIndexedStore<Modules.SubAccountStore>>({}),
+  detail: redux.reducers.createDetailReducer<Model.Template, BudgetActionContext<Model.Template, false>>({
     initialState: redux.initialDetailResponseState,
     actions: {
       loading: actions.loadingBudgetAction,
@@ -32,110 +83,66 @@ const genericReducer = combineReducers({
       updateInState: actions.updateBudgetInStateAction
     }
   }),
-  accounts: budgeting.reducers.createAuthenticatedAccountsTableReducer({
-    initialState: initialTemplateState.account.table,
-    clearOn: [
-      {
-        action: actions.accounts.requestAction,
-        payload: (p: Redux.TableRequestPayload) => !redux.isListRequestIdsPayload(p)
-      }
-    ],
+  fringes: budgeting.reducers.createAuthenticatedFringesTableReducer<Model.Template>({
+    initialState: redux.initialTableState,
+    columns: FringesColumns,
     actions: {
-      handleEvent: actions.accounts.handleTableEventAction,
-      loading: actions.accounts.loadingAction,
-      response: actions.accounts.responseAction,
-      setSearch: actions.accounts.setSearchAction
-    },
-    columns: AccountColumns,
-    getModelRowChildren: (m: Model.Account) => m.children
-  }),
-  account: budgeting.reducers.createAccountDetailReducer({
-    initialState: initialTemplateState.account,
-    actions: {
-      loading: actions.account.loadingAccountAction,
-      response: actions.account.responseAccountAction,
-      updateInState: actions.account.updateInStateAction
-    },
-    reducers: {
-      table: budgeting.reducers.createAuthenticatedSubAccountsTableReducer({
-        initialState: initialTemplateState.account.table,
-        clearOn: [
-          {
-            action: actions.account.requestAction,
-            payload: (p: Redux.TableRequestPayload) => !redux.isListRequestIdsPayload(p)
-          }
-        ],
-        actions: {
-          handleEvent: actions.account.handleTableEventAction,
-          loading: actions.account.loadingAction,
-          response: actions.account.responseAction,
-          responseSubAccountUnits: actions.responseSubAccountUnitsAction,
-          setSearch: actions.account.setSearchAction
-        },
-        getModelRowChildren: (m: Model.SubAccount) => m.children,
-        columns: SubAccountColumns,
-        fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
-          initialState: initialTemplateState.account.table.fringes,
-          columns: FringesColumns,
-          clearOn: [actions.requestFringesAction],
-          actions: {
-            responseFringeColors: actions.responseFringeColorsAction,
-            handleEvent: actions.handleFringesTableEventAction,
-            loading: actions.loadingFringesAction,
-            response: actions.responseFringesAction,
-            setSearch: actions.setFringesSearchAction
-          }
-        })
-      })
+      handleEvent: actions.handleFringesTableEventAction,
+      loading: actions.loadingFringesAction,
+      response: actions.responseFringesAction,
+      setSearch: actions.setFringesSearchAction
     }
   }),
-  subaccount: budgeting.reducers.createSubAccountDetailReducer({
-    initialState: initialTemplateState.subaccount,
+  accounts: budgeting.reducers.createAuthenticatedAccountsTableReducer<Model.Template>({
+    initialState: initialState.initialBudgetState.accounts,
+    columns: AccountColumns,
     actions: {
-      loading: actions.subAccount.loadingSubAccountAction,
-      response: actions.subAccount.responseSubAccountAction,
-      updateInState: actions.subAccount.updateInStateAction
-    },
-    reducers: {
-      table: budgeting.reducers.createAuthenticatedSubAccountsTableReducer({
-        initialState: initialTemplateState.subaccount.table,
-        clearOn: [
-          {
-            action: actions.subAccount.requestAction,
-            payload: (p: Redux.TableRequestPayload) => !redux.isListRequestIdsPayload(p)
-          }
-        ],
-        actions: {
-          handleEvent: actions.subAccount.handleTableEventAction,
-          responseSubAccountUnits: actions.responseSubAccountUnitsAction,
-          loading: actions.subAccount.loadingAction,
-          response: actions.subAccount.responseAction,
-          setSearch: actions.subAccount.setSearchAction
-        },
-        columns: SubAccountColumns,
-        getModelRowChildren: (m: Model.SubAccount) => m.children,
-        fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
-          initialState: initialTemplateState.subaccount.table.fringes,
-          columns: FringesColumns,
-          clearOn: [actions.requestFringesAction],
-          actions: {
-            responseFringeColors: actions.responseFringeColorsAction,
-            handleEvent: actions.handleFringesTableEventAction,
-            loading: actions.loadingFringesAction,
-            response: actions.responseFringesAction,
-            setSearch: actions.setFringesSearchAction
-          }
-        })
-      })
+      handleEvent: actions.handleTableEventAction,
+      loading: actions.loadingAction,
+      response: actions.responseAction,
+      setSearch: actions.setSearchAction
     }
   })
 });
 
 const rootReducer: Redux.Reducer<Modules.Template.Store> = (
-  state: Modules.Template.Store = initialTemplateState,
+  state: Modules.Template.Store = initialState.initialTemplateState,
   action: Redux.Action
 ): Modules.Template.Store => {
-  return genericReducer(state, action);
+  let newState = { ...state, ...genericReducer(state, action) };
+  if (includes(["template.account", "template.subaccount"], action.label)) {
+    if (action.label === "template.account") {
+      const a = action as Redux.AnyPayloadAction<
+        | SubAccountActionContext<Model.Template, false>
+        | SubAccountsTableActionContext<Model.Template, Model.Account, false>
+      >;
+      const id = context.isSubAccountsTableActionContext(a.context) ? a.context.parentId : a.context.id;
+      if (isNil(newState.account[id])) {
+        newState = { ...newState, account: { ...newState.account, [id]: initialState.initialAccountState } };
+      }
+      newState = {
+        ...newState,
+        account: { ...newState.account, [id]: accountStoreReducer(newState.account[id], a, newState.fringes) }
+      };
+    } else {
+      const a = action as Redux.AnyPayloadAction<
+        | SubAccountActionContext<Model.Template, false>
+        | SubAccountsTableActionContext<Model.Template, Model.SubAccount, false>
+      >;
+      const id = context.isSubAccountsTableActionContext(a.context) ? a.context.parentId : a.context.id;
+      if (isNil(newState.subaccount[id])) {
+        newState = { ...newState, subaccount: { ...newState.subaccount, [id]: initialState.initialSubAccountState } };
+      }
+      newState = {
+        ...newState,
+        subaccount: {
+          ...newState.subaccount,
+          [id]: subaccountStoreReducer(newState.subaccount[id], a, newState.fringes)
+        }
+      };
+    }
+  }
+  return newState;
 };
 
 export default rootReducer;

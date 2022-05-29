@@ -1,11 +1,12 @@
 import { SagaIterator } from "redux-saga";
-import { spawn, takeLatest, put } from "redux-saga/effects";
+import { spawn, takeLatest } from "redux-saga/effects";
 
-import * as api from "api";
-import { tabling, notifications, http } from "lib";
+import { tabling } from "lib";
 import * as store from "store";
 
+import * as selectors from "../../selectors";
 import * as actions from "../../actions/template";
+import * as tasks from "../tasks";
 
 import accountSaga from "./account";
 import subAccountSaga from "./subAccount";
@@ -19,55 +20,107 @@ const FringesActionMap = {
   loading: actions.loadingFringesAction,
   response: actions.responseFringesAction,
   updateBudgetInState: actions.updateBudgetInStateAction,
-  setSearch: actions.setFringesSearchAction,
-  responseFringeColors: actions.responseFringeColorsAction
+  setSearch: actions.setFringesSearchAction
 };
 
-function* getBudgetTask(action: Redux.Action<number>): SagaIterator {
-  yield put(actions.loadingBudgetAction(true));
-  try {
-    const response: Model.Template = yield http.request(api.getBudget, action.context, action.payload);
-    yield put(actions.responseBudgetAction(response));
-  } catch (e: unknown) {
-    notifications.ui.banner.handleRequestError(e as Error);
-    yield put(actions.responseBudgetAction(null));
-  } finally {
-    yield put(actions.loadingBudgetAction(false));
-  }
-}
-
-export const createFringesTableSaga = (
-  table: Table.TableInstance<Tables.FringeRowData, Model.Fringe>,
-  parentType: "account" | "subaccount"
-) =>
+export const createFringesTableSaga = (table: Table.TableInstance<Tables.FringeRowData, Model.Fringe>) =>
   tabling.sagas.createAuthenticatedTableSaga<
     Tables.FringeRowData,
     Model.Fringe,
     Tables.FringeTableStore,
-    Tables.FringeTableContext
+    FringesTableActionContext<Model.Template, Model.Account | Model.SubAccount, false>
   >({
     actions: FringesActionMap,
-    selectStore: (state: Application.Store) => state.template[parentType].table.fringes,
+    selectStore: (state: Application.Store) => state.template.fringes,
     tasks: store.tasks.fringes.createTableTaskSet<Model.Template>({
       table,
-      selectParentTableStore: (state: Application.Store) => state.template[parentType].table,
-      actions:
-        parentType === "account"
-          ? {
-              ...FringesActionMap,
-              requestParentTableData: actions.account.requestAction,
-              requestParent: actions.account.requestAccountAction
-            }
-          : {
-              ...FringesActionMap,
-              requestParentTableData: actions.subAccount.requestAction,
-              requestParent: actions.subAccount.requestSubAccountAction
-            }
+      selectBaseStore: (s: Application.Store) => s.template,
+      selectParentTableStore: (
+        s: Application.Store,
+        ctx: FringesTableActionContext<Model.Template, Model.Account | Model.SubAccount, false>
+      ) => selectors.selectSubAccountsTableStore(s, ctx),
+      actions: {
+        ...FringesActionMap,
+        invalidate: {
+          account: actions.account.invalidateAccountAction,
+          subaccount: actions.subAccount.invalidateSubAccountAction,
+          accountSubAccountsTable: actions.account.invalidateAction,
+          subaccountSubAccountsTable: actions.subAccount.invalidateAction
+        },
+        requestParentTableData: (
+          id: number,
+          parentType: "account" | "subaccount",
+          payload: Redux.TableRequestPayload,
+          ctx: Omit<
+            FringesTableActionContext<Model.Template, Model.Account | Model.SubAccount, false>,
+            "parentId" | "parentType"
+          >
+        ): Redux.Action<
+          Redux.TableRequestPayload,
+          SubAccountsTableActionContext<Model.Template, Model.Account | Model.SubAccount, false>
+        > => {
+          if (parentType === "account") {
+            return actions.account.requestAction(payload, {
+              parentId: id,
+              parentType,
+              domain: ctx.domain,
+              public: ctx.public,
+              budgetId: ctx.budgetId
+            }) as Redux.Action<
+              Redux.TableRequestPayload,
+              SubAccountsTableActionContext<Model.Template, Model.Account | Model.SubAccount, false>
+            >;
+          }
+          return actions.subAccount.requestAction(payload, {
+            parentId: id,
+            parentType: parentType,
+            domain: ctx.domain,
+            public: ctx.public,
+            budgetId: ctx.budgetId
+          }) as Redux.Action<
+            Redux.TableRequestPayload,
+            SubAccountsTableActionContext<Model.Template, Model.Account | Model.SubAccount, false>
+          >;
+        },
+        requestParent: (
+          id: number,
+          parentType: "account" | "subaccount",
+          payload: Redux.RequestPayload,
+          ctx: Omit<
+            FringesTableActionContext<Model.Template, Model.Account | Model.SubAccount, false>,
+            "parentId" | "parentType"
+          >
+        ): Redux.Action<
+          Redux.RequestPayload,
+          AccountActionContext<Model.Template, false> | SubAccountActionContext<Model.Template, false>
+        > => {
+          if (parentType === "account") {
+            return actions.account.requestAccountAction(payload, {
+              id,
+              domain: ctx.domain,
+              public: ctx.public,
+              budgetId: ctx.budgetId
+            }) as Redux.Action<
+              Redux.RequestPayload,
+              AccountActionContext<Model.Template, false> | SubAccountActionContext<Model.Template, false>
+            >;
+          }
+          return actions.subAccount.requestSubAccountAction(payload, {
+            id,
+            domain: ctx.domain,
+            public: ctx.public,
+            budgetId: ctx.budgetId
+          }) as Redux.Action<
+            Redux.RequestPayload,
+            AccountActionContext<Model.Template, false> | SubAccountActionContext<Model.Template, false>
+          >;
+        }
+      }
     })
   });
 
 export default function* rootSaga(): SagaIterator {
   yield spawn(accountSaga);
   yield spawn(subAccountSaga);
-  yield takeLatest(actions.requestBudgetAction.toString(), getBudgetTask);
+  yield takeLatest(actions.requestBudgetAction.toString(), tasks.getBudget);
 }

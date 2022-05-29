@@ -9,9 +9,10 @@ import { Cell } from "./generic";
 const DragCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
-  props: Table.CellProps<R, M, S, null, Table.ActionColumn<R, M>>
+  props: Table.CellProps<R, M, C, S, null, Table.ActionColumn<R, M>>
 ): JSX.Element => {
   const row: Table.BodyRow<R> = props.node.data;
   const iconRef = useRef(null);
@@ -32,4 +33,4 @@ const DragCell = <
   return <span></span>;
 };
 
-export default React.memo(DragCell);
+export default React.memo(DragCell) as typeof DragCell;

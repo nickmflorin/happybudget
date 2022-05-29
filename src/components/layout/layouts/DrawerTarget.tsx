@@ -12,7 +12,7 @@ const DrawerTarget = (props: Omit<StandardComponentProps, "id">): JSX.Element =>
       <IconButton
         className={"btn--drawer-close"}
         icon={"close"}
-        onClick={() => dispatch(store.actions.setApplicationDrawerAction(false))}
+        onClick={() => dispatch(store.actions.setApplicationDrawerAction(false, {}))}
       />
       <div id={"drawer-target"} className={"drawer-content"}></div>
     </div>

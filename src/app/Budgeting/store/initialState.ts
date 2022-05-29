@@ -1,10 +1,5 @@
 import { redux } from "lib";
 
-export const initialFringesState: Tables.FringeTableStore = {
-  ...redux.initialTableState,
-  fringeColors: []
-};
-
 export const initialAnalysisState: Modules.Budget.AnalysisStore = {
   loading: false,
   responseWasReceived: false,
@@ -22,45 +17,41 @@ export const initialAnalysisState: Modules.Budget.AnalysisStore = {
   }
 };
 
-export const initialSubAccountsTableState: Tables.SubAccountTableStore = {
-  ...redux.initialTableState,
-  fringes: initialFringesState,
-  subaccountUnits: []
-};
-
 export const initialSubAccountState: Modules.SubAccountStore = {
   detail: redux.initialDetailResponseState,
-  table: initialSubAccountsTableState
+  table: redux.initialTableState
 };
 
 export const initialAccountState: Modules.AccountStore = {
   detail: redux.initialDetailResponseState,
-  table: initialSubAccountsTableState
+  table: redux.initialTableState
 };
 
 export const initialBudgetState: Modules.Budget.Store = {
   detail: redux.initialDetailResponseState,
-  account: initialAccountState,
+  account: {},
   accounts: redux.initialTableState,
-  subaccount: initialSubAccountState,
+  subaccount: {},
+  fringes: redux.initialTableState,
   analysis: initialAnalysisState,
   actuals: {
     ...redux.initialTableState,
-    types: [],
     owners: redux.initialAuthenticatedModelListResponseState
   }
 };
 
 export const initialTemplateState: Modules.Template.Store = {
   detail: redux.initialDetailResponseState,
-  account: initialAccountState,
-  subaccount: initialSubAccountState,
-  accounts: redux.initialTableState
+  account: {},
+  subaccount: {},
+  accounts: redux.initialTableState,
+  fringes: redux.initialTableState
 };
 
 export const initialPublicBudgetState: Modules.PublicBudget.Store = {
   detail: redux.initialDetailResponseState,
-  account: initialAccountState,
+  account: {},
   accounts: redux.initialTableState,
-  subaccount: initialSubAccountState
+  subaccount: {},
+  fringes: redux.initialTableState
 };

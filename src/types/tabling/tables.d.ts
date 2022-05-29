@@ -5,9 +5,7 @@ declare namespace Tables {
   };
 
   type AccountRowData = BudgetRowData;
-
   type AccountRow = Table.ModelRow<AccountRowData>;
-  type AccountTableContext = { readonly budgetId: number };
   type AccountTableStore = Redux.BudgetTableStore<AccountRowData>;
 
   type SubAccountRowData = BudgetRowData &
@@ -15,21 +13,12 @@ declare namespace Tables {
       Model.SubAccount,
       "quantity" | "unit" | "multiplier" | "rate" | "fringes" | "fringe_contribution" | "attachments" | "contact"
     >;
-
   type SubAccountRow = Table.ModelRow<SubAccountRowData>;
-  type SubAccountTableContext = { readonly id: number; readonly budgetId: number };
-
-  type SubAccountTableStore = Redux.BudgetTableStore<SubAccountRowData> & {
-    readonly fringes: FringeTableStore;
-    readonly subaccountUnits: Model.Tag[];
-  };
+  type SubAccountTableStore = Redux.BudgetTableStore<SubAccountRowData>;
 
   type FringeRowData = Pick<Model.Fringe, "color" | "name" | "description" | "cutoff" | "rate" | "unit">;
-  type FringeTableContext = { readonly id: number; readonly budgetId: number };
   type FringeRow = Table.ModelRow<FringeRowData>;
-  type FringeTableStore = Redux.TableStore<FringeRowData> & {
-    readonly fringeColors: string[];
-  };
+  type FringeTableStore = Redux.TableStore<FringeRowData>;
 
   type ActualRowData = Pick<
     Model.Actual,
@@ -44,12 +33,9 @@ declare namespace Tables {
     | "owner"
     | "attachments"
   >;
-
   type ActualRow = Table.ModelRow<ActualRowData>;
-  type ActualTableContext = { readonly budgetId: number };
   type ActualTableStore = Redux.TableStore<ActualRowData> & {
-    readonly owners: Redux.AuthenticatedModelListResponseStore<Model.ActualOwner>;
-    readonly types: Model.Tag[];
+    readonly owners: Redux.AuthenticatedModelListStore<Model.ActualOwner>;
   };
 
   type ContactRowData = Pick<
@@ -67,7 +53,6 @@ declare namespace Tables {
   >;
 
   type ContactRow = Table.ModelRow<ContactRowData>;
-  type ContactTableContext = Table.Context;
   type ContactTableStore = Redux.TableStore<ContactRowData>;
 }
 

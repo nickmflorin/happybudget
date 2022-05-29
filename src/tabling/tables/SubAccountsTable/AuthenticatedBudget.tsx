@@ -20,7 +20,7 @@ type M = Model.SubAccount;
 
 export type AuthenticatedBudgetProps<P extends Model.Account | Model.SubAccount> = Omit<
   AuthenticatedTableProps<Model.Budget, P>,
-  "domain" | "onCellFocusChanged" | "columns" | "includeCollaborators"
+  "onCellFocusChanged" | "columns" | "includeCollaborators"
 > & {
   readonly onExportPdf: () => void;
   readonly onShared: (token: Model.PublicToken) => void;
@@ -56,7 +56,7 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
 
   const onContactCreated = useMemo(
     () => (m: Model.Contact, params?: CreateContactParams) => {
-      dispatch(store.actions.addContactToStateAction(m));
+      dispatch(store.actions.addContactToStateAction(m, {}));
       /* If we have enough information from before the contact was created in
 			   the specific cell, combine that information with the new value to
 				 perform a table update, showing the created contact in the new cell. */
@@ -88,7 +88,7 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
 
   const onContactUpdated = useMemo(
     () => (m: Model.Contact, params: EditContactParams) => {
-      dispatch(store.actions.updateContactInStateAction({ id: m.id, data: m }));
+      dispatch(store.actions.updateContactInStateAction({ id: m.id, data: m }, {}));
       const rowId = params.rowId;
       if (!isNil(rowId)) {
         const row: Table.BodyRow<R> | null = props.table.current.getRow(rowId);
@@ -187,7 +187,6 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
     <React.Fragment>
       <AuthenticatedTable
         {...props}
-        domain={"budget"}
         includeCollaborators={true}
         onCellFocusChanged={onCellFocusChanged}
         columns={columns}

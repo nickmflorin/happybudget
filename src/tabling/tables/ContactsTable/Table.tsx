@@ -18,7 +18,7 @@ type R = Tables.ContactRowData;
 type M = Model.Contact;
 
 type OmitProps =
-  | "actionContext"
+  | "tableContext"
   | "showPageFooter"
   | "pinFirstColumn"
   | "tableId"
@@ -54,9 +54,8 @@ const ContactsTable = (props: Props): JSX.Element => {
     path: (id: number) => `/v1/contacts/${id}/attachments/`
   });
 
-  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   const [__, editContactModal, editContact, _] = hooks.useContacts({
-    onCreated: (m: Model.Contact) => dispatch(store.actions.addContactToStateAction(m)),
+    onCreated: (m: Model.Contact) => dispatch(store.actions.addContactToStateAction(m, {})),
     onUpdated: (m: Model.Contact) =>
       props.table.current.dispatchEvent({
         type: "modelsUpdated",
@@ -102,9 +101,10 @@ const ContactsTable = (props: Props): JSX.Element => {
 
   return (
     <React.Fragment>
-      <AuthenticatedTable<R, M, Tables.ContactTableStore>
+      <AuthenticatedTable<R, M, Table.Context, Tables.ContactTableStore>
         {...props}
         tableId={"contacts"}
+        tableContext={{}}
         showPageFooter={false}
         minimal={true}
         rowHeight={40}

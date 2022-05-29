@@ -6,14 +6,14 @@ import { budgeting, http } from "lib";
 
 import { useConfirmation } from "components/notifications/hooks";
 
-export type UseKeyboardNavigationProps<B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount> = {
-  readonly id: P["id"];
-  readonly budgetId: B["id"];
-  readonly domain: B["domain"];
+export type UseKeyboardNavigationProps<
+  B extends Model.BaseBudget,
+  P extends Model.Account | Model.SubAccount,
+  PUBLIC extends boolean = false
+> = {
   readonly parent: P | null;
-  readonly parentType: P["type"];
   readonly tokenId?: string;
-  readonly authenticated: boolean;
+  readonly tableContext: SubAccountsTableActionContext<B, P, PUBLIC>;
 };
 
 export type UseKeyboardNavigationReturnType<R extends Tables.SubAccountRowData> = {
@@ -37,9 +37,10 @@ const rowShouldWarn = <R extends Tables.SubAccountRowData>(row: Table.ModelRow<R
 const useKeyboardNavigation = <
   B extends Model.BaseBudget,
   P extends Model.Account | Model.SubAccount,
-  R extends Tables.SubAccountRowData
+  R extends Tables.SubAccountRowData,
+  PUBLIC extends boolean = false
 >(
-  props: UseKeyboardNavigationProps<B, P>
+  props: UseKeyboardNavigationProps<B, P, PUBLIC>
 ): UseKeyboardNavigationReturnType<R> => {
   const history = useHistory();
 
@@ -50,7 +51,7 @@ const useKeyboardNavigation = <
     onConfirmed: (row: Table.ModelRow<R>) =>
       history.push(
         budgeting.urls.getUrl(
-          { domain: props.domain, id: props.budgetId },
+          { domain: props.tableContext.domain, id: props.tableContext.budgetId },
           { type: "subaccount", id: row.id },
           props.tokenId
         )
@@ -67,42 +68,46 @@ const useKeyboardNavigation = <
         if (ancestor.type === "budget") {
           history.push(
             http.addQueryParamsToUrl(
-              budgeting.urls.getUrl({ domain: props.domain, id: props.budgetId }, undefined, props.tokenId),
-              { row: props.id }
+              budgeting.urls.getUrl(
+                { domain: props.tableContext.domain, id: props.tableContext.budgetId },
+                undefined,
+                props.tokenId
+              ),
+              { row: props.tableContext.parentId }
             )
           );
         } else {
           history.push(
             http.addQueryParamsToUrl(
               budgeting.urls.getUrl(
-                { domain: props.domain, id: props.budgetId },
+                { domain: props.tableContext.domain, id: props.tableContext.budgetId },
                 { type: ancestor.type, id: ancestor.id },
                 props.tokenId
               ),
-              { row: props.id }
+              { row: props.tableContext.parentId }
             )
           );
         }
       }
     },
-    [props.parent, props.budgetId, props.tokenId, props.domain, props.id]
+    [props.parent, props.tableContext.budgetId, props.tokenId, props.tableContext.domain, props.tableContext.parentId]
   );
 
   const onRowExpand = useMemo(
     () =>
-      props.parentType === "account"
+      props.tableContext.parentType === "account"
         ? (row: Table.ModelRow<R>) =>
-            props.authenticated === true && rowShouldWarn(row)
+            props.tableContext.public === false && rowShouldWarn(row)
               ? confirmRowExpand([row], "You are about to expand the row.")
               : history.push(
                   budgeting.urls.getUrl(
-                    { domain: props.domain, id: props.budgetId },
+                    { domain: props.tableContext.domain, id: props.tableContext.budgetId },
                     { type: "subaccount", id: row.id },
                     props.tokenId
                   )
                 )
         : undefined,
-    [props.domain, props.budgetId, props.parentType, props.tokenId]
+    [props.tableContext.domain, props.tableContext.budgetId, props.tableContext.parentType, props.tokenId]
   );
 
   const onLeft = useMemo(
@@ -116,14 +121,14 @@ const useKeyboardNavigation = <
         if (index !== -1 && parent.table[index - 1] !== undefined) {
           history.push(
             budgeting.urls.getUrl(
-              { id: props.budgetId, domain: props.domain },
-              { type: props.parentType, id: parent.table[index - 1].id }
+              { id: props.tableContext.budgetId, domain: props.tableContext.domain },
+              { type: props.tableContext.parentType, id: parent.table[index - 1].id }
             )
           );
         }
       }
     },
-    [props.parent, props.domain, props.budgetId, props.parentType, props.tokenId]
+    [props.parent, props.tableContext.domain, props.tableContext.budgetId, props.tableContext.parentType, props.tokenId]
   );
 
   const onRight = useMemo(
@@ -137,14 +142,14 @@ const useKeyboardNavigation = <
         if (index !== -1 && parent.table[index + 1] !== undefined) {
           history.push(
             budgeting.urls.getUrl(
-              { id: props.budgetId, domain: props.domain },
-              { type: props.parentType, id: parent.table[index + 1].id }
+              { id: props.tableContext.budgetId, domain: props.tableContext.domain },
+              { type: props.tableContext.parentType, id: parent.table[index + 1].id }
             )
           );
         }
       }
     },
-    [props.budgetId, props.domain, props.parent, props.parentType, props.tokenId]
+    [props.tableContext.budgetId, props.tableContext.domain, props.parent, props.tableContext.parentType, props.tokenId]
   );
 
   return { onBack, onLeft, onRight, onRowExpand, confirmExpandModal };

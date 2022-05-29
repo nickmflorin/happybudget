@@ -4,7 +4,7 @@ import Columns from "./Columns";
 
 export type AuthenticatedTemplateProps<P extends Model.Account | Model.SubAccount> = Omit<
   AuthenticatedTableProps<Model.Template, P>,
-  "domain" | "columns" | "excludeColumns" | "includeCollaborators"
+  "columns" | "excludeColumns" | "includeCollaborators"
 >;
 
 const AuthenticatedTemplate = <P extends Model.Account | Model.SubAccount>(
@@ -15,7 +15,6 @@ const AuthenticatedTemplate = <P extends Model.Account | Model.SubAccount>(
       {...props}
       includeCollaborators={false}
       excludeColumns={["actual", "contact", "variance", "attachments"]}
-      domain={"template"}
       columns={Columns}
     />
   );

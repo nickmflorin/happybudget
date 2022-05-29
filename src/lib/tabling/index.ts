@@ -8,4 +8,4 @@ export * as menu from "./menu";
 export * as reducers from "./reducers";
 export * as rows from "./rows";
 export * as sagas from "./sagas";
-export * as tasks from "./tasks";
+export * from "./tasks";

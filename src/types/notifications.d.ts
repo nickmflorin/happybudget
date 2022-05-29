@@ -6,26 +6,37 @@ declare type UINotificationDetail = Http.ApiError | string;
 declare type UINotificationBehavior = "append" | "replace";
 
 declare type UINotificationOptions = {
-  /* In the case of Table notifications, the default behavior will be to append
-     the notification to the existing notifications that are shown.  In the
-		 case of Form notifications, the default behavior is to replace a preivous
-		 notification with the new one.
-		 */
+  /*
+	In the case of Table notifications, the default behavior will be to append
+	the notification to the existing notifications that are shown.  In the
+	case of Form notifications, the default behavior is to replace a preivous
+	notification with the new one.
+	*/
   readonly behavior?: UINotificationBehavior;
-  /* We allow the message to be provided as an option in the case that the
-     notification object itself is an Error or Http.Error. */
+  /*
+	We allow the message to be provided as an option in the case that the
+	notification object itself is an Error or Http.Error.
+	*/
   readonly message?: string;
-  /* We allow the detail to be provided as an option in the case that the
-     notification object itself is an Error or Http.Error. */
+  /*
+	We allow the detail to be provided as an option in the case that the
+  notification object itself is an Error or Http.Error.
+	*/
   readonly detail?: string;
-  /* We allow the duration to be provided as an option in the case that we want
-	   to apply the same duration to several dispatched notifications. */
+  /*
+	We allow the duration to be provided as an option in the case that we want
+	to apply the same duration to several dispatched notifications.
+	*/
   readonly duration?: number;
-  /* We allow the closable behavior to be provided as an option in the case that
-		 we want to apply the same behavior to several dispatched notifications. */
+  /*
+	We allow the closable behavior to be provided as an option in the case that
+	we want to apply the same behavior to several dispatched notifications.
+	*/
   readonly closable?: boolean;
-  /* If set to True, a notification will not be dispatched if it is deemed a
-	   duplicate of a notification already in state. */
+  /*
+	If set to True, a notification will not be dispatched if it is deemed a
+	duplicate of a notification already in state.
+	*/
   readonly ignoreIfDuplicate?: boolean;
 };
 
@@ -42,9 +53,11 @@ declare type UINotificationData<L extends AppNotificationLevel = AppNotification
 };
 
 declare type UINotification<L extends AppNotificationLevel = AppNotificationLevel> = UINotificationData<L> & {
-  /* Each UINotification that is in the state managed by the reducer needs to
-	 have a unique ID so that we can reference that ID if we need to remove or
-	 perform another action on that notification specifically in the future. */
+  /*
+	Each UINotification that is in the state managed by the reducer needs to
+	have a unique ID so that we can reference that ID if we need to remove or
+	perform another action on that notification specifically in the future.
+	*/
   readonly id: number;
   readonly remove: () => void;
 };
@@ -104,8 +117,10 @@ type UINotificationType = UINonFieldNotificationType | UIFieldNotification;
 
 type UINotificationStandard<N> = {
   readonly typeguard: (n: UINotificationType) => n is N;
-  /* Null is returned if for whatever reason, the notification cannot be
-     standardized and must be ignored. */
+  /*
+	Null is returned if for whatever reason, the notification cannot be
+  standardized and must be ignored.
+	*/
   readonly func: (n: N, opts: Omit<UINotificationOptions, "behavior">) => UINotificationData | null;
 };
 

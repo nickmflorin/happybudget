@@ -2,25 +2,6 @@ import { map } from "lodash";
 
 import { model, notifications } from "lib";
 
-import { isClearOnDetail } from "./typeguards";
-
-export const isClearOnAction = <T extends Redux.ActionPayload, C extends Table.Context = Table.Context>(
-  clearOn: Redux.ClearOn<T, C>[],
-  action: Redux.Action<T>
-): boolean => {
-  for (let i = 0; i < clearOn.length; i++) {
-    const clearer = clearOn[i];
-    if (isClearOnDetail(clearer)) {
-      if (clearer.action.toString() === action.type && clearer.payload(action.payload) === true) {
-        return true;
-      }
-    } else if (clearer.toString() === action.type) {
-      return true;
-    }
-  }
-  return false;
-};
-
 const onMissing =
   <M extends Model.Model>(data: M[], warningData?: Record<string, unknown>) =>
   (params: Model.OnModelMissingCallbackParams<M>) => {

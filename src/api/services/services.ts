@@ -60,7 +60,7 @@ export const detailDeleteService =
   };
 
 export const retrieveService =
-  <R>(path: Http.PathParams | ((id: number) => Http.PathParams)): Http.RetrieveService<R> =>
+  <R extends Model.HttpModel>(path: Http.PathParams | ((id: number) => Http.PathParams)): Http.RetrieveService<R> =>
   async (id: number, options?: Http.RequestOptions | undefined): Promise<R> => {
     const pt = typeof path === "function" ? path(id) : path;
     const url = URL.v1(...pt);

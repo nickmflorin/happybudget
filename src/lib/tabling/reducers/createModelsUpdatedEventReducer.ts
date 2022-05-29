@@ -15,11 +15,10 @@ const createModelsUpdatedEventReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Table.Context = Table.Context,
-  A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
+  C extends Redux.ActionContext = Redux.ActionContext
 >(
-  config: Table.ReducerConfig<R, M, S, C, A>
-): Redux.Reducer<S, Table.ModelsUpdatedEvent<M>> => {
+  config: Table.AuthenticatedReducerConfig<R, M, S, C>
+): Redux.BasicReducer<S, Table.ModelsUpdatedEvent<M>> => {
   const groupRowManager = new tabling.rows.GroupRowManager<R, M>({ columns: config.columns });
   const markupRowManager = new tabling.rows.MarkupRowManager({ columns: config.columns });
   const modelRowManager = new tabling.rows.ModelRowManager<R, M>({
@@ -129,17 +128,21 @@ const createModelsUpdatedEventReducer = <
           return {
             ...st,
             data: util.replaceInArray<Table.BodyRow<BR>>(
-              /* Since the Markup model is only applicable for the Budget
-								related tables, it is safe to coerce the row to being a BodyRow
-								for either the AccountRowData or the SubAccountRowData. */
+              /*
+							Since the Markup model is only applicable for the Budget
+							related tables, it is safe to coerce the row to being a BodyRow
+							for either the AccountRowData or the SubAccountRowData.
+							*/
               st.data as Table.BodyRow<BR>[],
               { id: row.id },
               {
                 ...row,
                 data: {
                   ...row.data,
-                  /* Markup contributions get applied to the value after
-										fringes are applied. */
+                  /*
+									Markup contributions get applied to the value after
+									fringes are applied.
+									*/
                   markup_contribution: model.budgeting.contributionFromMarkups(
                     isSubAccountRowData(row.data)
                       ? row.data.nominal_value +
@@ -183,9 +186,11 @@ const createModelsUpdatedEventReducer = <
         ...s,
         data: util.replaceInArray<Table.BodyRow<R>>(s.data, { id: modelRow.id }, modelRowManager.create({ model: m }))
       };
-      /* If the `group` on the event payload is undefined, it means
-				there was no change to the model's group.  A `null` group means
-				that the group was removed. */
+      /*
+			If the `group` on the event payload is undefined, it means
+			there was no change to the model's group.  A `null` group means
+			that the group was removed.
+			*/
       if (group !== undefined) {
         const groupRowId = group !== null ? tabling.rows.groupRowId(group) : null;
         const previousGroupRow: Table.GroupRow<R> | null = rowGroupRowFromState<R, S>(s, m.id, {
@@ -195,14 +200,18 @@ const createModelsUpdatedEventReducer = <
         // Make sure the Group actually changed before proceeding.
         if (previousGroupRowId !== groupRowId) {
           if (groupRowId !== null) {
-            /* If the Group ID of the Model is non-null, this means that
-							the GroupRow associated with the ModelRow was either
-							added or changed. */
+            /*
+						If the Group ID of the Model is non-null, this means that
+						the GroupRow associated with the ModelRow was either
+						added or changed.
+						*/
             s = updateRowGroup(s, [modelRow.id], groupRowId);
           } else if (previousGroupRow !== null) {
-            /* If the previous GroupRow associated with the ModelRow is
-							not null but the new Group ID of the Model is null, this
-							means that the GroupRow was removed from the ModelRow. */
+            /*
+						If the previous GroupRow associated with the ModelRow is
+						not null but the new Group ID of the Model is null, this
+						means that the GroupRow was removed from the ModelRow.
+						*/
             s = {
               ...s,
               data: util.replaceInArray<Table.BodyRow<R>>(

@@ -1,25 +1,23 @@
 import { redux } from "lib";
 
 export * as account from "./account";
-export * as accounts from "./accounts";
 export * as subAccount from "./subAccount";
 
-export const loadingBudgetAction = redux.actions.createAction<boolean>("public.Loading");
-export const responseBudgetAction = redux.actions.createAction<Model.Budget | null>("public.Response");
-export const requestBudgetAction = redux.actions.createAction<number>("public.Request");
+type FC = FringesTableActionContext<Model.Budget, Model.Account | Model.SubAccount, true>;
+type C = BudgetActionContext<Model.Budget, true>;
+type TC = AccountsTableActionContext<Model.Budget, true>;
 
-export const loadingFringesAction = redux.actions.createAction<boolean>("public.fringes.Loading");
-export const requestFringesAction = redux.actions.createTableAction<
-  Redux.TableRequestPayload,
-  Tables.FringeTableContext
->("public.fringes.Request");
-export const responseFringesAction =
-  redux.actions.createAction<Http.TableResponse<Model.Fringe>>("public.fringes.Response");
-export const setFringesSearchAction = redux.actions.createTableAction<string, Tables.FringeTableContext>(
-  "public.fringes.SetSearch"
-);
-export const responseSubAccountUnitsAction = redux.actions.createAction<Http.ListResponse<Model.Tag>>(
-  "public.subaccountunits.Response"
-);
-export const responseFringeColorsAction =
-  redux.actions.createAction<Http.ListResponse<string>>("public.fringecolors.Response");
+const creator = redux.actions.createActionCreator({ label: "public" });
+
+export const requestAction = creator<Redux.TableRequestPayload, TC>("TableRequest");
+export const loadingAction = creator<boolean, TC>("TableLoading");
+export const responseAction = creator<Http.TableResponse<Model.Account>, TC>("TableResponse");
+export const setSearchAction = creator<string, TC>("SetTableSearch");
+
+export const loadingBudgetAction = creator<boolean, C>("Loading");
+export const responseBudgetAction = creator<Http.RenderedDetailResponse<Model.Budget>>("Response");
+export const requestBudgetAction = creator<Redux.RequestPayload, C>("Request");
+
+export const loadingFringesAction = creator<boolean, FC>("fringes.Loading");
+export const responseFringesAction = creator<Http.TableResponse<Model.Fringe>, FC>("fringes.Response");
+export const setFringesSearchAction = creator<string, FC>("fringes.SetSearch");

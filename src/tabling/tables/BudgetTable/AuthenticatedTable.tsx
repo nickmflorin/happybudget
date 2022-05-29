@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from "react";
-import { isNil } from "lodash";
+import { isNil, map } from "lodash";
 
 import * as config from "config";
-import { tabling } from "lib";
+import { tabling, hooks } from "lib";
 import { AuthenticatedTable, AuthenticatedTableProps, framework } from "tabling/generic";
 
 import { CollaboratorsModal } from "components/modals";
@@ -10,10 +10,11 @@ import { Framework } from "./framework";
 
 export type AuthenticatedBudgetTableProps<
   R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends Model.RowHttpModel,
+  B extends Model.Budget | Model.Template,
+  C extends BudgetContext<B> = BudgetContext<B>,
   S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
-> = AuthenticatedTableProps<R, M, S> & {
-  readonly budgetId: number;
+> = AuthenticatedTableProps<R, M, C, S> & {
   readonly includeCollaborators: boolean;
   readonly onEditMarkup?: (row: Table.MarkupRow<R>) => void;
   readonly onEditGroup?: (row: Table.GroupRow<R>) => void;
@@ -22,7 +23,9 @@ export type AuthenticatedBudgetTableProps<
 
 const AuthenticatedBudgetTable = <
   R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends Model.RowHttpModel,
+  B extends Model.Budget | Model.Template,
+  C extends BudgetContext<B> = BudgetContext<B>,
   S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
 >({
   includeCollaborators,
@@ -30,7 +33,7 @@ const AuthenticatedBudgetTable = <
   onEditGroup,
   onRowExpand,
   ...props
-}: AuthenticatedBudgetTableProps<R, M, S>): JSX.Element => {
+}: AuthenticatedBudgetTableProps<R, M, B, C, S>): JSX.Element => {
   const [collaboratorsModalOpen, setCollaboratorsModalOpen] = useState(false);
 
   const actions = useMemo<Table.AuthenticatedMenuActions<R, M>>(
@@ -87,17 +90,35 @@ const AuthenticatedBudgetTable = <
     return c;
   }, [onEditMarkup, onEditGroup, onRowExpand]);
 
+  const columns = useMemo<Table.Column<R, M>[]>(
+    (): Table.Column<R, M>[] =>
+      map(props.columns, (col: Table.Column<R, M>) =>
+        tabling.columns.isRealColumn(col)
+          ? {
+              ...col,
+              cellRendererParams: { ...col.cellRendererParams, context: props.tableContext }
+            }
+          : col
+      ),
+    [hooks.useDeepEqualMemo(props.columns), props.tableContext]
+  );
+
   return (
     <React.Fragment>
       <AuthenticatedTable
         {...props}
+        columns={columns}
         actions={actions}
         editColumnConfig={editColumnConfig}
         calculatedCellHasInfo={true}
         framework={tabling.aggrid.combineFrameworks(Framework, props.framework)}
       />
       {collaboratorsModalOpen === true && includeCollaborators && (
-        <CollaboratorsModal open={true} onCancel={() => setCollaboratorsModalOpen(false)} budgetId={props.budgetId} />
+        <CollaboratorsModal
+          open={true}
+          onCancel={() => setCollaboratorsModalOpen(false)}
+          budgetId={props.tableContext.budgetId}
+        />
       )}
     </React.Fragment>
   );

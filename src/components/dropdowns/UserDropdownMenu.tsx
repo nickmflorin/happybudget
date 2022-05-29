@@ -10,7 +10,7 @@ import * as store from "store";
 import DropdownMenu, { DropdownMenuProps } from "./DropdownMenu";
 
 const UserDropdownMenu = (props: Omit<DropdownMenuProps, "models" | "menuClassName" | "children">): JSX.Element => {
-  const user = store.hooks.useLoggedInUser();
+  const [user, _] = store.hooks.useLoggedInUser();
   const history = useHistory();
 
   return (

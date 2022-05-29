@@ -717,6 +717,7 @@ const authenticateDataGrid = <
       if (params.initialValues.length === 1) {
         return false;
       }
+      /* eslint-disable-next-line  @typescript-eslint/no-unsafe-return */
       return params.initialValues[(params.values.length - params.initialValues.length) % params.initialValues.length];
     });
 

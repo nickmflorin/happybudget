@@ -153,8 +153,10 @@ declare namespace Model {
 
   type SimpleAttachment = HttpModel & {
     readonly name: string;
-    /* The extension will be null if the file name is corrupted and the extension
-     cannot be determined. */
+    /*
+		The extension will be null if the file name is corrupted and the extension
+    cannot be determined.
+		*/
     readonly extension: string | null;
     readonly url: string;
   };
@@ -200,8 +202,10 @@ declare namespace Model {
     readonly domain: BudgetDomain;
     readonly updated_at: string;
     readonly image: SavedImage | null;
-    /* A budget will not have an updated by field in the case that the user who
-       updated the budget has since been deleted. */
+    /*
+		A budget will not have an updated by field in the case that the user who
+    updated the budget has since been deleted.
+		*/
     readonly updated_by: Omit<SimpleUser, "profile_image"> | null;
   };
 
@@ -404,5 +408,41 @@ declare namespace Model {
     readonly left_info: string | null;
     readonly right_image: SavedImage | null;
     readonly right_info: string | null;
+  };
+
+  type BillingStatus = "active" | "expired" | "canceled" | null;
+
+  type ProductId = "standard";
+  type ProductPermissionId = "multiple_budgets";
+
+  type StripeSubscriptionStatus =
+    | "active"
+    | "trialing"
+    | "past_due"
+    | "canceled"
+    | "unpaid"
+    | "incomplete"
+    | "incomplete_expired";
+
+  interface Product {
+    readonly id: ProductId;
+    readonly price_id: string;
+    readonly active: boolean;
+    readonly description: string | null;
+    readonly name: string;
+    readonly stripe_id: string;
+    readonly image: string | null;
+  }
+
+  type Subscription = {
+    readonly id: string;
+    readonly cancel_at_period_end: boolean;
+    readonly canceled_at: string | null;
+    readonly current_period_start: string | null;
+    readonly current_period_end: string | null;
+    readonly start_date: string;
+    readonly cancel_at: string | null;
+    readonly status: BillingStatus;
+    readonly stripe_status: StripeSubscriptionStatus;
   };
 }

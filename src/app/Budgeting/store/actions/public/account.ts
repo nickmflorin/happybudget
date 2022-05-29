@@ -1,18 +1,15 @@
 import { redux } from "lib";
 
-export const requestAccountAction = redux.actions.createAction<number>("public.account.Request");
-export const loadingAccountAction = redux.actions.createAction<boolean>("public.account.Loading");
-export const responseAccountAction = redux.actions.createAction<Model.Account | null>("public.account.Response");
+type C = AccountActionContext<Model.Budget, true>;
+type TC = SubAccountsTableActionContext<Model.Budget, Model.Account, true>;
 
-export const loadingAction = redux.actions.createAction<boolean>("public.account.TableLoading");
+const creator = redux.actions.createActionCreator({ label: "public.account" });
 
-export const requestAction = redux.actions.createTableAction<Redux.TableRequestPayload, Tables.SubAccountTableContext>(
-  "public.account.TableRequest"
-);
-
-export const responseAction =
-  redux.actions.createAction<Http.TableResponse<Model.SubAccount>>("public.account.TableResponse");
-
-export const setSearchAction = redux.actions.createTableAction<string, Tables.SubAccountTableContext>(
-  "public.account.SetTableSearch"
-);
+export const requestAccountAction = creator<Redux.RequestPayload, C>("Request");
+// Currently, this action is not wired to anything but may be in the future.
+export const loadingAccountAction = creator<boolean, C>("Loading");
+export const responseAccountAction = creator<Http.RenderedDetailResponse<Model.Account>, C>("Response");
+export const loadingAction = creator<boolean, TC>("TableLoading");
+export const requestAction = creator<Redux.TableRequestPayload, TC>("TableRequest");
+export const responseAction = creator<Http.TableResponse<Model.SubAccount>, TC>("TableResponse");
+export const setSearchAction = creator<string, TC>("SetTableSearch");

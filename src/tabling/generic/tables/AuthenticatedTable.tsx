@@ -50,10 +50,11 @@ export type BaseTableProps<
 export type AuthenticatedTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = BaseTableProps<R, M> &
   Omit<AuthenticateDataGridProps<R, M>, "apis"> &
-  Omit<ConnectAuthenticatedTableProps<R, M, S>, "actionContext"> &
+  ConnectAuthenticatedTableProps<R, M, C, S> &
   ConnectedAuthenticatedTableInjectedProps<R, M> & {
     readonly hasDragColumn?: boolean;
     readonly checkboxColumn?: Table.PartialActionColumn<R, M>;
@@ -68,8 +69,9 @@ export type AuthenticatedTableProps<
 type _AuthenticatedTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
-> = AuthenticatedTableProps<R, M, S> & ConfiguredTableInjectedProps;
+> = AuthenticatedTableProps<R, M, C, S> & ConfiguredTableInjectedProps;
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const TableFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, any>>({
@@ -101,9 +103,10 @@ const PageFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, an
 const AuthenticatedTable = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
-  props: _AuthenticatedTableProps<R, M, S>
+  props: _AuthenticatedTableProps<R, M, C, S>
 ): JSX.Element => {
   const grid = tabling.hooks.useDataGrid();
   const [savingVisible, setSavingVisible] = useState(false);
@@ -178,7 +181,8 @@ const AuthenticatedTable = <
     }
     return map(cs, (c: Table.Column<R, M>) => ({
       ...c,
-      cellRendererParams: { ...c.cellRendererParams, table: props.table.current }
+      cellRendererParams: { ...c.cellRendererParams, table: props.table.current, tableContext: props.tableContext },
+      cellEditorParams: { ...c.cellEditorParams, table: props.table.current, tableContext: props.tableContext }
     }));
   }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns, props.table.current]);
 
@@ -496,8 +500,9 @@ export default configureTable<_AuthenticatedTableProps<any, any, any>, any, any>
   <
     R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
+    C extends Table.Context = Table.Context,
     S extends Redux.TableStore<R> = Redux.TableStore<R>
   >(
-    props: Subtract<_AuthenticatedTableProps<R, M, S>, ConfiguredTableInjectedProps>
+    props: Subtract<_AuthenticatedTableProps<R, M, C, S>, ConfiguredTableInjectedProps>
   ): JSX.Element;
 };

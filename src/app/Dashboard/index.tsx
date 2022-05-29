@@ -19,7 +19,7 @@ const Dashboard = (): JSX.Element => {
   const location = useLocation();
   const dispatch: Dispatch = useDispatch();
 
-  const user = store.hooks.useLoggedInUser();
+  const [user, _] = store.hooks.useLoggedInUser();
   const [createBudgetModalOpen, _setCreateBudgetModalOpen] = useState(false);
 
   const setCreateBudgetModalOpen = useMemo(
@@ -30,7 +30,7 @@ const Dashboard = (): JSX.Element => {
         !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS) &&
         config.env.BILLING_ENABLED
       ) {
-        dispatch(store.actions.setProductPermissionModalOpenAction(true));
+        dispatch(store.actions.setProductPermissionModalOpenAction(true, {}));
       } else {
         _setCreateBudgetModalOpen(v);
       }
@@ -125,10 +125,11 @@ const Dashboard = (): JSX.Element => {
           onCancel={() => setCreateBudgetModalOpen(false)}
           onSuccess={(budget: Model.UserBudget) => {
             setCreateBudgetModalOpen(false);
-            /* It is safe to coerce to an Budget because the User must be logged
-						   in at this point. */
-            dispatch(actions.addBudgetToStateAction(budget));
-            dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "increment" }));
+            /*
+						It is safe to coerce to an Budget because the User must be logged
+						in at this point. */
+            dispatch(actions.addBudgetToStateAction(budget, {}));
+            dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "increment" }, {}));
             history.push(`/budgets/${budget.id}/accounts`);
           }}
         />

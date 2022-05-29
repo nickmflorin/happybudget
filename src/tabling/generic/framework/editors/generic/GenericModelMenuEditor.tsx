@@ -4,29 +4,31 @@ import { IEditor } from "./useModelMenuEditor";
 
 export interface GenericModelMenuEditorProps<
   V extends Table.RawRowValue,
-  C extends Model.HttpModel,
+  CM extends Model.HttpModel,
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
-> extends Table.EditorParams<R, M, S, V | null>,
-    ModelTagsMenuProps<C, MenuItemSelectedState>,
+> extends Table.EditorProps<R, M, C, S, V | null>,
+    ModelTagsMenuProps<CM, MenuItemSelectedState>,
     StandardComponentProps {
   readonly searchIndices?: SearchIndicies;
-  readonly editor: IEditor<V, C, R, M, S>;
-  readonly tagProps?: Omit<TagProps<C>, "children" | "model" | "text">;
+  readonly editor: IEditor<V, CM, R, M, C, S>;
+  readonly tagProps?: Omit<TagProps<CM>, "children" | "model" | "text">;
 }
 
 const GenericModelMenuEditor = <
   V extends Table.RawRowValue,
-  C extends Model.HttpModel,
+  CM extends Model.HttpModel,
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
-  props: GenericModelMenuEditorProps<V, C, R, M, S>
+  props: GenericModelMenuEditorProps<V, CM, R, M, C, S>
 ) => {
   return (
-    <ModelTagsMenu<C>
+    <ModelTagsMenu<CM>
       clientSearching={true}
       {...props}
       menu={props.editor.menu}

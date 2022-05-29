@@ -15,11 +15,10 @@ const createModelsAddedEventReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Table.Context = Table.Context,
-  A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
+  C extends Redux.ActionContext = Redux.ActionContext
 >(
-  config: Table.ReducerConfig<R, M, S, C, A>
-): Redux.Reducer<S, Table.ModelsAddedEvent<M>> => {
+  config: Table.AuthenticatedReducerConfig<R, M, S, C>
+): Redux.BasicReducer<S, Table.ModelsAddedEvent<M>> => {
   const groupRowManager = new tabling.rows.GroupRowManager<R, M>({ columns: config.columns });
   const markupRowManager = new tabling.rows.MarkupRowManager({ columns: config.columns });
   const modelRowManager = new tabling.rows.ModelRowManager<R, M>({

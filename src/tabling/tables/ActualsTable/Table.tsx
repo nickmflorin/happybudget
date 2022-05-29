@@ -39,11 +39,11 @@ type OmitProps =
 type R = Tables.ActualRowData;
 type M = Model.Actual;
 type S = Tables.ActualTableStore;
+type C = ActualsTableContext;
 
-export type Props = Omit<AuthenticatedTableProps<R, M, S>, OmitProps> & {
+export type Props = Omit<AuthenticatedTableProps<R, M, C, S>, OmitProps> & {
   readonly parent: Model.Budget | null;
   readonly data: Table.BodyRow<R>[];
-  readonly actionContext: Tables.ActualTableContext;
   readonly actualTypes: Model.Tag[];
   readonly onOwnersSearch: (value: string) => void;
   readonly onExportPdf: () => void;
@@ -146,7 +146,7 @@ const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Pro
 
   const onContactCreated = useMemo(
     () => (m: Model.Contact, params?: CreateContactParams) => {
-      dispatch(store.actions.addContactToStateAction(m));
+      dispatch(store.actions.addContactToStateAction(m, {}));
       /* If we have enough information from before the contact was created in
 				 the specific cell, combine that information with the new value to
 				 perform a table update, showing the created contact in the new cell. */

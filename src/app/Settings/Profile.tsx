@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { useDispatch } from "react-redux";
 import { isNil } from "lodash";
 
 import * as api from "api";
@@ -14,8 +13,7 @@ import { Page } from "components/layout";
 
 const Profile = (): JSX.Element => {
   const form = ui.form.useForm<Http.UserPayload>();
-  const user = store.hooks.useLoggedInUser();
-  const dispatch: Redux.Dispatch = useDispatch();
+  const [user, updateUser] = store.hooks.useLoggedInUser();
   const [image, setImage] = useState<UploadedImage | SavedImage | null>(null);
   /*
   Note: We have to use a ref here, instead of storing firstName and lastName in
@@ -77,7 +75,7 @@ const Profile = (): JSX.Element => {
                   level: "success",
                   message: "Your information was successfully saved."
                 });
-                dispatch(store.actions.updateLoggedInUserAction(response));
+                updateUser(response);
               })
               .catch((e: Error) => form.handleRequestError(e))
               .finally(() => form.setLoading(false));

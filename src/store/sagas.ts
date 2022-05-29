@@ -23,14 +23,12 @@ export const createPublicRootSaga = (config: Application.StoreConfig): Saga => {
 const createApplicationSaga = (config: Application.StoreConfig): Saga => {
   const publicSaga = createPublicRootSaga(config);
 
-  const contactsTasks = tasks.contacts.createTaskSet();
-  const filteredContactsTasks = tasks.contacts.createFilteredTaskSet();
-  const contactsSaga = redux.createAuthenticatedModelListResponseSaga({
-    tasks: contactsTasks,
+  const contactsSaga = redux.createAuthenticatedModelListSaga({
+    tasks: { request: redux.convertContextTaskToTask(tasks.contacts.request) },
     actions: { request: actions.requestContactsAction }
   });
-  const filteredContactsSaga = redux.createAuthenticatedModelListResponseSaga({
-    tasks: filteredContactsTasks,
+  const filteredContactsSaga = redux.createAuthenticatedModelListSaga({
+    tasks: { request: redux.convertContextTaskToTask(tasks.contacts.requestFiltered) },
     actions: {
       request: actions.requestFilteredContactsAction,
       setSearch: actions.setContactsSearchAction

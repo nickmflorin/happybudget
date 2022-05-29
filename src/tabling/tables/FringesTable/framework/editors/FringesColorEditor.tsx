@@ -1,21 +1,33 @@
 import { forwardRef, useImperativeHandle, useState, useEffect, ForwardedRef } from "react";
 import { useSelector } from "react-redux";
 
+import * as store from "store";
+
 import { ColorGrid } from "components/tagging";
 import { ui } from "lib";
 
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
-interface FringesColorEditorProps
-  extends Table.EditorParams<Tables.FringeRowData, Model.Fringe, Tables.FringeTableStore> {
-  value: string | null;
-}
+type FringesColorEditorProps<
+  B extends Model.Budget | Model.Template,
+  P extends Model.Account | Model.SubAccount
+> = Table.EditorProps<
+  Tables.FringeRowData,
+  Model.Fringe,
+  FringesTableContext<B, P, false>,
+  Tables.FringeTableStore,
+  string | null
+>;
 
-const FringesColorEditor = (props: FringesColorEditorProps, ref: ForwardedRef<Table.AgEditorRef<string | null>>) => {
+const FringesColorEditor = <B extends Model.Budget | Model.Template, P extends Model.Account | Model.SubAccount>(
+  props: FringesColorEditorProps<B, P>,
+  ref: ForwardedRef<Table.AgEditorRef<string | null>>
+) => {
   const isFirstRender = ui.useTrackFirstRender();
   const [value, setValue] = useState<string | null>(props.value);
-  const colors = useSelector((state: Application.Store) => props.selector(state).fringeColors);
+  const colors = useSelector(store.selectors.selectFringeColors);
+  const colorsLoading = useSelector((s: Application.Store) => store.selectors.selectFringeColorStore(s).loading);
 
   useEffect(() => {
     if (!isFirstRender) {
@@ -43,6 +55,7 @@ const FringesColorEditor = (props: FringesColorEditorProps, ref: ForwardedRef<Ta
       colors={colors}
       colorSize={20}
       selectable={true}
+      loading={colorsLoading}
       value={value}
       treatDefaultAsNull={true}
       onChange={(v: string | null) => setValue(v)}
@@ -50,4 +63,4 @@ const FringesColorEditor = (props: FringesColorEditorProps, ref: ForwardedRef<Ta
   );
 };
 
-export default forwardRef(FringesColorEditor);
+export default forwardRef(FringesColorEditor) as typeof FringesColorEditor;

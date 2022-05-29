@@ -3,21 +3,20 @@ import { tabling } from "lib";
 type R = Tables.AccountRowData;
 type M = Model.Account;
 type S = Tables.AccountTableStore;
-type ACTION = Redux.TableAction<Redux.ActionPayload, Tables.ActualTableContext>;
-type AM = Redux.AuthenticatedTableActionMap<R, M, Tables.AccountTableContext>;
 
-type ReducerConfig<
-  A extends Redux.TableActionMap<M, Tables.AccountTableContext> = Redux.TableActionMap<M, Tables.ActualTableContext>
-> = Table.ReducerConfig<R, M, S, Tables.AccountTableContext, A>;
+export const createPublicAccountsTableReducer = <B extends Model.Budget | Model.Template>(
+  config: Table.ReducerConfig<R, M, S, AccountsTableActionContext<B, true>>
+): Redux.Reducer<S, AccountsTableActionContext<B, true>> =>
+  tabling.reducers.createPublicTableReducer<R, M, S, AccountsTableActionContext<B, true>>(config);
 
-export const createPublicAccountsTableReducer = (config: ReducerConfig): Redux.Reducer<S, ACTION> => {
-  return tabling.reducers.createPublicTableReducer<R, M, S, Tables.AccountTableContext>(config);
-};
-
-export const createAuthenticatedAccountsTableReducer = (
-  config: Omit<ReducerConfig<AM>, "defaultDataOnCreate">
-): Redux.Reducer<S, ACTION> =>
-  tabling.reducers.createAuthenticatedTableReducer<R, M, S, Tables.AccountTableContext, AM, ACTION>({
+export const createAuthenticatedAccountsTableReducer = <B extends Model.Budget | Model.Template>(
+  config: Omit<
+    Table.AuthenticatedReducerConfig<R, M, S, AccountsTableActionContext<B, false>>,
+    "defaultDataOnCreate" | "getModelRowChildren"
+  >
+): Redux.Reducer<S, AccountsTableActionContext<B, false>> =>
+  tabling.reducers.createAuthenticatedTableReducer<R, M, S, AccountsTableActionContext<B, false>>({
+    getModelRowChildren: (m: Model.Account) => m.children,
     defaultDataOnCreate: {
       markup_contribution: 0.0,
       actual: 0.0,

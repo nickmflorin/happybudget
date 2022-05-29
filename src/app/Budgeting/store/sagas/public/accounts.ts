@@ -1,22 +1,27 @@
 import { tabling } from "lib";
 import * as store from "store";
 
-import { accounts as actions } from "../../actions/public";
+import * as actions from "../../actions/public";
 
-const ActionMap: Redux.TableActionMap<Model.Account, Tables.AccountTableContext> = {
+type R = Tables.AccountRowData;
+type M = Model.Account;
+type B = Model.Budget;
+type C = AccountsTableActionContext<B, true>;
+
+const ActionMap = {
   request: actions.requestAction,
   loading: actions.loadingAction,
   response: actions.responseAction,
   setSearch: actions.setSearchAction
 };
 
-export const createTableSaga = (table: Table.TableInstance<Tables.AccountRowData, Model.Account>) =>
-  tabling.sagas.createPublicTableSaga<Tables.AccountRowData, Model.Account, Tables.AccountTableStore, Tables.AccountTableContext>({
+export const createTableSaga = (table: Table.TableInstance<R, M>) =>
+  tabling.sagas.createPublicTableSaga<R, M, Tables.AccountTableStore, C>({
     actions: ActionMap,
-		selectStore: (state: Application.Store) => state.public.budget.accounts,
-    tasks: store.tasks.accounts.createPublicTableTaskSet<Model.Budget>({
+    selectStore: (state: Application.Store) => state.public.budget.accounts,
+    tasks: store.tasks.accounts.createPublicTableTaskSet<B>({
       table,
       actions: ActionMap,
-			selectStore: (state: Application.Store) => state.public.budget.accounts,
+      selectStore: (state: Application.Store) => state.public.budget.accounts
     })
   });

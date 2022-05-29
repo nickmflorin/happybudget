@@ -9,12 +9,12 @@ type S = Tables.AccountTableStore;
 
 type OmitProps = "onRowExpand" | "showPageFooter" | "pinFirstColumn" | "tableId" | "menuPortalId";
 
-export type PublicTableProps<B extends Model.BaseBudget> = Omit<PublicBudgetTableProps<R, M, S>, OmitProps> & {
-  readonly id: B["id"];
+export type PublicTableProps<B extends Model.BaseBudget> = Omit<
+  PublicBudgetTableProps<R, M, B, AccountsTableContext<B, true>, S>,
+  OmitProps
+> & {
   readonly parent: B | null;
-  readonly domain: B["domain"];
   readonly tokenId: string;
-  readonly actionContext: Tables.AccountTableContext;
 };
 
 const PublicTable = <B extends Model.BaseBudget>(props: PublicTableProps<B>): JSX.Element => {
@@ -25,11 +25,14 @@ const PublicTable = <B extends Model.BaseBudget>(props: PublicTableProps<B>): JS
       {...props}
       showPageFooter={false}
       pinFirstColumn={true}
-      tableId={`public-${props.domain}-accounts`}
+      tableId={`public-${props.tableContext.domain}-accounts`}
       menuPortalId={"supplementary-header"}
       onRowExpand={(row: Table.ModelRow<R>) =>
         history.push(
-          budgeting.urls.getUrl({ domain: props.domain, id: props.id }, { type: "account", id: row.id }, props.tokenId)
+          budgeting.urls.getUrl(
+            { domain: props.tableContext.domain, id: props.tableContext.budgetId },
+            { type: "account", id: row.id }
+          )
         )
       }
     />

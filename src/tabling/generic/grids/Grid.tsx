@@ -146,6 +146,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
                 if (!isNil(params.node)) {
                   const row: Table.Row<R> = params.node.data;
                   if (tabling.rows.isBodyRow(row)) {
+                    /* eslint-disable-next-line @typescript-eslint/no-unsafe-return */
                     return tabling.columns.getColumnRowValue(
                       col,
                       row,
@@ -154,6 +155,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
                     );
                   }
                 }
+                /* eslint-disable-next-line @typescript-eslint/no-unsafe-return */
                 return col.nullValue;
               }
             : undefined,
@@ -257,7 +259,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
     []
   );
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return */
   const getRowNodeId = useMemo(() => (r: any) => r.id, []);
 
   useEffect(() => {

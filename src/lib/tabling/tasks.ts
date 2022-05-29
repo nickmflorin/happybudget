@@ -1,7 +1,6 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select, all } from "redux-saga/effects";
 import { isNil, map, filter } from "lodash";
-import { createSelector } from "reselect";
 
 import { http } from "lib";
 
@@ -13,13 +12,13 @@ export const task = <
   E extends Table.ChangeEvent<R>,
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  C extends Table.Context
+  C extends Redux.ActionContext = Redux.ActionContext
 >(
   saga: Redux.TableChangeEventTask<E, R, C>,
   table: Table.TableInstance<R, M>,
   defaultErrorMessage: string
 ): Redux.TableChangeEventTask<E, R, C> =>
-  function* (e: E, ctx: Redux.WithActionContext<C>): SagaIterator {
+  function* (e: E, ctx: C): SagaIterator {
     table.saving(true);
     try {
       yield call(saga, e, ctx);
@@ -37,10 +36,10 @@ export const task = <
     }
   };
 
-export const createChangeEventHandler = <R extends Table.RowData, C extends Table.Context = Table.Context>(
+export const createChangeEventHandler = <R extends Table.RowData, C extends Redux.ActionContext = Redux.ActionContext>(
   handlers: Partial<Redux.TableChangeEventTaskMapObject<R, C>>
 ): Redux.TableChangeEventTask<Table.ChangeEvent<R>, R, C> => {
-  function* handleChangeEvent<E extends Table.ChangeEvent<R>>(e: E, context: Redux.WithActionContext<C>): SagaIterator {
+  function* handleChangeEvent<E extends Table.ChangeEvent<R>>(e: E, context: C): SagaIterator {
     const handler = handlers[e.type] as Redux.TableChangeEventTask<E, R, C> | undefined;
     if (!isNil(handler)) {
       yield call(handler, e, context);
@@ -57,19 +56,15 @@ type CreateBulkTaskConfig<
   P extends Http.PayloadObj,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   SERVICE extends (...args: any[]) => Promise<any>,
-  C extends Table.Context = Table.Context,
+  C extends Redux.ActionContext = Redux.ActionContext,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = {
   readonly table: Table.TableInstance<R, M>;
-  readonly service: SERVICE;
-  readonly loadingActions?: Redux.ActionCreator<boolean>[];
-  readonly responseActions: (
-    ctx: Redux.WithActionContext<C>,
-    r: Http.ServiceResponse<SERVICE>,
-    e: Table.RowAddEvent<R>
-  ) => Redux.Action[];
-  readonly selectStore: (state: Application.Store) => S;
-  readonly performCreate: (ctx: Redux.WithActionContext<C>, p: Http.BulkCreatePayload<P>) => Parameters<SERVICE>;
+  readonly loadingActions?: Redux.ActionCreator<boolean, C>[];
+  readonly service: (ctx: C) => SERVICE;
+  readonly responseActions: (ctx: C, r: Http.ServiceResponse<SERVICE>, e: Table.RowAddEvent<R>) => Redux.Action[];
+  readonly selectStore: (state: Application.Store, ctx: C) => S;
+  readonly performCreate: (ctx: C, p: Http.BulkCreatePayload<P>) => Parameters<SERVICE>;
 };
 
 export const createBulkTask = <
@@ -78,15 +73,15 @@ export const createBulkTask = <
   P extends Http.PayloadObj,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   SERVICE extends (...args: any[]) => Promise<any>,
-  C extends Table.Context = Table.Context,
+  C extends Redux.ActionContext = Redux.ActionContext,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   config: CreateBulkTaskConfig<R, M, P, SERVICE, C, S>
 ) => {
-  const selectData = createSelector(config.selectStore, (store: S) => store.data);
-
-  function* bulkCreateTask(e: Table.RowAddEvent<R>, ctx: Redux.WithActionContext<C>): SagaIterator {
+  function* bulkCreateTask(e: Table.RowAddEvent<R>, ctx: C): SagaIterator {
     const payload: Partial<R>[] | Table.RowAddIndexPayload | Table.RowAddCountPayload = e.payload;
+
+    const selectData = (s: Application.Store) => config.selectStore(s, ctx).data;
     const store: Table.BodyRow<R>[] = yield select(selectData);
 
     let data: Partial<R>[];
@@ -120,12 +115,12 @@ export const createBulkTask = <
       >[]
     );
     if (!isNil(config.loadingActions)) {
-      yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean>) => put(action(true))));
+      yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean, C>) => put(action(true, ctx))));
     }
     config.table.saving(true);
     const performCreate = config.performCreate(ctx, requestPayload);
     try {
-      const response: Http.ServiceResponse<SERVICE> = yield http.request(config.service, ctx, ...performCreate);
+      const response: Http.ServiceResponse<SERVICE> = yield http.request(config.service(ctx), ctx, ...performCreate);
       yield all(map(config.responseActions(ctx, response, e), (action: Redux.Action) => put(action)));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, {
@@ -133,7 +128,7 @@ export const createBulkTask = <
       });
     } finally {
       if (!isNil(config.loadingActions)) {
-        yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean>) => put(action(false))));
+        yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean, C>) => put(action(false, ctx))));
       }
       config.table.saving(false);
     }

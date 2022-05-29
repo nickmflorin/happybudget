@@ -12,7 +12,7 @@ interface CreateTemplateModalProps extends CreateModelModalProps<Model.Template>
 }
 
 const CreateTemplateModal = ({ community = false, ...props }: CreateTemplateModalProps): JSX.Element => {
-  const user = store.hooks.useLoggedInUser();
+  const [user, _] = store.hooks.useLoggedInUser();
   const [file, setFile] = useState<UploadedImage | null>(null);
 
   return (

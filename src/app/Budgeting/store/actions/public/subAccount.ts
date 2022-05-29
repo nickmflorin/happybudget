@@ -1,19 +1,15 @@
 import { redux } from "lib";
 
-export const requestSubAccountAction = redux.actions.createAction<number>("public.subaccount.Request");
-export const loadingSubAccountAction = redux.actions.createAction<boolean>("public.subaccount.Loading");
-export const responseSubAccountAction = redux.actions.createAction<Model.SubAccount | null>(
-  "public.subaccount.Response"
-);
-export const loadingAction = redux.actions.createAction<boolean>("public.subaccount.TableLoading");
+type C = SubAccountActionContext<Model.Budget, true>;
+type TC = SubAccountsTableActionContext<Model.Budget, Model.Account | Model.SubAccount, true>;
 
-export const requestAction = redux.actions.createTableAction<Redux.TableRequestPayload, Tables.SubAccountTableContext>(
-  "public.subaccount.TableRequest"
-);
+const creator = redux.actions.createActionCreator({ label: "public.subaccount" });
 
-export const responseAction = redux.actions.createAction<Http.TableResponse<Model.SubAccount>>(
-  "public.subaccount.TableResponse"
-);
-export const setSearchAction = redux.actions.createTableAction<string, Tables.SubAccountTableContext>(
-  "public.subaccount.SetTableSearch"
-);
+export const requestSubAccountAction = creator<Redux.RequestPayload, C>("Request");
+// Currently, this action is not wired to anything but may be in the future.
+export const loadingSubAccountAction = creator<boolean, C>("Loading");
+export const responseSubAccountAction = creator<Http.RenderedDetailResponse<Model.SubAccount>, C>("Response");
+export const loadingAction = creator<boolean, TC>("TableLoading");
+export const requestAction = creator<Redux.TableRequestPayload, TC>("TableRequest");
+export const responseAction = creator<Http.TableResponse<Model.SubAccount>, TC>("TableResponse");
+export const setSearchAction = creator<string, TC>("SetTableSearch");

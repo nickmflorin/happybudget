@@ -30,7 +30,7 @@ const ProductsManager = ({
   const [products, setProducts] = useState<Model.Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [subscription, setSubscription] = useState<Model.Subscription | null>(null);
-  const user = store.hooks.useLoggedInUser();
+  const [user, _] = store.hooks.useLoggedInUser();
 
   useEffect(() => {
     setLoading(true);

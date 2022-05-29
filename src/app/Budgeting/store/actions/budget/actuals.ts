@@ -1,24 +1,18 @@
 import { redux } from "lib";
 
-export const responseActualOwnersAction =
-  redux.actions.createAction<Http.ListResponse<Model.ActualOwner>>("budget.actualowners.Response");
-export const setActualOwnersSearchAction = redux.actions.createTableAction<string, Tables.ActualTableContext>(
-  "budget.actualowners.SetSearch"
-);
-export const loadingActualOwnersAction = redux.actions.createAction<boolean>("budget.actualowners.Loading");
+type TC = ActualsTableActionContext;
 
-export const handleTableEventAction = redux.actions.createTableAction<
-  Table.Event<Tables.ActualRowData, Model.Actual>,
-  Tables.ActualTableContext
->("budget.actuals.TableChanged");
+const creator = redux.actions.createActionCreator({ label: "budget" });
 
-export const requestAction = redux.actions.createTableAction<Redux.TableRequestPayload, Tables.ActualTableContext>(
-  "budget.actuals.Request"
+export const responseActualOwnersAction = creator<Http.RenderedListResponse<Model.ActualOwner>, TC>(
+  "actualowners.Response"
 );
-export const loadingAction = redux.actions.createAction<boolean>("budget.actuals.Loading");
-export const responseAction = redux.actions.createAction<Http.TableResponse<Model.Actual>>("budget.actuals.Response");
-export const setSearchAction = redux.actions.createTableAction<string, Tables.ActualTableContext>(
-  "budget.actuals.SetSearch"
+export const setActualOwnersSearchAction = creator<string, TC>("actualowners.SetSearch");
+export const loadingActualOwnersAction = creator<boolean, TC>("actualowners.Loading");
+export const handleTableEventAction = creator<Table.Event<Tables.ActualRowData, Model.Actual>, TC>(
+  "actuals.TableChanged"
 );
-export const responseActualTypesAction =
-  redux.actions.createAction<Http.ListResponse<Model.Tag>>("budget.actualstypes.Response");
+export const requestAction = creator<Redux.TableRequestPayload, TC>("actuals.Request");
+export const loadingAction = creator<boolean, TC>("actuals.Loading");
+export const responseAction = creator<Http.TableResponse<Model.Actual>, TC>("actuals.Response");
+export const setSearchAction = creator<string, TC>("actuals.SetSearch");

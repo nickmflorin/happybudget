@@ -1,71 +1,72 @@
-import { redux, tabling } from "lib";
+import { isNil } from "lodash";
+
+import { tabling, http } from "lib";
 import createEventReducer from "./createEventReducer";
 
-export const createTableReducer = <
-  R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Table.Context = Table.Context,
-  A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
->(
-  config: Table.ReducerConfig<R, M, S, C, A>
-): Redux.Reducer<S> => {
-  return (state: S | undefined = config.initialState, action: Redux.Action): S => {
+export const createPublicTableReducer =
+  <
+    R extends Table.RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+    S extends Redux.TableStore<R> = Redux.TableStore<R>,
+    C extends Redux.ActionContext = Redux.ActionContext
+  >(
+    config: Table.ReducerConfig<R, M, S, C, Redux.TableActionCreatorMap<M, C>>
+  ): Redux.Reducer<S, C> =>
+  (state: S | undefined = config.initialState, action: Redux.AnyPayloadAction<C>): S => {
     let newState = { ...state };
-
-    if (redux.isClearOnAction(config.clearOn, action)) {
-      newState = { ...state, data: [] };
-    }
-
     if (action.type === config.actions.response.toString()) {
-      const response: Http.TableResponse<M> = action.payload;
-      return {
-        ...newState,
-        data: tabling.rows.generateTableData<R, M>({
-          ...config,
-          response
-        })
-      };
+      const a: Redux.InferAction<typeof config.actions.response> = action;
+      /*
+			The response was received so the results will not be invalidated
+      unless a subsequent action to invalidate them is received. */
+      newState = { ...newState, responseWasReceived: true, invalidated: false };
+      if (http.tableResponseFailed(a.payload)) {
+        return {
+          ...newState,
+          error: a.payload,
+          data: tabling.rows.generateTableData<R, M>({ ...config, response: { models: [], groups: [], markups: [] } })
+        };
+      } else {
+        return {
+          ...newState,
+          error: null,
+          data: tabling.rows.generateTableData<R, M>({
+            ...config,
+            response: a.payload
+          })
+        };
+      }
     } else if (action.type === config.actions.setSearch.toString()) {
-      const search: string = action.payload;
-      return { ...newState, search };
+      const a: Redux.InferAction<typeof config.actions.setSearch> = action;
+      return { ...newState, search: a.payload };
+    } else if (!isNil(config.actions.invalidate) && action.type === config.actions.invalidate.toString()) {
+      return { ...newState, invalidated: true };
     }
     return newState;
   };
-};
-
-export const createPublicTableReducer = <
-  R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Table.Context = Table.Context,
-  A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>,
-  AC extends Redux.TableAction<Redux.ActionPayload, C> = Redux.TableAction<Redux.ActionPayload, C>
->(
-  config: Table.ReducerConfig<R, M, S, C, A>
-): Redux.Reducer<S, AC> => createTableReducer<R, M, S, C, A>(config);
 
 export const createAuthenticatedTableReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Table.Context = Table.Context,
-  A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>,
-  AC extends Redux.TableAction<Redux.ActionPayload, C> = Redux.TableAction<Redux.ActionPayload, C>
+  C extends Redux.ActionContext = Redux.ActionContext
 >(
-  config: Table.ReducerConfig<R, M, S, C, A> & {
+  config: Table.AuthenticatedReducerConfig<R, M, S, C> & {
     readonly getModelRowChildren?: (m: M) => number[];
-    readonly recalculateRow?: (state: S, row: Table.DataRow<R>) => Partial<R>;
   }
-): Redux.Reducer<S, AC> => {
-  const tableEventReducer = createEventReducer<R, M, S, C, A>(config);
-  const generic = createTableReducer<R, M, S, C, A>(config);
+): Redux.DynamicReducer<S, Redux.RecalculateRowReducerCallback<S, R>, C> => {
+  const tableEventReducer = createEventReducer<R, M, S, C>(config);
+  const generic = createPublicTableReducer<R, M, S, C>(config);
 
-  return (state: S | undefined = config.initialState, action: AC): S => {
+  return (
+    state: S | undefined = config.initialState,
+    action: Redux.AnyPayloadAction<C>,
+    recalculateRow?: Redux.RecalculateRowReducerCallback<S, R>
+  ): S => {
     const newState = generic(state, action);
     if (action.type === config.actions.handleEvent.toString()) {
-      const a: Redux.TableAction<Table.Event<R, M, Table.EditableRow<R>>, C> = action;
-      return tableEventReducer(newState, a.payload);
+      const a: Redux.Action<Table.Event<R, M, Table.EditableRow<R>>, C> = action;
+      return tableEventReducer(newState, a.payload, recalculateRow);
     }
     return newState;
   };

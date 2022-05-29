@@ -37,8 +37,11 @@ declare namespace Application {
   type Store = AuthenticatedModuleStores & {
     readonly loading: boolean;
     readonly user: Model.User | null;
-    readonly contacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
-    readonly filteredContacts: Redux.AuthenticatedModelListResponseStore<Model.Contact>;
+    readonly contacts: Redux.AuthenticatedModelListStore<Model.Contact>;
+    readonly filteredContacts: Redux.AuthenticatedModelListStore<Model.Contact>;
+    readonly actualTypes: Redux.ModelListStore<Model.Tag>;
+    readonly fringeColors: Redux.ListStore<string>;
+    readonly subaccountUnits: Redux.ModelListStore<Model.Tag>;
     readonly productPermissionModalOpen: boolean;
     readonly public: PublicStore;
     readonly drawerOpen: boolean;
@@ -51,7 +54,8 @@ declare namespace Application {
       | AuthenticatedModuleStores[keyof AuthenticatedModuleStores] = any
   > {
     readonly rootSaga?: import("redux-saga").Saga;
-    readonly rootReducer: Redux.Reducer<S>;
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    readonly rootReducer: Redux.Reducer<S, any>;
     readonly initialState: S | (() => S);
     readonly label: ModuleLabel;
     readonly isPublic?: boolean;

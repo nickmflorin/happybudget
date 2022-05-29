@@ -5,10 +5,11 @@ import { tabling, redux, model } from "lib";
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
 type S = Tables.SubAccountTableStore;
-type CTX = Tables.SubAccountTableContext;
-type ACTION = Redux.TableAction<Redux.ActionPayload, CTX>;
 
-const recalculateSubAccountRow = (st: S, row: Table.DataRow<R>): Pick<R, "nominal_value" | "fringe_contribution"> => {
+const recalculateSubAccountRow = (
+  row: Table.DataRow<R>,
+  fringesStore: Tables.FringeTableStore
+): Pick<R, "nominal_value" | "fringe_contribution"> => {
   /*
   In the case that the SubAccount has SubAccount(s) itself, the estimated value
 	is determined from the accumulation of the estimated values for those children
@@ -21,17 +22,17 @@ const recalculateSubAccountRow = (st: S, row: Table.DataRow<R>): Pick<R, "nomina
 
   if (isValidToRecalculate) {
     const fringes: Table.ModelRow<Tables.FringeRowData>[] = redux.findModelsInData(
-      filter(st.fringes.data, (r: Table.BodyRow<Tables.FringeRowData>) => tabling.rows.isModelRow(r)),
+      filter(fringesStore.data, (r: Table.BodyRow<Tables.FringeRowData>) => tabling.rows.isModelRow(r)),
       row.data.fringes
     ) as Table.ModelRow<Tables.FringeRowData>[];
-
     if (!isNil(row.data.rate) && !isNil(row.data.quantity)) {
-      const multiplier = row.data.multiplier || 1.0;
-      // const quantity = row.data.quantity === null ? 1.0 : row.data.quantity;
-      const quantity = row.data.quantity;
+      const multiplier = row.data.multiplier === null ? 1.0 : row.data.multiplier;
       return {
-        nominal_value: quantity * row.data.rate * multiplier,
-        fringe_contribution: model.budgeting.contributionFromFringes(quantity * row.data.rate * multiplier, fringes)
+        nominal_value: row.data.quantity * row.data.rate * multiplier,
+        fringe_contribution: model.budgeting.contributionFromFringes(
+          row.data.quantity * row.data.rate * multiplier,
+          fringes
+        )
       };
     } else {
       return {
@@ -46,84 +47,51 @@ const recalculateSubAccountRow = (st: S, row: Table.DataRow<R>): Pick<R, "nomina
   };
 };
 
-export type SubAccountTableActionMap = Redux.TableActionMap<M, CTX> & {
-  readonly responseSubAccountUnits: Redux.ActionCreator<Http.ListResponse<Model.Tag>>;
-};
-
-export const createPublicSubAccountsTableReducer = (
-  config: Table.ReducerConfig<R, M, S, CTX, SubAccountTableActionMap> & {
-    readonly fringes: Redux.Reducer<
-      Tables.FringeTableStore,
-      Redux.TableAction<Redux.ActionPayload, Tables.FringeTableContext>
-    >;
-  }
-): Redux.Reducer<S, ACTION> => {
-  const generic = tabling.reducers.createPublicTableReducer<R, M, S, CTX, SubAccountTableActionMap, ACTION>(config);
-
-  return (state: S | undefined = config.initialState, action: ACTION): S => {
-    let newState = generic(state, action);
-    newState = { ...newState, fringes: config.fringes(newState.fringes, action) };
-
-    if (action.type === config.actions.responseSubAccountUnits.toString()) {
-      const payload: Http.ListResponse<Model.Tag> = action.payload;
-      newState = { ...newState, subaccountUnits: payload.data };
-    }
-    newState = { ...newState, fringes: config.fringes(newState.fringes, action) };
-    return newState;
-  };
-};
-
-export type AuthenticatedSubAccountTableActionMap = Redux.AuthenticatedTableActionMap<
-  R,
-  M,
-  Tables.SubAccountTableContext
-> & {
-  readonly responseSubAccountUnits: Redux.ActionCreator<Http.ListResponse<Model.Tag>>;
-};
-
-export const createAuthenticatedSubAccountsTableReducer = (
-  config: Omit<
-    Table.ReducerConfig<R, M, S, Tables.SubAccountTableContext, AuthenticatedSubAccountTableActionMap> & {
-      readonly fringes: Redux.Reducer<
-        Tables.FringeTableStore,
-        Redux.TableAction<Redux.ActionPayload, Tables.FringeTableContext>
-      >;
-    },
-    "defaultDateOnCreate" | "defaultDataOnUpdate"
-  >
-): Redux.Reducer<S, ACTION> => {
-  const generic = tabling.reducers.createAuthenticatedTableReducer<
-    R,
-    M,
-    S,
-    CTX,
-    AuthenticatedSubAccountTableActionMap,
-    ACTION
-  >({
+export const createPublicSubAccountsTableReducer = <
+  B extends Model.Budget | Model.Template,
+  P extends Model.Account | Model.SubAccount
+>(
+  config: Omit<Table.ReducerConfig<R, M, S, SubAccountsTableActionContext<B, P, true>>, "getModelRowChildren">
+): Redux.Reducer<S, SubAccountsTableActionContext<B, P, true>> =>
+  tabling.reducers.createPublicTableReducer<R, M, S, SubAccountsTableActionContext<B, P, true>>({
     ...config,
-    defaultDataOnCreate: (r: Partial<R>): Partial<R> => {
-      if (!isNil(r.rate) && isNil(r.quantity)) {
-        return { ...r, quantity: 1.0 };
-      }
-      return r;
-    },
-    defaultDataOnUpdate: (r: Table.ModelRow<R>, changes: Table.RowChangeData<R, Table.ModelRow<R>>): R => {
-      if (!isNil(r.data.rate) && isNil(r.data.quantity) && isNil(changes.quantity)) {
-        return { ...r.data, quantity: 1.0 };
-      }
-      return r.data;
-    },
-    recalculateRow: recalculateSubAccountRow
+    getModelRowChildren: (m: Model.SubAccount) => m.children
   });
 
-  return (state: S | undefined = config.initialState, action: ACTION): S => {
-    let newState = generic(state, action);
-    newState = { ...newState, fringes: config.fringes(newState.fringes, action) };
-
-    if (action.type === config.actions.responseSubAccountUnits.toString()) {
-      const payload: Http.ListResponse<Model.Tag> = action.payload;
-      newState = { ...newState, subaccountUnits: payload.data };
+export const createAuthenticatedSubAccountsTableReducer = <
+  B extends Model.Budget | Model.Template,
+  P extends Model.Account | Model.SubAccount
+>(
+  config: Omit<
+    Table.AuthenticatedReducerConfig<R, M, S, SubAccountsTableActionContext<B, P, false>>,
+    "defaultDateOnCreate" | "defaultDataOnUpdate" | "getModelRowChildren"
+  >
+): Redux.DynamicRequiredReducer<S, Tables.FringeTableStore, SubAccountsTableActionContext<B, P, false>> => {
+  const generic = tabling.reducers.createAuthenticatedTableReducer<R, M, S, SubAccountsTableActionContext<B, P, false>>(
+    {
+      ...config,
+      getModelRowChildren: (m: Model.SubAccount) => m.children,
+      defaultDataOnCreate: (r: Partial<R>): Partial<R> => {
+        if (!isNil(r.rate) && isNil(r.quantity)) {
+          return { ...r, quantity: 1.0 };
+        }
+        return r;
+      },
+      defaultDataOnUpdate: (r: Table.ModelRow<R>, changes: Table.RowChangeData<R, Table.ModelRow<R>>): R => {
+        if (!isNil(r.data.rate) && isNil(r.data.quantity) && isNil(changes.quantity)) {
+          return { ...r.data, quantity: 1.0 };
+        }
+        return r.data;
+      }
     }
-    return newState;
-  };
+  );
+
+  return (
+    state: S | undefined = config.initialState,
+    action: Redux.AnyPayloadAction<SubAccountsTableActionContext<B, P, false>>,
+    fringesStore: Tables.FringeTableStore
+  ): S =>
+    generic(state, action, (s: Tables.SubAccountTableStore, row: Table.DataRow<R>) =>
+      recalculateSubAccountRow(row, fringesStore)
+    );
 };

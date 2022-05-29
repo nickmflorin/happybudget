@@ -110,17 +110,19 @@ export const detectNextInPattern = (values: Table.PreviousValues<PatternValue>):
         const diff = previousNumericValue - numericValue;
         return typeof value === "string" ? String(numericValue - diff) : numericValue - diff;
       } else {
-        /* The numeric values are the same, but if we are not considering an
-           equality part of a pattern then we should return null to indicate that
-           we could not infer a pattern. */
+        /*
+				The numeric values are the same, but if we are not considering an
+				equality part of a pattern then we should return null to indicate that
+				we could not infer a pattern. */
         return null;
       }
     } else {
       return typeof value === "string" ? String(numericValue + 1) : numericValue + 1;
     }
   } else if (typeof value === "string") {
-    /* If the value itself is not numeric, then maybe there is a prefix before
-       a numeric value that we can infer from. */
+    /*
+		If the value itself is not numeric, then maybe there is a prefix before
+    a numeric value that we can infer from. */
     const separated = separate(value);
     if (!isNil(separated)) {
       if (!isNil(previousValue) && typeof previousValue === "string") {
@@ -131,7 +133,7 @@ export const detectNextInPattern = (values: Table.PreviousValues<PatternValue>):
         if (!isNil(previousSeparated) && previousSeparated[1] === separated[1]) {
           const nextInPattern = detectNextInPattern([previousSeparated[2], separated[2]]);
           if (!isNil(nextInPattern)) {
-            return separated[0] + separated[1] + nextInPattern;
+            return separated[0] + separated[1] + String(nextInPattern);
           }
         }
       }
@@ -211,9 +213,11 @@ export const findPreviousModelRows = <R extends Table.RowData>(
   source: AGSource | Omit<ReduxSource<R>, "count">,
   filling?: boolean
 ): Table.PreviousValues<Table.ModelRow<R> | Partial<R> | Table.PlaceholderRow<R>> | null => {
-  /* If finding the previous ModelRow<R>(s) from AG Grid, we can specify the index
-     we are starting at, otherwise we start at the end of the table (in AG Grid
-     context) or the end ot the store (in Reducer context). */
+  /*
+	If finding the previous ModelRow<R>(s) from AG Grid, we can specify the index
+	we are starting at, otherwise we start at the end of the table (in AG Grid
+	context) or the end ot the store (in Reducer context).
+	*/
   let runningIndex = getSourceIndex(source);
 
   const isModelRowOrData = (
@@ -231,9 +235,11 @@ export const findPreviousModelRows = <R extends Table.RowData>(
 
   const getRowAtIndex = (index: number): Table.BodyRow<R> | Partial<R> | null => {
     if (isAgSource(source)) {
-      /* The node should exist at the index because we check the validity of the
-         index compared to the number of rows in the table in `getSourceIndex` -
-         but this is mostly to make TS happy and to protect against edge cases. */
+      /*
+			The node should exist at the index because we check the validity of the
+			index compared to the number of rows in the table in `getSourceIndex` -
+			but this is mostly to make TS happy and to protect against edge cases.
+			*/
       const node = source.api.getDisplayedRowAtIndex(index);
       if (!isNil(node)) {
         const row: Table.BodyRow<R> = node.data;
@@ -241,19 +247,23 @@ export const findPreviousModelRows = <R extends Table.RowData>(
       }
       return null;
     } else {
-      /* The index should be in the store because we check the validity of the
-         index compared to the length of the store in `getSourceIndex` - so this
-         is primarily to make TS happy. */
+      /*
+			The index should be in the store because we check the validity of the
+			index compared to the length of the store in `getSourceIndex` - so this
+			is primarily to make TS happy.
+			*/
       return source.store[index] || null;
     }
   };
 
   const modelRowsOrData: (Table.ModelRow<R> | Table.PlaceholderRow<R> | Partial<R>)[] = [];
 
-  /* Because of how the timing of when the values are actually placed inside of
-     the AGGrid table, when we are filling cells from a drag handle, we need to
-     start one less than the index because the value is already assumed to be
-     in the table. */
+  /*
+	Because of how the timing of when the values are actually placed inside of
+	the AGGrid table, when we are filling cells from a drag handle, we need to
+	start one less than the index because the value is already assumed to be
+	in the table.
+	*/
   if (filling) {
     runningIndex = runningIndex - 1;
   }
@@ -296,25 +306,25 @@ const detectPatternFromPreviousRows = <R extends Table.RowData>(
     Table.RawRowValue | undefined
   >(previousRows, (ri: Table.ModelRow<R> | Partial<R> | Table.PlaceholderRow<R>) => {
     /*
-      If the object is a Row, then we know the value will not be undefined
-      because we do not allow undefined values for Row(s).  In the worst case
-      scenario, if it happened to slip in and avoid TS type checks, the below
-      block of code would recognize that `undefined` is not a PatternValue and
-      previous smart inference based on this column.
-      */
+		If the object is a Row, then we know the value will not be undefined
+		because we do not allow undefined values for Row(s).  In the worst case
+		scenario, if it happened to slip in and avoid TS type checks, the below
+		block of code would recognize that `undefined` is not a PatternValue and
+		previous smart inference based on this column.
+		*/
     if (tabling.rows.isRow(ri)) {
       return ri.data[field];
     } else {
       /*
-        If the object is not a Row, and is a partially created RowData object,
-        then the value will be undefined if the field does not exist in the
-        Partial - which can happen if there is an inconsistency with generating
-        row data from one row to the next.
+			If the object is not a Row, and is a partially created RowData object,
+			then the value will be undefined if the field does not exist in the
+			Partial - which can happen if there is an inconsistency with generating
+			row data from one row to the next.
 
-        In this case, we cannot perform the smart inference, so we simply return
-        `undefined` so that the next block of code will recognize the `undefined`
-        value as not being a PatternValue and not perform the inference.
-        */
+			In this case, we cannot perform the smart inference, so we simply return
+			`undefined` so that the next block of code will recognize the `undefined`
+			value as not being a PatternValue and not perform the inference.
+			*/
       return ri[field];
     }
   });
@@ -372,10 +382,12 @@ export const generateNewRowData = <R extends Table.RowData, M extends Model.RowH
     if (source.count === 0) {
       return [];
     } else {
-      /* We need to keep track of the RowData objects that are created as we go,
-         because in the case we are generating multiple RowData objects, the
-				 previously created RowData object needs to factor into the pattern
-				 recognition. */
+      /*
+			We need to keep track of the RowData objects that are created as we go,
+			because in the case we are generating multiple RowData objects, the
+			previously created RowData object needs to factor into the pattern
+			recognition.
+			*/
       const runningRows: Partial<R>[] = [];
       for (let i = 0; i < source.count; i++) {
         const runningSource = { ...source, count: 1, store: [...source.store, ...runningRows] };

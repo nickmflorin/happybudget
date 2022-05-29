@@ -63,9 +63,11 @@ export const removeRowsFromTheirGroupsIfTheyExist = <
   st: S,
   rowIds: (Table.ModelRowId | Table.ModelRow<R>)[]
 ): S => {
-  /* Keep track of which groups were altered and what their most recent children
-		 were after all alterations, because it will be faster to recalculate the
-		 groups in the state after so we can only recalculate each group once. */
+  /*
+	Keep track of which groups were altered and what their most recent children
+	were after all alterations, because it will be faster to recalculate the
+	groups in the state after so we can only recalculate each group once.
+	*/
   type Alteration = {
     groupRow: Table.GroupRow<R>;
     children: number[];
@@ -87,10 +89,12 @@ export const removeRowsFromTheirGroupsIfTheyExist = <
       if (!isNil(r)) {
         const groupRow = rowGroupRowFromState<R, S>(st, r.id, { warnOnMissing: false });
         if (!isNil(groupRow)) {
-          /* This will be overwrittten if a group belongs to multiple rows
-						 associated with the provided IDS - but that is what we want, because
-						 we want the final values to have the most up to date children for
-						 each group after all alterations. */
+          /*
+					This will be overwrittten if a group belongs to multiple rows
+					associated with the provided IDS - but that is what we want, because
+					we want the final values to have the most up to date children for
+					each group after all alterations.
+					*/
           const modelId = r.id;
           return {
             ...alterations,
@@ -130,15 +134,19 @@ export const updateRowGroup = <R extends Table.RowData, S extends Redux.TableSto
 
   const g: Table.GroupRow<R> | null = groupRowFromState<R, S>(st, group);
   if (!isNil(g)) {
-    /* If any of the ModelRow(s) already belong to Group(s), they must be
-			 disassociated from those Group(s) since a ModelRow can only belong to one
-			 and only one Group. */
+    /*
+		If any of the ModelRow(s) already belong to Group(s), they must be
+		disassociated from those Group(s) since a ModelRow can only belong to one
+		and only one Group.
+		*/
     const newState = removeRowsFromTheirGroupsIfTheyExist(st, ids);
-    /* Find the rows associated with this Group including the rows that are
-			 being added to the group.  Note that this is intentionally redundant (as
-			 we simply set the children propery to these IDs afterwards anyways) - but
-			 is done so to make sure that the IDs are valid and associated with
-			 ModelRow(s) in state. */
+    /*
+		Find the rows associated with this Group including the rows that are
+		being added to the group.  Note that this is intentionally redundant (as
+		we simply set the children propery to these IDs afterwards anyways) - but
+		is done so to make sure that the IDs are valid and associated with
+		ModelRow(s) in state.
+		*/
     const rws = redux.findModelsInData<Table.ModelRow<R>>(
       filter(newState.data, (r: Table.BodyRow<R>) => tabling.rows.isModelRow(r)) as Table.ModelRow<R>[],
       uniq([...ids, ...g.children])

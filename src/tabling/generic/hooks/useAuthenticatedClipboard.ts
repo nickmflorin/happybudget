@@ -147,6 +147,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
           /* The proccessed clipboard value will be undefined in the case that
              the column is not applicable for that row. */
           const processed: Table.InferV<typeof c> | undefined = processValueFromClipboard<R, M>(p.value, c, row);
+          /* eslint-disable-next-line  @typescript-eslint/no-unsafe-return */
           return processed === undefined ? "" : processed;
         }
       }

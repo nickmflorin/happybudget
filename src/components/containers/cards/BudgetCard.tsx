@@ -16,7 +16,7 @@ type BudgetCardProps = Omit<GenericOwnedBudgetCardProps, "dropdown"> & {
 };
 
 const BudgetCard = ({ onArchived, onDuplicated, ...props }: BudgetCardProps): JSX.Element => {
-  const user = store.hooks.useLoggedInUser();
+  const [user, _] = store.hooks.useLoggedInUser();
   const [archiving, setArchiving] = useState(false);
   const [duplicating, setDuplicating] = useState(false);
   const [cancelToken] = http.useCancelToken();
@@ -48,7 +48,7 @@ const BudgetCard = ({ onArchived, onDuplicated, ...props }: BudgetCardProps): JS
         config.env.BILLING_ENABLED &&
         !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
       ) {
-        dispatch(store.actions.setProductPermissionModalOpenAction(true));
+        dispatch(store.actions.setProductPermissionModalOpenAction(true, {}));
       } else {
         setDuplicating(true);
         api

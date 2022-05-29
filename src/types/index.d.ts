@@ -32,6 +32,9 @@ declare type ID = string | number;
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 declare type FnWithTypedArgs<T, ARGS extends any[]> = (...args: ARGS) => T;
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+declare type TOrFn<T, ARGS extends any[]> = T | FnWithTypedArgs<T, ARGS>;
+
 declare type SingleOrArray<T> = T | T[];
 
 declare type NonNullRef<T> = {
@@ -46,13 +49,6 @@ declare type RenderPropChild<PARAMS, P extends Record<string, unknown> = Record<
   p: PARAMS
 ) => import("react").ReactElement<P, string>;
 
-/* Adopted from AntD */
-declare type RecursivePartial<T> = T extends Record<string, unknown>
-  ? {
-      [P in keyof T]?: T[P] extends (infer U)[]
-        ? RecursivePartial<U>[]
-        : T[P] extends Record<string, unknown>
-        ? RecursivePartial<T[P]>
-        : T[P];
-    }
-  : never;
+// Adopted from `utility-types` and scoped to this project.
+type Optional<T extends Record<string, unknown>, K extends keyof T = keyof T> = import("utility-types").Optional<T, K>;
+type PickOptional<T extends Record<string, unknown>, K extends keyof T = keyof T> = Optional<Pick<T, K>, K>;

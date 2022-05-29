@@ -37,8 +37,9 @@ const DragCountReducer = (state: DragState = InitialDragState, action: DragCount
 interface AttachmentsCellProps<
   R extends Tables.ActualRowData | Tables.SubAccountRowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
-> extends Table.CellProps<R, M, S, Model.SimpleAttachment[]> {
+> extends Table.CellProps<R, M, C, S, Model.SimpleAttachment[]> {
   readonly uploadAttachmentsPath: (id: number) => string;
   readonly onAttachmentAdded: (row: Table.ModelRow<R>, attachment: Model.Attachment) => void;
 }
@@ -46,11 +47,12 @@ interface AttachmentsCellProps<
 const AttachmentsCell = <
   R extends Tables.ActualRowData | Tables.SubAccountRowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >({
   value,
   ...props
-}: AttachmentsCellProps<R, M, S>): JSX.Element => {
+}: AttachmentsCellProps<R, M, C, S>): JSX.Element => {
   const divRef = useRef<HTMLDivElement>(null);
   const [progressValue, progressActive, progressUpdate, progressCancel] = ui.progress.useDampenedProgress({
     dampenedRate: 0.1,

@@ -19,7 +19,7 @@ type TemplatesProps = {
 
 const Templates = (props: TemplatesProps): JSX.Element => {
   const [templateToDerive, _setTemplateToDerive] = useState<number | undefined>(undefined);
-  const user = store.hooks.useLoggedInUser();
+  const [user, _] = store.hooks.useLoggedInUser();
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -31,7 +31,7 @@ const Templates = (props: TemplatesProps): JSX.Element => {
         config.env.BILLING_ENABLED &&
         !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
       ) {
-        dispatch(store.actions.setProductPermissionModalOpenAction(true));
+        dispatch(store.actions.setProductPermissionModalOpenAction(true, {}));
       } else {
         _setTemplateToDerive(id);
       }
@@ -53,8 +53,8 @@ const Templates = (props: TemplatesProps): JSX.Element => {
           title={"Create Budget from Template"}
           onSuccess={(budget: Model.UserBudget) => {
             setTemplateToDerive(undefined);
-            dispatch(actions.addBudgetToStateAction(budget));
-            dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "increment" }));
+            dispatch(actions.addBudgetToStateAction(budget, {}));
+            dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "increment" }, {}));
             history.push(`/budgets/${budget.id}/accounts`);
           }}
         />

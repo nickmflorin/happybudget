@@ -7,14 +7,15 @@ const createDataChangeEventReducer =
     R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
-    C extends Table.Context = Table.Context,
-    A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
+    C extends Redux.ActionContext = Redux.ActionContext
   >(
-    config: Omit<Table.ReducerConfig<R, M, S, C, A>, "defaultDataOnCreate"> & {
-      readonly recalculateRow?: (state: S, row: Table.DataRow<R>) => Partial<R>;
-    }
-  ): Redux.Reducer<S, Table.DataChangeEvent<R>> =>
-  (s: S = config.initialState, e: Table.DataChangeEvent<R>): S => {
+    config: Omit<Table.AuthenticatedReducerConfig<R, M, S, C>, "defaultDataOnCreate">
+  ): Redux.BasicDynamicReducer<S, Redux.RecalculateRowReducerCallback<S, R>, Table.DataChangeEvent<R>> =>
+  (
+    s: S = config.initialState,
+    e: Table.DataChangeEvent<R>,
+    recalculateRow?: Redux.RecalculateRowReducerCallback<S, R>
+  ): S => {
     const modelRowManager = new tabling.rows.ModelRowManager<R, M>({
       getRowChildren: config.getModelRowChildren,
       columns: config.columns
@@ -23,10 +24,12 @@ const createDataChangeEventReducer =
 
     const consolidated = tabling.events.consolidateRowChanges(e.payload);
 
-    /* Note: This grouping may be redundant in the case that the change is
-       dispatched from the Table as the Table will already group the changes
-       by Row, but it is not guaranteed to be the case if the event is dispatched
-       from other locations. */
+    /*
+		Note: This grouping may be redundant in the case that the change is
+		dispatched from the Table as the Table will already group the changes
+		by Row, but it is not guaranteed to be the case if the event is dispatched
+		from other locations.
+		*/
     type ChangesPerRow = { [key: ID]: { data: Table.RowChangeData<R>; row: Table.EditableRow<R> } };
 
     const changesPerRow: ChangesPerRow = reduce(
@@ -36,8 +39,10 @@ const createDataChangeEventReducer =
           filter(s.data, (ri: Table.BodyRow<R>) => tabling.rows.isEditableRow(ri)) as Table.EditableRow<R>[],
           rowChange.id
         );
-        /* A warning will be issued if the row associated with the change could
-         not be found. */
+        /*
+				A warning will be issued if the row associated with the change could
+      	not be found.
+				*/
         if (!isNil(r)) {
           if (!isNil(curr[r.id])) {
             return { ...curr, [r.id]: { row: r, data: { ...curr[r.id].data, ...rowChange.data } } };
@@ -50,9 +55,7 @@ const createDataChangeEventReducer =
       },
       {}
     );
-
-    /* For each Row that was changed, apply that change to the Row stored in
-			 state. */
+    // Apply change to Row stored in state for each Row that was changed.
     return reduce(
       changesPerRow,
       (st: S, dt: { data: Table.RowChangeData<R>; row: Table.EditableRow<R> }) => {
@@ -60,8 +63,7 @@ const createDataChangeEventReducer =
           ? markupRowManager.mergeChangesWithRow(dt.row, dt.data as Table.RowChangeData<R, Table.MarkupRow<R>>)
           : modelRowManager.mergeChangesWithRow(dt.row, dt.data as Table.RowChangeData<R, Table.ModelRow<R>>);
 
-        /* Make sure to add in the default data before any recalculations are
-           performed. */
+        // Add the default data before recalculations are performed.
         if (tabling.rows.isModelRow(r)) {
           r = tabling.rows.applyDefaultsOnUpdate(
             tabling.columns.filterModelColumns(config.columns),
@@ -70,8 +72,8 @@ const createDataChangeEventReducer =
             config.defaultDataOnUpdate
           );
         }
-        if (!isNil(config.recalculateRow) && tabling.rows.isDataRow(r)) {
-          r = { ...r, data: { ...r.data, ...config.recalculateRow(st, r) } };
+        if (tabling.rows.isDataRow(r)) {
+          r = { ...r, data: { ...r.data, ...recalculateRow?.(st, r) } };
         }
         return {
           ...st,

@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/react";
-import { isNil } from "lodash";
+import { isNil, map } from "lodash";
 
 import * as api from "api";
 import * as config from "config";
@@ -151,22 +151,25 @@ export const inconsistentStateError = <P extends Redux.ActionPayload = Redux.Act
   });
 };
 
-export const handleRequestError = (e: Error, opts?: InternalNotificationOptions) => {
-  if (e instanceof api.ClientError || e instanceof api.ServerError) {
-    notify({
-      dispatchToSentry: true,
-      level: "error",
-      ...opts,
-      error: e
-    });
-  } else if (e instanceof api.NetworkError) {
-    notify({
-      dispatchToSentry: false,
-      level: "error",
-      ...opts,
-      error: e
-    });
-  } else if (!(e instanceof api.ForceLogout)) {
-    throw e;
-  }
+export const handleRequestError = (e: SingleOrArray<Error>, opts?: InternalNotificationOptions) => {
+  const errors = Array.isArray(e) ? e : [e];
+  map(errors, (er: Error) => {
+    if (er instanceof api.ClientError || er instanceof api.ServerError) {
+      notify({
+        dispatchToSentry: true,
+        level: "error",
+        ...opts,
+        error: er
+      });
+    } else if (er instanceof api.NetworkError) {
+      notify({
+        dispatchToSentry: false,
+        level: "error",
+        ...opts,
+        error: er
+      });
+    } else if (!(er instanceof api.ForceLogout)) {
+      throw er;
+    }
+  });
 };

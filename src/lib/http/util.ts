@@ -24,7 +24,7 @@ import { util } from "lib";
  *             the user's timezone.
  * @returns The provided array of models ordered by the provided ordering array.
  */
-export const orderBy = <M extends Model.HttpModel, F extends keyof M & string>(
+export const orderBy = <M extends Model.HttpModel, F extends string>(
   data: M[],
   ordering: Http.Ordering<F>,
   user?: Model.User | null
@@ -57,7 +57,7 @@ export const orderBy = <M extends Model.HttpModel, F extends keyof M & string>(
       reduce(
         fields,
         (currM: ModelFromOrderedFields, f: F) => {
-          const v = m[f];
+          const v = m[f as keyof M];
           /* If the value of the model field can be treated as a date, we
                should convert it to a date such that the Moment object is what
                the field is ordered by. */

@@ -3,60 +3,25 @@ import { tabling, model } from "lib";
 type R = Tables.FringeRowData;
 type M = Model.Fringe;
 type S = Tables.FringeTableStore;
-type CTX = Tables.FringeTableContext;
-type ACTION = Redux.TableAction<Redux.ActionPayload, CTX>;
 
-export type FringeTableActionMap = Redux.TableActionMap<M, CTX> & {
-  readonly responseFringeColors: Redux.ActionCreator<Http.ListResponse<string>>;
-};
+export const createPublicFringesTableReducer = <
+  B extends Model.Budget | Model.Template,
+  P extends Model.Account | Model.SubAccount = Model.Account | Model.SubAccount
+>(
+  config: Table.ReducerConfig<R, M, S, FringesTableActionContext<B, P, true>>
+): Redux.Reducer<S, FringesTableActionContext<B, P, true>> =>
+  tabling.reducers.createPublicTableReducer<R, M, S, FringesTableActionContext<B, P, true>>(config);
 
-export const createPublicFringesTableReducer = (
-  config: Table.ReducerConfig<R, M, S, CTX, FringeTableActionMap>
-): Redux.Reducer<S, ACTION> => {
-  const generic = tabling.reducers.createPublicTableReducer<
-    Tables.FringeRowData,
-    Model.Fringe,
-    Tables.FringeTableStore,
-    Tables.FringeTableContext
-  >(config);
-
-  return (state: S | undefined = config.initialState, action: ACTION): S => {
-    let newState = generic(state, action);
-    if (action.type === config.actions.responseFringeColors.toString()) {
-      const payload: Http.ListResponse<string> = action.payload;
-      newState = { ...newState, fringeColors: payload.data };
-    }
-    return newState;
-  };
-};
-
-export type AuthenticatedFringeTableActionMap = Redux.AuthenticatedTableActionMap<R, M, CTX> & {
-  readonly responseFringeColors: Redux.ActionCreator<Http.ListResponse<string>>;
-};
-
-export const createAuthenticatedFringesTableReducer = (
-  config: Omit<Table.ReducerConfig<R, M, S, CTX, AuthenticatedFringeTableActionMap>, "defaultDataOnCreate">
-): Redux.Reducer<S, ACTION> => {
-  const generic = tabling.reducers.createAuthenticatedTableReducer<
-    R,
-    M,
-    S,
-    CTX,
-    AuthenticatedFringeTableActionMap,
-    ACTION
-  >({
+export const createAuthenticatedFringesTableReducer = <
+  B extends Model.Budget | Model.Template,
+  P extends Model.Account | Model.SubAccount = Model.Account | Model.SubAccount
+>(
+  config: Omit<Table.AuthenticatedReducerConfig<R, M, S, FringesTableActionContext<B, P, false>>, "defaultDataOnCreate">
+): Redux.Reducer<S, FringesTableActionContext<B, P, false>> =>
+  tabling.reducers.createAuthenticatedTableReducer<R, M, S, FringesTableActionContext<B, P, false>>({
     ...config,
     defaultDataOnCreate: {
       unit: model.budgeting.FringeUnits.percent,
       rate: 0.0
     }
   });
-  return (state: S | undefined = config.initialState, action: ACTION): S => {
-    let newState = generic(state, action);
-    if (action.type === config.actions.responseFringeColors.toString()) {
-      const payload: Http.ListResponse<string> = action.payload;
-      newState = { ...newState, fringeColors: payload.data };
-    }
-    return newState;
-  };
-};

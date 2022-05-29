@@ -5,21 +5,25 @@ import { Framework } from "./framework";
 
 export type PublicBudgetTableProps<
   R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends Model.RowHttpModel,
+  B extends Model.Budget | Model.Template,
+  C extends BudgetContext<B, true> = BudgetContext<B, true>,
   S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
-> = PublicTableProps<R, M, S> & {
+> = PublicTableProps<R, M, C, S> & {
   readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
 };
 
 const PublicBudgetTable = <
   R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends Model.RowHttpModel,
+  B extends Model.Budget | Model.Template,
+  C extends BudgetContext<B, true> = BudgetContext<B, true>,
   S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
 >({
   onRowExpand,
   ...props
-}: PublicBudgetTableProps<R, M, S>): JSX.Element => (
-  <PublicTable<R, M, S>
+}: PublicBudgetTableProps<R, M, B, C, S>): JSX.Element => (
+  <PublicTable<R, M, C, S>
     {...props}
     editColumnConfig={
       [

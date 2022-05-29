@@ -33,8 +33,8 @@ declare namespace Http {
 
   type Ordering<F extends string = string> = FieldOrder<F>[];
 
-  type ListQuery<O extends string = string> = Omit<RawQuery, "ordering"> & {
-    readonly ordering?: Ordering<O>;
+  type ListQuery = Omit<RawQuery, "ordering"> & {
+    readonly ordering?: Ordering<string>;
     readonly ids?: number[];
     readonly exclude?: number[];
   };

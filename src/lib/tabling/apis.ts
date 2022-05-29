@@ -6,8 +6,9 @@ export default class TableApis implements Table.ITableApis {
   public store: Partial<Table.TableApiSet>;
 
   constructor(config: Partial<Table.TableApiSet>) {
-    /* We do this so we don't always have to provide the `primary` ID and the
-       `footer` ID since they are common for all table APIs. */
+    /*
+		We do this so we don't always have to provide the `primary` ID and the
+    `footer` ID since they are common for all table APIs. */
     this.store = {
       ...reduce(GridIds, (prev: Partial<Table.TableApiSet>, id: Table.GridId) => ({ ...prev, [id]: null }), {}),
       ...config

@@ -1,25 +1,21 @@
 import { redux } from "lib";
 
-export const updateInStateAction = redux.actions.createAction<Redux.UpdateModelPayload<Model.Account>>(
-  "template.account.UpdateInState"
-);
-export const requestAccountAction = redux.actions.createAction<number>("template.account.Request");
-export const loadingAccountAction = redux.actions.createAction<boolean>("template.account.Loading");
-export const responseAccountAction = redux.actions.createAction<Model.Account | null>("template.account.Response");
+type C = AccountActionContext<Model.Template, false>;
+type TC = SubAccountsTableActionContext<Model.Template, Model.Account, false>;
 
-export const handleTableEventAction = redux.actions.createTableAction<
-  Table.Event<Tables.SubAccountRowData, Model.SubAccount>,
-  Tables.SubAccountTableContext
->("template.account.TableChanged");
+const creator = redux.actions.createActionCreator({ label: "template.account" });
 
-export const loadingAction = redux.actions.createAction<boolean>("template.account.TableLoading");
-
-export const requestAction = redux.actions.createTableAction<Redux.TableRequestPayload, Tables.SubAccountTableContext>(
-  "template.account.TableRequest"
+export const updateInStateAction = creator<Redux.UpdateModelPayload<Model.Account>>("UpdateInState");
+export const requestAccountAction = creator<Redux.RequestPayload, C>("Request");
+export const invalidateAccountAction = creator<null, C>("Invalidate");
+// Currently, this action is not wired to anything but may be in the future.
+export const loadingAccountAction = creator<boolean, C>("Loading");
+export const responseAccountAction = creator<Http.RenderedDetailResponse<Model.Account>, C>("Response");
+export const handleTableEventAction = creator<Table.Event<Tables.SubAccountRowData, Model.SubAccount>, TC>(
+  "TableChanged"
 );
-export const responseAction = redux.actions.createAction<Http.TableResponse<Model.SubAccount>>(
-  "template.account.TableResponse"
-);
-export const setSearchAction = redux.actions.createTableAction<string, Tables.SubAccountTableContext>(
-  "template.account.SetTableSearch"
-);
+export const loadingAction = creator<boolean, TC>("TableLoading");
+export const requestAction = creator<Redux.TableRequestPayload, TC>("TableRequest");
+export const responseAction = creator<Http.TableResponse<Model.SubAccount>, TC>("TableResponse");
+export const setSearchAction = creator<string, TC>("SetTableSearch");
+export const invalidateAction = creator<null, TC>("TableInvalidate");

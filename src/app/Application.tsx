@@ -19,7 +19,6 @@ const selectProductPermissionModalOpen = (state: Application.Store) => state.pro
 const Application = (): JSX.Element => {
   const ProductPermissionModalOpen = useSelector(selectProductPermissionModalOpen);
   const dispatch: Dispatch = useDispatch();
-
   return (
     <React.Fragment>
       <Switch>
@@ -48,7 +47,7 @@ const Application = (): JSX.Element => {
       {config.env.BILLING_ENABLED && (
         <MultipleBudgetProductPermissionModal
           open={ProductPermissionModalOpen}
-          onCancel={() => dispatch(store.actions.setProductPermissionModalOpenAction(false))}
+          onCancel={() => dispatch(store.actions.setProductPermissionModalOpenAction(false, {}))}
         />
       )}
     </React.Fragment>

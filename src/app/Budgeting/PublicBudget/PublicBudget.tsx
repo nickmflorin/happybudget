@@ -19,14 +19,14 @@ type PublicBudgetProps = {
 const PublicBudget = (props: PublicBudgetProps): JSX.Element => {
   const dispatch = useDispatch();
   const budget = useSelector((s: Application.Store) =>
-    selectors.selectBudgetDetail(s, { domain: "budget", public: true })
-  ) as Model.Budget | null;
+    selectors.selectBudgetDetail<Model.Budget, true>(s, { domain: "budget", public: true })
+  );
   const budgetLoading = useSelector((s: Application.Store) =>
     selectors.selectBudgetLoading(s, { domain: "budget", public: true })
   );
 
   useEffect(() => {
-    dispatch(actions.pub.requestBudgetAction(props.budgetId));
+    dispatch(actions.pub.requestBudgetAction(null, { budgetId: props.budgetId, domain: "budget", public: true }));
   }, [props.budgetId]);
 
   return (

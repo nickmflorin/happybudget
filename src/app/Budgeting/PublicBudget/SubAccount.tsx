@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
-import { budgeting, tabling, model } from "lib";
+import { budgeting, tabling } from "lib";
 import { connectTableToPublicStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
 
 import { BudgetPage } from "../Pages";
@@ -12,43 +11,27 @@ import FringesModal from "./FringesModal";
 
 type M = Model.SubAccount;
 type R = Tables.SubAccountRowData;
+type TC = SubAccountsTableContext<Model.Budget, Model.SubAccount, true>;
 
 const ConnectedTable = connectTableToPublicStore<
   GenericSubAccountsTable.PublicBudgetProps<Model.SubAccount>,
   R,
   M,
-  Tables.SubAccountTableStore,
-  Tables.SubAccountTableContext
+  TC,
+  Tables.SubAccountTableStore
 >({
   actions: {
     loading: actions.pub.subAccount.loadingAction,
     response: actions.pub.subAccount.responseAction,
     setSearch: actions.pub.subAccount.setSearchAction
   },
-  tableId: "public-budget-subaccount-subaccounts-table",
-  selector: (s: Application.Store) =>
-    selectors.selectSubAccountsTableStore(s, { parentType: "subaccount", domain: "budget", public: true }),
+  tableId: (c: TC) => `public-${c.domain}-${c.parentType}-subaccounts`,
+  selector: (c: TC) => selectors.createSubAccountsTableStoreSelector(c),
   createSaga: (table: Table.TableInstance<R, M>) => sagas.pub.subAccount.createTableSaga(table),
-  footerRowSelectors: {
-    page: createSelector(
-      (state: Application.Store) => state.public.budget.detail.data,
-      (budget: Model.Budget | null) => ({
-        identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
-        estimated: !isNil(budget) ? model.budgeting.estimatedValue(budget) : 0.0,
-        variance: !isNil(budget) ? model.budgeting.varianceValue(budget) : 0.0,
-        actual: budget?.actual || 0.0
-      })
-    ),
-    footer: createSelector(
-      (state: Application.Store) => state.public.budget.subaccount.detail.data,
-      (detail: Model.SubAccount | null) => ({
-        identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
-        estimated: !isNil(detail) ? model.budgeting.estimatedValue(detail) : 0.0,
-        variance: !isNil(detail) ? model.budgeting.varianceValue(detail) : 0.0,
-        actual: detail?.actual || 0.0
-      })
-    )
-  }
+  footerRowSelectors: (c: TC) => ({
+    page: selectors.createBudgetFooterSelector(c),
+    footer: selectors.createSubAccountFooterSelector({ ...c, id: c.parentId })
+  })
 })(GenericSubAccountsTable.PublicBudget);
 
 interface SubAccountProps {
@@ -61,26 +44,43 @@ interface SubAccountProps {
 const SubAccount = (props: SubAccountProps): JSX.Element => {
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
   const fringesTable = tabling.hooks.useTable<Tables.FringeRowData, Model.Fringe>();
-
   const dispatch = useDispatch();
-  const table = tabling.hooks.useTable<Tables.SubAccountRowData, Model.SubAccount>();
-
+  const table = tabling.hooks.useTable<R, M>();
   const subaccount = useSelector((s: Application.Store) =>
-    selectors.selectSubAccountDetail(s, { domain: "budget", public: true })
+    selectors.selectSubAccountDetail(s, {
+      id: props.id,
+      domain: "budget",
+      public: true
+    })
   );
 
   useEffect(() => {
-    dispatch(actions.pub.subAccount.requestSubAccountAction(props.id));
-  }, [props.id]);
+    dispatch(
+      actions.pub.subAccount.requestSubAccountAction(null, {
+        id: props.id,
+        domain: "budget",
+        public: true,
+        budgetId: props.budgetId
+      })
+    );
+  }, [props.id, props.budgetId]);
 
   useEffect(() => {
     if (!isNil(props.budget) && !isNil(subaccount)) {
-      budgeting.urls.setLastVisited(props.budget, subaccount, props.tokenId);
+      budgeting.urls.setLastVisited(props.budget, subaccount);
     }
   }, [props.budget, subaccount]);
 
   useEffect(() => {
-    dispatch(actions.pub.subAccount.requestAction(null, { id: props.id, budgetId: props.budgetId }));
+    dispatch(
+      actions.pub.subAccount.requestAction(null, {
+        domain: "budget",
+        parentType: "subaccount",
+        budgetId: props.budgetId,
+        public: true,
+        parentId: props.id
+      })
+    );
   }, [props.id, props.budgetId]);
 
   return (
@@ -88,8 +88,13 @@ const SubAccount = (props: SubAccountProps): JSX.Element => {
       <ConnectedTable
         {...props}
         parent={subaccount}
-        actionContext={{ budgetId: props.budgetId, id: props.id }}
-        parentType={"subaccount"}
+        tableContext={{
+          parentId: props.id,
+          budgetId: props.budgetId,
+          parentType: "subaccount",
+          domain: "budget",
+          public: true
+        }}
         onOpenFringesModal={() => setFringesModalVisible(true)}
         table={table}
       />

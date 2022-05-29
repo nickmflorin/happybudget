@@ -1,25 +1,22 @@
 import { redux } from "lib";
 
-export const updateInStateAction =
-  redux.actions.createAction<Redux.UpdateModelPayload<Model.Account>>("budget.account.UpdateInState");
-export const requestAccountAction = redux.actions.createAction<number>("budget.account.Request");
-export const loadingAccountAction = redux.actions.createAction<boolean>("budget.account.Loading");
-export const responseAccountAction = redux.actions.createAction<Model.Account | null>("budget.account.Response");
+type C = AccountActionContext<Model.Budget, false>;
+type TC = SubAccountsTableActionContext<Model.Budget, Model.Account, false>;
 
-export const handleTableEventAction = redux.actions.createTableAction<
-  Table.Event<Tables.SubAccountRowData, Model.SubAccount>,
-  Tables.SubAccountTableContext
->("budget.account.TableChanged");
+const creator = redux.actions.createActionCreator({ label: "budget.account" });
 
-export const loadingAction = redux.actions.createAction<boolean>("budget.account.TableLoading");
+export const updateInStateAction = creator<Redux.UpdateModelPayload<Model.Account>>("UpdateInState");
+export const requestAccountAction = creator<Redux.RequestPayload, C>("Request");
+export const invalidateAccountAction = creator<null, C>("Invalidate");
+// Currently, this action is not wired to anything but may be in the future.
+export const loadingAccountAction = creator<boolean, C>("Loading");
+export const responseAccountAction = creator<Http.RenderedDetailResponse<Model.Account>, C>("Response");
 
-export const requestAction = redux.actions.createTableAction<Redux.TableRequestPayload, Tables.SubAccountTableContext>(
-  "budget.account.TableRequest"
+export const handleTableEventAction = creator<Table.Event<Tables.SubAccountRowData, Model.SubAccount>, TC>(
+  "TableChanged"
 );
-
-export const responseAction =
-  redux.actions.createAction<Http.TableResponse<Model.SubAccount>>("budget.account.TableResponse");
-
-export const setSearchAction = redux.actions.createTableAction<string, Tables.SubAccountTableContext>(
-  "budget.account.SetTableSearch"
-);
+export const loadingAction = creator<boolean, TC>("TableLoading");
+export const requestAction = creator<Redux.TableRequestPayload, TC>("TableRequest");
+export const responseAction = creator<Http.TableResponse<Model.SubAccount>, TC>("TableResponse");
+export const setSearchAction = creator<string, TC>("SetTableSearch");
+export const invalidateAction = creator<null, TC>("TableInvalidate");

@@ -2,18 +2,39 @@ declare namespace Http {
   type RawResponseValue = string | number | null;
   type Response = { [key: string]: RawResponseValue | Response | Response[] };
 
-  type ListResponse<T> = {
+  type RawListResponse<T> = {
     readonly count: number;
     readonly data: T[];
     readonly next?: string | null;
     readonly previous?: string | null;
   };
+  type ListResponse<T> = Omit<RawListResponse<T>, "next" | "previous"> & {
+    readonly query: Http.ListQuery;
+  };
+  type SuccessfulListResponse<T> = ListResponse<T>;
+  type FailedListResponse<T> = Omit<ListResponse<T>, "count" | "data"> & {
+    readonly error: import("api").RequestError;
+  };
+  type RenderedListResponse<T> = SuccessfulListResponse<T> | FailedListResponse<T>;
 
-  type TableResponse<M extends Model.RowHttpModel = Model.RowHttpModel> = {
+  type DetailResponse<T extends Model.HttpModel> = T;
+  type SuccessfulDetailResponse<T extends Model.HttpModel> = DetailResponse<T>;
+  type FailedDetailResponse = {
+    readonly error: import("api").RequestError;
+  };
+  type RenderedDetailResponse<T extends Model.HttpModel> = SuccessfulDetailResponse<T> | FailedDetailResponse;
+
+  type FailedTableResponse = {
+    readonly error: import("api").RequestError;
+  };
+  type SuccessfulTableResponse<M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly models: M[];
     readonly groups?: Model.Group[];
     readonly markups?: Model.Markup[];
   };
+  type TableResponse<M extends Model.RowHttpModel = Model.RowHttpModel> =
+    | FailedTableResponse
+    | SuccessfulTableResponse<M>;
 
   type FileUploadResponse = {
     readonly fileUrl: string;

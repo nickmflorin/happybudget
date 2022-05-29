@@ -71,7 +71,7 @@ export class ApiClient {
       | HttpRequestMethods.PUT
       | HttpRequestMethods.DELETE
       | HttpRequestMethods.PATCH,
-    query?: Http.ListQuery<string> | undefined
+    query?: Http.ListQuery | undefined
   ): Http.V1Url => {
     if (method === HttpRequestMethods.GET) {
       if (!isNil(query)) {
@@ -108,7 +108,7 @@ export class ApiClient {
       | HttpRequestMethods.DELETE
       | HttpRequestMethods.PATCH,
     url: Http.V1Url,
-    query?: Http.ListQuery<string> | undefined,
+    query?: Http.ListQuery | undefined,
     payload?: Partial<Http.Payload> | undefined,
     options?: Http.RequestOptions | undefined
   ): Promise<T> => {
@@ -153,7 +153,7 @@ export class ApiClient {
    * @param query   The query parameters to embed in the URL.
    * @param options The options for the request (see IRequestOptions).
    */
-  get = async <T>(url: Http.V1Url, query?: Http.ListQuery<string>, options?: Http.RequestOptions): Promise<T> => {
+  get = async <T>(url: Http.V1Url, query?: Http.ListQuery, options?: Http.RequestOptions): Promise<T> => {
     return this.request<T>(HttpRequestMethods.GET, url, query, {}, options);
   };
 
@@ -164,8 +164,8 @@ export class ApiClient {
    * @param url     The URL to send the POST request.
    * @param options The options for the request (see IRequestOptions).
    */
-  retrieve = async <T>(url: Http.V1Url, options?: Http.RequestOptions): Promise<T> => {
-    return this.request<T>(HttpRequestMethods.GET, url, {}, {}, options);
+  retrieve = async <T extends Model.HttpModel>(url: Http.V1Url, options?: Http.RequestOptions): Promise<T> => {
+    return this.request<Http.DetailResponse<T>>(HttpRequestMethods.GET, url, {}, {}, options);
   };
 
   /**
@@ -181,7 +181,10 @@ export class ApiClient {
     query?: Http.ListQuery,
     options?: Http.RequestOptions
   ): Promise<Http.ListResponse<T>> => {
-    return this.request<Http.ListResponse<T>>(HttpRequestMethods.GET, url, query, {}, options);
+    return this.request<Http.RawListResponse<T>>(HttpRequestMethods.GET, url, query, {}, options).then(
+      // Include the query used to make the request in the response.
+      (rsp: Http.RawListResponse<T>) => ({ data: rsp.data, count: rsp.count, query: query || {} })
+    );
   };
 
   /**

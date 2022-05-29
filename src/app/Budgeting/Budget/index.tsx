@@ -27,14 +27,16 @@ const Budget = (props: BudgetProps): JSX.Element => {
   const dispatch = useDispatch();
   const match = useRouteMatch();
   const budget = useSelector((s: Application.Store) =>
-    selectors.selectBudgetDetail(s, { domain: "budget" })
-  ) as Model.Budget | null;
-  const budgetLoading = useSelector((s: Application.Store) => selectors.selectBudgetLoading(s, { domain: "budget" }));
+    selectors.selectBudgetDetail<Model.Budget, false>(s, { domain: "budget", public: false })
+  );
+  const budgetLoading = useSelector((s: Application.Store) =>
+    selectors.selectBudgetLoading(s, { domain: "budget", public: false })
+  );
 
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
 
   useEffect(() => {
-    dispatch(actions.budget.requestBudgetAction(props.budgetId));
+    dispatch(actions.budget.requestBudgetAction(null, { budgetId: props.budgetId, domain: "budget", public: false }));
   }, [props.budgetId]);
 
   return (

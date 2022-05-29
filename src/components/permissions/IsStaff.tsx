@@ -7,7 +7,7 @@ type IsStaffProps = {
 };
 
 const IsStaff: React.FC<IsStaffProps> = ({ children }) => {
-  const user = store.hooks.useLoggedInUser();
+  const [user, _] = store.hooks.useLoggedInUser();
   return <ShowHide show={user.is_staff === true}>{children}</ShowHide>;
 };
 

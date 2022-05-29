@@ -7,7 +7,7 @@ export const getSubscription = async (
   options?: Http.RequestOptions
 ): Promise<{ subscription: Model.Subscription | null }> => {
   const url = services.URL.v1("billing", "subscription");
-  return client.retrieve<{ subscription: Model.Subscription | null }>(url, options);
+  return client.get<{ subscription: Model.Subscription | null }>(url, {}, options);
 };
 
 export const createCheckoutSession = services.postService<Http.CheckoutSessionPayload, { redirect_url: string }>([

@@ -18,7 +18,7 @@ const Active = (props: ActiveProps): JSX.Element => {
   const dispatch: Redux.Dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(actions.requestBudgetsAction(null));
+    dispatch(actions.requestBudgetsAction(null, {}));
   }, []);
 
   return (
@@ -32,13 +32,13 @@ const Active = (props: ActiveProps): JSX.Element => {
       }}
       selector={(s: Application.Store) => s.dashboard.budgets}
       onSearch={(v: string) => dispatch(actions.setBudgetsSearchAction(v, {}))}
-      onUpdatePagination={(p: Pagination) => dispatch(actions.setBudgetsPaginationAction(p))}
-      onUpdateOrdering={(o: Redux.UpdateOrderingPayload) => dispatch(actions.updateBudgetsOrderingAction(o))}
+      onUpdatePagination={(p: Pagination) => dispatch(actions.setBudgetsPaginationAction(p, {}))}
+      onUpdateOrdering={(o: Redux.UpdateOrderingPayload) => dispatch(actions.updateBudgetsOrderingAction(o, {}))}
       onCreate={props.onCreate}
       onDeleted={(b: Model.SimpleBudget) => {
-        dispatch(actions.removeBudgetFromStateAction(b.id));
-        dispatch(actions.requestPermissioningBudgetsAction(null));
-        dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "decrement" }));
+        dispatch(actions.removeBudgetFromStateAction(b.id, {}));
+        dispatch(actions.requestPermissioningBudgetsAction(null, {}));
+        dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "decrement" }, {}));
       }}
       renderCard={(params: RenderGenericOwnedBudgetCardParams) => (
         <BudgetCard
@@ -47,16 +47,16 @@ const Active = (props: ActiveProps): JSX.Element => {
           loading={params.deleting}
           onEdit={() => props.onEdit(params.budget)}
           onArchived={(b: Model.UserBudget) => {
-            dispatch(actions.removeBudgetFromStateAction(b.id));
-            dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "decrement" }));
-            dispatch(actions.addArchiveToStateAction(b));
+            dispatch(actions.removeBudgetFromStateAction(b.id, {}));
+            dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "decrement" }, {}));
+            dispatch(actions.addArchiveToStateAction(b, {}));
             dispatch(
-              store.actions.updateLoggedInUserMetricsAction({ metric: "num_archived_budgets", change: "increment" })
+              store.actions.updateLoggedInUserMetricsAction({ metric: "num_archived_budgets", change: "increment" }, {})
             );
           }}
           onDuplicated={(b: Model.UserBudget) => {
-            dispatch(actions.addBudgetToStateAction(b));
-            dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "increment" }));
+            dispatch(actions.addBudgetToStateAction(b, {}));
+            dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "increment" }, {}));
           }}
         />
       )}

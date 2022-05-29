@@ -27,7 +27,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ onCreateBudget, onDeriveBudge
   const history = useHistory();
 
   useEffect(() => {
-    dispatch(actions.requestTemplatesAction(null));
+    dispatch(actions.requestTemplatesAction(null, {}));
   }, []);
 
   return (
@@ -45,12 +45,12 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ onCreateBudget, onDeriveBudge
           },
           child: <TemplateEmptyIcon />
         }}
-        onUpdatePagination={(p: Pagination) => dispatch(actions.setTemplatesPaginationAction(p))}
-        onUpdateOrdering={(o: Redux.UpdateOrderingPayload) => dispatch(actions.updateTemplatesOrderingAction(o))}
+        onUpdatePagination={(p: Pagination) => dispatch(actions.setTemplatesPaginationAction(p, {}))}
+        onUpdateOrdering={(o: Redux.UpdateOrderingPayload) => dispatch(actions.updateTemplatesOrderingAction(o, {}))}
         onCreate={onCreateBudget}
         onDeleted={(b: Model.SimpleTemplate) => {
-          dispatch(actions.removeTemplateFromStateAction(b.id));
-          dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_templates", change: "decrement" }));
+          dispatch(actions.removeTemplateFromStateAction(b.id, {}));
+          dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_templates", change: "decrement" }, {}));
         }}
         lastCard={(budgets: Model.SimpleTemplate[]) => (
           <ShowHide show={budgets.length !== 0}>
@@ -70,12 +70,16 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ onCreateBudget, onDeriveBudge
             onEditNameImage={() => setTemplateToEdit(params.budget.id)}
             onClick={() => onDeriveBudget(params.budget.id)}
             onDuplicated={(b: Model.Template) => {
-              dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_templates", change: "increment" }));
-              dispatch(actions.addTemplateToStateAction(b));
+              dispatch(
+                store.actions.updateLoggedInUserMetricsAction({ metric: "num_templates", change: "increment" }, {})
+              );
+              dispatch(actions.addTemplateToStateAction(b, {}));
             }}
             onMoved={() => {
-              dispatch(actions.removeTemplateFromStateAction(params.budget.id));
-              dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_templates", change: "decrement" }));
+              dispatch(actions.removeTemplateFromStateAction(params.budget.id, {}));
+              dispatch(
+                store.actions.updateLoggedInUserMetricsAction({ metric: "num_templates", change: "decrement" }, {})
+              );
             }}
           />
         )}
@@ -87,7 +91,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ onCreateBudget, onDeriveBudge
           onCancel={() => setTemplateToEdit(undefined)}
           onSuccess={(template: Model.Template) => {
             setTemplateToEdit(undefined);
-            dispatch(actions.updateTemplateInStateAction({ id: template.id, data: template }));
+            dispatch(actions.updateTemplateInStateAction({ id: template.id, data: template }, {}));
           }}
         />
       )}
@@ -96,8 +100,8 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ onCreateBudget, onDeriveBudge
         onCancel={() => setCreateTempateModalOpen(false)}
         onSuccess={(template: Model.Template) => {
           setCreateTempateModalOpen(false);
-          dispatch(actions.addTemplateToStateAction(template));
-          dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_templates", change: "increment" }));
+          dispatch(actions.addTemplateToStateAction(template, {}));
+          dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_templates", change: "increment" }, {}));
           history.push(`/templates/${template.id}/accounts`);
         }}
       />

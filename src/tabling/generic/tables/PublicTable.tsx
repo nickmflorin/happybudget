@@ -27,18 +27,20 @@ export type PublicTableDataGridProps<
 export type PublicTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = BaseTableProps<R, M> &
   ConnectedPublicTableInjectedProps<R, S> &
-  Omit<ConnectPublicTableProps<R, M, S>, "actionContext"> & {
+  ConnectPublicTableProps<R, M, C, S> & {
     readonly actions?: Table.PublicMenuActions<R, M>;
   };
 
 type _PublicTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
-> = PublicTableProps<R, M, S> & ConfiguredTableInjectedProps;
+> = PublicTableProps<R, M, C, S> & ConfiguredTableInjectedProps;
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const TableFooterGrid = FooterGrid<any, any, PublicFooterGridProps<any>>({
@@ -70,9 +72,10 @@ const PageFooterGrid = FooterGrid<any, any, PublicFooterGridProps<any>>({
 const PublicTable = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
-  props: _PublicTableProps<R, M, S>
+  props: _PublicTableProps<R, M, C, S>
 ): JSX.Element => {
   const grid = tabling.hooks.useDataGrid();
   /**
@@ -118,7 +121,8 @@ const PublicTable = <
     );
     return map(cs, (c: Table.Column<R, M>) => ({
       ...c,
-      cellRendererParams: { ...c.cellRendererParams, table: props.table.current }
+      cellRendererParams: { ...c.cellRendererParams, table: props.table.current, tableContext: props.tableContext },
+      cellEditorParams: { ...c.cellEditorParams, table: props.table.current, tableContext: props.tableContext }
     }));
   }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns, props.table.current]);
 
@@ -253,8 +257,9 @@ export default configureTable<_PublicTableProps<any, any, any>, any, any>(Public
   <
     R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
+    C extends Table.Context = Table.Context,
     S extends Redux.TableStore<R> = Redux.TableStore<R>
   >(
-    props: Subtract<_PublicTableProps<R, M, S>, ConfiguredTableInjectedProps>
+    props: Subtract<_PublicTableProps<R, M, C, S>, ConfiguredTableInjectedProps>
   ): JSX.Element;
 };

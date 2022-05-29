@@ -12,28 +12,28 @@ export function* getBudgetsTask(action: Redux.Action<null>): SagaIterator {
     page_size: state.dashboard.budgets.pageSize,
     ordering: state.dashboard.budgets.ordering
   }));
-  yield put(actions.loadingBudgetsAction(true));
+  yield put(actions.loadingBudgetsAction(true, {}));
   try {
     const response: Http.ListResponse<Model.SimpleBudget> = yield http.request(api.getBudgets, action.context, query);
-    yield put(actions.responseBudgetsAction(response));
+    yield put(actions.responseBudgetsAction(response, {}));
   } catch (e: unknown) {
     notifications.ui.banner.handleRequestError(e as Error);
-    yield put(actions.responseBudgetsAction({ count: 0, data: [] }));
+    yield put(actions.responseBudgetsAction({ error: e as api.RequestError, query: {} }, {}));
   } finally {
-    yield put(actions.loadingBudgetsAction(false));
+    yield put(actions.loadingBudgetsAction(false, {}));
   }
 }
 
 export function* getBudgetsPermissioningTask(action: Redux.Action<null>): SagaIterator {
-  yield put(actions.loadingBudgetsAction(true));
+  yield put(actions.loadingBudgetsAction(true, {}));
   try {
     const response: Http.ListResponse<Model.SimpleBudget> = yield http.request(api.getBudgets, action.context, {});
-    yield put(actions.responsePermissionedBudgetsAction(response));
+    yield put(actions.responsePermissionedBudgetsAction(response, {}));
   } catch (e: unknown) {
     notifications.ui.banner.handleRequestError(e as Error);
-    yield put(actions.responseBudgetsAction({ count: 0, data: [] }));
+    yield put(actions.responseBudgetsAction({ error: e as api.RequestError, query: {} }, {}));
   } finally {
-    yield put(actions.loadingBudgetsAction(false));
+    yield put(actions.loadingBudgetsAction(false, {}));
   }
 }
 
@@ -44,36 +44,36 @@ export function* getArchiveTask(action: Redux.Action<null>): SagaIterator {
     page_size: state.dashboard.archive.pageSize,
     ordering: state.dashboard.archive.ordering
   }));
-  yield put(actions.loadingArchiveAction(true));
+  yield put(actions.loadingArchiveAction(true, {}));
   try {
     const response: Http.ListResponse<Model.SimpleBudget> = yield http.request(
       api.getArchivedBudgets,
       action.context,
       query
     );
-    yield put(actions.responseArchiveAction(response));
+    yield put(actions.responseArchiveAction(response, {}));
   } catch (e: unknown) {
     notifications.ui.banner.handleRequestError(e as Error);
-    yield put(actions.responseArchiveAction({ count: 0, data: [] }));
+    yield put(actions.responseArchiveAction({ error: e as api.RequestError, query: {} }, {}));
   } finally {
-    yield put(actions.loadingArchiveAction(false));
+    yield put(actions.loadingArchiveAction(false, {}));
   }
 }
 
 export function* getArchivePermissioningTask(action: Redux.Action<null>): SagaIterator {
-  yield put(actions.loadingArchiveAction(true));
+  yield put(actions.loadingArchiveAction(true, {}));
   try {
     const response: Http.ListResponse<Model.SimpleBudget> = yield http.request(
       api.getArchivedBudgets,
       action.context,
       {}
     );
-    yield put(actions.responsePermissionedArchiveAction(response));
+    yield put(actions.responsePermissionedArchiveAction(response, {}));
   } catch (e: unknown) {
     notifications.ui.banner.handleRequestError(e as Error);
-    yield put(actions.responseArchiveAction({ count: 0, data: [] }));
+    yield put(actions.responseArchiveAction({ error: e as api.RequestError, query: {} }, {}));
   } finally {
-    yield put(actions.loadingArchiveAction(false));
+    yield put(actions.loadingArchiveAction(false, {}));
   }
 }
 
@@ -84,19 +84,19 @@ export function* getCollaboratingTask(action: Redux.Action<null>): SagaIterator 
     page_size: state.dashboard.collaborating.pageSize,
     ordering: state.dashboard.collaborating.ordering
   }));
-  yield put(actions.loadingCollaboratingAction(true));
+  yield put(actions.loadingCollaboratingAction(true, {}));
   try {
     const response: Http.ListResponse<Model.SimpleCollaboratingBudget> = yield http.request(
       api.getCollaboratingBudgets,
       action.context,
       query
     );
-    yield put(actions.responseCollaboratingAction(response));
+    yield put(actions.responseCollaboratingAction(response, {}));
   } catch (e: unknown) {
     notifications.ui.banner.handleRequestError(e as Error);
-    yield put(actions.responseCollaboratingAction({ count: 0, data: [] }));
+    yield put(actions.responseCollaboratingAction({ error: e as api.RequestError, query: {} }, {}));
   } finally {
-    yield put(actions.loadingCollaboratingAction(false));
+    yield put(actions.loadingCollaboratingAction(false, {}));
   }
 }
 
@@ -109,19 +109,19 @@ export function* getTemplatesTask(action: Redux.Action<null>): SagaIterator {
       ordering: state.dashboard.templates.ordering
     };
   });
-  yield put(actions.loadingTemplatesAction(true));
+  yield put(actions.loadingTemplatesAction(true, {}));
   try {
     const response: Http.ListResponse<Model.SimpleTemplate> = yield http.request(
       api.getTemplates,
       action.context,
       query
     );
-    yield put(actions.responseTemplatesAction(response));
+    yield put(actions.responseTemplatesAction(response, {}));
   } catch (e: unknown) {
     notifications.ui.banner.handleRequestError(e as Error);
-    yield put(actions.responseTemplatesAction({ count: 0, data: [] }));
+    yield put(actions.responseTemplatesAction({ error: e as api.RequestError, query: {} }, {}));
   } finally {
-    yield put(actions.loadingTemplatesAction(false));
+    yield put(actions.loadingTemplatesAction(false, {}));
   }
 }
 
@@ -134,19 +134,19 @@ export function* getCommunityTask(action: Redux.Action<null>): SagaIterator {
       ordering: state.dashboard.community.ordering
     };
   });
-  yield put(actions.loadingCommunityAction(true));
+  yield put(actions.loadingCommunityAction(true, {}));
   try {
     const response: Http.ListResponse<Model.SimpleTemplate> = yield http.request(
       api.getCommunityTemplates,
       action.context,
       query
     );
-    yield put(actions.responseCommunityAction(response));
+    yield put(actions.responseCommunityAction(response, {}));
   } catch (e: unknown) {
     notifications.ui.banner.handleRequestError(e as Error);
-    yield put(actions.responseCommunityAction({ count: 0, data: [] }));
+    yield put(actions.responseCommunityAction({ error: e as api.RequestError, query: {} }, {}));
   } finally {
-    yield put(actions.loadingCommunityAction(false));
+    yield put(actions.loadingCommunityAction(false, {}));
   }
 }
 

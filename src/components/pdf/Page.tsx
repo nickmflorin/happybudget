@@ -30,7 +30,7 @@ const Page = ({ header, footer, children, ...props }: PageProps): JSX.Element =>
       <></>
     )}
     <View className={"page-footer"} wrap={false}>
-      <Image className={"footer-logo"} src={process.env.PUBLIC_URL + "/GreenLogo.png"} />
+      <Image className={"footer-logo"} src={String(process.env.PUBLIC_URL) + "/GreenLogo.png"} />
       <Label
         fixed={true}
         className={"page-number"}

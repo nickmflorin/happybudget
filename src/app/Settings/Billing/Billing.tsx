@@ -11,7 +11,7 @@ import { ProductsManager } from "components/model/billing";
 const Billing = (): JSX.Element => {
   const [subscribing, setSubscribing] = useState<Model.ProductId | null>(null);
   const [managing, setManaging] = useState(false);
-  const user = store.hooks.useLoggedInUser();
+  const [user, _] = store.hooks.useLoggedInUser();
   const history = useHistory();
   const location = useLocation<{
     readonly notification?: UINotificationData;

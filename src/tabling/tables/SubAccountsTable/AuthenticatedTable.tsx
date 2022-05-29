@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { isNil, map, filter } from "lodash";
 
 import { model, tabling, hooks, formatters } from "lib";
+import * as store from "store";
 import { framework } from "tabling/generic";
 
 import { selectors } from "app/Budgeting/store";
@@ -33,32 +34,20 @@ type OmitProps =
   | "onEditGroup";
 
 export type AuthenticatedTableProps<B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount> = Omit<
-  AuthenticatedBudgetTableProps<R, M, S>,
+  AuthenticatedBudgetTableProps<R, M, B, SubAccountsTableActionContext<B, P>, S>,
   OmitProps
 > & {
-  readonly id: P["id"];
-  readonly budgetId: B["id"];
-  readonly domain: B["domain"];
   readonly parent: P | null;
-  readonly parentType: P["type"];
-  readonly actionContext: Tables.SubAccountTableContext;
   readonly onOpenFringesModal: () => void;
 };
 
 const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount>(
   props: AuthenticatedTableProps<B, P>
 ): JSX.Element => {
-  const { onBack, onLeft, onRight, onRowExpand, confirmExpandModal } = useKeyboardNavigation({
-    ...props,
-    authenticated: true
-  });
+  const { onBack, onLeft, onRight, onRowExpand, confirmExpandModal } = useKeyboardNavigation(props);
 
-  const fringes = useSelector((s: Application.Store) =>
-    selectors.selectFringes(s, { domain: props.domain, parentType: props.parentType })
-  );
-  const subaccountUnits = useSelector((s: Application.Store) =>
-    selectors.selectSubAccountUnits(s, { domain: props.domain, parentType: props.parentType })
-  );
+  const fringes = useSelector((s: Application.Store) => selectors.selectFringes(s, props.tableContext));
+  const subaccountUnits = useSelector((s: Application.Store) => store.selectors.selectSubAccountUnits(s));
 
   const processUnitCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
     model.inferModelFromName<Model.Tag>(subaccountUnits, name, {
@@ -85,8 +74,8 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
   });
 
   const [groupModals, onEditGroup, onCreateGroup] = useGrouping({
-    parentId: props.id,
-    parentType: props.parentType,
+    parentId: props.tableContext.parentId,
+    parentType: props.tableContext.parentType,
     table: props.table.current,
     onGroupUpdated: (group: Model.Group) =>
       props.table.current.dispatchEvent({
@@ -103,8 +92,8 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
     P,
     Http.AncestryResponse<B, P, Model.Markup>
   >({
-    parentId: props.id,
-    parentType: props.parentType,
+    parentId: props.tableContext.parentId,
+    parentType: props.tableContext.parentType,
     table: props.table.current
   });
 
@@ -121,12 +110,14 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
           headerComponentParams: { onEdit: () => props.onOpenFringesModal() },
           processCellForClipboard: processFringesCellForClipboard
         },
-        identifier: { headerName: props.parentType === "account" ? "Account" : "Line" },
-        description: { headerName: `${props.parentType === "account" ? "SubAccount" : "Detail"} Description` }
+        identifier: { headerName: props.tableContext.parentType === "account" ? "Account" : "Line" },
+        description: {
+          headerName: `${props.tableContext.parentType === "account" ? "SubAccount" : "Detail"} Description`
+        }
       }),
     [
       props.onOpenFringesModal,
-      props.parentType,
+      props.tableContext.parentType,
       hooks.useDeepEqualMemo(props.columns),
       processUnitCellFromClipboard,
       processFringesCellForClipboard,
@@ -199,7 +190,7 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
         columns={columns}
         showPageFooter={true}
         pinFirstColumn={true}
-        tableId={`${props.domain}-${props.parentType}-subaccounts`}
+        tableId={`${props.tableContext.domain}-${props.tableContext.parentType}-subaccounts`}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
         framework={Framework}

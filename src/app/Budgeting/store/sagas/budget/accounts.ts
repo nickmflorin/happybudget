@@ -1,31 +1,28 @@
 import { tabling } from "lib";
 import * as store from "store";
 
-import { accounts as actions, updateBudgetInStateAction } from "../../actions/budget";
+import * as actions from "../../actions/budget";
 
-const ActionMap: Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account, Tables.AccountTableContext> & {
-  readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateModelPayload<Model.Budget>>;
-} = {
+type R = Tables.AccountRowData;
+type M = Model.Account;
+type B = Model.Budget;
+type C = AccountsTableActionContext<B, false>;
+
+const ActionMap = {
   request: actions.requestAction,
   handleEvent: actions.handleTableEventAction,
   loading: actions.loadingAction,
   response: actions.responseAction,
-  updateBudgetInState: updateBudgetInStateAction,
   setSearch: actions.setSearchAction
 };
 
-export const createTableSaga = (table: Table.TableInstance<Tables.AccountRowData, Model.Account>) =>
-  tabling.sagas.createAuthenticatedTableSaga<
-    Tables.AccountRowData,
-    Model.Account,
-    Tables.AccountTableStore,
-    Tables.AccountTableContext
-  >({
+export const createTableSaga = (table: Table.TableInstance<R, M>) =>
+  tabling.sagas.createAuthenticatedTableSaga<R, M, Tables.AccountTableStore, C>({
     actions: ActionMap,
     selectStore: (state: Application.Store) => state.budget.accounts,
-    tasks: store.tasks.accounts.createAuthenticatedTableTaskSet<Model.Budget>({
+    tasks: store.tasks.accounts.createAuthenticatedTableTaskSet<B>({
       table,
       selectStore: (state: Application.Store) => state.budget.accounts,
-      actions: ActionMap
+      actions: { ...ActionMap, updateBudgetInState: actions.updateBudgetInStateAction }
     })
   });

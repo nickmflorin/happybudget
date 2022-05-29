@@ -3,21 +3,19 @@ import React from "react";
 import { Icon } from "components";
 import { IconButton } from "components/buttons";
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-interface NewRowCellProps extends Table.CellProps<any, any, any, null> {
+interface NewRowCellProps
+  extends Table.CellProps<Table.RowData, Model.RowHttpModel, Table.Context, Redux.TableStore, null> {
   readonly onNewRow: () => void;
 }
 
-const NewRowCell = (props: NewRowCellProps): JSX.Element => {
-  return (
-    <IconButton
-      className={"btn--new-row"}
-      size={"medium"}
-      icon={<Icon icon={"plus-circle"} weight={"solid"} />}
-      style={{ margin: "0 auto" }}
-      onClick={() => props.onNewRow()}
-    />
-  );
-};
+const NewRowCell = (props: NewRowCellProps): JSX.Element => (
+  <IconButton
+    className={"btn--new-row"}
+    size={"medium"}
+    icon={<Icon icon={"plus-circle"} weight={"solid"} />}
+    style={{ margin: "0 auto" }}
+    onClick={() => props.onNewRow()}
+  />
+);
 
 export default React.memo(NewRowCell);

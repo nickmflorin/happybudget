@@ -1,27 +1,18 @@
 import { SagaIterator } from "redux-saga";
-import { put, takeLatest, spawn } from "redux-saga/effects";
+import { takeLatest, spawn } from "redux-saga/effects";
 
-import * as api from "api";
-import { tabling, notifications, http } from "lib";
+import { tabling } from "lib";
 import * as store from "store";
 
-import {
-  account as actions,
-  responseFringesAction,
-  updateBudgetInStateAction,
-  responseSubAccountUnitsAction,
-  responseFringeColorsAction
-} from "../../actions/template";
+import { account as actions, responseFringesAction, updateBudgetInStateAction } from "../../actions/template";
+import * as initialState from "../../initialState";
+import * as selectors from "../../selectors";
+import * as tasks from "../tasks";
 
-function* getAccount(action: Redux.Action<number>): SagaIterator {
-  try {
-    const response: Model.Account = yield http.request(api.getAccount, action.context, action.payload);
-    yield put(actions.responseAccountAction(response));
-  } catch (e: unknown) {
-    notifications.ui.banner.handleRequestError(e as Error);
-    yield put(actions.responseAccountAction(null));
-  }
-}
+type R = Tables.SubAccountRowData;
+type M = Model.SubAccount;
+type B = Model.Template;
+type TC = SubAccountsTableActionContext<B, Model.Account, false>;
 
 const ActionMap = {
   updateParentInState: actions.updateInStateAction,
@@ -30,41 +21,32 @@ const ActionMap = {
   response: actions.responseAction,
   updateBudgetInState: updateBudgetInStateAction,
   setSearch: actions.setSearchAction,
-  responseFringes: responseFringesAction,
-  responseFringeColors: responseFringeColorsAction,
-  responseSubAccountUnits: responseSubAccountUnitsAction
+  responseFringes: responseFringesAction
 };
 
-export const createTableSaga = (table: Table.TableInstance<Tables.SubAccountRowData, Model.SubAccount>) =>
-  tabling.sagas.createAuthenticatedTableSaga<
-    Tables.SubAccountRowData,
-    Model.SubAccount,
-    Tables.SubAccountTableStore,
-    Tables.SubAccountTableContext
-  >({
+export const createTableSaga = (table: Table.TableInstance<R, M>) =>
+  tabling.sagas.createAuthenticatedTableSaga<R, M, Tables.SubAccountTableStore, TC>({
     actions: { ...ActionMap, request: actions.requestAction },
-    selectStore: (state: Application.Store) => state.template.account.table,
-    tasks: store.tasks.subaccounts.createAuthenticatedTableTaskSet<Model.Account, Model.Template>({
+    selectStore: (state: Application.Store, ctx: TC) => selectors.selectSubAccountsTableStore(state, ctx),
+    tasks: store.tasks.subaccounts.createAuthenticatedTableTaskSet<B, Model.Account>({
       table,
-      selectStore: (state: Application.Store) => state.template.account.table,
-      actions: ActionMap,
-      services: {
-        create: api.createAccountChild,
-        createGroup: api.createAccountGroup,
-        createMarkup: api.createAccountMarkup,
-        request: api.getAccountChildren,
-        requestGroups: api.getAccountGroups,
-        requestMarkups: api.getAccountMarkups,
-        bulkCreate: api.bulkCreateAccountChildren,
-        bulkDelete: api.bulkDeleteAccountChildren,
-        bulkUpdate: api.bulkUpdateAccountChildren,
-        bulkDeleteMarkups: api.bulkDeleteAccountMarkups
-      }
+      initialState: initialState.initialAccountState,
+      selectBudgetStore: (state: Application.Store) =>
+        selectors.selectBudgetStore<Model.Template, false>(state, {
+          domain: "template",
+          public: false
+        }),
+      selectIndexedStore: (state: Application.Store) =>
+        selectors.selectBudgetStore<Model.Template, false>(state, {
+          domain: "template",
+          public: false
+        }).account,
+      actions: ActionMap
     })
   });
 
 function* watchForRequestAction(): SagaIterator {
-  yield takeLatest([actions.requestAccountAction.toString()], getAccount);
+  yield takeLatest([actions.requestAccountAction.toString()], tasks.getAccount);
 }
 
 function* rootSaga(): SagaIterator {

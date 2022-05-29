@@ -28,22 +28,20 @@ type OmitProps =
   | "onEditMarkup"
   | "onEditGroup";
 
-export type AuthenticatedFringesTableProps<B extends Model.BaseBudget> = Omit<
-  AuthenticatedTableProps<R, M, S>,
-  OmitProps
-> & {
+export type AuthenticatedFringesTableProps<
+  B extends Model.BaseBudget,
+  P extends Model.Account | Model.SubAccount
+> = Omit<AuthenticatedTableProps<R, M, FringesTableContext<B, P, false>, S>, OmitProps> & {
   readonly budget: B | null;
-  readonly domain: B["domain"];
 };
 
-const AuthenticatedFringesTable = <B extends Model.BaseBudget>({
+const AuthenticatedFringesTable = <B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount>({
   budget,
-  domain,
   ...props
-}: AuthenticatedFringesTableProps<B>): JSX.Element => (
-  <AuthenticatedTable<R, M, S>
+}: AuthenticatedFringesTableProps<B, P>): JSX.Element => (
+  <AuthenticatedTable<R, M, FringesTableContext<B, P, false>, S>
     {...props}
-    tableId={`${domain}-fringes`}
+    tableId={`${props.tableContext.domain}-fringes`}
     className={classNames("fringes-table", props.className)}
     getModelRowName={(r: Table.DataRow<R>) => r.data.name}
     getModelRowLabel={"Fringe"}

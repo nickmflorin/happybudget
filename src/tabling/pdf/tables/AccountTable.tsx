@@ -72,8 +72,10 @@ const AccountTable = ({ columns, subAccountColumns, account, options }: AccountT
           original: (coli: Table.DataColumn<R, M>, mi: Model.PdfSubAccount) => any
         ) => {
           if (!isNil(c.pdfChildFooter) && !isNil(c.pdfChildFooter(m).value)) {
+            /* eslint-disable-next-line  @typescript-eslint/no-unsafe-return */
             return c.pdfChildFooter(m).value;
           }
+          /* eslint-disable-next-line  @typescript-eslint/no-unsafe-return */
           return original(c, m);
         }
       });

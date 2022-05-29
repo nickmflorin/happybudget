@@ -1,56 +1,47 @@
 import { SagaIterator } from "redux-saga";
-import { put, takeLatest, spawn } from "redux-saga/effects";
+import { takeLatest, spawn } from "redux-saga/effects";
 
-import * as api from "api";
-import { tabling, notifications, http } from "lib";
+import { tabling } from "lib";
 import * as store from "store";
 
-import {
-  subAccount as actions,
-  responseFringeColorsAction,
-  responseFringesAction,
-  responseSubAccountUnitsAction
-} from "../../actions/public";
+import { subAccount as actions, responseFringesAction } from "../../actions/public";
+import * as selectors from "../../selectors";
+import * as tasks from "../tasks";
 
-function* getSubAccount(action: Redux.Action<number>): SagaIterator {
-  try {
-    const response: Model.SubAccount = yield http.request(api.getSubAccount, action.context, action.payload);
-    yield put(actions.responseSubAccountAction(response));
-  } catch (e: unknown) {
-    notifications.ui.banner.handleRequestError(e as Error);
-    yield put(actions.responseSubAccountAction(null));
-  }
-}
+type R = Tables.SubAccountRowData;
+type M = Model.SubAccount;
+type B = Model.Budget;
+type TC = SubAccountsTableActionContext<B, M, true>;
 
 const ActionMap = {
   loading: actions.loadingAction,
   response: actions.responseAction,
   setSearch: actions.setSearchAction,
-  responseFringes: responseFringesAction,
-  responseFringeColors: responseFringeColorsAction,
-  responseSubAccountUnits: responseSubAccountUnitsAction
+  responseFringes: responseFringesAction
 };
 
-export const createTableSaga = (table: Table.TableInstance<Tables.SubAccountRowData, Model.SubAccount>) =>
-  tabling.sagas.createPublicTableSaga<Tables.SubAccountRowData,
-	Model.SubAccount,
-	Tables.SubAccountTableStore, Tables.SubAccountTableContext>({
+export const createTableSaga = (table: Table.TableInstance<R, M>) =>
+  tabling.sagas.createPublicTableSaga<R, M, Tables.SubAccountTableStore, TC>({
     actions: { ...ActionMap, request: actions.requestAction },
-		selectStore: (state: Application.Store) => state.public.budget.subaccount.table,
-    tasks: store.tasks.subaccounts.createPublicTableTaskSet({
+    selectStore: (s: Application.Store, ctx: TC) => selectors.selectSubAccountsTableStore(s, ctx),
+    tasks: store.tasks.subaccounts.createPublicTableTaskSet<B, M>({
       table,
       actions: ActionMap,
-			selectStore: (state: Application.Store) => state.public.budget.subaccount.table,
-      services: {
-        request: api.getSubAccountChildren,
-        requestGroups: api.getSubAccountGroups,
-        requestMarkups: api.getSubAccountMarkups
-      }
+      selectBudgetStore: (state: Application.Store) =>
+        selectors.selectBudgetStore<B, true>(state, {
+          domain: "budget",
+          public: true
+        }),
+      selectIndexedStore: (state: Application.Store) =>
+        selectors.selectBudgetStore<B, true>(state, {
+          domain: "budget",
+          public: true
+        }).subaccount
     })
   });
 
 function* watchForRequestAction(): SagaIterator {
-  yield takeLatest([actions.requestSubAccountAction.toString()], getSubAccount);
+  yield takeLatest([actions.requestSubAccountAction.toString()], tasks.getSubAccount);
 }
 
 function* rootSaga(): SagaIterator {

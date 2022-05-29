@@ -1,7 +1,9 @@
 declare namespace Table {
-  /* Control events are table events that are dispatched from the code in
-     response to other actions, but they are not derived solely from a user's
-     interaction with the table. */
+  /*
+	Control events are table events that are dispatched from the code in
+	response to other actions, but they are not derived solely from a user's
+	interaction with the table.
+	*/
   type ControlEventIds = {
     readonly MODELS_UPDATED: "modelsUpdated";
     readonly UPDATE_ROWS: "updateRows";
@@ -11,9 +13,11 @@ declare namespace Table {
 
   type ControlEventId = ControlEventIds[keyof ControlEventIds];
 
-  /* Change events are table events that are derived solely from a user's
-     interaction with a table.  Unlike control events, change events are
-     reversible. */
+  /*
+	Change events are table events that are derived solely from a user's
+	interaction with a table.  Unlike control events, change events are
+	reversible.
+	*/
   type ChangeEventIds = {
     readonly DATA_CHANGE: "dataChange";
     readonly ROW_ADD: "rowAdd";
@@ -36,8 +40,10 @@ declare namespace Table {
   type ChangeEventId = ChangeEventIds[keyof ChangeEventIds];
   type TraversibleEventId = TraversibleEventIds[keyof TraversibleEventIds];
 
-  /* Meta events are table events that are derived solely from a user's
-	   interaction with a table but operate on events themselves. */
+  /*
+	Meta events are table events that are derived solely from a user's
+	interaction with a table but operate on events themselves.
+	*/
   type MetaEventIds = {
     readonly FORWARD: "forward";
     readonly REVERSE: "reverse";
@@ -114,12 +120,14 @@ declare namespace Table {
     readonly group: GroupRowId | null;
   };
 
-  /* RowInsertEvent differs from RowAddEvent because RowInsertEvent needs to
-	   insert the row in the middle of the table, whereas RowAddEvent inserts the
-		 row at the bottom of the table.  The difference is important, because with
-		 the RowInsertEvent, we cannot add placeholders until there is an API
-		 response - as we need the order of the inserted row from the API response
-		 before it is inserted into the table. */
+  /*
+	RowInsertEvent differs from RowAddEvent because RowInsertEvent needs to
+	insert the row in the middle of the table, whereas RowAddEvent inserts the
+	row at the bottom of the table.  The difference is important, because with
+	the RowInsertEvent, we cannot add placeholders until there is an API
+	response - as we need the order of the inserted row from the API response
+	before it is inserted into the table.
+	*/
   type RowInsertEvent<R extends RowData> = BaseChangeEvent<"rowInsert", RowInsertPayload<R>>;
 
   type RowAddCountPayload = { readonly count: number };
@@ -131,8 +139,10 @@ declare namespace Table {
     "rowAdd",
     P
   > & {
-    /* Placeholder IDs must be provided ahead of time so that the IDs are
-			 consistent between the sagas and the reducer. */
+    /*
+		Placeholder IDs must be provided ahead of time so that the IDs are
+		consistent between the sagas and the reducer.
+		*/
     readonly placeholderIds: PlaceholderRowId[];
   };
 
@@ -171,8 +181,10 @@ declare namespace Table {
   };
   type RowAddToGroupEvent = BaseChangeEvent<"rowAddToGroup", RowAddToGroupPayload>;
 
-  /* The Group is not attributed to a model in a detail response so we sometimes
-     have to use the value from the original event. */
+  /*
+	The Group is not attributed to a model in a detail response so we sometimes
+  have to use the value from the original event.
+	*/
   type ModelTableEventPayload<M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly model: M;
     readonly group?: number | null;

@@ -55,7 +55,6 @@ const publicizeDataGrid = <
       columns: props.columns,
       apis: props.apis
     });
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
     const [navigateToNextCell, tabToNextCell, _, moveToNextRow] = useCellNavigation<R, M>({
       apis: props.apis,
       columns: props.columns

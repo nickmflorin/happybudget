@@ -30,9 +30,9 @@ const Budgets = (props: BudgetsProps): JSX.Element => {
             onSuccess={(budget: Model.Budget) => {
               setEditModal(null);
               if (inArchive === true) {
-                dispatch(actions.updateArchiveInStateAction({ id: budget.id, data: budget }));
+                dispatch(actions.updateArchiveInStateAction({ id: budget.id, data: budget }, {}));
               } else {
-                dispatch(actions.updateBudgetInStateAction({ id: budget.id, data: budget }));
+                dispatch(actions.updateBudgetInStateAction({ id: budget.id, data: budget }, {}));
               }
             }}
           />

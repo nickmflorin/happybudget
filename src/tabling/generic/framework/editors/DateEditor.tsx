@@ -5,10 +5,16 @@ import { DatePicker } from "components/fields";
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
-type DateEditorProps = Table.EditorParams<Tables.ActualRowData, Model.Actual>;
-
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-const DateEditor = (props: DateEditorProps, ref: ForwardedRef<any>): JSX.Element => {
+const DateEditor = <
+  R extends Table.RowData & { readonly date: string | null },
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>
+>(
+  props: Table.EditorProps<R, M, C, S>,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  ref: ForwardedRef<any>
+): JSX.Element => {
   const [date, setDate] = useState<Date | null>(!isNil(props.value) ? new Date(props.value) : null);
   const [editing, setEditing] = useState(true);
 

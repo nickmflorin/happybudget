@@ -44,8 +44,9 @@ const CreateMarkupModal = <
       let mutated = { ...payload } as Http.MarkupPayload;
       // FLAT Markups do not have any children.
       if (mutated.unit === model.budgeting.MarkupUnits.percent.id) {
-        /* The children should not be an empty list as the Form should have
-						 already validated that. */
+        /*
+				The children should not be an empty list as the Form should have
+				already validated that. */
         mutated = { ...mutated, children: markupChildren };
         if (!isNaN(parseFloat(rate))) {
           mutated = {

@@ -1,9 +1,22 @@
 import { SagaIterator } from "redux-saga";
 import { take, cancel, call, spawn, debounce } from "redux-saga/effects";
 import { isNil } from "lodash";
+import { Optional } from "utility-types";
 
-export const createListResponseSaga = <P extends Redux.ActionPayload = null>(
-  config: Redux.SagaConfig<Redux.ListResponseTaskMap<P>, { request: Redux.ActionCreator<P> }>
+export const convertContextTaskToTask = <
+  P extends Redux.ActionPayload = Redux.ActionPayload,
+  C extends Redux.ActionContext = Redux.ActionContext
+>(
+  contextTask: Redux.ContextTask<C>
+): Redux.Task<P, C> => {
+  function* task(action: Redux.Action<P, C>): SagaIterator {
+    yield call(contextTask, action.context);
+  }
+  return task;
+};
+
+export const createListSaga = <T, C extends Redux.ActionContext = Redux.ActionContext>(
+  config: Redux.SagaConfig<Redux.ListTaskMap<C>, Pick<Redux.ListActionCreatorMap<T, C>, "request">, C>
 ) => {
   function* requestSaga(): SagaIterator {
     let lastTasks;
@@ -21,8 +34,8 @@ export const createListResponseSaga = <P extends Redux.ActionPayload = null>(
   return rootSaga;
 };
 
-export const createModelListResponseSaga = <M extends Model.HttpModel, P extends Redux.ActionPayload = null>(
-  config: Redux.SagaConfig<Redux.ModelListResponseTaskMap<P>, Pick<Redux.ModelListResponseActionMap<M>, "request">>
+export const createModelListSaga = <M extends Model.HttpModel, C extends Redux.ActionContext = Redux.ActionContext>(
+  config: Redux.SagaConfig<Redux.ModelListTaskMap<C>, Pick<Redux.ModelListActionCreatorMap<M, C>, "request">, C>
 ) => {
   function* requestSaga(): SagaIterator {
     let lastTasks;
@@ -40,13 +53,14 @@ export const createModelListResponseSaga = <M extends Model.HttpModel, P extends
   return rootSaga;
 };
 
-export const createAuthenticatedModelListResponseSaga = <
+export const createAuthenticatedModelListSaga = <
   M extends Model.HttpModel,
-  P extends Redux.ActionPayload = null
+  C extends Redux.ActionContext = Redux.ActionContext
 >(
   config: Redux.SagaConfig<
-    Redux.ModelListResponseTaskMap,
-    Pick<Redux.AuthenticatedModelListResponseActionMap<M, P>, "request" | "setSearch">
+    Redux.ModelListTaskMap,
+    Optional<Pick<Redux.AuthenticatedModelListActionCreatorMap<M, C>, "setSearch" | "request">, "setSearch">,
+    C
   >
 ) => {
   function* requestSaga(): SagaIterator {

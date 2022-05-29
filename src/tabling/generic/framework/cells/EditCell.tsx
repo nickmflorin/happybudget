@@ -10,8 +10,9 @@ import { IconButton } from "components/buttons";
 export interface EditCellProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
-> extends Table.CellProps<R, M, S, null, Table.ActionColumn<R, M>> {
+> extends Table.CellProps<R, M, C, S, null, Table.ActionColumn<R, M>> {
   readonly editColumnConfig: Table.EditColumnRowConfig<R, Table.NonPlaceholderBodyRow<R>>[];
   readonly alwaysShow?: (row: Table.BodyRow<R>) => boolean;
 }
@@ -72,13 +73,14 @@ const Action = <
 const EditCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >({
   editColumnConfig,
   alwaysShow,
   node,
   ...props
-}: EditCellProps<R, M, S>): JSX.Element => {
+}: EditCellProps<R, M, C, S>): JSX.Element => {
   // This cell renderer will only be allowed if the row is of type model.
   const row: Table.EditableRow<R> = node.data;
 

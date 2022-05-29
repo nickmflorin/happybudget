@@ -4,12 +4,13 @@ import { spawn, debounce } from "redux-saga/effects";
 import { tabling } from "lib";
 import * as store from "store";
 
-import { updateBudgetInStateAction } from "../../actions/budget";
-import { actuals as actions } from "../../actions/budget";
+import { actuals as actions, updateBudgetInStateAction } from "../../actions/budget";
 
-const ActionMap: store.tasks.actuals.ActualsTableActionMap & {
-  readonly request: Redux.TableActionCreator<Redux.TableRequestPayload, Tables.ActualTableContext>;
-} = {
+type R = Tables.ActualRowData;
+type M = Model.Actual;
+type C = ActualsTableActionContext;
+
+const ActionMap = {
   handleEvent: actions.handleTableEventAction,
   updateBudgetInState: updateBudgetInStateAction,
   loading: actions.loadingAction,
@@ -17,11 +18,10 @@ const ActionMap: store.tasks.actuals.ActualsTableActionMap & {
   response: actions.responseAction,
   setSearch: actions.setSearchAction,
   responseActualOwners: actions.responseActualOwnersAction,
-  loadingActualOwners: actions.loadingActualOwnersAction,
-  responseActualTypes: actions.responseActualTypesAction
+  loadingActualOwners: actions.loadingActualOwnersAction
 };
 
-export const createTableSaga = (table: Table.TableInstance<Tables.ActualRowData, Model.Actual>) => {
+export const createTableSaga = (table: Table.TableInstance<R, M>) => {
   const tasks = store.tasks.actuals.createTableTaskSet({
     table,
     selectStore: (state: Application.Store) => state.budget.actuals,
@@ -29,12 +29,7 @@ export const createTableSaga = (table: Table.TableInstance<Tables.ActualRowData,
     actions: ActionMap
   });
 
-  const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
-    Tables.ActualRowData,
-    Model.Actual,
-    Tables.ActualTableStore,
-    Tables.ActualTableContext
-  >({
+  const tableSaga = tabling.sagas.createAuthenticatedTableSaga<R, M, Tables.ActualTableStore, C>({
     actions: ActionMap,
     tasks: tasks,
     selectStore: (state: Application.Store) => state.budget.actuals

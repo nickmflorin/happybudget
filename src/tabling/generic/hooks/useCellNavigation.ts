@@ -94,7 +94,6 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
 
           if (verticalAscend === true || verticalDescend === true) {
             const direction: "asc" | "desc" = verticalAscend === true ? "asc" : "desc";
-            /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
             const [rowNodes, _, additionalIndex] = findNextNavigatableNodes(p.api, p.nextCellPosition.rowIndex, {
               direction
             });
@@ -128,7 +127,6 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
         const column = tabling.columns.getColumn(params.columns, field);
         if (!isNil(column) && column.cType === "action") {
           let nextCellPosition = { ...p.nextCellPosition };
-          /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
           const [rowNodes, _, additionalIndex] = findNextNavigatableNodes(p.api, p.nextCellPosition.rowIndex);
           if (rowNodes.length !== 0) {
             nextCellPosition = {
@@ -166,12 +164,11 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
       const node: Table.RowNode | undefined = params.apis.grid.getDisplayedRowAtIndex(loc.rowIndex);
       if (!isNil(node)) {
         const row: Table.BodyRow<R> = node.data;
-        /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
         const [nodes, rowIndex, _] = findNextNavigatableNodes(params.apis.grid, loc.rowIndex + 1, {
           direction: "asc"
         });
 
-        const rows: Table.BodyRow<R>[] = map(nodes, (n: Table.RowNode) => n.data);
+        const rows: Table.BodyRow<R>[] = map(nodes, (n: Table.RowNode) => n.data as Table.BodyRow<R>);
 
         /* We only want to add a new row if we are either at the last BodyRow of
 					 the entire table or at the last ModelRow of the entire table (in which

@@ -24,12 +24,15 @@ const Template = (props: TemplateProps): JSX.Element => {
   const dispatch = useDispatch();
   const match = useRouteMatch();
   const budget = useSelector((s: Application.Store) =>
-    selectors.selectBudgetDetail(s, { domain: "template" })
-  ) as Model.Template | null;
-  const budgetLoading = useSelector((s: Application.Store) => selectors.selectBudgetLoading(s, { domain: "template" }));
-
+    selectors.selectBudgetDetail<Model.Template, false>(s, { domain: "template", public: false })
+  );
+  const budgetLoading = useSelector((s: Application.Store) =>
+    selectors.selectBudgetLoading(s, { domain: "template", public: false })
+  );
   useEffect(() => {
-    dispatch(actions.template.requestBudgetAction(props.budgetId));
+    dispatch(
+      actions.template.requestBudgetAction(null, { budgetId: props.budgetId, domain: "template", public: false })
+    );
   }, [props.budgetId]);
 
   return (

@@ -3,10 +3,14 @@ export const isAction = (obj: Redux.Action | any): obj is Redux.Action => {
   return (obj as Redux.Action).type !== undefined;
 };
 
-export const isClearOnDetail = <T extends Redux.ActionPayload, C extends Table.Context = Table.Context>(
-  obj: Redux.ClearOn<T, C>
-): obj is Redux.ClearOnDetail<T, C> =>
-  (obj as Redux.ClearOnDetail<T, C>).payload !== undefined && (obj as Redux.ClearOnDetail<T, C>).action !== undefined;
+export const requestActionIsForced = <C extends Redux.ActionContext>(
+  a: Redux.RequestAction<C>
+): a is Redux.Action<{ force: true }, C> =>
+  a.payload !== null && (a as Redux.Action<{ force: true }, C>).payload.force === true;
+
+export const tableRequestEffectRTIsError = <C>(
+  rt: Redux.ListRequestEffectRTWithError<C>
+): rt is Redux.RequestEffectError => rt !== null && (rt as Redux.RequestEffectError).error !== undefined;
 
 export const isListRequestIdsPayload = (obj: Redux.TableRequestPayload): obj is { ids: number[] } =>
   obj !== null &&
@@ -14,5 +18,6 @@ export const isListRequestIdsPayload = (obj: Redux.TableRequestPayload): obj is 
   (obj as { ids: number[] }).ids !== undefined &&
   Array.isArray((obj as { ids: number[] }).ids);
 
-export const isListRequestIdsAction = (obj: Redux.Action): obj is Redux.Action<{ ids: number[] }> =>
-  isListRequestIdsPayload(obj.payload);
+export const tableRequestActionIsListIds = <C extends Redux.ActionContext>(
+  obj: Redux.Action<Redux.TableRequestPayload, C>
+): obj is Redux.Action<{ ids: number[] }, C> => isListRequestIdsPayload(obj.payload);

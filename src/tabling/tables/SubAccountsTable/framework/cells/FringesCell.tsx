@@ -2,16 +2,34 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { filter } from "lodash";
 
+import * as selectors from "app/Budgeting/store/selectors";
 import { hooks, model, tabling } from "lib";
 
 import { MultipleTags } from "components/tagging";
 import { Cell } from "tabling/generic/framework/cells";
 
-export type FringesCellProps = Table.CellProps<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore>;
+export type FringesCellProps<
+  B extends Model.Budget | Model.Template,
+  P extends Model.Account | Model.SubAccount,
+  PUBLIC extends boolean = boolean
+> = Table.CellProps<
+  Tables.SubAccountRowData,
+  Model.SubAccount,
+  SubAccountsTableActionContext<B, P, PUBLIC>,
+  Tables.SubAccountTableStore,
+  number[]
+>;
 
-const FringesCell = ({ value, ...props }: FringesCellProps): JSX.Element => {
-  const fringes: Table.BodyRow<Tables.FringeRowData>[] = useSelector(
-    (state: Application.Store) => props.selector(state).fringes.data
+const FringesCell = <
+  B extends Model.Budget | Model.Template,
+  P extends Model.Account | Model.SubAccount,
+  PUBLIC extends boolean = boolean
+>({
+  value,
+  ...props
+}: FringesCellProps<B, P, PUBLIC>): JSX.Element => {
+  const fringes: Table.BodyRow<Tables.FringeRowData>[] = useSelector((state: Application.Store) =>
+    selectors.selectFringes(state, props.tableContext)
   );
 
   const applicableFringes: Tables.FringeRow[] = useMemo(() => {
@@ -22,7 +40,9 @@ const FringesCell = ({ value, ...props }: FringesCellProps): JSX.Element => {
   }, [hooks.useDeepEqualMemo(fringes), value]);
 
   return (
-    <Cell<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore> {...props}>
+    <Cell<Tables.SubAccountRowData, Model.SubAccount, SubAccountsTableActionContext, Tables.SubAccountTableStore>
+      {...props}
+    >
       <MultipleTags<Tables.FringeRow> models={applicableFringes} />
     </Cell>
   );

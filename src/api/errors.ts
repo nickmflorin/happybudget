@@ -40,7 +40,7 @@ const standardizeResponseError = <T extends Http.ResponseError | Http.UnknownRes
         } else if (s.filter !== undefined && s.filter(e) !== true) {
           return curr;
         }
-        return s.func(e);
+        return s.func(e) as T;
       }
       return curr;
     },

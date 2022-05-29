@@ -1,34 +1,28 @@
 import { redux } from "lib";
 
 export * as account from "./account";
-export * as accounts from "./accounts";
 export * as subAccount from "./subAccount";
 
-export const loadingBudgetAction = redux.actions.createAction<boolean>("template.Loading");
-export const responseBudgetAction = redux.actions.createAction<Model.Template | null>("template.Response");
-export const requestBudgetAction = redux.actions.createAction<number>("template.Request");
+type FC = FringesTableActionContext<Model.Template, Model.Account | Model.SubAccount, false>;
+type C = BudgetActionContext<Model.Template, false>;
+type TC = AccountsTableActionContext<Model.Template, false>;
 
-export const updateBudgetInStateAction =
-  redux.actions.createAction<Redux.UpdateModelPayload<Model.Template>>("template.UpdateInState");
-export const loadingFringesAction = redux.actions.createAction<boolean>("template.fringes.Loading");
-export const requestFringesAction = redux.actions.createTableAction<
-  Redux.TableRequestPayload,
-  Tables.FringeTableContext
->("template.fringes.Request");
-export const responseFringesAction =
-  redux.actions.createAction<Http.TableResponse<Model.Fringe>>("template.fringes.Response");
+const creator = redux.actions.createActionCreator({ label: "template" });
 
-export const handleFringesTableEventAction = redux.actions.createTableAction<
-  Table.Event<Tables.FringeRowData, Model.Fringe>,
-  Tables.FringeTableContext
->("template.fringes.TableChanged");
+export const handleTableEventAction = creator<Table.Event<Tables.AccountRowData, Model.Account>, TC>("TableChanged");
+export const requestAction = creator<Redux.TableRequestPayload, TC>("TableRequest");
+export const loadingAction = creator<boolean, TC>("TableLoading");
+export const responseAction = creator<Http.TableResponse<Model.Account>, TC>("TableResponse");
+export const setSearchAction = creator<string, TC>("SetTableSearch");
 
-export const setFringesSearchAction = redux.actions.createTableAction<string, Tables.FringeTableContext>(
-  "template.fringes.SetSearch"
+export const loadingBudgetAction = creator<boolean, C>("Loading");
+export const responseBudgetAction = creator<Http.RenderedDetailResponse<Model.Template>>("Response");
+export const requestBudgetAction = creator<Redux.RequestPayload, C>("Request");
+export const updateBudgetInStateAction = creator<Redux.UpdateModelPayload<Model.Template>>("UpdateInState");
+
+export const loadingFringesAction = creator<boolean, FC>("fringes.Loading");
+export const responseFringesAction = creator<Http.TableResponse<Model.Fringe>, FC>("fringes.Response");
+export const handleFringesTableEventAction = creator<Table.Event<Tables.FringeRowData, Model.Fringe>, FC>(
+  "fringes.TableChanged"
 );
-export const responseSubAccountUnitsAction = redux.actions.createAction<Http.ListResponse<Model.Tag>>(
-  "template.subaccountunits.Response"
-);
-export const responseFringeColorsAction = redux.actions.createAction<Http.ListResponse<string>>(
-  "template.fringecolors.Response"
-);
+export const setFringesSearchAction = creator<string, FC>("fringes.SetSearch");

@@ -4,26 +4,31 @@ import { model } from "lib";
 import { framework } from "tabling/generic";
 import { ChoiceSelectEditor } from "tabling/generic/framework/editors";
 
-const FringeUnitEditor = (
+const FringeUnitEditor = <B extends Model.Budget | Model.Template, P extends Model.Account | Model.SubAccount>(
   props: Omit<
     framework.editors.ChoiceSelectEditorProps<
       Model.FringeUnit,
       Tables.FringeRowData,
       Model.Fringe,
+      FringesTableContext<B, P, false>,
       Tables.FringeTableStore
     >,
     "models" | "searchIndices"
   >,
   ref: ForwardedRef<Table.AgEditorRef<Model.FringeUnit>>
-) => {
-  return (
-    <ChoiceSelectEditor<Model.FringeUnit, Tables.FringeRowData, Model.Fringe, Tables.FringeTableStore>
-      searchIndices={["name"]}
-      ref={ref}
-      models={model.budgeting.FringeUnits.choices}
-      {...props}
-    />
-  );
-};
+) => (
+  <ChoiceSelectEditor<
+    Model.FringeUnit,
+    Tables.FringeRowData,
+    Model.Fringe,
+    FringesTableContext<B, P, false>,
+    Tables.FringeTableStore
+  >
+    searchIndices={["name"]}
+    ref={ref}
+    models={model.budgeting.FringeUnits.choices}
+    {...props}
+  />
+);
 
-export default forwardRef(FringeUnitEditor);
+export default forwardRef(FringeUnitEditor) as typeof FringeUnitEditor;

@@ -6,7 +6,13 @@ import { ActualOwnersMenu } from "components/menus";
 import { framework } from "tabling/generic";
 
 interface ActualOwnerEditorProps
-  extends Table.EditorParams<Tables.ActualRowData, Model.Actual, Tables.ActualTableStore, Model.ActualOwner | null> {
+  extends Table.EditorProps<
+    Tables.ActualRowData,
+    Model.Actual,
+    ActualsTableContext,
+    Tables.ActualTableStore,
+    Model.ActualOwner | null
+  > {
   readonly setSearch: (value: string) => void;
 }
 
@@ -23,6 +29,7 @@ const ActualOwnerEditor = (
     Model.ActualOwner,
     Tables.ActualRowData,
     Model.Actual,
+    ActualsTableContext,
     Tables.ActualTableStore
   >({
     ...props,

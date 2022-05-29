@@ -23,7 +23,7 @@ export type GenericOwnedBudgetProps = Omit<
 };
 
 const GenericOwnedBudget = (props: GenericOwnedBudgetProps): JSX.Element => {
-  const user = store.hooks.useLoggedInUser();
+  const [user, _] = store.hooks.useLoggedInUser();
   const dispatch: Redux.Dispatch = useDispatch();
 
   return (
@@ -31,7 +31,7 @@ const GenericOwnedBudget = (props: GenericOwnedBudgetProps): JSX.Element => {
       {...props}
       noDataProps={{ ...props.noDataProps, child: <BudgetEmptyIcon /> }}
       onDeleted={(b: Model.SimpleBudget) => {
-        dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "decrement" }));
+        dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "decrement" }, {}));
         props.onDeleted(b);
       }}
       confirmDeleteProps={{ suppressionKey: "delete-budget-confirmation-suppressed", title: "Delete Budget" }}
@@ -49,7 +49,7 @@ const GenericOwnedBudget = (props: GenericOwnedBudgetProps): JSX.Element => {
               config.env.BILLING_ENABLED &&
               !model.user.userHasPermission(user, model.user.Permissions.MULTIPLE_BUDGETS)
             ) {
-              dispatch(store.actions.setProductPermissionModalOpenAction(true));
+              dispatch(store.actions.setProductPermissionModalOpenAction(true, {}));
             } else {
               props.onCreate();
             }

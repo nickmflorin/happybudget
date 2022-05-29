@@ -15,7 +15,7 @@ type TemplateCardProps = Omit<GenericTemplateCardProps, "dropdown"> & {
 const TemplateCard = ({ onMoved, ...props }: TemplateCardProps): JSX.Element => {
   const [moving, setMoving] = useState(false);
 
-  const user = store.hooks.useLoggedInUser();
+  const [user, _] = store.hooks.useLoggedInUser();
   const [cancelToken] = http.useCancelToken();
 
   const move = useMemo(

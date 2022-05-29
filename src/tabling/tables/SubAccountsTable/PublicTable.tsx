@@ -22,27 +22,20 @@ type OmitProps =
   | "framework";
 
 export type PublicTableProps<B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount> = Omit<
-  PublicBudgetTableProps<R, M, S>,
+  PublicBudgetTableProps<R, M, B, SubAccountsTableActionContext<B, P, true>, S>,
   OmitProps
 > & {
-  readonly id: P["id"];
-  readonly domain: B["domain"];
-  readonly budgetId: B["id"];
   readonly parent: P | null;
-  readonly parentType: P["type"];
   readonly tokenId: string;
-  readonly actionContext: Tables.SubAccountTableContext;
   readonly onOpenFringesModal: () => void;
 };
 
 const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount>(
   props: PublicTableProps<B, P>
 ): JSX.Element => {
-  const { onBack, onLeft, onRight, onRowExpand } = useKeyboardNavigation({ ...props, authenticated: false });
+  const { onBack, onLeft, onRight, onRowExpand } = useKeyboardNavigation<B, P, R, true>(props);
 
-  const fringes = useSelector((s: Application.Store) =>
-    selectors.selectFringes(s, { domain: props.domain, parentType: props.parentType })
-  );
+  const fringes = useSelector((s: Application.Store) => selectors.selectFringes(s, props.tableContext));
 
   const processFringesCellForClipboard = hooks.useDynamicCallback((row: R) => {
     const fs = model.getModels<Tables.FringeRow>(fringes, row.fringes, { modelName: "fringe" });
@@ -56,10 +49,17 @@ const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model
           headerComponentParams: { onEdit: () => props.onOpenFringesModal() },
           processCellForClipboard: processFringesCellForClipboard
         },
-        identifier: { headerName: props.parentType === "account" ? "Account" : "Line" },
-        description: { headerName: `${props.parentType === "account" ? "SubAccount" : "Detail"} Description` }
+        identifier: { headerName: props.tableContext.parentType === "account" ? "Account" : "Line" },
+        description: {
+          headerName: `${props.tableContext.parentType === "account" ? "SubAccount" : "Detail"} Description`
+        }
       }),
-    [props.onOpenFringesModal, props.parentType, hooks.useDeepEqualMemo(props.columns), processFringesCellForClipboard]
+    [
+      props.onOpenFringesModal,
+      props.tableContext.parentType,
+      hooks.useDeepEqualMemo(props.columns),
+      processFringesCellForClipboard
+    ]
   );
 
   return (
@@ -69,7 +69,7 @@ const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model
       menuPortalId={"supplementary-header"}
       showPageFooter={true}
       pinFirstColumn={true}
-      tableId={`public-${props.domain}-${props.parentType}-subaccounts`}
+      tableId={`public-${props.tableContext.domain}-${props.tableContext.parentType}-subaccounts`}
       framework={Framework}
       onBack={onBack}
       onRowExpand={onRowExpand}

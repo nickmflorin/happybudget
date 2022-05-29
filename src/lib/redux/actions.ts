@@ -1,63 +1,71 @@
+import { isNil } from "lodash";
+
+type ActionCreatorConfig<P extends Redux.ActionPayload, C extends Redux.ActionContext = Redux.ActionContext> = {
+  readonly ctx?: Pick<C, "errorMessage">;
+  readonly label?: string;
+  readonly prefix?: string;
+  readonly prepareAction?: (p: P) => Omit<Redux.Action<P>, "type">;
+};
+
 /**
  * Modified version of @redux.js/toolkit's `createAction` method that uses an
- * action creator that attaches custom context to the action object.
+ * action creator that attaches custom context to the action object and an
+ * optionally provided label.
  */
-export function createAction<P extends Redux.ActionPayload>(
+export const createAction = <P extends Redux.ActionPayload, C extends Redux.ActionContext = Redux.ActionContext>(
   type: string,
-  ctx?: Pick<Redux.ActionContext, "errorMessage">,
-  prepareAction?: (p: P) => Omit<Redux.Action<P>, "type">
-): Redux.ActionCreator<P> {
-  function actionCreator(payload: P, dynamicContext?: Pick<Redux.ActionContext, "errorMessage">): Redux.Action<P> {
-    if (prepareAction) {
-      const prepared = prepareAction(payload);
-      if (!prepared) {
-        throw new Error("prepareAction did not return an object");
-      }
-      return {
-        type,
-        payload: prepared.payload,
-        /* Priority should always be given to context included when the action
-					 is dispatched.  Context provided to the action creator as a
-					 configuration takes priority after that. */
-        context: { ...ctx, ...dynamicContext }
-      };
-    }
-    /* Priority should always be given to context included when the action
-			 is dispatched.  Context provided to the action creator as a
-			 configuration takes priority after that. */
-    return { type, payload, context: { ...ctx, ...dynamicContext } };
-  }
-  actionCreator.toString = () => `${type}`;
-  actionCreator.type = type;
-  return actionCreator;
-}
+  config?: ActionCreatorConfig<P, C>
+): Redux.ActionCreator<P, C> => {
+  const actionType = !isNil(config?.prefix)
+    ? `${config?.prefix as string}.${type}`
+    : !isNil(config?.label)
+    ? `${config?.label as string}.${type}`
+    : type;
 
-export function createTableAction<P extends Redux.ActionPayload, C extends Table.Context = Table.Context>(
-  type: string,
-  ctx?: Pick<Redux.WithActionContext<C>, "errorMessage">,
-  prepareAction?: (p: P) => Omit<Redux.Action<P, Redux.WithActionContext<C>>, "type">
-): Redux.TableActionCreator<P, C> {
-  function actionCreator(payload: P, dynamicContext: Omit<C, "publicTokenId">): Redux.Action<P, C> {
-    if (prepareAction) {
-      const prepared = prepareAction(payload);
+  function actionCreator(payload: P, dynamicContext: Omit<C, "publicTokenId">): Redux.Action<P> {
+    let pyload = payload;
+    if (config?.prepareAction) {
+      const prepared = config?.prepareAction(payload);
       if (!prepared) {
         throw new Error("prepareAction did not return an object");
       }
-      return {
-        type,
-        payload: prepared.payload,
-        /* Priority should always be given to context included when the action
-					 is dispatched.  Context provided to the action creator as a
-					 configuration takes priority after that. */
-        context: { ...ctx, ...dynamicContext } as Redux.WithActionContext<C>
-      };
+      pyload = prepared.payload;
     }
-    /* Priority should always be given to context included when the action
-			 is dispatched.  Context provided to the action creator as a
-			 configuration takes priority after that. */
-    return { type, payload, context: { ...ctx, ...dynamicContext } as Redux.WithActionContext<C> };
+    /*
+		Priority should always be given to context that is included when the action
+		is dispatched, versus the context that is used to initialize the
+		ActionCreator - which is provided as a configuration.
+		*/
+    return {
+      type: actionType,
+      payload: pyload,
+      label: config?.label || null,
+      context: { ...config?.ctx, ...dynamicContext }
+    };
   }
-  actionCreator.toString = () => `${type}`;
-  actionCreator.type = type;
+  actionCreator.label = config?.label || null;
+  actionCreator.toString = () => `${actionType}`;
+  actionCreator.type = actionType;
   return actionCreator;
-}
+};
+
+/**
+ * An ActionCreator factory that returns a function that creates actions with
+ * the provided configuration.  This should be used when many actions are to
+ * be created with the same configuration.
+ */
+export const createActionCreator =
+  <C extends Redux.ActionContext = Redux.ActionContext>(
+    config?: ActionCreatorConfig<Redux.ActionPayload, C>
+  ): {
+    <PR extends Redux.ActionPayload, CR extends Redux.ActionContext = Redux.ActionContext>(
+      type: string,
+      config?: ActionCreatorConfig<PR, CR>
+    ): Redux.ActionCreator<PR, CR>;
+  } =>
+  <PR extends Redux.ActionPayload, CR extends Redux.ActionContext = Redux.ActionContext>(
+    type: string,
+    c?: ActionCreatorConfig<PR, CR>
+  ) =>
+    // Dynamic configuration should override static configuration.
+    createAction<PR, CR>(type, { ...config, ...c });

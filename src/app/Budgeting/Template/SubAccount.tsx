@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { isNil } from "lodash";
-import { createSelector } from "reselect";
 
-import { tabling, budgeting, model } from "lib";
+import { tabling, budgeting } from "lib";
 import { connectTableToAuthenticatedStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
 
 import { BudgetPage } from "../Pages";
@@ -12,13 +11,14 @@ import FringesModal from "./FringesModal";
 
 type M = Model.SubAccount;
 type R = Tables.SubAccountRowData;
+type TC = SubAccountsTableContext<Model.Template, Model.SubAccount, false>;
 
 const ConnectedTable = connectTableToAuthenticatedStore<
   GenericSubAccountsTable.AuthenticatedTemplateProps<Model.SubAccount>,
   R,
   M,
-  Tables.SubAccountTableStore,
-  Tables.SubAccountTableContext
+  TC,
+  Tables.SubAccountTableStore
 >({
   actions: {
     handleEvent: actions.template.subAccount.handleTableEventAction,
@@ -26,26 +26,13 @@ const ConnectedTable = connectTableToAuthenticatedStore<
     response: actions.template.subAccount.responseAction,
     setSearch: actions.template.subAccount.setSearchAction
   },
-  tableId: "template-subaccount-subaccounts-table",
-  selector: (s: Application.Store) =>
-    selectors.selectSubAccountsTableStore(s, { parentType: "subaccount", domain: "template" }),
+  tableId: (c: TC) => `${c.domain}-${c.parentType}-subaccounts`,
+  selector: (c: TC) => selectors.createSubAccountsTableStoreSelector(c),
   createSaga: (table: Table.TableInstance<R, M>) => sagas.template.subAccount.createTableSaga(table),
-  footerRowSelectors: {
-    page: createSelector(
-      (state: Application.Store) => state.template.detail.data,
-      (budget: Model.Template | null) => ({
-        identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
-        estimated: !isNil(budget) ? model.budgeting.estimatedValue(budget) : 0.0
-      })
-    ),
-    footer: createSelector(
-      (state: Application.Store) => state.template.subaccount.detail.data,
-      (detail: Model.SubAccount | null) => ({
-        identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
-        estimated: !isNil(detail) ? model.budgeting.estimatedValue(detail) : 0.0
-      })
-    )
-  }
+  footerRowSelectors: (c: TC) => ({
+    page: selectors.createBudgetFooterSelector(c),
+    footer: selectors.createSubAccountFooterSelector({ ...c, id: c.parentId })
+  })
 })(GenericSubAccountsTable.AuthenticatedTemplate);
 
 interface SubAccountProps {
@@ -59,13 +46,25 @@ const SubAccount = (props: SubAccountProps): JSX.Element => {
   const fringesTable = tabling.hooks.useTable<Tables.FringeRowData, Model.Fringe>();
 
   const dispatch = useDispatch();
-
-  const subaccount = useSelector((s: Application.Store) => selectors.selectSubAccountDetail(s, { domain: "template" }));
-  const table = tabling.hooks.useTable<Tables.SubAccountRowData, Model.SubAccount>();
+  const table = tabling.hooks.useTable<R, M>();
+  const subaccount = useSelector((s: Application.Store) =>
+    selectors.selectSubAccountDetail(s, {
+      id: props.id,
+      domain: "template",
+      public: false
+    })
+  );
 
   useEffect(() => {
-    dispatch(actions.template.subAccount.requestSubAccountAction(props.id));
-  }, [props.id]);
+    dispatch(
+      actions.template.subAccount.requestSubAccountAction(null, {
+        id: props.id,
+        domain: "template",
+        public: false,
+        budgetId: props.budgetId
+      })
+    );
+  }, [props.id, props.budgetId]);
 
   useEffect(() => {
     if (!isNil(props.budget) && !isNil(subaccount)) {
@@ -74,7 +73,15 @@ const SubAccount = (props: SubAccountProps): JSX.Element => {
   }, [props.budget, subaccount]);
 
   useEffect(() => {
-    dispatch(actions.template.subAccount.requestAction(null, { id: props.id, budgetId: props.budgetId }));
+    dispatch(
+      actions.template.subAccount.requestAction(null, {
+        domain: "template",
+        parentType: "subaccount",
+        budgetId: props.budgetId,
+        public: false,
+        parentId: props.id
+      })
+    );
   }, [props.id, props.budgetId]);
 
   return (
@@ -82,8 +89,13 @@ const SubAccount = (props: SubAccountProps): JSX.Element => {
       <ConnectedTable
         {...props}
         parent={subaccount}
-        actionContext={{ budgetId: props.budgetId, id: props.id }}
-        parentType={"subaccount"}
+        tableContext={{
+          parentId: props.id,
+          budgetId: props.budgetId,
+          parentType: "subaccount",
+          domain: "template",
+          public: false
+        }}
         onOpenFringesModal={() => setFringesModalVisible(true)}
         table={table}
       />

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import { Route, Redirect, RouteProps } from "react-router-dom";
 import axios from "axios";
 
@@ -18,8 +17,8 @@ const PrivateRoute = ({ forceReloadFromStripe, revalidate, ...props }: PrivateRo
   const authenticatedUser = store.hooks.useUser();
   const [redirect, setRedirect] = useState(false);
   const [authenticating, setAuthenticating] = useState(true);
-  const dispatch: Redux.Dispatch = useDispatch();
   const [newCancelToken] = http.useCancelToken();
+  const [_, updateUser] = store.hooks.useLoggedInUser();
 
   useEffect(() => {
     /* If there is not already an authenticated user in the store, we want to
@@ -44,7 +43,7 @@ const PrivateRoute = ({ forceReloadFromStripe, revalidate, ...props }: PrivateRo
             });
             setAuthenticating(false);
           } else {
-            dispatch(store.actions.updateLoggedInUserAction(response));
+            updateUser(response);
             setAuthenticating(false);
           }
         })

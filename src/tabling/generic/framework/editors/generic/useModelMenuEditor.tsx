@@ -10,34 +10,37 @@ export type UseModelMenuEditorParams<
   V extends Table.RawRowValue,
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
-> = Table.EditorParams<R, M, S, V | null>;
+> = Table.EditorProps<R, M, C, S, V | null>;
 
 export type IEditor<
   V extends Table.RawRowValue,
-  C extends Model.Model,
+  CM extends Model.Model,
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
-> = Omit<UseModelMenuEditorParams<V, R, M, S>, "forwardedRef"> & {
+> = Omit<UseModelMenuEditorParams<V, R, M, C, S>, "forwardedRef"> & {
   readonly onChange: (value: V | null, e: Table.CellDoneEditingEvent, stopEditing?: boolean) => void;
   readonly isFirstRender: boolean;
   readonly value: V | null;
   readonly changedEvent: Table.CellDoneEditingEvent | null;
-  readonly menu: NonNullRef<IMenuRef<MenuItemSelectedState, C>>;
+  readonly menu: NonNullRef<IMenuRef<MenuItemSelectedState, CM>>;
 };
 
 const useModelMenuEditor = <
   V extends Table.RawRowValue,
-  C extends Model.Model,
+  CM extends Model.Model,
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  params: UseModelMenuEditorParams<V, R, M, S> & { readonly forwardedRef: ForwardedRef<any> }
-): [IEditor<V, C, R, M, S>] => {
-  const menu = ui.menu.useMenu<MenuItemSelectedState, C>();
+  params: UseModelMenuEditorParams<V, R, M, C, S> & { readonly forwardedRef: ForwardedRef<any> }
+): [IEditor<V, CM, R, M, C, S>] => {
+  const menu = ui.menu.useMenu<MenuItemSelectedState, CM>();
 
   const isFirstRender = ui.useTrackFirstRender();
   const [value, setValue] = useState<V | null>(params.value);

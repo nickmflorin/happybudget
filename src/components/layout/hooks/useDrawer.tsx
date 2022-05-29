@@ -27,9 +27,9 @@ const useDrawer = (config: UseDrawerConfig): UseDrawerReturnType => {
   return {
     drawer,
     isOpen,
-    open: () => dispatch(store.actions.setApplicationDrawerAction(true)),
-    close: () => dispatch(store.actions.setApplicationDrawerAction(false)),
-    toggle: () => dispatch(store.actions.setApplicationDrawerAction("TOGGLE"))
+    open: () => dispatch(store.actions.setApplicationDrawerAction(true, {})),
+    close: () => dispatch(store.actions.setApplicationDrawerAction(false, {})),
+    toggle: () => dispatch(store.actions.setApplicationDrawerAction("TOGGLE", {}))
   };
 };
 

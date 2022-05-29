@@ -207,7 +207,7 @@ const getLastVisitedCookies = (domain: Model.BudgetDomain, tokenId?: string): Re
     cookies.remove(cookieParam(domain, tokenId));
     return {};
   }
-  return lastVisited;
+  return lastVisited as Record<string, unknown>;
 };
 
 export const getLastVisited = (domain: Model.BudgetDomain, id: number, tokenId?: string): string | null => {

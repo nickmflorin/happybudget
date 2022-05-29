@@ -4,12 +4,13 @@ import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
 const connectCellToStore = <
-  T extends Table.ValueCellProps<R, M, S, V, C>,
+  T extends Table.ValueCellProps<R, M, C, S, V, CL>,
   R extends Table.RowData = Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   V extends string | number | null = string | number | null,
-  C extends Table.DataColumn<R, M, V> = Table.BodyColumn<R, M, V>
+  CL extends Table.DataColumn<R, M, V> = Table.BodyColumn<R, M, V>
 >(
   Component: React.FunctionComponent<T>
 ) => {

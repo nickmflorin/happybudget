@@ -13,7 +13,6 @@ type M = Model.Account;
 type S = Tables.AccountTableStore;
 
 type OmitProps =
-  | "budgetId"
   | "onRowExpand"
   | "showPageFooter"
   | "pinFirstColumn"
@@ -31,20 +30,17 @@ type OmitProps =
   | "onEditGroup";
 
 export type AuthenticatedTableProps<B extends Model.BaseBudget> = Omit<
-  AuthenticatedBudgetTableProps<R, M, S>,
+  AuthenticatedBudgetTableProps<R, M, B, AccountsTableContext<B, false>, S>,
   OmitProps
 > & {
-  readonly id: B["id"];
   readonly parent: B | null;
-  readonly domain: B["domain"];
-  readonly actionContext: Tables.AccountTableContext;
 };
 
 const AuthenticatedTable = <B extends Model.BaseBudget>(props: AuthenticatedTableProps<B>): JSX.Element => {
   const history = useHistory();
 
   const [groupModals, onEditGroup, onCreateGroup] = useGrouping({
-    parentId: props.id,
+    parentId: props.tableContext.budgetId,
     parentType: "budget",
     table: props.table.current,
     onGroupUpdated: (group: Model.Group) =>
@@ -55,7 +51,7 @@ const AuthenticatedTable = <B extends Model.BaseBudget>(props: AuthenticatedTabl
   });
 
   const [markupModals, onEditMarkup, onCreateMarkup] = useMarkup({
-    parentId: props.id,
+    parentId: props.tableContext.budgetId,
     parentType: "budget",
     table: props.table.current
   });
@@ -120,14 +116,13 @@ const AuthenticatedTable = <B extends Model.BaseBudget>(props: AuthenticatedTabl
     <React.Fragment>
       <AuthenticatedBudgetTable
         {...props}
-        budgetId={props.id}
         showPageFooter={false}
         pinFirstColumn={true}
         getModelRowName={(r: Table.DataRow<R>) => r.data.identifier || r.data.description}
         getMarkupRowName={(r: Table.MarkupRow<R>) => r.data.identifier}
         getMarkupRowLabel={"Markup"}
         getModelRowLabel={"Account"}
-        tableId={`${props.domain}-accounts`}
+        tableId={`${props.tableContext.domain}-accounts`}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
         onGroupRows={(rows: Table.ModelRow<R>[]) => onCreateGroup(map(rows, (row: Table.ModelRow<R>) => row.id))}
@@ -138,7 +133,12 @@ const AuthenticatedTable = <B extends Model.BaseBudget>(props: AuthenticatedTabl
         onEditMarkup={(row: Table.MarkupRow<R>) => onEditMarkup(tabling.rows.markupId(row.id))}
         actions={actions}
         onRowExpand={(row: Table.ModelRow<R>) =>
-          history.push(budgeting.urls.getUrl({ domain: props.domain, id: props.id }, { type: "account", id: row.id }))
+          history.push(
+            budgeting.urls.getUrl(
+              { domain: props.tableContext.domain, id: props.tableContext.budgetId },
+              { type: "account", id: row.id }
+            )
+          )
         }
       />
       {markupModals}

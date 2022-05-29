@@ -51,12 +51,12 @@ export const isActionWithChangeEvent = <
   R extends Table.RowData = Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   RW extends Table.EditableRow<R> = Table.ModelRow<R>,
-  C extends Table.Context = Table.Context
+  C extends Redux.ActionContext = Redux.ActionContext
 >(
-  a: Redux.TableAction<Table.ChangeEvent<R, RW>, C>,
+  a: Redux.Action<Table.ChangeEvent<R, RW>, C>,
   t: T
-): a is Redux.TableAction<Table.ChangeEventLookup<T, R, RW>, C> =>
-  (a as Redux.TableAction<Table.EventLookup<T, R, M, RW>, C>).type === t;
+): a is Redux.Action<Table.ChangeEventLookup<T, R, RW>, C> =>
+  (a as Redux.Action<Table.EventLookup<T, R, M, RW>, C>).type === t;
 
 export const isModelsUpdatedEvent = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
   e: Table.ControlEvent<R, M>
@@ -102,13 +102,13 @@ export const isRowAddDataEvent = <R extends Table.RowData>(
   e: Table.RowAddEvent<R>
 ): e is Table.RowAddEvent<R, Table.RowAddDataPayload<R>> => !isNil(e.payload) && isRowAddDataPayload(e.payload);
 
-export const isRowAddDataEventAction = <R extends Table.RowData, C extends Table.Context = Table.Context>(
-  a: Redux.TableAction<Table.RowAddEvent<R>, C>
-): a is Redux.TableAction<Table.RowAddEvent<R, Table.RowAddDataPayload<R>>, C> => isRowAddDataEvent(a.payload);
+export const isRowAddDataEventAction = <R extends Table.RowData, C extends Redux.ActionContext = Redux.ActionContext>(
+  a: Redux.Action<Table.RowAddEvent<R>, C>
+): a is Redux.Action<Table.RowAddEvent<R, Table.RowAddDataPayload<R>>, C> => isRowAddDataEvent(a.payload);
 
-export const isRowAddEventAction = <R extends Table.RowData, C extends Table.Context = Table.Context>(
-  a: Redux.TableAction<Table.ChangeEvent<R>, C>
-): a is Redux.TableAction<Table.RowAddEvent<R>, C> => isRowAddEvent(a.payload);
+export const isRowAddEventAction = <R extends Table.RowData, C extends Redux.ActionContext = Redux.ActionContext>(
+  a: Redux.Action<Table.ChangeEvent<R>, C>
+): a is Redux.Action<Table.RowAddEvent<R>, C> => isRowAddEvent(a.payload);
 
 export const isRowDeleteEvent = <R extends Table.RowData>(e: Table.ChangeEvent<R>): e is Table.RowDeleteEvent =>
   (e as Table.RowDeleteEvent).type === "rowDelete";

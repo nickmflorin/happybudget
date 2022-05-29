@@ -14,12 +14,12 @@ type UseHiddenColumnsReturnType = [
   (changes: SingleOrArray<Table.ColumnVisibilityChange>, sizeToFit?: boolean) => void
 ];
 
-type SetHiddenColumnsAction = Omit<Redux.Action<Table.HiddenColumns>, "context"> & {
+type SetHiddenColumnsAction = Omit<Redux.BasicAction<Table.HiddenColumns>, "context"> & {
   readonly type: "SET";
   readonly cookie?: string | undefined;
 };
 
-type ChangeHiddenColumnsAction = Omit<Redux.Action<SingleOrArray<Table.ColumnVisibilityChange>>, "context"> & {
+type ChangeHiddenColumnsAction = Omit<Redux.BasicAction<SingleOrArray<Table.ColumnVisibilityChange>>, "context"> & {
   readonly type: "TOGGLE";
   readonly tableId: string;
 };

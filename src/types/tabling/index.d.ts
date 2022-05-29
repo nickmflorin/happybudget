@@ -18,7 +18,7 @@ declare namespace Table {
   type FirstDataRenderedEvent = import("@ag-grid-community/core").FirstDataRenderedEvent;
 
   type CreateTableDataConfig<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
-    readonly response: Http.TableResponse<M>;
+    readonly response: Http.SuccessfulTableResponse<M>;
     readonly columns: ModelColumn<R, M>[];
     readonly getModelRowChildren?: (m: M) => number[];
   };
@@ -31,19 +31,27 @@ declare namespace Table {
   interface AgEditorRef<V extends RawRowValue> {
     // Should return the final value to the grid, the result of the editing
     getValue(): V;
-    /* Gets called once after initialised.
-       If you return true, the editor will appear in a popup */
+    /*
+		Gets called once after initialised.
+    If you return true, the editor will appear in a popup.
+		*/
     isPopup?(): boolean;
-    /* Gets called once, only if isPopup() returns true. Return "over" if the
-       popup should cover the cell, or "under" if it should be positioned below
-       leaving the cell value visible. If this method is not present, the
-       default is "over" */
+    /*
+		Gets called once, only if isPopup() returns true. Return "over" if the
+		popup should cover the cell, or "under" if it should be positioned below
+		leaving the cell value visible. If this method is not present, the
+		default is "over".
+		*/
     getPopupPosition?(): string;
-    /* Gets called once before editing starts, to give editor a chance to
-       cancel the editing before it even starts. */
+    /*
+		Gets called once before editing starts, to give editor a chance to
+    cancel the editing before it even starts.
+		*/
     isCancelBeforeStart?(): boolean;
-    /* Gets called once when editing is finished (eg if Enter is pressed).
-       If you return true, then the result of the edit will be ignored. */
+    /*
+		Gets called once when editing is finished (eg if Enter is pressed).
+		If you return true, then the result of the edit will be ignored.
+		*/
     isCancelAfterEnd?(): boolean;
     // If doing full row edit, then gets called when tabbing into the cell.
     focusIn?(): boolean;
@@ -89,15 +97,20 @@ declare namespace Table {
     readonly gridApis: GridApi[];
   }
 
-  /* I really don't know why, but extending
-		 import("@ag-grid-community/core").IEditorParams does not work here. */
-  interface EditorParams<
+  /*
+	I really don't know why, but extending
+  import("@ag-grid-community/core").IEditorParams does not work here.
+	*/
+  interface EditorProps<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
+    C extends Context = Context,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
   > {
+    readonly tableContext: C;
+    readonly table: TableInstance<R, M>;
     readonly value: V;
     readonly keyPress: number | null;
     readonly charPress: string | null;
@@ -114,41 +127,44 @@ declare namespace Table {
     readonly selector: (state: Application.Store) => S;
     readonly onKeyDown: (event: KeyboardEvent) => void;
     readonly stopEditing: (suppressNavigateAfterEdit?: boolean) => void;
-    /* When the cell editor finishes editing, the AG Grid callback
-			 (onCellDoneEditing) does not have any context about what event triggered
-			 the completion, so we have to handle that ourselves so we can trigger
-			 different behaviors depending on how the selection was performed. */
+    /*
+		When the cell editor finishes editing, the AG Grid callback
+		(onCellDoneEditing) does not have any context about what event triggered
+		the completion, so we have to handle that ourselves so we can trigger
+		different behaviors depending on how the selection was performed.
+		*/
     readonly onDoneEditing: (e: CellDoneEditingEvent) => void;
   }
 
   interface CellProps<
     R extends RowData = RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
+    C extends Context = Context,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any,
-    C extends RealColumn<R, M, V> = BodyColumn<R, M, V>
-  > extends Omit<import("@ag-grid-community/core").ICellRendererParams, "value">,
+    CL extends RealColumn<R, M, V> = BodyColumn<R, M, V>
+  > extends Omit<import("@ag-grid-community/core").ICellRendererParams, "value" | "data">,
       StandardComponentProps {
+    readonly data: R;
+    readonly tableContext: C;
     readonly tooltip?: Tooltip;
     readonly hideClear?: boolean;
-    readonly customCol: C;
+    readonly customCol: CL;
     readonly value: V;
     readonly gridId: GridId;
+    readonly prefixChildren?: JSX.Element;
+    readonly suffixChildren?: JSX.Element;
     readonly icon?: IconOrElement | ((row: BodyRow<R>) => IconOrElement | undefined | null);
     readonly innerCellClassName?: string | undefined | ((r: Row<R>) => string | undefined);
     readonly innerCellStyle?: React.CSSProperties | undefined | ((r: Row<R>) => React.CSSProperties | undefined);
     readonly table: TableInstance<R, M>;
-    /* Note: This is only applied for the data grid rows/cells - so we have to
-			 be careful.  We need a better way of establishing which props are
-			 available to cells based on which grid they lie in. */
+    /*
+		Note: This is only applied for the data grid rows/cells - so we have to
+		be careful.  We need a better way of establishing which props are
+		available to cells based on which grid they lie in.
+		*/
     readonly getRowColorDef: (row: BodyRow<R>) => RowColorDef;
-    /* Info is only applicable for cells where the column is a CalculatedColumn
-       (currently) and the row is a ModelRow. */
-    readonly onInfoClicked?: (cell: Table.CellConstruct<Table.ModelRow<R>, Table.CalculatedColumn<R, M>>) => void;
-    readonly infoTooltip?: (
-      cell: Table.CellConstruct<Table.ModelRow<R>, Table.CalculatedColumn<R, M>>
-    ) => TooltipContent | null;
     readonly selector: (state: Application.Store) => S;
     readonly onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
     readonly onEvent?: (event: Event<R, M, EditableRow<R>>) => void;
@@ -157,27 +173,43 @@ declare namespace Table {
   type CellWithChildrenProps<
     R extends RowData = RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
+    C extends Context = Context,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any,
-    C extends RealColumn<R, M, V> = BodyColumn<R, M, V>
+    CL extends RealColumn<R, M, V> = BodyColumn<R, M, V>
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  > = Omit<CellProps<R, M, S, any, C>, "value"> & {
+  > = Omit<CellProps<R, M, C, S, any, CL>, "value"> & {
     readonly children: import("react").ReactNode;
   };
 
   type ValueCellProps<
     R extends RowData = RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
+    C extends Context = Context,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     V extends string | number | null = string | number | null,
-    C extends DataColumn<R, M, V> = BodyColumn<R, M, V>
-  > = CellProps<R, M, S, V, C> & {
-    /* This is used for extending cells.  Normally, the value formatter will be
-			 included on the ColDef of the associated column.  But when extending a
-			 Cell, we sometimes want to provide a formatter for that specific cell. */
+    CL extends DataColumn<R, M, V> = BodyColumn<R, M, V>
+  > = CellProps<R, M, C, S, V, CL> & {
+    /*
+		This is used for extending cells.  Normally, the value formatter will be
+		included on the ColDef of the associated column.  But when extending a
+		Cell, we sometimes want to provide a formatter for that specific cell.
+		*/
     readonly valueFormatter?: AGFormatter;
   };
+
+  type CalculatedCellProps<
+    R extends RowData = RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+    C extends Context = Context,
+    S extends Redux.TableStore<R> = Redux.TableStore<R>
+  > = Omit<ValueCellProps<R, M, C, S, number | null, CalculatedColumn<R, M, number | null>>, "prefixChildren"> & {
+    readonly hasInfo?: boolean | ((cell: CellConstruct<ModelRow<R>, CalculatedColumn<R, M>>) => boolean | undefined);
+    readonly onInfoClicked?: (cell: CellConstruct<ModelRow<R>, CalculatedColumn<R, M>>) => void;
+    readonly infoTooltip?: (cell: CellConstruct<ModelRow<R>, CalculatedColumn<R, M>>) => TooltipContent | null;
+  };
+
   /* ------------------------- Framework ------------------------------------ */
 
   /* ------------------------- Columns -------------------------------------- */
@@ -318,35 +350,49 @@ declare namespace Table {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any
   > = {
-    /* The field is used to pull data from the Model M in the case that the
-		   getRowValue callback is not provided.  In the case of a BodyColumn or
-			 CalculatedColumn, the field will only be used to pull data from the model
-			 if the `isRead` field is `true`, otherwise, it will just be used as the
-			 AG Grid colId. */
+    /*
+		The field is used to pull data from the Model M in the case that the
+		getRowValue callback is not provided.  In the case of a BodyColumn or
+		CalculatedColumn, the field will only be used to pull data from the model
+		if the `isRead` field is `true`, otherwise, it will just be used as the
+		AG Grid colId.
+		*/
     readonly field: string;
-    /* This value will be used in the case that undefined values are
-       unexpectedly encountered (in which case an error will be issued) or
-       another value that we treat as null is encountered (i.e. blank strings). */
+    /*
+		This value will be used in the case that undefined values are
+		unexpectedly encountered (in which case an error will be issued) or
+		another value that we treat as null is encountered (i.e. blank strings).
+		*/
     readonly nullValue: V;
-    /* Callback or explicit value that the RowData should be attributed with
-       in the case that the original value is equal to the nullValue when a
-       row is created. */
+    /*
+		Callback or explicit value that the RowData should be attributed with
+		in the case that the original value is equal to the nullValue when a
+		row is created.
+		*/
     readonly defaultValueOnCreate?: DefaultValueOnCreate<R>;
-    /* Callback or explicit value that the RowData should be attributed with
-       in the case that the original value is equal to the nullValue when a
-       row is updated. */
+    /*
+		Callback or explicit value that the RowData should be attributed with
+		in the case that the original value is equal to the nullValue when a
+		row is updated.
+		*/
     readonly defaultValueOnUpdate?: DefaultValueOnUpdate<R>;
-    /* If not provided, the default behavior is to obtain the Row's value by
-       attribute on the Model M corresponding to the Column's designated
-			 `field`. */
+    /*
+		If not provided, the default behavior is to obtain the Row's value by
+		attribute on the Model M corresponding to the Column's designated
+		`field`.
+		*/
     readonly getRowValue?: (m: M) => V;
-    /* Callback to indicate whether or not the column is applicable for a given
-       model.  If the column is not applicable, a warning will not be issued
-       if the column's field cannot be obtained from the model. */
+    /*
+		Callback to indicate whether or not the column is applicable for a given
+		model.  If the column is not applicable, a warning will not be issued
+		if the column's field cannot be obtained from the model.
+		*/
     readonly isApplicableForModel?: (m: M) => boolean;
-    /* Callback to indicate whether or not the column is applicable for a given
-       row type.  If the column is not applicable, the row will not include
-			 the Column's field in it's data. */
+    /*
+		Callback to indicate whether or not the column is applicable for a given
+		row type.  If the column is not applicable, the row will not include
+		the Column's field in it's data.
+		*/
     readonly isApplicableForRowType?: (rt: RowType) => boolean;
   };
 
@@ -398,9 +444,11 @@ declare namespace Table {
     readonly markupField?: keyof Model.Markup;
     // This field will be used to pull data from the Group model if applicable.
     readonly groupField?: keyof Model.Group;
-    /* This field, when false, indicates that the column value should not be
-       pulled from the model, but is instead set by other means (usually
-       value getters). */
+    /*
+		This field, when false, indicates that the column value should not be
+		pulled from the model, but is instead set by other means (usually
+		value getters).
+		*/
     readonly isRead?: boolean;
     readonly headerName?: string;
     readonly dataType?: ColumnDataTypeId;
@@ -410,13 +458,17 @@ declare namespace Table {
     readonly canBeExported?: boolean;
     readonly requiresAuthentication?: boolean;
     readonly includeInPdf?: boolean;
-    /* Callback to indicate whether or not the column is applicable for a given
-       model.  If the column is not applicable, a warning will not be issued
-       if the column's field cannot be obtained from the model. */
+    /*
+		Callback to indicate whether or not the column is applicable for a given
+		model.  If the column is not applicable, a warning will not be issued
+		if the column's field cannot be obtained from the model.
+		*/
     readonly isApplicableForModel?: (m: M) => boolean;
-    /* Callback to indicate whether or not the column is applicable for a given
-       row type.  If the column is not applicable, the row will not include
-			 the Column's field in it's data. */
+    /*
+		Callback to indicate whether or not the column is applicable for a given
+		row type.  If the column is not applicable, the row will not include
+		the Column's field in it's data.
+		*/
     readonly isApplicableForRowType?: (rt: RowType) => boolean;
     readonly valueGetter?: (row: BodyRow<R>, rows: BodyRow<R>[]) => V;
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -431,11 +483,12 @@ declare namespace Table {
     readonly pdfCellProps?: PdfCellStandardProps<R, M, V>;
     readonly pdfHeaderCellProps?: PdfCellStandardProps<R, M, V>;
     readonly pdfCellRenderer?: (params: PdfCellCallbackParams<R, M, V>) => JSX.Element;
-    readonly pdfFormatter?: NativeFormatter<V>;
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    readonly pdfFormatter?: NativeFormatter<any>;
     readonly pdfValueGetter?: (r: BodyRow<R>, rows: BodyRow<R>[]) => V;
     readonly pdfFooterValueGetter?: V | ((rows: BodyRow<R>[]) => V);
     /* NOTE: This only applies for the individual Account tables, not the the
-			 overall Accounts */
+         overall Accounts */
     readonly pdfChildFooter?: (s: M) => PdfFooterColumn<V>;
   };
 
@@ -454,16 +507,19 @@ declare namespace Table {
       readonly editable?: boolean | ((params: ColumnCallbackParams<R>) => boolean);
       readonly smartInference?: boolean;
       readonly processCellFromClipboard?: (value: string) => V;
-      /* The fields that the column is derive from.  Must be provided if
-			   parseIntoFields is defined */
+      /*
+			The fields that the column is derive from.  Must be provided if
+      parseIntoFields is defined.
+			*/
       readonly parsedFields?: string[];
-      /* Callback that is used when a given column is derived from multiple other
-				 columns.  The parser must take the value for the current column (which
-				 is derived from the parsed columns) and parse the value such that the
-				 contributing part from each parsed column is returned separately.
+      /*
+			Callback that is used when a given column is derived from multiple other
+      columns.  The parser must take the value for the current column (which
+			is derived from the parsed columns) and parse the value such that the
+			contributing part from each parsed column is returned separately.
 
-				 Must be provided if parsedFields is defined.
-				 */
+			Must be provided if parsedFields is defined.
+			*/
       readonly parseIntoFields?: (value: V) => ParsedColumnField<V>[];
       readonly onDataChange?: (id: ModelRowId, event: CellChange<V>) => void;
       readonly refreshColumns?: (change: CellChange<V>) => string[];
@@ -564,7 +620,9 @@ declare namespace Table {
 
   type CellStyle = import("@ag-grid-community/core").CellStyle | import("@ag-grid-community/core").CellStyleFunc;
 
-  type CellConstruct<RW extends Table.BodyRow, C extends Table.DataColumn> = {
+  type Context = Record<string, unknown>;
+
+  type CellConstruct<RW extends BodyRow<R>, C extends DataColumn, R extends RowData = RowData> = {
     readonly col: C;
     readonly row: RW;
   };
@@ -773,75 +831,79 @@ declare namespace Table {
   /* ------------------------- Multi-User ---------------------------------- */
 
   /* ------------------------- Redux -------------------------------------- */
-  /* We need to allow any for RowDataSelector instead of Application.Store because
-     there is a typing issue with reselect in regard to the footer row
-		 selectors. */
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  type RowDataSelector<R extends RowData> = (state: any) => Partial<R>;
-
-  type Context = Record<string, unknown>;
+  type RowDataSelector<R extends RowData> = (state: Application.Store) => Partial<R>;
 
   type TaskConfig<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
-    C extends Context = Context,
-    A extends Omit<Redux.TableActionMap<M, C>, "request"> = Omit<Redux.TableActionMap<M, C>, "request">
-  > = Redux.TaskConfig<A> & {
-    /* There are edge cases where the table will be null when switching between
-		   tables very fast. */
+    C extends Redux.ActionContext = Redux.ActionContext,
+    A extends Redux.ActionCreatorMap<Omit<Redux.TableActionPayloadMap<M>, "invalidate">, C> = Redux.ActionCreatorMap<
+      Omit<Redux.TableActionPayloadMap<M>, "invalidate">,
+      C
+    >
+  > = Redux.TaskConfig<A, C> & {
     readonly table: TableInstance<R, M>;
-    readonly selectStore: (state: Application.Store) => S;
+    readonly selectStore: (state: Application.Store, ctx: C) => S;
   };
 
   type DefaultValueOnCreate<R extends RowData> = R[keyof R] | ((r: Partial<R>) => R[keyof R]);
   type DefaultValueOnUpdate<R extends RowData> = R[keyof R] | ((r: ModelRow<R>) => R[keyof R]);
   type DefaultDataOnCreate<R extends RowData> = Partial<R> | ((r: Partial<R>) => Partial<R>);
-  type DefaultDataOnUpdate<R extends RowData> =
-    | R
-    | ((r: ModelRow<R>, ch: Table.RowChangeData<R, Table.ModelRow<R>>) => Partial<R>);
+  type DefaultDataOnUpdate<R extends RowData> = R | ((r: ModelRow<R>, ch: RowChangeData<R, ModelRow<R>>) => Partial<R>);
 
   type ReducerConfig<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
-    C extends Context = Context,
-    A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
+    C extends Redux.ActionContext = Redux.ActionContext,
+    A extends Redux.TableActionCreatorMap<M, C> = Redux.TableActionCreatorMap<M, C>
   > = Omit<TaskConfig<R, M, S, C, A>, "table" | "selectStore"> & {
     readonly initialState: S;
     readonly columns: ModelColumn<R, M>[];
     readonly defaultDataOnCreate?: DefaultDataOnCreate<R>;
     readonly defaultDataOnUpdate?: DefaultDataOnUpdate<R>;
     readonly getModelRowChildren?: (m: M) => number[];
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    readonly clearOn: Redux.ClearOn<any, C>[];
   };
+
+  type AuthenticatedReducerConfig<
+    R extends RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+    S extends Redux.TableStore<R> = Redux.TableStore<R>,
+    C extends Redux.ActionContext = Redux.ActionContext,
+    A extends Redux.AuthenticatedTableActionCreatorMap<R, M, C> = Redux.AuthenticatedTableActionCreatorMap<R, M, C>
+  > = ReducerConfig<R, M, S, C, A>;
 
   type PublicSagaConfig<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
-    C extends Context = Context,
-    A extends Redux.TableActionMap<M, C> = Redux.TableActionMap<M, C>
-  > = Redux.SagaConfig<Redux.TableTaskMap<C>, A> & {
-    readonly selectStore: (state: Application.Store) => S;
+    C extends Redux.ActionContext = Redux.ActionContext,
+    A extends PickOptional<Redux.TableActionCreatorMap<M, C>, "request"> = PickOptional<
+      Redux.TableActionCreatorMap<M, C>,
+      "request"
+    >,
+    T extends Optional<Redux.TableTaskMap<C>, "request"> = Optional<Redux.TableTaskMap<C>, "request">
+  > = Redux.SagaConfig<T, A, C> & {
+    readonly selectStore: (state: Application.Store, ctx: C) => S;
   };
 
   type AuthenticatedSagaConfig<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
-    C extends Context = Context,
-    A extends Redux.TableActionMapWithRequestOptional<
-      Redux.AuthenticatedTableActionMap<R, M, C>,
-      C
-    > = Redux.TableActionMapWithRequestOptional<Redux.AuthenticatedTableActionMap<R, M, C>, C>,
-    T extends Redux.TableTaskMapWithRequestOptional<
-      Redux.AuthenticatedTableTaskMap<R, C>,
-      C
-    > = Redux.TableTaskMapWithRequestOptional<Redux.AuthenticatedTableTaskMap<R, C>, C>
-  > = Redux.SagaConfig<T, A> & {
-    readonly selectStore: (state: Application.Store) => S;
+    C extends Redux.ActionContext = Redux.ActionContext,
+    A extends Optional<
+      Pick<Redux.AuthenticatedTableActionCreatorMap<R, M, C>, "request" | "handleEvent">,
+      "request"
+    > = Optional<Pick<Redux.AuthenticatedTableActionCreatorMap<R, M, C>, "request" | "handleEvent">, "request">,
+    T extends Optional<
+      Pick<Redux.AuthenticatedTableTaskMap<R, C>, "request" | "handleChangeEvent">,
+      "request"
+    > = Optional<Pick<Redux.AuthenticatedTableTaskMap<R, C>, "request" | "handleChangeEvent">, "request">
+  > = Redux.SagaConfig<T, A, C> & {
+    readonly selectStore: (state: Application.Store, ctx: C) => S;
   };
 
   /* ------------------------- Redux -------------------------------------- */
@@ -863,11 +925,13 @@ declare namespace Table {
       readonly changeColumnVisibility: (changes: SingleOrArray<ColumnVisibilityChange>, sizeToFit?: boolean) => void;
     };
 
-  /* We have to allow the onClick prop and ID prop to pass through the entire
-		 component to the render method in the case that we are rendering a button
-		 and we also specify wrapInDropdown.  This is so that AntD can control the
-		 dropdown visibility via the button.and click aways can be properly
-		 detected with the button ID. */
+  /*
+	We have to allow the onClick prop and ID prop to pass through the entire
+	component to the render method in the case that we are rendering a button
+	and we also specify wrapInDropdown.  This is so that AntD can control the
+	dropdown visibility via the button.and click aways can be properly
+	detected with the button ID.
+	*/
   type MenuActionRenderProps = {
     readonly id?: string;
     readonly onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -888,11 +952,13 @@ declare namespace Table {
     // If being wrapped in a Dropdown, the onClick prop will not be used.
     readonly onClick?: () => void;
     readonly wrapInDropdown?: (children: import("react").ReactChild | import("react").ReactChild[]) => JSX.Element;
-    /* We have to allow the onClick prop and ID prop to pass through the entire
-		   component to the render method in the case that we are rendering a button
-			 and we also specify wrapInDropdown.  This is so that AntD can control the
-			 dropdown visibility via the button.and click aways can be properly
-			 detected with the button ID. */
+    /*
+		We have to allow the onClick prop and ID prop to pass through the entire
+		component to the render method in the case that we are rendering a button
+		and we also specify wrapInDropdown.  This is so that AntD can control the
+		dropdown visibility via the button.and click aways can be properly
+		detected with the button ID.
+		*/
     readonly render?: MenuActionRenderFunc;
   };
 

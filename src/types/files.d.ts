@@ -7,8 +7,10 @@ declare type SavedImage = {
   readonly size: number;
   readonly height: number;
   readonly width: number;
-  /* The extension will be null if the file name is corrupted and the extension
-     cannot be determined. */
+  /*
+	The extension will be null if the file name is corrupted and the extension
+  cannot be determined.
+	*/
   readonly extension: string | null;
 };
 

@@ -18,9 +18,9 @@ const WrapInApplicationSpinner: React.FC<WrapInApplicationSpinnerProps> = ({
 
   useEffect(() => {
     if (loading === true) {
-      dispatch(setApplicationLoadingAction(true));
+      dispatch(setApplicationLoadingAction(true, {}));
     } else {
-      dispatch(setApplicationLoadingAction(false));
+      dispatch(setApplicationLoadingAction(false, {}));
     }
   }, [loading]);
 

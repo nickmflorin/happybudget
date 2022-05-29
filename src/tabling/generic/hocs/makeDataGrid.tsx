@@ -29,8 +29,8 @@ export type DataGridProps<
   readonly calculatedCellHasInfo?:
     | boolean
     | ((cell: Table.CellConstruct<Table.ModelRow<R>, Table.CalculatedColumn<R, M>>) => boolean);
-  readonly onCalculatedCellInfoClicked?: Table.CellProps<R, M>["onInfoClicked"];
-  readonly calculatedCellInfoTooltip?: Table.CellProps<R, M>["infoTooltip"];
+  readonly onCalculatedCellInfoClicked?: Table.CalculatedCellProps<R, M>["onInfoClicked"];
+  readonly calculatedCellInfoTooltip?: Table.CalculatedCellProps<R, M>["infoTooltip"];
   readonly onBack?: () => void;
   readonly onLeft?: () => void;
   readonly onRight?: () => void;

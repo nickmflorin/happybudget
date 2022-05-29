@@ -18,7 +18,7 @@ const CommunityTemplateStaffCard = ({
   ...props
 }: CommunityTemplateStaffCardProps): JSX.Element => {
   const [togglingVisibility, setTogglingVisibility] = useState(false);
-  const user = store.hooks.useLoggedInUser();
+  const [user, _] = store.hooks.useLoggedInUser();
   const [cancelToken] = http.useCancelToken();
 
   const toggleVisibility = useMemo(

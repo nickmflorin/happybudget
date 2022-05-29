@@ -12,8 +12,9 @@ import { GenericModelMenuEditor } from "./generic";
 interface ContactEditorProps<
   R extends Table.RowData & { readonly contact: number | null },
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
-> extends Table.EditorParams<R, M, S> {
+> extends Table.EditorProps<R, M, C, S> {
   readonly onNewContact: (params: { name?: string; rowId: Table.ModelRowId }) => void;
   readonly setSearch: (value: string) => void;
 }
@@ -21,21 +22,22 @@ interface ContactEditorProps<
 const ContactEditor = <
   R extends Table.RowData & { readonly contact: number | null },
   M extends Model.RowHttpModel = Model.RowHttpModel,
+  C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 >(
-  props: ContactEditorProps<R, M, S>,
+  props: ContactEditorProps<R, M, C, S>,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   ref: ForwardedRef<any>
 ) => {
   const cs = store.hooks.useFilteredContacts();
   const loading = store.hooks.useFilteredContactsLoading();
 
-  const [editor] = framework.editors.useModelMenuEditor<number, Model.Contact, R, M, S>({
+  const [editor] = framework.editors.useModelMenuEditor<number, Model.Contact, R, M, C, S>({
     ...props,
     forwardedRef: ref
   });
   return (
-    <GenericModelMenuEditor<number, Model.Contact, R, M, S>
+    <GenericModelMenuEditor<number, Model.Contact, R, M, C, S>
       {...props}
       editor={editor}
       style={{ width: 160 }}

@@ -6,11 +6,10 @@ const createPlaceholdersActivatedEventReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Table.Context = Table.Context,
-  A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
+  C extends Redux.ActionContext = Redux.ActionContext
 >(
-  config: Table.ReducerConfig<R, M, S, C, A>
-): Redux.Reducer<S, Table.PlaceholdersActivatedEvent<M>> => {
+  config: Table.AuthenticatedReducerConfig<R, M, S, C>
+): Redux.BasicReducer<S, Table.PlaceholdersActivatedEvent<M>> => {
   const modelRowManager = new tabling.rows.ModelRowManager<R, M>({
     getRowChildren: config.getModelRowChildren,
     columns: config.columns

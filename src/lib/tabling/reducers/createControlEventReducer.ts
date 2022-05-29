@@ -39,7 +39,7 @@ type ControlEventReducers<
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>
 > = {
-  readonly [Property in keyof Table.ControlEvents<R, M>]: Redux.ReducerWithDefinedState<
+  readonly [Property in keyof Table.ControlEvents<R, M>]: Redux.BasicReducerWithDefinedState<
     S,
     Table.ControlEvents<R, M>[Property]
   >;
@@ -49,11 +49,10 @@ const createControlEventReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Table.Context = Table.Context,
-  A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
+  C extends Redux.ActionContext = Redux.ActionContext
 >(
-  config: Table.ReducerConfig<R, M, S, C, A>
-): Redux.Reducer<S, Table.ControlEvent<R, M>> => {
+  config: Table.AuthenticatedReducerConfig<R, M, S, C>
+): Redux.BasicReducer<S, Table.ControlEvent<R, M>> => {
   const controlEventReducers: ControlEventReducers<R, M, S> = {
     modelsAdded: createModelsAddedEventReducer(config),
     modelsUpdated: createModelsUpdatedEventReducer(config),
@@ -62,7 +61,7 @@ const createControlEventReducer = <
   };
 
   return (state: S = config.initialState, e: Table.ControlEvent<R, M>): S => {
-    const reducer = controlEventReducers[e.type] as Redux.ReducerWithDefinedState<S, typeof e>;
+    const reducer = controlEventReducers[e.type] as Redux.BasicReducerWithDefinedState<S, typeof e>;
     return reducer(state, e);
   };
 };

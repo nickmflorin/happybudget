@@ -1,9 +1,8 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
-import { budgeting, tabling, model } from "lib";
+import { budgeting, tabling } from "lib";
 import { AccountsTable as GenericAccountsTable, connectTableToAuthenticatedStore } from "tabling";
 
 import { BudgetPage } from "../Pages";
@@ -11,32 +10,27 @@ import { actions, selectors, sagas } from "../store";
 
 type R = Tables.AccountRowData;
 type M = Model.Account;
+type TC = BudgetActionContext<Model.Template, false>;
 
 const ConnectedTable = connectTableToAuthenticatedStore<
   GenericAccountsTable.AuthenticatedTemplateProps,
   R,
   M,
-  Tables.AccountTableStore,
-  Tables.AccountTableContext
+  TC,
+  Tables.AccountTableStore
 >({
   actions: {
-    handleEvent: actions.template.accounts.handleTableEventAction,
-    loading: actions.template.accounts.loadingAction,
-    response: actions.template.accounts.responseAction,
-    setSearch: actions.template.accounts.setSearchAction
+    handleEvent: actions.template.handleTableEventAction,
+    loading: actions.template.loadingAction,
+    response: actions.template.responseAction,
+    setSearch: actions.template.setSearchAction
   },
-  tableId: "template-accounts",
-  selector: (s: Application.Store) => selectors.selectAccountsTableStore(s, { domain: "template" }),
+  tableId: (c: TC) => `${c.domain}-accounts`,
+  selector: (c: TC) => selectors.createAccountsTableStoreSelector<Model.Template, false>(c),
   createSaga: (table: Table.TableInstance<R, M>) => sagas.template.accounts.createTableSaga(table),
-  footerRowSelectors: {
-    footer: createSelector(
-      (state: Application.Store) => state.template.detail.data,
-      (budget: Model.Template | null) => ({
-        identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
-        estimated: !isNil(budget) ? model.budgeting.estimatedValue(budget) : 0.0
-      })
-    )
-  }
+  footerRowSelectors: (c: TC) => ({
+    footer: selectors.createBudgetFooterSelector(c)
+  })
 })(GenericAccountsTable.AuthenticatedTemplate);
 
 interface AccountsProps {
@@ -55,15 +49,14 @@ const Accounts = (props: AccountsProps): JSX.Element => {
   }, [props.budget]);
 
   useEffect(() => {
-    dispatch(actions.template.accounts.requestAction(null, { budgetId: props.budgetId }));
+    dispatch(actions.template.requestAction(null, { budgetId: props.budgetId, domain: "template", public: false }));
   }, [props.budgetId]);
 
   return (
     <BudgetPage budget={props.budget}>
       <ConnectedTable
-        id={props.budgetId}
         parent={props.budget}
-        actionContext={{ budgetId: props.budgetId }}
+        tableContext={{ budgetId: props.budgetId, domain: "template", public: false }}
         table={table}
       />
     </BudgetPage>

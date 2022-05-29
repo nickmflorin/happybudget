@@ -9,19 +9,22 @@ const createEventReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Table.Context = Table.Context,
-  A extends Redux.AuthenticatedTableActionMap<R, M, C> = Redux.AuthenticatedTableActionMap<R, M, C>
+  C extends Redux.ActionContext = Redux.ActionContext
 >(
-  config: Table.ReducerConfig<R, M, S, C, A> & {
+  config: Table.AuthenticatedReducerConfig<R, M, S, C> & {
     readonly recalculateRow?: (state: S, row: Table.DataRow<R>) => Partial<R>;
   }
-): Redux.Reducer<S, Table.Event<R, M>> => {
+): Redux.BasicDynamicReducer<S, Redux.RecalculateRowReducerCallback<S, R>, Table.Event<R, M>> => {
   const changeEventReducer = createChangeEventReducer(config);
   const controlEventReducer = createControlEventReducer(config);
 
-  return (state: S = config.initialState, e: Table.Event<R, M>): S => {
+  return (
+    state: S = config.initialState,
+    e: Table.Event<R, M>,
+    recalculateRow?: Redux.RecalculateRowReducerCallback<S, R>
+  ): S => {
     if (events.isChangeEvent(e)) {
-      return changeEventReducer(state, e);
+      return changeEventReducer(state, e, recalculateRow);
     } else if (events.isControlEvent(e)) {
       return controlEventReducer(state, e);
     } else if (events.isMetaEvent(e)) {

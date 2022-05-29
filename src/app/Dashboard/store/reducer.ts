@@ -7,7 +7,7 @@ import { ContactsTable } from "tabling";
 import initialState from "./initialState";
 import * as actions from "./actions";
 
-const rootBudgetsReducer = redux.reducers.createAuthenticatedModelListResponseReducer<Model.SimpleBudget>({
+const rootBudgetsReducer = redux.reducers.createAuthenticatedModelListReducer<Model.SimpleBudget>({
   initialState: initialState.budgets,
   actions: {
     request: actions.requestBudgetsAction,
@@ -22,7 +22,7 @@ const rootBudgetsReducer = redux.reducers.createAuthenticatedModelListResponseRe
   }
 });
 
-const rootArchiveReducer = redux.reducers.createAuthenticatedModelListResponseReducer<Model.SimpleBudget>({
+const rootArchiveReducer = redux.reducers.createAuthenticatedModelListReducer<Model.SimpleBudget>({
   initialState: initialState.archive,
   actions: {
     request: actions.requestArchiveAction,
@@ -44,7 +44,7 @@ const createBudgetsReducer = <L extends "budgets" | "archive">(location: L) => {
   return (state: Modules.Dashboard.Store[L] = initialState[location], action: Redux.Action) => {
     const newState = root(state, action);
     if (action.type === repermissionAction.toString()) {
-      const repermissioned: Model.SimpleBudget[] = action.payload.data;
+      const repermissioned: Model.SimpleBudget[] = action.payload.data as Model.SimpleBudget[];
       return {
         ...newState,
         data: reduce(
@@ -67,7 +67,7 @@ const createBudgetsReducer = <L extends "budgets" | "archive">(location: L) => {
 const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
   budgets: createBudgetsReducer("budgets"),
   archive: createBudgetsReducer("archive"),
-  collaborating: redux.reducers.createAuthenticatedModelListResponseReducer<Model.SimpleCollaboratingBudget>({
+  collaborating: redux.reducers.createAuthenticatedModelListReducer<Model.SimpleCollaboratingBudget>({
     initialState: redux.initialAuthenticatedModelListResponseState,
     actions: {
       request: actions.requestCollaboratingAction,
@@ -81,11 +81,9 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
   contacts: tabling.reducers.createAuthenticatedTableReducer<
     Tables.ContactRowData,
     Model.Contact,
-    Tables.ContactTableStore,
-    Tables.ContactTableContext
+    Tables.ContactTableStore
   >({
     columns: tabling.columns.filterModelColumns(ContactsTable.Columns),
-    clearOn: [actions.requestContactsAction],
     actions: {
       handleEvent: actions.handleContactsTableEventAction,
       loading: actions.loadingContactsAction,
@@ -94,7 +92,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
     },
     initialState: redux.initialTableState
   }),
-  templates: redux.reducers.createAuthenticatedModelListResponseReducer<Model.SimpleTemplate>({
+  templates: redux.reducers.createAuthenticatedModelListReducer<Model.SimpleTemplate>({
     initialState: redux.initialAuthenticatedModelListResponseState,
     actions: {
       request: actions.requestTemplatesAction,
@@ -108,7 +106,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
       updateOrdering: actions.updateTemplatesOrderingAction
     }
   }),
-  community: redux.reducers.createAuthenticatedModelListResponseReducer<Model.SimpleTemplate>({
+  community: redux.reducers.createAuthenticatedModelListReducer<Model.SimpleTemplate>({
     initialState: redux.initialAuthenticatedModelListResponseState,
     actions: {
       request: actions.requestCommunityAction,

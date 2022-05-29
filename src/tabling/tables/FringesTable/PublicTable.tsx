@@ -27,19 +27,20 @@ type OmitProps =
   | "onEditMarkup"
   | "onEditGroup";
 
-export type PublicFringesTableProps<B extends Model.BaseBudget> = Omit<PublicTableProps<R, M, S>, OmitProps> & {
+export type PublicFringesTableProps<B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount> = Omit<
+  PublicTableProps<R, M, FringesTableContext<B, P, true>, S>,
+  OmitProps
+> & {
   readonly budget: B | null;
-  readonly domain: B["domain"];
 };
 
-const PublicFringesTable = <B extends Model.BaseBudget>({
+const PublicFringesTable = <B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount>({
   budget,
-  domain,
   ...props
-}: PublicFringesTableProps<B>): JSX.Element => (
-  <PublicTable<R, M, S>
+}: PublicFringesTableProps<B, P>): JSX.Element => (
+  <PublicTable<R, M, FringesTableContext<B, P, true>, S>
     {...props}
-    tableId={`public-${domain}-fringes`}
+    tableId={`public-${props.tableContext.domain}-fringes`}
     className={classNames("fringes-table", props.className)}
     showPageFooter={false}
     framework={Framework}

@@ -10,37 +10,37 @@ import { Input } from "components/fields";
 import { Page } from "components/layout";
 
 const selectBudgets = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>(
-  state: Redux.AuthenticatedModelListResponseStore<B>
+  state: Redux.AuthenticatedModelListStore<B>
 ) => state.data;
 
 const selectLoading = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>(
-  state: Redux.AuthenticatedModelListResponseStore<B>
+  state: Redux.AuthenticatedModelListStore<B>
 ) => state.loading;
 
 const selectSearch = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>(
-  state: Redux.AuthenticatedModelListResponseStore<B>
+  state: Redux.AuthenticatedModelListStore<B>
 ) => state.search;
 
 const selectOrdering = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>(
-  state: Redux.AuthenticatedModelListResponseStore<B>
+  state: Redux.AuthenticatedModelListStore<B>
 ) => state.ordering;
 
 const selectPageSize = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>(
-  state: Redux.AuthenticatedModelListResponseStore<B>
+  state: Redux.AuthenticatedModelListStore<B>
 ) => state.pageSize;
 
 const selectPage = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>(
-  state: Redux.AuthenticatedModelListResponseStore<B>
+  state: Redux.AuthenticatedModelListStore<B>
 ) => state.page;
 
 const selectCount = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>(
-  state: Redux.AuthenticatedModelListResponseStore<B>
+  state: Redux.AuthenticatedModelListStore<B>
 ) => state.count;
 
 const selectResponseWasReceived = <
   B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate
 >(
-  state: Redux.AuthenticatedModelListResponseStore<B>
+  state: Redux.AuthenticatedModelListStore<B>
 ) => state.responseWasReceived;
 
 export type RenderDashboardPageCardParams<
@@ -57,7 +57,7 @@ export type DashboardPageProps<B extends Model.SimpleBudget | Model.SimpleCollab
     readonly searchPlaceholder?: string;
     readonly createMenuElement?: JSX.Element;
     readonly lastCard?: (b: B[]) => JSX.Element;
-    readonly selector: (state: Application.Store) => Redux.AuthenticatedModelListResponseStore<B>;
+    readonly selector: (state: Application.Store) => Redux.AuthenticatedModelListStore<B>;
     readonly onUpdateOrdering: (o: Redux.UpdateOrderingPayload) => void;
     readonly renderCard: (p: RenderDashboardPageCardParams<B>) => JSX.Element;
     readonly onSearch: (v: string) => void;

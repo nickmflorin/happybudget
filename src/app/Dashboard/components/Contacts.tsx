@@ -11,9 +11,15 @@ import { actions, sagas } from "../store";
 type M = Model.Contact;
 type R = Tables.ContactRowData;
 
-const ConnectedContactsTable = connectTableToAuthenticatedStore<ContactsTable.Props, R, M, Tables.ContactTableStore>({
+const ConnectedContactsTable = connectTableToAuthenticatedStore<
+  ContactsTable.Props,
+  R,
+  M,
+  Redux.ActionContext,
+  Tables.ContactTableStore
+>({
   tableId: "contacts",
-  selector: (state: Application.Store) => state.dashboard.contacts,
+  selector: () => (state: Application.Store) => state.dashboard.contacts,
   createSaga: (table: Table.TableInstance<R, M>) => sagas.createContactsTableSaga(table),
   actions: {
     handleEvent: actions.handleContactsTableEventAction,
@@ -33,7 +39,7 @@ const Contacts = (): JSX.Element => {
 
   return (
     <Page className={"contacts"} title={"My Contacts"}>
-      <ConnectedContactsTable actionContext={{}} table={table} />
+      <ConnectedContactsTable tableContext={{}} table={table} />
     </Page>
   );
 };
