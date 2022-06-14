@@ -117,6 +117,14 @@ const rootReducer: Redux.Reducer<Modules.Template.Store> = (
         | SubAccountsTableActionContext<Model.Template, Model.Account, false>
       >;
       const id = context.isSubAccountsTableActionContext(a.context) ? a.context.parentId : a.context.id;
+      /*
+			Even though this should not happen, and it is typed to not happen, it
+			has happened - and can lead to strange behavior without a clear
+			indication of what the root cause was. */
+      if (typeof id !== "number") {
+        console.error(`Invalid ID ${String(id)} received for template account indexed store reducer!`);
+        return newState;
+      }
       if (isNil(newState.account[id])) {
         newState = { ...newState, account: { ...newState.account, [id]: initialState.initialAccountState } };
       }
@@ -130,6 +138,14 @@ const rootReducer: Redux.Reducer<Modules.Template.Store> = (
         | SubAccountsTableActionContext<Model.Template, Model.SubAccount, false>
       >;
       const id = context.isSubAccountsTableActionContext(a.context) ? a.context.parentId : a.context.id;
+      /*
+			Even though this should not happen, and it is typed to not happen, it
+			has happened - and can lead to strange behavior without a clear
+			indication of what the root cause was. */
+      if (typeof id !== "number") {
+        console.error(`Invalid ID ${String(id)} received for template subaccount indexed store reducer!`);
+        return newState;
+      }
       if (isNil(newState.subaccount[id])) {
         newState = { ...newState, subaccount: { ...newState.subaccount, [id]: initialState.initialSubAccountState } };
       }

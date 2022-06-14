@@ -5,7 +5,9 @@ type TC = SubAccountsTableActionContext<Model.Budget, Model.Account | Model.SubA
 
 const creator = redux.actions.createActionCreator({ label: "budget.subaccount" });
 
-export const updateInStateAction = creator<Redux.UpdateModelPayload<Model.SubAccount>>("UpdateInState");
+/* The updateInState action needs to have context so the indexed stores can
+   obtain the ID. */
+export const updateInStateAction = creator<Redux.UpdateModelPayload<Model.SubAccount>, C>("UpdateInState");
 export const requestSubAccountAction = creator<Redux.RequestPayload, C>("Request");
 export const invalidateSubAccountAction = creator<null, C>("Invalidate");
 // Currently, this action is not wired to anything but may be in the future.

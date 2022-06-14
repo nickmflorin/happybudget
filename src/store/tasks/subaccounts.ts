@@ -32,7 +32,10 @@ type AuthenticatedSubAccountsTableActionMap<
   SubAccountsTableActionContext<B, M, false>
 > & {
   readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateModelPayload<B>>;
-  readonly updateParentInState: Redux.ActionCreator<Redux.UpdateModelPayload<M>>;
+  readonly updateParentInState: Redux.ActionCreator<
+    Redux.UpdateModelPayload<M>,
+    AccountOrSubAccountActionContext<B, M, false>
+  >;
   readonly responseFringes: Redux.ActionCreator<
     Http.TableResponse<Model.Fringe>,
     FringesTableActionContext<B, M, false>
@@ -87,7 +90,7 @@ const requestFringes = <
   config: PublicSubAccountsTableTaskConfig<B, M> | AuthenticatedSubAccountsTableTaskConfig<B, M>
 ) =>
   function* task(action: Redux.Action<null, SubAccountsTableActionContext<B, M, PUBLIC>>): SagaIterator {
-    const response: Http.ListResponse<Model.Fringe> = yield http.request(
+    const r: Http.ListResponse<Model.Fringe> = yield http.request(
       api.getFringes,
       action.context,
       action.context.budgetId
@@ -99,7 +102,7 @@ const requestFringes = <
 		should keep track of whether or not the last response was an error, so
     we can make decisions like that here.
 		*/
-    if (isAuthenticatedConfig(config) && response.data.length === 0) {
+    if (isAuthenticatedConfig(config) && r.data.length === 0) {
       // If there is no table data, we want to default create two rows.
       const bulkCreateResponse: Http.ServiceResponse<typeof api.bulkCreateFringes> = yield http.request(
         api.bulkCreateFringes,
@@ -110,11 +113,11 @@ const requestFringes = <
       yield put(
         config.actions.updateBudgetInState({ id: action.context.budgetId, data: bulkCreateResponse.parent as B }, {})
       );
-      const r = yield call(() => ({ data: bulkCreateResponse.children, count: response.data.length }));
-      return r as Http.ListResponse<Model.Fringe>;
+      const rsp = yield call(() => ({ data: bulkCreateResponse.children, count: r.data.length }));
+      return rsp as Http.ListResponse<Model.Fringe>;
     } else {
-      const r = yield call(() => response);
-      return r as Http.ListResponse<Model.Fringe>;
+      const rsp = yield call(() => r);
+      return rsp as Http.ListResponse<Model.Fringe>;
     }
   };
 
@@ -312,7 +315,7 @@ export const createAuthenticatedTableTaskSet = <
     if (redux.tableRequestActionIsListIds(action)) {
       const requestService =
         action.context.parentType === "account" ? api.getAccountChildren : api.getSubAccountChildren;
-      const response: Http.ListResponse<Model.SubAccount> = yield http.request(
+      const r: Http.ListResponse<Model.SubAccount> = yield http.request(
         requestService,
         action.context,
         action.context.parentId,
@@ -322,7 +325,7 @@ export const createAuthenticatedTableTaskSet = <
         config.actions.handleEvent(
           {
             type: "modelsUpdated",
-            payload: map(response.data, (m: Model.SubAccount) => ({ model: m }))
+            payload: map(r.data, (m: Model.SubAccount) => ({ model: m }))
           },
           action.context
         )
@@ -353,7 +356,7 @@ export const createAuthenticatedTableTaskSet = <
                 ? api.bulkCreateAccountChildren
                 : api.bulkCreateSubAccountChildren;
             // If there is no table data, we want to default create two rows.
-            const response: Http.ServiceResponse<typeof bulkCreateService> = yield http.request(
+            const r: Http.ServiceResponse<typeof bulkCreateService> = yield http.request(
               bulkCreateService,
               action.context,
               action.context.parentId,
@@ -361,7 +364,7 @@ export const createAuthenticatedTableTaskSet = <
             );
             yield put(
               config.actions.response(
-                { models: response.children, groups: groups.data, markups: markups.data },
+                { models: r.children, groups: groups.data, markups: markups.data },
                 action.context
               )
             );
@@ -407,7 +410,10 @@ export const createAuthenticatedTableTaskSet = <
         e: Table.RowAddEvent<R>
       ) => [
         config.actions.updateBudgetInState({ id: r.budget.id, data: r.budget }, {}),
-        config.actions.updateParentInState({ id: r.parent.id, data: r.parent }, {}),
+        config.actions.updateParentInState(
+          { id: r.parent.id, data: r.parent },
+          { id: r.parent.id, domain: ctx.domain, budgetId: ctx.budgetId, public: ctx.public }
+        ),
         config.actions.handleEvent(
           {
             type: "placeholdersActivated",
@@ -429,14 +435,14 @@ export const createAuthenticatedTableTaskSet = <
     const service = ctx.parentType === "account" ? api.bulkUpdateAccountChildren : api.bulkUpdateSubAccountChildren;
     config.table.saving(true);
     try {
-      const response: Http.ServiceResponse<typeof service> = yield http.request(
-        service,
-        ctx,
-        ctx.parentId,
-        requestPayload
+      const r: Http.ServiceResponse<typeof service> = yield http.request(service, ctx, ctx.parentId, requestPayload);
+      yield put(config.actions.updateBudgetInState({ id: r.budget.id, data: r.budget as B }, {}));
+      yield put(
+        config.actions.updateParentInState(
+          { id: r.parent.id, data: r.parent as M },
+          { id: r.parent.id, domain: ctx.domain, budgetId: ctx.budgetId, public: ctx.public }
+        )
       );
-      yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget as B }, {}));
-      yield put(config.actions.updateParentInState({ id: response.parent.id, data: response.parent as M }, {}));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, {
         message: ctx.errorMessage || "There was an error updating the table rows.",
@@ -499,16 +505,21 @@ export const createAuthenticatedTableTaskSet = <
     /* Note: We have do these operations sequentially, since they will both
 			 update the Budget in state and we cannot risk running into race
 			 conditions. */
-    let response: Http.ServiceResponse<typeof service> | null = null;
+    let r: Http.ServiceResponse<typeof service> | null = null;
     if (ids.length !== 0) {
-      response = yield http.request(service, ctx, ctx.parentId, { ids });
+      r = yield http.request(service, ctx, ctx.parentId, { ids });
     }
     if (!isNil(markupIds) && markupIds.length !== 0) {
-      response = yield http.request(markupService, ctx, ctx.parentId, { ids: markupIds });
+      r = yield http.request(markupService, ctx, ctx.parentId, { ids: markupIds });
     }
-    if (!isNil(response)) {
-      yield put(config.actions.updateParentInState({ id: response.parent.id, data: response.parent as M }, {}));
-      yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget as B }, {}));
+    if (!isNil(r)) {
+      yield put(
+        config.actions.updateParentInState(
+          { id: r.parent.id, data: r.parent as M },
+          { id: r.parent.id, domain: ctx.domain, budgetId: ctx.budgetId, public: ctx.public }
+        )
+      );
+      yield put(config.actions.updateBudgetInState({ id: r.budget.id, data: r.budget as B }, {}));
     }
   }
 
@@ -553,7 +564,7 @@ export const createAuthenticatedTableTaskSet = <
     ctx: SubAccountsTableActionContext<B, M, false>
   ): SagaIterator {
     const service = ctx.parentType === "account" ? api.createAccountChild : api.createSubAccountChild;
-    const response: C = yield http.request(service, ctx, ctx.parentId, {
+    const r: C = yield http.request(service, ctx, ctx.parentId, {
       previous: e.payload.previous,
       group: isNil(e.payload.group) ? null : tabling.rows.groupId(e.payload.group),
       ...tabling.rows.postPayload<R, C, P>(e.payload.data, config.table.getColumns())
@@ -565,7 +576,7 @@ export const createAuthenticatedTableTaskSet = <
         {
           type: "modelsAdded",
           payload: {
-            model: response,
+            model: r,
             group: !isNil(e.payload.group) ? tabling.rows.groupId(e.payload.group) : null
           }
         },
@@ -578,7 +589,7 @@ export const createAuthenticatedTableTaskSet = <
     e: Table.RowPositionChangedEvent,
     ctx: SubAccountsTableActionContext<B, M, false>
   ): SagaIterator {
-    const response: C = yield http.request(api.updateSubAccount, ctx, e.payload.id, {
+    const r: C = yield http.request(api.updateSubAccount, ctx, e.payload.id, {
       previous: e.payload.previous,
       group: isNil(e.payload.newGroup) ? null : tabling.rows.groupId(e.payload.newGroup)
     });
@@ -589,7 +600,7 @@ export const createAuthenticatedTableTaskSet = <
         {
           type: "modelsUpdated",
           payload: {
-            model: response,
+            model: r,
             group: !isNil(e.payload.newGroup) ? tabling.rows.groupId(e.payload.newGroup) : null
           }
         },
@@ -661,9 +672,9 @@ export const createAuthenticatedTableTaskSet = <
 
   function* handleGroupAddEvent(e: Table.GroupAddEvent, ctx: SubAccountsTableActionContext<B, M, false>): SagaIterator {
     const service = ctx.parentType === "account" ? api.createAccountGroup : api.createSubAccountGroup;
-    const response: Model.Group = yield http.request(service, ctx, ctx.parentId, e.payload);
-    yield put(config.actions.handleEvent({ type: "modelsAdded", payload: response }, ctx));
-    e.onSuccess?.(response);
+    const r: Model.Group = yield http.request(service, ctx, ctx.parentId, e.payload);
+    yield put(config.actions.handleEvent({ type: "modelsAdded", payload: r }, ctx));
+    e.onSuccess?.(r);
   }
 
   function* handleMarkupAddEvent(
@@ -671,32 +682,37 @@ export const createAuthenticatedTableTaskSet = <
     ctx: SubAccountsTableActionContext<B, M, false>
   ): SagaIterator {
     const service = ctx.parentType === "account" ? api.createAccountMarkup : api.createSubAccountMarkup;
-    const response: Http.AncestryResponse<B, M, Model.Markup> = yield http.request(
-      service,
-      ctx,
-      ctx.parentId,
-      e.payload
+    const r: Http.AncestryResponse<B, M, Model.Markup> = yield http.request(service, ctx, ctx.parentId, e.payload);
+    yield put(config.actions.updateBudgetInState({ id: r.budget.id, data: r.budget }, {}));
+    yield put(
+      config.actions.updateParentInState(
+        { id: r.parent.id, data: r.parent },
+        { id: r.parent.id, domain: ctx.domain, budgetId: ctx.budgetId, public: ctx.public }
+      )
     );
-    yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }, {}));
-    yield put(config.actions.updateParentInState({ id: response.parent.id, data: response.parent }, {}));
-    yield put(config.actions.handleEvent({ type: "modelsAdded", payload: response.data }, ctx));
-    e.onSuccess?.(response);
+    yield put(config.actions.handleEvent({ type: "modelsAdded", payload: r.data }, ctx));
+    e.onSuccess?.(r);
   }
 
   function* handleMarkupUpdateEvent(
     e: Table.MarkupUpdateEvent,
     ctx: SubAccountsTableActionContext<B, M, false>
   ): SagaIterator {
-    const response: Http.AncestryResponse<B, M, Model.Markup> = yield http.request(
+    const r: Http.AncestryResponse<B, M, Model.Markup> = yield http.request(
       api.updateMarkup,
       ctx,
       e.payload.id,
       e.payload.data
     );
-    yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }, {}));
-    yield put(config.actions.updateParentInState({ id: response.parent.id, data: response.parent }, {}));
-    yield put(config.actions.handleEvent({ type: "modelsUpdated", payload: response.data }, ctx));
-    e.onSuccess?.(response);
+    yield put(config.actions.updateBudgetInState({ id: r.budget.id, data: r.budget }, {}));
+    yield put(
+      config.actions.updateParentInState(
+        { id: r.parent.id, data: r.parent },
+        { id: r.parent.id, domain: ctx.domain, budgetId: ctx.budgetId, public: ctx.public }
+      )
+    );
+    yield put(config.actions.handleEvent({ type: "modelsUpdated", payload: r.data }, ctx));
+    e.onSuccess?.(r);
   }
 
   return {

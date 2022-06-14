@@ -24,6 +24,12 @@ declare type AccountOrSubAccountContext<
   PUBLIC extends boolean = boolean
 > = WithBudgetContext<{ readonly id: M["id"] }, B, PUBLIC>;
 
+declare type AccountOrSubAccountActionContext<
+  B extends Model.Budget | Model.Template = Model.Budget | Model.Template,
+  M extends Model.Account | Model.SubAccount = Model.Account | Model.SubAccount,
+  PUBLIC extends boolean = boolean
+> = Redux.WithActionContext<AccountOrSubAccountContext<B, M, PUBLIC>>;
+
 declare type AccountContext<
   B extends Model.Budget | Model.Template = Model.Budget | Model.Template,
   PUBLIC extends boolean = boolean

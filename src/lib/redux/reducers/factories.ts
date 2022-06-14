@@ -279,6 +279,14 @@ export const createModelIndexedReducer =
   (state: Redux.ModelIndexedStore<S> | undefined = {}, a: A): Redux.ModelIndexedStore<S> => {
     if (isNil(config.includeAction) || config.includeAction(a) === true) {
       const id = config.getId(a);
+      /*
+			Even though this should not happen, and it is typed to not happen, it
+			has happened - and can lead to strange behavior without a clear
+			indication of what the root cause was. */
+      if (typeof id !== "number") {
+        console.error(`Invalid ID ${String(id)} received for indexed store reducer!`);
+        return state;
+      }
       if (isNil(state[id])) {
         state[id] = config.initialState;
       }
