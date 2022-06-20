@@ -32,12 +32,14 @@ const FringesCell = <
     selectors.selectFringes(state, props.tableContext)
   );
 
-  const applicableFringes: Tables.FringeRow[] = useMemo(() => {
-    return model.getModels(
-      filter(fringes, (r: Table.BodyRow<Tables.FringeRowData>) => tabling.rows.isModelRow(r)) as Tables.FringeRow[],
-      value
-    );
-  }, [hooks.useDeepEqualMemo(fringes), value]);
+  const applicableFringes: Tables.FringeRow[] = useMemo(
+    () =>
+      model.getModels(
+        filter(fringes, (r: Table.BodyRow<Tables.FringeRowData>) => tabling.rows.isModelRow(r)) as Tables.FringeRow[],
+        value
+      ),
+    [hooks.useDeepEqualMemo(fringes), value]
+  );
 
   return (
     <Cell<Tables.SubAccountRowData, Model.SubAccount, SubAccountsTableActionContext, Tables.SubAccountTableStore>

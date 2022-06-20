@@ -221,6 +221,8 @@ declare namespace Table {
   type ForwardEvent = BaseMetaEvent<"forward">;
   type ReverseEvent = BaseMetaEvent<"reverse">;
 
+  /* Events that are used internally to manage the table state, but are not
+     triggered as a direct result of a user interaction. */
   type ControlEvents<R extends RowData = RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly modelsUpdated: ModelsUpdatedEvent<M>;
     readonly updateRows: UpdateRowsEvent<R>;
@@ -228,6 +230,7 @@ declare namespace Table {
     readonly placeholdersActivated: PlaceholdersActivatedEvent<M>;
   };
 
+  // Events that are triggered as a direct result of a user interaction.
   type ChangeEvents<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = {
     readonly dataChange: DataChangeEvent<R, RW>;
     readonly rowAdd: RowAddEvent<R>;

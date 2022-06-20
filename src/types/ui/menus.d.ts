@@ -10,6 +10,7 @@ declare type MenuItemStateWithModel<
 };
 
 declare type MenuExtraItemClickEvent = {
+  readonly searchValue: string;
   readonly event: Table.CellDoneEditingEvent;
   readonly closeParentDropdown: (() => void) | undefined;
 };

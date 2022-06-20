@@ -130,19 +130,13 @@ export class ApiClient {
     if (method === HttpRequestMethods.GET || method === HttpRequestMethods.DELETE) {
       response = await lookup[method](url, { cancelToken: options.cancelToken, timeout: options.timeout, headers });
     } else {
-      const Payload = payload || {};
-      response = await lookup[method](url, apiUtil.filterPayload<typeof Payload>(Payload), {
+      const _payload = payload || {};
+      response = await lookup[method](url, apiUtil.filterPayload<typeof _payload>(_payload), {
         cancelToken: options.cancelToken,
         timeout: options.timeout,
         headers
       });
     }
-    /* We are getting sporadic errors where the response is not defined.  I am
-       not exactly sure why this is happening, but it could be related to request
-       cancellation.  For now, we will just allow the return value to be undefined
-       here and force coerce it, with the understanding that the value only seems
-       to be undefined in cases where we would not be accessing the response
-       data anyways (i.e. task cancellation). */
     return response.data;
   };
 

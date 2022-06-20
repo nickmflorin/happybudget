@@ -54,13 +54,15 @@ declare namespace Http {
   };
 
   type FringePayload = {
-    readonly name: string;
+    readonly name?: string;
     readonly description?: string | null;
     readonly cutoff?: number | null;
-    readonly rate: number;
+    readonly rate?: number;
     readonly unit?: Model.FringeUnit["id"];
     readonly color?: string | null;
     readonly previous?: number | null;
+    // Only allowed to be provided on POST requests to create a Fringe.
+    readonly subaccounts?: number[];
   };
 
   type MarkupPayload = {

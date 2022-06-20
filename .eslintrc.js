@@ -109,6 +109,10 @@ module.exports = {
         "@typescript-eslint/explicit-module-boundary-types": ["off"],
         "@typescript-eslint/explicit-function-return-type": ["off"],
         "@typescript-eslint/no-unsafe-assignment": ["off"],
+        /* Eventually, we want this to be an error - but we are getting way too
+           many false postives.  It most likely has something to do with the
+           order in which files are being loaded. */
+        "@typescript-eslint/no-unsafe-call": ["off"],
         /* It would be nice for this to be an error, but unfortunately AG Grid's
 			     type bindings are so terrible that it makes it difficult. */
         "@typescript-eslint/no-unsafe-member-access": ["off"]

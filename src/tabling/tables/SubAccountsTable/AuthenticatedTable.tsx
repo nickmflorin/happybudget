@@ -38,7 +38,7 @@ export type AuthenticatedTableProps<B extends Model.BaseBudget, P extends Model.
   OmitProps
 > & {
   readonly parent: P | null;
-  readonly onOpenFringesModal: () => void;
+  readonly onViewFringes: (params?: { name?: string; rowId: Table.ModelRowId }) => void;
 };
 
 const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount>(
@@ -105,9 +105,11 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
         },
         fringes: {
           cellEditor: "FringesEditor",
-          cellEditorParams: { onAddFringes: () => props.onOpenFringesModal() },
+          cellEditorParams: {
+            onNewFringe: (params: { name?: string; rowId: Table.ModelRowId }) => props.onViewFringes(params)
+          },
           processCellFromClipboard: processFringesCellFromClipboard,
-          headerComponentParams: { onEdit: () => props.onOpenFringesModal() },
+          headerComponentParams: { onEdit: () => props.onViewFringes() },
           processCellForClipboard: processFringesCellForClipboard
         },
         identifier: { headerName: props.tableContext.parentType === "account" ? "Account" : "Line" },
@@ -116,7 +118,7 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
         }
       }),
     [
-      props.onOpenFringesModal,
+      props.onViewFringes,
       props.tableContext.parentType,
       hooks.useDeepEqualMemo(props.columns),
       processUnitCellFromClipboard,

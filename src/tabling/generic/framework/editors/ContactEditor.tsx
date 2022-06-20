@@ -56,19 +56,24 @@ const ContactEditor = <
       extra={[
         {
           id: "add-contact",
-          onClick: () => {
+          onClick: (e: MenuExtraItemClickEvent) => {
             const row: Table.DataRow<R> = props.node.data;
             if (tabling.rows.isModelRow(row) && !isNil(props.column.field)) {
-              const searchValue = editor.menu.current.getSearchValue();
               editor.stopEditing(false);
-              if (searchValue !== "") {
+              if (e.searchValue !== "") {
                 props.onNewContact({
-                  name: searchValue,
+                  name: e.searchValue,
                   rowId: row.id
                 });
               } else {
                 props.onNewContact({ rowId: row.id });
               }
+            } else if (!tabling.rows.isModelRow(row)) {
+              console.error(`Got unexpected row type ${row.rowType} when selecting "Add Contact" from table dropdown!`);
+            } else {
+              console.error(
+                `Got unexpected column field ${props.column.field} when selecting "Add Contact" from table dropdown!`
+              );
             }
           },
           label: "Add Contact",

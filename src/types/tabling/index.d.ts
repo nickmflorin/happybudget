@@ -913,6 +913,10 @@ declare namespace Table {
     readonly getCSVData: (fields?: string[]) => CSVData;
   };
 
+  type LocallyTrackedChangesCb<R extends RowData> = (events: Table.ChangeEvent<R>[]) => void;
+
+  type TableInstanceAttachmentAction = () => void;
+
   type TableInstance<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = DataGridInstance &
     UINotificationsManager & {
       readonly saving: (v: boolean) => void;

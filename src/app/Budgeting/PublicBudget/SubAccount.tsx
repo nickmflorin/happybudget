@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { isNil } from "lodash";
 
@@ -6,6 +6,7 @@ import { budgeting, tabling } from "lib";
 import { connectTableToPublicStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
 
 import { BudgetPage } from "../Pages";
+import { useFringesModalControl } from "../hooks";
 import { actions, selectors, sagas } from "../store";
 import FringesModal from "./FringesModal";
 
@@ -42,10 +43,22 @@ interface SubAccountProps {
 }
 
 const SubAccount = (props: SubAccountProps): JSX.Element => {
-  const [fringesModalVisible, setFringesModalVisible] = useState(false);
-  const fringesTable = tabling.hooks.useTable<Tables.FringeRowData, Model.Fringe>();
   const dispatch = useDispatch();
   const table = tabling.hooks.useTable<R, M>();
+  const fringesTable = tabling.hooks.useTable<Tables.FringeRowData, Model.Fringe>();
+
+  const [fringesModalVisible, openFringesModal, closeFringesModal] = useFringesModalControl<
+    Model.Budget,
+    Model.SubAccount
+  >({
+    parentId: props.id,
+    budgetId: props.budgetId,
+    domain: "budget",
+    parentType: "subaccount",
+    public: true,
+    table: table.current
+  });
+
   const subaccount = useSelector((s: Application.Store) =>
     selectors.selectSubAccountDetail(s, {
       id: props.id,
@@ -95,7 +108,7 @@ const SubAccount = (props: SubAccountProps): JSX.Element => {
           domain: "budget",
           public: true
         }}
-        onOpenFringesModal={() => setFringesModalVisible(true)}
+        onViewFringes={() => openFringesModal()}
         table={table}
       />
       <FringesModal
@@ -103,7 +116,7 @@ const SubAccount = (props: SubAccountProps): JSX.Element => {
         table={fringesTable}
         open={fringesModalVisible}
         parentType={"subaccount"}
-        onCancel={() => setFringesModalVisible(false)}
+        onCancel={() => closeFringesModal()}
       />
     </BudgetPage>
   );

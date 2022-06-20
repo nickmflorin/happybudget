@@ -401,7 +401,7 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
           }
         } else {
           if (!isNil(item.extra.onClick)) {
-            item.extra.onClick({ event, closeParentDropdown: props.closeParentDropdown });
+            item.extra.onClick({ event, closeParentDropdown: props.closeParentDropdown, searchValue: search });
           }
         }
       }
@@ -554,40 +554,38 @@ const Menu = <S extends Record<string, unknown> = MenuItemSelectedState, M exten
                   />
                 );
               })}
-              {map(availableExtraItems, (item: GenericExtraItem, index: number) => {
-                return (
-                  <ExtraMenuItem
-                    key={index}
-                    menuId={menuId}
-                    model={item.extra}
-                    onClick={item.extra.onClick}
-                    focused={menuState.focusedIndex === index + availableModelItems.length}
-                  />
-                );
-              })}
+              {map(availableExtraItems, (item: GenericExtraItem, index: number) => (
+                <ExtraMenuItem
+                  key={index}
+                  menuId={menuId}
+                  model={item.extra}
+                  onClick={(e: Omit<MenuExtraItemClickEvent, "searchValue">) =>
+                    item.extra.onClick?.({ ...e, searchValue: search })
+                  }
+                  focused={menuState.focusedIndex === index + availableModelItems.length}
+                />
+              ))}
             </React.Fragment>
           </ul>
         </RenderWithSpinner>
       </div>
       {!isNil(props.buttons) && (
         <div className={"btn-container"}>
-          {map(props.buttons, (btn: IMenuButton<S, M>, index: number) => {
-            return (
-              <Button
-                key={index}
-                className={classNames("btn--menu", btn.className)}
-                style={btn.style}
-                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  btn.onClick?.({ event: e, menuState: getModelAttributedState(selected) });
-                  if (btn.keepDropdownOpenOnClick !== true) {
-                    props.closeParentDropdown?.();
-                  }
-                }}
-              >
-                {btn.label}
-              </Button>
-            );
-          })}
+          {map(props.buttons, (btn: IMenuButton<S, M>, index: number) => (
+            <Button
+              key={index}
+              className={classNames("btn--menu", btn.className)}
+              style={btn.style}
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                btn.onClick?.({ event: e, menuState: getModelAttributedState(selected) });
+                if (btn.keepDropdownOpenOnClick !== true) {
+                  props.closeParentDropdown?.();
+                }
+              }}
+            >
+              {btn.label}
+            </Button>
+          ))}
         </div>
       )}
     </div>

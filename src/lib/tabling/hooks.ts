@@ -41,6 +41,4 @@ export const InitialTableRef: Table.TableInstance<Table.RowData, Model.RowHttpMo
 
 export const useTable = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(): NonNullRef<
   Table.TableInstance<R, M>
-> => {
-  return useRef<Table.TableInstance<R, M>>(InitialTableRef as Table.TableInstance<R, M>);
-};
+> => useRef<Table.TableInstance<R, M>>(InitialTableRef as Table.TableInstance<R, M>);

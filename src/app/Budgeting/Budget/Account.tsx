@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { isNil } from "lodash";
 
@@ -6,6 +6,7 @@ import { tabling, budgeting } from "lib";
 import { connectTableToAuthenticatedStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
 
 import { BudgetPage } from "../Pages";
+import { useFringesModalControl } from "../hooks";
 import { actions, selectors, sagas } from "../store";
 import FringesModal from "./FringesModal";
 
@@ -43,15 +44,27 @@ interface AccountProps {
 }
 
 const Account = ({ setPreviewModalVisible, ...props }: AccountProps): JSX.Element => {
-  const [fringesModalVisible, setFringesModalVisible] = useState(false);
+  const dispatch = useDispatch();
+  const table = tabling.hooks.useTable<R, M>();
   const fringesTable = tabling.hooks.useTable<Tables.FringeRowData, Model.Fringe>();
 
-  const dispatch = useDispatch();
+  const [fringesModalVisible, openFringesModal, closeFringesModal] = useFringesModalControl<
+    Model.Budget,
+    Model.Account
+  >({
+    parentId: props.id,
+    budgetId: props.budgetId,
+    domain: "budget",
+    parentType: "account",
+    public: false,
+    table: table.current,
+    fringesTableEventAction: actions.budget.handleFringesTableEventAction,
+    tableEventAction: actions.budget.account.handleTableEventAction
+  });
 
   const account = useSelector((s: Application.Store) =>
     selectors.selectAccountDetail(s, { id: props.id, domain: "budget", public: false })
   );
-  const table = tabling.hooks.useTable<R, M>();
 
   useEffect(() => {
     dispatch(
@@ -95,7 +108,7 @@ const Account = ({ setPreviewModalVisible, ...props }: AccountProps): JSX.Elemen
           public: false
         }}
         onExportPdf={() => setPreviewModalVisible(true)}
-        onOpenFringesModal={() => setFringesModalVisible(true)}
+        onViewFringes={openFringesModal}
         table={table}
         onShared={(publicToken: Model.PublicToken) =>
           dispatch(
@@ -116,7 +129,7 @@ const Account = ({ setPreviewModalVisible, ...props }: AccountProps): JSX.Elemen
         table={fringesTable}
         open={fringesModalVisible}
         parentType={"account"}
-        onCancel={() => setFringesModalVisible(false)}
+        onCancel={() => closeFringesModal()}
       />
     </BudgetPage>
   );

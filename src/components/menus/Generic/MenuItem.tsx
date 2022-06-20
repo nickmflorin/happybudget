@@ -107,7 +107,8 @@ type ExtraMenuItemProps<S extends Record<string, unknown> = MenuItemSelectedStat
   "id"
 > &
   Omit<CommonMenuItemProps<S, ExtraMenuItemModel>, "onClick" | "isExtra" | "children"> & {
-    readonly onClick?: (e: MenuExtraItemClickEvent) => void;
+    // The searchValue is injected by the parent Menu component.
+    readonly onClick?: (e: Omit<MenuExtraItemClickEvent, "searchValue">) => void;
   };
 
 export const ExtraMenuItem = <S extends Record<string, unknown> = MenuItemSelectedState>(

@@ -27,7 +27,7 @@ export type PublicTableProps<B extends Model.BaseBudget, P extends Model.Account
 > & {
   readonly parent: P | null;
   readonly tokenId: string;
-  readonly onOpenFringesModal: () => void;
+  readonly onViewFringes: () => void;
 };
 
 const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount>(
@@ -46,7 +46,7 @@ const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model
     () =>
       tabling.columns.normalizeColumns(props.columns, {
         fringes: {
-          headerComponentParams: { onEdit: () => props.onOpenFringesModal() },
+          headerComponentParams: { onEdit: () => props.onViewFringes() },
           processCellForClipboard: processFringesCellForClipboard
         },
         identifier: { headerName: props.tableContext.parentType === "account" ? "Account" : "Line" },
@@ -55,7 +55,7 @@ const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model
         }
       }),
     [
-      props.onOpenFringesModal,
+      props.onViewFringes,
       props.tableContext.parentType,
       hooks.useDeepEqualMemo(props.columns),
       processFringesCellForClipboard

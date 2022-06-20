@@ -111,11 +111,12 @@ const AuthenticatedTable = <
   const grid = tabling.hooks.useDataGrid();
   const [savingVisible, setSavingVisible] = useState(false);
   const [saving, _setSaving] = useState(false);
-  /* After any changes finish saving, we display "Changes Saved" for a short
-     duration before hiding the component.  We need to keep track of the timeout
-     that is used to hide the component after the delay such that if additional
-     changes start saving before the timeout delay finishes, the original timeout
-     can be cancelled. */
+  /*
+	After any changes finish saving, we display "Changes Saved" for a short
+	duration before hiding the component.  We need to keep track of the timeout
+	that is used to hide the component after the delay such that if additional
+	changes start saving before the timeout delay finishes, the original timeout
+	can be cancelled. */
   const hideSavingChangesTimout = useRef<NodeJS.Timeout | null>(null);
   const [selectedRows, setSelectedRows] = useState<Table.EditableRow<R>[]>([]);
 
@@ -187,82 +188,103 @@ const AuthenticatedTable = <
   }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns, props.table.current]);
 
   /**
-   * Modified version of the onEvent callback passed into the Grid.  The
-   * modified version of the callback will first fire the original callback,
-   * but then inspect whether or not the column associated with any of the fields
-   * that were changed warrant refreshing another column.
+   * Modified version of the onEvent callback passed into the Grid.  This
+   * modified version will call the original `onEvent` callback, but will first
+   * perform some additional steps:
+   *
+   * (1) Checks if any of the Column(s) associated with any field(s) that were
+   *     changed have their own `onDataChange` callbacks, which are used to
+   *     perform additional logic in the case that the field associated with
+   *     that Column has changed.  If there are Column(s) associated with a
+   *     field that was changed that define `onDataChange`, it is called.
+   *
+   * (2) Checks if any of the Column(s) associated with any field(s) that were
+   *     changed define a `refreshColumns` callback, which is used to instruct
+   *     the table that certain other Column(s) should be refreshed when the
+   *     field associated with the Column defining `refreshColumns` has changed.
+   *     If there are Column(s) associated with a field that was changed that
+   *     define `refreshColumns`, it is called - and the Column(s) associated
+   *     with the fields it returns are refreshed in the table.
    */
   const _onEvent = useMemo(
     () => (event: Table.Event<R, M>) => {
       const apis: Table.GridApis | null = props.tableApis.get("data");
 
-      // TODO: We might have to also apply similiar logic for when a row is added?
-      if (tabling.events.isChangeEvent(event) && tabling.events.isDataChangeEvent(event)) {
-        const nodesToRefresh: Table.RowNode[] = [];
-        let columnsToRefresh: string[] = [];
+      if (tabling.events.isChangeEvent(event)) {
+        // TODO: Do we also apply similiar logic for when a row is added?
+        if (tabling.events.isDataChangeEvent(event)) {
+          const nodesToRefresh: Table.RowNode[] = [];
+          let columnsToRefresh: string[] = [];
 
-        const changes: Table.RowChange<R>[] = tabling.events.consolidateRowChanges(event.payload);
+          const changes: Table.RowChange<R>[] = tabling.events.consolidateRowChanges(event.payload);
 
-        forEach(changes, (rowChange: Table.RowChange<R>) => {
-          const node = apis?.grid.getRowNode(String(rowChange.id));
-          if (!isNil(node)) {
-            let hasColumnsToRefresh = false;
+          forEach(changes, (rowChange: Table.RowChange<R>) => {
+            const node = apis?.grid.getRowNode(String(rowChange.id));
+            if (!isNil(node)) {
+              let hasColumnsToRefresh = false;
 
-            let field: keyof Table.EditableRow<R>["data"];
-            for (field in rowChange.data) {
-              /* If the field in the RowChangeData is a parsedField, it does not
-                 correspond to an RealColumn, but a FakeColumn (since the field
-                 is not displayed, just used to derive the values of other
-                 columns).  In this case, we cannot apply the logic below. */
-              const parsedFields = reduce(
-                tabling.columns.filterBodyColumns(props.columns),
-                (curr: string[], c: Table.BodyColumn<R, M>) => [...curr, ...(c.parsedFields || [])],
-                []
-              );
-              if (!includes(parsedFields, field)) {
-                const change = util.getKeyValue<Table.RowChangeData<R>, keyof Table.EditableRow<R>["data"]>(field)(
-                  rowChange.data
-                ) as Table.CellChange;
-                const col: Table.Column<R, M> | null = tabling.columns.getColumn(props.columns, field);
-                if (!isNil(col) && tabling.columns.isBodyColumn<R, M>(col)) {
-                  /* Check if the cellChange is associated with a Column that has
-										 it's own change event handler. */
-                  if (tabling.rows.isModelRowId(rowChange.id)) {
-                    col.onDataChange?.(rowChange.id, change);
-                  }
-                  /* Check if the cellChange is associated with a Column that when
-										 changed, should refresh other columns. */
-                  if (!isNil(col.refreshColumns)) {
-                    const fieldsToRefresh = col.refreshColumns(change);
-                    if (!isNil(fieldsToRefresh) && (!Array.isArray(fieldsToRefresh) || fieldsToRefresh.length !== 0)) {
-                      hasColumnsToRefresh = true;
-                      columnsToRefresh = uniq([
-                        ...columnsToRefresh,
-                        ...(Array.isArray(fieldsToRefresh) ? fieldsToRefresh : [fieldsToRefresh])
-                      ]);
+              let field: keyof Table.EditableRow<R>["data"];
+              for (field in rowChange.data) {
+                /*
+								If the field in the RowChangeData is a parsedField, it does not
+								correspond to an RealColumn, but a FakeColumn (since the field
+								is not displayed, just used to derive the values of other
+								columns).  In this case, we cannot apply the logic below. */
+                const parsedFields = reduce(
+                  tabling.columns.filterBodyColumns(props.columns),
+                  (curr: string[], c: Table.BodyColumn<R, M>) => [...curr, ...(c.parsedFields || [])],
+                  []
+                );
+                if (!includes(parsedFields, field)) {
+                  const change = util.getKeyValue<Table.RowChangeData<R>, keyof Table.EditableRow<R>["data"]>(field)(
+                    rowChange.data
+                  ) as Table.CellChange;
+                  const col: Table.Column<R, M> | null = tabling.columns.getColumn(props.columns, field);
+                  if (!isNil(col) && tabling.columns.isBodyColumn<R, M>(col)) {
+                    /*
+										Check if the cellChange is associated with a Column that has
+										it's own change event handler. */
+                    if (tabling.rows.isModelRowId(rowChange.id)) {
+                      col.onDataChange?.(rowChange.id, change);
+                    }
+                    /*
+										Check if the cellChange is associated with a Column that when
+										changed, should refresh other columns. */
+                    if (!isNil(col.refreshColumns)) {
+                      const fieldsToRefresh = col.refreshColumns(change);
+                      if (
+                        !isNil(fieldsToRefresh) &&
+                        (!Array.isArray(fieldsToRefresh) || fieldsToRefresh.length !== 0)
+                      ) {
+                        hasColumnsToRefresh = true;
+                        columnsToRefresh = uniq([
+                          ...columnsToRefresh,
+                          ...(Array.isArray(fieldsToRefresh) ? fieldsToRefresh : [fieldsToRefresh])
+                        ]);
+                      }
                     }
                   }
                 }
               }
+              if (hasColumnsToRefresh === true) {
+                nodesToRefresh.push(node);
+              }
             }
-            if (hasColumnsToRefresh === true) {
-              nodesToRefresh.push(node);
-            }
-          }
-        });
-        if (columnsToRefresh.length !== 0) {
-          apis?.grid.refreshCells({
-            force: true,
-            rowNodes: nodesToRefresh,
-            columns: columnsToRefresh
           });
+          if (columnsToRefresh.length !== 0) {
+            apis?.grid.refreshCells({
+              force: true,
+              rowNodes: nodesToRefresh,
+              columns: columnsToRefresh
+            });
+          }
         }
       }
-
-      /* Wait until the end to trigger the onEvent.  The onEvent
-				 handler is synchronous, and if we execute before hand the callbacks
-				 will not be able to access the previous state of a given row because it
-				 will already have been changed. */
+      /*
+			Wait until the end to trigger the onEvent.  The onEvent handler is
+			synchronous, and if we execute before hand the callbacks will not be able
+			to access the previous state of a given row because it will already have
+			been changed. */
       props.onEvent(event);
     },
     [props.onEvent, hooks.useDeepEqualMemo(props.columns)]
@@ -271,16 +293,20 @@ const AuthenticatedTable = <
   const setSaving = useMemo(
     () => (value: boolean) => {
       if (value === true) {
-        /* Set the saving state to True before setting visibility to True so the
-           <SavingChanges> component first appears in the "Saving Changes" state
-           without a flash. */
+        /*
+				Set the saving state to True before setting visibility to True so the
+				<SavingChanges> component first appears in the "Saving Changes" state
+				without a flash.
+				*/
         _setSaving(true);
         setSavingVisible(true);
-        /* If changes start saving and there is already a timeout set that is
-           instructed to hide the <SavingChanges> component after a delay, we
-					 need to cancel it, since the new "Saving Changes" should be visible
-					 for the remainder of the saving time and the previously set timeout
-					 will hide it while changes are potentially still saving. */
+        /*
+				If changes start saving and there is already a timeout set that is
+				instructed to hide the <SavingChanges> component after a delay, we
+				need to cancel it, since the new "Saving Changes" should be visible
+				for the remainder of the saving time and the previously set timeout
+				will hide it while changes are potentially still saving.
+				*/
         if (!isNil(hideSavingChangesTimout.current)) {
           clearTimeout(hideSavingChangesTimout.current);
         }
@@ -335,71 +361,69 @@ const AuthenticatedTable = <
     [props.actions, props.tableApis, selectedRows.length]
   );
 
-  useImperativeHandle(props.table, () => {
-    return {
-      ...grid.current,
-      ...NotificationsHandler,
-      saving: (v: boolean) => {
-        setSaving(v);
-      },
-      changeColumnVisibility: props.changeColumnVisibility,
-      getColumns: () => tabling.columns.filterModelColumns(columns),
-      dispatchEvent: (event: SingleOrArray<Table.Event<R, M>>) =>
-        Array.isArray(event) ? map(event, (e: Table.Event<R, M>) => _onEvent(e)) : _onEvent(event),
-      getRowsAboveAndIncludingFocusedRow: () => {
-        const apis = props.tableApis.get("data");
-        if (!isNil(apis)) {
-          const position: Table.CellPosition | null = apis.grid.getFocusedCell();
-          if (!isNil(position)) {
-            const nodes: Table.RowNode[] = [];
-            let rowIndex = position.rowIndex;
-            let node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(rowIndex);
-            while (rowIndex >= 0 && node !== undefined) {
-              nodes.push(node);
-              rowIndex = rowIndex - 1;
-              if (rowIndex >= 0) {
-                node = apis.grid.getDisplayedRowAtIndex(rowIndex);
-              }
-            }
-            return map(nodes, (nd: Table.RowNode) => {
-              const row: Table.BodyRow<R> = nd.data;
-              return row;
-            });
-          }
-        }
-        return [];
-      },
-      getRows: () => {
-        const apis = props.tableApis.get("data");
-        if (!isNil(apis)) {
-          return tabling.aggrid.getRows(apis.grid);
-        }
-        return [];
-      },
-      getRow: (id: Table.BodyRowId) => {
-        const apis = props.tableApis.get("data");
-        if (!isNil(apis)) {
-          const node: Table.RowNode | undefined = apis.grid.getRowNode(String(id));
-          return !isNil(node) ? (node.data as Table.BodyRow<R>) : null;
-        }
-        return null;
-      },
-      getFocusedRow: () => {
-        const apis = props.tableApis.get("data");
-        if (!isNil(apis)) {
-          const position: Table.CellPosition | null = apis.grid.getFocusedCell();
-          if (!isNil(position)) {
-            const node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(position.rowIndex);
-            if (!isNil(node)) {
-              const row: Table.BodyRow<R> = node.data;
-              return row;
+  useImperativeHandle(props.table, () => ({
+    ...grid.current,
+    ...NotificationsHandler,
+    saving: (v: boolean) => {
+      setSaving(v);
+    },
+    changeColumnVisibility: props.changeColumnVisibility,
+    getColumns: () => tabling.columns.filterModelColumns(columns),
+    dispatchEvent: (event: SingleOrArray<Table.Event<R, M>>) =>
+      Array.isArray(event) ? map(event, (e: Table.Event<R, M>) => _onEvent(e)) : _onEvent(event),
+    getRowsAboveAndIncludingFocusedRow: () => {
+      const apis = props.tableApis.get("data");
+      if (!isNil(apis)) {
+        const position: Table.CellPosition | null = apis.grid.getFocusedCell();
+        if (!isNil(position)) {
+          const nodes: Table.RowNode[] = [];
+          let rowIndex = position.rowIndex;
+          let node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(rowIndex);
+          while (rowIndex >= 0 && node !== undefined) {
+            nodes.push(node);
+            rowIndex = rowIndex - 1;
+            if (rowIndex >= 0) {
+              node = apis.grid.getDisplayedRowAtIndex(rowIndex);
             }
           }
+          return map(nodes, (nd: Table.RowNode) => {
+            const row: Table.BodyRow<R> = nd.data;
+            return row;
+          });
         }
-        return null;
       }
-    };
-  });
+      return [];
+    },
+    getRows: () => {
+      const apis = props.tableApis.get("data");
+      if (!isNil(apis)) {
+        return tabling.aggrid.getRows(apis.grid);
+      }
+      return [];
+    },
+    getRow: (id: Table.BodyRowId) => {
+      const apis = props.tableApis.get("data");
+      if (!isNil(apis)) {
+        const node: Table.RowNode | undefined = apis.grid.getRowNode(String(id));
+        return !isNil(node) ? (node.data as Table.BodyRow<R>) : null;
+      }
+      return null;
+    },
+    getFocusedRow: () => {
+      const apis = props.tableApis.get("data");
+      if (!isNil(apis)) {
+        const position: Table.CellPosition | null = apis.grid.getFocusedCell();
+        if (!isNil(position)) {
+          const node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(position.rowIndex);
+          if (!isNil(node)) {
+            const row: Table.BodyRow<R> = node.data;
+            return row;
+          }
+        }
+      }
+      return null;
+    }
+  }));
 
   const addNewRow = hooks.useDynamicCallback(() => {
     const dataGridApi = props.tableApis.get("data");

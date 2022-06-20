@@ -16,7 +16,7 @@ export interface FringesEditorProps<B extends Model.Budget | Model.Template, P e
     SubAccountsTableContext<B, P, false>,
     Tables.SubAccountTableStore
   > {
-  readonly onAddFringes: () => void;
+  readonly onNewFringe: (params: { name?: string; rowId: Table.ModelRowId }) => void;
   readonly colId: keyof Tables.SubAccountRowData;
 }
 
@@ -75,7 +75,26 @@ const FringesEditor = <B extends Model.Budget | Model.Template, P extends Model.
       extra={[
         {
           id: "add-fringes",
-          onClick: () => props.onAddFringes(),
+          onClick: (e: MenuExtraItemClickEvent) => {
+            const row: Table.DataRow<Tables.SubAccountRowData> = props.node.data;
+            if (tabling.rows.isModelRow(row) && !isNil(props.column.field)) {
+              editor.stopEditing(false);
+              if (e.searchValue !== "") {
+                props.onNewFringe({
+                  name: e.searchValue,
+                  rowId: row.id
+                });
+              } else {
+                props.onNewFringe({ rowId: row.id });
+              }
+            } else if (!tabling.rows.isModelRow(row)) {
+              console.error(`Got unexpected row type ${row.rowType} when selecting "Add Fringe" from table dropdown!`);
+            } else {
+              console.error(
+                `Got unexpected column field ${props.column.field} when selecting "Add Fringe" from table dropdown!`
+              );
+            }
+          },
           label: "Add Fringes",
           icon: <Icon icon={"plus-circle"} weight={"solid"} green={true} />,
           showOnNoSearchResults: true,

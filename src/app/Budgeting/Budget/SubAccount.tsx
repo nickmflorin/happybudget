@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { isNil } from "lodash";
 
@@ -7,6 +7,7 @@ import { tabling, budgeting } from "lib";
 import { connectTableToAuthenticatedStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
 
 import { BudgetPage } from "../Pages";
+import { useFringesModalControl } from "../hooks";
 import { actions, selectors, sagas } from "../store";
 import FringesModal from "./FringesModal";
 
@@ -44,10 +45,24 @@ interface SubAccountProps {
 }
 
 const SubAccount = ({ setPreviewModalVisible, ...props }: SubAccountProps): JSX.Element => {
-  const [fringesModalVisible, setFringesModalVisible] = useState(false);
-  const fringesTable = tabling.hooks.useTable<Tables.FringeRowData, Model.Fringe>();
   const dispatch = useDispatch();
   const table = tabling.hooks.useTable<R, M>();
+  const fringesTable = tabling.hooks.useTable<Tables.FringeRowData, Model.Fringe>();
+
+  const [fringesModalVisible, openFringesModal, closeFringesModal] = useFringesModalControl<
+    Model.Budget,
+    Model.SubAccount
+  >({
+    parentId: props.id,
+    budgetId: props.budgetId,
+    domain: "budget",
+    parentType: "subaccount",
+    public: false,
+    table: table.current,
+    tableEventAction: actions.budget.subAccount.handleTableEventAction,
+    fringesTableEventAction: actions.budget.handleFringesTableEventAction
+  });
+
   const subaccount = useSelector((s: Application.Store) =>
     selectors.selectSubAccountDetail(s, {
       id: props.id,
@@ -98,7 +113,7 @@ const SubAccount = ({ setPreviewModalVisible, ...props }: SubAccountProps): JSX.
           public: false
         }}
         onExportPdf={() => setPreviewModalVisible(true)}
-        onOpenFringesModal={() => setFringesModalVisible(true)}
+        onViewFringes={openFringesModal}
         table={table}
         onShared={(publicToken: Model.PublicToken) =>
           dispatch(
@@ -119,7 +134,7 @@ const SubAccount = ({ setPreviewModalVisible, ...props }: SubAccountProps): JSX.
         table={fringesTable}
         open={fringesModalVisible}
         parentType={"subaccount"}
-        onCancel={() => setFringesModalVisible(false)}
+        onCancel={() => closeFringesModal()}
       />
     </BudgetPage>
   );
