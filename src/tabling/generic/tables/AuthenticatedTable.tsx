@@ -210,74 +210,69 @@ const AuthenticatedTable = <
     () => (event: Table.Event<R, M>) => {
       const apis: Table.GridApis | null = props.tableApis.get("data");
 
-      if (tabling.events.isChangeEvent(event)) {
-        // TODO: Do we also apply similiar logic for when a row is added?
-        if (tabling.events.isDataChangeEvent(event)) {
-          const nodesToRefresh: Table.RowNode[] = [];
-          let columnsToRefresh: string[] = [];
+      // TODO: Do we also apply similiar logic for when a row is added?
+      if (tabling.events.isChangeEvent(event) && tabling.events.isDataChangeEvent(event)) {
+        const nodesToRefresh: Table.RowNode[] = [];
+        let columnsToRefresh: string[] = [];
 
-          const changes: Table.RowChange<R>[] = tabling.events.consolidateRowChanges(event.payload);
+        const changes: Table.RowChange<R>[] = tabling.events.consolidateRowChanges(event.payload);
 
-          forEach(changes, (rowChange: Table.RowChange<R>) => {
-            const node = apis?.grid.getRowNode(String(rowChange.id));
-            if (!isNil(node)) {
-              let hasColumnsToRefresh = false;
+        forEach(changes, (rowChange: Table.RowChange<R>) => {
+          const node = apis?.grid.getRowNode(String(rowChange.id));
+          if (!isNil(node)) {
+            let hasColumnsToRefresh = false;
 
-              let field: keyof Table.EditableRow<R>["data"];
-              for (field in rowChange.data) {
-                /*
-								If the field in the RowChangeData is a parsedField, it does not
-								correspond to an RealColumn, but a FakeColumn (since the field
-								is not displayed, just used to derive the values of other
-								columns).  In this case, we cannot apply the logic below. */
-                const parsedFields = reduce(
-                  tabling.columns.filterBodyColumns(props.columns),
-                  (curr: string[], c: Table.BodyColumn<R, M>) => [...curr, ...(c.parsedFields || [])],
-                  []
-                );
-                if (!includes(parsedFields, field)) {
-                  const change = util.getKeyValue<Table.RowChangeData<R>, keyof Table.EditableRow<R>["data"]>(field)(
-                    rowChange.data
-                  ) as Table.CellChange;
-                  const col: Table.Column<R, M> | null = tabling.columns.getColumn(props.columns, field);
-                  if (!isNil(col) && tabling.columns.isBodyColumn<R, M>(col)) {
-                    /*
+            let field: keyof Table.EditableRow<R>["data"];
+            for (field in rowChange.data) {
+              /*
+							If the field in the RowChangeData is a parsedField, it does not
+							correspond to an RealColumn, but a FakeColumn (since the field
+							is not displayed, just used to derive the values of other
+							columns).  In this case, we cannot apply the logic below. */
+              const parsedFields = reduce(
+                tabling.columns.filterBodyColumns(props.columns),
+                (curr: string[], c: Table.BodyColumn<R, M>) => [...curr, ...(c.parsedFields || [])],
+                []
+              );
+              if (!includes(parsedFields, field)) {
+                const change = util.getKeyValue<Table.RowChangeData<R>, keyof Table.EditableRow<R>["data"]>(field)(
+                  rowChange.data
+                ) as Table.CellChange;
+                const col: Table.Column<R, M> | null = tabling.columns.getColumn(props.columns, field);
+                if (!isNil(col) && tabling.columns.isBodyColumn<R, M>(col)) {
+                  /*
 										Check if the cellChange is associated with a Column that has
 										it's own change event handler. */
-                    if (tabling.rows.isModelRowId(rowChange.id)) {
-                      col.onDataChange?.(rowChange.id, change);
-                    }
-                    /*
+                  if (tabling.rows.isModelRowId(rowChange.id)) {
+                    col.onDataChange?.(rowChange.id, change);
+                  }
+                  /*
 										Check if the cellChange is associated with a Column that when
 										changed, should refresh other columns. */
-                    if (!isNil(col.refreshColumns)) {
-                      const fieldsToRefresh = col.refreshColumns(change);
-                      if (
-                        !isNil(fieldsToRefresh) &&
-                        (!Array.isArray(fieldsToRefresh) || fieldsToRefresh.length !== 0)
-                      ) {
-                        hasColumnsToRefresh = true;
-                        columnsToRefresh = uniq([
-                          ...columnsToRefresh,
-                          ...(Array.isArray(fieldsToRefresh) ? fieldsToRefresh : [fieldsToRefresh])
-                        ]);
-                      }
+                  if (!isNil(col.refreshColumns)) {
+                    const fieldsToRefresh = col.refreshColumns(change);
+                    if (!isNil(fieldsToRefresh) && (!Array.isArray(fieldsToRefresh) || fieldsToRefresh.length !== 0)) {
+                      hasColumnsToRefresh = true;
+                      columnsToRefresh = uniq([
+                        ...columnsToRefresh,
+                        ...(Array.isArray(fieldsToRefresh) ? fieldsToRefresh : [fieldsToRefresh])
+                      ]);
                     }
                   }
                 }
               }
-              if (hasColumnsToRefresh === true) {
-                nodesToRefresh.push(node);
-              }
             }
-          });
-          if (columnsToRefresh.length !== 0) {
-            apis?.grid.refreshCells({
-              force: true,
-              rowNodes: nodesToRefresh,
-              columns: columnsToRefresh
-            });
+            if (hasColumnsToRefresh === true) {
+              nodesToRefresh.push(node);
+            }
           }
+        });
+        if (columnsToRefresh.length !== 0) {
+          apis?.grid.refreshCells({
+            force: true,
+            rowNodes: nodesToRefresh,
+            columns: columnsToRefresh
+          });
         }
       }
       /*
