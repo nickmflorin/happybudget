@@ -27,9 +27,11 @@ const configureStore = (c: Omit<Application.StoreConfig, "modules">): Redux.Stor
   const applicationReducer = createApplicationReducer({ ...c, modules: ModuleConfig });
   const applicationSaga = createApplicationSaga({ ...c, modules: ModuleConfig });
 
-  /* Create the redux-saga middleware that allows the sagas to run as side-effects
-     in the application.  If in a production environment, instruct the middleware
-     to funnel errors through to Sentry. */
+  /*
+	Create the redux-saga middleware that allows the sagas to run as side-effects
+	in the application.  If in a production environment, instruct the middleware
+	to funnel errors through to Sentry.
+	*/
   let sagaMiddlewareOptions: SagaMiddlewareOptions = {};
   if (config.env.environmentIsRemote()) {
     sagaMiddlewareOptions = { ...sagaMiddlewareOptions, onError: (error: Error) => Sentry.captureException(error) };
@@ -38,7 +40,7 @@ const configureStore = (c: Omit<Application.StoreConfig, "modules">): Redux.Stor
 
   let baseMiddleware: MD[] = [publicActionMiddleware, userActionMiddleware, sagaMiddleware];
   baseMiddleware = config.env.environmentIsLocal()
-    ? /* eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-call */
+    ? /* eslint-disable-next-line @typescript-eslint/no-var-requires */
       [require("redux-immutable-state-invariant").default(), ...baseMiddleware]
     : baseMiddleware;
 
@@ -58,9 +60,11 @@ const configureStore = (c: Omit<Application.StoreConfig, "modules">): Redux.Stor
     never
   >(applicationReducer, initialState as PreloadedState<Application.Store>, enhancers);
 
-  /* Start the application saga and establish the saga injector.  We must do this
-     after we create the store, because the SagaMiddleware must be mounted to
-     run the root saga. */
+  /*
+	Start the application saga and establish the saga injector.  We must do this
+	after we create the store, because the SagaMiddleware must be mounted to
+	run the root saga.
+	*/
   const [injectSaga, ejectSaga, hasSaga] = createSagaManager(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (saga: any, ...args: Parameters<any>) => sagaMiddleware.run(saga, ...args),
