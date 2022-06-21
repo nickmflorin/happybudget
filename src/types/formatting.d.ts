@@ -15,10 +15,17 @@ declare type NativeFormatter<P extends string | number | import("moment").Moment
   onError?: OnFormatError
 ) => string;
 
-declare type FormatterOpts<T extends string | number | Moment = string | number> = {
-  readonly errorValue?: string;
-  readonly onError?: OnFormatError<T>;
+declare type FormatterCalbackOpts<T extends string | number | Moment = string | number> = {
+  readonly onError: OnFormatError<T>;
 };
+
+declare type FormatterErrorValueOpts = {
+  readonly errorValue: string;
+};
+
+declare type FormatterOpts<T extends string | number | Moment = string | number> =
+  | FormatterCalbackOpts<T>
+  | FormatterErrorValueOpts;
 
 declare type FormatterParams<T extends string | number | import("moment").Moment = string | number> =
   | AGFormatterParams

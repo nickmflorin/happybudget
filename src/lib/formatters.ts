@@ -1,57 +1,49 @@
 import { Moment } from "moment";
 import { toDisplayDate } from "./util/dates";
 
-type Fmt<T extends string | number | Moment = string | number, O extends FormatterOpts<T> = FormatterOpts<T>> = (
-  v: T,
-  opts: O
-) => string;
+type Fmt<T extends string | number | Moment = string | number> = (v: T, opts: FormatterOpts<T>) => string;
 
-type PARAMS<T extends string | number | Moment = string | number, O extends FormatterOpts<T> = FormatterOpts<T>> =
+type PARAMS<T extends string | number | Moment = string | number> =
   | FormatterParams<T>
-  | O
+  | FormatterOpts<T>
   | OnFormatError<T>;
 
 type RT<
   T extends string | number | Moment = string | number,
-  O extends FormatterOpts<T> = FormatterOpts<T>,
-  P extends PARAMS<T, O> = PARAMS<T, O>
+  P extends PARAMS<T> = PARAMS<T>
 > = P extends FormatterParams<T> ? string : Formatter<T>;
 
-const isNotFormatterParams = <
-  T extends string | number | Moment = string | number,
-  O extends FormatterOpts<T> = FormatterOpts<T>
->(
-  p: PARAMS<T, O>
-): p is FormatterParams<T> =>
-  typeof p === "function" || (typeof p === "object" && Object.prototype.hasOwnProperty.call(p, "value"));
+const isFormatterCallbackOpts = <T extends string | number | Moment = string | number>(
+  p: PARAMS<T>
+): p is FormatterCalbackOpts<T> => p !== null && (p as FormatterCalbackOpts<T>).onError !== undefined;
 
-const isFormatterParams = <
-  T extends string | number | Moment = string | number,
-  O extends FormatterOpts<T> = FormatterOpts<T>
->(
-  p: PARAMS<T, O>
-): p is FormatterParams<T> => !isNotFormatterParams(p);
+const isFormatterErrorValueOpts = <T extends string | number | Moment = string | number>(
+  p: PARAMS<T>
+): p is FormatterErrorValueOpts => p !== null && (p as FormatterErrorValueOpts).errorValue !== undefined;
 
-const isErrorHandler = <
-  T extends string | number | Moment = string | number,
-  O extends FormatterOpts<T> = FormatterOpts<T>
->(
-  p: PARAMS<T, O>
-): p is OnFormatError<T> => typeof p === "function";
+const isFormatterOpts = <T extends string | number | Moment = string | number>(p: PARAMS<T>): p is FormatterOpts<T> =>
+  isFormatterCallbackOpts(p) || isFormatterErrorValueOpts(p);
+
+const isFormatterParams = <T extends string | number | Moment = string | number>(
+  p: PARAMS<T>
+): p is FormatterParams<T> => typeof p !== "function" && !isFormatterOpts(p);
+
+const isErrorHandler = <T extends string | number | Moment = string | number>(p: PARAMS<T>): p is OnFormatError<T> =>
+  typeof p === "function";
 
 export const isAgFormatterParams = <T extends string | number | Moment = string | number>(
   params: NativeFormatterParams<T> | AGFormatterParams
-): params is AGFormatterParams => typeof params === "object";
+): params is AGFormatterParams => params !== null && typeof params === "object";
 
 const formatAs = <
   T extends string | number | Moment = string | number,
   O extends FormatterOpts<T> = FormatterOpts<T>,
-  P extends PARAMS<T, O> = PARAMS<T, O>
+  P extends PARAMS<T> = PARAMS<T>
 >(
-  fmt: Fmt<T, O>,
+  fmt: Fmt<T>,
   fmtType: FormatType,
   p: P
-): RT<T, O, P> => {
+): RT<T, P> => {
   const valuedFormatter = (params: FormatterParams<T>, options: O): string => {
     const v: T | null = isAgFormatterParams(params) ? params.value : params;
     if (v === null || (typeof v === "string" && v.trim() === "")) {
@@ -63,22 +55,25 @@ const formatAs = <
   if (isFormatterParams(p)) {
     return valuedFormatter(p, {
       onError: (v: T) => console.error(`Could not parse value ${String(v)} into ${fmtType}!`)
-    } as O) as RT<T, O, P>;
+    } as O) as RT<T, P>;
   } else if (isErrorHandler(p)) {
     const opts = { onError: p } as O;
-    return ((params: FormatterParams<T>) => valuedFormatter(params, opts)) as RT<T, O, P>;
+    return ((params: FormatterParams<T>) => valuedFormatter(params, opts)) as RT<T, P>;
   } else {
-    return ((params: FormatterParams<T>) => valuedFormatter(params, p as unknown as O)) as RT<T, O, P>;
+    return ((params: FormatterParams<T>) => valuedFormatter(params, p as unknown as O)) as RT<T, P>;
   }
 };
 
-export const currencyFormatter = <P extends PARAMS<string | number, FormatterOpts<string | number>>>(params: P) =>
+export const currencyFormatter = <P extends PARAMS<string | number>>(params: P) =>
   formatAs<string | number, FormatterOpts, P>(
     (v: string | number, opts: FormatterOpts) => {
       const numericValue = parseFloat(String(v));
       if (isNaN(numericValue)) {
-        opts.onError?.(v);
-        return opts.errorValue || "";
+        if (isFormatterCallbackOpts(opts)) {
+          opts.onError(v);
+          return "";
+        }
+        return opts.errorValue;
       }
       return numericValue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
     },
@@ -86,13 +81,16 @@ export const currencyFormatter = <P extends PARAMS<string | number, FormatterOpt
     params
   );
 
-export const percentageFormatter = <P extends PARAMS<string | number, FormatterOpts>>(params: P) =>
+export const percentageFormatter = <P extends PARAMS<string | number>>(params: P) =>
   formatAs<string | number, FormatterOpts, P>(
     (v: string | number, opts: FormatterOpts) => {
       const numericValue = parseFloat(String(v));
       if (isNaN(numericValue)) {
-        opts.onError?.(v);
-        return opts.errorValue || "";
+        if (isFormatterCallbackOpts(opts)) {
+          opts.onError(v);
+          return "";
+        }
+        return opts.errorValue;
       }
       return Number(v).toLocaleString(undefined, { style: "percent", minimumFractionDigits: 2 });
     },
@@ -100,7 +98,7 @@ export const percentageFormatter = <P extends PARAMS<string | number, FormatterO
     params
   );
 
-export const phoneNumberFormatter = <P extends PARAMS<string | number, FormatterOpts>>(params: P) =>
+export const phoneNumberFormatter = <P extends PARAMS<string | number>>(params: P) =>
   formatAs<string | number, FormatterOpts, P>(
     (v: string | number) => {
       const numeric = String(v).replace(/\D/g, "");
@@ -138,13 +136,16 @@ export const phoneNumberFormatter = <P extends PARAMS<string | number, Formatter
     params
   );
 
-export const dateFormatter = <P extends PARAMS<string | Moment, FormatterOpts<string | Moment>>>(params: P) =>
+export const dateFormatter = <P extends PARAMS<string | Moment>>(params: P) =>
   formatAs<string | Moment, FormatterOpts<string | Moment>, P>(
     (v: string | Moment, opts: FormatterOpts<string | Moment>) => {
       const formatted = toDisplayDate(v);
       if (formatted === undefined) {
-        opts.onError?.(v);
-        return opts.errorValue || "";
+        if (isFormatterCallbackOpts(opts)) {
+          opts.onError(v);
+          return "";
+        }
+        return opts.errorValue;
       }
       return formatted;
     },
@@ -152,7 +153,7 @@ export const dateFormatter = <P extends PARAMS<string | Moment, FormatterOpts<st
     params
   );
 
-export const titleCaseFormatter = <P extends PARAMS<string, FormatterOpts<string>>>(params: P) =>
+export const titleCaseFormatter = <P extends PARAMS<string>>(params: P) =>
   formatAs<string, FormatterOpts<string>, P>(
     (v: string) =>
       v.replace(/\w\S*/g, function (txt) {
