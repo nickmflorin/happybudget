@@ -6,6 +6,7 @@
 
 - yarn
 - nvm
+- node v17.0.0
 
 ## Getting Started
 
@@ -20,6 +21,8 @@ $ git clone https://github.com/nickmflorin/happybudget.git
 ### Step 2: Environment
 
 #### Node
+
+[Node](https://nodejs.org/en/) is the engine that supports the application.
 
 ##### NVM
 
