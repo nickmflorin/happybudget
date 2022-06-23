@@ -19,34 +19,68 @@ $ git clone https://github.com/nickmflorin/happybudget.git
 
 ### Step 2: Environment
 
-#### Node Version
+#### Node
 
-Install [`nvm`](https://github.com/nvm-sh/nvm) first. This will
-allow you to manage your Node version on a project basis.
+##### NVM
+
+We use [`nvm`](https://github.com/nvm-sh/nvm) to manage [Node](https://nodejs.org/en/) versions.  It allows us to isolate
+the version of [Node](https://nodejs.org/en/) being used to the project directory, avoiding conflicts with globally
+installed versions of [Node](https://nodejs.org/en/).
+
+To install [`nvm`](https://github.com/nvm-sh/nvm), simply run the following command:
 
 ```bash
 $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
 ```
 
-Use `nvm` to establish the version of Node that you will use with this project.
-The version should be 17.0.0.
+This command will automatically add the following to your `~/.zshrc`:
+
+```bash
+$ export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+```
+
+In order for the changes to the `~/.zshrc` to take effect, we need to source it:
+
+```bash
+$ . ~/.zshrc`
+```
+
+Now, when we run `nvm` in the terminal, the system should recognize the command.
+
+##### Node Version
+
+We now need to establish the version of [Node](https://nodejs.org/en/), 17.0.0, that will be used for this
+project.  To do this, simply install the version of [Node](https://nodejs.org/en/) locally to this project
+using [`nvm`](https://github.com/nvm-sh/nvm):
 
 ```bash
 $ nvm install 17.0.0
+```
+
+Then, tell [`nvm`](https://github.com/nvm-sh/nvm) this is the version we want to use:
+
+```bash
 $ nvm use 17.0.0
 ```
 
-Confirm that `nvm` is pointing at the correct Node version:
+Confirm that [`nvm`](https://github.com/nvm-sh/nvm) is pointing at the correct [Node](https://nodejs.org/en/) version
+before proceeding:
 
 ```bash
 $ nvm current
-$ v10.12.0
+$ v17.0.0
 ```
 
-Next, we need to install `yarn`:
+##### Yarn
+
+Now that v17.0.0 of [Node](https://nodejs.org/en/) is installed, we should have access to [npm](https://www.npmjs.com/),
+as [Node](https://nodejs.org/en/) comes equipped with it.  We will use [npm](https://www.npmjs.com/) to install
+[yarn](https://yarnpkg.com/), which we will use to manage dependencies in this project:
 
 ```bash
-npm install --global yarn
+$ npm install --global yarn
 ```
 
 #### Dependencies
