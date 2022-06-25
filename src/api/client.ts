@@ -100,7 +100,7 @@ export class ApiClient {
    * @param payload    The JSON body of the request.
    * @param options    The options for the request (see Http.RequestOptions).
    */
-  request = async <T>(
+  _request = async <T>(
     method:
       | HttpRequestMethods.POST
       | HttpRequestMethods.GET
@@ -140,60 +140,78 @@ export class ApiClient {
     return response.data;
   };
 
-  /**
-   * Submits a GET request to the provided URL.
+	/**
+   * Submits a GET request to the provided path.
    *
-   * @param url     The URL to send the POST request.
-   * @param query   The query parameters to embed in the URL.
-   * @param options The options for the request (see IRequestOptions).
+   * @param path     The path to send the GET request.
+   * @param query    The query parameters to embed in the URL.
+   * @param options  The options for the request.
    */
-  get = async <T>(url: Http.V1Url, query?: Http.ListQuery, options?: Http.RequestOptions): Promise<T> => {
-    return this.request<T>(HttpRequestMethods.GET, url, query, {}, options);
+	 get = async <T>(path: Http.V1Url, query?: Http.Query, options?: Http.RequestOptions): Promise<T> => {
+    return this._request<T>(HttpRequestMethods.GET, path, query, {}, options);
   };
 
   /**
-   * Submits a GET request to the provided URL to retrieve a specific resource
+   * Submits a GET request to the provided path to retrieve a specific resource
    * at it's detail endpoint.
    *
-   * @param url     The URL to send the POST request.
-   * @param options The options for the request (see IRequestOptions).
+   * @param path     The path to send the GET request.
+   * @param options  The options for the request.
    */
-  retrieve = async <T extends Model.HttpModel>(url: Http.V1Url, options?: Http.RequestOptions): Promise<T> => {
-    return this.request<Http.DetailResponse<T>>(HttpRequestMethods.GET, url, {}, {}, options);
+  retrieve = async <T>(path: Http.V1Url, options?: Http.RequestOptions): Promise<T> => {
+    return this._request<T>(HttpRequestMethods.GET, path, {}, {}, options);
   };
 
   /**
-   * Submits a GET request to the provided URL to retrieve a a list of resources
+   * Submits a GET request to the provided path to retrieve a a list of resources
    * from it's non-detail endpoint.
    *
-   * @param url     The URL to send the POST request.
-   * @param query   The query parameters to embed in the URL.
-   * @param options The options for the request (see IRequestOptions).
+   * @param path     The path to send the GET request.
+   * @param query    The query parameters to embed in the URL.
+   * @param options  The options for the request.
    */
-  list = async <T>(
-    url: Http.V1Url,
-    query?: Http.ListQuery,
-    options?: Http.RequestOptions
-  ): Promise<Http.ListResponse<T>> => {
-    return this.request<Http.RawListResponse<T>>(HttpRequestMethods.GET, url, query, {}, options).then(
-      // Include the query used to make the request in the response.
-      (rsp: Http.RawListResponse<T>) => ({ data: rsp.data, count: rsp.count, query: query || {} })
-    );
+  list = async <T>(path: Http.V1Url, query?: Http.Query, options?: Http.RequestOptions): Promise<Http.ListResponse<T>> => {
+    return this._request<Http.ListResponse<T>>(HttpRequestMethods.GET, path, query, {}, options);
   };
 
   /**
-   * Sends a POST request to the provided URL.
+   * Sends a POST request to the provided path.
    *
-   * @param url        The URL to send the POST request.
-   * @param payload    The JSON body of the request.
-   * @param options    The options for the request (see IRequestOptions).
+   * @param path        The path to send the POST request.
+   * @param payload     The JSON body of the request.
+   * @param options     The options for the request.
    */
-  post = async <T, P extends Http.Payload = Http.Payload>(
-    url: Http.V1Url,
-    payload?: P,
+  post = async <T, PL extends Http.Payload = Http.Payload>(
+    path: Http.V1Url,
+    payload?: PL,
     options?: Http.RequestOptions
   ): Promise<T> => {
-    return this.request<T>(HttpRequestMethods.POST, url, {}, payload, options);
+    return this._request<T>(HttpRequestMethods.POST, path, {}, payload, options);
+  };
+
+  /**
+   * Sends a DELETE request to the provided path.
+   *
+   * @param path        The path to send the DELETE request.
+   * @param options     The options for the request.
+   */
+  delete = async <T>(path: Http.V1Url, options?: Http.RequestOptions): Promise<T> => {
+    return this._request<T>(HttpRequestMethods.DELETE, path, {}, {}, options);
+  };
+
+  /**
+   * Sends a PATCH request to the provided path.
+   *
+   * @param path        The path to send the PATCH request.
+   * @param payload     The JSON body of the request.
+   * @param options     The options for the request.
+   */
+  patch = async <T, PL extends Partial<Http.Payload> = Partial<Http.Payload>>(
+    path: Http.V1Url,
+    payload?: PL,
+    options?: Http.RequestOptions
+  ): Promise<T> => {
+    return this._request(HttpRequestMethods.PATCH, path, {}, payload, options);
   };
 
   upload = async <T, P extends Http.Payload = Http.Payload>(
@@ -203,32 +221,6 @@ export class ApiClient {
   ): Promise<AxiosResponse<T>> => {
     url = this._prepare_url(url, HttpRequestMethods.POST);
     return this.instance.post(url, payload, options);
-  };
-
-  /**
-   * Sends a DELETE request to the provided URL.
-   *
-   * @param url        The URL to send the DELETE request.
-   * @param payload    The JSON body of the request.
-   * @param options    The options for the request (see IRequestOptions).
-   */
-  delete = async <T>(url: Http.V1Url, options?: Http.RequestOptions): Promise<T> => {
-    return this.request<T>(HttpRequestMethods.DELETE, url, {}, {}, options);
-  };
-
-  /**
-   * Sends a PATCH request to the provided URL.
-   *
-   * @param url        The URL to send the PATCH request.
-   * @param payload    The JSON body of the request.
-   * @param options    The options for the request (see IRequestOptions).
-   */
-  patch = async <T, P extends Partial<Http.Payload> = Partial<Http.Payload>>(
-    url: Http.V1Url,
-    payload?: P,
-    options?: Http.RequestOptions
-  ): Promise<T> => {
-    return this.request(HttpRequestMethods.PATCH, url, {}, payload, options);
   };
 }
 

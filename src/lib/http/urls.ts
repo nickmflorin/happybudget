@@ -1,16 +1,16 @@
-import { forEach, isNil, reduce } from "lodash";
+import { forEach, isNil, reduce, includes } from "lodash";
 
 /**
- * Parses the provided URL and returns the query parameters in the URL as
- * an object.
+ * Parses the query parameters from the provided URL and returns the query
+ * parameters as an object.
+ *
  * @param url The URL for which we want to get the query parameters from.
  */
-export const getQueryParams = (url: string): Record<string, string> => {
-  const queryParams: Record<string, string> = {};
-
+ export const getQueryParams = (url: string): Record<string, string> => {
   const anchor = document.createElement("a");
   anchor.href = url;
 
+  const queryParams: Record<string, string> = {};
   const queryStrings = anchor.search.substring(1);
   if (queryStrings !== "") {
     const params = queryStrings.split("&");
@@ -22,35 +22,50 @@ export const getQueryParams = (url: string): Record<string, string> => {
   return queryParams;
 };
 
+type QueryParamsExclusion = Http.QueryParamValue[] | ((v: Http.QueryParamValue) => boolean);
+
+type AddQueryParamsToUrlOptions = {
+  readonly exclude: QueryParamsExclusion;
+};
+
 /**
- * Adds the provided query parameters to the URL, merging the existing query
- * parameters with the provided query parameters if applicable.
+ * Adds the provided query parameters to the provided URL, accounting for query
+ * parameters that may already exist on the provided URL.  The provided query
+ * parameters will be merged with existing query parameters on the URL (if
+ * they exist).
  *
- * @param url The URL for which we want to add the provided query parameters to.
- * The URL can already contain query parameters, and the provided query parameters
- * will be merged with the exiting ones.
- * @param object The query parameters to add to the URL as an object.
+ * @param url      The URL for which we want to add the provided query parameters
+ *                 to.  The URL can already contain query parameters, and the
+ *                 provided query parameters will be merged with the existing
+ *                 ones.
+ * @param query    The query parameters to add to the URL as an object.
+ * @param options  Options that can be supplied to to the method.  This includes
+ *                 a `filter` option, which is responsible for removing query
+ *                 parameters (or not including them) if they meet the filter
+ *                 criteria.
  */
 export const addQueryParamsToUrl = (
   url: string,
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  query: Record<string, any> = {},
-  options: { filter: (string | number)[] } = { filter: [] }
+  query: Http.Query = {},
+  options?: AddQueryParamsToUrlOptions
 ): string => {
   const existingQuery = getQueryParams(url);
   const newQuery = query || {};
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  const mergedQuery: Record<string, any> = { ...existingQuery, ...newQuery };
+  const mergedQuery: Http.Query = { ...existingQuery, ...newQuery };
 
   const urlParams = new URLSearchParams();
-  forEach(mergedQuery, (value: Record<string, string>, key: string) => {
+  forEach(mergedQuery, (value: Http.QueryParamValue, key: string) => {
+    // Automatically exclude null or undefined values from the query string.
     if (!isNil(value)) {
-      if (typeof value === "string" || typeof value === "number") {
-        if (isNil(options.filter) || !options.filter.includes(value)) {
-          urlParams.append(key, String(value));
+      /* Even though this is typed to always be the case, we perform a runtime
+         check here and log if it fails. */
+      if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+        const exclusion: QueryParamsExclusion = options?.exclude || [];
+        if (typeof exclusion === "function" ? exclusion(value) !== true : !includes(exclusion, value)) {
+          urlParams.append(key, encodeURIComponent(value));
         }
       } else {
-        urlParams.append(key, String(value));
+        console.warn(`Invalid value ${String(value)} provided as a query parameter to URL.`);
       }
     }
   });
