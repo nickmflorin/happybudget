@@ -83,10 +83,12 @@ declare type InferExistingNotificationParams<T> = T extends UIExistingNotificati
 
 declare type FieldWithErrors = { readonly name: string; readonly errors: string[] };
 
-declare type InternalNotification = AppNotification<"error" | "warning"> & {
+declare type InternalNotificationObj = AppNotification<"error" | "warning"> & {
   readonly dispatchToSentry?: boolean;
   readonly error?: Error;
 };
+
+declare type InternalNotification = InternalNotificationObj | Error | string;
 
 declare type UINotificationsHandler = {
   readonly getNotifications: (
