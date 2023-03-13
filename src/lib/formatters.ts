@@ -1,7 +1,10 @@
 import { Moment } from "moment";
 import { toDisplayDate } from "./util/dates";
 
-type Fmt<T extends string | number | Moment = string | number> = (v: T, opts: FormatterOpts<T>) => string;
+type Fmt<T extends string | number | Moment = string | number> = (
+  v: T,
+  opts: FormatterOpts<T>,
+) => string;
 
 type PARAMS<T extends string | number | Moment = string | number> =
   | FormatterParams<T>
@@ -10,39 +13,43 @@ type PARAMS<T extends string | number | Moment = string | number> =
 
 type RT<
   T extends string | number | Moment = string | number,
-  P extends PARAMS<T> = PARAMS<T>
+  P extends PARAMS<T> = PARAMS<T>,
 > = P extends FormatterParams<T> ? string : Formatter<T>;
 
 const isFormatterCallbackOpts = <T extends string | number | Moment = string | number>(
-  p: PARAMS<T>
-): p is FormatterCalbackOpts<T> => p !== null && (p as FormatterCalbackOpts<T>).onError !== undefined;
+  p: PARAMS<T>,
+): p is FormatterCalbackOpts<T> =>
+  p !== null && (p as FormatterCalbackOpts<T>).onError !== undefined;
 
 const isFormatterErrorValueOpts = <T extends string | number | Moment = string | number>(
-  p: PARAMS<T>
-): p is FormatterErrorValueOpts => p !== null && (p as FormatterErrorValueOpts).errorValue !== undefined;
+  p: PARAMS<T>,
+): p is FormatterErrorValueOpts =>
+  p !== null && (p as FormatterErrorValueOpts).errorValue !== undefined;
 
-const isFormatterOpts = <T extends string | number | Moment = string | number>(p: PARAMS<T>): p is FormatterOpts<T> =>
-  isFormatterCallbackOpts(p) || isFormatterErrorValueOpts(p);
+const isFormatterOpts = <T extends string | number | Moment = string | number>(
+  p: PARAMS<T>,
+): p is FormatterOpts<T> => isFormatterCallbackOpts(p) || isFormatterErrorValueOpts(p);
 
 const isFormatterParams = <T extends string | number | Moment = string | number>(
-  p: PARAMS<T>
+  p: PARAMS<T>,
 ): p is FormatterParams<T> => typeof p !== "function" && !isFormatterOpts(p);
 
-const isErrorHandler = <T extends string | number | Moment = string | number>(p: PARAMS<T>): p is OnFormatError<T> =>
-  typeof p === "function";
+const isErrorHandler = <T extends string | number | Moment = string | number>(
+  p: PARAMS<T>,
+): p is OnFormatError<T> => typeof p === "function";
 
 export const isAgFormatterParams = <T extends string | number | Moment = string | number>(
-  params: NativeFormatterParams<T> | AGFormatterParams
+  params: NativeFormatterParams<T> | AGFormatterParams,
 ): params is AGFormatterParams => params !== null && typeof params === "object";
 
 const formatAs = <
   T extends string | number | Moment = string | number,
   O extends FormatterOpts<T> = FormatterOpts<T>,
-  P extends PARAMS<T> = PARAMS<T>
+  P extends PARAMS<T> = PARAMS<T>,
 >(
   fmt: Fmt<T>,
   fmtType: FormatType,
-  p: P
+  p: P,
 ): RT<T, P> => {
   const valuedFormatter = (params: FormatterParams<T>, options: O): string => {
     const v: T | null = isAgFormatterParams(params) ? params.value : params;
@@ -54,7 +61,7 @@ const formatAs = <
 
   if (isFormatterParams(p)) {
     return valuedFormatter(p, {
-      onError: (v: T) => console.error(`Could not parse value ${String(v)} into ${fmtType}!`)
+      onError: (v: T) => console.error(`Could not parse value ${String(v)} into ${fmtType}!`),
     } as O) as RT<T, P>;
   } else if (isErrorHandler(p)) {
     const opts = { onError: p } as O;
@@ -78,7 +85,7 @@ export const currencyFormatter = <P extends PARAMS<string | number>>(params: P) 
       return numericValue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
     },
     "currency",
-    params
+    params,
   );
 
 export const percentageFormatter = <P extends PARAMS<string | number>>(params: P) =>
@@ -95,7 +102,7 @@ export const percentageFormatter = <P extends PARAMS<string | number>>(params: P
       return Number(v).toLocaleString(undefined, { style: "percent", minimumFractionDigits: 2 });
     },
     "percentage",
-    params
+    params,
   );
 
 export const phoneNumberFormatter = <P extends PARAMS<string | number>>(params: P) =>
@@ -133,7 +140,7 @@ export const phoneNumberFormatter = <P extends PARAMS<string | number>>(params: 
       }
     },
     "phoneNumber",
-    params
+    params,
   );
 
 export const dateFormatter = <P extends PARAMS<string | Moment>>(params: P) =>
@@ -150,7 +157,7 @@ export const dateFormatter = <P extends PARAMS<string | Moment>>(params: P) =>
       return formatted;
     },
     "percentage",
-    params
+    params,
   );
 
 export const titleCaseFormatter = <P extends PARAMS<string>>(params: P) =>
@@ -160,5 +167,5 @@ export const titleCaseFormatter = <P extends PARAMS<string>>(params: P) =>
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
       }),
     "percentage",
-    params
+    params,
   );

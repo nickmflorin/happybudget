@@ -17,7 +17,7 @@ export const useIsFirstRender = () => {
 
 export const useRefIfNotDefined = <T extends Record<string, unknown>>(
   hook: () => { current: T },
-  prop?: { current: T }
+  prop?: { current: T },
 ): { current: T } => {
   const ref = hook();
   const returnRef = useMemo(() => (!isNil(prop) ? prop : ref), [ref]);
@@ -28,7 +28,8 @@ export const useRefIfNotDefined = <T extends Record<string, unknown>>(
 export const useDynamicCallback = <T>(callback: (...args: any[]) => T) => {
   const ref = useRef<typeof callback>(callback);
   ref.current = callback;
-  const func: typeof callback = (...args: Parameters<typeof callback>) => ref.current.apply(this, args);
+  const func: typeof callback = (...args: Parameters<typeof callback>) =>
+    ref.current.apply(this, args);
   return useCallback(func, []);
 };
 
@@ -39,7 +40,7 @@ export const deepCompareFn = (method?: DeepEqualCheck) => {
   return {
     lodash: isEqual,
     dequal: deepEqual,
-    fast: equal
+    fast: equal,
   }[method];
 };
 
@@ -48,8 +49,10 @@ export const deepCompare = (a: any, b: any, method?: DeepEqualCheck) => {
   return deepCompareFn(method)(a, b);
 };
 
-export const deepMemo = (c: React.ComponentType<Record<string, unknown>>, method?: DeepEqualCheck) =>
-  React.memo(c, deepCompareFn(method));
+export const deepMemo = (
+  c: React.ComponentType<Record<string, unknown>>,
+  method?: DeepEqualCheck,
+) => React.memo(c, deepCompareFn(method));
 
 export const useDeepEqualMemoDeps = (value: DependencyList, method?: DeepEqualCheck) => {
   const ref = useRef<DependencyList>();
@@ -61,7 +64,10 @@ export const useDeepEqualMemoDeps = (value: DependencyList, method?: DeepEqualCh
   return [signalRef.current];
 };
 
-export const useDeepEqualEffect = (callback: EffectCallback, dependencies: DependencyList): UseEffectReturn => {
+export const useDeepEqualEffect = (
+  callback: EffectCallback,
+  dependencies: DependencyList,
+): UseEffectReturn => {
   return useEffect(callback, useDeepEqualMemoDeps(dependencies));
 };
 
