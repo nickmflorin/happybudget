@@ -1,9 +1,4 @@
 import React, { useMemo, useEffect } from "react";
-import { map, isNil, cloneDeep } from "lodash";
-import classNames from "classnames";
-
-import { AgGridReact } from "@ag-grid-community/react";
-import { AllModules, ColSpanParams } from "@ag-grid-enterprise/all-modules";
 import {
   EditableCallbackParams,
   CellClassParams,
@@ -23,9 +18,13 @@ import {
   PasteEndEvent,
   PasteStartEvent,
   ProcessDataFromClipboardParams,
-  ValueGetterParams
+  ValueGetterParams,
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
+import { AgGridReact } from "@ag-grid-community/react";
+import { AllModules, ColSpanParams } from "@ag-grid-enterprise/all-modules";
+import classNames from "classnames";
+import { map, isNil, cloneDeep } from "lodash";
 
 import * as config from "config";
 import { tabling, hooks, util } from "lib";
@@ -71,11 +70,16 @@ type UseAgProps<R extends Table.RowData> = Omit<Table.AgGridProps, OverriddenAgP
   readonly onPasteEnd?: (event: PasteEndEvent) => void;
   readonly onCellValueChanged?: (e: CellValueChangedEvent) => void;
   readonly fillOperation?: (params: FillOperationParams) => boolean;
-  readonly getContextMenuItems?: (row: Table.BodyRow<R>, node: Table.RowNode) => Table.MenuItemDef[];
+  readonly getContextMenuItems?: (
+    row: Table.BodyRow<R>,
+    node: Table.RowNode,
+  ) => Table.MenuItemDef[];
 };
 
-export interface GridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
-  extends UseAgProps<R> {
+export interface GridProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+> extends UseAgProps<R> {
   readonly id: Table.GridId;
   readonly apis: Table.GridApis | null;
   readonly tableId: string;
@@ -120,14 +124,15 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
           headerComponentParams: { ...col.headerComponentParams, column: col },
           cellRendererParams: { ...col.cellRendererParams, columns, customCol: col, gridId: id },
           hide: hidden,
-          resizable: index === columns.length - 1 ? false : !isNil(col.resizable) ? col.resizable : true,
+          resizable:
+            index === columns.length - 1 ? false : !isNil(col.resizable) ? col.resizable : true,
           cellStyle: tabling.columns.isDataColumn(col)
             ? !isNil(col.dataType)
               ? { ...tabling.columns.getColumnTypeCSSStyle(col.dataType), ...col.cellStyle }
               : col.cellStyle
-            : col.cellStyle
+            : col.cellStyle,
         };
-      }
+      },
     );
     return !isNil(checkboxColumn)
       ? util.updateInArray<Table.RealColumn<R, M>>(cs, { colId: "checkbox" }, checkboxColumn)
@@ -151,7 +156,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
                       col,
                       row,
                       tabling.aggrid.getRows<R, Table.BodyRow<R>>(params.api),
-                      "aggrid"
+                      "aggrid",
                     );
                   }
                 }
@@ -169,7 +174,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
             !isNil(col.colSpan)
               ? col.colSpan({
                   ...params,
-                  columns: localColumns
+                  columns: localColumns,
                 })
               : 1,
           editable: (params: EditableCallbackParams) => {
@@ -189,17 +194,22 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
                   ? col.selectable({ row })
                   : col.selectable
                 : tabling.columns.isCalculatedColumn(col);
-              return tabling.aggrid.mergeClassNames<CellClassParams>(params, "cell", col.cellClass, {
-                "cell--not-selectable": isSelectable === false
-              });
+              return tabling.aggrid.mergeClassNames<CellClassParams>(
+                params,
+                "cell",
+                col.cellClass,
+                {
+                  "cell--not-selectable": isSelectable === false,
+                },
+              );
             }
             return tabling.aggrid.mergeClassNames<CellClassParams>(params, "cell", col.cellClass, {
-              "cell--not-selectable": true
+              "cell--not-selectable": true,
             });
-          }
-        })
+          },
+        }),
       ),
-    [hooks.useDeepEqualMemo(localColumns)]
+    [hooks.useDeepEqualMemo(localColumns)],
   );
 
   const navigateToNextCell = useMemo(
@@ -210,7 +220,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
         }
         return params.nextCellPosition || params.previousCellPosition;
       },
-    []
+    [],
   );
 
   const tabToNextCell = useMemo(
@@ -219,9 +229,11 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
         if (!isNil(props.tabToNextCell)) {
           return { ...props.tabToNextCell(params), rowPinned: null };
         }
-        return params.nextCellPosition === null ? params.previousCellPosition : params.nextCellPosition;
+        return params.nextCellPosition === null
+          ? params.previousCellPosition
+          : params.nextCellPosition;
       },
-    []
+    [],
   );
 
   const getRowStyle = useMemo(
@@ -229,7 +241,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
       !isNil(props.getRowStyle)
         ? (props.getRowStyle as (params: RowClassParams) => { [key: string]: string })
         : undefined,
-    [props.getRowStyle]
+    [props.getRowStyle],
   );
 
   /*
@@ -239,7 +251,10 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
 	the store.  This only becomes a problem since we are nestling the actual
 	underlying row data in a `data` property of the <Row> model.
   */
-  const rowData = useMemo(() => map(data, (r: Table.BodyRow<R>) => cloneDeep(r)), [hooks.useDeepEqualMemo(data)]);
+  const rowData = useMemo(
+    () => map(data, (r: Table.BodyRow<R>) => cloneDeep(r)),
+    [hooks.useDeepEqualMemo(data)],
+  );
 
   const getContextMenuItems = useMemo(
     () => (params: GetContextMenuItemsParams) => {
@@ -251,12 +266,13 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
       }
       return [];
     },
-    [props.getContextMenuItems]
+    [props.getContextMenuItems],
   );
 
   const getRowClass = useMemo(
-    () => (params: RowClassParams) => tabling.aggrid.mergeClassNames<RowClassParams>(params, "row", rowClass),
-    []
+    () => (params: RowClassParams) =>
+      tabling.aggrid.mergeClassNames<RowClassParams>(params, "row", rowClass),
+    [],
   );
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return */
@@ -280,7 +296,11 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
   }, [keyListeners, props.apis]);
 
   return (
-    <div id={`${tableId}-${id}`} className={classNames("ag-theme-alpine", "grid", className)} style={style}>
+    <div
+      id={`${tableId}-${id}`}
+      className={classNames("ag-theme-alpine", "grid", className)}
+      style={style}
+    >
       <AgGridReact
         headerHeight={38}
         cellFlashDelay={100}
@@ -307,8 +327,8 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
         columnDefs={colDefs}
         debug={config.env.TABLE_DEBUG}
         modules={AllModules}
-        overlayNoRowsTemplate={"<span></span>"}
-        overlayLoadingTemplate={"<span></span>"}
+        overlayNoRowsTemplate="<span></span>"
+        overlayLoadingTemplate="<span></span>"
         popupParent={
           localizePopupParent
             ? document.getElementById(tableId) || undefined

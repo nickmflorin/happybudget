@@ -18,7 +18,7 @@ type ConfigParserOptions = {
 };
 
 export const isParserFailedResult = <V extends ConfigValue>(
-  result: ConfigParserResult<V>
+  result: ConfigParserResult<V>,
 ): result is FailedConfigParserResult => typeof result === "object";
 
 const TRUTHY_VALUES = ["1", "true", "on"];
@@ -39,7 +39,7 @@ export const booleanParser =
           opts?.message ||
           (({ name }: ConfigMessageCallbackParams<string>) =>
             `Config ${name} value ${v} could not be converted to a boolean.`),
-        value: v
+        value: v,
       };
     }
   };

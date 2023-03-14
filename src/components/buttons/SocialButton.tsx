@@ -1,11 +1,9 @@
 import React from "react";
-import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
 import { isNil } from "lodash";
 
 import * as config from "config";
 
 import { ButtonProps } from "./Button";
-import GoogleAuthButton from "./GoogleAuthButton";
 
 type SocialButtonProps = ButtonProps & {
   readonly provider: "google";
@@ -15,15 +13,8 @@ type SocialButtonProps = ButtonProps & {
   readonly onGoogleScriptLoadFailure: (error: Record<string, unknown>) => void;
 };
 
-const isOfflineResponse = (
-  response: GoogleLoginResponse | GoogleLoginResponseOffline
-): response is GoogleLoginResponseOffline => {
-  return (
-    (response as GoogleLoginResponseOffline).code !== undefined &&
-    (response as GoogleLoginResponse).tokenId === undefined
-  );
-};
-
+// The package react-google-login is no longer maintained, and we will need to reimplement social
+// authentication without it.
 const SocialButton = ({
   provider,
   onGoogleSuccess,
@@ -39,28 +30,29 @@ const SocialButton = ({
     if (isNil(config.env.GOOGLE_CLIENT_KEY)) {
       return <></>;
     }
-    return (
-      <GoogleLogin
-        clientId={config.env.GOOGLE_CLIENT_KEY}
-        render={(p: { onClick: () => void; disabled?: boolean }) => (
-          <GoogleAuthButton {...props} onClick={p.onClick} disabled={p.disabled} />
-        )}
-        onSuccess={(response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
-          /* In the case that the response is GoogleLoginResponseOffline, the
-						 response will just be { code: xxx } that can be used to obtain a
-						 refresh token from the server.  This should be implemented at some
-						 point. */
-          if (isOfflineResponse(response)) {
-            console.error(`Received offline response with code ${response.code}.`);
-          } else {
-            onGoogleSuccess(response.tokenId);
-          }
-        }}
-        onFailure={(response: Record<string, unknown>) => onGoogleError(response)}
-        onScriptLoadFailure={(error: Record<string, unknown>) => onGoogleScriptLoadFailure(error)}
-        cookiePolicy={"single_host_origin"}
-      />
-    );
+    return <></>;
+    // return (
+    //   <GoogleLogin
+    //     clientId={config.env.GOOGLE_CLIENT_KEY}
+    //     render={(p: { onClick: () => void; disabled?: boolean }) => (
+    //       <GoogleAuthButton {...props} onClick={p.onClick} disabled={p.disabled} />
+    //     )}
+    //     onSuccess={(response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
+    //       /* In the case that the response is GoogleLoginResponseOffline, the
+    // 				 response will just be { code: xxx } that can be used to obtain a
+    // 				 refresh token from the server.  This should be implemented at some
+    // 				 point. */
+    //       if (isOfflineResponse(response)) {
+    //         console.error(`Received offline response with code ${response.code}.`);
+    //       } else {
+    //         onGoogleSuccess(response.tokenId);
+    //       }
+    //     }}
+    //     onFailure={(response: Record<string, unknown>) => onGoogleError(response)}
+    //     onScriptLoadFailure={(error: Record<string, unknown>) => onGoogleScriptLoadFailure(error)}
+    //     cookiePolicy={"single_host_origin"}
+    //   />
+    // );
   }
   console.warn(`Unsupported social login provider ${provider as string}.`);
   return <></>;

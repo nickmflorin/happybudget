@@ -1,5 +1,5 @@
 import React, { ReactNode, useMemo } from "react";
-import { useHistory } from "react-router-dom";
+import { useRouter } from "next/router";
 import { map, isNil, reduce } from "lodash";
 import classNames from "classnames";
 
@@ -8,7 +8,7 @@ import { DropdownMenu } from "components/dropdowns";
 import { TooltipWrapper } from "components/tooltips";
 
 const isLazyBreadCrumbItem = <P extends Record<string, unknown> = Record<string, unknown>>(
-  item: IBreadCrumbItem | ILazyBreadCrumbItem<P>
+  item: IBreadCrumbItem | ILazyBreadCrumbItem<P>,
 ): item is ILazyBreadCrumbItem<P> => {
   return (item as ILazyBreadCrumbItem<P>).func !== undefined;
 };
@@ -23,8 +23,14 @@ type BreadCrumbGenericItemProps = StandardComponentProps & {
 };
 
 const BreadCrumbGenericItem = React.memo(
-  ({ tooltip, primary, suppressClickBehavior, url, ...props }: BreadCrumbGenericItemProps): JSX.Element => {
-    const history = useHistory();
+  ({
+    tooltip,
+    primary,
+    suppressClickBehavior,
+    url,
+    ...props
+  }: BreadCrumbGenericItemProps): JSX.Element => {
+    const router = useRouter();
     return (
       <div
         {...props}
@@ -34,7 +40,7 @@ const BreadCrumbGenericItem = React.memo(
             if (!isNil(props.onClick)) {
               props.onClick(e);
             } else if (!isNil(url)) {
-              history.push(url);
+              router.push(url);
             }
           }
         }}
@@ -42,7 +48,7 @@ const BreadCrumbGenericItem = React.memo(
         <TooltipWrapper tooltip={tooltip}>{props.children}</TooltipWrapper>
       </div>
     );
-  }
+  },
 );
 
 interface BreadCrumbItemProps extends StandardComponentProps {
@@ -60,7 +66,7 @@ const BreadCrumbItem = React.memo(({ item, ...props }: BreadCrumbItemProps): JSX
       }
       return <></>;
     },
-    []
+    [],
   );
 
   const renderDropdownButton = useMemo(
@@ -73,7 +79,7 @@ const BreadCrumbItem = React.memo(({ item, ...props }: BreadCrumbItemProps): JSX
         }
         return <></>;
       },
-    []
+    [],
   );
 
   return (
@@ -85,7 +91,11 @@ const BreadCrumbItem = React.memo(({ item, ...props }: BreadCrumbItemProps): JSX
       suppressClickBehavior={!isNil(item.options) && item.options.length !== 0}
     >
       {!isNil(item.options) && item.options.length !== 0 ? (
-        <DropdownMenu menuClassName={"bread-crumb-dropdown"} defaultSelected={[item.id]} models={item.options}>
+        <DropdownMenu
+          menuClassName={"bread-crumb-dropdown"}
+          defaultSelected={[item.id]}
+          models={item.options}
+        >
           {renderDropdownButton(item)}
         </DropdownMenu>
       ) : (
@@ -122,7 +132,8 @@ const BreadCrumbItems = React.memo(({ children }: BreadCrumbItemsProps): JSX.Ele
   }
 });
 
-interface BreadCrumbsProps<P extends Record<string, unknown> = Record<string, unknown>> extends StandardComponentProps {
+interface BreadCrumbsProps<P extends Record<string, unknown> = Record<string, unknown>>
+  extends StandardComponentProps {
   readonly items?: (IBreadCrumbItem | ILazyBreadCrumbItem<P>)[];
   readonly itemProps?: StandardComponentProps;
   readonly params?: { [key in keyof P]: P[keyof P] | null };
@@ -139,7 +150,12 @@ const BreadCrumbs = <P extends Record<string, unknown> = Record<string, unknown>
   const parametersPresent = useMemo(
     () =>
       (item: ILazyBreadCrumbItem<P>): [boolean, P] => {
-        if ((item.requiredParams.length !== 0 && !isNil(params) && Object.keys(params).length === 0) || isNil(params)) {
+        if (
+          (item.requiredParams.length !== 0 &&
+            !isNil(params) &&
+            Object.keys(params).length === 0) ||
+          isNil(params)
+        ) {
           return [false, {} as P];
         }
         let allRequiredParamsPresent = true;
@@ -153,11 +169,11 @@ const BreadCrumbs = <P extends Record<string, unknown> = Record<string, unknown>
               return { ...curr, [param]: params[param] };
             }
           },
-          {} as P
+          {} as P,
         );
         return [allRequiredParamsPresent, presentParamsObj];
       },
-    [params]
+    [params],
   );
 
   const preparedItems = useMemo((): IBreadCrumbItem[] | null => {

@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useReducer } from "react";
+
 import hoistNonReactStatics from "hoist-non-react-statics";
 import { map, isNil, filter, reduce } from "lodash";
 import { Subtract } from "utility-types";
@@ -9,12 +10,14 @@ import { tabling, hooks, util } from "lib";
 import * as genericColumns from "../columns";
 import { useHiddenColumns } from "../hooks";
 
+import * as test from "./publicizeDataGrid";
+
 export const DefaultDataGridOptions: Table.GridOptions = {
   defaultColDef: {
     resizable: true,
     sortable: false,
     filter: false,
-    suppressMovable: true
+    suppressMovable: true,
   },
   suppressHorizontalScroll: true,
   suppressContextMenu: config.env.TABLE_DEBUG,
@@ -23,7 +26,7 @@ export const DefaultDataGridOptions: Table.GridOptions = {
   suppressCopyRowsToClipboard: false,
   suppressClipboardPaste: false,
   enableFillHandle: true,
-  fillHandleDirection: "y"
+  fillHandleDirection: "y",
 };
 
 export const DefaultFooterGridOptions: Table.GridOptions = {
@@ -32,10 +35,10 @@ export const DefaultFooterGridOptions: Table.GridOptions = {
     sortable: false,
     filter: false,
     editable: false,
-    suppressMovable: true
+    suppressMovable: true,
   },
   suppressContextMenu: true,
-  suppressHorizontalScroll: true
+  suppressHorizontalScroll: true,
 };
 
 export type ConfiguredTableInjectedProps = {
@@ -48,10 +51,16 @@ export type ConfiguredTableInjectedProps = {
   readonly onFooterGridReady: (event: Table.GridReadyEvent) => void;
   readonly onPageGridReady: (event: Table.GridReadyEvent) => void;
   readonly onFirstDataRendered: (e: Table.FirstDataRenderedEvent) => void;
-  readonly changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange>, sizeToFit?: boolean) => void;
+  readonly changeColumnVisibility: (
+    changes: SingleOrArray<Table.ColumnVisibilityChange>,
+    sizeToFit?: boolean,
+  ) => void;
 };
 
-export type TableConfigurationProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
+export type TableConfigurationProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+> = {
   readonly tableId: string;
   readonly hideEditColumn?: boolean;
   readonly editColumn?: Table.PartialActionColumn<R, M>;
@@ -74,7 +83,10 @@ type SetApiAction = {
   };
 };
 
-const apisReducer = (state: tabling.TableApis = InitialAPIs, action: SetApiAction): tabling.TableApis => {
+const apisReducer = (
+  state: tabling.TableApis = InitialAPIs,
+  action: SetApiAction,
+): tabling.TableApis => {
   const newApis = state.clone();
   newApis.set(action.gridId, { grid: action.payload.api, column: action.payload.columnApi });
   return newApis;
@@ -83,7 +95,7 @@ const apisReducer = (state: tabling.TableApis = InitialAPIs, action: SetApiActio
 const InitialDataRenderedSet: Table.GridSet<boolean> = {
   data: false,
   footer: false,
-  page: false
+  page: false,
 };
 
 const useTrackGridDataRender = (): [Table.GridSet<boolean>, (gridId: Table.GridId) => void] => {
@@ -99,11 +111,15 @@ const useTrackGridDataRender = (): [Table.GridSet<boolean>, (gridId: Table.GridI
 const configureTable = <
   T extends ConfiguredTableInjectedProps,
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
 >(
-  Component: React.FunctionComponent<T>
-): React.FunctionComponent<Subtract<T, ConfiguredTableInjectedProps> & TableConfigurationProps<R, M>> => {
-  function WithConfigureTable(props: Subtract<T, ConfiguredTableInjectedProps> & TableConfigurationProps<R, M>) {
+  Component: React.FunctionComponent<T>,
+): React.FunctionComponent<
+  Subtract<T, ConfiguredTableInjectedProps> & TableConfigurationProps<R, M>
+> => {
+  function WithConfigureTable(
+    props: Subtract<T, ConfiguredTableInjectedProps> & TableConfigurationProps<R, M>,
+  ) {
     const [_apis, dispatchApis] = useReducer(apisReducer, InitialAPIs);
     const [rendered, gridDataRendered] = useTrackGridDataRender();
 
@@ -112,10 +128,11 @@ const configureTable = <
       columns: map(
         filter(
           props.columns,
-          (col: Table.Column<R, M>) => tabling.columns.isDataColumn(col) && col.canBeHidden !== false
-        ) as Table.DataColumn<R, M>[]
+          (col: Table.Column<R, M>) =>
+            tabling.columns.isDataColumn(col) && col.canBeHidden !== false,
+        ) as Table.DataColumn<R, M>[],
       ),
-      apis: _apis
+      apis: _apis,
     });
 
     const onGridReady = useMemo(
@@ -123,11 +140,14 @@ const configureTable = <
         dispatchApis({ gridId, payload: { api: e.api, columnApi: e.columnApi } });
         gridDataRendered(gridId);
       },
-      []
+      [],
     );
 
     const onDataGridReady = useMemo(() => (e: Table.GridReadyEvent) => onGridReady(e, "data"), []);
-    const onFooterGridReady = useMemo(() => (e: Table.GridReadyEvent) => onGridReady(e, "footer"), []);
+    const onFooterGridReady = useMemo(
+      () => (e: Table.GridReadyEvent) => onGridReady(e, "footer"),
+      [],
+    );
     const onPageGridReady = useMemo(() => (e: Table.GridReadyEvent) => onGridReady(e, "page"), []);
 
     const onFirstDataRendered = useMemo(
@@ -137,16 +157,14 @@ const configureTable = <
           const cols = event.columnApi.getAllDisplayedColumns();
           const width = reduce(
             cols,
-            (curr: number, c: Table.AgColumn) => {
-              return curr + c.getActualWidth();
-            },
-            0.0
+            (curr: number, c: Table.AgColumn) => curr + c.getActualWidth(),
+            0.0,
           );
           if (props.sizeToFit === true || (grid?.clientWidth && width < grid.clientWidth)) {
             event.api.sizeColumnsToFit();
           }
         },
-      []
+      [],
     );
 
     const tableGridOptions = useMemo((): Table.TableOptionsSet => {
@@ -160,7 +178,7 @@ const configureTable = <
 
     const hasEditColumn = useMemo(
       () => (props.hideEditColumn === true ? false : !isNil(props.editColumnConfig)),
-      [props.editColumnConfig, props.hideEditColumn]
+      [props.editColumnConfig, props.hideEditColumn],
     );
 
     const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
@@ -171,8 +189,9 @@ const configureTable = <
             cs,
             (c: Table.Column<R, M>) =>
               tabling.columns.isRealColumn(c) &&
-              tabling.columns.normalizedField<R, M>(c) === tabling.columns.normalizedField<R, M>(realColumns[0]),
-            { ...realColumns[0], pinned: "left" }
+              tabling.columns.normalizedField<R, M>(c) ===
+                tabling.columns.normalizedField<R, M>(realColumns[0]),
+            { ...realColumns[0], pinned: "left" },
           );
         }
         return cs;
@@ -191,12 +210,12 @@ const configureTable = <
 								 level. */
               cellRendererParams: {
                 ...props.editColumn?.cellRendererParams,
-                editColumnConfig: props.editColumnConfig
-              }
+                editColumnConfig: props.editColumnConfig,
+              },
             },
-            props.editColumnWidth
+            props.editColumnWidth,
           ),
-          ...cols
+          ...cols,
         ];
       }
       return cols;

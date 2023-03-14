@@ -1,9 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "baseUrl": "src",
-    "types": ["node"],
-    "typeRoots": ["./src/types/"],
+    "baseUrl": "./src",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -18,7 +16,7 @@
     "jsx": "preserve",
     "incremental": true
   },
-  "include": ["src"],
+  "include": ["next-env.d.ts", "additional-env.d.ts", "src"],
   "exclude": ["node_modules"],
   "files": ["node_modules/jest-expect-message/types/index.d.ts"]
 }

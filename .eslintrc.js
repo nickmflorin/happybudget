@@ -1,10 +1,11 @@
 /*
 Non-language specific extensions that should be used for all files in the application.  If
 additional extensions are added, they need to go after `next/core-web-vitals` but before `prettier`.
-Includes Next.js' base ESLint configuration along with a stricter Core Web Vitals rule-set.  The
-"next/core-web-vitals" base configuration is stricter than the less strict base configuration
+
+The "next/core-web-vitals" base configuration is stricter than the less strict base configuration
 "next".  The "next/core-web-vitals" includes "eslint-plugin-react", "eslint-plugin-react-hooks"
-and "eslint-plugin-next".
+and "eslint-plugin-next" - along with other less notable plugins such as eslint-plugin-import.
+
 See https://nextjs.org/docs/basic-features/eslint for more information.
 */
 const EXTENSIONS = ["next/core-web-vitals", "prettier"];
@@ -12,90 +13,84 @@ const EXTENSIONS = ["next/core-web-vitals", "prettier"];
 const modifyExtensions = (...insert) =>
   insert === undefined ? EXTENSIONS : [EXTENSIONS[0], ...insert, ...EXTENSIONS.slice(1)];
 
-// const FIRST_INTERNAL_MODULE_GROUP = ["api", "lib", "store", "config", "style"];
+const GENERIC_INTERNAL_MODULE_GROUP = ["api", "lib", "internal", "store", "config", "core"];
+const COMPONENT_INTERNAL_MODULE_GROUP = ["app", "components", "tabling", "style"];
+const INTERNAL_MODULES = [...GENERIC_INTERNAL_MODULE_GROUP, ...GENERIC_INTERNAL_MODULE_GROUP];
 
-// // Components and styles should always be the last absolute imports.
-// const SECOND_INTERNAL_MODULE_GROUP = ["app", "components", "tabling", "styles"];
+console.log(process.env);
+const pathGroupPattern = packages =>
+  `{${packages.reduce((prev, v) => [...prev, `${v}`, `${v}/**`], []).join(",")}}`;
 
-// const INTERNAL_MODULES = [...FIRST_INTERNAL_MODULE_GROUP, ...SECOND_INTERNAL_MODULE_GROUP];
+const IMPORT_ORDER_CONFIG = {
+  groups: ["builtin", "external", "type", "internal", ["parent", "sibling"], "index", "object"],
+  "newlines-between": "always",
+  warnOnUnassignedImports: true,
+  distinctGroup: false,
+  pathGroupsExcludedImportTypes: ["react", "next"],
+  pathGroups: [
+    {
+      pattern: pathGroupPattern(["react", "next", "react-dom"]),
+      group: "builtin",
+      position: "before",
+    },
+    {
+      // Keep external UI and component related imports separate from generic external imports.
+      pattern: pathGroupPattern(["antd", "@ag-grid-*", "@fortawesome", "@nivo"]),
+      group: "external",
+      position: "after",
+    },
+    {
+      pattern: "{../*}",
+      group: "sibling",
+      position: "before",
+    },
+    {
+      pattern: "{./*}",
+      group: "sibling",
+      position: "after",
+    },
+    {
+      pattern: pathGroupPattern(GENERIC_INTERNAL_MODULE_GROUP),
+      group: "internal",
+      position: "before",
+    },
+    {
+      pattern: pathGroupPattern(COMPONENT_INTERNAL_MODULE_GROUP),
+      group: "internal",
+      position: "before",
+    },
+  ],
+  alphabetize: {
+    order: "asc",
+    caseInsensitive: true,
+    orderImportKind: "asc",
+  },
+};
 
-// /* Configuration for the 'import/order' ESLint rule.
-//    Note that eslint-plugin-import is provided for us out of the box via 'next/core-web-vitals'. */
-// const IMPORT_ORDER_CONFIG = {
-//   groups: [["builtin", "external"], "type", "internal", ["parent", "sibling"], "index", "object"],
-//   "newlines-between": "always",
-//   warnOnUnassignedImports: true,
-//   pathGroupsExcludedImportTypes: ["react", "next"],
-//   pathGroups: [
-//     {
-//       pattern: "{react,next,next/**}",
-//       group: "builtin",
-//       position: "before",
-//       distinctGroup: false,
-//     },
-//     /* Defining relative imports in the manner established by the next two pathGroups allows us to
-//        treat them as being apart of the same group but still be ordered based on parent child
-//        relationships. */
-//     {
-//       pattern: "{../*}",
-//       group: "sibling",
-//       position: "before",
-//       distinctGroup: false,
-//     },
-//     {
-//       pattern: "{./*}",
-//       group: "sibling",
-//       position: "after",
-//       distinctGroup: false,
-//     },
-//     {
-//       pattern: `{${FIRST_INTERNAL_MODULE_GROUP.reduce(
-//         (prev, v) => [...prev, `${v}`, `${v}/**`],
-//         [],
-//       ).join(",")}}`,
-//       group: "internal",
-//       position: "before",
-//       distinctGroup: false,
-//     },
-//     {
-//       pattern: `{${SECOND_INTERNAL_MODULE_GROUP.reduce(
-//         (prev, v) => [...prev, `${v}`, `${v}/**`],
-//         [],
-//       ).join(",")}}`,
-//       group: "internal",
-//       position: "before",
-//       distinctGroup: false,
-//     },
-//   ],
-//   alphabetize: {
-//     order: "asc",
-//     caseInsensitive: true,
-//   },
-// };
+const RESTRICTED_IMPORT_PATTERNS = [
+  {
+    group: ["lib/*", "!lib/compat"],
+    message: "Imports from lib must use namespaces.",
+  },
+  {
+    group: ["internal/*"],
+    message: "Imports from internal must use namespaces.",
+  },
+  {
+    group: ["components/*/*"],
+    message: "Components must be imported from modules.",
+  },
+  {
+    /* Importing from root level modules with relative imports (i.e. "../components" or "../lib")
+       is not allowed as it can lead to circular imports. */
+    group: INTERNAL_MODULES.reduce((prev, v) => [...prev, `../${v}`, `../*/${v}`], []),
+    message:
+      "When outside of the module, absolute imports must be used to import from that module.",
+  },
+];
 
-// const RESTRICTED_IMPORT_PATTERNS = [
-//   {
-//     group: ["lib/*", "!lib/support", "!lib/compat"],
-//     message: "Imports from lib must use namespaces.",
-//   },
-//   {
-//     group: ["components/*/*"],
-//     message: "Components must be imported from modules.",
-//   },
-//   {
-//     /* Importing from root level modules with relative imports (i.e. "../components" or "../lib")
-//        is not allowed as it can lead to circular imports. */
-//     group: INTERNAL_MODULES.reduce((prev, v) => [...prev, `../${v}`, `../*/${v}`], []),
-//     message: "When outside of the module, absolute imports must be used for the directory.",
-//   },
-//   {
-//     group: ["prisma/generated"],
-//     message: "Imports from Prisma generated files are not allowed.",
-//   },
-// ];
-
-/* The non-language specific ESLint and/or Prettier rules that apply to all files in the
-   application, regardless of file type or language. */
+/* The non-language specific rules that apply to all files in the application, regardless of file
+   type or language. */
 const BASE_RULES = {
   quotes: [1, "double"],
   semi: [1, "always"],
@@ -104,8 +99,8 @@ const BASE_RULES = {
   "max-len": [
     "warn",
     {
-      code: 120,
-      comments: 100, // Prettier will "generally strive" to wrap code but not comments at 100
+      code: 100,
+      comments: 100,
       tabWidth: 2,
       ignoreUrls: true,
       ignoreTemplateLiterals: true,
@@ -122,17 +117,9 @@ const BASE_RULES = {
   "import/no-duplicates": "error",
   "import/newline-after-import": ["error"],
   "import/no-useless-path-segments": ["error", { noUselessIndex: true }],
-  // "import/order": ["error", IMPORT_ORDER_CONFIG],
-  // "no-restricted-imports": ["error", { patterns: RESTRICTED_IMPORT_PATTERNS }],
-  "no-console": "off",
-  "no-restricted-syntax": [
-    "warn",
-    {
-      selector:
-        "CallExpression[callee.object.name='console'][callee.property.name!=/^(warn|error|info)$/]",
-      message: "This property on console is not allowed.",
-    },
-  ],
+  "no-console": "error",
+  "import/order": ["error", IMPORT_ORDER_CONFIG],
+  "no-restricted-imports": ["error", { patterns: RESTRICTED_IMPORT_PATTERNS }],
 };
 
 const TS_BASE_RULES = {
@@ -154,7 +141,7 @@ module.exports = {
   extends: EXTENSIONS,
   rules: BASE_RULES,
   // The "!.*" is included such that ESLint doesn't (by default) ignore files that start with ".".
-  ignorePatterns: ["!.*", "package.json", "package-lock.json"],
+  ignorePatterns: ["next-env.d.ts", "!.*", "package.json", "package-lock.json"],
   overrides: [
     {
       files: ["**/*.ts", "**/*.tsx"],
@@ -162,7 +149,7 @@ module.exports = {
       rules: TS_BASE_RULES,
     },
     {
-      files: ["**/*.test.ts", "**/*.test.tsx", "**/__tests__/utils/*"],
+      files: ["**/*.test.ts", "**/*.test.tsx", "**/tests/utils/*"],
       extends: modifyExtensions("plugin:@typescript-eslint/recommended"),
       rules: {
         ...TS_BASE_RULES,
@@ -170,8 +157,8 @@ module.exports = {
         "@typescript-eslint/no-var-requires": 0,
         /* Importing from components or lib without using a namespace is often times necessary in
            tests because the test is testing a function or component that is not exported outside
-        //    of the module in a namespace because it is not needed outside of the module.  */
-        // "no-restricted-imports": ["error", { patterns: RESTRICTED_IMPORT_PATTERNS.slice(2) }],
+           of the module in a namespace because it is not needed outside of the module.  */
+        "no-restricted-imports": ["error", { patterns: RESTRICTED_IMPORT_PATTERNS.slice(2) }],
       },
     },
     {

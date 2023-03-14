@@ -8,6 +8,10 @@ import reportWebVitals from "./reportWebVitals";
 
 import * as env from "./env";
 
+/*
+Note: It is extremely important that the config module does not export from "./fontAwesome" in the
+index file here.
+*/
 export { default as componentLoader } from "./componentLoader";
 export { default as lazyWithRetry } from "./lazyWithRetry";
 export { default as registerIcons } from "./configureFontAwesome";
@@ -16,6 +20,7 @@ export * from "./constants";
 export * as env from "./env";
 export * as parsers from "./parsers";
 export * as localization from "./localization";
+export * from "./pages";
 
 let prevPath: string | null = null;
 
@@ -54,7 +59,7 @@ const configureApplication = (history: History) => {
     whyDidYouRender(React, {
       trackAllPureComponents: true,
       trackHooks: true,
-      trackExtraHooks: [[require("react-redux/lib"), "useSelector"]]
+      trackExtraHooks: [[require("react-redux/lib"), "useSelector"]],
     });
   }
 };

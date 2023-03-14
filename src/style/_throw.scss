@@ -1,0 +1,211 @@
+/*
+The contents of this file represent an adaptation of the `error` function, `error` mixin and related
+functionality that are exposed as a part of the "sass-true" testing package.  The "sass-true"
+implementations are internalized and extended for the following reasons:
+1. There are frequent, confusing and problematic import issues involving imports from the `throw`
+   module of "sass-true".  The import treatment seems to differ between test and non-test
+   environments, and has been difficult to work around.  Since the logic that module contains is
+   very simple, it makes more sense to define it ourselves so we can tailor it to our needs.
+2. There are improvements we can make that better suit the context of this application.  These
+   improvements are entirely related to the inclusion of additional debugging information in
+   error messages to improve developer experiences and reduce the time required to diagnose and fix
+   an error in SASS.
+Background
+----------
+When we test functionality or mixins in SASS, the one thing that SASS does not support (at least not
+now) is the ability to test or assert that a given error is raised under the right conditions.  This
+was the intended purpose of "sass-true"'s `throw` module.  The `throw` module exposes an `error`
+function that is *returned* in logic it uses, rather than using `@error` directly.
+The reason this is important is that because if we can configure errors to be returned (instead of
+thrown) *only when in a test environment*, we can assert whether or not the function would have
+otherwise thrown an error because we can test if the error is the output of the function.  This
+works because the logic of the `throw.error` method, in both "sass-true" and here, will only use
+the `@error` directive if the `$catch-errors` global variable is not true.
+As such, controlling whether or not the error is thrown or returned is as simple as setting the
+`$catch-errors` variable to `true` in a testing environment.  If all thrown errors are funneled
+through the `error` method below, we will be able to assert in all tests whether or not a function
+threw an error under the right conditions.
+*/
+@use "sass:list";
+@use "sass:map";
+@use "sass:meta";
+
+$catch-errors: false !default;
+
+/// Safely formats the provided value for use in an error message.
+///
+/// Normally, when using string interpolation for error messages (or any other string for that
+/// matter), SASS will occasionally surface an error if the value being interpolated cannot be
+/// safely coerced to a string.  To avoid this, you can use SASS's `meta.inspect` method:
+///
+/// @function($unknown-var) {
+///   @error "This is an error with an interpolated #{meta.inspect($unknown-var)}.";
+/// }
+///
+/// However, when `meta.inspect` is used on primitive values, such as strings with quotes, it
+/// tends to format the values in unwanted ways.  For instance, it will format "value" as
+/// "\"value\"";
+///
+/// This method will only format the values using meta.inspect for certain variable types for which
+/// it is warranted.
+///
+/// @param {} $v
+///   The value that should be string formatted for an error message.
+@function string-fmt($v) {
+  $primitive: (bool, string, null, number, color, map, list);
+  @if list.index($primitive, meta.type-of($v)) {
+    @return $v;
+  }
+  @return meta.inspect($v);
+}
+
+/// Constructs a formatted error message with the provided base message, optionally provided context
+/// and an optionally provided source.
+///
+/// This function is an adapted form of "sass-true"'s `messages.message` function that is meant to
+/// be used in conjunction with debugging and error messages.  This implementation expands on the
+/// "sass-true" implementation by allowing contextual data to be provided and included in the
+/// outgoing message, which is incredibly useful for debugging errors in SASS.
+///
+/// Usage
+/// -----
+/// message(
+///   "The function failed because a value was invalid.",
+///   $context: ("value": 5px),
+///   $source: "my-function()"
+/// );
+/// "ERROR [my-function()]:
+///   The function failed because a value was invalid. [value = 5px (type is number)]
+///
+/// @param {string} $message
+///   The original error message that was provided in the call.  This message will be the main
+///   content of the returned, formatted message.
+///
+/// @param {map or null} $context
+///   An optional mapping of parameter names and values that should be included in the message.
+///
+/// @param {string or null} $source
+///   An optionally provided function or mixin name in which the error is being thrown inside of.
+@function message($message, $context: null, $source: null) {
+  $formatted: $message;
+  @if $context and list.length(map.keys($context)) != 0 {
+    $string-message: "[";
+    @for $i from 1 through list.length(map.keys($context)) {
+      $k: list.nth(map.keys($context), $i);
+      @if meta.type-of($k) != string {
+        @error "The keys of the error context must be of type string, but received key " +
+               "'#{string-fmt($k)}' with type '#{string-fmt(meta.type-of($k))}'.";
+      }
+      // Each contextual parameter should be included with its name and value.  Additionally, the
+      // data type of the parameter is included for debugging purposes.
+      $v: map.get($context, $k);
+      $string-message: $string-message +
+        "#{string-fmt($k)} = '#{string-fmt($v)}' "+"(type is '#{string-fmt(meta.type-of($v))})'";
+      @if $i != list.length(map.keys($context)) {
+        $string-message: $string-message + ", ";
+      }
+    }
+    $formatted: $message + " - " + $string-message + "]";
+  }
+  $prefix: if($source, "ERROR [#{$source}]:", "ERROR:");
+  @return $prefix + " " + $formatted;
+}
+
+/// Returns the contextual parameters for the message based on the arbitrary set of arguments the
+/// `error` method accepts.
+@function get-context($args...) {
+  $kwargs: meta.keywords($args);
+
+  @if map.has-key($kwargs, "context") {
+    @if meta.type-of(map.get($kwargs, "context")) != map {
+      @error "The error context must be a map, but a value of type " +
+             "#{string-fmt(meta.type-of(map.get($kwargs, "context")))} was provided.";
+    }
+    @return map.get($kwargs, "context");
+  } @else if list.length($args) != 0 and meta.type-of(list.nth($args, 1)) == map {
+    @return list.nth($args, 1);
+  }
+  $context: ();
+  @each $k in map.keys($kwargs) {
+    @if $k != "source" and $k != "catch" {
+      $context: map.set($context, $k, map.get($kwargs, $k));
+    }
+  }
+  @return $context;
+}
+
+/// The common method for throwing errors in SASS functions in the application.  In all cases where
+/// an error should be thrown, the function should make a call to this method and return the result.
+///
+/// See documentation at the beginning of the file for further understanding on the underlying
+/// purpose of this method, how it relates to test environments and why it should be used.
+///
+/// @param {string} $message
+///   The base error message that should be included in the resulting error that is thrown.
+///
+/// @param {$context} $map
+///   Additional, optional contextual parameters that should be included in the resulting error
+///   message that is thrown.  Including contextual parameters is highly useful for debugging
+///   purposes.
+///
+///   When a contextual parameter is included, the parameter name, value and type will be included
+///   in the error message.
+///
+///   Contextual parameters can be provided in any of the following forms:
+///
+///   1. The second argument to this method, as a map.
+///      error("...", ( param1: "foo", param2: "bar" ));
+///
+///   2. A "context" keyword argument, provided as a map:
+///      error("...", $source: "my-method()", $context: ( param1: "foo", param2: "bar" ));
+///
+///   3. Leftover keyword arguments, after $source and $catch are parsed:
+///      error("...", $param1: "foo", $param2: "bar" );
+///
+/// @param {string} $source
+///   An optionally provided function or mixin name in which the error is being thrown inside of.
+///
+/// @param {bool} $catch
+///   Forces the determination of whether or not the error should be thrown or returned regardless
+///   of the globally defined $catch-errors variable.
+///
+@function error($message, $args...) {
+  $kwargs: meta.keywords($args);
+  $source: map.get($kwargs, "source");
+  $catch: if(map.has-key($kwargs, "catch"), map.get($kwargs, "catch"), $catch-errors);
+
+  @if list.length($args) != 0 and list.length($args) != 1 {
+    $num-args: list.length($args) + 1; // Account for the first arg, the message.
+    @error "Only two positional arguments are allowed, but #{$num-args} were provided.";
+  }
+
+  $context: get-context($args...);
+
+  @if meta.type-of($catch) != bool and $catch != "error" {
+    @if meta.type-of($catch) == string and not $catch-is-level {
+      @error "The 'catch' argument must be a bool value or 'error', but a string value '#{$catch}' " +
+             "was provided.";
+    }
+    @error "The 'catch' argument must be a bool value or 'error', but a value of type " +
+             "'#{string-fmt(meta.type-of($catch))}' was provided.";
+  }
+  $message: message($message, $context, $source: $source);
+  @if $catch {
+    // When catching errors in a test environment, and returning them, we return a map with a key
+    // "ERROR" so that it is easier to test whether or not a general error was raised without
+    // having to match the error message for equality.
+    @return ("ERROR": $message);
+  }
+  @error $message;
+}
+
+/// A mixin that, when used, will cause an error constructed with the provided arguments to be
+/// thrown.  This mixin does not allow the `catch` parameter to be controlled on a case-by-case
+/// basis because a mixin does not return, making the intended purpose of using the `catch`
+/// parameter in effect pointless.
+@mixin error($message, $args...) {
+  @if map.get(meta.keywords($args), "catch") {
+    @error "Errors cannot be caught via a mixin.";
+  }
+  $_: error($message, $args...);
+}
